@@ -45,8 +45,8 @@ public:
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
-		, m_opna(*this, "opna")
-		, m_opn(*this, "opn")
+		, m_lspeaker(*this, "lspeaker")
+		, m_rspeaker(*this, "rspeaker")
 		, m_palette(*this, "palette")
 		, m_n80rom(*this, "n80rom")
 		, m_n88rom(*this, "n88rom")
@@ -56,7 +56,6 @@ public:
 	{ }
 
 	void pc8801(machine_config &config);
-	void pc8801mk2mr(machine_config &config);
 
 protected:
 	virtual void video_start() override;
@@ -82,8 +81,8 @@ protected:
 	required_device<upd1990a_device> m_rtc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
-	required_device<ym2608_device> m_opna;
-	required_device<ym2203_device> m_opn;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_n80rom;
 	required_region_ptr<u8> m_n88rom;
@@ -91,6 +90,17 @@ protected:
 	required_region_ptr<u8> m_kanji_rom;
 	required_region_ptr<u8> m_kanji_lv2_rom;
 
+	DECLARE_WRITE_LINE_MEMBER(int3_w);
+
+	struct mouse_t
+	{
+		uint8_t phase;
+		int8_t prev_dx, prev_dy;
+		uint8_t lx, ly;
+		attotime time;
+	};
+
+	mouse_t m_mouse;
 	uint8_t m_gfx_ctrl;
 
 private:
@@ -102,15 +112,6 @@ private:
 		uint8_t param[8][5];
 		uint8_t inverse;
 	};
-
-	struct mouse_t
-	{
-		uint8_t phase;
-		int8_t prev_dx, prev_dy;
-		uint8_t lx, ly;
-		attotime time;
-	};
-
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
@@ -138,12 +139,10 @@ private:
 	uint8_t m_txt_color;
 
 	crtc_t m_crtc;
-	mouse_t m_mouse;
 	struct { uint8_t r, g, b; } m_palram[8];
 	uint8_t m_dmac_ff;
 	uint32_t m_knj_addr[2];
 	uint32_t m_extram_size;
-	uint8_t m_has_opna;
 
 	uint8_t alu_r(offs_t offset);
 	void alu_w(offs_t offset, uint8_t data);
@@ -195,10 +194,10 @@ private:
 	void rtc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
-	uint8_t sound_board_r(offs_t offset);
-	void sound_board_w(offs_t offset, uint8_t data);
-	uint8_t opna_r(offs_t offset);
-	void opna_w(offs_t offset, uint8_t data);
+//	uint8_t sound_board_r(offs_t offset);
+//	void sound_board_w(offs_t offset, uint8_t data);
+//	uint8_t opna_r(offs_t offset);
+//	void opna_w(offs_t offset, uint8_t data);
 
 	uint8_t pixel_clock(void);
 	void dynamic_res_change(void);
@@ -218,7 +217,6 @@ private:
 	INTERRUPT_GEN_MEMBER(vrtc_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	bool m_vrtc_irq_mask;
 	bool m_timer_irq_mask;
@@ -229,16 +227,35 @@ private:
 	void cpu_8255_c_w(uint8_t data);
 	uint8_t fdc_8255_c_r();
 	void fdc_8255_c_w(uint8_t data);
+};
+
+class pc8801mk2sr_state : public pc8801_state
+{
+public:
+	pc8801mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc8801_state(mconfig, type, tag)
+		, m_opn(*this, "opn")
+	{ }
+
+	void pc8801mk2sr(machine_config &config);
+	void pc8801mk2mr(machine_config &config);
+
+protected:
+	virtual void main_io(address_map &map) override;
+
 	uint8_t opn_porta_r();
-	void opna_map(address_map &map);
+
+private:
+	optional_device<ym2203_device> m_opn;
 };
 
 // both FH and MH family bases sports selectable 8/4 MHz CPU clock switch
-class pc8801fh_state : public pc8801_state
+class pc8801fh_state : public pc8801mk2sr_state
 {
 public:
 	pc8801fh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc8801_state(mconfig, type, tag)
+		: pc8801mk2sr_state(mconfig, type, tag)
+		, m_opna(*this, "opna")
 	{ }
 
 	void pc8801fh(machine_config &config);
@@ -250,6 +267,9 @@ protected:
 	virtual attotime mouse_limit_hz() override;
 
 private:
+	required_device<ym2608_device> m_opna;
+	void opna_map(address_map &map);
+
 	uint8_t cpuclock_r();
 	uint8_t baudrate_r();
 	void baudrate_w(uint8_t data);

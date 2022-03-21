@@ -1101,6 +1101,7 @@ void pc8801_state::port40_w(uint8_t data)
 	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 		m_beeper->set_state(0);
 
+	// TODO: send to joyport implementation
 	if((m_device_ctrl_data & 0x40) != (data & 0x40))
 	{
 		attotime new_time = machine().time();
@@ -1199,11 +1200,10 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 {
 	m_misc_ctrl = data;
 
-	// TODO: need to propagate internally to the sound chip instead?
 	m_sound_irq_mask = ((data & 0x80) == 0);
-//	m_opna->address_w(0x29);
-//	m_opna->data_w((data & 0x80) == 0);
-//	m_opna->set_irq_mask((data & 0x80) == 0);
+//  m_opna->address_w(0x29);
+//  m_opna->data_w((data & 0x80) == 0);
+//  m_opna->set_irq_mask((data & 0x80) == 0);
 }
 
 /*
@@ -1466,6 +1466,7 @@ void pc8801_state::rtc_w(uint8_t data)
 	// TODO: remaining bits
 }
 
+#if 0
 uint8_t pc8801_state::sound_board_r(offs_t offset)
 {
 	if(m_has_opna)
@@ -1499,7 +1500,6 @@ void pc8801_state::opna_w(offs_t offset, uint8_t data)
 		// TODO: tied to second sound chip (noticeable in late doujinshi entries)
 		//m_sound_irq_mask = ((data & 0x80) == 0);
 
-#if 0
 		m_sound_irq_mask = ((data & 0x80) == 0);
 
 		if(m_sound_irq_mask == 0)
@@ -1514,9 +1514,9 @@ void pc8801_state::opna_w(offs_t offset, uint8_t data)
 			m_sound_irq_latch = 1;
 			m_sound_irq_pending = 0;
 		}
-#endif
 	}
 }
+#endif
 
 /*
  * PC8801FH overrides (CPU clock switch)
@@ -1601,12 +1601,12 @@ void pc8801_state::main_io(address_map &map)
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
-//	map(0x33, 0x33) PC8001mkIISR port, mirror on PC8801?
+//  map(0x33, 0x33) PC8001mkIISR port, mirror on PC8801?
 	// TODO: ALU not installed on pre-mkIISR machines
 	map(0x34, 0x34).w(FUNC(pc8801_state::alu_ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
 	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
-	map(0x44, 0x47).rw(FUNC(pc8801_state::sound_board_r), FUNC(pc8801_state::sound_board_w)); /* OPN / OPNA ports */
+//  map(0x44, 0x47).rw internal OPN/OPNA sound card for 8801mkIISR and beyond
 //  uPD3301
 	map(0x50, 0x50).rw(FUNC(pc8801_state::crtc_param_r), FUNC(pc8801_state::crtc_param_w));
 	map(0x51, 0x51).rw(FUNC(pc8801_state::crtc_status_r), FUNC(pc8801_state::crtc_cmd_w));
@@ -1624,10 +1624,10 @@ void pc8801_state::main_io(address_map &map)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
-//	map(0x8e, 0x8e).r accessed by scruiser on boot, unknown purpose (board ID?)
+//  map(0x8e, 0x8e).r accessed by scruiser on boot, unknown purpose (a board ID?)
 //  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
-	map(0xa8, 0xad).rw(FUNC(pc8801_state::opna_r), FUNC(pc8801_state::opna_w));  // Sound Board II
+//  map(0xa8, 0xad).rw expansion OPN (Sound Board) or OPNA (Sound Board II)
 //  map(0xb4, 0xb5) Video art board (?)
 //  map(0xc1, 0xc1) (unknown)
 //  map(0xc2, 0xcf) "music" (?)
@@ -1648,9 +1648,17 @@ void pc8801_state::main_io(address_map &map)
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
+void pc8801mk2sr_state::main_io(address_map &map)
+{
+	pc8801_state::main_io(map);
+	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
+
 void pc8801fh_state::main_io(address_map &map)
 {
 	pc8801_state::main_io(map);
+	map(0x44, 0x47).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+
 	map(0x6e, 0x6e).r(FUNC(pc8801fh_state::cpuclock_r));
 	map(0x6f, 0x6f).rw(FUNC(pc8801fh_state::baudrate_r), FUNC(pc8801fh_state::baudrate_w));
 }
@@ -1668,7 +1676,7 @@ void pc8801mc_state::main_io(address_map &map)
 	map(0x90, 0x9f).m(m_cdrom_if, FUNC(pc8801_31_device::amap));
 }
 
-void pc8801_state::opna_map(address_map &map)
+void pc8801fh_state::opna_map(address_map &map)
 {
 	// TODO: confirm it really is ROMless
 	// TODO: confirm size
@@ -1948,9 +1956,9 @@ static INPUT_PORTS_START( pc8801 )
 
 	PORT_START("BOARD_CONFIG")
 	// TODO: extend both via slot options
-	PORT_CONFNAME( 0x01, 0x01, "Sound Board" )
-	PORT_CONFSETTING(    0x00, "OPN (YM2203)" )
-	PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
+//  PORT_CONFNAME( 0x01, 0x01, "Sound Board" )
+//  PORT_CONFSETTING(    0x00, "OPN (YM2203)" )
+//  PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
 	PORT_CONFNAME( 0x02, 0x00, "Port 1 Connection" )
 	PORT_CONFSETTING(    0x00, "Joystick" )
 	PORT_CONFSETTING(    0x02, "Mouse" )
@@ -2074,7 +2082,7 @@ void pc8801_state::machine_reset()
 	palette_reset();
 
 	m_extram_size = extram_type[ioport("MEM")->read() & 0x0f];
-	m_has_opna = ioport("BOARD_CONFIG")->read() & 1;
+//  m_has_opna = ioport("BOARD_CONFIG")->read() & 1;
 }
 
 void pc8801fh_state::machine_reset()
@@ -2105,9 +2113,8 @@ void pc8801mc_state::machine_reset()
 	m_cdrom_bank = true;
 }
 
-/* YM2203 Interface */
-
-uint8_t pc8801_state::opn_porta_r()
+// TODO: to joyport option slot
+uint8_t pc8801mk2sr_state::opn_porta_r()
 {
 	if(ioport("BOARD_CONFIG")->read() & 2)
 	{
@@ -2141,17 +2148,21 @@ IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 	// Seems just an intermediate bridge for translating raw levels to vectors
 	// with no access from outside world?
 	u8 level = m_pic->a_r();
-//	printf("%d\n", level);
+//  printf("%d\n", level);
 	m_pic->r_w(level, 1);
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	return (7 - level) * 2;
 }
 
-WRITE_LINE_MEMBER(pc8801_state::sound_irq)
+WRITE_LINE_MEMBER(pc8801_state::int3_w)
 {
 	//printf("mask=%d state=%d\n", m_sound_irq_mask, state);
-	if (m_sound_irq_mask)
+	// TODO: fix xzr2 missing/stuck BGM playback
+	// xzr2 seems special in how it handles OPN/OPNA irq calls,
+	// apparently it's not pleased that we do 0 -> 1 transitions in ymfm_fm.ipp engine_check_interrupts fn.
+	// Maybe we should propagate irq_mask to the chip internals somehow?
+	if (m_sound_irq_mask && state)
 	{
 		m_pic->r_w(7 ^ 4, 0);
 	}
@@ -2222,51 +2233,64 @@ void pc8801_state::pc8801(machine_config &config)
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::timer_irq), attotime::from_hz(600));
 
-//  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-
-	// TODO: separate this into specific sound slot
-	// This is a legacy attempt to map a "Sound-Board II",
-	// other noteworthy cards are HMB-20 (single YM2151) and GSX-8800 (AY8910 x 4 + PIT)
-	// Misc notes:
-	// - sound irqs are cascaded on a SBII;
-	// - mixing is stereo, also needs handtuning;
-	// - read callbacks aren't shared obviously;
-	YM2203(config, m_opn, MASTER_CLOCK);
-	m_opn->irq_handler().set(FUNC(pc8801_state::sound_irq));
-	m_opn->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
-	m_opn->port_b_read_callback().set_ioport("OPN_PB");
-	m_opn->add_route(0, "mono", 0.25);
-	m_opn->add_route(1, "mono", 0.25);
-	m_opn->add_route(2, "mono", 0.25);
-	m_opn->add_route(3, "mono", 0.25);
-
-	YM2608(config, m_opna, MASTER_CLOCK*2);
-	m_opna->set_addrmap(0, &pc8801_state::opna_map);
-	m_opna->irq_handler().set(FUNC(pc8801_state::sound_irq));
-	m_opna->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
-	m_opna->port_b_read_callback().set_ioport("OPN_PB");
-	m_opna->add_route(0, "mono", 0.25);
-	m_opna->add_route(1, "mono", 0.25);
-	m_opna->add_route(2, "mono", 0.25);
+	// Note: original models up to OPNA variants really have an internal mono speaker,
+	// but user eventually can have a stereo mixing audio card mounted so for simplicity we MCM here.
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
 
 	// TODO: DAC_1BIT
 	// 2400 Hz according to schematics, unaffected by clock speed setting (confirmed on real HW)
-	BEEP(config, m_beeper, MASTER_CLOCK / 16 / 13 / 8).add_route(ALL_OUTPUTS, "mono", 0.10);
+	BEEP(config, m_beeper, MASTER_CLOCK / 16 / 13 / 8);
+
+	for (auto &speaker : { m_lspeaker, m_rspeaker })
+	{
+		m_cassette->add_route(ALL_OUTPUTS, speaker, 0.025);
+		m_beeper->add_route(ALL_OUTPUTS, speaker, 0.10);
+	}
 }
 
-void pc8801_state::pc8801mk2mr(machine_config &config)
+void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 {
 	pc8801(config);
+
+	YM2203(config, m_opn, MASTER_CLOCK);
+	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int3_w));
+	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
+	m_opn->port_b_read_callback().set_ioport("OPN_PB");
+
+	for (auto &speaker : { m_lspeaker, m_rspeaker })
+	{
+		// TODO: per-channel mixing is unconfirmed
+		m_opn->add_route(0, speaker, 0.125);
+		m_opn->add_route(1, speaker, 0.125);
+		m_opn->add_route(2, speaker, 0.125);
+		m_opn->add_route(3, speaker, 0.125);
+	}
+}
+
+void pc8801mk2sr_state::pc8801mk2mr(machine_config &config)
+{
+	pc8801mk2sr(config);
 	PC80S31K(config.replace(), m_pc80s31, MASTER_CLOCK);
 }
 
 void pc8801fh_state::pc8801fh(machine_config &config)
 {
 	pc8801mk2mr(config);
+
+	config.device_remove("opn");
+
+	YM2608(config, m_opna, MASTER_CLOCK*2);
+	m_opna->set_addrmap(0, &pc8801fh_state::opna_map);
+	m_opna->irq_handler().set(FUNC(pc8801fh_state::int3_w));
+	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
+	m_opna->port_b_read_callback().set_ioport("OPN_PB");
+	// TODO: per-channel mixing is unconfirmed
+	m_opna->add_route(0, m_lspeaker, 0.25);
+	m_opna->add_route(0, m_rspeaker, 0.25);
+	m_opna->add_route(1, m_lspeaker, 1.00);
+	m_opna->add_route(2, m_rspeaker, 1.00);
+
 	// TODO: add possible configuration override for baudrate here
 	// ...
 }
@@ -2510,13 +2534,14 @@ ROM_END
 
 /*    YEAR  NAME         PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT        COMPANY  FULLNAME */
 
-COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init, "NEC",   "PC-8801",       MACHINE_NOT_WORKING )
-COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init, "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING )
+COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING )
+COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING )
+
 // internal OPN
-COMP( 1985, pc8801mk2sr, pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr, pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2fr, pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2mr, pc8801, 0,      pc8801mk2mr, pc8801, pc8801_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2sr, pc8801, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_NOT_WORKING )
+//COMP( 1985, pc8801mk2tr, pc8801, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2fr, pc8801, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2mr, pc8801, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
 
 // internal OPNA
 //COMP( 1986, pc8801fh,    0,      0,      pc8801mk2fr,      pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
