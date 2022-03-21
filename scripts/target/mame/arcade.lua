@@ -4382,11 +4382,7 @@ files {
 	MAME_DIR .. "src/mame/includes/tehkanwc.h",
 	MAME_DIR .. "src/mame/video/tehkanwc.cpp",
 	MAME_DIR .. "src/mame/drivers/wc90.cpp",
-	MAME_DIR .. "src/mame/includes/wc90.h",
-	MAME_DIR .. "src/mame/video/wc90.cpp",
 	MAME_DIR .. "src/mame/drivers/wc90b.cpp",
-	MAME_DIR .. "src/mame/includes/wc90b.h",
-	MAME_DIR .. "src/mame/video/wc90b.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "terminal")

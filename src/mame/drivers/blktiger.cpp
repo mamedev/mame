@@ -13,7 +13,125 @@
     - sprites/tile priority is a guess. I didn't find a PROM that would simply
       translate to the scheme I implemented.
 
+***************************************************************************
+
+Black Tiger / Black Dragon (Capcom, 1987)
+Hardware info by Guru
+
+Note boards connect solder side to solder side and parts face outwards
+on both boards.
+
+Top Board
+---------
+
+CAPCOM
+87118-A-X1
+|-------------------------------------------------------------------------|
+|            VOL                          |------------------| BD_06.1L   |
+|  HA13001         YM3014   YM2203        |138  138   21  08 |            |
+|                                         |2kB  174 367 74 74| 3.579545MHz|
+|        M5224     YM3014   YM2203        |Z80           139 |    JP7..12 |
+|                                         |---SOUND_MODULE---|            |
+|                                                                         |
+|                 5814             4364                                   |
+|J                                                       BD.6K            |
+|A                               BD_U_01A.5E                              |
+|M                5814                                             24MHz  |
+|M                               BD_U_02A.6E                              |
+|A                                                                        |
+|                                                 BD01.8J                 |
+|                                BD_U_03A.8E                              |
+|                 JP1..6                          BD02.9J                 |
+|         SW2                    BD_U_04A.9E                              |
+|                                                                         |
+|                                BD_U_05A.10E            BD03.11K         |
+|         SW1                                               BD04.11L      |
+|                                  Z80                                    |
+|--------|--------------|-------------------------|--------------|--------|
+         |--------------|                         |--------------|
+Notes:
+               Z80 - Zilog Z084006PSC CPU (main CPU). Clock input 6MHz [24/4]
+Z80 (sound module) - Zilog Z084004PSC CPU (sound CPU). Clock input 3.579545MHz
+             BD.6K - Intel D8751H-8 Microcontroller with internal 4kBx8-bit EPROM and 128 bytes internal RAM. Clock input 8.000MHz [24/3]
+            YM2203 - Yamaha YM2203 FM Operator Type-N (OPN) sound chip. Clock input 3.579545MHz (both)
+            YM3014 - Yamaha YM3014B Serial Input Floating D/A Converter. Clock input 1.193181667MHz [3.579545/3] (both)
+      SOUND_MODULE - Contains commonly available parts.... logic, Z80A and 2kBx8-bit SRAM
+            JP1..6 - 0-ohm jumpers. JP1 & JP6 are shorted, others are open
+           JP7..12 - 0-ohm jumpers. JP10 & JP11 are shorted, others are open
+           HA13001 - Hitachi HA13001 5.5W Dual / 17.5W BTL Audio Power Amplifier
+             SW1/2 - 8-position DIP switch
+             M5224 - Mitsubishi M5224 Quad Operational Amplifier (compatible with LM324)
+               2kB - 2kBx8-bit SRAM (inside sound module). Compatible with 6116, 2018, 5814, 4016 etc.
+              5814 - Sony CXK5814 2kBx8-bit SRAM (color RAM)
+              4364 - NEC D4364 8kBx8-bit SRAM (main program RAM)
+           BD01.8J - Signetics 82S129 bipolar PROM. When removed: No backgrounds and no sprites. Text layer/characters ok.
+           BD02.9J - Signetics 82S129 bipolar PROM. When removed: Affects sprites, sometimes they are partial or disappear under tiles.
+          BD03.11K - Signetics 82S129 bipolar PROM. Timing. When removed: Black screen, no syncs, game plays blind.
+          BD04.11L - Signetics 82S129 bipolar PROM. Timing. When removed: No bootup, shows only static garbage
+          BD_06.1L - Hitachi HN27256 32kBx8-bit OTP EPROM (sound program)
+       BD_U_01A.5E -  \
+       BD_U_02A.6E -   \ 27C512 EPROM or OTP EPROM (main program)
+       BD_U_03A.8E -   /
+       BD_U_04A.9E -  /
+      BD_U_05A.10E - /
+             VSync - 59.6373Hz
+             HSync - 15.6250kHz
+
+
+Bottom Board
+------------
+
+CAPCOM
+87118-B-X1
+         |--------------|                         |--------------|
+|--------|--------------|-------------------------|--------------|--------|
+|                                                                86S100   |
+|         |-------|                                                       |
+|         |CAPCOM |                                           BD_U_15.2N  |
+|         |86S105 |                                                       |
+|         |RJ5C39 |             2018           2018                       |
+|         |-------|                                                       |
+|                                                                         |
+|                                                                         |
+|  BD_07.4A    BD_U_11A.4B                                                |
+|                                                                         |
+|  BD_08.5A    BD_U_12A.5B                                                |
+|                                                                         |
+|                                                                 4016    |
+|  86S100        86S100                                                   |
+|                                                                         |
+|  BD_09.8A    BD_U_13A.8B                                                |
+|                                                                         |
+|  BD_10.9A    BD_U_14A.9B   43256                                        |
+|            JP7..8  JP9..12                                              |
+|  JP1..6                                                                 |
+|-------------------------------------------------------------------------|
+Notes:
+      86S105 - Custom PLCC84 chip marked 'CAPCOM 86S105 RJ5C39 863 32 JAPAN'. Manufactured by Ricoh
+               This chip is used to generate sprites. Note the chip has 3x 2kBx8-bit (6kB) internal SRAM.
+               This chip fails often so when a game that uses this chip has vertical jailbars in the sprites
+               most likely this chip has failed.
+      86S100 - Custom chip marked 'CAPCOM 86S100 M ^ 73100'. ^ = triangle. Manufactured by Texas Instruments
+               This chip is similar to 2x 74LS165 8-bit parallel-to-serial shift register chips in one package
+               but with direction control and two data modes (4-bit/8-bit).
+      JP1..6 - 0-ohm jumpers. JP1 & JP5 are shorted, others are open
+      JP7..8 - 0-ohm jumpers. JP7 shorted, JP8 open
+     JP9..12 - 0-ohm jumpers. JP12 shorted, others are open
+       43256 - NEC D43256 32kBx8-bit SRAM (background tile RAM)
+        2018 - Toshiba TMM2018 2kBx8-bit SRAM (additional sprite RAM.... see note above re: 86S105)
+        4016 - NEC D4016 2kBx8-bit SRAM (text layer / character RAM)
+    BD_07.4A \
+    BD_08.5A  \ 27C512 EPROM or OTP EPROM
+    BD_09.8A  /
+    BD_10.9A /
+ BD_U_11A.4B \
+ BD_U_12A.5B  \
+ BD_U_13A.8B  / 27512 OTP EPROM
+ BD_U_14A.9B /
+  BD_U_15.2N - 27256 OTP EPROM
+
 ***************************************************************************/
+
 
 #include "emu.h"
 #include "includes/blktiger.h"
@@ -300,7 +418,7 @@ void blktiger_state::blktiger(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545));   /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blktiger_state::blktiger_sound_map);
 
-	I8751(config, m_mcu, XTAL(24'000'000)/4); /* ??? */
+	I8751(config, m_mcu, XTAL(24'000'000)/3);   /* verified on pcb */
 	m_mcu->port_in_cb<0>().set(FUNC(blktiger_state::blktiger_from_main_r));
 	m_mcu->port_out_cb<0>().set(FUNC(blktiger_state::blktiger_to_main_w));
 	// other ports unknown
