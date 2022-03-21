@@ -195,7 +195,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Missile Attack / Battlestar Galactica: Space Alert
-  * B6000 MCU (label B6001, die label B6001)
+  * B6000 MCU (label B6001CA/EA, die label B6001)
   * 2-digit 7seg display, 21 other leds, 1-bit sound
 
   The initial release was titled Missile Attack, it didn't sell well (Mattel
@@ -270,7 +270,7 @@ void misatk_state::misatk(machine_config &config)
 
 ROM_START( misatk )
 	ROM_REGION( 0x200, "maincpu", 0 )
-	ROM_LOAD( "b6001", 0x000, 0x200, CRC(56564b79) SHA1(6f33f57ea312cb2018fb59f72eaff3a9642e74a2) )
+	ROM_LOAD( "b6001ea", 0x000, 0x200, CRC(56564b79) SHA1(6f33f57ea312cb2018fb59f72eaff3a9642e74a2) )
 ROM_END
 
 
@@ -641,7 +641,7 @@ ROM_END
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1976, autorace,  0,       0, autorace,  autorace,  autorace_state,  empty_init, "Mattel Electronics", "Auto Race", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1976, misatk,    0,       0, misatk,    misatk,    misatk_state,    empty_init, "Mattel Electronics", "Missile Attack (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1977, misatk,    0,       0, misatk,    misatk,    misatk_state,    empty_init, "Mattel Electronics", "Missile Attack (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1977, mfootb,    0,       0, mfootb,    mfootb,    mfootb_state,    empty_init, "Mattel Electronics", "Football (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_init, "Mattel Electronics", "Baseball (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

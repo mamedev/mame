@@ -53,7 +53,7 @@ u16 b6100_cpu_device::decode_digit(u8 data)
 {
 	static u16 lut_segs[0x10] =
 	{
-		// 0-9 same as B5000
+		// 0-9 same as B6000
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
 
 		// EFG, BCG, none, SEG8, SEG9, SEG10
