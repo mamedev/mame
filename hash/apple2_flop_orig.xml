@@ -19713,7 +19713,7 @@ license:CC0
 	</software>
 
 	<software name="mixdupmg">
-		<description>Mixed-Up Mother Goose</description>
+		<description>Mixed-Up Mother Goose (Version 1.0I)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2022-02-23"/>
@@ -21300,6 +21300,337 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="68395">
 				<rom name="super galaxy wars.woz" size="68395" crc="18494bf7" sha1="1ebddec2b4db6c1c0beeba18954ccbd7ad618dfe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sstorytree">
+		<description>Super Story Tree (Version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-03-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"Super Story Tree" is a 1989 productivity program developed by George Brackett and distributed by Scholastic. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312530">
+				<rom name="super story tree 800k.woz" size="1312530" crc="782dc19e" sha1="276c3db1789b4331d3c1ce73df0842dc6b9c19d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compconc">
+		<description>Computer Concepts (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Ventura Educational Systems</publisher>
+		<info name="release" value="2022-03-12"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K //e with a compatible drive controller card. -->
+		<!--"Computer Concepts" is a 1990 educational program developed by Fred Ventura and distributed by Ventura Educational Systems. It requires an Apple IIgs, //c+, or 64K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296165">
+				<rom name="computer concepts 800k.woz" size="1296165" crc="a4c5967b" sha1="94318e12fa5ac22ffdc283f51d06aa7c57d0d13b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plntgsim">
+		<description>The Plant Growth Simulator (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2022-03-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 48K ][+ or //e with a compatible drive controller card. -->
+		<!--"The Plant Growth Simulator: Elementary Version" is a 1987 educational program developed by Allan Woolway, David Strelitz, Dan Gelon, and Kenneth Moss, and distributed by Focus Media. It requires an Apple IIgs, //c+, or 48K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296228">
+				<rom name="the plant growth simulator 800k disk 1.woz" size="1296228" crc="c2bfde2e" sha1="2102f99663fdee6c5de128b58cc49d91a0043b8e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296228">
+				<rom name="the plant growth simulator 800k disk 2.woz" size="1296228" crc="a48a8239" sha1="8f580be121773f10a151c5017e258e01f3822f79"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acedetec">
+		<description>Ace Detective (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>MindPlay</publisher>
+		<info name="release" value="2022-03-17"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a ROM3 Apple IIgs, //c+, or 64K //e with a compatible drive controller card. -->
+		<!--"Ace Detective" is a 1990 educational game developed and distributed by MindPlay. It requires a ROM3 Apple IIgs, //c+, or 64K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296178">
+				<rom name="ace detective 800k disk 1.woz" size="1296178" crc="a4b10736" sha1="e154e0bdd97daf924ca4dd7475a97003f8981810"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296145">
+				<rom name="ace detective 800k disk 2.woz" size="1296145" crc="fe981db8" sha1="34460241e5c1f2a6bd4befcd13ae32d5639c6e70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="factfall">
+		<description>Facts and Fallacies (Version 02.01.87) (800K 3.5")</description>
+		<year>1984</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-03-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 48K //e or ][+ with a compatible drive controller card -->
+		<!--"Facts and Fallacies" is a 1984 educational game developed by Jim Parshall, Garnet Chappell, and Mike Micklatcher, and distributed by Hartley Courseware. This version is dated 02.01.87. It requires an Apple IIgs, //c+, or 48K //e or ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Master disk"/>
+			<dataarea name="flop" size="1296232">
+				<rom name="facts and fallacies 800k - disk 1 - master disk.woz" size="1296232" crc="e6a57696" sha1="a7d1169128008d3b74586720f302bec783f1f410"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Fact sheets"/>
+			<dataarea name="flop" size="1296232">
+				<rom name="facts and fallacies 800k - disk 2 - fact sheets.woz" size="1296232" crc="563400e0" sha1="7d8412c3c162eebb84542c78e60a9464a5fb49c7"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Data disk"/>
+			<dataarea name="flop" size="1276774">
+				<rom name="facts and fallacies 800k - disk 3 - data disk.woz" size="1276774" crc="2725075c" sha1="7f9e7983b37c8e301a43bad22900b221fad3fea5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgshopng">
+		<description>Curious George Goes Shopping (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2022-03-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"Curious George Goes Shopping" is a 1989 educational program developed by Ahead Designs and distributed by Developmental Learning Materials. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345354">
+				<rom name="curious george goes shopping 800k.woz" size="1345354" crc="2c14df52" sha1="f6c46ae1671adfabe2568fb4137501e72f6e2703"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgoutspc">
+		<description>Curious George in Outer Space (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2022-03-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"Curious George in Outer Space" is a 1989 educational program developed by Ahead Designs and distributed by Developmental Learning Materials. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345355">
+				<rom name="curious george in outer space 800k.woz" size="1345355" crc="74deb6d4" sha1="d6df93f3de6df64a73ece451137a667b3596f40a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cglibrary">
+		<description>Curious George Visits the Library (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2022-03-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"Curious George Visits the Library" is a 1989 educational program developed by Ahead Designs and distributed by Developmental Learning Materials. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345359">
+				<rom name="curious george visits the library 800k.woz" size="1345359" crc="9c8279e3" sha1="0d94bc7834461c0c4771ebc239422f0b80db0794"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lafabric">
+		<description>La Fábrica (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>WINGS for Learning</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"La Fábrica" (The Factory) is a 1991 Spanish educational program developed by Marge Kosel and Mike Fish, and distributed by WINGS for Learning. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329972">
+				<rom name="la fabrica 800k.woz" size="1329972" crc="593ea2ef" sha1="920143b2cae9110368214a89db9c553c073d4f8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccwhnum1135">
+		<description>Conquering Whole Numbers (Version 1.1) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"Conquering Whole Numbers" is a 1987 educational program developed and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345322">
+				<rom name="conquering whole numbers 800k.woz" size="1345322" crc="a86a0c22" sha1="39d1b854624a062f03545888982bcb3f4954f5ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galquest">
+		<description>Galactic Quest</description>
+		<year>1980</year>
+		<publisher>Crystal Software</publisher>
+		<info name="release" value="2022-03-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later with a 13-sector drive. -->
+		<!--"Galactic Quest" is a 1980 simulation game developed by John and Patty Bell, and distributed by Crystal Software. It requires a 48K Apple ][+ or later with a 13-sector drive.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="galactic quest.woz" size="234809" crc="572d083b" sha1="f54caf4d741cbee834466eec62862ea1c97f91d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcflfun1135">
+		<description>First-Letter Fun (Version 1.1) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"First-Letter Fun" is a 1985 educational program developed and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345314">
+				<rom name="first-letter fun 800k.woz" size="1345314" crc="d7cafd9b" sha1="1bc9a26fb0273a85689e2ba94afde41b6c0e2f3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcjennyj35">
+		<description>Jenny's Journeys (Version 1.0) (800K 3.5")</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"Jenny's Journeys" is a 1984 educational program developed and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345314">
+				<rom name="jenny's journeys 800k.woz" size="1345314" crc="f077ef2a" sha1="f6c6279c28c45ec9137cb960ff5505df6d916914"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmmwgen1135">
+		<description>Mastering Math Worksheet Generator (Version 1.1) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"Mastering Math Worksheet Generator" is a 1985 educational program developed and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345332">
+				<rom name="mastering math worksheet generator 800k.woz" size="1345332" crc="9cf3e194" sha1="12bd756088f5b5ea6b5a118ddd1d173ba9d000af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcodell1235">
+		<description>Odell Lake (Version 1.2) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"Odell Lake" is a 1986 educational program developed and distributed by MECC. This is version 1.2. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345308">
+				<rom name="odell lake 800k.woz" size="1345308" crc="f56958b8" sha1="707b02e2648493226cc4a53c239db3bc8cb4f540"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspdwaym35">
+		<description>Speedway Math (Version 1.0) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"Speedway Math" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345311">
+				<rom name="speedway math 800k.woz" size="1345311" crc="bae80f2a" sha1="9702511ee81cc9a5465feec344baddeac4526c88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrdc1535">
+		<description>The Friendly Computer (Version 1.5) (800K 3.5")</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 48K ][+ or //e with a compatible drive controller card. -->
+		<!--"The Friendly Computer" is a 1983 educational program developed and distributed by MECC. This is version 1.5. It requires an Apple IIgs, //c+, or 48K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345319">
+				<rom name="the friendly computer 800k.woz" size="1345319" crc="9ed0d5ca" sha1="6f5af20ccede36b8b0bad57e710022197d7f8da2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcorgtrl1435">
+		<description>The Oregon Trail (Version 1.4) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2022-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card. -->
+		<!--"The Oregon Trail" is a 1985 educational program developed and distributed by MECC. This is version 1.4. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296162">
+				<rom name="the oregon trail 800k.woz" size="1296162" crc="89ee473a" sha1="101e39fed19715a6b577bb90ca67ac7b0c6ace23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bnksw320c35">
+		<description>The Bank Street Writer III (20-Column Version) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-03-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"The Bank Street Writer III" is a 1986 productivity program developed by Gordon Riggs and distributed by Scholastic. This is the 20 Column Version, with bundled Teacher Tools. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296683">
+				<rom name="the bank street writer iii 800k.woz" size="1296683" crc="c49de32c" sha1="e6617380de897d8f74e0724e004cf5850e697860"/>
 			</dataarea>
 		</part>
 	</software>
