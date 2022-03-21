@@ -1959,13 +1959,13 @@ void nes_cocoma_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 208
 
- In MESS: Preliminary Support.
+ In MAME: Preliminary Support.
 
  -------------------------------------------------*/
 
-void nes_gouder_device::write_l(offs_t offset, uint8_t data)
+void nes_gouder_device::write_l(offs_t offset, u8 data)
 {
-	static const uint8_t conv_table[256] =
+	static constexpr u8 conv_table[256] =
 	{
 		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x49,0x19,0x09,0x59,0x49,0x19,0x09,
 		0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x59,0x51,0x41,0x11,0x01,0x51,0x41,0x11,0x01,
@@ -1987,22 +1987,31 @@ void nes_gouder_device::write_l(offs_t offset, uint8_t data)
 
 	LOG_MMC(("gouder write_l, offset: %04x, data: %02x\n", offset, data));
 
-	if (!(offset < 0x1700))
-		m_reg[offset & 0x03] = data ^ conv_table[m_reg[4]];
-	else if (!(offset < 0xf00))
-		m_reg[4] = data;
-	else if (!(offset < 0x700))
-		prg32(bitswap<2>(data, 4, 0));
+	offset += 0x100;
+	switch (offset & 0x1800)
+	{
+		case 0x0800:
+			prg32(bitswap<2>(data, 4, 0));
+			set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
+		case 0x1000:
+			m_reg[4] = data;
+			break;
+		case 0x1800:
+			m_reg[offset & 0x03] = data ^ conv_table[m_reg[4]];
+			break;
+	}
 }
 
-uint8_t nes_gouder_device::read_l(offs_t offset)
+u8 nes_gouder_device::read_l(offs_t offset)
 {
 	LOG_MMC(("gouder read_l, offset: %04x\n", offset));
 
-	if (!(offset < 0x1700))
+	offset += 0x100;
+	if (offset >= 0x1800)
 		return m_reg[offset & 0x03];
 
-	return 0x00;
+	return get_open_bus();
 }
 
 // writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes)
