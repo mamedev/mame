@@ -12,31 +12,31 @@ license:CC0
 
 	<element name="text_down">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="DOWN"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="DOWN"><color red="0.1" green="0.4" blue="0.8" /></text>
 	</element>
 	<element name="text_home">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="HOME"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="HOME"><color red="0.1" green="0.4" blue="0.8" /></text>
 	</element>
 	<element name="text_yards">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="YARDS TO GO"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="YARDS TO GO"><color red="0.1" green="0.4" blue="0.8" /></text>
 	</element>
 	<element name="text_time">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="TIME REMAINING"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="TIME REMAINING"><color red="0.1" green="0.4" blue="0.8" /></text>
 	</element>
 	<element name="text_field">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="FIELD POSITION"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="FIELD POSITION"><color red="0.1" green="0.4" blue="0.8" /></text>
 	</element>
 	<element name="text_visitors">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="VISITORS"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="VISITORS"><color red="0.1" green="0.4" blue="0.8" /></text>
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.25" blue="0.26" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 	<element name="seg" defstate="0">
 		<rect>
@@ -45,15 +45,15 @@ license:CC0
 		</rect>
 		<rect state="0">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="0.13" green="0.0325" blue="0.0338" />
+			<color red="0.1" green="0.01" blue="0.015" />
 		</rect>
 		<rect state="1">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="0.5" green="0.125" blue="0.13" />
+			<color red="0.5" green="0.05" blue="0.075" />
 		</rect>
 		<rect state="2">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="1.0" green="0.25" blue="0.26" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</rect>
 	</element>
 

@@ -56,11 +56,11 @@ license:CC0
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.25" blue="0.26" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 	<element name="seg" defstate="0">
-		<rect state="0"><color red="0.13" green="0.0325" blue="0.0338" /></rect>
-		<rect state="1"><color red="1.0" green="0.25" blue="0.26" /></rect>
+		<rect state="0"><color red="0.1" green="0.01" blue="0.015" /></rect>
+		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
 	</element>
 
 

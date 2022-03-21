@@ -50,6 +50,7 @@ TODO:
   "First Up" button after the alarm sound.
 - bship discrete sound, netlist is documented
 - finish bshipb SN76477 sound
+- redo internal artwork for the baseball games (embedded SVG for diamond shapes)
 - improve elecbowl driver
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?

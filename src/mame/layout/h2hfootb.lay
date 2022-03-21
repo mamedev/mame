@@ -58,14 +58,14 @@ license:CC0
 	<!-- 7segs are not italic here, so let's make custom ones -->
 
 	<element name="seg" defstate="0">
-		<rect state="0"><color red="0.13" green="0.0325" blue="0.0338" /></rect>
-		<rect state="1"><color red="0.5" green="0.125" blue="0.13" /></rect>
-		<rect state="2"><color red="1.0" green="0.25" blue="0.26" /></rect>
+		<rect state="0"><color red="0.1" green="0.01" blue="0.015" /></rect>
+		<rect state="1"><color red="0.5" green="0.05" blue="0.075" /></rect>
+		<rect state="2"><color red="1.0" green="0.1" blue="0.15" /></rect>
 	</element>
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.13" green="0.0325" blue="0.0338" /></disk>
-		<disk state="1"><color red="0.5" green="0.125" blue="0.13" /></disk>
-		<disk state="2"><color red="1.0" green="0.25" blue="0.26" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="0.5" green="0.05" blue="0.075" /></disk>
+		<disk state="2"><color red="1.0" green="0.1" blue="0.15" /></disk>
 	</element>
 
 
