@@ -370,7 +370,10 @@ void playch10_state::bios_io_map(address_map &map)
 void playch10_state::ppu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(playch10_state::pc10_chr_r), FUNC(playch10_state::pc10_chr_w));
-	map(0x2000, 0x3eff).rw(FUNC(playch10_state::pc10_nt_r), FUNC(playch10_state::pc10_nt_w));
+	map(0x2000, 0x23ff).mirror(0x1000).bankrw(m_nt_page[0]);
+	map(0x2400, 0x27ff).mirror(0x1000).bankrw(m_nt_page[1]);
+	map(0x2800, 0x2bff).mirror(0x1000).bankrw(m_nt_page[2]);
+	map(0x2c00, 0x2fff).mirror(0x1000).bankrw(m_nt_page[3]);
 	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 

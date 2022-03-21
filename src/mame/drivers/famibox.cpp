@@ -80,7 +80,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ppu(*this, "ppu")
 		, m_screen(*this, "screen")
-		, m_ctrl(*this, "ctrl%u", 1) { }
+		, m_ctrl(*this, "ctrl%u", 1U)
+		, m_nt_page(*this, "nt_page%u", 0U)
+	{ }
 
 	void famibox(machine_config &config);
 
@@ -101,8 +103,8 @@ private:
 	required_device<screen_device> m_screen;
 	optional_device_array<nes_control_port_device, 3> m_ctrl;
 
+	required_memory_bank_array<4> m_nt_page;
 	std::unique_ptr<uint8_t[]> m_nt_ram;
-	uint8_t* m_nt_page[4];
 	uint8_t m_mirroring;
 
 	uint8_t       m_curr_slot;
@@ -121,8 +123,6 @@ private:
 	emu_timer*    m_gameplay_timer;
 	uint8_t       m_money_reg;
 
-	void famibox_nt_w(offs_t offset, uint8_t data);
-	uint8_t famibox_nt_r(offs_t offset);
 	void set_mirroring(int mirroring);
 	void sprite_dma_w(address_space &space, uint8_t data);
 	uint8_t famibox_IN0_r();
@@ -149,36 +149,23 @@ void famibox_state::set_mirroring(int mirroring)
 	switch (mirroring)
 	{
 		case PPU_MIRROR_LOW:
-			m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get();
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(0);
 			break;
 		case PPU_MIRROR_HIGH:
-			m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get() + 0x400;
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(1);
 			break;
 		case PPU_MIRROR_HORZ:
-			m_nt_page[0] = m_nt_ram.get();
-			m_nt_page[1] = m_nt_ram.get();
-			m_nt_page[2] = m_nt_ram.get() + 0x400;
-			m_nt_page[3] = m_nt_ram.get() + 0x400;
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(BIT(i, 1));
 			break;
 		case PPU_MIRROR_VERT:
-			m_nt_page[0] = m_nt_ram.get();
-			m_nt_page[1] = m_nt_ram.get() + 0x400;
-			m_nt_page[2] = m_nt_ram.get();
-			m_nt_page[3] = m_nt_ram.get() + 0x400;
+		default:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(i & 1);
 			break;
 	}
-}
-
-void famibox_state::famibox_nt_w(offs_t offset, uint8_t data)
-{
-	int page = BIT(offset, 10, 2);
-	m_nt_page[page][offset & 0x3ff] = data;
-}
-
-uint8_t famibox_state::famibox_nt_r(offs_t offset)
-{
-	int page = BIT(offset, 10, 2);
-	return m_nt_page[page][offset & 0x3ff];
 }
 
 /******************************************************
@@ -419,7 +406,10 @@ void famibox_state::famibox_map(address_map &map)
 void famibox_state::famibox_ppu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr("ppubank1");
-	map(0x2000, 0x3eff).rw(FUNC(famibox_state::famibox_nt_r), FUNC(famibox_state::famibox_nt_w));
+	map(0x2000, 0x23ff).mirror(0x1000).bankrw(m_nt_page[0]);
+	map(0x2400, 0x27ff).mirror(0x1000).bankrw(m_nt_page[1]);
+	map(0x2800, 0x2bff).mirror(0x1000).bankrw(m_nt_page[2]);
+	map(0x2c00, 0x2fff).mirror(0x1000).bankrw(m_nt_page[3]);
 	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
@@ -513,7 +503,10 @@ void famibox_state::machine_reset()
 
 void famibox_state::machine_start()
 {
-	m_nt_ram = std::make_unique<uint8_t[]>(0x800);
+	m_nt_ram = std::make_unique<u8[]>(0x800);
+
+	for (int i = 0; i < 4; i++)
+		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
 	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));
 	m_gameplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_gameplay_timer_callback),this));
