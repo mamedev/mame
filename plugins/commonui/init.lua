@@ -176,7 +176,7 @@ function commonui.switch_polling_helper(starting_sequence)
 
 		if uiinput:pressed(cancel) then
 			-- UI_CANCEL pressed, abort
-			machine:popmessage()
+			machine:popmessage('')
 			if (not poller.modified) or (modified_ticks == emu.osd_ticks()) then
 				-- cancelled immediately
 				self.sequence = nil
@@ -189,7 +189,7 @@ function commonui.switch_polling_helper(starting_sequence)
 		elseif poller:poll() then
 			if poller.valid then
 				-- valid sequence entered
-				machine:popmessage()
+				machine:popmessage('')
 				self.sequence = poller.sequence
 				return true
 			else

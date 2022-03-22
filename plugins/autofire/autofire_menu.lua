@@ -157,8 +157,8 @@ local function populate_configure_menu(menu)
 		configure_selection_save = #menu
 	end
 	table.insert(menu, {_p('plugin-autofire', 'Hotkey'), key_name, hotkey_poller and 'lr' or ''})
-	table.insert(menu, {_p('plugin-autofire', 'On frames'), current_button.on_frames, current_button.on_frames > 1 and 'lr' or 'r'})
-	table.insert(menu, {_p('plugin-autofire', 'Off frames'), current_button.off_frames, current_button.off_frames > 1 and 'lr' or 'r'})
+	table.insert(menu, {_p('plugin-autofire', 'On frames'), tostring(current_button.on_frames), current_button.on_frames > 1 and 'lr' or 'r'})
+	table.insert(menu, {_p('plugin-autofire', 'Off frames'), tostring(current_button.off_frames), current_button.off_frames > 1 and 'lr' or 'r'})
 	configure_menu_active = true
 end
 
@@ -352,7 +352,7 @@ function lib:populate_menu(buttons)
 end
 
 function lib:handle_menu_event(index, event, buttons)
-	manager.machine:popmessage()
+	manager.machine:popmessage('')
 	local current_menu = menu_stack[#menu_stack]
 	if current_menu == MENU_TYPES.MAIN then
 		return handle_main_menu(index, event, buttons)

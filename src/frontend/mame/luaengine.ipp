@@ -21,6 +21,24 @@
 
 
 
+template <typename T>
+struct lua_engine::simple_list_wrapper
+{
+	simple_list_wrapper(simple_list<T> const &l) : list(l) { }
+
+	simple_list<T> const &list;
+};
+
+
+template <typename T>
+struct lua_engine::tag_object_ptr_map
+{
+	tag_object_ptr_map(T const &m) : map(m) { }
+
+	T const &map;
+};
+
+
 class lua_engine::buffer_helper
 {
 private:
@@ -107,24 +125,6 @@ public:
 		assert(!m_prepared);
 		return proxy(*this, size);
 	}
-};
-
-
-template <typename T>
-struct lua_engine::simple_list_wrapper
-{
-	simple_list_wrapper(simple_list<T> const &l) : list(l) { }
-
-	simple_list<T> const &list;
-};
-
-
-template <typename T>
-struct lua_engine::tag_object_ptr_map
-{
-	tag_object_ptr_map(T const &m) : map(m) { }
-
-	T const &map;
 };
 
 
@@ -491,13 +491,13 @@ struct lua_engine::addr_space
 };
 
 
-template <typename T, size_t SIZE>
+template <typename T, size_t Size>
 class lua_engine::enum_parser
 {
 public:
 	constexpr enum_parser(std::initializer_list<std::pair<std::string_view, T> > values)
 	{
-		if (values.size() != SIZE)
+		if (values.size() != Size)
 			throw false && "size template argument incorrectly specified";
 		std::copy(values.begin(), values.end(), m_map.begin());
 	}
@@ -514,7 +514,7 @@ public:
 	}
 
 private:
-	std::array<std::pair<std::string_view, T>, SIZE> m_map;
+	std::array<std::pair<std::string_view, T>, Size> m_map;
 };
 
 
@@ -527,7 +527,7 @@ template <typename R, typename T, typename D>
 auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc)
 {
 	return
-		[this, setter, dflt, name, desc] (T &self, sol::object cb)
+		[setter, dflt, name, desc] (T &self, sol::object cb)
 		{
 			if (cb == sol::lua_nil)
 			{
@@ -536,7 +536,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 			else if (cb.is<sol::protected_function>())
 			{
 				(self.*setter)(delegate<R ()>(
-							[this, dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
+							[dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
 							{
 								if constexpr (std::is_same_v<R, void>)
 								{
@@ -564,20 +564,6 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 				osd_printf_error("[LUA ERROR] must call %s with function or nil\n", name);
 			}
 		};
-}
-
-
-//-------------------------------------------------
-//  invoke - invokes a function, wrapping profiler
-//-------------------------------------------------
-
-template <typename TFunc, typename... TArgs>
-inline sol::protected_function_result lua_engine::invoke(TFunc &&func, TArgs &&... args)
-{
-	g_profiler.start(PROFILER_LUA);
-	sol::protected_function_result result = func(std::forward<TArgs>(args)...);
-	g_profiler.stop();
-	return result;
 }
 
 #endif // MAME_FRONTEND_MAME_LUAENGINE_IPP

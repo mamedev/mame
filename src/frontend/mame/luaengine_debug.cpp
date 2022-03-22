@@ -185,10 +185,10 @@ void lua_engine::initialize_debug(sol::table &emu)
 	{
 		symbol_table::setter_func setfun;
 		if (setter)
-			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
+			setfun = [cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
 		return st.table().add(
 				name,
-				[this, cbfunc = std::move(getter)] () -> u64
+				[cbfunc = std::move(getter)] () -> u64
 				{
 					auto result = invoke(cbfunc).get<sol::optional<u64> >();
 					if (result)
@@ -222,7 +222,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 				if (cb == sol::lua_nil)
 					st.table().set_memory_modified_func(nullptr);
 				else if (cb.is<sol::protected_function>())
-					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+					st.table().set_memory_modified_func([cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
 				else
 					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
 			});

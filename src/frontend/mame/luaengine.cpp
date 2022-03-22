@@ -352,16 +352,18 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 {
 	std::string field = "cb_" + name;
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>(), in);
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in call_plugin: %s\n", err.what());
 		}
 		else
+		{
 			return res.get<sol::object>();
+		}
 	}
 	return sol::lua_nil;
 }
@@ -380,7 +382,7 @@ std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vect
 		}
 		else
 		{
-			std::tuple<sol::table, std::optional<long>, std::string> table = res;
+			std::tuple<sol::table, std::optional<long>, std::optional<std::string> > table = res;
 			for (auto &entry : std::get<0>(table))
 			{
 				if (entry.second.is<sol::table>())
@@ -389,7 +391,10 @@ std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vect
 					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
 				}
 			}
-			flags = std::get<2>(table);
+			if (std::get<2>(table))
+				flags = *std::get<2>(table);
+			else
+				flags.clear();
 			return std::get<1>(table);
 		}
 	}
@@ -400,7 +405,7 @@ std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vect
 std::pair<bool, std::optional<long> > lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
 {
 	std::string field = "menu_cb_" + menu;
-	std::pair<bool, std::optional<long> > ret(false, std::nullopt);
+	std::pair<std::optional<bool>, std::optional<long> > ret(false, std::nullopt);
 	sol::object obj = sol().registry()[field];
 	if (obj.is<sol::protected_function>())
 	{
@@ -415,7 +420,7 @@ std::pair<bool, std::optional<long> > lua_engine::menu_callback(const std::strin
 			ret = res;
 		}
 	}
-	return ret;
+	return std::make_pair(std::get<0>(ret) && *std::get<0>(ret), std::get<1>(ret));
 }
 
 void lua_engine::set_machine(running_machine *machine)
@@ -423,9 +428,10 @@ void lua_engine::set_machine(running_machine *machine)
 	m_machine = machine;
 }
 
-int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback)
+template <typename T>
+size_t lua_engine::enumerate_functions(const char *id, T &&callback)
 {
-	int count = 0;
+	size_t count = 0;
 	sol::object functable = sol().registry()[id];
 	if (functable.is<sol::table>())
 	{
@@ -439,23 +445,24 @@ int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol
 					break;
 			}
 		}
-		return true;
 	}
 	return count;
 }
 
 bool lua_engine::execute_function(const char *id)
 {
-	int count = enumerate_functions(id, [this](const sol::protected_function &func)
-	{
-		auto ret = invoke(func);
-		if(!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
-		}
-		return true;
-	});
+	size_t count = enumerate_functions(
+			id,
+			[this] (const sol::protected_function &func)
+			{
+				auto ret = invoke(func);
+				if (!ret.valid())
+				{
+					sol::error err = ret;
+					osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
+				}
+				return true;
+			});
 	return count > 0;
 }
 
@@ -521,21 +528,23 @@ void lua_engine::on_periodic()
 bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 {
 	bool handled = false;
-	enumerate_functions("LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE", [this, &instance_name, &handled](const sol::protected_function &func)
-	{
-		auto ret = invoke(func, instance_name);
+	enumerate_functions(
+			"LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE",
+			[this, &instance_name, &handled](const sol::protected_function &func)
+			{
+				auto ret = invoke(func, instance_name);
 
-		if(!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in on_missing_mandatory_image: %s\n", err.what());
-		}
-		else if (ret.get<bool>())
-		{
-			handled = true;
-		}
-		return !handled;
-	});
+				if (!ret.valid())
+				{
+					sol::error err = ret;
+					osd_printf_error("[LUA ERROR] in on_missing_mandatory_image: %s\n", err.what());
+				}
+				else if (ret.get<bool>())
+				{
+					handled = true;
+				}
+				return !handled;
+			});
 	return handled;
 }
 
@@ -829,7 +838,7 @@ void lua_engine::initialize()
 				auto space = buf.prepare(len);
 				space.add(file.read(space.get(), len));
 				buf.push();
-				return sol::stack::pop<sol::object>(s);
+				return sol::make_reference(s, sol::stack_reference(s, -1));
 			});
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
 	file_type.set("puts", &emu_file::puts);
@@ -1023,7 +1032,7 @@ void lua_engine::initialize()
 				space.add(len);
 			}
 			buf.push();
-			return sol::stack::pop<sol::object>(s);
+			return sol::make_reference(s, sol::stack_reference(s, -1));
 		});
 	item_type.set("write", [](save_item &item, int offset, uint64_t value) {
 			if(!item.base || (offset >= item.count))
@@ -1337,15 +1346,16 @@ void lua_engine::initialize()
 
 
 	auto device_type = sol().registry().new_usertype<device_t>("device", sol::no_constructor);
-	device_type["subtag"] = &device_t::subtag;
-	device_type["siblingtag"] = &device_t::siblingtag;
-	device_type["memregion"] = &device_t::memregion;
-	device_type["memshare"] = &device_t::memshare;
-	device_type["membank"] = &device_t::membank;
-	device_type["ioport"] = &device_t::ioport;
-	device_type["subdevice"] = static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice);
-	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice);
-	device_type["parameter"] = &device_t::parameter;
+	device_type.set_function(sol::meta_function::to_string, [] (device_t &d) { return util::string_format("%s(%s)", d.shortname(), d.tag()); });
+	device_type.set_function("subtag", &device_t::subtag);
+	device_type.set_function("siblingtag", &device_t::siblingtag);
+	device_type.set_function("memregion", &device_t::memregion);
+	device_type.set_function("memshare", &device_t::memshare);
+	device_type.set_function("membank", &device_t::membank);
+	device_type.set_function("ioport", &device_t::ioport);
+	device_type.set_function("subdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice));
+	device_type.set_function("siblingdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice));
+	device_type.set_function("parameter", &device_t::parameter);
 	device_type["tag"] = sol::property(&device_t::tag);
 	device_type["basetag"] = sol::property(&device_t::basetag);
 	device_type["name"] = sol::property(&device_t::name);
@@ -1916,10 +1926,10 @@ void lua_engine::resume(int nparam)
 
 void lua_engine::run(sol::load_result res)
 {
-	if(res.valid())
+	if (res.valid())
 	{
 		auto ret = invoke(res.get<sol::protected_function>());
-		if(!ret.valid())
+		if (!ret.valid())
 		{
 			sol::error err = ret;
 			osd_printf_error("[LUA ERROR] in run: %s\n", err.what());
@@ -1930,19 +1940,28 @@ void lua_engine::run(sol::load_result res)
 }
 
 //-------------------------------------------------
-//  execute - load and execute script
+//  load_script - load script from file path
 //-------------------------------------------------
 
-void lua_engine::load_script(const char *filename)
+sol::load_result lua_engine::load_script(std::string const &filename)
 {
-	run(sol().load_file(filename));
+	return sol().load_file(filename);
 }
 
 //-------------------------------------------------
-//  execute_string - execute script from string
+//  load_string - load script from string
 //-------------------------------------------------
 
-void lua_engine::load_string(const char *value)
+sol::load_result lua_engine::load_string(std::string const &value)
 {
-	run(sol().load(value));
+	return sol().load(value);
+}
+
+//-------------------------------------------------
+//  make_environment - make a sandbox
+//-------------------------------------------------
+
+sol::environment lua_engine::make_environment()
+{
+	return sol::environment(sol(), sol::create, sol().globals());
 }
