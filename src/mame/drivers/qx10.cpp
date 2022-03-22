@@ -387,6 +387,7 @@ void qx10_state::qx10_18_w(uint8_t data)
 	m_membank = (data >> 4) & 0x0f;
 	m_spkr_enable = (data >> 2) & 0x01;
 	m_external_bank = (data >> 3) & 0x01;
+	m_pit_1->write_gate2(BIT(data, 1));
 	m_pit_1->write_gate0(data & 1);
 	update_speaker();
 	update_memory_mapping();
@@ -899,7 +900,9 @@ void qx10_state::qx10(machine_config &config)
 	m_pit_1->set_clk<0>(1200);
 	m_pit_1->out_handler<0>().set(FUNC(qx10_state::speaker_duration));
 	m_pit_1->set_clk<1>(1200);
+	m_pit_1->out_handler<1>().set(m_pic_s, FUNC(pic8259_device::ir5_w));
 	m_pit_1->set_clk<2>(MAIN_CLK / 8);
+	m_pit_1->out_handler<2>().set(m_pic_m, FUNC(pic8259_device::ir1_w));
 
 /*
     Timer 1
