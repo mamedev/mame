@@ -194,8 +194,6 @@ private:
 
 	void close();
 
-	void run(sol::load_result res);
-
 	void initialize_debug(sol::table &emu);
 	void initialize_input(sol::table &emu);
 	void initialize_memory(sol::table &emu);

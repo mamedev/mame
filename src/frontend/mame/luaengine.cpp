@@ -1924,21 +1924,6 @@ void lua_engine::resume(int nparam)
 	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
 }
 
-void lua_engine::run(sol::load_result res)
-{
-	if (res.valid())
-	{
-		auto ret = invoke(res.get<sol::protected_function>());
-		if (!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in run: %s\n", err.what());
-		}
-	}
-	else
-		osd_printf_error("[LUA ERROR] %d loading Lua script\n", (int)res.status());
-}
-
 //-------------------------------------------------
 //  load_script - load script from file path
 //-------------------------------------------------
