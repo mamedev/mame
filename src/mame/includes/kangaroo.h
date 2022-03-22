@@ -23,10 +23,10 @@ public:
 	required_shared_ptr<uint8_t> m_video_control;
 
 	/* video-related */
-	std::unique_ptr<uint32_t[]>      m_videoram;
+	std::unique_ptr<uint32_t[]>      m_videoram{};
 
 	/* misc */
-	uint8_t m_mcu_clock;
+	uint8_t m_mcu_clock = 0U;
 	uint8_t mcu_sim_r();
 	void mcu_sim_w(uint8_t data);
 	void kangaroo_coin_counter_w(uint8_t data);

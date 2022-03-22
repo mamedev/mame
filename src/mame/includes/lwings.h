@@ -46,22 +46,22 @@ private:
 	optional_shared_ptr<uint8_t> m_soundlatch2;
 
 	/* video-related */
-	tilemap_t  *m_fg_tilemap;
-	tilemap_t  *m_bg1_tilemap;
-	tilemap_t  *m_bg2_tilemap;
-	uint8_t    m_bg2_image;
-	int      m_bg2_avenger_hw;
-	int      m_spr_avenger_hw;
-	uint8_t    m_scroll_x[2];
-	uint8_t    m_scroll_y[2];
+	tilemap_t  *m_fg_tilemap = nullptr;
+	tilemap_t  *m_bg1_tilemap = nullptr;
+	tilemap_t  *m_bg2_tilemap = nullptr;
+	uint8_t    m_bg2_image = 0U;
+	int      m_bg2_avenger_hw = 0;
+	int      m_spr_avenger_hw = 0;
+	uint8_t    m_scroll_x[2]{};
+	uint8_t    m_scroll_y[2]{};
 
 	/* misc */
-	uint8_t    m_param[4];
-	int      m_palette_pen;
-	uint8_t    m_soundstate;
-	uint8_t    m_adpcm;
-	uint8_t    m_nmi_mask;
-	int      m_sprbank;
+	uint8_t    m_param[4]{};
+	int      m_palette_pen = 0;
+	uint8_t    m_soundstate = 0U;
+	uint8_t    m_adpcm = 0U;
+	uint8_t    m_nmi_mask = 0U;
+	int      m_sprbank = 0;
 
 	void avengers_adpcm_w(uint8_t data);
 	uint8_t avengers_adpcm_r();
