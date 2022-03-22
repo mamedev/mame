@@ -193,11 +193,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 
-	//uint8_t* m_videoram;
-	//uint8_t* m_colorram;
+	//uint8_t* m_videoram = nullptr;
+	//uint8_t* m_colorram = nullptr;
 
-	tilemap_t *m_tilemap;
-	uint16_t  m_datA40000;
+	tilemap_t *m_tilemap = nullptr;
+	uint16_t  m_datA40000 = 0U;
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	uint32_t screen_update_nevada(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

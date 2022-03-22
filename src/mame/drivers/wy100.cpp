@@ -69,10 +69,10 @@ private:
 
 	required_region_ptr<u8> m_chargen;
 
-	bool m_brdy;
-	bool m_bs_enable;
-	bool m_txd;
-	bool m_printer_select;
+	bool m_brdy = false;
+	bool m_bs_enable = false;
+	bool m_txd = true;
+	bool m_printer_select = false;
 };
 
 void wy100_state::machine_start()
