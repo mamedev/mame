@@ -14,7 +14,7 @@
 
 namespace sol {
 
-class load_result;
+struct load_result;
 
 } // namespace sol
 
