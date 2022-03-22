@@ -22,6 +22,120 @@
 
 ****************************************************************************
 
+Green Beret / Rush'n Attack (Konami, 1985)
+Hardware info by Guru
+
+GX577
+PWB200225A
+|-----------------------------------------------------|
+|                                6264                 |
+|     Z80       577H03.10C                   4416     |
+|                              |------|      4416     |
+|               577H02.8C      |KONAMI|      4416     |
+|                              }005849|      4416     |
+|               577H01.7C      |------|               |
+|                                           577H11.6F |
+|                    501       577H06.5E    577H10.5F |
+|                                                     |
+|    DIPSW3   76489                                   |
+|                   18.432MHz  577H05.4E    577H08.4F |
+|    DIPSW2                                           |
+|                                                     |
+|    DIPSW1                    577H04.3E    577H07.3F |
+|                                                     |
+|    TA7900S                                577H09.2F |
+|                                                     |
+|                                                     |
+|           LA4460                             CN1    |
+|       VOL                                           |
+|                      |--|     18-WAY      |--|      |
+|----------------------|  |-----------------|  |------|
+Notes:
+       Z80 - NEC D780C-1 Z80-compatible CPU. Clock input 3.072MHz [18.432/6]
+     76489 - Texas Instruments SN76489A Digital Complex Sound Generator. Clock input 1.536MHz [18.432/12]
+    005849 - Custom Konami 005849 Video Controller
+      6264 - Hitachi HM6264 8kBx8-bit SRAM (main program RAM)
+      4416 - Mitsubishi M5M4416 16kBx4-bit DRAM (graphics RAM)
+    LA4460 - Sanyo LA4460 Audio Power Amplifier
+    DIPSW3 - 4-position DIP switch
+  DIPSW1/2 - 8-position DIP switch
+   TA7900S - Toshiba TA7900S 5V Regulator with Watchdog Timer and Reset
+       CN1 - 4-position connector for separate sync signal
+       VOL - 1k-ohm Volume Potentiometer
+ 577H01.7C \
+ 577H02.8C  \ 27128 EPROM (main program)
+577H03.10C /
+ 577H07.3E - 27128 EPROM (characters)
+ 577H04.3E \
+ 577H05.4E  \
+ 577H06.5E  / 27128 EPROM (sprites)
+ 577H08.4F /
+ 577H09.2F - MMI 63S081 32x8-bit Bipolar PROM, compatible with 82S123 (color PROM)
+ 577H10.5F - MMI 63S141 256x4-bit Bipolar PROM, compatible with 82S129 (sprite lookup table)
+ 577H11.6F - MMI 63S141 256x4-bit Bipolar PROM, compatible with 82S129 (character lookup table)
+
+
+Green Beret bootleg
+Hardware info by Guru
+
+Note none of the Green Beret bootleg PCBs have numbers/letters along the edge of the PCB.
+These have been added so that chip locations can be documented.
+
+4456
+793
+RING20
+ |---------------------------------------------------------------------------------|
+ |                                                                                 |
+J|DSW2  VOL          Z80    TBP24S10.J9  20MHz                                     |
+ |         C1181                                                                   |
+I|DSW1   76489A                                                                    |
+ |                                                                 2148  2148      |
+H|   X                   DIP28                      PAL16R6.H5                     |
+ |                                                        TBP24S10.G4              |
+G|                       2.G10                      TBP24S10.G5                    |
+ |                                                                                 |
+F|                       3.F10                                                     |
+ |                                                                                 |
+E|                                                                       4.2E      |
+ |                                                                                 |
+D|                       4364                          2148  2148        5.2D      |
+ |                                                                                 |
+C|             1.C12                                                     6.2C      |
+ |                                                                                 |
+B|    82S123.B13                                                         7.2B      |
+ |                                                                                 |
+A|         TBP24S10.A12                                                            |
+ |                                                                                 |
+ |---------------------------------------------------------------------------------|
+   14    13    12    11    10    9     8     7     6     5     4     3     2    1
+
+Notes:
+         Z80 - Sharp LH0080 Z80-compatible CPU. Clock 3.3333MHz [20/6]
+       76489 - Texas Instruments SN76489A Digital Complex Sound Generator. Clock input 1.6666MHz [20/12]
+       HSync - 15.0380kHz
+       VSync - 58.7090Hz
+       1.C12 - 27C128 (background character data)
+       2.G10 - 27C256 (main program)
+       3.F10 - 27C128 (main program)
+        4.E2 - 27C128 (sprite data)
+        5.D2 - 27C128 (sprite data)
+        6.C2 - 27C128 (sprite data)
+        7.B2 - 27C128 (sprite data)
+  82S123.B13 - 32x8-bit bipolar PROM (color PROM)
+TBP24S10.A12 - 256x4-bit bipolar PROM (possibly also a color PROM)
+ TBP24S10.J9 - 256x4-bit bipolar PROM
+ TBP24S10.G4 - 256x4-bit bipolar PROM
+ TBP24S10.G5 - 256x4-bit bipolar PROM
+        4364 - NEC D4364 8kBx8-bit SRAM
+        2148 - Fujitsu MBM2148 1kBx4-bit SRAM
+       C1181 - NEC uPC1181H Audio Power Amplifier
+  PAL16R6.H5 - sprites not shown when removed
+      DSW1/2 - 8-position DIP switch
+           X - Unpopulated position for 4-position DIP switch
+       DIP28 - Unpopulated DIP28 position (no socket)
+
+***************************************************************************
+
     Memory map
 
     0000-bfff   ROM
@@ -424,7 +538,7 @@ void gberet_state::gberet(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, m_sn, XTAL(18'432'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // type verified on real and bootleg PCB
+	SN76489A(config, m_sn, XTAL(18'432'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // type verified
 }
 
 void mrgoemon_state::mrgoemon(machine_config &config)
@@ -438,14 +552,14 @@ void mrgoemon_state::mrgoemon(machine_config &config)
 void gberetb_state::gberetb(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(20'000'000) / 4); // divider guessed
+	Z80(config, m_maincpu, XTAL(20'000'000) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gberetb_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gberetb_state::irq0_line_assert));
 	m_maincpu->set_periodic_int(FUNC(gberetb_state::nmi_line_assert), attotime::from_hz(XTAL(20'000'000) / 0x8000)); // divider guessed
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(58.7090);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
@@ -458,7 +572,7 @@ void gberetb_state::gberetb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, m_sn, XTAL(20'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // divider guessed
+	SN76489A(config, m_sn, XTAL(20'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
