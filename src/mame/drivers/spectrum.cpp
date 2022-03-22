@@ -334,10 +334,10 @@ void spectrum_state::adjust_mem_contended(offs_t offset)
 		return;
 
 	attotime shift = m_maincpu->clocks_to_attotime(1);
-	attotime contentended_pass = shift + m_screen->scan_period() - m_screen->time_until_pos(vpos + 1, get_screen_area().left());
-	attotime contentended_left = shift + m_screen->scan_period() - m_screen->time_until_pos(vpos + 1, get_screen_area().right() + 1);
-	if(contentended_pass >= attotime::zero && contentended_left < attotime::zero) {
-		u64 clocks = m_maincpu->attotime_to_clocks(contentended_pass);
+	attotime contended_pass = shift + m_screen->scan_period() - m_screen->time_until_pos(vpos + 1, get_screen_area().left());
+	attotime contended_left = shift + m_screen->scan_period() - m_screen->time_until_pos(vpos + 1, get_screen_area().right() + 1);
+	if(contended_pass >= attotime::zero && contended_left < attotime::zero) {
+		u64 clocks = m_maincpu->attotime_to_clocks(contended_pass);
 		u8 i = m_contention_pattern[clocks % m_contention_pattern.size()];
 		m_maincpu->adjust_icount(-i);
 	}

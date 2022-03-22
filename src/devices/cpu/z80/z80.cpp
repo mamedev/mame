@@ -517,14 +517,14 @@ uint8_t z80_device::arg()
 {
 	unsigned pc = PCD;
 	PC++;
-	return rm(pc);
+	u8 res = m_args.read_byte(pc);
+	T(3);
+	return res;
 }
 
 uint16_t z80_device::arg16()
 {
-	unsigned pc = PCD;
-	PC += 2;
-	return rm(pc) | (rm(pc+1) << 8);
+	return arg() | (arg() << 8);
 }
 
 /***************************************************************
