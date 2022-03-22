@@ -616,6 +616,7 @@ uint8_t geneve_state::memread(offs_t offset)
 
 	// In case we had a debugger read, reset the flag.
 	m_gatearray->set_debug(false);
+	if (m_genmod) m_genmod_decoder->set_debug(false);
 
 	return value;
 }
@@ -723,6 +724,7 @@ void geneve_state::memwrite(offs_t offset, uint8_t data)
 
 	// In case we had a debugger write, reset the flag.
 	m_gatearray->set_debug(false);
+	if (m_genmod) m_genmod_decoder->set_debug(false);
 }
 
 /****************************************************************************
