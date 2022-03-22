@@ -466,7 +466,7 @@ void coco_os9_image::impl::format(const meta_data &meta)
 	volume_header.w8(16, format_flags);								// DD.FMT - format flags
 	volume_header.w16b(17, sectors);								// DD.SPT - sectors per track
 	volume_header.w24b(26, creation_os9date);						// DD.DAT - date of creation
-	volume_header.w24b(29, creation_os9time);						// DD.DAT - time of creation
+	volume_header.w16b(29, creation_os9time);						// DD.DAT - time of creation
 	volume_header.wstr(31, to_os9_string(volume_title, 32));		// DD.NAM - title
 	volume_header.w16b(103, sector_bytes / 256);					// sector bytes
 
