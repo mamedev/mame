@@ -1533,7 +1533,7 @@ ExtractDisk  [01]"Disk Basic      " -> "adventure land_01.d88"
 ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		 -->
 
-		<!-- same as voodoo castle basic disk -->
+		<!-- same as voodoo castle (voodooca) BASIC disk -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="26800"> <!-- Data CRC16: 58939 -->
 				<rom name="adventure land_01.d88" size="26800" crc="0bbda412" sha1="c88a6c49309103eb6d836dc14dd8d9be0a7dc71a"/>
@@ -2320,12 +2320,12 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<software name="alphad" cloneof="alpha">
+	<software name="alphad" cloneof="alpha" supported="yes">
 		<description>Alpha (Demo)</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
 		<info name="alt_title" value="アルファ"/>
-		<info name="usage" value="Requires N88 Basic v2.0+ to boot"/>
+		<info name="usage" value="Needs BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="287920">    <!-- Data CRC16: 4039 -->
@@ -2550,7 +2550,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<!-- Has optional GSX8800 sound board support -->
+	<!-- Has optional [GSX8800] sound board support -->
 	<software name="amtrckm2" supported="partial">
 		<description>American Truck MKII Ban</description>
 		<year>1989</year>
@@ -2565,7 +2565,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<!-- Has optional GSX8800 sound board support -->
+	<!-- Has optional [GSX8800] sound board support -->
 	<software name="amtrckm2a" cloneof="amtrckm2" supported="partial">
 		<description>American Truck MKII Ban (alt)</description>
 		<year>1989</year>
@@ -4466,7 +4466,8 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 		</part>
 	</software>
 
-	<software name="bellonch">
+	<!-- Not extensively tested -->
+	<software name="bellonch" supported="partial">
 		<description>Belloncho Series 1 - Belloncho Shintai Kensa</description>
 		<year>1990</year>
 		<publisher>ハード (Hard)</publisher>
@@ -4745,8 +4746,9 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 	</software>
 
 	<!-- Sets up BG Pal -->
-	<!-- TODO: verify how to create a character -->
-	<software name="blckonyx" supported="partial">
+	<!-- TODO: verify how to create user disk -->
+	<!-- Prints "sono kata ha koko ni orimasen" in katakana (missing party?) -->
+	<software name="blckonyx" supported="no">
 		<description>The Black Onyx</description>
 		<year>1984</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
@@ -4902,7 +4904,9 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 		</part>
 	</software>
 
-	<software name="blassty">
+	<!-- Not extensively tested -->
+	<!-- Tests [Sound Board 2] -->
+	<software name="blassty" supported="partial">
 		<description>Cruise Chaser - Blassty</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
@@ -4993,6 +4997,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<!-- PC8801 -->
 		<info name="release" value="198406xx"/>
 		<info name="alt_title" value="ボコスカウォーズ"/>
+		<info name="usage" value="Needs V2 BASIC on machines equipped with it"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="57264">
 				<rom name="bokosuka wars.d88" size="57264" crc="410d9bb7" sha1="fa83f0e5d393c82b928180fb8cb4c2e1b3a321fb"/>
@@ -5626,7 +5631,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="cancanb">
+	<!-- [uPD3301] don't mask underlying bitmap on intro -->
+	<!-- [uPD3301] shows text layer frame glitches on gameplay scene transitions (more masking) -->
+	<!-- Keypresses on gameplay seems too fast (verify, PC8801MA) -->
+	<!-- Uses [DAC1BIT] during intro -->
+	<software name="cancanb" supported="no">
 		<description>Can Can Bunny</description>
 		<year>1989</year>
 		<publisher>カクテルソフト (Cocktail Soft)</publisher>
@@ -5650,7 +5659,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="cancanba" cloneof="cancanb">
+	<!-- [uPD3301] don't mask underlying bitmap on intro -->
+	<!-- [uPD3301] shows text layer frame glitches on scene transitions (more masking) -->
+	<!-- Keypresses on gameplay seems too fast (verify, PC8801MA) -->
+	<!-- Uses [DAC1BIT] during intro -->
+	<software name="cancanba" cloneof="cancanb" supported="no">
 		<description>Can Can Bunny (alt?)</description>
 		<year>1989</year>
 		<publisher>カクテルソフト (Cocktail Soft)</publisher>
@@ -5675,13 +5688,16 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="cancanbs">
+	<!-- Crashes the first way around (works on soft reset) -->
+	<!-- No sound -->
+	<software name="cancanbs" supported="no">
 		<description>Can Can Bunny Superior</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900601"/>
 		<info name="alt_title" value="きゃんきゃんバニー スペリオール"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="cancan bunny 2.d88" size="1729904" crc="f0550d79" sha1="b7488be5091f25130af6152975f23354024c0083"/-->
 
@@ -5714,13 +5730,16 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="cancanbsa" cloneof="cancanbs">
+	<!-- Crashes the first way around (works on soft reset) -->
+	<!-- No sound -->
+	<software name="cancanbsa" cloneof="cancanbs" supported="no">
 		<description>Can Can Bunny Superior (alt?)</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900601"/>
 		<info name="alt_title" value="きゃんきゃんバニー スペリオール"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="can can bunny superior.d88" size="1771552" crc="eec02037" sha1="7fcdeeb5169e9b97b260146efd24d275911d90d3"/-->
 
@@ -5753,7 +5772,9 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="cancanbsb" cloneof="cancanbs">
+	<!-- Crashes the first way around (works on soft reset) -->
+	<!-- No sound -->
+	<software name="cancanbsb" cloneof="cancanbs" supported="no">
 		<description>Can Can Bunny Superior (alt 2)</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
@@ -6086,7 +6107,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="cloderun">
+	<!-- No sound (verify, [DAC1BIT]?) -->
+	<software name="cloderun" supported="partial">
 		<description>Championship Lode Runner</description>
 		<year>1985</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -6795,7 +6817,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="cranston">
+	<!-- Crashes with illegal function call (TODO: is it truly PC8801?) -->
+	<software name="cranston" supported="no">
 		<description>Cranston Manor</description>
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -6852,7 +6875,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 ExtractDisk  [01]"Disk 1          " -> "cranston_manor_v80_01.d88"
 ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 -->
-	<software name="cranstonb" cloneof="cranston">
+	<!-- TODO: naming suggests being N80 BASIC, belonging to PC8001mkII -->
+	<software name="cranstonb" cloneof="cranston" supported="no">
 		<description>Cranston Manor (alt 2)</description>
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -7257,7 +7281,9 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<software name="croquis">
+	<!-- Hangs at title screen (accesses [RTC] TIME$ fn at 680) -->
+	<!-- Unemulated optional [GSX8800] sound board -->
+	<software name="croquis" supported="no">
 		<description>Chou Bishoujo Densetsu Croquis</description>
 		<year>1990</year>
 		<publisher>ピンキー (Pinky)</publisher>
@@ -7774,7 +7800,7 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<software name="daidasso">
+	<software name="daidasso" supported="yes">
 		<description>Dai Dassou</description>
 		<year>1985</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -7802,7 +7828,7 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<!-- "CANNOT LOAD YSHELL.COM" -->
+	<!-- "CANNOT LOAD YSHELL.COM" [PC=0xe200, PC=0xe297, CHRN=(0, 0, 2, 512)] -->
 	<software name="daikokai" supported="no">
 		<description>Daikoukai Jidai</description>
 		<year>1990</year>
@@ -8132,7 +8158,8 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
-	<software name="kyoko">
+	<!-- Shows garbage on right portion of screen -->
+	<software name="kyoko" supported="partial">
 		<description>Datenshi Kyouko - Part I</description>
 		<year>1988</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
@@ -8577,6 +8604,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		<info name="alt_title" value="電脳学園"/>
 		<!--combined image-->
 		<!--rom name="dennougakuen.d88" size="1681216" crc="35c2a006" sha1="78eddc3c921c57ecee379607586b5691165a2da8"/-->
+		<!-- Omake: press HOME key for fake ASM screen (boss key) -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
@@ -8616,6 +8644,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		<info name="alt_title" value="電脳学園 2 -ザ・ハイウェイバスター-"/>
 		<!--combined image-->
 		<!--rom name="dennougakuen 2.d88" size="1691776" crc="abbfcbd0" sha1="f969986f6168623468e2106f65447614d61537f5"/-->
+		<!-- Omake: press HOME key for fake game screen (boss key) -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
@@ -8655,6 +8684,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		<info name="alt_title" value="電脳学園 2 -ザ・ハイウェイバスター-"/>
 		<!--combined image-->
 		<!--rom name="denno gakuen 2.d88" size="1681216" crc="f546e159" sha1="d71481ebaaa106611cdaabdab2820b8f559f857d"/-->
+		<!-- Omake: press HOME key for fake game screen (boss key) -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
@@ -8694,6 +8724,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		<info name="alt_title" value="電脳学園 3 -トップをねらえ!-"/>
 		<!--combined image-->
 		<!--rom name="dennougakuen 3.d88" size="1769408" crc="0e25c762" sha1="0b9cd838d45a222630e56062169518ad388823ac"/-->
+		<!-- Omake: press HOME key for fake Tetris-like screen (boss key) -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
@@ -11174,7 +11205,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<!-- black screen while floppy keeps spinning -->
+	<!-- black screen while floppy keeps spinning, [FDC] copy protection? -->
 	<software name="elevator" supported="no">
 		<description>Elevator Action</description>
 		<year>1986</year>
@@ -11400,6 +11431,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
+	<!-- TODO: N-BASIC game, move to pc8001_flop -->
 	<software name="emmy">
 		<description>Emmy</description>
 		<year>1984</year>
@@ -11414,6 +11446,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
+	<!-- TODO: N-BASIC game, move to pc8001_flop -->
 	<software name="emmya" cloneof="emmy">
 		<description>Emmy (alt)</description>
 		<year>1984</year>
@@ -11946,7 +11979,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="fangs">
+	<!-- Randomly hangs on transitions (exiting doors, random battles) [FDC] CPU stalls (copy protection?) -->
+	<software name="fangs" supported="no">
 		<description>Fangs</description>
 		<year>1991</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -13365,8 +13399,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-
-	<software name="gamblerp">
+	<software name="gamblerp" supported="yes">
 		<description>Gambler Jikochuushinha Mahjong Puzzle Collection</description>
 		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -13380,7 +13413,8 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<software name="gamblerpd" cloneof="gamblerp">
+	<!-- Hangs after Game Arts logo animation, [i8214] spurious irqs -->
+	<software name="gamblerpd" cloneof="gamblerp" supported="no">
 		<description>Gambler Jikochuushinha Mahjong Puzzle Collection Demo</description>
 		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -13447,7 +13481,9 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<software name="gaudi">
+	<!-- Not extensively tested -->
+	<!-- Has text layer row garbage strip on top (verify) -->
+	<software name="gaudi" supported="partial">
 		<description>Gaudi - Barcelona no Kaze</description>
 		<year>1989</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
@@ -13582,6 +13618,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 	</software>
 
 	<!-- [Incorrect layout on track 24 head 1, expected_size=100000, current_size=126688] -->
+	<!-- (old note) title screen text/bitmap contrast is pretty ugly (verify) -->
 	<software name="gegege" supported="no">
 		<description>GeGeGe no Kitarou</description>
 		<year>1985</year>
@@ -14352,8 +14389,10 @@ ExtractDisk  [02]"Gradius改       " -> "gradius kai_02.d88"
 		</part>
 	</software>
 
-	<software name="grodba">
-		<description>Grodba</description>
+	<!-- Requires OPN equipped machine (verify) -->
+	<!-- palette is ugly (parent pc8801 only, verify) -->
+	<software name="grodba" supported="partial">
+		<description>Grobda</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<!-- PC8801 -->
@@ -14365,7 +14404,9 @@ ExtractDisk  [02]"Gradius改       " -> "gradius kai_02.d88"
 		</part>
 	</software>
 
-	<software name="grodbaa" cloneof="grodba">
+	<!-- Requires OPN equipped machine (verify) -->
+	<!-- palette is ugly (parent pc8801 only, verify) -->
+	<software name="grodbaa" cloneof="grodba" supported="partial">
 		<description>Grobda (alt)</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -14597,13 +14638,16 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="gunship">
+	<!-- Crashes at beginning of gameplay (copy protection kicking in?) -->
+	<!-- TODO: needs manual for copy protection (different images than Amiga version) -->
+	<software name="gunship" supported="no">
 		<description>Gunship</description>
 		<year>1990</year>
 		<publisher>マイクロプローズ (Microprose)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900713"/>
 		<info name="alt_title" value="ガンシップ"/>
+		<info name="usage" value="Sports manual copy protection (Military Equipment)"/>
 		<!--combined image-->
 		<!--rom name="gunship.d88" size="702016" crc="8f2372b3" sha1="9d9b4768fb86875ef647912754fe8e47e5156587"/-->
 
@@ -21889,7 +21933,9 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<!-- after losing a life the game doesn't work properly anymore (cannot reproduce in PC8801MA) -->
-	<software name="makaimur" supported="yes">
+	<!-- bitmap layer alignment is dubious (cfr. pit jumps) -->
+	<!-- Definitely needs save state support -->
+	<software name="makaimur" supported="partial">
 		<description>Makaimura</description>
 		<year>1987</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -23898,6 +23944,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
+	<!-- TODO: apparently has a copy protection check by picking up a specific item, verify -->
 	<software name="valis">
 		<description>Mugen Senshi Valis</description>
 		<year>1986</year>
@@ -23924,7 +23971,6 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<!-- boot OK -->
-	<!-- Omake: press F5 during opening for music test, alternatively just boot disk G from drive 2 -->
 	<!-- TODO: checkout if there are other hidden hotkeys like PC98 version -->
 	<software name="valis2" supported="yes">
 		<description>Mugen Senshi Valis II</description>
@@ -23935,6 +23981,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		<info name="alt_title" value="夢幻戦士ヴァリス2"/>
 		<!--combined image-->
 		<!--rom name="mugensenshi valis ii.d88" size="2912464" crc="b5eabbf1" sha1="572de9a1e3b7e21fb2acf67603d8944b31bea167"/-->
+		<!-- Omake: press F5 during opening for music test, alternatively just boot disk G from drive 2 -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
@@ -24365,7 +24412,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<!-- uPD3301 text layer draws UL covering the full screen -->
+	<!-- [uPD3301] text layer draws UL covering the full screen -->
 	<software name="ninjakmb" supported="partial">
 		<description>Ninja-kun - Majou no Bouken</description>
 		<year>1986</year>
@@ -25532,7 +25579,7 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<!-- Entering into shops causes corrupted text graphics [uPD3301] -->
+	<!-- Entering into shops causes corrupted text graphics with [uPD3301] text layer -->
 	<software name="paladin" supported="no">
 		<description>The Paladin</description>
 		<year>1985</year>
@@ -32449,7 +32496,7 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 ExtractDisk  [01]"B DISK          " -> "sorcerian music library_01.d88"
 ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 -->
-	<!-- Uses Bg Pal color, white screen on startup [caused by uPD3301 code] -->
+	<!-- Uses [BG Pal] color, white screen on startup [uPD3301] -->
 	<software name="sorcerml" supported="no">
 		<description>Sorcerian Music Library</description>
 		<year>1987?</year>
@@ -41092,8 +41139,10 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<!-- Hangs/crashes after few frames of opening animation -->
-	<software name="attacker" supported="no">
+	<!-- Hangs/crashes after few frames of opening animation (fixed) -->
+	<!-- Option 5 from main menu is a [3301] text layer game (verify) -->
+	<!-- Not extensively tested -->
+	<software name="attacker" supported="partial">
 		<description>Attacker</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -41332,7 +41381,8 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<software name="brunette">
+	<!-- No BGM on title screen, locks up on game selection, requires a [i8214] sound irq (regression) -->
+	<software name="brunette" supported="no">
 		<description>Brunette</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -41344,7 +41394,8 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<software name="brunettea" cloneof="brunette">
+	<!-- No BGM on title screen, locks up on game selection, requires a [i8214] sound irq (regression) -->
+	<software name="brunettea" cloneof="brunette" supported="no">
 		<description>Brunette (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -46401,7 +46452,7 @@ ExtractDisk  [02]"              " -> "sound on-ten vol.1(a)_02.d88"
 		<description>Sweet Girl</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Burning Apple?" />
+		<info name="developer" value="Burning★Apple?" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="422160">
 				<rom name="sweet_girl.d88" size="422160" crc="fa285b6f" sha1="de69bf3f2a1190e2c14d0123a83df75828f6485c"/>
@@ -46413,7 +46464,7 @@ ExtractDisk  [02]"              " -> "sound on-ten vol.1(a)_02.d88"
 		<description>Sweet Girl 2 ~Body Game~</description>
 		<year>1990?</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Burning Apple" />
+		<info name="developer" value="Burning★Apple" />
 		<!--combined image-->
 		<!--rom name="sweet girl 2.d88" size="876000" crc="dd0b8d1e" sha1="cc7860aaa23c2c2f87238c94df353115dcc2ffdd"/-->
 
@@ -47261,187 +47312,192 @@ ExtractDisk  [02]"              " -> "sound on-ten vol.1(a)_02.d88"
 		</part>
 	</software>
 
-
-
-
-<!-- STILL TO BE SPLIT -->
 <!--
-
-jam1 - pc8801           Device Floppy Disk load failed: Invalid image
-    ExtractDisk  [01]"Sys            " -> "jam vol.1_01.d88"
-    ExtractDisk  [02]"アイドルA    " -> "jam vol.1_02.d88"
-    ExtractDisk  [03]"アイドルB    " -> "jam vol.1_03.d88"
-    ExtractDisk  [04]"女子高生A    " -> "jam vol.1_04.d88"
-    ExtractDisk  [05]"女子高生B    " -> "jam vol.1_05.d88"
-    ExtractDisk  [06]"女子大生A    " -> "jam vol.1_06.d88"
-    ExtractDisk  [07]"女子大生B    " -> "jam vol.1_07.d88"
-    ExtractDisk  [08]"OL A        " -> "jam vol.1_08.d88"
-    ExtractDisk  [09]"OL B        " -> "jam vol.1_09.d88"
-
-jam1a - pc8801          Device Floppy Disk load failed: Invalid image
-    ExtractDisk  [01]"SYSTEM          " -> "jam vol.1 (alt)_01.d88"
-    ExtractDisk  [02]"第1集 A     " -> "jam vol.1 (alt)_02.d88"
-    ExtractDisk  [03]"第1集 B     " -> "jam vol.1 (alt)_03.d88"
-    ExtractDisk  [04]"第2集 A     " -> "jam vol.1 (alt)_04.d88"
-    ExtractDisk  [05]"第2集 B     " -> "jam vol.1 (alt)_05.d88"
-    ExtractDisk  [06]"第3集 A     " -> "jam vol.1 (alt)_06.d88"
-    ExtractDisk  [07]"第3集 B     " -> "jam vol.1 (alt)_07.d88"
-    ExtractDisk  [08]"第4集 A     " -> "jam vol.1 (alt)_08.d88"
-    ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
-
-loderuna - pc8801       Device Floppy Disk load failed: Invalid image
-    ExtractDisk  [01]"LOAD_RUNNER    " -> "lode runner with level disks_01.d88" 03323138 (same as Alt 2 set)
-    ExtractDisk  [02]"LRDAT(BUG  ) " -> "lode runner with level disks_02.d88"
-    ExtractDisk  [03]"LRDAT(CHAMP   ) " -> "lode runner with level disks_03.d88"
-    ExtractDisk  [04]"LRDAT(DMG  ) " -> "lode runner with level disks_04.d88"
-    ExtractDisk  [05]"LRDAT(FC_SLR1 ) " -> "lode runner with level disks_05.d88"
-    ExtractDisk  [06]"LRDAT(FC_SLR2 ) " -> "lode runner with level disks_06.d88"
-    ExtractDisk  [07]"LRDAT(FUNBOOK ) " -> "lode runner with level disks_07.d88"
-    ExtractDisk  [08]"LRDAT(HIR_RCNT) " -> "lode runner with level disks_08.d88"
-    ExtractDisk  [09]"LRDAT(HISSHO2 ) " -> "lode runner with level disks_09.d88"
-    ExtractDisk  [10]"LRDAT(LEVEL085) " -> "lode runner with level disks_10.d88"
-    ExtractDisk  [11]"LRDAT(TECHPOLI) " -> "lode runner with level disks_11.d88"
-    ExtractDisk  [12]"LRDAT(LRPRO68K) " -> "lode runner with level disks_12.d88"
-    ExtractDisk  [13]"LRDAT(MAP000  ) " -> "lode runner with level disks_13.d88"
-    ExtractDisk  [14]"LRDAT(MISC    ) " -> "lode runner with level disks_14.d88"
-    ExtractDisk  [15]"LRDAT(MSX  ) " -> "lode runner with level disks_15.d88"
-    ExtractDisk  [16]"LRDAT(MSX2    ) " -> "lode runner with level disks_16.d88"
-    ExtractDisk  [17]"LRDAT(MSX_CHP ) " -> "lode runner with level disks_17.d88"
-    ExtractDisk  [18]"LRDAT(PC100   ) " -> "lode runner with level disks_18.d88"
-    ExtractDisk  [19]"LRDAT(PCENGINE) " -> "lode runner with level disks_19.d88"
-    ExtractDisk  [20]"LRDAT(SEGA_CHP) " -> "lode runner with level disks_20.d88"
-    ExtractDisk  [21]"LRDAT(YUGEKISH) " -> "lode runner with level disks_21.d88"
-
+ExtractDisk  [01]"LOAD_RUNNER    " -> "lode runner with level disks_01.d88" 03323138 (same as Alt 2 set)
+ExtractDisk  [02]"LRDAT(BUG  ) " -> "lode runner with level disks_02.d88"
+ExtractDisk  [03]"LRDAT(CHAMP   ) " -> "lode runner with level disks_03.d88"
+ExtractDisk  [04]"LRDAT(DMG  ) " -> "lode runner with level disks_04.d88"
+ExtractDisk  [05]"LRDAT(FC_SLR1 ) " -> "lode runner with level disks_05.d88"
+ExtractDisk  [06]"LRDAT(FC_SLR2 ) " -> "lode runner with level disks_06.d88"
+ExtractDisk  [07]"LRDAT(FUNBOOK ) " -> "lode runner with level disks_07.d88"
+ExtractDisk  [08]"LRDAT(HIR_RCNT) " -> "lode runner with level disks_08.d88"
+ExtractDisk  [09]"LRDAT(HISSHO2 ) " -> "lode runner with level disks_09.d88"
+ExtractDisk  [10]"LRDAT(LEVEL085) " -> "lode runner with level disks_10.d88"
+ExtractDisk  [11]"LRDAT(TECHPOLI) " -> "lode runner with level disks_11.d88"
+ExtractDisk  [12]"LRDAT(LRPRO68K) " -> "lode runner with level disks_12.d88"
+ExtractDisk  [13]"LRDAT(MAP000  ) " -> "lode runner with level disks_13.d88"
+ExtractDisk  [14]"LRDAT(MISC    ) " -> "lode runner with level disks_14.d88"
+ExtractDisk  [15]"LRDAT(MSX  ) " -> "lode runner with level disks_15.d88"
+ExtractDisk  [16]"LRDAT(MSX2    ) " -> "lode runner with level disks_16.d88"
+ExtractDisk  [17]"LRDAT(MSX_CHP ) " -> "lode runner with level disks_17.d88"
+ExtractDisk  [18]"LRDAT(PC100   ) " -> "lode runner with level disks_18.d88"
+ExtractDisk  [19]"LRDAT(PCENGINE) " -> "lode runner with level disks_19.d88"
+ExtractDisk  [20]"LRDAT(SEGA_CHP) " -> "lode runner with level disks_20.d88"
+ExtractDisk  [21]"LRDAT(YUGEKISH) " -> "lode runner with level disks_21.d88"
 -->
-
-	<software name="ldrunc" cloneof="ldrun">
+	<software name="ldrunc" cloneof="ldrun" supported="no">
 		<description>Lode Runner with Level Disks</description>
 		<year>19??</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<!--combined image-->
 		<!--rom name="lode runner with level disks.d88" size="7548048" crc="d43e72d6" sha1="16b56366ac447ff3cd0c313b388e1ec72ec0922f"/-->
+		<!-- TODO: understand how to load these levels -->
+		<info name="usage" value="Data disks, needs a Lode Runner main disk"/>
 
+		<!-- TODO: find actual labels, double check with testing -->
+		<!-- We use markings found on the ExtractDisk for the time being -->
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="BUG level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_02.d88" size="359520" crc="2dacf817" sha1="6ddcadf1350d993760b79628dde22ce0c47a6210"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="CHAMP level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_03.d88" size="359520" crc="8aaa48bb" sha1="8ddd07b4e0ecca9db76782b46c0a9812a6bf01a8"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="DMG level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_04.d88" size="359520" crc="ed7040dc" sha1="f778865a55b54719b3f827343d1d092db936633c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="FC_SLR1 level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_05.d88" size="359520" crc="03faab32" sha1="bc85ddc1fcba941b5f45cf664de6a0f0afa7f643"/>
 			</dataarea>
 		</part>
 
 		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="FC_SLR2 level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_06.d88" size="359520" crc="3b1ea376" sha1="a94427c79a4b42813164452b7dfc1ca11d1b9da6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="FUNBOOK level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_07.d88" size="359520" crc="c8e010c5" sha1="cc9fbbc1490f6c47064b9f780bf621b20546eb58"/>
 			</dataarea>
 		</part>
 
 		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="HIR_RCNT level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_08.d88" size="359520" crc="cdda982a" sha1="e03309e7b98b12b3682c2e5d862c07e11a0291fc"/>
 			</dataarea>
 		</part>
 
 		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="HISSHO2 level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_09.d88" size="359520" crc="593df672" sha1="fce987922e85c26763fde8ac25340f4efb5f9ab2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="LEVEL085 level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_10.d88" size="359520" crc="198aa345" sha1="49abe84a0147578babfd85741b2e8490fe575250"/>
 			</dataarea>
 		</part>
 
 		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="TECHPOLI level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_11.d88" size="359520" crc="03d69db1" sha1="0c49a64f7dbdd05a79750ddc9b4efc8e1144ed38"/>
 			</dataarea>
 		</part>
 
 		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="LRPRO68K level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_12.d88" size="359520" crc="0a8aef00" sha1="fbcba737a3ad6825c8334dd3448a2cb04258db72"/>
 			</dataarea>
 		</part>
 
 		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="MAP000 level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_13.d88" size="359520" crc="d94e94f1" sha1="f2eb3d3f58fdc3bfd6e07ccbcfdcb9705ea2920b"/>
 			</dataarea>
 		</part>
 
 		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="MISC level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_14.d88" size="359520" crc="967c30c8" sha1="136adf861912efffbd4d43921dcd6058f9a67fbd"/>
 			</dataarea>
 		</part>
 
 		<part name="flop15" interface="floppy_5_25">
+			<feature name="part_id" value="MSX level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_15.d88" size="359520" crc="674b7f5f" sha1="8e223e6f50b104806ce8a6c83321f22a0b28f6dd"/>
 			</dataarea>
 		</part>
 
 		<part name="flop16" interface="floppy_5_25">
+			<feature name="part_id" value="MSX2 level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_16.d88" size="359520" crc="89579885" sha1="462aa2445c4016f640b261811f0d321296bbd44c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop17" interface="floppy_5_25">
+			<feature name="part_id" value="MSX_CHP level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_17.d88" size="359520" crc="642e06e3" sha1="e59e9b1b16a3c14f74ebae3a4149d7170bfa666c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop18" interface="floppy_5_25">
+			<feature name="part_id" value="PC100 level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_18.d88" size="359520" crc="aea019c3" sha1="4a7f4a284d2a67ee8825b07f337031d061b03671"/>
 			</dataarea>
 		</part>
 
 		<part name="flop19" interface="floppy_5_25">
+			<feature name="part_id" value="PCENGINE level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_19.d88" size="359520" crc="24a04d9f" sha1="bbb13261a3f03384cf033a2e9946d6cb890ba132"/>
 			</dataarea>
 		</part>
 
 		<part name="flop20" interface="floppy_5_25">
+			<feature name="part_id" value="SEGA_CHP level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_20.d88" size="359520" crc="6fb43b7b" sha1="04b6fe89b44e3f74beac614ae3ad1c4c2ad2a697"/>
 			</dataarea>
 		</part>
 
 		<part name="flop21" interface="floppy_5_25">
+			<feature name="part_id" value="YUGEKISH level disk" />
 			<dataarea name="flop" size="359520">
 				<rom name="lode runner with level disks_21.d88" size="359520" crc="60409515" sha1="b1bc2dc79cd429540fa15879580b34d23a7b030f"/>
 			</dataarea>
 		</part>
 	</software>
 
+<!--
+ExtractDisk  [01]"Sys            " -> "jam vol.1_01.d88"
+ExtractDisk  [02]"アイドルA    " -> "jam vol.1_02.d88"
+ExtractDisk  [03]"アイドルB    " -> "jam vol.1_03.d88"
+ExtractDisk  [04]"女子高生A    " -> "jam vol.1_04.d88"
+ExtractDisk  [05]"女子高生B    " -> "jam vol.1_05.d88"
+ExtractDisk  [06]"女子大生A    " -> "jam vol.1_06.d88"
+ExtractDisk  [07]"女子大生B    " -> "jam vol.1_07.d88"
+ExtractDisk  [08]"OL A        " -> "jam vol.1_08.d88"
+ExtractDisk  [09]"OL B        " -> "jam vol.1_09.d88"
+-->
 	<software name="jam1">
 		<description>Jam Disk Magazine Vol.1</description>
 		<year>19??</year>
@@ -47504,6 +47560,17 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
+<!--
+ExtractDisk  [01]"SYSTEM          " -> "jam vol.1 (alt)_01.d88"
+ExtractDisk  [02]"第1集 A     " -> "jam vol.1 (alt)_02.d88"
+ExtractDisk  [03]"第1集 B     " -> "jam vol.1 (alt)_03.d88"
+ExtractDisk  [04]"第2集 A     " -> "jam vol.1 (alt)_04.d88"
+ExtractDisk  [05]"第2集 B     " -> "jam vol.1 (alt)_05.d88"
+ExtractDisk  [06]"第3集 A     " -> "jam vol.1 (alt)_06.d88"
+ExtractDisk  [07]"第3集 B     " -> "jam vol.1 (alt)_07.d88"
+ExtractDisk  [08]"第4集 A     " -> "jam vol.1 (alt)_08.d88"
+ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
+-->
 	<software name="jam1a" cloneof="jam1">
 		<description>Jam Disk Magazine Vol.1 (alt)</description>
 		<year>19??</year>
@@ -47913,7 +47980,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="bluestat">
+	<software name="bluestat" supported="yes">
 		<description>Ao no Sekizou - The Blue Statue</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -47943,10 +48010,13 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
+	<!-- Hangs at main menu selection, [3301] vblank irq -->
 	<software name="ashurano" supported="no">
 		<description>Ashura no To</description>
-		<year>19??</year>
+		<year>1990</year>
+		<!-- "CaesarSoft" on title Doujinshi? -->
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Needs BASIC V2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ashura no to.d88" size="348848" crc="eb174138" sha1="6b730f90744692b6fefb85d12bcafdcef5ccd38a"/>
@@ -47990,12 +48060,16 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="autumnpa">
+	<!-- TODO: verify if it really works on BASIC 1.0 only -->
+	<!-- Doesn't accept input on main menu, [3301] vblank irq regression -->
+	<software name="autumnpa" supported="no">
 		<description>Autumn Park</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!--combined image-->
 		<!--rom name="autumn park.d88" size="697696" crc="9ee6184f" sha1="9ea1f7e9b791025324003d9cbb903576d2c247a2"/-->
+		<info name="usage" value="Works in vanilla PC8801 only"/>
+		<!-- otherwise punts with an invisible "RETURN without GOSUB in 56230" --> 
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -48067,10 +48141,13 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="cardgam1">
-		<description>Card Game Vol.1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<!-- Glitchy [3301] text layer on gameplay (verify) -->
+	<software name="cardgam1" supported="no">
+		<description>Card Game Change Vol.1</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="CardGame 「ちぇんじ」 Vol.1"/>
+		<info name="developer" value="Burning★Apple" />
 		<!--combined image-->
 		<!--rom name="card game vol.1.d88" size="844320" crc="0b69cebe" sha1="782f6564fd02dafef6256882f026ec231d13b8f6"/-->
 
@@ -48085,6 +48162,31 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="422160">
 				<rom name="card game vol.1 (disk b).d88" size="422160" crc="bb32c38c" sha1="109dcf24f95702dc8cb837e7c9da9d8d6ec8e2f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Glitchy [3301] text layer on gameplay (verify) -->
+	<software name="changevo" cloneof="cardgam1" supported="no">
+		<description>Card Game Change Vol.1 (alt)</description>
+		<year>1990</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="CardGame 「ちぇんじ」 Vol.1"/>
+		<info name="developer" value="Burning★Apple" />
+		<!--combined image-->
+		<!--rom name="change vol.1.d88" size="844320" crc="398f75bf" sha1="51e8f996f75d84dfbae82dcf460e38c1cc367116"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="422160">
+				<rom name="change vol.1 (disk 1).d88" size="422160" crc="839937e2" sha1="b04241d29aa220243d3b83263eb83a2b1dad0961"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="422160">
+				<rom name="change vol.1 (disk 2).d88" size="422160" crc="db1339eb" sha1="bd215e6400ca1b0b4096f71f3352abe7c740fc94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48107,29 +48209,6 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 			<feature name="part_id" value="Data" />
 			<dataarea name="flop" size="26800">
 				<rom name="celia (data).d88" size="26800" crc="bce8bdf1" sha1="860742e78ca630f208a98eb84a259b0943d3e85f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="changevo">
-		<description>Change Vol.1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ちぇんじ vol.1"/>
-		<!--combined image-->
-		<!--rom name="change vol.1.d88" size="844320" crc="398f75bf" sha1="51e8f996f75d84dfbae82dcf460e38c1cc367116"/-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="422160">
-				<rom name="change vol.1 (disk 1).d88" size="422160" crc="839937e2" sha1="b04241d29aa220243d3b83263eb83a2b1dad0961"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="422160">
-				<rom name="change vol.1 (disk 2).d88" size="422160" crc="db1339eb" sha1="bd215e6400ca1b0b4096f71f3352abe7c740fc94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48296,7 +48375,8 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="doublfac">
+	<!-- Not extensively tested, no BGM on gameplay (verify) -->
+	<software name="doublfac" supported="partial">
 		<description>Double Face</description>
 		<year>1987</year>
 		<publisher>DTB Software</publisher>
@@ -48942,7 +49022,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<!-- Not extensively tested -->
-	<!-- Tests Sound Board 2 -->
+	<!-- Tests [Sound Board 2] -->
 	<software name="lascivio" supported="partial">
 		<description>Lascivious Oranges</description>
 		<year>19??</year>
@@ -51092,7 +51172,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<!-- Hangs when selecting any option on main menu [i8214 never clears irq?] -->
-	<!-- Tests Sound Board 2 -->
+	<!-- Tests [Sound Board 2] -->
 	<software name="battlebu" supported="no">
 		<description>Battle Bunnygirl</description>
 		<year>1990</year>
@@ -52104,6 +52184,8 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<description>Jark</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Needs BASIC V2"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="jark.d88" size="348848" crc="f507ca84" sha1="eb65996e08a3fc0296c560fc7f4179cea7937a37"/>
@@ -53528,7 +53610,7 @@ ExtractDisk  [02]"sos sword    " -> "s-os sword_02.d88"
 
 	<!-- Keeps repeating the full sample bank -->
 	<!-- Has missing GFXs -->
-	<!-- Sound Board 2 may be required as name implies? -->
+	<!-- [Sound Board 2] may be required as name implies? -->
 	<software name="superjck" supported="no">
 		<description>Super Jack 88 (SB2 version)</description>
 		<year>19??</year>
@@ -53962,19 +54044,14 @@ ExtractDisk  [02]"sos sword    " -> "s-os sword_02.d88"
 		</part>
 	</software>
 
-
-<!-- GAME PACKS AND MUSIC PACKS -->
-<!--
-These (game) packs shall be eventually removed when the original disks get dumped,
-but given the difficulty to find dumpers and/or friendly collectors for these old
-systems, for the moment they stay here!
--->
+<!-- MISC MUSIC PACKS -->
 
 <!--
 ExtractDisk  [01]"DISK_A          " -> "game music library_01.d88"
 ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 -->
-	<software name="gamemusl">
+	<!-- Randomly crashes on extensive use? (verify) -->
+	<software name="gamemusl" supported="partial">
 		<description>Game Music Library</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -53993,6 +54070,54 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="fcsoftod">
+		<description>FC-Software Sound Board 1 Ongaku Disk</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="fc-software sound board 1 ongaku disk.d88" size="348832" crc="aed3eaac" sha1="f8c54a4ea80e7c50bf7c327e7d0c6b78aaa499ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicgal">
+		<description>Music Gallery 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="366240">
+				<rom name="music gallery 2.d88" size="366240" crc="e6bbe9a6" sha1="7ac0fcb43cd4064bf27ef3a44f5aeded384e7a00"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamemus1">
+		<description>Game Music Collection Vol. 1 - Sega &amp; Draque ][</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="game music collection vol.1.d88" size="348848" crc="4a41e3da" sha1="574141e1455bc12783e3019e7bca8ae1e4f6bf6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Tests [Sound Board 2] -->
+	<!-- Reports "ADPCM ???K" size after loading -->
+	<software name="gamemus2" supported="partial">
+		<description>Game Music Collection Vol. 2 - Final Fantasy Original Music + Alpha</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="371744">
+				<rom name="game music collection vol. 2 - final fantasy original music+ (-)(-).d88" size="371744" crc="aa272c52" sha1="b42b9bd96eae5cc95e86debf568032ed0971f6cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- (Mostly unidentified) bootleg or magazine GAME PACKS -->
 
 	<software name="gamepack">
 		<description>Game Pack 13</description>
@@ -54426,7 +54551,7 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
    09:ﾄﾞﾝｷｰｺﾞﾘﾗ                        10:Golf 1
    11:Golf 2                           12:SUPER BASEBALL
    13:ｶﾞﾝﾊﾞﾚ ﾓﾓｺ
-  -->
+-->
 	<software name="oldmix2">
 		<description>Oldmix2</description>
 		<year>19??</year>
@@ -54607,15 +54732,15 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 		</part>
 	</software>
 
-	<!--
-	    01 Pascom Tower
-	    02 Jagey
-	    03 Trump Kyou
-	    04 Yakyuu Kyou
-	    05 PUNCH BALL [Mario Bros]
-	    06 DRAGON SLAYER
-	    07 ??? (doesn't boot)
-	-->
+<!--
+	01 Pascom Tower
+	02 Jagey
+	03 Trump Kyou
+	04 Yakyuu Kyou
+	05 PUNCH BALL [Mario Bros]
+	06 DRAGON SLAYER
+	07 ??? (doesn't boot)
+-->
 	<software name="88gamez1">
 		<description>88Gamez1</description>
 		<year>19??</year>
@@ -54629,14 +54754,14 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 		</part>
 	</software>
 
-	<!--
-	    "PC-8801 GAME PACK"
-	    1: [Nintendo no] GOLF
-	    2: [Nintendo no] TENNIS
-	    3: EGGY
-	    4: BILLIARDS [Lunar Ball]
-	    5: [David's] MIDNIGHT MAGIC
-	-->
+<!--
+	"PC-8801 GAME PACK"
+	1: [Nintendo no] GOLF
+	2: [Nintendo no] TENNIS
+	3: EGGY
+	4: BILLIARDS [Lunar Ball]
+	5: [David's] MIDNIGHT MAGIC
+-->
 	<software name="88gamez2">
 		<description>88Gamez2</description>
 		<year>19??</year>
@@ -55056,76 +55181,6 @@ ExtractDisk  [02]"Hit88 Data      " -> "hit-88_assembler_02.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hit-88_assembler_02.d88" size="348848" crc="d2972fc9" sha1="27a65bc02f21d6a1e7835f671b1ef214c08578c5"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fcsoftod">
-		<description>FC-Software Sound Board 1 Ongaku Disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">
-				<rom name="fc-software sound board 1 ongaku disk.d88" size="348832" crc="aed3eaac" sha1="f8c54a4ea80e7c50bf7c327e7d0c6b78aaa499ae"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="musicgal">
-		<description>Music Gallery 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="366240">
-				<rom name="music gallery 2.d88" size="366240" crc="e6bbe9a6" sha1="7ac0fcb43cd4064bf27ef3a44f5aeded384e7a00"/>
-			</dataarea>
-		</part>
-	</software>
-
-<!--
-ExtractDisk  [01]"SYSTEM_DISK    " -> "ncs music art v.2_01.d88"
-ExtractDisk  [02]"DATA_DISK    " -> "ncs music art v.2_02.d88"
--->
-	<!-- Mouse pointer is jumpy -->
-	<software name="ncsmusic" supported="partial">
-		<description>Music Art 88 (v2.0)</description>
-		<year>1987?</year>
-		<publisher>NCS</publisher>
-		<info name="alt_title" value="ミュージックアート88"/>
-		<!--combined image-->
-		<!--rom name="ncs music art v.2.d88" size="697696" crc="d6efce72" sha1="bd42da12c6d3ce29faf679e57cfbe5ba764a446e"/-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="ncs music art v.2_01.d88" size="348848" crc="d4613837" sha1="93dd3369f19a3610530e0e0b9543774332eb2244"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="ncs music art v.2_02.d88" size="348848" crc="4ae20967" sha1="70e9904abacf4403ecaa8c522401e7313066b16f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gamemus1">
-		<description>Game Music Collection Vol. 1 - Sega &amp; Draque ][</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="game music collection vol.1.d88" size="348848" crc="4a41e3da" sha1="574141e1455bc12783e3019e7bca8ae1e4f6bf6b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gamemus2">
-		<description>Game Music Collection Vol. 2 - Final Fantasy Original Music + Alpha</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="371744">
-				<rom name="game music collection vol. 2 - final fantasy original music+ (-)(-).d88" size="371744" crc="aa272c52" sha1="b42b9bd96eae5cc95e86debf568032ed0971f6cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -55590,9 +55645,6 @@ THE RACER
 			</dataarea>
 		</part>
 	</software>
-
-
-	<!-- These are going to be replaced by the correspondent separate tapes, as soon as possible!! -->
 
 	<software name="pack1">
 		<description>Dig Dug / Xevious / Nintendo no Golf / Nuts &amp; Milk</description>
@@ -56445,6 +56497,32 @@ ExtractDisk  [02]"Disk 2          " -> "multiplan ver.1.07_02.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="multiplan ver.1.07_02.d88" size="348848" crc="a4c2108a" sha1="d6586b52978509639c27f9b93738a663dcac4f93"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+ExtractDisk  [01]"SYSTEM_DISK    " -> "ncs music art v.2_01.d88"
+ExtractDisk  [02]"DATA_DISK    " -> "ncs music art v.2_02.d88"
+-->
+	<!-- Not extensively tested -->
+	<software name="ncsmusic" supported="partial">
+		<description>Music Art 88 (v2.0)</description>
+		<year>1987?</year>
+		<publisher>NCS</publisher>
+		<info name="alt_title" value="ミュージックアート88"/>
+		<!--combined image-->
+		<!--rom name="ncs music art v.2.d88" size="697696" crc="d6efce72" sha1="bd42da12c6d3ce29faf679e57cfbe5ba764a446e"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ncs music art v.2_01.d88" size="348848" crc="d4613837" sha1="93dd3369f19a3610530e0e0b9543774332eb2244"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ncs music art v.2_02.d88" size="348848" crc="4ae20967" sha1="70e9904abacf4403ecaa8c522401e7313066b16f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58057,4 +58135,3 @@ ExtractDisk  [03]"backup          " -> "z's staff kid88_03.d88"
 	</software>
 
 </softwarelist>
-

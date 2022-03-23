@@ -61,25 +61,6 @@
             ("Sound Board X", 2x OPM + 1x SSG. Used by NRTDRV, more info at GH #8709);
 
     list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> regressed with current floppy code):
-    * Agni no Ishi
-    * Amazoness no Hihou (takes invalid data from floppy)
-    - American Truck / American Truck SR (polls read deleted data command)
-    * Ankokujou
-    * Ao No Sekizou (fdc CPU irq doesn't fire anymore)
-    * Arcus
-    * Attacker
-    - Autumn Park (BASIC error)
-    * Battle Gorilla
-    * Belloncho Shintai Kensa
-    - Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
-    * Blassty (attempts to read at 0x801b)
-    * Boukenshatachi
-    * Can Can Bunny Superior
-    - Carmine
-    - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't) (REGRESSED with current floppy code)
-    - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
-    - Championship Lode Runner (fdc CPU irq doesn't fire anymore)
-    - Change Vol. 1 (stops at PCM loading)
     - Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING") (REGRESSED with current floppy code)
     * Chikyuu Senshi Rayieza (fdc CPU crashes)
     - Choplifter
@@ -89,49 +70,26 @@
     * Crimson
     * Crimson 3
     * Cuby Panic (copy protection routine at 0x911A)
-    - Daidasso (prints "BOOT dekimasen" on screen -> can't boot)
-    - Daikoukai Jidai (YSHELL.COM error)
     - Databox (app)
     - Day Dream ("Bad drive number at 570")
     - Demons Ring
     * Dennou Tsuushin
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     * Dragon Slayer - The Legend of Heroes 2
-    - Dungeon Buster
     * El Dorado Denki
-    * Elevator Action
     - Emerald Densetsu (dies after few seconds of intro)
     - Emerald Dragon (it seems to miss a timer)
-    - Emmy
     - Explosion (fails to load ADPCM data?)
     * F15 Strike Eagle
     - F2 Grand Prix ("Boot dekimasen")
-    # Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
     - Fantasian
-    * Final Zone
-    # Final Zone (demo) (REGRESSION: asserts at MAME boot)
-    - Fruit Panic
     - FSD Sample Ongaku Shuu Vol. 1-7
     - Gaia no Kiba (Disk I/O error at 150)
-    - Gambler Jiko Chuushin ha Mahjong Puzzle Collection
-    - Gambler Jiko Chuushin ha Mahjong Puzzle Collection (demo)
-    * Game Music Library
-    * Gaudi - Barcelona no Kaze (bad Wolfteam logo then black screen)
     - GC-clusterz Music Disk Vol. 1-7
-    * Genji
-    * Gokuraku Tengoku
-    - Grodius 3 (might not be floppy)
-    - Gun Ship (at gameplay)
-    (Hacker)
 
-    - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
     - Lamia: fails to create an user disk (after character creation) -> disk write error
-    * MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
-    * Mugen Senshi Valis (at Telenet logo, it also appears to have a nasty copy protection when taking a specific item (untested))
     - Mr. Pro Yakyuu
-    - PC-8034 (app)
-    - PC-8037SR (app)
     - P1 (app)
     - Pattern Editor 88 (app)
     - Super Shunbo II (app) (Load error)
@@ -140,9 +98,6 @@
 
     list of games that doesn't like i8214_irq_level == 5 in sound irq
     - 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
-    - Alpha (demo): stuck note in title screen, doesn't seem to go further;
-    - Brunette: No sound, eventually hangs at gameplay;
-    - Digital Devil Story Megami Tensei: hangs at gameplay (sound irq issue)
 
     games that needs to NOT have write-protect floppies (BTANBs):
     - Balance of Power
@@ -616,7 +571,7 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			draw_bitmap_1bpp(bitmap,cliprect);
 	}
 
-	//popmessage("%02x %02x %02x %02x %02x",state->m_layer_mask,state->m_dmac_mode,state->m_crtc.status,state->m_crtc.irq_mask,state->m_gfx_ctrl);
+	//popmessage("%02x %02x %02x %02x %02x",m_layer_mask,m_dmac_mode,m_crtc.status,m_crtc.irq_mask,m_gfx_ctrl);
 
 	if(!(m_layer_mask & 1) && m_dmac_mode & 4 && m_crtc.status & 0x10 && m_crtc.irq_mask == 3)
 	{
@@ -1299,17 +1254,16 @@ void pc8801_state::crtc_cmd_w(uint8_t data)
 			// Notice that no SW actually writes a "0" to the IRQ mask register,
 			// which supposedly enable irqs from 3301 according to docs.
 			// Other noteworthy checks that needs to be done on actual device hookup:
-			// - BASIC itself (definitely needs VRTC irqs otherwise locks up on "How many files" prompt);
-			// - xzr2 gameplay (locks up at beginning of gameplay if this isn't handled right);
+			// - BIOS BASIC itself (definitely needs VRTC irqs otherwise locks up on "How many files" prompt);
+			// - xzr2 (locks up after map -> main gameplay screen if this isn't handled right);
+			// - ashurano (expecting a VRTC after title screen, never reading inputs without, **regressed**);
 			m_vrtc_irq_enable = false;
 			break;
 		case 1:  // start display
 			m_crtc.status |= 0x10;
 			m_crtc.status &= (~0x08);
+			// cfr. pc8001 games for 3301 RVV bit
 			m_crtc.inverse = data & 1;
-
-			if(data & 1) /* Ink Pot uses it, but I want another test case before removing this log */
-				logerror("CRTC inverse mode ON\n");
 			break;
 		case 2:  // set irq mask
 			m_crtc.irq_mask = data & 3;
@@ -1326,8 +1280,8 @@ void pc8801_state::crtc_cmd_w(uint8_t data)
 			break;
 	}
 
-	//if((data >> 5) != 4)
-	//  logerror("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
+//	if((data >> 5) != 4)
+//		printf("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
 }
 
 uint8_t pc8801_state::dmac_r(offs_t offset)
@@ -2299,8 +2253,8 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);
 	m_opna->add_route(0, m_rspeaker, 0.25);
-	m_opna->add_route(1, m_lspeaker, 1.00);
-	m_opna->add_route(2, m_rspeaker, 1.00);
+	m_opna->add_route(1, m_lspeaker, 0.75);
+	m_opna->add_route(2, m_rspeaker, 0.75);
 
 	// TODO: add possible configuration override for baudrate here
 	// ...
