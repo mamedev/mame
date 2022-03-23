@@ -67,24 +67,24 @@ private:
 	uint8_t krtn_read();
 
 	/* GAH40M state */
-	uint16_t m_icr;               /* input capture register */
-	uint16_t m_frc;               /* free running counter */
-	uint8_t m_ier;                /* interrupt acknowledge register */
-	uint8_t m_isr;                /* interrupt status register */
-	uint8_t m_sio;                /* serial I/O register */
-	int m_bank0;                /* */
+	uint16_t m_icr = 0;               // input capture register
+	uint16_t m_frc = 0;               // free running counter
+	uint8_t m_ier = 0;                // interrupt acknowledge register
+	uint8_t m_isr = 0;                // interrupt status register
+	uint8_t m_sio = 0;                // serial I/O register
+	int m_bank0 = 0;
 
 	/* GAH40S state */
-	uint16_t m_cnt;               /* microcassette tape counter */
-	int m_swpr;             /* P-ROM power switch */
-	uint16_t m_pra;               /* P-ROM address */
-	uint8_t m_prd;                /* P-ROM data */
+	uint16_t m_cnt = 0;               // microcassette tape counter
+	int m_swpr = 0;                   // P-ROM power switch
+	uint16_t m_pra = 0;               // P-ROM address
+	uint8_t m_prd = 0;                // P-ROM data
 
 	/* memory state */
-	int m_bk2;              /* */
+	int m_bk2 = 0;
 
 	/* keyboard state */
-	int m_ksc;              /* keyboard scan column */
+	int m_ksc = 0;              // keyboard scan column
 	void px8_palette(palette_device &palette) const;
 	void px8_io(address_map &map);
 	void px8_mem(address_map &map);
