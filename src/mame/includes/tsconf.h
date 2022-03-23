@@ -134,8 +134,8 @@ private:
 	};
 
 	void update_frame_timer();
-	emu_timer *m_frame_irq_timer;
-	emu_timer *m_line_irq_timer;
+	emu_timer *m_frame_irq_timer = nullptr;
+	emu_timer *m_line_irq_timer = nullptr;
 
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
 
@@ -191,7 +191,7 @@ private:
 	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
 	u8 m_regs[0x100];
 
-	address_space *m_program;
+	address_space *m_program = nullptr;
 	memory_view m_bank0_rom;
 	required_memory_bank_array<5> m_banks;
 
@@ -200,17 +200,17 @@ private:
 	required_device<beta_disk_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
 	required_device<spi_sdcard_sdhc_device> m_sdcard;
-	u8 m_zctl_di;
-	u8 m_zctl_cs;
+	u8 m_zctl_di = 0;
+	u8 m_zctl_cs = 0;
 
 	required_device<glukrs_device> m_glukrs;
-	gluk_ext m_port_f7_ext;
-	u8 m_port_f7_gluk_reg;
+	gluk_ext m_port_f7_ext{};
+	u8 m_port_f7_gluk_reg = 0;
 
-	s16 m_gfx_y_frame_offset;
+	s16 m_gfx_y_frame_offset = 0;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	tilemap_t *m_ts_tilemap[3];
+	tilemap_t *m_ts_tilemap[3]{};
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
 };

@@ -69,29 +69,29 @@ private:
 	uint32_t update_inputs(void);
 
 	// members
-	emu_timer *m_dma_timer;
-	uint32_t  m_inputs_active;
+	emu_timer *m_dma_timer = nullptr;
+	uint32_t  m_inputs_active = 0;
 	std::unique_ptr<uint16_t[]>  m_video_ram[2];
-	uint16_t  m_last_pixel;
-	int32_t   m_video_ctrl;
-	uint16_t  m_video_fade;
-	int16_t   m_x_pos;
-	int16_t   m_x_start;
-	int16_t   m_x_mod;
-	int16_t   m_dx;
-	int16_t   m_y_pos;
-	int16_t   m_scale_cnt_y;
-	int16_t   m_scale_cnt_x;
-	bool    m_skip_x;
-	bool    m_skip_y;
-	int16_t   m_scale;
-	int16_t   m_hotspot_x;
-	int16_t   m_hotspot_y;
-	bool    m_dma_idle;
-	uint32_t  m_dma_addr[2];
-	uint32_t  m_ipt_val;
-	uint8_t   m_frame;
-	uint8_t   m_adc;
+	uint16_t  m_last_pixel = 0;
+	int32_t   m_video_ctrl = 0;
+	uint16_t  m_video_fade = 0;
+	int16_t   m_x_pos = 0;
+	int16_t   m_x_start = 0;
+	int16_t   m_x_mod = 0;
+	int16_t   m_dx = 0;
+	int16_t   m_y_pos = 0;
+	int16_t   m_scale_cnt_y = 0;
+	int16_t   m_scale_cnt_x = 0;
+	bool    m_skip_x = false;
+	bool    m_skip_y = false;
+	int16_t   m_scale = 0;
+	int16_t   m_hotspot_x = 0;
+	int16_t   m_hotspot_y = 0;
+	bool    m_dma_idle = false;
+	uint32_t  m_dma_addr[2]{};
+	uint32_t  m_ipt_val = 0;
+	uint8_t   m_frame = 0;
+	uint8_t   m_adc = 0;
 
 	void cpu_map(address_map &map);
 	void turrett_sound_map(address_map &map);
@@ -134,12 +134,12 @@ private:
 
 	struct
 	{
-		uint32_t  m_address;
-		uint32_t  m_volume;
-		bool    m_playing;
+		uint32_t  m_address = 0;
+		uint32_t  m_volume = 0;
+		bool    m_playing = false;
 	} m_channels[SOUND_CHANNELS];
 
-	int32_t m_volume_table[0x50];
+	int32_t m_volume_table[0x50]{};
 };
 
 // device type definition

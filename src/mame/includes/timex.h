@@ -88,8 +88,8 @@ private:
 	void port_ff_w(offs_t offset, u8 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	int m_dock_cart_type, m_ram_chunks;
-	memory_region *m_dock_crt;
+	int m_dock_cart_type = 0, m_ram_chunks = 0;
+	memory_region *m_dock_crt = nullptr;
 
 	void ts2068_io(address_map &map);
 	void ts2068_mem(address_map &map);
