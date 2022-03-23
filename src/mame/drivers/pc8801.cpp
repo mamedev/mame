@@ -36,7 +36,7 @@
       \- NEC PC-8801-13
             (Parallel I/F board);
       \- NEC PC-8801-17 / -18
-            (VTR capture card, 16-bit color);
+            (VTR capture card "Video art board" / "Video digitizing unit", 16-bit color);
       \- NEC PC-8801-21
             (CMT i/f board);
       \- NEC PC-8801-22
@@ -47,6 +47,8 @@
             Standard and on main board instead for FA / MA and onward);
       \- NEC PC-8801-30 & -31
             (CD-ROM SCSI i/f, subset of PC Engine and PCFX) **in progress**
+      \- NEC PC-8864
+            (Network board mapping at $a0-$a3)
       \- HAL PCG-8100
             (PCG and 3x DAC_1BIT at I/O $01, $02. PIT at $0c-$0f)
       \- HAL GSX-8800
@@ -173,8 +175,7 @@
      * CD-ROM BIOS: 0x0000 - 0x7fff
      * Dictionary: 0xc000 - 0xffff (32 Banks)
 
-    info from http://www.geocities.jp/retro_zzz/machines/nec/cmn_roms.html
-    also refer to http://www.geocities.jp/retro_zzz/machines/nec/cmn_vers.html for info about BASIC revisions in the various models
+    info from https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
 
 *************************************************************************************************************************************/
 
@@ -1280,8 +1281,8 @@ void pc8801_state::crtc_cmd_w(uint8_t data)
 			break;
 	}
 
-//	if((data >> 5) != 4)
-//		printf("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
+//  if((data >> 5) != 4)
+//      printf("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
 }
 
 uint8_t pc8801_state::dmac_r(offs_t offset)
@@ -1392,7 +1393,8 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 		);
 	}
 	// TODO: document and implement what the upper two regs does
-	// read latches on write?
+	// read latches on write? "read start/end sign" according to
+	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
 void pc8801_state::rtc_w(uint8_t data)
@@ -1536,7 +1538,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x0f, 0x0f).portr("KEY15");
 	map(0x00, 0x02).w(FUNC(pc8801_state::pcg8100_w));
 	map(0x10, 0x10).w(FUNC(pc8801_state::rtc_w));
-	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
@@ -1567,14 +1569,22 @@ void pc8801_state::main_io(address_map &map)
 //  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
 //  map(0xa8, 0xad).rw expansion OPN (Sound Board) or OPNA (Sound Board II)
-//  map(0xb4, 0xb5) Video art board (?)
-//  map(0xc1, 0xc1) (unknown)
-//  map(0xc2, 0xcf) "music" (?)
-//  map(0xd0, 0xd7) "music" or GP-IB
-//  map(0xd8, 0xd8) GP-IB
-//  map(0xdc, 0xdf) MODEM
-	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w)); /* expand RAM mode */
-	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w)); /* expand RAM bank */
+//  map(0xb0, 0xb3) General purpose parallel I/O (i8255?)
+//  map(0xb4, 0xb4) PC-8801-17 Video art board
+//  map(0xb5, 0xb5) PC-8801-18 Video digitizing unit
+//  map(0xbc, 0xbf) External mini floppy disk I/F (i8255), PC-8801-13 / -20 / -22
+//  map(0xc0, 0xc3) USART RS-232C ch. 1 / ch. 2
+//  map(0xc4, 0xc7) PC-8801-10 Music interface board (MIDI), GSX-8800 PIT?
+//  map(0xc8, 0xc8) RS-232C ch. 1 "prohibited gate" (?)
+//  map(0xca, 0xca) RS-232C ch. 2 "prohibited gate" (?)
+//  map(0xd0, 0xdf) GP-IB
+//  map(0xd3, 0xd4) PC-8801-10 Music interface board (MIDI)
+//  map(0xdc, 0xdf) PC-8801-12 MODEM (built-in for mkIITR)
+	// $e2-$e3 are standard for mkIIMR, MH / MA / MA2 / MC
+	// also used by expansion boards -02 / -02N, -22,
+	// and -17 video art board (transfers from RAM?)
+	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w));
+	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w));
 	map(0xe4, 0xe4).w(FUNC(pc8801_state::irq_level_w));
 	map(0xe6, 0xe6).w(FUNC(pc8801_state::irq_mask_w));
 //  map(0xe7, 0xe7).noprw(); /* arcus writes here, mirror of above? */
