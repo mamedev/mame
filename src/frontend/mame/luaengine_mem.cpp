@@ -528,6 +528,12 @@ void lua_engine::initialize_memory(sol::table &emu)
 {
 
 	auto addr_space_type = sol().registry().new_usertype<addr_space>("addr_space", sol::no_constructor);
+	addr_space_type.set_function(sol::meta_function::to_string,
+			[] (addr_space const &sp)
+			{
+				device_t &d(sp.dev.device());
+				return util::string_format("%s(%s):%s", d.shortname(), d.tag(), sp.space.name());
+			});
 	addr_space_type.set_function("read_i8", &addr_space::mem_read<s8>);
 	addr_space_type.set_function("read_u8", &addr_space::mem_read<u8>);
 	addr_space_type.set_function("read_i16", &addr_space::mem_read<s16>);
@@ -579,23 +585,25 @@ void lua_engine::initialize_memory(sol::table &emu)
 	addr_space_type.set_function("read_range",
 			[] (addr_space &sp, sol::this_state s, u64 first, u64 last, int width, sol::object opt_step) -> sol::object
 			{
-				luaL_Buffer buff;
-				offs_t space_size = sp.space.addrmask();
 				u64 step = 1;
 				if (opt_step.is<u64>())
 				{
 					step = opt_step.as<u64>();
-					if (step < 1 || step > last - first)
+					if ((step < 1) || (step > last - first))
 					{
 						luaL_error(s, "Invalid step");
 						return sol::lua_nil;
 					}
 				}
-				if (first > space_size || last > space_size || last < first)
+
+				offs_t space_size = sp.space.addrmask();
+				if ((first > space_size) || (last > space_size) || (last < first))
 				{
 					luaL_error(s, "Invalid offset");
 					return sol::lua_nil;
 				}
+
+				luaL_Buffer buff;
 				int byte_count = width / 8 * (last - first + 1) / step;
 				switch (width)
 				{

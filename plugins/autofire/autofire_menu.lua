@@ -352,7 +352,7 @@ function lib:populate_menu(buttons)
 end
 
 function lib:handle_menu_event(index, event, buttons)
-	manager.machine:popmessage('')
+	manager.machine:popmessage()
 	local current_menu = menu_stack[#menu_stack]
 	if current_menu == MENU_TYPES.MAIN then
 		return handle_main_menu(index, event, buttons)

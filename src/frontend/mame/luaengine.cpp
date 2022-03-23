@@ -453,7 +453,7 @@ bool lua_engine::execute_function(const char *id)
 {
 	size_t count = enumerate_functions(
 			id,
-			[this] (const sol::protected_function &func)
+			[] (const sol::protected_function &func)
 			{
 				auto ret = invoke(func);
 				if (!ret.valid())
@@ -530,7 +530,7 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 	bool handled = false;
 	enumerate_functions(
 			"LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE",
-			[this, &instance_name, &handled](const sol::protected_function &func)
+			[&instance_name, &handled] (const sol::protected_function &func)
 			{
 				auto ret = invoke(func, instance_name);
 
@@ -983,12 +983,14 @@ void lua_engine::initialize()
 				}));
 	item_type.set("size", sol::readonly(&save_item::size));
 	item_type.set("count", sol::readonly(&save_item::count));
-	item_type.set("read", [this](save_item &item, int offset) -> sol::object {
-			if(!item.base || (offset >= item.count))
+	item_type.set("read",
+		[this] (save_item &item, int offset) -> sol::object
+		{
+			if (!item.base || (offset >= item.count))
 				return sol::lua_nil;
 			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.stride * (offset / item.valcount));
 			uint64_t ret = 0;
-			switch(item.size)
+			switch (item.size)
 			{
 				case 1:
 				default:
@@ -1006,32 +1008,37 @@ void lua_engine::initialize()
 			}
 			return sol::make_object(sol(), ret);
 		});
-	item_type.set("read_block", [](save_item &item, sol::this_state s, int offset, size_t len) {
-			buffer_helper buf(s);
-			auto space = buf.prepare(len);
-			if(!item.base || ((offset + len) > (item.size * item.count)))
+	item_type.set("read_block",
+		[] (save_item &item, sol::this_state s, uint32_t offset, size_t len) -> sol::object
+		{
+			if (!item.base)
 			{
-				space.add(0);
+				luaL_error(s, "Invalid save item");
+				return sol::lua_nil;
 			}
-			else
+
+			if ((offset + len) > (item.size * item.count))
 			{
-				const uint32_t blocksize = item.size * item.valcount;
-				size_t remaining = len;
-				uint8_t *dest = reinterpret_cast<uint8_t *>(space.get());
-				while(remaining)
-				{
-					const uint32_t blockno = offset / blocksize;
-					const uint32_t available = blocksize - (offset % blocksize);
-					const uint32_t chunk = (available < remaining) ? available : remaining;
-					const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * item.stride) + (offset % blocksize);
-					std::memcpy(dest, source, chunk);
-					offset += chunk;
-					remaining -= chunk;
-					dest += chunk;
-				}
-				space.add(len);
+				luaL_error(s, "Range extends beyond end of save item");
+				return sol::lua_nil;
 			}
-			buf.push();
+
+			luaL_Buffer buff;
+			uint8_t *dest = reinterpret_cast<uint8_t *>(luaL_buffinitsize(s, &buff, len));
+			const uint32_t blocksize = item.size * item.valcount;
+			size_t remaining = len;
+			while (remaining)
+			{
+				const uint32_t blockno = offset / blocksize;
+				const uint32_t available = blocksize - (offset % blocksize);
+				const uint32_t chunk = (available < remaining) ? available : remaining;
+				const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * item.stride) + (offset % blocksize);
+				std::memcpy(dest, source, chunk);
+				offset += chunk;
+				remaining -= chunk;
+				dest += chunk;
+			}
+			luaL_pushresultsize(&buff, len);
 			return sol::make_reference(s, sol::stack_reference(s, -1));
 		});
 	item_type.set("write", [](save_item &item, int offset, uint64_t value) {
@@ -1196,54 +1203,54 @@ void lua_engine::initialize()
 
 
 	auto machine_type = sol().registry().new_usertype<running_machine>("machine", sol::no_constructor);
-	machine_type["exit"] = &running_machine::schedule_exit;
-	machine_type["hard_reset"] = &running_machine::schedule_hard_reset;
-	machine_type["soft_reset"] = &running_machine::schedule_soft_reset;
-	machine_type["save"] = &running_machine::schedule_save; // TODO: some kind of completion notification?
-	machine_type["load"] = &running_machine::schedule_load; // TODO: some kind of completion notification?
-	machine_type["buffer_save"] =
-		[] (running_machine &m, sol::this_state s)
-		{
-			// FIXME: this needs to schedule saving to a buffer and return asynchronously somehow
-			// right now it's broken by anonymous timers, synchronize, etc.
-			lua_State *L = s;
-			luaL_Buffer buff;
-			int size = ram_state::get_size(m.save());
-			u8 *ptr = (u8 *)luaL_buffinitsize(L, &buff, size);
-			save_error error = m.save().write_buffer(ptr, size);
-			if (error == STATERR_NONE)
+	machine_type.set_function("exit", &running_machine::schedule_exit);
+	machine_type.set_function("hard_reset", &running_machine::schedule_hard_reset);
+	machine_type.set_function("soft_reset", &running_machine::schedule_soft_reset);
+	machine_type.set_function("save", &running_machine::schedule_save); // TODO: some kind of completion notification?
+	machine_type.set_function("load", &running_machine::schedule_load); // TODO: some kind of completion notification?
+	machine_type.set_function("buffer_save",
+			[] (running_machine &m, sol::this_state s)
 			{
-				luaL_pushresultsize(&buff, size);
-				return sol::make_reference(L, sol::stack_reference(L, -1));
-			}
-			luaL_error(L, "State save error.");
-			return sol::make_reference(L, nullptr);
-		};
-	machine_type["buffer_load"] =
-		[] (running_machine &m, sol::this_state s, std::string str)
-		{
-			// FIXME: this needs to schedule loading from the buffer and return asynchronously somehow
-			// right now it's broken by anonymous timers, synchronize, etc.
-			save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
-			if (error == STATERR_NONE)
+				// FIXME: this needs to schedule saving to a buffer and return asynchronously somehow
+				// right now it's broken by anonymous timers, synchronize, etc.
+				lua_State *L = s;
+				luaL_Buffer buff;
+				int size = ram_state::get_size(m.save());
+				u8 *ptr = (u8 *)luaL_buffinitsize(L, &buff, size);
+				save_error error = m.save().write_buffer(ptr, size);
+				if (error == STATERR_NONE)
+				{
+					luaL_pushresultsize(&buff, size);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
+				}
+				luaL_error(L, "State save error.");
+				return sol::make_reference(L, nullptr);
+			});
+	machine_type.set_function("buffer_load",
+			[] (running_machine &m, sol::this_state s, std::string str)
 			{
-				return true;
-			}
-			else
+				// FIXME: this needs to schedule loading from the buffer and return asynchronously somehow
+				// right now it's broken by anonymous timers, synchronize, etc.
+				save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
+				if (error == STATERR_NONE)
+				{
+					return true;
+				}
+				else
+				{
+					luaL_error(s,"State load error.");
+					return false;
+				}
+			});
+	machine_type.set_function("popmessage",
+			[] (running_machine &m, std::optional<const char *> str)
 			{
-				luaL_error(s,"State load error.");
-				return false;
-			}
-		};
-	machine_type["popmessage"] =
-		[] (running_machine &m, const char *str)
-		{
-			if (str)
-				m.popmessage("%s", str);
-			else
-				m.popmessage();
-		};
-	machine_type["logerror"]  = [] (running_machine &m, std::string const *str) { m.logerror("[luaengine] %s\n", str); };
+				if (str)
+					m.popmessage("%s", *str);
+				else
+					m.popmessage();
+			});
+	machine_type.set_function("logerror", [] (running_machine &m, char const *str) { m.logerror("[luaengine] %s\n", str); });
 	machine_type["time"] = sol::property(&running_machine::time);
 	machine_type["system"] = sol::property(&running_machine::system);
 	machine_type["parameters"] = sol::property(&running_machine::parameters);
