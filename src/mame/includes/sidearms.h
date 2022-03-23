@@ -50,22 +50,22 @@ private:
 
 	optional_ioport_array<5> m_ports;
 
-	int m_gameid;
+	int m_gameid = 0;
 
-	uint8_t *m_tilerom;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	uint8_t *m_tilerom = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
-	int m_bgon;
-	int m_objon;
-	int m_staron;
-	int m_charon;
-	int m_flipon;
+	int m_bgon = 0;
+	int m_objon = 0;
+	int m_staron = 0;
+	int m_charon = 0;
+	int m_flipon = 0;
 
-	uint32_t m_hflop_74a_n;
-	uint32_t m_hcount_191;
-	uint32_t m_vcount_191;
-	uint32_t m_latch_374;
+	uint32_t m_hflop_74a_n = 0;
+	uint32_t m_hcount_191 = 0;
+	uint32_t m_vcount_191 = 0;
+	uint32_t m_latch_374 = 0;
 
 	void bankswitch_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);

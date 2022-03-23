@@ -62,18 +62,18 @@ private:
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 
-	uint8_t m_led_time[2];
-	uint8_t m_led_score[24];
-	uint8_t m_toggle;
-	uint16_t m_driver_horz;
-	uint8_t m_driver_vert;
-	uint8_t m_driver_pic;
-	uint16_t m_drones_horz;
-	uint8_t m_drones_vert[3];
-	uint8_t m_drones_mask;
-	uint16_t m_track_horz;
-	uint8_t m_track_vert[2];
-	uint8_t m_track_ice;
+	uint8_t m_led_time[2]{};
+	uint8_t m_led_score[24]{};
+	uint8_t m_toggle = 0;
+	uint16_t m_driver_horz = 0;
+	uint8_t m_driver_vert = 0;
+	uint8_t m_driver_pic = 0;
+	uint16_t m_drones_horz = 0;
+	uint8_t m_drones_vert[3]{};
+	uint8_t m_drones_mask = 0;
+	uint16_t m_track_horz = 0;
+	uint8_t m_track_vert[2]{};
+	uint8_t m_track_ice = 0;
 
 	void draw_track(bitmap_ind16 &bitmap);
 	void draw_drones(bitmap_ind16 &bitmap, const rectangle &cliprect);
