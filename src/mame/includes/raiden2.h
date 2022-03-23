@@ -108,7 +108,10 @@ protected:
 
 	bool m_blend_active[0x800]; // cfg
 
-	tilemap_t *m_background_layer,*m_midground_layer,*m_foreground_layer,*m_text_layer;
+	tilemap_t *m_background_layer = nullptr;
+	tilemap_t *m_midground_layer = nullptr;
+	tilemap_t *m_foreground_layer = nullptr;
+	tilemap_t *m_text_layer = nullptr;
 
 	int m_bg_bank, m_fg_bank, m_mid_bank, m_tx_bank;
 	u16 m_tilemap_enable;
@@ -117,7 +120,7 @@ protected:
 
 	void draw_sprites(const rectangle &cliprect);
 
-	const int *m_cur_spri; // cfg
+	const int *m_cur_spri = nullptr; // cfg
 
 	DECLARE_GFXDECODE_MEMBER(gfx_raiden2);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
@@ -155,10 +158,10 @@ private:
 	void sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	u32 m_sprcpt_adr, m_sprcpt_idx;
+	u32 m_sprcpt_adr = 0, m_sprcpt_idx = 0;
 
-	u32 m_sprcpt_val[2], m_sprcpt_flags1;
-	u16 m_sprcpt_flags2;
+	u32 m_sprcpt_val[2], m_sprcpt_flags1 = 0;
+	u16 m_sprcpt_flags2 = 0;
 	u32 m_sprcpt_data_1[0x100], m_sprcpt_data_2[0x40], m_sprcpt_data_3[6], m_sprcpt_data_4[4];
 
 	virtual void machine_start() override;

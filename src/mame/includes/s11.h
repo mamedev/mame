@@ -163,7 +163,7 @@ protected:
 	u32 m_segment1 = 0U;
 	u32 m_segment2 = 0U;
 	u32 m_timer_count = 0U;
-	emu_timer* m_irq_timer = 0;
+	emu_timer* m_irq_timer = nullptr;
 	bool m_timer_irq_active = false;
 	bool m_pia_irq_active = false;
 	u8 m_lock1 = 0U;
@@ -215,7 +215,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	bool m_invert = false;  // later System 11B games start expecting inverted data to the display LED segments.
+	bool m_invert = false;  // later System 11B games expect inverted data to the display LED segments.
 	void set_invert(bool i) { m_invert = i; }
 	bool m_is7seg34 = false;  // some games use 7-segment displays for players 3 and 4
 	void set_7seg(bool i) { m_is7seg34 = i; }
