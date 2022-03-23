@@ -6,7 +6,8 @@ PINBALL
 Zaccaria Prototype
 
 These use the INS8060 (SC/MP) processor, and are Zaccaria's first
-  digital machines.
+  digital machines. The term "prototype" is misleading - they were
+  normal production machines with a different computer board.
 
 After starting a game, press X, wait for the sound of the ball
  being ejected, then press Z. Now you can get a score.
@@ -23,7 +24,7 @@ Status:
 
 ToDo:
 - Doesn't appear to have a knocker. To be confirmed.
-- Find out how to enter test mode.
+- Is there a test mode? If so, how to get to it?
 
 **********************************************************************/
 
@@ -56,6 +57,7 @@ private:
 	void digit_w(offs_t offset, uint8_t data);
 	void sound_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(audio_clock);
+	DECLARE_READ_LINE_MEMBER(slam_r);
 	void zac_proto_map(address_map &map);
 	u8 m_u36 = 0x80U;  // preset divider for u44/u45
 	u8 m_u37 = 0U;  // selector for u48
@@ -64,7 +66,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<scmp_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	output_finder<11> m_digits;
 	output_finder<12+84> m_io_outputs;
@@ -212,7 +214,15 @@ static INPUT_PORTS_START( zac_proto )
 	PORT_DIPNAME( 0x80, 0x80, "SW24" )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+
+	PORT_START("X8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_0)
 INPUT_PORTS_END
+
+READ_LINE_MEMBER( zac_proto_state::slam_r )
+{
+	return BIT(ioport("X8")->read(), 0);
+}
 
 // solenoids (not knocker)
 void zac_proto_state::out0_w(offs_t offset, uint8_t data)
@@ -313,6 +323,7 @@ void zac_proto_state::zac_proto(machine_config &config)
 	/* basic machine hardware */
 	INS8060(config, m_maincpu, XTAL(4'000'000) / 2); // Using SC/MP II chip which has an internal /2 circuit.
 	m_maincpu->set_addrmap(AS_PROGRAM, &zac_proto_state::zac_proto_map);
+	m_maincpu->sense_b().set(FUNC(zac_proto_state::slam_r));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
