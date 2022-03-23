@@ -52,7 +52,6 @@ protected:
 	// device-level overrides
 	virtual void device_reset() override;
 
-	void update_speaker();
 	virtual void execute_one() override;
 	virtual u16 decode_digit(u8 data) override;
 

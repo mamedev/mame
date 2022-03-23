@@ -7,7 +7,8 @@
 TODO:
 - only one device dumped (Rockwell 8R) and it doesn't work at all
 - is unmapped ram mirrored? (that goes for subdevices too)
-- fix digit segment decoder, there should be a minus sign in it
+- Fix digit segment decoder, it's not on a neat PLA. There should be a minus
+  sign in it, and more.
 
 */
 
