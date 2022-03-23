@@ -60,23 +60,6 @@
       \- JMB-X1
             ("Sound Board X", 2x OPM + 1x SSG. Used by NRTDRV, more info at GH #8709);
 
-    per-game specific TODO (move to XML):
-    - The Black Onyx: writes a katakana msg: "sono kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
-    - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
-    - Can Can Bunny: no sound (regression);
-    - Can Can Bunny Superior: black screen during the intro
-    - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
-    - Cranston Manor (actually N88-Basic demo): no sound
-    - Datenshi Kyouko: gfx garbage on the right edge?
-    - Final Crisis: sound stuck with OPNA?
-    - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
-    - Game Music Library: "Disk I/O error on 3040", starting from Sorcerian item
-    - Gaudi - Barcelona no Kaze: fails PCM loading
-    - GeGeGe no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
-    - Grobda: palette is ugly (parent pc8801 only);
-    - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
-    - Xevious: game is too fast (parent pc8801 only)
-
     list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> regressed with current floppy code):
     * Agni no Ishi
     * Amazoness no Hihou (takes invalid data from floppy)
@@ -90,7 +73,6 @@
     * Belloncho Shintai Kensa
     - Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
     * Blassty (attempts to read at 0x801b)
-    - Bokosuka Wars (polls read ID command)
     * Boukenshatachi
     * Can Can Bunny Superior
     - Carmine
@@ -159,10 +141,8 @@
     list of games that doesn't like i8214_irq_level == 5 in sound irq
     - 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
     - Alpha (demo): stuck note in title screen, doesn't seem to go further;
-    - Ayumi: black screen after new game / load game screen;
     - Brunette: No sound, eventually hangs at gameplay;
     - Digital Devil Story Megami Tensei: hangs at gameplay (sound irq issue)
-    - Double Face: hangs at logo (sound irq issue)
 
     games that needs to NOT have write-protect floppies (BTANBs):
     - Balance of Power
@@ -173,30 +153,11 @@
     games that needs to HAVE write-protect floppies (BTANBs):
     - 100 Yen Disk 7: (doesn't boot in V2 mode)
 
-    other BTANBs
-    - Attack Hirokochan: returns to BASIC after an initial animation, needs BASIC V1:
-    - Jark (needs PC-8801MC)
-    - Kuronekosou Souzoku Satsujin Jiken: "Illegal function call in 105", needs BASIC V1;
-
     Notes:
-    - BIOS disk ROM defines what kind of floppies you could load:
-      * with 0x0800 ROM size you can load 2d floppies only;
-      * with 0x2000 ROM size you can load 2d and 2hd floppies;
-    - Later models have palette bugs with some games (Alphos, Tokyo Nampa Street).
-      This is because you have to set up the V1 / V2 DIP-SW to V1 for those games (it's the BIOS that sets up to analog and never changes back otherwise).
-    - Password for "AY-1: Fortress Solomon" is "123" then press enter, any other key pressed makes it to fail the check (you must soft reset the machine)
-    - Pressing Home in Dennou Gakuen during gameplay makes it to show a fake DASM screen. That's supposed to be a panic button and it's also in the
-      sequels (with different screens);
-
-    Bankswitch Notes:
-    - 0x31 - graphic banking
-    - 0x32 - misc banking
-    - 0x5c / 0x5f - VRAM banking
-    - 0x70 - window offset (banking)
-    - 0x71 - extra ROM banking
-    - 0x78 - window offset (banking) increment (+ 0x100)
-    - 0xe2 / 0xe3 - extra RAM banking
-    - 0xf0 / 0xf1 = kanji banking
+    - Later models have washed out palette with some SWs, with no red component.
+      This is because you have to set up the V1 / V2 DIP-SW to V1 mode for those games
+      (BIOS sets up analog palette and never changes back otherwise).
+      cfr. SW list usage SW notes that specifically needs V1.
 
 ======================================================================================================================================
 
@@ -258,9 +219,7 @@
      * Dictionary: 0xc000 - 0xffff (32 Banks)
 
     info from http://www.geocities.jp/retro_zzz/machines/nec/cmn_roms.html
-    also, refer to http://www.geocities.jp/retro_zzz/machines/nec/cmn_vers.html for
-        info about BASIC revisions in the various models (BASIC V2 is the BASIC
-        Expansion, if I unerstood correctly)
+    also refer to http://www.geocities.jp/retro_zzz/machines/nec/cmn_vers.html for info about BASIC revisions in the various models
 
 *************************************************************************************************************************************/
 
@@ -484,7 +443,7 @@ uint8_t pc8801_state::extract_text_attribute(uint32_t address,int x, uint8_t wid
 	non_special = 0;
 	if(m_crtc.param[0][4] & 0x80)
 	{
-		popmessage("Using non-separate mode for text tilemap, contact MESSdev");
+		popmessage("Using non-separate mode for text tilemap, contact MAMEdev");
 		return 0;
 	}
 
@@ -635,7 +594,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 				reverse ^= m_crtc.inverse;
 
 				if(attr & 0x80)
-					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
+					popmessage("Warning: mono gfx mode enabled, contact MAMEdev");
 			}
 
 			draw_char(bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,!width,non_special);
@@ -1165,6 +1124,12 @@ void pc8801_state::irq_mask_w(uint8_t data)
 	m_vrtc_irq_enable = bool(BIT(data, 1));
 	// Pulled high when cassette LOAD command is issued
 	m_rxrdy_irq_enable = bool(BIT(data, 2));
+
+	if (m_timer_irq_enable && m_timer_irq_pending)
+	{
+		m_timer_irq_pending = false;
+		m_pic->r_w(7 ^ 2, 0);
+	}
 }
 
 
@@ -1327,6 +1292,16 @@ void pc8801_state::crtc_cmd_w(uint8_t data)
 	{
 		case 0:  // reset CRTC
 			m_crtc.status &= (~0x16);
+			// TODO: honor device IRQ masks
+			// megamit and babylon in particular expects that the VRTC irq disables during boot
+			// otherwise they hangs up.
+			// i.e. former will try to execute a spurious irq and jump to PC=0
+			// Notice that no SW actually writes a "0" to the IRQ mask register,
+			// which supposedly enable irqs from 3301 according to docs.
+			// Other noteworthy checks that needs to be done on actual device hookup:
+			// - BASIC itself (definitely needs VRTC irqs otherwise locks up on "How many files" prompt);
+			// - xzr2 gameplay (locks up at beginning of gameplay if this isn't handled right);
+			m_vrtc_irq_enable = false;
 			break;
 		case 1:  // start display
 			m_crtc.status |= 0x10;
@@ -1901,7 +1876,7 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
 	PORT_DIPSETTING(    0x02, "15 KHz" )
 	PORT_DIPSETTING(    0x00, "24 KHz" )
-//	PORT_BIT 0x04 USART DCD signal carrier
+//  PORT_BIT 0x04 USART DCD signal carrier
 	PORT_DIPNAME( 0x08, 0x00, "Auto-boot floppy at start-up" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1936,7 +1911,7 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("OPN_PB")
-	// TODO: yojukiko maps Joystick buttons in reverse than expected?
+	// TODO: yojukiko and grobda maps Joystick buttons in reverse than expected?
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
@@ -2083,6 +2058,7 @@ void pc8801_state::machine_reset()
 	// initialize irq section
 	{
 		m_timer_irq_enable = false;
+		m_timer_irq_pending = false;
 		m_vrtc_irq_enable = false;
 		m_rxrdy_irq_enable = false;
 		m_sound_irq_enable = false;
@@ -2197,11 +2173,15 @@ WRITE_LINE_MEMBER(pc8801_state::int4_irq_w)
 	m_sound_irq_pending = state;
 }
 
-// FIXME: convert these two to pure WRITE_LINE_MEMBERs
+// FIXME: convert following two to pure WRITE_LINE_MEMBERs
 TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 {
+	// TODO: castlex sound notes in BGM loop are pretty erratic
+	// (uses clock irq instead of the dedicated INT4, started happening on last OPN rewrite)
 	if (m_timer_irq_enable)
 		m_pic->r_w(7 ^ 2, 0);
+	else
+		m_timer_irq_pending = true;
 }
 
 INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq_w)

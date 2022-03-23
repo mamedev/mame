@@ -222,6 +222,7 @@ private:
 	bool m_timer_irq_enable;
 	bool m_rxrdy_irq_enable;
 	bool m_sound_irq_enable;
+	bool m_timer_irq_pending;
 //	bool m_rxrdy_irq_pending;
 	bool m_sound_irq_pending;
 
