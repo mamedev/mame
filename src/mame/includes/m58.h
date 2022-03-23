@@ -50,7 +50,7 @@ private:
 	required_shared_ptr<uint8_t> m_score_panel_disabled;
 
 	/* video-related */
-	tilemap_t* m_bg_tilemap;
+	tilemap_t* m_bg_tilemap = nullptr;
 	bitmap_ind16 m_scroll_panel_bitmap;
 
 	void videoram_w(offs_t offset, uint8_t data);
