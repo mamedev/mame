@@ -313,14 +313,6 @@ void hh_tms1k_state::machine_start()
 	// resolve handlers
 	m_out_power.resolve();
 
-	// zerofill
-	m_o = 0;
-	m_r = 0;
-	m_inp_mux = 0;
-	m_power_on = false;
-	m_grid = 0;
-	m_plate = 0;
-
 	// register for savestates
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
