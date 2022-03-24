@@ -1710,4 +1710,4 @@ GAME(1991,  larana,   0, inder,    larana,   inder_state, init_0, ROT0, "Inder",
 GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder",    "250 CC",             MACHINE_IS_SKELETON_MECHANICAL )
 
 // new cpu board, sound board with msm6585 (like the ones in spinb.cpp)
-GAME(199?,  gunshot,  0, inder,    larana,   inder_state, init_0, ROT0, "Spinball", "Gun Shot",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1996,  gunshot,  0, inder,    larana,   inder_state, init_0, ROT0, "Spinball", "Gun Shot",           MACHINE_IS_SKELETON_MECHANICAL )
