@@ -18930,10 +18930,11 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 48K Apple II+ or later. -->
 		<!--"Pursuit of the Graf Spee" is a 1982 strategy game developed by Joel Billings and distributed by Strategic Simulations. It requires a 48K Apple ][+ or later.-->
+        <!-- This disk was replaced on March 24th, 2021 because the previous disk we obtained proved to be a fake. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234780">
-				<rom name="pursuit of the graf spee.woz" size="234780" crc="99c70418" sha1="e1022a37b8e5b11b5c0143c984b3d74bdd4ebaeb"/>
+			<dataarea name="flop" size="254799">
+				<rom name="pursuit of the graf spee.woz" size="254799" crc="18221871" sha1="f400d38bfe73a768d8db4fd9cf7ab4c37282f8ed" />
 			</dataarea>
 		</part>
 	</software>
