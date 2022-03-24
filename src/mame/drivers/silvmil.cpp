@@ -67,10 +67,10 @@ private:
 	required_shared_ptr<u16> m_spriteram;
 
 	/* video-related */
-	tilemap_t   *m_bg_layer;
-	tilemap_t   *m_fg_layer;
-	int         m_tilebank[4];
-	int         m_whichbank;
+	tilemap_t   *m_bg_layer = nullptr;
+	tilemap_t   *m_fg_layer = nullptr;
+	int         m_tilebank[4]{};
+	int         m_whichbank = 0;
 
 	void tilebank_w(u16 data);
 	void tilebank1_w(u16 data);

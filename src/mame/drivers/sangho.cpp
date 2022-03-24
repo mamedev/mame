@@ -98,9 +98,9 @@ protected:
 	void pzlestar_io_map(address_map &map);
 
 private:
-	uint8_t m_pzlestar_mem_bank;
-	uint8_t m_pzlestar_rom_bank;
-	uint8_t m_sec_slot[4];
+	uint8_t m_pzlestar_mem_bank = 0;
+	uint8_t m_pzlestar_rom_bank = 0;
+	uint8_t m_sec_slot[4]{};
 };
 
 class sexyboom_state : public sangho_state

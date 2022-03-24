@@ -126,13 +126,13 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_bg_xscroll;
-	uint8_t m_nmi_enable;
-	uint8_t m_spritebank0;
-	uint8_t m_spritebank1;
+	uint8_t m_bg_xscroll = 0;
+	uint8_t m_nmi_enable = 0;
+	uint8_t m_spritebank0 = 0;
+	uint8_t m_spritebank1 = 0;
 
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
