@@ -105,12 +105,12 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<samples_device> m_samples;
-	tilemap_t *m_tmap;
-	uint8_t m_ball_regs[2];
-	uint8_t m_paddle_reg;
-	uint8_t m_paddle_ysize;
-	bool m_bottom_edge_enable;
-	bool m_bricks_color_bank;
+	tilemap_t *m_tmap = nullptr;
+	uint8_t m_ball_regs[2]{};
+	uint8_t m_paddle_reg = 0;
+	uint8_t m_paddle_ysize = 0;
+	bool m_bottom_edge_enable = false;
+	bool m_bricks_color_bank = false;
 
 	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);

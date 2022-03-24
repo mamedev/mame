@@ -69,13 +69,13 @@ license:CC0
 		<element ref="static_white"><bounds x="2" y="0" width="179" height="48" /></element>
 		<element ref="static_black"><bounds x="4" y="11" width="175" height="26" /></element>
 
-		<element name="digit7" ref="digit"><bounds x="19.5"  y="16" width="12" height="16" /></element>
-		<element name="digit6" ref="digit"><bounds x="35.5"  y="16" width="12" height="16" /></element>
-		<element name="digit5" ref="digit"><bounds x="67.5"  y="16" width="12" height="16" /></element>
-		<element name="digit4" ref="digit"><bounds x="83.5"  y="16" width="12" height="16" /></element>
-		<element name="digit3" ref="digit"><bounds x="99.5"  y="16" width="12" height="16" /></element>
-		<element name="digit1" ref="digit"><bounds x="131.5" y="16" width="12" height="16" /></element>
-		<element name="digit0" ref="digit"><bounds x="147.5" y="16" width="12" height="16" /></element>
+		<element name="digit7" ref="digit"><bounds x="21"  y="16" width="12" height="16" /></element>
+		<element name="digit6" ref="digit"><bounds x="37"  y="16" width="12" height="16" /></element>
+		<element name="digit5" ref="digit"><bounds x="69"  y="16" width="12" height="16" /></element>
+		<element name="digit4" ref="digit"><bounds x="85"  y="16" width="12" height="16" /></element>
+		<element name="digit3" ref="digit"><bounds x="101" y="16" width="12" height="16" /></element>
+		<element name="digit1" ref="digit"><bounds x="133" y="16" width="12" height="16" /></element>
+		<element name="digit0" ref="digit"><bounds x="149" y="16" width="12" height="16" /></element>
 
 		<element ref="static_white"><bounds x="58" y="1" width="2" height="46" /></element>
 		<element ref="static_white"><bounds x="123" y="1" width="2" height="46" /></element>

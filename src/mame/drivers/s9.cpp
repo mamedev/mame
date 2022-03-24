@@ -104,12 +104,12 @@ private:
 
 	u8 m_strobe = 0U;
 	u8 m_row = 0U;
-	bool m_game = 0;
-	bool m_comma12 = 0;
-	bool m_comma34 = 0;
-	bool m_data_ok = 0;
+	bool m_game = false;
+	bool m_comma12 = false;
+	bool m_comma34 = false;
+	bool m_data_ok = false;
 	u8 m_lamp_data = 0U;
-	emu_timer* m_irq_timer = 0;
+	emu_timer* m_irq_timer = nullptr;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s9_sound_device> m_s9sound;

@@ -79,8 +79,8 @@ private:
 	// devices
 	required_device<cpu_device> m_filecpu;
 
-	uint8_t *m_file_rom;
-	uint8_t *m_app_rom;
+	uint8_t *m_file_rom = nullptr;
+	uint8_t *m_app_rom = nullptr;
 	std::unique_ptr<uint8_t[]> m_file_ram;
 	std::unique_ptr<uint8_t[]> m_app_ram;
 
@@ -99,8 +99,8 @@ private:
 	uint8_t sio_r(offs_t offset);
 	void sio_w(offs_t offset, uint8_t data);
 
-	uint8_t app_ram_enable;
-	uint8_t file_ram_enable;
+	uint8_t app_ram_enable = 0;
+	uint8_t file_ram_enable = 0;
 
 	void molecula_palette(palette_device &palette) const;
 

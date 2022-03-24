@@ -70,8 +70,8 @@ private:
 
 	void output_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	uint8_t m_fg_tilebank;
-	bool m_rowscroll_enable;
+	uint8_t m_fg_tilebank = 0;
+	bool m_rowscroll_enable = false;
 	void decrypted_opcodes_map(address_map &map);
 	void metlfrzr_map(address_map &map);
 };

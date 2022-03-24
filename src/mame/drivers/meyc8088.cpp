@@ -62,8 +62,8 @@ private:
 
 	output_finder<16> m_lamps;
 
-	uint8_t m_status;
-	uint8_t m_common;
+	uint8_t m_status = 0;
+	uint8_t m_common = 0;
 
 	void drive_w(uint8_t data);
 	void video5_flip_w(uint8_t data);

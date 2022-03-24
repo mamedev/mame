@@ -306,24 +306,24 @@ private:
 
 	struct stream
 	{
-		uint8_t byte_depth;
-		uint32_t position;
-		emu_timer *timer;
+		uint8_t byte_depth = 0;
+		uint32_t position = 0;
+		emu_timer *timer = nullptr;
 		// stream control
 		vgm_chip chip_type;
-		uint8_t port;
-		uint8_t reg;
+		uint8_t port = 0;
+		uint8_t reg = 0;
 		// stream data
-		uint8_t bank;
-		uint8_t step_size;
-		uint8_t step_base;
+		uint8_t bank = 0;
+		uint8_t step_size = 0;
+		uint8_t step_base = 0;
 		// frequency
-		uint32_t frequency;
+		uint32_t frequency = 0;
 		// start stream
-		uint32_t offset;
-		uint32_t length;
-		bool loop;
-		bool reverse;
+		uint32_t offset = 0;
+		uint32_t length = 0;
+		bool loop = false;
+		bool reverse = false;
 	};
 
 	TIMER_CALLBACK_MEMBER(stream_timer_expired);
@@ -387,9 +387,9 @@ private:
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
 
-	C140_TYPE m_c140_bank[2];
+	C140_TYPE m_c140_bank[2]{};
 
-	int m_sega32x_channel_hack;
+	int m_sega32x_channel_hack = 0;
 	int m_nes_apu_channel_hack[2];
 	uint8_t m_c6280_channel[2];
 

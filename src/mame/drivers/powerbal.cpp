@@ -44,8 +44,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	u8 m_tilebank;
-	s8 m_bg_yoffset;
+	u8 m_tilebank = 0;
+	s8 m_bg_yoffset = 0;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

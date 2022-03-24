@@ -96,7 +96,7 @@ protected:
 	bool m_pc1 = 0;
 
 	/* devices */
-	bool m_previous_i8271_int_state;
+	bool m_previous_i8271_int_state = false;
 	static void floppy_formats(format_registration &fr);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output_tick);
 
@@ -131,7 +131,7 @@ private:
 	uint8_t dos_r(offs_t offset);
 
 	/* eprom state */
-	u8 m_eprom;
+	u8 m_eprom = 0;
 
 	required_device_array<generic_slot_device, 16> m_ext;
 	required_device<generic_slot_device> m_e0;

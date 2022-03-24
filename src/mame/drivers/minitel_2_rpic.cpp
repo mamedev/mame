@@ -151,15 +151,15 @@ private:
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
 
-	uint8_t port1, port3;
+	uint8_t port1 = 0, port3 = 0;
 
-	int keyboard_para_ser;
-	uint8_t keyboard_x_row_reg;
+	int keyboard_para_ser = 0;
+	uint8_t keyboard_x_row_reg = 0;
 
-	uint8_t last_ctrl_reg;
+	uint8_t last_ctrl_reg = 0;
 
-	int lineconnected;
-	int tonedetect;
+	int lineconnected = 0;
+	int tonedetect = 0;
 };
 
 void minitel_state::machine_start()

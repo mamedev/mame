@@ -92,8 +92,8 @@ private:
 	required_region_ptr<u8> m_banked_rom;
 	required_device<ticket_dispenser_device> m_hopper;
 
-	u8 m_input_select[2];
-	u8 m_bank_select;
+	u8 m_input_select[2]{};
+	u8 m_bank_select = 0;
 };
 
 #define MAIN_CLOCK      XTAL(21'477'272)

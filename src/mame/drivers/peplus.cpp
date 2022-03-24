@@ -8005,6 +8005,95 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap656.u50", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
+
+// Player's Choice Poker
+
+ROM_START( pcramclr ) // Normal board : Player's Choice - RAM Clear util
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ram_clear.u68",   0x00000, 0x08000, CRC(766fd94a) SHA1(33a00ceec1452f7e186fd2cdd57667445b8bc03d) )
+	ROM_RELOAD(                  0x08000, 0x8000)
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mro-cf0125.u72",   0x00000, 0x8000, CRC(7486a4a2) SHA1(b04a17f0ec67d5363d14689fd1108c7734e602d0) )
+	ROM_LOAD( "mgo-cf0125.u73",   0x08000, 0x8000, CRC(b0464252) SHA1(a2df19a4cd6d9f16a84ac5625899469a2b465a38) )
+	ROM_LOAD( "mbo-cf0125.u74",   0x10000, 0x8000, CRC(1bca19f3) SHA1(0cb23d5a5acfd72d8d847b13ad08fee0cc2f9e71) )
+	ROM_LOAD( "mxo-cf0125.u75",   0x18000, 0x8000, CRC(c5aed726) SHA1(96a55b5d5ddaf7736f76b7d4479f19885c62234c) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) // BPROM type DM74LS471 (compatible with N82S135N) verified
+ROM_END
+
+ROM_START( pc644vz ) // Normal board : Player's Choice - Standard Draw Poker (3PF644VZ)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3pf644vz.u65",   0x00000, 0x10000, CRC(9f4a4c41) SHA1(72a17ad929828d6fa38766431b7ef7c7d21c9b03) )
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mro-cf0125.u72",   0x00000, 0x8000, CRC(7486a4a2) SHA1(b04a17f0ec67d5363d14689fd1108c7734e602d0) )
+	ROM_LOAD( "mgo-cf0125.u73",   0x08000, 0x8000, CRC(b0464252) SHA1(a2df19a4cd6d9f16a84ac5625899469a2b465a38) )
+	ROM_LOAD( "mbo-cf0125.u74",   0x10000, 0x8000, CRC(1bca19f3) SHA1(0cb23d5a5acfd72d8d847b13ad08fee0cc2f9e71) )
+	ROM_LOAD( "mxo-cf0125.u75",   0x18000, 0x8000, CRC(c5aed726) SHA1(96a55b5d5ddaf7736f76b7d4479f19885c62234c) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) // BPROM type DM74LS471 (compatible with N82S135N) verified
+ROM_END
+
+ROM_START( pc679cy ) // Normal board : Player's Choice - Standard Draw Poker (1PF679CY)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1pf679cy.u65",   0x00000, 0x10000, CRC(480342e7) SHA1(229a0178c9e69171e2e30be2e3c50427ac379a7b) )
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mro-cf0125.u72",   0x00000, 0x8000, CRC(7486a4a2) SHA1(b04a17f0ec67d5363d14689fd1108c7734e602d0) )
+	ROM_LOAD( "mgo-cf0125.u73",   0x08000, 0x8000, CRC(b0464252) SHA1(a2df19a4cd6d9f16a84ac5625899469a2b465a38) )
+	ROM_LOAD( "mbo-cf0125.u74",   0x10000, 0x8000, CRC(1bca19f3) SHA1(0cb23d5a5acfd72d8d847b13ad08fee0cc2f9e71) )
+	ROM_LOAD( "mxo-cf0125.u75",   0x18000, 0x8000, CRC(c5aed726) SHA1(96a55b5d5ddaf7736f76b7d4479f19885c62234c) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) // BPROM type DM74LS471 (compatible with N82S135N) verified
+ROM_END
+
+ROM_START( pc714vz ) // Normal board : Player's Choice - Standard Draw Poker (2PF714VZ)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2pf714vz.u65",   0x00000, 0x10000, CRC(102908a8) SHA1(86237c5c27eb4625c892776ba36c37cf280bd099) )
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mro-cf0125.u72",   0x00000, 0x8000, CRC(7486a4a2) SHA1(b04a17f0ec67d5363d14689fd1108c7734e602d0) )
+	ROM_LOAD( "mgo-cf0125.u73",   0x08000, 0x8000, CRC(b0464252) SHA1(a2df19a4cd6d9f16a84ac5625899469a2b465a38) )
+	ROM_LOAD( "mbo-cf0125.u74",   0x10000, 0x8000, CRC(1bca19f3) SHA1(0cb23d5a5acfd72d8d847b13ad08fee0cc2f9e71) )
+	ROM_LOAD( "mxo-cf0125.u75",   0x18000, 0x8000, CRC(c5aed726) SHA1(96a55b5d5ddaf7736f76b7d4479f19885c62234c) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) // BPROM type DM74LS471 (compatible with N82S135N) verified
+ROM_END
+
+ROM_START( pc716vy ) // Normal board : Player's Choice - Standard Draw Poker (2PF716VY)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2pf716vy.u68",   0x00000, 0x10000, CRC(9b744236) SHA1(ff541ec1a44d0eccf95b4ce332897a4d7d7f2119) ) // Found as "GT 006684.bin"
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mro-cf0125.u72",   0x00000, 0x8000, CRC(7486a4a2) SHA1(b04a17f0ec67d5363d14689fd1108c7734e602d0) )
+	ROM_LOAD( "mgo-cf0125.u73",   0x08000, 0x8000, CRC(b0464252) SHA1(a2df19a4cd6d9f16a84ac5625899469a2b465a38) )
+	ROM_LOAD( "mbo-cf0125.u74",   0x10000, 0x8000, CRC(1bca19f3) SHA1(0cb23d5a5acfd72d8d847b13ad08fee0cc2f9e71) )
+	ROM_LOAD( "mxo-cf0125.u75",   0x18000, 0x8000, CRC(c5aed726) SHA1(96a55b5d5ddaf7736f76b7d4479f19885c62234c) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) // BPROM type DM74LS471 (compatible with N82S135N) verified
+ROM_END
+
+ROM_START( pc718vy ) // Normal board : Player's Choice - Standard Draw Poker (1PF718VY)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1pf718vy.u65",   0x00000, 0x10000, CRC(3b19ecb7) SHA1(c1070755a157d2a501d04e3af0c7305e5aa0745f) )
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "mro-cf0125.u72",   0x00000, 0x8000, CRC(7486a4a2) SHA1(b04a17f0ec67d5363d14689fd1108c7734e602d0) )
+	ROM_LOAD( "mgo-cf0125.u73",   0x08000, 0x8000, CRC(b0464252) SHA1(a2df19a4cd6d9f16a84ac5625899469a2b465a38) )
+	ROM_LOAD( "mbo-cf0125.u74",   0x10000, 0x8000, CRC(1bca19f3) SHA1(0cb23d5a5acfd72d8d847b13ad08fee0cc2f9e71) )
+	ROM_LOAD( "mxo-cf0125.u75",   0x18000, 0x8000, CRC(c5aed726) SHA1(96a55b5d5ddaf7736f76b7d4479f19885c62234c) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) // BPROM type DM74LS471 (compatible with N82S135N) verified
+ROM_END
+
+
 /*
 
 Player's Choice & Montana Choice games:
@@ -15146,6 +15235,7 @@ GAMEL( 1987, pepp0797,  pepp0542, peplus, peplus_poker,  peplus_state, init_pepl
 GAMEL( 1987, pepp0812,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0812) Deuces Joker Wild Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, pepp0816,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0816) Treasure Chest Poker",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) // CG2283+CAP2283 undumped - Missing "Bonus" at MAX Bet for 4 of a Kind & Treasure Chest graphics
 
+
 // Normal board International Poker
 GAMEL( 1987, peip0028,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0028) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, peip0029,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0029) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
@@ -15167,6 +15257,15 @@ GAMEL( 1987, peip0115,  peip0028, peplus, peplus_poker,  peplus_state, init_nonp
 GAMEL( 1987, peip0116,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0116) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, peip0118,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0118) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1987, peip0120,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0120) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+
+// Normal board : Player's Choice Poker */
+GAMEL(1987, pcramclr,   0,        peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice RAM Clear",                                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc644vz,    0,        peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC644VZ) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc679cy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Choice (PC679CY) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc714vz,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC714VZ) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc716vy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC716VY) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL(1987, pc718vy,    pc644vz,  peplus,  peplus_poker, peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (PC718VY) Jacks or Better",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+
 
 // Normal board Multi-Game - Player's Choice - Some sets require a printer (not yet supported)
 GAMEL( 1994, pemg0025,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0025) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE, layout_pe_poker) // Needs printer

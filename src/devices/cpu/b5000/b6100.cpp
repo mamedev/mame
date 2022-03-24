@@ -130,7 +130,9 @@ void b6100_cpu_device::execute_one()
 			break; // 0xfc
 	}
 
-	update_speaker();
+	// instead of with TKBS, carry flag directly outputs to SPK
+	if (m_c != m_prev_c)
+		m_write_spk(m_c);
 }
 
 bool b6100_cpu_device::op_canskip(u8 op)

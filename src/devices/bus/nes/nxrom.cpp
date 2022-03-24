@@ -411,8 +411,6 @@ void nes_cnrom_device::write_h(offs_t offset, uint8_t data)
 
 uint8_t nes_cnrom_device::chr_r(offs_t offset)
 {
-	int bank = offset >> 10;
-
 	// a few CNROM boards contained copy protection schemes through
 	// suitably configured diodes, so that subsequent CHR reads can
 	// give actual VROM content or open bus values.
@@ -420,7 +418,7 @@ uint8_t nes_cnrom_device::chr_r(offs_t offset)
 	if (m_chr_open_bus)
 		return get_open_bus();
 
-	return m_chr_access[bank][offset & 0x3ff];
+	return device_nes_cart_interface::chr_r(offset);
 }
 
 
@@ -466,7 +464,7 @@ void nes_gxrom_device::write_h(offs_t offset, uint8_t data)
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
 
-	prg32((data & 0xf0) >> 4);
+	prg32(data >> 4);
 	chr8(data & 0x0f, CHRROM);
 }
 

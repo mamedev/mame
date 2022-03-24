@@ -210,15 +210,15 @@ void b5000_base_device::execute_run()
 		// some opcodes delay RAM address adjustment for 1 cycle
 		m_ram_addr = (m_bu << 4 & 0x30) | (m_bl & 0xf);
 
-		if (m_bu_delay)
-		{
-			m_ram_addr = (m_ram_addr & 0xf) | (m_prev_bu << 4 & 0x30);
-			m_bu_delay = false;
-		}
 		if (m_bl_delay)
 		{
 			m_ram_addr = (m_ram_addr & ~0xf) | (m_prev_bl & 0xf);
 			m_bl_delay = false;
+		}
+		if (m_bu_delay)
+		{
+			m_ram_addr = (m_ram_addr & 0xf) | (m_prev_bu << 4 & 0x30);
+			m_bu_delay = false;
 		}
 	}
 }

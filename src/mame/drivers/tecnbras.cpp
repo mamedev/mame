@@ -53,8 +53,8 @@ private:
 	required_device<i80c31_device> m_maincpu;
 	output_finder<14 * 7> m_dmds;
 
-	int m_xcoord;
-	char m_digit[14][7];
+	int m_xcoord = 0;
+	char m_digit[14][7]{};
 };
 
 void tecnbras_state::i80c31_prg(address_map &map)

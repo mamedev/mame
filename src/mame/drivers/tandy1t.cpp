@@ -132,20 +132,20 @@ private:
 
 	struct
 	{
-		uint8_t low, high;
+		uint8_t low = 0, high = 0;
 	} m_eeprom_ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */
 
-	int m_eeprom_state;
-	int m_eeprom_clock;
-	uint8_t m_eeprom_oper;
-	uint16_t m_eeprom_data;
+	int m_eeprom_state = 0;
+	int m_eeprom_clock = 0;
+	uint8_t m_eeprom_oper = 0;
+	uint16_t m_eeprom_data = 0;
 
-	uint8_t m_tandy_data[8];
+	uint8_t m_tandy_data[8]{};
 
-	uint8_t m_tandy_bios_bank;    /* I/O port FFEAh */
-	uint8_t m_tandy_ppi_porta, m_tandy_ppi_ack;
-	uint8_t m_tandy_ppi_portb, m_tandy_ppi_portc;
-	uint8_t m_vram_bank;
+	uint8_t m_tandy_bios_bank = 0;    /* I/O port FFEAh */
+	uint8_t m_tandy_ppi_porta = 0, m_tandy_ppi_ack = 0;
+	uint8_t m_tandy_ppi_portb = 0, m_tandy_ppi_portc = 0;
+	uint8_t m_vram_bank = 0;
 	static void cfg_fdc_35(device_t *device);
 	static void cfg_fdc_525(device_t *device);
 

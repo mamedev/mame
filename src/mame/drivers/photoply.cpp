@@ -57,7 +57,7 @@ private:
 	void bios_w(offs_t offset, uint8_t data);
 	void eeprom_w(uint8_t data);
 
-	uint16_t m_pci_shadow_reg;
+	uint16_t m_pci_shadow_reg = 0;
 
 	void photoply_io(address_map &map);
 	void photoply_map(address_map &map);

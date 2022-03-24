@@ -29,11 +29,11 @@ protected:
 
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
-	int m_romsize;
+	int m_romsize = 0;
 
-	int m_mysprtch_rombase;
-	uint16_t m_prev_porta;
-	int m_bank_enabled;
+	int m_mysprtch_rombase = 0;
+	uint16_t m_prev_porta = 0;
+	int m_bank_enabled = 0;
 
 private:
 	uint16_t mysprtch_rom_r(offs_t offset);

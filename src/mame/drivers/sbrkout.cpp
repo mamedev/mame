@@ -89,12 +89,12 @@ private:
 	void main_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
-	emu_timer *m_scanline_timer;
-	emu_timer *m_pot_timer;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_sync2_value;
-	uint8_t m_pot_mask[2];
-	uint8_t m_pot_trigger[2];
+	emu_timer *m_scanline_timer = nullptr;
+	emu_timer *m_pot_timer = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_sync2_value = 0;
+	uint8_t m_pot_mask[2]{};
+	uint8_t m_pot_trigger[2]{};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<f9334_device> m_outlatch;

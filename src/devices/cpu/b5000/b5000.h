@@ -69,6 +69,7 @@ protected:
 	void ram_w(u8 data);
 	void set_pc(u8 pu, u8 pl);
 	void set_bu(u8 bu);
+	void seg_w(u16 seg);
 	void op_illegal();
 
 	// opcode handlers

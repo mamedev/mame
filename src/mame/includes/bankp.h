@@ -42,7 +42,7 @@ private:
 	int     m_scroll_x = 0;
 	int     m_priority = 0;
 
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0;
 	void scroll_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);

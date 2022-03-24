@@ -90,8 +90,8 @@ private:
 	uint16_t term_rx_status_r();
 	void term_w(uint16_t data);
 	void kbd_put(u8 data);
-	uint8_t m_term_data;
-	uint16_t m_term_status;
+	uint8_t m_term_data = 0;
+	uint16_t m_term_status = 0;
 	void vax11_mem(address_map &map);
 };
 

@@ -91,9 +91,9 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 
-	offs_t m_ef9345_offset;
-	uint8_t m_printer_latch;
-	uint8_t m_printer_signal;
+	offs_t m_ef9345_offset = 0;
+	uint8_t m_printer_latch = 0;
+	uint8_t m_printer_signal = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

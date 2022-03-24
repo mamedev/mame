@@ -86,12 +86,12 @@ private:
 	void vram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg_tilemap2;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap2 = nullptr;
 
 	void to_subcpu_0x400004_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint8_t m_subcmd;
+	uint8_t m_subcmd = 0;
 
 	void sub_rambankselect_w(uint8_t data);
 	void sub_rombankselect_w(uint8_t data);
@@ -99,7 +99,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
-	int m_adpcm_data;
+	int m_adpcm_data = 0;
 
 	void subrambank_map(address_map& map);
 	void subrombank_map(address_map& map);

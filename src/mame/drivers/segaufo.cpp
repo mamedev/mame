@@ -130,14 +130,14 @@ private:
 	{
 		struct Motor
 		{
-			uint8_t running;
-			uint8_t direction;
-			float position;
-			float speed;
+			uint8_t running = 0;
+			uint8_t direction = 0;
+			float position = 0;
+			float speed = 0;
 		} motor[4];
 	} m_player[2];
 
-	uint8_t m_stepper;
+	uint8_t m_stepper = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sega_315_5296_device> m_io1;

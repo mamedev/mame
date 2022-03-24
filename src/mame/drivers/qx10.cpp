@@ -116,10 +116,12 @@ private:
 	void prom_sel_w(uint8_t data);
 	void cmos_sel_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
+	void update_fdd_motor(uint8_t state);
 	void fdd_motor_w(uint8_t data);
 	uint8_t qx10_30_r();
 	void zoom_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	void sqw_out(uint8_t state);
 	uint8_t mc146818_r(offs_t offset);
 	void mc146818_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER( inta_call );
@@ -184,32 +186,33 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* FDD */
-	int     m_fdcint;
-	int     m_fdcmotor;
-	//int     m_fdcready;
+	int     m_fdcint = 0;
+	uint8_t  m_motor_clk = 0;
+	uint16_t m_counter = 0;
+	//int     m_fdcready = 0;
 
-	int m_spkr_enable;
-	int m_spkr_freq;
-	int m_pit1_out0;
+	int m_spkr_enable = 0;
+	int m_spkr_freq = 0;
+	int m_pit1_out0 = 0;
 
 	/* centronics */
-	int m_centronics_error;
-	int m_centronics_busy;
-	int m_centronics_paper;
-	int m_centronics_select;
-	int m_centronics_sense;
+	int m_centronics_error = 0;
+	int m_centronics_busy = 0;
+	int m_centronics_paper = 0;
+	int m_centronics_select = 0;
+	int m_centronics_sense = 0;
 
 
 	/* memory */
 	memory_view m_ram_view;
-	int     m_external_bank;
-	int     m_membank;
-	int     m_memprom;
-	int     m_memcmos;
-	uint8_t   m_cmosram[0x800];
+	int     m_external_bank = 0;
+	int     m_membank = 0;
+	int     m_memprom = 0;
+	int     m_memcmos = 0;
+	uint8_t   m_cmosram[0x800]{};
 
-	uint8_t m_color_mode;
-	uint8_t m_zoom;
+	uint8_t m_color_mode = 0;
+	uint8_t m_zoom = 0;
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
@@ -477,12 +480,22 @@ WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 	m_pic_m->ir6_w(state);
 }
 
+void qx10_state::update_fdd_motor(uint8_t state)
+{
+	for (auto& fdd : m_floppy)
+	{
+		floppy_image_device *floppy = fdd->get_device();
+		if (floppy)
+		{
+			floppy->mon_w(state);
+		}
+	}
+}
+
 void qx10_state::fdd_motor_w(uint8_t data)
 {
-	m_fdcmotor = 1;
-
-	m_floppy[0]->get_device()->mon_w(false);
-	m_floppy[1]->get_device()->mon_w(false);
+	m_counter = 0;
+	update_fdd_motor(0);
 	// motor off controlled by clock
 }
 
@@ -494,7 +507,7 @@ uint8_t qx10_state::qx10_30_r()
 	floppy2 = m_floppy[1]->get_device();
 
 	return m_fdcint |
-			/*m_fdcmotor*/ 0 << 1 |
+			BIT(m_counter, 11) << 1 |
 			((floppy1 != nullptr) || (floppy2 != nullptr) ? 1 : 0) << 3 |
 			m_membank << 4;
 }
@@ -590,6 +603,22 @@ void qx10_state::memory_write_byte(offs_t offset, uint8_t data)
 /*
     MC146818
 */
+void qx10_state::sqw_out(uint8_t state)
+{
+	uint8_t clk = !(state || BIT(m_counter, 11));
+	uint16_t cnt = m_counter;
+
+	if (!clk && m_motor_clk)
+	{
+		cnt = (cnt + 1) & 0xfff;
+	}
+	if (BIT(cnt, 11) && !BIT(m_counter, 11)) {
+		update_fdd_motor(1);
+	}
+
+	m_motor_clk = clk;
+	m_counter = cnt;
+}
 
 void qx10_state::mc146818_w(offs_t offset, uint8_t data)
 {
@@ -965,6 +994,7 @@ void qx10_state::qx10(machine_config &config)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic_s, FUNC(pic8259_device::ir2_w));
+	m_rtc->sqw().set(FUNC(qx10_state::sqw_out));
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(qx10_state::qx10_upd765_interrupt));

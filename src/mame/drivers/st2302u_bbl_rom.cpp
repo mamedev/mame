@@ -60,7 +60,7 @@ protected:
 private:
 	u8 sim152_r();
 	void sim152_w(u8 data);
-	u8 m_152_dat;
+	u8 m_152_dat = 0;
 };
 
 u8 st22xx_bbl338_sim_state::sim152_r()

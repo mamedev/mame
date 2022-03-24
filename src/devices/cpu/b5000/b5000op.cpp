@@ -29,8 +29,13 @@ void b5000_cpu_device::set_bu(u8 bu)
 	m_bu = bu & 3;
 
 	// changing to or from 0 delays RAM address modification
-	if ((m_bu && !m_prev_bu) || (!m_bu && m_prev_bu))
+	if (bool(m_bu) != bool(m_prev_bu))
 		m_bu_delay = true;
+}
+
+void b5000_cpu_device::seg_w(u16 seg)
+{
+	m_write_seg(m_seg = seg);
 }
 
 void b5000_cpu_device::op_illegal()
@@ -260,8 +265,7 @@ void b5000_cpu_device::op_tc()
 void b5000_cpu_device::op_kseg()
 {
 	// KSEG: reset segment outputs
-	m_seg = 0;
-	m_write_seg(0);
+	seg_w(0);
 }
 
 void b5000_cpu_device::op_atbz()
@@ -315,8 +319,7 @@ void b5000_cpu_device::op_tkbs()
 		// step 2: load segments from RAM
 		case 2:
 			// note: SEG0(DP) from C flag is delayed 2 cycles
-			m_seg |= decode_digit(ram_r()) << 1 | m_prev3_c;
-			m_write_seg(m_seg);
+			seg_w(m_seg | decode_digit(ram_r()) << 1 | m_prev3_c);
 			m_tkbs_step = 0;
 			return;
 
