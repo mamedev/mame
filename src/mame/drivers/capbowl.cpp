@@ -425,7 +425,7 @@ void capbowl_state::rom_select_w(uint8_t data)
 template <uint8_t Which>
 uint8_t capbowl_base_state::track_r()
 {
-	return (m_in[Which]->read() & 0xf0) | ((Which ? m_trackx->read() : m_tracky->read() - m_last_trackball_val[Which]) & 0x0f);
+	return (m_in[Which]->read() & 0xf0) | (((Which ? m_trackx->read() : m_tracky->read()) - m_last_trackball_val[Which]) & 0x0f);
 }
 
 void capbowl_base_state::track_reset_w(uint8_t data)
@@ -603,7 +603,7 @@ void capbowl_base_state::base(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(8'000'000) / 2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
