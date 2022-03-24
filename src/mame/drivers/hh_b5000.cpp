@@ -703,8 +703,8 @@ void rw18r_state::rw18r(machine_config &config)
 
 ROM_START( rw18r )
 	ROM_REGION( 0x200, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b5000cc", 0x000, 0x080, CRC(ace32614) SHA1(23cf11acf2e73ce2dfc165cb87f86fab15f69ff7) )
-	ROM_CONTINUE(        0x0c0, 0x140 )
+	ROM_LOAD( "b5000cc", 0x000, 0x0c0, CRC(ace32614) SHA1(23cf11acf2e73ce2dfc165cb87f86fab15f69ff7) )
+	ROM_CONTINUE(        0x100, 0x100 )
 ROM_END
 
 

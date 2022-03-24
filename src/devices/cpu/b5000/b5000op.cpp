@@ -29,7 +29,7 @@ void b5000_cpu_device::set_bu(u8 bu)
 	m_bu = bu & 3;
 
 	// changing to or from 0 delays RAM address modification
-	if ((m_bu && !m_prev_bu) || (!m_bu && m_prev_bu))
+	if (bool(m_bu) != bool(m_prev_bu))
 		m_bu_delay = true;
 }
 
