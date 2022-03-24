@@ -1339,7 +1339,7 @@ public:
 
 private:
 	namcos23_state& m_state;
-	float* m_zBuffer;
+	float* m_zBuffer = nullptr;
 };
 
 typedef namcos23_renderer::vertex_t poly_vertex;
