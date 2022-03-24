@@ -8511,6 +8511,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
+	<!-- Draws double height bitmap in 15 kHz mode (verify) -->
 	<software name="demnring">
 		<description>Demon's Ring</description>
 		<year>1984</year>
@@ -8537,6 +8538,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
+	<!-- Draws double height bitmap in 15 kHz mode (verify) -->
 	<software name="demnringa" cloneof="demnring">
 		<description>Demon's Ring (alt)</description>
 		<year>1984</year>
@@ -43669,7 +43671,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="hoehoem1">
+	<!-- Never completes ADPCM loading on boot -->
+	<software name="hoehoem1" supported="no">
 		<description>Hoehoe Team 199x Music Disk Vol. 1 - Explosion</description>
 		<year>1992?</year>
 		<publisher>&lt;doujin&gt;</publisher>

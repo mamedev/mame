@@ -74,7 +74,6 @@
     * Cuby Panic (copy protection routine at 0x911A)
     - Databox (app)
     - Day Dream ("Bad drive number at 570")
-    - Demons Ring
     * Dennou Tsuushin
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     * Dragon Slayer - The Legend of Heroes 2
@@ -1257,7 +1256,8 @@ void pc8801_state::crtc_cmd_w(uint8_t data)
 			// Other noteworthy checks that needs to be done on actual device hookup:
 			// - BIOS BASIC itself (definitely needs VRTC irqs otherwise locks up on "How many files" prompt);
 			// - xzr2 (locks up after map -> main gameplay screen if this isn't handled right);
-			// - ashurano (expecting a VRTC after title screen, never reading inputs without, **regressed**);
+			// - ashurano (expecting a VRTC after title screen, never reading inputs without, **regressed here**);
+			// - rayieza (no inputs on character creation, wants VRTC **regressed here**);
 			m_vrtc_irq_enable = false;
 			break;
 		case 1:  // start display
@@ -1565,7 +1565,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
 	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
-//  map(0x8e, 0x8e).r accessed by scruiser on boot, unknown purpose (a board ID?)
+//  map(0x8e, 0x8e).r <unknown>, accessed by scruiser on boot (a board ID?)
 //  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
 //  map(0xa0, 0xa3) GSX-8800 or network board
 //  map(0xa8, 0xad).rw expansion OPN (Sound Board) or OPNA (Sound Board II)
@@ -1577,6 +1577,7 @@ void pc8801_state::main_io(address_map &map)
 //  map(0xc4, 0xc7) PC-8801-10 Music interface board (MIDI), GSX-8800 PIT?
 //  map(0xc8, 0xc8) RS-232C ch. 1 "prohibited gate" (?)
 //  map(0xca, 0xca) RS-232C ch. 2 "prohibited gate" (?)
+//	map(0xc8, 0xcd) JMB-X1 OPM / SSG chips
 //  map(0xd0, 0xdf) GP-IB
 //  map(0xd3, 0xd4) PC-8801-10 Music interface board (MIDI)
 //  map(0xdc, 0xdf) PC-8801-12 MODEM (built-in for mkIITR)
