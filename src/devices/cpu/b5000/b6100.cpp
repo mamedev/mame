@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Rockwell B6100 MCU (based on A5500+B6000)
+  Rockwell B6100 MCU (based on B5500+B6000)
 
 */
 

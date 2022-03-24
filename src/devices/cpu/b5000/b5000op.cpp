@@ -281,13 +281,13 @@ void b5000_cpu_device::op_atbz()
 			op_kseg();
 			break;
 
-		// step 2: disable strobe
-		case 2:
+		// step 3: disable strobe
+		case 3:
 			m_write_str(0);
 			break;
 
-		// step 3: load strobe from Bl
-		case 3:
+		// step 4: load strobe from Bl
+		case 4:
 			m_write_str(1 << (m_ram_addr & 0xf));
 			m_atbz_step = 0;
 			return;
@@ -306,27 +306,11 @@ void b5000_cpu_device::op_tkb()
 
 void b5000_cpu_device::op_tkbs()
 {
-	assert(m_tkbs_step > 0);
+	// TKBS: TKB + load segments
+	op_tkb();
 
-	// TKBS: TKB + load segments (multi step)
-	switch (m_tkbs_step)
-	{
-		// step 1: TKB
-		case 1:
-			op_tkb();
-			break;
-
-		// step 2: load segments from RAM
-		case 2:
-			// note: SEG0(DP) from C flag is delayed 2 cycles
-			seg_w(m_seg | decode_digit(ram_r()) << 1 | m_prev3_c);
-			m_tkbs_step = 0;
-			return;
-
-		default:
-			break;
-	}
-	m_tkbs_step++;
+	// note: SEG0(DP) from C flag is delayed 2 cycles
+	seg_w(m_seg | decode_digit(ram_r()) << 1 | m_prev2_c);
 }
 
 void b5000_cpu_device::op_read()

@@ -63,7 +63,7 @@ u16 b5000_cpu_device::decode_digit(u8 data)
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
 
 		// ?, ?, ?, ?, ?, ?
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		0, 0, 0, 0, 0, 0
 	};
 	return lut_segs[data & 0xf];
 }
@@ -120,7 +120,7 @@ void b5000_cpu_device::execute_one()
 		case 0x00: op_nop(); break;
 		case 0x01: op_tc(); break;
 		case 0x02: op_tkb(); break;
-		case 0x03: m_tkbs_step = 1; break;
+		case 0x03: op_tkbs(); break;
 		case 0x39: op_rsc(); break;
 		case 0x3b: op_sc(); break;
 		case 0x74: op_kseg(); break;

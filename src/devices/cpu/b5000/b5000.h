@@ -100,7 +100,7 @@ protected:
 	virtual void op_kseg();
 	virtual void op_atbz() override;
 	virtual void op_tkb();
-	virtual void op_tkbs() override;
+	virtual void op_tkbs();
 	virtual void op_read();
 	virtual void op_tdin();
 };

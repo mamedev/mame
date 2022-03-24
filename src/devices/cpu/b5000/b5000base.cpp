@@ -73,13 +73,11 @@ void b5000_base_device::device_start()
 	m_c = 0;
 	m_prev_c = 0;
 	m_prev2_c = 0;
-	m_prev3_c = 0;
 	m_sr = false;
 	m_skip = false;
 	m_seg = 0;
 
 	m_atbz_step = 0;
-	m_tkbs_step = 0;
 	m_tra_step = 0;
 	m_ret_step = 0;
 
@@ -101,13 +99,11 @@ void b5000_base_device::device_start()
 	save_item(NAME(m_c));
 	save_item(NAME(m_prev_c));
 	save_item(NAME(m_prev2_c));
-	save_item(NAME(m_prev3_c));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_seg));
 
 	save_item(NAME(m_atbz_step));
-	save_item(NAME(m_tkbs_step));
 	save_item(NAME(m_tra_step));
 	save_item(NAME(m_ret_step));
 
@@ -152,7 +148,6 @@ void b5000_base_device::device_reset()
 	m_skip = false;
 
 	m_atbz_step = 0;
-	m_tkbs_step = 0;
 	m_tra_step = 0;
 	m_ret_step = 0;
 }
@@ -180,7 +175,6 @@ void b5000_base_device::execute_run()
 
 		m_prev_bl = m_bl;
 		m_prev_bu = m_bu;
-		m_prev3_c = m_prev2_c;
 		m_prev2_c = m_prev_c;
 		m_prev_c = m_c;
 
@@ -203,7 +197,6 @@ void b5000_base_device::execute_run()
 		// some opcodes have multiple steps and will run in parallel with next ones,
 		// eg. it may fetch in order A,B and parts executed in order B,A
 		if (m_atbz_step) op_atbz();
-		if (m_tkbs_step) op_tkbs();
 		if (m_tra_step) op_tra();
 		if (m_ret_step) op_ret();
 

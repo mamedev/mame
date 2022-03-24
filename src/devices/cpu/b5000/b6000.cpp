@@ -102,7 +102,7 @@ void b6000_cpu_device::op_tkbs()
 
 void b6000_cpu_device::op_atbz()
 {
-	// ATBZ: load strobe from A (no ATB step)
-	m_write_str(1 << (m_a & 0xf));
+	// ATBZ: KSEG + load strobe (no ATB step)
 	op_kseg();
+	m_write_str(1 << m_a);
 }
