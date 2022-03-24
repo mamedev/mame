@@ -2574,299 +2574,480 @@ void m68000_base_device::xc07a_and_w_pcdi_071234fc()
 	m_not_z_flag = MASK_OUT_ABOVE_16(DX() &= (OPER_PCDI_16() | 0xffff0000));
 
 	m_n_flag = NFLAG_16(m_not_z_flag);
-	m_void x5bf9_smi_b_al_071234fc();
-void x5cd0_sge_b_ai_071234fc();
-void x5cd8_sge_b_pi_071234fc();
-void x5cdf_sge_b_pi7_071234fc();
-void x5ce0_sge_b_pd_071234fc();
-void x5ce7_sge_b_pd7_071234fc();
-void x5ce8_sge_b_di_071234fc();
-void x5cf0_sge_b_ix_071234fc();
-void x5cf8_sge_b_aw_071234fc();
-void x5cf9_sge_b_al_071234fc();
-void x5dd0_slt_b_ai_071234fc();
-void x5dd8_slt_b_pi_071234fc();
-void x5ddf_slt_b_pi7_071234fc();
-void x5de0_slt_b_pd_071234fc();
-void x5de7_slt_b_pd7_071234fc();
-void x5de8_slt_b_di_071234fc();
-void x5df0_slt_b_ix_071234fc();
-void x5df8_slt_b_aw_071234fc();
-void x5df9_slt_b_al_071234fc();
-void x5ed0_sgt_b_ai_071234fc();
-void x5ed8_sgt_b_pi_071234fc();
-void x5edf_sgt_b_pi7_071234fc();
-void x5ee0_sgt_b_pd_071234fc();
-void x5ee7_sgt_b_pd7_071234fc();
-void x5ee8_sgt_b_di_071234fc();
-void x5ef0_sgt_b_ix_071234fc();
-void x5ef8_sgt_b_aw_071234fc();
-void x5ef9_sgt_b_al_071234fc();
-void x5fd0_sle_b_ai_071234fc();
-void x5fd8_sle_b_pi_071234fc();
-void x5fdf_sle_b_pi7_071234fc();
-void x5fe0_sle_b_pd_071234fc();
-void x5fe7_sle_b_pd7_071234fc();
-void x5fe8_sle_b_di_071234fc();
-void x5ff0_sle_b_ix_071234fc();
-void x5ff8_sle_b_aw_071234fc();
-void x5ff9_sle_b_al_071234fc();
-void x4e72_stop_071234fc();
-void x9000_sub_b_071234fc();
-void x9010_sub_b_ai_071234fc();
-void x9018_sub_b_pi_071234fc();
-void x901f_sub_b_pi7_071234fc();
-void x9020_sub_b_pd_071234fc();
-void x9027_sub_b_pd7_071234fc();
-void x9028_sub_b_di_071234fc();
-void x9030_sub_b_ix_071234fc();
-void x9038_sub_b_aw_071234fc();
-void x9039_sub_b_al_071234fc();
-void x903a_sub_b_pcdi_071234fc();
-void x903b_sub_b_pcix_071234fc();
-void x903c_sub_b_i_071234fc();
-void x9040_sub_w_071234fc();
-void x9048_sub_w_071234fc();
-void x9050_sub_w_ai_071234fc();
-void x9058_sub_w_pi_071234fc();
-void x9060_sub_w_pd_071234fc();
-void x9068_sub_w_di_071234fc();
-void x9070_sub_w_ix_071234fc();
-void x9078_sub_w_aw_071234fc();
-void x9079_sub_w_al_071234fc();
-void x907a_sub_w_pcdi_071234fc();
-void x907b_sub_w_pcix_071234fc();
-void x907c_sub_w_i_071234fc();
-void x9080_sub_l_071234fc();
-void x9088_sub_l_071234fc();
-void x9090_sub_l_ai_071234fc();
-void x9098_sub_l_pi_071234fc();
-void x90a0_sub_l_pd_071234fc();
-void x90a8_sub_l_di_071234fc();
-void x90b0_sub_l_ix_071234fc();
-void x90b8_sub_l_aw_071234fc();
-void x90b9_sub_l_al_071234fc();
-void x90ba_sub_l_pcdi_071234fc();
-void x90bb_sub_l_pcix_071234fc();
-void x90bc_sub_l_i_071234fc();
-void x9110_sub_b_ai_071234fc();
-void x9118_sub_b_pi_071234fc();
-void x911f_sub_b_pi7_071234fc();
-void x9120_sub_b_pd_071234fc();
-void x9127_sub_b_pd7_071234fc();
-void x9128_sub_b_di_071234fc();
-void x9130_sub_b_ix_071234fc();
-void x9138_sub_b_aw_071234fc();
-void x9139_sub_b_al_071234fc();
-void x9150_sub_w_ai_071234fc();
-void x9158_sub_w_pi_071234fc();
-void x9160_sub_w_pd_071234fc();
-void x9168_sub_w_di_071234fc();
-void x9170_sub_w_ix_071234fc();
-void x9178_sub_w_aw_071234fc();
-void x9179_sub_w_al_071234fc();
-void x9190_sub_l_ai_071234fc();
-void x9198_sub_l_pi_071234fc();
-void x91a0_sub_l_pd_071234fc();
-void x91a8_sub_l_di_071234fc();
-void x91b0_sub_l_ix_071234fc();
-void x91b8_sub_l_aw_071234fc();
-void x91b9_sub_l_al_071234fc();
-void x90c0_suba_w_071234fc();
-void x90c8_suba_w_071234fc();
-void x90d0_suba_w_ai_071234fc();
-void x90d8_suba_w_pi_071234fc();
-void x90e0_suba_w_pd_071234fc();
-void x90e8_suba_w_di_071234fc();
-void x90f0_suba_w_ix_071234fc();
-void x90f8_suba_w_aw_071234fc();
-void x90f9_suba_w_al_071234fc();
-void x90fa_suba_w_pcdi_071234fc();
-void x90fb_suba_w_pcix_071234fc();
-void x90fc_suba_w_i_071234fc();
-void x91c0_suba_l_071234fc();
-void x91c8_suba_l_071234fc();
-void x91d0_suba_l_ai_071234fc();
-void x91d8_suba_l_pi_071234fc();
-void x91e0_suba_l_pd_071234fc();
-void x91e8_suba_l_di_071234fc();
-void x91f0_suba_l_ix_071234fc();
-void x91f8_suba_l_aw_071234fc();
-void x91f9_suba_l_al_071234fc();
-void x91fa_suba_l_pcdi_071234fc();
-void x91fb_suba_l_pcix_071234fc();
-void x91fc_suba_l_i_071234fc();
-void x0400_subi_b_071234fc();
-void x0410_subi_b_ai_071234fc();
-void x0418_subi_b_pi_071234fc();
-void x041f_subi_b_pi7_071234fc();
-void x0420_subi_b_pd_071234fc();
-void x0427_subi_b_pd7_071234fc();
-void x0428_subi_b_di_071234fc();
-void x0430_subi_b_ix_071234fc();
-void x0438_subi_b_aw_071234fc();
-void x0439_subi_b_al_071234fc();
-void x0440_subi_w_071234fc();
-void x0450_subi_w_ai_071234fc();
-void x0458_subi_w_pi_071234fc();
-void x0460_subi_w_pd_071234fc();
-void x0468_subi_w_di_071234fc();
-void x0470_subi_w_ix_071234fc();
-void x0478_subi_w_aw_071234fc();
-void x0479_subi_w_al_071234fc();
-void x0480_subi_l_071234fc();
-void x0490_subi_l_ai_071234fc();
-void x0498_subi_l_pi_071234fc();
-void x04a0_subi_l_pd_071234fc();
-void x04a8_subi_l_di_071234fc();
-void x04b0_subi_l_ix_071234fc();
-void x04b8_subi_l_aw_071234fc();
-void x04b9_subi_l_al_071234fc();
-void x5100_subq_b_071234fc();
-void x5110_subq_b_ai_071234fc();
-void x5118_subq_b_pi_071234fc();
-void x511f_subq_b_pi7_071234fc();
-void x5120_subq_b_pd_071234fc();
-void x5127_subq_b_pd7_071234fc();
-void x5128_subq_b_di_071234fc();
-void x5130_subq_b_ix_071234fc();
-void x5138_subq_b_aw_071234fc();
-void x5139_subq_b_al_071234fc();
-void x5140_subq_w_071234fc();
-void x5148_subq_w_071234fc();
-void x5150_subq_w_ai_071234fc();
-void x5158_subq_w_pi_071234fc();
-void x5160_subq_w_pd_071234fc();
-void x5168_subq_w_di_071234fc();
-void x5170_subq_w_ix_071234fc();
-void x5178_subq_w_aw_071234fc();
-void x5179_subq_w_al_071234fc();
-void x5180_subq_l_071234fc();
-void x5188_subq_l_071234fc();
-void x5190_subq_l_ai_071234fc();
-void x5198_subq_l_pi_071234fc();
-void x51a0_subq_l_pd_071234fc();
-void x51a8_subq_l_di_071234fc();
-void x51b0_subq_l_ix_071234fc();
-void x51b8_subq_l_aw_071234fc();
-void x51b9_subq_l_al_071234fc();
-void x9100_subx_b_071234fc();
-void x9140_subx_w_071234fc();
-void x9180_subx_l_071234fc();
-void x9f08_subx_b_071234fc();
-void x910f_subx_b_071234fc();
-void x9f0f_subx_b_071234fc();
-void x9108_subx_b_071234fc();
-void x9148_subx_w_071234fc();
-void x9188_subx_l_071234fc();
-void x4840_swap_l_071234fc();
-void x4ac0_tas_b_071234fc();
-void x4ad0_tas_b_ai_071234fc();
-void x4ad8_tas_b_pi_071234fc();
-void x4adf_tas_b_pi7_071234fc();
-void x4ae0_tas_b_pd_071234fc();
-void x4ae7_tas_b_pd7_071234fc();
-void x4ae8_tas_b_di_071234fc();
-void x4af0_tas_b_ix_071234fc();
-void x4af8_tas_b_aw_071234fc();
-void x4af9_tas_b_al_071234fc();
-void x4e40_trap_071234fc();
-void x50fc_trapt_234fc();
-void x50fa_trapt_w_234fc();
-void x50fb_trapt_l_234fc();
-void x51fc_trapf_234fc();
-void x51fa_trapf_w_234fc();
-void x51fb_trapf_l_234fc();
-void x52fc_traphi_234fc();
-void x53fc_trapls_234fc();
-void x54fc_trapcc_234fc();
-void x55fc_trapcs_234fc();
-void x56fc_trapne_234fc();
-void x57fc_trapeq_234fc();
-void x58fc_trapvc_234fc();
-void x59fc_trapvs_234fc();
-void x5afc_trappl_234fc();
-void x5bfc_trapmi_234fc();
-void x5cfc_trapge_234fc();
-void x5dfc_traplt_234fc();
-void x5efc_trapgt_234fc();
-void x5ffc_traple_234fc();
-void x52fa_traphi_w_234fc();
-void x53fa_trapls_w_234fc();
-void x54fa_trapcc_w_234fc();
-void x55fa_trapcs_w_234fc();
-void x56fa_trapne_w_234fc();
-void x57fa_trapeq_w_234fc();
-void x58fa_trapvc_w_234fc();
-void x59fa_trapvs_w_234fc();
-void x5afa_trappl_w_234fc();
-void x5bfa_trapmi_w_234fc();
-void x5cfa_trapge_w_234fc();
-void x5dfa_traplt_w_234fc();
-void x5efa_trapgt_w_234fc();
-void x5ffa_traple_w_234fc();
-void x52fb_traphi_l_234fc();
-void x53fb_trapls_l_234fc();
-void x54fb_trapcc_l_234fc();
-void x55fb_trapcs_l_234fc();
-void x56fb_trapne_l_234fc();
-void x57fb_trapeq_l_234fc();
-void x58fb_trapvc_l_234fc();
-void x59fb_trapvs_l_234fc();
-void x5afb_trappl_l_234fc();
-void x5bfb_trapmi_l_234fc();
-void x5cfb_trapge_l_234fc();
-void x5dfb_traplt_l_234fc();
-void x5efb_trapgt_l_234fc();
-void x5ffb_traple_l_234fc();
-void x4e76_trapv_071234fc();
-void x4a00_tst_b_071234fc();
-void x4a10_tst_b_ai_071234fc();
-void x4a18_tst_b_pi_071234fc();
-void x4a1f_tst_b_pi7_071234fc();
-void x4a20_tst_b_pd_071234fc();
-void x4a27_tst_b_pd7_071234fc();
-void x4a28_tst_b_di_071234fc();
-void x4a30_tst_b_ix_071234fc();
-void x4a38_tst_b_aw_071234fc();
-void x4a39_tst_b_al_071234fc();
-void x4a3a_tst_b_234fc();
-void x4a3b_tst_b_234fc();
-void x4a3c_tst_b_234fc();
-void x4a40_tst_w_071234fc();
-void x4a48_tst_w_234fc();
-void x4a50_tst_w_ai_071234fc();
-void x4a58_tst_w_pi_071234fc();
-void x4a60_tst_w_pd_071234fc();
-void x4a68_tst_w_di_071234fc();
-void x4a70_tst_w_ix_071234fc();
-void x4a78_tst_w_aw_071234fc();
-void x4a79_tst_w_al_071234fc();
-void x4a7a_tst_w_234fc();
-void x4a7b_tst_w_234fc();
-void x4a7c_tst_w_234fc();
-void x4a80_tst_l_071234fc();
-void x4a88_tst_l_234fc();
-void x4a90_tst_l_ai_071234fc();
-void x4a98_tst_l_pi_071234fc();
-void x4aa0_tst_l_pd_071234fc();
-void x4aa8_tst_l_di_071234fc();
-void x4ab0_tst_l_ix_071234fc();
-void x4ab8_tst_l_aw_071234fc();
-void x4ab9_tst_l_al_071234fc();
-void x4aba_tst_l_234fc();
-void x4abb_tst_l_234fc();
-void x4abc_tst_l_234fc();
-void x4e5f_unlk_l_071234fc();
-void x4e58_unlk_l_071234fc();
-void x8180_unpk_w_234fc();
-void x8f88_unpk_w_234fc();
-void x818f_unpk_w_234fc();
-void x8f8f_unpk_w_234fc();
-void x8188_unpk_w_234fc();
-void xf400_cinv_l_4();
-void xf420_cpush_l_4();
-s);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc07b_and_w_pcix_071234fc()
+{
+	m_not_z_flag = MASK_OUT_ABOVE_16(DX() &= (OPER_PCIX_16() | 0xffff0000));
+
+	m_n_flag = NFLAG_16(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc07c_and_w_i_071234fc()
+{
+	m_not_z_flag = MASK_OUT_ABOVE_16(DX() &= (OPER_I_16() | 0xffff0000));
+
+	m_n_flag = NFLAG_16(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc080_and_l_071234fc()
+{
+	m_not_z_flag = DX() &= DY();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc090_and_l_ai_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_AY_AI_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc098_and_l_pi_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_AY_PI_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc0a0_and_l_pd_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_AY_PD_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc0a8_and_l_di_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_AY_DI_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc0b0_and_l_ix_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_AY_IX_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc0b8_and_l_aw_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_AW_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc0b9_and_l_al_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_AL_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc0ba_and_l_pcdi_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_PCDI_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc0bb_and_l_pcix_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_PCIX_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc0bc_and_l_i_071234fc()
+{
+	m_not_z_flag = DX() &= OPER_I_32();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::xc110_and_b_ai_071234fc()
+{
+	u32 ea = EA_AY_AI_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc118_and_b_pi_071234fc()
+{
+	u32 ea = EA_AY_PI_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc11f_and_b_pi7_071234fc()
+{
+	u32 ea = EA_A7_PI_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc120_and_b_pd_071234fc()
+{
+	u32 ea = EA_AY_PD_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc127_and_b_pd7_071234fc()
+{
+	u32 ea = EA_A7_PD_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc128_and_b_di_071234fc()
+{
+	u32 ea = EA_AY_DI_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc130_and_b_ix_071234fc()
+{
+	u32 ea = EA_AY_IX_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc138_and_b_aw_071234fc()
+{
+	u32 ea = EA_AW_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc139_and_b_al_071234fc()
+{
+	u32 ea = EA_AL_8();
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc150_and_w_ai_071234fc()
+{
+	u32 ea = EA_AY_AI_16();
+	u32 res = DX() & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc158_and_w_pi_071234fc()
+{
+	u32 ea = EA_AY_PI_16();
+	u32 res = DX() & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc160_and_w_pd_071234fc()
+{
+	u32 ea = EA_AY_PD_16();
+	u32 res = DX() & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc168_and_w_di_071234fc()
+{
+	u32 ea = EA_AY_DI_16();
+	u32 res = DX() & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc170_and_w_ix_071234fc()
+{
+	u32 ea = EA_AY_IX_16();
+	u32 res = DX() & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc178_and_w_aw_071234fc()
+{
+	u32 ea = EA_AW_16();
+	u32 res = DX() & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc179_and_w_al_071234fc()
+{
+	u32 ea = EA_AL_16();
+	u32 res = DX() & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+}
+void m68000_base_device::xc190_and_l_ai_071234fc()
+{
+	u32 ea = EA_AY_AI_32();
+	u32 res = DX() & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+}
+void m68000_base_device::xc198_and_l_pi_071234fc()
+{
+	u32 ea = EA_AY_PI_32();
+	u32 res = DX() & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+}
+void m68000_base_device::xc1a0_and_l_pd_071234fc()
+{
+	u32 ea = EA_AY_PD_32();
+	u32 res = DX() & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+}
+void m68000_base_device::xc1a8_and_l_di_071234fc()
+{
+	u32 ea = EA_AY_DI_32();
+	u32 res = DX() & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+}
+void m68000_base_device::xc1b0_and_l_ix_071234fc()
+{
+	u32 ea = EA_AY_IX_32();
+	u32 res = DX() & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+}
+void m68000_base_device::xc1b8_and_l_aw_071234fc()
+{
+	u32 ea = EA_AW_32();
+	u32 res = DX() & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+}
+void m68000_base_device::xc1b9_and_l_al_071234fc()
+{
+	u32 ea = EA_AL_32();
+	u32 res = DX() & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+}
+void m68000_base_device::x0200_andi_b_071234fc()
+{
+	m_not_z_flag = MASK_OUT_ABOVE_8(DY() &= (OPER_I_8() | 0xffffff00));
+
+	m_n_flag = NFLAG_8(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+}
+void m68000_base_device::x0210_andi_b_ai_071234fc()
+{
+	u32 src = OPER_I_8();
+	u32 ea = EA_AY_AI_8();
+	u32 res = src & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
 	m_not_z_flag = res;
 	m_c_flag = CFLAG_CLEAR;
 	m_v_flag = VFLAG_CLEAR;
