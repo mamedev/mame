@@ -826,8 +826,8 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 3" />
-			<dataarea name="flop" size="3582193">
-				<rom name="loh2_scenariodisk3.mfm" size="3582193" crc="588d3a38" sha1="59acc89c9cc4c862637be3bffb16434af101517a"/>
+			<dataarea name="flop" size="3528398">
+				<rom name="loh2_scenariodisk3.mfm" size="3528398" crc="5ef0e069" sha1="bd5d49a3a4c93987dd8be992f55e24065d3ca2c8"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
@@ -2223,6 +2223,57 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
 				<rom name="tenshi-tachi_no_gogo_vi_disk_c.hdm" size="1261568" crc="fb775fed" sha1="c4cc8a6244c75035b6c40c4310cb0d497701cc84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="think_cmi">
+		<description>Think Lead Gakushuu System - FM Towns CMI Program</description>
+		<year>1991</year>
+		<publisher>ＣＡＩ総合研究所 (CAI Sougou Kenkyuusho)</publisher>
+		<info name="alt_title" value="ＴＨＩＮＫリード学習システム　ＦＭ　ＴＯＷＮＳ　ＣＭＩプログラム" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="think_lead_cmi_program.hdm" size="1261568" crc="17f7dda2" sha1="0c32c7b789dcc2c74d86fa14c8f93344b341932c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="think_program">
+		<description>Think Lead Gakushuu System - FM Towns Theme-betsu Gakushuu Series - Jikkou Program Ver. 2</description>
+		<year>1991</year>
+		<publisher>ＣＡＩ総合研究所 (CAI Sougou Kenkyuusho)</publisher>
+		<info name="alt_title" value="ＴＨＩＮＫリード学習システム　ＦＭ　ＴＯＷＮＳ　テーマ別学習シリーズ　実行プログラム　Ｖｅｒ．　２" />
+		<info name="usage" value="Run SETMENU to register the course disks with the application, then reboot" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3445159">
+				<rom name="think_lead_program_ver2.mfm" size="3445159" crc="26830067" sha1="728b948cba90ce143ae8f64e97a2f08c91eb0fe3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The following are course disks for the Think Lead program -->
+
+	<software name="think_sr5tane">
+		<description>Think Lead Gakushuu System - Shougaku Rika 5-nen - Tane no Hatsuga (1)</description>
+		<year>1991</year>
+		<publisher>ＣＡＩ総合研究所 (CAI Sougou Kenkyuusho)</publisher>
+		<info name="alt_title" value="ＴＨＩＮＫリード学習システム　小学理科５年　たねの発芽（１）" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="think_lead_shougaku_rika_5-nen_tane_no_hatsuga.hdm" size="1261568" crc="40f9c328" sha1="85433366beb9a021bc8919e5693018e702726acb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="think_sr6karada">
+		<description>Think Lead Gakushuu System - Shougaku Rika 6-nen - Karada no Tsukuri (1)</description>
+		<year>1991</year>
+		<publisher>ＣＡＩ総合研究所 (CAI Sougou Kenkyuusho)</publisher>
+		<info name="alt_title" value="ＴＨＩＮＫリード学習システム　小学理科６年　からだのつくり（１）" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="think_lead_shougaku_rika_6-nen_karada_no_tsukuri.hdm" size="1261568" crc="16b6142d" sha1="e1bf0cf2781ddfb82cc58107eba23902d2b569cb"/>
 			</dataarea>
 		</part>
 	</software>
