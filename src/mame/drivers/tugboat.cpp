@@ -67,12 +67,12 @@ private:
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
-	uint8_t m_hd46505_0_reg[18];
-	uint8_t m_hd46505_1_reg[18];
-	int m_reg0;
-	int m_reg1;
-	int m_ctrl;
-	emu_timer *m_interrupt_timer;
+	uint8_t m_hd46505_0_reg[18]{};
+	uint8_t m_hd46505_1_reg[18]{};
+	int m_reg0 = 0;
+	int m_reg1 = 0;
+	int m_ctrl = 0;
+	emu_timer *m_interrupt_timer = nullptr;
 
 	void hd46505_0_w(offs_t offset, uint8_t data);
 	void hd46505_1_w(offs_t offset, uint8_t data);

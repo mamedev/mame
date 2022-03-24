@@ -82,9 +82,9 @@ private:
 
 	void tv950_mem(address_map &map);
 
-	uint8_t m_via_row;
-	uint8_t m_attr_row;
-	uint8_t m_attr_screen;
+	uint8_t m_via_row = 0;
+	uint8_t m_attr_row = 0;
+	uint8_t m_attr_screen = 0;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
@@ -95,8 +95,8 @@ private:
 	required_region_ptr<uint16_t> m_gfx;
 	required_ioport_array<4> m_dsw;
 
-	int m_row_addr;
-	int m_row;
+	int m_row_addr = 0;
+	int m_row = 0;
 };
 
 void tv950_state::machine_start()

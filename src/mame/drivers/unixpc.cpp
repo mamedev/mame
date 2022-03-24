@@ -109,12 +109,12 @@ private:
 	required_shared_ptr<uint16_t> m_mapram;
 	required_shared_ptr<uint16_t> m_videoram;
 
-	uint16_t *m_ramptr;
-	uint32_t m_ramsize;
-	uint16_t m_diskdmasize;
-	uint32_t m_diskdmaptr;
-	bool m_fdc_intrq;
-	bool m_hdc_intrq;
+	uint16_t *m_ramptr = nullptr;
+	uint32_t m_ramsize = 0;
+	uint16_t m_diskdmasize = 0;
+	uint32_t m_diskdmaptr = 0;
+	bool m_fdc_intrq = false;
+	bool m_hdc_intrq = false;
 };
 
 

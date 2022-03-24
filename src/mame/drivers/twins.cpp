@@ -130,12 +130,12 @@ protected:
 	std::unique_ptr<u16 []> m_bgvram;
 	std::unique_ptr<u16 []> m_fgvram;
 	std::unique_ptr<u16 []> m_paletteram;
-	uint16_t m_paloff;
+	uint16_t m_paloff = 0;
 	int m_spritesinit;
-	int m_spriteswidth;
-	int m_spritesaddr;
+	int m_spriteswidth = 0;
+	int m_spritesaddr = 0;
 	uint16_t m_videorambank;
-	uint8_t* m_rom8;
+	uint8_t* m_rom8 = nullptr;
 
 	void base_config(machine_config &config);
 	void video_config(machine_config &config);
