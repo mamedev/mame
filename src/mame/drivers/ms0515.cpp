@@ -134,12 +134,12 @@ private:
 	output_finder<> m_led16;
 	output_finder<> m_led17;
 
-	uint8_t *m_video_ram;
-	uint8_t m_sysrega, m_sysregc;
-	uint16_t m_bankreg, m_haltreg;
-	uint16_t m_irqs;
-	int m_blink;
-	floppy_image_device *m_floppy;
+	uint8_t *m_video_ram = nullptr;
+	uint8_t m_sysrega = 0, m_sysregc = 0;
+	uint16_t m_bankreg = 0, m_haltreg = 0;
+	uint16_t m_irqs = 0;
+	int m_blink = 0;
+	floppy_image_device *m_floppy = nullptr;
 };
 
 void ms0515_state::ms0515_mem(address_map &map)

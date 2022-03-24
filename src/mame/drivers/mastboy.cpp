@@ -490,9 +490,9 @@ private:
 	required_shared_ptr<uint8_t> m_colram;
 	required_shared_ptr<uint8_t> m_vram;
 
-	int m_irq0_ack;
-	int m_m5205_next;
-	int m_m5205_part;
+	int m_irq0_ack = 0;
+	int m_m5205_next = 0;
+	int m_m5205_part = 0;
 
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
