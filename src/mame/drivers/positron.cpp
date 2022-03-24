@@ -77,8 +77,8 @@ private:
 	// disassembly override
 	offs_t os9_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
-	emu_timer *m_fuse_timer;
-	bool m_fuse_timer_running;
+	emu_timer *m_fuse_timer = nullptr;
+	bool m_fuse_timer_running = false;
 
 	void positron_map(address_map &map);
 	void positron_fetch(address_map &map);
@@ -89,11 +89,11 @@ private:
 
 	// sockets for upto 8 x SC67476, only 2 actually fitted in this machine
 	struct mmu {
-		uint16_t access_reg[1024];
-		uint8_t key_value[8];
-		uint8_t access_key;
-		uint8_t operate_key;
-		uint8_t active_key;
+		uint16_t access_reg[1024]{};
+		uint8_t key_value[8]{};
+		uint8_t access_key = 0;
+		uint8_t operate_key = 0;
+		uint8_t active_key = 0;
 		bool sbit;
 	} m_mmu;
 
@@ -101,7 +101,7 @@ private:
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 
-	bool m_irq_ack;
+	bool m_irq_ack = 0;
 
 	required_device<mc6809_device> m_maincpu;
 	required_device<address_map_bank_device> m_mmu_bankdev;

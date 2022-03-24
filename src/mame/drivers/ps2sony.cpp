@@ -280,18 +280,18 @@ protected:
 	required_shared_ptr<uint64_t>   m_vu1_dmem;
 	required_region_ptr<uint32_t>   m_bios;
 
-	uint32_t m_unk_f430_reg;
-	uint32_t m_unk_f440_counter;
-	uint32_t m_unk_f440_reg;
-	uint32_t m_unk_f440_ret;
+	uint32_t m_unk_f430_reg = 0;
+	uint32_t m_unk_f440_counter = 0;
+	uint32_t m_unk_f440_reg = 0;
+	uint32_t m_unk_f440_ret = 0;
 
-	uint32_t m_ipu_ctrl;
-	uint64_t m_ipu_in_fifo[0x1000];
-	uint64_t m_ipu_in_fifo_index;
-	uint64_t m_ipu_out_fifo[0x1000];
-	uint64_t m_ipu_out_fifo_index;
+	uint32_t m_ipu_ctrl = 0;
+	uint64_t m_ipu_in_fifo[0x1000]{};
+	uint64_t m_ipu_in_fifo_index = 0;
+	uint64_t m_ipu_out_fifo[0x1000]{};
+	uint64_t m_ipu_out_fifo_index = 0;
 
-	emu_timer *m_vblank_timer;
+	emu_timer *m_vblank_timer = nullptr;
 };
 
 /**************************************
