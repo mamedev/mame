@@ -186,33 +186,33 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* FDD */
-	int     m_fdcint;
-	uint8_t  m_motor_clk;
-	uint16_t m_counter;
-	//int     m_fdcready;
+	int     m_fdcint = 0;
+	uint8_t  m_motor_clk = 0;
+	uint16_t m_counter = 0;
+	//int     m_fdcready = 0;
 
-	int m_spkr_enable;
-	int m_spkr_freq;
-	int m_pit1_out0;
+	int m_spkr_enable = 0;
+	int m_spkr_freq = 0;
+	int m_pit1_out0 = 0;
 
 	/* centronics */
-	int m_centronics_error;
-	int m_centronics_busy;
-	int m_centronics_paper;
-	int m_centronics_select;
-	int m_centronics_sense;
+	int m_centronics_error = 0;
+	int m_centronics_busy = 0;
+	int m_centronics_paper = 0;
+	int m_centronics_select = 0;
+	int m_centronics_sense = 0;
 
 
 	/* memory */
 	memory_view m_ram_view;
-	int     m_external_bank;
-	int     m_membank;
-	int     m_memprom;
-	int     m_memcmos;
-	uint8_t   m_cmosram[0x800];
+	int     m_external_bank = 0;
+	int     m_membank = 0;
+	int     m_memprom = 0;
+	int     m_memcmos = 0;
+	uint8_t   m_cmosram[0x800]{};
 
-	uint8_t m_color_mode;
-	uint8_t m_zoom;
+	uint8_t m_color_mode = 0;
+	uint8_t m_zoom = 0;
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )

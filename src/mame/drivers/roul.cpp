@@ -112,7 +112,7 @@ private:
 
 	uint8_t m_reg[0x10];
 	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp_old;
+	uint8_t m_lamp_old = 0;
 };
 
 

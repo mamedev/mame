@@ -66,7 +66,7 @@ private:
 	void a7000_map(address_map &map);
 	void riscpc_map(address_map &map);
 
-	bool m_i2cmem_clock;
+	bool m_i2cmem_clock = false;
 	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
 	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
 	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
