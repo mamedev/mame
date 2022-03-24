@@ -100,8 +100,8 @@ private:
 	emu_timer *m_hblank_start_timer = nullptr;
 	std::unique_ptr<uint8_t[]> m_fig_scale_table{};
 	std::unique_ptr<uint8_t[]> m_scale_table{};
-	int m_video_firq;
-	uint8_t m_bg_intensity;
+	int m_video_firq = 0;
+	uint8_t m_bg_intensity = 0;
 	void uart_w(offs_t offset, uint8_t data);
 	uint8_t uart_r();
 	uint8_t g_status_r();
