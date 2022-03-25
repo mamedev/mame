@@ -234,12 +234,12 @@ private:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-	uint8_t mux_sel;
-	uint8_t muxlamps;
+	uint8_t mux_sel = 0;
+	uint8_t muxlamps = 0;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<9> m_lamps;
