@@ -20,6 +20,11 @@ public:
 		, m_sensor(*this, "sensor")
 		, m_nvram(*this, "nvram")
 		, m_gfx1_rom(*this, "gfx1")
+		, m_in(*this, "IN%u", 0U)
+		, m_coins(*this, "COINS%u", 1U)
+		, m_dsw(*this, "DSW%u", 0U)
+		, m_gunx(*this, "GUNX")
+		, m_guny(*this, "GUNY")
 		, m_prg_banks(*this, "prg%u", 0U)
 		, m_prg_view(*this, "prg_view")
 		, m_chr_banks(*this, "chr%u", 0U)
@@ -52,7 +57,12 @@ public:
 	void init_vsdual();
 	void init_bootleg();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
+	enum { MAIN = 0, SUB = 1 };
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<ppu2c0x_device> m_ppu1;
@@ -65,20 +75,19 @@ private:
 
 	optional_memory_region m_gfx1_rom;
 
-	void sprite_dma_0_w(address_space &space, uint8_t data);
-	void sprite_dma_1_w(address_space &space, uint8_t data);
-	void vsnes_coin_counter_w(uint8_t data);
-	uint8_t vsnes_coin_counter_r();
-	void vsnes_coin_counter_1_w(uint8_t data);
-	void vsnes_in0_w(uint8_t data);
-	uint8_t vsnes_in0_r();
-	uint8_t vsnes_in1_r();
-	void vsnes_in0_1_w(uint8_t data);
-	uint8_t vsnes_in0_1_r();
-	uint8_t vsnes_in1_1_r();
-	void gun_in0_w(uint8_t data);
+	optional_ioport_array<4> m_in;
+	optional_ioport_array<2> m_coins;
+	optional_ioport_array<2> m_dsw;
+	optional_ioport m_gunx;
+	optional_ioport m_guny;
+
+	template <u8 Side> void sprite_dma_w(address_space &space, u8 data);
+	template <u8 Side> void vsnes_coin_counter_w(offs_t offset, u8 data);
+	template <u8 Side> u8 vsnes_coin_counter_r(offs_t offset);
+	template <u8 Side> void vsnes_in0_w(u8 data);
+	template <u8 Side> u8 vsnes_in0_r();
+	template <u8 Side> u8 vsnes_in1_r();
 	void vsnormal_vrom_banking(uint8_t data);
-	void vsnes_gun_in0_w(uint8_t data);
 	void vskonami_rom_banking(offs_t offset, uint8_t data);
 	void vsgshoe_gun_in0_w(uint8_t data);
 	void drmario_rom_banking(offs_t offset, uint8_t data);
@@ -98,7 +107,6 @@ private:
 	void vssmbbl_sn_w(offs_t offset, uint8_t data);
 
 	DECLARE_MACHINE_START(vsnes);
-	DECLARE_MACHINE_RESET(vsnes);
 	DECLARE_MACHINE_START(vsdual);
 	DECLARE_MACHINE_START(bootleg);
 	void v_set_videorom_bank(int start, int count, int vrom_start_bank);
@@ -130,6 +138,7 @@ private:
 	memory_view m_chr_view;
 	int m_chr_chunks = 0;
 
+	bool m_has_gun = false;
 	int m_coin = 0;
 	int m_input_latch[4]{};
 	int m_input_strobe[2]{};
