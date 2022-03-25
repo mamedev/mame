@@ -10885,6 +10885,11 @@ cosmicgi                        // bootleg (Inder)
 @source:cosmicos.cpp
 cosmicos                        //
 
+@source:cosmos_play8cf.cpp
+bgbasketb                       // (c) 2013 Benchmark Games
+bgbasketbb                      // (c) 2004 Benchmark Games
+tenstrikc                       // (c) 2003 Benchmark Games
+
 @source:cowtipping.cpp
 cowtipp                         //
 cowtippa                        //
