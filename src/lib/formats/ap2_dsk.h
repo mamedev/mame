@@ -40,29 +40,41 @@ LEGACY_FLOPPY_OPTIONS_EXTERN(apple2);
 class a2_16sect_format : public floppy_image_format_t
 {
 public:
-	a2_16sect_format();
+	a2_16sect_format(bool prodos_order);
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
 	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
 	virtual bool supports_save() const override;
 
 private:
-	static const desc_e mac_gcr[];
+	const bool m_prodos_order;
 
 	uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
 	void update_chk(const uint8_t *data, int size, uint32_t &chk);
-
-	bool m_prodos_order;
-
-	int m_tracks = 0;
 };
 
-extern const floppy_format_type FLOPPY_A216S_FORMAT;
+class a2_16sect_dos_format : public a2_16sect_format
+{
+public:
+	a2_16sect_dos_format();
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
+};
+
+class a2_16sect_prodos_format : public a2_16sect_format
+{
+public:
+	a2_16sect_prodos_format();
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
+};
+
+extern const floppy_format_type FLOPPY_A216S_DOS_FORMAT;
+extern const floppy_format_type FLOPPY_A216S_PRODOS_FORMAT;
 
 class a2_rwts18_format : public floppy_image_format_t
 {
