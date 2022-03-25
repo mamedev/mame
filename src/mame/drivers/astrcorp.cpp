@@ -104,12 +104,12 @@ protected:
 	void screen_enable_w(u8 data);
 	u16 unk_r();
 	void oki_bank_w(u8 data);
-	u8      m_screen_enable;
+	u8      m_screen_enable = 0;
 
 private:
 	// video-related
 	bitmap_ind16 m_bitmap;
-	u16     m_sprite_dma;
+	u16     m_sprite_dma = 0;
 
 	output_finder<7> m_lamps;
 

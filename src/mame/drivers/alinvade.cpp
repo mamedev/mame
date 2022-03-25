@@ -50,8 +50,8 @@ private:
 
 	void alinvade_map(address_map &map);
 
-	uint8_t m_irqmask;
-	uint8_t m_irqff;
+	uint8_t m_irqmask = 0;
+	uint8_t m_irqff = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

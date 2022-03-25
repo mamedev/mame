@@ -46,7 +46,7 @@ private:
 	required_region_ptr<u16> m_mainprom;
 	required_shared_ptr<u16> m_mainram;
 
-	bool m_ram_enabled;
+	bool m_ram_enabled = false;
 };
 
 

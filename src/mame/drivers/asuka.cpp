@@ -383,8 +383,8 @@ private:
 	required_region_ptr<u8> m_sound_data;
 
 	// misc
-	u16         m_adpcm_pos;
-	bool        m_adpcm_ff;
+	u16         m_adpcm_pos = 0;
+	bool        m_adpcm_ff = false;
 
 	// devices
 	required_device<msm5205_device> m_msm;
@@ -443,7 +443,7 @@ private:
 	// memory pointers
 	required_shared_ptr<u8> m_shared_ram;
 
-	emu_timer *m_int5_timer;
+	emu_timer *m_int5_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(interrupt5);
 
 	u16 share_r(offs_t offset);
