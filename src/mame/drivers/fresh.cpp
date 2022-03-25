@@ -52,8 +52,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg_2_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_2_tilemap = nullptr;
 
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_bg_2_videoram;
@@ -71,7 +71,7 @@ private:
 	void fresh_attr_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
 
-	uint16_t m_d30000_value;
+	uint16_t m_d30000_value = 0;
 
 	void d30000_write(uint16_t data)
 	{

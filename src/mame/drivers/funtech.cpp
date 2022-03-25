@@ -66,9 +66,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<6> m_lamps;
 
-	uint8_t m_vreg;
+	uint8_t m_vreg = 0;
 
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 
@@ -80,7 +80,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	tilemap_t *m_reel_tilemap[3];
+	tilemap_t *m_reel_tilemap[3]{};
 
 	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
 

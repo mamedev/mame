@@ -76,8 +76,8 @@ private:
 	void init_board(int state);
 	u8 read_board_row(u8 row);
 
-	u8 m_inp_mux;
-	u8 m_led_select;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 };
 
 void dsc_state::machine_start()
