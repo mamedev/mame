@@ -29,6 +29,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_SVI_FORMAT;
+extern const svi_format FLOPPY_SVI_FORMAT;
 
 #endif // MAME_FORMATS_SVI_DSK_H

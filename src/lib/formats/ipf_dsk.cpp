@@ -7,7 +7,7 @@
 #include <cstring>
 
 
-const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;
+const ipf_format FLOPPY_IPF_FORMAT;
 
 const char *ipf_format::name() const
 {

@@ -131,4 +131,4 @@ bool dim_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_DIM_FORMAT = &floppy_image_format_creator<dim_format>;
+const dim_format FLOPPY_DIM_FORMAT;

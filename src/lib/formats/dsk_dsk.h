@@ -28,6 +28,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_DSK_FORMAT;
+extern const dsk_format FLOPPY_DSK_FORMAT;
 
 #endif // MAME_FORMATS_DSK_DSK_H

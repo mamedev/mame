@@ -210,4 +210,4 @@ bool apd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_APD_FORMAT = &floppy_image_format_creator<apd_format>;
+const apd_format FLOPPY_APD_FORMAT;

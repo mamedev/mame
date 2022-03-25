@@ -61,6 +61,6 @@ private:
 	static void wd_generate_track_from_sectors_only(int track, int head, floppy_image *image, wd_obs &obs);
 };
 
-extern const floppy_format_type FLOPPY_PASTI_FORMAT;
+extern const pasti_format FLOPPY_PASTI_FORMAT;
 
 #endif // MAME_FORMATS_PASTI_DSK_H

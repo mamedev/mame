@@ -1275,4 +1275,4 @@ const flex_format::format flex_format::formats_head1_track0[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_FLEX_FORMAT = &floppy_image_format_creator<flex_format>;
+const flex_format FLOPPY_FLEX_FORMAT;

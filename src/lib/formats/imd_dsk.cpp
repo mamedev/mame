@@ -644,4 +644,4 @@ bool imd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_IMD_FORMAT = &floppy_image_format_creator<imd_format>;
+const imd_format FLOPPY_IMD_FORMAT;

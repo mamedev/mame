@@ -50,6 +50,6 @@ private:
 	static const format formats_head1_track0[];
 };
 
-extern const floppy_format_type FLOPPY_FLEX_FORMAT;
+extern const flex_format FLOPPY_FLEX_FORMAT;
 
 #endif // MAME_FORMATS_FLEX_DSK_H

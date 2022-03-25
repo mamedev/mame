@@ -305,4 +305,4 @@ bool dcp_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_DCP_FORMAT = &floppy_image_format_creator<dcp_format>;
+const dcp_format FLOPPY_DCP_FORMAT;

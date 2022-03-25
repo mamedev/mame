@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_SF7000_FORMAT;
+extern const sf7000_format FLOPPY_SF7000_FORMAT;
 
 #endif // MAME_FORMATS_SF7000_DSK_H

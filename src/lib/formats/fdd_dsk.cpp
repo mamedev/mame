@@ -153,4 +153,4 @@ bool fdd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_FDD_FORMAT = &floppy_image_format_creator<fdd_format>;
+const fdd_format FLOPPY_FDD_FORMAT;

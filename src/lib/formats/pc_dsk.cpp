@@ -94,4 +94,4 @@ const pc_format::format pc_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_PC_FORMAT = &floppy_image_format_creator<pc_format>;
+const pc_format FLOPPY_PC_FORMAT;

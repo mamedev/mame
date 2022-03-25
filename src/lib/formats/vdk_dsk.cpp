@@ -141,4 +141,4 @@ bool vdk_format::supports_save() const
 	return true;
 }
 
-const floppy_format_type FLOPPY_VDK_FORMAT = &floppy_image_format_creator<vdk_format>;
+const vdk_format FLOPPY_VDK_FORMAT;

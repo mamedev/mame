@@ -76,4 +76,4 @@ const cgenie_format::format cgenie_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_CGENIE_FORMAT = &floppy_image_format_creator<cgenie_format>;
+const cgenie_format FLOPPY_CGENIE_FORMAT;

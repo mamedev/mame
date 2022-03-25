@@ -407,5 +407,5 @@ bool vtech_dsk_format::save(util::random_read_write &io, const std::vector<uint3
 }
 
 
-const floppy_format_type FLOPPY_VTECH_BIN_FORMAT = &floppy_image_format_creator<vtech_bin_format>;
-const floppy_format_type FLOPPY_VTECH_DSK_FORMAT = &floppy_image_format_creator<vtech_dsk_format>;
+const vtech_bin_format FLOPPY_VTECH_BIN_FORMAT;
+const vtech_dsk_format FLOPPY_VTECH_DSK_FORMAT;

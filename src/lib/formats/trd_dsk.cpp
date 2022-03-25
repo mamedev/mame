@@ -110,4 +110,4 @@ const trd_format::format trd_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_TRD_FORMAT = &floppy_image_format_creator<trd_format>;
+const trd_format FLOPPY_TRD_FORMAT;

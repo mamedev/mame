@@ -153,4 +153,4 @@ bool apridisk_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_APRIDISK_FORMAT = &floppy_image_format_creator<apridisk_format>;
+const apridisk_format FLOPPY_APRIDISK_FORMAT;

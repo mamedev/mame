@@ -47,4 +47,4 @@ const swd_format::format swd_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_SWD_FORMAT = &floppy_image_format_creator<swd_format>;
+const swd_format FLOPPY_SWD_FORMAT;

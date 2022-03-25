@@ -386,4 +386,4 @@ bool img_format::get_next_sector(const std::vector<bool> &bitstream , int& pos ,
 	return true;
 }
 
-const floppy_format_type FLOPPY_IMG_FORMAT = &floppy_image_format_creator<img_format>;
+const img_format FLOPPY_IMG_FORMAT;

@@ -33,6 +33,6 @@ private:
 	static void find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count);
 };
 
-extern const floppy_format_type FLOPPY_DVK_MX_FORMAT;
+extern const dvk_mx_format FLOPPY_DVK_MX_FORMAT;
 
 #endif // MAME_FORMATS_DVK_MX_DSK_H

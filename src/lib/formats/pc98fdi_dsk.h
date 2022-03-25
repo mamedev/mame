@@ -29,6 +29,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_PC98FDI_FORMAT;
+extern const pc98fdi_format FLOPPY_PC98FDI_FORMAT;
 
 #endif // MAME_FORMATS_PC98FDI_DSK_H

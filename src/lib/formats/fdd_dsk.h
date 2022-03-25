@@ -29,6 +29,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_FDD_FORMAT;
+extern const fdd_format FLOPPY_FDD_FORMAT;
 
 #endif // MAME_FORMATS_FDD_DSK_H

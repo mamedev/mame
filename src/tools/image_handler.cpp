@@ -31,8 +31,8 @@ namespace {
 			m_category = name;
 		}
 
-		virtual void add(floppy_format_type format) {
-			m_table->floppy_format_infos.emplace_back(std::make_unique<floppy_format_info>(format(), m_category));
+		virtual void add(const floppy_image_format_t &format) {
+			m_table->floppy_format_infos.emplace_back(std::make_unique<floppy_format_info>(&format, m_category));
 		}
 
 		virtual void add(const fs::manager_t &fs) {
@@ -45,9 +45,9 @@ namespace {
 
 		fs_enum(filesystem_format *format) : m_format(format) {}
 
-		virtual void add(floppy_format_type type, u32 image_size, const char *name, const char *description) override {
+		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override {
 			m_format->m_floppy = true;
-			m_format->m_floppy_create.emplace_back(std::make_unique<floppy_create_info>(m_format->m_manager, type, image_size, name, description));
+			m_format->m_floppy_create.emplace_back(std::make_unique<floppy_create_info>(m_format->m_manager, &type, image_size, name, description));
 		}
 
 		virtual void add_raw(const char *name, u32 key, const char *description) override {
@@ -292,10 +292,8 @@ void image_handler::floppy_create(const floppy_create_info *format, fs::meta_dat
 		auto fs = format->m_manager->mount(blockdev);
 		fs->format(meta);
 
-		auto source_format = format->m_type();
 		auto io = util::ram_read(img.data(), img.size(), 0xff);
-		source_format->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
-		delete source_format;
+		format->m_type->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
 	} else {
 		fs::unformatted_image::format(format->m_key, &m_floppy_image);
 	}
@@ -309,10 +307,8 @@ bool image_handler::floppy_mount_fs(const filesystem_format *format)
 			std::vector<uint32_t> variants;
 			m_floppy_fs_converter = ci->m_type;
 			m_sector_image.clear();
-			auto load_format = m_floppy_fs_converter();
 			util::random_read_write_fill_wrapper<util::vector_read_write_adapter<u8>, 0xff> io(m_sector_image);
-			load_format->save(io, variants, &m_floppy_image);
-			delete load_format;
+			m_floppy_fs_converter->save(io, variants, &m_floppy_image);
 		}
 
 		if(ci->m_image_size == m_sector_image.size())
@@ -344,9 +340,7 @@ void image_handler::fs_to_floppy()
 {
 	std::vector<uint32_t> variants;
 	auto io = util::ram_read(m_sector_image.data(), m_sector_image.size(), 0xff);
-	auto format = m_floppy_fs_converter();
-	format->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
-	delete format;
+	m_floppy_fs_converter->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
 }
 
 std::vector<std::string> image_handler::path_split(std::string path) const

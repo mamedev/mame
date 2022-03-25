@@ -1414,7 +1414,7 @@ bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> 
 	return true;
 }
 
-const floppy_format_type FLOPPY_DC42_FORMAT = &floppy_image_format_creator<dc42_format>;
+const dc42_format FLOPPY_DC42_FORMAT;
 
 
 apple_gcr_format::apple_gcr_format() : floppy_image_format_t()
@@ -1523,7 +1523,7 @@ bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint3
 	return true;
 }
 
-const floppy_format_type FLOPPY_APPLE_GCR_FORMAT = &floppy_image_format_creator<apple_gcr_format>;
+const apple_gcr_format FLOPPY_APPLE_GCR_FORMAT;
 
 // .2MG format
 apple_2mg_format::apple_2mg_format() : floppy_image_format_t()
@@ -1648,4 +1648,4 @@ bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint3
 	return true;
 }
 
-const floppy_format_type FLOPPY_APPLE_2MG_FORMAT = &floppy_image_format_creator<apple_2mg_format>;
+const apple_2mg_format FLOPPY_APPLE_2MG_FORMAT;

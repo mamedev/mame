@@ -154,4 +154,4 @@ bool cc525dsdd_format::save(util::random_read_write &io, const std::vector<uint3
 	return true;
 }
 
-const floppy_format_type FLOPPY_CONCEPT_525DSDD_FORMAT = &floppy_image_format_creator<cc525dsdd_format>;
+const cc525dsdd_format FLOPPY_CONCEPT_525DSDD_FORMAT;

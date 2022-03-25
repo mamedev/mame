@@ -85,6 +85,6 @@ private:
 	static void set_encoding(header_info &info, encoding_t enc) { info.m_selected_encoding = enc; }
 };
 
-extern const floppy_format_type FLOPPY_HFE_FORMAT;
+extern const hfe_format FLOPPY_HFE_FORMAT;
 
 #endif // MAME_FORMATS_HXCHFE_DSK_H

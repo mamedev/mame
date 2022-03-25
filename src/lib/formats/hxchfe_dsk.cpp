@@ -406,6 +406,6 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	image->set_write_splice_position(cyl, head, 0, 0);
 }
 
-const floppy_format_type FLOPPY_HFE_FORMAT = &floppy_image_format_creator<hfe_format>;
+const hfe_format FLOPPY_HFE_FORMAT;
 
 

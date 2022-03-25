@@ -925,8 +925,8 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 		return true;
 }
 
-const floppy_format_type FLOPPY_A216S_DOS_FORMAT = &floppy_image_format_creator<a2_16sect_dos_format>;
-const floppy_format_type FLOPPY_A216S_PRODOS_FORMAT = &floppy_image_format_creator<a2_16sect_prodos_format>;
+const a2_16sect_dos_format FLOPPY_A216S_DOS_FORMAT;
+const a2_16sect_prodos_format FLOPPY_A216S_PRODOS_FORMAT;
 /* RWTS18 format
  * Developed by Roland Gustafsson (http://www.acts.org/roland/index.html)
    for Br0derbund Software around 1986
@@ -1434,7 +1434,7 @@ bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint3
 		return true;
 }
 
-const floppy_format_type FLOPPY_RWTS18_FORMAT = &floppy_image_format_creator<a2_rwts18_format>;
+const a2_rwts18_format FLOPPY_RWTS18_FORMAT;
 
 a2_edd_format::a2_edd_format() : floppy_image_format_t()
 {
@@ -1557,7 +1557,7 @@ bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std:
 	return true;
 }
 
-const floppy_format_type FLOPPY_EDD_FORMAT = &floppy_image_format_creator<a2_edd_format>;
+const a2_edd_format FLOPPY_EDD_FORMAT;
 
 
 a2_woz_format::a2_woz_format() : floppy_image_format_t()
@@ -1850,7 +1850,7 @@ uint32_t a2_woz_format::crc32r(const uint8_t *data, uint32_t size)
 }
 
 
-const floppy_format_type FLOPPY_WOZ_FORMAT = &floppy_image_format_creator<a2_woz_format>;
+const a2_woz_format FLOPPY_WOZ_FORMAT;
 
 
 a2_nib_format::a2_nib_format() : floppy_image_format_t()
@@ -2026,4 +2026,4 @@ bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-const floppy_format_type FLOPPY_NIB_FORMAT = &floppy_image_format_creator<a2_nib_format>;
+const a2_nib_format FLOPPY_NIB_FORMAT;

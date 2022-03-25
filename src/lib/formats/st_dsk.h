@@ -52,7 +52,7 @@ private:
 	static void read_header(util::random_read &io, uint16_t &sign, uint16_t &sect, uint16_t &head, uint16_t &strack, uint16_t &etrack);
 };
 
-extern const floppy_format_type FLOPPY_ST_FORMAT;
-extern const floppy_format_type FLOPPY_MSA_FORMAT;
+extern const st_format FLOPPY_ST_FORMAT;
+extern const msa_format FLOPPY_MSA_FORMAT;
 
 #endif // MAME_FORMATS_ST_DSK_H

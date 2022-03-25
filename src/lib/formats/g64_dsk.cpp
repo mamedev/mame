@@ -204,4 +204,4 @@ const char *g64_format::extensions() const
 	return "g64,g41,g71";
 }
 
-const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_format>;
+const g64_format FLOPPY_G64_FORMAT;

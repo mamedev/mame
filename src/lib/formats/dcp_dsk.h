@@ -29,6 +29,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_DCP_FORMAT;
+extern const dcp_format FLOPPY_DCP_FORMAT;
 
 #endif // MAME_FORMATS_DCP_DSK_H

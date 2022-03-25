@@ -288,4 +288,4 @@ const mdos_format::format mdos_format::formats_head1[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_MDOS_FORMAT = &floppy_image_format_creator<mdos_format>;
+const mdos_format FLOPPY_MDOS_FORMAT;

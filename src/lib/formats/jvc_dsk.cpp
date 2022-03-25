@@ -295,4 +295,4 @@ bool jvc_format::supports_save() const
 	return true;
 }
 
-const floppy_format_type FLOPPY_JVC_FORMAT = &floppy_image_format_creator<jvc_format>;
+const jvc_format FLOPPY_JVC_FORMAT;

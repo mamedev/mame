@@ -132,4 +132,4 @@ void d80_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_
 	desc[20].p1 >>= remaining_size & 0x01;
 }
 
-const floppy_format_type FLOPPY_D80_FORMAT = &floppy_image_format_creator<d80_format>;
+const d80_format FLOPPY_D80_FORMAT;

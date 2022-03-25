@@ -29,6 +29,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_D88_FORMAT;
+extern const d88_format FLOPPY_D88_FORMAT;
 
 #endif // MAME_FORMATS_D88_DSK_H

@@ -31,6 +31,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_CGENIE_FORMAT;
+extern const cgenie_format FLOPPY_CGENIE_FORMAT;
 
 #endif // MAME_FORMATS_CGENIE_DSK_H

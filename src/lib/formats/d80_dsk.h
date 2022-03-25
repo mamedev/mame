@@ -41,6 +41,6 @@ protected:
 	static const int d80_sectors_per_track[];
 };
 
-extern const floppy_format_type FLOPPY_D80_FORMAT;
+extern const d80_format FLOPPY_D80_FORMAT;
 
 #endif // MAME_FORMATS_D80_DSK_H

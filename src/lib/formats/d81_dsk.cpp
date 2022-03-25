@@ -159,4 +159,4 @@ floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &cu
 	return desc;
 }
 
-const floppy_format_type FLOPPY_D81_FORMAT = &floppy_image_format_creator<d81_format>;
+const d81_format FLOPPY_D81_FORMAT;

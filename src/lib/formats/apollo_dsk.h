@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_APOLLO_FORMAT;
+extern const apollo_format FLOPPY_APOLLO_FORMAT;
 
 #endif // MAME_FORMATS_APOLLO_DSK_H

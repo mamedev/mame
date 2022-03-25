@@ -44,6 +44,6 @@ private:
 	static bool parse_header(util::random_read &io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id);
 };
 
-extern const floppy_format_type FLOPPY_JVC_FORMAT;
+extern const jvc_format FLOPPY_JVC_FORMAT;
 
 #endif // MAME_FORMATS_JVC_DSK_H

@@ -54,4 +54,4 @@ const fl1_format::format fl1_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_FL1_FORMAT = &floppy_image_format_creator<fl1_format>;
+const fl1_format FLOPPY_FL1_FORMAT;

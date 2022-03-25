@@ -583,4 +583,4 @@ const os9_format::format os9_format::formats_track0[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_OS9_FORMAT = &floppy_image_format_creator<os9_format>;
+const os9_format FLOPPY_OS9_FORMAT;

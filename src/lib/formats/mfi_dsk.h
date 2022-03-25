@@ -49,6 +49,6 @@ private:
 	};
 };
 
-extern const floppy_format_type FLOPPY_MFI_FORMAT;
+extern const mfi_format FLOPPY_MFI_FORMAT;
 
 #endif // MAME_FORMATS_MFI_DSK_H

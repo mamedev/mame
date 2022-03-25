@@ -58,4 +58,4 @@ const afs_format::format afs_format::formats[] =
 };
 
 
-const floppy_format_type FLOPPY_AFS_FORMAT = &floppy_image_format_creator<afs_format>;
+const afs_format FLOPPY_AFS_FORMAT;

@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_UNIFLEX_FORMAT;
+extern const uniflex_format FLOPPY_UNIFLEX_FORMAT;
 
 #endif // MAME_FORMATS_UNIFLEX_DSK_H

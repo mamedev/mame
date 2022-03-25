@@ -72,8 +72,8 @@ public:
 	virtual const char *extensions() const override;
 };
 
-extern const floppy_format_type FLOPPY_A216S_DOS_FORMAT;
-extern const floppy_format_type FLOPPY_A216S_PRODOS_FORMAT;
+extern const a2_16sect_dos_format FLOPPY_A216S_DOS_FORMAT;
+extern const a2_16sect_prodos_format FLOPPY_A216S_PRODOS_FORMAT;
 
 class a2_rwts18_format : public floppy_image_format_t
 {
@@ -95,7 +95,7 @@ private:
 	static uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
 };
 
-extern const floppy_format_type FLOPPY_RWTS18_FORMAT;
+extern const a2_rwts18_format FLOPPY_RWTS18_FORMAT;
 
 
 class a2_edd_format : public floppy_image_format_t
@@ -115,7 +115,7 @@ private:
 	static uint8_t pick(const uint8_t *data, int pos);
 };
 
-extern const floppy_format_type FLOPPY_EDD_FORMAT;
+extern const a2_edd_format FLOPPY_EDD_FORMAT;
 
 class a2_woz_format : public floppy_image_format_t
 {
@@ -144,7 +144,7 @@ private:
 	static uint32_t find_tag(const std::vector<uint8_t> &data, uint32_t tag);
 };
 
-extern const floppy_format_type FLOPPY_WOZ_FORMAT;
+extern const a2_woz_format FLOPPY_WOZ_FORMAT;
 
 
 class a2_nib_format : public floppy_image_format_t
@@ -170,6 +170,6 @@ private:
 	static std::vector<uint32_t> generate_levels_from_nibbles(const std::vector<uint8_t>& nibbles);
 };
 
-extern const floppy_format_type FLOPPY_NIB_FORMAT;
+extern const a2_nib_format FLOPPY_NIB_FORMAT;
 
 #endif // MAME_FORMATS_AP2_DSK_H

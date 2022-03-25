@@ -40,6 +40,6 @@ protected:
 	static constexpr int SECTOR_SLOT_COUNT  = 31;
 };
 
-extern const floppy_format_type FLOPPY_SDF_FORMAT;
+extern const sdf_format FLOPPY_SDF_FORMAT;
 
 #endif // MAME_FORMATS_SDF_DSK_H

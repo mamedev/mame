@@ -82,6 +82,6 @@ protected:
 	static const int speed_zone[];
 };
 
-extern const floppy_format_type FLOPPY_D64_FORMAT;
+extern const d64_format FLOPPY_D64_FORMAT;
 
 #endif // MAME_FORMATS_D64_DSK_H

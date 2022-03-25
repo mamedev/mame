@@ -107,7 +107,7 @@ bool oric_dsk_format::load(util::random_read &io, uint32_t form_factor, const st
 	return true;
 }
 
-const floppy_format_type FLOPPY_ORIC_DSK_FORMAT = &floppy_image_format_creator<oric_dsk_format>;
+const oric_dsk_format FLOPPY_ORIC_DSK_FORMAT;
 
 
 const char *oric_jasmin_format::name() const
@@ -209,4 +209,4 @@ bool oric_jasmin_format::save(util::random_read_write &io, const std::vector<uin
 	return true;
 }
 
-const floppy_format_type FLOPPY_ORIC_JASMIN_FORMAT = &floppy_image_format_creator<oric_jasmin_format>;
+const oric_jasmin_format FLOPPY_ORIC_JASMIN_FORMAT;

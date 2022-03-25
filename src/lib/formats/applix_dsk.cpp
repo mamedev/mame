@@ -38,4 +38,4 @@ const applix_format::format applix_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_APPLIX_FORMAT = &floppy_image_format_creator<applix_format>;
+const applix_format FLOPPY_APPLIX_FORMAT;

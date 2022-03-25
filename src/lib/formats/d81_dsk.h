@@ -29,6 +29,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_D81_FORMAT;
+extern const d81_format FLOPPY_D81_FORMAT;
 
 #endif // MAME_FORMATS_D81_DSK_H

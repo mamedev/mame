@@ -22,6 +22,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_TD0_FORMAT;
+extern const td0_format FLOPPY_TD0_FORMAT;
 
 #endif // MAME_FORMATS_TD0_DSK_H

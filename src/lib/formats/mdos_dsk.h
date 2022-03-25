@@ -40,6 +40,6 @@ private:
 	static int parse_date_field(const uint8_t *str);
 };
 
-extern const floppy_format_type FLOPPY_MDOS_FORMAT;
+extern const mdos_format FLOPPY_MDOS_FORMAT;
 
 #endif // MAME_FORMATS_MDOS_DSK_H

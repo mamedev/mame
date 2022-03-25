@@ -31,6 +31,6 @@ private:
 };
 
 
-extern const floppy_format_type FLOPPY_AFS_FORMAT;
+extern const afs_format FLOPPY_AFS_FORMAT;
 
 #endif // MAME_FORMATS_AFS_DSK_H

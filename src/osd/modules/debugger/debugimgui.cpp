@@ -142,7 +142,7 @@ private:
 
 	struct image_type_entry
 	{
-		floppy_image_format_t* format;
+		const floppy_image_format_t* format;
 		std::string shortname;
 		std::string longname;
 	};
@@ -1061,7 +1061,7 @@ void debug_imgui::refresh_typelist()
 	if(fd == nullptr)
 		return;
 
-	for(floppy_image_format_t* flist : fd->get_formats())
+	for(const floppy_image_format_t* flist : fd->get_formats())
 	{
 		if(flist->supports_save())
 		{

@@ -1028,4 +1028,4 @@ bool td0_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_TD0_FORMAT = &floppy_image_format_creator<td0_format>;
+const td0_format FLOPPY_TD0_FORMAT;

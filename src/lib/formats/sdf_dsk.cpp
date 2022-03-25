@@ -190,4 +190,4 @@ bool sdf_format::supports_save() const
 }
 
 
-const floppy_format_type FLOPPY_SDF_FORMAT = &floppy_image_format_creator<sdf_format>;
+const sdf_format FLOPPY_SDF_FORMAT;

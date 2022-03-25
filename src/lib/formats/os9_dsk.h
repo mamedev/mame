@@ -30,6 +30,6 @@ private:
 	static const format formats_track0[];
 };
 
-extern const floppy_format_type FLOPPY_OS9_FORMAT;
+extern const os9_format FLOPPY_OS9_FORMAT;
 
 #endif // MAME_FORMATS_OS9_DSK_H

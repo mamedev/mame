@@ -29,6 +29,6 @@ private:
 	void fixnum(char *start, char *end) const;
 };
 
-extern const floppy_format_type FLOPPY_IMD_FORMAT;
+extern const imd_format FLOPPY_IMD_FORMAT;
 
 #endif // MAME_FORMATS_IMD_DSK_H

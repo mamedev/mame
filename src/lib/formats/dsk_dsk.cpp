@@ -497,4 +497,4 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-const floppy_format_type FLOPPY_DSK_FORMAT = &floppy_image_format_creator<dsk_format>;
+const dsk_format FLOPPY_DSK_FORMAT;

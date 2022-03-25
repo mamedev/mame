@@ -21,6 +21,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_DFI_FORMAT;
+extern const dfi_format FLOPPY_DFI_FORMAT;
 
 #endif // MAME_FORMATS_DFI_DSK_H

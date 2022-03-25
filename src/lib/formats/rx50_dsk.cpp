@@ -212,7 +212,7 @@ bool rx50img_format::save(util::random_read_write &io, const std::vector<uint32_
 	return true;
 }
 
-const floppy_format_type FLOPPY_RX50IMG_FORMAT = &floppy_image_format_creator<rx50img_format>;
+const rx50img_format FLOPPY_RX50IMG_FORMAT;
 
 
 /*

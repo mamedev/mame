@@ -28,6 +28,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_PC_FORMAT;
+extern const pc_format FLOPPY_PC_FORMAT;
 
 #endif // MAME_FORMATS_PC_DSK_H

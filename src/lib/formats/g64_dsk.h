@@ -50,6 +50,6 @@ protected:
 	static int generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, floppy_image *image);
 };
 
-extern const floppy_format_type FLOPPY_G64_FORMAT;
+extern const g64_format FLOPPY_G64_FORMAT;
 
 #endif // MAME_FORMATS_G64_DSK_H

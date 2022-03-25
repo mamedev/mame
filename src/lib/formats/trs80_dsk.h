@@ -45,7 +45,7 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_JV1_FORMAT;
-extern const floppy_format_type FLOPPY_JV3_FORMAT;
+extern const jv1_format FLOPPY_JV1_FORMAT;
+extern const jv3_format FLOPPY_JV3_FORMAT;
 
 #endif // MAME_FORMATS_TRS80_DSK_H

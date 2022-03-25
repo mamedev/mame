@@ -36,6 +36,6 @@ private:
 	static const int FIRST_SECTOR_ID = 1;
 };
 
-extern const floppy_format_type FLOPPY_VDK_FORMAT;
+extern const vdk_format FLOPPY_VDK_FORMAT;
 
 #endif // MAME_FORMATS_VDK_DSK_H

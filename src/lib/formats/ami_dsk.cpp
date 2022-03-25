@@ -159,4 +159,4 @@ bool adf_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const floppy_format_type FLOPPY_ADF_FORMAT = &floppy_image_format_creator<adf_format>;
+const adf_format FLOPPY_ADF_FORMAT;

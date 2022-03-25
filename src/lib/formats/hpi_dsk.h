@@ -53,6 +53,6 @@ private:
 	static const uint8_t m_track_skew[ HPI_SECTORS - 1 ][ HPI_HEADS ];
 };
 
-extern const floppy_format_type FLOPPY_HPI_FORMAT;
+extern const hpi_format FLOPPY_HPI_FORMAT;
 
 #endif // MAME_FORMATS_HPI_DSK_H

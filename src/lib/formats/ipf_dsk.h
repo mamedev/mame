@@ -88,6 +88,6 @@ private:
 	};
 };
 
-extern const floppy_format_type FLOPPY_IPF_FORMAT;
+extern const ipf_format FLOPPY_IPF_FORMAT;
 
 #endif // MAME_FORMATS_IPF_DSK_H

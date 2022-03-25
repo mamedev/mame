@@ -547,4 +547,4 @@ bool d88_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_D88_FORMAT = &floppy_image_format_creator<d88_format>;
+const d88_format FLOPPY_D88_FORMAT;

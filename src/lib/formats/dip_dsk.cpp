@@ -98,4 +98,4 @@ bool dip_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_DIP_FORMAT = &floppy_image_format_creator<dip_format>;
+const dip_format FLOPPY_DIP_FORMAT;

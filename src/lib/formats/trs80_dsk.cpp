@@ -112,7 +112,7 @@ const jv1_format::format jv1_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_JV1_FORMAT = &floppy_image_format_creator<jv1_format>;
+const jv1_format FLOPPY_JV1_FORMAT;
 
 
 #define MAX_SECTORS 19
@@ -455,5 +455,5 @@ bool jv3_format::supports_save() const
 	return true;
 }
 
-const floppy_format_type FLOPPY_JV3_FORMAT = &floppy_image_format_creator<jv3_format>;
+const jv3_format FLOPPY_JV3_FORMAT;
 

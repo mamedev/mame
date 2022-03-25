@@ -1164,7 +1164,7 @@ void ti99_sdf_format::write_track(util::random_read_write &io, uint8_t *sectorda
 }
 
 
-const floppy_format_type FLOPPY_TI99_SDF_FORMAT = &floppy_image_format_creator<ti99_sdf_format>;
+const ti99_sdf_format FLOPPY_TI99_SDF_FORMAT;
 
 /*
     Track Dump Format
@@ -1526,4 +1526,4 @@ int ti99_tdf_format::get_track_size(int sector_count) const
 	return 0;
 }
 
-const floppy_format_type FLOPPY_TI99_TDF_FORMAT = &floppy_image_format_creator<ti99_tdf_format>;
+const ti99_tdf_format FLOPPY_TI99_TDF_FORMAT;

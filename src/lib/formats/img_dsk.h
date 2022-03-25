@@ -48,6 +48,6 @@ private:
 	static bool get_next_sector(const std::vector<bool> &bitstream , int& pos , unsigned& track , unsigned& sector , uint8_t *sector_data);
 };
 
-extern const floppy_format_type FLOPPY_IMG_FORMAT;
+extern const img_format FLOPPY_IMG_FORMAT;
 
 #endif // MAME_FORMATS_IMG_DSK_H

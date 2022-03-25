@@ -59,4 +59,4 @@ const opd_format::format opd_format::formats[] =
 };
 
 
-const floppy_format_type FLOPPY_OPD_FORMAT = &floppy_image_format_creator<opd_format>;
+const opd_format FLOPPY_OPD_FORMAT;

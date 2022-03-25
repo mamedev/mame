@@ -32,6 +32,6 @@ private:
 };
 
 
-extern const floppy_format_type FLOPPY_OPD_FORMAT;
+extern const opd_format FLOPPY_OPD_FORMAT;
 
 #endif // MAME_FORMATS_OPD_DSK_H

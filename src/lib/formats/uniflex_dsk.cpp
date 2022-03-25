@@ -154,4 +154,4 @@ const uniflex_format::format uniflex_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_UNIFLEX_FORMAT = &floppy_image_format_creator<uniflex_format>;
+const uniflex_format FLOPPY_UNIFLEX_FORMAT;

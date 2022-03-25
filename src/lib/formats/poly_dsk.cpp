@@ -124,4 +124,4 @@ bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const st
 	return true;
 }
 
-const floppy_format_type FLOPPY_POLY_CPM_FORMAT = &floppy_image_format_creator<poly_cpm_format>;
+const poly_cpm_format FLOPPY_POLY_CPM_FORMAT;

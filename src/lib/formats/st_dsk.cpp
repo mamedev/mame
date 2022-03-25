@@ -330,5 +330,5 @@ bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const floppy_format_type FLOPPY_ST_FORMAT = &floppy_image_format_creator<st_format>;
-const floppy_format_type FLOPPY_MSA_FORMAT = &floppy_image_format_creator<msa_format>;
+const st_format FLOPPY_ST_FORMAT;
+const msa_format FLOPPY_MSA_FORMAT;

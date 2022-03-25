@@ -133,4 +133,4 @@ bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-const floppy_format_type FLOPPY_AIM_FORMAT = &floppy_image_format_creator<aim_format>;
+const aim_format FLOPPY_AIM_FORMAT;

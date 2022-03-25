@@ -25,6 +25,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_POLY_CPM_FORMAT;
+extern const poly_cpm_format FLOPPY_POLY_CPM_FORMAT;
 
 #endif // MAME_FORMATS_POLY_DSK_H

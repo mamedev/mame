@@ -40,6 +40,6 @@ private:
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
 };
 
-extern const floppy_format_type FLOPPY_IBMXDF_FORMAT;
+extern const ibmxdf_format FLOPPY_IBMXDF_FORMAT;
 
 #endif // MAME_FORMATS_IBMXDF_DSK_H

@@ -31,6 +31,6 @@ private:
 	static void find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count);
 };
 
-extern const floppy_format_type FLOPPY_DS9_FORMAT;
+extern const ds9_format FLOPPY_DS9_FORMAT;
 
 #endif // MAME_FORMATS_DS9_DSK_H

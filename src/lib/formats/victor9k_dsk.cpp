@@ -449,4 +449,4 @@ void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc
 	}
 }
 
-const floppy_format_type FLOPPY_VICTOR_9000_FORMAT = &floppy_image_format_creator<victor9k_format>;
+const victor9k_format FLOPPY_VICTOR_9000_FORMAT;

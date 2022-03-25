@@ -45,4 +45,4 @@ const apollo_format::format apollo_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_APOLLO_FORMAT = &floppy_image_format_creator<apollo_format>;
+const apollo_format FLOPPY_APOLLO_FORMAT;

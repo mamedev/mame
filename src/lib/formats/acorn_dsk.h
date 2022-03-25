@@ -127,12 +127,12 @@ public:
 };
 
 
-extern const floppy_format_type FLOPPY_ACORN_SSD_FORMAT;
-extern const floppy_format_type FLOPPY_ACORN_DSD_FORMAT;
-extern const floppy_format_type FLOPPY_ACORN_DOS_FORMAT;
-extern const floppy_format_type FLOPPY_ACORN_ADFS_OLD_FORMAT;
-extern const floppy_format_type FLOPPY_ACORN_ADFS_NEW_FORMAT;
-extern const floppy_format_type FLOPPY_OPUS_DDOS_FORMAT;
-extern const floppy_format_type FLOPPY_OPUS_DDCPM_FORMAT;
+extern const acorn_ssd_format FLOPPY_ACORN_SSD_FORMAT;
+extern const acorn_dsd_format FLOPPY_ACORN_DSD_FORMAT;
+extern const acorn_dos_format FLOPPY_ACORN_DOS_FORMAT;
+extern const acorn_adfs_old_format FLOPPY_ACORN_ADFS_OLD_FORMAT;
+extern const acorn_adfs_new_format FLOPPY_ACORN_ADFS_NEW_FORMAT;
+extern const opus_ddos_format FLOPPY_OPUS_DDOS_FORMAT;
+extern const opus_ddcpm_format FLOPPY_OPUS_DDCPM_FORMAT;
 
 #endif // MAME_FORMATS_ACORN_DSK_H

@@ -29,6 +29,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_CQM_FORMAT;
+extern const cqm_format FLOPPY_CQM_FORMAT;
 
 #endif // MAME_FORMATS_CQM_DSK_H

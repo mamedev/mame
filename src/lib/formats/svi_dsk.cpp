@@ -144,4 +144,4 @@ bool svi_format::supports_save() const
 	return true;
 }
 
-const floppy_format_type FLOPPY_SVI_FORMAT = &floppy_image_format_creator<svi_format>;
+const svi_format FLOPPY_SVI_FORMAT;

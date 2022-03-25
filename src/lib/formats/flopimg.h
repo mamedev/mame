@@ -443,16 +443,6 @@ private:
 	static int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);
 };
 
-// a dce_type is simply a pointer to its alloc function
-typedef floppy_image_format_t *(*floppy_format_type)();
-
-// this template function creates a stub which constructs a image format
-template<class _FormatClass>
-floppy_image_format_t *floppy_image_format_creator()
-{
-	return new _FormatClass();
-}
-
 // ======================> floppy_image
 
 //! Class representing floppy image

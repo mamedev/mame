@@ -104,4 +104,4 @@ bool pc98fdi_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_PC98FDI_FORMAT = &floppy_image_format_creator<pc98fdi_format>;
+const pc98fdi_format FLOPPY_PC98FDI_FORMAT;

@@ -58,7 +58,7 @@ protected:
 	static void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count);
 };
 
-extern const floppy_format_type FLOPPY_VICTOR_9000_FORMAT;
+extern const victor9k_format FLOPPY_VICTOR_9000_FORMAT;
 
 
 #endif // MAME_FORMATS_VICTOR9K_DSK_H

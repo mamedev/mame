@@ -50,6 +50,6 @@ private:
 	static const int MAX_SECTORS = 2880;  // enough for a hd disk image
 };
 
-extern const floppy_format_type FLOPPY_APRIDISK_FORMAT;
+extern const apridisk_format FLOPPY_APRIDISK_FORMAT;
 
 #endif // MAME_FORMATS_APRIDISK_H

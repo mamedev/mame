@@ -156,4 +156,4 @@ bool ccvf_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_CCVF_FORMAT = &floppy_image_format_creator<ccvf_format>;
+const ccvf_format FLOPPY_CCVF_FORMAT;

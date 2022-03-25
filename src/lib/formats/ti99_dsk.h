@@ -84,7 +84,7 @@ private:
 	};
 };
 
-extern const floppy_format_type FLOPPY_TI99_SDF_FORMAT;
+extern const ti99_sdf_format FLOPPY_TI99_SDF_FORMAT;
 
 /*
     Implementation of the track dump format.
@@ -107,6 +107,6 @@ private:
 	int min_heads() const override { return 2; }
 };
 
-extern const floppy_format_type FLOPPY_TI99_TDF_FORMAT;
+extern const ti99_tdf_format FLOPPY_TI99_TDF_FORMAT;
 
 #endif // MAME_FORMATS_TI99_DSK_H

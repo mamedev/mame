@@ -288,4 +288,4 @@ bool nfd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_NFD_FORMAT = &floppy_image_format_creator<nfd_format>;
+const nfd_format FLOPPY_NFD_FORMAT;

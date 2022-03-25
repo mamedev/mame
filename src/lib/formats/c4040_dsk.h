@@ -32,6 +32,6 @@ protected:
 	static const int c4040_gap2[];
 };
 
-extern const floppy_format_type FLOPPY_C4040_FORMAT;
+extern const c4040_format FLOPPY_C4040_FORMAT;
 
 #endif // MAME_FORMATS_C4040_DSK_H

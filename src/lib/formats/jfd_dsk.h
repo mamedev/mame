@@ -28,6 +28,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_JFD_FORMAT;
+extern const jfd_format FLOPPY_JFD_FORMAT;
 
 #endif // MAME_FORMATS_JFD_DSK_H

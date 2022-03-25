@@ -165,7 +165,7 @@ bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::
 	return true;
 }
 
-const floppy_format_type FLOPPY_PASTI_FORMAT = &floppy_image_format_creator<pasti_format>;
+const pasti_format FLOPPY_PASTI_FORMAT;
 
 
 void pasti_format::wd_generate_track_from_observations(int track, int head, floppy_image *image, wd_obs &obs)

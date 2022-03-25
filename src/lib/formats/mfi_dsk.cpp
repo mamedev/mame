@@ -240,4 +240,4 @@ bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const floppy_format_type FLOPPY_MFI_FORMAT = &floppy_image_format_creator<mfi_format>;
+const mfi_format FLOPPY_MFI_FORMAT;

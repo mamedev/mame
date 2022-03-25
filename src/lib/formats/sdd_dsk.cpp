@@ -61,4 +61,4 @@ const sdd_format::format sdd_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_SDD_FORMAT = &floppy_image_format_creator<sdd_format>;
+const sdd_format FLOPPY_SDD_FORMAT;

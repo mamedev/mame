@@ -190,4 +190,4 @@ bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-const floppy_format_type FLOPPY_FSD_FORMAT = &floppy_image_format_creator<fsd_format>;
+const fsd_format FLOPPY_FSD_FORMAT;

@@ -160,4 +160,4 @@ bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const floppy_format_type FLOPPY_MFM_FORMAT = &floppy_image_format_creator<mfm_format>;
+const mfm_format FLOPPY_MFM_FORMAT;

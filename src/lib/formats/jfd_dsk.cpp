@@ -375,4 +375,4 @@ bool jfd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_JFD_FORMAT = &floppy_image_format_creator<jfd_format>;
+const jfd_format FLOPPY_JFD_FORMAT;

@@ -120,4 +120,4 @@ bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-const floppy_format_type FLOPPY_DS9_FORMAT = &floppy_image_format_creator<ds9_format>;
+const ds9_format FLOPPY_DS9_FORMAT;

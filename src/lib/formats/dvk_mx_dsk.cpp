@@ -181,4 +181,4 @@ bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std:
 	return true;
 }
 
-const floppy_format_type FLOPPY_DVK_MX_FORMAT = &floppy_image_format_creator<dvk_mx_format>;
+const dvk_mx_format FLOPPY_DVK_MX_FORMAT;

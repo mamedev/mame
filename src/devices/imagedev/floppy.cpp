@@ -183,9 +183,9 @@ void format_registration::add_pc_formats()
 	add(FLOPPY_IPF_FORMAT);
 }
 
-void format_registration::add(floppy_format_type format)
+void format_registration::add(const floppy_image_format_t &format)
 {
-	m_formats.push_back(format);
+	m_formats.push_back(&format);
 }
 
 void format_registration::add(const fs::manager_t &fs)
@@ -286,8 +286,6 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 
 floppy_image_device::~floppy_image_device()
 {
-	for(floppy_image_format_t *format : fif_list)
-		delete format;
 }
 
 void floppy_image_device::setup_load_cb(load_cb cb)
@@ -320,12 +318,12 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
-void floppy_image_device::fs_enum::add(floppy_format_type type, u32 image_size, const char *name, const char *description)
+void floppy_image_device::fs_enum::add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description)
 {
 	if(m_manager->can_format())
-		m_fid->m_create_fs.emplace_back(fs_info(m_manager, type, image_size, name, description));
+		m_fid->m_create_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
 	if(m_manager->can_read())
-		m_fid->m_io_fs.emplace_back(fs_info(m_manager, type, image_size, name, description));
+		m_fid->m_io_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
 }
 
 void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char *description)
@@ -340,14 +338,10 @@ void floppy_image_device::register_formats()
 		format_registration_cb(fr);
 
 	extension_list[0] = '\0';
-	fif_list.clear();
-	for(floppy_format_type fft : fr.m_formats)
+	fif_list = std::move(fr.m_formats);
+	for(const floppy_image_format_t *fif : fif_list)
 	{
-		// allocate a new format
-		floppy_image_format_t *fif = fft();
-		fif_list.push_back(fif);
 		add_format(fif->name(), fif->description(), fif->extensions(), "");
-
 		image_specify_extension( extension_list, 256, fif->extensions() );
 	}
 
@@ -365,12 +359,12 @@ void floppy_image_device::set_formats(std::function<void (format_registration &f
 	format_registration_cb = formats;
 }
 
-const std::vector<floppy_image_format_t *> &floppy_image_device::get_formats() const
+const std::vector<const floppy_image_format_t *> &floppy_image_device::get_formats() const
 {
 	return fif_list;
 }
 
-floppy_image_format_t *floppy_image_device::get_load_format() const
+const floppy_image_format_t *floppy_image_device::get_load_format() const
 {
 	return input_format;
 }
@@ -385,7 +379,7 @@ void floppy_image_device::set_rpm(float _rpm)
 	angular_speed = rpm/60.0*2e8;
 }
 
-void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
+void floppy_image_device::setup_write(const floppy_image_format_t *_output_format)
 {
 	output_format = _output_format;
 	if(image)
@@ -539,7 +533,7 @@ void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int
 	index_resync();
 }
 
-floppy_image_format_t *floppy_image_device::identify(std::string filename)
+const floppy_image_format_t *floppy_image_device::identify(std::string filename)
 {
 	util::core_file::ptr fd;
 	std::string revised_path;
@@ -556,8 +550,8 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	}
 
 	int best = 0;
-	floppy_image_format_t *best_format = nullptr;
-	for(floppy_image_format_t *format : fif_list) {
+	const floppy_image_format_t *best_format = nullptr;
+	for(const floppy_image_format_t *format : fif_list) {
 		int score = format->identify(*io, form_factor, variants);
 		if(score > best) {
 			best = score;
@@ -604,8 +598,8 @@ image_init_result floppy_image_device::call_load()
 	}
 
 	int best = 0;
-	floppy_image_format_t *best_format = nullptr;
-	for (floppy_image_format_t *format : fif_list) {
+	const floppy_image_format_t *best_format = nullptr;
+	for (const floppy_image_format_t *format : fif_list) {
 		int score = format->identify(*io, form_factor, variants);
 		if(score > best) {
 			best = score;
@@ -810,7 +804,7 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 	output_format = nullptr;
 
 	// search for a suitable format based on the extension
-	for(floppy_image_format_t *i : fif_list)
+	for(const floppy_image_format_t *i : fif_list)
 	{
 		// only consider formats that actually support saving
 		if(!i->supports_save())
@@ -843,10 +837,8 @@ void floppy_image_device::init_fs(const fs_info *fs, const fs::meta_data &meta)
 		auto cfs = fs->m_manager->mount(blockdev);
 		cfs->format(meta);
 
-		auto source_format = fs->m_type();
 		auto io = util::ram_read(img.data(), img.size(), 0xff);
-		source_format->load(*io, floppy_image::FF_UNKNOWN, variants, image.get());
-		delete source_format;
+		fs->m_type->load(*io, floppy_image::FF_UNKNOWN, variants, image.get());
 	} else {
 		fs::unformatted_image::format(fs->m_key, image.get());
 	}

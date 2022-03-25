@@ -30,6 +30,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_DMK_FORMAT;
+extern const dmk_format FLOPPY_DMK_FORMAT;
 
 #endif // MAME_FORMATS_DMK_DSK_H

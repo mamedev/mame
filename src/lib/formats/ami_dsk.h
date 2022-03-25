@@ -33,6 +33,6 @@ private:
 	static uint32_t checksum(const std::vector<bool> &bitsteam, uint32_t pos, int long_count);
 };
 
-extern const floppy_format_type FLOPPY_ADF_FORMAT;
+extern const adf_format FLOPPY_ADF_FORMAT;
 
 #endif // MAME_FORMATS_AMI_DSK_H

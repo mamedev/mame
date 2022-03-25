@@ -51,6 +51,6 @@ protected:
 	static const format file_formats[];
 };
 
-extern const floppy_format_type FLOPPY_CCVF_FORMAT;
+extern const ccvf_format FLOPPY_CCVF_FORMAT;
 
 #endif // MAME_FORMATS_CCVF_DSK_H

@@ -31,6 +31,6 @@ public:
 	static const floppy_image_format_t::desc_e desc_10[];
 };
 
-extern const floppy_format_type FLOPPY_MGT_FORMAT;
+extern const mgt_format FLOPPY_MGT_FORMAT;
 
 #endif // MAME_FORMATS_COUPEDSK_H

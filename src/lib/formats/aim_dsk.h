@@ -30,6 +30,6 @@ public:
 	virtual bool supports_save() const override { return false; }
 };
 
-extern const floppy_format_type FLOPPY_AIM_FORMAT;
+extern const aim_format FLOPPY_AIM_FORMAT;
 
 #endif // MAME_FORMATS_AIM_DSK_H

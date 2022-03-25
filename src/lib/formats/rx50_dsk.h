@@ -38,6 +38,6 @@ private:
 	static void find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count);
 };
 
-extern const floppy_format_type FLOPPY_RX50IMG_FORMAT;
+extern const rx50img_format FLOPPY_RX50IMG_FORMAT;
 
 #endif // MAME_FORMATS_RX50_DSK_H

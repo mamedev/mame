@@ -96,4 +96,4 @@ void c3040_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remainin
 	desc[20].p1 >>= remaining_size & 0x01;
 }
 
-const floppy_format_type FLOPPY_C3040_FORMAT = &floppy_image_format_creator<c3040_format>;
+const c3040_format FLOPPY_C3040_FORMAT;

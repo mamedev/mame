@@ -190,4 +190,4 @@ bool esq8img_format::save(util::random_read_write &io, const std::vector<uint32_
 	return true;
 }
 
-const floppy_format_type FLOPPY_ESQ8IMG_FORMAT = &floppy_image_format_creator<esq8img_format>;
+const esq8img_format FLOPPY_ESQ8IMG_FORMAT;

@@ -34,6 +34,6 @@ protected:
 	static const int c3040_sectors_per_track[];
 };
 
-extern const floppy_format_type FLOPPY_C3040_FORMAT;
+extern const c3040_format FLOPPY_C3040_FORMAT;
 
 #endif // MAME_FORMATS_C3040_DSK_H

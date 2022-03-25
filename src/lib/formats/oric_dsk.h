@@ -27,7 +27,7 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_ORIC_DSK_FORMAT;
+extern const oric_dsk_format FLOPPY_ORIC_DSK_FORMAT;
 
 class oric_jasmin_format : public floppy_image_format_t
 {
@@ -44,6 +44,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_ORIC_JASMIN_FORMAT;
+extern const oric_jasmin_format FLOPPY_ORIC_JASMIN_FORMAT;
 
 #endif // MAME_FORMATS_ORIC_DSK_H

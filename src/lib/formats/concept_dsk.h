@@ -32,6 +32,6 @@ private:
 	static void find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count);
 };
 
-extern const floppy_format_type FLOPPY_CONCEPT_525DSDD_FORMAT;
+extern const cc525dsdd_format FLOPPY_CONCEPT_525DSDD_FORMAT;
 
 #endif // MAME_FORMATS_CONCEPT_DSK_H

@@ -38,6 +38,6 @@ private:
 	static void find_size(util::random_read &io, int &track_count, int &head_count, int &sector_count);
 };
 
-extern const floppy_format_type FLOPPY_ESQ8IMG_FORMAT;
+extern const esq8img_format FLOPPY_ESQ8IMG_FORMAT;
 
 #endif // MAME_FORMATS_ESQ8_DSK_H

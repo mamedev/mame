@@ -756,10 +756,10 @@ bool opus_ddcpm_format::save(util::random_read_write &io, const std::vector<uint
 }
 
 
-const floppy_format_type FLOPPY_ACORN_SSD_FORMAT = &floppy_image_format_creator<acorn_ssd_format>;
-const floppy_format_type FLOPPY_ACORN_DSD_FORMAT = &floppy_image_format_creator<acorn_dsd_format>;
-const floppy_format_type FLOPPY_ACORN_DOS_FORMAT = &floppy_image_format_creator<acorn_dos_format>;
-const floppy_format_type FLOPPY_ACORN_ADFS_OLD_FORMAT = &floppy_image_format_creator<acorn_adfs_old_format>;
-const floppy_format_type FLOPPY_ACORN_ADFS_NEW_FORMAT = &floppy_image_format_creator<acorn_adfs_new_format>;
-const floppy_format_type FLOPPY_OPUS_DDOS_FORMAT = &floppy_image_format_creator<opus_ddos_format>;
-const floppy_format_type FLOPPY_OPUS_DDCPM_FORMAT = &floppy_image_format_creator<opus_ddcpm_format>;
+const acorn_ssd_format FLOPPY_ACORN_SSD_FORMAT;
+const acorn_dsd_format FLOPPY_ACORN_DSD_FORMAT;
+const acorn_dos_format FLOPPY_ACORN_DOS_FORMAT;
+const acorn_adfs_old_format FLOPPY_ACORN_ADFS_OLD_FORMAT;
+const acorn_adfs_new_format FLOPPY_ACORN_ADFS_NEW_FORMAT;
+const opus_ddos_format FLOPPY_OPUS_DDOS_FORMAT;
+const opus_ddcpm_format FLOPPY_OPUS_DDCPM_FORMAT;

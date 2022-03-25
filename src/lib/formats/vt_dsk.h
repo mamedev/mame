@@ -52,7 +52,7 @@ public:
 	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 };
 
-extern const floppy_format_type FLOPPY_VTECH_BIN_FORMAT;
-extern const floppy_format_type FLOPPY_VTECH_DSK_FORMAT;
+extern const vtech_bin_format FLOPPY_VTECH_BIN_FORMAT;
+extern const vtech_dsk_format FLOPPY_VTECH_DSK_FORMAT;
 
 #endif // MAME_FORMATS_VT_DSK_H

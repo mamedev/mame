@@ -325,4 +325,4 @@ void d64_format::extract_sectors(floppy_image *image, const format &f, desc_s *s
 	}
 }
 
-const floppy_format_type FLOPPY_D64_FORMAT = &floppy_image_format_creator<d64_format>;
+const d64_format FLOPPY_D64_FORMAT;

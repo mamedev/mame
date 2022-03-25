@@ -43,7 +43,7 @@ private:
 	static void update_chk(const uint8_t *data, int size, uint32_t &chk);
 };
 
-extern const floppy_format_type FLOPPY_DC42_FORMAT;
+extern const dc42_format FLOPPY_DC42_FORMAT;
 
 class apple_gcr_format : public floppy_image_format_t
 {
@@ -60,7 +60,7 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_APPLE_GCR_FORMAT;
+extern const apple_gcr_format FLOPPY_APPLE_GCR_FORMAT;
 
 class apple_2mg_format : public floppy_image_format_t
 {
@@ -77,6 +77,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_APPLE_2MG_FORMAT;
+extern const apple_2mg_format FLOPPY_APPLE_2MG_FORMAT;
 
 #endif // MAME_FORMATS_AP_DSK35_H

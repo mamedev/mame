@@ -125,4 +125,4 @@ bool m20_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const floppy_format_type FLOPPY_M20_FORMAT = &floppy_image_format_creator<m20_format>;
+const m20_format FLOPPY_M20_FORMAT;

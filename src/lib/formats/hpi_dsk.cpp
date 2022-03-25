@@ -497,4 +497,4 @@ const uint8_t hpi_format::m_track_skew[ HPI_SECTORS - 1 ][ HPI_HEADS ] = {
 	{ 0x00 , 0x00 }     // Interleave = 29
 };
 
-const floppy_format_type FLOPPY_HPI_FORMAT = &floppy_image_format_creator<hpi_format>;
+const hpi_format FLOPPY_HPI_FORMAT;
