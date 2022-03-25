@@ -1,14 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders: Fabio Dalla Libera
+
+#include "machine/alps_dpg1302.h"
+
 /*
   The pen changing mechanism is explained in this video https://www.youtube.com/watch?v=TuMkl_ftuNM
 */
 
-#include "machine/alps_dpg1302.h"
-
-
-
-ALPS_DPG1302_plotter_device::ALPS_DPG1302_plotter_device (const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+alps_dpg1302_plotter_device::alps_dpg1302_plotter_device (const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	paper_roll_plotter_device(mconfig, ALPS_DPG1302, tag, owner,
 				  Element(1200, 900, 0xc3b4bb),
 				  Element(1000, 700, 0xFFFFFF),
@@ -20,7 +19,7 @@ ALPS_DPG1302_plotter_device::ALPS_DPG1302_plotter_device (const machine_config &
 	set_headcolor(PENCOLOR[0]);
 }
 
-void ALPS_DPG1302_plotter_device::update_motors(uint8_t xpattern,uint8_t ypattern)
+void alps_dpg1302_plotter_device::update_motors(uint8_t xpattern,uint8_t ypattern)
 {
 	paper_roll_plotter_device::update_motors(xpattern, ypattern);
 	int pos=get_xmotor_pos();
@@ -36,9 +35,9 @@ void ALPS_DPG1302_plotter_device::update_motors(uint8_t xpattern,uint8_t ypatter
 	m_prevx=pos;
 }
 
-int ALPS_DPG1302_plotter_device::get_reedswitch_state()
+int alps_dpg1302_plotter_device::get_reedswitch_state()
 {
 	return (m_pencarrierphase==0) && (get_xmotor_pos()>METALTABPOS) ? 0 : 1;
 }
 
-DEFINE_DEVICE_TYPE(ALPS_DPG1302, ALPS_DPG1302_plotter_device, "alps_dpg1302", "ALPS DPG1302")
+DEFINE_DEVICE_TYPE(ALPS_DPG1302, alps_dpg1302_plotter_device, "alps_dpg1302", "ALPS DPG1302")

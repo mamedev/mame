@@ -4956,7 +4956,7 @@ if (MACHINES["ALPS_DPG1302"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/alps_dpg1302.cpp",
 		MAME_DIR .. "src/devices/machine/alps_dpg1302.h",
-        }
+	}
 end
 
 

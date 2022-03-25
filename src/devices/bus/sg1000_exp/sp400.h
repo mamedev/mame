@@ -14,12 +14,12 @@
 
 
 
-class sp400_device : public device_t,
+class sp400_printer_device : public device_t,
 		     public device_sk1100_printer_port_interface
 {
 public:
 
-	sp400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sp400_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
@@ -54,12 +54,12 @@ private:
 	volatile int m_dserdata, m_dserstrobe;
 	volatile int m_motbusy, m_motPenUp, m_motPenDown;
 
-	required_device<ALPS_DPG1302_plotter_device> m_plotter;
+	required_device<alps_dpg1302_plotter_device> m_plotter;
 	required_ioport m_frontbuttons;
 	required_ioport m_misc;
 };
 
 
-DECLARE_DEVICE_TYPE(SP400_PRINTER, sp400_device)
+DECLARE_DEVICE_TYPE(SP400_PRINTER, sp400_printer_device)
 
 #endif

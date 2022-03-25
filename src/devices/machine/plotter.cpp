@@ -9,25 +9,20 @@
 
 */
 
+#include <algorithm>
 #include "plotter.h"
 #include "emuopts.h"
 #include "fileio.h"
 #include "png.h"
 
-static inline int32_t clip(int32_t v,int32_t minv,int32_t maxv)
-{
-	if (v<minv) return minv;
-	if (v>maxv) return maxv;
-	return  v;
-}
 
 void draw_with_thickness(bitmap_rgb32 &bitmap,generic_plotter_device::Position pos,int thickness,uint32_t col)
 {
 	if (thickness<=0) return;
-	int left = clip(pos.x-thickness/2, 0, bitmap.width()-1);
-	int right = clip(pos.x+thickness/2, 0, bitmap.width()-1);
-	int top = clip(pos.y-thickness/2, 0, bitmap.height()-1);
-	int bottom = clip(pos.y+thickness/2, 0, bitmap.height()-1);
+	int left = std::clamp(pos.x-thickness/2, 0, bitmap.width()-1);
+	int right = std::clamp(pos.x+thickness/2, 0, bitmap.width()-1);
+	int top = std::clamp(pos.y-thickness/2, 0, bitmap.height()-1);
+	int bottom = std::clamp(pos.y+thickness/2, 0, bitmap.height()-1);
 	bitmap.plot_box(left, top, right-left+1, bottom-top+1, col);
 }
 
@@ -46,13 +41,8 @@ void copybitmapregion(bitmap_rgb32 &dest,const bitmap_rgb32 &src,const generic_p
 	int32_t maxy = std::min(std::min(dest.height(), src.height()+destp.y-srcp.y),
 			      std::min(destp.y+height, cliprect.max_y+1)
 		);
-	for (int32_t x = minx; x<maxx;x++)
-	{
-		for (int32_t y = miny; y<maxy;y++)
-		{
-			dest.pix(y,x) = src.pix(y-destp.y+srcp.y, x-destp.x+srcp.x);
-		}
-	}
+
+	copybitmap(dest, src, 0, 0, destp.x-srcp.x, destp.y-srcp.y, rectangle(minx, maxx, miny, maxy));
 }
 
 
@@ -228,7 +218,7 @@ void paper_roll_plotter_device:: extend_paper()
 	{
 		bitmap_rgb32 tmp;
 		tmp.allocate(m_paper_bitmap.width(), m_paper_bitmap.height());
-		copybitmap(tmp,m_paper_bitmap, 0, 0, 0, 0,
+		copybitmap(tmp, m_paper_bitmap, 0, 0, 0, 0,
 			   rectangle(0, tmp.width(), 0, tmp.height()));
 		m_paper_bitmap.resize(m_paper_bitmap.width(), m_paper_bitmap.height()+m_paperwin.height);
 		m_paper_bitmap.fill(m_paperwin.color);
