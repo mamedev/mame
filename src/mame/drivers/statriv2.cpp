@@ -113,15 +113,15 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;
 	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	optional_shared_ptr<uint8_t> m_question_offset;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	uint8_t m_question_offset_low;
-	uint8_t m_question_offset_mid;
-	uint8_t m_question_offset_high;
-	uint8_t m_latched_coin;
-	uint8_t m_last_coin;
+	uint8_t m_question_offset_low = 0;
+	uint8_t m_question_offset_mid = 0;
+	uint8_t m_question_offset_high = 0;
+	uint8_t m_latched_coin = 0;
+	uint8_t m_last_coin = 0;
 
 	void statriv2_videoram_w(offs_t offset, uint8_t data);
 	uint8_t question_data_r();

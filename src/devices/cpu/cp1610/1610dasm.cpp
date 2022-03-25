@@ -14,6 +14,7 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	uint16_t op = oprom16[0]; uint16_t subop;
 	uint16_t ea, ea1, ea2;
 	unsigned size = 1;
+	offs_t flags = 0;
 //  const char *sym, *sym2;
 
 	switch( op )
@@ -171,12 +172,15 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			{
 				case 0:
 					util::stream_format(stream, "JSR  R%01d,%04X",((ea1&0x300)>>8)+4,ea);
+					flags = STEP_OVER;
 					break;
 				case 1:
 					util::stream_format(stream, "JSRE R%01d,%04X",((ea1&0x300)>>8)+4,ea);
+					flags = STEP_OVER;
 					break;
 				case 2:
 					util::stream_format(stream, "JSRD R%01d,%04X",((ea1&0x300)>>8)+4,ea);
+					flags = STEP_OVER;
 					break;
 				case 3:
 					util::stream_format(stream, "????");
@@ -1490,5 +1494,5 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		util::stream_format(stream, "????");
 	}
 
-	return size;
+	return size | flags | SUPPORTED;
 }

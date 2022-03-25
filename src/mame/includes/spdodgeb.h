@@ -58,17 +58,17 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	int m_adpcm_pos[2];
-	int m_adpcm_end[2];
-	int m_adpcm_idle[2];
-	int m_adpcm_data[2];
-	uint8_t m_mcu_status;
-	uint8_t m_inputs[5];
+	int m_adpcm_pos[2]{};
+	int m_adpcm_end[2]{};
+	int m_adpcm_idle[2]{};
+	int m_adpcm_data[2]{};
+	uint8_t m_mcu_status = 0;
+	uint8_t m_inputs[5]{};
 
-	int m_tile_palbank;
-	int m_sprite_palbank;
-	tilemap_t *m_bg_tilemap;
-	int m_lastscroll;
+	int m_tile_palbank = 0;
+	int m_sprite_palbank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_lastscroll = 0;
 
 	void spd_adpcm_w(offs_t offset, uint8_t data);
 	uint8_t mcu63701_r(offs_t offset);

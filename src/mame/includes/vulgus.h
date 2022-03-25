@@ -43,9 +43,9 @@ private:
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_bgvideoram;
 
-	int m_palette_bank;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	int m_palette_bank = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void bgvideoram_w(offs_t offset, uint8_t data);

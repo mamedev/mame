@@ -113,23 +113,23 @@ public:
 	optional_ioport_array<2> m_dial;
 	struct
 	{
-		uint8_t current_value;
-		bool reverse;
+		uint8_t current_value = 0;
+		bool reverse = false;
 	} m_dial_status[2];
 
 	struct
 	{
-		uint8_t rxd;
-		uint8_t txd;
-		uint8_t rst;
-		uint8_t state;
-		uint8_t packet_type;
+		uint8_t rxd = 0;
+		uint8_t txd = 0;
+		uint8_t rst = 0;
+		uint8_t state = 0;
+		uint8_t packet_type = 0;
 	} m_mcu[2];
 
-	uint16_t m_dsw_pc_hack;
-	bool m_use_dial;
-	bool m_screen_display;
-	int m_sprite_page;
+	uint16_t m_dsw_pc_hack = 0;
+	bool m_use_dial = false;
+	bool m_screen_display = false;
+	int m_sprite_page = 0;
 
 	void cyclemb_bankswitch_w(uint8_t data);
 	void skydest_bankswitch_w(uint8_t data);

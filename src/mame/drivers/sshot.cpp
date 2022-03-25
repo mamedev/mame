@@ -185,7 +185,7 @@ public:
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t   *m_tilemap;
+	tilemap_t   *m_tilemap = nullptr;
 	void supershot_vidram_w(offs_t offset, uint8_t data);
 	void supershot_output0_w(uint8_t data);
 	void supershot_output1_w(uint8_t data);

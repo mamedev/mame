@@ -62,9 +62,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_paletteram;
 
-	uint8_t           m_playfield_tile_bank;
-	uint16_t          m_playfield_xscroll;
-	uint16_t          m_playfield_yscroll;
+	uint8_t           m_playfield_tile_bank = 0;
+	uint16_t          m_playfield_xscroll = 0;
+	uint16_t          m_playfield_yscroll = 0;
 };
 
 #endif // MAME_INCLUDES_VINDICTR_H

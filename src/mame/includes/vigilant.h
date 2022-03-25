@@ -36,13 +36,13 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	int m_horiz_scroll_low;
-	int m_horiz_scroll_high;
-	int m_rear_horiz_scroll_low;
-	int m_rear_horiz_scroll_high;
-	int m_rear_color;
-	int m_rear_disable;
-	int m_rear_refresh;
+	int m_horiz_scroll_low = 0;
+	int m_horiz_scroll_high = 0;
+	int m_rear_horiz_scroll_low = 0;
+	int m_rear_horiz_scroll_high = 0;
+	int m_rear_color = 0;
+	int m_rear_disable = 0;
+	int m_rear_refresh = 0;
 	std::unique_ptr<bitmap_ind16> m_bg_bitmap;
 
 	// common

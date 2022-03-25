@@ -61,8 +61,8 @@ private:
 	std::unique_ptr<uint16_t[]>    m_video_ram;
 
 	/* video-related */
-	uint16_t      m_video_ctrl;
-	uint16_t      m_video_mask;
+	uint16_t      m_video_ctrl = 0;
+	uint16_t      m_video_mask = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

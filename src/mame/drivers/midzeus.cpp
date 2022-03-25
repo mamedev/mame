@@ -115,8 +115,8 @@ private:
 	void update_firewire_irq();
 
 	uint32_t    m_disk_asic[0x10];
-	int         m_fw_int_enable;
-	int         m_fw_int;
+	int         m_fw_int_enable = 0;
+	int         m_fw_int = 0;
 
 	required_device<zeus2_device> m_zeus;
 	required_device<tsb12lv01a_device> m_fw_link;

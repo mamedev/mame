@@ -45,9 +45,9 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int        m_scroll;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int        m_scroll = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -58,8 +58,8 @@ public:
 	required_device<z80ctc_device> m_ctc;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	emu_timer *m_soundcommand_timer;
-	uint8_t      m_nmi_mask;
+	emu_timer *m_soundcommand_timer = nullptr;
+	uint8_t      m_nmi_mask = 0;
 	void pbaction_sh_command_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(sound_trigger);
 	void nmi_mask_w(uint8_t data);
@@ -115,7 +115,7 @@ private:
 	void main_io_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(sub_trigger);
-	emu_timer *m_subcommand_timer;
+	emu_timer *m_subcommand_timer = nullptr;
 
 	uint8_t subcpu_r();
 	void subcpu_w(uint8_t data);
@@ -132,8 +132,8 @@ private:
 	required_device<generic_latch_8_device> m_maintosublatch;
 	//required_device<generic_latch_8_device> m_subtomainlatch;
 	output_finder<24> m_digits;
-	uint8_t m_outlatch;
-	uint32_t m_outdata;
+	uint8_t m_outlatch = 0;
+	uint32_t m_outdata = 0;
 };
 
 #endif // MAME_INCLUDES_PBACTION_H

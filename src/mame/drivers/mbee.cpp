@@ -88,6 +88,7 @@ from Brett Selwood and Andrew Davies.
     - Port 48 is used for drive/side/density select on write, and intrq/drq on read.
       intrq and drq are OR'd together, then gated to bit 7 of the data bus whenever
       port 48 is activated on read. There are no interrupts used.
+    - The 256TC can boot from the B drive if you hold down Shift and hit F1 at the menu.
 
     How to use the config switch for PIO B7:
     - Teleterm: Must use RTC. Anything else makes teleterm go crazy.
@@ -103,15 +104,13 @@ from Brett Selwood and Andrew Davies.
     Old CRTC-based keyboard:
     - Paste drops many characters.
     - Typing can drop the occasional character.
+    - mbee -bios 1 is unusable due to keyboard issues.
 
     FDC:   (TODO: see if these bugs still exist)
     - B drive doesn't work with most disks.
     - some disks cause MAME to freeze.
 
     - 128k: Simply Write has no keyboard.
-
-    - 256tc: At the menu, if F2 pressed to activate the Monitor, the emulated machine
-      crashes due to a bug in z80pio emulation.
 
     - 256tc: the Intro disk doesn't work
 
@@ -897,18 +896,24 @@ void mbee_state::mbeett(machine_config &config)
 // This represents the Series 1: Kit computer, 16K, 32K, 16K Plus, and 32K plus.
 ROM_START( mbee )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD("bas510a.ic25",          0x0000,  0x1000, CRC(2ca47c36) SHA1(f36fd0afb3f1df26edc67919e78000b762b6cbcb) )
-	ROM_LOAD("bas510b.ic27",          0x1000,  0x1000, CRC(a07a0c51) SHA1(dcbdd9df78b4b6b2972de2e4050dabb8ae9c3f5a) )
-	ROM_LOAD("bas510c.ic28",          0x2000,  0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271) )
-	ROM_LOAD("bas510d.ic30",          0x3000,  0x1000, CRC(61727323) SHA1(c0fea9fd0e25beb9faa7424db8efd07cf8d26c1b) )
+	ROM_SYSTEM_BIOS( 0, "510", "Basic 5.10" )
+	ROMX_LOAD("bas510a.ic25",  0x0000, 0x1000, CRC(2ca47c36) SHA1(f36fd0afb3f1df26edc67919e78000b762b6cbcb), ROM_BIOS(0) )
+	ROMX_LOAD("bas510b.ic27",  0x1000, 0x1000, CRC(a07a0c51) SHA1(dcbdd9df78b4b6b2972de2e4050dabb8ae9c3f5a), ROM_BIOS(0) )
+	ROMX_LOAD("bas510c.ic28",  0x2000, 0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271), ROM_BIOS(0) )
+	ROMX_LOAD("bas510d.ic30",  0x3000, 0x1000, CRC(61727323) SHA1(c0fea9fd0e25beb9faa7424db8efd07cf8d26c1b), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "500", "Basic 5.00" )
+	ROMX_LOAD("bas500a.ic25",  0x0000, 0x1000, CRC(5fabd317) SHA1(a91bb6a802da17bc02e720e68b8bdd80261b5039), ROM_BIOS(1) )
+	ROMX_LOAD("bas500b.ic27",  0x1000, 0x1000, CRC(0aaf5d04) SHA1(f871a2991d4a487596ec637e237fc0d9656f4a64), ROM_BIOS(1) )
+	ROMX_LOAD("bas500c.ic28",  0x2000, 0x1000, CRC(ab7d79b8) SHA1(75f71b63dcd81946afce7e2c4d83c6f3ba5c2bc3), ROM_BIOS(1) )
+	ROMX_LOAD("bas500d.ic30",  0x3000, 0x1000, CRC(19f83c4e) SHA1(3ca985bb6b31d39e9cd42ea0a4baeb266c1b5e86), ROM_BIOS(1) )
 
 	// first 0x800 for normal chars, 2nd 0x800 for small chars. Some roms don't have small chars so normal ones loaded twice.
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD("charrom.ic13",          0x0000,  0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
+	ROM_LOAD("charrom.ic13",   0x0000, 0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
 	ROM_RELOAD( 0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0000,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) ) // video switching prom, not needed for emulation purposes
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0000, 0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) ) // video switching prom, not needed for emulation purposes
 ROM_END
 
 // This represents the Series 1: IC (Integrated Computer), and the Series 2: Experimenter, the Educator, and the Personal Communicator
@@ -922,7 +927,7 @@ ROM_START( mbeeic )
 	ROMX_LOAD("bas522d.ic10",          0x2000,  0x2000, CRC(523a38ff) SHA1(a5383067bc712123849710d8b69cbd879d17a61f), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "netdef", ROMREGION_ERASEFF )
-	ROM_LOAD_OPTIONAL( "telcom10.mbn", 0x0000, 0x1000, CRC(d1617e4f) SHA1(c73dc4dcf4c69419842fa4b52aa92e86924a2e2b) ) // net
+	ROM_LOAD_OPTIONAL( "telcom10.mbn", 0x0000,  0x1000, CRC(d1617e4f) SHA1(c73dc4dcf4c69419842fa4b52aa92e86924a2e2b) ) // net
 
 	/* PAK option roms */
 	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )

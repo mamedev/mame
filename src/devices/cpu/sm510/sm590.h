@@ -93,8 +93,8 @@ public:
 
 	// four 4-bit R I/O ports
 	using sm510_base_device::write_r;
-	template <std::size_t Bit> auto write_r() { return m_write_rx[Bit].bind(); }
-	template <std::size_t Bit> auto read_r() { return m_read_rx[Bit].bind(); }
+	template <std::size_t N> auto write_r() { return m_write_rx[N].bind(); }
+	template <std::size_t N> auto read_r() { return m_read_rx[N].bind(); }
 
 protected:
 	sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);

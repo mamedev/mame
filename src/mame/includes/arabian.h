@@ -61,17 +61,17 @@ private:
 	required_shared_ptr<uint8_t> m_custom_cpu_ram;
 	required_shared_ptr<uint8_t> m_blitter;
 
-	std::unique_ptr<uint8_t[]>  m_main_bitmap;
-	std::unique_ptr<uint8_t[]>  m_converted_gfx;
+	std::unique_ptr<uint8_t[]>  m_main_bitmap{};
+	std::unique_ptr<uint8_t[]>  m_converted_gfx{};
 
 	/* video-related */
-	uint8_t    m_video_control;
-	uint8_t    m_flip_screen;
+	uint8_t    m_video_control = 0U;
+	uint8_t    m_flip_screen = 0U;
 
 	/* MCU */
-	uint8_t    m_mcu_port_o;
-	uint8_t    m_mcu_port_p;
-	uint8_t    m_mcu_port_r[4];
+	uint8_t    m_mcu_port_o = 0U;
+	uint8_t    m_mcu_port_p = 0U;
+	uint8_t    m_mcu_port_r[4]{};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mb8841_cpu_device> m_mcu;

@@ -58,6 +58,7 @@
 #include "pachinko.h"
 #include "partytap.h"
 #include "powerpad.h"
+#include "rob.h"
 #include "snesadapter.h"
 #include "suborkey.h"
 #include "turbofile.h"

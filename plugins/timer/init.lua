@@ -38,7 +38,7 @@ function timer.startplugin()
 				{ '---', '', '' },
 				{ _p("plugin-timer", "Current time"), sectohms(time), "off" },
 				{ _p("plugin-timer", "Total time"), sectohms(total), "off" },
-				{ _p("plugin-timer", "Play Count"), play_count, "off" } },
+				{ _p("plugin-timer", "Play Count"), tostring(play_count), "off" } },
 			highlight,
 			"idle"
 	end

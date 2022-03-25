@@ -52,7 +52,7 @@ protected:
 	required_device<arm7_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
-	uint32_t m_ram_size;
+	uint32_t m_ram_size = 0;
 };
 
 uint32_t newton_state::tick_count_r()

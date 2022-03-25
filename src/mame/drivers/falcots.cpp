@@ -57,7 +57,7 @@ private:
 	required_region_ptr<u8> m_chargen;
 	optional_ioport_array<16> m_keys;
 
-	u8 m_key_scan;
+	u8 m_key_scan = 0;
 };
 
 void falcots_state::machine_start()

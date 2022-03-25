@@ -406,6 +406,7 @@ hec2hrp.cpp
 hektor.cpp
 hhtiger.cpp
 hh_amis2k.cpp
+hh_b5000.cpp
 hh_cop400.cpp
 hh_cops1.cpp
 hh_hmcs40.cpp
@@ -657,6 +658,7 @@ mk1forth.cpp
 mk14.cpp
 mk85.cpp
 mk90.cpp
+mk98.cpp
 mkit09.cpp
 ml20.cpp
 mmd1.cpp

@@ -44,8 +44,8 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	int        m_palette_offset;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int        m_palette_offset = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 

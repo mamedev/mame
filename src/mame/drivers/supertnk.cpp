@@ -147,10 +147,10 @@ private:
 	void supertnk_map(address_map &map);
 
 	std::unique_ptr<uint8_t[]> m_videoram[3];
-	uint8_t m_rom_bank;
-	uint8_t m_bitplane_select;
+	uint8_t m_rom_bank = 0;
+	uint8_t m_bitplane_select = 0;
 	pen_t m_pens[NUM_PENS];
-	bool m_interrupt_enable;
+	bool m_interrupt_enable = false;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;

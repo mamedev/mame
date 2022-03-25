@@ -97,7 +97,7 @@ protected:
 	u8 m_t_c = 0;
 	u8 m_strobe = 0;
 	u8 m_row = 0;
-	bool m_data_ok = 0;
+	bool m_data_ok = false;
 	u8 m_lamp_data = 0;
 	u8 m_game = 0;
 	bool m_disco = false;

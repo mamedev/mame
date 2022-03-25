@@ -138,9 +138,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	void duart_output(u8 data);
 
-	u16 *m_rom, *m_ram;
-	u8 m_duart_io;
-	bool  m_bCalibSecondByte; // only set to false on machine_reset()?
+	u16 *m_rom = nullptr, *m_ram = nullptr;
+	u8 m_duart_io = 0;
+	bool m_bCalibSecondByte = false; // only set to false on machine_reset()?
 
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	u16 esq5506_read_adc();

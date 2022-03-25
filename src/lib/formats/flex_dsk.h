@@ -48,9 +48,6 @@ private:
 	static const format formats_head1[];
 	static const format formats_track0[];
 	static const format formats_head1_track0[];
-
-	uint8_t boot0_sector_id;
-	uint8_t boot1_sector_id;
 };
 
 extern const floppy_format_type FLOPPY_FLEX_FORMAT;

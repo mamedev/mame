@@ -55,6 +55,7 @@ Status:
 
 ToDo:
 - Display flickers a bit
+- tt_game: roms missing therefore no sound
 
 *****************************************************************************************************/
 
@@ -320,8 +321,6 @@ void gts3_state::u5a_w(u8 data)
 
 void gts3_state::machine_start()
 {
-	genpin_class::machine_start();
-
 	m_digits.resolve();
 	m_io_outputs.resolve();
 
@@ -334,7 +333,6 @@ void gts3_state::machine_start()
 
 void gts3_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

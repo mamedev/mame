@@ -31,6 +31,7 @@ Status:
 ToDo:
 - The "new cpu" machines are lacking mechanical sounds. The output bits vary per game.
 - La Rana: playable. Needs its own layout. Inputs to be figured out.
+- Gun Shot: needs device-ification and sharing of the sound board emulated in spinb.cpp.
 
 ********************************************************************************************************/
 
@@ -73,6 +74,7 @@ public:
 	void inder(machine_config &config);
 	void brvteam(machine_config &config);
 	void canasta(machine_config &config);
+	void gunshot(machine_config &config);
 	void lapbylap(machine_config &config);
 
 	void init_0();
@@ -1642,6 +1644,34 @@ ROM_START(larana)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Gun Shot (199?)
+/ Main PCB: Inder SA UCPU87 (only 3 of 4 I8255 sockets populated)
+/ Sound PCB: unmarked (only 1 of 2 ROM sockets populated)
+/-------------------------------------------------------------------*/
+ROM_START(gunshot)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("m-177_gun_shot_rom_0_version_0.4.ci3", 0x0000, 0x4000, CRC(f0f4e01e) SHA1(27b28ce3a81e01d9c1bacebe078c135e24b637a7)) // 001xxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                                    0x0000, 0x4000)
+	ROM_CONTINUE(                                    0x0000, 0x4000)
+	ROM_CONTINUE(                                    0x0000, 0x4000)
+	// second ROM socket empty
+
+	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_LOAD("m-177_gun_shot_rom_1_version_0.0.ic9", 0x0000, 0x2000, CRC(737ea656) SHA1(0bb16ae4bef2800681aaa7741506f40a337e6af0)) // 000111xxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                                    0x0000, 0x2000)
+	ROM_CONTINUE(                                    0x0000, 0x2000)
+	ROM_CONTINUE(                                    0x0000, 0x2000)
+	ROM_CONTINUE(                                    0x0000, 0x2000)
+	ROM_CONTINUE(                                    0x0000, 0x2000)
+	ROM_CONTINUE(                                    0x0000, 0x2000)
+	ROM_CONTINUE(                                    0x0000, 0x2000)
+
+	ROM_REGION(0x80000, "audiorom", 0)
+	ROM_LOAD("m-177_gun_shot_rom_2_version_0.0.ic16", 0x00000, 0x80000, CRC(f91ddd0c) SHA1(cc4e1440e76330872f512d56376f45b92a8dbee6))
+	// second ROM socket empty
+ROM_END
+
+/*-------------------------------------------------------------------
 / 250 CC (1992)
 /-------------------------------------------------------------------*/
 ROM_START(ind250cc)
@@ -1671,10 +1701,13 @@ GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "In
 GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",    MACHINE_IS_SKELETON_MECHANICAL )
 
 // new cpu board, sound board with msm5205
-GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_0, ROT0, "Inder", "Moon Light (Inder)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_1, ROT0, "Inder", "Clown (Inder)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_1, ROT0, "Inder", "Corsario",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_1, ROT0, "Inder", "Mundial 90",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_1, ROT0, "Inder", "Atleta",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1991,  larana,   0, inder,    larana,   inder_state, init_0, ROT0, "Inder", "La Rana",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder", "250 CC",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_0, ROT0, "Inder",    "Moon Light (Inder)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_1, ROT0, "Inder",    "Clown (Inder)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_1, ROT0, "Inder",    "Corsario",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_1, ROT0, "Inder",    "Mundial 90",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_1, ROT0, "Inder",    "Atleta",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1991,  larana,   0, inder,    larana,   inder_state, init_0, ROT0, "Inder",    "La Rana",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder",    "250 CC",             MACHINE_IS_SKELETON_MECHANICAL )
+
+// new cpu board, sound board with msm6585 (like the ones in spinb.cpp)
+GAME(1996,  gunshot,  0, inder,    larana,   inder_state, init_0, ROT0, "Spinball", "Gun Shot",           MACHINE_IS_SKELETON_MECHANICAL )

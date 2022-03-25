@@ -592,8 +592,8 @@ protected:
 	virtual void io_control_w(offs_t offset, uint8_t data) override;
 
 private:
-	uint8_t m_output_data;
-	uint8_t m_output_latch;
+	uint8_t m_output_data = 0;
+	uint8_t m_output_latch = 0;
 };
 
 
@@ -688,8 +688,8 @@ protected:
 private:
 	output_finder<4> m_digits;
 
-	uint8_t m_led1_value;
-	uint8_t m_led2_value;
+	uint8_t m_led1_value = 0;
+	uint8_t m_led2_value = 0;
 };
 
 
@@ -716,7 +716,7 @@ protected:
 private:
 	output_finder<6> m_lamps;
 
-	uint8_t m_el_value;
+	uint8_t m_el_value = 0;
 };
 
 

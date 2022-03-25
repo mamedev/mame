@@ -231,10 +231,10 @@ protected:
 
 	output_finder<4> m_leds;
 
-	uint8_t m_c0;
-	uint8_t m_c4;
-	uint8_t m_c6;
-	uint8_t m_c8;
+	uint8_t m_c0 = 0;
+	uint8_t m_c4 = 0;
+	uint8_t m_c6 = 0;
+	uint8_t m_c8 = 0;
 };
 
 
@@ -271,9 +271,9 @@ private:
 	void lufykzku_io_map(address_map &map);
 	void lufykzku_mem_map(address_map &map);
 
-	uint8_t m_vblank_vector;
-	uint8_t m_timer0_vector;
-	uint8_t m_timer1_vector;
+	uint8_t m_vblank_vector = 0;
+	uint8_t m_timer0_vector = 0;
+	uint8_t m_timer1_vector = 0;
 };
 
 

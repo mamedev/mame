@@ -30,8 +30,8 @@ private:
 	required_shared_ptr<uint16_t> m_regs2;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_tilemap1;
-	tilemap_t *m_tilemap2;
+	tilemap_t *m_tilemap1 = nullptr;
+	tilemap_t *m_tilemap2 = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

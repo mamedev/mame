@@ -104,15 +104,15 @@ offs_t melps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	{
 		uint8_t x = op >> 4 & 3;
 		uint8_t y = op & 0xf;
-		util::stream_format(stream, " %d,%d", x, y);
+		util::stream_format(stream, "%d,%d", x, y);
 	}
 	else if (bits > 0)
 	{
 		uint8_t param = op & ((1 << bits) - 1);
 		if (bits > 4)
-			util::stream_format(stream, " $%02X", param);
+			util::stream_format(stream, "$%02X", param);
 		else
-			util::stream_format(stream, " %d", param);
+			util::stream_format(stream, "%d", param);
 	}
 
 	return 1 | em_flags[instr] | SUPPORTED;

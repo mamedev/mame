@@ -138,8 +138,8 @@ class tpp2_state : public tpp1_state
 public:
 	virtual void config(machine_config &config) override;
 protected:
-	bool m_watchdog_enabled;
-	uint8_t m_watchdog_counter;
+	bool m_watchdog_enabled = false;
+	uint8_t m_watchdog_counter = 0;
 
 	virtual void driver_start() override;
 	virtual void refresh_w(offs_t offset, uint8_t data) override;

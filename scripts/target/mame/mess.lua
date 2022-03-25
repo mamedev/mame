@@ -123,6 +123,7 @@ CPUS["UNSP"] = true
 CPUS["HCD62121"] = true
 CPUS["PPS4"] = true
 CPUS["PPS41"] = true
+CPUS["B5000"] = true
 CPUS["UPD7725"] = true
 CPUS["HD61700"] = true
 CPUS["LC8670"] = true
@@ -2371,6 +2372,7 @@ files {
 	MAME_DIR .. "src/mame/machine/ms7004.h",
 	MAME_DIR .. "src/mame/drivers/mk85.cpp",
 	MAME_DIR .. "src/mame/drivers/mk90.cpp",
+	MAME_DIR .. "src/mame/drivers/mk98.cpp",
 	MAME_DIR .. "src/mame/drivers/ms6102.cpp",
 	MAME_DIR .. "src/mame/machine/kr1601rr1.cpp",
 	MAME_DIR .. "src/mame/machine/kr1601rr1.h",
@@ -3589,6 +3591,7 @@ files {
 	MAME_DIR .. "src/mame/includes/aim65.h",
 	MAME_DIR .. "src/mame/machine/aim65.cpp",
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_b5000.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_pps41.cpp",
 }
 

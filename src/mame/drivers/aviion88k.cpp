@@ -121,11 +121,11 @@ private:
 
 	memory_view m_mbus;
 
-	u32 m_ucs;
+	u32 m_ucs = 0;
 
-	emu_timer *m_pit[4];
+	emu_timer *m_pit[4]{};
 
-	u32 m_pit_cmd[4];
+	u32 m_pit_cmd[4]{};
 	u32 m_pit_cnt[4] = {};
 };
 

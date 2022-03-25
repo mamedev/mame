@@ -50,12 +50,12 @@ private:
 	void busicom_rp(address_map &map);
 	void busicom_stat(address_map &map);
 
-	uint8_t m_drum_index;
-	uint16_t m_keyboard_shifter;
-	uint32_t m_printer_shifter;
-	uint8_t m_timer;
-	uint8_t m_printer_line[11][17];
-	uint8_t m_printer_line_color[11];
+	uint8_t m_drum_index = 0U;
+	uint16_t m_keyboard_shifter = 0U;
+	uint32_t m_printer_shifter = 0U;
+	uint8_t m_timer = 0U;
+	uint8_t m_printer_line[11][17]{};
+	uint8_t m_printer_line_color[11]{};
 
 	required_device<i4004_cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;

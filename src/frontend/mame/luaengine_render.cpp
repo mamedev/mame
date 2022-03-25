@@ -418,7 +418,7 @@ void lua_engine::initialize_render(sol::table &emu)
 				ctnr.add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			};
 	render_container_type["draw_text"] =
-			[this] (render_container &ctnr, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			[] (render_container &ctnr, sol::this_state s, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
 			{
 				auto justify = ui::text_layout::text_justify::LEFT;
 				float x = 0;
@@ -438,7 +438,7 @@ void lua_engine::initialize_render(sol::table &emu)
 				}
 				else
 				{
-					luaL_error(m_lua_state, "Error in param 1 to draw_text");
+					luaL_error(s, "Error in param 1 to draw_text");
 					return;
 				}
 				y = std::clamp(y, 0.0f, 1.0f);

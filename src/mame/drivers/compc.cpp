@@ -66,7 +66,7 @@ public:
 	void compc_map(address_map &map);
 	void compciii_io(address_map &map);
 private:
-	u8 m_portb, m_dips;
+	u8 m_portb = 0, m_dips = 0;
 };
 
 void compc_state::machine_reset()

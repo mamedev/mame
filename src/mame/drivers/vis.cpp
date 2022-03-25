@@ -33,16 +33,16 @@ protected:
 private:
 	required_device<dac_16bit_r2r_device> m_rdac;
 	required_device<dac_16bit_r2r_device> m_ldac;
-	uint16_t m_count;
-	uint16_t m_curcount;
-	uint16_t m_sample[2];
-	uint8_t m_index[2]; // unknown indexed registers, volume?
-	uint8_t m_data[2][16];
-	uint8_t m_mode;
-	uint8_t m_ctrl;
-	unsigned int m_sample_byte;
-	unsigned int m_samples;
-	emu_timer *m_pcm;
+	uint16_t m_count = 0U;
+	uint16_t m_curcount = 0U;
+	uint16_t m_sample[2]{};
+	uint8_t m_index[2]{}; // unknown indexed registers, volume?
+	uint8_t m_data[2][16]{};
+	uint8_t m_mode = 0U;
+	uint8_t m_ctrl = 0U;
+	unsigned int m_sample_byte = 0U;
+	unsigned int m_samples = 0U;
+	emu_timer *m_pcm = nullptr;
 };
 
 DEFINE_DEVICE_TYPE(VIS_AUDIO, vis_audio_device, "vis_pcm", "vis_pcm")
@@ -249,12 +249,12 @@ private:
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	int m_extcnt;
-	uint8_t m_extreg;
-	uint8_t m_interlace;
-	uint16_t m_wina, m_winb;
-	uint8_t m_shift256, m_dw, m_8bit_640;
-	uint8_t m_crtc_regs[0x32];
+	int m_extcnt = 0;
+	uint8_t m_extreg = 0U;
+	uint8_t m_interlace = 0U;
+	uint16_t m_wina, m_winb = 0U;
+	uint8_t m_shift256 = 0U, m_dw = 0U, m_8bit_640 = 0U;
+	uint8_t m_crtc_regs[0x32]{};
 };
 
 DEFINE_DEVICE_TYPE(VIS_VGA, vis_vga_device, "vis_vga", "vis_vga")

@@ -59,11 +59,11 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t      *m_mid_tilemap;
-	tilemap_t      *m_txt_tilemap;
+	tilemap_t      *m_mid_tilemap = nullptr;
+	tilemap_t      *m_txt_tilemap = nullptr;
 
 	/* misc */
-	int            m_ticket;
+	int            m_ticket = 0;
 	void mid_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void txt_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void ticket_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

@@ -49,11 +49,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	int m_c0;
-	int m_c1;
-	int m_c2;
-	int m_mm0;
-	int m_mm1;
+	int m_c0 = 0;
+	int m_c1 = 0;
+	int m_c2 = 0;
+	int m_mm0 = 0;
+	int m_mm1 = 0;
 	void prof180x_io(address_map &map);
 	void prof180x_mem(address_map &map);
 };

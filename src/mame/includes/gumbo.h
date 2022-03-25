@@ -36,8 +36,8 @@ private:
 	required_shared_ptr<uint16_t> m_fg_videoram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

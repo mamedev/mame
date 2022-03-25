@@ -28,6 +28,7 @@ using util::BIT;
 #include "cpu/arm7/arm7dasm.h"
 #include "cpu/asap/asapdasm.h"
 #include "cpu/avr8/avr8dasm.h"
+#include "cpu/b5000/b5000d.h"
 #include "cpu/bcp/bcpdasm.h"
 #include "cpu/capricorn/capricorn_dasm.h"
 #include "cpu/ccpu/ccpudasm.h"
@@ -390,6 +391,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "avr8",            le,  0, []() -> util::disasm_interface * { return new avr8_disassembler; } },
 	{ "axc51core",       le,  0, []() -> util::disasm_interface * { return new axc51core_disassembler; } },
 	{ "axc208",          le,  0, []() -> util::disasm_interface * { return new ax208_disassembler; } },
+	{ "b5000",           le,  0, []() -> util::disasm_interface * { return new b5000_disassembler; } },
+	{ "b5500",           le,  0, []() -> util::disasm_interface * { return new b5500_disassembler; } },
 	{ "capricorn",       le,  0, []() -> util::disasm_interface * { return new capricorn_disassembler; } },
 	{ "ccpu",            le,  0, []() -> util::disasm_interface * { return new ccpu_disassembler; } },
 	{ "cdp1801",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1801); } },

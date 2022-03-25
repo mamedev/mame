@@ -112,18 +112,18 @@ private:
 	output_finder<2> m_leds;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_bg_bank;
-	uint8_t    m_scroll_x;
-	uint8_t    m_scroll_y;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int      m_bg_bank = 0;
+	uint8_t    m_scroll_x = 0;
+	uint8_t    m_scroll_y = 0;
 
 	/* sound-related */
-	int m_msm_data;
-	int m_msm_toggle;
-	uint8_t m_snd_interrupt_enable;
-	uint8_t m_music_interrupt_enable;
-	uint8_t m_snd_ack;
+	int m_msm_data = 0;
+	int m_msm_toggle = 0;
+	uint8_t m_snd_interrupt_enable = 0;
+	uint8_t m_music_interrupt_enable = 0;
+	uint8_t m_snd_ack = 0;
 
 };
 

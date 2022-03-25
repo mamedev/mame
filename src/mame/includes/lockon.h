@@ -70,34 +70,34 @@ private:
 	required_shared_ptr<uint16_t> m_object_ram;
 
 	/* video-related */
-	tilemap_t       *m_tilemap;
-	uint8_t           m_ground_ctrl;
-	uint16_t          m_scroll_h;
-	uint16_t          m_scroll_v;
-	std::unique_ptr<bitmap_ind16> m_front_buffer;
-	std::unique_ptr<bitmap_ind16> m_back_buffer;
-	emu_timer       *m_bufend_timer;
-	emu_timer       *m_cursor_timer;
+	tilemap_t       *m_tilemap = nullptr;
+	uint8_t           m_ground_ctrl = 0U;
+	uint16_t          m_scroll_h = 0U;
+	uint16_t          m_scroll_v = 0U;
+	std::unique_ptr<bitmap_ind16> m_front_buffer{};
+	std::unique_ptr<bitmap_ind16> m_back_buffer{};
+	emu_timer       *m_bufend_timer = nullptr;
+	emu_timer       *m_cursor_timer = nullptr;
 
 	/* Rotation Control */
-	uint16_t      m_xsal;
-	uint16_t      m_x0ll;
-	uint16_t      m_dx0ll;
-	uint16_t      m_dxll;
-	uint16_t      m_ysal;
-	uint16_t      m_y0ll;
-	uint16_t      m_dy0ll;
-	uint16_t      m_dyll;
+	uint16_t      m_xsal = 0U;
+	uint16_t      m_x0ll = 0U;
+	uint16_t      m_dx0ll = 0U;
+	uint16_t      m_dxll = 0U;
+	uint16_t      m_ysal = 0U;
+	uint16_t      m_y0ll = 0U;
+	uint16_t      m_dy0ll = 0U;
+	uint16_t      m_dyll = 0U;
 
 	/* Object palette RAM control */
-	uint32_t      m_iden;
-	std::unique_ptr<uint8_t[]>       m_obj_pal_ram;
-	uint32_t      m_obj_pal_latch;
-	uint32_t      m_obj_pal_addr;
+	uint32_t      m_iden = 0U;
+	std::unique_ptr<uint8_t[]>       m_obj_pal_ram{};
+	uint32_t      m_obj_pal_latch = 0U;
+	uint32_t      m_obj_pal_addr = 0U;
 
 	/* misc */
-	uint8_t       m_ctrl_reg;
-	uint32_t      m_main_inten;
+	uint8_t       m_ctrl_reg = 0U;
+	uint32_t      m_main_inten = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

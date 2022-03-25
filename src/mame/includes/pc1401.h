@@ -47,7 +47,7 @@ protected:
 private:
 	required_ioport_array<13> m_keys;
 
-	uint8_t m_portc;
+	uint8_t m_portc = 0;
 	uint8_t m_reg[0x100];
 
 	static const char* const s_line[5];

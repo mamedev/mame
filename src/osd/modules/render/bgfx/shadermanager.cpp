@@ -47,6 +47,37 @@ bgfx::ShaderHandle shader_manager::get_or_load_shader(osd_options &options, std:
 
 bgfx::ShaderHandle shader_manager::load_shader(osd_options &options, std::string name)
 {
+	std::string shader_path = make_path_string(options, name);
+	const bgfx::Memory* mem = load_mem(shader_path + name + ".bin");
+	if (mem != nullptr)
+	{
+		return bgfx::createShader(mem);
+	}
+
+	return BGFX_INVALID_HANDLE;
+}
+
+bool shader_manager::is_shader_present(osd_options &options, std::string name)
+{
+	std::string shader_path = make_path_string(options, name);
+	std::string file_name = shader_path + name + ".bin";
+	bx::FileReader reader;
+	if (bx::open(&reader, file_name.c_str()))
+	{
+		uint32_t expected_size(bx::getSize(&reader));
+		uint8_t *data = new uint8_t[expected_size];
+		uint32_t read_size = (uint32_t)bx::read(&reader, data, expected_size);
+		delete [] data;
+		bx::close(&reader);
+
+		return expected_size == read_size;
+	}
+
+	return false;
+}
+
+std::string shader_manager::make_path_string(osd_options &options, std::string name)
+{
 	std::string shader_path(options.bgfx_path());
 	shader_path += PATH_SEPARATOR "shaders" PATH_SEPARATOR;
 	switch (bgfx::getRendererType())
@@ -87,13 +118,7 @@ bgfx::ShaderHandle shader_manager::load_shader(osd_options &options, std::string
 	shader_path += PATH_SEPARATOR;
 	osd_subst_env(shader_path, shader_path);
 
-	const bgfx::Memory* mem = load_mem(shader_path + name + ".bin");
-	if (mem != nullptr)
-	{
-		return bgfx::createShader(mem);
-	}
-
-	return BGFX_INVALID_HANDLE;
+	return shader_path;
 }
 
 const bgfx::Memory* shader_manager::load_mem(std::string name)

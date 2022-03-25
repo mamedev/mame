@@ -72,10 +72,10 @@ private:
 	required_shared_ptr<uint16_t> m_xscroll;
 	required_shared_ptr<uint16_t> m_yscroll;
 
-	double          m_brightness;
+	double          m_brightness = 0;
 	bitmap_ind16 m_pfbitmap;
 
-	emu_timer *m_scanline_interrupt_timer;
+	emu_timer *m_scanline_interrupt_timer = nullptr;
 
 	static const atari_motion_objects_config s_mob_config;
 };

@@ -47,8 +47,8 @@ private:
 	void dorachan_map(address_map &map);
 
 	// internal state
-	uint8_t m_flip_screen;
-	uint16_t m_prot_value;
+	uint8_t m_flip_screen = 0;
+	uint16_t m_prot_value = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -53,7 +53,7 @@ private:
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 	required_shared_ptr<uint16_t> m_pf4_rowscroll;
 
-	uint16_t m_priority;
+	uint16_t m_priority = 0U;
 
 	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void main_irq_ack_w(uint16_t data);

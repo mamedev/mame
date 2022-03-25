@@ -3237,6 +3237,18 @@ symbols:set_memory_value(name, space, offset, value, size, disable_se)
     The access size is specified in bytes, and must be 1, 2, 4 or 8.  The
     ``disable_se`` argument specifies whether memory access side effects should
     be disabled.
+symbols:read_memory(space, address, size, apply_translation)
+    Read a value from an address space.  The access size is specified in bytes,
+    and must be 1, 2, 4, or 8.  If the ``apply_translation`` argument is true,
+    the address will be translated with debug read intention.  Returns a value
+    of the requested size with all bits set if address translation fails.
+symbols:write_memory(space, address, data, size, apply_translation)
+    Write a value to an address space.  The access size is specified in bytes,
+    and must be 1, 2, 4, or 8.  If the ``apply_translation`` argument is true,
+    the address will be translated with debug write intention.  The symbol
+    table’s memory modified function will be called after the value is written.
+    The value will not be written and the symbol table’s memory modified
+    function will not be called if address translation fails.
 
 Properties
 ^^^^^^^^^^

@@ -172,4 +172,4 @@ ROM_END
 // This ties everything together
 //    YEAR  NAME            PARENT    COMPAT    MACHINE        INPUT          CLASS             INIT           COMPANY           FULLNAME                FLAGS
 COMP( 2007, gsz80,          0,        0,        gsz80,         0,             gsz80_state,      empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
-COMP( 2015, rc2014mini,     gsz80,    0,        rc2014mini,    rc2014mini,    rc2014mini_state, empty_init,    "Z80Kits",        "RC2014 Mini",          MACHINE_NO_SOUND_HW )
+COMP( 2016, rc2014mini,     gsz80,    0,        rc2014mini,    rc2014mini,    rc2014mini_state, empty_init,    "RFC2795 Ltd",    "RC2014 Mini",          MACHINE_NO_SOUND_HW )

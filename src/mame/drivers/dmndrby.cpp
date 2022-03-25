@@ -89,10 +89,10 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_dderby_vidchars;
 	required_shared_ptr<uint8_t> m_dderby_vidattribs;
-	uint8_t *m_racetrack_tilemap_rom;
-	tilemap_t *m_racetrack_tilemap;
-	uint8_t m_io_port[8];
-	int m_bg;
+	uint8_t *m_racetrack_tilemap_rom = nullptr;
+	tilemap_t *m_racetrack_tilemap = nullptr;
+	uint8_t m_io_port[8]{};
+	int m_bg = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

@@ -134,8 +134,8 @@ private:
 	};
 
 	void update_frame_timer();
-	emu_timer *m_frame_irq_timer;
-	emu_timer *m_line_irq_timer;
+	emu_timer *m_frame_irq_timer = nullptr;
+	emu_timer *m_line_irq_timer = nullptr;
 
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
 
@@ -144,17 +144,15 @@ private:
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 
-	// Changing this consider to revert 'virtual' in spectrum.h
-	u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	void spectrum_UpdateScreenBitmap(bool eof = false) override;
-	void spectrum_UpdateBorderBitmap() override;
-	void spectrum_UpdateZxScreenBitmap();
-	void tsconf_UpdateTxtBitmap(unsigned int from_x, unsigned int from_y);
-	void tsconf_UpdateGfxBitmap(unsigned int from_x, unsigned int from_y);
+	u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
+	rectangle get_screen_area() override;
+	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	void tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tsconf_palette(palette_device &palette) const;
-	void draw_sprites(const rectangle &cliprect);
 	void tsconf_update_video_mode();
-	rectangle get_screen_area();
 
 	void tsconf_port_7ffd_w(u8 data);
 	void tsconf_ula_w(offs_t offset, u8 data);
@@ -193,7 +191,7 @@ private:
 	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
 	u8 m_regs[0x100];
 
-	address_space *m_program;
+	address_space *m_program = nullptr;
 	memory_view m_bank0_rom;
 	required_memory_bank_array<5> m_banks;
 
@@ -202,20 +200,19 @@ private:
 	required_device<beta_disk_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
 	required_device<spi_sdcard_sdhc_device> m_sdcard;
-	u8 m_zctl_di;
-	u8 m_zctl_cs;
+	u8 m_zctl_di = 0;
+	u8 m_zctl_cs = 0;
 
 	required_device<glukrs_device> m_glukrs;
-	gluk_ext m_port_f7_ext;
-	u8 m_port_f7_gluk_reg;
+	gluk_ext m_port_f7_ext{};
+	u8 m_port_f7_gluk_reg = 0;
 
-	u16 m_rendering_gfx_y_offset;
+	s16 m_gfx_y_frame_offset = 0;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	tilemap_t *m_ts_tilemap[3];
+	tilemap_t *m_ts_tilemap[3]{};
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
-	u16 m_previous_tsu_vpos;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

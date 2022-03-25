@@ -169,7 +169,7 @@ offs_t sm510_common_disassembler::common_disasm(const u8 *lut_mnemonic, const u8
 		instr = lut_extended[param];
 
 	// disassemble it
-	util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
+	util::stream_format(stream, "%-8s", s_mnemonics[instr]);
 	if (bits > 0)
 	{
 		if (bits <= 4)

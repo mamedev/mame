@@ -76,10 +76,10 @@ public:
 	void superga2_map(address_map &map);
 
 private:
-	int m_speaker_state;
+	int m_speaker_state = 0;
 
-	uint8_t *m_ram_ptr;
-	int m_ram_size;
+	uint8_t *m_ram_ptr = nullptr;
+	int m_ram_size = 0;
 
 	uint8_t read_floatingbus();
 };

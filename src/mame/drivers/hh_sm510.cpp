@@ -147,7 +147,7 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 #include "gnw_dualh.lh"
 
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
-//#include "hh_sm500_test.lh" // "
+#include "hh_sm500_test.lh" // "
 
 
 // machine start/reset
@@ -5372,11 +5372,13 @@ INPUT_PORTS_END
 void gamewatch_state::nsmb3(machine_config &config)
 {
 	sm530_common(config, 1000, 1000);
+	config.set_default_layout(layout_hh_sm500_test);
 }
 
 void gamewatch_state::nsmw(machine_config &config)
 {
 	sm530_common(config, 1000, 1000);
+	config.set_default_layout(layout_hh_sm500_test);
 }
 
 // roms

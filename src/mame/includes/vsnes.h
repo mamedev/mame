@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 
+#include "bus/nes_ctrl/zapper_sensor.h"
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
 #include "video/ppu2c0x.h"
@@ -16,8 +17,11 @@ public:
 		, m_ppu2(*this, "ppu2")
 		, m_sn1(*this, "sn1")
 		, m_sn2(*this, "sn2")
+		, m_sensor(*this, "sensor")
 		, m_nvram(*this, "nvram")
 		, m_gfx1_rom(*this, "gfx1")
+		, m_prg_banks(*this, "prg%u", 0U)
+		, m_prg_view(*this, "prg_view")
 		, m_chr_banks(*this, "chr%u", 0U)
 		, m_chr_view(*this, "chr_view")
 	{
@@ -56,6 +60,7 @@ private:
 	optional_device<sn76489_device> m_sn1;
 	optional_device<sn76489_device> m_sn2;
 
+	optional_device<nes_zapper_sensor_device> m_sensor;
 	optional_device<nvram_device> m_nvram;
 
 	optional_memory_region m_gfx1_rom;
@@ -79,12 +84,12 @@ private:
 	void drmario_rom_banking(offs_t offset, uint8_t data);
 	void vsvram_rom_banking(uint8_t data);
 	void vs108_rom_banking(offs_t offset, uint8_t data);
-	uint8_t rbi_hack_r(offs_t offset);
-	uint8_t supxevs_read_prot_1_r();
-	uint8_t supxevs_read_prot_2_r();
-	uint8_t supxevs_read_prot_3_r();
-	uint8_t supxevs_read_prot_4_r();
-	uint8_t tko_security_r(offs_t offset);
+	u8 rbibb_prot_r(offs_t offset);
+	u8 supxevs_prot_1_r();
+	u8 supxevs_prot_2_r();
+	u8 supxevs_prot_3_r();
+	u8 supxevs_prot_4_r();
+	u8 tkoboxng_prot_r(offs_t offset);
 	void sunsoft3_rom_banking(offs_t offset, uint8_t data);
 	void set_bnglngby_irq_w(uint8_t data);
 	uint8_t set_bnglngby_irq_r();
@@ -112,27 +117,32 @@ private:
 	void vsnes_ppu1_map(address_map &map);
 	void vsnes_ppu2_map(address_map &map);
 
+	void init_prg_banking();
+	void prg32(int bank);
+	void prg16(int slot, int bank);
+	void prg8(int slot, int bank);
+
+	memory_bank_array_creator<4> m_prg_banks;
+	memory_view m_prg_view;
+	int m_prg_chunks = 0;
+
 	memory_bank_array_creator<8> m_chr_banks;
 	memory_view m_chr_view;
-	int m_chr_chunks;
+	int m_chr_chunks = 0;
 
-	int m_coin;
-	int m_input_latch[4];
-	int m_input_strobe[2];
-	int m_old_bank;
-	int m_drmario_shiftreg;
-	int m_drmario_shiftcount;
-	int m_size16k;
-	int m_switchlow;
-	int m_vrom4k;
-	int m_108_reg;
-	int m_108_prg_mask;
-	int m_VSindex;
-	int m_supxevs_prot_index;
-	int m_security_counter;
-	int m_ret;
+	int m_coin = 0;
+	int m_input_latch[4]{};
+	int m_input_strobe[2]{};
+	int m_mmc1_shiftreg = 0;
+	int m_mmc1_shiftcount = 0;
+	int m_mmc1_prg16k = 0;
+	int m_mmc1_switchlow = 0;
+	int m_mmc1_chr4k = 0;
+	int m_108_reg = 0;
+	int m_prot_index = 0;
+	int m_ret = 0;
 
-	uint8_t m_bootleg_sound_offset;
-	uint8_t m_bootleg_sound_data;
-	int m_bootleg_latched_scanline;
+	u8 m_bootleg_sound_offset = 0U;
+	u8 m_bootleg_sound_data = 0U;
+	int m_bootleg_latched_scanline = 0;
 };

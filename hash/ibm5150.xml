@@ -53,7 +53,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
     Rick Dangerous (SPS 3042)
 
 -->
-<softwarelist name="ibm5150" description="IBM PC disk images">
+<softwarelist name="ibm5150" description="IBM PC floppy disk images">
 
 	<!-- Booter Games -->
 
@@ -2762,7 +2762,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="abilityd">
-		<description>Ability (Demo)</description>
+		<description>Ability (demo)</description>
 		<year>1985</year>
 		<publisher>Xanaro Technologies</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -10274,6 +10274,78 @@ has been replaced with an all-zero block. -->
 
 	<software name="dlair">
 		<description>Dragon's Lair (5.25")</description>
+		<year>1990</year>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Sullivan Bluth Interactive Media" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 01 of 13].img" size="368640" crc="d776e980" sha1="1bbde85e939709eb9310d341e406750fc38d4bc7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 02 of 13].img" size="368640" crc="7dacc47c" sha1="0ac74f4a6b32ddb1f268533e02aec28e55460c8b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 03 of 13].img" size="368640" crc="9726e9f6" sha1="6814cd61c21d6dde7acf42462315a45a21c01e02"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 04 of 13].img" size="368640" crc="ce115351" sha1="894d69491d4c57f9a9e90f1ead196c292d35c9ea"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 05 of 13].img" size="368640" crc="5fe3b002" sha1="df30336e17b23348de555d8c571d6c494163e477"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 06 of 13].img" size="368640" crc="1966a5ab" sha1="311c51d5c08059f1724ebf409036b5a17272ee76"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 07 of 13].img" size="368640" crc="cdbf1454" sha1="55cc999f569be64a0714981712e28e6bdcc284fa"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 08 of 13].img" size="368640" crc="db040f90" sha1="27fb5c90228dc24b6d78ddf5e3285d00888c452d"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 09 of 13].img" size="368640" crc="b649788c" sha1="3e536b6ed4411a7c55b9ed66b6679f7f1a6f888a"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 10 of 13].img" size="368640" crc="7b0be33d" sha1="f0874d9b2cf6032d00ddb86912a6a7327211cd69"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 11 of 13].img" size="368640" crc="e6dca8a2" sha1="83f14ebd4748ec30755a625250eb581434e1cc8e"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 12 of 13].img" size="368640" crc="061c9ecc" sha1="baedfaf68fa1abc8649fc922f4962a8b18ea2716"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 13 of 13].img" size="368640" crc="50cad757" sha1="cdf3598100a329c849eaa034f129bb8f28063135"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlaira" cloneof="dlair">
+		<description>Dragon's Lair (5.25", older)</description>
 		<year>1989</year>
 		<publisher>Merit Software</publisher>
 		<info name="developer" value="Sullivan Bluth Interactive Media" />
@@ -10346,42 +10418,42 @@ has been replaced with an all-zero block. -->
 
 	<software name="dlair35" cloneof="dlair">
 		<description>Dragon's Lair (3.5")</description>
-		<year>1989</year>
+		<year>1990</year>
 		<publisher>Merit Software</publisher>
 		<info name="developer" value="Sullivan Bluth Interactive Media" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 1 of 7].img" size="737280" crc="427a0228" sha1="1dc55efd9e29cf40cf7fb3d8f18c7bd638463767"/>
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 1 of 7].img" size="737280" crc="427a0228" sha1="1dc55efd9e29cf40cf7fb3d8f18c7bd638463767"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 2 of 7].img" size="737280" crc="edd53e3f" sha1="0e3a92ef40d34625ca7bbf0659f92426a87f7d7d"/>
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 2 of 7].img" size="737280" crc="140c3c14" sha1="6eae473a61211e3c92c7b92407a958570fbcaf08"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 3 of 7].img" size="737280" crc="abce5854" sha1="1c5fb429a82c333e80c97dacc643a53f75d697a9"/>
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 3 of 7].img" size="737280" crc="dd7643f1" sha1="90c61bf6e9674b16da3a337148aaf07529f57fc8"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 4 of 7].img" size="737280" crc="4b18e231" sha1="77956cf326c656040623ea18e6e29855198b4a43"/>
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 4 of 7].img" size="737280" crc="95f5e10e" sha1="754a901e80b3874ca7aedd30e9e328ce372bdcd8"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 5 of 7].img" size="737280" crc="8472352b" sha1="951ada228f6b503590240a0826638a44767eb15a"/>
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 5 of 7].img" size="737280" crc="8472352b" sha1="951ada228f6b503590240a0826638a44767eb15a"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 6 of 7].img" size="737280" crc="32eb9f17" sha1="c04ee5b1f011d57382ad91ea39462339795cc2ef"/>
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 6 of 7].img" size="737280" crc="32eb9f17" sha1="c04ee5b1f011d57382ad91ea39462339795cc2ef"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Dragon's Lair [Merit Software] [1989] [3.5DD] [Disk 7 of 7].img" size="737280" crc="3454a916" sha1="88fcfc7b9f653951023ee3b7cd9955eff9083ddc"/>
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 7 of 7].img" size="737280" crc="3454a916" sha1="88fcfc7b9f653951023ee3b7cd9955eff9083ddc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10907,6 +10979,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="ghostbs2">
+		<description>Ghostbusters II</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Dynamix" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Ghostbusters II [Activision] [1989] [3.5DD] [Disk 1 of 2].img" size="737280" crc="0a91c367" sha1="1ea2e675ad20738db631a6c6d17447adbb52b7ad"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Ghostbusters II [Activision] [1989] [3.5DD] [Disk 2 of 2].img" size="737280" crc="effa451e" sha1="739824ae5c457bbc13940fd3c0fb8245c5535959"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gosim">
 		<description>Go Simulator</description>
 		<year>1992</year>
@@ -11214,6 +11303,63 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Heroes of the Lance (1991)(SSI)(Disk 2 of 2).dsk" size="737280" crc="a11712fe" sha1="45ac0bd7f42e30f0ebd0ebd1c6455afb477ff563"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hillsfar">
+		<description>Hillsfar (v1.2, 3.5")</description>
+		<year>1989</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hillsfar [SSI] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3784ec95" sha1="8152b37a1236207a17bb2a47b039d83c556e8cb4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hillsfar525" cloneof="hillsfar">
+		<description>Hillsfar (v1.0, 5.25")</description>
+		<year>1989</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Hillsfar (v1.0) [SSI] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="04378346" sha1="7f195144fbb791c9c109cc3518335db2f04480ab"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Hillsfar (v1.0) [SSI] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="8338f1dc" sha1="ba4cb827aa71e1098f7314d6bf4d3932e2a2637e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hillsfar35a" cloneof="hillsfar">
+		<description>Hillsfar (v1.0, 3.5")</description>
+		<year>1989</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hillsfar (v1.0) [SSI] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="21491dea" sha1="32df2f66e53df5203cc7977a80f18e079c5dab20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hillsfar35b" cloneof="hillsfar">
+		<description>Hillsfar (v1.1, 3.5")</description>
+		<year>1989</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hillsfar (v1.1) [SSI] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="a06b44c9" sha1="4dd9b8d4696391432160abf60c2dada2860b3054"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11746,14 +11892,38 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="kvesoccr" supported="no">
+		<description>Keith Van Eron's Pro Soccer (5.25")</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Sensible Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Keith Van Eron's Pro Soccer [MicroProse] [1990] [5.25DD] [Disk 1 of 1].img" size="368640" crc="65fec578" sha1="38d0f7e39f75db3f78e58de5a368b8dd8d5b66d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kvesoccr35" cloneof="kvesoccr" supported="no">
+		<description>Keith Van Eron's Pro Soccer (3.5")</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Sensible Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Keith Van Eron's Pro Soccer [MicroProse] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="73cf30fc" sha1="1e66fba1e7370d105ae566e68ff27715ff71f867"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kbounty">
-		<!-- Dumped via Kryoflux, track 0 shows as modified -->
 		<description>King's Bounty</description>
-		<year>1991</year>
+		<year>1990</year>
 		<publisher>New World Computing</publisher>
+		<info name="developer" value="New World Computing" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="king's bounty.img" size="737280" crc="267624e2" sha1="763a5014008f46f93a13c822377c41965c09a1f8" status="baddump" />
+				<rom name="King's Bounty [New World Computing] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6252780c" sha1="081db3433ce4e5860bf13092457000b664324c2d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13168,6 +13338,65 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="nshift">
+		<description>Night Shift (5.25")</description>
+		<year>1990</year>
+		<publisher>Lucasfilm</publisher>
+		<info name="version" value="V1.1" />
+		<info name="developer" value="Attention to Detail" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="Night Shift [Lucasfilm] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="e4f1af89" sha1="93013386d3ec6ed9479077b84366b90de818fecf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="Night Shift [Lucasfilm] [1990] [5.25DD] [Disk 2 of 3].img" size="368640" crc="eeb79a13" sha1="02adbf9824b520d2f6b65e4188a631003531cfb8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="Night Shift [Lucasfilm] [1990] [5.25DD] [Disk 3 of 3].img" size="368640" crc="ba0a19c2" sha1="1f66ed76630a61181db05df5d74935fb597daf3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nshift_35" cloneof="nshift">
+		<description>Night Shift (3.5")</description>
+		<year>1990</year>
+		<publisher>Lucasfilm</publisher>
+		<info name="developer" value="Attention to Detail" />
+		<info name="version" value="V1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Night Shift [Lucasfilm] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="291faf52" sha1="32b2162aa9d0da03b20d852e6d81d7dffc89c30f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Night Shift [Lucasfilm] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="22a3e6f7" sha1="e8578da3abb9d9c5104d39b4268b71f718cbc3ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nshift_35a" cloneof="nshift">
+		<description>Night Shift (3.5", alt)</description>
+		<year>1990</year>
+		<publisher>Lucasfilm</publisher>
+		<info name="developer" value="Attention to Detail" />
+		<info name="version" value="V1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Night Shift (alt) [Lucasfilm] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="b2146606" sha1="d13067154a2f4f07afe77dc6321d56d515f40bfd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Night Shift (alt) [Lucasfilm] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="9ebf9eda" sha1="b838c18addd367c05d3d0184ca3be5738ae09bb7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ngaiden2">
 		<description>Ninja Gaiden II - The Dark Sword of Chaos</description>
 		<year>1991</year>
@@ -13426,9 +13655,20 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="paperboy">
+		<description>Paperboy (5.25")</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "368640">
+				<rom name="Paperboy [Mindscape] [1989] [5.25DD] [Disk 1 of 1].img" size="368640" crc="6aefc6df" sha1="f9f3f2044c864d659ca35b4d14933b5295c3e95c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Doesn't pass the protection check. The same image works on real hardware. -->
-	<software name="paperboy" supported="no">
-		<description>Paperboy</description>
+	<software name="paperboy35" cloneof="paperboy" supported="no">
+		<description>Paperboy (3.5")</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -13439,13 +13679,25 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="paperbo2">
-		<description>Paperboy 2</description>
+		<description>Paperboy 2 (5.25")</description>
+		<year>1991</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Tengen" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Paperboy 2 [Mindscape] [1991] [5.25DD] [Disk 1 of 1].img" size="368640" crc="bb112875" sha1="ff2a6cd28a3c7590b5b39302676fc3d234a87eeb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paperbo2_35" cloneof="paperbo2">
+		<description>Paperboy 2 (3.5")</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Tengen" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Paperboy 2 [Mindscape] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="b782a653" sha1="e69a6201bd98b77ea3c04889fc425d3dab1d8a26"/>
+				<rom name="Paperboy 2 [Mindscape] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="00d9a84d" sha1="08adf291ed25db37bf01511974ec7d3da133c344"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13654,6 +13906,43 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="pquest2a" cloneof="pquest2">
+		<description>Police Quest II - The Vengeance (5.25", v1.001.000)</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="version" value="1.001.000" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest II (v1.001.000) [Sierra] [1989] [5.25DD] [Disk 1 of 6].img" size="368640" crc="3b9ad218" sha1="5b203e63693f254ad5969dbbc3095ca6a10cb6d0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest II (v1.001.000) [Sierra] [1989] [5.25DD] [Disk 2 of 6].img" size="368640" crc="88987a7c" sha1="305c3d446f09bbb91655a998b50cf9db06b90aaa"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest II (v1.001.000) [Sierra] [1989] [5.25DD] [Disk 3 of 6].img" size="368640" crc="15968f7b" sha1="7e16e9b0894d5c640c1b30f9de1ffe2c89b79d86"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest II (v1.001.000) [Sierra] [1989] [5.25DD] [Disk 4 of 6].img" size="368640" crc="23501600" sha1="be43863209b6f1f3143df0f3bb4fca71a614738d"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest II (v1.001.000) [Sierra] [1989] [5.25DD] [Disk 5 of 6].img" size="368640" crc="36c53795" sha1="a4ae64c91b8652e9d16a23ff1f650cc87f2a5786"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Police Quest II (v1.001.000) [Sierra] [1989] [5.25DD] [Disk 6 of 6].img" size="368640" crc="f780cee6" sha1="f32d1b762ee9bbee2b9b912a1649fe25df010d8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pquest2b" cloneof="pquest2">
 		<description>Police Quest II - The Vengeance (5.25", v1.001.006)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
@@ -13926,9 +14215,9 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="protennis">
-		<description>Pro Tennis Tour (The Hit Squad release)</description>
+		<description>Pro Tennis Tour (Hit Squad release)</description>
 		<year>1989</year>
-		<publisher>The Hit Squad</publisher>
+		<publisher>Hit Squad</publisher>
 		<info name="developer" value="Blue Byte Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -14879,6 +15168,65 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="sq3">
+		<description>Space Quest III - The Pirates of Pestulon (5.25")</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="version" value="1.0P - 3/22/89" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space Quest 3 [Sierra] [1989] [5.25DD] [Disk 1 of 6].img" size="368640" crc="fc8236f0" sha1="1a5ef16abd02b06d4320c03c1174d8003ddb912c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space Quest 3 [Sierra] [1989] [5.25DD] [Disk 2 of 6].img" size="368640" crc="ccd09ffa" sha1="e0e1168e556fbe18ac154b88c980553924f37f3d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space Quest 3 [Sierra] [1989] [5.25DD] [Disk 3 of 6].img" size="368640" crc="ddc13035" sha1="48a9bcf444fed943951587cfe46ffdbbbb1213f0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space Quest 3 [Sierra] [1989] [5.25DD] [Disk 4 of 6].img" size="368640" crc="37cdecde" sha1="1b550395929973b239b4a8eb6b605bb5ea27ed12"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space Quest 3 [Sierra] [1989] [5.25DD] [Disk 5 of 6].img" size="368640" crc="f0f77b45" sha1="817cb11111b52200eca24bdfff1cfb37f1b67472"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space Quest 3 [Sierra] [1989] [5.25DD] [Disk 6 of 6].img" size="368640" crc="1cecf5c3" sha1="c151c538810ccb219cb95efdafb782cd1ddbb4ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sq3_35" cloneof="sq3">
+		<description>Space Quest III - The Pirates of Pestulon (3.5")</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="version" value="1.0P - 3/22/89" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Space Quest 3 [Sierra] [1989] [3.5DD] [Disk 1 of 3].img" size="737280" crc="13b219a2" sha1="18e9fa715a175a742fc27a69f99aa21649d38cea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Space Quest 3 [Sierra] [1989] [3.5DD] [Disk 2 of 3].img" size="737280" crc="749e839a" sha1="3053b1f73497f3dc77268810111bbabe95d2dd47"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Space Quest 3 [Sierra] [1989] [3.5DD] [Disk 3 of 3].img" size="737280" crc="46c32373" sha1="a8f9c55ce3f3fa8f77664aee5e989f224d28428a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="speedbal">
 		<description>Speedball (re-release)</description>
 		<year>1991</year>
@@ -15817,6 +16165,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="VGA Slot Machine [Titanium Seal] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="a55c4c1f" sha1="5a54ca9da5e565afbc920261d6b785e13aba37c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waterloo">
+		<description>Waterloo</description>
+		<year>1989</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="developer" value="Turcan Research Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Waterloo [Mirrorsoft] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="40d86774" sha1="6add22940024936bd3f3c094c520a4c051d2f196"/>
 			</dataarea>
 		</part>
 	</software>

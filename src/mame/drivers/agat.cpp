@@ -253,11 +253,11 @@ public:
 	void agat9_upperbank_w(offs_t offset, uint8_t data);
 
 private:
-	int m_agat9_membank[16]; // 8 physical banks, but ram chip has 16 locations
-	int m_agat9_upperbank;
-	int m_agat9_lcbank;
-	bool m_agat9_prewrite;
-	bool m_apple;
+	int m_agat9_membank[16]{}; // 8 physical banks, but ram chip has 16 locations
+	int m_agat9_upperbank = 0;
+	int m_agat9_lcbank = 0;
+	bool m_agat9_prewrite = false;
+	bool m_apple = false;
 };
 
 /***************************************************************************

@@ -79,19 +79,19 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	bool m_irq_mask;
-	bool m_video_enable;
+	bool m_irq_mask = false;
+	bool m_video_enable = false;
 
 	/*table holds outputs of all ANDs (after AND map)*/
-	uint8_t m_andmap[64];
+	uint8_t m_andmap[64]{};
 
 	/*table holds inputs (ie. not x, x, not q, q) to the AND map*/
-	uint8_t m_columnvalue[32];
+	uint8_t m_columnvalue[32]{};
 
 	/*8 output pins (actually 6 output and 2 input/output)*/
-	uint8_t m_outvalue[8];
+	uint8_t m_outvalue[8]{};
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 };
 
 

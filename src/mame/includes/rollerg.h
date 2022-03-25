@@ -37,8 +37,8 @@ private:
 	};
 
 	/* misc */
-	int        m_readzoomroms;
-	emu_timer *m_nmi_timer;
+	int        m_readzoomroms = 0;
+	emu_timer *m_nmi_timer = nullptr;
 
 	/* devices */
 	required_device<konami_cpu_device> m_maincpu;

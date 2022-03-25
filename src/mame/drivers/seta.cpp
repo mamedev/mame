@@ -146,6 +146,7 @@ TODO:
 
 Thundercade / Twin Formation
 Taito America Corp./Romstar USA/Seta, 1987
+Hardware info by Guru
 
 PCB Layout
 ---------
@@ -630,6 +631,7 @@ BPGH-013.U70    TC538000
 
 Zombie Raid
 Sammy, 1996
+Hardware info by Guru
 
 This is a gun shooting game using Seta/Allumer hardware.
 
@@ -689,6 +691,7 @@ NEC 71054C  ----???
                                 Kamen Rider
 Kamen Riderclub Battleracer
 Banpresto, 1993
+Hardware info by Guru
 
 Runs on Seta/Allumer hardware
 
@@ -748,6 +751,7 @@ X1-010           X1-006
 
 Allumer, 1993
 This game is a vertical shoot'em-up and runs on fairly standard Allumer hardware.
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -882,6 +886,7 @@ Custom chips:   X1-001A X1-002A
 
 Triple Fun
 ??, 19??
+Hardware info by Guru
 
 
 CPU   : TMP68HC000P-16 (68000)
@@ -1006,6 +1011,7 @@ Other   : Allumer
 
 Banpresto, 1992
 This game runs on Seta/Allumer hardware
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -1081,6 +1087,7 @@ Custom chips:   X1-001A X1-002A
 
 Banpresto, 1992
 Board looks similar to Castle of Dragon PCB.
+Hardware info by Guru
 
 PCB No: P0-077A (Seta Number)
         BP922   (Banpresto Number)
@@ -1116,6 +1123,7 @@ BP-U-003.U13      8M mask (32 pin, 1M x 8),   read as MX27C8000           Sound
 /***************************************************************************
 Ultra Toukon Densetsu
 Banpresto, 1993
+Hardware info by Guru
 
 This game runs on fairly standard Allumer hardware.
 
@@ -1212,6 +1220,7 @@ X1-010                           5168-10       68000-16
 
 Pairs Love
 Allumer, 199x
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -1249,6 +1258,7 @@ Notes:
 
 Rezon (Taito License)
 Allumer / Taito, 1992
+Hardware info by Guru
 
 This game runs on fairly standard Allumer hardware.
 
@@ -1324,7 +1334,7 @@ Notes:
 
 Crazy Fight
 Subsino 1996
-Readme by Guru
+Hardware info by Guru
 This game runs on Allumer-based hardware.
 It is a whack-a-mole type game using 6 buttons.
 

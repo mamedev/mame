@@ -155,10 +155,10 @@ private:
 	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	tilemap_t   *m_tx_tilemap;
-	tilemap_t   *m_bg_tilemap;
-	tilemap_t   *m_fg_tilemap;
-	uint16_t    m_scroll[4];
+	tilemap_t   *m_tx_tilemap = nullptr;
+	tilemap_t   *m_bg_tilemap = nullptr;
+	tilemap_t   *m_fg_tilemap = nullptr;
+	uint16_t    m_scroll[4]{};
 
 	// audio
 	void audiocpu_nmi_w(u8 data);
@@ -166,7 +166,7 @@ private:
 	// protection mcu
 	u8 m_audiocpu_to_mcu; // ls374 at 4a
 	u8 m_mcu_to_audiocpu; // ls374 at 5a
-	u8 m_mcu_p1;
+	u8 m_mcu_p1 = 0;
 	u8 m_mcu_p3;
 
 	void dmaon_w(u16 data);

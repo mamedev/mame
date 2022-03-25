@@ -63,11 +63,11 @@ private:
 
 	virtual void machine_start() override;
 
-	u8 m_page;
-	u8 m_attr;
-	bool m_attr_readback;
-	bool m_uart_loopback;
-	std::unique_ptr<u16[]> m_paged_ram;
+	u8 m_page = 0;
+	u8 m_attr = 0;
+	bool m_attr_readback = false;
+	bool m_uart_loopback = false;
+	std::unique_ptr<u16[]> m_paged_ram{};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<crt5037_device> m_vtac;

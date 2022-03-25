@@ -50,25 +50,25 @@ protected:
 	required_shared_ptr<uint16_t> m_regs;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	emu_timer *m_music_timer;
+	emu_timer *m_music_timer = nullptr;
 
-	int m_sound;
-	int m_melody;
-	int m_bar;
-	int m_track;
-	int m_snd_bank;
+	int m_sound = 0;
+	int m_melody = 0;
+	int m_bar = 0;
+	int m_track = 0;
+	int m_snd_bank = 0;
 
-	uint8_t m_oki_control;
-	uint8_t m_oki_command;
-	uint8_t m_oki_bank;
+	uint8_t m_oki_control = 0;
+	uint8_t m_oki_command = 0;
+	uint8_t m_oki_bank = 0;
 
-	uint32_t m_unk_458;
+	uint32_t m_unk_458 = 0;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_md_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_md_tilemap = nullptr;
 
-	int m_sprites_x_offset;
+	int m_sprites_x_offset = 0;
 	uint8_t playmark_snd_command_r();
 	void playmark_oki_w(uint8_t data);
 	void playmark_snd_control_w(uint8_t data);

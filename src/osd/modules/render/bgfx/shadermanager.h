@@ -30,8 +30,10 @@ public:
 	// Getters
 	bgfx::ShaderHandle get_or_load_shader(osd_options &options, std::string name);
 	static bgfx::ShaderHandle load_shader(osd_options &options, std::string name);
+	static bool is_shader_present(osd_options &options, std::string name);
 
 private:
+	static std::string make_path_string(osd_options &options, std::string name);
 	static const bgfx::Memory* load_mem(std::string name);
 
 	std::map<std::string, bgfx::ShaderHandle>   m_shaders;
