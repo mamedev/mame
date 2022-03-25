@@ -364,8 +364,8 @@ private:
 	u8 other_cpu_r(offs_t offset);
 	void other_cpu_w(offs_t offset, u8 data);
 
-	u8 m_paladdr;
-	int m_palbank;
+	u8 m_paladdr = 0;
+	int m_palbank = 0;
 
 	u8 m_ic48_pio_pa_val;
 	u8 m_ic48_pio_pb_val;

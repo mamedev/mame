@@ -359,9 +359,9 @@ public:
 
 	optional_ioport_array<2> m_player_ports;
 
-	int m_oldstate[2];
-	int m_cd32_shifter[2];
-	uint16_t m_potgo_value;
+	int m_oldstate[2]{};
+	int m_cd32_shifter[2]{};
+	uint16_t m_potgo_value = 0;
 
 	void cubo(machine_config &config);
 	void cubo_mem(address_map &map);
@@ -375,7 +375,7 @@ private:
 	required_device<cdda_device> m_cdda;
 
 	typedef void (cubo_state::*input_hack_func)();
-	input_hack_func m_input_hack;
+	input_hack_func m_input_hack{};
 	void chip_ram_w8_hack(offs_t byteoffs, uint8_t data);
 	void cndypuzl_input_hack();
 	void haremchl_input_hack();

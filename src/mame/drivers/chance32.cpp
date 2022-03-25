@@ -72,13 +72,13 @@ private:
 	void chance32_map(address_map &map);
 	void chance32_portmap(address_map &map);
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_shared_ptr<uint8_t> m_fgram;
 	required_shared_ptr<uint8_t> m_bgram;
 
-	uint8_t mux_data;
+	uint8_t mux_data = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<13> m_lamps;
