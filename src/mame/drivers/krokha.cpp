@@ -66,7 +66,7 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 	required_device<speaker_sound_device> m_speaker;
 
-	int m_speaker_state;
+	int m_speaker_state = 0;
 };
 
 //
