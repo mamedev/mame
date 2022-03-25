@@ -76,6 +76,7 @@ void b5000_base_device::device_start()
 	m_sr = false;
 	m_skip = false;
 	m_seg = 0;
+	m_suppress0 = false;
 
 	m_atbz_step = 0;
 	m_tra_step = 0;
@@ -102,6 +103,7 @@ void b5000_base_device::device_start()
 	save_item(NAME(m_sr));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_seg));
+	save_item(NAME(m_suppress0));
 
 	save_item(NAME(m_atbz_step));
 	save_item(NAME(m_tra_step));
