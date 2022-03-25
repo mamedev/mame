@@ -276,8 +276,8 @@ protected:
 	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
 	uint32_t          m_ea;
 
-	int             m_icount;
-	int				m_icount_executing;
+	int               m_icount;
+	int               m_icount_executing;
 	uint8_t           m_rtemp;
 	const uint8_t *   m_cc_op;
 	const uint8_t *   m_cc_cb;
@@ -285,7 +285,7 @@ protected:
 	const uint8_t *   m_cc_xy;
 	const uint8_t *   m_cc_xycb;
 	const uint8_t *   m_cc_ex;
-	const uint8_t *   m_cc_rop;
+	const uint8_t *   m_cc_m0_ext;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

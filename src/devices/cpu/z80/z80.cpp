@@ -26,12 +26,12 @@
  *    Fundation for M cycles emulation. Currently we preserve cc_* tables with total timings.
  *    execute_run() behavior (simplified) ...
  *    Before:
- *      + read opcode
+ *      + fetch opcode
  *      + call EXEC()
- *        + adjust icount base on cc_* (all T are used before instruction == wrong)
+ *        + adjust icount base on cc_* (all T are used after M1 == wrong)
  *          + execute instruction
  *    Now:
- *      + read opcode
+ *      + fetch opcode
  *      + store M1 from cc_rop in m_icount_executing
  *      + call EXEC()
  *        + read cc_* value to m_icount_executing
@@ -270,7 +270,7 @@ static const uint8_t cc_ed[0x100] = {
 	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
 };
 
-/* ix/iy: with the exception of (i+offset) opcodes, t-states are main_opcode_table + 4 */
+/* ix/iy: with the exception of (i+offset) opcodes, for total add t-states from main_opcode_table[DD/FD] == 4 */
 static const uint8_t cc_xy[0x100] = {
 	 4,10, 7, 6, 4, 4, 7, 4, 4,11, 7, 6, 4, 4, 7, 4,
 	 8,10, 7, 6, 4, 4, 7, 4,12,11, 7, 6, 4, 4, 7, 4,
@@ -284,29 +284,29 @@ static const uint8_t cc_xy[0x100] = {
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 5,10,10,10,10,11, 7,11, 5,10,10,16,10,17, 7,11, /* cb -> cc_xycb */
+	 5,10,10,10,10,11, 7,11, 5,10,10,12,10,17, 7,11, /* cb -> cc_xycb */
 	 5,10,10,11,10,11, 7,11, 5, 4,10,11,10, 4, 7,11, /* dd -> cc_xy again */
 	 5,10,10,15,10,11, 7,11, 5, 4,10, 4,10, 4, 7,11, /* ed -> cc_ed */
 	 5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 4, 7,11  /* fd -> cc_xy again */
 };
 
 static const uint8_t cc_xycb[0x100] = {
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7
 };
 
 /* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
@@ -329,24 +329,25 @@ static const uint8_t cc_ex[0x100] = {
 	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2
 };
 
-/* rop() usually takes 4 cycles except some ops */
-static const u8 cc_rop[0x100] = {
-	4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4,
-	5, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4,
-	4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4,
-	4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	5, 4, 4, 4, 4, 5, 4, 5, 5, 4, 4, 4, 4, 4, 4, 4,
-	5, 4, 4, 4, 4, 5, 4, 5, 5, 4, 4, 4, 4, 4, 4, 4,
-	5, 4, 4, 4, 4, 5, 4, 5, 5, 4, 4, 4, 4, 4, 4, 4,
-	5, 4, 4, 4, 4, 5, 4, 5, 5, 6, 4, 4, 4, 4, 4, 4
+/* rop()|M0 usually takes 4(NOP|m_op[0]) cycles except some instructions.
+   This value is not intended to be added to instruction execution, just needed for M0 shift calculation in EXEC() after op fetch. */
+static const u8 cc_m0_ext[0x100] = {
+	0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+	1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+	0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+	0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+	1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+	1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+	1, 0, 0, 0, 0, 1, 0, 1, 1, 2, 0, 0, 0, 0, 0, 0
 };
 
 #define m_cc_dd   m_cc_xy
@@ -366,6 +367,11 @@ static const u8 cc_rop[0x100] = {
 	m_icount -= icount; \
 	m_icount_executing -= icount; \
 } while (0)
+
+// M0 equals to NOP|m_op[0] typically implemented as rop() and takes 4 cycles
+#define M0T m_cc_op[0]
+// M1 tipically implemented as arg() and takes 1 cycle less (==3) than op fetch (M0|rop())
+#define M1T (M0T-1)
 
 #define EXEC(prefix,opcode) do { \
 	unsigned op = opcode; \
@@ -473,7 +479,7 @@ inline void z80_device::leave_halt()
 inline uint8_t z80_device::in(uint16_t port)
 {
 	u8 res = m_io.read_byte(port);
-	T(4);
+	T(M0T);
 	return res;
 }
 
@@ -482,9 +488,9 @@ inline uint8_t z80_device::in(uint16_t port)
  ***************************************************************/
 inline void z80_device::out(uint16_t port, uint8_t value)
 {
-	T(m_icount_executing - 4);
+	if(m_icount_executing != M0T) T(m_icount_executing - M0T);
 	m_io.write_byte(port, value);
-	T(4);
+	T(M0T);
 }
 
 /***************************************************************
@@ -493,7 +499,7 @@ inline void z80_device::out(uint16_t port, uint8_t value)
 uint8_t z80_device::rm(uint16_t addr)
 {
 	u8 res = m_data.read_byte(addr);
-	T(3);
+	T(M1T);
 	return res;
 }
 
@@ -512,9 +518,9 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
 void z80_device::wm(uint16_t addr, uint8_t value)
 {
 	// As we don't count changes between read and write, simply adjust to the end of requested.
-	if(m_icount_executing != 3) T(m_icount_executing - 3);
+	if(m_icount_executing != M1T) T(m_icount_executing - M1T);
 	m_data.write_byte(addr, value);
-	T(3);
+	T(M1T);
 }
 
 /***************************************************************
@@ -522,9 +528,9 @@ void z80_device::wm(uint16_t addr, uint8_t value)
  ***************************************************************/
 inline void z80_device::wm16(uint16_t addr, PAIR &r)
 {
-	m_icount_executing -= 3;
+	m_icount_executing -= M1T;
 	wm(addr, r.b.l);
-	m_icount_executing += 3;
+	m_icount_executing += M1T;
 	wm(addr+1, r.b.h);
 }
 
@@ -542,7 +548,7 @@ uint8_t z80_device::rop()
 	uint8_t res = m_opcodes.read_byte(pc);
 	// Store borrowed cycles to be used by EXEC()
 	// TODO may be inaccurate for non op
-	m_icount_executing = m_cc_rop[res];
+	m_icount_executing = M0T + m_cc_m0_ext[res];
 	m_icount -= 2;
 	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
 	m_icount += 2;
@@ -560,7 +566,7 @@ uint8_t z80_device::arg()
 	unsigned pc = PCD;
 	PC++;
 	u8 res = m_args.read_byte(pc);
-	T(3);
+	T(M1T);
 	return res;
 }
 
@@ -2252,7 +2258,8 @@ OP(dd,c7) { illegal_1(); op_c7();                            } /* DB   DD       
 OP(dd,c8) { illegal_1(); op_c8();                            } /* DB   DD          */
 OP(dd,c9) { illegal_1(); op_c9();                            } /* DB   DD          */
 OP(dd,ca) { illegal_1(); op_ca();                            } /* DB   DD          */
-OP(dd,cb) { eax(); EXEC(xycb,arg());                         } /* **   DD CB xx    */
+OP(dd,cb) { eax(); u8 a=rop(); m_icount_executing = M0T; EXEC(xycb,a); // unlike rop() time is not cc_m0_ext but well known M0T
+                                                             } /* **   DD CB xx    */
 OP(dd,cc) { illegal_1(); op_cc();                            } /* DB   DD          */
 OP(dd,cd) { illegal_1(); op_cd();                            } /* DB   DD          */
 OP(dd,ce) { illegal_1(); op_ce();                            } /* DB   DD          */
@@ -2543,7 +2550,8 @@ OP(fd,c7) { illegal_1(); op_c7();                            } /* DB   FD       
 OP(fd,c8) { illegal_1(); op_c8();                            } /* DB   FD          */
 OP(fd,c9) { illegal_1(); op_c9();                            } /* DB   FD          */
 OP(fd,ca) { illegal_1(); op_ca();                            } /* DB   FD          */
-OP(fd,cb) { eay(); EXEC(xycb,arg());                         } /* **   FD CB xx    */
+OP(fd,cb) { eay(); u8 a=rop(); m_icount_executing = M0T; EXEC(xycb,a); // unlike rop() time is not cc_m0_ext but well known M0T
+                                                             } /* **   FD CB xx    */
 OP(fd,cc) { illegal_1(); op_cc();                            } /* DB   FD          */
 OP(fd,cd) { illegal_1(); op_cd();                            } /* DB   FD          */
 OP(fd,ce) { illegal_1(); op_ce();                            } /* DB   FD          */
@@ -3520,7 +3528,7 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
-	m_cc_rop = cc_rop;
+	m_cc_m0_ext = cc_m0_ext;
 
 	m_irqack_cb.resolve_safe();
 	m_refresh_cb.resolve_safe();
@@ -3752,7 +3760,7 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
 	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
 	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
-	m_cc_rop = (rop != nullptr) ? rop : cc_rop;
+	m_cc_m0_ext = (rop != nullptr) ? rop : cc_m0_ext;
 }
 
 
