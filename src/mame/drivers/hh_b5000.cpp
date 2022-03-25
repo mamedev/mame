@@ -11,7 +11,7 @@ ROM source notes when dumped from another model, but confident it's the same:
 - misatk: Mattel Space Alert
 
 TODO:
-- figure out why rw18r doesn't work (ROM dump is good)
+- fix rw18r leading 0s, it seems to work fine other than that
 
 ***************************************************************************/
 
