@@ -97,20 +97,20 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	int m_mmtr_latch;
-	int m_triac_latch;
-	int m_alpha_clock; // always 0
-	int m_irq_status;
-	int m_optic_pattern;
-	int m_locked; // always 0
-	int m_is_timer_enabled; // always 1
-	int m_coin_inhibits; // always 0
-	int m_mux_output_strobe;
-	int m_mux_input_strobe;
-	int m_mux_input;
-	uint8_t m_Inputs[64];
-	uint8_t m_codec_data[256];
-	uint8_t m_sys85_data_line_t; // never read
+	int m_mmtr_latch = 0;
+	int m_triac_latch = 0;
+	int m_alpha_clock = 0; // always 0
+	int m_irq_status = 0;
+	int m_optic_pattern = 0;
+	int m_locked = 0; // always 0
+	int m_is_timer_enabled = 1; // always 1
+	int m_coin_inhibits = 0; // always 0
+	int m_mux_output_strobe = 0;
+	int m_mux_input_strobe = 0;
+	int m_mux_input = 0;
+	uint8_t m_Inputs[64]{};
+	uint8_t m_codec_data[256]{};
+	uint8_t m_sys85_data_line_t = 0; // never read
 	optional_device<rocvfd_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reel;

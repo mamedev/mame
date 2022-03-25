@@ -115,7 +115,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	uint32_t* m_cpuregion;
+	uint32_t* m_cpuregion = nullptr;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
 	uint32_t bfm_swp_mem_r(offs_t offset, uint32_t mem_mask = ~0);

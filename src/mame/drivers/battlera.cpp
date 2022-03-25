@@ -138,9 +138,9 @@ private:
 	required_ioport_array<3> m_in;
 	required_ioport_array<2> m_dsw;
 
-	uint8_t m_control_port_select;
-	int m_msm5205next;
-	uint8_t m_toggle;
+	uint8_t m_control_port_select = 0;
+	int m_msm5205next = 0;
+	uint8_t m_toggle = 0;
 
 	void control_data_w(uint8_t data);
 	uint8_t control_data_r();

@@ -81,7 +81,7 @@ protected:
 	virtual void machine_start() override { save_item(NAME(m_mux_data)); m_lamp.resolve(); }
 
 private:
-	uint8_t m_mux_data;
+	uint8_t m_mux_data = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
