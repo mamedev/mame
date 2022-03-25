@@ -547,7 +547,6 @@ uint8_t z80_device::rop()
 	if(m_icount_executing) T(m_icount_executing);
 	uint8_t res = m_opcodes.read_byte(pc);
 	// Store borrowed cycles to be used by EXEC()
-	// TODO may be inaccurate for non op
 	m_icount_executing = M0T + m_cc_m0_ext[res];
 	m_icount -= 2;
 	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
@@ -3752,7 +3751,7 @@ std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
  * Generic set_info
  **************************************************************************/
 
-void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex, const uint8_t *rop)
+void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex, const uint8_t *m0_ext)
 {
 	m_cc_op = (op != nullptr) ? op : cc_op;
 	m_cc_cb = (cb != nullptr) ? cb : cc_cb;
@@ -3760,7 +3759,7 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
 	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
 	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
-	m_cc_m0_ext = (rop != nullptr) ? rop : cc_m0_ext;
+	m_cc_m0_ext = (m0_ext != nullptr) ? m0_ext : cc_m0_ext;
 }
 
 
