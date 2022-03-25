@@ -125,17 +125,17 @@ private:
 	required_shared_ptr<uint8_t> m_bgvram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int32_t    m_char_bank;
-	int32_t    m_bgadr;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int32_t    m_char_bank = 0;
+	int32_t    m_bgadr = 0;
 
 	/* misc */
-	bool       m_sound_nmi_enable;
-	bool       m_main_nmi_enable;
-	int32_t    m_e00x_l[4];
-	int32_t    m_e00x_d[4][2];
-	uint8_t    m_prot_addr;
+	bool       m_sound_nmi_enable = false;
+	bool       m_main_nmi_enable = false;
+	int32_t    m_e00x_l[4]{};
+	int32_t    m_e00x_d[4][2]{};
+	uint8_t    m_prot_addr = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
