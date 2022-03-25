@@ -38,7 +38,7 @@ private:
 	required_region_ptr<u8> m_chargen;
 
 	std::unique_ptr<u8[]> m_mainram;
-	bool m_rom_enabled;
+	bool m_rom_enabled = true;
 };
 
 void itt9216_state::machine_start()

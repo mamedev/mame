@@ -107,13 +107,13 @@ private:
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	output_finder<7> m_leds;
 
-	tilemap_t *m_reel_tilemap[4];
-	tilemap_t *m_fg_tilemap;
-	int m_video_enable;
-	int m_nmi_enable;
-	int m_hopper;
-	uint8_t m_out[3];
-	uint8_t m_igs_magic[2];
+	tilemap_t *m_reel_tilemap[4]{};
+	tilemap_t *m_fg_tilemap = nullptr;
+	int m_video_enable = 0;
+	int m_nmi_enable = 0;
+	int m_hopper = 0;
+	uint8_t m_out[3]{};
+	uint8_t m_igs_magic[2]{};
 };
 
 

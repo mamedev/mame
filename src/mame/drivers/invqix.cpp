@@ -163,7 +163,7 @@ private:
 	// driver_device overrides
 	virtual void video_start() override;
 
-	uint16_t m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
+	uint16_t m_vctl = 0;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
 };
 
 
