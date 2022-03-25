@@ -230,7 +230,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 };
 
 
