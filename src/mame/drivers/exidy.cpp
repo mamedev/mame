@@ -236,10 +236,10 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_enable;
 	optional_shared_ptr<uint8_t> m_characterram;
 
-	uint8_t m_collision_mask;
-	uint8_t m_collision_invert;
-	int m_is_2bpp;
-	uint8_t m_int_condition;
+	uint8_t m_collision_mask = 0;
+	uint8_t m_collision_invert = 0;
+	int m_is_2bpp = 0;
+	uint8_t m_int_condition = 0;
 	bitmap_ind16 m_background_bitmap;
 	bitmap_ind16 m_motion_object_1_vid;
 	bitmap_ind16 m_motion_object_2_vid;
@@ -300,10 +300,10 @@ private:
 	required_device<samples_device> m_samples;
 
 	// Targ and Spectar samples
-	int m_max_freq;
-	uint8_t m_port_1_last;
-	uint8_t m_tone_freq;
-	uint8_t m_tone_active;
+	int m_max_freq = 0;
+	uint8_t m_port_1_last = 0;
+	uint8_t m_tone_freq = 0;
+	uint8_t m_tone_active = 0;
 
 	void sidetrac_map(address_map &map);
 	void spectar_map(address_map &map);
@@ -334,8 +334,8 @@ protected:
 private:
 	required_region_ptr<uint8_t> m_sound_prom;
 
-	uint8_t m_port_2_last;
-	uint8_t m_tone_pointer;
+	uint8_t m_port_2_last = 0;
+	uint8_t m_tone_pointer = 0;
 
 	void targ_map(address_map &map);
 };
