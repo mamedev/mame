@@ -43,7 +43,7 @@ bool m20_format::supports_save() const
 	return true;
 }
 
-int m20_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int m20_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -55,7 +55,7 @@ int m20_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	for (int track = 0; track < 35; track++)
 		for (int head = 0; head < 2; head ++) {
@@ -85,7 +85,7 @@ bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool m20_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool m20_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t file_offset = 0;
 

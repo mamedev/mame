@@ -29,7 +29,7 @@ const char *fl1_format::extensions() const
 	return "fl1";
 }
 
-int fl1_format::get_image_offset(const format &f, int head, int track)
+int fl1_format::get_image_offset(const format &f, int head, int track) const
 {
 	return (f.track_count * head + track) * compute_track_size(f);
 }

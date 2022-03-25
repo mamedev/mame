@@ -52,7 +52,7 @@ void st_format::find_size(util::random_read &io, uint8_t &track_count, uint8_t &
 	track_count = head_count = sector_count = 0;
 }
 
-int st_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int st_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -62,7 +62,7 @@ int st_format::identify(util::random_read &io, uint32_t form_factor, const std::
 	return 0;
 }
 
-bool st_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool st_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -90,7 +90,7 @@ bool st_format::load(util::random_read &io, uint32_t form_factor, const std::vec
 	return true;
 }
 
-bool st_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool st_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -214,7 +214,7 @@ bool msa_format::compress(const uint8_t *buffer, int usize, uint8_t *dest, int &
 	return dst < usize;
 }
 
-int msa_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int msa_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint16_t sign, sect, head, strack, etrack;
 	read_header(io, sign, sect, head, strack, etrack);
@@ -228,7 +228,7 @@ int msa_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint16_t sign, sect, heads, strack, etrack;
 	read_header(io, sign, sect, heads, strack, etrack);
@@ -267,7 +267,7 @@ bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);

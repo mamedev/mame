@@ -59,7 +59,7 @@ const char *fdd_format::extensions() const
 	return "fdd";
 }
 
-int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[7];
 	size_t actual;
@@ -71,7 +71,7 @@ int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t hsec[0x0c];
 

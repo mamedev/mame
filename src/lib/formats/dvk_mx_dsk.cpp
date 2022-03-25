@@ -113,7 +113,7 @@ void dvk_mx_format::find_size(util::random_read &io, uint8_t &track_count, uint8
 	}
 }
 
-int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t track_count, head_count, sector_count;
 
@@ -135,7 +135,7 @@ int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const s
 	return 0;
 }
 
-bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t track_count, head_count, sector_count;
 

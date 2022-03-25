@@ -23,7 +23,7 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 
-	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index) override;
+	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index) const override;
 
 private:
 	static const format formats[];

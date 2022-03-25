@@ -115,7 +115,7 @@ const d81_format::format d81_format::formats[] = {
 	{}
 };
 
-floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index)
+floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index) const
 {
 	static floppy_image_format_t::desc_e desc[25] = {
 	/* 00 */ { MFM, 0x4e, f.gap_1 },

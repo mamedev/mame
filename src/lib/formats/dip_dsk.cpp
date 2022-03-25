@@ -38,7 +38,7 @@ const char *dip_format::extensions() const
 	return "dip";
 }
 
-int dip_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dip_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -50,7 +50,7 @@ int dip_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool dip_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dip_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int heads, tracks, spt, bps;
 

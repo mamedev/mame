@@ -41,7 +41,7 @@ const char *dmk_format::extensions() const
 }
 
 
-int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -83,7 +83,7 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 
@@ -214,13 +214,6 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	return true;
 }
-
-
-bool dmk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	return false;
-}
-
 
 bool dmk_format::supports_save() const
 {

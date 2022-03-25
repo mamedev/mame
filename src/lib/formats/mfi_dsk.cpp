@@ -98,7 +98,7 @@ bool mfi_format::supports_save() const
 	return true;
 }
 
-int mfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int mfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	header h;
 
@@ -113,7 +113,7 @@ int mfi_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	header h;
@@ -171,11 +171,10 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			ent++;
 		}
 
-	fprintf(stderr, "tick\n");
 	return true;
 }
 
-bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	int tracks, heads;

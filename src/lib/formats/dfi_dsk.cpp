@@ -59,7 +59,7 @@ bool dfi_format::supports_save() const
 	return false;
 }
 
-int dfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char sign[4];
 	size_t actual;
@@ -67,7 +67,7 @@ int dfi_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return memcmp(sign, "DFE2", 4) ? 0 : 100;
 }
 
-bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	char sign[4];

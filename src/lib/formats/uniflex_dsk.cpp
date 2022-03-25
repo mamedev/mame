@@ -34,7 +34,7 @@ const char *uniflex_format::extensions() const
 	return "dsk";
 }
 
-int uniflex_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int uniflex_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int const type = find_size(io, form_factor, variants);
 
@@ -44,7 +44,7 @@ int uniflex_format::identify(util::random_read &io, uint32_t form_factor, const 
 	return 0;
 }
 
-int uniflex_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int uniflex_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))

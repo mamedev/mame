@@ -413,7 +413,7 @@ void imd_format::fixnum(char *start, char *end) const
 	};
 }
 
-int imd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int imd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[4];
 
@@ -425,7 +425,7 @@ int imd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	std::vector<uint8_t> comment;
 	std::vector<std::vector<uint8_t> > snum;

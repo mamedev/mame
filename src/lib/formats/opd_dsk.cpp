@@ -30,7 +30,7 @@ const char *opd_format::extensions() const
 	return "opd,opu";
 }
 
-int opd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int opd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int const type = find_size(io, form_factor, variants);
 
@@ -40,7 +40,7 @@ int opd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-int opd_format::get_image_offset(const format &f, int head, int track)
+int opd_format::get_image_offset(const format &f, int head, int track) const
 {
 	return (f.track_count * head + track) * compute_track_size(f);
 }

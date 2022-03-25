@@ -415,7 +415,7 @@ const char *d88_format::extensions() const
 	return "d77,d88,1dd";
 }
 
-int d88_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int d88_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if(io.length(size))
@@ -431,7 +431,7 @@ int d88_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 
@@ -540,12 +540,6 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 
 	return true;
-}
-
-
-bool d88_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	return false;
 }
 
 bool d88_format::supports_save() const

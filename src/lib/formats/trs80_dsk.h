@@ -24,7 +24,7 @@ public:
 	virtual const char *extensions() const override;
 
 protected:
-	virtual int get_track_dam_fm(const format &f, int head, int track) override;
+	virtual int get_track_dam_fm(const format &f, int head, int track) const override;
 
 private:
 	static const format formats[];
@@ -35,9 +35,9 @@ class jv3_format : public floppy_image_format_t
 public:
 	jv3_format();
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;

@@ -44,7 +44,7 @@ const char *dcp_format::extensions() const
 	return "dcp,dcu";
 }
 
-int dcp_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dcp_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -117,7 +117,7 @@ int dcp_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint8_t h[0xa2];

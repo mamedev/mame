@@ -41,7 +41,7 @@ bool pasti_format::supports_save() const
 	return false;
 }
 
-int pasti_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int pasti_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
 	size_t actual;
@@ -64,7 +64,7 @@ static void hexdump(const uint8_t *d, int s)
 	}
 }
 
-bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint8_t fh[16];

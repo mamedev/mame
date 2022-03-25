@@ -43,7 +43,7 @@ img_format::img_format()
 {
 }
 
-int img_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int img_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size)) {
@@ -58,7 +58,7 @@ int img_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	}
 }
 
-bool img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size) || (size != IMG_IMAGE_SIZE)) {
@@ -104,7 +104,7 @@ bool img_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	for (int cyl = 0; cyl < TRACKS; cyl++) {
 		auto bitstream = generate_bitstream_from_track(cyl , 0 , CELL_SIZE , image , 0);

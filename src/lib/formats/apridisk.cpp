@@ -34,7 +34,7 @@ const char *apridisk_format::extensions() const
 	return "dsk";
 }
 
-int apridisk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apridisk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[APR_HEADER_SIZE];
 	size_t actual;
@@ -48,7 +48,7 @@ int apridisk_format::identify(util::random_read &io, uint32_t form_factor, const
 		return 0;
 }
 
-bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	desc_pc_sector sectors[80][2][18];
 	std::unique_ptr<uint8_t []> sector_data(new uint8_t [MAX_SECTORS * SECTOR_SIZE]);
@@ -146,11 +146,6 @@ bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const st
 			build_pc_track_mfm(track, head, image, cell_count, sector_count, sectors[track][head], 84, 80, 50, 22);
 
 	return true;
-}
-
-bool apridisk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	return false;
 }
 
 bool apridisk_format::supports_save() const

@@ -135,7 +135,7 @@ bool hfe_format::supports_save() const
 	return false;
 }
 
-int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[8];
 
@@ -147,7 +147,7 @@ int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint8_t header[HEADER_LENGTH];

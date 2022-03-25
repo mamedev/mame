@@ -93,7 +93,7 @@ const char *apd_format::extensions() const
 	return "apd";
 }
 
-int apd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -135,7 +135,7 @@ int apd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size))

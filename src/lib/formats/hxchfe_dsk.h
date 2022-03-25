@@ -47,8 +47,8 @@ public:
 
 	hfe_format();
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -56,7 +56,7 @@ public:
 	virtual bool supports_save() const override;
 
 private:
-	void generate_track_from_hfe_bitstream(int track, int head, int samplelength, const uint8_t *trackbuf, int track_end, floppy_image *image);
+	static void generate_track_from_hfe_bitstream(int track, int head, int samplelength, const uint8_t *trackbuf, int track_end, floppy_image *image);
 
 	// Header fields from the HFE format
 	struct header_info {
@@ -81,8 +81,8 @@ private:
 		encoding_t m_selected_encoding = UNKNOWN_ENCODING;
 	};
 
-	void set_floppy_mode(header_info &info, floppymode_t mode) { info.m_selected_mode = mode; }
-	void set_encoding(header_info &info, encoding_t enc) { info.m_selected_encoding = enc; }
+	static void set_floppy_mode(header_info &info, floppymode_t mode) { info.m_selected_mode = mode; }
+	static void set_encoding(header_info &info, encoding_t enc) { info.m_selected_encoding = enc; }
 };
 
 extern const floppy_format_type FLOPPY_HFE_FORMAT;

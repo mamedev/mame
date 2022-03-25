@@ -35,7 +35,7 @@ const char *acorn_ssd_format::extensions() const
 	return "ssd,bbc,img";
 }
 
-int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t cat[8];
 	uint32_t sectors0, sectors2;
@@ -108,7 +108,7 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 	return -1;
 }
 
-int acorn_ssd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_ssd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
@@ -118,7 +118,7 @@ int acorn_ssd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return 0;
 }
 
-int acorn_ssd_format::get_image_offset(const format &f, int head, int track)
+int acorn_ssd_format::get_image_offset(const format &f, int head, int track) const
 {
 	if (f.sector_base_id == -1)
 		return (track * f.head_count + head) * compute_track_size(f);
@@ -187,7 +187,7 @@ const char *acorn_dsd_format::extensions() const
 	return "dsd";
 }
 
-int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t cat[8];
 	uint32_t sectors0, sectors2;
@@ -241,7 +241,7 @@ int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, con
 	return -1;
 }
 
-int acorn_dsd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_dsd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
@@ -251,7 +251,7 @@ int acorn_dsd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return 0;
 }
 
-int acorn_dsd_format::get_image_offset(const format &f, int head, int track)
+int acorn_dsd_format::get_image_offset(const format &f, int head, int track) const
 {
 	if (f.sector_base_id == -1)
 		return (track * f.head_count + head) * compute_track_size(f);
@@ -300,7 +300,7 @@ const char *opus_ddos_format::extensions() const
 	return "dds";
 }
 
-int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	size_t actual;
 	uint8_t cat[8];
@@ -346,7 +346,7 @@ int opus_ddos_format::find_size(util::random_read &io, uint32_t form_factor, con
 	return -1;
 }
 
-int opus_ddos_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int opus_ddos_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
@@ -356,7 +356,7 @@ int opus_ddos_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return 0;
 }
 
-int opus_ddos_format::get_image_offset(const format &f, int head, int track)
+int opus_ddos_format::get_image_offset(const format &f, int head, int track) const
 {
 	if (f.sector_base_id == -1)
 		return (track * f.head_count + head) * compute_track_size(f);
@@ -405,7 +405,7 @@ const char *acorn_adfs_old_format::extensions() const
 	return "adf,ads,adm,adl";
 }
 
-int acorn_adfs_old_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_adfs_old_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	size_t actual;
 	uint8_t map[3];
@@ -443,7 +443,7 @@ int acorn_adfs_old_format::find_size(util::random_read &io, uint32_t form_factor
 	return -1;
 }
 
-int acorn_adfs_old_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_adfs_old_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
@@ -453,7 +453,7 @@ int acorn_adfs_old_format::identify(util::random_read &io, uint32_t form_factor,
 	return 0;
 }
 
-int acorn_adfs_old_format::get_image_offset(const format &f, int head, int track)
+int acorn_adfs_old_format::get_image_offset(const format &f, int head, int track) const
 {
 	if (f.sector_base_id == -1)
 		return (track * f.head_count + head) * compute_track_size(f);
@@ -510,7 +510,7 @@ const char *acorn_adfs_new_format::extensions() const
 	return "adf";
 }
 
-int acorn_adfs_new_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_adfs_new_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	size_t actual;
 	uint8_t dform[4];
@@ -547,7 +547,7 @@ int acorn_adfs_new_format::find_size(util::random_read &io, uint32_t form_factor
 	return -1;
 }
 
-int acorn_adfs_new_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_adfs_new_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
@@ -557,7 +557,7 @@ int acorn_adfs_new_format::identify(util::random_read &io, uint32_t form_factor,
 	return 0;
 }
 
-int acorn_adfs_new_format::get_image_offset(const format &f, int head, int track)
+int acorn_adfs_new_format::get_image_offset(const format &f, int head, int track) const
 {
 	if (f.sector_base_id == -1)
 		return (track * f.head_count + head) * compute_track_size(f);
@@ -598,7 +598,7 @@ const char *acorn_dos_format::extensions() const
 	return "img";
 }
 
-int acorn_dos_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_dos_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -628,7 +628,7 @@ int acorn_dos_format::find_size(util::random_read &io, uint32_t form_factor, con
 	return -1;
 }
 
-int acorn_dos_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int acorn_dos_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
@@ -638,7 +638,7 @@ int acorn_dos_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return 0;
 }
 
-int acorn_dos_format::get_image_offset(const format &f, int head, int track)
+int acorn_dos_format::get_image_offset(const format &f, int head, int track) const
 {
 	if (f.sector_base_id == -1)
 		return (track * f.head_count + head) * compute_track_size(f);
@@ -680,7 +680,7 @@ bool opus_ddcpm_format::supports_save() const
 	return false;
 }
 
-int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	size_t actual;
 	uint8_t h[8];
@@ -701,7 +701,7 @@ int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, con
 	return 0;
 }
 
-bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 // Double density discs formatted with DDCPM :
 //
@@ -750,7 +750,7 @@ bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const 
 	return true;
 }
 
-bool opus_ddcpm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool opus_ddcpm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	return false;
 }

@@ -105,7 +105,7 @@ const char *nfd_format::extensions() const
 	return "nfd";
 }
 
-int nfd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int nfd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
 	size_t actual;
@@ -117,7 +117,7 @@ int nfd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint64_t size;

@@ -88,7 +88,7 @@ bool fsd_format::supports_save() const
 	return false;
 }
 
-int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[3];
 
@@ -101,7 +101,7 @@ int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	const char* result[255];
 	result[0x00] = "OK";

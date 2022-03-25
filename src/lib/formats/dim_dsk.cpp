@@ -33,7 +33,7 @@ const char *dim_format::extensions() const
 	return "dim";
 }
 
-int dim_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dim_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
 
@@ -46,7 +46,7 @@ int dim_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	int offset = 0x100;
@@ -125,11 +125,6 @@ bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-
-bool dim_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	return false;
-}
 
 bool dim_format::supports_save() const
 {

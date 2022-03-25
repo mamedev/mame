@@ -584,7 +584,7 @@ bool a2_16sect_format::supports_save() const
 	return true;
 }
 
-int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -602,7 +602,7 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return 0;
 }
 
-bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -698,13 +698,9 @@ uint8_t a2_16sect_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 		return v;
 }
 
-void a2_16sect_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
-{
-}
-
 //#define VERBOSE_SAVE
 
-bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 		int g_tracks, g_heads;
 		int visualgrid[16][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
@@ -982,7 +978,7 @@ bool a2_rwts18_format::supports_save() const
 		return true;
 }
 
-int a2_rwts18_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int a2_rwts18_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 		uint64_t size;
 		if(io.length(size))
@@ -991,7 +987,7 @@ int a2_rwts18_format::identify(util::random_read &io, uint32_t form_factor, cons
 		return size == expected_size;
 }
 
-bool a2_rwts18_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool a2_rwts18_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 /*      TODO: rewrite me properly
         uint8_t sector_data[(256)*16];
@@ -1037,11 +1033,7 @@ uint8_t a2_rwts18_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 		return v;
 }
 
-void a2_rwts18_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
-{
-}
-
-bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 		int g_tracks, g_heads;
 		int visualgrid[18][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
@@ -1468,7 +1460,7 @@ bool a2_edd_format::supports_save() const
 	return false;
 }
 
-int a2_edd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int a2_edd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -1481,7 +1473,7 @@ uint8_t a2_edd_format::pick(const uint8_t *data, int pos)
 	return ((data[pos>>3] << 8) | data[(pos>>3)+1]) >> (8-(pos & 7));
 }
 
-bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t nibble[16384], stream[16384];
 	int npos[16384];
@@ -1595,7 +1587,7 @@ bool a2_woz_format::supports_save() const
 const uint8_t a2_woz_format::signature[8] = { 0x57, 0x4f, 0x5a, 0x31, 0xff, 0x0a, 0x0d, 0x0a };
 const uint8_t a2_woz_format::signature2[8] = { 0x57, 0x4f, 0x5a, 0x32, 0xff, 0x0a, 0x0d, 0x0a };
 
-int a2_woz_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int a2_woz_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[8];
 	size_t actual;
@@ -1605,7 +1597,7 @@ int a2_woz_format::identify(util::random_read &io, uint32_t form_factor, const s
 	return 0;
 }
 
-bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t image_size;
 	if(io.length(image_size))
@@ -1694,7 +1686,7 @@ bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std:
 	return true;
 }
 
-bool a2_woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool a2_woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	std::vector<std::vector<bool>> tracks(160);
 	bool twosided = false;
@@ -1885,7 +1877,7 @@ bool a2_nib_format::supports_save() const
 	return false;
 }
 
-int a2_nib_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int a2_nib_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -2008,7 +2000,7 @@ std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vec
 	return levels;
 }
 
-bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size))

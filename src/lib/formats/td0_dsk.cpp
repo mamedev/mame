@@ -808,7 +808,7 @@ const char *td0_format::extensions() const
 	return "td0";
 }
 
-int td0_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int td0_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	size_t actual;
 	uint8_t h[7];
@@ -821,7 +821,7 @@ int td0_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	int track_count = 0;
@@ -1022,11 +1022,6 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-
-bool td0_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	return false;
-}
 
 bool td0_format::supports_save() const
 {

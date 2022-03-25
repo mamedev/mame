@@ -40,7 +40,7 @@ const char *aim_format::extensions() const
 }
 
 
-int aim_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int aim_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -53,7 +53,7 @@ int aim_format::identify(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool aim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	image->set_variant(floppy_image::DSQD);
 

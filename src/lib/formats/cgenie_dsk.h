@@ -24,8 +24,8 @@ public:
 	virtual const char *extensions() const override;
 
 protected:
-	virtual int get_track_dam_fm(const format &f, int head, int track) override;
-	virtual int get_track_dam_mfm(const format &f, int head, int track) override;
+	virtual int get_track_dam_fm(const format &f, int head, int track) const override;
+	virtual int get_track_dam_mfm(const format &f, int head, int track) const override;
 
 private:
 	static const format formats[];

@@ -39,7 +39,7 @@ bool poly_cpm_format::supports_save() const
 	return true;
 }
 
-int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -61,7 +61,7 @@ int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const
 	return 0;
 }
 
-bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size) || io.seek(0, SEEK_SET))

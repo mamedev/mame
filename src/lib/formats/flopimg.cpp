@@ -118,7 +118,7 @@ bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, u
 	return false;
 }
 
-bool floppy_image_format_t::save(util::random_read_write &io, const std::vector<uint32_t> &, floppy_image *)
+bool floppy_image_format_t::save(util::random_read_write &io, const std::vector<uint32_t> &, floppy_image *) const
 {
 	return false;
 }

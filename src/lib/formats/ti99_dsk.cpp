@@ -81,7 +81,7 @@ int ti99_floppy_format::get_encoding(int cell_size)
 /*
     Load the image from disk and convert it into a sequence of flux levels.
 */
-bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t file_size;
 	if (io.length(file_size))
@@ -215,7 +215,7 @@ bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const
 /*
     Save all tracks to the image file.
 */
-bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t sectordata[9216];   // max size (36*256)
 
@@ -920,7 +920,7 @@ const char *ti99_sdf_format::extensions() const
 	return "dsk";
 }
 
-int ti99_sdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ti99_sdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t file_size;
 	if (io.length(file_size))
@@ -972,7 +972,7 @@ int ti99_sdf_format::identify(util::random_read &io, uint32_t form_factor, const
 	return vote;
 }
 
-void ti99_sdf_format::determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks)
+void ti99_sdf_format::determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks) const
 {
 	uint64_t file_size;
 	if (io.length(file_size))
@@ -1068,12 +1068,12 @@ void ti99_sdf_format::determine_sizes(util::random_read &io, int& cell_size, int
 	}
 }
 
-int ti99_sdf_format::get_track_size(int sector_count)
+int ti99_sdf_format::get_track_size(int sector_count) const
 {
 	return sector_count * SECTOR_SIZE;
 }
 
-void ti99_sdf_format::load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount)
+void ti99_sdf_format::load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount) const
 {
 	// Calculate the track offset from the beginning of the image file
 	int logicaltrack = (head==0)? track : (2*trackcount - track - 1);
@@ -1118,7 +1118,7 @@ void ti99_sdf_format::load_track(util::random_read &io, uint8_t *sectordata, int
 /*
     For debugging. Outputs the byte array in a xxd-like way.
 */
-void ti99_floppy_format::dumpbytes(uint8_t* trackdata, int length)
+void ti99_floppy_format::dumpbytes(const uint8_t* trackdata, int length)
 {
 	for (int i=0; i < length; i+=16)
 	{
@@ -1126,7 +1126,7 @@ void ti99_floppy_format::dumpbytes(uint8_t* trackdata, int length)
 	}
 }
 
-std::string ti99_floppy_format::dumpline(uint8_t* line, int address) const
+std::string ti99_floppy_format::dumpline(const uint8_t* line, int address)
 {
 	std::ostringstream stream;
 	stream << std::hex << std::setfill('0') << std::setw(6) << unsigned(address);
@@ -1148,7 +1148,7 @@ std::string ti99_floppy_format::dumpline(uint8_t* line, int address) const
     Write the data to the disk. We have a list of sector positions, so we
     just need to go through that list and save each sector in the sector data.
 */
-void ti99_sdf_format::write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count)
+void ti99_sdf_format::write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count) const
 {
 	int logicaltrack = head * track_count;
 	logicaltrack += ((head&1)==0)?  track : (track_count - 1 - track);
@@ -1223,7 +1223,7 @@ const char *ti99_tdf_format::extensions() const
 /*
     Determine whether the image file can be interpreted as a track dump
 */
-int ti99_tdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ti99_tdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int vote = 0;
 	uint8_t fulltrack[6872];
@@ -1294,7 +1294,7 @@ int ti99_tdf_format::identify(util::random_read &io, uint32_t form_factor, const
     Find the proper format for a given image file. Tracks are counted per side.
     Note that only two formats are actually compatible with the PC99 emulator.
 */
-void ti99_tdf_format::determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks)
+void ti99_tdf_format::determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks) const
 {
 	uint64_t file_size;
 	if (io.length(file_size))
@@ -1356,7 +1356,7 @@ void ti99_tdf_format::determine_sizes(util::random_read &io, int& cell_size, int
     track from scratch. TDF is not as flexible as it suggests, it does not
     allow different gap lengths and so on.
 */
-void ti99_tdf_format::load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount)
+void ti99_tdf_format::load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount) const
 {
 	size_t actual;
 	uint8_t fulltrack[12544]; // space for a full TDF track
@@ -1452,7 +1452,7 @@ void ti99_tdf_format::load_track(util::random_read &io, uint8_t *sectordata, int
     need the sector contents and the sector sequence, which are passed via
     sectordata, sector, and sector_count.
 */
-void ti99_tdf_format::write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count)
+void ti99_tdf_format::write_track(util::random_read_write &io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count) const
 {
 	uint8_t trackdata[12544];
 	int offset = ((track_count * head) + track) * get_track_size(sector_count);
@@ -1510,7 +1510,7 @@ void ti99_tdf_format::write_track(util::random_read_write &io, uint8_t *sectorda
 	io.write_at(offset, trackdata, get_track_size(sector_count), actual);
 }
 
-int ti99_tdf_format::get_track_size(int sector_count)
+int ti99_tdf_format::get_track_size(int sector_count) const
 {
 	switch (sector_count)
 	{

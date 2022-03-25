@@ -44,7 +44,7 @@ public:
 	  @param variants the variants from floppy_image the drive can handle
 	  @return 1 if image valid, 0 otherwise.
 	*/
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) = 0;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const = 0;
 
 	/*! @brief Load an image.
 	  The load function opens an image file and converts it to the
@@ -56,7 +56,7 @@ public:
 	  @param image output buffer for data in MAME internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) = 0;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const = 0;
 
 	/*! @brief Save an image.
 	  The save function writes back an image from the MAME internal
@@ -66,7 +66,7 @@ public:
 	  @param image source buffer containing data in MAME internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image);
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const;
 
 	//! @returns string containing name of format.
 	virtual const char *name() const = 0;

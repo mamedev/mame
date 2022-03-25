@@ -30,7 +30,7 @@ const char *afs_format::extensions() const
 	return "adl,img";
 }
 
-int afs_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int afs_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
@@ -40,7 +40,7 @@ int afs_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-int afs_format::get_image_offset(const format &f, int head, int track)
+int afs_format::get_image_offset(const format &f, int head, int track) const
 {
 	if (f.sector_base_id == -1)
 		return (track * f.head_count + head) * compute_track_size(f);
