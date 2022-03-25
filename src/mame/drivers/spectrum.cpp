@@ -323,12 +323,6 @@ void spectrum_state::adjust_mem_contended(offs_t offset)
 {
 	unsigned int vpos = m_screen->vpos();
 
-	/*
-		Target (FUSE):
-		    no: 69888
-		target: 57600 (12288)
-	*/
-
 	if (m_contention_pattern.empty() || offset < 0x4000 || (offset > 0x7fff /*128: && offset < 0xc000*/)
 		|| vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
 		return;

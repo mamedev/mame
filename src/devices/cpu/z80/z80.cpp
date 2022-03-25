@@ -22,6 +22,25 @@
  *         behaviour on NEC Z80 is still unknown.
  *      This Z80 emulator assumes a ZiLOG NMOS model.
  *
+ *   Changes in 0.242:
+ *    Fundation for M cycles emulation. Currently we preserve cc_* tables with total timings.
+ *    execute_run() behavior (simplified) ...
+ *    Before:
+ *      + read opcode
+ *      + call EXEC()
+ *        + adjust icount base on cc_* (all T are used before instruction == wrong)
+ *          + execute instruction
+ *    Now:
+ *      + read opcode
+ *      + store M1 from cc_rop in m_icount_executing
+ *      + call EXEC()
+ *        + read cc_* value to m_icount_executing
+ *        + apply M1 icount
+ *          + execute instruction adjusting icount per each Read (arg(), recursive rop())
+ *            + before Write (which is last Mn) use rest of m_icount_executing except count required for write
+ *            + use rest m_icount_executing after write
+ *    Next:
+ *      If gracefully adjust icount for each operation after read and before write we can receive precise M timings without cc_* tables.
  *   Changes in 3.9:
  *    - Fixed cycle counts for LD IYL/IXL/IYH/IXH,n [Marshmellow]
  *    - Fixed X/Y flags in CCF/SCF/BIT, ZEXALL is happy now [hap]
@@ -265,29 +284,29 @@ static const uint8_t cc_xy[0x100] = {
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 5,10,10,10,10,11, 7,11, 5,10,10,10,10,17, 7,11, /* cb -> cc_xycb */
+	 5,10,10,10,10,11, 7,11, 5,10,10,16,10,17, 7,11, /* cb -> cc_xycb */
 	 5,10,10,11,10,11, 7,11, 5, 4,10,11,10, 4, 7,11, /* dd -> cc_xy again */
 	 5,10,10,15,10,11, 7,11, 5, 4,10, 4,10, 4, 7,11, /* ed -> cc_ed */
 	 5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 4, 7,11  /* fd -> cc_xy again */
 };
 
 static const uint8_t cc_xycb[0x100] = {
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-	 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-	 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-	 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
 };
 
 /* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
@@ -310,6 +329,26 @@ static const uint8_t cc_ex[0x100] = {
 	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2
 };
 
+/* rop() usually takes 4 cycles except some ops */
+static const u8 cc_rop[0x100] = {
+	4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4,
+	5, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4,
+	4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4,
+	4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	5, 4, 4, 4, 4, 5, 4, 5, 5, 4, 4, 4, 4, 4, 4, 4,
+	5, 4, 4, 4, 4, 5, 4, 5, 5, 4, 4, 4, 4, 4, 4, 4,
+	5, 4, 4, 4, 4, 5, 4, 5, 5, 4, 4, 4, 4, 4, 4, 4,
+	5, 4, 4, 4, 4, 5, 4, 5, 5, 6, 4, 4, 4, 4, 4, 4
+};
+
 #define m_cc_dd   m_cc_xy
 #define m_cc_fd   m_cc_xy
 
@@ -330,10 +369,10 @@ static const uint8_t cc_ex[0x100] = {
 
 #define EXEC(prefix,opcode) do { \
 	unsigned op = opcode; \
-	int prefetch_borrowed = m_icount_executing; /* rop() stores 4 borrowed cycles */ \
+	int op_fetch_borrowed = m_icount_executing; /* rop() stores borrowed cycles */ \
 	m_icount_executing = 0; \
 	CC(prefix,op); \
-	T(prefetch_borrowed); \
+	T(op_fetch_borrowed); \
 	switch(op) \
 	{  \
 	case 0x00:prefix##_##00();break; case 0x01:prefix##_##01();break; case 0x02:prefix##_##02();break; case 0x03:prefix##_##03();break; \
@@ -473,7 +512,7 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
 void z80_device::wm(uint16_t addr, uint8_t value)
 {
 	// As we don't count changes between read and write, simply adjust to the end of requested.
-	T(m_icount_executing - 3);
+	if(m_icount_executing != 3) T(m_icount_executing - 3);
 	m_data.write_byte(addr, value);
 	T(3);
 }
@@ -498,9 +537,12 @@ uint8_t z80_device::rop()
 {
 	unsigned pc = PCD;
 	PC++;
+	// Use leftovers from previous instruction. Mainly to support recursive EXEC(.., rop())
 	if(m_icount_executing) T(m_icount_executing);
-	m_icount_executing = 4; //T(4); To be applied in EXEC()
 	uint8_t res = m_opcodes.read_byte(pc);
+	// Store borrowed cycles to be used by EXEC()
+	// TODO may be inaccurate for non op
+	m_icount_executing = m_cc_rop[res];
 	m_icount -= 2;
 	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
 	m_icount += 2;
@@ -3478,6 +3520,7 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
+	m_cc_rop = cc_rop;
 
 	m_irqack_cb.resolve_safe();
 	m_refresh_cb.resolve_safe();
@@ -3701,7 +3744,7 @@ std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
  * Generic set_info
  **************************************************************************/
 
-void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex)
+void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex, const uint8_t *rop)
 {
 	m_cc_op = (op != nullptr) ? op : cc_op;
 	m_cc_cb = (cb != nullptr) ? cb : cc_cb;
@@ -3709,6 +3752,7 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
 	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
 	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
+	m_cc_rop = (rop != nullptr) ? rop : cc_rop;
 }
 
 

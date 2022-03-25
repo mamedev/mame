@@ -385,7 +385,7 @@ void system1_state::machine_start()
 		m_bank1d->set_entry(0);
 	}
 
-	m_maincpu->z80_set_cycle_tables(cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
+	m_maincpu->z80_set_cycle_tables(cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex, nullptr);
 
 	m_mute_xor = 0x00;
 	m_dakkochn_mux_data = 0x00;
