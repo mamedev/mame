@@ -5,18 +5,18 @@
     Apple Newton devices skeleton driver
 
     CPUs:
-        MessagePad:        ARM 610 (20MHz)
+        Newton MessagePad:        ARM 610 (20MHz)
         ExpertPad PI-7000: ARM 610 (20MHz)
-        MessagePad 100:    ARM 610 (20MHz)
-        MessagePad 110:    ARM 610 (20MHz)
-        MessagePad 120:    ARM 610 (20MHz)
+        Newton MessagePad 100:    ARM 610 (20MHz)
+        Newton MessagePad 110:    ARM 610 (20MHz)
+        Newton MessagePad 120:    ARM 610 (20MHz)
         Marco:             ARM 610 (20MHz)
-        MessagePad 130:    ARM 610 (20MHz)
+        Newton MessagePad 130:    ARM 610 (20MHz)
 
         eMate 300:         ARM 710a (25MHz)
 
-        MessagePad 2000:   StrongARM SA-110 (162MHz)
-        MessagePad 2100:   StrongARM SA-110 (162MHz)
+        Newton MessagePad 2000:   StrongARM SA-110 (162MHz)
+        Newton MessagePad 2100:   StrongARM SA-110 (162MHz)
 
 ****************************************************************************/
 
@@ -183,12 +183,12 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY           FULLNAME     FLAGS
 CONS( 1992, newtnotp, 0,      0,      gen1,     newton, newton_state, empty_init, "Apple Computer", "Newton Notepad (prototype)", MACHINE_IS_SKELETON )
-CONS( 1993, newtonmp, 0,      0,      gen1,     newton, newton_state, empty_init, "Apple Computer", "MessagePad", MACHINE_IS_SKELETON )
+CONS( 1993, newtonmp, 0,      0,      gen1,     newton, newton_state, empty_init, "Apple Computer", "Newton MessagePad", MACHINE_IS_SKELETON )
 CONS( 1993, spi7000,  0,      0,      gen1,     newton, newton_state, empty_init, "Sharp", "ExpertPad PI-7000", MACHINE_IS_SKELETON )
-CONS( 1994, mp110,    0,      0,      gen1,     newton, newton_state, empty_init, "Apple Computer", "MessagePad 110", MACHINE_IS_SKELETON )
-CONS( 1995, mp120,    0,      0,      mp120,    newton, newton_state, empty_init, "Apple Computer", "MessagePad 120", MACHINE_IS_SKELETON )
+CONS( 1994, mp110,    0,      0,      gen1,     newton, newton_state, empty_init, "Apple Computer", "Newton MessagePad 110", MACHINE_IS_SKELETON )
+CONS( 1995, mp120,    0,      0,      mp120,    newton, newton_state, empty_init, "Apple Computer", "Newton MessagePad 120", MACHINE_IS_SKELETON )
 CONS( 1995, motmarco, 0,      0,      marco,    newton, newton_state, empty_init, "Motorola", "Marco", MACHINE_IS_SKELETON )
-CONS( 1996, mp130,    0,      0,      mp130,    newton, newton_state, empty_init, "Apple Computer", "MessagePad 130", MACHINE_IS_SKELETON )
+CONS( 1996, mp130,    0,      0,      mp130,    newton, newton_state, empty_init, "Apple Computer", "Newton MessagePad 130", MACHINE_IS_SKELETON )
 CONS( 1997, emate,    0,      0,      emate,    newton, newton_state, empty_init, "Apple Computer", "eMate 300", MACHINE_IS_SKELETON )
-CONS( 1997, mp2000,   0,      0,      mp2000,   newton, newton_state, empty_init, "Apple Computer", "MessagePad 2000", MACHINE_IS_SKELETON )
-CONS( 1997, mp2100,   0,      0,      mp2100,   newton, newton_state, empty_init, "Apple Computer", "MessagePad 2100", MACHINE_IS_SKELETON )
+CONS( 1997, mp2000,   0,      0,      mp2000,   newton, newton_state, empty_init, "Apple Computer", "Newton MessagePad 2000", MACHINE_IS_SKELETON )
+CONS( 1997, mp2100,   0,      0,      mp2100,   newton, newton_state, empty_init, "Apple Computer", "Newton MessagePad 2100", MACHINE_IS_SKELETON )
