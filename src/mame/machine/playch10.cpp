@@ -154,16 +154,6 @@ void playch10_state::pc10_prot_w(uint8_t data)
 	}
 }
 
-// Some prototypes/location test games need this
-void playch10_state::init_rp5h01_fix()
-{
-	u8 *ROM = memregion("rp5h01")->base();
-	u32 len = memregion("rp5h01")->bytes();
-
-	for (int i = 0; i < len; i++)
-		ROM[i] = ~bitswap<8>(ROM[i], 0, 1, 2, 3, 4, 5, 6, 7);
-}
-
 /*************************************
  *
  *  Input Ports
@@ -657,14 +647,6 @@ void playch10_state::init_pcfboard()
 	init_prg_banking();
 }
 
-void playch10_state::init_virus()
-{
-	// common init
-	init_pcfboard();
-
-	init_rp5h01_fix();
-}
-
 //**********************************************************************************
 // G Board (MMC3) games (Super Mario Bros. 3, etc)
 
@@ -790,14 +772,6 @@ void playch10_state::init_pcgboard_type2()
 	// 2K on the cart board, in addition to the 2K on the main board
 	m_cart_nt_ram = std::make_unique<u8[]>(0x800);
 	m_mirroring = PPU_MIRROR_4SCREEN;
-}
-
-void playch10_state::init_ttoon()
-{
-	// common init
-	init_pcgboard();
-
-	init_rp5h01_fix();
 }
 
 //**********************************************************************************
