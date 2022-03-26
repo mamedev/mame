@@ -18787,22 +18787,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="aoidchpo">
-		<description>Apple-Oids and Chipout</description>
-		<year>1981</year>
-		<publisher>California Pacific Computer</publisher>
-		<info name="release" value="2022-02-08"/>
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
-		<!-- It runs on any Apple II with 48K. -->
-		<!--"Apple-Oids and Chipout" is a 1981 pair of action games developed by Tom Luhrs and distributed by California Pacific Computer. It runs on any Apple II with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="201004">
-				<rom name="apple-oids and chipout.woz" size="201004" crc="e1b224a9" sha1="5bcbdb1329051b2ae2eaf3fa35159a2c9a06d911"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="swdsheol">
 		<description>Sword of Sheol</description>
 		<year>1982</year>
