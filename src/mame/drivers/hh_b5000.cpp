@@ -235,14 +235,15 @@ ROM_END
 
 /***************************************************************************
 
-  Mattel Missile Attack (model 2048) / Battlestar Galactica: Space Alert (model 2448)
+  Mattel Missile Attack (model 2048) / Space Alert (model 2448)
   * B6000 MCU (label B6001CA/EA, die label B6001)
   * 2-digit 7seg display, 21 other leds, 1-bit sound
 
   The initial release was called Missile Attack, it didn't sell well (Mattel
   blamed it on NBC for refusing to air their commercial). They changed the
   title/setting and advertised an upcoming rerelease as "Flash Gordon", but
-  changed plans and named it "Battlestar Galactica: Space Alert".
+  changed plans and named it "Space Alert" (aka "Battlestar Galactica:
+  Space Alert").
 
 ***************************************************************************/
 
@@ -716,7 +717,7 @@ ROM_END
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1976, autorace,  0,       0, autorace,  autorace,  autorace_state,  empty_init, "Mattel Electronics", "Auto Race", MACHINE_SUPPORTS_SAVE )
-CONS( 1977, misatk,    0,       0, misatk,    misatk,    misatk_state,    empty_init, "Mattel Electronics", "Missile Attack (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1977, misatk,    0,       0, misatk,    misatk,    misatk_state,    empty_init, "Mattel Electronics", "Missile Attack / Space Alert", MACHINE_SUPPORTS_SAVE )
 CONS( 1977, mfootb,    0,       0, mfootb,    mfootb,    mfootb_state,    empty_init, "Mattel Electronics", "Football (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_init, "Mattel Electronics", "Baseball (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE )

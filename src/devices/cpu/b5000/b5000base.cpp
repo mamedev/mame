@@ -5,7 +5,7 @@
   Rockwell B5000 family MCU cores
 
 This MCU series sits between A4000 and the more publicly available PPS4/1.
-Known part numbers: A/B5000, A/B5300, A/B5500, A/B5900, B6000, B6100.
+Known part numbers: A/B5000, A5300, A/B5500, A/B5900, B6000, B6100.
 The latter two were manufactured for Mattel, with small modifications
 useful for making handheld games. In fact, the programmer of the first
 Mattel handheld games was a circuit designer at Rockwell.
@@ -13,6 +13,7 @@ Mattel handheld games was a circuit designer at Rockwell.
 The main difference between Axxxx and Bxxxx is that B runs on low power,
 there's also a small change with the way they output LEDs.
 
+A5300 might not be in this series, the page size is 0x3f instead of 0x40.
 A4000 is similar, but too many differences to emulate in this device, probably.
 
 */
