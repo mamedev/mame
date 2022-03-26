@@ -57,7 +57,7 @@ private:
 
 	int m_hopper_motor = 0;
 	int m_hopper_coin = 0;
-	emu_timer *m_hopper_timer;
+	emu_timer *m_hopper_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(hopper_coinout);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

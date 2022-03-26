@@ -122,8 +122,8 @@ private:
 		}
 	}
 
-	u8 m_irq_latch;
-	bool m_irq_state;
+	u8 m_irq_latch = 0;
+	bool m_irq_state = false;
 };
 
 void emu3_state::machine_start()

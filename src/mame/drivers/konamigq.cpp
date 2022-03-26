@@ -114,9 +114,9 @@ private:
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<uint8_t> m_pcmram;
 
-	uint8_t m_sector_buffer[ 512 ];
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_intck;
+	uint8_t m_sector_buffer[ 512 ]{};
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
 
 	void eeprom_w(uint16_t data);
 	void pcmram_w(offs_t offset, uint8_t data);

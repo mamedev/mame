@@ -60,7 +60,7 @@ protected:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	std::unique_ptr<uint32_t[]> m_dsp_ram;
 	required_device<light_video_device> m_light;
-	address_space *m_space;
+	address_space *m_space = nullptr;
 };
 
 class indigo3k_state : public indigo_state

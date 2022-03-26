@@ -55,10 +55,10 @@ private:
 	required_region_ptr<uint8_t> m_tx_clut;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	int m_hw;
-	tilemap_t *m_bgtilemap;
-	tilemap_t *m_fgtilemap;
-	tilemap_t *m_txtilemap;
+	int m_hw = 0;
+	tilemap_t *m_bgtilemap = nullptr;
+	tilemap_t *m_fgtilemap = nullptr;
+	tilemap_t *m_txtilemap = nullptr;
 
 	void hw_w(uint8_t data);
 	void tx_vram_w(offs_t offset, uint8_t data);

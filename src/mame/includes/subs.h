@@ -47,12 +47,12 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	int m_steering_buf1;
-	int m_steering_buf2;
-	int m_steering_val1;
-	int m_steering_val2;
-	int m_last_val_1;
-	int m_last_val_2;
+	int m_steering_buf1 = 0;
+	int m_steering_buf2 = 0;
+	int m_steering_val1 = 0;
+	int m_steering_val2 = 0;
+	int m_last_val_1 = 0;
+	int m_last_val_2 = 0;
 
 	void steer_reset_w(uint8_t data);
 	uint8_t control_r(offs_t offset);

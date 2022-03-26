@@ -34,7 +34,7 @@ public:
 		m_user_password_enable = (password != nullptr);
 	}
 
-	void set_dma_transfer_time(const attotime time) { m_dma_transfer_time = time; };
+	void set_dma_transfer_time(const attotime time) { m_dma_transfer_time = time; }
 protected:
 	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

@@ -36,7 +36,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
 	void higemaru_videoram_w(offs_t offset, uint8_t data);
 	void higemaru_colorram_w(offs_t offset, uint8_t data);
 	void higemaru_c800_w(uint8_t data);

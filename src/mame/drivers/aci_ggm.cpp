@@ -8,7 +8,7 @@ Applied Concepts Great Game Machine (GGM), electronic board game computer.
 
 Hardware notes:
 - 6502A 2MHz, SYP6522 VIA
-- 2KB RAM(4*HM472114AP-2), no ROM on main PCB
+- 2KB RAM(4*HM472114AP-2 or 1*M58725P), no ROM on main PCB
 - 2*74164 shift register, 3*6118P VFD driver
 - 8-digit 14seg VFD panel (same one as in Speak & Spell)
 - 5*4 keypad(unlabeled by default), 1-bit sound
@@ -39,7 +39,6 @@ Other games:
 TODO:
 - it doesn't have nvram, it's a workaround for MAME forcing a hard reset when
   swapping in a new cartridge
-- what's VIA PB0 for? game toggles it once per irq
 - confirm display AP segment, is it used anywhere?
 - verify cartridge pinout, right now assume A0-A15 (max known cart size is 24KB).
   Boris/Sargon cartridge is A0-A11 and 2 CS lines, Steinitz uses the whole range.
@@ -237,7 +236,7 @@ void ggm_state::select_w(u8 data)
 
 void ggm_state::control_w(u8 data)
 {
-	// PB0: ?
+	// PB0: DC/DC converter, toggles once per IRQ (probably for VFD, not needed for emulation)
 
 	// PB7: speaker out
 	m_dac->write(BIT(data, 7));

@@ -120,6 +120,7 @@ protected:
 	address_space *m_data;
 
 	int m_icount;
+	int m_state_count;
 
 	// fixed settings or mask options that differ between MCU type
 	int m_prgwidth;         // number of bits and bitmask for ROM/RAM size: see melps4.c for info

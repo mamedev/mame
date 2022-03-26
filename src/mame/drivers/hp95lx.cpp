@@ -25,6 +25,9 @@
     - native keyboard
     - 1MB model
     - identify RTC core
+    - variable refresh rate?
+      When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
+      When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
     - everything else
 
     Technical info:
@@ -55,15 +58,15 @@
 
 #include "emu.h"
 
-#include "machine/nvram.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/nec/nec.h"
 #include "machine/bankdev.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
 
@@ -78,7 +81,7 @@
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
@@ -117,6 +120,7 @@ public:
 	uint8_t f300_r(offs_t offset);
 
 	void hp95lx(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -160,20 +164,20 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	u8 m_mapper[32], m_rtcram[2];
+	u8 m_mapper[32]{}, m_rtcram[2]{};
 
 	// crtc
-	u8 m_crtc[64], m_cursor_start_ras;
-	u16 m_disp_start_addr, m_cursor_addr, m_window_start_addr;
-	int m_register_address_latch;
-	bool m_graphics_mode;
+	u8 m_crtc[64]{}, m_cursor_start_ras = 0;
+	u16 m_disp_start_addr = 0, m_cursor_addr = 0, m_window_start_addr = 0;
+	int m_register_address_latch = 0;
+	bool m_graphics_mode = false;
 
 	// from pt68k4.cpp
-	bool m_kclk;
-	uint8_t m_kdata;
-	uint8_t m_scancode;
-	uint8_t m_kbdflag;
-	int m_kbit;
+	bool m_kclk = false;
+	uint8_t m_kdata = 0;
+	uint8_t m_scancode = 0;
+	uint8_t m_kbdflag = 0;
+	int m_kbit = 0;
 };
 
 
@@ -559,7 +563,7 @@ WRITE_LINE_MEMBER(hp95lx_state::keyboard_clock_w)
 		{
 			m_scancode >>= 1;
 			m_scancode |= m_kdata;
-			// XXX map F2..F10 to blue function keys
+			// FIXME: workaround, map F2..F10 to blue function keys
 			if (m_scancode > 0x3B && m_scancode < 0x45) m_scancode += 0x36;
 			LOGKBD("kbd: scancode %02x\n", m_scancode);
 			m_kbit = 0;
@@ -725,9 +729,9 @@ void hp95lx_state::hp95lx(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankdev_ec00").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	PIT8254(config, m_pit8254, 0);
-	m_pit8254->set_clk<0>(XTAL(14'318'181)/12); /* heartbeat IRQ */
+	m_pit8254->set_clk<0>(XTAL(14'318'181) / 12); /* heartbeat IRQ */
 	m_pit8254->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
-	m_pit8254->set_clk<1>(XTAL(14'318'181)/12); /* misc IRQ */
+	m_pit8254->set_clk<1>(XTAL(14'318'181) / 12); /* misc IRQ */
 	m_pit8254->out_handler<1>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 
 	PIC8259(config, m_pic8259, 0);
@@ -749,8 +753,6 @@ void hp95lx_state::hp95lx(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 
-	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
-	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
 	m_screen->set_screen_update(FUNC(hp95lx_state::screen_update));
 	m_screen->set_raw(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128);

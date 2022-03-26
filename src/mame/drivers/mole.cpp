@@ -74,8 +74,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	int m_tile_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_tile_bank = 0;
 
 	/* memory */
 	uint16_t m_tileram[0x400];

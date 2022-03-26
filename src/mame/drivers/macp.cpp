@@ -393,6 +393,12 @@ ROM_START(macgalxy)
 	ROM_LOAD("galaxy2.bin", 0x2000, 0x2000, CRC(f0efb723) SHA1(697b3c9f3ebedca1087354eda5dfe9719d497045))
 ROM_END
 
+ROM_START(macgalxyb)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("system_iv_fabricante_m-73_macsa_galaxy_m5_6.bin",    0x0000, 0x2000, CRC(38319685) SHA1(54e979bba16d79d3589b3ae3f9e8e29071ef5b36))
+	ROM_LOAD("modelo_a-01202_fabricante_m-73_macsa_galaxy_05.bin", 0x2000, 0x2000, CRC(c1f40cbf) SHA1(566d962f55367379346155f2078b92b4e1e6a79d))
+ROM_END
+
 ROM_START(macjungl)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("jungle1.bin", 0x0000, 0x2000, CRC(461a3e1b) SHA1(96981b4d8db0412c474169eaf5e5386be5006ffe))
@@ -463,7 +469,8 @@ ROM_END
 } // Anonymous namespace
 
 // MAC S.A. pinballs
-GAME( 1986, macgalxy,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, macgalxy,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (yellow version, M.6)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, macgalxyb, macgalxy, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (blue version, M.042)",  MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, macjungl,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle",                          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, spctrain,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball)",               MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, spctraino, spctrain, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball, old hardware)", MACHINE_IS_SKELETON_MECHANICAL )

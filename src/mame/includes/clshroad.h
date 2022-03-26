@@ -25,6 +25,11 @@ public:
 		, m_vregs(*this, "vregs")
 	{ }
 
+	void firebatl(machine_config &config);
+	void clshroad(machine_config &config);
+	void init_firebatl();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
@@ -36,14 +41,14 @@ public:
 	required_shared_ptr<uint8_t> m_vram_1;
 	required_shared_ptr<uint8_t> m_vregs;
 
-	u8 m_main_irq_mask;
-	u8 m_sound_irq_mask;
-	u8 m_color_bank;
-	u8 m_video_unk;
+	u8 m_main_irq_mask = 0U;
+	u8 m_sound_irq_mask = 0U;
+	u8 m_color_bank = 0U;
+	u8 m_video_unk = 0U;
 
-	tilemap_t *m_tilemap_0a;
-	tilemap_t *m_tilemap_0b;
-	tilemap_t *m_tilemap_1;
+	tilemap_t *m_tilemap_0a = nullptr;
+	tilemap_t *m_tilemap_0b = nullptr;
+	tilemap_t *m_tilemap_1 = nullptr;
 
 	uint8_t input_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(main_irq_mask_w);
@@ -58,7 +63,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_fb1);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	void init_firebatl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(firebatl);
@@ -73,8 +77,6 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
-	void firebatl(machine_config &config);
-	void clshroad(machine_config &config);
 	void clshroad_map(address_map &map);
 	void clshroad_sound_map(address_map &map);
 };

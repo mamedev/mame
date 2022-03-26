@@ -45,14 +45,14 @@ private:
 	std::unique_ptr<uint16_t[]>    m_buffered_spriteram;
 
 	/* video-related */
-	tilemap_t     *m_bg_layer;
-	tilemap_t     *m_fg_layer;
-	tilemap_t     *m_tx_layer;
-	uint16_t      m_fg_bank;
+	tilemap_t     *m_bg_layer = nullptr;
+	tilemap_t     *m_fg_layer = nullptr;
+	tilemap_t     *m_tx_layer = nullptr;
+	uint16_t      m_fg_bank = 0U;
 
 	/* misc */
-	int         m_msm5205next;
-	int         m_adpcm_toggle;
+	int         m_msm5205next = 0;
+	int         m_adpcm_toggle = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

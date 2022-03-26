@@ -103,9 +103,9 @@ private:
 	output_finder<> m_lamp_v;
 	output_finder<> m_lamp_e;
 	output_finder<> m_lamp_r;
-	int m_nmion;
-	tilemap_t *m_bg_tilemap;
-	int m_width;
+	int m_nmion = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_width = 0;
 };
 
 /*----------- defined in audio/skydiver.c -----------*/

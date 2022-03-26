@@ -13,42 +13,104 @@ There are many sound boards used, however there are only a few major types.
 * Cheap Squeak has 6803 + ZN429 + 2x2kROM
 * Xenon (#1196) has a sound board (similar to AS-3022) and a vocalizer board, with 32k of roms.
 
+List of games:
 
-Sound Board     Machine
----------------------------------------------
-AS-2888-1       1106,1116,1119,1138,1147,1148
-AS-2888-3       1152
-AS-2888-4       1161,1162,1167
-AS-3022-1       1173
-AS-3022-2       1154
-AS-3022-3       1157
-AS-3022-5       1187
-AS-3022-6       1178
-AS-3022-7       1192
-AS-3022-8       1198
-AS-3022-9       1199
-AS-3022-11      1210
-AS-3022-12      1217
-AS-3022-14      1273
-AS-3022-15      1276
-AS-3022-18      1311
-AS-3059/3060    1196
-AS-3107-1       1215
-AS-3107-2       1220
-AS-3107-3       1219
-AS-3107-4       1222
-AS-3107-5       1233
-AS-3107-6       1245
-AS-3107-7       1239
-AS-3107-8       1248
-AS-3107-9       1247
-AS-3107-10      1262
-AS-3107-11      1282
-AS-3107-12      1283
-A084-91495-A371 1371
-Cheap Squeak    1390,1391,0A17,0A40,0A44,0B42
-(unknown)       1370 (Centaur II - Manual has the correct cover but insides are for Centaur #1239)
-
+Game                              NUM        Sound Board
+-----------------------------------------------------------------------------------------------
+**** Bally ****
+Mysterian                         868
+Supersonic                       1106        AS-2888-1
+Playboy                          1116        AS-2888-1
+Lost World                       1119        AS-2888-1
+The Six Million Dollar Man       1138        AS-2888-1
+Voltan Escapes Cosmic Doom       1147        AS-2888-1
+Star Trek                        1148        AS-2888-1
+Kiss                             1152        AS-2888-3
+Nitro Ground Shaker              1154        AS-3022-2
+Silverball Mania                 1157        AS-3022-3
+Harlem Globetrotters on Tour     1161        AS-2888-4
+Dolly Parton                     1162        AS-2888-4
+Paragon                          1167        AS-2888-4
+Future Spa                       1173        AS-3022-1
+Space Invaders                   1178        AS-3022-6
+Rolling Stones                   1187        AS-3022-5
+Mystic                           1192        AS-3022-7
+Xenon                            1196        AS-3059 (AS-2518-56) (Sounds Plus) and AS-3060 (AS-2518-57) (Vocalizer)
+Viking                           1198        AS-3022-8
+Hotdoggin'                       1199        AS-3022-9
+Skateball                        1210        AS-3022-11
+Flash Gordon                     1215        AS-3107-1 (AS-2518-61) (Squawk & Talk)
+Frontier                         1217        AS-3022-12
+Fireball II                      1219        AS-3107-3
+Eight Ball Deluxe                1220        AS-3107-2
+Embryon                          1222        AS-3107-4
+Fathom                           1233        AS-3107-5
+Centaur                          1239        AS-3107-7
+Medusa                           1245        AS-3107-6
+Vector                           1247        AS-3107-9
+Elektra                          1248        AS-3107-8
+Spectrum                         1262        AS-3107-10
+Speakeasy / Speakeasy 4          1273        AS-3022-14
+BMX                              1276        AS-3022-15
+Rapid Fire                       1282        AS-3107-11 (No flippers in this game)
+Mr & Mrs Pac-Man Pinball         1283        AS-3107-12
+Eight Ball Deluxe LE             1300
+Grand Slam (BY133)               1311        AS-3022-18
+Gold Ball (BY133)                1314 (0371) A084-91945-A371
+Centaur II                       1370 (0370) Squawk & Talk, plus Say It Again (reverb card)
+Kings of Steel                   1390 (0390) Cheap Squeak
+X's & O's                        1391 (0391) Cheap Squeak
+Midnight Marauders               0A12        (gun game)
+Spy Hunter                       0A17        Cheap Squeak
+Fireball Classic                 0A40        Cheap Squeak
+Black Pyramid                    0A44        Cheap Squeak
+Cybernaut                        0B42        Cheap Squeak
+Eight Ball Deluxe (reissue)      0B87
+Big Bat (BY133)                  ----        AS-2518-61 (Squawk & Talk)
+**** Bell ****
+Cosmic Flash
+Fantasy
+Fireball II
+Flash Gordon
+Frontier
+New Wave
+Pinball
+Pin Ball Pool
+Saturn 2
+Super Bowl
+Tiger Rag
+**** Nuova Bell ****
+Cobra
+Dark Shadow
+F1 Grand Prix
+Future Queen
+Skill Flight
+Space Hawks
+Top Pin
+U-boat 65
+World Defender
+**** I.D.I. ****
+Movie Master
+**** Geiger-Automatenbau ****
+Dark Rider
+Fly High
+Miss World
+Space Rider
+**** Grand Products ****
+301/Bullseye
+**** Arkon Automaten ****
+Sexy Girl
+**** Elbos Electronics ****
+Genesis
+**** Zaccaria ****
+Mystic Star
+**** United ****
+Big Ball Bowling (shuffle)
+**** Monroe ****
+Stars and Strikes (shuffle)
+**** Stern ****
+Black Beauty (shuffle)
+--------------------------------------------------------------------------------------------
 
 - The Nuova Bell Games from Dark Shadow onwards use inhouse designed circuit boards. The MPU board contains enhancements for full
   CPU address space, larger ROMs, 6802 CPU, Toshiba TC5517 CMOS RAM (2kb) for battery backup that can be jumpered in nibble or byte mode, etc.
@@ -166,29 +228,28 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
-	DECLARE_WRITE_LINE_MEMBER(sound_ack_w);
 
 	void by35_map(address_map &map);
 	void nuovo_map(address_map &map);
 
-	uint8_t m_u10a;
-	uint8_t m_u10b;
-	uint8_t m_u11a;
-	uint8_t m_u11b;
+	uint8_t m_u10a = 0U;
+	uint8_t m_u10b = 0U;
+	uint8_t m_u11a = 0U;
+	uint8_t m_u11b = 0U;
 
 	static solenoid_feature_data const s_solenoid_features_default;
 
 private:
-	bool m_u10_ca2;
-	bool m_u10_cb1;
-	bool m_u10_cb2;
-	bool m_u11_ca1;
-	bool m_u11_cb2;
-	bool m_7d;
-	uint8_t m_segment[6];
-	uint8_t m_lamp_decode;
+	bool m_u10_ca2 = 0;
+	bool m_u10_cb1 = 0;
+	bool m_u10_cb2 = 0;
+	bool m_u11_ca1 = 0;
+	bool m_u11_cb2 = 0;
+	bool m_7d = 0;
+	uint8_t m_segment[6]{};
+	uint8_t m_lamp_decode = 0U;
 	solenoid_feature_data const &m_solenoid_features;
-	uint8_t m_io_hold_x[6];
+	uint8_t m_io_hold_x[6]{};
 	required_device<m6800_cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
@@ -392,56 +453,57 @@ static INPUT_PORTS_START( by35 )
 	PORT_DIPNAME( 0x80, 0x80, "Melody Option 2")        PORT_DIPLOCATION("SW3:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP01")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP02")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP03")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP04")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP05")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
+//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, outhole_x0<0x07>) // PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP12")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP13")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP14")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP15")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT2 ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP18")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP19")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP21")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP22")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP23")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP24")
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP25")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP26")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP27")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP28")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP29")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP30")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP31")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP32")
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP36")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP37")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP38")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP39")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP40")
 INPUT_PORTS_END
 
 /*
@@ -900,54 +962,54 @@ static INPUT_PORTS_START( frontier )
 	PORT_DIPSETTING(    0x20, "Both Lites Come On")
 
 	PORT_MODIFY("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("30 Point Rebound") PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Right Out Special") PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Right Flipper Feed Lane") PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Left Flipper Feed Lane") PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Left Out Special") PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("30 Point Rebound") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Right Out Special") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Right Flipper Feed Lane") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Left Flipper Feed Lane") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Left Out Special") PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )  PORT_NAME("Start")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )    PORT_NAME("Tilt")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_MODIFY("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin3")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin1")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Saucer") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("A Rollover Lane") PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("B Rollover Lane") PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("C Rollover Lane") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Saucer") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("A Rollover Lane") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("B Rollover Lane") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("C Rollover Lane") PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT2 ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
 
 	PORT_MODIFY("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("3rd In Line Drop Target") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("2nd In Line Drop Target") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("1st In Line Drop Target") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Grizzly Target") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("3rd In Line Drop Target") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("2nd In Line Drop Target") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("1st In Line Drop Target") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Grizzly Target") PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Saucer Rollover Button") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinner") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bit4") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Target") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Center Target") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Target") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Saucer Rollover Button") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Spinner") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Left Target") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Center Target") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Right Target") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bottom Side Drop Target") PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Middle Side Drop Target") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Top Side Drop Target") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Slingshot") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Slingshot") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bottom Thumper Bumper") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Thumper Bumper") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Thumper Bumper") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Bottom Side Drop Target") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Middle Side Drop Target") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Top Side Drop Target") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Right Slingshot") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Left Slingshot") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Bottom Thumper Bumper") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Right Thumper Bumper") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Left Thumper Bumper") PORT_CODE(KEYCODE_Z)
 INPUT_PORTS_END
 
 
@@ -1240,7 +1302,7 @@ void by35_state::u11_b_w(uint8_t data)
 			if (m_solenoid_features[(data & 0x0f)][3])  // Reset/release relevant switch after firing Solenoid
 				m_io_hold_x[(m_solenoid_features[(data & 0x0f)][2])] &= (m_solenoid_features[(data & 0x0f)][3]);
 		}
-		else                        // Rest output - all momentary solenoids are off
+		else                        // Reset output - all momentary solenoids are off
 		{
 			std::fill_n(std::begin(m_solenoids), 15, false);
 		}
@@ -1358,12 +1420,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_d_pulse )
 	m_pia_u11->ca1_w(m_u11_ca1);
 }
 
-WRITE_LINE_MEMBER( by35_state::sound_ack_w )
-{
-	m_pia_u11->cb2_w(state);
-}
-
-
 by35_state::solenoid_feature_data const by35_state::s_solenoid_features_default =
 {
 // This table serves two functions and is configured on a per game basis:
@@ -1430,6 +1486,20 @@ void by35_state::machine_start()
 	m_solenoids.resolve();
 	m_sound_select_handler.resolve();
 	m_sound_int_handler.resolve();
+
+	save_item(NAME(m_u10a));
+	save_item(NAME(m_u10b));
+	save_item(NAME(m_u11a));
+	save_item(NAME(m_u11b));
+	save_item(NAME(m_u10_ca2));
+	save_item(NAME(m_u10_cb1));
+	save_item(NAME(m_u10_cb2));
+	save_item(NAME(m_u11_ca1));
+	save_item(NAME(m_u11_cb2));
+	save_item(NAME(m_7d));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_lamp_decode));
+	save_item(NAME(m_io_hold_x));
 }
 
 void by35_state::machine_reset()
@@ -1543,7 +1613,7 @@ void by35_state::cheap_squeak(machine_config &config)
 
 	m_sound_select_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_select));
 	m_sound_int_handler.bind().set(m_cheap_squeak, FUNC(bally_cheap_squeak_device::sound_int));
-	m_cheap_squeak->sound_ack_w_handler().set(FUNC(by35_state::sound_ack_w));
+	m_cheap_squeak->sound_ack_w_handler().set(m_pia_u11, FUNC(pia6821_device::cb2_w));
 }
 
 void by35_state::squawk_n_talk(machine_config &config)
@@ -2497,6 +2567,27 @@ ROM_START(tigerrag)
 	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
 
+/*--------------------------------------
+/ Mysterian (BY35-868: 1982)
+/--------------------------------------*/
+ROM_START(mysteria)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "u2game.732",   0x1000, 0x0800, CRC(fb72a51a) SHA1(d96e8669d3c12dd9578af0af85b5d9e6f7378966))
+	ROM_CONTINUE(             0x5000, 0x0800)
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_CONTINUE(             0x5800, 0x0800)
+	ROM_RELOAD(               0x7000, 0x1000)
+	ROM_REGION(0x10000, "squawk_n_talk_ay:cpu", 0)
+	ROM_LOAD("snd-au3.732", 0x9000, 0x1000, CRC(17b27bd7) SHA1(6f1b3f6059704e65a876849eec4682e3a5e3c874))
+	ROM_LOAD("snd-au4.732", 0xa000, 0x1000, CRC(d229df68) SHA1(7206881ea93d67b15e05e3b59ee5cbe9ba3455f5))
+	ROM_LOAD("snd-au5.732", 0xb000, 0x1000, CRC(44f9a29c) SHA1(d569d19d22472c436ac3f22a1119f95b51c22e73))
+	ROM_REGION(0x10000, "squawk_n_talk_ay_2:cpu", 0)
+	ROM_LOAD("snd-bu2.732", 0x8000, 0x1000, CRC(1bc7ebdf) SHA1(0c9555066cf148ae5ba8f1b22c1a8ac927308fde))
+	ROM_LOAD("snd-bu3.732", 0x9000, 0x1000, CRC(a6b372b2) SHA1(9fc86721b73f0352bbc907ad208406d303ace9a7))
+	ROM_LOAD("snd-bu4.732", 0xa000, 0x1000, CRC(43d62e6d) SHA1(2fe305c4415efa6fad689f7683680ea456bae0fe))
+	ROM_LOAD("snd-bu5.732", 0xb000, 0x1000, CRC(9af26fd3) SHA1(5389da006a8fc7d64fa422ff1cf65bb5a569c307))
+ROM_END
+
 /*--------------------------------
 / Unofficial
 /-------------------------------*/
@@ -2840,6 +2931,7 @@ GAME( 1982, spectrm,    0,        squawk_n_talk,    by35_os5x, by35_state, init_
 GAME( 1982, spectrm4,   spectrm,  squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1982, rapidfip,   0,        squawk_n_talk,    by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 GAME( 1982, m_mpac,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, mysteria,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mysterian (prototype)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING) // uses 2 sound boards
 
 // Cheap Squeak sound
 GAME( 1984, kosteel,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

@@ -280,8 +280,8 @@ void nes_jf13_device::write_m(offs_t offset, uint8_t data)
 
 	if (offset < 0x1000)
 	{
-		prg32((data >> 4) & 0x03);
-		chr8(((data >> 4) & 0x04) | (data & 0x03), CHRROM);
+		prg32(BIT(data, 4, 2));
+		chr8(bitswap<3>(data, 6, 1, 0), CHRROM);
 	}
 	else
 	{

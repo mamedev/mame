@@ -178,15 +178,16 @@ private:
 };
 
 
-// ======================> nes_mk2_device
+// ======================> nes_jy830623c_device
 
-class nes_mk2_device : public nes_nrom_device
+class nes_jy830623c_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_jy830623c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -196,8 +197,11 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint16_t m_irq_count, m_irq_count_latch;
-	uint8_t m_irq_clear;
+	void update_banks();
+	u8 m_latch;
+	u8 m_reg[6];
+
+	u16 m_irq_count, m_irq_count_latch;
 	int m_irq_enable;
 };
 
@@ -283,7 +287,7 @@ DECLARE_DEVICE_TYPE(NES_DAOU306,     nes_daou306_device)
 DECLARE_DEVICE_TYPE(NES_CC21,        nes_cc21_device)
 DECLARE_DEVICE_TYPE(NES_XIAOZY,      nes_xiaozy_device)
 DECLARE_DEVICE_TYPE(NES_EDU2K,       nes_edu2k_device)
-DECLARE_DEVICE_TYPE(NES_MK2,         nes_mk2_device)
+DECLARE_DEVICE_TYPE(NES_JY830623C,   nes_jy830623c_device)
 DECLARE_DEVICE_TYPE(NES_43272,       nes_43272_device)
 DECLARE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device)
 //DECLARE_DEVICE_TYPE(NES_FUJIYA,      nes_fujiya_device)

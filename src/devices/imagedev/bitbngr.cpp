@@ -9,6 +9,10 @@
 #include "emu.h"
 #include "bitbngr.h"
 
+#include "softlist_dev.h"
+
+#include <cstring>
+
 
 
 /***************************************************************************
@@ -37,10 +41,8 @@ bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *ta
 
 void bitbanger_device::output(uint8_t data)
 {
-	if (exists())
-	{
+	if (!loaded_through_softlist() && exists())
 		fwrite(&data, 1);
-	}
 }
 
 
@@ -51,10 +53,9 @@ void bitbanger_device::output(uint8_t data)
 uint32_t bitbanger_device::input(void *buffer, uint32_t length)
 {
 	if (exists())
-	{
 		return fread(buffer, length);
-	}
-	return 0;
+	else
+		return 0;
 }
 
 
@@ -63,8 +64,19 @@ uint32_t bitbanger_device::input(void *buffer, uint32_t length)
     device_start
 -------------------------------------------------*/
 
-void bitbanger_device::device_start(void)
+void bitbanger_device::device_start()
 {
+}
+
+
+
+/*-------------------------------------------------
+    get_software_list_loader
+-------------------------------------------------*/
+
+const software_list_loader &bitbanger_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
 }
 
 
@@ -73,15 +85,15 @@ void bitbanger_device::device_start(void)
     call_load
 -------------------------------------------------*/
 
-image_init_result bitbanger_device::call_load(void)
+image_init_result bitbanger_device::call_load()
 {
-	/* we don't need to do anything special */
+	// we don't need to do anything special
 	return image_init_result::PASS;
 }
 
 image_init_result bitbanger_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	/* we don't need to do anything special */
+	// we don't need to do anything special
 	return image_init_result::PASS;
 }
 
@@ -89,6 +101,7 @@ image_init_result bitbanger_device::call_create(int format_type, util::option_re
     call_unload
 -------------------------------------------------*/
 
-void bitbanger_device::call_unload(void)
+void bitbanger_device::call_unload()
 {
+	// we don't need to do anything special
 }

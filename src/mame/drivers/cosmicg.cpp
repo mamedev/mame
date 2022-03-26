@@ -69,13 +69,13 @@ private:
 	required_region_ptr<u8> m_colormap;
 
 	/* video-related */
-	int            m_color_registers[2];
-	bool           m_flip_screen;
+	int            m_color_registers[2]{};
+	bool           m_flip_screen = false;
 
 	/* sound-related */
-	int            m_sound_enabled;
-	int            m_march_select;
-	int            m_gun_die_select;
+	int            m_sound_enabled = 0;
+	int            m_march_select = 0;
+	int            m_gun_die_select = 0;
 };
 
 

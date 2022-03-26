@@ -430,6 +430,8 @@ license:CC0
 		<description>Windows 98 Second Edition</description>
 		<year>1999</year>
 		<publisher>Microsoft</publisher>
+		<info name="alt_title" value="マイクロソフト ウィンドウズ 98 オペレイティング システム SECOND EDITION" />
+		<info name="serial" value="X04-67430"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="microsoft windows 98se" sha1="eb0bdd209334b3709fa31043f390838351127bc0" />

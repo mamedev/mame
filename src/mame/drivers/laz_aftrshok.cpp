@@ -60,7 +60,7 @@ private:
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 
-	u8 m_sound_data;
+	u8 m_sound_data = 0;
 };
 
 static INPUT_PORTS_START( aftrshok )

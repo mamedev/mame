@@ -36,11 +36,11 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	int      m_scroll_bit_8;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	int      m_scroll_bit_8 = 0;
 
 	/* sound-related */
-	int      m_theme_playing;
+	int      m_theme_playing = 0;
 
 	/* devices */
 	required_device<samples_device> m_samples;

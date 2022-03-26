@@ -86,14 +86,14 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<beep_device> m_beep;
 
-	u8 m_line_base;
-	u8 m_line_count;
-	bool m_latch_full;
-	u8 m_mcu_p2;
-	bool m_hsync;
+	u8 m_line_base = 0;
+	u8 m_line_count = 0;
+	bool m_latch_full = false;
+	u8 m_mcu_p2 = 0;
+	bool m_hsync = false;
 
-	emu_timer *m_hsync_on_timer;
-	emu_timer *m_hsync_off_timer;
+	emu_timer *m_hsync_on_timer = nullptr;
+	emu_timer *m_hsync_off_timer = nullptr;
 };
 
 void m79152pc_state::beep_w(offs_t offset, uint8_t data)

@@ -60,10 +60,10 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	bool       m_spriteram_select;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	bool       m_spriteram_select = false;
 
-	bool       m_irq_mask;
+	bool       m_irq_mask = false;
 	void sbasketb_sh_irqtrigger_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
@@ -73,9 +73,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(spriteram_select_w);
 
-	uint8_t m_SN76496_latch;
-	void  konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; };
-	void  konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); };
+	uint8_t m_SN76496_latch = 0;
+	void  konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
+	void  konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	void sbasketb_palette(palette_device &palette) const;

@@ -36,8 +36,8 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	int        m_palettebank;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	int        m_palettebank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -45,7 +45,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_irq_mask;
+	uint8_t m_irq_mask = 0;
 	uint8_t mikie_sh_timer_r();
 	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);

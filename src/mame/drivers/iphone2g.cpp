@@ -42,9 +42,9 @@ private:
 
 	devcb_write_line m_out_irq_func;
 
-	u8 cmd, tx_data;
-	u32 ctrl;
-	u16 status;
+	u8 m_cmd = 0, m_tx_data = 0;
+	u32 m_ctrl = 0;
+	u16 m_status = 0;
 };
 
 DECLARE_DEVICE_TYPE(IPHONE2G_SPI, iphone2g_spi_device)
@@ -56,20 +56,20 @@ void iphone2g_spi_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 void iphone2g_spi_device::map(address_map &map)
 {
-	map(0x00,0x03).lrw32(NAME([this](offs_t offset){ return ctrl; }), NAME([this](offs_t offset, u32 data){
+	map(0x00,0x03).lrw32(NAME([this](offs_t offset){ return m_ctrl; }), NAME([this](offs_t offset, u32 data){
 		if(data & 1)
 		{
-			status |= 0xfff2;
-			cmd = tx_data;
+			m_status |= 0xfff2;
+			m_cmd = m_tx_data;
 			timer_set(attotime::from_hz(1'000), TIMER_SEND_IRQ);
 		}
-		ctrl = data;
+		m_ctrl = data;
 	}));
-	map(0x08, 0x09).lr16([this](offs_t offset){ return status; }, "status").umask32(0x0000ffff);
-	map(0x10, 0x10).lrw8(NAME([this](offs_t offset){ return tx_data; }), NAME([this](offs_t offset, u8 data){ tx_data = data; })).umask32(0x000000ff);
+	map(0x08, 0x09).lr16([this](offs_t offset){ return m_status; }, "status").umask32(0x0000ffff);
+	map(0x10, 0x10).lrw8(NAME([this](offs_t offset){ return m_tx_data; }), NAME([this](offs_t offset, u8 data){ m_tx_data = data; })).umask32(0x000000ff);
 	map(0x20, 0x20).lr8([this](offs_t offset){
 		// FIXME: make this less hacky
-		switch(cmd)
+		switch(m_cmd)
 		{
 			case 0x95: return 0x01;
 			case 0xda: return 0x71;
@@ -95,15 +95,15 @@ void iphone2g_spi_device::device_resolve_objects()
 
 void iphone2g_spi_device::device_start()
 {
-	save_item(NAME(cmd));
-	save_item(NAME(ctrl));
-	save_item(NAME(tx_data));
-	save_item(NAME(status));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_tx_data));
+	save_item(NAME(m_status));
 }
 
 void iphone2g_spi_device::device_reset()
 {
-	cmd = ctrl= status = tx_data = 0;
+	m_cmd = m_ctrl= m_status = m_tx_data = 0;
 }
 
 DEFINE_DEVICE_TYPE(IPHONE2G_SPI, iphone2g_spi_device, "iphone2g_spi", "iPhone 2G SPI controller")
@@ -151,12 +151,12 @@ private:
 
 	struct timer
 	{
-		u16 config;
-		u8 state;
-		u32 count_buffer[2], count;
+		u16 config = 0;
+		u8 state = 0;
+		u32 count_buffer[2]{}, count = 0;
 	} timers[7];
 
-	u64 ticks;
+	//u64 m_ticks = 0;   not used
 };
 
 DECLARE_DEVICE_TYPE(IPHONE2G_TIMER, iphone2g_timer_device)

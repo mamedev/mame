@@ -41,10 +41,10 @@ private:
 	required_shared_ptr<uint8_t> m_vram4;
 	required_shared_ptr<uint8_t> m_scrollram;
 
-	int m_oldport;
-	tilemap_t *m_tilemap1;
-	tilemap_t *m_tilemap2;
-	tilemap_t *m_tilemap4;
+	int m_oldport = 0;
+	tilemap_t *m_tilemap1 = nullptr;
+	tilemap_t *m_tilemap2 = nullptr;
+	tilemap_t *m_tilemap4 = nullptr;
 	std::unique_ptr<uint8_t[]> m_buffer_spriteram;
 
 	uint8_t wheel_r();

@@ -123,7 +123,7 @@ static const nes_mmc mmc_list[] =
 	{ 88, NAMCOT_34X3 },
 	{ 89, SUNSOFT_2 },
 	{ 90, JYCOMPANY_A },
-	{ 91, UNL_MK2 },
+	{ 91, UNL_JY830623C },
 	{ 92, JALECO_JF19 },
 	{ 93, SUNSOFT_2 },
 	{ 94, STD_UN1ROM },
@@ -284,9 +284,9 @@ static const nes_mmc mmc_list[] =
 	// 248 Unused
 	{ 249, WAIXING_SECURITY },
 	{ 250, NITRA_TDA },
-	// 251 Shen Hua Jian Yun III?? - Unsupported
+	// 251 Unused
 	{ 252, WAIXING_SGZ },
-	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
+	{ 253, HENGG_SHJY3 },
 	{ 254, BTL_PIKACHUY2K },
 	{ 255, BMC_72IN1 },         // duplicate of mapper 225
 
@@ -516,7 +516,7 @@ static const nes_mmc mmc_list[] =
 	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
-	// 555 retroUSB re-release of 1991 Nintendo Campus Challenge
+	{ 555, STD_EVENT2 },
 	// 556 JY-215 multicart
 	{ 557, UNL_LG25 },             // Moero TwinBee FDS conversion
 	// 558 some games on YC-03-09 board (related to mappers 162-164)

@@ -6,7 +6,7 @@ Quiz Punch II (C)1989 Space Computer
 
 Driver by Luca Elia
 
-- It uses an unknown DIP40 device for protection, that supplies
+- It uses a COP MCU for protection, that supplies
   the address to jump to (same as mosaic.cpp) and handles the EEPROM
 
 PCB Layout
@@ -97,6 +97,19 @@ Notes:
 #include "speaker.h"
 #include "tilemap.h"
 
+// configurable logging
+#define LOG_SCROLL     (1U <<  1)
+#define LOG_MCU        (1U <<  2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SCROLL | LOG_MCU)
+
+#include "logmacro.h"
+
+#define LOGSCROLL(...)     LOGMASKED(LOG_SCROLL,     __VA_ARGS__)
+#define LOGMCU(...) LOGMASKED(LOG_MCU, __VA_ARGS__)
+
+
+namespace {
 
 class quizpun2_state : public driver_device
 {
@@ -110,7 +123,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_eeprom(*this, "eeprom"),
 		m_fg_ram(*this, "fg_ram"),
-		m_bg_ram(*this, "bg_ram")
+		m_bg_ram(*this, "bg_ram"),
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	void quizpun2_base(machine_config &config);
@@ -131,6 +145,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_shared_ptr<uint8_t> m_fg_ram;
 	required_shared_ptr<uint8_t> m_bg_ram;
+	required_memory_bank m_mainbank;
 
 	tilemap_t *m_bg_tmap;
 	tilemap_t *m_fg_tmap;
@@ -150,8 +165,10 @@ private:
 	void rombank_w(uint8_t data);
 	void irq_ack(uint8_t data);
 	void soundlatch_w(uint8_t data);
+	uint8_t protection_r();
+	void protection_w(uint8_t data);
 
-	uint32_t screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// quizpun2
 	void cop_d_w(uint8_t data);
@@ -170,14 +187,11 @@ private:
 	uint8_t quizpun_68705_port_c_r();
 	void quizpun_68705_port_c_w(uint8_t data);
 
-	uint8_t quizpun_protection_r();
-	void quizpun_protection_w(uint8_t data);
-
 	void quizpun2_cop_map(address_map &map);
-	void quizpun2_io_map(address_map &map);
-	void quizpun2_map(address_map &map);
-	void quizpun2_sound_io_map(address_map &map);
-	void quizpun2_sound_map(address_map &map);
+	void io_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 /***************************************************************************
@@ -186,27 +200,27 @@ private:
 
 TILE_GET_INFO_MEMBER(quizpun2_state::get_bg_tile_info)
 {
-	uint16_t code = m_bg_ram[ tile_index * 2 ] + m_bg_ram[ tile_index * 2 + 1 ] * 256;
+	uint16_t code = m_bg_ram[tile_index * 2] + m_bg_ram[tile_index * 2 + 1] * 256;
 	tileinfo.set(0, code, code >> 12, TILE_FLIPXY((code & 0x800) >> 11));
 }
 
 TILE_GET_INFO_MEMBER(quizpun2_state::get_fg_tile_info)
 {
-	uint16_t code  = m_fg_ram[ tile_index * 4 ]/* + m_fg_ram[ tile_index * 4 + 1 ] * 256*/;
-	uint8_t  color = m_fg_ram[ tile_index * 4 + 2 ];
+	uint16_t code  = m_fg_ram[tile_index * 4]; // + m_fg_ram[tile_index * 4 + 1] * 256
+	uint8_t  color = m_fg_ram[tile_index * 4 + 2];
 	tileinfo.set(1, code, color / 2, 0);
 }
 
 void quizpun2_state::bg_ram_w(offs_t offset, uint8_t data)
 {
 	m_bg_ram[offset] = data;
-	m_bg_tmap->mark_tile_dirty(offset/2);
+	m_bg_tmap->mark_tile_dirty(offset / 2);
 }
 
 void quizpun2_state::fg_ram_w(offs_t offset, uint8_t data)
 {
 	m_fg_ram[offset] = data;
-	m_fg_tmap->mark_tile_dirty(offset/4);
+	m_fg_tmap->mark_tile_dirty(offset / 4);
 }
 
 void quizpun2_state::scroll_w(uint8_t data)
@@ -216,14 +230,16 @@ void quizpun2_state::scroll_w(uint8_t data)
 
 void quizpun2_state::video_start()
 {
-	m_bg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpun2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
-	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpun2_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
+	m_bg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpun2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x40);
+	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpun2_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x40);
 
 	m_bg_tmap->set_transparent_pen(0);
 	m_fg_tmap->set_transparent_pen(0);
+
+	save_item(NAME(m_scroll));
 }
 
-uint32_t quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quizpun2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -248,7 +264,7 @@ uint32_t quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_in
 
 	if (layers_ctrl & 2)    m_fg_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
-//  popmessage("BG: %x FG: %x", bg_scroll, fg_scroll);
+	LOGSCROLL("BG: %x FG: %x", bg_scroll, fg_scroll);
 
 	return 0;
 }
@@ -266,12 +282,18 @@ uint32_t quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_in
 void quizpun2_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x2000);
+	m_mainbank->configure_entries(0, 0x20, &ROM[0x10000], 0x2000);
+
+	save_item(NAME(m_mcu_data_port));
+	save_item(NAME(m_mcu_control_port));
+	save_item(NAME(m_mcu_pending));
+	save_item(NAME(m_mcu_repeat));
+	save_item(NAME(m_mcu_written));
 }
 
 void quizpun2_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
+	m_mainbank->set_entry(0);
 
 	// quizpun2 service mode needs this to fix a race condition since the MCU takes a while to start up
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -319,7 +341,7 @@ uint8_t quizpun2_state::cop_in_r()
 
 void quizpun2_state::rombank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x1f);
+	m_mainbank->set_entry(data & 0x1f);
 }
 
 void quizpun2_state::irq_ack(uint8_t data)
@@ -333,19 +355,19 @@ void quizpun2_state::soundlatch_w(uint8_t data)
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void quizpun2_state::quizpun2_map(address_map &map)
+void quizpun2_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("bank1");
+	map(0x8000, 0x9fff).bankr(m_mainbank);
 
-	map(0xa000, 0xbfff).ram().w(FUNC(quizpun2_state::fg_ram_w)).share("fg_ram");
-	map(0xc000, 0xcfff).ram().w(FUNC(quizpun2_state::bg_ram_w)).share("bg_ram");
+	map(0xa000, 0xbfff).ram().w(FUNC(quizpun2_state::fg_ram_w)).share(m_fg_ram);
+	map(0xc000, 0xcfff).ram().w(FUNC(quizpun2_state::bg_ram_w)).share(m_bg_ram);
 
 	map(0xd000, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe000, 0xffff).ram();
 }
 
-void quizpun2_state::quizpun2_io_map(address_map &map)
+void quizpun2_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x40).w(FUNC(quizpun2_state::irq_ack));
@@ -355,7 +377,7 @@ void quizpun2_state::quizpun2_io_map(address_map &map)
 	map(0x80, 0x80).portr("DSW");
 	map(0x90, 0x90).portr("IN0");
 	map(0xa0, 0xa0).portr("IN1");
-	map(0xe0, 0xe0).rw(FUNC(quizpun2_state::quizpun_protection_r), FUNC(quizpun2_state::quizpun_protection_w));
+	map(0xe0, 0xe0).rw(FUNC(quizpun2_state::protection_r), FUNC(quizpun2_state::protection_w));
 }
 
 void quizpun2_state::quizpun2_cop_map(address_map &map)
@@ -365,19 +387,19 @@ void quizpun2_state::quizpun2_cop_map(address_map &map)
 
 // quizpun
 
-uint8_t quizpun2_state::quizpun_protection_r()
+uint8_t quizpun2_state::protection_r()
 {
-//  logerror("%s: port A read %02x\n", machine().describe_context(), m_mcu_data_port);
+	LOGMCU("%s: port A read %02x\n", machine().describe_context(), m_mcu_data_port);
 
 	/*
-	   Upon reading this port the main cpu is stalled until the mcu provides the value to read
+	   Upon reading this port the main CPU is stalled until the MCU provides the value to read
 	   and explicitly un-stalls the z80. Is this possible under the current MAME architecture?
 
 	   ** ghastly hack **
 
-	   The first read stalls the main cpu and triggers the mcu, it returns an incorrect value.
-	   It also decrements the main cpu PC back to the start of the read instruction.
-	   When the mcu un-stalls the Z80, the read happens again, returning the correct mcu-provided value this time
+	   The first read stalls the main CPU and triggers the MCU, it returns an incorrect value.
+	   It also decrements the main CPU PC back to the start of the read instruction.
+	   When the MCU un-stalls the Z80, the read happens again, returning the correct MCU-provided value this time
 	*/
 	if (m_mcu_repeat)
 	{
@@ -397,9 +419,9 @@ uint8_t quizpun2_state::quizpun_protection_r()
 	return m_mcu_data_port;
 }
 
-void quizpun2_state::quizpun_protection_w(uint8_t data)
+void quizpun2_state::protection_w(uint8_t data)
 {
-//  logerror("%s: port A write %02x\n", machine().describe_context(), data);
+	LOGMCU("%s: port A write %02x\n", machine().describe_context(), data);
 	m_mcu_data_port = data;
 	m_mcu_pending = true;
 	m_mcu_written = true;
@@ -411,27 +433,27 @@ void quizpun2_state::quizpun_protection_w(uint8_t data)
                             Memory Maps - MCU
 ***************************************************************************/
 
-// Port A - I/O with main cpu (data)
+// Port A - I/O with main CPU (data)
 
 uint8_t quizpun2_state::quizpun_68705_port_a_r()
 {
-//  logerror("%s: port A read %02x\n", machine().describe_context(), m_mcu_data_port);
+	LOGMCU("%s: port A read %02x\n", machine().describe_context(), m_mcu_data_port);
 	return m_mcu_data_port;
 }
 
 void quizpun2_state::quizpun_68705_port_a_w(uint8_t data)
 {
-//  logerror("%s: port A write %02x\n", machine().describe_context(), data);
+	LOGMCU("%s: port A write %02x\n", machine().describe_context(), data);
 	m_mcu_data_port = data;
 }
 
-// Port B - I/O with main cpu (status)
+// Port B - I/O with main CPU (status)
 
 uint8_t quizpun2_state::quizpun_68705_port_b_r()
 {
 	// bit 3: 0 = pending
-	// bit 1: 0 = main cpu has written
-	// bit 0: 0 = main cpu is reading
+	// bit 1: 0 = main CPU has written
+	// bit 0: 0 = main CPU is reading
 
 	uint8_t const ret =
 			0xf4 |
@@ -439,15 +461,15 @@ uint8_t quizpun2_state::quizpun_68705_port_b_r()
 			((m_mcu_pending &&  m_mcu_written) ? 0 : (1 << 1)) |
 			((m_mcu_pending && !m_mcu_written) ? 0 : (1 << 0));
 
-//  logerror("%s: port B read %02x\n", machine().describe_context(), ret);
+	LOGMCU("%s: port B read %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void quizpun2_state::quizpun_68705_port_b_w(uint8_t data)
 {
-//  logerror("%s: port B write %02x\n", machine().describe_context(), data);
+	LOGMCU("%s: port B write %02x\n", machine().describe_context(), data);
 
-	// bit 2: 0->1 run main cpu
+	// bit 2: 0->1 run main CPU
 
 	if (!BIT(m_mcu_control_port, 2) && BIT(data, 2))
 	{
@@ -462,7 +484,7 @@ void quizpun2_state::quizpun_68705_port_b_w(uint8_t data)
 uint8_t quizpun2_state::quizpun_68705_port_c_r()
 {
 	uint8_t const ret = 0xf7 | (m_eeprom->do_read() ? 0x08 : 0x00);
-//  logerror("%s: port C read %02x\n", machine().describe_context(), ret);
+	LOGMCU("%s: port C read %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -477,20 +499,20 @@ void quizpun2_state::quizpun_68705_port_c_w(uint8_t data)
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 
-//  logerror("%s: port C write %02x\n", machine().describe_context(), data);
+	LOGMCU("%s: port C write %02x\n", machine().describe_context(), data);
 }
 
 /***************************************************************************
                             Memory Maps - Sound CPU
 ***************************************************************************/
 
-void quizpun2_state::quizpun2_sound_map(address_map &map)
+void quizpun2_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xf7ff).rom();
 	map(0xf800, 0xffff).ram();
 }
 
-void quizpun2_state::quizpun2_sound_io_map(address_map &map)
+void quizpun2_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).nopw();  // IRQ end
@@ -582,33 +604,33 @@ GFXDECODE_END
 
 void quizpun2_state::quizpun2_base(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2); // 4 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &quizpun2_state::quizpun2_map);
-	m_maincpu->set_addrmap(AS_IO, &quizpun2_state::quizpun2_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &quizpun2_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &quizpun2_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(quizpun2_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(8'000'000) / 2); // 4 MHz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &quizpun2_state::quizpun2_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &quizpun2_state::quizpun2_sound_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &quizpun2_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &quizpun2_state::sound_io_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(quizpun2_state::irq0_line_hold));
 	// NMI generated by main CPU
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 256);
 	screen.set_visarea(0, 384-1, 0, 256-1);
-	screen.set_screen_update(FUNC(quizpun2_state::screen_update_quizpun2));
+	screen.set_screen_update(FUNC(quizpun2_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizpun2);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x200);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -655,7 +677,7 @@ ROM_START( quizpun2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "u111", 0x00000, 0x08000, CRC(14bdaffc) SHA1(7fb5988ea565d7cbe3c8e2cdb9402d3cf81507d7) )
 	ROM_LOAD( "u117", 0x10000, 0x10000, CRC(e9d1d05e) SHA1(c24104e023d12db8c9199d3e18750414aa511e40) )
-	ROM_LOAD( "u118", 0x20000, 0x10000, CRC(1f232707) SHA1(3f5f44611f25c556521333f15daf3e2128cc1538) BAD_DUMP ) // fails rom check
+	ROM_LOAD( "u118", 0x20000, 0x10000, CRC(1f232707) SHA1(3f5f44611f25c556521333f15daf3e2128cc1538) BAD_DUMP ) // fails ROM check
 	ROM_LOAD( "u119", 0x30000, 0x10000, CRC(c73b82f7) SHA1(d5c683440e9db46dd5859b519b3f32da80352626) )
 	ROM_LOAD( "u120", 0x40000, 0x10000, CRC(700648b8) SHA1(dfa824166dfe7361d7c2ab0d8aa1ada882916cb9) )
 
@@ -718,5 +740,8 @@ ROM_START( quizpun )
 	ROM_LOAD( "02.u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
 ROM_END
 
-GAME( 1988, quizpun,  0, quizpun,  quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, quizpun2, 0, quizpun2, quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+} // anonymous namespace
+
+
+GAME( 1988, quizpun,  0, quizpun,  quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, quizpun2, 0, quizpun2, quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

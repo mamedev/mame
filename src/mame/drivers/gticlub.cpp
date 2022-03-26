@@ -339,7 +339,7 @@ private:
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
 
-	emu_timer *m_sound_irq_timer;
+	emu_timer *m_sound_irq_timer = nullptr;
 
 #if DEBUG_GTI
 	uint8_t m_tick = 0;

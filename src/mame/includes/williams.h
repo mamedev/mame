@@ -171,7 +171,7 @@ private:
 
 	virtual void main_map(address_map &map) override;
 
-	uint8_t *m_protection;
+	uint8_t *m_protection = nullptr;
 	u8 protection_r(offs_t offset);
 };
 
@@ -336,9 +336,9 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_tileram;
 
-	tilemap_t *m_bg_tilemap;
-	uint16_t m_tilemap_xscroll;
-	uint8_t m_fg_color;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint16_t m_tilemap_xscroll = 0;
+	uint8_t m_fg_color = 0;
 	std::array<float, 3> m_gain;
 	std::array<float, 3> m_offset;
 
@@ -434,7 +434,7 @@ private:
 
 	int color_decode(uint8_t base_col, int sig_J1, int y);
 
-	uint8_t m_bg_color;
+	uint8_t m_bg_color = 0;
 
 };
 
@@ -487,7 +487,7 @@ private:
 
 	required_device<ls157_device> m_mux;
 	required_device<s11_obg_device> m_bg;
-	uint16_t m_current_sound_data;
+	uint16_t m_current_sound_data = 0;
 
 	virtual TILE_GET_INFO_MEMBER(get_tile_info) override;
 	virtual void bg_select_w(u8 data) override;

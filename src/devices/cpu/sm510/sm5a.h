@@ -23,23 +23,37 @@
         ____________________________________________________________
        |                                                            |
 OS1 46 |                                                            | 30 H1
+       |                                                            |
 O41 47 |                                                            | 29 H2
+       |                                                            |
 O31 48 |                                                            | 28 Vm
+       |                                                            |
 O21 49 |                                                            | 27 Vdd
+       |                                                            |
 O11 50 |                                                            | 26 _R2
+       |                                                            |
 O42 51 |                                                            | 25 _R3
-O32 52 |                          SM5A                              | 24 _R4
-O22 53 |                          SM5L                              | 23 OSCin
+       |                                                            |
+O32 52 |                                                            | 24 _R4
+       |                            SM5A                            |
+O22 53 |                            SM5L                            | 23 OSCin
+       |                                                            |
 O12 54 |                                                            | 22 OSCout
+       |                                                            |
 O43 55 |                                                            | 21 _T2
+       |                                                            |
 O33 56 |                                                            | 20 _T1
+       |                                                            |
 O23 57 |                                                            | 19 O18
+       |                                                            |
 O13 58 |                                                            | 18 O28
+       |                                                            |
 O44 59 |                                                            | 17 O38
-O34 60 | *                                                          | 16 O48
+       |                                                            |
+O34 60 |  *                                                         | 16 O48
        |____________________________________________________________/
 
-         1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+          1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
          O24 O14 O45 O35 O25 O15 O46 GND O36 O26 O16 O47 O37 O27 O17
 */
 
@@ -56,6 +70,10 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;
+
+	u8 mirror_r(offs_t offset) { return m_data->read_byte(offset & 0x7c); }
+	void mirror_w(offs_t offset, u8 data) { m_data->write_byte(offset & 0x7c, data); }
+
 	virtual int get_trs_field() override { return 1; }
 };
 

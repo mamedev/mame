@@ -26,6 +26,7 @@
 #include "samples.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 
 #include "flac.h"
 

@@ -80,7 +80,7 @@ private:
 	optional_device<hp_hil_mlc_device> m_mlc;
 	std::vector<uint8_t> m_vram;
 
-	uint8_t m_mask, m_val;
+	uint8_t m_mask = 0, m_val = 0;
 
 	void palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 

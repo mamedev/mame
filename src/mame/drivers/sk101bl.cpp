@@ -58,11 +58,11 @@ private:
 	required_device<hd44780_device> m_lcdc;
 	optional_ioport_array<16> m_key_row;
 
-	u8 m_p1_data;
-	u8 m_lcd_control;
-	u16 m_key_scan;
-	u16 m_shift_output;
-	u8 m_row_counter;
+	u8 m_p1_data = 0;
+	u8 m_lcd_control = 0;
+	u16 m_key_scan = 0;
+	u16 m_shift_output = 0;
+	u8 m_row_counter = 0;
 };
 
 void sk101bl_state::machine_start()

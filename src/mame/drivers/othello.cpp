@@ -82,14 +82,14 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	int    m_tile_bank;
+	int    m_tile_bank = 0;
 
 	/* misc */
-	int   m_ay_select;
-	int   m_ack_data;
-	uint8_t m_n7751_command;
-	int m_sound_addr;
-	int m_n7751_busy;
+	int   m_ay_select = 0;
+	int   m_ack_data = 0;
+	uint8_t m_n7751_command = 0;
+	int m_sound_addr = 0;
+	int m_n7751_busy = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

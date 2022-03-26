@@ -116,28 +116,28 @@ protected:
 	/* video-related */
 	struct cvs_star
 	{
-		int x, y, code;
+		int x = 0, y = 0, code = 0;
 	};
 
-	cvs_star m_stars[CVS_MAX_STARS];
-	bitmap_ind16   m_collision_background;
-	bitmap_ind16   m_background_bitmap;
-	bitmap_ind16   m_scrolled_collision_background;
-	int        m_collision_register;
-	int        m_total_stars;
-	int        m_stars_on;
-	uint8_t      m_scroll_reg;
-	int        m_stars_scroll;
+	cvs_star m_stars[CVS_MAX_STARS]{};
+	bitmap_ind16   m_collision_background = 0;
+	bitmap_ind16   m_background_bitmap = 0;
+	bitmap_ind16   m_scrolled_collision_background = 0;
+	int        m_collision_register = 0;
+	int        m_total_stars = 0;
+	int        m_stars_on = 0;
+	uint8_t      m_scroll_reg = 0U;
+	int        m_stars_scroll = 0;
 
 	/* misc */
-	int m_s2650_flag;
-	emu_timer  *m_cvs_393hz_timer;
-	uint8_t      m_cvs_393hz_clock;
-	uint8_t      m_protection_counter;
+	int m_s2650_flag = 0;
+	emu_timer  *m_cvs_393hz_timer = nullptr;
+	uint8_t      m_cvs_393hz_clock = 0U;
+	uint8_t      m_protection_counter = 0U;
 
-	uint8_t      m_character_banking_mode;
-	uint16_t     m_character_ram_page_start;
-	uint16_t     m_speech_rom_bit_address;
+	uint8_t      m_character_banking_mode = 0U;
+	uint16_t     m_character_ram_page_start = 0U;
+	uint16_t     m_speech_rom_bit_address = 0U;
 
 	/* devices */
 	required_device<s2650_device> m_maincpu;

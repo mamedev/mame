@@ -75,17 +75,21 @@ Keyboard:
 **********************************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/keyboard.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/keyboard.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "bus/rs232/rs232.h"
 #include "machine/timer.h"
-#include "emupal.h"
-#include "screen.h"
 
+#include "screen.h"
+#include "emupal.h"
+
+
+namespace {
 
 class okean240_state : public driver_device
 {
@@ -132,7 +136,7 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 	optional_ioport_array<11> m_io_keyboard;
 	optional_ioport m_io_modifiers;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -399,20 +403,22 @@ void okean240_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom+0x2000);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xe000, 0xe7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xe000, 0xe7ff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 u32 okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -553,6 +559,8 @@ ROM_START( okean240t )
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "test.bin",    0x2000, 0x0800, CRC(e9e2b7b9) SHA1(e4e0b6984a2514b6ba3e97500d487ea1a68b7577) )
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

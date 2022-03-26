@@ -130,7 +130,7 @@ const uint32_t PTYPE_MF   = PTYPE_M | PTYPE_F;
 //**************************************************************************
 
 #define X86_CONDITION(condition)        (condition_map[condition - uml::COND_Z])
-#define X86_NOT_CONDITION(condition)    (condition_map[condition - uml::COND_Z] ^ 1)
+#define X86_NOT_CONDITION(condition)    negateCond(condition_map[condition - uml::COND_Z])
 
 #define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
 #define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
@@ -159,24 +159,24 @@ static uint8_t flags_map[0x1000];
 static uint32_t flags_unmap[0x20];
 
 // condition mapping table
-static const Condition::Code condition_map[uml::COND_MAX - uml::COND_Z] =
+static const CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 {
-	Condition::Code::kZ,    // COND_Z = 0x80,    requires Z
-	Condition::Code::kNZ,   // COND_NZ,          requires Z
-	Condition::Code::kS,    // COND_S,           requires S
-	Condition::Code::kNS,   // COND_NS,          requires S
-	Condition::Code::kC,    // COND_C,           requires C
-	Condition::Code::kNC,   // COND_NC,          requires C
-	Condition::Code::kO,    // COND_V,           requires V
-	Condition::Code::kNO,   // COND_NV,          requires V
-	Condition::Code::kP,    // COND_U,           requires U
-	Condition::Code::kNP,   // COND_NU,          requires U
-	Condition::Code::kA,    // COND_A,           requires CZ
-	Condition::Code::kBE,   // COND_BE,          requires CZ
-	Condition::Code::kG,    // COND_G,           requires SVZ
-	Condition::Code::kLE,   // COND_LE,          requires SVZ
-	Condition::Code::kL,    // COND_L,           requires SV
-	Condition::Code::kGE,   // COND_GE,          requires SV
+	CondCode::kZ,    // COND_Z = 0x80,    requires Z
+	CondCode::kNZ,   // COND_NZ,          requires Z
+	CondCode::kS,    // COND_S,           requires S
+	CondCode::kNS,   // COND_NS,          requires S
+	CondCode::kC,    // COND_C,           requires C
+	CondCode::kNC,   // COND_NC,          requires C
+	CondCode::kO,    // COND_V,           requires V
+	CondCode::kNO,   // COND_NV,          requires V
+	CondCode::kP,    // COND_U,           requires U
+	CondCode::kNP,   // COND_NU,          requires U
+	CondCode::kA,    // COND_A,           requires CZ
+	CondCode::kBE,   // COND_BE,          requires CZ
+	CondCode::kG,    // COND_G,           requires SVZ
+	CondCode::kLE,   // COND_LE,          requires SVZ
+	CondCode::kL,    // COND_L,           requires SV
+	CondCode::kGE,   // COND_GE,          requires SV
 };
 
 // FPU control register mapping
@@ -353,7 +353,7 @@ drcbe_x86::be_parameter::be_parameter(drcbe_x86 &drcbe, parameter const &param, 
 //  checkparam
 //-------------------------------------------------
 
-inline Gp drcbe_x86::be_parameter::select_register(Gp const &defreg) const
+inline Gpd drcbe_x86::be_parameter::select_register(Gpd const &defreg) const
 {
 	if (m_type == PTYPE_INT_REGISTER)
 		return Gpd(m_value);
@@ -517,7 +517,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		m_log(nullptr),
 		m_log_asmjit(nullptr),
 		m_logged_common(false),
-		m_sse3(CpuInfo::host().features().as<Features>().hasSSE3()),
+		m_sse3(CpuInfo::host().features().x86().hasSSE3()),
 		m_entry(nullptr),
 		m_exit(nullptr),
 		m_nocode(nullptr),
@@ -624,7 +624,7 @@ size_t drcbe_x86::emit(CodeHolder &ch)
 	if (cachetop == nullptr)
 		return 0;
 
-	err = ch.copyFlattenedData(drccodeptr(ch.baseAddress()), code_size, CodeHolder::kCopyWithPadding);
+	err = ch.copyFlattenedData(drccodeptr(ch.baseAddress()), code_size, CopySectionFlags::kPadTargetBuffer);
 	if (err)
 		throw emu_fatalerror("asmjit::CodeHolder::copyFlattenedData() error %d", err);
 
@@ -649,26 +649,26 @@ void drcbe_x86::reset()
 	x86code *dst = (x86code *)m_cache.top();
 
 	CodeHolder ch;
-	ch.init(hostEnvironment(), uint64_t(dst));
+	ch.init(Environment::host(), uint64_t(dst));
 
 	FileLogger logger(m_log_asmjit);
 	if (logger.file())
 	{
-		logger.setFlags(FormatOptions::Flags::kFlagHexOffsets | FormatOptions::Flags::kFlagHexImms | FormatOptions::Flags::kFlagMachineCode);
-		logger.setIndentation(FormatOptions::IndentationType::kIndentationCode, 4);
+		logger.setFlags(FormatFlags::kHexOffsets | FormatFlags::kHexImms | FormatFlags::kMachineCode);
+		logger.setIndentation(FormatIndentationGroup::kCode, 4);
 		ch.setLogger(&logger);
 	}
 
 	Assembler a(&ch);
 	if (logger.file())
-		a.addValidationOptions(BaseEmitter::kValidationOptionIntermediate);
+		a.addDiagnosticOptions(DiagnosticOptions::kValidateIntermediate);
 
 	// generate an entry point
 	m_entry = (x86_entry_point_func)dst;
 	a.bind(a.newNamedLabel("entry_point"));
 
 	FuncDetail entry_point;
-	entry_point.init(FuncSignatureT<uint32_t, x86code *>(CallConv::kIdHost), hostEnvironment());
+	entry_point.init(FuncSignatureT<uint32_t, x86code *>(CallConvId::kHost), Environment::host());
 
 	FuncFrame frame;
 	frame.init(entry_point);
@@ -822,21 +822,21 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 	x86code *dst = (x86code *)(uint64_t(m_cache.top() + 63) & ~63);
 
 	CodeHolder ch;
-	ch.init(hostEnvironment(), uint64_t(dst));
+	ch.init(Environment::host(), uint64_t(dst));
 	ThrowableErrorHandler e;
 	ch.setErrorHandler(&e);
 
 	FileLogger logger(m_log_asmjit);
 	if (logger.file())
 	{
-		logger.setFlags(FormatOptions::Flags::kFlagHexOffsets | FormatOptions::Flags::kFlagHexImms | FormatOptions::Flags::kFlagMachineCode);
-		logger.setIndentation(FormatOptions::IndentationType::kIndentationCode, 4);
+		logger.setFlags(FormatFlags::kHexOffsets | FormatFlags::kHexImms | FormatFlags::kMachineCode);
+		logger.setIndentation(FormatIndentationGroup::kCode, 4);
 		ch.setLogger(&logger);
 	}
 
 	Assembler a(&ch);
 	if (logger.file())
-		a.addValidationOptions(BaseEmitter::kValidationOptionIntermediate);
+		a.addDiagnosticOptions(DiagnosticOptions::kValidateIntermediate);
 
 	// generate code
 	std::string blockname;
@@ -3416,7 +3416,7 @@ void drcbe_x86::op_sext(Assembler &a, const instruction &inst)
 	assert(sizep.is_size());
 
 	// pick a target register for the general case
-	Gp const dstreg = (inst.size() == 8) ? eax : dstp.select_register(eax);
+	Gp const dstreg = dstp.select_register(eax);
 
 	// convert 8-bit source registers to EAX
 	if (sizep.size() == SIZE_BYTE && srcp.is_int_register() && (srcp.ireg() & 4))

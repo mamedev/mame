@@ -22,7 +22,10 @@
 
 #include "emu.h"
 
+#include "bus/ieee488/ieee488.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/cassette.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/bankdev.h"
@@ -32,13 +35,10 @@
 #include "machine/ram.h"
 #include "machine/tms9914.h"
 #include "video/saa5050.h"
-#include "bus/ieee488/ieee488.h"
-#include "bus/rs232/rs232.h"
-#include "imagedev/cassette.h"
-#include "speaker.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 // Debugging
@@ -77,8 +77,8 @@ private:
 	// disassembly override
 	offs_t os9_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
-	emu_timer *m_fuse_timer;
-	bool m_fuse_timer_running;
+	emu_timer *m_fuse_timer = nullptr;
+	bool m_fuse_timer_running = false;
 
 	void positron_map(address_map &map);
 	void positron_fetch(address_map &map);
@@ -89,11 +89,11 @@ private:
 
 	// sockets for upto 8 x SC67476, only 2 actually fitted in this machine
 	struct mmu {
-		uint16_t access_reg[1024];
-		uint8_t key_value[8];
-		uint8_t access_key;
-		uint8_t operate_key;
-		uint8_t active_key;
+		uint16_t access_reg[1024]{};
+		uint8_t key_value[8]{};
+		uint8_t access_key = 0;
+		uint8_t operate_key = 0;
+		uint8_t active_key = 0;
 		bool sbit;
 	} m_mmu;
 
@@ -101,8 +101,7 @@ private:
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	bool m_irq_ack;
+	bool m_irq_ack = 0;
 
 	required_device<mc6809_device> m_maincpu;
 	required_device<address_map_bank_device> m_mmu_bankdev;
@@ -112,7 +111,7 @@ private:
 	required_shared_ptr<uint8_t> m_lores_ram;
 	required_device<cassette_image_device> m_cassette;
 
-	memory_passthrough_handler *m_mmu_shadow_tap;
+	memory_passthrough_handler m_mmu_shadow_tap;
 
 	uint8_t m_prev_opcode;
 };
@@ -152,30 +151,32 @@ void positron_state::machine_reset()
 	m_mmu.active_key = 0;
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	m_mmu_shadow_tap = program.install_read_tap(0x0000, 0xffff, "mmu_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			if (m_fuse_timer_running && m_prev_opcode == 0x3b) // RTI
+	m_mmu_shadow_tap.remove();
+	m_mmu_shadow_tap = program.install_read_tap(
+			0x0000, 0xffff,
+			"mmu_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
-				m_mmu.active_key = m_mmu.operate_key;
-				logerror("mmu_shadow_r: switched to task %d\n", m_mmu.active_key);
-				m_mmu.sbit = false;
-				m_fuse_timer_running = false;
-			}
-			else if (m_irq_ack && offset >= 0xfff0 && offset != 0xffff)
-			{
-				m_mmu.active_key = 0;
-				logerror("irq_callback: switched to task %d\n", m_mmu.active_key);
-				m_mmu.sbit = true;
-				m_irq_ack = false;
-				data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
-			}
-		}
-
-		// return the original data
-		return data;
-	});
+				if (!machine().side_effects_disabled())
+				{
+					if (m_fuse_timer_running && m_prev_opcode == 0x3b) // RTI
+					{
+						m_mmu.active_key = m_mmu.operate_key;
+						logerror("mmu_shadow_r: switched to task %d\n", m_mmu.active_key);
+						m_mmu.sbit = false;
+						m_fuse_timer_running = false;
+					}
+					else if (m_irq_ack && offset >= 0xfff0 && offset != 0xffff)
+					{
+						m_mmu.active_key = 0;
+						logerror("irq_callback: switched to task %d\n", m_mmu.active_key);
+						m_mmu.sbit = true;
+						m_irq_ack = false;
+						data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+					}
+				}
+			},
+			&m_mmu_shadow_tap);
 }
 
 
@@ -380,14 +381,6 @@ void positron_state::ram_w(offs_t offset, uint8_t data)
 }
 
 
-IRQ_CALLBACK_MEMBER(positron_state::irq_callback)
-{
-	m_irq_ack = true;
-
-	return 0;
-}
-
-
 static INPUT_PORTS_START(positron)
 	PORT_START("COL0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RETURN")             PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
@@ -490,12 +483,12 @@ static INPUT_PORTS_START(positron)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("COL10") // Graphics Encoding
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE // unlabelled Viewdata 2x3 matrix toggle
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REP")                PORT_CODE(KEYCODE_PGUP)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENC")                PORT_CODE(KEYCODE_PGDN)
 
@@ -837,11 +830,11 @@ offs_t positron_state::os9_dasm_override(std::ostream &stream, offs_t pc, const 
 
 void positron_state::positron(machine_config &config)
 {
-	MC6809(config, m_maincpu, 24_MHz_XTAL / 24);
+	MC6809(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &positron_state::positron_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &positron_state::positron_fetch);
 	m_maincpu->set_dasm_override(FUNC(positron_state::os9_dasm_override));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(positron_state::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(NAME([this](device_t&, int) -> int { m_irq_ack = true; return 0; }));
 
 	ADDRESS_MAP_BANK(config, m_mmu_bankdev); // SC67476
 	m_mmu_bankdev->set_addrmap(0, &positron_state::mmu_map);

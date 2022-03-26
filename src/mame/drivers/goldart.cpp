@@ -83,7 +83,7 @@ private:
 	uint8_t m_ram[0x10000];
 	uint8_t m_ram2[0x10000];
 
-	uint8_t m_port1;
+	uint8_t m_port1 = 0;
 
 	uint8_t hostmem_r(offs_t offset);
 	void hostmem_w(offs_t offset, uint8_t data);

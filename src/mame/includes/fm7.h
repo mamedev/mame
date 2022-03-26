@@ -97,45 +97,45 @@ protected:
 
 	struct fm7_video_t
 	{
-		uint8_t sub_busy;
-		uint8_t sub_halt;
-		uint8_t sub_reset;  // high if reset caused by subrom change
-		uint8_t attn_irq;
-		uint8_t vram_access;  // VRAM access flag
-		uint8_t crt_enable;
-		uint16_t vram_offset;
-		uint16_t vram_offset2;
-		uint8_t fm7_pal[8];
-		uint16_t fm77av_pal_selected;
-		uint8_t subrom;  // currently active sub CPU ROM (AV only)
-		uint8_t cgrom;  // currently active CGROM (AV only)
-		uint8_t modestatus;
-		uint8_t multi_page;
-		uint8_t fine_offset;
-		uint8_t nmi_mask;
-		uint8_t active_video_page;
-		uint8_t display_video_page;
-		uint8_t vsync_flag;
+		uint8_t sub_busy = 0U;
+		uint8_t sub_halt = 0U;
+		uint8_t sub_reset = 0U;  // high if reset caused by subrom change
+		uint8_t attn_irq = 0U;
+		uint8_t vram_access = 0U;  // VRAM access flag
+		uint8_t crt_enable = 0U;
+		uint16_t vram_offset = 0U;
+		uint16_t vram_offset2 = 0U;
+		uint8_t fm7_pal[8]{};
+		uint16_t fm77av_pal_selected = 0U;
+		uint8_t subrom = 0U;  // currently active sub CPU ROM (AV only)
+		uint8_t cgrom = 0U;  // currently active CGROM (AV only)
+		uint8_t modestatus = 0U;
+		uint8_t multi_page = 0U;
+		uint8_t fine_offset = 0U;
+		uint8_t nmi_mask = 0U;
+		uint8_t active_video_page = 0U;
+		uint8_t display_video_page = 0U;
+		uint8_t vsync_flag = 0U;
 	};
 
 	struct fm7_alu_t
 	{
-		uint8_t command;
-		uint8_t lcolour;
-		uint8_t mask;
-		uint8_t compare_data;
-		uint8_t compare[8];
-		uint8_t bank_disable;
-		uint8_t tilepaint_b;
-		uint8_t tilepaint_r;
-		uint8_t tilepaint_g;
-		uint16_t addr_offset;
-		uint16_t line_style;
-		uint16_t x0;
-		uint16_t x1;
-		uint16_t y0;
-		uint16_t y1;
-		uint8_t busy;
+		uint8_t command = 0U;
+		uint8_t lcolour = 0U;
+		uint8_t mask = 0U;
+		uint8_t compare_data = 0U;
+		uint8_t compare[8]{};
+		uint8_t bank_disable = 0U;
+		uint8_t tilepaint_b = 0U;
+		uint8_t tilepaint_r = 0U;
+		uint8_t tilepaint_g = 0U;
+		uint16_t addr_offset = 0U;
+		uint16_t line_style = 0U;
+		uint16_t x0 = 0U;
+		uint16_t x1 = 0U;
+		uint16_t y0 = 0U;
+		uint16_t y1 = 0U;
+		uint8_t busy = 0U;
 	};
 
 	virtual void machine_reset() override;
@@ -210,41 +210,41 @@ protected:
 	optional_shared_ptr<uint8_t> m_a15_ram;
 	optional_shared_ptr<uint8_t> m_vectors;
 
-	uint8_t           m_irq_flags;
-	uint8_t           m_irq_mask;
-	emu_timer*      m_beeper_off_timer;
-	emu_timer*      m_timer;
-	emu_timer*      m_subtimer;
-	emu_timer*      m_keyboard_timer;
-	bool            m_basic_rom_en;
-	bool            m_init_rom_en;
+	uint8_t           m_irq_flags = 0U;
+	uint8_t           m_irq_mask = 0U;
+	emu_timer*      m_beeper_off_timer = nullptr;
+	emu_timer*      m_timer = nullptr;
+	emu_timer*      m_subtimer = nullptr;
+	emu_timer*      m_keyboard_timer = nullptr;
+	bool            m_basic_rom_en = false;
+	bool            m_init_rom_en = false;
 
-	unsigned int    m_key_delay;
-	unsigned int    m_key_repeat;
-	uint16_t          m_current_scancode;
-	uint32_t          m_key_data[4];
-	uint32_t          m_mod_data;
-	uint8_t           m_key_scan_mode;
-	uint8_t           m_break_flag;
+	unsigned int    m_key_delay = 0U;
+	unsigned int    m_key_repeat = 0U;
+	uint16_t          m_current_scancode = 0U;
+	uint32_t          m_key_data[4]{};
+	uint32_t          m_mod_data = 0U;
+	uint8_t           m_key_scan_mode = 0U;
+	uint8_t           m_break_flag = 0U;
 
-	uint8_t           m_psg_regsel;
-	uint8_t           m_psg_data;
+	uint8_t           m_psg_regsel = 0U;
+	uint8_t           m_psg_data = 0U;
 
-	uint8_t           m_fdc_side;
-	uint8_t           m_fdc_drive;
-	uint8_t           m_fdc_irq_flag;
-	uint8_t           m_fdc_drq_flag;
+	uint8_t           m_fdc_side = 0U;
+	uint8_t           m_fdc_drive = 0U;
+	uint8_t           m_fdc_irq_flag = 0U;
+	uint8_t           m_fdc_drq_flag = 0U;
 
-	uint8_t           m_speaker_active;
+	uint8_t           m_speaker_active = 0U;
 
-	uint16_t          m_kanji_address;
-	uint8_t           m_cp_prev;
+	uint16_t          m_kanji_address = 0U;
+	uint8_t           m_cp_prev = 0U;
 
-	std::unique_ptr<uint8_t[]>    m_video_ram;
-	uint8_t m_type;
-	fm7_video_t     m_video;
-	fm7_alu_t       m_alu;
-	int             m_sb_prev;
+	std::unique_ptr<uint8_t[]>    m_video_ram{};
+	uint8_t m_type = 0U;
+	fm7_video_t     m_video{};
+	fm7_alu_t       m_alu{};
+	int             m_sb_prev = 0;
 
 	TIMER_CALLBACK_MEMBER(beeper_off);
 	TIMER_CALLBACK_MEMBER(timer_irq);
@@ -264,7 +264,7 @@ protected:
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 
 	optional_region_ptr<uint8_t> m_rom_ptr;
 	optional_region_ptr<uint8_t> m_btrom_ptr;
@@ -276,10 +276,10 @@ protected:
 	void key_press(uint16_t scancode);
 	void keyboard_poll_scan();
 
-	int m_centronics_busy;
-	int m_centronics_fault;
-	int m_centronics_ack;
-	int m_centronics_perror;
+	int m_centronics_busy = 0;
+	int m_centronics_fault = 0;
+	int m_centronics_ack = 0;
+	int m_centronics_perror = 0;
 
 	optional_memory_region m_kanji;
 	required_ioport_array<3> m_kb_ports;
@@ -309,23 +309,23 @@ public:
 protected:
 	struct fm7_encoder_t
 	{
-		uint8_t buffer[12];
-		uint8_t tx_count;
-		uint8_t rx_count;
-		uint8_t command_length;
-		uint8_t answer_length;
-		uint8_t latch;  // 0=ready to receive
-		uint8_t ack;
-		uint8_t position;
+		uint8_t buffer[12]{};
+		uint8_t tx_count = 0U;
+		uint8_t rx_count = 0U;
+		uint8_t command_length = 0U;
+		uint8_t answer_length = 0U;
+		uint8_t latch = 0U;  // 0=ready to receive
+		uint8_t ack = 0U;
+		uint8_t position = 0U;
 	};
 
 	struct fm7_mmr_t
 	{
-		uint8_t bank_addr[8][16];
-		uint8_t segment;
-		uint8_t window_offset;
-		uint8_t enabled;
-		uint8_t mode;
+		uint8_t bank_addr[8][16]{};
+		uint8_t segment = 0U;
+		uint8_t window_offset = 0U;
+		uint8_t enabled = 0U;
+		uint8_t mode = 0U;
 	};
 
 	virtual void machine_reset() override;
@@ -387,14 +387,14 @@ protected:
 	required_shared_ptr<uint8_t> m_fbasic_bank_ram;
 	required_shared_ptr<uint8_t> m_init_bank_ram;
 
-	fm7_encoder_t   m_encoder;
-	fm7_mmr_t       m_mmr;
+	fm7_encoder_t   m_encoder{};
+	fm7_mmr_t       m_mmr{};
 
-	emu_timer *m_encoder_ack_timer;
-	emu_timer *m_alu_task_end_timer;
-	emu_timer *m_vsync_timer;
+	emu_timer *m_encoder_ack_timer = nullptr;
+	emu_timer *m_alu_task_end_timer = nullptr;
+	emu_timer *m_vsync_timer = nullptr;
 
-	uint8_t           m_fm77av_ym_irq;
+	uint8_t           m_fm77av_ym_irq = 0U;
 };
 
 class fm11_state : public fm77_state

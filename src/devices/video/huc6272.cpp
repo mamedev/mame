@@ -7,7 +7,7 @@
     TODO:
     - Use NSCSI instead of legacy one;
     - Convert base mapping to address_map;
-	- Convert I/O to space address, and make it honor mem_mask;
+    - Convert I/O to space address, and make it honor mem_mask;
     - subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
       \- Crashes if CD-ROM is in, on unhandled command 0x28 "Read(10)";
       \- During POST it tries an unhandled 0x44 "Read Header";
@@ -17,8 +17,8 @@
       \- BIOS main menu draws BG0 only as backdrop of the PCE VDCs with 16M mode (5);
     - Implement video mixing with other PCFX chips;
     - Implement microprogram (layer timings, sort of Sega Saturn VRAM cycle patterns);
-	- Implement Rainbow transfers (NEC logo on POST);
-	- Verify ADPCM transfers;
+    - Implement Rainbow transfers (NEC logo on POST);
+    - Verify ADPCM transfers;
 
     ADPCM related patents:
     - https://patents.google.com/patent/US5692099

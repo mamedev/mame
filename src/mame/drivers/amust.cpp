@@ -76,21 +76,25 @@ ToDo:
 *******************************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/clock.h"
-#include "bus/rs232/rs232.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
-#include "machine/timer.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class amust_state : public driver_device
 {
@@ -149,7 +153,7 @@ private:
 	bool m_hsync = 0;
 	bool m_vsync = 0;
 	std::unique_ptr<u8[]> m_vram;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -417,20 +421,22 @@ void amust_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf800, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void amust_state::machine_start()
@@ -535,6 +541,8 @@ ROM_START( amust )
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "kbd_3.rom",  0x000, 0x800, CRC(d9441b35) SHA1(ce250ab1e892a13fd75182703f259855388c6bf4) )
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

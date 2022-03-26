@@ -66,6 +66,7 @@
 #include "bus/acorn/bus.h"
 #include "softlist_dev.h"
 
+namespace {
 
 class acrnsys_state : public driver_device
 {
@@ -115,7 +116,7 @@ private:
 	optional_device<via6522_device> m_via6522;
 	optional_device<centronics_device> m_centronics;
 
-	uint8_t m_kbd_data;
+	uint8_t m_kbd_data = 0U;
 };
 
 
@@ -608,7 +609,7 @@ ROM_START( acrnsys5 )
 	ROM_LOAD("sys5f_iss1.ic11", 0x0000, 0x2000, CRC(cd80418d) SHA1(e588298239b5360b5d1e15d5cd9f7fe2b1693e5d)) // 201,625
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 /*    YEAR  NAME           PARENT    COMPAT  MACHINE        INPUT    CLASS          INIT        COMPANY            FULLNAME                     FLAGS */
 COMP( 1980, acrnsys2,      acrnsys3, 0,      acrnsys2,      acrnsys, acrnsys_state, empty_init, "Acorn Computers", "Acorn System 2",            MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -500,11 +500,11 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_main_latch_d800;
-	uint8_t m_snd_latch_0800;
-	uint8_t m_snd_latch_0a02;
-	uint8_t m_ay8910_addr;
-	int m_mux_data;
+	uint8_t m_main_latch_d800 = 0;
+	uint8_t m_snd_latch_0800 = 0;
+	uint8_t m_snd_latch_0a02 = 0;
+	uint8_t m_ay8910_addr = 0;
+	int m_mux_data = 0;
 
 	void cpu_c048_w(uint8_t data);
 	void cpu_d800_w(uint8_t data);

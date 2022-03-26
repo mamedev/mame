@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 
+#include "bus/nes_ctrl/zapper_sensor.h"
+#include "machine/nvram.h"
 #include "sound/sn76496.h"
 #include "video/ppu2c0x.h"
 
@@ -15,11 +17,18 @@ public:
 		, m_ppu2(*this, "ppu2")
 		, m_sn1(*this, "sn1")
 		, m_sn2(*this, "sn2")
-		, m_work_ram(*this, "work_ram")
-		, m_work_ram_1(*this, "work_ram_1")
+		, m_sensor(*this, "sensor")
+		, m_nvram(*this, "nvram")
 		, m_gfx1_rom(*this, "gfx1")
+		, m_in(*this, "IN%u", 0U)
+		, m_coins(*this, "COINS%u", 1U)
+		, m_dsw(*this, "DSW%u", 0U)
+		, m_gunx(*this, "GUNX")
+		, m_guny(*this, "GUNY")
+		, m_prg_banks(*this, "prg%u", 0U)
+		, m_prg_view(*this, "prg_view")
 		, m_chr_banks(*this, "chr%u", 0U)
-		, m_bank_vrom(*this, "vrom%u", 0U)
+		, m_chr_view(*this, "chr_view")
 	{
 	}
 
@@ -48,7 +57,12 @@ public:
 	void init_vsdual();
 	void init_bootleg();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
+	enum { MAIN = 0, SUB = 1 };
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<ppu2c0x_device> m_ppu1;
@@ -56,55 +70,46 @@ private:
 	optional_device<sn76489_device> m_sn1;
 	optional_device<sn76489_device> m_sn2;
 
-	required_shared_ptr<uint8_t> m_work_ram;
-	optional_shared_ptr<uint8_t> m_work_ram_1;
+	optional_device<nes_zapper_sensor_device> m_sensor;
+	optional_device<nvram_device> m_nvram;
 
 	optional_memory_region m_gfx1_rom;
-	memory_bank_array_creator<8> m_chr_banks;
 
-	void sprite_dma_0_w(address_space &space, uint8_t data);
-	void sprite_dma_1_w(address_space &space, uint8_t data);
-	void vsnes_coin_counter_w(uint8_t data);
-	uint8_t vsnes_coin_counter_r();
-	void vsnes_coin_counter_1_w(uint8_t data);
-	void vsnes_in0_w(uint8_t data);
-	uint8_t vsnes_in0_r();
-	uint8_t vsnes_in1_r();
-	void vsnes_in0_1_w(uint8_t data);
-	uint8_t vsnes_in0_1_r();
-	uint8_t vsnes_in1_1_r();
-	uint8_t gun_in0_r();
-	void vsnes_nt0_w(offs_t offset, uint8_t data);
-	void vsnes_nt1_w(offs_t offset, uint8_t data);
-	uint8_t vsnes_nt0_r(offs_t offset);
-	uint8_t vsnes_nt1_r(offs_t offset);
+	optional_ioport_array<4> m_in;
+	optional_ioport_array<2> m_coins;
+	optional_ioport_array<2> m_dsw;
+	optional_ioport m_gunx;
+	optional_ioport m_guny;
+
+	template <u8 Side> void sprite_dma_w(address_space &space, u8 data);
+	template <u8 Side> void vsnes_coin_counter_w(offs_t offset, u8 data);
+	template <u8 Side> u8 vsnes_coin_counter_r(offs_t offset);
+	template <u8 Side> void vsnes_in0_w(u8 data);
+	template <u8 Side> u8 vsnes_in0_r();
+	template <u8 Side> u8 vsnes_in1_r();
 	void vsnormal_vrom_banking(uint8_t data);
-	void gun_in0_w(uint8_t data);
 	void vskonami_rom_banking(offs_t offset, uint8_t data);
 	void vsgshoe_gun_in0_w(uint8_t data);
 	void drmario_rom_banking(offs_t offset, uint8_t data);
 	void vsvram_rom_banking(uint8_t data);
 	void vs108_rom_banking(offs_t offset, uint8_t data);
-	uint8_t rbi_hack_r(offs_t offset);
-	uint8_t supxevs_read_prot_1_r();
-	uint8_t supxevs_read_prot_2_r();
-	uint8_t supxevs_read_prot_3_r();
-	uint8_t supxevs_read_prot_4_r();
-	uint8_t tko_security_r(offs_t offset);
-	void mapper68_rom_banking(offs_t offset, uint8_t data);
+	u8 rbibb_prot_r(offs_t offset);
+	u8 supxevs_prot_1_r();
+	u8 supxevs_prot_2_r();
+	u8 supxevs_prot_3_r();
+	u8 supxevs_prot_4_r();
+	u8 tkoboxng_prot_r(offs_t offset);
+	void sunsoft3_rom_banking(offs_t offset, uint8_t data);
 	void set_bnglngby_irq_w(uint8_t data);
 	uint8_t set_bnglngby_irq_r();
 	void vsdual_vrom_banking_main(uint8_t data);
 	void vsdual_vrom_banking_sub(uint8_t data);
 	void vssmbbl_sn_w(offs_t offset, uint8_t data);
-	void v_set_mirroring(int ppu, int mirroring);
 
 	DECLARE_MACHINE_START(vsnes);
-	DECLARE_MACHINE_RESET(vsnes);
 	DECLARE_MACHINE_START(vsdual);
-	DECLARE_MACHINE_RESET(vsdual);
 	DECLARE_MACHINE_START(bootleg);
-	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
+	void v_set_videorom_bank(int start, int count, int vrom_start_bank);
 
 	void bootleg_sound_write(offs_t offset, uint8_t data);
 	uint8_t vsnes_bootleg_z80_data_r();
@@ -114,37 +119,39 @@ private:
 
 	void vsnes_bootleg_z80_map(address_map &map);
 	void vsnes_cpu1_bootleg_map(address_map &map);
+	void vsnes_ppu_bootleg_map(address_map &map);
 	void vsnes_cpu1_map(address_map &map);
 	void vsnes_cpu2_map(address_map &map);
+	void vsnes_ppu1_map(address_map &map);
+	void vsnes_ppu2_map(address_map &map);
 
-	int m_coin;
-	int m_do_vrom_bank;
-	int m_input_latch[4];
-	int m_sound_fix;
-	uint8_t m_last_bank;
-	std::unique_ptr<uint8_t[]> m_vram;
-	std::unique_ptr<uint8_t[]> m_extraram;
-	uint8_t* m_vrom[2];
-	std::unique_ptr<uint8_t[]> m_nt_ram[2];
-	memory_bank_array_creator<8> m_bank_vrom;
-	uint8_t* m_nt_page[2][4];
-	uint32_t m_vrom_size[2];
-	int m_vrom_banks;
-	int m_zapstore;
-	int m_old_bank;
-	int m_drmario_shiftreg;
-	int m_drmario_shiftcount;
-	int m_size16k;
-	int m_switchlow;
-	int m_vrom4k;
-	int m_108_reg;
-	int m_108_prg_mask;
-	int m_VSindex;
-	int m_supxevs_prot_index;
-	int m_security_counter;
-	int m_ret;
+	void init_prg_banking();
+	void prg32(int bank);
+	void prg16(int slot, int bank);
+	void prg8(int slot, int bank);
 
-	uint8_t m_bootleg_sound_offset;
-	uint8_t m_bootleg_sound_data;
-	int m_bootleg_latched_scanline;
+	memory_bank_array_creator<4> m_prg_banks;
+	memory_view m_prg_view;
+	int m_prg_chunks = 0;
+
+	memory_bank_array_creator<8> m_chr_banks;
+	memory_view m_chr_view;
+	int m_chr_chunks = 0;
+
+	bool m_has_gun = false;
+	int m_coin = 0;
+	int m_input_latch[4]{};
+	int m_input_strobe[2]{};
+	int m_mmc1_shiftreg = 0;
+	int m_mmc1_shiftcount = 0;
+	int m_mmc1_prg16k = 0;
+	int m_mmc1_switchlow = 0;
+	int m_mmc1_chr4k = 0;
+	int m_108_reg = 0;
+	int m_prot_index = 0;
+	int m_ret = 0;
+
+	u8 m_bootleg_sound_offset = 0U;
+	u8 m_bootleg_sound_data = 0U;
+	int m_bootleg_latched_scanline = 0;
 };

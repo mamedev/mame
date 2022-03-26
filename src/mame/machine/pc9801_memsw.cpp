@@ -78,6 +78,7 @@
 
 #include "emu.h"
 #include "pc9801_memsw.h"
+
 #include "coreutil.h"
 
 //**************************************************************************
@@ -141,14 +142,16 @@ void pc9801_memsw_device::nvram_default()
 	m_bram[0xf] = dec_2_bcd(systime.local_time.year - 2000) & 0xff;
 }
 
-void pc9801_memsw_device::nvram_read(emu_file &file)
+bool pc9801_memsw_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_bram, m_bram_size);
+	size_t actual_size;
+	return !file.read(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
 }
 
-void pc9801_memsw_device::nvram_write(emu_file &file)
+bool pc9801_memsw_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_bram, m_bram_size);
+	size_t actual_size;
+	return !file.write(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
 }
 
 //**************************************************************************

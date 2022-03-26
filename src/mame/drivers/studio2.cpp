@@ -331,7 +331,7 @@ private:
 
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
-	uint8_t m_color;
+	uint8_t m_color = 0;
 	void mpt02_io_map(address_map &map);
 	void mpt02_map(address_map &map);
 };

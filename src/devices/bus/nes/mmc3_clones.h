@@ -147,7 +147,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -155,7 +155,7 @@ protected:
 private:
 	void update_banks();
 	u8 m_reg[3];
-	int m_board;
+	const int m_board;
 };
 
 
@@ -228,10 +228,10 @@ public:
 
 protected:
 	// construction/destruction
-	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board);
 
 private:
-	int m_board;
+	const int m_board;
 };
 
 

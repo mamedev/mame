@@ -156,8 +156,8 @@ private:
 	required_shared_ptr<uint16_t> m_outputs;
 
 	// tilemaps
-	tilemap_t *m_bg1_tmap;
-	tilemap_t *m_bg2_tmap;
+	tilemap_t *m_bg1_tmap = nullptr;
+	tilemap_t *m_bg2_tmap = nullptr;
 	void bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bg2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
@@ -170,7 +170,7 @@ private:
 	static const rgb_t BG15_TRANSPARENT;
 	void draw_bg15_tile(int x, int y, uint16_t code);
 	void draw_bg15_tilemap();
-	bool bg15_tiles_dirty;
+	bool bg15_tiles_dirty = false;
 
 	// eeprom
 	uint16_t eeprom_r();

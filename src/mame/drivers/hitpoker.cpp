@@ -71,9 +71,9 @@ public:
 	void init_hitpoker();
 
 private:
-	uint8_t m_sys_regs;
+	uint8_t m_sys_regs = 0;
 
-	uint8_t m_pic_data;
+	uint8_t m_pic_data = 0;
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_colorram;

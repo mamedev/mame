@@ -675,7 +675,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		NSUInteger  start = 0, length = 0;
 		for (uint32_t col = origin.x; col < origin.x + size.x; col++)
 		{
-			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
+			[[text mutableString] appendFormat:@"%C", unichar(data[col - origin.x].byte)];
 			if ((start < length) && (attr != data[col - origin.x].attrib))
 			{
 				NSRange const run = NSMakeRange(start, length - start);

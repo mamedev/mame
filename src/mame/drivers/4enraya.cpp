@@ -612,6 +612,13 @@ void unk_gambl_state::tourpgum(machine_config &config)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void unk_gambl_state::chicgum(machine_config &config)
+{
+	tourpgum(config);
+
+	PALETTE(config.replace(), m_palette, palette_device::BRG_3BIT);
+}
+
 /***********************************
 *             Rom Load             *
 ***********************************/
@@ -663,9 +670,9 @@ ROM_END
    |  __________  __________  _________________      | AY3910A/P      |                       __________ __|
    | |SN74LS92N| |_74LS74AN| | Z0840004PSC Z80|      |________________|                      |ULN2003A_| __|
    |  __________  __________ |________________|                       __________  __________  __________ __|
-   | |__EMPTY__| |__EMPTY__|                                         |__8xDIPS_| |SN74LS245N |SN7407N_|  __|
+   | |SN74LS04N| |SN74LS00N|                                         |__8xDIPS_| |SN74LS245N |SN7407N_|  __|
    |                              __________                          __________  __________  __________ |_
-   |                             |_74LS245N|                         |74LS02??*| |74LS273B1| |4116R-001|   |
+   |                             |_74LS245N|                         |_74LS02N_| |74LS273B1| |4116R-001|   |
    |    Xtal                     ______________   BATT                __________  __________               |
    |   18.000 MHz               | EPROM 4     |                      |_ULN2003A| |74LS273B1|               |
    |                            |_____________|                  CONN-> ······     ······ <-CONN           |
@@ -692,6 +699,19 @@ ROM_START( tourpgum )
 	ROM_LOAD( "1_tourvision.ic19",   0x00000, 0x8000, CRC(dbfb5b72) SHA1(efdc66f2288cd66f0b91211d3d1e7e6b20079ab1) )
 	ROM_LOAD( "2_tourvision.ic18",   0x08000, 0x8000, CRC(af25ed99) SHA1(9605b36151791b84c2d0648070b0f97e31300dbb) )
 	ROM_LOAD( "3_tourvision.ic17",   0x10000, 0x8000, CRC(0b081663) SHA1(86dbf69e819ced12ac7cb7a4839fe0ba677580ae) )
+ROM_END
+
+ROM_START( chicgum )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "k13.ic52", 0x0000, 0x8000, CRC(3e01a610) SHA1(86be3d1c3a9810f29701c22d79f262c7e89a2b9b) ) // 1xxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "kb.ic19", 0x02000, 0x6000, CRC(90eaa64b) SHA1(867d94a65d7350fa3c0cf84f081056b035385a4a) ) // 00xxxxxxxxxxxxx = 0x00
+	ROM_CONTINUE(        0x00000, 0x2000 )
+	ROM_LOAD( "kg.ic18", 0x0a000, 0x6000, CRC(0f1394b9) SHA1(9c21b03b080d007ff3c9ec93881efd11a5740bd4) ) // 00xxxxxxxxxxxxx = 0x00
+	ROM_CONTINUE(        0x08000, 0x2000 )
+	ROM_LOAD( "kr.ic17", 0x12000, 0x6000, CRC(45590724) SHA1(0b8544be3a2b28b7bc0ed8ca72af0e558acd3f1d) ) // 00xxxxxxxxxxxxx = 0x00
+	ROM_CONTINUE(        0x10000, 0x2000 )
 ROM_END
 
 ROM_START( strker )
@@ -864,17 +884,18 @@ void unk_gambl_enc_state::driver_init()
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS            INIT        ROT   COMPANY      FULLNAME                                          FLAGS  */
-GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT   MACHINE   INPUT     CLASS            INIT        ROT   COMPANY      FULLNAME                                          FLAGS  */
+GAME( 1990, 4enraya,   0,       _4enraya, 4enraya,  _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa,  4enraya, _4enraya, 4enraya,  _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992?, strker,   0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Striker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
+GAME( 1992?, chicgum,  0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Chic Gum Video", MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, strker,   0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Striker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
 
-GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacgb, unkpacg, unkpacg,  unkpacg, unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgc, unkpacg, unkpacg,  unkpacg, unk_gambl_state,     empty_init, ROT0, "<unknown>", "Coco Louco",                              MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacga, unkpacg, unkpacga, unkpacg, unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,  unk_gambl_state,     empty_init, ROT0, "<unknown>", "Coco Louco",                              MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                  MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unksig,   0,       unkpacg,  unkfr,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,    0,       unkpacg,  unkfr,    unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,    unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )

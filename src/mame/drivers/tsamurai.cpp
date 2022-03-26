@@ -996,10 +996,10 @@ ROM_START( nunchaku )
 	ROM_LOAD( "nunchack.c2", 0x4000, 0x4000, CRC(701a0cc3) SHA1(323ee1cba3da0ccb2c4d542c497de0e1c047f532) )
 	ROM_LOAD( "nunchack.c3", 0x8000, 0x4000, CRC(ffb841fc) SHA1(c1285cf093360923307bc86f6a5473d689b16a2c) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "nunchack.016", 0x000, 0x100, CRC(a7b077d4) SHA1(48c3e68d67de067c0ead0dbd34769b755fb5952f) )
-	ROM_LOAD( "nunchack.017", 0x100, 0x100, CRC(1c04c087) SHA1(7179edf96f59a469353d9652900b99fef25f4054) )
-	ROM_LOAD( "nunchack.018", 0x200, 0x100, CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
+	ROM_REGION( 0x0300, "proms", 0 ) // no way these PROMs can give the colours seen in reference videos
+	ROM_LOAD( "nunchack.016", 0x000, 0x100, BAD_DUMP CRC(a7b077d4) SHA1(48c3e68d67de067c0ead0dbd34769b755fb5952f) )
+	ROM_LOAD( "nunchack.017", 0x100, 0x100, BAD_DUMP CRC(1c04c087) SHA1(7179edf96f59a469353d9652900b99fef25f4054) )
+	ROM_LOAD( "nunchack.018", 0x200, 0x100, BAD_DUMP CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
 ROM_END
 
 ROM_START( yamagchi )

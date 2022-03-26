@@ -22,11 +22,11 @@ public:
 
 private:
 	struct HD44102CH {
-		uint8_t   enabled;
-		uint8_t   start_page;
-		uint8_t   address;
-		uint8_t   y_inc;
-		uint8_t   ram[256];   // There are actually 50 x 4 x 8 bits. This just makes addressing easier.
+		uint8_t   enabled = 0U;
+		uint8_t   start_page = 0U;
+		uint8_t   address = 0U;
+		uint8_t   y_inc = 0U;
+		uint8_t   ram[256]{};   // There are actually 50 x 4 x 8 bits. This just makes addressing easier.
 	};
 
 	virtual void machine_reset() override;
@@ -43,8 +43,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(gamepock_to_w);
 	void gamepock_mem(address_map &map);
 
-	uint8_t m_port_a;
-	uint8_t m_port_b;
+	uint8_t m_port_a = 0U;
+	uint8_t m_port_b = 0U;
 	HD44102CH m_hd44102ch[3];
 
 	required_device<cpu_device> m_maincpu;

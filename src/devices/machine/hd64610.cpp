@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "hd64610.h"
+
 #include "coreutil.h"
 
 #define VERBOSE 1
@@ -255,9 +256,10 @@ void hd64610_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void hd64610_device::nvram_read(emu_file &file)
+bool hd64610_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_regs, 0x10);
+	size_t actual;
+	return !file.read(m_regs, 0x10, actual) && actual == 0x10;
 }
 
 
@@ -266,9 +268,10 @@ void hd64610_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void hd64610_device::nvram_write(emu_file &file)
+bool hd64610_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_regs, 0x10);
+	size_t actual;
+	return !file.write(m_regs, 0x10, actual) && actual == 0x10;
 }
 
 

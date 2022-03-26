@@ -35,7 +35,7 @@ Mephisto Junior: (listed differences)
 - no module slot, I/O chip, or external port
 
 Mephisto program module:
-- PCB label: DF 4003-B
+- PCB label: DF 4003-B or DH 4005 20100
 - 6*CDP1833CE (1KB ROM)
 
 Mephisto II/ESB II program module:
@@ -505,14 +505,14 @@ void brikett_state::mephisto3(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( mephisto )
+ROM_START( mephisto ) // ROM serials 911xx have same contents, some modules have both 898xx and 911xx chips
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("89810", 0x0000, 0x0400, CRC(6816be9e) SHA1(f5f1d5084925fe239f5b2ecf4724751e0dc4fc51) ) // CDP1833CE
-	ROM_LOAD("89811", 0x0400, 0x0400, CRC(15febc73) SHA1(10353a7f021993f2cf7d509a928425617e1786fb) ) // "
-	ROM_LOAD("89812", 0x0800, 0x0400, CRC(5e45eb65) SHA1(9d46e5f405bd48705d1e29826917522595fc9768) ) // "
-	ROM_LOAD("89813", 0x0c00, 0x0400, CRC(62da3d89) SHA1(a7f9ada7037e0bd61420358c147b2f57ee47ebcb) ) // "
-	ROM_LOAD("89814", 0x1000, 0x0400, CRC(8e212d9c) SHA1(5df221ce8ca4fbb74f34f31738db4c2efee7fb01) ) // "
-	ROM_LOAD("89815", 0x1400, 0x0400, CRC(072e0b01) SHA1(5b1074932b3f21ab01392250061c093de4af3624) ) // "
+	ROM_LOAD("89810", 0x0000, 0x0400, CRC(6816be9e) SHA1(f5f1d5084925fe239f5b2ecf4724751e0dc4fc51) ) // CDP1833CE, also seen with label 91143
+	ROM_LOAD("89811", 0x0400, 0x0400, CRC(15febc73) SHA1(10353a7f021993f2cf7d509a928425617e1786fb) ) // " or 91144
+	ROM_LOAD("89812", 0x0800, 0x0400, CRC(5e45eb65) SHA1(9d46e5f405bd48705d1e29826917522595fc9768) ) // " or 91145
+	ROM_LOAD("89813", 0x0c00, 0x0400, CRC(62da3d89) SHA1(a7f9ada7037e0bd61420358c147b2f57ee47ebcb) ) // " or 91146
+	ROM_LOAD("89814", 0x1000, 0x0400, CRC(8e212d9c) SHA1(5df221ce8ca4fbb74f34f31738db4c2efee7fb01) ) // " or 91163
+	ROM_LOAD("89815", 0x1400, 0x0400, CRC(072e0b01) SHA1(5b1074932b3f21ab01392250061c093de4af3624) ) // " or 91147
 ROM_END
 
 ROM_START( mephisto1x )

@@ -95,10 +95,14 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } // dummy to stop error log filling up
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[20] = state; } // E
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[21] = state; } // F
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4 (not used)
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2 (not used)
+	DECLARE_WRITE_LINE_MEMBER(pia2c_ca2_w) { m_io_outputs[17] = state; } // B
+	DECLARE_WRITE_LINE_MEMBER(pia2c_cb2_w) { m_io_outputs[18] = state; } // C
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[16] = state; } // D
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[19] = state; } // A
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_irq);
 
@@ -136,7 +140,7 @@ protected:
 	optional_device<pinsnd88_device> m_ps88;
 	output_finder<63> m_digits;
 	required_ioport_array<8> m_io_keyboard;
-	output_finder<80> m_io_outputs; // 16 solenoids + 64 lamps
+	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
 
 	// getters/setters
 	u8 get_strobe() { return m_strobe; }
@@ -159,7 +163,7 @@ protected:
 	u32 m_segment1 = 0U;
 	u32 m_segment2 = 0U;
 	u32 m_timer_count = 0U;
-	emu_timer* m_irq_timer;
+	emu_timer* m_irq_timer = nullptr;
 	bool m_timer_irq_active = false;
 	bool m_pia_irq_active = false;
 	u8 m_lock1 = 0U;
@@ -211,7 +215,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	bool m_invert = false;  // later System 11B games start expecting inverted data to the display LED segments.
+	bool m_invert = false;  // later System 11B games expect inverted data to the display LED segments.
 	void set_invert(bool i) { m_invert = i; }
 	bool m_is7seg34 = false;  // some games use 7-segment displays for players 3 and 4
 	void set_7seg(bool i) { m_is7seg34 = i; }

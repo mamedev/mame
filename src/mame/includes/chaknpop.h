@@ -47,10 +47,10 @@ private:
 	memory_share_creator<uint8_t> m_vram;
 
 	/* video-related */
-	tilemap_t  *m_tx_tilemap;
-	uint8_t    m_gfxmode;
-	uint8_t    m_flip_x;
-	uint8_t    m_flip_y;
+	tilemap_t  *m_tx_tilemap = nullptr;
+	uint8_t    m_gfxmode = 0U;
+	uint8_t    m_flip_x = 0U;
+	uint8_t    m_flip_y = 0U;
 
 	void coinlock_w(uint8_t data);
 	uint8_t gfxmode_r();

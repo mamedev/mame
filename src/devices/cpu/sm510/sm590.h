@@ -12,12 +12,6 @@
 #include "sm510base.h"
 
 
-// I/O ports setup
-
-// It does not have K pins, but can wake up after halt on R2.2
-#define SM590_INPUT_LINE_R22 SM510_INPUT_LINE_K3
-
-
 // pinout reference
 
 /*
@@ -95,103 +89,87 @@ R3.3/CL2 =>  |_|6         15|_|  <> R1.3
 class sm590_device : public sm510_base_device
 {
 public:
-	sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
+	sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// four 4-bit R I/O ports
+	using sm510_base_device::write_r;
+	template <std::size_t N> auto write_r() { return m_write_rx[N].bind(); }
+	template <std::size_t N> auto read_r() { return m_read_rx[N].bind(); }
 
 protected:
 	sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
-	void program_1x128x4(address_map &map);
-	void data_16x2x4(address_map &map);
+	void program_512x8(address_map &map);
+	void program_768x8(address_map &map);
+	void program_1kx8(address_map &map);
+	void data_32x4(address_map &map);
+	void data_56x4(address_map &map);
 
+	virtual void device_start() override;
 	virtual void device_reset() override;
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual void init_divider() override { }
-	virtual void init_lcd_driver() override { }
-	virtual void init_melody() override { }
-	virtual void increment_pc() override;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); } // "
+
+	virtual void init_divider() override { } // no divider timer
+	virtual void init_lcd_driver() override { } // no lcd driver
 	virtual void execute_one() override;
 	virtual bool op_argument() override;
-	virtual void do_branch(u8 pu, u8 pm, u8 pl) override;
 
 	virtual void reset_vector() override { do_branch(0, 0, 0); }
 	virtual void wakeup_vector() override { do_branch(0, 1, 0); }
-	virtual bool valid_wakeup_line(int line) const override { return (line == SM590_INPUT_LINE_R22); }
+
+	// R ports
+	devcb_write8::array<4> m_write_rx;
+	devcb_read8::array<4> m_read_rx;
+	u8 m_rports[4];
 
 	// opcode handlers
-	// 00-3f
-	virtual void op_adx() override;
-	virtual void op_tax();
-	virtual void op_lblx();
-	// lax (same as sm510)
+	virtual void do_branch(u8 pu, u8 pm, u8 pl) override;
+	void port_w(offs_t offset, u8 data);
 
-	// 40-43
+	virtual void op_tl() override;
+	virtual void op_tls();
+
+	virtual void op_lblx();
+	virtual void op_lbmx();
+	virtual void op_str();
 	virtual void op_lda() override;
 	virtual void op_exc() override;
-	// exci (same as sm510)
-	// excd (same as sm510)
-
-	// 44-47
-	// coma (same as sm510)
-	// tam (same as sm510)
-	virtual void op_atr() override;
-	virtual void op_mtr();
-
-	// 48-4b
-	// rc (same as sm510)
-	// sc (same as sm510)
-	virtual void op_str();
-	// cctrl (same as sm510 cend)
-
-	// 4c-4f
-	// rtn (same as sm510 rtn0)
-	// rtns (same as sm510 rtn1)
-	// 4e illegal
-	// 4f illegal
-
-	// 50-53
-	virtual void op_inbm();
-	virtual void op_debm();
-	// inbl (same as sm510 incb)
-	// debl (same as sm510 decb)
-
-	// 54-57
-	virtual void op_tc() override;
-	virtual void op_rta();
-	virtual void op_blta();
-	// xbla (same as sm510 exbla)
-
-	// 58-5b are all illegal
-
-	// 5c-5f
-	// atx (same as sm510)
 	virtual void op_exax();
-	// 5e illegal???
-	// 5f illegal
+	virtual void op_blta();
 
-	// 60-6f
-	// tm (same as sm510 tmi)
-	virtual void op_tba();
-	// rm (same as sm510)
-	// sm (same as sm510)
-
-	// 70-73
-	// add (same as sm510)
+	virtual void op_adx() override;
 	virtual void op_ads();
 	virtual void op_adc();
-	// adcs (same as sm510 add11)
+	virtual void op_inbm();
+	virtual void op_debm();
 
-	// 74-7f
-	virtual void op_lbmx();
-	virtual void op_tl() override;
-	virtual void op_tml() override; // aka TLS
+	virtual void op_tax();
+	virtual void op_tba();
+	virtual void op_tc() override;
 
-	// 80-ff
-	virtual void op_t() override; // aka TR
+	virtual void op_atr() override;
+	virtual void op_mtr();
+	virtual void op_rta();
+};
 
-	u8 m_rports[4];
+class sm591_device : public sm590_device
+{
+public:
+	sm591_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class sm595_device : public sm590_device
+{
+public:
+	sm595_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 DECLARE_DEVICE_TYPE(SM590, sm590_device)
+DECLARE_DEVICE_TYPE(SM591, sm591_device)
+DECLARE_DEVICE_TYPE(SM595, sm595_device)
 
 #endif // MAME_CPU_SM510_SM590_H

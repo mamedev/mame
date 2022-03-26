@@ -101,7 +101,7 @@ private:
 	output_finder<6> m_7segs;
 	output_finder<> m_lamp;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	bitmap_ind16 m_collision_bg;
 
 	bool m_waveenable;

@@ -62,17 +62,17 @@ private:
 	required_ioport_array<2> m_io_in;
 
 	/* video-related */
-	tilemap_t    *m_bgmap;
-	u8      m_cocktail_flip;
-	u8      m_char_palette;
-	u8      m_sprite_palette;
-	u8      m_char_bank;
+	tilemap_t    *m_bgmap = nullptr;
+	u8      m_cocktail_flip = 0U;
+	u8      m_char_palette = 0U;
+	u8      m_sprite_palette = 0U;
+	u8      m_char_bank = 0U;
 
 	/* misc */
-	int        m_fcombat_sh;
-	int        m_fcombat_sv;
-	int        m_tx;
-	int        m_ty;
+	int        m_fcombat_sh = 0;
+	int        m_fcombat_sv = 0;
+	int        m_tx = 0;
+	int        m_ty = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

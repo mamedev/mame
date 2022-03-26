@@ -145,7 +145,7 @@ public:
 	void bbcm_drive_control_w(uint8_t data);
 	void serial_ula_w(uint8_t data);
 	void video_ula_w(offs_t offset, uint8_t data);
-	uint8_t bbc_fe_r() { return 0xfe; };
+	uint8_t bbc_fe_r() { return 0xfe; }
 
 	DECLARE_VIDEO_START(bbc);
 
@@ -196,6 +196,7 @@ public:
 	void bbcb(machine_config &config);
 	void bbcb_de(machine_config &config);
 	void bbcb_us(machine_config &config);
+	void sist1(machine_config &config);
 
 	void bbca_mem(address_map &map);
 	void bbc_base(address_map &map);
@@ -437,9 +438,9 @@ public:
 	void daisy(machine_config &config);
 	void discmon(machine_config &config);
 	void discmate(machine_config &config);
-	void mpc800(machine_config& config);
-	void mpc900(machine_config& config);
-	void mpc900gx(machine_config& config);
+	void mpc800(machine_config &config);
+	void mpc900(machine_config &config);
+	void mpc900gx(machine_config &config);
 	void bbcmc(machine_config &config);
 	void pro128s(machine_config &config);
 	void autoc15(machine_config &config);

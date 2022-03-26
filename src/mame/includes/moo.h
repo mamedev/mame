@@ -54,15 +54,15 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
-	int         m_sprite_colorbase;
+	int         m_sprite_colorbase = 0;
 	int         m_layer_colorbase[4];
 	int         m_layerpri[3];
-	int         m_alpha_enabled;
-	uint16_t      m_zmask;
+	int         m_alpha_enabled = 0;
+	uint16_t      m_zmask = 0;
 
 	/* misc */
 	uint16_t      m_protram[16];
-	uint16_t      m_cur_control2;
+	uint16_t      m_cur_control2 = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -78,7 +78,7 @@ private:
 	required_device<screen_device> m_screen;
 	optional_device<k054321_device> m_k054321;
 
-	emu_timer *m_dmaend_timer;
+	emu_timer *m_dmaend_timer = nullptr;
 	uint16_t control2_r();
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_irq_w(uint16_t data);

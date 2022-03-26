@@ -46,7 +46,7 @@ private:
 	required_shared_ptr<uint8_t> m_store;
 	required_device<screen_device> m_screen;
 
-	uint8_t m_store_line;
+	uint8_t m_store_line = 0;
 
 	util::ovectorstream m_glyph_print_buf;
 };

@@ -33,6 +33,7 @@
 #include "emuopts.h"
 #include "mameopts.h"
 #include "drivenum.h"
+#include "fileio.h"
 #include "natkeyboard.h"
 #include "render.h"
 #include "cheat.h"

@@ -164,14 +164,14 @@ private:
 
 	// driver_device overrides
 	virtual void video_start() override;
-	int pic_cmd;
-	int pic_state;
-	int m_dmarq_state;
-	uint32_t m_dma_ptr;
-	uint32_t m_spi_select;
-	uint32_t m_unk_sound_toggle;
-	uint32_t m_sound_cmd;
-	uint32_t m_fb_base;
+	int pic_cmd = 0;
+	int pic_state = 0;
+	int m_dmarq_state = 0;
+	uint32_t m_dma_ptr = 0U;
+	uint32_t m_spi_select = 0U;
+	uint32_t m_unk_sound_toggle = 0U;
+	uint32_t m_sound_cmd = 0U;
+	uint32_t m_fb_base = 0U;
 };
 
 void vp10x_state::machine_reset()

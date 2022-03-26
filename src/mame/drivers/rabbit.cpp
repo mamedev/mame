@@ -154,12 +154,12 @@ private:
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 	rectangle m_sprite_clip;
-	int m_vblirqlevel;
-	int m_bltirqlevel;
-	int m_banking;
+	int m_vblirqlevel = 0;
+	int m_bltirqlevel = 0;
+	int m_banking = 0;
 	std::unique_ptr<uint32_t[]> m_tilemap_ram[4];
-	tilemap_t *m_tilemap[4];
-	emu_timer *m_blit_done_timer;
+	tilemap_t *m_tilemap[4]{};
+	emu_timer *m_blit_done_timer = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);

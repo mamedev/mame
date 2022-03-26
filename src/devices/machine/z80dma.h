@@ -118,6 +118,7 @@ private:
 	uint16_t m_addressA;
 	uint16_t m_addressB;
 	uint16_t m_count;
+	uint16_t m_byte_counter;
 
 	int m_rdy;
 	int m_force_ready;
@@ -128,7 +129,7 @@ private:
 	uint8_t m_latch;
 
 	// interrupts
-	bool m_iei;
+	int m_iei;					// interrupt enable input
 	int m_ip;                   // interrupt pending
 	int m_ius;                  // interrupt under service
 	uint8_t m_vector;             // interrupt vector

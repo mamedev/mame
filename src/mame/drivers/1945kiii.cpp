@@ -153,10 +153,10 @@ private:
 	required_shared_ptr<u16> m_bgram;
 
 	/* video-related */
-	std::unique_ptr<u16[]> m_spriteram_buffer[2];
-	std::unique_ptr<u16[]> m_bgram_buffer;
+	std::unique_ptr<u16[]> m_spriteram_buffer[2]{};
+	std::unique_ptr<u16[]> m_bgram_buffer{};
 	bool m_refresh = false;
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

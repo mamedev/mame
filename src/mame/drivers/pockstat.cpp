@@ -89,7 +89,7 @@ private:
 	required_shared_ptr<uint32_t> m_lcd_buffer;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 
 	static constexpr uint32_t TIMER_COUNT = 3;
 
@@ -121,49 +121,49 @@ private:
 
 	struct ftlb_regs_t
 	{
-		uint32_t control;
-		uint32_t stat;
-		uint32_t valid;
-		uint32_t wait1;
-		uint32_t wait2;
-		uint32_t entry[16];
-		uint32_t serial;
+		uint32_t control = 0;
+		uint32_t stat = 0;
+		uint32_t valid = 0;
+		uint32_t wait1 = 0;
+		uint32_t wait2 = 0;
+		uint32_t entry[16]{};
+		uint32_t serial = 0;
 	} m_ftlb_regs;
 
 	struct intc_regs_t
 	{
-		uint32_t hold;
-		uint32_t status;
-		uint32_t enable;
-		uint32_t mask;
+		uint32_t hold = 0;
+		uint32_t status = 0;
+		uint32_t enable = 0;
+		uint32_t mask = 0;
 	} m_intc_regs;
 
 	struct timer_t
 	{
-		uint32_t period;
-		uint32_t count;
-		uint32_t control;
-		emu_timer *timer;
+		uint32_t period = 0;
+		uint32_t count = 0;
+		uint32_t control = 0;
+		emu_timer *timer = nullptr;
 	} m_timers[TIMER_COUNT];
 
 	struct clock_regs_t
 	{
-		uint32_t mode;
-		uint32_t control;
+		uint32_t mode = 0;
+		uint32_t control = 0;
 	} m_clock_regs;
 
 	struct rtc_regs_t
 	{
-		uint32_t mode;
-		uint32_t control;
-		uint32_t time;
-		uint32_t date;
-		emu_timer *timer;
+		uint32_t mode = 0;
+		uint32_t control = 0;
+		uint32_t time = 0;
+		uint32_t date = 0;
+		emu_timer *timer = nullptr;
 	} m_rtc_regs;
 
-	uint32_t m_lcd_control;
-	int32_t m_flash_write_enable_count;
-	int32_t m_flash_write_count;
+	uint32_t m_lcd_control = 0;
+	int32_t m_flash_write_enable_count = 0;
+	int32_t m_flash_write_count = 0;
 
 	uint32_t ftlb_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ftlb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

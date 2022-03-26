@@ -360,14 +360,14 @@ private:
 	std::unique_ptr<uint32_t[]>         m_spriteram_old2;
 
 	/* video-related */
-	tilemap_t  *m_scra_tilemap;
-	tilemap_t  *m_scrb_tilemap;
-	tilemap_t  *m_scrc_tilemap;
-	tilemap_t  *m_text_tilemap;
+	tilemap_t  *m_scra_tilemap = nullptr;
+	tilemap_t  *m_scrb_tilemap = nullptr;
+	tilemap_t  *m_scrc_tilemap = nullptr;
+	tilemap_t  *m_text_tilemap = nullptr;
 
 	/* misc */
-	int              m_sndpending;
-	int              m_snd_toggle;
+	int              m_sndpending = 0;
+	int              m_snd_toggle = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

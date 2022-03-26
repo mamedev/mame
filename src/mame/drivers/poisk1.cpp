@@ -25,6 +25,7 @@
 #include "machine/kb_poisk1.h"
 
 #include "bus/isa/isa.h"
+#include "bus/isa/p1_fdc.h"
 #include "bus/isa/xsu_cards.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/cassette.h"
@@ -35,7 +36,6 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
-#include "bus/isa/p1_fdc.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -48,7 +48,7 @@
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
@@ -112,22 +112,22 @@ private:
 
 	required_ioport_array<8> m_kbdio;
 
-	uint8_t m_p1_spkrdata;
-	uint8_t m_p1_input;
+	uint8_t m_p1_spkrdata = 0;
+	uint8_t m_p1_input = 0;
 
-	uint8_t m_kbpoll_mask;
-	uint8_t m_vsync;
-	uint8_t m_hsync;
+	uint8_t m_kbpoll_mask = 0;
+	uint8_t m_vsync = 0;
+	uint8_t m_hsync = 0;
 
 	struct
 	{
-		uint8_t trap[4];
-		std::unique_ptr<uint8_t[]> videoram_base;
-		uint8_t *videoram;
-		uint8_t mode_control_6a;
-		uint8_t color_select_68;
-		uint8_t palette_lut_2bpp[4];
-		int stride;
+		uint8_t trap[4]{};
+		std::unique_ptr<uint8_t[]> videoram_base{};
+		uint8_t *videoram = nullptr;
+		uint8_t mode_control_6a = 0;
+		uint8_t color_select_68 = 0;
+		uint8_t palette_lut_2bpp[4]{};
+		int stride = 0;
 		void *update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *videoram, uint16_t ma, uint8_t ra, uint8_t stride);
 	} m_video;
 

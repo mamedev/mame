@@ -27,6 +27,7 @@
 #include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "rendfont.h"
 #include "rendutil.h"
 #include "romload.h"

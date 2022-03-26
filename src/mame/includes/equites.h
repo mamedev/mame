@@ -41,9 +41,9 @@ public:
 	optional_shared_ptr<uint16_t> m_spriteram_2;
 
 	/* video-related */
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	uint8_t     m_bgcolor;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t     m_bgcolor = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -94,7 +94,7 @@ protected:
 	void gekisou_unknown_bit_w(offs_t offset, uint16_t data);
 
 private:
-	int m_gekisou_unknown_bit;
+	int m_gekisou_unknown_bit = 0;
 };
 
 
@@ -121,9 +121,9 @@ protected:
 	void splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
 
 private:
-	int       m_fg_char_bank;
-	uint16_t  m_splndrbt_bg_scrollx;
-	uint16_t  m_splndrbt_bg_scrolly;
+	int       m_fg_char_bank = 0;
+	uint16_t  m_splndrbt_bg_scrollx = 0U;
+	uint16_t  m_splndrbt_bg_scrolly = 0U;
 };
 
 #endif // MAME_INCLUDES_EQUITES_H

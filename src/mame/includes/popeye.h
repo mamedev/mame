@@ -65,7 +65,7 @@ protected:
 	static const res_net_info txt_mb7051_net_info;
 	static const res_net_info tnx1_bak_mb7051_net_info;
 	static const res_net_info obj_mb7052_net_info;
-	virtual const res_net_info bak_mb7051_net_info() { return tnx1_bak_mb7051_net_info; };
+	virtual const res_net_info bak_mb7051_net_info() { return tnx1_bak_mb7051_net_info; }
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 	std::vector<uint8_t> m_sprite_ram;
@@ -116,7 +116,7 @@ protected:
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	static const res_net_info tpp1_bak_mb7051_net_info;
-	virtual const res_net_info bak_mb7051_net_info() override { return tpp1_bak_mb7051_net_info; };
+	virtual const res_net_info bak_mb7051_net_info() override { return tpp1_bak_mb7051_net_info; }
 };
 
 class popeyebl_state : public tpp1_state
@@ -138,8 +138,8 @@ class tpp2_state : public tpp1_state
 public:
 	virtual void config(machine_config &config) override;
 protected:
-	bool m_watchdog_enabled;
-	uint8_t m_watchdog_counter;
+	bool m_watchdog_enabled = false;
+	uint8_t m_watchdog_counter = 0;
 
 	virtual void driver_start() override;
 	virtual void refresh_w(offs_t offset, uint8_t data) override;

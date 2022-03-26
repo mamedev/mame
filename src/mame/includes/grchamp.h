@@ -91,27 +91,27 @@ private:
 	void sub_map(address_map &map);
 	void sub_portmap(address_map &map);
 
-	uint8_t       m_cpu0_out[16];
-	uint8_t       m_cpu1_out[16];
+	uint8_t       m_cpu0_out[16]{};
+	uint8_t       m_cpu1_out[16]{};
 
-	uint8_t       m_comm_latch;
-	uint8_t       m_comm_latch2[4];
+	uint8_t       m_comm_latch = 0U;
+	uint8_t       m_comm_latch2[4]{};
 
-	uint16_t      m_ledlatch;
-	uint8_t       m_ledaddr;
-	uint16_t      m_ledram[8];
+	uint16_t      m_ledlatch = 0U;
+	uint8_t       m_ledaddr = 0U;
+	uint16_t      m_ledram[8]{};
 
-	uint8_t       m_soundlatch_data;
-	bool          m_soundlatch_flag;
+	uint8_t       m_soundlatch_data = 0U;
+	bool          m_soundlatch_flag = false;
 
-	uint16_t      m_collide;
-	uint8_t       m_collmode;
+	uint16_t      m_collide = 0U;
+	uint8_t       m_collmode = 0U;
 
-	bitmap_ind16 m_work_bitmap;
-	tilemap_t *m_text_tilemap;
-	tilemap_t *m_left_tilemap;
-	tilemap_t *m_center_tilemap;
-	tilemap_t *m_right_tilemap;
+	bitmap_ind16 m_work_bitmap{};
+	tilemap_t *m_text_tilemap = nullptr;
+	tilemap_t *m_left_tilemap = nullptr;
+	tilemap_t *m_center_tilemap = nullptr;
+	tilemap_t *m_right_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

@@ -10,8 +10,8 @@
 #include "mm78la.h"
 
 
-DEFINE_DEVICE_TYPE(MM78LA, mm78la_device, "mm78la", "Rockwell MM78LA") // MM78L + output PLA and tone generator, no serial i/o
-DEFINE_DEVICE_TYPE(MM77LA, mm77la_device, "mm77la", "Rockwell MM77LA") // MM77L + "
+DEFINE_DEVICE_TYPE(MM78LA, mm78la_device, "mm78la", "Rockwell MM78LA B9000") // MM78L + output PLA and tone generator, no serial i/o
+DEFINE_DEVICE_TYPE(MM77LA, mm77la_device, "mm77la", "Rockwell MM77LA B8000") // MM77L + "
 
 
 // constructor

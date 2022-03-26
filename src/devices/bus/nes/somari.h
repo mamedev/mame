@@ -24,7 +24,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_somari_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_somari_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mmc1_prg_shift);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -44,7 +44,7 @@ private:
 	u8 m_mmc1_count;
 	u8 m_mmc1_latch;
 	u8 m_mmc1_reg[4];
-	u8 m_mmc1_prg_shift;
+	const u8 m_mmc1_prg_shift;
 
 	// VRC2
 	u8 m_vrc_prg_bank[2];

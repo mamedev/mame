@@ -126,8 +126,8 @@ public:
 
 protected:
 	void debug_generate_irq(int irq, bool active);
-	virtual void hack_eeprom() {};
-	virtual void hack_usb() {};
+	virtual void hack_eeprom() {}
+	virtual void hack_usb() {}
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

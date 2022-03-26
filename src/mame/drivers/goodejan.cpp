@@ -120,15 +120,15 @@ private:
 
 	required_ioport_array<5> m_key;
 
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	tilemap_t *m_sc2_tilemap = nullptr;
+	tilemap_t *m_sc3_tilemap = nullptr;
 
-	uint16_t m_mux_data;
-	uint16_t m_seibucrtc_sc0bank;
-	uint16_t m_layer_en;
-	uint16_t m_scrollram[6];
+	uint16_t m_mux_data = 0;
+	uint16_t m_seibucrtc_sc0bank = 0;
+	uint16_t m_layer_en = 0;
+	uint16_t m_scrollram[6]{};
 
 	void gfxbank_w(uint16_t data);
 	uint16_t mahjong_panel_r();

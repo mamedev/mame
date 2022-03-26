@@ -66,11 +66,11 @@ private:
 	optional_shared_ptr<uint16_t> m_hyperpac_ram;
 	optional_shared_ptr<uint16_t> m_bootleg_spriteram16;
 
-	int m_sb3_music_is_playing;
-	int m_sb3_music;
-	uint8_t m_semicom_prot_offset;
+	int m_sb3_music_is_playing = 0;
+	int m_sb3_music = 0;
+	uint8_t m_semicom_prot_offset = 0;
 	uint16_t m_semicom_prot_base;
-	uint16_t m_yutnori_prot_val;
+	uint16_t m_yutnori_prot_val = 0;
 
 	void snowbros_flipscreen_w(uint8_t data);
 	void bootleg_flipscreen_w(uint8_t data);

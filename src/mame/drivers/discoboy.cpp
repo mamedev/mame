@@ -76,10 +76,10 @@ public:
 
 private:
 	/* video-related */
-	uint8_t    m_gfxbank;
-	uint8_t    m_port_00;
+	uint8_t    m_gfxbank = 0;
+	uint8_t    m_port_00 = 0;
 
-	bool       m_toggle;
+	bool       m_toggle = false;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -298,19 +298,19 @@ void nes_x1_005_device::write_m(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0x1ef0:
-			chr2_0((data & 0x7f) >> 1, CHRROM);
+			chr2_0(BIT(data, 1, 6), CHRROM);
 			if (m_x1_005_alt_mirroring)
 			{
-				set_nt_page(0, CIRAM, (data & 0x80) ? 1 : 0, 1);
-				set_nt_page(1, CIRAM, (data & 0x80) ? 1 : 0, 1);
+				set_nt_page(0, CIRAM, BIT(data, 7), 1);
+				set_nt_page(1, CIRAM, BIT(data, 7), 1);
 			}
 			break;
 		case 0x1ef1:
-			chr2_2((data & 0x7f) >> 1, CHRROM);
+			chr2_2(BIT(data, 1, 6), CHRROM);
 			if (m_x1_005_alt_mirroring)
 			{
-				set_nt_page(2, CIRAM, (data & 0x80) ? 1 : 0, 1);
-				set_nt_page(3, CIRAM, (data & 0x80) ? 1 : 0, 1);
+				set_nt_page(2, CIRAM, BIT(data, 7), 1);
+				set_nt_page(3, CIRAM, BIT(data, 7), 1);
 			}
 			break;
 		case 0x1ef2:

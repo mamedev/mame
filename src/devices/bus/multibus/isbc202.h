@@ -27,10 +27,6 @@ public:
 	isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~isbc202_device();
 
-	// device_multibus_interface overrides
-	virtual void install_io_rw(address_space& space) override;
-	virtual void install_mem_rw(address_space& space) override;
-
 	// Access to I/O space by CPU
 	uint8_t io_r(address_space &space, offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);

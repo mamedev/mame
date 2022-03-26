@@ -162,11 +162,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
-	uint16_t m_pntpzl_200000;
-	uint16_t m_serial;
-	uint16_t m_serial_out;
-	uint16_t m_read_count;
-	int m_touchscr[5];
+	uint16_t m_pntpzl_200000 = 0;
+	uint16_t m_serial = 0;
+	uint16_t m_serial_out = 0;
+	uint16_t m_read_count = 0;
+	int m_touchscr[5]{};
 
 	required_device<cpu_device> m_maincpu;
 	void pntnpuzl_200000_w(uint16_t data);
@@ -383,7 +383,9 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	VGA(config, "vga", 0).set_screen("screen");
+	vga_device &vga(VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x100000);
 }
 
 ROM_START( pntnpuzl )

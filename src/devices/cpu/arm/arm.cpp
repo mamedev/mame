@@ -542,8 +542,8 @@ void arm_cpu_device::device_start()
 	state_add( ARM32_SR13, "SR13", m_sArmRegister[eR13_SVC] ).formatstr("%08X");
 	state_add( ARM32_SR14, "SR14", m_sArmRegister[eR14_SVC] ).formatstr("%08X");
 
-	state_add(STATE_GENPC, "GENPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "GENPC", m_sArmRegister[15]).mask(ADDRESS_MASK).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sArmRegister[15]).formatstr("%11s").noshow();
 
 	set_icountptr(m_icount);

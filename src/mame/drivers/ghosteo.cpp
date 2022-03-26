@@ -125,8 +125,8 @@ private:
 	required_region_ptr<uint8_t> m_flash;
 	memory_bank_creator m_qs1000_bank;
 
-	int m_security_count;
-	uint32_t m_bballoon_port[20];
+	int m_security_count = 0;
+	uint32_t m_bballoon_port[20]{};
 	struct nand_t m_nand;
 	uint32_t bballoon_speedup_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t touryuu_port_10000000_r();

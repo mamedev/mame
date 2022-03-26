@@ -22,31 +22,8 @@
 #include "screen.h"
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define NES_BATTERY_SIZE 0x2000
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-/*PPU fast banking constants and structures */
-
-#define CHRROM 0
-#define CHRRAM 1
-
-
-/*PPU nametable fast banking constants and structures */
-
-#define CIRAM 0
-#define ROM 1
-#define EXRAM 2
-#define MMC5FILL 3
-#define CART_NTRAM 4
-
-#define NES_BATTERY 0
-#define NES_WRAM 1
 
 class nes_base_state : public driver_device
 {
@@ -76,14 +53,13 @@ public:
 		m_ppu(*this, "ppu"),
 		m_screen(*this, "screen"),
 		m_exp(*this, "exp"),
+		m_special(*this, "special"),
 		m_cartslot(*this, "nes_slot"),
 		m_disk(*this, "disk"),
 		m_prg_bank(*this, "prg%u", 0U)
 	{ }
 
-
 	int nes_ppu_vidaccess(int address, int data);
-
 
 	uint8_t fc_in0_r();
 	uint8_t fc_in1_r();
@@ -114,23 +90,22 @@ public:
 	void nes(machine_config &config);
 	void fds(machine_config &config);
 	void nes_map(address_map &map);
+
 private:
-	memory_bank       *m_prg_bank_mem[5];
+	// video-related
+	int m_last_frame_flip = 0;
 
-	/* video-related */
-	int m_last_frame_flip;
+	// misc
+	ioport_port       *m_io_disksel = nullptr;
 
-	/* misc */
-	ioport_port       *m_io_disksel;
-
-	uint8_t      *m_vram;
-	std::unique_ptr<uint8_t[]>    m_ciram; //PPU nametable RAM - external to PPU!
+	std::unique_ptr<uint8_t[]>    m_ciram; // PPU nametable RAM - external to PPU!
 
 	required_shared_ptr<uint8_t> m_mainram;
 
 	required_device<ppu2c0x_device> m_ppu;
 	required_device<screen_device> m_screen;
 	optional_device<nes_control_port_device> m_exp;
+	optional_device<nes_control_port_device> m_special;
 	optional_device<nes_cart_slot_device> m_cartslot;
 	optional_device<nes_disksys_device> m_disk;
 	memory_bank_array_creator<4> m_prg_bank;

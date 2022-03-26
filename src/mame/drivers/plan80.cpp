@@ -24,12 +24,16 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
+#include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "sound/spkrdev.h"
 #include "speaker.h"
 
+
+namespace {
 
 class plan80_state : public driver_device
 {
@@ -57,7 +61,7 @@ private:
 	bool m_spk_pol = 0;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -171,20 +175,22 @@ void plan80_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf800, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void plan80_state::machine_start()
@@ -277,6 +283,8 @@ ROM_START( plan80 )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "pl80gzn.bin", 0x0000, 0x0800, CRC(b4ddbdb6) SHA1(31bf9cf0f2ed53f48dda29ea830f74cea7b9b9b2) )
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

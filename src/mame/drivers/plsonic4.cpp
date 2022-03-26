@@ -51,7 +51,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

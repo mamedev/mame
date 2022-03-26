@@ -202,7 +202,7 @@ static int flopconvert(int argc, char *argv[])
 		return 1;
 	}
 	if(!dest_format->m_format->supports_save()) {
-		fprintf(stderr, "Error: Aaving to format '%s' unsupported\n", argv[3]);
+		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[3]);
 		return 1;
 	}
 
@@ -231,11 +231,11 @@ static int flopcreate(int argc, char *argv[])
 
 	auto dest_format = formats.find_floppy_format_info_by_key(argv[2]);
 	if(!dest_format) {
-		fprintf(stderr, "Error: Floppy format '%s' unknown\n", argv[3]);
+		fprintf(stderr, "Error: Floppy format '%s' unknown\n", argv[2]);
 		return 1;
 	}
 	if(!dest_format->m_format->supports_save()) {
-		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[3]);
+		fprintf(stderr, "Error: Saving to format '%s' unsupported\n", argv[2]);
 		return 1;
 	}
 
@@ -244,7 +244,7 @@ static int flopcreate(int argc, char *argv[])
 		fprintf(stderr, "Error: Floppy creation format '%s' unknown\n", argv[3]);
 		return 1;
 	}
-	if(!create_fs->m_manager->can_format()) {
+	if(create_fs->m_manager && !create_fs->m_manager->can_format()) {
 		fprintf(stderr, "Error: Floppy creation format '%s' does not support creating new images\n", argv[3]);
 		return 1;
 	}

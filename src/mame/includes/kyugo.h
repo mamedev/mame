@@ -77,17 +77,17 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 	required_shared_ptr<uint8_t> m_shared_ram;
 
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0U;
 
 	// video-related
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
-	uint8_t       m_scroll_x_lo;
-	uint8_t       m_scroll_x_hi;
-	uint8_t       m_scroll_y;
-	uint8_t       m_bgpalbank;
-	uint8_t       m_fgcolor;
-	const uint8_t *m_color_codes;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	tilemap_t     *m_fg_tilemap = nullptr;
+	uint8_t       m_scroll_x_lo = 0U;
+	uint8_t       m_scroll_x_hi = 0U;
+	uint8_t       m_scroll_y = 0U;
+	uint8_t       m_bgpalbank = 0U;
+	uint8_t       m_fgcolor = 0U;
+	const uint8_t *m_color_codes = nullptr;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

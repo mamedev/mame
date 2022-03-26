@@ -68,28 +68,28 @@ private:
 	output_finder<8> m_lamps;
 	output_finder<5> m_counters;
 
-	uint32_t m_dsp_rom_pos;
+	uint32_t m_dsp_rom_pos = 0;
 
-	int m_first_dsp_reset;
+	int m_first_dsp_reset = 0;
 	int16_t m_viewport_data[3];
 	int16_t m_projection_data[3];
 	int16_t m_intersection_data[3];
 
-	int m_gfx_index;
+	int m_gfx_index = 0;
 
 	std::unique_ptr<uint32_t[]> m_char_ram;
 	std::unique_ptr<uint32_t[]> m_tile_ram;
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
-	uint8_t m_mcu_comm_main;
-	uint8_t m_mcu_comm_hc11;
-	uint8_t m_mcu_data_main;
-	uint8_t m_mcu_data_hc11;
+	uint8_t m_mcu_comm_main = 0;
+	uint8_t m_mcu_comm_hc11 = 0;
+	uint8_t m_mcu_data_main = 0;
+	uint8_t m_mcu_data_hc11 = 0;
 
-	uint8_t m_has_dsp_hack;
+	uint8_t m_has_dsp_hack = 0;
 
-	int m_speed_meter;
-	int m_brake_meter;
+	int m_speed_meter = 0;
+	int m_brake_meter = 0;
 
 	void coin_control_w(uint8_t data);
 

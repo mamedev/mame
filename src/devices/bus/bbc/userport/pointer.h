@@ -22,9 +22,6 @@ class bbc_pointer_device :
 	public device_t,
 	public device_bbc_userport_interface
 {
-public:
-	DECLARE_INPUT_CHANGED_MEMBER(pointer_changed);
-
 protected:
 	// construction/destruction
 	bbc_pointer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -32,6 +29,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_ioport m_pointer_x;
 	required_ioport m_pointer_y;
@@ -41,11 +39,9 @@ protected:
 	int m_xdir, m_ydir;
 
 	// internal quadrature state
-	int m_direction_x, m_direction_y;
-	int m_distance_x, m_distance_y;
+	int m_x, m_y;
 	int m_phase_x, m_phase_y;
 
-	TIMER_CALLBACK_MEMBER(pointer_poll);
 	emu_timer *m_pointer_timer;
 };
 

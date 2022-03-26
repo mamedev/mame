@@ -133,7 +133,7 @@ public:
 	void uapce(machine_config &config);
 
 private:
-	uint8_t m_jamma_if_control_latch;
+	uint8_t m_jamma_if_control_latch = 0;
 	void jamma_if_control_latch_w(uint8_t data);
 	uint8_t jamma_if_control_latch_r();
 	uint8_t jamma_if_read_dsw(offs_t offset);

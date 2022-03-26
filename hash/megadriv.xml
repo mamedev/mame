@@ -95,7 +95,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 -->
 
-<softwarelist name="megadriv" description="Sega MegaDrive/Genesis cartridges">
+<softwarelist name="megadriv" description="Sega Mega Drive/Genesis cartridges">
 
 <!-- Fully documented: confirmed dumps + PCB pics -->
 
@@ -12460,6 +12460,28 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="cvaniaup" cloneof="cvania">
+		<description>Castlevania - Bloodlines (USA, 19931003 prototype)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="castlevania bloodlines (october 10, 1993 prototype).bin" size="1048576" crc="64d46357" sha1="95fc97ebfe1fda753319f27518c301551596adaa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvaniaup1" cloneof="cvania">
+		<description>Castlevania - Bloodlines (USA, 19930804 prototype)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="castlevaniabloodli0000.bin" size="1048576" crc="ca0df45b" sha1="a7ed6359456e7a6f730e77c7b8aeb86562d6a31b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="akumajo" cloneof="cvania">
 		<description>Akumajou Dracula - Vampire Killer (Jpn)</description>
 		<year>1994</year>
@@ -14657,6 +14679,17 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="dune ii - the battle for arrakis (prototype 19940111).bin" size="1048576" crc="781cb285" sha1="d02cf6e07071cf3d47e867182bf42d67b9e30a3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dune2p1" cloneof="dune2">
+		<description>Dune - The Battle for Arrakis (prototype, Ver 0.03)</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="dune the battle for arrakis (prototype).bin" size="1048576" crc="692cd794" sha1="2eea4201195994d84f57f7b9003d825a2f96d0b3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19923,6 +19956,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="mk3p" cloneof="mk3">
+		<description>Mortal Kombat 3 (prototype)</description>
+		<year>1995</year>
+		<publisher>Williams</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="mortal kombat 3 (prototype).bin" size="4194304" crc="7ab140e1" sha1="e220766fefc1dacd052724bd705a6ceade12059e"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This was compiled from the source code
 Thanks goes to the original developers for releasing the source,
 and to MetalliC for spending time to compile it
@@ -23640,6 +23684,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-12675.bin" size="524288" crc="5c7e5ea6" sha1="d5807a44d2059aa4ff27ecb7bdc749fbb0382550"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rhythmld">
+		<description>16Bit Rhythm Land</description>
+		<year>2019</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="serial" value="CC-MD16R-BK"/>
+		<info name="release" value="20190221"/>
+		<info name="alt_title" value="16BITリズムランド"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3145728">
+				<rom name="16bit rhythm land.bin" size="3145728" crc="67271302" sha1="8ef04cbf881330b1243b4618c94e95279886efbf"/>
 			</dataarea>
 		</part>
 	</software>
