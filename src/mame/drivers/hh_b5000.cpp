@@ -241,9 +241,9 @@ ROM_END
 
   The initial release was called Missile Attack, it didn't sell well (Mattel
   blamed it on NBC for refusing to air their commercial). They changed the
-  title/setting and advertised an upcoming rerelease as "Flash Gordon", but
-  changed plans and named it "Space Alert" (aka "Battlestar Galactica:
-  Space Alert").
+  title/setting and rereleased it as "Space Alert" (aka "Battlestar Galactica:
+  Space Alert"). In 1980, they advertised another rerelease, this time as
+  "Flash Gordon", but that didn't come out.
 
 ***************************************************************************/
 
