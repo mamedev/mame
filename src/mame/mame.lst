@@ -10885,7 +10885,7 @@ cosmicgi                        // bootleg (Inder)
 @source:cosmicos.cpp
 cosmicos                        //
 
-@source:cosmos_play8cf.cpp
+@source:cosmos_playc8f.cpp
 bgbasketb                       // (c) 2013 Benchmark Games
 bgbasketbb                      // (c) 2004 Benchmark Games
 tenstrikc                       // (c) 2003 Benchmark Games
@@ -17332,7 +17332,6 @@ atleta                          //
 brvteam                         //
 canasta                         //
 corsario                        //
-gunshot                         //
 ind250cc                        //
 lapbylap                        //
 larana                          //
@@ -39634,6 +39633,7 @@ spinner                         // bootleg
 bushido                         //
 bushidoa                        //
 bushidob                        //
+gunshot                         //
 jolypark                        //
 mach2                           //
 mach2a                          //
