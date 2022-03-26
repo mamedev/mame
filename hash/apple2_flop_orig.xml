@@ -18810,7 +18810,7 @@ license:CC0
 		<info name="release" value="2022-02-08"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-		<!--"Sword of Sheol" is a 1982 action game developed by David Riggle and distributed by Winner's Circle. It runs on any Apple II with 48K.&lt;br /&gt;&lt;br /&gt;A 1987 textfile called "Eggs and Keys from Hot Rod" listed "Sword of Sheol" among a list of "vaporwares"; crediting it to Winner's Circle, creators of Sanitron.&lt;br /&gt;&lt;br /&gt;&lt;div&gt;Hot Rod's document is likely based on the advertisement for Sword of Sheol that was included in the August 1983 issue of &lt;i&gt;Creative Computing&lt;/i&gt;, where it appeared next to titles Ice Cave, Exterminator, and Sanitron.&lt;/div&gt;-->
+		<!--"Sword of Sheol" is a 1982 action game developed by David Riggle and distributed by Winner's Circle. It runs on any Apple II with 48K. A 1987 textfile called "Eggs and Keys from Hot Rod" listed "Sword of Sheol" among a list of "vaporwares"; crediting it to Winner's Circle, creators of Sanitron. Hot Rod's document is likely based on the advertisement for Sword of Sheol that was included in the August 1983 issue of Creative Computing, where it appeared next to titles Ice Cave, Exterminator, and Sanitron.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="467751">
@@ -19615,7 +19615,7 @@ license:CC0
 		<info name="release" value="2022-02-22"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-		<!--"Critical Mass" is a 1983 adventure game developed by Bob Blauschild and distributed by Sirius Software. It runs on any Apple II with 48K.&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;Note: side B is write-protected, and you must make a copy of it in order to play the game. Side B is not copy protected, so any disk copier will work. I have included a writeable .dsk version of side B in the download.&lt;/div&gt;-->
+		<!--"Critical Mass" is a 1983 adventure game developed by Bob Blauschild and distributed by Sirius Software. It runs on any Apple II with 48K. Note: side B is write-protected, and you must make a copy of it in order to play the game. Side B is not copy protected, so any disk copier will work. I have included a writeable .dsk version of side B in the download.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
