@@ -131,9 +131,9 @@ private:
 	void subcpu_to_maincpu_w(uint8_t data);
 	uint8_t maincpu_status_r();
 
-	uint8_t m_subcpu_to_maincpu;
-	uint8_t m_maincpu_to_subcpu;
-	uint8_t m_maincpu_status;
+	uint8_t m_subcpu_to_maincpu = 0;
+	uint8_t m_maincpu_to_subcpu = 0;
+	uint8_t m_maincpu_status = 0;
 };
 
 

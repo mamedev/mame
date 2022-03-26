@@ -131,8 +131,8 @@ void b5000_cpu_device::op_nop()
 
 void b5000_cpu_device::op_lb(u8 bl)
 {
-	// LB x,y: load B from x,y (successive LB are ignored)
-	if (!op_is_lb(m_prev_op))
+	// LB x,y: load B from x,y (successive LB/ATB are ignored)
+	if (!op_is_lb(m_prev_op) && !op_is_atb(m_prev_op))
 	{
 		m_bl = bl;
 		set_bu(m_op & 3);
@@ -141,9 +141,12 @@ void b5000_cpu_device::op_lb(u8 bl)
 
 void b5000_cpu_device::op_atb()
 {
-	// ATB: load Bl from A (ignore if previous opcode was LB)
-	if (!op_is_lb(m_prev_op))
+	// ATB: load Bl from A (successive LB/ATB are ignored)
+	if (!op_is_lb(m_prev_op) && !op_is_atb(m_prev_op))
+	{
 		m_bl = m_a;
+		m_bl_delay = true;
+	}
 }
 
 void b5000_cpu_device::op_lda()
@@ -310,7 +313,7 @@ void b5000_cpu_device::op_tkbs()
 	op_tkb();
 
 	// note: SEG0(DP) from C flag is delayed 2 cycles
-	seg_w(m_seg | decode_digit(ram_r()) << 1 | m_prev2_c);
+	seg_w(m_seg | decode_digit(m_prev2_c << 4 | ram_r()));
 }
 
 void b5000_cpu_device::op_read()

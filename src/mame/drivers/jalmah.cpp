@@ -263,7 +263,7 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_vreg;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	tilemap_t *m_layer[2];
+	tilemap_t *m_layer[2]{};
 
 	TILEMAP_MAPPER_MEMBER(range0_16x16);
 	TILEMAP_MAPPER_MEMBER(range3_8x8);

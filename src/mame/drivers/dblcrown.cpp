@@ -113,12 +113,12 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<8> m_lamps;
 
-	uint8_t m_bank;
-	uint8_t m_irq_src;
+	uint8_t m_bank = 0;
+	uint8_t m_irq_src = 0;
 	std::unique_ptr<uint8_t[]> m_pal_ram;
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t m_vram_bank[2];
-	uint8_t m_mux_data;
+	uint8_t m_vram_bank[2]{};
+	uint8_t m_mux_data = 0;
 };
 
 void dblcrown_state::video_start()

@@ -2194,7 +2194,7 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 		return sectors;
 
 	// Start by detecting all id and data blocks
-	uint32_t hblk[100], dblk[100];
+	uint32_t hblk[100]{}, dblk[100]{};
 	uint32_t hblk_count = 0, dblk_count = 0;
 
 	// Precharge the shift register to detect over-the-index stuff
@@ -2276,7 +2276,7 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 		return sectors;
 
 	// Start by detecting all id and data blocks
-	uint32_t hblk[100], dblk[100];
+	uint32_t hblk[100]{}, dblk[100]{};
 	uint32_t hblk_count = 0, dblk_count = 0;
 
 	// Precharge the shift register to detect over-the-index stuff

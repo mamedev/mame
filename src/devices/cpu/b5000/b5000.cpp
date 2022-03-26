@@ -5,10 +5,9 @@
   Rockwell B5000 MCU
 
 TODO:
-- only one device dumped (Rockwell 8R) and it doesn't work at all
 - is unmapped ram mirrored? (that goes for subdevices too)
-- Fix digit segment decoder, it's not on a neat PLA. There should be a minus
-  sign in it, and more.
+- fill unknown data in segment decoder, it's not on a neat PLA
+- is ATB an unskippable opcode? nothing relies on it
 
 */
 
@@ -62,10 +61,19 @@ u16 b5000_cpu_device::decode_digit(u8 data)
 		// 0-9 ok (6 and 9 have tails)
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
 
-		// ?, ?, ?, ?, ?, ?
-		0, 0, 0, 0, 0, 0
+		// ?, ?, newline?, -, ?, ?
+		0, 0, 0x80, 0x40, 0, 0
 	};
-	return lut_segs[data & 0xf];
+
+	u16 seg = lut_segs[data & 0xf] << 1 | BIT(data, 4);
+
+	// zero suppression logic is done in hardware
+	if (seg & 0x100)
+		m_suppress0 = true;
+	else if (data > 0)
+		m_suppress0 = false;
+
+	return m_suppress0 ? 0 : (seg & 0xff);
 }
 
 
@@ -135,13 +143,17 @@ void b5000_cpu_device::execute_one()
 	}
 }
 
-bool b5000_cpu_device::op_canskip(u8 op)
+bool b5000_cpu_device::op_is_tl(u8 op)
 {
-	// TL and ATB are unskippable
-	return ((op & 0xf8) != 0x30) && (op != 0x77);
+	return ((op & 0xf8) == 0x30);
 }
 
 bool b5000_cpu_device::op_is_lb(u8 op)
 {
 	return ((op & 0xf0) == 0x20) || ((op & 0xfc) == 0x3c);
+}
+
+bool b5000_cpu_device::op_is_atb(u8 op)
+{
+	return (op == 0x77);
 }

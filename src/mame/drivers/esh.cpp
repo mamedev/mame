@@ -62,12 +62,12 @@ private:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
-	bool m_ld_video_visible;
+	bool m_ld_video_visible = false;
 	uint8_t ldp_read();
 	void misc_write(uint8_t data);
 	void led_writes(offs_t offset, uint8_t data);
 	void nmi_line_w(uint8_t data);
-	bool m_nmi_enable;
+	bool m_nmi_enable = false;
 	void esh_palette(palette_device &palette) const;
 	uint32_t screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);

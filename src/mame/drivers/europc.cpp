@@ -76,7 +76,7 @@ private:
 
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
-	isa8_aga_device::mode_t m_jim_mode;
+	isa8_aga_device::mode_t m_jim_mode{};
 	int m_port61; // bit 0,1 must be 0 for startup; reset?
 
 	void europc_io(address_map &map);

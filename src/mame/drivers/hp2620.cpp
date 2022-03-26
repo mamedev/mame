@@ -66,8 +66,8 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_nvram;
 
-	u16 m_display_page;
-	u8 m_key_status;
+	u16 m_display_page = 0;
+	u8 m_key_status = 0;
 };
 
 

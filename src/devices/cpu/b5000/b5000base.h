@@ -92,6 +92,7 @@ protected:
 	bool m_sr;
 	bool m_skip;
 	u16 m_seg;
+	bool m_suppress0;
 
 	u8 m_atbz_step;
 	u8 m_tra_step;

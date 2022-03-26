@@ -55,25 +55,25 @@ private:
 
 	uint8_t m_irq_control;
 
-	uint8_t m_via2_ier, m_via2_ifr, m_via2_sier, m_via2_sifr;
+	uint8_t m_via2_ier = 0, m_via2_ifr = 0, m_via2_sier = 0, m_via2_sifr = 0;
 
-	uint64_t m_dma_scsi_buffer;
+	uint64_t m_dma_scsi_buffer = 0;
 
-	uint32_t m_dma_badr, m_dma_floppy_adr;
-	uint16_t m_dma_floppy_byte_count, m_dma_floppy_offset;
+	uint32_t m_dma_badr = 0, m_dma_floppy_adr = 0;
+	uint16_t m_dma_floppy_byte_count = 0, m_dma_floppy_offset = 0;
 
-	uint16_t m_dma_berr_en, m_dma_berr_flag;
+	uint16_t m_dma_berr_en = 0, m_dma_berr_flag = 0;
 
-	uint32_t m_dma_scsi_a_base_adr, m_dma_scsi_b_base_adr;
-	uint32_t m_dma_scsi_a_cur_offset, m_dma_scsi_b_cur_offset;
+	uint32_t m_dma_scsi_a_base_adr = 0, m_dma_scsi_b_base_adr = 0;
+	uint32_t m_dma_scsi_a_cur_offset = 0, m_dma_scsi_b_cur_offset = 0;
 
-	uint8_t m_dma_scsi_a_ctrl, m_dma_scsi_b_ctrl, m_dma_floppy_ctrl;
-	uint8_t m_dma_scsi_buffer_byte_count;
+	uint8_t m_dma_scsi_a_ctrl = 0, m_dma_scsi_b_ctrl = 0, m_dma_floppy_ctrl = 0;
+	uint8_t m_dma_scsi_buffer_byte_count = 0;
 
-	uint8_t m_dma_scc_txa_ctrl, m_dma_scc_rxa_ctrl, m_dma_scc_txb_ctrl, m_dma_scc_rxb_ctrl;
-	uint8_t m_dma_enet_rx_ctrl, m_dma_enet_tx_ctrl;
+	uint8_t m_dma_scc_txa_ctrl = 0, m_dma_scc_rxa_ctrl = 0, m_dma_scc_txb_ctrl = 0, m_dma_scc_rxb_ctrl = 0;
+	uint8_t m_dma_enet_rx_ctrl = 0, m_dma_enet_tx_ctrl = 0;
 
-	bool m_dma_scsi_a_in_step, m_dma_floppy_in_step, m_floppy_drq;
+	bool m_dma_scsi_a_in_step = false, m_dma_floppy_in_step = false, m_floppy_drq = false;
 
 	void pdm_map(address_map &map);
 

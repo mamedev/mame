@@ -151,8 +151,8 @@ protected:
 	optional_device<gio64_slot_device> m_gio64_exp0;
 	optional_device<gio64_slot_device> m_gio64_exp1;
 
-	uint8_t m_volume_l;
-	uint8_t m_volume_r;
+	uint8_t m_volume_l = 0;
+	uint8_t m_volume_r = 0;
 };
 
 class ip22_state : public ip24_state

@@ -161,7 +161,7 @@ private:
 	required_region_ptr<uint8_t> m_chargen;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<pc_keyboard_device> m_keyboard;
-	uint8_t m_kbd_data;
+	uint8_t m_kbd_data = 0;
 };
 
 void kron180_state::kron180_mem(address_map &map)

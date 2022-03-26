@@ -28,21 +28,21 @@ public:
 private:
 	struct sysinfo_sector
 	{
-		uint8_t unused1[16];
-		uint8_t disk_name[8];
-		uint8_t disk_ext[3];
-		uint8_t disk_number[2];
-		uint8_t fc_start_trk;
-		uint8_t fc_start_sec;
-		uint8_t fc_end_trk;
-		uint8_t fc_end_sec;
-		uint8_t free[2];
-		uint8_t month;
-		uint8_t day;
-		uint8_t year;
-		uint8_t last_trk;
-		uint8_t last_sec;
-		uint8_t unused2[216];
+		uint8_t unused1[16]{};
+		uint8_t disk_name[8]{};
+		uint8_t disk_ext[3]{};
+		uint8_t disk_number[2]{};
+		uint8_t fc_start_trk = 0;
+		uint8_t fc_start_sec = 0;
+		uint8_t fc_end_trk = 0;
+		uint8_t fc_end_sec = 0;
+		uint8_t free[2]{};
+		uint8_t month = 0;
+		uint8_t day = 0;
+		uint8_t year = 0;
+		uint8_t last_trk = 0;
+		uint8_t last_sec = 0;
+		uint8_t unused2[216]{};
 	} info;
 	static const format formats[];
 	static const format formats_head1[];

@@ -43,14 +43,14 @@ public:
 private:
 	// devices
 	required_device<i8085a_cpu_device> m_maincpu;
-	uint8_t m_io_type;
-	uint8_t *m_chargen;
-	uint8_t m_keyb_mux;
+	uint8_t m_io_type = 0;
+	uint8_t *m_chargen = nullptr;
+	uint8_t m_keyb_mux = 0;
 
 	struct{
-		uint8_t x;
-		uint8_t y;
-		uint8_t status;
+		uint8_t x = 0;
+		uint8_t y = 0;
+		uint8_t status = 0;
 		std::unique_ptr<uint8_t[]> vram;
 		std::unique_ptr<uint8_t[]> attr;
 	}m_lcd;

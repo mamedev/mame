@@ -55,7 +55,7 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_one() override;
 
-	virtual bool op_canskip(u8 op) override;
+	virtual bool op_is_tl(u8 op) override;
 	virtual bool op_is_lb(u8 op) override;
 	virtual void reset_pc() override { set_pc(0, 0); }
 	virtual u8 sr_page() override { return 15; }
@@ -65,7 +65,6 @@ protected:
 	void data_48x4(address_map &map);
 
 	// opcode handlers
-	virtual void op_atb() override;
 	virtual void op_read() override;
 };
 

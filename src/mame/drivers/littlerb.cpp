@@ -133,8 +133,8 @@ private:
 
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
-	uint8_t m_sound_index_l,m_sound_index_r;
-	uint16_t m_sound_pointer_l,m_sound_pointer_r;
+	uint8_t m_sound_index_l = 0, m_sound_index_r = 0;
+	uint16_t m_sound_pointer_l = 0, m_sound_pointer_r = 0;
 	int m_soundframe;
 
 	void l_sound_w(uint16_t data);

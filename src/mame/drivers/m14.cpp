@@ -108,12 +108,12 @@ private:
 	void m14_map(address_map &map);
 
 	/* video-related */
-	tilemap_t  *m_m14_tilemap;
+	tilemap_t  *m_m14_tilemap = nullptr;
 
 	/* input-related */
 	//uint8_t m_hop_mux;
-	uint8_t m_ballx,m_bally;
-	uint8_t m_paddlex;
+	uint8_t m_ballx = 0, m_bally = 0;
+	uint8_t m_paddlex = 0;
 };
 
 

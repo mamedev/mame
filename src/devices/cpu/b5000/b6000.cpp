@@ -79,7 +79,6 @@ void b6000_cpu_device::execute_one()
 {
 	switch (m_op)
 	{
-		case 0x03: op_tkbs(); break;
 		case 0x76: op_atbz(); break;
 		case 0x77: op_atb(); break;
 

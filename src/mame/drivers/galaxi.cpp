@@ -95,19 +95,19 @@ private:
 	output_finder<6> m_lamps;
 
 	/* video-related */
-	tilemap_t   *m_bg1_tmap;
-	tilemap_t   *m_bg2_tmap;
-	tilemap_t   *m_bg3_tmap;
-	tilemap_t   *m_bg4_tmap;
-	tilemap_t   *m_fg_tmap;
+	tilemap_t   *m_bg1_tmap = nullptr;
+	tilemap_t   *m_bg2_tmap = nullptr;
+	tilemap_t   *m_bg3_tmap = nullptr;
+	tilemap_t   *m_bg4_tmap = nullptr;
+	tilemap_t   *m_fg_tmap = nullptr;
 
 	uint16_t m_bg3_xscroll;
 	uint16_t m_bg3_yscroll;
 
 	/* misc */
-	int       m_hopper;
-	int       m_ticket;
-	uint16_t    m_out;
+	int       m_hopper = 0;
+	int       m_ticket = 0;
+	uint16_t    m_out = 0;
 
 	void bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bg2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

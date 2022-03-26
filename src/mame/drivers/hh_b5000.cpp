@@ -10,9 +10,6 @@ ROM source notes when dumped from another model, but confident it's the same:
 - rw18r: Rockwell 8R
 - misatk: Mattel Space Alert
 
-TODO:
-- figure out why rw18r doesn't work (ROM dump is good)
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -724,4 +721,4 @@ CONS( 1977, mfootb,    0,       0, mfootb,    mfootb,    mfootb_state,    empty_
 CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_init, "Mattel Electronics", "Baseball (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

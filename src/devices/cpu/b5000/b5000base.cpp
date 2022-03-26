@@ -76,6 +76,7 @@ void b5000_base_device::device_start()
 	m_sr = false;
 	m_skip = false;
 	m_seg = 0;
+	m_suppress0 = false;
 
 	m_atbz_step = 0;
 	m_tra_step = 0;
@@ -102,6 +103,7 @@ void b5000_base_device::device_start()
 	save_item(NAME(m_sr));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_seg));
+	save_item(NAME(m_suppress0));
 
 	save_item(NAME(m_atbz_step));
 	save_item(NAME(m_tra_step));
@@ -117,6 +119,8 @@ void b5000_base_device::device_start()
 	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 3
 	state_add(++m_state_count, "C", m_c).formatstr("%01X"); // 4
 	state_add(++m_state_count, "B", m_ram_addr).formatstr("%02X"); // 5
+	state_add(++m_state_count, "BU", m_bu).formatstr("%01X").noshow(); // 6
+	state_add(++m_state_count, "BL", m_bl).formatstr("%01X").noshow(); // 7
 
 	set_icountptr(m_icount);
 }

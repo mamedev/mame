@@ -79,10 +79,10 @@ private:
 	required_device<ticket_dispenser_device> m_hopper;
 	required_shared_ptr<u8> m_videoram;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
-	bool m_nmi_enable;
+	bool m_nmi_enable = false;
 };
 
 void clpoker_state::prg_map(address_map &map)

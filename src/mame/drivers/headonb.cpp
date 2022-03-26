@@ -63,7 +63,7 @@ private:
 
 	required_shared_ptr<u8> m_video_ram;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
 	void video_ram_w(offs_t offset, u8 data);
 

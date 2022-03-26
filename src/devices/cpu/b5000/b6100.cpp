@@ -135,10 +135,9 @@ void b6100_cpu_device::execute_one()
 		m_write_spk(m_c);
 }
 
-bool b6100_cpu_device::op_canskip(u8 op)
+bool b6100_cpu_device::op_is_tl(u8 op)
 {
-	// TL is unskippable
-	return ((op & 0xf8) != 0x30) && ((op & 0xfc) != 0x38);
+	return ((op & 0xf8) == 0x30) || ((op & 0xfc) == 0x38);
 }
 
 bool b6100_cpu_device::op_is_lb(u8 op)
@@ -150,13 +149,6 @@ bool b6100_cpu_device::op_is_lb(u8 op)
 //-------------------------------------------------
 //  changed opcodes (no need for separate file)
 //-------------------------------------------------
-
-void b6100_cpu_device::op_atb()
-{
-	// ATB: load Bl from A (delayed)
-	m_bl = m_a;
-	m_bl_delay = true;
-}
 
 void b6100_cpu_device::op_read()
 {

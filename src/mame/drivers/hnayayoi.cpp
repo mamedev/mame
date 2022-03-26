@@ -97,14 +97,14 @@ protected:
 private:
 	// video-related
 	std::unique_ptr<uint8_t[]> m_pixmap[8];
-	uint16_t m_palbank;
-	uint8_t m_blit_layer;
-	uint16_t m_blit_dest;
-	uint32_t m_blit_src;
+	uint16_t m_palbank = 0;
+	uint8_t m_blit_layer = 0;
+	uint16_t m_blit_dest = 0;
+	uint32_t m_blit_src = 0;
 
 	// misc
-	uint8_t m_keyb;
-	bool m_nmi_enable;
+	uint8_t m_keyb = 0;
+	bool m_nmi_enable = false;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
