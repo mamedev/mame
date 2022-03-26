@@ -48,6 +48,7 @@ public:
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
 		, m_digits(*this, "digit%d", 0U)
+		, m_io_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -101,6 +102,7 @@ private:
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
 	output_finder<48> m_digits;
+	output_finder<1> m_io_leds;
 	output_finder<80> m_io_outputs;   // 16 solenoids + 64 lamps
 };
 
@@ -530,7 +532,7 @@ WRITE_LINE_MEMBER( st_mp100_state::u10_cb2_w )
 
 WRITE_LINE_MEMBER( st_mp100_state::u11_ca2_w )
 {
-	output().set_value("led0", !state);
+	m_io_leds[0] = state ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER( st_mp100_state::u11_cb2_w )
@@ -717,8 +719,8 @@ void st_mp100_state::u11_b_w(u8 data)
 
 void st_mp100_state::machine_start()
 {
-	genpin_class::machine_start();
 	m_digits.resolve();
+	m_io_leds.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_u10a));
@@ -737,7 +739,6 @@ void st_mp100_state::machine_start()
 
 void st_mp100_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	m_u10a = 0;
 	m_u10b = 0;
 	m_u10_cb2 = 0;

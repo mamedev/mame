@@ -36,13 +36,13 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_crtc_vreg[0x100];
-	uint8_t m_crtc_index;
-	uint8_t m_flip_scr;
-	uint8_t m_mux_data;
-	uint8_t m_km_status;
-	uint8_t m_coin_settings;
-	uint8_t m_coin_impulse;
+	uint8_t m_crtc_vreg[0x100]{};
+	uint8_t m_crtc_index = 0;
+	uint8_t m_flip_scr = 0;
+	uint8_t m_mux_data = 0;
+	uint8_t m_km_status = 0;
+	uint8_t m_coin_settings = 0;
+	uint8_t m_coin_impulse = 0;
 
 	uint8_t key_matrix_r();
 	void key_matrix_w(uint8_t data);

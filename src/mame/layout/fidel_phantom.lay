@@ -7,7 +7,7 @@ license:CC0
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
-
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="redb"><rect><color red="0.81" green="0.3" blue="0.29" /></rect></element>
 	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
 	<element name="disk_white"><disk><color red="0.99" green="0.99" blue="0.99" /></disk></element>
@@ -35,6 +35,29 @@ license:CC0
 		<disk state="1">
 			<bounds x="0.5" y="0.5" width="7" height="5" />
 			<color red="1.0" green="1.0" blue="1.0" />
+		</disk>
+	</element>
+
+	<element name="mpos0" defstate="0">
+		<rect>
+			<bounds x="0" y="0" width="256" height="2" />
+			<color alpha="0" />
+		</rect>
+		<disk>
+			<bounds state="0" x="0" y="0" width="2" height="2" />
+			<bounds state="240" x="240" y="0" width="2" height="2" />
+			<color red="0.9" green="0.0" blue="0.6" alpha="0.35" />
+		</disk>
+	</element>
+	<element name="mpos1" defstate="0">
+		<rect>
+			<bounds x="0" y="0" width="256" height="2" />
+			<color alpha="0" />
+		</rect>
+		<disk>
+			<bounds state="0" x="0" y="0" width="2" height="2" />
+			<bounds state="240" x="240" y="0" width="2" height="2" />
+			<color red="0.9" green="0.0" blue="0.6" alpha="0.85" />
 		</disk>
 	</element>
 
@@ -188,6 +211,7 @@ license:CC0
 	<element name="text_p4">      <image file="chess/wb.svg"/></element>
 	<element name="text_p5">      <image file="chess/wn.svg"/></element>
 	<element name="text_p6">      <image file="chess/wp.svg"/></element>
+
 
 <!-- sb board -->
 
@@ -403,6 +427,7 @@ license:CC0
 		</repeat>
 	</group>
 
+
 <!-- sb ui -->
 
 	<element name="hlub" defstate="0">
@@ -535,6 +560,9 @@ license:CC0
 		<element ref="text_uiu3b"><bounds x="4" y="75" width="2" height="2" /></element>
 	</group>
 
+
+<!-- bottom panel -->
+
 	<group name="panel">
 		<bounds x="0" y="0" width="122" height="17" />
 
@@ -635,8 +663,7 @@ license:CC0
 		<element ref="text_p6" ><bounds x="43.5" y="9.5" width="2.3" height="2.5" /></element>
 		<element name="0.7" ref="led" blend="multiply"><bounds x="43.5" y="9.5" width="2.3" height="2.5" /></element>
 
-		<!-- lcd panel -->
-
+		<!-- lcd screen -->
 		<element ref="cwhite"><bounds x="3.5" y="5" width="20.25" height="7.5" /></element>
 		<element ref="black"><bounds x="3.725" y="5.225" width="19.8" height="7.05" /></element>
 		<element ref="lcd_bg"><bounds x="4.625" y="6.125" width="18" height="5.25" /></element>
@@ -654,42 +681,6 @@ license:CC0
 		<element name="4.7" ref="ldot"><bounds x="13.3925" y="9.2375" width="0.45" height="0.45" /></element>
 	</group>
 
-<!-- motor status -->
-
-	<element name="text_motor"><text string="MOTOR:"><color red="0.843" green="0.678" blue="0.482" /></text></element>
-	<element name="text_motoru">
-		<text string="U" state="0"><color red="0.209" green="0.209" blue="0.201" /></text>
-		<text string="U" state="1"><color red="0.9" green="0.9" blue="0.85" /></text>
-	</element>
-	<element name="text_motord">
-		<text string="D" state="0"><color red="0.209" green="0.209" blue="0.201" /></text>
-		<text string="D" state="1"><color red="0.9" green="0.9" blue="0.85" /></text>
-	</element>
-	<element name="text_motorl">
-		<text string="L" state="0" align="2"><color red="0.209" green="0.209" blue="0.201" /></text>
-		<text string="L" state="1" align="2"><color red="0.9" green="0.9" blue="0.85" /></text>
-	</element>
-	<element name="text_motorr">
-		<text string="R" state="0" align="1"><color red="0.209" green="0.209" blue="0.201" /></text>
-		<text string="R" state="1" align="1"><color red="0.9" green="0.9" blue="0.85" /></text>
-	</element>
-	<element name="text_motorx">
-		<text string="X" state="0"><color red="0.209" green="0.209" blue="0.201" /></text>
-		<text string="X" state="1"><color red="0.9" green="0.9" blue="0.85" /></text>
-	</element>
-
-	<group name="motor">
-		<bounds x="0" y="0" width="10" height="12" />
-		<element ref="text_motor"><bounds x="0" y="0" width="10" height="2" /></element>
-		<element ref="cwhite"><bounds x="0" y="11" width="10" height="1" /></element>
-
-		<element name="motor.1" ref="text_motoru"><bounds x="0" y="3" width="10" height="2" /></element>
-		<element name="motor.2" ref="text_motorl"><bounds x="0" y="5" width="3.5" height="2" /></element>
-		<element name="motor.3" ref="text_motorr"><bounds x="6.5" y="5" width="3.5" height="2" /></element>
-		<element name="motor.4" ref="text_motorx"><bounds x="0" y="5" width="10" height="2" /></element>
-		<element name="motor.0" ref="text_motord"><bounds x="0" y="7" width="10" height="2" /></element>
-	</group>
-
 
 <!-- build screen -->
 
@@ -701,10 +692,23 @@ license:CC0
 		<element ref="cwhite"><bounds x="-0.5" y="3" width="81" height="81" /></element>
 
 		<group ref="sb_board"><bounds x="-20.5" y="3.5" width="121" height="80" /></group>
-
 		<group ref="sb_ui"><bounds x="-33" y="3" width="10" height="80" /></group>
-		<group ref="motor"><bounds x="-33" y="84.5" width="10" height="12" /></group>
-
 		<group ref="panel"><bounds x="-21" y="85" width="122" height="17" /></group>
+
+		<!-- optional motor position overlay -->
+		<collection name="Motor Position">
+			<repeat count="2">
+				<param name="i" start="0" increment="1" />
+
+				<element name="motorx~i~" ref="mpos~i~">
+					<animate name="motory" />
+					<bounds state="4" x="-17.5" y="84.0" width="160" height="1.25" />
+					<bounds state="136" x="-17.5" y="1.5" width="160" height="1.25" />
+				</element>
+			</repeat>
+
+			<element ref="blackb"><bounds x="110" y="0" width="5" height="100" /></element>
+		</collection>
+
 	</view>
 </mamelayout>

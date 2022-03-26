@@ -26,7 +26,8 @@ public:
 	~bgfx_effect();
 
 	void submit(int view, uint64_t blend = 0L);
-	bgfx_uniform* uniform(std::string name);
+	bgfx_uniform *uniform(std::string name);
+	bool is_valid() { return m_program_handle.idx != bgfx::kInvalidHandle; }
 
 private:
 	uint64_t                             m_state;

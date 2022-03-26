@@ -63,9 +63,9 @@ private:
 	required_ioport_array<3> m_dsw_port;
 	required_ioport m_coins;
 
-	uint8_t m_dsw_sel;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_nmi_mask;
+	uint8_t m_dsw_sel = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_nmi_mask = 0;
 };
 
 #endif // MAME_INCLUDES_ZACCARIA_H

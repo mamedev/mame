@@ -192,8 +192,8 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// SCREEN-PAC registers
-	u8              m_resolution;
-	u8              m_hc_left;
+	u8              m_resolution = 0;
+	u8              m_hc_left = 0;
 };
 
 

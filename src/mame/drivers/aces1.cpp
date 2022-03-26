@@ -70,13 +70,13 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	int m_input_strobe;
-	int m_lamp_strobe;
-	int m_led_strobe;
-	int m_reel_clock[4];
-	int m_reel_phase[4];
-	int m_reel_count[4];
-	int m_optic_pattern;
+	int m_input_strobe = 0;
+	int m_lamp_strobe = 0;
+	int m_led_strobe = 0;
+	int m_reel_clock[4]{};
+	int m_reel_phase[4]{};
+	int m_reel_count[4]{};
+	int m_optic_pattern = 0;
 
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
@@ -112,8 +112,8 @@ private:
 	}
 
 
-	emu_timer *m_aces1_irq_timer;
-	emu_timer *m_aces1_nmi_timer;
+	emu_timer *m_aces1_irq_timer = nullptr;
+	emu_timer *m_aces1_nmi_timer = nullptr;
 
 
 	void ic24_write_a(uint8_t data)

@@ -41,7 +41,7 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8031_device> m_subcpu;
-	bool m_obfa;
+	bool m_obfa = false;
 };
 
 

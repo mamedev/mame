@@ -84,17 +84,17 @@ private:
 	output_finder<> m_tilt_output;
 	output_finder<> m_start_output;
 
-	uint8_t   m_digit;            // scanlines from i8279
-	uint8_t   m_sound_latch;      // sound bus latch
-	uint8_t   m_ay_ctrl;          // ay controls line
-	uint8_t   m_motors_ctrl;      // motors control
-	int     m_sint;             // SINT line
-	int     m_motenbl;          // /MOTENBL line
-	int     m_ball_gate_sw;     // ball gate switch
+	uint8_t   m_digit = 0;            // scanlines from i8279
+	uint8_t   m_sound_latch = 0;      // sound bus latch
+	uint8_t   m_ay_ctrl = 0;          // ay controls line
+	uint8_t   m_motors_ctrl = 0;      // motors control
+	int     m_sint = 0;             // SINT line
+	int     m_motenbl = 0;          // /MOTENBL line
+	int     m_ball_gate_sw = 0;     // ball gate switch
 
 	// motors positions
-	int     m_rmotor;           // right motor position (0-100)
-	int     m_lmotor;           // left motor position (0-100)
+	int     m_rmotor = 0;           // right motor position (0-100)
+	int     m_lmotor = 0;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
 	void icecold_map(address_map &map);

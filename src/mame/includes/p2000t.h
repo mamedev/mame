@@ -93,7 +93,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	int8_t m_frame_count;
+	int8_t m_frame_count = 0;
 };
 
 #endif // MAME_INCLUDES_P2000T_H

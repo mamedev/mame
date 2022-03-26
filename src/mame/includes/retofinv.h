@@ -80,13 +80,13 @@ private:
 	required_shared_ptr<uint8_t> m_sharedram;
 	required_shared_ptr<uint8_t> m_bg_videoram;
 
-	uint8_t m_main_irq_mask;
-	uint8_t m_sub_irq_mask;
-	uint8_t m_cpu2_m6000;
-	int m_fg_bank;
-	int m_bg_bank;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_sub_irq_mask = 0;
+	uint8_t m_cpu2_m6000 = 0;
+	int m_fg_bank = 0;
+	int m_bg_bank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 };
 
 #endif // MAME_INCLUDES_RETOFINV_H

@@ -79,7 +79,7 @@ protected:
 	uint64_t eeprom_93c46a_r();
 	void eeprom_93c46a_w(uint64_t data);
 
-	uint8_t m_mp_mux;
+	uint8_t m_mp_mux = 0;
 
 	uint8_t asciihex_to_dec(uint8_t in);
 	void create_pic_from_retdat();

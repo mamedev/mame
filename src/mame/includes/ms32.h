@@ -54,8 +54,8 @@ protected:
 	void base_sound_map(address_map &map);
 
 private:
-	u32 m_to_main;
-	u16 m_irqreq;
+	u32 m_to_main = 0;
+	u16 m_irqreq = 0;
 };
 
 class ms32_state : public ms32_base_state

@@ -75,8 +75,8 @@ public:
 
 protected:
 	// device_nvram_interface overrides
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 	virtual void nvram_default() override;
 };
 
@@ -162,9 +162,10 @@ void s100_8k_sc_device::device_start()
 //  nvram_read - read NVRAM from the file
 //-------------------------------------------------
 
-void s100_8k_sc_bb_device::nvram_read(emu_file &file)
+bool s100_8k_sc_bb_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_ram.get(), 0x2000);
+	size_t actual;
+	return !file.read(m_ram.get(), 0x2000, actual) && actual == 0x2000;
 }
 
 
@@ -172,9 +173,10 @@ void s100_8k_sc_bb_device::nvram_read(emu_file &file)
 //  nvram_write - write NVRAM to the file
 //-------------------------------------------------
 
-void s100_8k_sc_bb_device::nvram_write(emu_file &file)
+bool s100_8k_sc_bb_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_ram.get(), 0x2000);
+	size_t actual;
+	return !file.write(m_ram.get(), 0x2000, actual) && actual == 0x2000;
 }
 
 

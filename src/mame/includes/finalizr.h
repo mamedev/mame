@@ -54,14 +54,14 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 
 	// video-related
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_spriterambank;
-	uint8_t m_charbank;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_spriterambank = 0U;
+	uint8_t m_charbank = 0U;
 
 	// misc
-	uint8_t m_nmi_enable;
-	uint8_t m_irq_enable;
+	uint8_t m_nmi_enable = 0U;
+	uint8_t m_irq_enable = 0U;
 
 	void coin_w(uint8_t data);
 	void flipscreen_w(uint8_t data);

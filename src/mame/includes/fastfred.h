@@ -48,18 +48,18 @@ private:
 	optional_shared_ptr<uint8_t> m_background_color;
 	optional_shared_ptr<uint8_t> m_imago_fg_videoram;
 
-	int m_hardware_type;
-	uint16_t m_charbank;
-	uint8_t m_colorbank;
-	uint8_t m_nmi_mask;
-	uint8_t m_sound_nmi_mask;
-	uint8_t m_imago_sprites[0x800*3];
-	uint16_t m_imago_sprites_address;
-	uint8_t m_imago_sprites_bank;
+	int m_hardware_type = 0;
+	uint16_t m_charbank = 0U;
+	uint8_t m_colorbank = 0U;
+	uint8_t m_nmi_mask = 0U;
+	uint8_t m_sound_nmi_mask = 0U;
+	uint8_t m_imago_sprites[0x800*3]{};
+	uint16_t m_imago_sprites_address = 0U;
+	uint8_t m_imago_sprites_bank = 0U;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_web_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_web_tilemap = nullptr;
 
 	uint8_t fastfred_custom_io_r(offs_t offset);
 	uint8_t flyboy_custom1_io_r(offs_t offset);

@@ -201,10 +201,10 @@ private:
 	inline uint16_t FETCHD16(offs_t base_pc, offs_t &pc, const data_buffer &opcodes);
 	inline uint32_t FETCHD32(offs_t base_pc, offs_t &pc, const data_buffer &opcodes);
 
-	char *hexstring(uint32_t value, int digits);
-	char *hexstring64(uint32_t lo, uint32_t hi);
-	char *hexstringpc(uint64_t pc);
-	char *shexstring(uint32_t value, int digits, bool always);
+	static char *hexstring(uint32_t value, int digits);
+	static char *hexstring64(uint32_t lo, uint32_t hi);
+	std::string hexstringpc(uint64_t pc);
+	static std::string shexstring(uint32_t value, int digits, bool always);
 	void handle_sib_byte(std::ostream &stream, uint8_t mod, offs_t base_pc, offs_t &pc, const data_buffer &opcodes);
 	void handle_modrm(std::ostream &stream, offs_t base_pc, offs_t &pc, const data_buffer &opcodes);
 	void handle_modrm(std::string &buffer, offs_t base_pc, offs_t &pc, const data_buffer &opcodes);

@@ -265,20 +265,22 @@ void z80ne_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x03ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0x8000, 0x83ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0x8000, 0x83ff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x03ff, m_mram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x03ff, m_mram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void z80net_state::machine_reset()
@@ -303,20 +305,22 @@ void z80netf_state::machine_reset()
 	if ((m_io_config->read() & 0x07) != 2)
 	{
 		address_space &program = m_maincpu->space(AS_PROGRAM);
-		m_rom_shadow_tap = program.install_read_tap(0x8000, 0xf3ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-		{
-			if (!machine().side_effects_disabled())
-			{
-				// delete this tap
-				m_rom_shadow_tap->remove();
+		m_rom_shadow_tap.remove();
+		m_rom_shadow_tap = program.install_read_tap(
+				0x8000, 0xf3ff,
+				"rom_shadow_r",
+				[this] (offs_t offset, u8 &data, u8 mem_mask)
+				{
+					if (!machine().side_effects_disabled())
+					{
+						// delete this tap
+						m_rom_shadow_tap.remove();
 
-				// reinstall ram over the rom shadow
-				m_bank1->set_entry(0);
-			}
-
-			// return the original data
-			return data;
-		});
+						// reinstall RAM over the ROM shadow
+						m_bank1->set_entry(0);
+					}
+				},
+				&m_rom_shadow_tap);
 	}
 }
 

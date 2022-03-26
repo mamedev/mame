@@ -2608,7 +2608,7 @@ license:CC0
 		<!-- Burgertime (1983)(Mattel)(proto).bin -->
 		<description>Burgertime (Prototype)</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="developer" value="Data East USA" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">

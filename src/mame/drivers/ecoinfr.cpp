@@ -17,7 +17,7 @@
 ------------------------------
 
  WARNING: I have little faith in many of these sets being what they claim to be,
-          the headers in the ROMs often indicate different titles, and sevearl of
+          the headers in the ROMs often indicate different titles, and several of
           the sets contain what look to be games on different hardware, or entirely
           different game, there was even a Data East Pinball ROM in with this lot.
 
@@ -72,18 +72,18 @@ public:
 	DECLARE_READ_LINE_MEMBER(reel3_opto_r);
 
 private:
-	int irq_toggle;
-	int m_optic_pattern;
+	int irq_toggle = 0;
+	int m_optic_pattern = 0;
 
-	uint8_t port09_value;
-	uint8_t port10_value;
-	uint8_t port11_value;
-	uint8_t port12_value;
-	uint8_t port13_value;
-	uint8_t port14_value;
-	uint8_t port15_value;
-	uint8_t port16_value;
-	uint8_t port17_value;
+	uint8_t port09_value = 0;
+	uint8_t port10_value = 0;
+	uint8_t port11_value = 0;
+	uint8_t port12_value = 0;
+	uint8_t port13_value = 0;
+	uint8_t port14_value = 0;
+	uint8_t port15_value = 0;
+	uint8_t port16_value = 0;
+	uint8_t port17_value = 0;
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void ec_port00_out_w(uint8_t data);

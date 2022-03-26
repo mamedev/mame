@@ -42,7 +42,7 @@ protected:
 
 	required_ioport m_joypad;
 	u32 m_latch;  // wider than standard joypad's 8-bit latch to accomodate subclass devices
-	u32 m_latch_fill;  // the new MSB as a joypad's shift register shifts
+	const u32 m_latch_fill;  // the new MSB as a joypad's shift register shifts
 };
 
 

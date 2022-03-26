@@ -1661,9 +1661,9 @@ static INPUT_PORTS_START( wantsega )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 
 	PORT_MODIFY("IN3")
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x04, "20k" )
+	PORT_DIPSETTING(    0x00, "30k" )
 
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // teleport
@@ -2181,9 +2181,9 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3") // This should be Alpha Fighter bonus life (Off 15000, On 10000) - didn't verify though
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Bonus Life" )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x04, "1500" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vicdual_state, timer_value_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -2196,7 +2196,7 @@ static INPUT_PORTS_START( alphaho )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vicdual_state, coin_status_r)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2204,6 +2204,33 @@ static INPUT_PORTS_START( alphaho )
 
 	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x03, "Alpha Fighter Lives" )   PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( alphahob )
+	PORT_INCLUDE( alphaho )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x08, 0x00, "Circuit Lives" )           PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x04, 0x00, "Missile Bonus Life" )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "10k" )
+	PORT_DIPSETTING(    0x04, "15k" )
+	
+	PORT_MODIFY("IN3")
+	PORT_DIPNAME( 0x04, 0x00, "Missile Final UFO Bonus" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("FAKE_LIVES.0")
+	PORT_DIPNAME( 0x03, 0x03, "Missile Lives" )           PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -4257,5 +4284,5 @@ GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,   empty_i
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,   empty_init, ROT270, "Sega",                    "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,   empty_init, ROT270, "Denki Onkyo",             "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, alphaho,    0,        alphaho,   alphaho,   vicdual_state,   empty_init, ROT270, "Data East Corporation",   "Alpha Fighter / Head On", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, alphahob,   alphaho,  alphaho,   alphaho,   vicdual_state,   empty_init, ROT270, "bootleg",                 "Missile / Circuit (bootleg of Alpha Fighter / Head On)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, alphahob,   alphaho,  alphaho,   alphahob,  vicdual_state,   empty_init, ROT270, "bootleg",                 "Missile / Circuit (bootleg of Alpha Fighter / Head On)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wantsega,   0,        carhntds,  wantsega,  vicdual_state,   empty_init, ROT270, "Sega",                    "Wanted (Sega)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE )

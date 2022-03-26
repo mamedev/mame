@@ -64,7 +64,7 @@ private:
 
 	std::unique_ptr<u8[]> m_ram;
 
-	bool m_boot_read;
+	bool m_boot_read = false;
 };
 
 void systel1_state::machine_start()

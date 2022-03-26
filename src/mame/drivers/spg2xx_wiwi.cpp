@@ -57,7 +57,7 @@ protected:
 	uint16_t m_prev_porta;
 	uint16_t m_prev_portb;
 	bool m_toggle;
-	emu_timer *m_pulse_timer;
+	emu_timer *m_pulse_timer = nullptr;
 
 private:
 
@@ -118,7 +118,7 @@ protected:
 
 private:
 	bool m_toggle2;
-	emu_timer *m_pulse_timer2;
+	emu_timer *m_pulse_timer2 = nullptr;
 };
 
 void spg2xx_game_marc101_state::device_timer(emu_timer &timer, device_timer_id id, int param)

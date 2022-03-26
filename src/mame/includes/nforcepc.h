@@ -82,7 +82,7 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	int ddr_ram_size;
+	int ddr_ram_size = 0;
 	std::vector<uint32_t> ram;
 	crush11_host_device *host;
 	address_space *ram_space;
@@ -104,7 +104,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t buffer[0xff];
+	uint8_t buffer[0xff]{};
 };
 
 DECLARE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device)
@@ -123,8 +123,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	const uint8_t *buffer;
-	int buffer_size;
+	const uint8_t *buffer  = nullptr;
+	int buffer_size = 0;
 };
 
 DECLARE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device)
@@ -143,7 +143,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t buffer[0xff];
+	uint8_t buffer[0xff]{};
 };
 
 DECLARE_DEVICE_TYPE(AS99127F, as99127f_device)
@@ -159,7 +159,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t buffer[0xff];
+	uint8_t buffer[0xff]{};
 };
 
 DECLARE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device)
@@ -175,7 +175,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t buffer[0xff];
+	uint8_t buffer[0xff]{};
 };
 
 DECLARE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device)

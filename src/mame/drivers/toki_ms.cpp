@@ -316,9 +316,9 @@ private:
 	void bk1vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bk2vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	tilemap_t *m_bk1_tilemap;
-	tilemap_t *m_bk2_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bk1_tilemap = nullptr;
+	tilemap_t *m_bk2_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	u8 palette_r(offs_t offset);
 	void palette_w(offs_t offset, u8 data);
@@ -333,7 +333,7 @@ private:
 	void sound_command_w(u8 data);
 	void adpcm_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	u8 m_adpcm_data;
+	u8 m_adpcm_data = 0;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
 };

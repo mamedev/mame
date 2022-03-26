@@ -1717,7 +1717,7 @@ ROM_END
 
 void msx_state::mx10(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
 	// Z80: uPD780C-1
@@ -1783,7 +1783,7 @@ ROM_END
 
 void msx_state::pv7(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot + expansion slot, or 2 cartridge slots?
@@ -1809,7 +1809,7 @@ ROM_END
 
 void msx_state::pv16(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -1950,7 +1950,7 @@ ROM_END
 
 void msx_state::cpc50a(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1974,7 +1974,7 @@ ROM_END
 
 void msx_state::cpc50b(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1998,7 +1998,7 @@ ROM_END
 
 void msx_state::cpc51(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot

@@ -107,6 +107,7 @@ void sacstate_state::sacstate_mem(address_map &map)
 void sacstate_state::sacstate_io(address_map &map)
 {
 	map.unmap_value_high();
+	map.global_mask(0x1f);
 	map(0x00, 0x00).r(FUNC(sacstate_state::port00_r));
 	map(0x01, 0x01).r(FUNC(sacstate_state::port01_r));
 	map(0x04, 0x04).r(FUNC(sacstate_state::port04_r));

@@ -30,19 +30,22 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void init_mightguy();
+	void cop01(machine_config &config);
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 
 	/* video-related */
-	tilemap_t        *m_bg_tilemap;
-	tilemap_t        *m_fg_tilemap;
-	uint8_t          m_vreg[4];
+	tilemap_t        *m_bg_tilemap = nullptr;
+	tilemap_t        *m_fg_tilemap = nullptr;
+	uint8_t          m_vreg[4]{};
 
 	/* sound-related */
-	int            m_pulse;
-	int            m_timer; // kludge for ym3526 in mightguy
+	int            m_pulse = 0;
+	int            m_timer = 0; // kludge for ym3526 in mightguy
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -59,7 +62,6 @@ public:
 	void cop01_foreground_w(offs_t offset, uint8_t data);
 	void cop01_vreg_w(offs_t offset, uint8_t data);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(mightguy_area_r);
-	void init_mightguy();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -68,7 +70,6 @@ public:
 	void cop01_palette(palette_device &palette) const;
 	uint32_t screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void cop01(machine_config &config);
 	void audio_io_map(address_map &map);
 	void cop01_map(address_map &map);
 	void io_map(address_map &map);

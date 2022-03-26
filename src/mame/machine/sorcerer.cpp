@@ -498,20 +498,22 @@ void sorcerer_state::machine_reset_common()
 	portfe_w(0);
 
 	space.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = space.install_read_tap(0xe000, 0xefff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = space.install_read_tap(
+			0xe000, 0xefff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram->pointer());
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram->pointer());
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void sorcerer_state::machine_reset()

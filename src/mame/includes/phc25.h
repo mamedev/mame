@@ -50,7 +50,7 @@ private:
 	MC6847_GET_CHARROM_MEMBER(pal_char_rom_r);
 	void machine_start() override;
 	void machine_reset() override;
-	uint8_t *m_char_rom;
+	uint8_t *m_char_rom = nullptr;
 	uint8_t m_port40 = 0U;
 	int m_centronics_busy = 0;
 	required_shared_ptr<uint8_t> m_vram;

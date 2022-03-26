@@ -178,7 +178,7 @@ private:
 	virtual void sound_w(offs_t offset, uint8_t data) override;
 	virtual void music_w(offs_t offset, uint8_t data) override;
 
-	uint8_t m_player_select;
+	uint8_t m_player_select = 0;
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 

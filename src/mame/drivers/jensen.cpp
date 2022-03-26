@@ -90,9 +90,9 @@ private:
 	required_device<i82357_device> m_isp;
 
 	// machine state
-	u8 m_hae;
-	u8 m_sysctl;
-	u8 m_spare;
+	u8 m_hae = 0;
+	u8 m_sysctl = 0;
+	u8 m_spare = 0;
 };
 
 void jensen_state::machine_start()

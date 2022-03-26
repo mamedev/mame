@@ -92,23 +92,23 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<> m_led;
 
-	bool m_collision;
-	unsigned m_current_index;
-	uint8_t m_video_invert;
-	uint8_t m_ship_reflect;
-	uint8_t m_pt_pos_select;
-	uint8_t m_pt_horz;
-	uint8_t m_pt_pic;
-	uint8_t m_ship_h;
-	uint8_t m_torpedo_pic;
-	uint8_t m_ship_size;
-	uint8_t m_ship_h_precess;
-	uint8_t m_ship_pic;
-	uint8_t m_torpedo_h;
-	uint8_t m_torpedo_v;
+	bool m_collision = false;
+	unsigned m_current_index = 0;
+	uint8_t m_video_invert = 0;
+	uint8_t m_ship_reflect = 0;
+	uint8_t m_pt_pos_select = 0;
+	uint8_t m_pt_horz = 0;
+	uint8_t m_pt_pic = 0;
+	uint8_t m_ship_h = 0;
+	uint8_t m_torpedo_pic = 0;
+	uint8_t m_ship_size = 0;
+	uint8_t m_ship_h_precess = 0;
+	uint8_t m_ship_pic = 0;
+	uint8_t m_torpedo_h = 0;
+	uint8_t m_torpedo_v = 0;
 	std::unique_ptr<uint8_t[]> m_LFSR;
 	bitmap_ind16 m_helper;
-	emu_timer *m_periodic_timer;
+	emu_timer *m_periodic_timer = nullptr;
 };
 
 #endif // MAME_INCLUDES_WOLFPACK_H

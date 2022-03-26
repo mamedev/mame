@@ -151,8 +151,8 @@ public:
 	void jpmmps(machine_config &config);
 
 private:
-	uint8_t m_sound_buffer;
-	uint8_t m_psg_latch;
+	uint8_t m_sound_buffer = 0;
+	uint8_t m_psg_latch = 0;
 	virtual void machine_reset() override;
 
 	void jpmmps_io_map(address_map &map);

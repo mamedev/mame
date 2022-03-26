@@ -38,7 +38,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_battery_ram;
 
-	int m_trigger;
+	int m_trigger = 0;
 
 	void porta_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);

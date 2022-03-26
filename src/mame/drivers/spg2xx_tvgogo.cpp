@@ -21,7 +21,7 @@ public:
 	void tvgogo(machine_config &config);
 
 private:
-	uint8_t m_i2cunk;
+	uint8_t m_i2cunk = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -63,16 +63,16 @@ private:
 
 	output_finder<2> m_digits;
 
-	int m_track0[2];
-	int m_track1[2];
-	int m_msm_data_offs;
-	int m_toggle;
-	uint8_t m_scroll_x[2];
-	uint8_t m_led0;
-	uint8_t m_led1;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	emu_timer *m_reset_timer;
+	int m_track0[2]{};
+	int m_track1[2]{};
+	int m_msm_data_offs = 0;
+	int m_toggle = 0;
+	uint8_t m_scroll_x[2]{};
+	uint8_t m_led0 = 0;
+	uint8_t m_led1 = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	emu_timer *m_reset_timer = nullptr;
 
 	void sub_cpu_halt_w(uint8_t data);
 	uint8_t track_0_r(offs_t offset);

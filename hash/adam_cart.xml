@@ -156,7 +156,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="gfxproc">
+	<software name="gfxproc">
 		<description>Coleco Graphics Processor</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
@@ -165,6 +165,6 @@ license:CC0
 				<rom name="Coleco Graphics Processor (1984) (Coleco).rom" size="0x8000" crc="5d09075d" sha1="ce2fec45a410408ed0789966e7ff8391b0374a19"/>
 			</dataarea>
 		</part>
-</software>
+	</software>
 
 </softwarelist>

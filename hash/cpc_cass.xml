@@ -915,6 +915,7 @@ Please stick to using the floppy versions for the time being...
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
+		<!-- According to CPC-Power faces 1a and 1b are identical -->
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="173875">
 				<rom name="a 320 (f) (face 1a) (1988) (1. programmes 01 a 12) [original] [tape].cdt" size="173875" crc="5b9e80cc" sha1="c7f67a1154d93008849b2f3e77765884aafcf850"/>
@@ -922,7 +923,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 		<part name="cass2" interface="cpc_cass">
 			<dataarea name="cass" size="173875">
-				<rom name="a 320 (f) (face 1a) (1988) (1. programmes 01 a 12) [original] [tape].cdt" size="173875" crc="5b9e80cc" sha1="c7f67a1154d93008849b2f3e77765884aafcf850"/>
+				<rom name="a 320 (f) (face 1b) (1988) (1. programmes 01 a 12) [original] [tape].cdt" size="173875" crc="5b9e80cc" sha1="c7f67a1154d93008849b2f3e77765884aafcf850"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="cpc_cass">
@@ -3730,8 +3731,8 @@ Please stick to using the floppy versions for the time being...
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
-			<dataarea name="cass" size="72360">
-				<rom name="back to the future ii (uk) (face a) (1990) [original] [tape].cdt" size="72360" crc="c2b3d27f" sha1="e7340d4890d3c950bdc5dcc557e8a839a6c80bb1"/>
+			<dataarea name="cass" size="208301">
+				<rom name="back to the future ii (uk) (face b) (1990) [original] [tape].cdt" size="208301" crc="6cb818fa" sha1="888101480873b6d4ff9bf0d720268b0fe9b5fde1"/>
 			</dataarea>
 		</part>
 	</software>

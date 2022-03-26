@@ -71,8 +71,8 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	tilemap_t *m_tilemap[4];
-	int m_scrolly[4];
+	tilemap_t *m_tilemap[4]{};
+	int m_scrolly[4]{};
 };
 
 class saiyukip_state : public umipoker_state

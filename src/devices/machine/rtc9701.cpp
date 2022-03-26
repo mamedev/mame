@@ -160,9 +160,10 @@ void rtc9701_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void rtc9701_device::nvram_read(emu_file &file)
+bool rtc9701_device::nvram_read(util::read_stream &file)
 {
-	file.read(rtc9701_data, 0x200);
+	size_t actual;
+	return !file.read(rtc9701_data, 0x200, actual) && actual == 0x200;
 }
 
 
@@ -171,9 +172,10 @@ void rtc9701_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void rtc9701_device::nvram_write(emu_file &file)
+bool rtc9701_device::nvram_write(util::write_stream &file)
 {
-	file.write(rtc9701_data, 0x200);
+	size_t actual;
+	return !file.write(rtc9701_data, 0x200, actual) && actual == 0x200;
 }
 
 //-------------------------------------------------

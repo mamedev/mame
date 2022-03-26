@@ -107,7 +107,7 @@ path_iterator &path_iterator::operator=(path_iterator const &that)
 //  multipath sequence
 //-------------------------------------------------
 
-bool path_iterator::next(std::string &buffer, const char *name)
+bool path_iterator::next(std::string &buffer)
 {
 	// if none left, return false to indicate we are done
 	if (!m_is_first && (m_searchpath.cend() == m_current))
@@ -119,10 +119,6 @@ bool path_iterator::next(std::string &buffer, const char *name)
 	m_current = sep;
 	if (m_searchpath.cend() != m_current)
 		++m_current;
-
-	// append the name if we have one
-	if (name)
-		util::path_append(buffer, name);
 
 	// bump the index and return true
 	m_is_first = false;
@@ -160,8 +156,12 @@ const osd::directory::entry *file_enumerator::next(const char *subdir)
 		while (!m_curdir)
 		{
 			// if we fail to get anything more, we're done
-			if (!m_iterator.next(m_pathbuffer, subdir))
+			if (!m_iterator.next(m_pathbuffer))
 				return nullptr;
+
+			// append the subdir if we have one
+			if (subdir)
+				util::path_append(m_pathbuffer, subdir);
 
 			// open the path
 			m_curdir = osd::directory::open(m_pathbuffer);

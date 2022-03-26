@@ -75,13 +75,13 @@ private:
 	void fireball_io_map(address_map &map);
 	void fireball_map(address_map &map);
 
-	uint8_t m_p1_data;
-	uint8_t m_p3_data;
-	uint8_t int_timing;
-	uint8_t int_data;
-	uint8_t ay_data;
-	uint8_t to_ay_data;
-	uint8_t m_display_data;
+	uint8_t m_p1_data = 0;
+	uint8_t m_p3_data = 0;
+	uint8_t int_timing = 0;
+	uint8_t int_data = 0;
+	uint8_t ay_data = 0;
+	uint8_t to_ay_data = 0;
+	uint8_t m_display_data = 0;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<i8031_device> m_maincpu;

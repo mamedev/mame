@@ -177,8 +177,8 @@ public:
 	void export_http_api();
 
 	// TODO: Do saves and loads still require scheduling?
-	void immediate_save(const char *filename);
-	void immediate_load(const char *filename);
+	void immediate_save(std::string_view filename);
+	void immediate_load(std::string_view filename);
 
 	// rewind operations
 	bool rewind_capture();
@@ -217,7 +217,7 @@ public:
 	bool debug_enabled() { return (debug_flags & DEBUG_FLAG_ENABLED) != 0; }
 
 	// used by debug_console to take ownership of the debug.log file
-	std::unique_ptr<emu_file> steal_debuglogfile() { return std::move(m_debuglogfile); }
+	std::unique_ptr<emu_file> steal_debuglogfile();
 
 private:
 	class side_effects_disabler {

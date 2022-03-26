@@ -43,17 +43,17 @@ private:
 	required_shared_ptr<uint16_t> m_back_data;
 	required_shared_ptr<uint16_t> m_fore_data;
 
-	tilemap_t *m_bg_layer;
-	tilemap_t *m_fg_layer;
-	tilemap_t *m_tx_layer;
-	int m_back_bankbase;
-	int m_fore_bankbase;
-	int m_back_enable;
-	int m_fore_enable;
-	int m_sprite_enable;
-	int m_txt_enable;
-	int m_old_back;
-	int m_old_fore;
+	tilemap_t *m_bg_layer = nullptr;
+	tilemap_t *m_fg_layer = nullptr;
+	tilemap_t *m_tx_layer = nullptr;
+	int m_back_bankbase = 0;
+	int m_fore_bankbase = 0;
+	int m_back_enable = 0;
+	int m_fore_enable = 0;
+	int m_sprite_enable = 0;
+	int m_txt_enable = 0;
+	int m_old_back = 0;
+	int m_old_fore = 0;
 
 	void background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

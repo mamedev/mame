@@ -63,12 +63,12 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_sg1_line;
-	bool m_keypressed;
-	uint8_t m_keyboard_cnt;
-	uint8_t m_ppi_porta;
-	uint8_t m_ppi_portc;
-	emu_timer *m_key_timer;
+	bool m_sg1_line = false;
+	bool m_keypressed = false;
+	uint8_t m_keyboard_cnt = 0;
+	uint8_t m_ppi_porta = 0;
+	uint8_t m_ppi_portc = 0;
+	emu_timer *m_key_timer = nullptr;
 	void update_speaker();
 	void machine_start() override;
 	void machine_reset() override;

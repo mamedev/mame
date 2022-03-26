@@ -65,6 +65,12 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<cop400_cpu_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -72,19 +78,14 @@ public:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_l;                         // MCU port L write data
-	u8 m_g;                         // MCU port G write data
-	u8 m_d;                         // MCU port D write data
-	int m_so;                       // MCU SO line state
-	int m_sk;                       // MCU SK line state
-	u16 m_inp_mux;                  // multiplexed inputs mask
+	u8 m_l = 0;                     // MCU port L write data
+	u8 m_g = 0;                     // MCU port G write data
+	u8 m_d = 0;                     // MCU port D write data
+	int m_so = 0;                   // MCU SO line state
+	int m_sk = 0;                   // MCU SK line state
+	u16 m_inp_mux = ~0;             // multiplexed inputs mask
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -92,14 +93,6 @@ protected:
 
 void hh_cop400_state::machine_start()
 {
-	// zerofill
-	m_l = 0;
-	m_g = 0;
-	m_d = 0;
-	m_so = 0;
-	m_sk = 0;
-	m_inp_mux = ~0;
-
 	// register for savestates
 	save_item(NAME(m_l));
 	save_item(NAME(m_g));
@@ -170,10 +163,12 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void ctstein(machine_config &config);
+
+private:
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_l();
-	void ctstein(machine_config &config);
 };
 
 // handlers
@@ -220,7 +215,7 @@ INPUT_PORTS_END
 
 void ctstein_state::ctstein(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 850000); // approximation - RC osc. R=12K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_g().set(FUNC(ctstein_state::write_g));
@@ -228,11 +223,11 @@ void ctstein_state::ctstein(machine_config &config)
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	m_maincpu->read_l().set(FUNC(ctstein_state::read_l));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ctstein);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -272,14 +267,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void h2hsoccerc(machine_config &config);
+	void h2hbaskbc(machine_config &config);
+	void h2hhockeyc(machine_config &config);
+
+private:
 	void write_d(u8 data);
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_in();
-
-	void h2hsoccerc(machine_config &config);
-	void h2hbaskbc(machine_config &config);
-	void h2hhockeyc(machine_config &config);
 };
 
 // handlers
@@ -367,7 +363,7 @@ INPUT_PORTS_END
 
 void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=101pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(h2hbaskbc_state::write_d));
@@ -376,12 +372,12 @@ void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 	m_maincpu->read_in().set(FUNC(h2hbaskbc_state::read_in));
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(16, 7);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_h2hbaskbc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -430,13 +426,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void einvaderc(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	void write_l(u8 data);
-	void einvaderc(machine_config &config);
 };
 
 // handlers
@@ -499,7 +497,7 @@ INPUT_PORTS_END
 
 void einvaderc_state::einvaderc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP444L(config, m_maincpu, 850000); // approximation - RC osc. R=47K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->read_in().set_ioport("IN.0");
@@ -509,7 +507,7 @@ void einvaderc_state::einvaderc(machine_config &config)
 	m_maincpu->write_so().set(FUNC(einvaderc_state::write_so));
 	m_maincpu->write_l().set(FUNC(einvaderc_state::write_l));
 
-	/* video hardware */
+	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
 	mask.set_refresh_hz(60);
 	mask.set_size(919, 1080);
@@ -519,7 +517,7 @@ void einvaderc_state::einvaderc(machine_config &config)
 	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_einvaderc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -559,12 +557,14 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void unkeinv(machine_config &config);
+
+private:
 	void update_display();
 	void write_g(u8 data);
 	void write_d(u8 data);
 	void write_l(u8 data);
 	u8 read_l();
-	void unkeinv(machine_config &config);
 };
 
 // handlers
@@ -627,7 +627,7 @@ INPUT_PORTS_END
 
 void unkeinv_state::unkeinv(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 850000); // frequency guessed
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_g().set(FUNC(unkeinv_state::write_g));
@@ -637,11 +637,11 @@ void unkeinv_state::unkeinv(machine_config &config)
 	m_maincpu->read_l_tristate().set_constant(0xff);
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	config.set_default_layout(layout_unkeinv);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -681,21 +681,24 @@ public:
 		m_motor_on_out(*this, "motor_on")
 	{ }
 
+	void lchicken(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER(motor_switch_r);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	output_finder<> m_motor_pos_out;
 	output_finder<> m_motor_on_out;
 
 	u8 m_motor_pos = 0;
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
-	DECLARE_READ_LINE_MEMBER(motor_switch_r);
 
 	void write_l(u8 data);
 	void write_d(u8 data);
 	void write_g(u8 data);
 	u8 read_g();
-	void lchicken(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
 };
 
 void lchicken_state::machine_start()
@@ -782,7 +785,7 @@ INPUT_PORTS_END
 
 void lchicken_state::lchicken(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 850000); // approximation - RC osc. R=12K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(lchicken_state::write_l));
@@ -794,11 +797,11 @@ void lchicken_state::lchicken(machine_config &config)
 
 	TIMER(config, "chicken_motor").configure_periodic(FUNC(lchicken_state::motor_sim_tick), attotime::from_msec(6000/0x100)); // ~6sec for a full rotation
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 4);
 	config.set_default_layout(layout_lchicken);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -829,13 +832,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void funjacks(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
 	void write_g(u8 data);
 	u8 read_l();
 	u8 read_g();
-	void funjacks(machine_config &config);
 };
 
 // handlers
@@ -906,7 +911,7 @@ INPUT_PORTS_END
 
 void funjacks_state::funjacks(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP410(config, m_maincpu, 850000); // approximation - RC osc. R=47K, C=56pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funjacks_state::write_d));
@@ -915,11 +920,11 @@ void funjacks_state::funjacks(machine_config &config)
 	m_maincpu->read_l().set(FUNC(funjacks_state::read_l));
 	m_maincpu->read_g().set(FUNC(funjacks_state::read_g));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 2);
 	config.set_default_layout(layout_funjacks);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -954,11 +959,13 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void funrlgl(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
 	void write_g(u8 data);
-	void funrlgl(machine_config &config);
 };
 
 // handlers
@@ -1006,7 +1013,7 @@ INPUT_PORTS_END
 
 void funrlgl_state::funrlgl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP410(config, m_maincpu, 800000); // approximation - RC osc. R=51K, C=91pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funrlgl_state::write_d));
@@ -1015,12 +1022,12 @@ void funrlgl_state::funrlgl(machine_config &config)
 	m_maincpu->write_g().set(FUNC(funrlgl_state::write_g));
 	m_maincpu->read_g().set_ioport("IN.0");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	m_display->set_bri_levels(0.005, 0.1); // top led is brighter
 	config.set_default_layout(layout_funrlgl);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1051,13 +1058,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void funtag(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
 	void write_g(u8 data);
 	u8 read_l();
 	u8 read_g();
-	void funtag(machine_config &config);
 };
 
 // handlers
@@ -1127,7 +1136,7 @@ INPUT_PORTS_END
 
 void funtag_state::funtag(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=47K, C=91pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funtag_state::write_d));
@@ -1136,11 +1145,11 @@ void funtag_state::funtag(machine_config &config)
 	m_maincpu->read_l().set(FUNC(funtag_state::read_l));
 	m_maincpu->read_g().set(FUNC(funtag_state::read_g));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 2);
 	config.set_default_layout(layout_funtag);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1182,8 +1191,15 @@ public:
 		m_on_timer(*this, "on_timer")
 	{ }
 
+	void mbaskb2(machine_config &config);
+	void msoccer2(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(switch_r);
 
+protected:
+	virtual void machine_reset() override;
+
+private:
 	required_device<cop400_cpu_device> m_subcpu;
 	required_device<timer_device> m_on_timer;
 
@@ -1193,12 +1209,6 @@ public:
 	void sub_write_g(u8 data);
 	void sub_write_d(u8 data);
 	u8 sub_read_in();
-
-	void mbaskb2(machine_config &config);
-	void msoccer2(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
 
 void mbaskb2_state::machine_reset()
@@ -1291,7 +1301,7 @@ INPUT_PORTS_END
 
 void mbaskb2_state::mbaskb2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 500000); // approximation
 	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_SYNC_INPUT, false); // guessed
 	m_maincpu->write_g().set(FUNC(mbaskb2_state::main_write_g));
@@ -1315,13 +1325,13 @@ void mbaskb2_state::mbaskb2(machine_config &config)
 
 	TIMER(config, "on_timer").configure_generic(nullptr);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(0xc0, 0x7f);
 	m_display->set_bri_levels(0.008, 0.04); // offense is brighter
 	config.set_default_layout(layout_mbaskb2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1372,11 +1382,13 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void lafootb(machine_config &config);
+
+private:
 	void update_display();
 	void write_l(u8 data);
 	void write_d(u8 data);
 	u8 read_g();
-	void lafootb(machine_config &config);
 };
 
 // handlers
@@ -1428,7 +1440,7 @@ INPUT_PORTS_END
 
 void lafootb_state::lafootb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 900000); // approximation - RC osc. R=51K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(lafootb_state::write_l));
@@ -1436,7 +1448,7 @@ void lafootb_state::lafootb(machine_config &config)
 	m_maincpu->read_g().set(FUNC(lafootb_state::read_g));
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
 	mask.set_refresh_hz(60);
 	mask.set_size(1920, 864);
@@ -1448,7 +1460,7 @@ void lafootb_state::lafootb(machine_config &config)
 	m_display->set_bri_levels(0.005);
 	config.set_default_layout(layout_lafootb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1484,12 +1496,14 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void mdallas(machine_config &config);
+
+private:
 	void update_display();
 	void write_l(u8 data);
 	void write_d(u8 data);
 	void write_g(u8 data);
 	u8 read_in();
-	void mdallas(machine_config &config);
 };
 
 // handlers
@@ -1530,7 +1544,7 @@ u8 mdallas_state::read_in()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     <  ON>  [YES]   [NO]   [NEXT]
     [<W]    [^N]    [Sv]   [E>]
@@ -1580,7 +1594,7 @@ INPUT_PORTS_END
 
 void mdallas_state::mdallas(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP444L(config, m_maincpu, 1000000); // approximation - RC osc. R=57K, C=101pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(mdallas_state::write_l));
@@ -1589,12 +1603,12 @@ void mdallas_state::mdallas(machine_config &config)
 	m_maincpu->read_in().set(FUNC(mdallas_state::read_in));
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_mdallas);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1628,10 +1642,12 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void plus1(machine_config &config);
+
+private:
 	void write_d(u8 data);
 	void write_l(u8 data);
 	u8 read_l();
-	void plus1(machine_config &config);
 };
 
 // handlers
@@ -1672,7 +1688,7 @@ INPUT_PORTS_END
 
 void plus1_state::plus1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=51K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(plus1_state::write_d));
@@ -1680,9 +1696,9 @@ void plus1_state::plus1(machine_config &config)
 	m_maincpu->write_l().set(FUNC(plus1_state::write_l));
 	m_maincpu->read_l().set(FUNC(plus1_state::read_l));
 
-	/* no visual feedback! */
+	// no visual feedback!
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1725,12 +1741,14 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void lightfgt(machine_config &config);
+
+private:
 	void update_display();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	void write_d(u8 data);
 	void write_l(u8 data);
 	u8 read_g();
-	void lightfgt(machine_config &config);
 };
 
 // handlers
@@ -1806,7 +1824,7 @@ INPUT_PORTS_END
 
 void lightfgt_state::lightfgt(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 950000); // approximation - RC osc. R=82K, C=56pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_so().set(FUNC(lightfgt_state::write_so));
@@ -1815,11 +1833,11 @@ void lightfgt_state::lightfgt(machine_config &config)
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	m_maincpu->read_g().set(FUNC(lightfgt_state::read_g));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5, 5);
 	config.set_default_layout(layout_lightfgt);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1851,12 +1869,14 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void bship82(machine_config &config);
+
+private:
 	void write_d(u8 data);
 	void write_g(u8 data);
 	u8 read_l();
 	u8 read_in();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
-	void bship82(machine_config &config);
 };
 
 // handlers
@@ -1957,7 +1977,7 @@ INPUT_PORTS_END
 
 void bship82_state::bship82(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 750000); // approximation - RC osc. R=14K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(bship82_state::write_d));
@@ -1967,11 +1987,11 @@ void bship82_state::bship82(machine_config &config)
 	m_maincpu->write_so().set(FUNC(bship82_state::write_so));
 	m_maincpu->read_si().set_ioport("IN.4");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship82);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[8] = { 0.0, 1.0/7.0, 2.0/7.0, 3.0/7.0, 4.0/7.0, 5.0/7.0, 6.0/7.0, 1.0 };
@@ -2008,13 +2028,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void qkracer(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_in();
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
-	void qkracer(machine_config &config);
 };
 
 // handlers
@@ -2096,7 +2118,7 @@ INPUT_PORTS_END
 
 void qkracer_state::qkracer(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 950000); // approximation - RC osc. R=47K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(qkracer_state::write_d));
@@ -2105,13 +2127,13 @@ void qkracer_state::qkracer(machine_config &config)
 	m_maincpu->read_in().set(FUNC(qkracer_state::read_in));
 	m_maincpu->write_sk().set(FUNC(qkracer_state::write_sk));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
 	config.set_default_layout(layout_qkracer);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -2151,13 +2173,16 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void scat(machine_config &config);
+
+private:
+	void main_map(address_map &map);
+
 	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_in();
-	void main_map(address_map &map);
-	void scat(machine_config &config);
 };
 
 // handlers
@@ -2243,7 +2268,7 @@ INPUT_PORTS_END
 
 void scat_state::scat(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP404L(config, m_maincpu, 1500000); // R/C OSC via MM74C14N
 	m_maincpu->set_config(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &scat_state::main_map);
@@ -2252,12 +2277,12 @@ void scat_state::scat(machine_config &config)
 	m_maincpu->write_l().set(FUNC(scat_state::write_l));
 	m_maincpu->read_in().set(FUNC(scat_state::read_in));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_scat);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -2295,11 +2320,13 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void vidchal(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
-	void vidchal(machine_config &config);
 };
 
 // handlers
@@ -2342,7 +2369,7 @@ INPUT_PORTS_END
 
 void vidchal_state::vidchal(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 900000); // approximation
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(vidchal_state::write_d));
@@ -2351,12 +2378,12 @@ void vidchal_state::vidchal(machine_config &config)
 	m_maincpu->read_in().set_ioport("IN.0");
 	m_maincpu->write_sk().set(FUNC(vidchal_state::write_sk));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6+1, 8);
 	m_display->set_segmask(0x3f, 0xff);
 	config.set_default_layout(layout_vidchal);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
 }
@@ -2391,13 +2418,13 @@ CONS( 1980, unkeinv,    0,         0, unkeinv,    unkeinv,    unkeinv_state,   e
 
 CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  empty_init, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
-CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, funtag,     0,         0, funtag,     funtag,     funtag_state,    empty_init, "Mattel", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, mbaskb2,    0,         0, mbaskb2,    mbaskb2,    mbaskb2_state,   empty_init, "Mattel", "Basketball 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, msoccer2,   0,         0, msoccer2,   msoccer2,   mbaskb2_state,   empty_init, "Mattel", "Soccer 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, lafootb,    0,         0, lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel Electronics", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel Electronics", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, funtag,     0,         0, funtag,     funtag,     funtag_state,    empty_init, "Mattel Electronics", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, mbaskb2,    0,         0, mbaskb2,    mbaskb2,    mbaskb2_state,   empty_init, "Mattel Electronics", "Basketball 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, msoccer2,   0,         0, msoccer2,   msoccer2,   mbaskb2_state,   empty_init, "Mattel Electronics", "Soccer 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, lafootb,    0,         0, lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel Electronics", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel Electronics", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
 CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

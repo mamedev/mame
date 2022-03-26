@@ -41,15 +41,15 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	int m_latch;
-	uint32_t m_timer1;
+	int m_latch = 0;
+	uint32_t m_timer1 = 0;
 	int m_e0xx_data[8];
-	uint8_t m_variable_data;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_txt_tilemap;
+	uint8_t m_variable_data = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_txt_tilemap = nullptr;
 	uint8_t m_xscroll[2];
 	uint8_t m_yscroll[2];
-	uint8_t m_irq_mask;
+	uint8_t m_irq_mask = 0;
 
 	void soundlatch_w(uint8_t data);
 	void e0xx_w(offs_t offset, uint8_t data);

@@ -52,13 +52,13 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_mcu_p1;
-	uint8_t m_mcu_p2;
-	uint8_t m_mcu_p3;
+	uint8_t m_mcu_p1 = 0;
+	uint8_t m_mcu_p2 = 0;
+	uint8_t m_mcu_p3 = 0;
 
-	uint8_t m_scroll_y;
+	uint8_t m_scroll_y = 0;
 
 	uint8_t mcu_r();
 	void mcu_w(uint8_t data);

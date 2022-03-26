@@ -11,12 +11,12 @@
 
 struct gfx_tempsprite
 {
-	u8 gfx;
-	u32 code,color;
-	bool flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int pri;
+	u8 gfx = 0U;
+	u32 code = 0U, color = 0U;
+	bool flipx = false, flipy = false;
+	int x = 0, y = 0;
+	int zoomx = 0, zoomy = 0;
+	int pri = 0;
 };
 
 class groundfx_state : public driver_device
@@ -51,11 +51,11 @@ private:
 	required_device<palette_device> m_palette;
 	required_region_ptr<u16> m_spritemap;
 
-	u16 m_frame_counter;
-	u16 m_port_sel;
-	std::unique_ptr<gfx_tempsprite[]> m_spritelist;
-	u16 m_rotate_ctrl[8];
-	rectangle m_hack_cliprect;
+	u16 m_frame_counter = 0U;
+	u16 m_port_sel = 0U;
+	std::unique_ptr<gfx_tempsprite[]> m_spritelist{};
+	u16 m_rotate_ctrl[8]{};
+	rectangle m_hack_cliprect{};
 
 	void rotate_control_w(offs_t offset, u16 data);
 	void motor_control_w(u32 data);

@@ -58,15 +58,15 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
 
 	/* misc */
-	int m_timer_rate;
-	uint8_t m_joinem_nmi_enable;
-	uint8_t m_joinem_palette_bank;
-	int m_question_address;
-	int m_question_rom;
-	int m_remap_address[16];
+	int m_timer_rate = 0;
+	uint8_t m_joinem_nmi_enable = 0U;
+	uint8_t m_joinem_palette_bank = 0U;
+	int m_question_address = 0;
+	int m_question_rom = 0;
+	int m_remap_address[16]{};
 
 	IRQ_CALLBACK_MEMBER(jack_sh_irq_ack);
 	void joinem_control_w(uint8_t data);

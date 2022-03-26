@@ -224,6 +224,7 @@ private:
 	static constexpr device_timer_id TIMER_SCANLINE = 2;
 
 	inline void writebyte(offs_t address, uint8_t data);
+	inline uint16_t apply_grayscale_and_emphasis(uint8_t color);
 
 
 	scanline_delegate           m_scanline_callback_proc;   /* optional scanline callback */
@@ -326,7 +327,6 @@ private:
 };
 
 // device type definition
-//extern const device_type PPU_2C0X;
 DECLARE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device)       // NTSC NES
 DECLARE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device)      // Playchoice 10
 DECLARE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device)       // Vs. Unisystem

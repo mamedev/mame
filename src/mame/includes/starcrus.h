@@ -55,21 +55,21 @@ private:
 	std::unique_ptr<bitmap_ind16> m_proj1_vid;
 	std::unique_ptr<bitmap_ind16> m_proj2_vid;
 
-	int m_s1_x;
-	int m_s1_y;
-	int m_s2_x;
-	int m_s2_y;
-	int m_p1_x;
-	int m_p1_y;
-	int m_p2_x;
-	int m_p2_y;
+	int m_s1_x = 0;
+	int m_s1_y = 0;
+	int m_s2_x = 0;
+	int m_s2_y = 0;
+	int m_p1_x = 0;
+	int m_p1_y = 0;
+	int m_p2_x = 0;
+	int m_p2_y = 0;
 
-	int m_p1_sprite;
-	int m_p2_sprite;
-	int m_s1_sprite;
-	int m_s2_sprite;
+	int m_p1_sprite = 0;
+	int m_p2_sprite = 0;
+	int m_s1_sprite = 0;
+	int m_s2_sprite = 0;
 
-	int m_collision_reg;
+	int m_collision_reg = 0;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int collision_check_s1s2();

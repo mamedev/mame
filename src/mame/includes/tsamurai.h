@@ -78,22 +78,22 @@ protected:
 	optional_shared_ptr<uint8_t> m_bg_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t *m_background;
-	tilemap_t *m_foreground;
+	tilemap_t *m_background = nullptr;
+	tilemap_t *m_foreground = nullptr;
 
 	//common
-	int m_textbank1;
-	int m_nmi_enabled;
+	int m_textbank1 = 0;
+	int m_nmi_enabled = 0;
 
 	// tsamurai and m660 specific
-	int m_bgcolor;
-	int m_sound_command1;
-	int m_sound_command2;
+	int m_bgcolor = 0;
+	int m_sound_command1 = 0;
+	int m_sound_command2 = 0;
 
 	virtual TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	int m_numsprites;
+	int m_numsprites = 0;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
@@ -126,9 +126,9 @@ private:
 	void vsgongf_sound_command_w(uint8_t data);
 
 	//vsgongf specific
-	int m_vsgongf_sound_nmi_enabled;
-	int m_vsgongf_color;
-	int m_key_count; //debug only
+	int m_vsgongf_sound_nmi_enabled = 0;
+	int m_vsgongf_color = 0;
+	int m_key_count = 0; //debug only
 
 	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
 
@@ -171,8 +171,8 @@ private:
 	void z80_m660_io_map(address_map &map);
 
 	//m660 specific
-	int m_textbank2;
-	int m_sound_command3;
+	int m_textbank2 = 0;
+	int m_sound_command3 = 0;
 };
 
 #endif // MAME_INCLUDES_TSAMURAI_H

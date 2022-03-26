@@ -69,10 +69,10 @@ private:
 	required_shared_ptr<uint8_t>    m_port_80;
 
 	// video-related
-	tilemap_t        *m_cm_tilemap;
+	tilemap_t        *m_cm_tilemap = nullptr;
 	std::unique_ptr<bitmap_ind16>       m_bitmap_buffer;
 
-	uint8_t          m_irq_mask;
+	uint8_t          m_irq_mask = 0U;
 };
 
 #endif // MAME_INCLUDES_CHEEKYMS_H

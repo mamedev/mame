@@ -127,7 +127,7 @@ private:
 	int m_port_bank;
 	uint32_t m_philips_code;
 
-	emu_timer *m_irq_timer;
+	emu_timer *m_irq_timer = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;

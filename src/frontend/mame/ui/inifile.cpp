@@ -16,6 +16,7 @@
 #include "language.h"
 
 #include "drivenum.h"
+#include "fileio.h"
 #include "softlist_dev.h"
 
 #include "corestr.h"

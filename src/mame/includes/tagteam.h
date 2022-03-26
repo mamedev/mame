@@ -41,9 +41,9 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	int m_palettebank;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_sound_nmi_mask;
+	int m_palettebank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_sound_nmi_mask = 0;
 
 	void irq_clear_w(uint8_t data);
 	void sound_nmi_mask_w(uint8_t data);

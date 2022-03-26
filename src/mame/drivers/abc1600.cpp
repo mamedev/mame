@@ -34,24 +34,7 @@
 
     TODO:
 
-    - sas/format/format in abcenix tries to access the SASI card using a memory location mapped for task 0, when the process is run as task 1
-        - MAC task/page/segment addressing failure?
-        - MAC page/segment RAM write strobe decoding failure?
-        - CPU does not enter supervisor mode when needed?
-
-        [:mac] ':3f' (0009E) ff800:4f TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
-        [:mac] ':3f' (0009E) ff801:ff TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
-        [:mac] ':3f' (0009E) ff000:4f TASK 0 SEGMENT 15 PAGE 14 MEM 7f000-7f7ff 1ff000
-        [:mac] ':3f' (0009E) ff001:fe TASK 0 SEGMENT 15 PAGE 14 MEM 7f000-7f7ff 1ff000
-        [:mac] ':3f' (0009E) fe800:4f TASK 0 SEGMENT 15 PAGE 13 MEM 7e800-7efff 1fe800
-        [:mac] ':3f' (0009E) fe801:fd TASK 0 SEGMENT 15 PAGE 13 MEM 7e800-7efff 1fe800
-        [:mac] ':3f' (0009E) fe000:4f TASK 0 SEGMENT 15 PAGE 12 MEM 7e000-7e7ff 1fe000
-        [:mac] ':3f' (0009E) fe001:fc TASK 0 SEGMENT 15 PAGE 12 MEM 7e000-7e7ff 1fe000
-
-        [:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0 TASK 1 FC 1)
-        should be
-        [:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1 TASK 0 FC 5)
-
+	- z80dma.cpp register read must return byte UP counter value (0x200 at end of block, not 0 as it does now)
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!
@@ -59,7 +42,7 @@
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - Z80 SCC DMA request
-	- [:2a:chb] - TX FIFO is full, discarding data
+    - [:2a:chb] - TX FIFO is full, discarding data
 
 */
 
@@ -886,33 +869,39 @@ void abc1600_state::abc1600(machine_config &config)
 	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
 	m_mac->fc_cb().set(m_maincpu, FUNC(m68000_base_device::get_fc));
 	m_mac->buserr_cb().set(FUNC(abc1600_state::buserr_w));
+	m_mac->in_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::read_tren)); // TODO bus0x
+	m_mac->out_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::write_tren)); // TODO bus0x
+	m_mac->in_tren1_cb().set(m_bus1, FUNC(abcbus_slot_device::read_tren));
+	m_mac->out_tren1_cb().set(m_bus1, FUNC(abcbus_slot_device::write_tren));
+	m_mac->in_tren2_cb().set(m_bus2, FUNC(abcbus_slot_device::read_tren));
+	m_mac->out_tren2_cb().set(m_bus2, FUNC(abcbus_slot_device::write_tren));
 
 	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
 	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
 	m_dma0->out_bao_callback().set(m_dma1, FUNC(z80dma_device::bai_w));
 	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_r));
 	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_w));
-	m_dma0->out_ieo_callback().set(m_bus0i, FUNC(abcbus_slot_device::prac_w));
-	//m_dma0->out_ieo_callback().set(m_bus0x, FUNC(abcbus_slot_device::prac_w));
-	m_dma0->in_iorq_callback().set(FUNC(abc1600_state::dma0_iorq_r));
-	m_dma0->out_iorq_callback().set(FUNC(abc1600_state::dma0_iorq_w));
+	m_dma0->out_ieo_callback().set(m_bus0i, FUNC(abcbus_slot_device::prac_w)).exor(1);
+	//m_dma0->out_ieo_callback().set(m_bus0x, FUNC(abcbus_slot_device::prac_w)).exor(1);
+	m_dma0->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_r));
+	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_w));
 
 	Z80DMA(config, m_dma1, 64_MHz_XTAL / 16);
 	m_dma1->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
 	m_dma1->out_bao_callback().set(m_dma2, FUNC(z80dma_device::bai_w));
 	m_dma1->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_r));
 	m_dma1->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_w));
-	m_dma1->out_ieo_callback().set(m_bus1, FUNC(abcbus_slot_device::prac_w));
-	m_dma1->in_iorq_callback().set(FUNC(abc1600_state::dma1_iorq_r));
-	m_dma1->out_iorq_callback().set(FUNC(abc1600_state::dma1_iorq_w));
+	m_dma1->out_ieo_callback().set(m_bus1, FUNC(abcbus_slot_device::prac_w)).exor(1);
+	m_dma1->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_iorq_r));
+	m_dma1->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_iorq_w));
 
 	Z80DMA(config, m_dma2, 64_MHz_XTAL / 16);
 	m_dma2->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
 	m_dma2->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_r));
 	m_dma2->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_w));
-	m_dma2->out_ieo_callback().set(m_bus2, FUNC(abcbus_slot_device::prac_w));
-	m_dma2->in_iorq_callback().set(m_bus2, FUNC(abcbus_slot_device::read_tren));
-	m_dma2->out_iorq_callback().set(m_bus2, FUNC(abcbus_slot_device::write_tren));
+	m_dma2->out_ieo_callback().set(m_bus2, FUNC(abcbus_slot_device::prac_w)).exor(1);
+	m_dma2->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_iorq_r));
+	m_dma2->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_iorq_w));
 
 	Z80DART(config, m_dart, 64_MHz_XTAL / 16);
 	m_dart->out_int_callback().set(FUNC(abc1600_state::dart_irq_w));
@@ -996,7 +985,7 @@ void abc1600_state::abc1600(machine_config &config)
 
 	ABCBUS_SLOT(config, m_bus2, 64_MHz_XTAL / 16, abc1600bus_cards, "4105");
 	m_bus2->irq_callback().set(m_cio, FUNC(z8536_device::pa0_w));
-	m_bus2->pren_callback().set(m_dma2, FUNC(z80dma_device::iei_w));
+	m_bus2->pren_callback().set(m_dma2, FUNC(z80dma_device::iei_w)).exor(1);
 	m_bus2->trrq_callback().set(m_dma2, FUNC(z80dma_device::rdy_w));
 
 	// internal ram
@@ -1032,4 +1021,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_NOT_WORKING )
+COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

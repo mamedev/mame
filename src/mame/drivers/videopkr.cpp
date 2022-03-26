@@ -423,7 +423,7 @@ private:
 	required_device<ay8910_device> m_aysnd;
 	output_finder<3> m_top_lamps;
 
-	uint8_t m_sbp0;
+	uint8_t m_sbp0 = 0U;
 };
 
 

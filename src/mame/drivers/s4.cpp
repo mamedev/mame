@@ -89,9 +89,9 @@ private:
 	u8 switch_r();
 	u8 m_strobe = 0;
 	u8 m_row = 0;
-	bool m_data_ok = 0;
+	bool m_data_ok = false;
 	u8 m_lamp_data = 0;
-	bool m_irq_in_progress = 0;
+	bool m_irq_in_progress = false;
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
@@ -197,7 +197,7 @@ static INPUT_PORTS_START( s4 )
 	PORT_START("DIAGS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s4_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
 
 	PORT_START("DS1")

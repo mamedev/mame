@@ -124,6 +124,9 @@ void ns32202_device::device_reset()
 	m_ips = 0xff;
 	m_pdir = 0xff;
 	m_cictl = 0;
+
+	set_int(false);
+	set_cout(false);
 }
 
 void ns32202_device::set_int(bool int_state)
@@ -205,12 +208,17 @@ template <unsigned Number> void ns32202_device::ir_w(int state)
 	{
 		// level triggered
 		if (state == BIT(m_tpl, Number))
-			m_ipnd |= mask;
+		{
+			if (!(m_mctl & MCTL_FRZ))
+				m_ipnd |= mask;
+		}
 		else
 			m_ipnd &= ~mask;
 	}
 	else
 	{
+		// TODO: freeze bit MCTL_FRZ causes delayed edge-triggered recognition?
+
 		// edge triggered
 		if (bool(state) == BIT(m_tpl, Number) && bool(state) ^ BIT(m_line_state, Number))
 			m_ipnd |= mask;
@@ -254,57 +262,54 @@ template void ns32202_device::ir_w<15>(int state);
  */
 void ns32202_device::interrupt(s32 param)
 {
-	// check for unmasked pending interrupts
-	if (!(m_ipnd & ~m_imsk))
-		return;
+	bool int_state = false;
 
-	if (m_mctl & MCTL_NTAR)
+	// check for unmasked pending interrupts
+	if (m_ipnd & ~m_imsk)
 	{
 		// fixed priority mode
-		bool accept = false;
-
-		// check any interrupts in-service
-		if (m_isrv)
+		if (m_mctl & MCTL_NTAR)
 		{
-			// check interrupts in descending priority order
-			u16 mask = m_fprt;
-			for (unsigned i = 0; i < 16; i++)
+			// check any interrupts in-service
+			if (m_isrv)
 			{
-				// check interrupt in-service
-				if (m_isrv & mask)
+				// check interrupts in descending priority order
+				u16 mask = m_fprt;
+				for (unsigned i = 0; i < 16; i++)
 				{
-					// check equal priority unmasked pending cascade interrupt
-					if ((m_csrc & mask) && (m_ipnd & mask) && !(m_imsk & mask))
+					// check interrupt in-service
+					if (m_isrv & mask)
 					{
-						LOGMASKED(LOG_STATE, "unmasked pending cascade in-service interrupt %d\n", 31 - count_leading_zeros_32(mask));
-						accept = true;
+						// check equal priority unmasked pending cascade interrupt
+						if ((m_csrc & mask) && (m_ipnd & mask) && !(m_imsk & mask))
+						{
+							LOGMASKED(LOG_STATE, "unmasked pending cascade in-service interrupt %d\n", 31 - count_leading_zeros_32(mask));
+							int_state = true;
+						}
+
+						break;
 					}
 
-					break;
-				}
+					// check unmasked pending interrupt
+					if ((m_ipnd & mask) && !(m_imsk & mask))
+					{
+						LOGMASKED(LOG_STATE, "unmasked pending interrupt %d\n", 31 - count_leading_zeros_32(mask));
+						int_state = true;
+						break;
+					}
 
-				// check unmasked pending interrupt
-				if ((m_ipnd & mask) && !(m_imsk & mask))
-				{
-					LOGMASKED(LOG_STATE, "unmasked pending interrupt %d\n", 31 - count_leading_zeros_32(mask));
-					accept = true;
-					break;
+					// rotate priority mask
+					mask = (mask << 1) | (mask >> 15);
 				}
-
-				// rotate priority mask
-				mask = (mask << 1) | (mask >> 15);
 			}
+			else
+				int_state = true;
 		}
-		else
-			accept = true;
-
-		if (!accept)
-			return;
+		else if (!m_isrv)
+			int_state = true;
 	}
-	else if (m_isrv)
-		return;
 
-	set_int(true);
+	set_int(int_state);
 }
 
 u8 ns32202_device::interrupt_acknowledge(bool side_effects)
@@ -341,8 +346,9 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 			// mark interrupt in-service
 			m_isrv |= mask;
 
-			// clear interrupt pending
-			m_ipnd &= ~(mask);
+			// clear interrupt pending (only if edge-triggered or internal)
+			if (!(m_eltg & mask) || ((m_line_state ^ m_tpl) & mask))
+				m_ipnd &= ~mask;
 
 			// clear l-counter interrupt pending
 			if ((m_cictl & CICTL_CIEL) && (m_cictl & CICTL_CIRL) && BIT(mask, m_ciptr & 15))
@@ -351,9 +357,6 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 			// clear h-counter interrupt pending
 			if ((m_cictl & CICTL_CIEH) && (m_cictl & CICTL_CIRH) && BIT(mask, m_ciptr >> 4))
 				m_cictl &= ~CICTL_CIRH;
-
-			// clear interrupt output
-			set_int(false);
 		}
 
 		// compute acknowledge vector
@@ -379,7 +382,12 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 	}
 
 	if (side_effects)
+	{
 		LOGMASKED(LOG_STATE, "acknowledge vector 0x%02x\n", vector);
+
+		// clear interrupt output
+		set_int(false);
+	}
 
 	return vector;
 }
@@ -571,6 +579,7 @@ template <unsigned ST1, bool SideEffects> u8 ns32202_device::hvct_r()
 
 void ns32202_device::eltgl_w(u8 data)
 {
+	LOGMASKED(LOG_REGW, "eltgl_w 0x%02x (%s)\n", data, machine().describe_context());
 	m_eltg = (m_eltg & 0xff00) | data;
 
 	interrupt_update();
@@ -578,6 +587,7 @@ void ns32202_device::eltgl_w(u8 data)
 
 void ns32202_device::eltgh_w(u8 data)
 {
+	LOGMASKED(LOG_REGW, "eltgh_w 0x%02x (%s)\n", data, machine().describe_context());
 	m_eltg = (u16(data) << 8) | u8(m_eltg);
 
 	interrupt_update();
@@ -620,35 +630,55 @@ void ns32202_device::csrch_w(u8 data)
 void ns32202_device::ipndl_w(u8 data)
 {
 	if (BIT(data, 6))
-		// clear all pending interrupts in register
+	{
+		// clear all pending interrupts
+		LOGMASKED(LOG_REGW, "ipndl_w 0x%02x clear all pending interrupts (%s)\n", data, machine().describe_context());
+
 		m_ipnd &= 0xff00;
+	}
 	else if (BIT(data, 7))
 	{
-		// set interrupt
-		m_ipnd |= 1 << (data & 7);
+		// set pending interrupt
+		LOGMASKED(LOG_REGW, "ipndl_w 0x%02x set pending interrupt %d (%s)\n", data, data & 15, machine().describe_context());
 
-		m_interrupt->adjust(attotime::zero);
+		m_ipnd |= 1 << (data & 15);
 	}
 	else
-		// clear interrupt
-		m_ipnd &= ~(1 << (data & 7));
+	{
+		// clear pending interrupt
+		LOGMASKED(LOG_REGW, "ipndl_w 0x%02x clear pending interrupt %d (%s)\n", data, data & 15, machine().describe_context());
+
+		m_ipnd &= ~(1 << (data & 15));
+	}
+
+	m_interrupt->adjust(attotime::zero);
 }
 
 void ns32202_device::ipndh_w(u8 data)
 {
 	if (BIT(data, 6))
-		// clear all pending interrupts in register
+	{
+		// clear all pending interrupts
+		LOGMASKED(LOG_REGW, "ipndh_w 0x%02x clear all pending interrupts (%s)\n", data, machine().describe_context());
+
 		m_ipnd &= 0x00ff;
+	}
 	else if (BIT(data, 7))
 	{
-		// set interrupt
-		m_ipnd |= 256 << (data & 7);
+		// set pending interrupt
+		LOGMASKED(LOG_REGW, "ipndh_w 0x%02x set pending interrupt %d (%s)\n", data, data & 15, machine().describe_context());
 
-		m_interrupt->adjust(attotime::zero);
+		m_ipnd |= 1 << (data & 15);
 	}
 	else
-		// clear interrupt
-		m_ipnd &= ~(256 << (data & 7));
+	{
+		// clear pending interrupt
+		LOGMASKED(LOG_REGW, "ipndh_w 0x%02x clear pending interrupt %d (%s)\n", data, data & 15, machine().describe_context());
+
+		m_ipnd &= ~(1 << (data & 15));
+	}
+
+	m_interrupt->adjust(attotime::zero);
 }
 
 void ns32202_device::fprtl_w(u8 data)
@@ -726,6 +756,7 @@ template <unsigned N> void ns32202_device::ccvh_w(u8 data)
 
 void ns32202_device::mctl_w(u8 data)
 {
+	LOGMASKED(LOG_REGW, "mctl_w 0x%02x (%s)\n", data, machine().describe_context());
 	if (!(m_mctl & MCTL_CFRZ) && (data & MCTL_CFRZ))
 		update_ccv();
 

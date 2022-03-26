@@ -55,17 +55,17 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	std::vector<uint8_t> m_paletteram;
 	std::vector<uint8_t> m_paletteram_ext;
-	uint8_t m_gfxctrl;
-	uint8_t m_char_bank;
-	uint8_t m_palette_bank;
+	uint8_t m_gfxctrl = 0;
+	uint8_t m_char_bank = 0;
+	uint8_t m_palette_bank = 0;
 
 	/* misc */
-	int m_generic_control_reg;
-	int m_gametype;
-	int m_mask;
+	int m_generic_control_reg = 0;
+	int m_gametype = 0;
+	int m_mask = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

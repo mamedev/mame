@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-  machine\dgn_beta.c (machine.c)
+  machine/dgn_beta.cpp
 
     Moved out of dragon.c, 2005-05-05, P.Harvey-Smith.
 
@@ -57,21 +57,22 @@
 
 ***************************************************************************/
 
-#include <functional>
+#include "emu.h"
+#include "includes/dgn_beta.h"
+
+#include "includes/coco.h" // for CoCo OS-9 disassembler enhancements
+
+#include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
+#include "machine/6821pia.h"
+#include "machine/mos6551.h"
+#include "machine/ram.h"
+
+#include "debug/debugcon.h"
+#include "debugger.h"
 
 #include <cmath>
-#include "emu.h"
-#include "debug/debugcon.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "includes/dgn_beta.h"
-#include "includes/coco.h"
-#include "machine/mos6551.h"
-#include "imagedev/floppy.h"
-
-#include "debugger.h"
-#include "debug/debugcon.h"
-#include "machine/ram.h"
+#include <functional>
 
 #define VERBOSE 0
 
@@ -118,13 +119,10 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 	int                 bank_start;
 	int                 bank_end;
 	int                 MapPage;
-	char                page_num[10];
 
 	LOG_BANK_UPDATE(("\n\n%s Updating banks %d to %d\n", machine().describe_context(), first, last));
 	for(Page=first;Page<=last;Page++)
 	{
-		sprintf(page_num,"bank%d",Page+1);
-
 		bank_start  = Page < 16 ? Page * 0x1000 : 0xff00;
 		bank_end    = Page < 15 ? bank_start + 0xfff : Page == 15 ? 0xfbff : 0xffff;
 

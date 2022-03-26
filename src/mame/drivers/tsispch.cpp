@@ -176,7 +176,7 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<i8251_device> m_uart;
 
-	uint8_t m_paramReg;           // status leds and resets and etc
+	uint8_t m_paramReg = 0;           // status leds and resets and etc
 };
 
 /*

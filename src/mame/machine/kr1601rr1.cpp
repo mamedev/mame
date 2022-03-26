@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "kr1601rr1.h"
 
 #include <algorithm>
@@ -119,9 +118,10 @@ void kr1601rr1_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void kr1601rr1_device::nvram_read(emu_file &file)
+bool kr1601rr1_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_earom, EAROM_SIZE);
+	size_t actual;
+	return !file.read(m_earom, EAROM_SIZE, actual) && actual == EAROM_SIZE;
 }
 
 //-------------------------------------------------
@@ -129,9 +129,10 @@ void kr1601rr1_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void kr1601rr1_device::nvram_write(emu_file &file)
+bool kr1601rr1_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_earom, EAROM_SIZE);
+	size_t actual;
+	return !file.write(m_earom, EAROM_SIZE, actual) && actual == EAROM_SIZE;
 }
 
 //-------------------------------------------------

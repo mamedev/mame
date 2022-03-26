@@ -137,11 +137,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	std::unique_ptr<uint8_t[]>   m_nvram8;
-	uint8_t   m_irq_status;
-	uint32_t  m_dpyaddr;
+	uint8_t   m_irq_status = 0;
+	uint32_t  m_dpyaddr = 0;
 	std::unique_ptr<uint16_t[]> m_paletteram;
-	uint32_t  m_speedup_count;
-	uint32_t  m_tms_io_regs[0x80];
+	uint32_t  m_speedup_count = 0;
+	uint32_t  m_tms_io_regs[0x80]{};
 	bitmap_ind16 m_update_bitmap;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

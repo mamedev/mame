@@ -20,6 +20,20 @@
 
 
 //**************************************************************************
+//  HELPER FUNCTIONS
+//**************************************************************************
+
+namespace {
+
+constexpr u8 sanitise_character(u8 ch)
+{
+	// assume ISO-8859-1 (low 256 Unicode codepoints) - tab, soft hyphen, C0 and C1 cause problems
+	return ('\t' == ch) ? ' ' : (0xadU == ch) ? '-' : ((' ' > ch) || (('~' < ch) && (0xa0U > ch))) ? '.' : ch;
+}
+
+} // anonymous namespace
+
+//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -301,7 +315,7 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 		if (dest >= destmin && dest < destmax)
 			dest->byte = addrtext[ch];
 
-	// generate the data and the ascii string
+	// generate the data and the ASCII string
 	std::string chunkascii;
 	if (m_shift_bits != 0)
 	{
@@ -323,7 +337,7 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 			for (int i = 0; i < m_bytes_per_chunk; i++)
 			{
 				u8 chval = chunkdata >> (8 * (m_bytes_per_chunk - i - 1));
-				chunkascii += char((ismapped && isprint(chval)) ? chval : '.');
+				chunkascii += char(ismapped ? sanitise_character(chval) : '.');
 			}
 		}
 	}
@@ -380,7 +394,7 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 			for (int i = 0; i < m_bytes_per_chunk; i++)
 			{
 				u8 chval = chunkdata >> (8 * (m_bytes_per_chunk - i - 1));
-				chunkascii += char((ismapped && isprint(chval)) ? chval : '.');
+				chunkascii += char(ismapped ? sanitise_character(chval) : '.');
 			}
 		}
 	}

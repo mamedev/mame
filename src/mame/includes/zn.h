@@ -82,7 +82,7 @@ protected:
 	static uint16_t psxreadword( uint32_t *p_n_psxram, uint32_t n_address );
 	static void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data );
 
-	uint8_t m_n_znsecsel;
+	uint8_t m_n_znsecsel = 0;
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_gpu_screen;
@@ -93,7 +93,7 @@ protected:
 	required_device<spu_device> m_spu;
 	required_device<ram_device> m_ram;
 
-	int m_cat702_dataout[2];
+	int m_cat702_dataout[2]{};
 	int m_znmcu_dataout;
 };
 
@@ -223,7 +223,7 @@ private:
 	void bank_map(address_map &map);
 
 	std::unique_ptr<uint8_t[]> m_sram;
-	uint32_t m_curr_rombank[2];
+	uint32_t m_curr_rombank[2]{};
 
 	required_device<acclaim_rax_device> m_rax;
 	required_device<address_map_bank_device> m_bankmap;
@@ -254,7 +254,7 @@ private:
 
 	required_ioport_array<2> m_gun_x;
 	required_ioport_array<2> m_gun_y;
-	bool m_gun_mux;
+	bool m_gun_mux = false;
 };
 
 //
@@ -392,7 +392,7 @@ private:
 
 	void main_map(address_map &map);
 
-	uint16_t m_mcu_command;
+	uint16_t m_mcu_command = 0;
 
 	void mcu_w(offs_t offset, uint16_t data);
 	uint16_t mcu_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -521,7 +521,7 @@ private:
 
 	required_device<vt83c461_device> m_vt83c461;
 
-	uint16_t m_vt83c461_latch;
+	uint16_t m_vt83c461_latch = 0;
 };
 
 //

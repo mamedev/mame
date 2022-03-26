@@ -14,14 +14,14 @@ Custom ICs:
 ----------
 98XX     lamp/coin output
 99XX     sound volume
-CUS27    clock divider
+CUS27    ULA clock divider
 CUS30    sound control
-CUS31
-CUS39    sprite generator
+CUS31    ULA
+CUS39    ULA sprite generator
 CUS41    address decoder
 CUS42    dual scrolling tilemap address generator
-CUS43    dual tilemap generator
-CUS48    sprite address generator
+CUS43    ULA dual tilemap generator
+CUS48    ULA sprite address generator
 CUS60    MCU (63701) aka 60A1
 
 

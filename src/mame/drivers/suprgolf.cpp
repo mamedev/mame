@@ -64,20 +64,20 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	std::unique_ptr<uint8_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_bg_vram;
 	std::unique_ptr<uint16_t[]> m_bg_fb;
 	std::unique_ptr<uint16_t[]> m_fg_fb;
-	uint8_t m_rom_bank;
-	uint8_t m_bg_bank;
-	uint8_t m_vreg_bank;
-	uint8_t m_msm5205next;
-	uint8_t m_msm_nmi_mask;
-	uint8_t m_vreg_pen;
-	uint8_t m_palette_switch;
-	uint8_t m_bg_vreg_test;
-	uint8_t m_toggle;
+	uint8_t m_rom_bank = 0;
+	uint8_t m_bg_bank = 0;
+	uint8_t m_vreg_bank = 0;
+	uint8_t m_msm5205next = 0;
+	uint8_t m_msm_nmi_mask = 0;
+	uint8_t m_vreg_pen = 0;
+	uint8_t m_palette_switch = 0;
+	uint8_t m_bg_vreg_test = 0;
+	uint8_t m_toggle = 0;
 
 	uint8_t videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);

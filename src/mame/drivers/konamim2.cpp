@@ -357,13 +357,13 @@ private:
 	optional_device<ymz280b_device> m_ymz280b;
 
 	// ATAPI
-	cdrom_file *m_available_cdroms;
+	cdrom_file *m_available_cdroms = nullptr;
 
 	// Konami SIO
-	uint16_t    m_sio_data;
+	uint16_t    m_sio_data = 0;
 
-	uint32_t    m_ata_int; // TEST
-	emu_timer *m_atapi_timer;
+	uint32_t    m_ata_int = 0; // TEST
+	emu_timer *m_atapi_timer = nullptr;
 
 	TIMER_CALLBACK_MEMBER( atapi_delay )
 	{

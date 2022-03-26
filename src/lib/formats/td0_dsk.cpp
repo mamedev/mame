@@ -51,11 +51,11 @@ struct td0dsk_tag
 };
 
 struct tdlzhuf {
-	uint16_t r,
-					bufcnt,bufndx,bufpos,  // string buffer
+	uint16_t r = 0,
+					bufcnt = 0, bufndx = 0, bufpos = 0,  // string buffer
 				// the following to allow block reads from input in next_word()
-					ibufcnt,ibufndx; // input buffer counters
-	uint8_t  inbuf[BUFSZ];    // input buffer
+					ibufcnt = 0, ibufndx = 0; // input buffer counters
+	uint8_t  inbuf[BUFSZ]{};    // input buffer
 };
 
 

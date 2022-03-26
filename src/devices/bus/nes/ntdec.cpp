@@ -207,6 +207,6 @@ void nes_ntdec_fh_device::write_m(offs_t offset, u8 data)
 void nes_ntdec_n715021_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ntdec_n715021 write_h, offset: %04x, data: %02x\n", offset, data));
-	prg16_89ab((offset >> 2) & 0x03);
+	prg16_89ab(BIT(offset, 2, 2));
 	chr8(offset & 0x03, CHRROM);
 }

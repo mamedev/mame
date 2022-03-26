@@ -376,21 +376,25 @@ void ti99_gkracker_device::nvram_default()
 	m_ram_ptr[0x6100] = 0x0b;       // GPL EXIT
 }
 
-void ti99_gkracker_device::nvram_read(emu_file &file)
+bool ti99_gkracker_device::nvram_read(util::read_stream &file)
 {
-	int readsize = file.read(m_ram_ptr, 81920);
+	size_t readsize;
+	if (file.read(m_ram_ptr, 81920, readsize))
+		return false;
 	LOGMASKED(LOG_GKRACKER, "Reading NVRAM\n");
 	// If we increased the size, fill the remaining parts with 0
 	if (readsize < 81920)
 	{
 		memset(m_ram_ptr + readsize, 0, 81920-readsize);
 	}
+	return true;
 }
 
-void ti99_gkracker_device::nvram_write(emu_file &file)
+bool ti99_gkracker_device::nvram_write(util::write_stream &file)
 {
 	LOGMASKED(LOG_GKRACKER, "Writing NVRAM\n");
-	file.write(m_ram_ptr, 81920);
+	size_t writesize;
+	return !file.write(m_ram_ptr, 81920, writesize) && writesize == 81920;
 }
 
 void ti99_gkracker_device::device_start()

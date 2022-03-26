@@ -243,45 +243,45 @@ private:
 	uint8_t m_draw_udk;
 	uint8_t m_sp_on;
 	uint8_t m_font_code;
-	emu_timer *m_rsta_clear;
-	emu_timer *m_rstb_clear;
-	emu_timer *m_beep_stop;
+	emu_timer *m_rsta_clear = nullptr;
+	emu_timer *m_rstb_clear = nullptr;
+	emu_timer *m_beep_stop = nullptr;
 
 	/* LCD */
-	uint8_t m_lcd_on;
-	uint8_t m_lcd_map[32][120];
-	uint8_t m_scroll_min;
-	uint8_t m_scroll_max;
-	uint8_t m_blink;
+	uint8_t m_lcd_on = 0;
+	uint8_t m_lcd_map[32][120]{};
+	uint8_t m_scroll_min = 0;
+	uint8_t m_scroll_max = 0;
+	uint8_t m_blink = 0;
 
 	struct lcd_position
 	{
-		uint8_t x;
-		uint8_t y;
-		uint8_t on;
+		uint8_t x = 0;
+		uint8_t y = 0;
+		uint8_t on = 0;
 	};
 	lcd_position m_locate;
 	lcd_position m_cursor;
 
 	/* keyboard */
-	uint8_t m_kb_on;
-	uint8_t m_repeat_key;         //not supported
-	uint8_t m_kb_size;
+	uint8_t m_kb_on = 0;
+	uint8_t m_repeat_key = 0;         //not supported
+	uint8_t m_kb_size = 0;
 
 	/* cassette */
-	uint8_t  m_cass_motor;
-	uint8_t  m_cass_data;
-	uint32_t m_cass_clk;
-	uint8_t  m_bit_count;
-	int    m_cass_state;
-	emu_timer *m_cass_poll;
-	emu_timer *m_cass_tick;
+	uint8_t  m_cass_motor = 0;
+	uint8_t  m_cass_data = 0;
+	uint32_t m_cass_clk = 0;
+	uint8_t  m_bit_count = 0;
+	int    m_cass_state = 0;
+	emu_timer *m_cass_poll = nullptr;
+	emu_timer *m_cass_tick = nullptr;
 
 	/* printer */
-	uint8_t m_prn_sendbit;
-	uint8_t m_prn_char_code;
-	uint8_t m_prn_buffer[0x100];
-	uint8_t m_prn_size;
+	uint8_t m_prn_sendbit = 0;
+	uint8_t m_prn_char_code = 0;
+	uint8_t m_prn_buffer[0x100]{};
+	uint8_t m_prn_size = 0;
 	void x07_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(cassette_tick);
 	TIMER_CALLBACK_MEMBER(cassette_poll);

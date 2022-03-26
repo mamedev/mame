@@ -223,12 +223,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( xint5_r ) { return m_xint5; }
 
 	// card interface
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq = state; m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { if (m_irq != state) { m_irq = state; m_write_irq(state); } }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi = state; m_write_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( rdy_w ) { m_write_rdy(state); }
 	DECLARE_WRITE_LINE_MEMBER( resin_w ) { m_write_resin(state); }
-	DECLARE_WRITE_LINE_MEMBER( pren_w ) { m_pren = state; m_write_pren(state); }
-	DECLARE_WRITE_LINE_MEMBER( trrq_w ) { m_trrq = state; m_write_trrq(state); }
+	DECLARE_WRITE_LINE_MEMBER( pren_w ) { if (m_pren != state) { m_pren = state; m_write_pren(state); } }
+	DECLARE_WRITE_LINE_MEMBER( trrq_w ) { if (m_trrq != state) { m_trrq = state; m_write_trrq(state); } }
 	DECLARE_WRITE_LINE_MEMBER( xint2_w ) { m_xint2 = state; m_write_xint2(state); }
 	DECLARE_WRITE_LINE_MEMBER( xint3_w ) { m_xint3 = state; m_write_xint3(state); }
 	DECLARE_WRITE_LINE_MEMBER( xint4_w ) { m_xint4 = state; m_write_xint4(state); }
@@ -237,6 +237,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;

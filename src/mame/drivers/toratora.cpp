@@ -70,8 +70,8 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	int        m_timer;
-	uint8_t      m_clear_tv;
+	int        m_timer = 0;
+	uint8_t      m_clear_tv = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

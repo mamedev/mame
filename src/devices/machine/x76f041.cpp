@@ -742,22 +742,26 @@ void x76f041_device::nvram_default()
 	}
 }
 
-void x76f041_device::nvram_read( emu_file &file )
+bool x76f041_device::nvram_read( util::read_stream &file )
 {
-	file.read( m_response_to_reset, sizeof( m_response_to_reset ) );
-	file.read( m_write_password, sizeof( m_write_password ) );
-	file.read( m_read_password, sizeof( m_read_password ) );
-	file.read( m_configuration_password, sizeof( m_configuration_password ) );
-	file.read( m_configuration_registers, sizeof( m_configuration_registers ) );
-	file.read( m_data, sizeof( m_data ) );
+	size_t actual;
+	bool result = !file.read( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
+	result = result && !file.read( m_write_password, sizeof( m_write_password ), actual ) && actual == sizeof( m_write_password );
+	result = result && !file.read( m_read_password, sizeof( m_read_password ), actual ) && actual == sizeof( m_read_password );
+	result = result && !file.read( m_configuration_password, sizeof( m_configuration_password ), actual ) && actual == sizeof( m_configuration_password );
+	result = result && !file.read( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
+	result = result && !file.read( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	return result;
 }
 
-void x76f041_device::nvram_write( emu_file &file )
+bool x76f041_device::nvram_write( util::write_stream &file )
 {
-	file.write( m_response_to_reset, sizeof( m_response_to_reset ) );
-	file.write( m_write_password, sizeof( m_write_password ) );
-	file.write( m_read_password, sizeof( m_read_password ) );
-	file.write( m_configuration_password, sizeof( m_configuration_password ) );
-	file.write( m_configuration_registers, sizeof( m_configuration_registers ) );
-	file.write( m_data, sizeof( m_data ) );
+	size_t actual;
+	bool result = !file.write( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
+	result = result && !file.write( m_write_password, sizeof( m_write_password ), actual ) && actual == sizeof( m_write_password );
+	result = result && !file.write( m_read_password, sizeof( m_read_password ), actual ) && actual == sizeof( m_read_password );
+	result = result && !file.write( m_configuration_password, sizeof( m_configuration_password ), actual ) && actual == sizeof( m_configuration_password );
+	result = result && !file.write( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
+	result = result && !file.write( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	return result;
 }

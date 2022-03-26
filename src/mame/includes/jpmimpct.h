@@ -46,9 +46,9 @@ private:
 	void tx_queue();
 
 	devcb_write_line m_rxd_handler;
-	int8_t m_sending;
-	uint8_t m_touch_data[3];
-	uint8_t m_sendpos;
+	int8_t m_sending = 0;
+	uint8_t m_touch_data[3]{};
+	uint8_t m_sendpos = 0;
 };
 
 DECLARE_DEVICE_TYPE(JPM_TOUCHSCREEN, jpmtouch_device)
@@ -104,7 +104,7 @@ protected:
 
 	void common_map(address_map &map);
 
-	int m_lamp_strobe;
+	int m_lamp_strobe = 0;
 
 	void set_duart_1_hack_ip(bool state);
 
@@ -147,16 +147,16 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	void impact_non_video_map(address_map &map);
 
-	uint8_t m_Lamps[256];
-	int m_optic_pattern;
-	int m_payen;
-	int m_hopinhibit;
-	int m_slidesout;
-	int m_hopper[3];
-	int m_motor[3];
-	int m_volume_latch;
-	int m_global_volume;
-	uint16_t m_coinstate;
+	uint8_t m_Lamps[256]{};
+	int m_optic_pattern = 0;
+	int m_payen = 0;
+	int m_hopinhibit = 0;
+	int m_slidesout = 0;
+	int m_hopper[3]{};
+	int m_motor[3]{};
+	int m_volume_latch = 0;
+	int m_global_volume = 0;
+	uint16_t m_coinstate = 0;
 	required_device_array<timer_device, 6> m_cointimer;
 
 	required_device<i8255_device> m_ppi;
@@ -201,7 +201,7 @@ protected:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	uint8_t m_tms_irq;
+	uint8_t m_tms_irq = 0;
 
 	virtual void update_irqs() override;
 

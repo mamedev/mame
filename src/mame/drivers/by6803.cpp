@@ -5,28 +5,43 @@
 PINBALL
 Bally MPU A084-91786-AH06 (6803)
 
-The characteristic 6803 pinball has 4x 7-digit displays lined up along the bottom of the
- backbox. They show scores, moving messages, and anything else that's needed.
+First generation 6803 has 4x 7-digit displays, and a 6-digit display for the credits/balls (only
+ 4 digits are visible).
+Then, the 2nd generation replaced all that with 2x 14-letter alphanumeric displays lined up along
+ the bottom of the backbox. They show scores, moving messages, and anything else that's needed.
+ This also meant a more informative setup mode.
 
 Schematic has a number of mistakes.
 
-Here are the key codes to enable play: (to do)
+Setting Up:
+- The default settings don't work on most machines. Use the number pad for all inputs.
+   After starting or restarting, wait for flashing scores before pressing anything.
+   Each number pair is entered as: first number, Enter, 2nd number, Enter, Enter.
+   See the manual for more details.
+- 0B38: F1, 16 40, 17 1, 23 3, 24 3, 25 3, 26 3, 27 3, 29 1, 30 1, 47 1, esc.
+- 0C70: Press F1, 62 1, esc. Start again. F1, 62 0, 16 40, 17 1, 24 3, 25 3,
+    26 3, 27 3, 29 1, 30 1, esc. Start again.
+- 0E34: Press F1, 44 65, esc. Start again.
+- 0H05, 0H07, 2001, 2006: no setup necessary.
+- Others: Press F1, press / to choose Feature Options, Enter, 65, Enter, Enter, esc.
+
+Here are the key codes to enable play:
 
 Game                                       NUM  Start game                    End ball
 --------------------------------------------------------------------------------------------------
-Eight Ball Champ                          0B38  (not working)
-Beat the Clock                            0C70  (not working)
-Motordome                                 0E14  (can't insert coin)
-Lady Luck                                 0E34  (not working)
-Strange Science                           0E35  (can't insert coin)
-Special Force / Special Force Girls       0E47  (can't insert coin)
-Black Belt / Karate Fight                 0E52  (can't insert coin)
-City Slicker                              0E79  (can't insert coin)
+Eight Ball Champ                          0B38  1                             X
+Beat the Clock                            0C70  1                             X (timed game, no ball display)
+Motordome                                 0E14  1                             X
+Lady Luck                                 0E34  1                             X
+Strange Science                           0E35  (unknown)
+Special Force / Special Force Girls       0E47  Hold TUV, hit 1               TUV
+Black Belt / Karate Fight                 0E52  1                             X
+City Slicker                              0E79  Hold U and ; hit 1            U;
 Hardbody / Super Sport                    0E94  (stuck switch)
-Party Animal                              0H01  (can't insert coin)
-Heavy Metal Meltdown                      0H03  (can't insert coin)
+Party Animal                              0H01  Hold Left Down Right, hit 1   Down Left Right
+Heavy Metal Meltdown                      0H03  Hold ;'/. and hit 1           Hold ;'/. and hit X twice
 Escape from the Lost World                0H05  Hold DX, hit 1                DX
-Dungeons and Dragons                      0H06  (can't insert coin)
+Dungeons and Dragons                      0H06  Hold Left Down Right, hit 1   Down Left Right
 Blackwater 100                            0H07  Hold Enter ][, hit 1          Jiggle ]X[
 Hot Shotz                                  (unemulated prototype)
 **** After merge with Williams ****
@@ -35,16 +50,14 @@ Atlantis                                  2006  Hold Left Down Right, hit 1   Do
 
 
 Status:
-- 2nd gen games boot up and display. See above table for individual status.
+- Most games are playable. See above table for individual status.
 
 ToDo:
 - Sound
 - Mechanical sounds
 - Outputs
-- 1st gen display needs credits/balls
-- Commas are missing from the display.
+- Gen 2 games: Commas
 - Code has provision for a round LED, to be added to layout.
-- Operator keypad
 - Various sound boards
 - Inputs, Solenoids vary per game
 
@@ -63,6 +76,7 @@ ToDo:
 #include "speaker.h"
 
 #include "by6803.lh"
+#include "by6803a.lh"
 
 
 namespace {
@@ -84,7 +98,7 @@ public:
 	{ }
 
 	void by6803(machine_config &config);
-	void digit6(machine_config &config);
+	void gen1(machine_config &config);
 	void s11(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
@@ -106,9 +120,9 @@ private:
 	u8 pia1a_r();
 	void pia1a_w(u8 data);
 	void pia1b_w(u8 data);
-	void pia0a_6w(u8 data);
-	void pia1a_6w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_6w);
+	void pia0a_g1w(u8 data);
+	void pia1a_g1w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_g1w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
@@ -124,14 +138,14 @@ private:
 	bool m_pia0_timer = 0;
 	u8 m_port1 = 0U, m_port2 = 0U;
 	u8 m_digit = 0U;
-	u8 m_segment[4]{};
+	u8 m_segment[5]{};
 	required_device<m6803_cpu_device> m_maincpu;
 	//optional_device<williams_s11b_sound_device> m_s11sound;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
 	required_ioport m_io_test;
 	required_ioport_array<6> m_io_keyboard;
-	output_finder<40> m_digits;
+	output_finder<50> m_digits;
 	output_finder<1> m_leds;
 	output_finder<112> m_io_outputs; // 16 solenoids + 96 lamps
 };
@@ -147,24 +161,24 @@ void by6803_state::by6803_map(address_map &map)
 
 static INPUT_PORTS_START( by6803 )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, self_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, activity_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, self_test, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, activity_test, 0)
 
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP01")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP02")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP03")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP04")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("INP01") // PAD ENTER
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("INP02")  // PAD 0
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("INP03") // PAD KBD/CLR
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP04") // PAD GAME
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Left Flipper")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Right Flipper")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP12")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_3_PAD) // PAD 3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_2_PAD) // PAD 2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_1_PAD) // PAD 1
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("INP12") // PAD A
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP13")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
@@ -172,20 +186,20 @@ static INPUT_PORTS_START( by6803 )
 
 	// from here, vary per game
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP17")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP18")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP19")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP20")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("INP17") // PAD 6
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("INP18") // PAD 5
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("INP19") // PAD 4
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("INP20") // PAD B
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP21")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP22")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP23")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP24")
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP25")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP26")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP27")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP28")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("INP25") // PAD 9
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("INP26") // PAD 8
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("INP27") // PAD 7
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("INP28") // PAD C
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP29")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP30")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP31")
@@ -255,9 +269,11 @@ WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
 {
 	if (state)
 	{
-		// comma info is available in m_pia1_a at this time.
-		m_digits[m_digit] = m_segment[0];
-		m_digits[m_digit+16] = m_segment[1];
+		for (u8 i = 0; i < 2; i++)
+		{
+			u16 t = bitswap<10>(u16(m_segment[i]), 0, 0, 7, 7, 6, 5, 4, 3, 2, 1);
+			m_digits[m_digit+i*20] = t;
+		}
 	}
 }
 
@@ -289,12 +305,12 @@ void by6803_state::pia0a_w(u8 data)
 	if ((data & 15)==14)
 	{
 		m_digit = data >> 4;
-		m_segment[0] = bitswap<8>(m_pia1_a, 0, 7, 6, 5, 4, 3, 2, 1) ^ 0x80;
+		m_segment[0] = m_pia1_a ^ 1;
 	}
 	else
 	if ((data & 15)==13)
 	{
-		m_segment[1] = bitswap<8>(m_pia1_a, 0, 7, 6, 5, 4, 3, 2, 1) ^ 0x80;
+		m_segment[1] = m_pia1_a ^ 1;
 	}
 }
 
@@ -382,30 +398,38 @@ void by6803_state::pia1b_w(u8 data)
 	}
 }
 
-void by6803_state::pia0a_6w(u8 data)
+void by6803_state::pia0a_g1w(u8 data)
 {
+	m_pia0_a = data;
 	for (u8 i = 0; i < 4; i++)
 		if (!BIT(data, i))
 			m_segment[i] = BIT(data, 4, 4);
 }
 
-void by6803_state::pia1a_6w(u8 data)
+void by6803_state::pia1a_g1w(u8 data)
 {
+	m_pia1_a = data;
 	if (!BIT(data, 0))
 		for (u8 i = 1; i < 8; i++)
 			if (BIT(data, i))
-				m_digit = 7 - i;
+				m_digit = i;
+	if (!BIT(m_pia1_a, 0))
+		m_segment[4] = BIT(m_pia0_a, 4, 4);
 }
 
-WRITE_LINE_MEMBER( by6803_state::pia0_ca2_6w )
+WRITE_LINE_MEMBER( by6803_state::pia0_ca2_g1w )
 {
-	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+	static const u8 patterns[16] = { 0x3f,0x06,0xdb,0xcf,0xe6,0xed,0xfd,0x07,0xff,0xef,0,0,0,0,0,0 }; // MC14543
 	if (state)
 	{
-		m_digits[m_digit] = patterns[m_segment[0]];
-		m_digits[m_digit+7] = patterns[m_segment[1]];
-		m_digits[m_digit+16] = patterns[m_segment[2]];
-		m_digits[m_digit+23] = patterns[m_segment[3]];
+		for (u8 i = 0; i < 4; i++)
+		{
+			u16 t = patterns[m_segment[i]];
+			if (t && ((m_digit == 1) || (m_digit == 4)))
+				t |= 0xc000; // Add comma
+			m_digits[m_digit+i*10] = t;
+		}
+		m_digits[m_digit+40] = patterns[m_segment[4]];
 	}
 }
 
@@ -507,12 +531,13 @@ void by6803_state::s11(machine_config &config)
 	//WILLIAMS_S11B_SOUND(config, m_s11sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void by6803_state::digit6(machine_config &config)
+void by6803_state::gen1(machine_config &config)
 {
 	by6803(config);
-	m_pia0->writepa_handler().set(FUNC(by6803_state::pia0a_6w));
-	m_pia1->writepa_handler().set(FUNC(by6803_state::pia1a_6w));
-	m_pia0->ca2_handler().set(FUNC(by6803_state::pia0_ca2_6w));
+	m_pia0->writepa_handler().set(FUNC(by6803_state::pia0a_g1w));
+	m_pia1->writepa_handler().set(FUNC(by6803_state::pia1a_g1w));
+	m_pia0->ca2_handler().set(FUNC(by6803_state::pia0_ca2_g1w));
+	config.set_default_layout(layout_by6803a);
 }
 
 
@@ -851,10 +876,10 @@ ROM_END
 
 
 // 1st gen
-GAME( 1985, eballchp,  0,        digit6, by6803, by6803_state, empty_init, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, beatclck,  0,        digit6, by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, beatclck2, beatclck, digit6, by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, ladyluck,  0,        digit6, by6803, by6803_state, empty_init, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, eballchp,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, beatclck,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, beatclck2, beatclck, gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, ladyluck,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL )
 
 // 2nd gen
 GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (rev. D)",                    MACHINE_IS_SKELETON_MECHANICAL )

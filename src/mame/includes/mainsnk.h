@@ -40,10 +40,10 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_fgram;
 
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg_tilemap;
-	int m_sound_cpu_busy;
-	uint32_t m_bg_tile_offset;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_sound_cpu_busy = 0;
+	uint32_t m_bg_tile_offset = 0;
 
 	uint8_t sound_ack_r();
 	void c600_w(uint8_t data);

@@ -30,19 +30,19 @@ protected:
 
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
-	uint8_t *m_tileram;
-	uint8_t *m_charram;
-	uint8_t *m_spriteram_x;
-	uint8_t *m_spriteram_y;
-	uint8_t *m_spriteram_a;
-	uint8_t *m_spriteram_n;
-	uint8_t *m_paletteram;
-	uint8_t m_layers_ctrl;
-	uint8_t m_bg_vshift;
-	uint8_t m_bg_hshift;
-	uint8_t m_bg_bplctrl;
-	tilemap_t *m_bg_tilemap1;
-	tilemap_t *m_bg_tilemap2;
+	uint8_t *m_tileram = nullptr;
+	uint8_t *m_charram = nullptr;
+	uint8_t *m_spriteram_x = nullptr;
+	uint8_t *m_spriteram_y = nullptr;
+	uint8_t *m_spriteram_a = nullptr;
+	uint8_t *m_spriteram_n = nullptr;
+	uint8_t *m_paletteram = nullptr;
+	uint8_t m_layers_ctrl =0;
+	uint8_t m_bg_vshift = 0;
+	uint8_t m_bg_hshift = 0;
+	uint8_t m_bg_bplctrl = 0;
+	tilemap_t *m_bg_tilemap1 = nullptr;
+	tilemap_t *m_bg_tilemap2 = nullptr;
 	std::unique_ptr<rgb_t[]> m_palette_ptr;
 	void tiamc1_control_w(uint8_t data);
 	void tiamc1_videoram_w(offs_t offset, uint8_t data);

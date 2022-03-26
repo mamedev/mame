@@ -49,27 +49,27 @@ private:
 	required_shared_ptr<uint8_t> m_videoram2;
 
 	/* video-related */
-	bitmap_ind16    *m_tmp_bitmap1;
-	bitmap_ind16    *m_tmp_bitmap2;
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
-	tilemap_t     *m_bg2_tilemap;
-	int         m_bg2_textbank;
+	bitmap_ind16    *m_tmp_bitmap1 = nullptr;
+	bitmap_ind16    *m_tmp_bitmap2 = nullptr;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	tilemap_t     *m_fg_tilemap = nullptr;
+	tilemap_t     *m_bg2_tilemap = nullptr;
+	int         m_bg2_textbank = 0;
 
 	/* sound-related */
-	int         m_sound_nmi_enable;
-	int         m_pending_nmi;
+	int         m_sound_nmi_enable = 0;
+	int         m_pending_nmi = 0;
 
 	/* fake mcu (in msisaac.c) */
 #ifndef USE_MCU
-	uint8_t       m_mcu_val;
-	uint8_t       m_direction;
+	uint8_t       m_mcu_val = 0;
+	uint8_t       m_direction = 0;
 #endif
 
-	uint8_t       m_snd_ctrl0;
-	uint8_t       m_snd_ctrl1;
-	uint8_t       m_snd_ctrl2;
-	uint8_t       m_snd_ctrl3;
+	uint8_t       m_snd_ctrl0 = 0;
+	uint8_t       m_snd_ctrl1 = 0;
+	uint8_t       m_snd_ctrl2 = 0;
+	uint8_t       m_snd_ctrl3 = 0;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;

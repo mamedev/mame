@@ -10,22 +10,23 @@
 
 #pragma once
 
+#include "bus/centronics/ctronics.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/rs232/rs232.h"
-#include "machine/ram.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/floppy.h"
-#include "formats/sorc_dsk.h"
-#include "formats/sorc_cas.h"
 #include "machine/micropolis.h"
+#include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
+#include "formats/sorc_cas.h"
+#include "formats/sorc_dsk.h"
 
 
 class sorcerer_state : public driver_device
@@ -141,7 +142,7 @@ protected:
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;
 	required_ioport_array<16> m_iop_x;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 
 private:
 	u8 m_port48;

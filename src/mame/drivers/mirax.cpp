@@ -145,10 +145,10 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_nAyCtrl;
-	uint8_t m_nmi_mask;
-	uint8_t m_flipscreen_x;
-	uint8_t m_flipscreen_y;
+	uint8_t m_nAyCtrl = 0;
+	uint8_t m_nmi_mask = 0;
+	uint8_t m_flipscreen_x = 0;
+	uint8_t m_flipscreen_y = 0;
 
 	void audio_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);

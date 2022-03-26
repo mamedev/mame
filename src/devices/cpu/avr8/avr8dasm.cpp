@@ -104,6 +104,7 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	/* SPH    */ {  "SP8",   "SP9",  "SP10",  "SP11",  "SP12",  "SP13",  "SP14",  "SP15"},
 	/* SREG   */ {    "C",     "Z",     "N",     "V",     "S",     "H",     "T",     "I"}};
 
+	offs_t flags = 0;
 	switch(op & 0xf000)
 	{
 	case 0x0000:
@@ -425,6 +426,7 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				addr |= opcodes.r16(pc);
 				pc += 2;
 				util::stream_format(stream, "CALL    0x%06x", addr << 1);
+				flags = STEP_OVER;
 				break;
 			default:
 				util::stream_format(stream, "Undefined (%08x)", op);
@@ -460,9 +462,11 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				{
 				case 0x0000:
 					util::stream_format(stream, "RET");
+					flags = STEP_OUT;
 					break;
 				case 0x0010:
 					util::stream_format(stream, "RETI");
+					flags = STEP_OUT;
 					break;
 				case 0x0080:
 					util::stream_format(stream, "SLEEP");
@@ -495,9 +499,11 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				{
 				case 0x0000:
 					util::stream_format(stream, "ICALL");
+					flags = STEP_OVER;
 					break;
 				case 0x0010:
 					util::stream_format(stream, "EICALL");
+					flags = STEP_OVER;
 					break;
 				default:
 					util::stream_format(stream, "Undefined (%08x)", op);
@@ -520,6 +526,7 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				op |= opcodes.r16(pc);
 				pc += 2;
 				util::stream_format(stream, "CALL    0x%06x", KCONST22(op) << 1);
+				flags = STEP_OVER;
 				break;
 			}
 			break;
@@ -560,6 +567,7 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		break;
 	case 0xd000:
 		util::stream_format(stream, "RCALL   %08x", (((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff)) << 1));
+		flags = STEP_OVER;
 		break;
 	case 0xe000:
 		util::stream_format(stream, "LDI     R%d, 0x%02x", 16 + RD4(op), KCONST8(op));
@@ -641,5 +649,5 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		break;
 	}
 
-	return (pc - base_pc) | SUPPORTED;
+	return (pc - base_pc) | flags | SUPPORTED;
 }

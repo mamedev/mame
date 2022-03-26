@@ -159,8 +159,8 @@ private:
 	output_finder<3> m_gun_recoil;
 	required_shared_ptr<uint16_t> m_eprom_data;
 
-	tilemap_t *m_fix_tilemap;
-	tilemap_t *m_pf_tilemap[2];
+	tilemap_t *m_fix_tilemap = nullptr;
+	tilemap_t *m_pf_tilemap[2]{};
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	template <int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);

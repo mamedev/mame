@@ -36,7 +36,7 @@ private:
 	void sn_93c46a_w(uint64_t data);
 	uint64_t sp_bank_r(offs_t offset, uint64_t mem_mask = ~0);
 	void sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint16_t m_sp_bank;
+	uint16_t m_sp_bank = 0;
 
 	void onchip_port(address_map &map);
 	void segasp_map(address_map &map);

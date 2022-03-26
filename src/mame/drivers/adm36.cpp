@@ -55,7 +55,7 @@ private:
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr_array<u8, 2> m_vram;
 
-	bool m_vsyn;
+	bool m_vsyn = false;
 };
 
 

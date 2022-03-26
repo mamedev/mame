@@ -59,11 +59,11 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t   *m_fg_tilemap;
-	tilemap_t   *m_bg_tilemap;
-	uint8_t       m_background_image;
+	tilemap_t   *m_fg_tilemap = nullptr;
+	tilemap_t   *m_bg_tilemap = nullptr;
+	uint8_t       m_background_image = 0U;
 
-	bool          m_nmi_mask;
+	bool          m_nmi_mask = false;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

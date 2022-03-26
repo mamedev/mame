@@ -196,14 +196,14 @@ private:
 		CPUAUXCTRL_GR  = 0x80, // graphics reset (active low)
 	};
 
-	u8 m_memcfg;
-	u8 m_sysid;
-	u8 m_vme_isr;
-	u8 m_vme_imr;
-	u16 m_cpuctrl;
-	u8 m_cpuauxctl;
-	u32 m_erradr;
-	u32 m_refadr;
+	u8 m_memcfg = 0;
+	u8 m_sysid = 0;
+	u8 m_vme_isr = 0;
+	u8 m_vme_imr = 0;
+	u16 m_cpuctrl = 0;
+	u8 m_cpuauxctl = 0;
+	u32 m_erradr = 0;
+	u32 m_refadr = 0;
 	attotime m_refresh_timer;
 
 	enum parerr_mask : u8
@@ -214,22 +214,22 @@ private:
 		PARERR_VME   = 0x08,
 		PARERR_BYTE  = 0xf0,
 	};
-	u8 m_parerr;
+	u8 m_parerr = 0;
 
-	u16 m_lio_isr;
-	u8 m_lio_imr;
-	bool m_lio_int;
-	int m_lio_fifo;
+	u16 m_lio_isr = 0;
+	u8 m_lio_imr = 0;
+	bool m_lio_int = false;
+	int m_lio_fifo = 0;
 
-	u16 m_dmalo;
-	u8 m_mapindex;
+	u16 m_dmalo = 0;
+	u8 m_mapindex = 0;
 	std::unique_ptr<u16 []> m_dmahi;
-	offs_t m_dmaaddr;
+	offs_t m_dmaaddr = 0;
 
-	u32 m_gdma_dabr;   // descriptor array base
-	u32 m_gdma_bufadr; // buffer address
-	u16 m_gdma_burst;  // burst/delay
-	u16 m_gdma_buflen; // buffer length
+	u32 m_gdma_dabr = 0;   // descriptor array base
+	u32 m_gdma_bufadr = 0; // buffer address
+	u16 m_gdma_burst = 0;  // burst/delay
+	u16 m_gdma_buflen = 0; // buffer length
 };
 
 class pi4d3x_state : public driver_device

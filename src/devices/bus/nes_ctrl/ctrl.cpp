@@ -58,6 +58,7 @@
 #include "pachinko.h"
 #include "partytap.h"
 #include "powerpad.h"
+#include "rob.h"
 #include "snesadapter.h"
 #include "suborkey.h"
 #include "turbofile.h"
@@ -199,6 +200,11 @@ void nes_control_port2_devices(device_slot_interface &device)
 	device.option_add("vboy", NES_VBOYCTRL);
 }
 
+void nes_control_special_devices(device_slot_interface &device)
+{
+	device.option_add("rob", NES_ROB);
+}
+
 void fc_control_port1_devices(device_slot_interface &device)
 {
 	device.option_add("joypad", NES_JOYPAD);
@@ -233,4 +239,15 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("subor_keyboard", NES_SUBORKEYBOARD);
 	device.option_add("taptapmat", NES_TAPTAPMAT);
 	device.option_add("turbofile", NES_TURBOFILE);
+}
+
+void famibox_control_port12_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("zapper", NES_ZAPPER);
+}
+
+void famibox_control_port3_devices(device_slot_interface &device)
+{
+	device.option_add("zapper", NES_ZAPPER);
 }

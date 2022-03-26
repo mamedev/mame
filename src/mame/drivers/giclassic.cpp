@@ -84,7 +84,7 @@ private:
 
 	void satellite_main(address_map &map);
 
-	uint8_t m_control;
+	uint8_t m_control = 0;
 };
 
 // --------------------------------------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ public:
 	void giclassvr(machine_config &config);
 	void server_main(address_map &map);
 private:
-	uint16_t m_control;
+	uint16_t m_control = 0;
 };
 
 void giclassicsvr_state::control_w(uint16_t data)

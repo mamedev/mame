@@ -32,10 +32,10 @@ public:
 
 private:
 	/* video-related */
-	bitmap_ind16 m_bitmap0;
-	tilemap_t *m_vram_tilemap;
-	std::unique_ptr<uint16_t[]> m_sprite_triple_buffer[2];
-	std::unique_ptr<uint8_t[]> m_vram_buffer;
+	bitmap_ind16 m_bitmap0{};
+	tilemap_t *m_vram_tilemap = nullptr;
+	std::unique_ptr<uint16_t[]> m_sprite_triple_buffer[2]{};
+	std::unique_ptr<uint8_t[]> m_vram_buffer{};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

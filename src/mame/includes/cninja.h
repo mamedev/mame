@@ -38,6 +38,17 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
+	void cninjabl(machine_config &config);
+	void edrandy(machine_config &config);
+	void cninja(machine_config &config);
+	void robocop2(machine_config &config);
+	void stoneage(machine_config &config);
+	void cninjabl2(machine_config &config);
+	void mutantf(machine_config &config);
+	void init_mutantf();
+	void init_cninjabl2();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -55,13 +66,11 @@ public:
 	required_shared_ptr_array<uint16_t, 4> m_pf_rowscroll;
 	optional_memory_bank m_okibank;
 
-	uint16_t m_priority;
+	uint16_t m_priority = 0U;
 
 	template<int Chip> void cninja_pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_bankswitch_w(uint8_t data);
 	void cninjabl2_oki_bank_w(uint8_t data);
-	void init_mutantf();
-	void init_cninjabl2();
 	DECLARE_MACHINE_START(robocop2);
 	DECLARE_MACHINE_RESET(robocop2);
 	DECLARE_VIDEO_START(cninja);
@@ -96,13 +105,6 @@ public:
 	uint16_t cninjabl2_sprite_dma_r();
 	void robocop2_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t mutantf_71_r();
-	void cninjabl(machine_config &config);
-	void edrandy(machine_config &config);
-	void cninja(machine_config &config);
-	void robocop2(machine_config &config);
-	void stoneage(machine_config &config);
-	void cninjabl2(machine_config &config);
-	void mutantf(machine_config &config);
 	void cninja_map(address_map &map);
 	void cninjabl2_map(address_map &map);
 	void cninjabl2_oki_map(address_map &map);

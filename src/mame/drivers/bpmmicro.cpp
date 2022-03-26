@@ -190,8 +190,8 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom_u38;
-	uint16_t m_shifter;
-	uint16_t m_latch;
+	uint16_t m_shifter = 0;
+	uint16_t m_latch = 0;
 };
 
 /******************************************************************************

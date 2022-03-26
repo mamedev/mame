@@ -79,17 +79,17 @@ protected:
 	optional_shared_ptr<uint16_t> m_control;
 
 	/* misc */
-	int         m_music_command;
-	int         m_music_bank;
-	int         m_music_is_playing;
+	int         m_music_command = 0;
+	int         m_music_bank = 0;
+	int         m_music_is_playing = 0;
 
 	/* video-related */
-	tilemap_t   *m_pf1_tilemap;
-	tilemap_t   *m_pf1_alt_tilemap;
-	tilemap_t   *m_pf2_tilemap;
-	tilemap_t   *m_pf2_alt_tilemap;
-	uint16_t      m_control_0[8];
-	uint16_t      m_tilebank;
+	tilemap_t   *m_pf1_tilemap = nullptr;
+	tilemap_t   *m_pf1_alt_tilemap = nullptr;
+	tilemap_t   *m_pf2_tilemap = nullptr;
+	tilemap_t   *m_pf2_alt_tilemap = nullptr;
+	uint16_t      m_control_0[8]{};
+	uint16_t      m_tilebank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -101,7 +101,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	uint8_t m_semicom_prot_offset;
+	uint8_t m_semicom_prot_offset = 0;
 	uint16_t m_protbase;
 	void tumblepb_oki_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t tumblepb_prot_r();

@@ -28,32 +28,36 @@ public:
 	{
 	}
 
+	void bking(machine_config &config);
+	void bking3(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
 
 	/* video-related */
-	bitmap_ind16    m_colmap_bg;
-	bitmap_ind16    m_colmap_ball;
-	tilemap_t     *m_bg_tilemap;
-	int         m_pc3259_output[4];
-	int         m_pc3259_mask;
-	uint8_t       m_xld1;
-	uint8_t       m_xld2;
-	uint8_t       m_xld3;
-	uint8_t       m_yld1;
-	uint8_t       m_yld2;
-	uint8_t       m_yld3;
-	int         m_ball1_pic;
-	int         m_ball2_pic;
-	int         m_crow_pic;
-	int         m_crow_flip;
-	int         m_palette_bank;
-	int         m_controller;
-	int         m_hit;
+	bitmap_ind16    m_colmap_bg = 0;
+	bitmap_ind16    m_colmap_ball = 0;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	int         m_pc3259_output[4]{};
+	int         m_pc3259_mask = 0;
+	uint8_t       m_xld1 = 0U;
+	uint8_t       m_xld2 = 0U;
+	uint8_t       m_xld3 = 0U;
+	uint8_t       m_yld1 = 0U;
+	uint8_t       m_yld2 = 0U;
+	uint8_t       m_yld3 = 0U;
+	int         m_ball1_pic = 0;
+	int         m_ball2_pic = 0;
+	int         m_crow_pic = 0;
+	int         m_crow_flip = 0;
+	int         m_palette_bank = 0;
+	int         m_controller = 0;
+	int         m_hit = 0;
 
 	/* misc */
-	int         m_addr_h;
-	int         m_addr_l;
+	int         m_addr_h = 0;
+	int         m_addr_l = 0;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -99,8 +103,6 @@ public:
 	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bking);
-	void bking(machine_config &config);
-	void bking3(machine_config &config);
 	void bking3_io_map(address_map &map);
 	void bking_audio_map(address_map &map);
 	void bking_io_map(address_map &map);

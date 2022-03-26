@@ -194,45 +194,45 @@ struct bf_blitter_t
 {
 	ADDR_REG    program;
 
-	uint8_t       control;
-	uint8_t       status;
+	uint8_t       control = 0;
+	uint8_t       status = 0;
 
-	uint8_t       command;
+	uint8_t       command = 0;
 	ADDR_REG    source;
 	ADDR_REG    dest;
-	uint8_t       modectl;
-	uint8_t       compfunc;
-	uint8_t       outercnt;
+	uint8_t       modectl = 0;
+	uint8_t       compfunc = 0;
+	uint8_t       outercnt = 0;
 
-	uint8_t       innercnt;
-	uint8_t       step;
-	uint8_t       pattern;
+	uint8_t       innercnt = 0;
+	uint8_t       step = 0;
+	uint8_t       pattern = 0;
 };
 
 #define LOOPTYPE ( ( blitter.command&0x60 ) >> 5 )
 
 struct fdc_t
 {
-	uint8_t   MSR;
+	uint8_t   MSR = 0;
 
-	int     side;
-	int     track;
-	int     sector;
-	int     number;
-	int     stop_track;
-	int     setup_read;
+	int     side = 0;
+	int     track = 0;
+	int     sector = 0;
+	int     number = 0;
+	int     stop_track = 0;
+	int     setup_read = 0;
 
-	int     byte_pos;
-	int     offset;
+	int     byte_pos = 0;
+	int     offset = 0;
 
-	int     phase;
-	int     next_phase;
-	int     cmd_len;
-	int     cmd_cnt;
-	int     res_len;
-	int     res_cnt;
-	uint8_t   cmd[10];
-	uint8_t   results[8];
+	int     phase = 0;
+	int     next_phase = 0;
+	int     cmd_len = 0;
+	int     cmd_cnt = 0;
+	int     res_len = 0;
+	int     res_cnt = 0;
+	uint8_t   cmd[10]{};
+	uint8_t   results[8]{};
 };
 
 
@@ -314,30 +314,30 @@ protected:
 	void z80_prog_map(address_map &map);
 
 private:
-	uint8_t m_bank_data[4];
+	uint8_t m_bank_data[4]{};
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_video_ram;
-	uint8_t m_h_scroll;
-	uint8_t m_v_scroll;
-	uint8_t m_flip_8;
-	uint8_t m_flip_22;
-	uint8_t m_videomode;
-	uint8_t m_data_r;
-	uint8_t m_data_t;
-	int m_irq_state;
-	int m_acia_irq;
-	int m_vblank_irq;
-	int m_blitter_irq;
-	uint8_t m_z80_int;
-	uint8_t m_z80_inten;
-	uint32_t m_meter_latch;
-	uint32_t m_mux_input;
-	uint32_t m_mux_outputlatch;
-	uint8_t m_col4bit[16];
-	uint8_t m_col3bit[16];
-	uint8_t m_col8bit[256];
-	uint8_t m_col7bit[256];
-	uint8_t m_col6bit[256];
+	uint8_t m_h_scroll = 0;
+	uint8_t m_v_scroll = 0;
+	uint8_t m_flip_8 = 0;
+	uint8_t m_flip_22 = 0;
+	uint8_t m_videomode = 0;
+	uint8_t m_data_r = 0;
+	uint8_t m_data_t = 0;
+	int m_irq_state = 0;
+	int m_acia_irq = 0;
+	int m_vblank_irq = 0;
+	int m_blitter_irq = 0;
+	uint8_t m_z80_int = 0;
+	uint8_t m_z80_inten = 0;
+	uint32_t m_meter_latch = 0;
+	uint32_t m_mux_input = 0;
+	uint32_t m_mux_outputlatch = 0;
+	uint8_t m_col4bit[16]{};
+	uint8_t m_col3bit[16]{};
+	uint8_t m_col8bit[256]{};
+	uint8_t m_col7bit[256]{};
+	uint8_t m_col6bit[256]{};
 	struct bf_blitter_t m_blitter;
 	struct fdc_t m_fdc;
 	required_device<cpu_device> m_maincpu;
@@ -1758,35 +1758,35 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_bank_data[4];
-	uint8_t m_rompage;
-	uint8_t m_h_scroll;
-	uint8_t m_v_scroll;
-	uint8_t m_flip_8;
-	uint8_t m_flip_22;
-	uint8_t m_videomode;
-	uint8_t m_data_r;
-	uint8_t m_data_t;
-	uint8_t m_port_0;
-	int m_irq_state;
-	int m_acia_irq;
-	int m_scanline_irq;
-	int m_blitter_irq;
-	int m_global_volume;
-	uint8_t dm_shift_data ;
-	int dm_shift = 0 ;
-	int dm_last_data = 0 ;
+	uint8_t m_bank_data[4]{};
+	uint8_t m_rompage = 0;
+	uint8_t m_h_scroll = 0;
+	uint8_t m_v_scroll = 0;
+	uint8_t m_flip_8 = 0;
+	uint8_t m_flip_22 = 0;
+	uint8_t m_videomode = 0;
+	uint8_t m_data_r = 0;
+	uint8_t m_data_t = 0;
+	uint8_t m_port_0 = 0;
+	int m_irq_state = 0;
+	int m_acia_irq = 0;
+	int m_scanline_irq = 0;
+	int m_blitter_irq = 0;
+	int m_global_volume = 0;
+	uint8_t dm_shift_data = 0;
+	int dm_shift = 0;
+	int dm_last_data = 0;
 
-	uint8_t m_z8s180_int;
-	uint8_t m_z8s180_inten;
-	uint8_t m_col4bit[16];
-	uint8_t m_col3bit[16];
-	uint8_t m_col8bit[256];
-	uint8_t m_col7bit[256];
-	uint8_t m_col6bit[256];
+	uint8_t m_z8s180_int = 0;
+	uint8_t m_z8s180_inten = 0;
+	uint8_t m_col4bit[16]{};
+	uint8_t m_col3bit[16]{};
+	uint8_t m_col8bit[256]{};
+	uint8_t m_col7bit[256]{};
+	uint8_t m_col6bit[256]{};
 	struct bf_blitter_t m_blitter;
-	emu_timer *m_scanline_timer;
-	uint8_t m_genio ;
+	emu_timer *m_scanline_timer = nullptr;
+	uint8_t m_genio = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<screen_device> m_screen;

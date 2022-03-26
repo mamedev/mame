@@ -269,6 +269,14 @@
 #define XOR_M(d)    int sreg, dreg, source, dest, result, ea; GET_SREG; source = REGW(sreg); GET_DW_##d; CLR_NZV; result = dest ^ source; SETW_NZ; PUT_DW_EA(result)
 
 
+void t11_device::trap_to(uint16_t vector)
+{
+	PUSH(PSW);
+	PUSH(PC);
+	PC = RWORD(vector);
+	PSW = RWORD(vector + 2);
+	t11_check_irqs();
+}
 
 void t11_device::op_0000(uint16_t op)
 {
@@ -277,8 +285,8 @@ void t11_device::op_0000(uint16_t op)
 		case 0x00:  /* HALT  */ halt(op); break;
 		case 0x01:  /* WAIT  */ m_icount = 0; m_wait_state = 1; break;
 		case 0x02:  /* RTI   */ m_icount -= 24; PC = POP(); PSW = POP(); t11_check_irqs(); break;
-		case 0x03:  /* BPT   */ m_icount -= 48; PUSH(PSW); PUSH(PC); PC = RWORD(0x0c); PSW = RWORD(0x0e); t11_check_irqs(); break;
-		case 0x04:  /* IOT   */ m_icount -= 48; PUSH(PSW); PUSH(PC); PC = RWORD(0x10); PSW = RWORD(0x12); t11_check_irqs(); break;
+		case 0x03:  /* BPT   */ m_icount -= 48; trap_to(0x0c); break;
+		case 0x04:  /* IOT   */ m_icount -= 48; trap_to(0x10); break;
 		case 0x05:  /* RESET */ m_out_reset_func(ASSERT_LINE); m_out_reset_func(CLEAR_LINE); m_icount -= 110; break;
 		case 0x06:  /* RTT   */ m_icount -= 33; PC = POP(); PSW = POP(); t11_check_irqs(); break;
 		case 0x07:  /* MFPT  */ REGB(0) = 4; break;
@@ -300,11 +308,13 @@ void t11_device::halt(uint16_t op)
 void t11_device::illegal(uint16_t op)
 {
 	m_icount -= 48;
-	PUSH(PSW);
-	PUSH(PC);
-	PC = RWORD(0x08);
-	PSW = RWORD(0x0a);
-	t11_check_irqs();
+	trap_to(0x08);
+}
+
+void t11_device::illegal4(uint16_t op)
+{
+	m_icount -= 48;
+	trap_to(0x04);
 }
 
 void t11_device::mark(uint16_t op)
@@ -901,21 +911,13 @@ void t11_device::bcs(uint16_t op)           { m_icount -= 12; { BR( GET_C); } }
 void t11_device::emt(uint16_t op)
 {
 	m_icount -= 48;
-	PUSH(PSW);
-	PUSH(PC);
-	PC = RWORD(0x18);
-	PSW = RWORD(0x1a);
-	t11_check_irqs();
+	trap_to(0x18);
 }
 
 void t11_device::trap(uint16_t op)
 {
 	m_icount -= 48;
-	PUSH(PSW);
-	PUSH(PC);
-	PC = RWORD(0x1c);
-	PSW = RWORD(0x1e);
-	t11_check_irqs();
+	trap_to(0x1c);
 }
 
 void t11_device::clrb_rg(uint16_t op)       { m_icount -= 12; { CLRB_R(RG);  } }

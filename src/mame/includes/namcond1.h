@@ -34,8 +34,8 @@ private:
 
 	required_shared_ptr<uint16_t> m_shared_ram;
 
-	uint8_t m_h8_irq5_enabled;
-	int m_p8;
+	uint8_t m_h8_irq5_enabled = 0;
+	int m_p8 = 0;
 
 	uint16_t mcu_p7_read();
 	uint16_t mcu_pa_read();

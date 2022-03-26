@@ -21,7 +21,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pascal">
+	<software name="pascal11" cloneof="pascal">
 		<description>Hisoft PASCAL</description>
 		<year>1984</year>
 		<publisher>Hisoft</publisher>
@@ -30,6 +30,19 @@ license:CC0
 			<dataarea name="rom" size="32768">
 				<rom name="pascal0.rom" size="8192" crc="fcdf9cd9" sha1="fd8409659bc89f9cf1df367b7160bab396ddd88b" offset="0x0000"/>
 				<rom name="pascal1.rom" size="8192" crc="39d105ca" sha1="21ed29f79388c41d1f87268cab478e174536a208" offset="0x2000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal">
+		<description>Hisoft PASCAL V1.4</description>
+		<year>1984</year>
+		<publisher>Hisoft</publisher>
+		<info name="usage" value="ROM 2" />
+		<part name="rom" interface="mtx_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="pascal_140.rom" size="8192" crc="eef114f4" sha1="32d9b92da8129f6e70016be3ad42251bd2543d09" offset="0x0000"/>
+				<rom name="pascal_141.rom" size="8192" crc="27058f6e" sha1="9424e30ac2d0a5e5e4d1e05957143afa1f206cdf" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
