@@ -329,9 +329,9 @@ static const uint8_t cc_ex[0x100] = {
 	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2
 };
 
-/* rop()|M0 usually takes 4(NOP|m_op[0]) cycles except some instructions.
-   This value is not intended to be added to instruction execution, just needed for M0 shift calculation in EXEC() after op fetch. */
-static const u8 cc_m0_ext[0x100] = {
+/* rop()|M1 usually takes 4(NOP|m_op[0]) cycles except some instructions.
+   This value is not intended to be added to instruction execution, just needed for M1 shift calculation in EXEC() after op fetch. */
+static const u8 cc_m1_ext[0x100] = {
 	0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
 	1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
 	0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
@@ -368,10 +368,10 @@ static const u8 cc_m0_ext[0x100] = {
 	m_icount_executing -= icount; \
 } while (0)
 
-// M0 equals to NOP|m_op[0] typically implemented as rop() and takes 4 cycles
-#define M0T m_cc_op[0]
-// M1 tipically implemented as arg() and takes 1 cycle less (==3) than op fetch (M0|rop())
-#define M1T (M0T-1)
+// M1 equals to NOP|m_op[0] typically implemented as rop() and takes 4 cycles
+#define M1T m_cc_op[0]
+// M2 tipically implemented as arg() and takes 1 cycle less (==3) than op fetch (M1|rop())
+#define M2T (M1T-1)
 
 #define EXEC(prefix,opcode) do { \
 	unsigned op = opcode; \
@@ -479,7 +479,7 @@ inline void z80_device::leave_halt()
 inline uint8_t z80_device::in(uint16_t port)
 {
 	u8 res = m_io.read_byte(port);
-	T(M0T);
+	T(M1T);
 	return res;
 }
 
@@ -488,9 +488,9 @@ inline uint8_t z80_device::in(uint16_t port)
  ***************************************************************/
 inline void z80_device::out(uint16_t port, uint8_t value)
 {
-	if(m_icount_executing != M0T) T(m_icount_executing - M0T);
+	if(m_icount_executing != M1T) T(m_icount_executing - M1T);
 	m_io.write_byte(port, value);
-	T(M0T);
+	T(M1T);
 }
 
 /***************************************************************
@@ -499,7 +499,7 @@ inline void z80_device::out(uint16_t port, uint8_t value)
 uint8_t z80_device::rm(uint16_t addr)
 {
 	u8 res = m_data.read_byte(addr);
-	T(M1T);
+	T(M2T);
 	return res;
 }
 
@@ -518,9 +518,9 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
 void z80_device::wm(uint16_t addr, uint8_t value)
 {
 	// As we don't count changes between read and write, simply adjust to the end of requested.
-	if(m_icount_executing != M1T) T(m_icount_executing - M1T);
+	if(m_icount_executing != M2T) T(m_icount_executing - M2T);
 	m_data.write_byte(addr, value);
-	T(M1T);
+	T(M2T);
 }
 
 /***************************************************************
@@ -547,7 +547,7 @@ uint8_t z80_device::rop()
 	if(m_icount_executing) T(m_icount_executing);
 	uint8_t res = m_opcodes.read_byte(pc);
 	// Store borrowed cycles to be used by EXEC()
-	m_icount_executing = M0T + m_cc_m0_ext[res];
+	m_icount_executing = M1T + m_cc_m0_ext[res];
 	m_icount -= 2;
 	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
 	m_icount += 2;
@@ -565,7 +565,7 @@ uint8_t z80_device::arg()
 	unsigned pc = PCD;
 	PC++;
 	u8 res = m_args.read_byte(pc);
-	T(M1T);
+	T(M2T);
 	return res;
 }
 
@@ -2257,7 +2257,7 @@ OP(dd,c7) { illegal_1(); op_c7();                            } /* DB   DD       
 OP(dd,c8) { illegal_1(); op_c8();                            } /* DB   DD          */
 OP(dd,c9) { illegal_1(); op_c9();                            } /* DB   DD          */
 OP(dd,ca) { illegal_1(); op_ca();                            } /* DB   DD          */
-OP(dd,cb) { eax(); u8 a=rop(); m_icount_executing = M0T; EXEC(xycb,a); // unlike rop() time is not cc_m0_ext but well known M0T
+OP(dd,cb) { eax(); u8 a=rop(); m_icount_executing = M1T; EXEC(xycb,a); // unlike rop() time is not cc_m1_ext but well known M1T
                                                              } /* **   DD CB xx    */
 OP(dd,cc) { illegal_1(); op_cc();                            } /* DB   DD          */
 OP(dd,cd) { illegal_1(); op_cd();                            } /* DB   DD          */
@@ -2549,7 +2549,7 @@ OP(fd,c7) { illegal_1(); op_c7();                            } /* DB   FD       
 OP(fd,c8) { illegal_1(); op_c8();                            } /* DB   FD          */
 OP(fd,c9) { illegal_1(); op_c9();                            } /* DB   FD          */
 OP(fd,ca) { illegal_1(); op_ca();                            } /* DB   FD          */
-OP(fd,cb) { eay(); u8 a=rop(); m_icount_executing = M0T; EXEC(xycb,a); // unlike rop() time is not cc_m0_ext but well known M0T
+OP(fd,cb) { eay(); u8 a=rop(); m_icount_executing = M1T; EXEC(xycb,a); // unlike rop() time is not cc_m1_ext but well known M1T
                                                              } /* **   FD CB xx    */
 OP(fd,cc) { illegal_1(); op_cc();                            } /* DB   FD          */
 OP(fd,cd) { illegal_1(); op_cd();                            } /* DB   FD          */
@@ -3527,7 +3527,7 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
-	m_cc_m0_ext = cc_m0_ext;
+	m_cc_m0_ext = cc_m1_ext;
 
 	m_irqack_cb.resolve_safe();
 	m_refresh_cb.resolve_safe();
@@ -3751,7 +3751,7 @@ std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
  * Generic set_info
  **************************************************************************/
 
-void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex, const uint8_t *m0_ext)
+void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex, const uint8_t *m1_ext)
 {
 	m_cc_op = (op != nullptr) ? op : cc_op;
 	m_cc_cb = (cb != nullptr) ? cb : cc_cb;
@@ -3759,7 +3759,7 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
 	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
 	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
-	m_cc_m0_ext = (m0_ext != nullptr) ? m0_ext : cc_m0_ext;
+	m_cc_m0_ext = (m1_ext != nullptr) ? m1_ext : cc_m1_ext;
 }
 
 
