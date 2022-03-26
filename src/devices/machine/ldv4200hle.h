@@ -30,6 +30,8 @@ DECLARE_DEVICE_TYPE(PIONEER_LDV4200HLE, pioneer_ldv4200hle_device)
 //  GLOBAL HELPERS
 //**************************************************************************
 
+// Note: This should be included within the class rather than the global namespace.
+// However, doing so results in a "called in a constant expression before its definition is complete" error for the enum values.
 static constexpr uint16_t make_ldv4000_command(const char *str) { return ((uint8_t)str[0] << 8) | (uint8_t)str[1]; }
 
 
@@ -166,8 +168,8 @@ private:
 	void normalize_command_buffer();
 	void process_command_buffer();
 
-	uint32_t bcd_to_literal(uint32_t bcd);
-	bool is_number(char value);
+	static uint32_t bcd_to_literal(uint32_t bcd);
+	static bool is_number(char value);
 	uint8_t parse_numeric_value(uint8_t cmd_index, uint32_t &value, error_code &err);
 	uint8_t process_command(uint8_t cmd_index, uint32_t value, error_code &err);
 

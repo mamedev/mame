@@ -9,7 +9,8 @@ LaserDisc and artwork hookup by Ryan Holtz
 
 TODO:
 - Unemulated Sony LDP-1450 player, and Pioneer LD-V4200 is HLE; needs a dump of the BIOSes and
-  proper hook-up
+  proper hook-up.
+- Unknown how the bill validator is hooked up.
 
 ==================================================================================================
 

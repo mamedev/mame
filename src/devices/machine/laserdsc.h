@@ -233,7 +233,7 @@ protected:
 	int32_t generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &curstate);
 
 	// general helpers
-	bool is_cav_disc() { return m_is_cav_disc; }
+	bool is_cav_disc() const { return m_is_cav_disc; }
 	bool is_start_of_frame(const vbi_metadata &vbi);
 	int frame_from_metadata(const vbi_metadata &metadata);
 	int chapter_from_metadata(const vbi_metadata &metadata);
