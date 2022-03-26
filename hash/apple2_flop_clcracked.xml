@@ -47028,7 +47028,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Society for Visual Education</publisher>
 		<info name="release" value="2022-01-11"/>
-		<!--"Ripley's Believe It Or Not: Beginning Library Research Skills" is a 1984 educational program developed and distribute by Society for Visual Education. It is preserved here for the first time.&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;Enter TEACHER (password TEACHER) for the administration menu.&lt;/div&gt;-->
+		<!--"Ripley's Believe It Or Not: Beginning Library Research Skills" is a 1984 educational program developed and distribute by Society for Visual Education. It is preserved here for the first time. Enter TEACHER (password TEACHER) for the administration menu.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>

@@ -524,7 +524,7 @@ uint8_t nes_namcot175_device::read_m(offs_t offset)
 	if (!m_battery.empty() && !m_wram_protect)
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 void nes_namcot175_device::write_m(offs_t offset, uint8_t data)
@@ -605,7 +605,7 @@ uint8_t nes_namcot163_device::read_m(offs_t offset)
 	if (!m_battery.empty() && offset < m_battery.size())
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 void nes_namcot163_device::write_m(offs_t offset, uint8_t data)

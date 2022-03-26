@@ -3138,7 +3138,7 @@ uint8_t nes_bmc_gold150_device::read_h(offs_t offset)
 {
 	LOG_MMC(("bmc_gold150 read_h, offset: %04x\n", offset));
 
-	if (m_latch)    // open bus
+	if (m_latch)
 		return get_open_bus();
 	else
 		return hi_access_rom(offset);

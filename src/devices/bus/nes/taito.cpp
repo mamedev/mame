@@ -362,7 +362,7 @@ uint8_t nes_x1_005_device::read_m(offs_t offset)
 	if (offset >= 0x1f00 && m_latch == 0xa3)
 		return m_x1_005_ram[offset & 0x7f];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 /*-------------------------------------------------
@@ -465,5 +465,5 @@ uint8_t nes_x1_017_device::read_m(offs_t offset)
 	if (offset < 0x1400 && m_reg[2] == 0x84)
 		return m_x1_017_ram[0x1000 + (offset & 0x3ff)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }

@@ -780,6 +780,6 @@ uint8_t nes_fujiya_device::read_m(offs_t offset)
 	if (offset == 0x7001 || offset == 0x7777)
 		return m_latch | ((offset >> 8) & 0x7f);
 
-	return get_open_bus();  // open bus
+	return get_open_bus();
 }
 #endif
