@@ -539,7 +539,7 @@ static INPUT_PORTS_START( raidenm )
 	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, "A" )
 	PORT_DIPSETTING(      0x0000, "B" )
-	/* Coin Mode A */
+	// Coin Mode A
 	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_CONDITION("P2", 0x0001, EQUALS, 0x0001) PORT_DIPLOCATION("SW1:2,3,4,5")
 	PORT_DIPSETTING(      0x0014, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x0016, DEF_STR( 5C_1C ) )
@@ -557,7 +557,7 @@ static INPUT_PORTS_START( raidenm )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	/* Coin Mode B */
+	// Coin Mode B
 	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_CONDITION("P2", 0x0001, NOTEQUALS, 0x0001) PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(      0x0000, "5C/1C or Free if Coin B too" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -652,7 +652,7 @@ WRITE_LINE_MEMBER(raiden_ms_state::vblank_irq)
 
 void raiden_ms_state::raidenm(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	V30(config, m_maincpu, 20_MHz_XTAL / 2); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::raidenm_map);
 
@@ -662,7 +662,7 @@ void raiden_ms_state::raidenm(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::audio_map);
 
-	/* video hardware */
+	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
@@ -679,7 +679,7 @@ void raiden_ms_state::raidenm(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_ym1, XTAL(4'000'000)/4); // unknown clock
 	m_ym1->add_route(0, "mono", 0.15);
@@ -739,7 +739,7 @@ ROM_START( raidenm )
 	ROM_LOAD( "msraid_1-5_rd101.ic12",  0x00000, 0x10000, CRC(2b76e371) SHA1(4c9732950f576e498d02fde485ba92fb293d5594) )
 
 	// dumper's note: ROMs [rd4b1, rd4b2, rb4b3, rd4b4] and [rd4a1, rd4a2, rb4a3, rd4a4] have a strange setup
-	// with pins 32, 31 and 31 soldered together and pin 2 connected between all four chips, while the sockets are for 28 pin chips
+	// with pins 32, 31 and 30 soldered together and pin 2 connected between all four chips, while the sockets are for 28 pin chips
 	// (with 27C512 silkscreened on the PCB behind the chips)
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) // on one of the MOD 4/3 boards
 	ROM_LOAD32_BYTE( "msraid_4-3-1_rd4b1.ic17",  0x00003, 0x20000, CRC(ff35b830) SHA1(fb552b2aa50aed12c3adb6ef9032a438adf6f37f) )
@@ -765,7 +765,7 @@ ROM_START( raidenm )
 	ROM_LOAD32_BYTE( "msraid_51-3_rd503.ic41",   0x00001, 0x20000, CRC(ae4001e9) SHA1(5f21a042cad1807d2ef5e7f4f2cfd86cadc0503b) )
 	ROM_LOAD32_BYTE( "msraid_51-3_rd504.ic40",   0x00000, 0x20000, CRC(0452eb10) SHA1(3b998da404bd7133d12aadcadd57ee21a0cfc226) )
 
-	ROM_REGION( 0x0700, "proms", 0 )    /* PROMs (function unknown) */
+	ROM_REGION( 0x0700, "proms", 0 )    // PROMs (function unknown)
 	ROM_LOAD( "msraid_1-5_110_82s123.ic20",      0x0000, 0x0020, CRC(e26e680a) SHA1(9bbe30e98e952a6113c64e1171330153ddf22ce7) )
 	ROM_LOAD( "msraid_21-1_211_82s129.ic4",      0x0100, 0x0100, CRC(4f8c3e63) SHA1(0aa68fa1de6ca945027366a06752e834bbbc8d09) )
 	ROM_LOAD( "msraid_21-1_p0202_82s129.ic12",   0x0200, 0x0100, CRC(e434128a) SHA1(ef0f6d8daef8b25211095577a182cdf120a272c1) )
