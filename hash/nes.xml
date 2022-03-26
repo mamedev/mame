@@ -86179,6 +86179,25 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+	<software name="mc_g500a" supported="no">
+		<description>Game 500 in 1 (alt)</description>
+		<year>201?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" /> <!-- FIXME: really unemulated mapper 176 submapper 5 -->
+			<feature name="pcb_model" value="HST-162" />
+			<dataarea name="prg" size="33554432">
+				<rom name="game 500-in-1.prg" size="33554432" crc="b50d8fbc" sha1="a782669be175ea235663dd8764f3d24d3a54c2eb" status="baddump" />
+			</dataarea>
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_pg150" supported="partial">
 		<description>Pocket Games 150 in 1</description>
 		<year>2015</year>
@@ -86229,6 +86248,27 @@ that the real dumps might surface -->
 			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="super game 143-in-1 (the best games of nes).prg" size="33554432" crc="4026eed1" sha1="f127498b71dab1ab3196e0967055cb986779dfa9" status="baddump" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Same game set as parent but Rad Racer is replaced with Terra Cresta -->
+	<software name="mc_sg143a" cloneof="mc_sg143" supported="partial">
+		<description>Super Games 143 in 1 (HKMK-143)</description>
+		<year>201?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="33554432">
+				<rom name="super game 143-in-1 (hkmk-143).prg" size="33554432" crc="6a18daff" sha1="54604a69c47d8e740f944fec2069b431d9bad817" status="baddump" />
 			</dataarea>
 			<!-- 256k VRAM on cartridge -->
 			<dataarea name="vram" size="262144">
