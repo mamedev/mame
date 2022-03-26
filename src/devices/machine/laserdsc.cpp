@@ -69,6 +69,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_overclip(0, -1, 0, -1),
 		m_overupdate_rgb32(*this),
 		m_disc(nullptr),
+		m_is_cav_disc(false),
 		m_width(0),
 		m_height(0),
 		m_fps_times_1million(0),
@@ -398,7 +399,9 @@ void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
 
 	// negative values store negative times
 	else
+	{
 		m_attospertrack = -(vsyncperiod / -tracks_per_vsync).as_attoseconds();
+	}
 
 	if (LOG_SLIDER)
 		printf("Slider speed = %d\n", tracks_per_vsync);
@@ -685,6 +688,23 @@ void laserdisc_device::init_disc()
 		err = m_disc->read_metadata(AV_LD_METADATA_TAG, 0, m_vbidata);
 		if (err || (m_vbidata.size() != totalhunks * VBI_PACKED_BYTES))
 			throw emu_fatalerror("Precomputed VBI metadata missing or incorrect size");
+
+		m_is_cav_disc = false;
+		vbi_metadata vbidata_even = { 0 };
+		vbi_metadata_unpack(&vbidata_even, nullptr, &m_vbidata[m_chdtracks * VBI_PACKED_BYTES]);
+		if ((vbidata_even.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+		{
+			m_is_cav_disc = true;
+		}
+		else
+		{
+			vbi_metadata vbidata_odd = { 0 };
+			vbi_metadata_unpack(&vbidata_odd, nullptr, &m_vbidata[(m_chdtracks + 1) * VBI_PACKED_BYTES]);
+			if ((vbidata_odd.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+			{
+				m_is_cav_disc = true;
+			}
+		}
 	}
 	m_maxtrack = std::max(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
 }
