@@ -158,7 +158,7 @@ protected:
 	};
 
 	// common laserdisc states
-	enum player_state
+	enum player_state : uint32_t
 	{
 		LDSTATE_NONE,                           // unspecified state
 		LDSTATE_EJECTING,                       // in the process of ejecting
@@ -190,7 +190,7 @@ protected:
 	};
 
 	// slider position
-	enum slider_position
+	enum slider_position : uint32_t
 	{
 		SLIDER_MINIMUM,                         // at the minimum value
 		SLIDER_VIRTUAL_LEADIN,                  // within the virtual lead-in area
@@ -204,8 +204,8 @@ protected:
 	struct player_state_info
 	{
 		player_state    m_state;                // current state
-		int32_t           m_substate;             // internal sub-state; starts at 0 on any state change
-		int32_t           m_param;                // parameter for current state
+		int32_t         m_substate;             // internal sub-state; starts at 0 on any state change
+		int32_t         m_param;                // parameter for current state
 		attotime        m_endtime;              // minimum ending time for current state
 	};
 

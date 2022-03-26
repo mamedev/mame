@@ -10,7 +10,6 @@ LaserDisc and artwork hookup by Ryan Holtz
 TODO:
 - Unemulated Sony LDP-1450 player, and Pioneer LD-V4200 is HLE; needs a dump of the BIOSes and
   proper hook-up.
-- Unknown how the bill validator is hooked up.
 
 ==================================================================================================
 
@@ -223,7 +222,7 @@ static INPUT_PORTS_START( timetrv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BILL1 )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -354,5 +353,5 @@ ROM_END
 
 
 
-GAMEL( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_IMPERFECT_SOUND, layout_timetrv )
-GAMEL( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND, layout_timetrv ) // Different frame indices; Europe?
+GAMEL( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_timetrv )
+GAMEL( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND, layout_timetrv ) // Different frame indices; Europe?
