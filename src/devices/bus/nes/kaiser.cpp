@@ -723,7 +723,7 @@ uint8_t nes_ks7017_device::read_ex(offs_t offset)
 		return temp;
 	}
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 /*-------------------------------------------------
