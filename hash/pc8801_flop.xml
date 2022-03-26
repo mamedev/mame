@@ -22627,10 +22627,12 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="metalora">
-		<description>Metal Orange</description>
+	<!-- Has [uPD3301] layer masking bugs (logo, OP title, gameplay bottom area) -->
+	<!-- Corrupted GFX layer on main menu, is the dump right? (bug not present in metaloraa set) -->
+	<software name="metalora" supported="partial">
+		<description>Cyber Block Metal Orange</description>
 		<year>1990</year>
-		<publisher>Custom</publisher>
+		<publisher>Cybertech Custom</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199012xx"/>
 		<info name="alt_title" value="サイバーブロック メタルオレンジ"/>
@@ -22666,10 +22668,11 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="metaloraa" cloneof="metalora">
-		<description>Metal Orange (alt)</description>
+	<!-- Has [uPD3301] layer masking bugs (logo, OP title, gameplay) -->
+	<software name="metaloraa" cloneof="metalora" supported="partial">
+		<description>Cyber Block Metal Orange (alt)</description>
 		<year>1990</year>
-		<publisher>Custom</publisher>
+		<publisher>Cybertech Custom</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199012xx"/>
 		<info name="alt_title" value="サイバーブロック メタルオレンジ"/>
