@@ -796,9 +796,9 @@ GAME( 1989, b85clbpm,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_dec
 
 
 // PROJECT NUMBER 5116  HI LO SILVER DX  GAME No 39-350-049 -   27-FEB-1987 10:49:08
-GAME( 1987, b85hilo,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi Lo Silver (System 85, set 1)", MACHINE_FLAGS )
+GAME( 1987, b85hilo,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi-Lo Silver (System 85, set 1)", MACHINE_FLAGS )
 // PROJECT NUMBER 5407  HI LO SILVER 2P  GAME No 39-350-142 -   12-OCT-1988 09:39:26
-GAME( 1988, b85hiloa,   b85hilo,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi Lo Silver (System 85, set 2)", MACHINE_FLAGS )
+GAME( 1988, b85hiloa,   b85hilo,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi-Lo Silver (System 85, set 2)", MACHINE_FLAGS )
 
 
 // PROJECT NUMBER 5104  THE RITZ 10P PLAY  GAME No 39-350-084 -   28-AUG-1987 08:44:30
