@@ -3583,6 +3583,7 @@ void z80_device::execute_run()
 
 		// check for interrupts before each instruction
 		check_interrupts();
+		T(m_icount_executing);
 
 		m_after_ei = false;
 		m_after_ldair = false;
