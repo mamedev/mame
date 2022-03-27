@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "includes/pc8001.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -32,25 +33,25 @@
 #define I8214_TAG       "i8214"
 #define UPD1990A_TAG    "upd1990a"
 
-class pc8801_state : public driver_device
+class pc8801_state : public pc8001_base_state
 {
 public:
 	pc8801_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+		: pc8001_base_state(mconfig, type, tag)
+//		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_pc80s31(*this, "pc80s31")
 		, m_pic(*this, I8214_TAG)
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_usart(*this, "usart")
-		, m_cassette(*this, "cassette")
+//		, m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
 		, m_lspeaker(*this, "lspeaker")
 		, m_rspeaker(*this, "rspeaker")
 		, m_palette(*this, "palette")
 		, m_n80rom(*this, "n80rom")
 		, m_n88rom(*this, "n88rom")
-		, m_cg_rom(*this, "cgrom")
+//		, m_cg_rom(*this, "cgrom")
 		, m_kanji_rom(*this, "kanji")
 		, m_kanji_lv2_rom(*this, "kanji_lv2")
 	{ }
@@ -74,20 +75,20 @@ protected:
 	virtual bool cdbios_rom_enable();
 	virtual void main_io(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+//	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<pc80s31_device> m_pc80s31;
 	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_usart;
-	required_device<cassette_image_device> m_cassette;
+//	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_n80rom;
 	required_region_ptr<u8> m_n88rom;
-	required_region_ptr<u8> m_cg_rom;
+//	required_region_ptr<u8> m_cg_rom;
 	required_region_ptr<u8> m_kanji_rom;
 	required_region_ptr<u8> m_kanji_lv2_rom;
 
@@ -106,41 +107,42 @@ protected:
 private:
 	void main_map(address_map &map);
 
+/*
 	struct crtc_t
 	{
 		uint8_t cmd,param_count,cursor_on,status,irq_mask;
 		uint8_t param[8][5];
 		uint8_t inverse;
-	};
+	};*/
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
 	std::unique_ptr<uint8_t[]> m_gvram;
 
-	uint8_t m_i8255_0_pc;
-	uint8_t m_i8255_1_pc;
-	uint8_t m_fdc_irq_opcode;
+//	uint8_t m_i8255_0_pc;
+//	uint8_t m_i8255_1_pc;
+//	uint8_t m_fdc_irq_opcode;
 	uint8_t m_ext_rom_bank;
 	uint8_t m_vram_sel;
 	uint8_t m_misc_ctrl;
 	uint8_t m_device_ctrl_data;
 	uint8_t m_window_offset_bank;
 	uint8_t m_layer_mask;
-	uint16_t m_dma_counter[4];
-	uint16_t m_dma_address[4];
+//	uint16_t m_dma_counter[4];
+//	uint16_t m_dma_address[4];
 	uint8_t m_alu_reg[3];
 	uint8_t m_dmac_mode;
 	uint8_t m_alu_ctrl1;
 	uint8_t m_alu_ctrl2;
 	uint8_t m_extram_mode;
 	uint8_t m_extram_bank;
-	uint8_t m_txt_width;
-	uint8_t m_txt_color;
+//	uint8_t m_txt_width;
+//	uint8_t m_txt_color;
 
-	crtc_t m_crtc;
+//	crtc_t m_crtc;
 	struct { uint8_t r, g, b; } m_palram[8];
-	uint8_t m_dmac_ff;
+//	uint8_t m_dmac_ff;
 	uint32_t m_knj_addr[2];
 	uint32_t m_extram_size;
 
@@ -158,7 +160,7 @@ private:
 	void high_wram_w(offs_t offset, uint8_t data);
 	uint8_t ext_rom_bank_r();
 	void ext_rom_bank_w(uint8_t data);
-	void port30_w(uint8_t data);
+//	void port30_w(uint8_t data);
 	void port31_w(uint8_t data);
 	uint8_t port40_r();
 	void port40_w(uint8_t data);
@@ -174,14 +176,14 @@ private:
 	void bgpal_w(uint8_t data);
 	void palram_w(offs_t offset, uint8_t data);
 	void layer_masking_w(uint8_t data);
-	uint8_t crtc_param_r();
-	void crtc_param_w(uint8_t data);
-	uint8_t crtc_status_r();
-	void crtc_cmd_w(uint8_t data);
-	uint8_t dmac_r(offs_t offset);
-	void dmac_w(offs_t offset, uint8_t data);
-	uint8_t dmac_status_r();
-	void dmac_mode_w(uint8_t data);
+//	uint8_t crtc_param_r();
+//	void crtc_param_w(uint8_t data);
+//	uint8_t crtc_status_r();
+//	void crtc_cmd_w(uint8_t data);
+//	uint8_t dmac_r(offs_t offset);
+//	void dmac_w(offs_t offset, uint8_t data);
+//	uint8_t dmac_status_r();
+//	void dmac_mode_w(uint8_t data);
 	uint8_t extram_mode_r();
 	void extram_mode_w(uint8_t data);
 	uint8_t extram_bank_r();
@@ -199,22 +201,23 @@ private:
 //	uint8_t opna_r(offs_t offset);
 //	void opna_w(offs_t offset, uint8_t data);
 
-	uint8_t pixel_clock(void);
-	void dynamic_res_change(void);
-	void draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	uint8_t calc_cursor_pos(int x,int y,int yi);
-	uint8_t extract_text_attribute(uint32_t address,int x, uint8_t width, uint8_t &non_special);
-	void draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,
-							uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special);
-	void draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width);
+//	uint8_t pixel_clock(void);
+//	void dynamic_res_change(void);
+	void draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	void draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+//	uint8_t calc_cursor_pos(int x,int y,int yi);
+//	uint8_t extract_text_attribute(uint32_t address,int x, uint8_t width, uint8_t &non_special);
+//	void draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,
+//							uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special);
+//	void draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void palette_reset();
+	bitmap_rgb32 m_text_bitmap;
 
 	DECLARE_MACHINE_RESET(pc8801_dic);
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
-	INTERRUPT_GEN_MEMBER(vrtc_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(vrtc_irq_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_irq_w);
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);

@@ -194,7 +194,170 @@
 #define PIXEL_CLOCK_15KHz (PC8801FH_OSC1 / 2)
 #define PIXEL_CLOCK_24KHz XTAL(21'477'272)  // should be (PC8801FH_OSC2 / 2)?
 
+void pc8801_state::video_start()
+{
+	// TODO: verify max possible 3301 size
+	m_text_bitmap.allocate(1024, 1024);
+	m_text_bitmap.fill(0);
+}
 
+void pc8801_state::palette_reset()
+{
+	int i;
+
+	// bitmap init
+	for (i = 0; i < 8; i ++)
+	{
+		m_palram[i].b = i & 1 ? 7 : 0;
+		m_palram[i].r = i & 2 ? 7 : 0;
+		m_palram[i].g = i & 4 ? 7 : 0;
+		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	}
+}
+
+void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect)
+{
+	uint32_t count = 0;
+
+	uint16_t y_double = 1;//pixel_clock();
+	uint16_t y_size = (y_double+1) * 200;
+
+	for(int y = 0; y < y_size; y+=(y_double + 1))
+	{
+		for(int x = 0; x < 640; x+=8)
+		{
+			for(int xi = 0; xi < 8; xi++)
+			{
+				int pen = 0;
+
+				/* note: layer masking doesn't occur in 3bpp mode, Bug Attack relies on this */
+				pen |= ((m_gvram[count+0x0000] >> (7-xi)) & 1) << 0;
+				pen |= ((m_gvram[count+0x4000] >> (7-xi)) & 1) << 1;
+				pen |= ((m_gvram[count+0x8000] >> (7-xi)) & 1) << 2;
+
+				if(y_double)
+				{
+					if(cliprect.contains(x+xi, y+0))
+						bitmap.pix(y+0, x+xi) = m_palette->pen(pen & 7);
+
+					// TODO: real HW seems to actually just output to either even or odd line when in 3bpp mode
+					// investigate which is right
+					if(cliprect.contains(x+xi, y+1))
+						bitmap.pix(y+1, x+xi) = m_palette->pen(pen & 7);
+				}
+				else
+				{
+					if(cliprect.contains(x+xi, y+0))
+						bitmap.pix(y, x+xi) = m_palette->pen(pen & 7);
+				}
+			}
+
+			count++;
+		}
+	}
+}
+
+void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect)
+{
+	// TODO: jettermi really masks the color attribute from 3301
+	// (we currently draw it in b&w, should be colorized)
+	uint32_t count = 0;
+	uint8_t color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
+	uint8_t is_cursor = 0;
+
+	for(int y = 0; y < 200; y++)
+	{
+		for(int x = 0; x < 640; x+=8)
+		{
+//          if(!(m_gfx_ctrl & 1))
+//              is_cursor = calc_cursor_pos(x / 8, y / lines_per_char, y & (lines_per_char-1));
+
+			for(int xi = 0; xi < 8; xi++)
+			{
+				int pen = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
+				if(is_cursor)
+					pen^=1;
+
+				if((m_gfx_ctrl & 1))
+				{
+					if(cliprect.contains(x+xi, y*2+0))
+						bitmap.pix(y*2+0, x+xi) = m_palette->pen(pen ? color : 0);
+
+					if(cliprect.contains(x+xi, y*2+1))
+						bitmap.pix(y*2+1, x+xi) = m_palette->pen(pen ? color : 0);
+				}
+				else
+				{
+					if(cliprect.contains(x+xi, y))
+						bitmap.pix(y, x+xi) = m_palette->pen(pen ? color : 0);
+				}
+			}
+
+			count++;
+		}
+	}
+
+	if(!(m_gfx_ctrl & 1)) // 400 lines
+	{
+		count = 0;
+
+		for(int y = 200; y < 400; y++)
+		{
+			for(int x = 0; x < 640; x+=8)
+			{
+				//if(!(m_gfx_ctrl & 1))
+				//  is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
+
+				for(int xi = 0; xi < 8; xi++)
+				{
+					int pen = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
+					if(is_cursor)
+						pen^=1;
+
+					if(cliprect.contains(x+xi, y))
+						bitmap.pix(y, x+xi) = m_palette->pen(pen ? 7 : 0);
+				}
+
+				count++;
+			}
+		}
+	}
+}
+
+uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->pen(0), cliprect);
+	m_text_bitmap.fill(m_crtc_palette->pen(0), cliprect);
+
+//  popmessage("%04x %04x %02x",m_dma_address[2],m_dma_counter[2],m_dmac_mode);
+
+	if(m_gfx_ctrl & 8)
+	{
+		if(m_gfx_ctrl & 0x10)
+			draw_bitmap_3bpp(bitmap,cliprect);
+		else
+			draw_bitmap_1bpp(bitmap,cliprect);
+	}
+
+	if(!(m_layer_mask & 1))
+		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
+	copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, m_crtc_palette->pen(0));
+
+#if 0
+	//popmessage("%02x %02x %02x %02x %02x",m_layer_mask,m_dmac_mode,m_crtc.status,m_crtc.irq_mask,m_gfx_ctrl);
+
+	if(!(m_layer_mask & 1) && m_dmac_mode & 4 && m_crtc.status & 0x10 && m_crtc.irq_mask == 3)
+	{
+		//popmessage("%02x %02x",m_crtc.param[0][0],m_crtc.param[0][4]);
+
+		draw_text(bitmap,screen_height,m_txt_width);
+	}
+#endif
+
+	return 0;
+}
+
+#if 0
 /*
 CRTC command params:
 0. CRTC reset
@@ -233,134 +396,11 @@ CRTC command params:
 // TODO: not the right condition
 //#define monitor_24KHz ((m_gfx_ctrl & 0x19) == 0x08)
 
-void pc8801_state::video_start()
-{
-}
 
-void pc8801_state::palette_reset()
-{
-	int i;
 
-	for (i = 0; i < 8; i ++)
-	{
-		m_palram[i].b = i & 1 ? 7 : 0;
-		m_palram[i].r = i & 2 ? 7 : 0;
-		m_palram[i].g = i & 4 ? 7 : 0;
-	}
 
-	// text + bitmap
-	for(i = 0; i < 0x10; i++)
-		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-}
 
-void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
-{
-	uint32_t count = 0;
 
-	uint16_t y_double = pixel_clock();
-	uint16_t y_size = (y_double+1) * 200;
-
-	for(int y = 0; y < y_size; y+=(y_double + 1))
-	{
-		for(int x = 0; x < 640; x+=8)
-		{
-			for(int xi = 0; xi < 8; xi++)
-			{
-				int pen = 0;
-
-				/* note: layer masking doesn't occur in 3bpp mode, Bug Attack relies on this */
-				pen |= ((m_gvram[count+0x0000] >> (7-xi)) & 1) << 0;
-				pen |= ((m_gvram[count+0x4000] >> (7-xi)) & 1) << 1;
-				pen |= ((m_gvram[count+0x8000] >> (7-xi)) & 1) << 2;
-
-				if(y_double)
-				{
-					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix(y+0, x+xi) = m_palette->pen(pen & 7);
-
-					// TODO: real HW seems to actually just output to either even or odd line when in 3bpp mode
-					// investigate which is right
-					if(cliprect.contains(x+xi, y+1))
-						bitmap.pix(y+1, x+xi) = m_palette->pen(pen & 7);
-				}
-				else
-				{
-					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix(y, x+xi) = m_palette->pen(pen & 7);
-				}
-			}
-
-			count++;
-		}
-	}
-}
-
-void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
-{
-	// TODO: jettermi really masks the color attribute from 3301
-	// (we currently draw it in b&w, should be colorized)
-	uint32_t count = 0;
-	uint8_t color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
-	uint8_t is_cursor = 0;
-
-	for(int y = 0; y < 200; y++)
-	{
-		for(int x = 0; x < 640; x+=8)
-		{
-			if(!(m_gfx_ctrl & 1))
-				is_cursor = calc_cursor_pos(x / 8, y / lines_per_char, y & (lines_per_char-1));
-
-			for(int xi = 0; xi < 8; xi++)
-			{
-				int pen = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
-				if(is_cursor)
-					pen^=1;
-
-				if((m_gfx_ctrl & 1))
-				{
-					if(cliprect.contains(x+xi, y*2+0))
-						bitmap.pix(y*2+0, x+xi) = m_palette->pen(pen ? color : 0);
-
-					if(cliprect.contains(x+xi, y*2+1))
-						bitmap.pix(y*2+1, x+xi) = m_palette->pen(pen ? color : 0);
-				}
-				else
-				{
-					if(cliprect.contains(x+xi, y))
-						bitmap.pix(y, x+xi) = m_palette->pen(pen ? color : 0);
-				}
-			}
-
-			count++;
-		}
-	}
-
-	if(!(m_gfx_ctrl & 1)) // 400 lines
-	{
-		count = 0;
-
-		for(int y = 200; y < 400; y++)
-		{
-			for(int x = 0; x < 640; x+=8)
-			{
-				if(!(m_gfx_ctrl & 1))
-					is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
-
-				for(int xi = 0; xi < 8; xi++)
-				{
-					int pen = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
-					if(is_cursor)
-						pen^=1;
-
-					if(cliprect.contains(x+xi, y))
-						bitmap.pix(y, x+xi) = m_palette->pen(pen ? 7 : 0);
-				}
-
-				count++;
-			}
-		}
-	}
-}
 
 uint8_t pc8801_state::calc_cursor_pos(int x,int y,int yi)
 {
@@ -470,7 +510,7 @@ void pc8801_state::draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gf
 				if(yi >= (1 << (y_double+3)) || secret || blink_mask)
 					char_data = 0;
 				else
-					char_data = (m_cg_rom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
+					char_data = (m_cgrom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
 
 				if(yi == 0 && upper)
 					char_data = 1;
@@ -556,32 +596,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
 		}
 	}
 }
-
-uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->pen(0), cliprect);
-
-//  popmessage("%04x %04x %02x",m_dma_address[2],m_dma_counter[2],m_dmac_mode);
-
-	if(m_gfx_ctrl & 8)
-	{
-		if(m_gfx_ctrl & 0x10)
-			draw_bitmap_3bpp(bitmap,cliprect);
-		else
-			draw_bitmap_1bpp(bitmap,cliprect);
-	}
-
-	//popmessage("%02x %02x %02x %02x %02x",m_layer_mask,m_dmac_mode,m_crtc.status,m_crtc.irq_mask,m_gfx_ctrl);
-
-	if(!(m_layer_mask & 1) && m_dmac_mode & 4 && m_crtc.status & 0x10 && m_crtc.irq_mask == 3)
-	{
-		//popmessage("%02x %02x",m_crtc.param[0][0],m_crtc.param[0][4]);
-
-		draw_text(bitmap,screen_height,m_txt_width);
-	}
-
-	return 0;
-}
+#endif
 
 uint8_t pc8801_state::alu_r(offs_t offset)
 {
@@ -881,6 +896,7 @@ void pc8801_state::ext_rom_bank_w(uint8_t data)
 	m_ext_rom_bank = data;
 }
 
+#if 0
 uint8_t pc8801_state::pixel_clock(void)
 {
 	// TODO: pinpoint exact condition
@@ -914,24 +930,10 @@ void pc8801_state::dynamic_res_change(void)
 
 	m_screen->configure(xsize, ysize, visarea, refresh);
 }
+#endif
 
-/*
- * I/O Port $30 (w/o) "System Control Port (1)"
- * N88-BASIC buffer port $e6c0
- *
- * Virtually same as the correlated PC-8001 port
- *
- * --xx ---- BS2, BS1: USART channel control
- * --00 ----           CMT 600 bps
- * --01 ----           CMT 1200 bps
- * --10 ----           RS-232C async mode
- * --11 ----           RS-232C sync mode
- * ---- x--- MTON: CMT motor control (active high)
- * ---- -x-- CDS: CMT carrier control (1) mark (0) space
- * ---- --x- /COLOR: CRT display mode control (1) color mode (0) monochrome
- * ---- ---x /40: CRT display format control (1) 80 chars per line (0) 40 chars
- *
- */
+// inherited from pc8001.cpp
+#if 0
 void pc8801_state::port30_w(uint8_t data)
 {
 	m_txt_width = data & 1;
@@ -939,6 +941,7 @@ void pc8801_state::port30_w(uint8_t data)
 
 	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
+#endif
 
 /*
  * I/O Port $31 (w/o) "System Control Port (2)"
@@ -958,7 +961,8 @@ void pc8801_state::port31_w(uint8_t data)
 {
 	m_gfx_ctrl = data;
 
-	dynamic_res_change();
+	set_screen_frequency((data & 0x11) != 0x11);
+//  dynamic_res_change();
 }
 
 /*
@@ -976,7 +980,16 @@ void pc8801_state::port31_w(uint8_t data)
  */
 uint8_t pc8801_state::port40_r()
 {
-	return ioport("CTRL")->read();
+	uint8_t data = 0x00;
+
+	data |= ioport("CTRL")->read() & 0x2f;
+	data |= m_rtc->data_out_r() << 4;
+	data |= m_crtc->vrtc_r() << 5;
+	// TODO: enable line from pc80s31k (bit 3, active_low)
+
+	return data;
+
+//  return ioport("CTRL")->read();
 }
 
 inline attotime pc8801_state::mouse_limit_hz()
@@ -1193,6 +1206,7 @@ void pc8801_state::layer_masking_w(uint8_t data)
 	m_layer_mask = data;
 }
 
+#if 0
 uint8_t pc8801_state::crtc_param_r()
 {
 	logerror("CRTC param reading\n");
@@ -1320,6 +1334,7 @@ void pc8801_state::dmac_mode_w(uint8_t data)
 	//if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80 && data != 0x00)
 	//  logerror("%02x DMAC mode\n",data);
 }
+#endif
 
 uint8_t pc8801_state::extram_mode_r()
 {
@@ -1549,8 +1564,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
 //  map(0x44, 0x47).rw internal OPN/OPNA sound card for 8801mkIISR and beyond
 //  uPD3301
-	map(0x50, 0x50).rw(FUNC(pc8801_state::crtc_param_r), FUNC(pc8801_state::crtc_param_w));
-	map(0x51, 0x51).rw(FUNC(pc8801_state::crtc_status_r), FUNC(pc8801_state::crtc_cmd_w));
+	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 
 	map(0x52, 0x52).w(FUNC(pc8801_state::bgpal_w));
 	map(0x53, 0x53).w(FUNC(pc8801_state::layer_masking_w));
@@ -1558,8 +1572,7 @@ void pc8801_state::main_io(address_map &map)
 	map(0x5c, 0x5c).r(FUNC(pc8801_state::vram_select_r));
 	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
 //  i8257
-	map(0x60, 0x67).rw(FUNC(pc8801_state::dmac_r), FUNC(pc8801_state::dmac_w));
-	map(0x68, 0x68).rw(FUNC(pc8801_state::dmac_status_r), FUNC(pc8801_state::dmac_mode_w));
+	map(0x60, 0x68).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 
 //  map(0x6e, 0x6f) clock settings (8801FH and later)
 	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
@@ -1577,7 +1590,7 @@ void pc8801_state::main_io(address_map &map)
 //  map(0xc4, 0xc7) PC-8801-10 Music interface board (MIDI), GSX-8800 PIT?
 //  map(0xc8, 0xc8) RS-232C ch. 1 "prohibited gate" (?)
 //  map(0xca, 0xca) RS-232C ch. 2 "prohibited gate" (?)
-//	map(0xc8, 0xcd) JMB-X1 OPM / SSG chips
+//  map(0xc8, 0xcd) JMB-X1 OPM / SSG chips
 //  map(0xd0, 0xdf) GP-IB
 //  map(0xd3, 0xd4) PC-8801-10 Music interface board (MIDI)
 //  map(0xdc, 0xdf) PC-8801-12 MODEM (built-in for mkIITR)
@@ -1635,6 +1648,7 @@ void pc8801fh_state::opna_map(address_map &map)
 
 /* Input Ports */
 
+// TODO: move to a pc8801_keyboard_device, merge with pc8001.cpp implementation
 /* 2008-05 FP:
 Small note about the strange default mapping of function keys:
 the top line of keys in PC8801 keyboard is as follows
@@ -1997,9 +2011,9 @@ void pc8801_state::machine_reset()
 
 	m_mouse.phase = 0;
 
-	{
-		m_txt_color = 2;
-	}
+//  {
+//      m_txt_color = 2;
+//  }
 
 	{
 		int i;
@@ -2008,11 +2022,11 @@ void pc8801_state::machine_reset()
 			m_alu_reg[i] = 0x00;
 	}
 
-	{
-		m_crtc.param_count = 0;
-		m_crtc.cmd = 0;
-		m_crtc.status = 0;
-	}
+//  {
+//      m_crtc.param_count = 0;
+//      m_crtc.cmd = 0;
+//      m_crtc.status = 0;
+//  }
 
 	m_beeper->set_state(0);
 
@@ -2030,9 +2044,9 @@ void pc8801_state::machine_reset()
 		m_sound_irq_pending = false;
 	}
 
-	{
-		m_dma_address[2] = 0xf300;
-	}
+//  {
+//      m_dma_address[2] = 0xf300;
+//  }
 
 	{
 		m_extram_bank = 0;
@@ -2073,7 +2087,7 @@ void pc8801mc_state::machine_reset()
 	m_cdrom_bank = true;
 }
 
-// TODO: to joyport option slot
+// TODO: to joyport DB9 option slot
 uint8_t pc8801mk2sr_state::opn_porta_r()
 {
 	if(ioport("BOARD_CONFIG")->read() & 2)
@@ -2120,6 +2134,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 	// TODO: schematics sports a μPB8212 too, with DI2-DI4 connected to 8214 A0-A2
 	// Seems just an intermediate bridge for translating raw levels to vectors
 	// with no access from outside world?
+	// TODO: acknowledge should probably be handled from i8214 int_wr_callback state = 0
 	u8 level = m_pic->a_r();
 //  printf("%d\n", level);
 	m_pic->r_w(level, 1);
@@ -2138,7 +2153,8 @@ WRITE_LINE_MEMBER(pc8801_state::int4_irq_w)
 	m_sound_irq_pending = state;
 }
 
-// FIXME: convert following two to pure WRITE_LINE_MEMBERs
+// FIXME: convert to pure WRITE_LINE_MEMBER
+// Works with 0 -> 1 F/F transitions
 TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 {
 	// TODO: castlex sound notes in BGM loop are pretty erratic
@@ -2149,10 +2165,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 		m_timer_irq_pending = true;
 }
 
-INTERRUPT_GEN_MEMBER(pc8801_state::vrtc_irq_w)
+WRITE_LINE_MEMBER(pc8801_state::vrtc_irq_w)
 {
+//  bool irq_state = m_vrtc_irq_enable & state;
+
 	if (m_vrtc_irq_enable)
+	{
+		//machine().debug_break();
 		m_pic->r_w(7 ^ 1, 0);
+	}
+//  printf("%d %d\n", m_vrtc_irq_enable, state);
 }
 
 WRITE_LINE_MEMBER(pc8801_state::irq_w)
@@ -2164,11 +2186,10 @@ WRITE_LINE_MEMBER(pc8801_state::irq_w)
 
 void pc8801_state::pc8801(machine_config &config)
 {
-	/* main CPU */
-	Z80(config, m_maincpu, MASTER_CLOCK);        /* 4 MHz */
+	Z80(config, m_maincpu, MASTER_CLOCK); // ~4 MHz, selectable to ~8 MHz on late models
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8801_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8801_state::main_io);
-	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::vrtc_irq_w));
+//  m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::vrtc_irq_w));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
@@ -2198,14 +2219,28 @@ void pc8801_state::pc8801(machine_config &config)
 	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
 	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
 
-	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
 	m_screen->set_screen_update(FUNC(pc8801_state::screen_update));
-	m_screen->set_palette(m_palette);
+//  m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
-	PALETTE(config, m_palette, palette_device::BLACK, 0x10);
+	PALETTE(config, m_palette, palette_device::BLACK, 0x8);
+	PALETTE(config, m_crtc_palette, palette_device::BRG_3BIT);
+
+	UPD3301(config, m_crtc, PIXEL_CLOCK_24KHz);
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(pc8801_state::draw_text));
+	m_crtc->set_attribute_fetch_callback(FUNC(pc8801_state::attr_fetch));
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	m_crtc->rvv_wr_callback().set(FUNC(pc8801_state::crtc_reverse_w));
+	m_crtc->int_wr_callback().set(FUNC(pc8801_state::vrtc_irq_w));
+	m_crtc->set_screen(m_screen);
+
+	I8257(config, m_dma, MASTER_CLOCK);
+	m_dma->out_hrq_cb().set(FUNC(pc8801_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(pc8801_state::dma_mem_r));
+	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));
 
