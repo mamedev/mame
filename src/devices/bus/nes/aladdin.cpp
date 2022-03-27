@@ -245,7 +245,7 @@ void nes_algq_rom_device::write_prg(uint32_t offset, uint8_t data)
 	// m_hibank = 3rd page inside the block
 	if (offset < 0x4000)
 	{
-		m_bank_base = ((data >> 3) & 3) << 2;
+		m_bank_base = (data & 0x18) >> 1;
 		m_lobank = m_bank_base | (m_lobank & 3);
 		m_hibank = m_bank_base | 3;
 	}

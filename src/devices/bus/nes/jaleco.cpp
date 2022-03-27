@@ -513,9 +513,9 @@ void nes_ss88006_device::ss88006_write(offs_t offset, uint8_t data)
 		case 0x3000: case 0x3001: case 0x3002: case 0x3003:
 		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
 		case 0x5000: case 0x5001: case 0x5002: case 0x5003:
-			bank = ((offset & 0x7000) - 0x2000) / 0x0800 + ((offset & 0x0002) >> 1);
+			bank = 2 * (BIT(offset, 12, 3) - 2) + BIT(offset, 1);
 			if (offset & 0x0001)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f)<< 4);
+				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
 			else
 				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
@@ -575,7 +575,7 @@ void nes_ss88006_adpcm_device::ss88006_adpcm_write(offs_t offset, uint8_t data, 
 			{
 //              printf("sample write: data: %02x\n", data);
 				if ((m_latch & 2) && !(data & 2))
-					dev.start((data >> 2) & 0x1f, (data >> 2) & 0x1f);
+					dev.start(BIT(data, 2, 5), BIT(data, 2, 5));
 			}
 			m_latch = data;
 			break;

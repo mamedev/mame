@@ -154,7 +154,8 @@ void nes_nina006_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("nina-006 write_l, offset: %04x, data: %02x\n", offset, data));
 
-	if (!(offset & 0x0100))
+	offset += 0x100;
+	if (BIT(offset, 8)) // $41xx, $43xx, ... $5fxx
 	{
 		prg32(data >> 3);
 		chr8(data & 7, CHRROM);

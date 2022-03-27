@@ -1019,7 +1019,7 @@ void nes_btl_dn_device::write_h(offs_t offset, uint8_t data)
 		case 0x5002:
 		case 0x6000:
 		case 0x6002:
-			bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0002) >> 1);
+			bank = 2 * (BIT(offset, 12, 3) - 3) + BIT(offset, 1);
 			chr1_x(bank, data, CHRROM);
 			break;
 		case 0x7000:
