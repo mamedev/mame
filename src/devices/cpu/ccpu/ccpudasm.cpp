@@ -343,5 +343,5 @@ offs_t ccpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			break;
 	}
 
-	return (pc - startpc) | SUPPORTED;
+	return (pc - startpc) | flags | SUPPORTED;
 }
