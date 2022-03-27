@@ -2509,32 +2509,46 @@ inline void i386_device::dri_changed()
 				{
 					logerror("i386: Unknown breakpoint length value\n");
 				}
-				else if(breakpoint_type == 1) m_dr_breakpoints[dr] = m_program->install_write_tap(phys_addr, phys_addr + 3, "i386_debug_write_breakpoint",
-				[&, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+				else if(breakpoint_type == 1)
 				{
-					if(true_mask & mem_mask)
-					{
-						m_dr[6] |= 1 << dr;
-						i386_trap(1,1,0);
-					}
-				}, &m_dr_breakpoints[dr]);
-				else if(breakpoint_type == 3) m_dr_breakpoints[dr] = m_program->install_readwrite_tap(phys_addr, phys_addr + 3, "i386_debug_readwrite_breakpoint",
-				[this, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+					m_dr_breakpoints[dr] = m_program->install_write_tap(
+							phys_addr,
+							phys_addr + 3,
+							"i386_debug_write_breakpoint",
+							[this, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+							{
+								if(true_mask & mem_mask)
+								{
+									m_dr[6] |= 1 << dr;
+									i386_trap(1,1,0);
+								}
+							},
+							&m_dr_breakpoints[dr]);
+				}
+				else if(breakpoint_type == 3)
 				{
-					if(true_mask & mem_mask)
-					{
-						m_dr[6] |= 1 << dr;
-						i386_trap(1,1,0);
-					}
-				},
-				[this, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
-				{
-					if(true_mask & mem_mask)
-					{
-						m_dr[6] |= 1 << dr;
-						i386_trap(1,1,0);
-					}
-				}, &m_dr_breakpoints[dr]);
+					m_dr_breakpoints[dr] = m_program->install_readwrite_tap(
+							phys_addr,
+							phys_addr + 3,
+							"i386_debug_readwrite_breakpoint",
+							[this, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+							{
+								if(true_mask & mem_mask)
+								{
+									m_dr[6] |= 1 << dr;
+									i386_trap(1,1,0);
+								}
+							},
+							[this, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+							{
+								if(true_mask & mem_mask)
+								{
+									m_dr[6] |= 1 << dr;
+									i386_trap(1,1,0);
+								}
+							},
+							&m_dr_breakpoints[dr]);
+				}
 			}
 		}
 	}
