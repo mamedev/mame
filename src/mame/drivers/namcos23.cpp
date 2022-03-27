@@ -32,7 +32,7 @@
 
     - Add the sh2 in Gunmen Wars (no ROM, controls the camera)
 
-    - Super System 23 tests irqs in the post.  timecrs2v4a's code can
+    - Super System 23 tests irqs in the post.  timecrs2wa's code can
     potentially test 7 sources, but only actually test 5.  With each
     source there is code to clear the interrupt and code to raise it.
     Levels 0 and 1 are not connected to anything according to the code.
@@ -69,11 +69,11 @@
                a6400006.h = fffb
                a6400006.h = 0
 
-      RS232  (level 6, not tested by timecrs2v4a):
+      RS232  (level 6, not tested by timecrs2wa):
         clear: nothing
         raise: nothing
 
-      Timer  (level 7, not tested by timecrs2v4a):
+      Timer  (level 7, not tested by timecrs2wa):
         clear: c0.Compare = 10d880
         raise: c0.Count   = 10c8e0
                c0.Compare = 10d880
@@ -2506,7 +2506,7 @@ WRITE_LINE_MEMBER(namcos23_state::sub_irq)
 uint16_t namcos23_state::c417_r(offs_t offset, uint16_t mem_mask)
 {
 	switch(offset) {
-	/* According to timecrs2v4a, +0 is the status word with bits being:
+	/* According to timecrs2wa, +0 is the status word with bits being:
 	   15: test mode flag (huh?)
 	   10: fifo data ready
 	   9:  cmd ram data ready
