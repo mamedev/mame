@@ -50,9 +50,9 @@ private:
 	required_device<i8035_device>   m_dsercpu; // "deserializer cpu"
 	required_device<m6805_hmos_device> m_motcpu; // "motor cpu"
 
-	volatile int m_data, m_busy;
-	volatile int m_dserdata, m_dserstrobe;
-	volatile int m_motbusy, m_motPenUp, m_motPenDown;
+	int m_data, m_busy;
+	int m_dserdata, m_dserstrobe;
+	int m_motbusy, m_motPenUp, m_motPenDown;
 
 	required_device<alps_dpg1302_plotter_device> m_plotter;
 	required_ioport m_frontbuttons;
