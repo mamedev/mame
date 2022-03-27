@@ -157,43 +157,43 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case 0xe0:
 		util::stream_format(stream, "blt $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe1:
 		util::stream_format(stream, "bgt $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe2:
 		util::stream_format(stream, "bge $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe3:
 		util::stream_format(stream, "ble $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe4:
 		util::stream_format(stream, "bcs $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe5:
 		util::stream_format(stream, "bhi $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe6:
 		util::stream_format(stream, "bcc $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe7:
 		util::stream_format(stream, "bls $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe8:
 		util::stream_format(stream, "beq $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xe9:
 		util::stream_format(stream, "bne $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xea:
 		util::stream_format(stream, "bra $%x", (pc+2+(s8)opcodes.r8(pc+1)) & 0xffffff);
@@ -442,12 +442,12 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 				util::stream_format(stream, "tbz ($%x) %d, $%x", r24(opcodes, pc+3), opcode & 7,
 					(pc+7+(s8)opcodes.r8(pc+6)) & 0xffffff);
-				return 7 | SUPPORTED;
+				return 7 | STEP_COND | SUPPORTED;
 
 			case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 				util::stream_format(stream, "tbnz ($%x) %d, $%x", r24(opcodes, pc+3), opcode & 7,
 					(pc+7+(s8)opcodes.r8(pc+6)) & 0xffffff);
-				return 7 | SUPPORTED;
+				return 7 | STEP_COND | SUPPORTED;
 
 			case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 				util::stream_format(stream, "bset ($%x) %d", r24(opcodes, pc+2), opcode & 7);
@@ -469,7 +469,7 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 				util::stream_format(stream, "tbz (%s, a%d) %d, $%x", i8str(opcodes.r8(pc+3)), 2+((opcode>>3)&1), opcode & 7,
 					(pc+5+(s8)opcodes.r8(pc+4)) & 0xffffff);
-				return 5 | SUPPORTED;
+				return 5 | STEP_COND | SUPPORTED;
 
 			case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 			case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
@@ -480,7 +480,7 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 				util::stream_format(stream, "tbnz (%s, a%d) %d, $%x", i8str(opcodes.r8(pc+3)), 2+((opcode>>3)&1), opcode & 7,
 					(pc+5+(s8)opcodes.r8(pc+4)) & 0xffffff);
-				return 5 | SUPPORTED;
+				return 5 | STEP_COND | SUPPORTED;
 
 			case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 			case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
@@ -723,7 +723,7 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 			util::stream_format(stream, "tbz (%s, a%d) %d, $%x", i8str(opcodes.r8(pc+2)), (opcode>>3)&1, opcode & 7,
 					(pc+4+(s8)opcodes.r8(pc+3)) & 0xffffff);
-			return 4 | SUPPORTED;
+			return 4 | STEP_COND | SUPPORTED;
 
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
@@ -734,7 +734,7 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 			util::stream_format(stream, "tbnz (%s, a%d) %d, $%x", i8str(opcodes.r8(pc+2)), (opcode>>3)&1, opcode & 7,
 					(pc+4+(s8)opcodes.r8(pc+3)) & 0xffffff);
-			return 4 | SUPPORTED;
+			return 4 | STEP_COND | SUPPORTED;
 
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
@@ -744,12 +744,12 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 			util::stream_format(stream, "tbz ($%x) %d, $%x", opcodes.r16(pc+2), opcode & 7,
 					(pc+5+(s8)opcodes.r8(pc+4)) & 0xffffff);
-			return 5 | SUPPORTED;
+			return 5 | STEP_COND | SUPPORTED;
 
 		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 			util::stream_format(stream, "tbnz ($%x) %d, $%x", opcodes.r16(pc+2), opcode & 7,
 					(pc+5+(s8)opcodes.r8(pc+4)) & 0xffffff);
-			return 5 | SUPPORTED;
+			return 5 | STEP_COND | SUPPORTED;
 
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 			util::stream_format(stream, "bset ($%x) %d", opcodes.r16(pc+2), opcode & 7);
@@ -761,59 +761,59 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		case 0xe0:
 			util::stream_format(stream, "bltx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe1:
 			util::stream_format(stream, "bgtx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe2:
 			util::stream_format(stream, "bgex $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe3:
 			util::stream_format(stream, "blex $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe4:
 			util::stream_format(stream, "bcsx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe5:
 			util::stream_format(stream, "bhix $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe6:
 			util::stream_format(stream, "bccx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe7:
 			util::stream_format(stream, "blsx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe8:
 			util::stream_format(stream, "beqx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xe9:
 			util::stream_format(stream, "bnex $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xec:
 			util::stream_format(stream, "bvcx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xed:
 			util::stream_format(stream, "bvsx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xee:
 			util::stream_format(stream, "bncx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xef:
 			util::stream_format(stream, "bnsx $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 		{
@@ -843,19 +843,19 @@ offs_t mn10200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		case 0xfc:
 			util::stream_format(stream, "bvc $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xfd:
 			util::stream_format(stream, "bvs $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xfe:
 			util::stream_format(stream, "bnc $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0xff:
 			util::stream_format(stream, "bns $%x", (pc+3+s8(opcodes.r8(pc+2))) & 0xffffff);
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		default:
 			goto illegal2;

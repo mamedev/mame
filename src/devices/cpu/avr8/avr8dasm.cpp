@@ -161,6 +161,7 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		{
 		case 0x0000:
 			util::stream_format(stream, "CPSE    R%d, R%d", RD5(op), RR5(op));
+			flags = STEP_COND;
 			break;
 		case 0x0400:
 			util::stream_format(stream, "CP      R%d, R%d", RD5(op), RR5(op));
@@ -541,12 +542,14 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			break;
 		case 0x0900:
 			util::stream_format(stream, "SBIC    %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)]);
+			flags = STEP_COND;
 			break;
 		case 0x0a00:
 			util::stream_format(stream, "SBI     %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)]);
 			break;
 		case 0x0b00:
 			util::stream_format(stream, "SBIS    %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)]);
+			flags = STEP_COND;
 			break;
 		case 0x0c00:
 		case 0x0d00:
@@ -603,6 +606,7 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				util::stream_format(stream, "BRIE    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
 				break;
 			}
+			flags = STEP_COND;
 			break;
 		case 0x0400:
 			switch(op & 0x0007)
@@ -632,6 +636,7 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				util::stream_format(stream, "BRID    %08x", (((op & 0x0200) ? (KCONST7(op) | 0xff80) : KCONST7(op)) << 1));
 				break;
 			}
+			flags = STEP_COND;
 			break;
 		case 0x0800:
 			if(op & 0x0200)
@@ -644,6 +649,7 @@ offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				util::stream_format(stream, "SBRS    R%d, %d", RD5(op), RR3(op));
 			else
 				util::stream_format(stream, "SBRC    R%d, %d", RD5(op), RR3(op));
+			flags = STEP_COND;
 			break;
 		}
 		break;

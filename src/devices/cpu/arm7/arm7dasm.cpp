@@ -226,6 +226,8 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		/* BLX(2) */
 		stream << "BLX";
 		dasmflags = STEP_OVER;
+		if (opcode < 0xe0000000)
+			dasmflags |= STEP_COND;
 		WritePadding(stream, start_position);
 		util::stream_format( stream, "R%d",(opcode&0xf));
 	}
@@ -237,6 +239,8 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		util::stream_format( stream, "R%d",(opcode&0xf));
 		if ((opcode & 0x0f) == 14)
 			dasmflags = STEP_OUT;
+		if (opcode < 0xe0000000)
+			dasmflags |= STEP_COND;
 	}
 	else if ((opcode & 0x0ff000f0) == 0x01600010)   // CLZ - v5
 	{
@@ -290,11 +294,11 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 			/* half word data transfer */
 			if (((opcode & 0x60) == 0x40) && !(opcode & 0x100000))  // bit 20 = 0, bits 5&6 = 10 is ARMv5TE LDRD
 			{
-				util::stream_format(stream, "LDRD%s", pConditionCode);
+				stream << "LDRD";
 			}
 			else if (((opcode & 0x60) == 0x60) && !(opcode & 0x100000)) // bit 20 = 0, bits 5&6 = 11 is ARMv5TE STRD
 			{
-				util::stream_format(stream, "STRD%s", pConditionCode);
+				stream << "STRD";
 			}
 			else
 			{
@@ -309,9 +313,8 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 					util::stream_format(stream, "S%c", (opcode & 0x20) ? 'H' : 'B');    //Bit 5 = 1 for Half Word, 0 for Byte
 				else
 					stream << 'H';
-
-				stream << pConditionCode;
 			}
+			stream << pConditionCode;
 
 			WritePadding(stream, start_position);
 
@@ -529,8 +532,13 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 			switch (op) {
 			case 0x02:
 				// check for SUBS PC, LR, #imm
-				if (((opcode >> 12) & 0x0f) == 15 && ((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02100000) == 0x02100000)
-					dasmflags = STEP_OUT;
+				if (((opcode >> 12) & 0x0f) == 15)
+				{
+					if (((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02100000) == 0x02100000)
+						dasmflags = STEP_OUT;
+					if (opcode < 0xe0000000)
+						dasmflags |= STEP_COND;
+				}
 				[[fallthrough]];
 			case 0x04:
 				if (is_adr)
@@ -576,8 +584,13 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 					break;
 				}
 				/* look for mov pc,lr */
-				if (((opcode >> 12) & 0x0f) == 15 && ((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02000000) == 0)
-					dasmflags = STEP_OUT;
+				if (((opcode >> 12) & 0x0f) == 15)
+				{
+					if (((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02000000) == 0)
+						dasmflags = STEP_OUT;
+					if (opcode < 0xe0000000)
+						dasmflags |= STEP_COND;
+				}
 				[[fallthrough]];
 			case 0x0f:
 				WriteDataProcessingOperand(stream, opcode, true, false);
@@ -707,6 +720,8 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 					util::stream_format(stream, "R%d-", last);
 				stream << "R15";
 				dasmflags = STEP_OUT;
+				if (opcode < 0xe0000000)
+					dasmflags |= STEP_COND;
 			}
 		}
 
@@ -732,6 +747,8 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		}
 
 		stream << pConditionCode;
+		if (opcode < 0xe0000000)
+			dasmflags |= STEP_COND;
 
 		WritePadding(stream, start_position);
 
@@ -767,6 +784,8 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		WritePadding(stream, start_position);
 		util::stream_format( stream, "0x%X", opcode&0x00ffffff );
 		dasmflags = STEP_OVER;
+		if (opcode < 0xe0000000)
+			dasmflags |= STEP_COND;
 	}
 	else
 	{
@@ -1330,6 +1349,7 @@ u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t 
 			util::stream_format( stream, "B%s", pConditionCodeTable[( opcode & THUMB_COND_TYPE ) >> THUMB_COND_TYPE_SHIFT]);
 			WritePadding(stream, start_position);
 			util::stream_format( stream, "0x%08X", pc + 4 + (offs << 1));
+			dasmflags = STEP_COND;
 			break;
 		}
 		break;

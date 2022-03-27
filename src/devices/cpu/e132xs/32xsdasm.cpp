@@ -1751,7 +1751,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBV $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1762,7 +1762,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBNV $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1773,7 +1773,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBE $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1784,7 +1784,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBNE $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1795,7 +1795,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBC $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1806,7 +1806,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBNC $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1817,7 +1817,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBSE $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1828,7 +1828,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBHT $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1839,7 +1839,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBN $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1850,7 +1850,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBNN $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1861,7 +1861,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBLE $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1872,7 +1872,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBGT $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1883,7 +1883,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "DBR $%x", rel);
-			flags = STEP_OVER | step_over_extra(1);
+			flags = STEP_COND | step_over_extra(1);
 
 			break;
 		}
@@ -1923,6 +1923,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BV $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -1933,6 +1934,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BNV $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -1943,6 +1945,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BE $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -1953,6 +1956,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BNE $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -1963,6 +1967,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BC $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -1973,6 +1978,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BNC $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -1983,6 +1989,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BSE $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -1993,6 +2000,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BHT $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -2003,6 +2011,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BN $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -2013,6 +2022,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BNN $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -2023,6 +2033,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BLE $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -2033,6 +2044,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			int32_t rel = PCrel_format(op, pc, opcodes) + 2;
 
 			util::stream_format(stream, "BGT $%x", rel);
+			flags = STEP_COND;
 
 			break;
 		}
@@ -2057,67 +2069,67 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			{
 				case TRAPLE:
 					util::stream_format(stream, "TRAPLE %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPGT:
 					util::stream_format(stream, "TRAPGT %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPLT:
 					util::stream_format(stream, "TRAPLT %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPGE:
 					util::stream_format(stream, "TRAPGE %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPSE:
 					util::stream_format(stream, "TRAPSE %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPHT:
 					util::stream_format(stream, "TRAPHT %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPST:
 					util::stream_format(stream, "TRAPST %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPHE:
 					util::stream_format(stream, "TRAPHE %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPE:
 					util::stream_format(stream, "TRAPE %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPNE:
 					util::stream_format(stream, "TRAPNE %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 
 				case TRAPV:
 					util::stream_format(stream, "TRAPV %d", trapno);
-					flags = STEP_OVER;
+					flags = STEP_OVER | STEP_COND;
 
 					break;
 

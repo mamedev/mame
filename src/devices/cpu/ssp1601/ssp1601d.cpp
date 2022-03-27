@@ -243,6 +243,8 @@ offs_t ssp1601_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0x24:
 			util::stream_format(stream, "call %s, %X", get_cond(op), opcodes.r16(pc+1));
 			flags |= STEP_OVER;
+			if (((op >> 4) & 0xf) != 0)
+				flags |= STEP_COND;
 			size = 2;
 			break;
 
@@ -254,6 +256,8 @@ offs_t ssp1601_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		// bra cond, addr
 		case 0x26:
 			util::stream_format(stream, "bra %s, %X", get_cond(op), opcodes.r16(pc+1));
+			if (((op >> 4) & 0xf) != 0)
+				flags |= STEP_COND;
 			size = 2;
 			break;
 

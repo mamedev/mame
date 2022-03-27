@@ -282,7 +282,11 @@ offs_t tms32010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			switch (*cp++)
 			{
 				case 'A': sprintf(num,"%02Xh",a); break; // was $%02X
-				case 'B': sprintf(num,"%04Xh",b); break; // was $%04X
+				case 'B':
+					if (strncmp(cp, "b  ", 3) && strncmp(cp, "cal", 3))
+						flags = STEP_COND;
+					sprintf(num,"%04Xh",b); // was $%04X
+					break;
 				case 'D': sprintf(num,"%02Xh",d); break;
 				case 'K': sprintf(num,"%d",k); break;
 				case 'N': sprintf(num,"%s",nextar[n]); break;

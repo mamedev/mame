@@ -61,13 +61,13 @@ const u8 b5000_common_disassembler::s_bits[] =
 const u32 b5000_common_disassembler::s_flags[] =
 {
 	0,
-	0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0,
+	0, 0, 0, STEP_COND, STEP_COND,
+	0, STEP_COND, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND, 0,
 	0, 0, 0, 0, 0, 0,
-	0, 0, 0,
+	0, 0, STEP_COND,
 	0, STEP_OVER, 0, STEP_OUT,
-	0, 0, 0, 0, 0, 0
+	STEP_COND, STEP_COND, STEP_COND, 0, 0
 };
 
 
@@ -93,6 +93,7 @@ offs_t b5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 	// disassemble it
 	util::stream_format(stream, "%-6s", s_name[instr]);
 
+	u32 flags = s_flags[instr];
 	if (bits > 0)
 	{
 		// exceptions for opcodes with 2 params
@@ -110,9 +111,9 @@ offs_t b5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 		{
 			switch (param ^ 2)
 			{
-				case 1: stream << "S"; break; // 0,1
+				case 1: stream << "S"; flags |= STEP_COND; break; // 0,1
 				case 2: stream << "C"; break; // 1,0
-				case 3: stream << "C,S"; break; // 1,1
+				case 3: stream << "C,S"; flags |= STEP_COND; break; // 1,1
 				default: break;
 			}
 		}
@@ -130,7 +131,7 @@ offs_t b5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 			util::stream_format(stream, "%d", param);
 	}
 
-	return 1 | s_flags[instr] | SUPPORTED;
+	return 1 | flags | SUPPORTED;
 }
 
 

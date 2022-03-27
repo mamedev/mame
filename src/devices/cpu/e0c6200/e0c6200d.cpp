@@ -21,7 +21,7 @@ const char *const e0c6200_disassembler::em_name[] =
 
 const u32 e0c6200_disassembler::em_flags[] =
 {
-	0, STEP_OUT, STEP_OVER, STEP_OVER,
+	STEP_COND, STEP_OUT, STEP_OVER, STEP_OVER,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
@@ -656,7 +656,6 @@ offs_t e0c6200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	} // 0xf00 (big switch)
 
-
 	// fetch mnemonic
 	util::stream_format(stream, "%-6s", em_name[m]);
 
@@ -670,7 +669,7 @@ offs_t e0c6200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		}
 	}
 
-	return 1 | em_flags[m] | SUPPORTED;
+	return 1 | ((op & 0xf00) == 0 ? 0 : em_flags[m]) | SUPPORTED;
 }
 
 u32 e0c6200_disassembler::opcode_alignment() const

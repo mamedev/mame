@@ -118,6 +118,8 @@ offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	{
 		// Addressable instructions (only 3 in this version)
 		util::stream_format(stream, "%s %06o", s_addressable_insts[(inst & 0600000) >> 13], inst & 0177777);
+		if (inst >= 0400000) // trn
+			return 1 | STEP_COND | SUPPORTED;
 	}
 	else
 		dasm_opr(stream, inst);
@@ -301,6 +303,8 @@ offs_t tx0_8kwo_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			util::stream_format(stream, "%06o", inst);
 		else
 			util::stream_format(stream, "%s %05o", s_addressable_insts[(inst & 0700000) >> 13], inst & 017777);
+		if ((inst & 0700000) == 0400000) // trn
+			return 1 | STEP_COND | SUPPORTED;
 	}
 	else switch (inst)
 	{
@@ -346,10 +350,15 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		{
 			util::stream_format(stream, "%s %05o", str, inst & 017777);
 
-			if ((inst & 0760000) == 0440000) // tsx
-				return 1 | STEP_OVER | SUPPORTED;
-			else if ((inst & 0760000) == 0520000) // trx
-				return 1 | STEP_OUT | SUPPORTED;
+			if (inst >= 0400000)
+			{
+				if ((inst & 0760000) == 0440000) // tsx
+					return 1 | STEP_OVER | SUPPORTED;
+				else if ((inst & 0760000) == 0520000) // trx
+					return 1 | STEP_OUT | SUPPORTED;
+				else if ((inst & 0760000) != 0500000) // trn, tze, tix, tlv
+					return 1 | STEP_COND | SUPPORTED;
+			}
 		}
 	}
 	else if ((inst & 037000) == 004000)

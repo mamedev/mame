@@ -234,6 +234,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1));
 	m_console.register_command("gp",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1));
+	m_console.register_command("gbt",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_branch, this, true, _1));
+	m_console.register_command("gbf",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_branch, this, false, _1));
+	m_console.register_command("gni",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_next_instruction, this, _1));
 	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_next, this, _1));
 	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_next, this, _1));
 	m_console.register_command("focus",     CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1));
@@ -1355,6 +1358,56 @@ void debugger_commands::execute_go_privilege(const std::vector<std::string> &par
 
 	m_console.get_visible_cpu()->debug()->go_privilege((condition.is_empty()) ? "1" : condition.original_string());
 }
+
+
+/*-------------------------------------------------
+    execute_go_branch - execute gbt or gbf command
+-------------------------------------------------*/
+
+void debugger_commands::execute_go_branch(bool sense, const std::vector<std::string> &params)
+{
+	parsed_expression condition(m_console.visible_symtable());
+	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+		return;
+
+	m_console.get_visible_cpu()->debug()->go_branch(sense, (condition.is_empty()) ? "1" : condition.original_string());
+}
+
+
+/*-------------------------------------------------
+    execute_go_next_instruction - execute gni command
+-------------------------------------------------*/
+
+void debugger_commands::execute_go_next_instruction(const std::vector<std::string> &params)
+{
+	u64 count = 1;
+
+	// if we have a parameter, use it instead */
+	if (params.size() > 0 && !validate_number_parameter(params[0], count))
+		return;
+	if (count == 0)
+		return;
+
+	device_state_interface *stateintf;
+	device_t *cpu = m_machine.debugger().console().get_visible_cpu();
+	if (!cpu->interface(stateintf))
+	{
+		m_console.printf("No state interface available for %s\n", cpu->name());
+		return;
+	}
+	u32 pc = stateintf->pcbase();
+
+	debug_disasm_buffer buffer(*cpu);
+	while (count-- != 0)
+	{
+		// disassemble the current instruction and get the length
+		u32 result = buffer.disassemble_info(pc);
+		pc = buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
+	}
+
+	cpu->debug()->go(pc);
+}
+
 
 /*-------------------------------------------------
     execute_next - execute the next command

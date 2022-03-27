@@ -252,7 +252,7 @@ void we32100_disassembler::dasm_ea(std::ostream &stream, offs_t &pc, offs_t ppc,
 				pc += 4;
 			}
 			format_signed(stream, disp);
-			util::stream_format(stream, "(%%%s) <%x>", s_rnames[15], u32(ppc + disp));
+			util::stream_format(stream, "(%%%s) /*0x%x*/", s_rnames[15], u32(ppc + disp));
 		}
 		else
 			dasm_am(stream, pc, opcodes, n, false, true);
@@ -284,7 +284,7 @@ void we32100_disassembler::dasm_bdisp(std::ostream &stream, offs_t &pc, const we
 		pc += 2;
 	}
 	format_signed(stream, disp);
-	util::stream_format(stream, " <%x>", u32(ppc + disp));
+	util::stream_format(stream, " /*0x%x*/", u32(ppc + disp));
 }
 
 offs_t we32100_disassembler::dasm_30xx(std::ostream &stream, offs_t &pc, const we32100_disassembler::data_buffer &opcodes)
@@ -557,6 +557,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BGEB" : "BGEH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x44: case 0x54:
@@ -575,6 +576,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				util::stream_format(stream, "%-8s", BIT(op, 0) ? "BGB" : "BGH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x48:
@@ -588,6 +590,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BLB" : "BLH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x4c: case 0x5c:
@@ -606,6 +609,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				util::stream_format(stream, "%-8s", BIT(op, 0) ? "BLEB" : "BLEH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x50:
@@ -619,6 +623,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BCC" : "BCC");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x58:
@@ -632,6 +637,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BCSB" : "BCSH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x60:
@@ -645,6 +651,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BVCB" : "BVCH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x64: case 0x74:
@@ -660,6 +667,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BNEB" : "BNEH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x68:
@@ -673,6 +681,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BVSB" : "BVSH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x6c: case 0x7c:
@@ -688,6 +697,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BEB" : "BEH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
+		flags |= STEP_COND;
 		break;
 
 	case 0x70:

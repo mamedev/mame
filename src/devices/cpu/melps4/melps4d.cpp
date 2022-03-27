@@ -47,14 +47,14 @@ const uint32_t melps4_disassembler::em_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND, 0, 0,
+	0, 0, STEP_COND, STEP_COND,
+	0, 0, 0, STEP_COND, STEP_COND, 0, 0, STEP_COND, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND, STEP_COND,
+	0, 0, 0, 0, 0, 0, STEP_COND, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_COND,
 	0, 0, 0, STEP_OVER, STEP_OUT, STEP_OUT, STEP_OUT,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, STEP_COND, 0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, 0, 0,
 	0, 0, 0, 0, 0
 };
 
@@ -115,7 +115,7 @@ offs_t melps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			util::stream_format(stream, "%d", param);
 	}
 
-	return 1 | em_flags[instr] | SUPPORTED;
+	return 1 | (op == 0xa6 ? 0 : em_flags[instr]) | SUPPORTED;
 }
 
 u32 melps4_disassembler::opcode_alignment() const

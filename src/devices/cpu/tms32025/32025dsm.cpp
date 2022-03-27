@@ -440,6 +440,8 @@ offs_t tms32025_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		flags = STEP_OVER;
 	else if (!strncmp(cp, "ret", 3))
 		flags = STEP_OUT;
+	else if ((code & 0xfe000000) == 0x5e000000 || (code >= 0xf0000000 && code < 0xfc000000))
+		flags = STEP_COND;
 
 	while (*cp)
 	{
