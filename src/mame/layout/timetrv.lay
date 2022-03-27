@@ -37,7 +37,7 @@ copyright-holders:Ryan Holtz
 		<bounds x="0" y="0" width="704" height="544" />
 
 		<screen index="0">
-			<bounds left="0" top="16" right="704" bottom="528" />
+			<bounds left="0" top="16" right="704" bottom="544" />
 		</screen>
 
 		<repeat count="16">
