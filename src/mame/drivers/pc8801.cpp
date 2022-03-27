@@ -982,7 +982,7 @@ uint8_t pc8801_state::port40_r()
 {
 	uint8_t data = 0x00;
 
-	data |= ioport("CTRL")->read() & 0x2f;
+	data |= ioport("CTRL")->read() & 0xcf;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
 	// TODO: enable line from pc80s31k (bit 3, active_low)
@@ -1859,9 +1859,9 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPNAME( 0x08, 0x00, "Auto-boot floppy at start-up" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+//	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
+//	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: Coming from the old legacy driver as "EXSWITCH", where this maps?
 	PORT_START("CFG")
