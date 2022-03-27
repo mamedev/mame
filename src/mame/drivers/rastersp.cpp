@@ -193,6 +193,8 @@ class fbcrazy_state : public rastersp_state
 public:
 	fbcrazy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: rastersp_state(mconfig, type, tag)
+		, m_io_track_x(*this, "TRACK_X")
+		, m_io_track_y(*this, "TRACK_Y")
 		, m_trackball_timer(nullptr)
 	{
 	}
@@ -206,6 +208,9 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_ioport m_io_track_x;
+	required_ioport m_io_track_y;
+	emu_timer *m_trackball_timer;
 
 	void aux_port0_w(offs_t offset, uint8_t data);
 	void aux_port1_w(offs_t offset, uint8_t data);
@@ -219,7 +224,6 @@ private:
 	TIMER_CALLBACK_MEMBER(trackball_timer);
 	DECLARE_WRITE_LINE_MEMBER(trackball_rts);
 
-	emu_timer *m_trackball_timer;
 	uint8_t m_aux_port3_data;
 	uint8_t m_trackball_ctr;
 	uint8_t m_trackball_data[3];
@@ -267,6 +271,7 @@ void rastersp_state::machine_start()
 	save_item(NAME(m_left_volume));
 	save_item(NAME(m_right_volume));
 	save_item(NAME(m_interrupt_mask));
+	save_item(NAME(m_dsp_ctrl_data));
 }
 
 void fbcrazy_state::machine_start()
@@ -275,6 +280,7 @@ void fbcrazy_state::machine_start()
 
 	m_trackball_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fbcrazy_state::trackball_timer), this));
 
+	save_item(NAME(m_aux_port3_data));
 	save_item(NAME(m_trackball_ctr));
 	save_item(NAME(m_trackball_data));
 	save_item(NAME(m_oldxpos));
@@ -644,8 +650,8 @@ TIMER_CALLBACK_MEMBER(fbcrazy_state::trackball_timer)
 		{
 			uint16_t newxpos, newypos;
 
-			newxpos = ioport("TRACK_X")->read();
-			newypos = ioport("TRACK_Y")->read();
+			newxpos = m_io_track_x->read();
+			newypos = m_io_track_y->read();
 
 			int diffx, diffy;
 			diffx = newxpos - m_oldxpos;
@@ -706,14 +712,7 @@ TIMER_CALLBACK_MEMBER(fbcrazy_state::trackball_timer)
 			else if (bitnum < 9)
 			{
 				//Data bits
-				if (m_trackball_data[(m_trackball_ctr/12)]&(1<<(bitnum-1)))
-				{
-					m_duart->rxb_w(1);
-				}
-				else
-				{
-					m_duart->rxb_w(0);
-				}
+				m_duart->rxb_w(BIT(m_trackball_data[m_trackball_ctr / 12], bitnum - 1));
 			}
 			else
 			{
