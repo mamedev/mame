@@ -216,27 +216,26 @@ void pc8001_state::port10_w(uint8_t data)
 	m_cent_data_out->write(data);
 }
 
+/*
+ * I/O Port $30 (w/o) "System Control Port (1)"
+ * N88-BASIC buffer port $e6c0
+ *
+ * Virtually same between PC-8001 and PC-8801
+ *
+ * --xx ---- BS2, BS1: USART channel control
+ * --00 ----           CMT 600 bps
+ * --01 ----           CMT 1200 bps
+ * --10 ----           RS-232C async mode
+ * --11 ----           RS-232C sync mode
+ * ---- x--- MTON: CMT motor control (active high)
+ * ---- -x-- CDS: CMT carrier control (1) mark (0) space
+ * ---- --x- /COLOR: CRT display mode control (1) color mode (0) monochrome
+ * ---- ---x /40: CRT display format control (1) 80 chars per line (0) 40 chars
+ *
+ */
 void pc8001_base_state::port30_w(uint8_t data)
 {
-	/*
-
-	    bit     description
-
-	    0       characters per line (0=40, 1=80)
-	    1       color mode (0=color, 1=B&W)
-	    2       CMT CHIN
-	    3       CMT MOTOR (1=on)
-	    4       CMT BS1
-	    5       CMT BS2
-	    6       unused
-	    7       unused
-
-	*/
-
-	/* characters per line */
 	m_width80 = BIT(data, 0);
-
-	/* color mode */
 	m_color = BIT(data, 1);
 
 	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);

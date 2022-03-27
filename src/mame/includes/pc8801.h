@@ -225,11 +225,6 @@ private:
 	bool m_timer_irq_pending;
 //	bool m_rxrdy_irq_pending;
 	bool m_sound_irq_pending;
-
-	uint8_t cpu_8255_c_r();
-	void cpu_8255_c_w(uint8_t data);
-	uint8_t fdc_8255_c_r();
-	void fdc_8255_c_w(uint8_t data);
 };
 
 class pc8801mk2sr_state : public pc8801_state

@@ -8,7 +8,7 @@ license:CC0
 <!--
 
 Titles, publishers and release dates taken from:
-  - PC88 Library ( http://refugee2005.sakura.ne.jp/library/frame1.htm )
+  - PC88 Library ( https://web.archive.org/web/20160101005647/http://refugee2005.sakura.ne.jp/library/frame1.htm )
   - 8bitters ( http://www.8-bits.info/ )
 
 Are the following undumped or mistranslated (check also if available in TOSEC)?
@@ -21044,6 +21044,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="マカダム"/>
+		<info name="developer" value="マカダミアソフト (Macadamia Soft)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="macadam.d88" size="348848" crc="544d2b8c" sha1="eb66ce5817c5005a77c1360382768b3240e069c4"/>
@@ -21058,6 +21059,8 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="マカダム"/>
+		<info name="developer" value="マカダミアソフト (Macadamia Soft)"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="macadam (a).d88" size="348832" crc="90527ea3" sha1="1a633ab7764e19508c97b66e3cf0a8200e37f08b"/>
@@ -32756,12 +32759,17 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="starship">
+		<!-- "Star Ship" on box, stylized as "Star/Ship" ingame -->
 		<description>Star Ship Rendezvous</description>
 		<year>1988</year>
 		<publisher>スキャップトラスト (Scap Trust)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="スターシップランデブー"/>
+		<!-- Gameplay playfield scrolling is disabled with 4 MHz -->
+		<info name="usage" value="Needs BASIC V2, runs better in 8 MHz Mode"/>
+		<info name="developer" value="Arklight"/>
+		<!-- Omake: press F2 during OP for sound test -->
 		<!--combined image-->
 		<!--rom name="star ship rendezvous.d88" size="1046496" crc="5f899ec2" sha1="c6f2d34e9a21053449cf91eca8d80c2dc794ed09"/-->
 
