@@ -35,20 +35,20 @@ class vertex_program_disassembler {
 
 	struct fields
 	{
-		int ScaOperation;
-		int VecOperation;
-		int SourceConstantIndex;
-		int InputIndex;
-		sourcefields src[3];
-		int VecTempWriteMask;
-		int VecTempIndex;
-		int ScaTempWriteMask;
-		int OutputWriteMask;
-		int OutputSelect;
-		int OutputIndex;
-		int MultiplexerControl;
-		int Usea0x;
-		int EndOfProgram;
+		int ScaOperation = 0;
+		int VecOperation = 0;
+		int SourceConstantIndex = 0;
+		int InputIndex = 0;
+		sourcefields src[3]{};
+		int VecTempWriteMask = 0;
+		int VecTempIndex = 0;
+		int ScaTempWriteMask = 0;
+		int OutputWriteMask = 0;
+		int OutputSelect = 0;
+		int OutputIndex = 0;
+		int MultiplexerControl = 0;
+		int Usea0x = 0;
+		int EndOfProgram = 0;
 	};
 	fields f;
 
@@ -797,25 +797,25 @@ public:
 		int colorkey;
 		int imagefield;
 		int aniso;
-		int mipmapmaxlod;
-		int mipmapminlod;
-		int rectheight;
-		int rectwidth;
+		int mipmapmaxlod = 0;
+		int mipmapminlod = 0;
+		int rectheight = 0;
+		int rectwidth = 0;
 		int addrmodes;
 		int addrmodet;
 		int addrmoder;
 	} texture[4];
 	uint32_t triangles_bfculled;
 	NV2A_BEGIN_END primitive_type;
-	uint32_t primitives_count;
+	uint32_t primitives_count = 0;
 	uint32_t primitives_total_count;
 	uint32_t primitives_batches_count;
 	int indexesleft_count;
-	int indexesleft_first;
+	int indexesleft_first = 0;
 	uint32_t vertex_indexes[1024]; // vertex indices sent by the software to the 3d accelerator
-	int vertex_count;
-	unsigned int vertex_first;
-	int vertex_accumulated;
+	int vertex_count = 0;
+	unsigned int vertex_first = 0;
+	int vertex_accumulated = 0;
 	vertex_nv vertex_software[1024+2]; // vertex attributes sent by the software to the 3d accelerator
 	nv2avertex_t vertex_xy[1024+2]; // vertex attributes computed by the 3d accelerator
 	vertex_nv persistvertexattr; // persistent vertex attributes
@@ -866,30 +866,30 @@ public:
 	int vertex_pipeline;
 
 	struct {
-		int format;
-		uint32_t pitch_source;
-		uint32_t pitch_destination;
-		offs_t source_address;
-		offs_t destination_address;
-		int op;
-		int width;
-		int heigth;
-		uint32_t sourcex;
-		uint32_t sourcey;
-		uint32_t destinationx;
-		uint32_t destinationy;
+		int format = 0;
+		uint32_t pitch_source = 0;
+		uint32_t pitch_destination = 0;
+		offs_t source_address = 0;
+		offs_t destination_address = 0;
+		int op = 0;
+		int width = 0;
+		int heigth = 0;
+		uint32_t sourcex = 0;
+		uint32_t sourcey = 0;
+		uint32_t destinationx = 0;
+		uint32_t destinationy = 0;
 	} bitblit;
-	emu_timer *puller_timer;
-	int puller_waiting;
-	address_space *puller_space;
-	uint32_t dilated0[16][2048];
-	uint32_t dilated1[16][2048];
-	int dilatechose[256];
-	nvidia_object_data *objectdata;
-	int debug_grab_texttype;
-	char *debug_grab_textfile;
-	bool enable_waitvblank;
-	bool enable_clipping_w;
+	emu_timer *puller_timer = nullptr;
+	int puller_waiting = 0;
+	address_space *puller_space = nullptr;
+	uint32_t dilated0[16][2048]{};
+	uint32_t dilated1[16][2048]{};
+	int dilatechose[256]{};
+	nvidia_object_data *objectdata = nullptr;
+	int debug_grab_texttype = 0;
+	char *debug_grab_textfile = nullptr;
+	bool enable_waitvblank = false;
+	bool enable_clipping_w = false;
 };
 
 #endif // MAME_INCLUDES_XBOX_NV2A_H

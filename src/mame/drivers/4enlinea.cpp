@@ -249,9 +249,9 @@ private:
 	void k7_out0_w(uint8_t data);
 	void k7_out1_w(uint8_t data);
 
-	uint8_t m_irq_count;
-	uint8_t m_serial_flags;
-	uint8_t m_serial_data[2];
+	uint8_t m_irq_count = 0;
+	uint8_t m_serial_flags = 0;
+	uint8_t m_serial_data[2]{};
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

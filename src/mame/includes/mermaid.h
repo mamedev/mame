@@ -54,27 +54,27 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 	bitmap_ind16 m_helper;
 	bitmap_ind16 m_helper2;
 	bitmap_ind16 m_helper_mask;
-	int m_coll_bit0;
-	int m_coll_bit1;
-	int m_coll_bit2;
-	int m_coll_bit3;
-	int m_coll_bit6;
+	int m_coll_bit0 = 0;
+	int m_coll_bit1 = 0;
+	int m_coll_bit2 = 0;
+	int m_coll_bit3 = 0;
+	int m_coll_bit6 = 0;
 	int m_bg_split;
-	int m_bg_mask;
-	int m_bg_bank;
-	int m_rougien_gfxbank1;
-	int m_rougien_gfxbank2;
+	int m_bg_mask = 0;
+	int m_bg_bank = 0;
+	int m_rougien_gfxbank1 = 0;
+	int m_rougien_gfxbank2 = 0;
 
 	/* sound-related */
-	uint8_t    m_adpcm_idle;
-	int      m_adpcm_data;
-	uint8_t    m_adpcm_trigger;
-	uint8_t    m_adpcm_rom_sel;
+	uint8_t    m_adpcm_idle = 0;
+	int      m_adpcm_data = 0;
+	uint8_t    m_adpcm_trigger = 0;
+	uint8_t    m_adpcm_rom_sel = 0;
 	bool       m_ay8910_enable[2];
 
 	/* devices */
@@ -87,7 +87,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device_array<ls259_device, 2> m_latch;
 
-	uint8_t    m_nmi_mask;
+	uint8_t    m_nmi_mask = 0;
 	void mermaid_ay8910_write_port_w(uint8_t data);
 	void mermaid_ay8910_control_port_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ay1_enable_w);

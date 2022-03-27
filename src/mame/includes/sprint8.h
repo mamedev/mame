@@ -67,18 +67,18 @@ private:
 	required_shared_ptr<uint8_t> m_pos_v_ram;
 	required_shared_ptr<uint8_t> m_pos_d_ram;
 
-	int m_steer_dir[8];
-	int m_steer_flag[8];
-	int m_collision_reset;
-	int m_collision_index;
-	uint8_t m_dial[8];
-	int m_team;
+	int m_steer_dir[8]{};
+	int m_steer_flag[8]{};
+	int m_collision_reset = 0;
+	int m_collision_index = 0;
+	uint8_t m_dial[8]{};
+	int m_team = 0;
 
-	tilemap_t* m_tilemap1;
-	tilemap_t* m_tilemap2;
+	tilemap_t* m_tilemap1 = nullptr;
+	tilemap_t* m_tilemap2 = nullptr;
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
-	emu_timer *m_collision_timer;
+	emu_timer *m_collision_timer = nullptr;
 };
 
 /*----------- defined in audio/sprint8.c -----------*/

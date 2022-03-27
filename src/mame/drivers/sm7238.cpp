@@ -90,10 +90,10 @@ private:
 
 	struct
 	{
-		uint8_t control;
-		uint16_t ptr;
-		int stride;
-		bool reverse;
+		uint8_t control = 0;
+		uint16_t ptr = 0;
+		int stride = 0;
+		bool reverse = false;
 	} m_video;
 
 	virtual void machine_reset() override;

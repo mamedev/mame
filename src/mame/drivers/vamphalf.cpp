@@ -299,7 +299,7 @@ private:
 
 	required_device<nvram_device> m_nvram;
 
-	u16 m_finalgdr_backupram_bank;
+	u16 m_finalgdr_backupram_bank = 0;
 	std::unique_ptr<u8[]> m_finalgdr_backupram;
 	void finalgdr_backupram_bank_w(u32 data);
 	u32 finalgdr_backupram_r(offs_t offset);

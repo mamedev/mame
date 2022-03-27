@@ -1151,6 +1151,8 @@ offs_t hc11_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		flags = STEP_OVER;
 	else if (!strcmp(op_table->mnemonic, "rts") || !strcmp(op_table->mnemonic, "rti"))
 		flags = STEP_OUT;
+	else if ((opcode >= 0x22 && opcode < 0x30) || !strcmp(op_table->mnemonic, "brset") || !strcmp(op_table->mnemonic, "brclr"))
+		flags = STEP_COND;
 
 	switch(op_table->address_mode)
 	{

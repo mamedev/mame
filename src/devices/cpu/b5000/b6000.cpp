@@ -8,7 +8,8 @@ MCU designed for Mattel's electronic games, I/O is a bit more versatile,
 and a speaker output was added. It was succeeded by B6100 with a larger ROM.
 
 TODO:
-- confirm digit segment decoder (10, 11, 15 appear to be unused by the games)
+- any other changed opcodes?
+- confirm digit segment decoder (10, 11, 15 are unused by the games)
 
 */
 
@@ -47,11 +48,10 @@ void b6000_cpu_device::device_reset()
 	m_ram_addr = 0;
 	m_a = 0;
 	m_c = 0;
-	m_seg = 0;
 
 	// clear outputs
+	seg_w(0);
 	m_write_str(0);
-	m_write_seg(0);
 	m_write_spk(0);
 }
 
@@ -65,7 +65,7 @@ u16 b6000_cpu_device::decode_digit(u8 data)
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
 
 		// ?, ?, none, F, G, ?
-		0x64, 0x64, 0x00, 0x20, 0x40, 0x64
+		0, 0, 0x00, 0x20, 0x40, 0
 	};
 	return lut_segs[data & 0xf];
 }
@@ -75,26 +75,16 @@ u16 b6000_cpu_device::decode_digit(u8 data)
 //  execute
 //-------------------------------------------------
 
-void b6000_cpu_device::update_speaker()
-{
-	// carry flag outputs to SPK
-	if (m_c != m_prev_c)
-		m_write_spk(m_c);
-}
-
 void b6000_cpu_device::execute_one()
 {
 	switch (m_op)
 	{
-		case 0x03: op_tkbs(); break;
 		case 0x76: op_atbz(); break;
 		case 0x77: op_atb(); break;
 
 		// rest is same as B5000
 		default: b5000_cpu_device::execute_one(); break;
 	}
-
-	update_speaker();
 }
 
 
@@ -104,13 +94,14 @@ void b6000_cpu_device::execute_one()
 
 void b6000_cpu_device::op_tkbs()
 {
-	// TKBS: load segments (no TKB step)
-	m_seg |= decode_digit(ram_r());
-	m_write_seg(m_seg);
+	// TKBS: load segments and speaker (no TKB step)
+	seg_w(m_seg | decode_digit(ram_r()));
+	m_write_spk(m_c);
 }
 
 void b6000_cpu_device::op_atbz()
 {
-	// ATBZ: load strobe from A (no ATB step)
-	m_write_str(1 << (m_a & 0xf));
+	// ATBZ: KSEG + load strobe (no ATB step)
+	op_kseg();
+	m_write_str(1 << m_a);
 }

@@ -67,25 +67,25 @@ protected:
 
 	required_region_ptr<uint8_t> m_sprite_region;
 
-	int m_spr_color_offs;
-	int m_prot_state;
-	int m_selected_ip;
-	int m_irqctrl;
-	int m_bgpage[4];
-	int m_fgpage[4];
-	const int *m_gfx_bank;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_txt_tilemap;
-	int m_gameid;
-	int m_spr_offsx;
-	int m_spr_offsy;
-	int m_spr_count;
-	int m_cloud_blend;
-	int m_cloud_ds;
-	int m_cloud_visible;
-	int m_sound_hw_type;
-	bool m_hotchase_sound_hs;
+	int m_spr_color_offs = 0;
+	int m_prot_state = 0;
+	int m_selected_ip = 0;
+	int m_irqctrl = 0;
+	int m_bgpage[4]{};
+	int m_fgpage[4]{};
+	const int *m_gfx_bank = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_txt_tilemap = nullptr;
+	int m_gameid = 0;
+	int m_spr_offsx = 0;
+	int m_spr_offsy = 0;
+	int m_spr_count = 0;
+	int m_cloud_blend = 0;
+	int m_cloud_ds = 0;
+	int m_cloud_visible = 0;
+	int m_sound_hw_type = 0;
+	bool m_hotchase_sound_hs = 0;
 	pen_t m_black_pen;
 
 	uint16_t wecleman_protection_r();
@@ -152,10 +152,10 @@ protected:
 	template<class BitmapClass> void do_blit_zoom32(BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite);
 	template<class BitmapClass> void sprite_draw(BitmapClass &bitmap, const rectangle &cliprect);
 
-	sprite_t *m_spr_ptr_list[NUM_SPRITES];
-	int m_spr_idx_list[NUM_SPRITES];
-	int m_spr_pri_list[NUM_SPRITES];
-	sprite_t m_sprite_list[NUM_SPRITES];
+	sprite_t *m_spr_ptr_list[NUM_SPRITES]{};
+	int m_spr_idx_list[NUM_SPRITES]{};
+	int m_spr_pri_list[NUM_SPRITES]{};
+	sprite_t m_sprite_list[NUM_SPRITES]{};
 };
 
 class hotchase_state : public wecleman_state

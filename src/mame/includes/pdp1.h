@@ -359,16 +359,16 @@ public:
 
 	required_device<pdp1_device> m_maincpu;
 
-	int m_il;       // initial location (12-bit)
-	int m_wc;       // word counter (12-bit)
-	int m_wcl;      // word core location counter (16-bit)
-	int m_rfb;      // read field buffer (5-bit)
-	int m_wfb;      // write field buffer (5-bit)
+	int m_il = 0;       // initial location (12-bit)
+	int m_wc = 0;       // word counter (12-bit)
+	int m_wcl = 0;      // word core location counter (16-bit)
+	int m_rfb = 0;      // read field buffer (5-bit)
+	int m_wfb = 0;      // write field buffer (5-bit)
 
-	int m_dba;
+	int m_dba = 0;
 
-	emu_timer *m_rotation_timer;// timer called each time dc is 0
-	emu_timer *m_il_timer;      // timer called each time dc is il
+	emu_timer *m_rotation_timer = nullptr;// timer called each time dc is 0
+	emu_timer *m_il_timer = nullptr;      // timer called each time dc is il
 };
 
 

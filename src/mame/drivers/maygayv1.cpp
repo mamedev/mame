@@ -267,12 +267,12 @@ private:
 		std::unique_ptr<uint8_t[]>   line_buf;  // there's actually two
 	};
 
-	int m_lamp_strobe;
-	int m_old_lamp_strobe;
-	int m_vsync_latch_preset;
-	uint8_t m_p1;
-	uint8_t m_p3;
-	int m_d68681_val;
+	int m_lamp_strobe = 0;
+	int m_old_lamp_strobe = 0;
+	int m_vsync_latch_preset = 0;
+	uint8_t m_p1 = 0;
+	uint8_t m_p3 = 0;
+	int m_d68681_val = 0;
 	i82716_t m_i82716;
 	output_finder<8 * 256> m_lamp;
 };

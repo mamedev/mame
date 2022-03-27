@@ -12,27 +12,27 @@ license:CC0
 
 	<element name="text_down">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="DOWN"><color red="0.1" green="0.4" blue="0.8" /></text>
+		<text string="DOWN"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_home">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="HOME"><color red="0.1" green="0.4" blue="0.8" /></text>
+		<text string="HOME"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_yards">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="YARDS TO GO"><color red="0.1" green="0.4" blue="0.8" /></text>
+		<text string="YARDS TO GO"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_time">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="TIME REMAINING"><color red="0.1" green="0.4" blue="0.8" /></text>
+		<text string="TIME REMAINING"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_field">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="FIELD POSITION"><color red="0.1" green="0.4" blue="0.8" /></text>
+		<text string="FIELD POSITION"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_visitors">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="VISITORS"><color red="0.1" green="0.4" blue="0.8" /></text>
+		<text string="VISITORS"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 
 	<element name="digit" defstate="0">
@@ -64,13 +64,13 @@ license:CC0
 		<element ref="white"><bounds x="2" y="0" width="179" height="48" /></element>
 		<element ref="black"><bounds x="4" y="11" width="175" height="26" /></element>
 
-		<element name="digit8" ref="digit"><bounds x="19.5"  y="16" width="12" height="16" /></element>
-		<element name="digit9" ref="digit"><bounds x="35.5"  y="16" width="12" height="16" /></element>
-		<element name="digit0" ref="digit"><bounds x="67.5"  y="16" width="12" height="16" /></element>
-		<element name="digit1" ref="digit"><bounds x="83.5"  y="16" width="12" height="16" /></element>
-		<element name="digit2" ref="digit"><bounds x="99.5"  y="16" width="12" height="16" /></element>
-		<element name="digit6" ref="digit"><bounds x="131.5" y="16" width="12" height="16" /></element>
-		<element name="digit7" ref="digit"><bounds x="147.5" y="16" width="12" height="16" /></element>
+		<element name="digit8" ref="digit"><bounds x="21"  y="16" width="12" height="16" /></element>
+		<element name="digit9" ref="digit"><bounds x="37"  y="16" width="12" height="16" /></element>
+		<element name="digit0" ref="digit"><bounds x="69"  y="16" width="12" height="16" /></element>
+		<element name="digit1" ref="digit"><bounds x="85"  y="16" width="12" height="16" /></element>
+		<element name="digit2" ref="digit"><bounds x="101" y="16" width="12" height="16" /></element>
+		<element name="digit6" ref="digit"><bounds x="133" y="16" width="12" height="16" /></element>
+		<element name="digit7" ref="digit"><bounds x="149" y="16" width="12" height="16" /></element>
 
 		<element ref="white"><bounds x="58" y="1" width="2" height="46" /></element>
 		<element ref="white"><bounds x="123" y="1" width="2" height="46" /></element>

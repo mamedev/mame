@@ -108,17 +108,17 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// crtc
-	u8 m_crtc[64], m_cursor_start_ras;
-	u16 m_disp_start_addr, m_cursor_addr;
-	int m_register_address_latch, m_font_upload;
-	bool m_graphics_mode;
+	u8 m_crtc[64]{}, m_cursor_start_ras = 0;
+	u16 m_disp_start_addr = 0, m_cursor_addr = 0;
+	int m_register_address_latch = 0, m_font_upload = 0;
+	bool m_graphics_mode = false;
 
 	// from pt68k4.cpp
-	bool m_kclk;
-	uint8_t m_kdata;
-	uint8_t m_scancode;
-	uint8_t m_kbdflag;
-	int m_kbit;
+	bool m_kclk = false;
+	uint8_t m_kdata = 0;
+	uint8_t m_scancode = 0;
+	uint8_t m_kbdflag = 0;
+	int m_kbit = 0;
 };
 
 
@@ -382,7 +382,7 @@ uint8_t mk98_state::video_r(offs_t offset)
 	case 5:
 		return video_register_r();
 	}
-	
+
 	return 0xff;
 }
 
@@ -418,16 +418,16 @@ void mk98_state::mk98_map(address_map &map)
 void mk98_state::mk98_io(address_map &map)
 {
 	map.unmap_value_low();
-//	map(0x0000, 0x000f).unmaprw();
+//  map(0x0000, 0x000f).unmaprw();
 	map(0x0020, 0x002f).rw(m_pic8259, FUNC(mk98pic_device::read), FUNC(mk98pic_device::write));
 	map(0x0040, 0x004f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0063).rw(FUNC(mk98_state::keyboard_r), FUNC(mk98_state::keyboard_w));
-//	unidentified devices
-//	map(0x00a0, 0x00a1).unmapw();
-//	map(0x0110, 0x0111).unmapw();
-//	map(0x0112, 0x0113).unmaprw();
-//	map(0x0150, 0x0150).unmapw(); -- cart slot select
-//	map(0x0170, 0x0170).unmapw();
+//  unidentified devices
+//  map(0x00a0, 0x00a1).unmapw();
+//  map(0x0110, 0x0111).unmapw();
+//  map(0x0112, 0x0113).unmaprw();
+//  map(0x0150, 0x0150).unmapw(); -- cart slot select
+//  map(0x0170, 0x0170).unmapw();
 	map(0x03d0, 0x03df).rw(FUNC(mk98_state::video_r), FUNC(mk98_state::video_w));
 	map(0x03f8, 0x03fe).rw("uart0", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x03ff, 0x03ff).rw(FUNC(mk98_state::serial_r), FUNC(mk98_state::serial_w));

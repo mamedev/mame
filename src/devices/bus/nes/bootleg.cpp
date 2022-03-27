@@ -967,7 +967,7 @@ void nes_btl_cj_device::write_h(offs_t offset, u8 data)
 	}
 	else
 	{
-		offset = (offset >> 13) & 0x03;
+		offset = BIT(offset, 13, 2);
 		if (offset != 3)
 			prg8_x(offset, data & 0x0f);
 	}
@@ -1335,7 +1335,7 @@ void nes_n32_4in1_device::write_h(offs_t offset, u8 data)
 			prg8_ef(3);
 		}
 
-		chr8((data >> 1) & 0x03, CHRROM);
+		chr8(BIT(data, 1, 2), CHRROM);
 		set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
 }
@@ -1482,7 +1482,7 @@ void nes_l001_device::write_h(offs_t offset, u8 data)
 	{
 		case 0x0000:
 		case 0x2000:
-			chr1_x((offset >> 11) & 0x07, data, CHRROM);
+			chr1_x(BIT(offset, 11, 3), data, CHRROM);
 			break;
 		case 0x0400:
 			m_irq_count = (m_irq_count & 0xff00) | data;
@@ -1492,11 +1492,11 @@ void nes_l001_device::write_h(offs_t offset, u8 data)
 			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x4000:
-			set_nt_page((offset >> 11) & 0x03, CIRAM, data & 1, 1);
+			set_nt_page(BIT(offset, 11, 2), CIRAM, data & 1, 1);
 			break;
 		case 0x6000:
 			if (offset < 0x7800)
-				prg8_x((offset >> 11) & 0x03, data & 0x1f);
+				prg8_x(BIT(offset, 11, 2), data & 0x1f);
 			break;
 	}
 }
@@ -1613,7 +1613,7 @@ void nes_palthena_device::write_m(offs_t offset, u8 data)
 u8 nes_palthena_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("palthena read_h, offset: %04x\n", offset));
-	u8 page = (offset >> 8);
+	u8 page = offset >> 8;
 	if ((page >= 0x40 && page < 0x52) || page == 0x5f)
 		return m_prgram[offset & 0x1fff];
 	else if (page == 0x02)
@@ -1625,7 +1625,7 @@ u8 nes_palthena_device::read_h(offs_t offset)
 void nes_palthena_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("palthena write_h, offset: %04x, data: %02x\n", offset, data));
-	u8 page = (offset >> 8);
+	u8 page = offset >> 8;
 	if ((page >= 0x40 && page < 0x52) || page == 0x5f)
 		m_prgram[offset & 0x1fff] = data;
 	else if (page == 0x02)
@@ -2048,7 +2048,7 @@ void nes_ac08_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("AC-08 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset == 1)
-		m_latch = (data >> 1) & 0x0f;
+		m_latch = BIT(data, 1, 4);
 	else
 		m_latch = data & 0x0f;  // apparently there also is a Castlevania FDS conversion using same board with different banking lines
 }
@@ -2148,7 +2148,7 @@ void nes_yung08_device::write_45(offs_t offset, u8 data)
 	switch (offset & 0x51ff)
 	{
 		case 0x4022:
-			prg8_cd(data & 1 ? 3 : 4 + ((data & 0x07) >> 1));
+			prg8_cd(data & 1 ? 3 : 4 + BIT(data, 1, 2));
 			break;
 		case 0x4122:
 			m_irq_latch = data & 0x35;

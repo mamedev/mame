@@ -68,8 +68,8 @@ private:
 	required_shared_ptr<uint8_t> m_vpos_ram;
 	output_finder<2> m_leds;
 
-	tilemap_t* m_bg_tilemap;
-	int m_da_latch;
+	tilemap_t* m_bg_tilemap = nullptr;
+	int m_da_latch = 0;
 };
 
 

@@ -29,8 +29,13 @@ void b5000_cpu_device::set_bu(u8 bu)
 	m_bu = bu & 3;
 
 	// changing to or from 0 delays RAM address modification
-	if ((m_bu && !m_prev_bu) || (!m_bu && m_prev_bu))
+	if (bool(m_bu) != bool(m_prev_bu))
 		m_bu_delay = true;
+}
+
+void b5000_cpu_device::seg_w(u16 seg)
+{
+	m_write_seg(m_seg = seg);
 }
 
 void b5000_cpu_device::op_illegal()
@@ -126,8 +131,8 @@ void b5000_cpu_device::op_nop()
 
 void b5000_cpu_device::op_lb(u8 bl)
 {
-	// LB x,y: load B from x,y (successive LB are ignored)
-	if (!op_is_lb(m_prev_op))
+	// LB x,y: load B from x,y (successive LB/ATB are ignored)
+	if (!op_is_lb(m_prev_op) && !op_is_atb(m_prev_op))
 	{
 		m_bl = bl;
 		set_bu(m_op & 3);
@@ -136,9 +141,12 @@ void b5000_cpu_device::op_lb(u8 bl)
 
 void b5000_cpu_device::op_atb()
 {
-	// ATB: load Bl from A (ignore if previous opcode was LB)
-	if (!op_is_lb(m_prev_op))
+	// ATB: load Bl from A (successive LB/ATB are ignored)
+	if (!op_is_lb(m_prev_op) && !op_is_atb(m_prev_op))
+	{
 		m_bl = m_a;
+		m_bl_delay = true;
+	}
 }
 
 void b5000_cpu_device::op_lda()
@@ -260,8 +268,7 @@ void b5000_cpu_device::op_tc()
 void b5000_cpu_device::op_kseg()
 {
 	// KSEG: reset segment outputs
-	m_seg = 0;
-	m_write_seg(0);
+	seg_w(0);
 }
 
 void b5000_cpu_device::op_atbz()
@@ -277,13 +284,13 @@ void b5000_cpu_device::op_atbz()
 			op_kseg();
 			break;
 
-		// step 2: disable strobe
-		case 2:
+		// step 3: disable strobe
+		case 3:
 			m_write_str(0);
 			break;
 
-		// step 3: load strobe from Bl
-		case 3:
+		// step 4: load strobe from Bl
+		case 4:
 			m_write_str(1 << (m_ram_addr & 0xf));
 			m_atbz_step = 0;
 			return;
@@ -302,28 +309,11 @@ void b5000_cpu_device::op_tkb()
 
 void b5000_cpu_device::op_tkbs()
 {
-	assert(m_tkbs_step > 0);
+	// TKBS: TKB + load segments
+	op_tkb();
 
-	// TKBS: TKB + load segments (multi step)
-	switch (m_tkbs_step)
-	{
-		// step 1: TKB
-		case 1:
-			op_tkb();
-			break;
-
-		// step 2: load segments from RAM
-		case 2:
-			// note: SEG0(DP) from C flag is delayed 2 cycles
-			m_seg |= decode_digit(ram_r()) << 1 | m_prev3_c;
-			m_write_seg(m_seg);
-			m_tkbs_step = 0;
-			return;
-
-		default:
-			break;
-	}
-	m_tkbs_step++;
+	// note: SEG0(DP) from C flag is delayed 2 cycles
+	seg_w(m_seg | decode_digit(m_prev2_c << 4 | ram_r()));
 }
 
 void b5000_cpu_device::op_read()

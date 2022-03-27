@@ -65,14 +65,14 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
-	tilemap_t* m_bg_tilemap;
+	tilemap_t* m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t m_prev;
-	uint8_t m_mask;
+	uint8_t m_prev = 0;
+	uint8_t m_mask = 0;
 	attotime m_time_pushed;
 	attotime m_time_released;
-	emu_timer *m_interrupt_timer;
+	emu_timer *m_interrupt_timer = nullptr;
 };
 
 

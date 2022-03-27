@@ -37,12 +37,12 @@ protected:
 	required_shared_ptr<uint8_t> m_bg_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	bool m_nmi_enabled;
-	bool m_nmi_state;
-	int m_scrollx;
-	int m_scrolly;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	bool m_nmi_enabled = false;
+	bool m_nmi_state = false;
+	int m_scrollx = 0;
+	int m_scrolly = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);

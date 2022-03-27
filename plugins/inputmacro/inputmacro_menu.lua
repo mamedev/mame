@@ -347,7 +347,7 @@ local function add_edit_items(items)
 	local input = manager.machine.input
 	local arrows
 
-	items[#items + 1] = { _p('plugin-inputmacro', 'Name'), edit_name_buffer and (edit_name_buffer .. '_') or edit_current_macro.name, '' }
+	table.insert(items, { _p('plugin-inputmacro', 'Name'), edit_name_buffer and (edit_name_buffer .. '_') or edit_current_macro.name, '' })
 	edit_items[#items] = { action = 'name' }
 	if not (edit_start_selection or edit_start_step or edit_menu_active) then
 		edit_start_selection = #items
@@ -356,11 +356,11 @@ local function add_edit_items(items)
 
 	local binding = edit_current_macro.binding
 	local activation = binding and input:seq_name(binding) or _p('plugin-inputmacro', '[not set]')
-	items[#items + 1] = { _p('plugin-inputmacro', 'Activation sequence'), activation, edit_switch_poller and 'lr' or '' }
+	table.insert(items, { _p('plugin-inputmacro', 'Activation sequence'), activation, edit_switch_poller and 'lr' or '' })
 	edit_items[#items] = { action = 'binding' }
 
 	local releaseaction = edit_current_macro.earlycancel and _p('plugin-inputmacro', 'Stop immediately') or _p('plugin-inputmacro', 'Complete macro')
-	items[#items + 1] = { _p('plugin-inputmacro', 'On release'), releaseaction, edit_current_macro.earlycancel and 'r' or 'l' }
+	table.insert(items, { _p('plugin-inputmacro', 'On release'), releaseaction, edit_current_macro.earlycancel and 'r' or 'l' })
 	edit_items[#items] = { action = 'releaseaction' }
 
 	local holdaction
@@ -376,18 +376,18 @@ local function add_edit_items(items)
 	else
 		holdaction = string.format(_p('plugin-inputmacro', 'Prolong step %d'), #edit_current_macro.steps)
 	end
-	items[#items + 1] = { _p('plugin-inputmacro', 'When held'), holdaction, arrows }
+	table.insert(items, { _p('plugin-inputmacro', 'When held'), holdaction, arrows })
 	edit_items[#items] = { action = 'holdaction' }
 
 	for i, step in ipairs(edit_current_macro.steps) do
-		items[#items + 1] = { string.format(_p('plugin-inputmacro', 'Step %d'), i), '', 'heading' }
-		items[#items + 1] = { _p('plugin-inputmacro', 'Delay (frames)'), step.delay, (step.delay > 0) and 'lr' or 'r' }
+		table.insert(items, { string.format(_p('plugin-inputmacro', 'Step %d'), i), '', 'heading' })
+		table.insert(items, { _p('plugin-inputmacro', 'Delay (frames)'), tostring(step.delay), (step.delay > 0) and 'lr' or 'r' })
 		edit_items[#items] = { action = 'delay', step = i }
 		if edit_start_step == i then
 			edit_start_selection = #items
 		end
 
-		items[#items + 1] = { _p('plugin-inputmacro', 'Duration (frames)'), step.duration, (step.duration > 1) and 'lr' or 'r' }
+		table.insert(items, { _p('plugin-inputmacro', 'Duration (frames)'), tostring(step.duration), (step.duration > 1) and 'lr' or 'r' })
 		edit_items[#items] = { action = 'duration', step = i }
 
 		for j, input in ipairs(step.inputs) do
@@ -399,17 +399,17 @@ local function add_edit_items(items)
 			else
 				inputname = _p('plugin-inputmacro', '[not set]')
 			end
-			items[#items + 1] = { string.format(_p('plugin-inputmacro', 'Input %d'), j), inputname, '' }
+			table.insert(items, { string.format(_p('plugin-inputmacro', 'Input %d'), j), inputname, '' })
 			edit_items[#items] = { action = 'input', step = i, input = j }
 		end
 
 		if step.inputs[#step.inputs].field then
-			items[#items + 1] = { _p('plugin-inputmacro', 'Add input'), '', '' }
+			table.insert(items, { _p('plugin-inputmacro', 'Add input'), '', '' })
 			edit_items[#items] = { action = 'addinput', step = i }
 		end
 
 		if #edit_current_macro.steps > 1 then
-			items[#items + 1] = { _p('plugin-inputmacro', 'Delete step'), '', '' }
+			table.insert(items, { _p('plugin-inputmacro', 'Delete step'), '', '' })
 			edit_items[#items] = { action = 'deletestep', step = i }
 		end
 	end
@@ -417,7 +417,7 @@ local function add_edit_items(items)
 
 	local laststep = edit_current_macro.steps[#edit_current_macro.steps]
 	if laststep.inputs[#laststep.inputs].field then
-		items[#items + 1] = { '---', '', '' }
+		table.insert(items, { '---', '', '' })
 
 		arrows = 'lr'
 		if edit_insert_position > #edit_current_macro.steps then
@@ -425,7 +425,7 @@ local function add_edit_items(items)
 		elseif edit_insert_position < 2 then
 			arrows = 'r'
 		end
-		items[#items + 1] = { _p('plugin-inputmacro', 'Add step at position'), edit_insert_position, arrows }
+		table.insert(items, { _p('plugin-inputmacro', 'Add step at position'), tostring(edit_insert_position), arrows })
 		edit_items[#items] = { action = 'addstep', step = i }
 	end
 end

@@ -26,9 +26,9 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* misc */
-	uint8_t    m_dial_enable_1;
-	uint8_t    m_dial_enable_2;
-	uint8_t    m_input_select;
+	uint8_t    m_dial_enable_1 = 0;
+	uint8_t    m_dial_enable_2 = 0;
+	uint8_t    m_input_select = 0;
 	uint8_t input_port_bit_r();
 	uint8_t dial_r();
 	void port_1_w(uint8_t data);

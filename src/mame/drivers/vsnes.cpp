@@ -152,45 +152,90 @@ Changes:
 /******************************************************************************/
 
 
-void vsnes_state::sprite_dma_0_w(address_space &space, uint8_t data)
+template <u8 Side>
+void vsnes_state::sprite_dma_w(address_space &space, u8 data)
 {
-	int source = ( data & 7 );
-	m_ppu1->spriteram_dma( space, source );
+	if (Side == MAIN)
+		m_ppu1->spriteram_dma(space, data & 0x07);
+	else
+		m_ppu2->spriteram_dma(space, data & 0x07);
 }
 
-void vsnes_state::sprite_dma_1_w(address_space &space, uint8_t data)
+template <u8 Side>
+void vsnes_state::vsnes_coin_counter_w(offs_t offset, u8 data)
 {
-	int source = ( data & 7 );
-	m_ppu2->spriteram_dma( space, source );
-}
-
-void vsnes_state::vsnes_coin_counter_w(uint8_t data)
-{
-	machine().bookkeeping().coin_counter_w(0, data & 0x01 );
+	machine().bookkeeping().coin_counter_w(Side, data & 0x01);
 	m_coin = data;
 
-		//"bnglngby" and "cluclu"
-	if( data & 0xfe )
-	{
-		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", m_maincpu->pc(), data);
-	}
+	// "bnglngby" and "cluclu", vsbball service mode
+	if(data & 0xfe)
+		logerror("vsnes_coin_counter_w: cpu %hhu, pc = 0x%04x - data = 0x%02x\n", Side, (Side == MAIN) ? m_maincpu->pc() : m_subcpu->pc(), data);
 }
 
-uint8_t vsnes_state::vsnes_coin_counter_r()
+template <u8 Side>
+u8 vsnes_state::vsnes_coin_counter_r(offs_t offset)
 {
-	//only for platoon
+	// reads effectively write MSB of address (via open bus) to coin counter
+	machine().bookkeeping().coin_counter_w(Side, BIT(offset, 8));
+
+	// only for platoon
 	return m_coin;
 }
 
-void vsnes_state::vsnes_coin_counter_1_w(uint8_t data)
+template <u8 Side>
+void vsnes_state::vsnes_in0_w(u8 data)
 {
-	machine().bookkeeping().coin_counter_w(1, data & 0x01 );
-	if( data & 0xfe ) //vsbball service mode
+	// Toggling bit 0 high then low resets both controllers
+	if (m_input_strobe[Side] & ~data & 1)
 	{
-	//do something?
-		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", m_subcpu->pc(), data);
+		// load up the latches
+		int p1 = 2 * Side;
+		int p2 = p1 + 1;
+		m_input_latch[p1] = m_in[p1]->read();
+		m_input_latch[p2] = m_in[p2]->read();
+
+		if (m_has_gun && m_sensor->detect_light(m_gunx->read(), m_guny->read()))
+			m_input_latch[p1] |= 0x40;
 	}
 
+	m_input_strobe[Side] = data;
+}
+
+template <u8 Side>
+u8 vsnes_state::vsnes_in0_r()
+{
+	int p1 = 2 * Side;
+
+	if (m_input_strobe[Side] & 1)
+	{
+		m_input_latch[p1] = m_in[p1]->read();
+		if (m_has_gun && m_sensor->detect_light(m_gunx->read(), m_guny->read()))
+			m_input_latch[p1] |= 0x40;
+	}
+
+	int ret = m_input_latch[p1] & 1;
+	m_input_latch[p1] >>= 1;
+
+	ret |= m_coins[Side]->read();             // merge coins, etc
+	ret |= (m_dsw[Side]->read() & 3) << 3;    // merge 2 dipswitches
+
+	return ret;
+}
+
+template <u8 Side>
+u8 vsnes_state::vsnes_in1_r()
+{
+	int p2 = 2 * Side + 1;
+
+	if (m_input_strobe[Side] & 1)
+		m_input_latch[p2] = m_in[p2]->read();
+
+	int ret = m_input_latch[p2] & 1;
+	m_input_latch[p2] >>= 1;
+
+	ret |= m_dsw[Side]->read() & ~3;          // merge the rest of the dipswitches
+
+	return ret;
 }
 
 /******************************************************************************/
@@ -200,10 +245,10 @@ void vsnes_state::vsnes_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_0_w));
-	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
-	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).mirror(0x1fdf).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_w<MAIN>));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r<MAIN>), FUNC(vsnes_state::vsnes_in0_w<MAIN>));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r<MAIN>)); // IN1 - input port 2 / PSG second control register
+	map(0x4020, 0x5fff).rw(FUNC(vsnes_state::vsnes_coin_counter_r<MAIN>), FUNC(vsnes_state::vsnes_coin_counter_w<MAIN>));
 	map(0x6000, 0x67ff).mirror(0x1800).ram().share("nvram");
 	// Games that don't bank PRG
 	map(0x8000, 0xffff).rom().region("prg", 0);
@@ -219,10 +264,10 @@ void vsnes_state::vsnes_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_1_w));
-	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_1_r), FUNC(vsnes_state::vsnes_in0_1_w));
-	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_1_r));  /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).mirror(0x1fdf).w(FUNC(vsnes_state::vsnes_coin_counter_1_w));
+	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_w<SUB>));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r<SUB>), FUNC(vsnes_state::vsnes_in0_w<SUB>));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r<SUB>));  // IN1 - input port 2 / PSG second control register
+	map(0x4020, 0x5fff).rw(FUNC(vsnes_state::vsnes_coin_counter_r<SUB>), FUNC(vsnes_state::vsnes_coin_counter_w<SUB>));
 	map(0x6000, 0x67ff).mirror(0x1800).ram().share("nvram");
 	map(0x8000, 0xffff).rom();
 }
@@ -300,9 +345,9 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x0800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
 	map(0x4000, 0x400f).w(FUNC(vsnes_state::bootleg_sound_write));
-	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
-	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r<MAIN>), FUNC(vsnes_state::vsnes_in0_w<MAIN>));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r<MAIN>)); // IN1 - input port 2 / PSG second control register
+	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_w<MAIN>));
 	map(0x6000, 0x67ff).mirror(0x0800).ram();
 	map(0x8000, 0xffff).rom();
 }
@@ -360,7 +405,7 @@ static INPUT_PORTS_START( vsnes )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
-	PORT_START("COINS")
+	PORT_START("COINS1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )            /* serial pin from controller */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)  /* service credit? */
@@ -415,7 +460,7 @@ static INPUT_PORTS_START( vsnes_dual )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
-	PORT_START("COINS")
+	PORT_START("COINS1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )            /* serial pin from controller */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)  /* service credit? */
@@ -516,7 +561,7 @@ static INPUT_PORTS_START( vsnes_zapper )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("COINS")
+	PORT_START("COINS1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )            /* serial pin from controller */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)  /* service credit? */
@@ -1133,7 +1178,7 @@ static INPUT_PORTS_START( iceclmbj )
 	PORT_MODIFY("IN1")  /* IN1 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
 
-	PORT_MODIFY("COINS")    /* IN2 */
+	PORT_MODIFY("COINS1")    /* IN2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -1175,7 +1220,7 @@ static INPUT_PORTS_START( jajamaru )
 	PORT_MODIFY("IN1")  /* IN1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )       /* SELECT on a nes */
 
-	PORT_MODIFY("COINS")    /* IN2 */
+	PORT_MODIFY("COINS1")    /* IN2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1237,7 +1282,7 @@ static INPUT_PORTS_START( machridj )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )        /* SELECT on a nes */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )        /* START on a nes */
 
-	PORT_MODIFY("COINS")    /* IN2 */
+	PORT_MODIFY("COINS1")    /* IN2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -1642,7 +1687,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tkoboxng )
 	PORT_INCLUDE( vsnes )
 
-	PORT_MODIFY("COINS")    /* IN2 */
+	PORT_MODIFY("COINS1")    /* IN2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -1679,7 +1724,7 @@ static INPUT_PORTS_START( bnglngby )
 	PORT_MODIFY("IN1")  /* IN1 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
 
-	PORT_MODIFY("COINS")    /* IN2 */
+	PORT_MODIFY("COINS1")    /* IN2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -1733,7 +1778,7 @@ static INPUT_PORTS_START( supxevs )
 	PORT_MODIFY("IN1")  /* IN1 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )       /* SELECT on a nes */
 
-	PORT_MODIFY("COINS")    /* IN2 */
+	PORT_MODIFY("COINS1")    /* IN2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1760,8 +1805,7 @@ void vsnes_state::vsnes(machine_config &config)
 	/* basic machine hardware */
 	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
-	/* some carts also trigger IRQs */
-	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
+
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1834,7 +1878,6 @@ void vsnes_state::vsdual(machine_config &config)
 	n2a03_device &subcpu(N2A03(config, m_subcpu, NTSC_APU_CLOCK));
 	subcpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu2_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
 	config.set_default_layout(layout_dualhsxs);
@@ -1881,8 +1924,7 @@ void vsnes_state::vsnes_bootleg(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, XTAL(16'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_bootleg_map);
-	/* some carts also trigger IRQs */
-	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
+
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,bootleg)
 
 	Z80(config, m_subcpu, XTAL(16'000'000)/8); // Z8400APS-Z80CPU
@@ -2890,8 +2932,8 @@ GAME( 1986, rbibb,    0,         vsnes,         rbibb,    vsnes_state, init_rbib
 GAME( 1986, rbibba,   rbibb,     vsnes,         rbibb,    vsnes_state, init_rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
 GAME( 1986, suprmrio, 0,         vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
 GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
-GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", 0) // timer starts at 200(!)
-GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", 0) // timer starts at 300
+GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", 0 ) // timer starts at 200(!)
+GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", 0 ) // timer starts at 300
 GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
 GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, init_vs108,    ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
 GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )

@@ -34,7 +34,7 @@
 
     TODO:
 
-	- z80dma.cpp register read must return byte UP counter value (0x200 at end of block, not 0 as it does now)
+    - z80dma.cpp register read must return byte UP counter value (0x200 at end of block, not 0 as it does now)
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!

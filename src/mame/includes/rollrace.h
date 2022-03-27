@@ -36,18 +36,18 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t *m_fg_tilemap;
-	int m_bkgpage;
-	int m_bkgflip;
-	int m_chrbank;
-	int m_bkgpen;
-	int m_bkgcol;
-	int m_flipy;
-	int m_flipx;
-	int m_spritebank;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int m_bkgpage = 0;
+	int m_bkgflip = 0;
+	int m_chrbank = 0;
+	int m_bkgpen = 0;
+	int m_bkgcol = 0;
+	int m_flipy = 0;
+	int m_flipx = 0;
+	int m_spritebank = 0;
 
-	uint8_t m_nmi_mask;
-	uint8_t m_sound_nmi_mask;
+	uint8_t m_nmi_mask = 0;
+	uint8_t m_sound_nmi_mask = 0;
 
 	uint8_t fake_d800_r();
 	void fake_d800_w(uint8_t data);

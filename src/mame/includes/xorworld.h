@@ -35,7 +35,7 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void irq2_ack_w(uint16_t data);
 	void irq6_ack_w(uint16_t data);

@@ -74,8 +74,8 @@ private:
 	required_shared_ptr<u8> m_videoram;
 	optional_ioport_array<16> m_key_row;
 
-	u8 m_active_row;
-	bool m_video_enable;
+	u8 m_active_row = 0;
+	bool m_video_enable = false;
 };
 
 u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

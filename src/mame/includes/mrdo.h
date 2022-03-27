@@ -37,7 +37,7 @@ protected:
 	virtual void protection_w(uint8_t data);
 	virtual uint8_t protection_r();
 
-	uint8_t m_pal_u001;
+	uint8_t m_pal_u001 = 0;
 
 private:
 	// memory pointers
@@ -52,9 +52,9 @@ private:
 	void main_map(address_map &map);
 
 	// video-related
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	int m_flipscreen;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int m_flipscreen = 0;
 
 	void bgvideoram_w(offs_t offset, uint8_t data);
 	void fgvideoram_w(offs_t offset, uint8_t data);

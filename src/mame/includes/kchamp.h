@@ -53,12 +53,12 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
 
 	/* misc */
-	bool       m_nmi_enable;
-	bool       m_sound_nmi_enable;
-	bool       m_msm_play_lo_nibble;
+	bool       m_nmi_enable = false;
+	bool       m_sound_nmi_enable = false;
+	bool       m_msm_play_lo_nibble = false;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

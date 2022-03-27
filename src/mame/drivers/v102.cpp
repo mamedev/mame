@@ -49,8 +49,8 @@ private:
 	required_device<upd7201_device> m_mpsc;
 	required_region_ptr<u8> m_chargen;
 
-	bool m_hs_state;
-	bool m_kb_clock;
+	bool m_hs_state = false;
+	bool m_kb_clock = false;
 };
 
 

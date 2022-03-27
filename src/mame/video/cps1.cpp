@@ -1529,6 +1529,26 @@ static const struct gfx_range mapper_CP1B1F_table[] =
 	{ 0 }
 };
 
+#define mapper_CP1B1F_boot   { 0x10000, 0x10000, 0, 0 }, mapper_CP1B1F_boot_table
+static const struct gfx_range mapper_CP1B1F_boot_table[] =
+{
+	// verified from PAL dump:
+	//         pin 15 (ROMs 1-4,7-10 /oe)
+	// bank0 = pin 16 (ROMs 1,7  /ce)
+	//         pin 18 (ROMs 3,9  /ce)
+	// bank1 = pin 17 (ROMs 2,8  /ce)
+	//         pin 19 (ROMs 4,10 /ce)
+	// An a19 line is available on pin 13 for 32MBit roms (pin 44 of the EPROM) but is unused.
+	// pin 14 is fixed high in 16Mbit mode and is driven by gfx_chnl (CPS B-21 pin 108) if 32Mbit mode is selected
+
+	/* type                                                                  start   end     bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x10000, 0x17fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x18000, 0x1ffff, 1 },
+	{ 0 }
+};
+
 
 /* unverified, no dump */
 #define mapper_sfzch    { 0x20000, 0, 0, 0 }, mapper_sfzch_table
@@ -1672,6 +1692,26 @@ static const struct gfx_range mapper_pokonyan_table[] =
 	{ GFXTYPE_SCROLL1, 0x7000, 0x7fff, 0 },
 	{ GFXTYPE_SCROLL3, 0x3000, 0x3fff, 0 },
 	{ GFXTYPE_SCROLL2, 0x4000, 0x6fff, 0 },
+	{ 0 }
+};
+
+// pang3b4, PAL16V8@1A
+#define mapper_pang3b4   { 0x8000, 0x8000, 0, 0 }, mapper_pang3b4_table
+static const struct gfx_range mapper_pang3b4_table[] =
+{
+	// verified from PAL dump:
+	// bank0 = pin 14 (ROMs 2,4,6,8,10,12,14,16)
+	// bank1 = pin 12 (ROMs 1,3,5,7,9,11,13,15)
+	// pins 13,15,16,17,18,19 are always enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
+
+	{ GFXTYPE_SPRITES, 0x8000, 0xffff, 1 },
+	{ GFXTYPE_SCROLL1, 0x8000, 0xffff, 1 },
+	{ GFXTYPE_SCROLL2, 0x8000, 0xffff, 1 },
+	{ GFXTYPE_SCROLL3, 0x8000, 0xffff, 1 },
 	{ 0 }
 };
 
@@ -1924,6 +1964,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3b",      CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3b2",     CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3b3",     CPS_B_17,     mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3b4",     CPS_B_21_DEF, mapper_pang3b4 },
+	{"pang3b5",     CPS_B_21_DEF, mapper_CP1B1F_boot },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"ganbare",     CPS_B_21_DEF, mapper_GBPR2 },
 	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
 

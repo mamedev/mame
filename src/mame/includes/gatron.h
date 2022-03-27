@@ -23,7 +23,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<9> m_lamps;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void output_port_0_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);

@@ -110,8 +110,8 @@ int flex_format::find_size(util::random_read &io, uint32_t form_factor, const st
 	if (info.month < 1 || info.month > 12 || info.day < 1 || info.day > 31)
 		return -1;
 
-	boot0_sector_id = 1;
-	boot1_sector_id = 2;
+	uint8_t boot0_sector_id = 1;
+	//  uint8_t boot1_sector_id = 2;
 
 	// This floppy format uses a strategy of looking for 6800 boot code to
 	// set the numbering of the first two sectors. If this is shown to not
@@ -122,12 +122,13 @@ int flex_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		// Found a 6800 stack load and branch, looks like a 6800 boot sector.
 		boot0_sector_id = 0;
 
+		// boot1 is not actually used (yet?)
 		// Look for a link to the next sector, normal usage.
-		if (boot1[0] != 0 || boot1[1] != 3)
-		{
+		//      if (boot1[0] != 0 || boot1[1] != 3)
+		//      {
 			// If not then assume it is a boot sector.
-			boot1_sector_id = 1;
-		}
+		//          boot1_sector_id = 1;
+		//      }
 	}
 
 	for (int i=0; formats[i].form_factor; i++) {

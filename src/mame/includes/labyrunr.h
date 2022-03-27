@@ -50,10 +50,10 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t    *m_layer0;
-	tilemap_t    *m_layer1;
-	rectangle  m_clip0;
-	rectangle  m_clip1;
+	tilemap_t    *m_layer0 = nullptr;
+	tilemap_t    *m_layer1 = nullptr;
+	rectangle  m_clip0{};
+	rectangle  m_clip1{};
 
 	void labyrunr_bankswitch_w(uint8_t data);
 	void labyrunr_vram1_w(offs_t offset, uint8_t data);

@@ -105,23 +105,23 @@ private:
 
 	required_memory_bank_array<4> m_nt_page;
 	std::unique_ptr<uint8_t[]> m_nt_ram;
-	uint8_t m_mirroring;
+	uint8_t m_mirroring = 0;
 
-	uint8_t       m_curr_slot;
+	uint8_t       m_curr_slot = 0;
 
-	uint8_t       m_exception_mask;
-	uint8_t       m_exception_cause;
+	uint8_t       m_exception_mask = 0;
+	uint8_t       m_exception_cause = 0;
 
-	emu_timer*    m_attract_timer;
-	uint8_t       m_attract_timer_period;
+	emu_timer*    m_attract_timer = nullptr;
+	uint8_t       m_attract_timer_period = 0;
 
-	uint32_t      m_coins;
-	uint8_t       m_zapper_enable;
-	uint8_t       m_joypad_enable;
-	uint8_t       m_joypad_swap;
+	uint32_t      m_coins = 0;
+	uint8_t       m_zapper_enable = 0;
+	uint8_t       m_joypad_enable = 0;
+	uint8_t       m_joypad_swap = 0;
 
-	emu_timer*    m_gameplay_timer;
-	uint8_t       m_money_reg;
+	emu_timer*    m_gameplay_timer = nullptr;
+	uint8_t       m_money_reg = 0;
 
 	void set_mirroring(int mirroring);
 	void sprite_dma_w(address_space &space, uint8_t data);

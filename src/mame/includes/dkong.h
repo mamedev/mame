@@ -195,7 +195,7 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_ram;
 
 	/* machine states */
-	uint8_t               m_hardware_type;
+	uint8_t               m_hardware_type = 0;
 	uint8_t               m_nmi_mask = 0U;
 
 	std::unique_ptr<uint8_t[]> m_decrypted;

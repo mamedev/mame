@@ -349,7 +349,7 @@ offs_t f2mc16_disassembler::dasm_bitop(std::ostream &stream, offs_t pc, u32 byte
 		{
 			stream << ", ";
 			format_rel(stream, pc + bytes + 1, opcodes.r8(pc + bytes));
-			++bytes;
+			return (bytes + 1) | STEP_COND | SUPPORTED;
 		}
 		else if ((op2 & 0xe0) == 0x20)
 			stream << ", A";
@@ -710,8 +710,7 @@ offs_t f2mc16_disassembler::dasm_eainst(std::ostream &stream, offs_t pc, u32 byt
 		format_imm8(stream, opcodes.r8(pc + bytes));
 		stream << ", ";
 		format_rel(stream, pc + bytes + 2, opcodes.r8(pc + bytes + 1));
-		bytes += 2;
-		break;
+		return (bytes + 2) | STEP_COND | SUPPORTED;
 
 	case 0x01:
 		util::stream_format(stream, "%-8s@", "JMPP");
@@ -881,8 +880,7 @@ offs_t f2mc16_disassembler::dasm_eainst(std::ostream &stream, offs_t pc, u32 byt
 		bytes += dasm_ea8(stream, pc + bytes, op2, segm, opcodes);
 		stream << ", ";
 		format_rel(stream, pc + bytes + 1, opcodes.r8(pc + bytes));
-		++bytes;
-		break;
+		return (bytes + 1) | STEP_COND | SUPPORTED;
 
 	case 0x05:
 		util::stream_format(stream, "%-8s", "ADD");
@@ -969,8 +967,7 @@ offs_t f2mc16_disassembler::dasm_eainst(std::ostream &stream, offs_t pc, u32 byt
 		bytes += dasm_ea16(stream, pc + bytes, op2, segm, opcodes);
 		stream << ", ";
 		format_rel(stream, pc + bytes + 1, opcodes.r8(pc + bytes));
-		++bytes;
-		break;
+		return (bytes + 1) | STEP_COND | SUPPORTED;
 
 	case 0x07:
 		util::stream_format(stream, "%-8s", "ADDW");
@@ -1061,7 +1058,7 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 	{
 		util::stream_format(stream, "%-8s", s_bcc_ops[op & 0x0f]);
 		format_rel(stream, pc + bytes + 1, opcodes.r8(pc + bytes));
-		++bytes;
+		return (bytes + 1) | STEP_COND | SUPPORTED;
 	}
 	else if (op >= 0xe0)
 	{
@@ -1278,8 +1275,7 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 		format_imm8(stream, opcodes.r8(pc + bytes++));
 		stream << ", ";
 		format_rel(stream, pc + bytes + 1, opcodes.r8(pc + bytes));
-		++bytes;
-		break;
+		return (bytes + 1) | STEP_COND | SUPPORTED;
 
 	case 0x2b: case 0x3b:
 		util::stream_format(stream, "%-8sA", "CMPW");

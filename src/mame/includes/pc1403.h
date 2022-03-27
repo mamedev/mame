@@ -46,15 +46,15 @@ protected:
 	uint8_t lcd_read(offs_t offset);
 	void lcd_write(offs_t offset, uint8_t data);
 
-	int m_down;
-	int m_right;
+	int m_down = 0;
+	int m_right = 0;
 
 private:
 	required_ioport_array<14> m_keys;
 
-	uint8_t m_portc;
-	uint8_t m_asic[4];
-	uint8_t m_reg[0x100];
+	uint8_t m_portc = 0;
+	uint8_t m_asic[4]{};
+	uint8_t m_reg[0x100]{};
 
 	static const char* const s_line[5];
 	static const char* const s_busy[5];

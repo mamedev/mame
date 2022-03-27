@@ -137,10 +137,10 @@ private:
 
 	void update_display();
 
-	uint8_t m_port_b;
-	uint8_t m_port_c;
-	uint8_t m_port_d;
-	uint8_t m_port_e;
+	uint8_t m_port_b = 0;
+	uint8_t m_port_c = 0;
+	uint8_t m_port_d = 0;
+	uint8_t m_port_e = 0;
 
 	required_device<avr8_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;

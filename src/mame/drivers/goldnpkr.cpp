@@ -1120,11 +1120,11 @@ private:
 	optional_device<ay8910_device> m_ay8910;
 	output_finder<5> m_lamps;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_mux_data;
-	uint8_t m_pia0_PA_data;
-	uint8_t m_ay8910_data;
-	uint8_t m_ay8910_control;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_mux_data = 0;
+	uint8_t m_pia0_PA_data = 0;
+	uint8_t m_ay8910_data = 0;
+	uint8_t m_ay8910_control = 0;
 };
 
 class blitz_state : public goldnpkr_state

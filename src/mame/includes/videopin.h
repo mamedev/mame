@@ -82,12 +82,12 @@ private:
 
 	attotime m_time_pushed;
 	attotime m_time_released;
-	uint8_t m_prev;
-	uint8_t m_mask;
-	int m_ball_x;
-	int m_ball_y;
-	tilemap_t* m_bg_tilemap;
-	emu_timer *m_interrupt_timer;
+	uint8_t m_prev = 0;
+	uint8_t m_mask = 0;
+	int m_ball_x = 0;
+	int m_ball_y = 0;
+	tilemap_t* m_bg_tilemap = nullptr;
+	emu_timer *m_interrupt_timer = nullptr;
 };
 
 /*----------- defined in audio/videopin.c -----------*/

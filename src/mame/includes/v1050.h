@@ -204,35 +204,35 @@ private:
 	// interrupt state
 	uint8_t m_int_mask;           // interrupt mask
 	uint8_t m_int_state;
-	int m_f_int_enb;            // floppy interrupt enable
+	int m_f_int_enb = 0;            // floppy interrupt enable
 	bool m_fdc_irq;
 	bool m_fdc_drq;
 
 	// keyboard state
-	uint8_t m_keylatch;           // keyboard row select
-	uint8_t m_keydata;
-	int m_keyavail;
+	uint8_t m_keylatch = 0;           // keyboard row select
+	uint8_t m_keydata = 0;
+	int m_keyavail = 0;
 
 	// serial state
-	int m_rxrdy;                // receiver ready
-	int m_txrdy;                // transmitter ready
-	int m_baud_sel;             // baud select
+	int m_rxrdy = 0;                // receiver ready
+	int m_txrdy = 0;                // transmitter ready
+	int m_baud_sel = 0;             // baud select
 
 	// memory state
-	uint8_t m_bank;               // bank register
+	uint8_t m_bank = 0;               // bank register
 
 	// video state
-	uint8_t m_attr;               // attribute latch
+	uint8_t m_attr = 0;               // attribute latch
 
 	// sasi state
-	uint8_t m_sasi_data;
-	int m_sasi_data_enable;
+	uint8_t m_sasi_data = 0;
+	int m_sasi_data_enable = 0;
 
 	uint8_t m_rtc_ppi_pa;
 	uint8_t m_rtc_ppi_pc;
 
-	int m_centronics_busy;
-	int m_centronics_perror;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
 };
 
 #endif // MAME_INCLUDES_V1050_H

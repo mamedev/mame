@@ -280,40 +280,40 @@ private:
 
 	uint16_t m_mcu_en;
 
-	uint32_t m_activeDisplayList;
-	uint32_t m_no_machine_error_code;
+	uint32_t m_activeDisplayList = 0U;
+	uint32_t m_no_machine_error_code = 0U;
 
-	uint32_t m_unk_vreg_toggle;
-	uint32_t m_p1_trig;
+	uint32_t m_unk_vreg_toggle = 0U;
+	uint32_t m_p1_trig = 0U;
 
-	//uint32_t *q2;
+	//uint32_t *q2 = nullptr;
 
 	std::vector< std::pair <int, uint32_t *> > m_spritelist;
 
-	uint8_t m_screen_dis;
+	uint8_t m_screen_dis = 0U;
 
 	struct hng64_tilemap {
-		tilemap_t *m_tilemap_8x8;
-		tilemap_t *m_tilemap_16x16;
-		tilemap_t *m_tilemap_16x16_alt;
+		tilemap_t *m_tilemap_8x8 = nullptr;
+		tilemap_t *m_tilemap_16x16 = nullptr;
+		tilemap_t *m_tilemap_16x16_alt = nullptr;
 	};
 
-	hng64_tilemap m_tilemap[4];
+	hng64_tilemap m_tilemap[4]{};
 
-	uint8_t m_additive_tilemap_debug;
+	uint8_t m_additive_tilemap_debug = 0U;
 
-	uint32_t m_old_animmask;
-	uint32_t m_old_animbits;
-	uint16_t m_old_tileflags[4];
+	uint32_t m_old_animmask = 0U;
+	uint32_t m_old_animbits = 0U;
+	uint16_t m_old_tileflags[4]{};
 
 	// 3d State
 	int m_paletteState3d;
-	float m_projectionMatrix[16];
-	float m_modelViewMatrix[16];
-	float m_cameraMatrix[16];
+	float m_projectionMatrix[16]{};
+	float m_modelViewMatrix[16]{};
+	float m_cameraMatrix[16]{};
 
-	float m_lightStrength;
-	float m_lightVector[3];
+	float m_lightStrength = 0;
+	float m_lightVector[3]{};
 
 	uint32_t hng64_com_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

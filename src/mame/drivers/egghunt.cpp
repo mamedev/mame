@@ -70,20 +70,20 @@ public:
 
 private:
 	/* video-related */
-	tilemap_t   *m_bg_tilemap;
-	uint8_t     m_vidram_bank;
+	tilemap_t   *m_bg_tilemap = nullptr;
+	uint8_t     m_vidram_bank = 0;
 
 	/* misc */
-	uint8_t     m_okibanking;
-	uint8_t     m_gfx_banking;
+	uint8_t     m_okibanking = 0;
+	uint8_t     m_gfx_banking = 0;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 
 	/* memory */
 	required_shared_ptr<uint8_t> m_atram;
-	uint8_t     m_bgram[0x1000];
-	uint8_t     m_spram[0x1000];
+	uint8_t     m_bgram[0x1000]{};
+	uint8_t     m_spram[0x1000]{};
 	uint8_t egghunt_bgram_r(offs_t offset);
 	void egghunt_bgram_w(offs_t offset, uint8_t data);
 	void egghunt_atram_w(offs_t offset, uint8_t data);

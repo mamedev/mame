@@ -58,7 +58,7 @@ private:
 
 	void keyboard_w(uint8_t data);
 
-	uint8_t m_keydata;
+	uint8_t m_keydata = 0;
 	uint8_t pt_r();
 };
 

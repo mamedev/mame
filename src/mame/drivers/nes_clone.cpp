@@ -116,7 +116,7 @@ private:
 	virtual void machine_reset() override;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
-	uint8_t m_rombase;
+	uint8_t m_rombase = 0;
 };
 
 class nes_clone_vtvppong_state : public nes_clone_state
@@ -150,7 +150,7 @@ private:
 	virtual void machine_reset() override;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
-	uint8_t m_rombase;
+	uint8_t m_rombase = 0;
 };
 
 class nes_clone_vtvsocr_state : public nes_clone_state
@@ -192,7 +192,7 @@ protected:
 
 private:
 	// configured at startup
-	uint8_t m_maxchrbank;
+	uint8_t m_maxchrbank = 0;
 
 	void nes_clone_afbm7800_map(address_map &map);
 
@@ -215,20 +215,20 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 
-	uint8_t m_banksel;
+	uint8_t m_banksel = 0;
 	uint8_t m_bankregs[8];
 	uint8_t m_extraregs[4];
 
 	void update_banks();
 	void mmc3_scanline_cb(int scanline, int vblank, int blanked);
-	int16_t m_mmc3_scanline_counter;
-	uint8_t m_mmc3_scanline_latch;
-	uint8_t m_mmc3_irq_enable;
+	int16_t m_mmc3_scanline_counter = 0;
+	uint8_t m_mmc3_scanline_latch = 0;
+	uint8_t m_mmc3_irq_enable = 0;
 
 	std::vector<u8> m_vram;
 
-	uint8_t m_ntmirror;
-	uint8_t m_ramprot;
+	uint8_t m_ntmirror = 0;
+	uint8_t m_ramprot = 0;
 
 	void update_nt_mirroring();
 	std::vector<u8> m_nt_ram;

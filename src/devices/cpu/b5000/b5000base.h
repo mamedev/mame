@@ -89,18 +89,16 @@ protected:
 	u8 m_c;
 	u8 m_prev_c;
 	u8 m_prev2_c;
-	u8 m_prev3_c;
 	bool m_sr;
 	bool m_skip;
 	u16 m_seg;
+	bool m_suppress0;
 
 	u8 m_atbz_step;
-	u8 m_tkbs_step;
 	u8 m_tra_step;
 	u8 m_ret_step;
 
 	virtual void op_atbz() { ; }
-	virtual void op_tkbs() { ; }
 	virtual void op_tra() { ; }
 	virtual void op_ret() { ; }
 

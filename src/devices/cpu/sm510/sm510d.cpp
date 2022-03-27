@@ -115,31 +115,31 @@ const u32 sm510_common_disassembler::s_flags[] =
 {
 	// SM510
 	0, 0,
-	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, STEP_COND, STEP_COND,
 	0, STEP_OUT, STEP_OUT, 0, STEP_OVER, STEP_OVER, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, STEP_COND, STEP_COND, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND,
 	0, 0,
 	0, 0, 0, 0,
 	0, STEP_OVER, 0, 0, 0, 0, 0,
 
 	// SM500
 	0, STEP_OUT, STEP_OUT, 0, 0, STEP_OVER, 0,
-	0, 0, 0, 0,
+	STEP_COND, 0, 0, 0,
 	0, 0, 0,
 	0, 0, 0,
-	0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND,
 
 	// SM530
 	0, 0, 0,
-	0, 0,
+	STEP_COND, STEP_COND,
 	0, 0, 0, 0,
 	0,
 
 	// SM590
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER,
+	STEP_COND, 0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, 0, 0, 0, STEP_OVER,
 	0, 0, 0, 0, 0, 0, STEP_OVER
 };
 

@@ -379,8 +379,8 @@ protected:
 	optional_device_array<stepper_device, 6> m_reel;
 
 private:
-	int m_optic_pattern;
-	int m_reels;
+	int m_optic_pattern = 0;
+	int m_reels = 0;
 };
 
 

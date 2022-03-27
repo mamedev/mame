@@ -52,12 +52,12 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_sound_latch;
-	uint8_t m_LS74_clr;
-	uint8_t m_LS74_q;
-	uint8_t m_gain_control;
-	emu_timer *m_interrupt_timer;
-	uint8_t m_flipscreen;
+	uint8_t m_sound_latch = 0;
+	uint8_t m_LS74_clr = 0;
+	uint8_t m_LS74_q = 0;
+	uint8_t m_gain_control = 0;
+	emu_timer *m_interrupt_timer = nullptr;
+	uint8_t m_flipscreen = 0;
 	std::unique_ptr<uint32_t[]> m_prom_tab;
 	bitmap_ind16 m_bitmap;
 

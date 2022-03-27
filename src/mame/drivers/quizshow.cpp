@@ -95,11 +95,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 
-	tilemap_t *m_tilemap;
-	uint32_t m_clocks;
-	int m_blink_state;
-	int m_category_enable;
-	int m_tape_head_pos;
+	tilemap_t *m_tilemap = nullptr;
+	uint32_t m_clocks = 0;
+	int m_blink_state = 0;
+	int m_category_enable = 0;
+	int m_tape_head_pos = 0;
 };
 
 

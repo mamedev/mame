@@ -410,7 +410,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	u8 m_val;
+	u8 m_val = 0;
 };
 
 void igs_incdec_device::reset_w(u8 data)

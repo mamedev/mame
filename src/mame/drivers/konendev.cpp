@@ -130,7 +130,7 @@ private:
 	required_device<rtc62423_device> m_rtc;
 	required_shared_ptr<uint32_t> m_dpram;
 
-	uint16_t *m_dpram_base;
+	uint16_t *m_dpram_base = nullptr;
 };
 
 uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

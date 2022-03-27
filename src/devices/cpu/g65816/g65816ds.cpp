@@ -64,6 +64,11 @@ bool g65816_disassembler::opcode_struct::is_return() const
 	}
 }
 
+bool g65816_disassembler::opcode_struct::is_cond() const
+{
+	return ea == RELB && m_name != op::BRA;
+}
+
 g65816_disassembler::opcode_struct::opcode_struct(op n, u8 f, u8 e) : m_name(n), flag(f), ea(e)
 {
 }
@@ -183,6 +188,8 @@ offs_t g65816_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		dasm_flags = STEP_OVER;
 	else if (opcode->is_return())
 		dasm_flags = STEP_OUT;
+	else if (opcode->is_cond())
+		dasm_flags = STEP_COND;
 	else
 		dasm_flags = 0;
 

@@ -542,6 +542,7 @@ MACHINES["LC89510"] = true
 MACHINES["LDPR8210"] = true
 MACHINES["LDSTUB"] = true
 MACHINES["LDV1000"] = true
+MACHINES["LDV4200HLE"] = true
 MACHINES["LDP1000"] = true
 MACHINES["LDP1450"] = true
 MACHINES["LDVP931"] = true
@@ -1528,8 +1529,6 @@ files {
 	MAME_DIR .. "src/mame/video/tigeroad_spr.cpp",
 	MAME_DIR .. "src/mame/video/tigeroad_spr.h",
 	MAME_DIR .. "src/mame/drivers/blktiger.cpp",
-	MAME_DIR .. "src/mame/includes/blktiger.h",
-	MAME_DIR .. "src/mame/video/blktiger.cpp",
 	MAME_DIR .. "src/mame/drivers/blktiger_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/cbasebal.cpp",
 	MAME_DIR .. "src/mame/includes/cbasebal.h",
@@ -2254,8 +2253,6 @@ files {
 createMAMEProjects(_target, _subtarget, "itech")
 files {
 	MAME_DIR .. "src/mame/drivers/capbowl.cpp",
-	MAME_DIR .. "src/mame/includes/capbowl.h",
-	MAME_DIR .. "src/mame/video/capbowl.cpp",
 	MAME_DIR .. "src/mame/drivers/itech8.cpp",
 	MAME_DIR .. "src/mame/includes/itech8.h",
 	MAME_DIR .. "src/mame/machine/itech8.cpp",
@@ -4832,6 +4829,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cointek.cpp",
 	MAME_DIR .. "src/mame/drivers/comebaby.cpp",
 	MAME_DIR .. "src/mame/drivers/compucranes.cpp",
+	MAME_DIR .. "src/mame/drivers/cosmos_playc8f.cpp",
 	MAME_DIR .. "src/mame/drivers/cowtipping.cpp",
 	MAME_DIR .. "src/mame/drivers/crazybal.cpp",
 	MAME_DIR .. "src/mame/drivers/cromptons.cpp",

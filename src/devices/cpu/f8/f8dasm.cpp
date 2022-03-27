@@ -277,14 +277,17 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x81: /* 1000 0001 */
 	case 0x85: /* 1000 0101 */
 		util::stream_format(stream, "BP   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x82: /* 1000 0010 */
 		util::stream_format(stream, "BC   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x84: /* 1000 0100 */
 		util::stream_format(stream, "BZ   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x80: /* 1000 0000 */
@@ -292,6 +295,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x86: /* 1000 0110 */
 	case 0x87: /* 1000 0111 */
 		util::stream_format(stream, "BT   H'%02X',H'%04X'", op & 0x07, base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x88: /* 1000 1000 */
@@ -324,6 +328,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 
 	case 0x8f: /* 1000 1111 */
 		util::stream_format(stream, "BR7  H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x90: /* 1001 0000 */
@@ -333,18 +338,22 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x91: /* 1001 0001 */
 	case 0x95: /* 1001 0101 */
 		util::stream_format(stream, "BM   H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x92: /* 1001 0010 */
 		util::stream_format(stream, "BNC  H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x94: /* 1001 0100 */
 		util::stream_format(stream, "BNZ  H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x98: /* 1001 1000 */
 		util::stream_format(stream, "BNO  H'%04X'", base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0x93: /* 1001 0011 */
@@ -358,6 +367,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 	case 0x9e: /* 1001 1110 */
 	case 0x9f: /* 1001 1111 */
 		util::stream_format(stream, "BF   H'%02X',H'%04X'", op & 0x0f, base_pc + (int8_t)opcodes.r8(pc++) + 1);
+		flags |= STEP_COND;
 		break;
 
 	case 0xa0: /* 1010 0000 */

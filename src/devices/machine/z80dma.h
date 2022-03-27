@@ -129,7 +129,7 @@ private:
 	uint8_t m_latch;
 
 	// interrupts
-	int m_iei;					// interrupt enable input
+	int m_iei;                  // interrupt enable input
 	int m_ip;                   // interrupt pending
 	int m_ius;                  // interrupt under service
 	uint8_t m_vector;             // interrupt vector

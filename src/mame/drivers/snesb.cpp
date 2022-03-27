@@ -191,7 +191,7 @@ public:
 
 private:
 	optional_shared_ptr_array<int8_t, 2> m_shared_ram;
-	uint8_t m_cnt;
+	uint8_t m_cnt = 0;
 	uint8_t prot_cnt_r();
 	uint8_t sb2b_6a6xxx_r(offs_t offset);
 	uint8_t sb2b_7xxx_r(offs_t offset);

@@ -145,6 +145,42 @@ X-6203 : Chess
 		</part>
 	</software>
 
+	<software name="bombc">
+		<description>Bomb Catcher II (16K)</description>
+		<year>2021</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Roy Templeman"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bombc16.rom" size="0x4000" crc="67ee7d94" sha1="fe8965ced847bfacd9420204604bf585ff3f03fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombc8" cloneof="bombc">
+		<description>Bomb Catcher II (8K)</description>
+		<year>2021</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Roy Templeman"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bombc8k.rom" size="0x4000" crc="056c2848" sha1="858aa69f32900e1ffcf4449997de40a06a5cde7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombc4" cloneof="bombc">
+		<description>Bomb Catcher II (4K)</description>
+		<year>2021</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Roy Templeman"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bombc4k.rom" size="0x4000" crc="e865cfbd" sha1="6c9cb93e3904cb0cf02860a58baaa387622189fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="btime">
 		<description>Burgertime</description>
 		<year>1983</year>
@@ -353,7 +389,7 @@ X-6203 : Chess
 		<publisher>Ron Koenig</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<!--<feature name="slot" value="c1541" />-->
-			<dataarea name="rom" size="0x8000">
+			<dataarea name="rom" size="0x4000">
 				<rom name="1541os.bin" size="0x4000" crc="6cd611e8" sha1="b2c3eabaadf21b463653f0e2bcf7b70c4a13fc39"/>
 			</dataarea>
 		</part>

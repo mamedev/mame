@@ -181,14 +181,14 @@ void lua_engine::initialize_debug(sol::table &emu)
 		{ "m", EXPSPACE_REGION }
 	};
 
-	auto const do_add_symbol = [this] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter, std::optional<char const *> format) -> symbol_entry &
+	auto const do_add_symbol = [] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter, std::optional<char const *> format) -> symbol_entry &
 	{
 		symbol_table::setter_func setfun;
 		if (setter)
-			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
+			setfun = [cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
 		return st.table().add(
 				name,
-				[this, cbfunc = std::move(getter)] () -> u64
+				[cbfunc = std::move(getter)] () -> u64
 				{
 					auto result = invoke(cbfunc).get<sol::optional<u64> >();
 					if (result)
@@ -217,12 +217,12 @@ void lua_engine::initialize_debug(sol::table &emu)
 				[] (device_t &device)
 				{ return std::make_shared<symbol_table_wrapper>(device.machine(), nullptr, &device); }));
 	symbol_table_type.set_function("set_memory_modified_func",
-			[this] (symbol_table_wrapper &st, sol::object cb)
+			[] (symbol_table_wrapper &st, sol::object cb)
 			{
 				if (cb == sol::lua_nil)
 					st.table().set_memory_modified_func(nullptr);
 				else if (cb.is<sol::protected_function>())
-					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+					st.table().set_memory_modified_func([cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
 				else
 					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
 			});
@@ -246,19 +246,19 @@ void lua_engine::initialize_debug(sol::table &emu)
 			{
 				return do_add_symbol(st, name, getter, std::nullopt, nullptr);
 			},
-			[this] (symbol_table_wrapper &st, char const *name, int minparams, int maxparams, sol::protected_function execute) -> symbol_entry &
+			[] (symbol_table_wrapper &st, sol::this_state s, char const *name, int minparams, int maxparams, sol::protected_function execute) -> symbol_entry &
 			{
 				return st.table().add(
 						name,
 						minparams,
 						maxparams,
-						[this, cbref = sol::reference(execute)] (int numparams, u64 const *paramlist) -> u64
+						[L = s.L, cbref = sol::reference(execute)] (int numparams, u64 const *paramlist) -> u64
 						{
-							sol::stack_reference traceback(m_lua_state, -sol::stack::push(m_lua_state, sol::default_traceback_error_handler));
+							sol::stack_reference traceback(L, -sol::stack::push(L, sol::default_traceback_error_handler));
 							cbref.push();
-							sol::stack_aligned_stack_handler_function func(m_lua_state, -1, traceback);
+							sol::stack_aligned_stack_handler_function func(L, -1, traceback);
 							for (int i = 0; numparams > i; ++i)
-								lua_pushinteger(m_lua_state, paramlist[i]);
+								lua_pushinteger(L, paramlist[i]);
 							auto result = func(sol::stack_count(numparams)).get<sol::optional<u64> >();
 							traceback.pop();
 							return result ? *result : 0;

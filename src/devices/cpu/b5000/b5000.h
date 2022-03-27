@@ -55,8 +55,10 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_one() override;
 
-	virtual bool op_canskip(u8 op) override;
+	virtual bool op_canskip(u8 op) override { return !op_is_tl(op); }
+	virtual bool op_is_tl(u8 op);
 	virtual bool op_is_lb(u8 op);
+	virtual bool op_is_atb(u8 op);
 	virtual void reset_pc() override { set_pc(7, 0); }
 	virtual u8 sr_page() { return 0; }
 	virtual u16 decode_digit(u8 data);
@@ -69,6 +71,7 @@ protected:
 	void ram_w(u8 data);
 	void set_pc(u8 pu, u8 pl);
 	void set_bu(u8 bu);
+	void seg_w(u16 seg);
 	void op_illegal();
 
 	// opcode handlers
@@ -99,7 +102,7 @@ protected:
 	virtual void op_kseg();
 	virtual void op_atbz() override;
 	virtual void op_tkb();
-	virtual void op_tkbs() override;
+	virtual void op_tkbs();
 	virtual void op_read();
 	virtual void op_tdin();
 };

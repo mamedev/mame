@@ -1144,132 +1144,132 @@ void amiga_state::ocs_map(address_map &map)
 	map(0x000, 0x1ff).rw(FUNC(amiga_state::custom_chip_r), FUNC(amiga_state::custom_chip_w));
 
 	// Reading state section
-//	map(0x000, 0x001).r(FUNC(amiga_state::bltddat_r));
-//	map(0x002, 0x003).r(FUNC(amiga_state::dmaconr_r));
+//  map(0x000, 0x001).r(FUNC(amiga_state::bltddat_r));
+//  map(0x002, 0x003).r(FUNC(amiga_state::dmaconr_r));
 	map(0x004, 0x005).r(FUNC(amiga_state::vposr_r));
-//	map(0x006, 0x007).r(FUNC(amiga_state::vhposr_r));
-//	map(0x008, 0x009).r(FUNC(amiga_state::dskdatr_r));
+//  map(0x006, 0x007).r(FUNC(amiga_state::vhposr_r));
+//  map(0x008, 0x009).r(FUNC(amiga_state::dskdatr_r));
 	// TODO: verify if JOYxDAT really belongs to Denise (???)
-//	map(0x00a, 0x00b).r(FUNC(amiga_state::joydat_r<0>));
-//	map(0x00c, 0x00d).r(FUNC(amiga_state::joydat_r<1>));
-//	map(0x00e, 0x00f).r(FUNC(amiga_state::clxdat_r));
+//  map(0x00a, 0x00b).r(FUNC(amiga_state::joydat_r<0>));
+//  map(0x00c, 0x00d).r(FUNC(amiga_state::joydat_r<1>));
+//  map(0x00e, 0x00f).r(FUNC(amiga_state::clxdat_r));
 	map(0x010, 0x011).r(m_fdc, FUNC(amiga_fdc_device::adkcon_r));
-//	map(0x012, 0x013).r(FUNC(amiga_state::potdat_r<0>)); // POT0DAT
-//	map(0x014, 0x015).r(FUNC(amiga_state::potdat_r<1>));
-//	map(0x016, 0x017).r(FUNC(amiga_state::potgor_r)); // a.k.a. POTINP
-//	map(0x018, 0x019).r(FUNC(amiga_state::serdat_r));
+//  map(0x012, 0x013).r(FUNC(amiga_state::potdat_r<0>)); // POT0DAT
+//  map(0x014, 0x015).r(FUNC(amiga_state::potdat_r<1>));
+//  map(0x016, 0x017).r(FUNC(amiga_state::potgor_r)); // a.k.a. POTINP
+//  map(0x018, 0x019).r(FUNC(amiga_state::serdat_r));
 	map(0x01a, 0x01b).r(m_fdc, FUNC(amiga_fdc_device::dskbytr_r));
-//	map(0x01c, 0x01d).r(m_paula, FUNC(paula_8364_device::intenar_r));
-//	map(0x01e, 0x01f).r(m_paula, FUNC(paula_8364_device::intreqr_r));
+//  map(0x01c, 0x01d).r(m_paula, FUNC(paula_8364_device::intenar_r));
+//  map(0x01e, 0x01f).r(m_paula, FUNC(paula_8364_device::intreqr_r));
 
 	// FDC writes
 	// FIXME: these two belongs to Agnus, also shouldn't be readable
 	map(0x020, 0x021).rw(m_fdc, FUNC(amiga_fdc_device::dskpth_r), FUNC(amiga_fdc_device::dskpth_w));
 	map(0x022, 0x023).rw(m_fdc, FUNC(amiga_fdc_device::dskptl_r), FUNC(amiga_fdc_device::dskptl_w));
 	map(0x024, 0x025).w(m_fdc, FUNC(amiga_fdc_device::dsklen_w));
-//	map(0x026, 0x027).w(m_fdc, FUNC(amiga_fdc_device::dskdat_w));
+//  map(0x026, 0x027).w(m_fdc, FUNC(amiga_fdc_device::dskdat_w));
 
-//	map(0x028, 0x029).w(FUNC(amiga_state::refptr_w));
+//  map(0x028, 0x029).w(FUNC(amiga_state::refptr_w));
 	map(0x02a, 0x02b).w(FUNC(amiga_state::vposw_w));
-//	map(0x02c, 0x02d).w(FUNC(amiga_state::vhposw_w));
+//  map(0x02c, 0x02d).w(FUNC(amiga_state::vhposw_w));
 	map(0x02e, 0x02f).w(m_copper, FUNC(amiga_copper_device::copcon_w));
 
 	// input strobes
-//	map(0x030, 0x031).w(FUNC(amiga_state::serdat_w));
-//	map(0x032, 0x033).w(FUNC(amiga_state::serper_w));
-//	map(0x034, 0x035).w(FUNC(amiga_state::potgo_w));
-//	map(0x036, 0x037).w(FUNC(amiga_state::joytest_w));
+//  map(0x030, 0x031).w(FUNC(amiga_state::serdat_w));
+//  map(0x032, 0x033).w(FUNC(amiga_state::serper_w));
+//  map(0x034, 0x035).w(FUNC(amiga_state::potgo_w));
+//  map(0x036, 0x037).w(FUNC(amiga_state::joytest_w));
 
 	// video beam strobes
-//	map(0x038, 0x039).w(FUNC(amiga_state::strequ_w));
-//	map(0x03a, 0x03b).w(FUNC(amiga_state::strvbl_w));
-//	map(0x03c, 0x03d).w(FUNC(amiga_state::strhor_w));
+//  map(0x038, 0x039).w(FUNC(amiga_state::strequ_w));
+//  map(0x03a, 0x03b).w(FUNC(amiga_state::strvbl_w));
+//  map(0x03c, 0x03d).w(FUNC(amiga_state::strhor_w));
 
-//	map(0x040, 0x075).m(m_blitter, FUNC(amiga_blitter_device::regs_map));
-//	map(0x07c, 0x07d).r <open bus for OCS>
+//  map(0x040, 0x075).m(m_blitter, FUNC(amiga_blitter_device::regs_map));
+//  map(0x07c, 0x07d).r <open bus for OCS>
 	map(0x07e, 0x07f).w(m_fdc, FUNC(amiga_fdc_device::dsksync_w));
 
 	// Copper
 	map(0x080, 0x08b).m(m_copper, FUNC(amiga_copper_device::regs_map));
 	map(0x08c, 0x08d).w(m_copper, FUNC(amiga_copper_device::copins_w));
 	// Display window
-//	map(0x08e, 0x08f).w(FUNC(amiga_state::diwstrt_w));
-//	map(0x090, 0x091).w(FUNC(amiga_state::diwstop_w));
+//  map(0x08e, 0x08f).w(FUNC(amiga_state::diwstrt_w));
+//  map(0x090, 0x091).w(FUNC(amiga_state::diwstop_w));
 	// Display horizontal fetch
-//	map(0x092, 0x093).w(FUNC(amiga_state::ddfstrt_w));
-//	map(0x094, 0x095).w(FUNC(amiga_state::ddfstop_w));
+//  map(0x092, 0x093).w(FUNC(amiga_state::ddfstrt_w));
+//  map(0x094, 0x095).w(FUNC(amiga_state::ddfstop_w));
 
-//	map(0x096, 0x097).w(FUNC(amiga_state::dmacon_w));
-//	map(0x098, 0x099).w(FUNC(amiga_state::clxcon_w));
-//	map(0x09a, 0x09b).w(m_paula, FUNC(paula_8364_device::intena_w));
-//	map(0x09c, 0x09d).w(m_paula, FUNC(paula_8364_device::intreq_w));
-//	map(0x09e, 0x09f).w(m_paula, FUNC(paula_8364_device::adkcon_w));
+//  map(0x096, 0x097).w(FUNC(amiga_state::dmacon_w));
+//  map(0x098, 0x099).w(FUNC(amiga_state::clxcon_w));
+//  map(0x09a, 0x09b).w(m_paula, FUNC(paula_8364_device::intena_w));
+//  map(0x09c, 0x09d).w(m_paula, FUNC(paula_8364_device::intreq_w));
+//  map(0x09e, 0x09f).w(m_paula, FUNC(paula_8364_device::adkcon_w));
 	// Audio section
 	map(0x0a0, 0x0ab).m(m_paula, FUNC(paula_8364_device::audio_channel_map<0>));
 	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<1>));
 	map(0x0c0, 0x0cb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<2>));
 	map(0x0d0, 0x0db).m(m_paula, FUNC(paula_8364_device::audio_channel_map<3>));
-	
+
 	// Bitplane pointer section
-//	map(0x0e0, 0x0ff).m(amiga_state::bplxptr_map));
+//  map(0x0e0, 0x0ff).m(amiga_state::bplxptr_map));
 
 	// Video bitplane registers
 	map(0x100, 0x101).w(FUNC(amiga_state::bplcon0_w));
-//	map(0x102, 0x103).w(FUNC(amiga_state::bplcon1_w));
-//	map(0x104, 0x105).w(FUNC(amiga_state::bplcon2_w));
+//  map(0x102, 0x103).w(FUNC(amiga_state::bplcon1_w));
+//  map(0x104, 0x105).w(FUNC(amiga_state::bplcon2_w));
 
-//	map(0x108, 0x109).w(FUNC(amiga_state::bpl1mod_w));
-//	map(0x10a, 0x10b).w(FUNC(amiga_state::bpl2mod_w));
+//  map(0x108, 0x109).w(FUNC(amiga_state::bpl1mod_w));
+//  map(0x10a, 0x10b).w(FUNC(amiga_state::bpl2mod_w));
 
-//	map(0x110, 0x11f).m(amiga_state::bplxdat_map));
+//  map(0x110, 0x11f).m(amiga_state::bplxdat_map));
 	// Sprite section
-//	map(0x120, 0x17f).m(amiga_state::sprxpt_map));
+//  map(0x120, 0x17f).m(amiga_state::sprxpt_map));
 	// Color section
-//	map(0x180, 0x1bf).m(amiga_state::colorxx_map));
+//  map(0x180, 0x1bf).m(amiga_state::colorxx_map));
 }
 
 void amiga_state::ecs_map(address_map &map)
 {
 	ocs_map(map);
-//	map(0x03e, 0x03f).w(FUNC(amiga_state::strlong_w));
-//	map(0x078, 0x079).w(FUNC(amiga_state::sprhdat_w));
-//	map(0x07c, 0x07d).r(FUNC(amiga_state::deniseid_r));
+//  map(0x03e, 0x03f).w(FUNC(amiga_state::strlong_w));
+//  map(0x078, 0x079).w(FUNC(amiga_state::sprhdat_w));
+//  map(0x07c, 0x07d).r(FUNC(amiga_state::deniseid_r));
 
-//	map(0x106, 0x107).w(FUNC(amiga_state::bplcon3_w));
-	
+//  map(0x106, 0x107).w(FUNC(amiga_state::bplcon3_w));
+
 	// Extended ECS registers
 	// video geometry regs
-//	map(0x1c0, 0x1c7).m(FUNC(amiga_state::horz_screen_map));
-//	map(0x1c8, 0x1cf).m(FUNC(amiga_state::vert_screen_map));
-//	map(0x1dc, 0x1dd).w(FUNC(amiga_state::beamcon0_w));
+//  map(0x1c0, 0x1c7).m(FUNC(amiga_state::horz_screen_map));
+//  map(0x1c8, 0x1cf).m(FUNC(amiga_state::vert_screen_map));
+//  map(0x1dc, 0x1dd).w(FUNC(amiga_state::beamcon0_w));
 	// Screen sync regs, VARHSY / VARVSY
-//	map(0x1de, 0x1df).w(FUNC(amiga_state::hsstrt_w));
-//	map(0x1e0, 0x1e1).w(FUNC(amiga_state::vsstrt_w));
+//  map(0x1de, 0x1df).w(FUNC(amiga_state::hsstrt_w));
+//  map(0x1e0, 0x1e1).w(FUNC(amiga_state::vsstrt_w));
 
-//	map(0x1e2, 0x1e3).w(FUNC(amiga_state::hcenter_w));
-//	map(0x1e4, 0x1e5).w(FUNC(amiga_state::diwhigh_w));
+//  map(0x1e2, 0x1e3).w(FUNC(amiga_state::hcenter_w));
+//  map(0x1e4, 0x1e5).w(FUNC(amiga_state::diwhigh_w));
 
 	// dummy, either related to copper lockup restart or "last N refresh cycles"
-//	map(0x1fe, 0x1ff).?(FUNC(amiga_state::no_op_*)); 
+//  map(0x1fe, 0x1ff).?(FUNC(amiga_state::no_op_*));
 }
 
 void amiga_state::aga_map(address_map &map)
 {
 	ecs_map(map);
 
-//	map(0x078, 0x079).w(FUNC(amiga_state::sprhdat_w));
+//  map(0x078, 0x079).w(FUNC(amiga_state::sprhdat_w));
 
 	map(0x100, 0x101).w(FUNC(amiga_state::aga_bplcon0_w));
 
 	// UHRES regs
 	// TODO: may be shared with ECS?
-//	map(0x1e6, 0x1e7).w(FUNC(amiga_state::bplhmod_w));
-//	map(0x1e8, 0x1e9).w(FUNC(amiga_state::sprhpth_w));
-//	map(0x1ea, 0x1eb).w(FUNC(amiga_state::sprhptl_w));
-//	map(0x1ec, 0x1ed).w(FUNC(amiga_state::bplhpth_w));
-//	map(0x1ed, 0x1ef).w(FUNC(amiga_state::bplhptl_w));
+//  map(0x1e6, 0x1e7).w(FUNC(amiga_state::bplhmod_w));
+//  map(0x1e8, 0x1e9).w(FUNC(amiga_state::sprhpth_w));
+//  map(0x1ea, 0x1eb).w(FUNC(amiga_state::sprhptl_w));
+//  map(0x1ec, 0x1ed).w(FUNC(amiga_state::bplhpth_w));
+//  map(0x1ed, 0x1ef).w(FUNC(amiga_state::bplhptl_w));
 
-//	map(0x1fc, 0x1fd).w(FUNC(amiga_state::fmode_w));
+//  map(0x1fc, 0x1fd).w(FUNC(amiga_state::fmode_w));
 }
 
 
@@ -1298,8 +1298,8 @@ void amiga_state::vposw_w(u16 data)
 	// TODO: ECS always resets the LOF no matter the setting
 	CUSTOM_REG(REG_VPOSR) = (data & VPOSR_LOF) | (data & 7);
 	// TODO: high bits of screen height
-//	if (data & 7)
-//		popmessage("Upper VPOSW set %02x", data);
+//  if (data & 7)
+//      popmessage("Upper VPOSW set %02x", data);
 }
 
 void amiga_state::bplcon0_w(u16 data)

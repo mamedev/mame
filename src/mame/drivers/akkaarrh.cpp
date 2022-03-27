@@ -74,8 +74,8 @@ private:
 	required_device<screen_device> m_screen;
 	output_finder<26> m_lamps;
 
-	tilemap_t * m_tilemap[4];
-	uint8_t m_video_mirror;
+	tilemap_t * m_tilemap[4]{};
+	uint8_t m_video_mirror = 0;
 };
 
 static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;

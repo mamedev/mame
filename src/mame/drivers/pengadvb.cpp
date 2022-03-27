@@ -86,8 +86,8 @@ private:
 	required_device_array<address_map_bank_device, 4> m_page;
 	required_memory_bank_array<4> m_bank;
 
-	uint8_t m_primary_slot_reg;
-	uint8_t m_kb_matrix_row;
+	uint8_t m_primary_slot_reg = 0;
+	uint8_t m_kb_matrix_row = 0;
 };
 
 

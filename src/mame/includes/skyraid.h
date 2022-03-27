@@ -43,10 +43,10 @@ private:
 
 	void skyraid_map(address_map &map);
 
-	int m_analog_range;
-	int m_analog_offset;
+	int m_analog_range = 0;
+	int m_analog_offset = 0;
 
-	int m_scroll;
+	int m_scroll = 0;
 
 	required_shared_ptr<uint8_t> m_pos_ram;
 	required_shared_ptr<uint8_t> m_alpha_num_ram;

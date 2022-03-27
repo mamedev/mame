@@ -77,12 +77,12 @@ protected:
 	required_device<screen_device> m_screen;
 	output_finder<3> m_lamps;
 
-	uint8_t m_latched_input;
-	uint8_t m_spyhunt_sprite_color_mask;
-	int16_t m_spyhunt_scroll_offset;
-	int16_t m_spyhunt_scrollx;
-	int16_t m_spyhunt_scrolly;
-	tilemap_t *m_alpha_tilemap;
+	uint8_t m_latched_input = 0;
+	uint8_t m_spyhunt_sprite_color_mask = 0;
+	int16_t m_spyhunt_scroll_offset = 0;
+	int16_t m_spyhunt_scrollx = 0;
+	int16_t m_spyhunt_scrolly = 0;
+	tilemap_t *m_alpha_tilemap = nullptr;
 
 	[[maybe_unused]] TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(mcrmono_get_bg_tile_info);
@@ -113,10 +113,10 @@ private:
 
 	required_device<adc0844_device> m_maxrpm_adc;
 
-	uint8_t m_maxrpm_adc_control;
-	uint8_t m_maxrpm_last_shift;
-	int8_t m_maxrpm_p1_shift;
-	int8_t m_maxrpm_p2_shift;
+	uint8_t m_maxrpm_adc_control = 0;
+	uint8_t m_maxrpm_last_shift = 0;
+	int8_t m_maxrpm_p1_shift = 0;
+	int8_t m_maxrpm_p2_shift = 0;
 };
 
 class mcrsc_csd_state : public mcr3_state

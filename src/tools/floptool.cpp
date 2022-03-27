@@ -244,7 +244,7 @@ static int flopcreate(int argc, char *argv[])
 		fprintf(stderr, "Error: Floppy creation format '%s' unknown\n", argv[3]);
 		return 1;
 	}
-	if(!create_fs->m_manager->can_format()) {
+	if(create_fs->m_manager && !create_fs->m_manager->can_format()) {
 		fprintf(stderr, "Error: Floppy creation format '%s' does not support creating new images\n", argv[3]);
 		return 1;
 	}

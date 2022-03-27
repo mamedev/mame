@@ -861,7 +861,7 @@ offs_t tms34010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			print_des_reg(stream);
 			stream << ",";
 			print_relative(stream, pc, pos, params);
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 
 		case 0x01a0:
@@ -869,7 +869,7 @@ offs_t tms34010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			print_des_reg(stream);
 			stream << ",";
 			print_relative(stream, pc, pos, params);
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 
 		case 0x01c0:
@@ -877,7 +877,7 @@ offs_t tms34010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			print_des_reg(stream);
 			stream << ",";
 			print_relative(stream, pc, pos, params);
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 
 		case 0x01e0:
@@ -1063,7 +1063,7 @@ offs_t tms34010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		print_des_reg(stream);
 		stream << ",";
 		print_relative_5bit(stream, pc);
-		flags = STEP_OVER;
+		flags = STEP_COND;
 		break;
 
 
@@ -1465,6 +1465,8 @@ offs_t tms34010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			util::stream_format(stream, "JR");
 		}
 
+		if ((op & 0x0f00) != 0)
+			flags = STEP_COND;
 		print_condition_code(stream);
 		stream << "   ";
 

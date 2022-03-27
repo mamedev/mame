@@ -438,7 +438,7 @@ private:
 	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_6);
 	DECLARE_WRITE_LINE_MEMBER(irq_7);
 
-	emu_timer *m_bus_error_timer;
+	emu_timer *m_bus_error_timer = nullptr;
 
 	void hp_ipc_mem_inner_base(address_map &map);
 	void hp_ipc_mem_inner_9807a(address_map &map);
@@ -462,11 +462,11 @@ private:
 	required_device<hp_ipc_io_slot_device> m_io_slot_b;
 	required_device_array<hp_ipc_optrom_device , 2> m_rom_slots;
 
-	uint32_t m_mmu[4], m_lowest_ram_addr;
-	uint16_t *m_internal_ram;
-	int m_fc;
+	uint32_t m_mmu[4]{}, m_lowest_ram_addr = 0;
+	uint16_t *m_internal_ram = nullptr;
+	int m_fc = 0;
 
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 
 	inline uint32_t get_ram_address(offs_t offset)
 	{
@@ -474,7 +474,7 @@ private:
 	}
 
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
-	bool m_bus_error;
+	bool m_bus_error = false;
 };
 
 

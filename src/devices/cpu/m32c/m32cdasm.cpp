@@ -856,7 +856,7 @@ void m32c_disassembler::dasm_1101(std::ostream &stream, offs_t &pc, const m32c_d
 		stream << "und";
 }
 
-void m32c_disassembler::dasm_111x(std::ostream &stream, offs_t &pc, const m32c_disassembler::data_buffer &opcodes, u8 op1, bool indirect_dest) const
+void m32c_disassembler::dasm_111x(std::ostream &stream, offs_t &pc, offs_t &flags, const m32c_disassembler::data_buffer &opcodes, u8 op1, bool indirect_dest) const
 {
 	u8 op2 = opcodes.r8(pc++);
 	if ((op2 & 0x30) == 0 || ((op2 & 0x30) == 0x20 && !BIT(op1, 4)))
@@ -877,6 +877,7 @@ void m32c_disassembler::dasm_111x(std::ostream &stream, offs_t &pc, const m32c_d
 		dasm_operand(stream, pc, opcodes, (op1 & 0x0e) << 1 | BIT(op2, 6, 2), op1 & 1, indirect_dest);
 		stream << ", ";
 		format_label(stream, pc + s8(opcodes.r8(pc)));
+		flags |= STEP_COND;
 		++pc;
 	}
 	else if ((op2 & 0x30) == 0x30 && BIT(op1, 4))
@@ -1050,6 +1051,7 @@ offs_t m32c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m32
 		util::stream_format(stream, "%-11s", util::string_format("j%s", s_cnds[bitswap<4>(op1, 6, 5, 4, 0)]));
 		format_label(stream, pc + s8(opcodes.r8(pc)));
 		++pc;
+		flags |= STEP_COND;
 		break;
 
 	case 0x8c: case 0x8d:
@@ -1211,7 +1213,7 @@ offs_t m32c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m32
 
 	case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: case 0xe8: case 0xe9:
 	case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: case 0xf8: case 0xf9:
-		dasm_111x(stream, pc, opcodes, op1, indirect_dest);
+		dasm_111x(stream, pc, flags, opcodes, op1, indirect_dest);
 		break;
 
 	case 0xec:

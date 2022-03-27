@@ -45,14 +45,14 @@ private:
 	required_region_ptr<u8> m_bgrom;
 
 	/* video-related */
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
-	tilemap_t     *m_tx_tilemap;
-	int           m_layers_ctrl;
-	int           m_flipscreen;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	tilemap_t     *m_fg_tilemap = nullptr;
+	tilemap_t     *m_tx_tilemap = nullptr;
+	int           m_layers_ctrl = 0;
+	int           m_flipscreen = 0;
 #ifdef MAME_DEBUG
-	int           m_posx;
-	int           m_posy;
+	int           m_posx = 0;
+	int           m_posy = 0;
 #endif
 
 	/* devices */

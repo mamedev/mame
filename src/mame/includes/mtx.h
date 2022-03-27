@@ -76,22 +76,22 @@ private:
 	memory_bank_creator m_rommap_bank3;
 
 	/* keyboard state */
-	uint8_t m_key_sense;
+	uint8_t m_key_sense = 0;
 
 	/* video state */
-	uint8_t *m_video_ram;
-	uint8_t *m_attr_ram;
+	uint8_t *m_video_ram = nullptr;
+	uint8_t *m_attr_ram = nullptr;
 
 	/* sound state */
-	uint8_t m_sound_latch;
+	uint8_t m_sound_latch = 0;
 
 	/* timers */
-	device_t *m_cassette_timer;
+	device_t *m_cassette_timer = nullptr;
 
-	int m_centronics_busy;
-	int m_centronics_fault;
-	int m_centronics_perror;
-	int m_centronics_select;
+	int m_centronics_busy = 0;
+	int m_centronics_fault = 0;
+	int m_centronics_perror = 0;
+	int m_centronics_select = 0;
 
 	void mtx_subpage_w(uint8_t data);
 	void mtx_bankswitch_w(uint8_t data);

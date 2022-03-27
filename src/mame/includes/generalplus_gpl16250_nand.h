@@ -55,15 +55,15 @@ private:
 
 	void nand_create_stripped_region();
 
-	std::vector<uint8_t> m_strippedrom;
-	int m_strippedsize;
-	int m_size;
-	int m_nandblocksize;
-	int m_nandblocksize_stripped;
+	std::vector<uint8_t> m_strippedrom{};
+	int m_strippedsize = 0;
+	int m_size = 0;
+	int m_nandblocksize = 0;
+	int m_nandblocksize_stripped = 0;
 
 	int m_sdram_kwords;
 	int m_initial_copy_words;
-	int m_vectorbase;
+	int m_vectorbase = 0;
 };
 
 

@@ -55,8 +55,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	// video-related
-	uint8_t m_tilebank;
-	tilemap_t *m_zz_tilemap;
+	uint8_t m_tilebank = 0;
+	tilemap_t *m_zz_tilemap = nullptr;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

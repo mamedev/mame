@@ -5926,8 +5926,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="msdos32" supported="no">
+	<software name="msdos32">
 		<description>MS-DOS (Version 3.2)</description>
+		<year>1985</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="f7c4b665" sha1="ba3491076e0af4cf8ce754c5e2cd7da31bfb2954"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="620f3653" sha1="ee67a0bb2a397ba1a78991ca20f977cb18bd2288"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos32a" supported="no" cloneof="msdos32">
+		<description>MS-DOS (Version 3.2) (alt)</description>
 		<year>1985</year>
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">

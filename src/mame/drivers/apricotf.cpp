@@ -118,8 +118,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	void m1_w(u8 data);
 
-	int m_40_80;
-	int m_200_256;
+	int m_40_80 = 0;
+	int m_200_256 = 0;
 
 	void act_f1_io(address_map &map);
 	void act_f1_mem(address_map &map);

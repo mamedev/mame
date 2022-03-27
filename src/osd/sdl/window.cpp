@@ -94,17 +94,17 @@ bool sdl_osd_interface::window_init()
 
 	// initialize the renderer
 	const int fallbacks[VIDEO_MODE_COUNT] = {
-		-1,						// NONE -> no fallback
-		-1,						// No GDI on Linux
+		-1,                     // NONE -> no fallback
+		-1,                     // No GDI on Linux
 #if defined(USE_OPENGL) && USE_OPENGL
-		VIDEO_MODE_OPENGL,		// BGFX -> OpenGL
-		VIDEO_MODE_SDL2ACCEL,	// OpenGL -> SDL2Accel
+		VIDEO_MODE_OPENGL,      // BGFX -> OpenGL
+		-1,                     // OpenGL -> no fallback
 #else
-		VIDEO_MODE_SDL2ACCEL,	// BGFX -> SDL2Accel
+		VIDEO_MODE_SDL2ACCEL,   // BGFX -> SDL2Accel
 #endif
-		VIDEO_MODE_SOFT,		// SDL2ACCEL -> SOFT
-		-1,						// No D3D on Linux
-		-1,						// SOFT -> no fallback
+		-1,                     // SDL2ACCEL -> no fallback
+		-1,                     // No D3D on Linux
+		-1,                     // SOFT -> no fallback
 	};
 
 	int current_mode = video_config.mode;
@@ -114,7 +114,7 @@ bool sdl_osd_interface::window_init()
 		switch(current_mode)
 		{
 			case VIDEO_MODE_BGFX:
-				renderer_bgfx::init(machine());
+				error = renderer_bgfx::init(machine());
 				break;
 #if defined(USE_OPENGL) && USE_OPENGL
 			case VIDEO_MODE_OPENGL:

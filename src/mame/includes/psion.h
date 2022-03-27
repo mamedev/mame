@@ -60,19 +60,19 @@ protected:
 	required_device<nvram_device> m_nvram2;
 	optional_device<nvram_device> m_nvram3;
 
-	uint16_t m_kb_counter;
-	uint8_t m_enable_nmi;
+	uint16_t m_kb_counter = 0;
+	uint8_t m_enable_nmi = 0;
 	optional_shared_ptr<uint8_t> m_sys_register;
 	uint8_t m_stby_pwr;
-	uint8_t m_pulse;
+	uint8_t m_pulse = 0;
 
 	// RAM/ROM banks
 	required_shared_ptr<uint8_t> m_ram;
 	std::unique_ptr<uint8_t[]> m_paged_ram;
-	uint8_t m_rom_bank;
-	uint8_t m_ram_bank;
-	uint8_t m_ram_bank_count;
-	uint8_t m_rom_bank_count;
+	uint8_t m_rom_bank = 0;
+	uint8_t m_ram_bank = 0;
+	uint8_t m_ram_bank_count = 0;
+	uint8_t m_rom_bank_count = 0;
 
 	required_ioport_array<7> m_kb_lines;
 

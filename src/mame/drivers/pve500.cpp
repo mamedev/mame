@@ -109,8 +109,8 @@ private:
 	required_device<beep_device> m_buzzer;
 	output_finder<27> m_digits;
 
-	uint8_t io_SEL, io_LD, io_LE, io_SC, io_KY;
-	int LD_data[4];
+	uint8_t io_SEL = 0, io_LD = 0, io_LE = 0, io_SC = 0, io_KY = 0;
+	int LD_data[4]{};
 };
 
 WRITE_LINE_MEMBER(pve500_state::GPI_w)

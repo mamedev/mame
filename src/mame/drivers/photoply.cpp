@@ -57,7 +57,7 @@ private:
 	void bios_w(offs_t offset, uint8_t data);
 	void eeprom_w(uint8_t data);
 
-	uint16_t m_pci_shadow_reg;
+	uint16_t m_pci_shadow_reg = 0;
 
 	void photoply_io(address_map &map);
 	void photoply_map(address_map &map);
@@ -349,10 +349,10 @@ ROM_START(photoply99sp)
 	    -Atmel AT89C2051 MCU (2KBytes internal ROM)
 	    -Xtal 11.05MHz
 	    -24C08W6 SEEPROM
-	    -HC132 
+	    -HC132
 	   On each dongle there's a sticker with the revision number, but we've found the same MCU program on different revisions and
 	   different SEEPROM contents on the same revision. We're adding here every found combination of MCU program and SEEPROM content.
-        */
+	    */
 	ROM_REGION(0xC00, "dongle", 0)
 
 	// Same MCU program as "pp_99_dongle_r3a", and "pp_99_dongle_r1" but with unique SEEPROM content

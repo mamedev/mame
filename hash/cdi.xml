@@ -10736,7 +10736,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="from the associated press - the best of photo journalism (1993)[dvc]" sha1="c8eb407a10916be732e9fa10c198dce1a277e525"/>
+				<disk name="from the associated press - the best of photo journalism (1993)[dvc]" sha1="4059c3d61a00194f1e761d7a0d76ec871c9dad74"/>
 			</diskarea>
 		</part>
 	</software>

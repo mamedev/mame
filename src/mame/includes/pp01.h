@@ -45,12 +45,12 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t m_video_scroll;
-	uint8_t m_memory_block[16];
-	uint8_t m_video_write_mode;
-	uint8_t m_key_line;
-	bool m_txe, m_txd, m_rts, m_casspol;
-	u8 m_cass_data[4];
+	uint8_t m_video_scroll = 0;
+	uint8_t m_memory_block[16]{};
+	uint8_t m_video_write_mode = 0;
+	uint8_t m_key_line = 0;
+	bool m_txe = false, m_txd = false, m_rts = false, m_casspol = false;
+	u8 m_cass_data[4]{};
 
 	void video_write_mode_w(uint8_t data);
 	void video_r_1_w(offs_t offset, uint8_t data);

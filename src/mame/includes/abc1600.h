@@ -124,7 +124,7 @@ private:
 	void spec_contr_reg_w(uint8_t data);
 
 	void dbrq_w(int state);
-	
+
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
 	void cio_pb_w(uint8_t data);

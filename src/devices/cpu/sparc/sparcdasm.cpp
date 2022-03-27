@@ -1117,7 +1117,10 @@ offs_t sparc_disassembler::dasm_branch(std::ostream &stream, offs_t pc, uint32_t
 	//const char * const comment(desc.get_comment ? desc.get_comment(m_config, desc.use_cc, pc, op) : nullptr);
 	//if (comment) util::stream_format(stream, " - %s", comment);
 
-	return 4 | SUPPORTED;
+	if ((COND & 7) != 0)
+		return 4 | STEP_COND | step_over_extra(1) | SUPPORTED;
+	else
+		return 4 | SUPPORTED; // branch never or always
 }
 
 

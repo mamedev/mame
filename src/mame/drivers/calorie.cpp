@@ -109,9 +109,9 @@ public:
 	required_shared_ptr<uint8_t> m_sprites;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	uint8_t    m_bg_bank;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	uint8_t    m_bg_bank = 0;
 	void fg_ram_w(offs_t offset, uint8_t data);
 	void bg_bank_w(uint8_t data);
 	void calorie_flipscreen_w(uint8_t data);

@@ -50,16 +50,16 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_gpio_b;
+	uint8_t m_gpio_b = 0;
 
-	uint64_t m_last_cycles;
-	uint64_t m_frame_start_cycle;
+	uint64_t m_last_cycles = 0;
+	uint64_t m_frame_start_cycle = 0;
 
-	uint8_t m_latched_sample;
-	bool m_in_blanking;
-	uint64_t m_blanking_start;
-	uint32_t m_sample_x;
-	uint32_t m_sample_y;
+	uint8_t m_latched_sample = 0;
+	bool m_in_blanking = false;
+	uint64_t m_blanking_start = 0;
+	uint32_t m_sample_x = 0;
+	uint32_t m_sample_y = 0;
 	std::unique_ptr<uint8_t[]> m_samples;
 };
 

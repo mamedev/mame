@@ -55,9 +55,6 @@ public:
 	void init_pcdboard();
 	void init_pceboard();
 	void init_pcfboard();
-	void init_rp5h01_fix();
-	void init_virus();
-	void init_ttoon();
 	void init_pcgboard();
 	void init_pcgboard_type2();
 	void init_pchboard();

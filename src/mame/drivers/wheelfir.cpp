@@ -188,7 +188,7 @@ static const int NUM_COLORS=256;
 
 struct scroll_info
 {
-		int32_t x,y,unkbits;
+		int32_t x = 0, y = 0, unkbits = 0;
 };
 
 
@@ -224,16 +224,16 @@ private:
 
 	std::unique_ptr<scroll_info[]> m_scanlines;
 
-	int32_t m_direct_write_x0;
-	int32_t m_direct_write_x1;
-	int32_t m_direct_write_y0;
-	int32_t m_direct_write_y1;
-	int32_t m_direct_write_idx;
+	int32_t m_direct_write_x0 = 0;
+	int32_t m_direct_write_x1 = 0;
+	int32_t m_direct_write_y0 = 0;
+	int32_t m_direct_write_y1 = 0;
+	int32_t m_direct_write_idx = 0;
 
-	int16_t m_scanline_cnt;
+	int16_t m_scanline_cnt = 0;
 
 
-	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[2];
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[2]{};
 
 	int32_t get_scale(int32_t index)
 	{

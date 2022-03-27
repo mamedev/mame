@@ -73,10 +73,10 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_ram;
 
 	/* misc */
-	uint8_t m_pot_state;
-	uint8_t m_pot_latch;
-	emu_timer *m_pot_interrupt;
-	emu_timer *m_periodic_timer;
+	uint8_t m_pot_state = 0;
+	uint8_t m_pot_latch = 0;
+	emu_timer *m_pot_interrupt = nullptr;
+	emu_timer *m_periodic_timer = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -462,10 +462,12 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 
 	case 0x06:
 		stream << "ifnc";
+		bytes |= STEP_COND;
 		break;
 
 	case 0x07:
 		stream << "ifc";
+		bytes |= STEP_COND;
 		break;
 
 	case 0x08: case 0x09: case 0x0a: case 0x0b:
@@ -476,6 +478,7 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 	case 0x10: case 0x11: case 0x12: case 0x13:
 	case 0x14: case 0x15: case 0x16: case 0x17:
 		disassemble_bit_op(stream, "ifbit", opcode & 0x07, reg, src, indir, idx);
+		bytes |= STEP_COND;
 		break;
 
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
@@ -515,6 +518,7 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 
 	case 0x3a:
 		disassemble_op(stream, "ifbit", reg, src, imm, indir, idx, false);
+		bytes |= STEP_COND;
 		break;
 
 	case 0x3b:
@@ -589,7 +593,7 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 	case 0x8a:
 	case 0xaa:
 		disassemble_unary_op(stream, "decsz", reg, src, indir, idx, BIT(opcode, 5));
-		bytes |= STEP_OVER | (1 << OVERINSTSHIFT);
+		bytes |= STEP_COND;
 		break;
 
 	case 0x8b:
@@ -643,10 +647,12 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 
 	case 0x9c: case 0xbc: case 0xdc: case 0xfc:
 		disassemble_op(stream, "ifeq", reg, src, imm, indir, idx, BIT(opcode, 5));
+		bytes |= STEP_COND;
 		break;
 
 	case 0x9d: case 0xbd: case 0xdd: case 0xfd:
 		disassemble_op(stream, "ifgt", reg, src, imm, indir, idx, BIT(opcode, 5));
+		bytes |= STEP_COND;
 		break;
 
 	case 0x9e: case 0xbe: case 0xde: case 0xfe:
@@ -691,7 +697,7 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 		util::stream_format(stream, "%-8sA,[B%c].%c", "lds",
 			BIT(opcode, 1) ? '-' : '+',
 			BIT(opcode, 5) ? 'w' : 'b');
-		bytes |= STEP_OVER | (1 << OVERINSTSHIFT);
+		bytes |= STEP_COND;
 		break;
 
 	case 0xd0: case 0xd2:
@@ -706,7 +712,7 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 		util::stream_format(stream, "%-8sA,[B%c].%c", "xs",
 			BIT(opcode, 1) ? '-' : '+',
 			BIT(opcode, 5) ? 'w' : 'b');
-		bytes |= STEP_OVER | (1 << OVERINSTSHIFT);
+		bytes |= STEP_COND;
 		break;
 
 	case 0xd1: case 0xd3:

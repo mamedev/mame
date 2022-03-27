@@ -61,7 +61,7 @@ private:
 	// driver_device overrides
 	virtual void video_start() override;
 
-	uint8_t m_keyrow;
+	uint8_t m_keyrow = 0;
 };
 
 uint8_t lw700i_state::p7_r()
