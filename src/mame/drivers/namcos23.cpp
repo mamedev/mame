@@ -3579,11 +3579,11 @@ void namcos23_state::init_s23()
 		(!strcmp(machine().system().name, "finfurl2j")) ||
 		(!strcmp(machine().system().name, "raceon")) ||
 		(!strcmp(machine().system().name, "crszone")) ||
-		(!strcmp(machine().system().name, "crszonev4a")) ||
-		(!strcmp(machine().system().name, "crszonev3b")) ||
-		(!strcmp(machine().system().name, "crszonev3b2")) ||
-		(!strcmp(machine().system().name, "crszonev3a")) ||
-		(!strcmp(machine().system().name, "crszonev2a")) ||
+		(!strcmp(machine().system().name, "crszonea")) ||
+		(!strcmp(machine().system().name, "crszoneub")) ||
+		(!strcmp(machine().system().name, "crszoneub2")) ||
+		(!strcmp(machine().system().name, "crszoneua")) ||
+		(!strcmp(machine().system().name, "crszonewa")) ||
 		(!strcmp(machine().system().name, "timecrs2u")) ||
 		(!strcmp(machine().system().name, "timecrs2j")) ||
 		(!strcmp(machine().system().name, "timecrs2"))) {
@@ -5172,7 +5172,7 @@ ROM_START( crszone )
 ROM_END
 
 
-ROM_START( crszonev4a )
+ROM_START( crszonea )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo4vera.ic4", 0x400000, 0x400000, CRC(cabee8c3) SHA1(4887b8550038c072f988c5999d57ec40e82e4072) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -5225,7 +5225,7 @@ ROM_START( crszonev4a )
 ROM_END
 
 
-ROM_START( crszonev3b )
+ROM_START( crszoneub )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x400000, 0x400000, CRC(4cb26465) SHA1(078dfd0d8c920707df14e9a26658fa63421fcb0b) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -5278,7 +5278,7 @@ ROM_START( crszonev3b )
 ROM_END
 
 
-ROM_START( crszonev3b2 )
+ROM_START( crszoneub2 )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x400000, 0x400000, CRC(3755b402) SHA1(e169fded9d136af7ce6997868629eed5196b8cdd) ) // sldh
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -5331,7 +5331,7 @@ ROM_START( crszonev3b2 )
 ROM_END
 
 
-ROM_START( crszonev3a )
+ROM_START( crszoneua )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo3vera.ic4", 0x400000, 0x400000, CRC(09b0c91e) SHA1(226c3788d6a50272e2544d04d9ca20df81014fb6) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -5384,7 +5384,7 @@ ROM_START( crszonev3a )
 ROM_END
 
 
-ROM_START( crszonev2a )
+ROM_START( crszonewa )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo2vera.ic4", 0x400000, 0x400000, CRC(1426d8d0) SHA1(e8049df1b2db1180f9edf6e5fa9fe8692ae81086) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -5467,8 +5467,8 @@ GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, init_
 GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1999, crszone,     0,        ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",   GAME_FLAGS )
-GAME( 1999, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",   GAME_FLAGS )
-GAME( 1999, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )
-GAME( 1999, crszonev3b2, crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 2)", GAME_FLAGS )
-GAME( 1999, crszonev3a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. A)",   GAME_FLAGS )
-GAME( 1999, crszonev2a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO2 Ver. A)",   GAME_FLAGS )
+GAME( 1999, crszonea,    crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",   GAME_FLAGS )
+GAME( 1999, crszoneub,   crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )
+GAME( 1999, crszoneub2,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 2)", GAME_FLAGS )
+GAME( 1999, crszoneua,   crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. A)",   GAME_FLAGS )
+GAME( 1999, crszonewa,   crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO2 Ver. A)",   GAME_FLAGS )
