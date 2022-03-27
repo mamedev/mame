@@ -1913,8 +1913,8 @@ void gottlieb_state::cobram3(machine_config &config)
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* sound hardware */
-	subdevice<dac_8bit_r2r_device>("r2sound:dac")->reset_routes();
-	subdevice<dac_8bit_r2r_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
+	subdevice<ad7528_device>("r2sound:dac")->reset_routes();
+	subdevice<ad7528_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
 }
 
 
