@@ -1140,6 +1140,11 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_rts));
 	save_item(NAME(m_tx_int_disarm));
 	save_item(NAME(m_sync_pattern));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_rcv_mode));
+	save_item(NAME(m_index));
+	save_item(NAME(m_brg_rate));
+	save_item(NAME(m_delayed_tx_brg_change));
 }
 
 
