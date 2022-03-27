@@ -5440,8 +5440,8 @@ ROM_END
 /* Games */
 #define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 //    YEAR, NAME,        PARENT,   MACHINE,     INPUT,     CLASS,          INIT,     MNTR, COMPANY, FULLNAME,                      FLAGS
-GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
-GAME( 1997, rapidrvru,   rapidrvr, gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (US, RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
+GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
+GAME( 1997, rapidrvru,   rapidrvr, gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (US, RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
 GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, init_s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
 GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, init_s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (World, DH2 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
