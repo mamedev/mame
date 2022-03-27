@@ -20,8 +20,8 @@ public:
 	constexpr int width() const { return m_w; }
 	constexpr int height() const { return m_h; }
 
-	constexpr bool operator!=(const osd_dim &other) { return (m_w != other.width()) || (m_h != other.height()); }
-	constexpr bool operator==(const osd_dim &other) { return (m_w == other.width()) && (m_h == other.height()); }
+	constexpr bool operator!=(const osd_dim &other) const { return (m_w != other.width()) || (m_h != other.height()); }
+	constexpr bool operator==(const osd_dim &other) const { return (m_w == other.width()) && (m_h == other.height()); }
 
 private:
 	int m_w;
