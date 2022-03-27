@@ -298,7 +298,7 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->pre_opcode_fetch(offset);
-	adjust_mem_contended(offset);
+	adjust_contended(offset);
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_opcode_fetch(offset);
 	return retval;
@@ -307,7 +307,7 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
 	m_exp->pre_data_fetch(offset);
-	adjust_mem_contended(offset);
+	adjust_contended(offset);
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_data_fetch(offset);
 	return retval;
@@ -315,11 +315,11 @@ uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 
 void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 {
-	adjust_mem_contended(offset);
+	adjust_contended(offset);
 	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
 }
 
-void spectrum_state::adjust_mem_contended(offs_t offset)
+void spectrum_state::adjust_contended(offs_t offset)
 {
 	unsigned int vpos = m_screen->vpos();
 
@@ -362,7 +362,7 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 */
 void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 {
-	adjust_mem_contended(offset);
+	adjust_contended(offset);
 
 	unsigned char Changed = m_port_fe_data^data;
 
@@ -390,7 +390,7 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 /* DJR: Spectrum+ keys added */
 uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 {
-	adjust_mem_contended(offset);
+	adjust_contended(offset);
 
 	int lines = offset >> 8;
 	int data = 0xff;
@@ -467,7 +467,7 @@ uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 
 void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 {
-	adjust_mem_contended(offset);
+	adjust_contended(offset);
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
 		m_exp->iorq_w(offset | 1, data);
@@ -479,7 +479,7 @@ uint8_t spectrum_state::spectrum_port_r(offs_t offset)
 	if (m_exp->get_card_device())
 		return m_exp->iorq_r(offset | 1);
 
-	adjust_mem_contended(offset);
+	adjust_contended(offset);
 	return floating_bus_r();
 }
 
