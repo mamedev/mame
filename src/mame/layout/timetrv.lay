@@ -33,9 +33,11 @@ copyright-holders:Ryan Holtz
 		<text string="PLAYER 2"><color red="0.3" green="0.3" blue="0.3" /></text>
 	</element>
 
-	<view name="Lamps and LEDs">
+	<view name="Lamps and LEDs Separate">
+		<bounds x="0" y="0" width="704" height="544" />
+
 		<screen index="0">
-			<bounds left="0" top="0" right="704" bottom="480" />
+			<bounds left="0" top="16" right="704" bottom="528" />
 		</screen>
 
 		<repeat count="16">
