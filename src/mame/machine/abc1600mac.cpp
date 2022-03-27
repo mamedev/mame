@@ -231,7 +231,7 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 	{
 		if (nonx)
 		{
-			logerror("%s BUS ERROR R %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n", 
+			logerror("%s BUS ERROR R %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			dump();
 			m_write_buserr(offset, 1);
@@ -274,14 +274,14 @@ void abc1600_mac_device::write(offs_t offset, uint8_t data)
 	{
 		if (nonx)
 		{
-			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n", 
+			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			dump();
 			m_write_buserr(offset, 0);
 		}
 		if (!wp)
 		{
-			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n", 
+			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			dump();
 			m_write_buserr(offset, 0);

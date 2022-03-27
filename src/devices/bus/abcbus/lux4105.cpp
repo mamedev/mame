@@ -280,7 +280,7 @@ void luxor_4105_device::write_sasi_data(uint8_t data)
 
 	// clock REQ FF
 	m_req = m_sasi->req_r();
-	
+
 	update_ack();
 	update_dma();
 }
@@ -304,7 +304,7 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
 WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
 {
 	if (LOG) logerror("%s REQ %u\n", machine().describe_context(), state);
-	
+
 	if (!state)
 	{
 		// reset REQ FF
@@ -540,6 +540,6 @@ void luxor_4105_device::abcbus_prac(int state)
 	if (LOG) logerror("%s PRAC %u\n", machine().describe_context(), state);
 
 	m_prac = state;
-	
+
 	update_dma();
 }

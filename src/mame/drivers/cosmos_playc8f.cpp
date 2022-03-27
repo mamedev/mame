@@ -27,8 +27,7 @@
 #include "sound/okim9810.h"
 #include "speaker.h"
 
-namespace
-{
+namespace {
 
 class cosmos_playc8f_state : public driver_device
 {
@@ -45,7 +44,7 @@ public:
 
 private:
 	required_device<m68hc05_device> m_maincpu;
-        optional_device<mcs51_cpu_device> m_soundcpu;
+	optional_device<mcs51_cpu_device> m_soundcpu;
 };
 
 static INPUT_PORTS_START(playc8f)
@@ -54,7 +53,7 @@ INPUT_PORTS_END
 // PLAYC8F + SY-MUSIC01 (music)
 void cosmos_playc8f_state::playc8f_symusic01(machine_config &config)
 {
-	M68HC705C8A(config, m_maincpu, 4_MHz_XTAL); 
+	M68HC705C8A(config, m_maincpu, 4_MHz_XTAL);
 
 	I80C51(config, m_soundcpu, 6_MHz_XTAL); // Actually an AT89C51
 
@@ -67,12 +66,12 @@ void cosmos_playc8f_state::playc8f_symusic01(machine_config &config)
 // PLAYC8F (without sound hardware)
 void cosmos_playc8f_state::playc8f(machine_config &config)
 {
-	M68HC705C8A(config, m_maincpu, 4_MHz_XTAL); 
+	M68HC705C8A(config, m_maincpu, 4_MHz_XTAL);
 }
 
 ROM_START(bgbasketb)
 	ROM_REGION(0x002000, "maincpu", 0)
-	ROM_LOAD("srlqj02-2-01_2013-03-23.u13", 0x000000, 0x002000, CRC(9ab77de9) SHA1(c3507636dfe963023d5894403b850b65da2613b4)) // MC705C8ACPE	
+	ROM_LOAD("srlqj02-2-01_2013-03-23.u13", 0x000000, 0x002000, CRC(9ab77de9) SHA1(c3507636dfe963023d5894403b850b65da2613b4)) // MC705C8ACPE
 
 	ROM_REGION(0x001000, "soundcpu", 0)
 	ROM_LOAD("mglqj-y-3-3_2004-10-22.u2",   0x000000, 0x001000, NO_DUMP) // AT89C51, protected

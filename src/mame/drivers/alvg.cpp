@@ -149,7 +149,7 @@ private:
 	// bsmt
 	u8 rdstat_r() { return m_bsmt_rdcode; }
 	u8 rdcode_r() { m_audiocpu->set_input_line(0, CLEAR_LINE); return m_cpu_to_bsmt; }
-	void wrcode_w(u8 data) { m_bsmt_to_cpu = data; 	m_via1->write_ca1(BIT(data, 0)); }
+	void wrcode_w(u8 data) { m_bsmt_to_cpu = data;  m_via1->write_ca1(BIT(data, 0)); }
 	void bsmt_w(offs_t offset, u8 data);
 	void watch_w(u8 data) { if (!BIT(data, 6)) m_bsmt->reset(); }
 	void bsmt_ready_w() { m_bsmt_rdcode |= 0x80; }

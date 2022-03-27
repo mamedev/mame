@@ -25,7 +25,7 @@
 
     What is implemented but not working :
 
-    - The rear serial port.(Prise péri-informatique) 
+    - The rear serial port.(Prise péri-informatique)
      (Internal 8051 serial port emulation missing).
 
     What is not yet implemented :
@@ -197,12 +197,12 @@ void minitel_state::port1_w(uint8_t data)
 	{
 		LOG("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
 	}
-	
+
 	if(lineconnected)
 	{
 		m_modem->write_txd(!!(data & PORT_1_MDM_TXD));
 	}
-	
+
 	if( (port1 ^ data) & PORT_1_MDM_RTS )
 	{
 		LOG("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );

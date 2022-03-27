@@ -143,7 +143,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				}
 				// scale to 11 bit digital output on chip
 				if (voice.key)
-					outputs[0].add_int(i, (voice.waveram[voice.counter] * voice.volume) >> 4, 1024); 
+					outputs[0].add_int(i, (voice.waveram[voice.counter] * voice.volume) >> 4, 1024);
 			}
 		}
 	}

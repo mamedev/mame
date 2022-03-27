@@ -294,14 +294,14 @@ K: uses alt. ext. analog I/O board GX700-PWB(K)
 
 GX700-PWB(K)A (C)2000 KONAMI
 |-----------------------------|
-|    CN9        CN4	        |
+|    CN9        CN4         |
 |         CN3          CN5    |
 |                             |
 |   U2 U1                     |
 |                             |-----------------|
 |                                    CN6        |
 |         U3   U4 U5   U6                       |
-|   U7    U8         				 U9-U16       |
+|   U7    U8                         U9-U16     |
 |               U17  U18                        |
 |                                               |
 |    U19                                        |
@@ -310,27 +310,27 @@ GX700-PWB(K)A (C)2000 KONAMI
 |-----------------------------------------------|
 Notes: (all ICs shown)
 
-		CN1        - (bottom) Connector joining this PCB to the MAIN PCB
-		CN2        - (unpopulated custom 80-pin)
-		CN3        - JST ??12
-		CN4        - JST ??12
-		CN5        - JST ??12
-		CN6        - JST ??10
-		CN7        - (unpopulated 5-pin)
-		CN8        - (unpopulated 8-pin)
-		CN9        - (unpopulated 4-pin)
-		U1         - Maxim DS2401 (SOIC6)
-		U2         - (unpopulated SOIC8)
-		U3         - Motorola 74LS74A (SOIC14)
-		U4,U5,U6   - Motorola 74LS244 (SOIC20)
-		U7         - (unpopulated 4-pad)
-		U8         - AMD PALCE16V8Q-15, stamped 'X700K01' (DIP20)
-		U9-16      - Sharp PC817XF (DIP4)
-		U17        - TI 74LV245A (SOIC20)
-		U18        - Motorola 74LS273 (SOIC20)
-		U19        - (unpopulated PLCC44 socket)
-		U20        - (unpopulated SOIC16)
-		U21        - (unpopulated SOIC16)
+        CN1        - (bottom) Connector joining this PCB to the MAIN PCB
+        CN2        - (unpopulated custom 80-pin)
+        CN3        - JST ??12
+        CN4        - JST ??12
+        CN5        - JST ??12
+        CN6        - JST ??10
+        CN7        - (unpopulated 5-pin)
+        CN8        - (unpopulated 8-pin)
+        CN9        - (unpopulated 4-pin)
+        U1         - Maxim DS2401 (SOIC6)
+        U2         - (unpopulated SOIC8)
+        U3         - Motorola 74LS74A (SOIC14)
+        U4,U5,U6   - Motorola 74LS244 (SOIC20)
+        U7         - (unpopulated 4-pad)
+        U8         - AMD PALCE16V8Q-15, stamped 'X700K01' (DIP20)
+        U9-16      - Sharp PC817XF (DIP4)
+        U17        - TI 74LV245A (SOIC20)
+        U18        - Motorola 74LS273 (SOIC20)
+        U19        - (unpopulated PLCC44 socket)
+        U20        - (unpopulated SOIC16)
+        U21        - (unpopulated SOIC16)
 
 
   PCMCIA Flash Card

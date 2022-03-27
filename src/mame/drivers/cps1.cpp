@@ -3120,16 +3120,16 @@ static INPUT_PORTS_START( pang3b4 )
   PORT_DIPSETTING(    0x18, "3" )
   PORT_DIPSETTING(    0x00, "4" )
   PORT_DIPNAME( 0x60, 0x20, "Extend" )                          PORT_DIPLOCATION("DIP-B:6,7")
-  PORT_DIPSETTING(    0x00, "30K, 250K, 1M, 3M, 7M" ) 
+  PORT_DIPSETTING(    0x00, "30K, 250K, 1M, 3M, 7M" )
   PORT_DIPSETTING(    0x20, "80K, 500k, 2M, 5M, 10M" )
   PORT_DIPSETTING(    0x40, "250K, 1M, 3M, 7M, 15M" )
   PORT_DIPSETTING(    0x60, "Not extend" )
   PORT_DIPNAME( 0x80, 0x80, "Free play" )                         PORT_DIPLOCATION("DIP-B:8")
   PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-  PORT_DIPSETTING(    0x00, DEF_STR( On ) ) 
+  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
   PORT_START("DSWC")
-  PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DIP-C:1" )  
+  PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DIP-C:1" )
   PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "DIP-C:2" )
   PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DIP-C:3" )
   PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DIP-C:4" )                  // Missing freeze code @ 0x020B74
@@ -13360,8 +13360,8 @@ ROM_END
 
 /* This bootleg uses a bootlegged B board nearly identical to that used in sf2ceblp.
    In my set:
-     - Board-A is missing so I don't know if a normal or a dash board was used. 
-     - Board-C is an hacked 88622-C-5 with an unusual CPS-B-12 and clearly it's not its C-board because 
+     - Board-A is missing so I don't know if a normal or a dash board was used.
+     - Board-C is an hacked 88622-C-5 with an unusual CPS-B-12 and clearly it's not its C-board because
        code analisys led to identify the CPS_B_21_DEF as the right configuration.
      - Board-B has some missing components:
       - audio cpu code EPROM @B13 (pang3b pa3_11.11f used instead)
@@ -13370,10 +13370,10 @@ ROM_END
    The program code is almost the same as of pang3b with some minor, yet interesting, hacks:
       - Dip switch use for board configuration (code@ 0x000300, 0xe0000) instead of a serial EPROM
       - Removed freeze from dip switch (code@ 020B74)
-      - Some code to handle the PIC (protection?). 
+      - Some code to handle the PIC (protection?).
         Read and write to addresses 0x5762b0 and 0x57a2b0 occurs in the code but the return value is never really used (nop or bra skips relevant parts)
         and so seems that the PIC protection is ineffective.
-      - Read and write to port 0x80017a (EEPROM in pang3) still are present in the code, but are filtered by the PAL16V8 @ E13 so there is no need to 
+      - Read and write to port 0x80017a (EEPROM in pang3) still are present in the code, but are filtered by the PAL16V8 @ E13 so there is no need to
         create a port for that address here in mame (altough this causes a popmessage "CPS-B read port 3A contact MAMEDEV" to occurr at startup if compiled with
         DEBUG=1)
 
@@ -13436,7 +13436,7 @@ ROM_END
 
 /* B-Board Mitchell 94916-10 */
 /* This set comes from an encrypted bootleg that uses a very well reproduced Mitchell 94916-10 B-Board surmounted by an
-   original Capcom 90631C-5 C-Board taken from a Knights of the round board (there's a sticker on it). 
+   original Capcom 90631C-5 C-Board taken from a Knights of the round board (there's a sticker on it).
    Protection chip MACH215 is present. */
 ROM_START( pang3b5 )
   ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -13456,7 +13456,7 @@ ROM_START( pang3b5 )
 
   ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
   ROM_LOAD( "pa3_11.11f",  0x00000, 0x08000, CRC(cb1423a2) SHA1(3191bf5d340168647881738cb2aed09b1d86146e) )  // == 11.11f has the same content of pa3w_16.10l from pang3 romset
-  ROM_IGNORE( 0x18000 )  
+  ROM_IGNORE( 0x18000 )
 
   ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
   ROM_LOAD( "pa3_05.10d",  0x00000, 0x20000, CRC(73a10d5d) SHA1(999465e4fbc35a34746d2db61ad49f61403d5af7) ) // 5.10c has the same content of pa3_05.10d from pang3 romset
@@ -13472,7 +13472,7 @@ ROM_START( pang3b5 )
   ROM_REGION( 0x0200, "bboardplds", 0 )
   ROM_LOAD( "cp1b1f_boot.1f", 0x0000, 0x0117, CRC(658849dc) SHA1(4fc386fa33322ce52334dee1391d617e0754bde0) )
   ROM_LOAD( "cp1b8k.8k",      0x0000, 0x0117, CRC(8a52ea7a) SHA1(47a59abc54a83292cfd6faa2d293c8f948c7ea03) ) // I was not able to dump the original PAL. Tryied to swap it with a legit CP1B8K on real hw
-                                                                                                             // and it's working, so I suppose they're functionally equivalent
+																											 // and it's working, so I suppose they're functionally equivalent
   ROM_LOAD( "cp1b9ka.9k",     0x0000, 0x0117, CRC(238d3ff4) SHA1(597f429d6a0ea485746322592604188c1ec87595) ) // The PAL @ 9k was bruteforced and verified to be to be functionally equivalent to a standard cp1b9ka
 
   ROM_REGION( 0x0200, "cboardplds", 0 )
@@ -14180,31 +14180,30 @@ Pang 3b4 - code accesso to $5762b0 and $57a2b0 (PIC)
 */
 uint16_t cps_state::pang3b4_prot_r()
 {
-
-  if ((pang3b4_prot & 0xFF) >=0 && (pang3b4_prot & 0xFF) <=7)
-    return (pang3b4_prot & 0xFF)+0x20;  // Game level + extend
-  if (pang3b4_prot == 0x17)
-    return 0x7321;                      // Guessed from code @0x314
-  return 0xFFFF;
+	if ((pang3b4_prot & 0xff) >=0 && (pang3b4_prot & 0xff) <=7)
+	      return (pang3b4_prot & 0xff) + 0x20;  // Game level + extend
+	if (pang3b4_prot == 0x17)
+	      return 0x7321;                      // Guessed from code @0x314
+	return 0xffff;
 }
 
 void cps_state::pang3b4_prot_w(uint16_t data)
 {
-  pang3b4_prot = data;
+	pang3b4_prot = data;
 }
 
 
 void cps_state::init_pang3b4()
 {
-  m_maincpu->space(AS_PROGRAM).install_write_handler(0x5762b0, 0x5762b1, write16smo_delegate(*this, FUNC(cps_state::pang3b4_prot_w)));
-  m_maincpu->space(AS_PROGRAM).install_read_handler(0x57A2b0, 0x57A2b1, read16smo_delegate(*this, FUNC(cps_state::pang3b4_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5762b0, 0x5762b1, write16smo_delegate(*this, FUNC(cps_state::pang3b4_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x57a2b0, 0x57a2b1, read16smo_delegate(*this, FUNC(cps_state::pang3b4_prot_r)));
 
-  /* In pang3 the Mach215 security chip outputs 2 control signals (pins 4, 6) which switch the eeprom in/out serial data lines onto the main 68k data bus when required
-     They're mapped in the CPS-B address range but there is not the EPROM on the board
-     Read and write to port 0x80017a still are present in the code, but they are filtered by the PAL16V8 @ E13 */
-  m_maincpu->space(AS_PROGRAM).nop_readwrite(0x80017a, 0x80017b);
+	/* In pang3 the Mach215 security chip outputs 2 control signals (pins 4, 6) which switch the eeprom in/out serial data lines onto the main 68k data bus when required
+	   They're mapped in the CPS-B address range but there is not the EPROM on the board
+	   Read and write to port 0x80017a still are present in the code, but they are filtered by the PAL16V8 @ E13 */
+	m_maincpu->space(AS_PROGRAM).nop_readwrite(0x80017a, 0x80017b);
 
-  init_cps1();
+	init_cps1();
 }
 
 

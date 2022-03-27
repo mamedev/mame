@@ -354,7 +354,7 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 				/* xxxx 0001 0B00 nnnn dddd 0000 1001 mmmm */
 				util::stream_format( stream, "SWP%s%s", pConditionCode, (opcode & 0x400000)?"B":"" );    //Bit 22 = Byte/Word selection
 				WritePadding(stream, start_position);
-	
+
 				//Rd, Rm, [Rn]
 				util::stream_format( stream, "R%d, R%d, [R%d]",
 								(opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf );
@@ -637,7 +637,7 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		{
 			/* immediate form */
 			util::stream_format( stream, "[R%d%s", rn, (opcode&0x01000000)?"":"]" );
-			
+
 			//hide zero offsets
 			if(opcode&0xfff) {
 				stream << ", #";

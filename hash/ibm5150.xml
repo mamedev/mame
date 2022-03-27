@@ -5943,7 +5943,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="msdos32a" supported="no" cloneof="msdos32">
-		<description>MS-DOS (Version 3.2) (alt.)</description>
+		<description>MS-DOS (Version 3.2) (alt)</description>
 		<year>1985</year>
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">

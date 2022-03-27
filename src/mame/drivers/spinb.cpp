@@ -19,7 +19,7 @@ There are mistakes in the sound board schematic: IC14 pin12 goes to IC5 pin13 on
 
 Also, very unobvious is the fact that PIA ports A and B are swapped around compared to the Inder
  soundcard.
- 
+
 Issues with the sound:
 - MSM6585 sounds are very slow, like a faulty tape player. MSM5205 sounds are better, although some
    speech can be slow.

@@ -7,15 +7,15 @@
     and 1x sio. One of the sio ports communicated with the keyboard with a coiled
     telephone cord, complete with modular plug on each end. The keyboard carries
     its own Intel 87C51 processor and is an intelligent device.
-	
-	Kaypro 5 notes:
-	The Kaycomp Kay Pro V / Non-Linear Systems Kaypro 5: https://retrocmp.de/kaypro/kay-p1_vers.htm#kay-5, 
-	a version of the Kaypro II, but with a 5MB harddisk instead of one of the floppy drives, was announced 
-	in December 1982, but apart from the relevant articles of the time,	only one photo can be found.
-	
+
+    Kaypro 5 notes:
+    The Kaycomp Kay Pro V / Non-Linear Systems Kaypro 5: https://retrocmp.de/kaypro/kay-p1_vers.htm#kay-5,
+    a version of the Kaypro II, but with a 5MB harddisk instead of one of the floppy drives, was announced
+    in December 1982, but apart from the relevant articles of the time, only one photo can be found.
+
     Kaypro 10 notes:
-    This machine comes with a 10MB hard drive, split into 2 5MB partitions. It also has one floppy drive. 
-	The drive letters change depending on what drive it was booted from. The boot drive is always A:.
+    This machine comes with a 10MB hard drive, split into 2 5MB partitions. It also has one floppy drive.
+    The drive letters change depending on what drive it was booted from. The boot drive is always A:.
     - If booted from floppy:
       A: floppy
       B: HD partition 1

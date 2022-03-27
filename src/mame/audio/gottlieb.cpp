@@ -195,8 +195,8 @@ uint8_t gottlieb_sound_p3_device::r6530b_r()
 
 void gottlieb_sound_p3_device::r6530b_w(u8 data)
 {
-//	if (BIT(data, 6))
-//		m_cpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+//  if (BIT(data, 6))
+//      m_cpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 

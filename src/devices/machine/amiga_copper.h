@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Angelo Salese
 /***************************************************************************
 
-	Amiga Copper
+    Amiga Copper
 
 ***************************************************************************/
 
@@ -68,7 +68,7 @@ private:
 	u16 m_waitmask;
 	u16 m_pending_offset;
 	u16 m_pending_data;
-//	int m_wait_offset;
+//  int m_wait_offset;
 
 	// waitstate delays for copper
 	// basically anything that doesn't belong to Angus has a penalty for Copper

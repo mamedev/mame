@@ -113,7 +113,7 @@ offs_t b5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 				case 1: stream << "S"; break; // 0,1
 				case 2: stream << "C"; break; // 1,0
 				case 3: stream << "C,S"; break; // 1,1
- 				default: break;
+				default: break;
 			}
 		}
 		else if (instr >= em_LB0 && instr <= em_LB11)

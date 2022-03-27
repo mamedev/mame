@@ -1537,7 +1537,7 @@ static const struct gfx_range mapper_CP1B1F_boot_table[] =
 	// bank0 = pin 16 (ROMs 1,7  /ce)
 	//         pin 18 (ROMs 3,9  /ce)
 	// bank1 = pin 17 (ROMs 2,8  /ce)
-	// 		   pin 19 (ROMs 4,10 /ce)
+	//         pin 19 (ROMs 4,10 /ce)
 	// An a19 line is available on pin 13 for 32MBit roms (pin 44 of the EPROM) but is unused.
 	// pin 14 is fixed high in 16Mbit mode and is driven by gfx_chnl (CPS B-21 pin 108) if 32Mbit mode is selected
 
@@ -1964,7 +1964,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3b",      CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3b2",     CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3b3",     CPS_B_17,     mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
-	{"pang3b4",     CPS_B_21_DEF, mapper_pang3b4 }, 
+	{"pang3b4",     CPS_B_21_DEF, mapper_pang3b4 },
 	{"pang3b5",     CPS_B_21_DEF, mapper_CP1B1F_boot },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"ganbare",     CPS_B_21_DEF, mapper_GBPR2 },
 	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
