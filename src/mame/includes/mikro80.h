@@ -40,8 +40,8 @@ public:
 	void init_mikro80();
 
 private:
-	u8 m_keyboard_mask;
-	u8 m_key_mask;
+	u8 m_keyboard_mask = 0;
+	u8 m_key_mask = 0;
 	void sound_w(u8 data);
 	u8 portb_r();
 	u8 portc_r();

@@ -60,7 +60,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(render_w);
 
-	u8 m_matrixsel;
+	u8 m_matrixsel = 0U;
 	u8 matrix_r();
 };
 

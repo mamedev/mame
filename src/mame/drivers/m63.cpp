@@ -171,20 +171,20 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t    m_nmi_mask;
+	uint8_t    m_nmi_mask = 0;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_pal_bank;
-	int      m_fg_flag;
-	int      m_sy_offset;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int      m_pal_bank = 0;
+	int      m_fg_flag = 0;
+	int      m_sy_offset = 0;
 
 	/* sound-related */
-	uint8_t    m_sound_irq;
-	int      m_sound_status;
-	int      m_p1;
-	int      m_p2;
+	uint8_t    m_sound_irq = 0;
+	int      m_sound_status = 0;
+	int      m_p1 = 0;
+	int      m_p2 = 0;
 	std::unique_ptr<int16_t[]>    m_samplebuf;
 
 	/* devices */

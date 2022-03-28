@@ -142,7 +142,7 @@ void arc_uma_morley_device::ioc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 11) & 0x7800)]; })).umask32(0x000000ff);
 	map(0x2000, 0x203f).rw("via", FUNC(via6522_device::read), FUNC(via6522_device::write)).umask32(0x000000ff);
-	map(0x3000, 0x301f).rw("uart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0x000000ff);
+	map(0x3000, 0x303f).rw("uart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0x000000ff);
 }
 
 void arc_uma_morley_device::memc_map(address_map &map)

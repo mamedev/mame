@@ -51,10 +51,10 @@ private:
 	void ts816_io(address_map &map);
 	void ts816_mem(address_map &map);
 
-	uint8_t m_term_data;
-	uint8_t m_status;
-	bool m_2ndbank;
-	bool m_endram;
+	uint8_t m_term_data = 0;
+	uint8_t m_status = 0;
+	bool m_2ndbank = false;
+	bool m_endram = false;
 	void set_banks();
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;

@@ -109,9 +109,9 @@ protected:
 
 	optional_device<cassette_image_device> m_cass;
 	required_ioport_array<5> m_io_lines;
-	uint8_t m_lines[4];
-	uint8_t m_reset;
-	uint8_t m_shift;
+	uint8_t m_lines[4]{};
+	uint8_t m_reset = 0;
+	uint8_t m_shift = 0;
 	optional_device<rs232_port_device> m_rs232;
 	output_finder<> m_led;
 };

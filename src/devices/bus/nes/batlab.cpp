@@ -237,7 +237,7 @@ void nes_batmap_srrx_device::write_h(offs_t offset, u8 data)
 				set_irq_line(CLEAR_LINE);
 			break;
 		case 0x4000:
-			m_dpcm_addr = (m_dpcm_addr << 1 | data >> 7);
+			m_dpcm_addr = m_dpcm_addr << 1 | data >> 7;
 			break;
 		case 0x5000:
 			m_dpcm_ctrl = data;

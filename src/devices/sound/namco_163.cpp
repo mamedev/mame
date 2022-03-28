@@ -137,8 +137,8 @@ void namco_163_sound_device::data_w(u8 data)
 
 u8 namco_163_sound_device::data_r()
 {
-	u8 val = m_ram[m_addr];
-	if (m_inc)
+	const u8 val = m_ram[m_addr];
+	if (!machine().side_effects_disabled() && m_inc)
 		m_addr = (m_addr + 1) & 0x7f;
 
 	return val;

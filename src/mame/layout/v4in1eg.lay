@@ -35,10 +35,10 @@ license:CC0
 		</repeat>
 
 		<repeat count="4">
-			<param name="x" start="1.25" increment="8.333" />
+			<param name="x" start="6.25" increment="8.333" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_l~i~"><bounds x="~x~" y="2" width="22" height="1.75" /></element>
+			<element ref="text_l~i~"><bounds x="~x~" y="2" width="12" height="1.75" /></element>
 		</repeat>
 
 		<repeat count="12">

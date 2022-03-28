@@ -92,10 +92,10 @@ private:
 	output_finder<2> m_gear_sel, m_tacho_sel;
 
 	// video-related
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	// misc
-	uint8_t       m_gear[2];
+	uint8_t       m_gear[2]{};
 };
 
 //----------- defined in audio/dragrace.cpp -----------

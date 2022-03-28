@@ -120,11 +120,11 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
 
 	/* video-related */
-	bool     m_flipscreen;
-	bool     m_flipchars;
-	uint8_t    m_star_enable;
-	uint16_t   m_star_delay_counter;
-	uint16_t   m_star_shift_reg;
+	bool     m_flipscreen = false;
+	bool     m_flipchars = false;
+	uint8_t    m_star_enable = 0;
+	uint16_t   m_star_delay_counter = 0;
+	uint16_t   m_star_shift_reg = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

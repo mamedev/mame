@@ -46,7 +46,7 @@ private:
 	void io_map(address_map &map);
 	void program_map(address_map &map);
 
-	uint8_t m_selected_7seg_module;
+	uint8_t m_selected_7seg_module = 0;
 	virtual void machine_start() override;
 	output_finder<32> m_digits;
 	output_finder<30> m_leds;

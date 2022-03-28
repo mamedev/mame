@@ -93,15 +93,15 @@ private:
 	required_shared_ptr<u16> m_videoram;
 	required_region_ptr<u8> m_chargen;
 
-	u32 m_mmu_reg[4];
-	bool m_from_reset;
+	u32 m_mmu_reg[4]{};
+	bool m_from_reset = false;
 
-	u8 m_floppy_status;
-	u8 m_floppy_control;
-	u8 m_floppy_select;
-	u8 m_fdc_select;
-	u16 m_fdc_dma_count;
-	emu_timer *m_fdc_dma_timer;
+	u8 m_floppy_status = 0;
+	u8 m_floppy_control = 0;
+	u8 m_floppy_select = 0;
+	u8 m_fdc_select = 0;
+	u16 m_fdc_dma_count = 0;
+	emu_timer *m_fdc_dma_timer = nullptr;
 	std::unique_ptr<u8[]> m_fdc_ram;
 };
 

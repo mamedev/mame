@@ -92,6 +92,8 @@ offs_t dsp16_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			util::stream_format(
 					stream, "if %1$s%2$s%3$s%4$s",
 					con.text, controlled.nop ? "" : " ", controlled.text, comment);
+			if (!controlled.nop)
+				flags |= STEP_COND;
 		}
 		break;
 

@@ -67,9 +67,9 @@ private:
 
 	/* video-related */
 	TILEMAP_MAPPER_MEMBER(pagescan);
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
-	int m_fg_bank;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	int m_fg_bank = 0;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

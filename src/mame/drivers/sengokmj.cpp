@@ -99,15 +99,15 @@ private:
 	required_shared_ptr<uint16_t> m_sc3_vram;
 	required_shared_ptr<uint16_t> m_spriteram16;
 
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	tilemap_t *m_sc2_tilemap = nullptr;
+	tilemap_t *m_sc3_tilemap = nullptr;
 
-	uint16_t m_mux_data;
-	uint8_t m_hopper_io;
-	uint16_t m_layer_en;
-	uint16_t m_scrollram[6];
+	uint16_t m_mux_data = 0;
+	uint8_t m_hopper_io = 0;
+	uint16_t m_layer_en = 0;
+	uint16_t m_scrollram[6]{};
 
 	uint16_t mahjong_panel_r();
 	void mahjong_panel_w(uint16_t data);

@@ -260,7 +260,7 @@ protected:
 	required_device<sda2006_device> m_eeprom;
 
 	// cpu state
-	int m_reset;
+	int m_reset = 0;
 };
 
 void nightmare_state::device_timer(emu_timer &timer, device_timer_id id, int param)

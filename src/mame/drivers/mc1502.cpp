@@ -96,14 +96,14 @@ private:
 	TIMER_CALLBACK_MEMBER(keyb_signal_callback);
 
 	struct {
-		uint8_t       pulsing;
-		uint16_t      mask;       /* input lines */
-		emu_timer   *keyb_signal_timer;
+		uint8_t       pulsing = 0;
+		uint16_t      mask = 0;       /* input lines */
+		emu_timer   *keyb_signal_timer = nullptr;
 	} m_kbd;
 
-	uint8_t m_ppi_portb;
-	uint8_t m_ppi_portc;
-	uint8_t m_spkrdata;
+	uint8_t m_ppi_portb = 0;
+	uint8_t m_ppi_portc = 0;
+	uint8_t m_spkrdata = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out2_changed);
@@ -120,7 +120,7 @@ private:
 	void mc1502_io(address_map &map);
 	void mc1502_map(address_map &map);
 
-	int m_pit_out2;
+	int m_pit_out2 = 0;
 };
 
 

@@ -105,8 +105,8 @@ uint32_t mips1_disassembler::dasm_cop(uint32_t pc, int cop, uint32_t op, std::os
 		case 0x08:  /* BC */
 			switch (rt)
 			{
-				case 0x00:  util::stream_format(stream, "bc%df   $%08x", cop, pc + 4 + ((int16_t)op << 2));       break;
-				case 0x01:  util::stream_format(stream, "bc%dt   $%08x", cop, pc + 4 + ((int16_t)op << 2));       break;
+				case 0x00:  util::stream_format(stream, "bc%df   $%08x", cop, pc + 4 + ((int16_t)op << 2)); flags = STEP_COND | step_over_extra(1); break;
+				case 0x01:  util::stream_format(stream, "bc%dt   $%08x", cop, pc + 4 + ((int16_t)op << 2)); flags = STEP_COND | step_over_extra(1); break;
 				case 0x02:  util::stream_format(stream, "bc%dfl [invalid]", cop);                               break;
 				case 0x03:  util::stream_format(stream, "bc%dtl [invalid]", cop);                               break;
 				default:    util::stream_format(stream, "dc.l    $%08x [invalid]", op);                         break;
@@ -176,10 +176,10 @@ uint32_t mips1_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &s
 		case 0x08:  /* BC */
 			switch (rt & 3)
 			{
-				case 0x00:  util::stream_format(stream, "bc1f   $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7);      break;
-				case 0x01:  util::stream_format(stream, "bc1t   $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7);      break;
-				case 0x02:  util::stream_format(stream, "bc1fl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_OVER | step_over_extra(1); break;
-				case 0x03:  util::stream_format(stream, "bc1tl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_OVER | step_over_extra(1); break;
+				case 0x00:  util::stream_format(stream, "bc1f   $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_COND | step_over_extra(1); break;
+				case 0x01:  util::stream_format(stream, "bc1t   $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_COND | step_over_extra(1); break;
+				case 0x02:  util::stream_format(stream, "bc1fl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_COND | step_over_extra(1); break;
+				case 0x03:  util::stream_format(stream, "bc1tl  $%08x,%d", pc + 4 + ((int16_t)op << 2), (op >> 18) & 7); flags = STEP_COND | step_over_extra(1); break;
 			}
 			break;
 		default:    /* COP */
@@ -298,8 +298,8 @@ offs_t mips1_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x01:  /* REGIMM */
 			switch ((op >> 16) & 31)
 			{
-				case 0x00:  util::stream_format(stream, "bltz   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
-				case 0x01:  util::stream_format(stream, "bgez   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x00:  util::stream_format(stream, "bltz   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); if (rs != 0) flags = STEP_COND | step_over_extra(1); break;
+				case 0x01:  util::stream_format(stream, "bgez   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); if (rs != 0) flags = STEP_COND | step_over_extra(1); break;
 				case 0x02:  util::stream_format(stream, "bltzl [invalid]");                                     break;
 				case 0x03:  util::stream_format(stream, "bgezl [invalid]");                                     break;
 				case 0x08:  util::stream_format(stream, "tgei [invalid]");                                      break;
@@ -308,8 +308,8 @@ offs_t mips1_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x0b:  util::stream_format(stream, "tltiu [invalid]");                                     break;
 				case 0x0c:  util::stream_format(stream, "teqi [invalid]");                                      break;
 				case 0x0e:  util::stream_format(stream, "tnei [invalid]");                                      break;
-				case 0x10:  util::stream_format(stream, "bltzal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); break;
-				case 0x11:  util::stream_format(stream, "bgezal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); break;
+				case 0x10:  util::stream_format(stream, "bltzal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); if (rs != 0) flags = STEP_OVER | STEP_COND | step_over_extra(1); break;
+				case 0x11:  util::stream_format(stream, "bgezal %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | (rs != 0 ? STEP_COND : 0) | step_over_extra(1); break;
 				case 0x12:  util::stream_format(stream, "bltzall [invalid]");                                   break;
 				case 0x13:  util::stream_format(stream, "bgezall [invalid]");                                   break;
 				default:    util::stream_format(stream, "dc.l   $%08x [invalid]", op);                          break;
@@ -321,11 +321,14 @@ offs_t mips1_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x04:  if (rs == 0 && rt == 0)
 					util::stream_format(stream, "b      $%08x", pc + 4 + ((int16_t)op << 2));
 					else
+					{
 					util::stream_format(stream, "beq    %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((int16_t)op << 2));
+					flags = STEP_COND | step_over_extra(1);
+					}
 			break;
-		case 0x05:  util::stream_format(stream, "bne    %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((int16_t)op << 2));break;
-		case 0x06:  util::stream_format(stream, "blez   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2));         break;
-		case 0x07:  util::stream_format(stream, "bgtz   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2));         break;
+		case 0x05:  util::stream_format(stream, "bne    %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((int16_t)op << 2)); flags = STEP_COND | step_over_extra(1); break;
+		case 0x06:  util::stream_format(stream, "blez   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_COND | step_over_extra(1); break;
+		case 0x07:  util::stream_format(stream, "bgtz   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_COND | step_over_extra(1); break;
 		case 0x08:  util::stream_format(stream, "addi   %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
 		case 0x09:  util::stream_format(stream, "addiu  %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
 		case 0x0a:  util::stream_format(stream, "slti   %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;

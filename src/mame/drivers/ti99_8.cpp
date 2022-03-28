@@ -270,14 +270,14 @@ private:
 
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
-	int     m_keyboard_column;
+	int     m_keyboard_column = 0;
 
 	// READY handling
-	int m_ready_old;
+	int m_ready_old = 0;
 
 	// Latch for 9901 INT2, INT1 lines
-	int  m_int1;
-	int  m_int2;
+	int  m_int1 = 0;
+	int  m_int2 = 0;
 
 	// Connected devices
 	required_device<tms9995_device>     m_cpu;

@@ -44,7 +44,7 @@ private:
 	required_device_array<scn2651_device, 4> m_usart;
 	required_shared_ptr<uint16_t> m_ram;
 
-	uint8_t m_mux;
+	uint8_t m_mux = 0;
 };
 
 

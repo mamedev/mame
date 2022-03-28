@@ -56,12 +56,12 @@ private:
 	void ppi_pb_w(uint8_t data);
 
 	// timers
-	emu_timer *m_led_refresh_timer;
+	emu_timer *m_led_refresh_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	void amico2k_mem(address_map &map);
 
-	int m_ls145_p;
-	uint8_t m_segment;
+	int m_ls145_p = 0;
+	uint8_t m_segment = 0U;
 	required_device<cpu_device> m_maincpu;
 	output_finder<6> m_digits;
 };

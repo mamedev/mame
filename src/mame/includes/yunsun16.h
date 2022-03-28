@@ -55,9 +55,9 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* other video-related elements */
-	tilemap_t     *m_tilemap[2];
-	int         m_sprites_scrolldx;
-	int         m_sprites_scrolldy;
+	tilemap_t     *m_tilemap[2]{};
+	int         m_sprites_scrolldx = 0;
+	int         m_sprites_scrolldy = 0;
 
 	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

@@ -203,8 +203,29 @@ void mame_machine_manager::start_luaengine()
 		if (!filerr)
 		{
 			std::string exppath;
-			osd_subst_env(exppath, std::string(file.fullpath()));
-			m_lua->load_script(exppath.c_str());
+			osd_subst_env(exppath, file.fullpath());
+			auto &l(*lua());
+			auto load_result = l.load_script(exppath);
+			if (!load_result.valid())
+			{
+				sol::error err = load_result;
+				sol::load_status status = load_result.status();
+				fatalerror("Error plugin bootstrap script %s: %s error\n%s\n",
+						exppath,
+						sol::to_string(status),
+						err.what());
+			}
+			sol::protected_function func = load_result;
+			sol::protected_function_result call_result = l.invoke(func);
+			if (!call_result.valid())
+			{
+				sol::error err = call_result;
+				sol::call_status status = call_result.status();
+				fatalerror("Error running plugin bootstrap script %s: %s error\n%s\n",
+						options().autoboot_script(),
+						sol::to_string(status),
+						err.what());
+			}
 		}
 	}
 }
@@ -295,21 +316,35 @@ int mame_machine_manager::execute()
 
 TIMER_CALLBACK_MEMBER(mame_machine_manager::autoboot_callback)
 {
-	if (strlen(options().autoboot_script())!=0) {
-		mame_machine_manager::instance()->lua()->load_script(options().autoboot_script());
+	if (*options().autoboot_script())
+	{
+		assert(m_autoboot_script);
+		sol::protected_function func = *m_autoboot_script;
+		sol::protected_function_result result = lua()->invoke(func);
+		if (!result.valid())
+		{
+			sol::error err = result;
+			sol::call_status status = result.status();
+			fatalerror("Error running autoboot script %s: %s error\n%s\n",
+					options().autoboot_script(),
+					sol::to_string(status),
+					err.what());
+		}
 	}
-	else if (strlen(options().autoboot_command())!=0) {
-		std::string cmd = std::string(options().autoboot_command());
+	else if (*options().autoboot_command())
+	{
+		std::string cmd(options().autoboot_command());
 		strreplace(cmd, "'", "\\'");
 		std::string val = std::string("emu.keypost('").append(cmd).append("')");
-		mame_machine_manager::instance()->lua()->load_string(val.c_str());
+		auto &l(*lua());
+		l.invoke(l.load_string(val));
 	}
 }
 
 void mame_machine_manager::reset()
 {
 	// setup autoboot if needed
-	m_autoboot_timer->adjust(attotime(options().autoboot_delay(),0),0);
+	m_autoboot_timer->adjust(attotime(options().autoboot_delay(), 0), 0);
 }
 
 ui_manager* mame_machine_manager::create_ui(running_machine& machine)
@@ -337,7 +372,7 @@ void mame_machine_manager::before_load_settings(running_machine& machine)
 	m_lua->on_machine_before_load_settings();
 }
 
-void mame_machine_manager::create_custom(running_machine& machine)
+void mame_machine_manager::create_custom(running_machine &machine)
 {
 	// start the inifile manager
 	m_inifile = std::make_unique<inifile_manager>(m_ui->options());
@@ -347,6 +382,25 @@ void mame_machine_manager::create_custom(running_machine& machine)
 
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(m_ui->options());
+
+	// attempt to load the autoboot script if configured
+	m_autoboot_script.reset();
+	if (*options().autoboot_script())
+	{
+		auto result = lua()->load_script(options().autoboot_script());
+		if (!result.valid())
+		{
+			sol::error err = result;
+			sol::load_status status = result.status();
+			fatalerror("Error loading autoboot script %s: %s error\n%s\n",
+					options().autoboot_script(),
+					sol::to_string(status),
+					err.what());
+		}
+		m_autoboot_script.reset(new sol::load_result(std::move(result)));
+		sol::protected_function func = *m_autoboot_script;
+		sol::set_environment(lua()->make_environment(), func);
+	}
 }
 
 void mame_machine_manager::load_cheatfiles(running_machine& machine)

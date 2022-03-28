@@ -243,12 +243,12 @@ private:
 	int m_from68k_st3;
 	int m_from68k_st2;
 
-	int m_led_latch;
-	int m_led_serial_data;
-	int m_led_clock;
+	int m_led_latch = 0;
+	int m_led_serial_data = 0;
+	int m_led_clock = 0;
 
-	int mole_state_a[6];
-	int mole_state_b[6];
+	int mole_state_a[6]{};
+	int mole_state_b[6]{};
 	output_finder<20> m_lamps;
 	output_finder<2> m_startlamp;
 	output_finder<6> m_molea;

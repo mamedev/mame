@@ -39,14 +39,14 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
-	uint8_t m_soundlatch[4];
-	uint8_t m_soundCommand;
-	uint8_t m_soundControl;
+	uint8_t m_soundlatch[4]{};
+	uint8_t m_soundCommand = 0U;
+	uint8_t m_soundControl = 0U;
 
 
 	/* video-related */
-	tilemap_t      *m_tilemap[2];
-	int             m_tilebank;
+	tilemap_t      *m_tilemap[2]{};
+	int             m_tilebank = 0;
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);

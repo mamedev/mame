@@ -360,10 +360,87 @@ ROM_START( zzblock )
 	ROM_LOAD( "tz03.6f",      0x0000, 0x0020, CRC(1ba385b1) SHA1(b70c356174a1748723c0116ae8dd74b25e1fe6b4) )
 ROM_END
 
+//****************************************************************
+//******** GAMES AND CLONES NOT FROM TAITO ***********************
 
-GAME( 1977, fisco400,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",     MACHINE_IS_SKELETON )
-GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman [TTL]",              MACHINE_IS_SKELETON )
-GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X [TTL]",           MACHINE_IS_SKELETON )
-GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block [TTL]",           MACHINE_IS_SKELETON )
-GAME( 1978, ttsracec,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL [TTL]",  MACHINE_IS_SKELETON )
-GAME( 1979, zzblock,   0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block [TTL]",       MACHINE_IS_SKELETON )
+/*
+Super Road Champions (1978), from Model Racing
+
+7 PCBs:
+
+CS219A (road PCB):
+  1 x 22x2 edge connector
+  6 x trimmer (VR1-VR6)
+  2 x 1 DIP switch bank (SW1-SW2)
+  ROMs:
+    1 x 6301
+    1 x 6331
+
+CS220:
+  1 x 22x2 edge connector
+  3 x trimmer (VR1-VR3)
+  1 x F32582DC 64x7x5 Character Generator (not dumped)
+  ROMs:
+    3 x 6331
+
+CS221 (sound):
+  1 x 22x2 edge connector
+  17 x trimmer (VR1-VR17)
+  1 x 1 DIP switch bank (SW)
+  1 x LM324 Quad Operational Amplifier (sound)
+  1 x MM5837N Digital Noise Source (sound)
+  1 x N50241 13-Note Top Octave Generator (sound)
+  2 x TBA810 Audio Amplifier (sound)
+  ROMs:
+    1 x 6301
+
+CS222 (main):
+  2 x 22x2 edge connector
+  1 x LM324 Quad Operational Amplifier (sound)
+  ROMs:
+    8 x 6301
+
+CS223 (base)
+
+CS224 (power supply):
+  2x 22x2 edge connector
+  3x trimmer (VR1-VR3)
+
+CS225 (high score):
+  1x 11x2 edge connector
+*/
+ROM_START( srdchamp )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "cs219_mr31.5d",     0x000, 0x020, CRC(332efd4f) SHA1(dc858b02d92d2a6f466fd4b0a8a2e415050286a5) )
+	ROM_LOAD( "cs219_mr32.4j",     0x000, 0x100, CRC(08a808e3) SHA1(11e279e5f80d702155850612b1fe299af5f62167) )
+
+	ROM_LOAD( "cs220_f32582dc.3f", 0x000, 0x400, NO_DUMP ) // CGROM size unknown
+	ROM_LOAD( "cs220_mr39.3e",     0x000, 0x020, CRC(46bb17ff) SHA1(14d3b675613e9e13943d5fd38dbaab827f4d7a48) )
+	ROM_LOAD( "cs220_mr40.3g",     0x000, 0x020, CRC(65fc450c) SHA1(d75f59775a3d6c82f942245b550be9cec2183848) )
+	ROM_LOAD( "cs220_mr41.3h",     0x000, 0x020, CRC(b46a4389) SHA1(260a965b0219feae29bef0891bc96858995894a1) )
+
+	ROM_LOAD( "cs221_mr42.5a",     0x000, 0x100, CRC(9d24a1a8) SHA1(f98b55316dfc00c43830aff77c257265b0b5403d) )
+
+	ROM_LOAD( "cs222_mr33.3c",     0x000, 0x100, CRC(cc2ba2ea) SHA1(80fabb1b0b828f24012285525493f241e1b51a9f) )
+	ROM_LOAD( "cs222_mr33.3g",     0x000, 0x100, CRC(cc2ba2ea) SHA1(80fabb1b0b828f24012285525493f241e1b51a9f) )
+	ROM_LOAD( "cs222_mr34.3b",     0x000, 0x100, CRC(ce321649) SHA1(2ec5b25e03807ca49ab72dab13173e3d0445b1ac) )
+	ROM_LOAD( "cs222_mr34.3h",     0x000, 0x100, CRC(ce321649) SHA1(2ec5b25e03807ca49ab72dab13173e3d0445b1ac) )
+
+	ROM_LOAD( "cs222_mr35.9g",     0x000, 0x100, CRC(f434cc57) SHA1(f2cf604d4d5cd55de31032abea5c35f3179121b0) )
+	ROM_LOAD( "cs222_mr36.11f",    0x000, 0x100, CRC(8edc7993) SHA1(bc21ef568d6ee5ba33cefe015269ac2853dc0594) )
+	ROM_LOAD( "cs222_mr37.12f",    0x000, 0x100, CRC(85573385) SHA1(db1feef3525247926316743f54e626e0c3da3f2b) )
+	ROM_LOAD( "cs222_mr38.11j",    0x000, 0x100, CRC(fb775d23) SHA1(8dd3fca4d08c235c0999bd3623127331eed004d9) )
+ROM_END
+
+
+GAME( 1977, fisco400, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1977, gunman,   0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman [TTL]",             MACHINE_IS_SKELETON )
+GAME( 1977, missilex, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X [TTL]",          MACHINE_IS_SKELETON )
+GAME( 1977, ttblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block [TTL]",          MACHINE_IS_SKELETON )
+GAME( 1978, ttsracec, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL [TTL]", MACHINE_IS_SKELETON )
+GAME( 1979, zzblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block [TTL]",      MACHINE_IS_SKELETON )
+
+// Not from Taito
+GAME( 1978, srdchamp, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Model Racing", "Super Road Champions [TTL]", MACHINE_IS_SKELETON )

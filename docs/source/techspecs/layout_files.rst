@@ -1468,12 +1468,12 @@ internal layouts included in MAME.
     This system uses lamps for key gameplay elements.  Blending modes are used
     for the translucent colour overlay placed over the monitor, and the lamps
     reflected in front of the monitor.  Also uses collections to allow parts of
-    the layout to be disabled selectively.  The shapes on the overlay are drawn
-    using embedded SVG images.
+    the layout to be disabled selectively.
 `armora.lay <https://git.redump.net/mame/tree/src/mame/layout/armora.lay?h=mame0235>`_
     This game’s monitor is viewed directly through a translucent colour overlay
     rather than being reflected from inside the cabinet.  This means the overlay
     reflects ambient light as well as affecting the colour of the video image.
+    The shapes on the overlay are drawn using embedded SVG images.
 `tranz330.lay <https://git.redump.net/mame/tree/src/mame/layout/tranz330.lay?h=mame0235>`_
     A multi-segment alphanumeric display and keypad.  The keys are clickable,
     and provide visual feedback when pressed.

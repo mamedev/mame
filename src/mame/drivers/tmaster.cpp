@@ -153,9 +153,9 @@ private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<mc68681_device> m_duart;
 
-	int m_okibank;
+	int m_okibank = 0;
 
-	uint8_t m_rtc_ram[8];
+	uint8_t m_rtc_ram[8]{};
 };
 
 WRITE_LINE_MEMBER(tmaster_state::blitter_irq_callback)

@@ -226,6 +226,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 void gottlieb_state::machine_start()
 {
 	m_leds.resolve();
+	m_knockers.resolve();
 	/* register for save states */
 	save_item(NAME(m_joystick_select));
 	save_item(NAME(m_track));
@@ -338,7 +339,7 @@ void gottlieb_state::qbert_output_w(u8 data)
 	general_output_w(data & ~0x20);
 
 	// bit 5 controls the knocker
-	qbert_knocker(data >> 5 & 1);
+	qbert_knocker(BIT(data, 5));
 }
 
 void gottlieb_state::qbertqub_output_w(u8 data)
@@ -658,7 +659,8 @@ void gottlieb_state::laserdisc_audio_process(int samplerate, int samples, const 
 
 void gottlieb_state::qbert_knocker(u8 knock)
 {
-	output().set_value("knocker0", knock);
+	//output().set_value("knocker0", knock);
+	m_knockers[0] = knock ? 1 : 0;
 
 	// start sound on rising edge
 	if (knock & ~m_knocker_prev)
@@ -1911,8 +1913,8 @@ void gottlieb_state::cobram3(machine_config &config)
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* sound hardware */
-	subdevice<dac_8bit_r2r_device>("r2sound:dac")->reset_routes();
-	subdevice<dac_8bit_r2r_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
+	subdevice<ad7528_device>("r2sound:dac")->reset_routes();
+	subdevice<ad7528_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
 }
 
 

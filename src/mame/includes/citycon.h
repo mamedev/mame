@@ -27,6 +27,10 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void init_citycon();
+	void citycon(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_linecolor;
@@ -34,9 +38,9 @@ public:
 	required_shared_ptr<uint8_t> m_scroll;
 
 	/* video-related */
-	tilemap_t        *m_bg_tilemap;
-	tilemap_t        *m_fg_tilemap;
-	int            m_bg_image;
+	tilemap_t        *m_bg_tilemap = nullptr;
+	tilemap_t        *m_fg_tilemap = nullptr;
+	int            m_bg_image = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -48,7 +52,6 @@ public:
 	void citycon_videoram_w(offs_t offset, uint8_t data);
 	void citycon_linecolor_w(offs_t offset, uint8_t data);
 	void citycon_background_w(uint8_t data);
-	void init_citycon();
 	TILEMAP_MAPPER_MEMBER(citycon_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -58,7 +61,6 @@ public:
 	uint32_t screen_update_citycon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	inline void changecolor_RRRRGGGGBBBBxxxx( int color, int indx );
-	void citycon(machine_config &config);
 	void citycon_map(address_map &map);
 	void sound_map(address_map &map);
 };

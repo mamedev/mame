@@ -52,8 +52,8 @@ private:
 
 	void main_map(address_map &map);
 
-	bool m_scanline_int_state;
-	bool m_video_int_state;
+	bool m_scanline_int_state = false;
+	bool m_video_int_state = false;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<x2212_device> m_nvram;
@@ -64,10 +64,10 @@ private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<timer_device> m_scan_timer;
 
-	double          m_rweights[3];
-	double          m_gweights[3];
-	double          m_bweights[2];
-	uint8_t           m_playfield_flip;
+	double          m_rweights[3]{};
+	double          m_gweights[3]{};
+	double          m_bweights[2]{};
+	uint8_t           m_playfield_flip = 0U;
 
 	required_shared_ptr<uint16_t> m_spriteram;
 	output_finder<2> m_leds;

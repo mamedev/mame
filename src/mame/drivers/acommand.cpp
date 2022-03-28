@@ -118,10 +118,10 @@ private:
 	required_device<megasys1_tilemap_device> m_txtmap;
 	output_finder<8> m_digits;
 
-	uint16_t m_7seg0;
-	uint16_t m_7seg1;
-	uint16_t m_ufo_lane[5];
-	uint8_t m_boss_door;
+	uint16_t m_7seg0 = 0;
+	uint16_t m_7seg1 = 0;
+	uint16_t m_ufo_lane[5]{};
+	uint8_t m_boss_door = 0;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
 };

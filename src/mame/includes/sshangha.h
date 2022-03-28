@@ -51,7 +51,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 
-	int m_video_control;
+	int m_video_control = 0;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	u16 mix_callback(u16 p, u16 p2);
 

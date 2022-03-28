@@ -43,10 +43,10 @@ private:
 	required_shared_ptr<uint8_t> m_textram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_background;
-	tilemap_t *m_foreground;
+	tilemap_t *m_background = nullptr;
+	tilemap_t *m_foreground = nullptr;
 
-	int m_ccnt_old_val;
+	int m_ccnt_old_val = 0;
 
 	void bankswitch_w(uint8_t data);
 	uint8_t sound_cpu_command_r();

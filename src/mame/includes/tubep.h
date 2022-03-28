@@ -52,32 +52,32 @@ protected:
 	optional_shared_ptr<uint8_t> m_backgroundram;
 	required_shared_ptr<uint8_t> m_sprite_colorsharedram;
 
-	emu_timer *m_interrupt_timer;
-	emu_timer *m_sprite_timer;
-	int m_curr_scanline;
+	emu_timer *m_interrupt_timer = nullptr;
+	emu_timer *m_sprite_timer = nullptr;
+	int m_curr_scanline = 0;
 	std::unique_ptr<uint8_t[]> m_spritemap;
 	uint8_t m_prom2[32];
-	uint32_t m_romD_addr;
-	uint32_t m_romEF_addr;
-	uint32_t m_E16_add_b;
-	uint32_t m_HINV;
-	uint32_t m_VINV;
-	uint32_t m_XSize;
-	uint32_t m_YSize;
-	uint32_t m_mark_1;
-	uint32_t m_mark_2;
-	uint32_t m_colorram_addr_hi;
-	uint32_t m_ls273_g6;
-	uint32_t m_ls273_j6;
-	uint32_t m_romHI_addr_mid;
-	uint32_t m_romHI_addr_msb;
-	uint8_t m_DISP;
-	uint8_t m_background_romsel;
-	uint8_t m_color_A4;
-	uint8_t m_ls175_b7;
-	uint8_t m_ls175_e8;
-	uint8_t m_ls377_data;
-	uint32_t m_page;
+	uint32_t m_romD_addr = 0;
+	uint32_t m_romEF_addr = 0;
+	uint32_t m_E16_add_b = 0;
+	uint32_t m_HINV = 0;
+	uint32_t m_VINV = 0;
+	uint32_t m_XSize = 0;
+	uint32_t m_YSize = 0;
+	uint32_t m_mark_1 = 0;
+	uint32_t m_mark_2 = 0;
+	uint32_t m_colorram_addr_hi = 0;
+	uint32_t m_ls273_g6 = 0;
+	uint32_t m_ls273_j6 = 0;
+	uint32_t m_romHI_addr_mid = 0;
+	uint32_t m_romHI_addr_msb = 0;
+	uint8_t m_DISP = 0;
+	uint8_t m_background_romsel = 0;
+	uint8_t m_color_A4 = 0;
+	uint8_t m_ls175_b7 = 0;
+	uint8_t m_ls175_e8 = 0;
+	uint8_t m_ls377_data = 0;
+	uint32_t m_page = 0;
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 	void main_cpu_irq_line_clear_w(uint8_t data);
@@ -164,7 +164,7 @@ private:
 	required_device<ls157_device> m_adpcm_mux;
 	required_shared_ptr<uint8_t> m_rjammer_backgroundram;
 
-	bool m_msm5205_toggle;
+	bool m_msm5205_toggle = 0;
 };
 
 #endif // MAME_INCLUDES_TUBEP_H

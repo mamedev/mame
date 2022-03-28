@@ -71,17 +71,17 @@ public:
 		hp48_module(device_t &owner) : read(owner), write(owner) { }
 
 		/* static part */
-		uint32_t off_mask;          // offset bit-mask, indicates the real size
+		uint32_t off_mask = 0U;          // offset bit-mask, indicates the real size
 		read8sm_delegate read;
-		const char *read_name;
+		const char *read_name = nullptr;
 		write8sm_delegate write;
-		void* data;                 // non-NULL for banks
+		void* data = nullptr;            // non-NULL for banks
 		int isnop;
 
 		/* configurable part */
-		uint8_t  state;             // one of HP48_MODULE_
-		uint32_t base;              // base address
-		uint32_t mask;              // often improperly called size, it is an address select mask
+		uint8_t  state = 0U;             // one of HP48_MODULE_
+		uint32_t base = 0U;              // base address
+		uint32_t mask = 0U;              // often improperly called size, it is an address select mask
 
 	};
 
@@ -140,15 +140,15 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	uint8_t *m_videoram;
-	uint8_t m_io[64];
-	hp48_models m_model;
+	uint8_t *m_videoram = nullptr;
+	uint8_t m_io[64]{};
+	hp48_models m_model{};
 
 	/* OUT register from SATURN (actually 12-bit) */
-	uint16_t m_out;
+	uint16_t m_out = 0U;
 
 	/* keyboard interrupt */
-	uint8_t m_kdn;
+	uint8_t m_kdn = 0U;
 
 	/* RAM/ROM extensions, GX/SX only
 	   port1: SX/GX: 32/128 KB
@@ -163,19 +163,19 @@ private:
 	output_finder<> m_busy0;
 	output_finder<> m_transmit0;
 
-	uint32_t m_bank_switch;
-	uint32_t m_io_addr;
-	uint16_t m_crc;
-	uint8_t m_timer1;
-	uint32_t m_timer2;
-	uint8_t m_screens[HP48_NB_SCREENS][64][144];
-	int m_cur_screen;
-	uint8_t* m_rom;
-	emu_timer *m_1st_timer;
-	emu_timer *m_2nd_timer;
-	emu_timer *m_kbd_timer;
-	std::unique_ptr<uint8_t[]> m_allocated_ram;
-	std::unique_ptr<uint8_t[]> m_allocated_rom;
+	uint32_t m_bank_switch = 0U;
+	uint32_t m_io_addr = 0U;
+	uint16_t m_crc = 0U;
+	uint8_t m_timer1 = 0U;
+	uint32_t m_timer2 = 0U;
+	uint8_t m_screens[HP48_NB_SCREENS][64][144]{};
+	int m_cur_screen = 0;
+	uint8_t* m_rom = nullptr;
+	emu_timer *m_1st_timer = nullptr;
+	emu_timer *m_2nd_timer = nullptr;
+	emu_timer *m_kbd_timer = nullptr;
+	std::unique_ptr<uint8_t[]> m_allocated_ram{};
+	std::unique_ptr<uint8_t[]> m_allocated_rom{};
 };
 
 

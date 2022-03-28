@@ -33,10 +33,10 @@ public:
 
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
-	uint8_t m_input_select;
-	uint8_t m_read_mask;
-	uint8_t m_write_mask;
-	uint8_t m_video_control;
+	uint8_t m_input_select = 0;
+	uint8_t m_read_mask = 0;
+	uint8_t m_write_mask = 0;
+	uint8_t m_video_control = 0;
 	coprocessor_t m_coprocessor;
 	void thief_input_select_w(uint8_t data);
 	uint8_t thief_io_r();

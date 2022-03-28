@@ -51,12 +51,12 @@ private:
 	};
 
 	// video-related
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-	int        m_layerpri[3];
+	int        m_layer_colorbase[3]{};
+	int        m_sprite_colorbase = 0;
+	int        m_layerpri[3]{};
 
 	// misc
-	int        m_irq_enabled;
+	int        m_irq_enabled = 0;
 
 	// devices
 	required_device<konami_cpu_device> m_maincpu;

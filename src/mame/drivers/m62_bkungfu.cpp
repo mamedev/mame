@@ -21,6 +21,7 @@ class m62_bkungfu_state : public m62_state
 public:
 	m62_bkungfu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: m62_state(mconfig, type, tag)
+		, m_bkungfu_tileram(*this, "tileram", 64*32*2, ENDIANNESS_LITTLE)
 		, m_blitterdatarom(*this, "blitterdat")
 		, m_blittercmdram(*this, "blittercmdram")
 	{ }
@@ -37,7 +38,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
 
-	std::vector<uint8_t> m_bkungfu_tileram;
+	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
 	required_region_ptr<uint8_t> m_blitterdatarom;
 	required_shared_ptr<uint8_t> m_blittercmdram;
@@ -64,10 +65,6 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 
 VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
 {
-	// tileram is private to blitter
-	m_bkungfu_tileram.resize(64*32*2);
-	save_item(NAME(m_bkungfu_tileram));
-
 	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 64, 32);
 }
 
@@ -131,7 +128,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			{
 				m_bkungfu_tileram[(position) & 0xfff] = m_blittercmdram[0x002];
 				m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x001];
-				m_bg_tilemap->mark_tile_dirty((position &0xfff) >> 1);
 			}
 		}
 		else if (data == 0x02)
@@ -175,6 +171,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		{
 			//logerror("%s: blitter: unknown\n", machine().describe_context());
 		}
+		m_bg_tilemap->mark_all_dirty();
 	}
 	else
 	{

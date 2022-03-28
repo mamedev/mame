@@ -710,6 +710,8 @@ uint32_t sharc_disassembler::dasm_direct_jump(std::ostream &stream, uint32_t pc,
 	{
 		util::stream_format(stream, "JUMP");
 	}
+	if (cond != 31)
+		flags |= STEP_COND;
 
 	if (opcode & 0x10000000000U)    /* PC-relative branch */
 	{
@@ -722,6 +724,7 @@ uint32_t sharc_disassembler::dasm_direct_jump(std::ostream &stream, uint32_t pc,
 	if (j)
 	{
 		util::stream_format(stream, " (DB)");
+		flags |= step_over_extra(2);
 	}
 	if (ci)
 	{
@@ -753,6 +756,8 @@ uint32_t sharc_disassembler::dasm_indirect_jump_compute(std::ostream &stream, ui
 	{
 		util::stream_format(stream, "JUMP");
 	}
+	if (cond != 31)
+		flags |= STEP_COND;
 
 	if (opcode & 0x10000000000U)    /* PC-relative branch */
 	{
@@ -765,6 +770,7 @@ uint32_t sharc_disassembler::dasm_indirect_jump_compute(std::ostream &stream, ui
 	if (j)
 	{
 		util::stream_format(stream, " (DB)");
+		flags |= step_over_extra(2);
 	}
 	if (ci)
 	{
@@ -795,6 +801,7 @@ uint32_t sharc_disassembler::dasm_indirect_jump_compute_dregdm(std::ostream &str
 	int reladdr = (opcode >> 27) & 0x3f;
 	int dreg = (opcode >> 23) & 0xf;
 	int comp = opcode & 0x7fffff;
+	uint32_t flags = cond != 31 ? STEP_COND : 0;
 
 	get_if_condition(stream, cond);
 	util::stream_format(stream, "JUMP");
@@ -822,7 +829,7 @@ uint32_t sharc_disassembler::dasm_indirect_jump_compute_dregdm(std::ostream &str
 	{
 		util::stream_format(stream, "DM(%s, %s) = %s", GET_DAG1_I(dmi), GET_DAG1_M(dmm), GET_DREG(dreg));
 	}
-	return 0;
+	return flags;
 }
 
 uint32_t sharc_disassembler::dasm_rts_compute(std::ostream &stream, uint32_t pc, uint64_t opcode)
@@ -832,8 +839,11 @@ uint32_t sharc_disassembler::dasm_rts_compute(std::ostream &stream, uint32_t pc,
 	int lr = (opcode >> 24) & 0x1;
 	int cond = (opcode >> 33) & 0x1f;
 	int comp = opcode & 0x7fffff;
+	uint32_t flags = STEP_OUT;
 
 	get_if_condition(stream, cond);
+	if (cond != 31)
+		flags |= STEP_COND;
 
 	if (opcode & 0x10000000000U)
 	{
@@ -847,6 +857,7 @@ uint32_t sharc_disassembler::dasm_rts_compute(std::ostream &stream, uint32_t pc,
 	if (j)
 	{
 		util::stream_format(stream, " (DB)");
+		flags |= step_over_extra(2);
 	}
 	if (lr)
 	{
@@ -863,7 +874,7 @@ uint32_t sharc_disassembler::dasm_rts_compute(std::ostream &stream, uint32_t pc,
 
 		compute(stream, comp);
 	}
-	return STEP_OUT;
+	return flags;
 }
 
 uint32_t sharc_disassembler::dasm_do_until_counter(std::ostream &stream, uint32_t pc, uint64_t opcode)

@@ -69,7 +69,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	tilemap_t *m_sc_layer[4];
+	tilemap_t *m_sc_layer[4]{};
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -94,7 +94,7 @@ private:
 	virtual void video_start() override;
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	uint16_t m_layer_disable;
+	uint16_t m_layer_disable = 0;
 };
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)

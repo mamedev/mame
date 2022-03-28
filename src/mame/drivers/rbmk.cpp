@@ -103,9 +103,9 @@ private:
 	required_device<ym2151_device> m_ymsnd;
 	required_ioport_array<3> m_dsw;
 
-	uint16_t m_tilebank;
-	uint8_t m_mux_data;
-	uint16_t m_dip_mux;
+	uint16_t m_tilebank = 0;
+	uint8_t m_mux_data = 0;
+	uint16_t m_dip_mux = 0;
 
 	void mcu_io(address_map &map);
 	void mcu_mem(address_map &map);

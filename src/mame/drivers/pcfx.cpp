@@ -65,15 +65,15 @@ private:
 	void pcfx_mem(address_map &map);
 
 	// Interrupt controller (component unknown)
-	uint16_t m_irq_mask;
-	uint16_t m_irq_pending;
-	uint8_t m_irq_priority[8];
+	uint16_t m_irq_mask = 0;
+	uint16_t m_irq_pending = 0;
+	uint8_t m_irq_priority[8]{};
 
 	struct pcfx_pad_t
 	{
-		uint8_t ctrl[2];
-		uint8_t status[2];
-		uint32_t latch[2];
+		uint8_t ctrl[2]{};
+		uint8_t status[2]{};
+		uint32_t latch[2]{};
 	};
 
 	pcfx_pad_t m_pad;

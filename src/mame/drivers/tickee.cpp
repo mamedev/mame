@@ -68,11 +68,11 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	optional_shared_ptr<uint16_t> m_control;
 
-	emu_timer *m_setup_gun_timer;
-	int m_beamxadd;
-	int m_beamyadd;
-	int m_palette_bank;
-	uint8_t m_gunx[2];
+	emu_timer *m_setup_gun_timer = nullptr;
+	int m_beamxadd = 0;
+	int m_beamyadd = 0;
+	int m_palette_bank = 0;
+	uint8_t m_gunx[2]{};
 	void get_crosshair_xy(int player, int &x, int &y);
 
 	void rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

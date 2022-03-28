@@ -49,6 +49,7 @@ u32 n8x300_disassembler::opcode_alignment() const
 offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	unsigned startpc = pc;
+	offs_t flags = 0;
 	uint16_t opcode = opcodes.r16(pc);
 	uint8_t inst = opcode >> 13;
 	pc+=1;
@@ -111,6 +112,7 @@ offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			util::stream_format(stream, ",%i", ROTLEN);
 			util::stream_format(stream, ",%02XH", IMM5);
 		}
+		flags = STEP_COND;
 		break;
 	case 0x06:
 		stream << "XMIT ";
@@ -132,5 +134,5 @@ offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	}
 
 
-	return (pc - startpc);
+	return (pc - startpc) | flags | SUPPORTED;
 }

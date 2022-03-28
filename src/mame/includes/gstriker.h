@@ -65,8 +65,8 @@ private:
 	optional_device<acia6850_device> m_acia;
 
 	required_shared_ptr<uint16_t> m_CG10103_m_vram;
-	std::unique_ptr<uint16_t[]>    m_buffered_spriteram;
-	std::unique_ptr<uint16_t[]>    m_buffered_spriteram2;
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram{};
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram2{};
 	required_shared_ptr<uint16_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mixerregs;
 
@@ -76,8 +76,8 @@ private:
 		TECMO_WCUP94B_MCU,
 		VGOAL_SOCCER_MCU
 	}m_mcutype;
-	int m_gametype;
-	uint16_t m_prot_reg[2];
+	int m_gametype = 0;
+	uint16_t m_prot_reg[2]{};
 
 	// common
 	void sh_bankswitch_w(uint8_t data);

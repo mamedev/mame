@@ -22,13 +22,13 @@ const char *const lr35902_disassembler::s_mnemonic[] =
 };
 
 const uint32_t lr35902_disassembler::s_flags[] = {
-	0        ,0    ,0    ,0        ,STEP_OVER,0    ,0        ,
-	0        ,0    ,0    ,0        ,0        ,0    ,STEP_OVER,
-	0        ,0    ,0    ,0        ,0        ,0    ,0        ,
-	0        ,0    ,0    ,STEP_OUT ,STEP_OUT ,0    ,0        ,
-	0        ,0    ,0    ,0        ,0        ,0    ,STEP_OVER,
-	0        ,0    ,0    ,0        ,0        ,0    ,0        ,
-	STEP_OVER,0    ,0    ,0
+	0        ,0    ,0        ,0        ,STEP_OVER,0    ,0        ,
+	0        ,0    ,0        ,0        ,0        ,0    ,STEP_OVER,
+	0        ,0    ,STEP_COND,STEP_COND,0        ,0    ,0        ,
+	0        ,0    ,0        ,STEP_OUT ,STEP_OUT ,0    ,0        ,
+	0        ,0    ,0        ,0        ,0        ,0    ,STEP_OVER,
+	0        ,0    ,0        ,0        ,0        ,0    ,0        ,
+	STEP_OVER,0    ,0        ,0
 };
 
 const lr35902_disassembler::lr35902dasm lr35902_disassembler::mnemonic_cb[256] = {
@@ -195,6 +195,7 @@ offs_t lr35902_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		d = &mnemonic_main[op];
 	}
 
+	bool comma = false;
 	if( d->arguments ) {
 		util::stream_format(stream, "%-4s ", s_mnemonic[d->mnemonic]);
 		src = d->arguments;
@@ -245,6 +246,9 @@ offs_t lr35902_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
+			case ',':
+				comma = true;
+				[[fallthrough]];
 			default:
 				stream << *src;
 				break;
@@ -255,5 +259,9 @@ offs_t lr35902_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
-	return (pos - pc) | s_flags[d->mnemonic] | SUPPORTED;
+	uint32_t flags = s_flags[d->mnemonic];
+	if (flags == STEP_COND && !comma)
+		flags = 0;
+
+	return (pos - pc) | flags | SUPPORTED;
 }

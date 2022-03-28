@@ -283,7 +283,7 @@ void hexion_state::hexion(machine_config &config)
 	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	/* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
-	K051649(config, "k051649", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.5);
+	K051649(config, "k051649", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void hexion_state::hexionb(machine_config &config)

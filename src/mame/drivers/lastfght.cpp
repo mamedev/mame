@@ -122,27 +122,27 @@ private:
 
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
-	int m_dest;
-	int m_hi;
-	int m_sx;
-	int m_sx1;
-	int m_dsx;
-	int m_sy;
-	int m_sy1;
-	int m_dsy;
-	int m_sp;
-	int m_sr;
-	int m_x;
-	int m_y;
-	int m_w;
-	int m_h;
+	int m_dest = 0;
+	int m_hi = 0;
+	int m_sx = 0;
+	int m_sx1 = 0;
+	int m_dsx = 0;
+	int m_sy = 0;
+	int m_sy1 = 0;
+	int m_dsy = 0;
+	int m_sp = 0;
+	int m_sr = 0;
+	int m_x = 0;
+	int m_y = 0;
+	int m_w = 0;
+	int m_h = 0;
 #ifdef MAME_DEBUG
 	unsigned m_base = 0;
 	int m_view_roms = 0;
 #endif
 
 	/* misc */
-	uint16_t m_c00006;
+	uint16_t m_c00006 = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -56,7 +56,7 @@ protected:
 	virtual void update_keyboard_input(uint8_t value) override;
 	virtual void cart_w(bool line) override;
 
-	uint8_t m_pia1b_control_register;
+	uint8_t m_pia1b_control_register = 0U;
 
 private:
 	required_device<gime_device> m_gime;

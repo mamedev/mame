@@ -153,7 +153,7 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<8> m_key;
 
-	address_space *m_program;
+	address_space *m_program = nullptr;
 
 	void update_interrupt();
 

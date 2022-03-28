@@ -48,20 +48,20 @@ protected:
 	required_device<ay8910_device> m_ay1;
 
 	// commmon 68705/8751/HLE
-	uint8_t m_from_mcu;     // byte latch for 68705/8751->z80 comms
-	uint8_t m_from_z80;     // byte latch for z80->68705/8751 comms
-	bool m_z80_has_written; // z80 has written to latch flag
-	bool m_mcu_has_written; // 68705/8751 has written to latch flag
+	uint8_t m_from_mcu = 0;     // byte latch for 68705/8751->z80 comms
+	uint8_t m_from_z80 = 0;     // byte latch for z80->68705/8751 comms
+	bool m_z80_has_written = 0; // z80 has written to latch flag
+	bool m_mcu_has_written = 0; // 68705/8751 has written to latch flag
 
 	//general machine stuff
-	bool m_invert_coin_lockout;
-	bool m_invert_p2_spinner;
-	int m_gfxbank;
-	bool m_show_bitmap;
-	bool m_nmi_mask;
+	bool m_invert_coin_lockout = false;
+	bool m_invert_p2_spinner = false;
+	int m_gfxbank = 0;
+	bool m_show_bitmap = false;
+	bool m_nmi_mask = false;
 
 	std::unique_ptr<bitmap_ind16> m_fg_bitmap[2];
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t nmi_ack_r();
 	void superqix_videoram_w(offs_t offset, uint8_t data);
@@ -104,10 +104,10 @@ private:
 	required_device<ay8910_device>    m_ay2;
 
 	// 8031 and/or 8751 MCU related
-	uint8_t m_bl_port1;
-	uint8_t m_bl_fake_port2;
-	uint8_t m_port2_raw;
-	uint8_t m_bl_port3_out;
+	uint8_t m_bl_port1 = 0;
+	uint8_t m_bl_fake_port2 = 0;
+	uint8_t m_port2_raw = 0;
+	uint8_t m_bl_port3_out = 0;
 
 	uint8_t z80_semaphore_assert_r();
 	void bootleg_mcu_port1_w(uint8_t data);
@@ -203,7 +203,7 @@ private:
 	std::unique_ptr<s16[]>           m_samplebuf;
 
 	// 68705 related
-	u8  m_porta_in;
+	u8  m_porta_in = 0;
 	u8  m_portb_out;
 	u8  m_portc_out;
 

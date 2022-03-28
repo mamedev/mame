@@ -19,26 +19,30 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void init_cbasebal();
+	void cbasebal(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_fg_tilemap;
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	tilemap_t    *m_bg_tilemap = nullptr;
 	std::unique_ptr<uint8_t[]>    m_textram;
 	std::unique_ptr<uint8_t[]>      m_scrollram;
 	std::unique_ptr<uint8_t[]>    m_decoded;
-	uint8_t      m_scroll_x[2];
-	uint8_t      m_scroll_y[2];
-	int        m_tilebank;
-	int        m_spritebank;
-	int        m_text_on;
-	int        m_bg_on;
-	int        m_obj_on;
-	int        m_flipscreen;
+	uint8_t      m_scroll_x[2]{};
+	uint8_t      m_scroll_y[2]{};
+	int        m_tilebank = 0;
+	int        m_spritebank = 0;
+	int        m_text_on = 0;
+	int        m_bg_on = 0;
+	int        m_obj_on = 0;
+	int        m_flipscreen = 0;
 
 	/* misc */
-	uint8_t      m_rambank;
+	uint8_t      m_rambank = 0U;
 	void cbasebal_bankswitch_w(uint8_t data);
 	uint8_t bankedram_r(offs_t offset);
 	void bankedram_w(offs_t offset, uint8_t data);
@@ -50,7 +54,6 @@ public:
 	void cbasebal_gfxctrl_w(uint8_t data);
 	void cbasebal_scrollx_w(offs_t offset, uint8_t data);
 	void cbasebal_scrolly_w(offs_t offset, uint8_t data);
-	void init_cbasebal();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -61,7 +64,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void cbasebal(machine_config &config);
 	void cbasebal_map(address_map &map);
 	void cbasebal_portmap(address_map &map);
 	void decrypted_opcodes_map(address_map &map);

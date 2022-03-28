@@ -84,9 +84,9 @@ private:
 
 	required_device<tms5220_device> m_tms;
 	required_shared_ptr<uint16_t> m_shared_ram;
-	uint8_t m_nvram[0x800];
-	int m_dsp_bio;
-	int m_dsp_idle;
+	uint8_t m_nvram[0x800]{};
+	int m_dsp_bio = 0;
+	int m_dsp_idle = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms32010_device> m_dsp;

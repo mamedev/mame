@@ -77,7 +77,7 @@ private:
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update_summit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 };
 
 

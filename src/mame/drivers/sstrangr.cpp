@@ -358,9 +358,9 @@ private:
 	optional_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_ram;
 
-	uint8_t m_flip_screen;
-	uint8_t m_last_sound1;
-	uint8_t m_last_sound2;
+	uint8_t m_flip_screen = 0;
+	uint8_t m_last_sound1 = 0;
+	uint8_t m_last_sound2 = 0;
 
 	void port44_w(uint8_t data);
 	void port42_w(uint8_t data);

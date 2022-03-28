@@ -64,8 +64,8 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scrollram;
 
-	tilemap_t* m_tilemap;
-	int m_nmi;
+	tilemap_t* m_tilemap = nullptr;
+	int m_nmi = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);

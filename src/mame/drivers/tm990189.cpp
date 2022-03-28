@@ -142,7 +142,7 @@ private:
 	DECLARE_MACHINE_START(tm990_189_v);
 	DECLARE_MACHINE_RESET(tm990_189_v);
 
-	emu_timer *m_rs232_input_timer;
+	emu_timer *m_rs232_input_timer = 0;
 
 	void tm990_189_cru_map(address_map &map);
 	void tm990_189_memmap(address_map &map);
@@ -172,15 +172,15 @@ private:
 
 	int m_digitsel = 0;
 	int m_segment = 0;
-	emu_timer *m_displayena_timer;
+	emu_timer *m_displayena_timer = 0;
 	uint8_t m_segment_state[10]{};
 	uint8_t m_old_segment_state[10]{};
 	uint8_t m_LED_state = 0U;
-	emu_timer *m_joy1x_timer;
-	emu_timer *m_joy1y_timer;
-	emu_timer *m_joy2x_timer;
-	emu_timer *m_joy2y_timer;
-	device_image_interface *m_rs232_fp;
+	emu_timer *m_joy1x_timer = 0;
+	emu_timer *m_joy1y_timer = 0;
+	emu_timer *m_joy2x_timer = 0;
+	emu_timer *m_joy2y_timer = 0;
+	device_image_interface *m_rs232_fp = 0;
 	//uint8_t m_rs232_rts;
 	uint8_t m_bogus_read_save = 0U;
 };

@@ -54,9 +54,9 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* misc */
-	emu_timer *m_analog_timer_1, *m_analog_timer_2;
-	uint8_t m_input_port_select;
-	uint8_t m_analog_port_val;
+	emu_timer *m_analog_timer_1 = nullptr, *m_analog_timer_2 = nullptr;
+	uint8_t m_input_port_select = 0;
+	uint8_t m_analog_port_val = 0;
 
 	required_device<cpu_device> m_maincpu;
 };

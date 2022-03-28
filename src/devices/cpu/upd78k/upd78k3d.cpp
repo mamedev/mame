@@ -235,7 +235,7 @@ offs_t upd78k3_disassembler::dasm_02xx(std::ostream &stream, u8 op1, u8 op2, off
 		else
 			util::stream_format(stream, "%s,", m_psw_bits[op2 & 0x0f]);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 	}
 	else
 		return dasm_illegal2(stream, op1, op2);
@@ -332,7 +332,7 @@ offs_t upd78k3_disassembler::dasm_07xx(std::ostream &stream, u8 op2, offs_t pc, 
 	{
 		util::stream_format(stream, "%-8s", s_bcond_07f8[op2 & 0x07]);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 	}
 	else if ((op2 & 0xce) == 0xc8)
 	{
@@ -409,7 +409,7 @@ offs_t upd78k3_disassembler::dasm_08xx(std::ostream &stream, u8 op2, offs_t pc, 
 			format_saddr(stream, opcodes.r8(pc + 2));
 		util::stream_format(stream, ".%d,", op2 & 0x07);
 		format_jdisp8(stream, pc + 4, opcodes.r8(pc + 3));
-		return 4 | SUPPORTED;
+		return 4 | STEP_COND | SUPPORTED;
 	}
 	else
 		return dasm_illegal2(stream, 0x08, op2);
@@ -937,7 +937,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		{
 			util::stream_format(stream, "%-8s%c,", "DBNZ", BIT(op, 0) ? 'B' : 'C');
 			format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
-			return 2 | SUPPORTED;
+			return 2 | STEP_COND | SUPPORTED;
 		}
 		else
 		{
@@ -960,10 +960,15 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			format_saddr(stream, opcodes.r8(pc + 1));
 			stream << ",";
 			if (BIT(op, 0))
+			{
 				format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
+				return 3 | STEP_COND | SUPPORTED;
+			}
 			else
+			{
 				format_imm8(stream, opcodes.r8(pc + 2));
-			return 3 | SUPPORTED;
+				return 3 | SUPPORTED;
+			}
 		}
 		else
 			return dasm_38(stream, op, pc, opcodes);
@@ -1019,7 +1024,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		format_saddr(stream, opcodes.r8(pc + 1));
 		util::stream_format(stream, ".%d,", op & 0x07);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 
 	case 0x78:
 		return dasm_78(stream, op, pc, opcodes);
@@ -1027,7 +1032,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0x80:
 		util::stream_format(stream, "%-8s", s_bcond[op & 0x07]);
 		format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0x88:
 		return dasm_88xx(stream, op, opcodes.r8(pc + 1));

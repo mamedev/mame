@@ -303,7 +303,7 @@ private:
 	bool write_dest_byte(u8 usedata);
 
 	// blitter timers
-	emu_timer *m_blitter_end_timer;
+	emu_timer *m_blitter_end_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(blitter_end);
 
 	// decompressor functions

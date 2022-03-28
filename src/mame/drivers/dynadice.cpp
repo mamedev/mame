@@ -75,11 +75,11 @@ private:
 	required_device<ay8910_device> m_ay8910;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_top_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_top_tilemap = nullptr;
 
 	/* misc */
-	int      m_ay_data;
+	int      m_ay_data = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void sound_data_w(uint8_t data);

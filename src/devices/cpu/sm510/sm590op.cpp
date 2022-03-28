@@ -11,26 +11,38 @@
 
 void sm590_device::do_branch(u8 pu, u8 pm, u8 pl)
 {
-	// set new PC(Pu/Pm/Pl)
-	m_pc = (((u16)pu << 9 & 0x200) | ((u16)pm << 7 & 0x180) | (pl & 0x07f)) & m_prgmask;
+	// set new PC(Pu/Pm/Pl) (Pu is not used on SM590)
+	m_pc = ((pu << 9 & 0x200) | (pm << 7 & 0x180) | (pl & 0x07f)) & m_prgmask;
+}
+
+void sm590_device::port_w(offs_t offset, u8 data)
+{
+	offset &= 3;
+	data &= 0xf;
+	m_rports[offset] = data;
+	m_write_rx[offset](offset, data);
 }
 
 
 // instruction set
 
-void sm590_device::op_adx()
+// ROM address instructions
+
+void sm590_device::op_tl()
 {
-	// ADX x: add immediate value to ACC, skip next on carry
-	m_acc += (m_op & 0xf);
-	m_skip = bool(m_acc & 0x10);
-	m_acc &= 0xf;
+	// TL xyz: long jump
+	do_branch(BIT(m_op, 1), (m_op << 1 & 2) | BIT(m_param, 7), m_param & 0x7f);
 }
 
-void sm590_device::op_tax()
+void sm590_device::op_tls()
 {
-	// TAX: skip next if ACC equals 4-bit immediate value
-	m_skip = (m_acc == (m_op & 0xf));
+	// TLS xyz: long call
+	push_stack();
+	do_branch(BIT(m_op, 1), (m_op << 1 & 2) | BIT(m_param, 7), m_param & 0x7f);
 }
+
+
+// Data transfer instructions
 
 void sm590_device::op_lblx()
 {
@@ -38,66 +50,30 @@ void sm590_device::op_lblx()
 	m_bl = (m_op & 0xf);
 }
 
+void sm590_device::op_lbmx()
+{
+	// LBM x: load BM with 2-bit immediate value
+	m_bm = (m_op & 0x3);
+}
+
+void sm590_device::op_str()
+{
+	// STR: store ACC to RAM
+	ram_w(m_acc);
+}
+
 void sm590_device::op_lda()
 {
-	// LDA: load ACC with RAM
+	// LDA: load ACC with RAM (no BM xor)
 	m_acc = ram_r();
 }
 
 void sm590_device::op_exc()
 {
-	// EXC: exchange ACC with RAM
+	// EXC: exchange ACC with RAM (no BM xor)
 	u8 a = m_acc;
 	m_acc = ram_r();
 	ram_w(a);
-}
-
-void sm590_device::op_atr()
-{
-	// ATR: output ACC to R(BL)
-	m_rports[m_bl & 0x3] = m_acc; // is the mask for BL correct here? if BL is >= 4, do the writes just go nowhere?
-}
-
-void sm590_device::op_mtr()
-{
-	// MTR: output RAM to R(BL)
-	m_rports[m_bl & 0x3] = ram_r(); // is the mask for BL correct here? if BL is >= 4, do the writes just go nowhere?
-}
-
-void sm590_device::op_str()
-{
-	// STR: output ACC to RAM
-	ram_w(m_acc);
-}
-
-void sm590_device::op_inbm()
-{
-	// INBM: increment BM
-	m_bm = (m_bm + 1) & 0x3; // is this mask correct?
-}
-
-void sm590_device::op_debm()
-{
-	// DEBM: decrement BM
-	m_bm = (m_bm - 1) & 0x3; // is this mask correct?
-}
-
-void sm590_device::op_tc()
-{
-	// TC: skip next if carry
-	m_skip = bool(m_c);
-}
-
-void sm590_device::op_rta()
-{
-	// RTA: load ACC with R(BL)
-	m_acc = m_rports[m_bl & 0x3]; // TODO: need a read function for this; is the mask for BL correct here? if BL is >= 4, do we always read 0 or F?
-}
-
-void sm590_device::op_blta()
-{
-	// BLTA: load ACC with BL
-	m_acc = m_bl;
 }
 
 void sm590_device::op_exax()
@@ -108,10 +84,21 @@ void sm590_device::op_exax()
 	m_x = a;
 }
 
-void sm590_device::op_tba()
+void sm590_device::op_blta()
 {
-	// TBA x: skip next if ACC bit is set
-	m_skip = ((m_acc & bitmask(m_op)) != 0);
+	// BLTA: load ACC with BL
+	m_acc = m_bl;
+}
+
+
+// Arithmetic instructions
+
+void sm590_device::op_adx()
+{
+	// ADX x: add immediate value to ACC, skip next on carry
+	m_acc += (m_op & 0xf);
+	m_skip = bool(m_acc & 0x10);
+	m_acc &= 0xf;
 }
 
 void sm590_device::op_ads()
@@ -125,32 +112,61 @@ void sm590_device::op_ads()
 void sm590_device::op_adc()
 {
 	// ADC: add RAM and carry to ACC and carry
-	m_acc += ram_r() + m_c;
-	m_c = m_acc >> 4 & 1;
-	m_acc &= 0xf;
+	op_add11();
+	m_skip = false; // no skip
 }
 
-void sm590_device::op_lbmx()
+void sm590_device::op_inbm()
 {
-	// LBM x: load BM with 2-bit immediate value
-	m_bm = (m_op & 0x3);
+	// INBM: increment BM
+	m_bm = (m_bm + 1) & m_datamask >> 4;
 }
 
-void sm590_device::op_tl()
+void sm590_device::op_debm()
 {
-	// TL xyz: long jump (same as sm510 TL except m_op and m_param masks)
-	do_branch((m_op & 2)>>1, (((m_op & 1)<<1)|((m_param&0x80)?1:0)), m_param & 0x7f);
+	// DEBM: decrement BM
+	m_bm = (m_bm - 1) & m_datamask >> 4;
 }
 
-void sm590_device::op_tml() // aka TLS
+
+// Test instructions
+
+void sm590_device::op_tax()
 {
-	// TLS xyz: long call (same as sm510 TML except m_param mask)
-	push_stack();
-	do_branch((m_op & 2)>>1, (((m_op & 1)<<1)|((m_param&0x80)?1:0)), m_param & 0x7f);
+	// TAX: skip next if ACC equals 4-bit immediate value
+	m_skip = (m_acc == (m_op & 0xf));
 }
 
-void sm590_device::op_t()
+void sm590_device::op_tba()
 {
-	// TR xy: jump(transfer) within current page (same as sm510 T except m_op/m_pc mask)
-	m_pc = (m_pc & ~0x7f) | (m_op & 0x7f);
+	// TBA x: skip next if ACC bit is set
+	m_skip = ((m_acc & bitmask(m_op)) != 0);
+}
+
+void sm590_device::op_tc()
+{
+	// TC: skip next if carry
+	m_skip = bool(m_c);
+}
+
+
+// I/O instructions
+
+void sm590_device::op_atr()
+{
+	// ATR: output ACC to R(BL)
+	port_w(m_bl, m_acc);
+}
+
+void sm590_device::op_mtr()
+{
+	// MTR: output RAM to R(BL)
+	port_w(m_bl, ram_r());
+}
+
+void sm590_device::op_rta()
+{
+	// RTA: load ACC with R(BL)
+	u8 offset = m_bl & 3;
+	m_acc = (m_rports[offset] | m_read_rx[offset](offset)) & 0xf;
 }

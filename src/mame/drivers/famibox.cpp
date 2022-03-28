@@ -30,7 +30,6 @@ Cartridges are shaped and appear to be similar to NES 72-pin cartridges. They ha
 own unique PCBs, use EPROMS, and often (always?) contain the same data as an existing
 NES/FC cart. It was made to play only the games specifically released for it.
 
-- The FamicomBox will not run mmc3 games and many other advanced mappers
 - There a special lockout chip, but the lockout chip connects to different pins on
   a FamicomBox cartridge's connector than a regular cart
 - The lockout chips in the system and the games have to 'talk' before the system will
@@ -40,7 +39,7 @@ Here's a list of some of the games known to have come with the FamicomBox:
 1943; Baseball; Bomber Man; Devil World; Donkey Kong; Donkey Kong Jr.; Duck Hunt;
 Excitebike; F1 Race; Fighting Golf; Golf; Gradius; Hogan's Alley; Ice Climbers;
 Ice Hockey; Knight Rider; Makaimura: Ghosts 'n Goblins; McKids; Mah-Jong; Mario Bros.;
-Mike Tyson's Punch-Out!!; Ninja Ryukenden; Operation Wolf (?); Punch-Out!!; Rock Man;
+Mike Tyson's Punch-Out!!; Ninja Ryukenden; Operation Wolf (?); Punch-Out!!; Rockman;
 Rygar; Senjou no Ookami; Soccer League Winner's Cup; Super Chinese 2; Super Mario Bros;
 Tag Team Pro Wrestling; Takahashi Meijin no Boukenjima; Tennis; Twin Bee;
 Volleyball; Wild Gunman; Wrecking Crew.
@@ -60,7 +59,6 @@ Notes/ToDo:
 - coin insertion sound is not emulated
 - coin beep (before time out) is not emulated
 - screen modulation (before time out) is not emulated
-- nametable mirroring is incorrectly hardcoded (cart PCBs have H/V solder pads like their NES counterparts)
 ***************************************************************************/
 
 #include "emu.h"
@@ -82,7 +80,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ppu(*this, "ppu")
 		, m_screen(*this, "screen")
-		, m_ctrl(*this, "ctrl%u", 1) { }
+		, m_ctrl(*this, "ctrl%u", 1U)
+		, m_nt_page(*this, "nt_page%u", 0U)
+	{ }
 
 	void famibox(machine_config &config);
 
@@ -103,24 +103,26 @@ private:
 	required_device<screen_device> m_screen;
 	optional_device_array<nes_control_port_device, 3> m_ctrl;
 
+	required_memory_bank_array<4> m_nt_page;
 	std::unique_ptr<uint8_t[]> m_nt_ram;
-	uint8_t* m_nt_page[4];
-	uint8_t m_mirroring;
+	uint8_t m_mirroring = 0;
 
-	uint8_t       m_exception_mask;
-	uint8_t       m_exception_cause;
+	uint8_t       m_curr_slot = 0;
 
-	emu_timer*    m_attract_timer;
-	uint8_t       m_attract_timer_period;
+	uint8_t       m_exception_mask = 0;
+	uint8_t       m_exception_cause = 0;
 
-	uint32_t      m_coins;
-	uint8_t       m_zapper_enable;
+	emu_timer*    m_attract_timer = nullptr;
+	uint8_t       m_attract_timer_period = 0;
 
-	emu_timer*    m_gameplay_timer;
-	uint8_t       m_money_reg;
+	uint32_t      m_coins = 0;
+	uint8_t       m_zapper_enable = 0;
+	uint8_t       m_joypad_enable = 0;
+	uint8_t       m_joypad_swap = 0;
 
-	void famibox_nt_w(offs_t offset, uint8_t data);
-	uint8_t famibox_nt_r(offs_t offset);
+	emu_timer*    m_gameplay_timer = nullptr;
+	uint8_t       m_money_reg = 0;
+
 	void set_mirroring(int mirroring);
 	void sprite_dma_w(address_space &space, uint8_t data);
 	uint8_t famibox_IN0_r();
@@ -130,8 +132,8 @@ private:
 	void famibox_system_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
-	void famicombox_bankswitch(uint8_t bank);
-	void famicombox_reset();
+	void famibox_cartswitch(u8 data);
+	void famibox_reset();
 	void famibox_map(address_map &map);
 	void famibox_ppu_map(address_map &map);
 };
@@ -144,40 +146,26 @@ private:
 
 void famibox_state::set_mirroring(int mirroring)
 {
-	switch(mirroring)
+	switch (mirroring)
 	{
 		case PPU_MIRROR_LOW:
-			m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get();
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(0);
 			break;
 		case PPU_MIRROR_HIGH:
-			m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get() + 0x400;
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(1);
 			break;
 		case PPU_MIRROR_HORZ:
-			m_nt_page[0] = m_nt_ram.get();
-			m_nt_page[1] = m_nt_ram.get();
-			m_nt_page[2] = m_nt_ram.get() + 0x400;
-			m_nt_page[3] = m_nt_ram.get() + 0x400;
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(BIT(i, 1));
 			break;
 		case PPU_MIRROR_VERT:
-			m_nt_page[0] = m_nt_ram.get();
-			m_nt_page[1] = m_nt_ram.get() + 0x400;
-			m_nt_page[2] = m_nt_ram.get();
-			m_nt_page[3] = m_nt_ram.get() + 0x400;
+		default:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(i & 1);
 			break;
 	}
-}
-
-void famibox_state::famibox_nt_w(offs_t offset, uint8_t data)
-{
-	int page = (offset & 0xc00) >> 10;
-	m_nt_page[page][offset & 0x3ff] = data;
-}
-
-
-uint8_t famibox_state::famibox_nt_r(offs_t offset)
-{
-	int page = (offset & 0xc00) >> 10;
-	return m_nt_page[page][offset & 0x3ff];
 }
 
 /******************************************************
@@ -188,10 +176,9 @@ uint8_t famibox_state::famibox_nt_r(offs_t offset)
 
 void famibox_state::sprite_dma_w(address_space &space, uint8_t data)
 {
-	int source = (data & 7);
+	int source = data & 7;
 	m_ppu->spriteram_dma(space, source);
 }
-
 
 
 /******************************************************
@@ -200,12 +187,17 @@ void famibox_state::sprite_dma_w(address_space &space, uint8_t data)
 
 *******************************************************/
 
-
 uint8_t famibox_state::famibox_IN0_r()
 {
 	uint8_t ret = 0x40;
-	ret |= m_ctrl[0]->read_bit0();
-	ret |= m_ctrl[0]->read_bit34();
+
+	if (m_joypad_enable)
+	{
+		// joypad swap only affects D0 pin
+		ret |= m_ctrl[m_joypad_swap]->read_bit0();
+		ret |= m_ctrl[0]->read_bit34();
+	}
+
 	return ret;
 }
 
@@ -213,8 +205,12 @@ uint8_t famibox_state::famibox_IN1_r()
 {
 	uint8_t ret = 0x40;
 
-	ret |= m_ctrl[1]->read_bit0();
-	ret |= m_ctrl[1]->read_bit34();
+	if (m_joypad_enable)
+	{
+		// joypad swap only affects D0 pin
+		ret |= m_ctrl[m_joypad_swap ^ 1]->read_bit0();
+		ret |= m_ctrl[1]->read_bit34();
+	}
 
 	// only read port 3 if its pin 1 (normally GND) is held low
 	if (m_zapper_enable)
@@ -235,52 +231,55 @@ void famibox_state::famibox_IN0_w(uint8_t data)
    System
 
 *******************************************************/
-void famibox_state::famicombox_bankswitch(uint8_t bank)
+
+void famibox_state::famibox_cartswitch(u8 data)
 {
 	struct
 	{
-		uint8_t bank;
 		const char* memory_region;
 		offs_t bank1_offset;
 		offs_t bank2_offset;
 		offs_t ppubank_offset;
-	} famicombox_banks[] =
+		uint8_t mirroring;
+	} cart_list[16] =
 	{
-		{ 0x11, "donkeykong",   0, 0, 0x4000 },
-		{ 0x12, "donkeykongjr", 0, 0, 0x4000 },
-		{ 0x13, "popeye",       0, 0, 0x4000 },
-		{ 0x14, "eigoasobi",    0, 0, 0x4000 },
-		{ 0x15, "mahjong",      0, 0, 0x4000 },
-		{ 0x26, "gomokunarabe", 0, 0, 0x4000 },
-		{ 0x27, "baseball",     0, 0, 0x4000 },
-		{ 0x28, "empty",        0, 0, 0x4000 },
-		{ 0x29, "empty",        0, 0, 0x4000 },
-		{ 0x2a, "empty",        0, 0, 0x4000 },
-		{ 0x3b, "empty",        0, 0, 0x4000 },
-		{ 0x3c, "empty",        0, 0, 0x4000 },
-		{ 0x3d, "empty",        0, 0, 0x4000 },
-		{ 0x3e, "empty",        0, 0, 0x4000 },
-		{ 0x3f, "empty",        0, 0, 0x4000 },
-		{ 0x00, "menu",         0, 0x4000, 0x8000 },
+		{ "menu",     0, 0x4000, 0x8000, 0 },
+		{ "baseball", 0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "bombman",  0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "dkong",    0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "duckhunt", 0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "excitebk", 0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "f1race",   0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "golf",     0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "hogan",    0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "icehocky", 0, 0x4000, 0x8000, PPU_MIRROR_VERT },
+		{ "mahjong",  0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "mario",    0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "smb",      0, 0x4000, 0x8000, PPU_MIRROR_VERT },
+		{ "tennis",   0, 0,      0x4000, PPU_MIRROR_HORZ },
+		{ "wildgunm", 0, 0,      0x4000, PPU_MIRROR_VERT },
+		{ "wrecking", 0, 0x4000, 0x8000, PPU_MIRROR_HORZ }
 	};
 
+	m_curr_slot = data & 0x0f;
+	int column = BIT(data, 4, 2);
 
-	for (auto & famicombox_bank : famicombox_banks)
-	{
-		if ( bank == famicombox_bank.bank ||
-				famicombox_bank.bank == 0 )
-		{
-			membank("cpubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank1_offset);
-			membank("cpubank2")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank2_offset);
-			membank("ppubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.ppubank_offset);
-			break;
-		}
-	}
+	// slot # must belong to correct column, else we default to menu cart
+	if (column != (m_curr_slot - 1) / 5 + 1)
+		m_curr_slot = 0;
+
+	auto &cart = cart_list[m_curr_slot];
+	u8 *base = memregion(cart.memory_region)->base();
+
+	membank("cpubank1")->set_base(base + cart.bank1_offset);
+	membank("cpubank2")->set_base(base + cart.bank2_offset);
+	membank("ppubank1")->set_base(base + cart.ppubank_offset);
+	set_mirroring(m_curr_slot ? cart.mirroring : m_mirroring);
 }
 
-void famibox_state::famicombox_reset()
+void famibox_state::famibox_reset()
 {
-	famicombox_bankswitch(0);
+	famibox_cartswitch(0);
 	m_maincpu->reset();
 }
 
@@ -290,7 +289,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 	if ( BIT(m_exception_mask,1) )
 	{
 		m_exception_cause &= ~0x02;
-		famicombox_reset();
+		famibox_reset();
 	}
 }
 
@@ -305,7 +304,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 		if ( BIT(m_exception_mask,4) )
 		{
 			m_exception_cause &= ~0x10;
-			famicombox_reset();
+			famibox_reset();
 		}
 	}
 }
@@ -372,11 +371,13 @@ void famibox_state::famibox_system_w(offs_t offset, uint8_t data)
 			break;
 		case 4:
 			logerror("%s: bankswitch %x\n", machine().describe_context(), data );
-			famicombox_bankswitch(data & 0x3f);
+			famibox_cartswitch(data & 0x3f);
 			break;
 		case 5:
 			logerror("%s: misc control register: %02x\n", machine().describe_context(), data);
 			m_zapper_enable = data & 0x04;
+			m_joypad_enable = !BIT(data, 6);
+			m_joypad_swap = !BIT(data, 7);
 			break;
 		default:
 			logerror("%s: Unhandled famibox_system_w(%x,%02x)\n", machine().describe_context(), offset, data );
@@ -388,7 +389,6 @@ void famibox_state::famibox_system_w(offs_t offset, uint8_t data)
    Memory map
 
 *******************************************************/
-
 
 void famibox_state::famibox_map(address_map &map)
 {
@@ -406,7 +406,10 @@ void famibox_state::famibox_map(address_map &map)
 void famibox_state::famibox_ppu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr("ppubank1");
-	map(0x2000, 0x3eff).rw(FUNC(famibox_state::famibox_nt_r), FUNC(famibox_state::famibox_nt_w));
+	map(0x2000, 0x23ff).mirror(0x1000).bankrw(m_nt_page[0]);
+	map(0x2400, 0x27ff).mirror(0x1000).bankrw(m_nt_page[1]);
+	map(0x2800, 0x2bff).mirror(0x1000).bankrw(m_nt_page[2]);
+	map(0x2c00, 0x2fff).mirror(0x1000).bankrw(m_nt_page[3]);
 	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
@@ -421,7 +424,7 @@ INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
 	if ( BIT(m_exception_mask, 3) )
 	{
 		m_exception_cause &= ~0x08;
-		famicombox_reset();
+		famibox_reset();
 	}
 }
 
@@ -438,7 +441,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 		if ( BIT(m_exception_mask,4) && (m_coins == 1) )
 		{
 			m_exception_cause &= ~0x10;
-			famicombox_reset();
+			famibox_reset();
 		}
 	}
 }
@@ -459,10 +462,10 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Famicombox menu time" )
+	PORT_DIPNAME( 0x08, 0x00, "Logo attract time" )
 	PORT_DIPSETTING(    0x00, "5 sec" )
 	PORT_DIPSETTING(    0x08, "10 sec" )
-	PORT_DIPNAME( 0x30, 0x00, "Attract time" )
+	PORT_DIPNAME( 0x30, 0x00, "Game attract time" )
 	PORT_DIPSETTING(    0x30, "5 sec" )
 	PORT_DIPSETTING(    0x00, "10 sec" )
 	PORT_DIPSETTING(    0x10, "15 sec" )
@@ -495,15 +498,15 @@ INPUT_PORTS_END
 
 void famibox_state::machine_reset()
 {
-	famicombox_bankswitch(0);
+	famibox_cartswitch(0);
 }
 
 void famibox_state::machine_start()
 {
-	m_nt_ram = std::make_unique<uint8_t[]>(0x800);
-	set_mirroring(m_mirroring);
+	m_nt_ram = std::make_unique<u8[]>(0x800);
 
-	famicombox_bankswitch(0);
+	for (int i = 0; i < 4; i++)
+		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
 	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));
 	m_gameplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_gameplay_timer_callback),this));
@@ -513,6 +516,8 @@ void famibox_state::machine_start()
 	m_money_reg = 0;
 	m_coins = 0;
 	m_zapper_enable = 0;
+	m_joypad_enable = 1;
+	m_joypad_swap = 1;
 }
 
 void famibox_state::famibox(machine_config &config)
@@ -554,34 +559,68 @@ void famibox_state::init_famistat()
 	m_mirroring = PPU_MIRROR_VERT;
 }
 
+// These have all been confirmed against FamicomBox carts, except Excitebike
 #define GAME_LIST \
-	ROM_REGION(0x6000, "donkeykong", 0) \
-	ROM_LOAD("0.prg", 0x0000, 0x4000, CRC(06d1a012) SHA1(a6f92ae0a991c532e6377db2b3ab7f5c13d27675) ) \
-	ROM_LOAD("0.chr", 0x4000, 0x2000, CRC(a21d7c2e) SHA1(97c16cd6b1f3656428b682a23e6e4248c1ca3607) ) \
- \
-	ROM_REGION(0x6000, "donkeykongjr", 0) \
-	ROM_LOAD("hvc-jr-1 prg", 0x0000, 0x4000, CRC(cf6c88b6) SHA1(cefc276e7601d14c6a20e545f334281b7a9fe8db) ) \
-	ROM_LOAD("hvc-jr-0 chr", 0x4000, 0x2000, CRC(852778ab) SHA1(307f2245cce164491012f75897eb984af0c3f456) ) \
- \
-	ROM_REGION(0x6000, "popeye", 0) \
-	ROM_LOAD("hvc-pp-1 prg", 0x0000, 0x4000, CRC(0fa63a45) SHA1(50c594a6d8dcbeee2d83bca8c54c42cf57093aba) ) \
-	ROM_LOAD("hvc-pp-0 chr", 0x4000, 0x2000, CRC(a5fd8d98) SHA1(09d229404babb6c89b417ac541bab80fb06d2ba9) ) \
- \
-	ROM_REGION(0x6000, "eigoasobi", 0) \
-	ROM_LOAD("hvc-en-0 prg", 0x0000, 0x4000, CRC(2dbfa36a) SHA1(0f4301d78d3dfa163239e7b7b7c4dff8a7e21bac) ) \
-	ROM_LOAD("hvc-en-0 chr", 0x4000, 0x2000, CRC(fccc0f36) SHA1(3566709c3c74960ce2ee1e60a85d026e70d7fd2c) ) \
- \
-	ROM_REGION(0x6000, "mahjong", 0) \
-	ROM_LOAD("mahjong.prg", 0x0000, 0x4000, CRC(f86d8d8a) SHA1(2904137a030ae2370a8cd3e068078a1d59a4f229) ) \
-	ROM_LOAD("mahjong.chr", 0x4000, 0x2000, CRC(6bb45576) SHA1(5974787496dfa27a4b7fe6023473fae930ea41dc) ) \
- \
-	ROM_REGION(0x6000, "gomokunarabe", 0) \
-	ROM_LOAD("hvc-go-0 prg", 0x0000, 0x4000, CRC(5603f579) SHA1(f2b007e3b13a777f9f88ff58f87ead6ae8f26327) ) \
-	ROM_LOAD("hvc-go-0 chr", 0x4000, 0x2000, CRC(97ea7144) SHA1(47d354c654285275d0a9420cc6eb3564f0453eb0) ) \
- \
 	ROM_REGION(0x6000, "baseball", 0) \
 	ROM_LOAD("hvc-ba-0 prg", 0x0000, 0x4000, CRC(d18a3dde) SHA1(91f7d3e4c9d18c1969ca1fffdc811b763508a0a2) ) \
-	ROM_LOAD("hvc-ba-0 chr", 0x4000, 0x2000, CRC(c27eef20) SHA1(d5bd643b3ba98846e520b4d3f38aae45a29cf250) )
+	ROM_LOAD("hvc-ba-0 chr", 0x4000, 0x2000, CRC(c27eef20) SHA1(d5bd643b3ba98846e520b4d3f38aae45a29cf250) ) \
+ \
+	ROM_REGION(0x6000, "bombman", 0) \
+	ROM_LOAD("hvc-bm-0 prg", 0x0000, 0x4000, CRC(9684657f) SHA1(055db2dc8cec0448f3845da1626e108c7692cfc6) ) \
+	ROM_LOAD("hvc-bm-0 chr", 0x4000, 0x2000, CRC(a775822e) SHA1(b0584f9f4172b9e111ae275d8de6644b76372b32) ) \
+ \
+	ROM_REGION(0x6000, "dkong", 0) \
+	ROM_LOAD("hvc-dk-1 prg", 0x0000, 0x4000, CRC(f56a5b10) SHA1(2c4b1d653194df0996d54d9de9188b270d0337d9) ) \
+	ROM_LOAD("hvc-dk-0 chr", 0x4000, 0x2000, CRC(a21d7c2e) SHA1(97c16cd6b1f3656428b682a23e6e4248c1ca3607) ) \
+ \
+	ROM_REGION(0x6000, "duckhunt", 0) \
+	ROM_LOAD("hvc-dh-0 prg", 0x0000, 0x4000, CRC(90ca616d) SHA1(b742576317cd6a04caac25252d5593844c9a0bb6) ) \
+	ROM_LOAD("hvc-dh-0 chr", 0x4000, 0x2000, CRC(4e049e03) SHA1(ffad32a3bab2fb3826bc554b1b9838e837513576) ) \
+ \
+	ROM_REGION(0x6000, "excitebk", 0) \
+	ROM_LOAD("hvc-eb-0 prg", 0x0000, 0x4000, CRC(3a94fa0b) SHA1(6239e91ccefdc017d233cbae388c6568a17ed04b) ) \
+	ROM_LOAD("hvc-eb-0 chr", 0x4000, 0x2000, CRC(e5f72401) SHA1(a8bf028e1a62677e48e88cf421bb2a8051eb800c) ) \
+ \
+	ROM_REGION(0x6000, "f1race", 0) \
+	ROM_LOAD("sss-fr prg", 0x0000, 0x4000, CRC(57970078) SHA1(c212294be2a3b8f89ff440df821324fa0d522a55) ) \
+	ROM_LOAD("sss-fr chr", 0x4000, 0x2000, CRC(e653dbcb) SHA1(f9758fcc8e07890bd733af127defc86bb70f179e) ) \
+ \
+	ROM_REGION(0x6000, "golf", 0) \
+	ROM_LOAD("hvc-gf-0 prg", 0x0000, 0x4000, CRC(9c7e6421) SHA1(e67e9ff5ee81fbd1af8d7439b86a9ad98499b9dc) ) \
+	ROM_LOAD("hvc-gf-0 chr", 0x4000, 0x2000, CRC(7dfa75a8) SHA1(ee016d37f4c54bea8cbbb9ae125bff4c7e14bfb3) ) \
+ \
+	ROM_REGION(0x6000, "hogan", 0) \
+	ROM_LOAD("hvc-ha-0 prg", 0x0000, 0x4000, CRC(8963ae6e) SHA1(bca489ed0fb58e1e99f36c427bc0d7d805b6c61a) ) \
+	ROM_LOAD("hvc-ha-0 chr", 0x4000, 0x2000, CRC(5df42fc4) SHA1(4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8) ) \
+ \
+	ROM_REGION(0xa000, "icehocky", 0) \
+	ROM_LOAD("sss hy-0 prg", 0x0000, 0x8000, CRC(82dff13d) SHA1(4edbf555d319dfe1c2a08dc28f484d4344a228ba) ) \
+	ROM_LOAD("sss hy-0 chr", 0x8000, 0x2000, CRC(f10fc90a) SHA1(1a2a657267de1f5bdf284d1b69ed7d4895dfb281) ) \
+ \
+	ROM_REGION(0x6000, "mahjong", 0) \
+	ROM_LOAD("hvc mj-1 prg", 0x0000, 0x4000, CRC(f86d8d8a) SHA1(2904137a030ae2370a8cd3e068078a1d59a4f229) ) \
+	ROM_LOAD("hvc mj-1 chr", 0x4000, 0x2000, CRC(6bb45576) SHA1(5974787496dfa27a4b7fe6023473fae930ea41dc) ) \
+ \
+	ROM_REGION(0x6000, "mario", 0) \
+	ROM_LOAD("hvc-ma-0 prg", 0x0000, 0x4000, CRC(75f6a9f3) SHA1(b6f88f7a2f9a49cc9182a244571730198f1edc4b) ) \
+	ROM_LOAD("hvc-ma-0 chr", 0x4000, 0x2000, CRC(10f77435) SHA1(a646c3443832ada84d31a3a8a4b34aebc17cecd5) ) \
+ \
+	ROM_REGION(0xa000, "smb", 0) \
+	ROM_LOAD("hvc sm-0 prg", 0x0000, 0x8000, CRC(5cf548d3) SHA1(fefa1097449a3a11ebf8c6199e905996c5dc8fbd) ) \
+	ROM_LOAD("hvc sm-0 chr", 0x8000, 0x2000, CRC(867b51ad) SHA1(394badaf0b0bdd0ea279a1bca89a9d9ddc00b1b5) ) \
+ \
+	ROM_REGION(0x6000, "tennis", 0) \
+	ROM_LOAD("hvc-te-0 prg", 0x0000, 0x4000, CRC(8b2e3e81) SHA1(e54274c0b0d651458c5459d41872b1f99904d0fb) ) \
+	ROM_LOAD("hvc-te-0 chr", 0x4000, 0x2000, CRC(3a34c45b) SHA1(2cc26a01c38ead50503dccb3ee929ba7a2b6772c) ) \
+ \
+	ROM_REGION(0x6000, "wildgunm", 0) \
+	ROM_LOAD("hvc-wg-1 prg", 0x0000, 0x4000, CRC(389960db) SHA1(6b38f2c86ef27f653a2bdb9c682ac0bc981c7db6) ) \
+	ROM_LOAD("hvc-wg-0 chr", 0x4000, 0x2000, CRC(a5e04856) SHA1(9194d89a34f687742216889cbb3e717a9ae81c92) ) \
+ \
+	ROM_REGION(0xa000, "wrecking", 0) \
+	ROM_LOAD("hvc-wr-0 prg", 0x0000, 0x8000, CRC(4328b273) SHA1(764d68f05f4a6e43fb26d7e654e237d2b0258fe4) ) \
+	ROM_LOAD("hvc-wr-0 chr", 0x8000, 0x2000, CRC(23f0b9fd) SHA1(c7f2d4f5f555490847654b8458687f94fba3bd12) )
+
 
 ROM_START(famibox)
 	ROM_REGION(0xa000, "menu", 0)
@@ -589,8 +628,6 @@ ROM_START(famibox)
 	ROM_LOAD("sss-m chr v-1", 0x8000, 0x2000, CRC(a43d4435) SHA1(ee56b4d2110aff394bf2c8cd3414ca175ace01bd))
 
 	GAME_LIST
-
-	ROM_REGION(0x6000, "empty", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(famistat)
@@ -604,8 +641,6 @@ ROM_START(famistat)
 	ROM_LOAD("sss-m chr", 0x8000, 0x2000, CRC(85561c8a) SHA1(35ab7e72512831a2f4cfaa689551fe7b5fa6d673))
 
 	GAME_LIST
-
-	ROM_REGION(0x6000, "empty", ROMREGION_ERASEFF)
 ROM_END
 } // Anonymous namespace
 

@@ -59,13 +59,13 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<seibu_sound_device> m_seibu_sound;
 
-	int m_tilebank;
-	int m_oldtilebank;
+	int m_tilebank = 0;
+	int m_oldtilebank = 0;
 
-	tilemap_t *m_pf3_layer;
-	tilemap_t *m_pf2_layer;
-	tilemap_t *m_pf1_layer;
-	tilemap_t *m_text_layer;
+	tilemap_t *m_pf3_layer = nullptr;
+	tilemap_t *m_pf2_layer = nullptr;
+	tilemap_t *m_pf1_layer = nullptr;
+	tilemap_t *m_text_layer = nullptr;
 
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

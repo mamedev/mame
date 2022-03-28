@@ -93,15 +93,15 @@ private:
 	required_shared_ptr<uint8_t> m_sndram;
 	output_finder<3> m_leds;
 
-	int m_sndram_bank;
-	int m_turntable_select;
-	uint8_t m_turntable_last_pos[2];
-	uint16_t m_turntable_pos[2];
-	uint8_t m_pending_vb_int;
-	uint16_t m_v_ctrl;
-	uint32_t m_obj_regs[0xa0/4];
-	const uint8_t *m_ata_user_password;
-	const uint8_t *m_ata_master_password;
+	int m_sndram_bank = 0;
+	int m_turntable_select = 0;
+	uint8_t m_turntable_last_pos[2]{};
+	uint16_t m_turntable_pos[2]{};
+	uint8_t m_pending_vb_int = 0U;
+	uint16_t m_v_ctrl = 0U;
+	uint32_t m_obj_regs[0xa0/4]{};
+	const uint8_t *m_ata_user_password = nullptr;
+	const uint8_t *m_ata_master_password = nullptr;
 };
 
 #endif // MAME_INCLUDES_DJMAIN_H

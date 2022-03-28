@@ -75,10 +75,9 @@ void nes_state::nes(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	maincpu.add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
-	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
-	m_ctrl1->set_screen_tag(m_screen);
-	m_ctrl2->set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad").set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad").set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config, m_special, nes_control_special_devices, nullptr).set_screen_tag(m_screen);
 
 	NES_CART_SLOT(config, m_cartslot, NTSC_APU_CLOCK, nes_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("nes");
@@ -86,6 +85,7 @@ void nes_state::nes(machine_config &config)
 	SOFTWARE_LIST(config, "ntb_list").set_original("nes_ntbrom");      // Sunsoft Nantettate! Baseball mini-carts
 	SOFTWARE_LIST(config, "kstudio_list").set_original("nes_kstudio"); // Bandai Karaoke Studio expansion carts
 	SOFTWARE_LIST(config, "datach_list").set_original("nes_datach");   // Bandai Datach Joint ROM System mini-carts
+	SOFTWARE_LIST(config, "famibox_list").set_compatible("famibox");   // FamicomBox/FamicomStation carts
 }
 
 void nes_state::nespal(machine_config &config)
@@ -113,12 +113,9 @@ void nes_state::famicom(machine_config &config)
 {
 	nes(config);
 
-	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
-	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
-	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
-	m_ctrl1->set_screen_tag(m_screen);
-	m_ctrl2->set_screen_tag(m_screen);
-	m_exp->set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad").set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad").set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr).set_screen_tag(m_screen);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("famicom_flop");
 	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
@@ -148,12 +145,9 @@ void nes_state::famipalc(machine_config &config)
 {
 	nespalc(config);
 
-	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
-	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
-	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
-	m_ctrl1->set_screen_tag(m_screen);
-	m_ctrl2->set_screen_tag(m_screen);
-	m_exp->set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad").set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad").set_screen_tag(m_screen);
+	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr).set_screen_tag(m_screen);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
 }

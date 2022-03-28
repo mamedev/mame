@@ -11,8 +11,8 @@
     - convert volume values to non-linear dB scale (cfr. )
     - Verify ADKCON modulation;
     - Verify manual mode:
-	  \- AGA roadkill during gameplay, which also has very long period setups,
-	     extremely aliased;
+      \- AGA roadkill during gameplay, which also has very long period setups,
+         extremely aliased;
     - When a DMA stop occurs, is the correlated channel playback stopped
       at the end of the current cycle or as soon as possible like current
       implementation?

@@ -70,7 +70,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	bool m_nmi_enable, m_irq_enable, m_firq_enable;
+	bool m_nmi_enable = false, m_irq_enable = false, m_firq_enable = false;
 };
 
 void konblands_state::konblands_palette(palette_device &palette) const

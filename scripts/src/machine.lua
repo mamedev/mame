@@ -1976,6 +1976,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ldv4200hle.h,MACHINES["LDV4200HLE"] = true
+---------------------------------------------------
+
+if (MACHINES["LDV4200HLE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ldv4200hle.cpp",
+		MAME_DIR .. "src/devices/machine/ldv4200hle.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ldp1000.h,MACHINES["LDP1000"] = true
 ---------------------------------------------------
 
@@ -4945,5 +4957,16 @@ if (MACHINES["BITMAP_PRINTER"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/bitmap_printer.cpp",
 		MAME_DIR .. "src/devices/machine/bitmap_printer.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ns32382.h,MACHINES["NS32382"] = true
+---------------------------------------------------
+if (MACHINES["NS32382"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ns32382.cpp",
+		MAME_DIR .. "src/devices/machine/ns32382.h",
 	}
 end

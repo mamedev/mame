@@ -65,9 +65,9 @@ private:
 	required_shared_ptr<uint8_t> m_edge2_pos;
 	required_shared_ptr<uint8_t> m_scroll;
 
-	tilemap_t *m_tilemap_fg;
-	tilemap_t *m_tilemap_edge1[4];
-	tilemap_t *m_tilemap_edge2[4];
+	tilemap_t *m_tilemap_fg = nullptr;
+	tilemap_t *m_tilemap_edge1[4]{};
+	tilemap_t *m_tilemap_edge2[4]{};
 	std::unique_ptr<bitmap_ind16> m_headlight_bitmap;
 	uint8_t shift_r();
 	uint8_t shift_rev_r();

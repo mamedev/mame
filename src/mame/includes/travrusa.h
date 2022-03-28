@@ -35,8 +35,8 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t*             m_bg_tilemap;
-	int                  m_scrollx[2];
+	tilemap_t*             m_bg_tilemap = nullptr;
+	int                  m_scrollx[2]{};
 	void travrusa_videoram_w(offs_t offset, uint8_t data);
 	void travrusa_scroll_x_low_w(uint8_t data);
 	void travrusa_scroll_x_high_w(uint8_t data);

@@ -43,16 +43,16 @@ public:
 
 	output_finder<2> m_leds;
 
-	uint8_t m_palette_bank;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	uint8_t m_palette_bank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 	bitmap_ind16 m_fg_bitmap;
 	bitmap_ind16 m_sprite_bitmap;
 	std::unique_ptr<uint32_t[]> m_transmask[3];
-	uint16_t m_scroll0;
-	uint16_t m_scroll1;
-	uint8_t m_main_irq_mask;
-	uint8_t m_mcu_irq_mask;
+	uint16_t m_scroll0 = 0;
+	uint16_t m_scroll1 = 0;
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_mcu_irq_mask = 0;
 
 	void subreset_w(offs_t offset, uint8_t data);
 	void flipscreen_w(offs_t offset, uint8_t data);

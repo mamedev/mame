@@ -244,16 +244,16 @@ private:
 	required_region_ptr<uint8_t> m_cyclwarr_tileclut;
 
 	std::vector<uint8_t> m_mask;
-	tilemap_t *m_layer[4];
+	tilemap_t *m_layer[4]{};
 
-	uint16_t m_video_config[4];
-	uint16_t m_mixing_control;
-	uint16_t m_bigfight_a40000[2];
-	uint16_t m_bigfight_bank;
-	uint16_t m_bigfight_last_bank;
-	uint16_t m_road_color_bank, m_prev_road_bank;
-	uint16_t m_layer_page_size[4];
-	bool m_layer1_can_be_road;
+	uint16_t m_video_config[4]{};
+	uint16_t m_mixing_control = 0;
+	uint16_t m_bigfight_a40000[2]{};
+	uint16_t m_bigfight_bank = 0;
+	uint16_t m_bigfight_last_bank = 0;
+	uint16_t m_road_color_bank = 0, m_prev_road_bank = 0;
+	uint16_t m_layer_page_size[4]{};
+	bool m_layer1_can_be_road = false;
 	std::unique_ptr<uint8_t[]> m_decoded_gfx;
 
 	void tile_expand();
