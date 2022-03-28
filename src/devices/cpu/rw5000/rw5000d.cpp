@@ -2,16 +2,16 @@
 // copyright-holders:hap
 /*
 
-  Rockwell B5000 family MCU disassembler
+  Rockwell A/B5000 family MCU disassembler
 
 */
 
 #include "emu.h"
-#include "b5000d.h"
+#include "rw5000d.h"
 
 // constructor
 
-b5000_common_disassembler::b5000_common_disassembler()
+rw5000_common_disassembler::rw5000_common_disassembler()
 {
 	// init lfsr pc lut
 	for (u32 i = 0, pc = 0; i < 0x40; i++)
@@ -22,7 +22,7 @@ b5000_common_disassembler::b5000_common_disassembler()
 	}
 }
 
-offs_t b5000_common_disassembler::increment_pc(offs_t pc)
+offs_t rw5000_common_disassembler::increment_pc(offs_t pc)
 {
 	int feed = ((pc & 0x3e) == 0) ? 1 : 0;
 	feed ^= (pc >> 1 ^ pc) & 1;
@@ -32,7 +32,7 @@ offs_t b5000_common_disassembler::increment_pc(offs_t pc)
 
 // common lookup tables
 
-const char *const b5000_common_disassembler::s_name[] =
+const char *const rw5000_common_disassembler::s_name[] =
 {
 	"?",
 	"NOP", "RSC", "SC", "TC", "TAM",
@@ -46,7 +46,7 @@ const char *const b5000_common_disassembler::s_name[] =
 
 // number of bits per opcode parameter
 // note: d4 means bitmask param, d5 means inverted
-const u8 b5000_common_disassembler::s_bits[] =
+const u8 rw5000_common_disassembler::s_bits[] =
 {
 	0,
 	0, 0, 0, 0, 0,
@@ -58,7 +58,7 @@ const u8 b5000_common_disassembler::s_bits[] =
 	0, 0, 2, 0, 0, 0
 };
 
-const u32 b5000_common_disassembler::s_flags[] =
+const u32 rw5000_common_disassembler::s_flags[] =
 {
 	0,
 	0, 0, 0, STEP_COND, STEP_COND,
@@ -67,17 +67,18 @@ const u32 b5000_common_disassembler::s_flags[] =
 	0, 0, 0, 0, 0, 0,
 	0, 0, STEP_COND,
 	0, STEP_OVER, 0, STEP_OUT,
-	STEP_COND, STEP_COND, STEP_COND, 0, 0
+	STEP_COND, STEP_COND, STEP_COND, STEP_COND, 0, 0
 };
 
 
 // common disasm
 
-offs_t b5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t rw5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	// get raw opcode
 	u8 op = opcodes.r8(pc);
 	u8 instr = lut_opmap[op];
+	u32 flags = s_flags[instr];
 
 	// get parameter
 	u8 bits = s_bits[instr];
@@ -93,7 +94,6 @@ offs_t b5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 	// disassemble it
 	util::stream_format(stream, "%-6s", s_name[instr]);
 
-	u32 flags = s_flags[instr];
 	if (bits > 0)
 	{
 		// exceptions for opcodes with 2 params
@@ -109,11 +109,14 @@ offs_t b5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 		}
 		else if (instr == em_ADD)
 		{
+			if (param & 1)
+				flags |= STEP_COND;
+
 			switch (param ^ 2)
 			{
-				case 1: stream << "S"; flags |= STEP_COND; break; // 0,1
+				case 1: stream << "S"; break; // 0,1
 				case 2: stream << "C"; break; // 1,0
-				case 3: stream << "C,S"; flags |= STEP_COND; break; // 1,1
+				case 3: stream << "C,S"; break; // 1,1
 				default: break;
 			}
 		}

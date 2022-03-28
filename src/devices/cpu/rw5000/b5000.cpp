@@ -6,6 +6,8 @@
 
 TODO:
 - is unmapped ram mirrored? (that goes for subdevices too)
+- not sure how 7seg zero suppression works, the only documentation for it
+  is a block diagram with the logic connected to the 7seg decoder
 - fill unknown data in segment decoder, it's not on a neat PLA
 - is ATB an unskippable opcode? nothing relies on it
 
@@ -14,7 +16,7 @@ TODO:
 #include "emu.h"
 #include "b5000.h"
 
-#include "b5000d.h"
+#include "rw5000d.h"
 
 
 DEFINE_DEVICE_TYPE(B5000, b5000_cpu_device, "b5000", "Rockwell B5000")
@@ -22,7 +24,7 @@ DEFINE_DEVICE_TYPE(B5000, b5000_cpu_device, "b5000", "Rockwell B5000")
 
 // constructor
 b5000_cpu_device::b5000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
-	b5000_base_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
+	rw5000_base_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
 { }
 
 b5000_cpu_device::b5000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -132,7 +134,7 @@ void b5000_cpu_device::execute_one()
 		case 0x39: op_rsc(); break;
 		case 0x3b: op_sc(); break;
 		case 0x74: op_kseg(); break;
-		case 0x77: m_atbz_step = 1; break; // ATB
+		case 0x77: m_atb_step = 1; break;
 
 		default: op_illegal(); break;
 			}

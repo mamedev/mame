@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Rockwell B5000 family MCU cores
+  Rockwell A/B5000 family MCU cores
 
 This MCU series sits between A4000 and the more publicly available PPS4/1.
 Known part numbers: A/B5000, A5300, A/B5500, A/B5900, B6000, B6100.
@@ -19,12 +19,12 @@ A4000 is similar, but too many differences to emulate in this device, probably.
 */
 
 #include "emu.h"
-#include "b5000base.h"
+#include "rw5000base.h"
 
 #include "debugger.h"
 
 
-b5000_base_device::b5000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+rw5000_base_device::rw5000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
@@ -42,7 +42,7 @@ b5000_base_device::b5000_base_device(const machine_config &mconfig, device_type 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void b5000_base_device::device_start()
+void rw5000_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
@@ -79,7 +79,8 @@ void b5000_base_device::device_start()
 	m_seg = 0;
 	m_suppress0 = false;
 
-	m_atbz_step = 0;
+	m_atb_step = 0;
+	m_mtd_step = 0;
 	m_tra_step = 0;
 	m_ret_step = 0;
 
@@ -106,7 +107,8 @@ void b5000_base_device::device_start()
 	save_item(NAME(m_seg));
 	save_item(NAME(m_suppress0));
 
-	save_item(NAME(m_atbz_step));
+	save_item(NAME(m_atb_step));
+	save_item(NAME(m_mtd_step));
 	save_item(NAME(m_tra_step));
 	save_item(NAME(m_ret_step));
 
@@ -126,7 +128,7 @@ void b5000_base_device::device_start()
 	set_icountptr(m_icount);
 }
 
-device_memory_interface::space_config_vector b5000_base_device::memory_space_config() const
+device_memory_interface::space_config_vector rw5000_base_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
@@ -139,7 +141,7 @@ device_memory_interface::space_config_vector b5000_base_device::memory_space_con
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void b5000_base_device::device_reset()
+void rw5000_base_device::device_reset()
 {
 	reset_pc();
 	m_prev_pc = m_pc;
@@ -152,7 +154,8 @@ void b5000_base_device::device_reset()
 	m_sr = false;
 	m_skip = false;
 
-	m_atbz_step = 0;
+	m_atb_step = 0;
+	m_mtd_step = 0;
 	m_tra_step = 0;
 	m_ret_step = 0;
 }
@@ -162,7 +165,7 @@ void b5000_base_device::device_reset()
 //  execute
 //-------------------------------------------------
 
-void b5000_base_device::increment_pc()
+void rw5000_base_device::increment_pc()
 {
 	// low part is LFSR
 	int feed = ((m_pc & 0x3e) == 0) ? 1 : 0;
@@ -170,7 +173,7 @@ void b5000_base_device::increment_pc()
 	m_pc = (m_pc & ~0x3f) | (m_pc >> 1 & 0x1f) | (feed << 5);
 }
 
-void b5000_base_device::execute_run()
+void rw5000_base_device::execute_run()
 {
 	while (m_icount > 0)
 	{
@@ -201,9 +204,10 @@ void b5000_base_device::execute_run()
 
 		// some opcodes have multiple steps and will run in parallel with next ones,
 		// eg. it may fetch in order A,B and parts executed in order B,A
-		if (m_atbz_step) op_atbz();
-		if (m_tra_step) op_tra();
-		if (m_ret_step) op_ret();
+		if (m_atb_step) op_atb_step();
+		if (m_mtd_step) op_mtd_step();
+		if (m_tra_step) op_tra_step();
+		if (m_ret_step) op_ret_step();
 
 		// some opcodes delay RAM address adjustment for 1 cycle
 		m_ram_addr = (m_bu << 4 & 0x30) | (m_bl & 0xf);

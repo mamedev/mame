@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_CPU_B5000_B6000_H
-#define MAME_CPU_B5000_B6000_H
+#ifndef MAME_CPU_RW5000_B6000_H
+#define MAME_CPU_RW5000_B6000_H
 
 #pragma once
 
@@ -59,10 +59,10 @@ protected:
 
 	// opcode handlers
 	virtual void op_tkbs() override;
-	virtual void op_atbz() override;
+	virtual void op_atbz();
 };
 
 
 DECLARE_DEVICE_TYPE(B6000, b6000_cpu_device)
 
-#endif // MAME_CPU_B5000_B6000_H
+#endif // MAME_CPU_RW5000_B6000_H

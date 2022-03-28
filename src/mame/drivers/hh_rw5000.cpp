@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-Rockwell B5000 MCU series handhelds (before PPS-4/1)
+Rockwell A/B5000 MCU series handhelds (before PPS-4/1)
 Mostly calculators on these MCUs, but also Mattel's first couple of handhelds.
 
 ROM source notes when dumped from another model, but confident it's the same:
@@ -14,9 +14,9 @@ ROM source notes when dumped from another model, but confident it's the same:
 
 #include "emu.h"
 
-#include "cpu/b5000/b5000.h"
-#include "cpu/b5000/b6000.h"
-#include "cpu/b5000/b6100.h"
+#include "cpu/rw5000/b5000.h"
+#include "cpu/rw5000/b6000.h"
+#include "cpu/rw5000/b6100.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
 
@@ -30,13 +30,13 @@ ROM source notes when dumped from another model, but confident it's the same:
 #include "misatk.lh"
 #include "rw18r.lh"
 
-//#include "hh_b5000_test.lh" // common test-layout - use external artwork
+//#include "hh_rw5000_test.lh" // common test-layout - use external artwork
 
 
-class hh_b5000_state : public driver_device
+class hh_rw5000_state : public driver_device
 {
 public:
-	hh_b5000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	hh_rw5000_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
@@ -53,7 +53,7 @@ protected:
 	virtual void machine_reset() override;
 
 	// devices
-	required_device<b5000_base_device> m_maincpu;
+	required_device<rw5000_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<5> m_inputs; // max 5
@@ -71,7 +71,7 @@ protected:
 
 // machine start/reset
 
-void hh_b5000_state::machine_start()
+void hh_rw5000_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -79,7 +79,7 @@ void hh_b5000_state::machine_start()
 	save_item(NAME(m_seg));
 }
 
-void hh_b5000_state::machine_reset()
+void hh_rw5000_state::machine_reset()
 {
 }
 
@@ -93,7 +93,7 @@ void hh_b5000_state::machine_reset()
 
 // generic input handlers
 
-u8 hh_b5000_state::read_inputs(int columns)
+u8 hh_rw5000_state::read_inputs(int columns)
 {
 	u8 ret = 0;
 
@@ -105,7 +105,7 @@ u8 hh_b5000_state::read_inputs(int columns)
 	return ret;
 }
 
-void hh_b5000_state::switch_change(int sel, u32 mask, bool next)
+void hh_rw5000_state::switch_change(int sel, u32 mask, bool next)
 {
 	// config switches (for direct control)
 	ioport_field *inp = m_inputs[sel]->field(mask);
@@ -116,7 +116,7 @@ void hh_b5000_state::switch_change(int sel, u32 mask, bool next)
 		inp->select_previous_setting();
 }
 
-INPUT_CHANGED_MEMBER(hh_b5000_state::power_button)
+INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
 {
 	// power button or switch
 	bool power = (param) ? (bool(param - 1)) : !newval;
@@ -150,11 +150,11 @@ namespace {
 
 ***************************************************************************/
 
-class autorace_state : public hh_b5000_state
+class autorace_state : public hh_rw5000_state
 {
 public:
 	autorace_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void autorace(machine_config &config);
@@ -194,11 +194,11 @@ static INPUT_PORTS_START( autorace )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("POWER") // power switch
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_b5000_state, power_button, 0) PORT_NAME("Start / Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Start / Reset")
 
 	PORT_START("SWITCH") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_b5000_state, switch_prev<0>, 0x0c) PORT_NAME("Gear Switch Down")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_b5000_state, switch_next<0>, 0x0c) PORT_NAME("Gear Switch Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_prev<0>, 0x0c) PORT_NAME("Gear Switch Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_next<0>, 0x0c) PORT_NAME("Gear Switch Up")
 INPUT_PORTS_END
 
 void autorace_state::autorace(machine_config &config)
@@ -247,11 +247,11 @@ ROM_END
 
 ***************************************************************************/
 
-class misatk_state : public hh_b5000_state
+class misatk_state : public hh_rw5000_state
 {
 public:
 	misatk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void misatk(machine_config &config);
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( misatk )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("POWER") // power switch
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_b5000_state, power_button, 0) PORT_NAME("Arm / Off")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Arm / Off")
 INPUT_PORTS_END
 
 void misatk_state::misatk(machine_config &config)
@@ -333,11 +333,11 @@ ROM_END
 
 ***************************************************************************/
 
-class mfootb_state : public hh_b5000_state
+class mfootb_state : public hh_rw5000_state
 {
 public:
 	mfootb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void mfootb(machine_config &config);
@@ -433,11 +433,11 @@ ROM_END
 
 ***************************************************************************/
 
-class mbaseb_state : public hh_b5000_state
+class mbaseb_state : public hh_rw5000_state
 {
 public:
 	mbaseb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void mbaseb(machine_config &config);
@@ -528,11 +528,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gravity_state : public hh_b5000_state
+class gravity_state : public hh_rw5000_state
 {
 public:
 	gravity_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void gravity(machine_config &config);
@@ -612,11 +612,11 @@ ROM_END
 
 ***************************************************************************/
 
-class rw18r_state : public hh_b5000_state
+class rw18r_state : public hh_rw5000_state
 {
 public:
 	rw18r_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void rw18r(machine_config &config);

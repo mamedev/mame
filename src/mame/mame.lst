@@ -16442,14 +16442,6 @@ hexionb                         // bootleg
 @source:hh_amis2k.cpp
 wildfire                        // Parker Bros
 
-@source:hh_b5000.cpp
-autorace                        // Mattel
-gravity                         // Mattel
-mbaseb                          // Mattel
-mfootb                          // Mattel
-misatk                          // Mattel
-rw18r                           // Rockwell
-
 @source:hh_cop400.cpp
 bship82                         // Milton Bradley
 ctstein                         // Castle Toy
@@ -16549,6 +16541,14 @@ mwcfootb                        // Mattel
 rdqa                            // Selchow & Righter
 scrabsen                        // Selchow & Righter
 smastmind                       // Invicta
+
+@source:hh_rw5000.cpp
+autorace                        // Mattel
+gravity                         // Mattel
+mbaseb                          // Mattel
+mfootb                          // Mattel
+misatk                          // Mattel
+rw18r                           // Rockwell
 
 @source:hh_sm510.cpp
 atakaast                        // Elektronika

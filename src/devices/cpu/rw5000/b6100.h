@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_CPU_B5000_B6100_H
-#define MAME_CPU_B5000_B6100_H
+#ifndef MAME_CPU_RW5000_B6100_H
+#define MAME_CPU_RW5000_B6100_H
 
 #pragma once
 
@@ -71,4 +71,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(B6100, b6100_cpu_device)
 
-#endif // MAME_CPU_B5000_B6100_H
+#endif // MAME_CPU_RW5000_B6100_H

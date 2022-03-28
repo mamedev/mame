@@ -57,7 +57,7 @@ void b5000_cpu_device::op_tl()
 	m_s = (m_pc & ~0x3f) | (m_s & 0x3f);
 }
 
-void b5000_cpu_device::op_tra()
+void b5000_cpu_device::op_tra_step()
 {
 	assert(m_tra_step > 0);
 
@@ -95,7 +95,7 @@ void b5000_cpu_device::op_tra()
 	m_tra_step++;
 }
 
-void b5000_cpu_device::op_ret()
+void b5000_cpu_device::op_ret_step()
 {
 	assert(m_ret_step > 0);
 
@@ -271,12 +271,12 @@ void b5000_cpu_device::op_kseg()
 	seg_w(0);
 }
 
-void b5000_cpu_device::op_atbz()
+void b5000_cpu_device::op_atb_step()
 {
-	assert(m_atbz_step > 0);
+	assert(m_atb_step > 0);
 
 	// ATBZ (aka ATB on B5xxx): ATB + load strobe (multi step)
-	switch (m_atbz_step)
+	switch (m_atb_step)
 	{
 		// step 1: ATB + KSEG
 		case 1:
@@ -291,14 +291,14 @@ void b5000_cpu_device::op_atbz()
 
 		// step 4: load strobe from Bl
 		case 4:
-			m_write_str(1 << (m_ram_addr & 0xf));
-			m_atbz_step = 0;
+			m_write_str(1 << m_prev_bl);
+			m_atb_step = 0;
 			return;
 
 		default:
 			break;
 	}
-	m_atbz_step++;
+	m_atb_step++;
 }
 
 void b5000_cpu_device::op_tkb()
