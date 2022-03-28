@@ -44,7 +44,7 @@ void b6100_cpu_device::data_48x4(address_map &map)
 // disasm
 std::unique_ptr<util::disasm_interface> b6100_cpu_device::create_disassembler()
 {
-	return std::make_unique<b5500_disassembler>();
+	return std::make_unique<b6100_disassembler>();
 }
 
 
