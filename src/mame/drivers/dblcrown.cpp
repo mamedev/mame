@@ -501,17 +501,6 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout char_8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4,0, 12,8, 20,16, 28,24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout char_16x16_layout =
 {
 	16,16,
@@ -526,7 +515,7 @@ static const gfx_layout char_16x16_layout =
 
 static GFXDECODE_START( gfx_dblcrown )
 #ifdef DEBUG_VRAM
-	GFXDECODE_ENTRY( "vram", 0, char_8x8_layout, 0, 0x10 )
+	GFXDECODE_ENTRY( "vram", 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
 #endif
 	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 0x10 )
 GFXDECODE_END

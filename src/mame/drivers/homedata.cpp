@@ -1101,20 +1101,9 @@ INPUT_PORTS_END
 /**************************************************************************/
 
 
-static const gfx_layout char_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_mrokumei )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0x6000, 0x100 )
-	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0x7000, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0x6000, 0x100 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x7000, 0x100 )
 GFXDECODE_END
 
 static const gfx_layout tile_layout =
@@ -1491,20 +1480,9 @@ void homedata_state::cpu2_map(address_map &map)
 
 
 
-static const gfx_layout mirderbychar_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_mirderby )
-	GFXDECODE_ENTRY( "gfx1", 0, mirderbychar_layout, 0x0000, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0, mirderbychar_layout, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
 GFXDECODE_END
 
 /*   Miracle Derby - Ascot

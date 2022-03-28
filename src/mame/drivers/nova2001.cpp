@@ -586,17 +586,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout layout8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
 static const gfx_layout layout8x8_part =
 {
 	8,8,
@@ -626,20 +615,20 @@ static GFXDECODE_START( gfx_nova2001 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ninjakun )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x200, 16 )    // sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x000, 16 )    // fg tiles
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,   0x100, 16 )    // bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,            0x200, 16 )    // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0x000, 16 )    // fg tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_pkunwar )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x000, 16 )    // sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 16 )    // bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,            0x000, 16 )    // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_raiders5 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,    0x200, 16 ) // sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part, 0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,      0x100, 16 ) // bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,               0x200, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part,            0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,      0x100, 16 ) // bg tiles
 GFXDECODE_END
 
 

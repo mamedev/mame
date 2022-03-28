@@ -318,20 +318,9 @@ void esh_state::esh_palette(palette_device &palette) const
 	}
 }
 
-static const gfx_layout esh_gfx_layout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_esh )
-	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
-	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
+	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x3_planar, 0x0, 0x20)
+	GFXDECODE_ENTRY("gfx2", 0, gfx_8x8x3_planar, 0x0, 0x20)
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)

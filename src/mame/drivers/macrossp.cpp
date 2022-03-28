@@ -1075,18 +1075,6 @@ INPUT_PORTS_END
 
 /*** GFX DECODE **************************************************************/
 
-static const gfx_layout macrossp_char16x16x4layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28, 32+0,32+4,32+8,32+12,32+16,32+20,32+24,32+28 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64,11*64,12*64,13*64,14*64,15*64},
-	16*64
-};
-
 static const gfx_layout macrossp_char16x16x8layout =
 {
 	16,16,
@@ -1104,7 +1092,7 @@ static GFXDECODE_START( gfx_macrossp )
 	GFXDECODE_ENTRY( "gfx2", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx3", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx4", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
-	GFXDECODE_ENTRY( "gfx5", 0, macrossp_char16x16x4layout,   0x800, 0x80 )
+	GFXDECODE_ENTRY( "gfx5", 0, gfx_16x16x4_packed_msb,       0x800, 0x80 )
 GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/

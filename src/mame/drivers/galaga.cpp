@@ -1442,17 +1442,6 @@ static const gfx_layout charlayout_2bpp =
 	16*8
 };
 
-static const gfx_layout charlayout_xevious =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout charlayout_digdug =
 {
 	8,8,
@@ -1531,7 +1520,7 @@ static GFXDECODE_START( gfx_galaga )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_xevious )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_xevious, 128*4+64*8,  64 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,          128*4+64*8,  64 )
 	GFXDECODE_ENTRY( "gfx2", 0, bgcharlayout,                0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_xevious,    128*4,  64 )
 GFXDECODE_END

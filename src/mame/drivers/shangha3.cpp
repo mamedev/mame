@@ -441,20 +441,8 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ STEP16(0,4*16) },
-	128*8
-};
-
 static GFXDECODE_START( gfx_shangha3 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_lsb, 0, 128 )
 GFXDECODE_END
 
 

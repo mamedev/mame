@@ -598,17 +598,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -621,8 +610,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_firefox )
-	GFXDECODE_ENTRY("tiles",   0, tilelayout,   0,   1)
-	GFXDECODE_ENTRY("sprites", 0, spritelayout, 256, 4)
+	GFXDECODE_ENTRY("tiles",   0, gfx_8x8x4_packed_msb,   0,   1)
+	GFXDECODE_ENTRY("sprites", 0, spritelayout,           256, 4)
 GFXDECODE_END
 
 

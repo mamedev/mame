@@ -685,27 +685,16 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_1k )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x1, 0, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_2k )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x1, 0, 2 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_color )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x1, 0, 256 )
 GFXDECODE_END
 
 

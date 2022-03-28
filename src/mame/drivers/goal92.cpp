@@ -231,17 +231,6 @@ WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4),RGN_FRAC(2,4),RGN_FRAC(1,4),RGN_FRAC(0,4) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -270,7 +259,7 @@ static const gfx_layout layout_16x16x4_2 =
 
 static GFXDECODE_START( gfx_goal92 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,        0*16, 8*16 ) // Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,         48*16,   16 ) // Text Layer
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_planar,     48*16,   16 ) // Text Layer
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,        0*16,   16 ) // BG Layer
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,       16*16,   16 ) // Mid Layer
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,       32*16,   16 ) // FG Layer

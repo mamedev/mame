@@ -463,18 +463,6 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
-
 static const gfx_layout tilelayout =
 {
 	16,16,  /* 16*16 sprites */
@@ -487,7 +475,7 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_bbusters )
-	GFXDECODE_ENTRY( "tx_tiles", 0, charlayout,     0, 16 )
+	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x4_packed_msb,     0, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,   768, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  1024+256, 16 )
 GFXDECODE_END

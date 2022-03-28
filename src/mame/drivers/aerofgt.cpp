@@ -1311,18 +1311,6 @@ static const gfx_layout aerofgt_spritelayout =
 	128*8
 };
 
-static const gfx_layout spikes91_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
 
 
 static const gfx_layout aerfboot_spritelayout =
@@ -1390,7 +1378,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( gfx_spikes91 )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikesb_charlayout,      0, 64 )   /* colors    0-1023 in 8 banks */
-	GFXDECODE_ENTRY( "gfx2", 0, spikes91_spritelayout, 1024, 64 )   /* colors 1024-2047 in 4 banks */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_planar,    1024, 64 )   /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_kickball )

@@ -4033,8 +4033,6 @@ files {
 	MAME_DIR .. "src/mame/video/darius.cpp",
 	MAME_DIR .. "src/mame/drivers/dinoking.cpp",
 	MAME_DIR .. "src/mame/drivers/exzisus.cpp",
-	MAME_DIR .. "src/mame/includes/exzisus.h",
-	MAME_DIR .. "src/mame/video/exzisus.cpp",
 	MAME_DIR .. "src/mame/drivers/fgoal.cpp",
 	MAME_DIR .. "src/mame/includes/fgoal.h",
 	MAME_DIR .. "src/mame/video/fgoal.cpp",
