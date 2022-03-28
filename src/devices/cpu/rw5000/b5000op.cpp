@@ -313,7 +313,7 @@ void b5000_cpu_device::op_tkbs()
 	op_tkb();
 
 	// note: SEG0(DP) from C flag is delayed 2 cycles
-	seg_w(m_seg | decode_digit(m_prev2_c << 4 | ram_r()));
+	seg_w(m_seg | decode_digit(m_prev3_c << 4 | ram_r()));
 }
 
 void b5000_cpu_device::op_read()

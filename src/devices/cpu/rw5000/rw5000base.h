@@ -89,6 +89,7 @@ protected:
 	u8 m_c;
 	u8 m_prev_c;
 	u8 m_prev2_c;
+	u8 m_prev3_c;
 	bool m_sr;
 	bool m_skip;
 	u16 m_seg;

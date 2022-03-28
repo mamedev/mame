@@ -13,7 +13,7 @@
 
 #include "rw5000base.h"
 
-// pinout reference (preliminary)
+// pinout reference (preliminary, other A/B5xxx pinouts are same or very similar)
 
 /*
             _____   _____
