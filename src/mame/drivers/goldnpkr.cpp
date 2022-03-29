@@ -148,6 +148,7 @@
   * unknown rocket/animal-themed poker,               199?, Unknown.
   * Mega Double Poker (conversion kit, set 1),        1990, Blitz System Inc.
   * Mega Double Poker (conversion kit, set 2),        1990, Blitz System Inc.
+  * Maxi Double Poker (version 1.8),                  1990, Blitz System Inc.
 
 ************************************************************************************
 
@@ -11310,6 +11311,36 @@ ROM_START( megadpkrb )
 	ROM_LOAD( "m3-7611-5.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/*
+  Maxi Draw Poker
+  Blitz System Inc.
+
+  Ver 1.8
+
+*/
+ROM_START( maxidpkr )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // program ROM
+	ROM_LOAD( "maxi-2_1.8.u4",  0x8000, 0x8000, CRC(98981016) SHA1(a655cd9528d5e3bf40034b4e65f50b91f7c4c59c) )
+
+	ROM_REGION( 0x8000, "cpubank", 0 ) // banked through MCU
+	ROM_LOAD( "maxi-3_1.8.u3",  0x0000, 0x8000, CRC(3fc6eae7) SHA1(81709db8c744406846d279be2b5cbb7c3ec60896) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  // 68705P5 microcontroller, borrowed from parent
+	ROM_LOAD( "mega-1.u11",  0x0000, 0x0800, BAD_DUMP CRC(621a7971) SHA1(49121f7b0d428a825ccd219622dcc4abe3572968) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                0x0000, 0x2000, 0x000000 ) // filling the R-G bitplanes
+	ROM_LOAD( "car-1.a5",    0x2000, 0x1000, CRC(e2b97357) SHA1(606c2d0abfd235866fa5f3e9178f72ab91422103) )    // chars / cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "car-3.a2",    0x0000, 0x1000, CRC(819c06c4) SHA1(45b874554fb487173acf12daa4ff99e49e335362) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "car-2.a4",    0x1000, 0x1000, CRC(41eec680) SHA1(3723f66e1def3908f2e6ba2989def229d9846b02) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",   0x2800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the chars rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "m3-7611-5.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 
 /*
   Super 21.
@@ -12031,3 +12062,4 @@ GAMEL( 198?, boasorte,  bchanceq, gldnirq0, goldnpkr, goldnpkr_state, empty_init
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS
 GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
 GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.1 MD)", 0 )
+GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Maxi Double Poker (version 1.8)",                    MACHINE_NOT_WORKING )
