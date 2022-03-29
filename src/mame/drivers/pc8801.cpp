@@ -174,7 +174,10 @@
      * CD-ROM BIOS: 0x0000 - 0x7fff
      * Dictionary: 0xc000 - 0xffff (32 Banks)
 
-    info from https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
+    References:
+	- https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
+	- http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
+    - http://www7b.biglobe.ne.jp/~crazyunit/pc88.html
 
 *************************************************************************************************************************************/
 
@@ -190,9 +193,12 @@
 #define PC8801FH_OSC3   XTAL(31'948'800)    // called OSC1 on PC-8801FE board
 
 #define MASTER_CLOCK (PC8801FH_OSC3 / 8)
-// TODO: exact clocks
+// Crazy Unit page shows following measurements on N88 BASIC:
+// 15kHz 25 lines 62.422 Hz, 20 lines 61.462 Hz
 #define PIXEL_CLOCK_15KHz (PC8801FH_OSC1 / 2)
-#define PIXEL_CLOCK_24KHz XTAL(21'477'272)  // should be (PC8801FH_OSC2 / 2)?
+// 24kHz 25 lines 55.416 Hz, 20 lines 56.424 Hz
+#define PIXEL_CLOCK_24KHz (PC8801FH_OSC2 / 2)
+// Note: games may set these up differently, namely xak2 in 15 kHz going 68-ish Hz
 
 void pc8801_state::video_start()
 {
@@ -961,7 +967,7 @@ void pc8801_state::port31_w(uint8_t data)
 {
 	m_gfx_ctrl = data;
 
-	set_screen_frequency((data & 0x11) != 0x11);
+//	set_screen_frequency((data & 0x11) != 0x11);
 //  dynamic_res_change();
 }
 
@@ -1981,6 +1987,8 @@ void pc8801_state::machine_start()
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
+	m_dma->ready_w(1);
+
 	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
 	m_hi_work_ram = make_unique_clear<uint8_t[]>(0x1000);
 	m_ext_work_ram = make_unique_clear<uint8_t[]>(0x8000*0x100);
@@ -2057,6 +2065,10 @@ void pc8801_state::machine_reset()
 
 	m_extram_size = extram_type[ioport("MEM")->read() & 0x0f];
 //  m_has_opna = ioport("BOARD_CONFIG")->read() & 1;
+
+	const bool pixel_clock_setting = bool(!BIT(ioport("CTRL")->read(), 1));
+	set_screen_frequency(pixel_clock_setting);
+	m_crtc->set_unscaled_clock(pixel_clock_setting ? PIXEL_CLOCK_24KHz : PIXEL_CLOCK_15KHz);
 }
 
 void pc8801fh_state::machine_reset()
@@ -2220,7 +2232,8 @@ void pc8801_state::pc8801(machine_config &config)
 	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
+//	m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
+	m_screen->set_raw(PIXEL_CLOCK_15KHz, 896, 0, 640, 260, 0, 200);
 	m_screen->set_screen_update(FUNC(pc8801_state::screen_update));
 //  m_screen->set_palette(m_palette);
 
@@ -2228,7 +2241,7 @@ void pc8801_state::pc8801(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK, 0x8);
 	PALETTE(config, m_crtc_palette, palette_device::BRG_3BIT);
 
-	UPD3301(config, m_crtc, PIXEL_CLOCK_24KHz);
+	UPD3301(config, m_crtc, PIXEL_CLOCK_15KHz);
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(pc8801_state::draw_text));
 	m_crtc->set_attribute_fetch_callback(FUNC(pc8801_state::attr_fetch));
