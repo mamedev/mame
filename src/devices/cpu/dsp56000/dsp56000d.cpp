@@ -56,7 +56,7 @@ offs_t dsp56000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_
 	u32 flags = SUPPORTED;
 	unsigned words = 0;
 
-	// fetch the instruction word and consume it"j
+	// fetch the instruction word and consume it
 	u32 const op = opcodes.r32(pc + words++) & 0x00ffffffU;
 
 	// fetch the extension word but don't consume it yet
