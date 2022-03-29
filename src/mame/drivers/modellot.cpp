@@ -42,11 +42,15 @@ All input must in UPPER case.
 ***********************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class modellot_state : public driver_device
 {
@@ -74,7 +78,7 @@ private:
 	u8 m_term_data = 0U;
 	void machine_start() override;
 	void machine_reset() override;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -126,20 +130,22 @@ void modellot_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xe000, 0xe7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xe000, 0xe7ff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void modellot_state::machine_start()
@@ -245,6 +251,8 @@ ROM_START( modellot )
 	ROM_LOAD( "gcem2.u4", 0x0200, 0x0200, CRC(6614330e) SHA1(880a541fb0ef6f37ac89439f9ea75a313c3e53d6))
 	ROM_CONTINUE(0x600, 0x200)
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, empty_init, "General Processor", "Modello T", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

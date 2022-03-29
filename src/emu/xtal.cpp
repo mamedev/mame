@@ -124,6 +124,7 @@ const double XTAL::known_xtals[] = {
 	  5'460'000, /* 5.46_MHz_XTAL          ec1840 and ec1841 keyboard */
 	  5'529'600, /* 5.5296_MHz_XTAL        Kontron PSI98 keyboard */
 	  5'626'000, /* 5.626_MHz_XTAL         RCA CDP1869 PAL dot clock */
+	  5'659'200, /* 5.6592_MHz_XTAL        Digilog 320 dot clock */
 	  5'670'000, /* 5.67_MHz_XTAL          RCA CDP1869 NTSC dot clock */
 	  5'714'300, /* 5.7143_MHz_XTAL        Cidelsa Destroyer, TeleVideo serial keyboards */
 	  5'856'000, /* 5.856_MHz_XTAL         HP 3478A Multimeter */
@@ -456,6 +457,7 @@ const double XTAL::known_xtals[] = {
 	 57'272'727, /* 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)*/
 	 57'283'200, /* 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display */
 	 58'000'000, /* 58_MHz_XTAL            Magic Reel (Play System) */
+	 58'982'400, /* 58.9824_MHz_XTAL       Wyse WY-65 */
 	 59'292'000, /* 59.292_MHz_XTAL        Data General D461 */
 	 60'000'000, /* 60_MHz_XTAL            ARM610 */
 	 61'440'000, /* 61.44_MHz_XTAL         Donkey Kong */

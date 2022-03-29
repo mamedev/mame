@@ -66,8 +66,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	void mixer_w(uint8_t data);
-	void swap_memory(void *ptr1, void *ptr2, int bytes);
-	void common_init(int vindctr2);
+	void common_init();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -98,7 +97,7 @@ private:
 	required_device<atari_motion_objects_device> m_mob;
 
 	uint16_t          m_sound_reset_val;
-	uint8_t           m_vindctr2_screen_refresh;
+	bool              m_vindctr2_screen_refresh;
 	uint8_t           m_playfield_tile_bank;
 	uint8_t           m_playfield_color_bank;
 

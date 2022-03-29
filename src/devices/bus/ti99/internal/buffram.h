@@ -30,12 +30,13 @@ public:
 	void set_buffered(bool on) { m_buffered = on; }
 
 private:
-	void device_start() override;
+	virtual void device_start() override;
 
 	// derived class overrides
-	void nvram_default() override;
-	void nvram_read(emu_file &file) override;
-	void nvram_write(emu_file &file) override;
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+	virtual bool nvram_can_write() override { return m_buffered; }
 
 	bool m_buffered;
 	int m_size;

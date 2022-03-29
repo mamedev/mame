@@ -54,9 +54,10 @@ void tosh1000_bram_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void tosh1000_bram_device::nvram_read(emu_file &file)
+bool tosh1000_bram_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_bram, BRAM_SIZE);
+	size_t actual;
+	return !file.read(m_bram, BRAM_SIZE, actual) && actual == BRAM_SIZE;
 }
 
 //-------------------------------------------------
@@ -64,9 +65,10 @@ void tosh1000_bram_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void tosh1000_bram_device::nvram_write(emu_file &file)
+bool tosh1000_bram_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_bram, BRAM_SIZE);
+	size_t actual;
+	return !file.write(m_bram, BRAM_SIZE, actual) && actual == BRAM_SIZE;
 }
 
 //-------------------------------------------------

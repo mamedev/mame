@@ -57,7 +57,7 @@ void jvc_xvd701_device::device_reset()
 	m_response_index = sizeof(m_response);
 }
 
-void jvc_xvd701_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void jvc_xvd701_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

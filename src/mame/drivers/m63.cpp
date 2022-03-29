@@ -171,20 +171,20 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t    m_nmi_mask;
+	uint8_t    m_nmi_mask = 0;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_pal_bank;
-	int      m_fg_flag;
-	int      m_sy_offset;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int      m_pal_bank = 0;
+	int      m_fg_flag = 0;
+	int      m_sy_offset = 0;
 
 	/* sound-related */
-	uint8_t    m_sound_irq;
-	int      m_sound_status;
-	int      m_p1;
-	int      m_p2;
+	uint8_t    m_sound_irq = 0;
+	int      m_sound_status = 0;
+	int      m_p1 = 0;
+	int      m_p2 = 0;
 	std::unique_ptr<int16_t[]>    m_samplebuf;
 
 	/* devices */
@@ -664,28 +664,6 @@ static INPUT_PORTS_START( fghtbskt )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(1,2), RGN_FRAC(0,2) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -701,15 +679,15 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_m63 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   256, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 256, 1  )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar,   0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_fghtbskt )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,  16, 1  )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar,   0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       0, 32 )
 GFXDECODE_END
 
 

@@ -273,14 +273,14 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 
 	/* video-related */
-	tilemap_t  *m_tilemap[2];
+	tilemap_t  *m_tilemap[2]{};
 	std::unique_ptr<bitmap_ind16> m_pixmap;
 
 	/* misc */
-	uint8_t m_prot_val;
-	uint8_t m_input_data;
-	uint8_t m_priority_reg;
-	uint8_t m_gfx_bank;
+	uint8_t m_prot_val = 0;
+	uint8_t m_input_data = 0;
+	uint8_t m_priority_reg = 0;
+	uint8_t m_gfx_bank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

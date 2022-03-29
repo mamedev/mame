@@ -508,7 +508,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void rainbow8088_base_map(address_map &map);
 	void rainbow8088_base_io(address_map &map);
@@ -874,8 +874,9 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 
 void rainbow_base_state::floppy_formats(format_registration &fr)
 {
-	fr.add_pc_formats();
+	// this order is important as there is a DS 40track 400KB pc format that is the same size as the SS 80track rx50 format
 	fr.add(FLOPPY_RX50IMG_FORMAT);
+	fr.add_pc_formats();
 }
 
 static void rainbow_floppies(device_slot_interface &device)
@@ -1280,7 +1281,7 @@ void rainbow_modelb_state::machine_reset()
 }
 
 // Simulate AC_OK signal (power good) and RESET after ~ 108 ms.
-void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	switch (tid)
 	{

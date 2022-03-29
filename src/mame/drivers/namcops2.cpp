@@ -45,7 +45,8 @@ Gundam vs Gundam Next........................... XXXX56X  GNX100-1-NA-HDD0-A   H
 Idol Master..................................... ------X *IDM1-HA             *HDD         *NM00022  *IDMS1 Ver.A            Namco 2004
 Kinnikuman Muscle Grand Prix.................... XXXX56X  KN1-B                DVD          NM00029   KN1 Ver.A              Banpresto 2006                #
 Kinnikuman Muscle Grand Prix 2.................. XXXX56X  KN2                  DVD          NM00040   KN2 Ver.A              Banpresto 2007                #
-Minna de Kitaeru Zenno Training................. ------X *ZNT100-1-NA-DVD0    *DVD         *NM00036  *ZNT100-1-ST-A          Namco 2006
+Minna de Kitaeru Zenno Training................. ------X *ZNT100-1-NA-DVD0    *DVD          NM00036   ZNT100-1-ST-A          Namco 2006
+Minna de Kitaeru Zenno Training.(Ver. 1.50)..... ------X  ZNT100-1-NA-DVD0-B   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
 Mobile Suit Gundam - Gundam vs Gundam........... XXXX56X  GVS1 DVD0B           DVD          NM00043   GVS1 Ver.A             Bandai/Capcom 2008
 Mobile Suit Gundam SEED O.M.N.I. vs Z.A.F.T..... 123456X  SED1 DVD0            DVD          NM00024   SED1 Ver.A             Banpresto 2005                % #
 M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 123456X  GSD1 DVD0            DVD          NM00034   GSD1 Ver.A             Banpresto 2006                % #
@@ -1549,6 +1550,17 @@ ROM_START( qgundam )
 	DISK_IMAGE_READONLY( "qg1", 0, SHA1(80fe5cb325c7cfa439d66e9d264337c01559d0e5) )
 ROM_END
 
+ROM_START( minnadk )
+	ROM_REGION32_LE(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "nm00036_znt100-1-st-a.bin", 0x000000, 0x840000, CRC(420b9ac5) SHA1(7094ca4b1840ba5f312aeaa28165cd683a1621a3) )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "znt150-1-na-dvd0-b", 0, SHA1(d8343b3248e88051ca0c15d198a6dcd16eedf931) )
+ROM_END
+
 ROM_START( fateulc )
 	ROM_REGION32_LE(0x200000, "bios", 0)
 	SYSTEM246_BIOS
@@ -1667,6 +1679,7 @@ GAME(2005, soulclb3b,soulclb3, system246, system246, namcops2_state, empty_init,
 GAME(2005, taiko7,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 7 (TK71-NA-A)", MACHINE_IS_SKELETON)
 GAME(2006, taiko8,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
 GAME(2006, qgundam,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2007, minnadk,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Minna de Kitaeru Zenno Training (Ver. 1.50)", MACHINE_IS_SKELETON)
 GAME(2008, fateulc,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", MACHINE_IS_SKELETON)
 GAME(2008, fateulcb,  fateulc, system246, system246, namcops2_state, empty_init, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", MACHINE_IS_SKELETON)
 GAME(2008, sbxc,       sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Arc System Works", "Sengoku Basara X Cross", MACHINE_IS_SKELETON)

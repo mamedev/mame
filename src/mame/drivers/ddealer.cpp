@@ -373,7 +373,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::mcu_sim)
 
 		if (m_coin_input & 0x10)//start 2
 		{
-			if((m_input_pressed & 0x10) == 0 && (~(m_work_ram[0x100 / 2] & 2)))
+			if(((m_input_pressed & 0x10) == 0) && (~m_work_ram[0x100 / 2] & 2))
 				m_mcu_shared_ram[0x000 / 2]--;
 			m_input_pressed = (m_input_pressed & 0xef) | 0x10;
 		}

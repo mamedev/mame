@@ -47,7 +47,7 @@ private:
 	required_device<cd4099_device> m_latch;
 	required_device<i8251_device> m_usart;
 
-	u8 m_db;
+	u8 m_db = 0;
 };
 
 void juno6_state::machine_start()

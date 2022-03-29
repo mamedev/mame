@@ -657,18 +657,59 @@ static INPUT_PORTS_START( riskchal )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/*****************************************************************************/
+static INPUT_PORTS_START( dicegame )
+	PORT_START("P1_P2")
+	IREM_GENERIC_JOYSTICKS_2_BUTTONS(1, 2)
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
+	PORT_START("SYSTEM")
+	IREM_COINS
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
+
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0800, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	/* Coin Mode 1 */
+	IREM_COIN_MODE_1_NEW_HIGH
+	/* Coin Mode 2 */
+	IREM_COIN_MODE_2_HIGH
+
+	PORT_START("P3_P4") /* unused */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+/*****************************************************************************/
 
 static const gfx_layout spritelayout =
 {
@@ -682,8 +723,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_m90 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,     0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,       256, 16 )
 GFXDECODE_END
 
 /*****************************************************************************/
@@ -857,6 +898,12 @@ void m90_state::dynablsb(machine_config &config)
 	soundlatch.set_separate_acknowledge(false);
 
 	subdevice<ym2151_device>("ymsnd")->irq_handler().set_nop(); /* this bootleg polls the YM2151 instead of taking interrupts from it */
+}
+
+void m90_state::dicegame(machine_config &config)
+{
+	m90(config);
+	m_screen->set_visarea(10*8, 50*8-1, 17*8, 47*8-1);
 }
 
 
@@ -1245,14 +1292,31 @@ ROM_START( shisen2 )
 	/* No samples */
 ROM_END
 
+// This is a clone of Dice Dice Dice (Irem Corp, 1991). It came from Germany sold by Tuning, and is JP language.
+ROM_START( dicegame )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "dice-p1.ic61",  0x00001, 0x20000, CRC(8f2257d8) SHA1(d804c0ca7cd70bdc30c028607040eaf260d877d4) )
+	ROM_LOAD16_BYTE( "dice-p0.ic65",  0x00000, 0x20000, CRC(9c191d18) SHA1(5016b0c688cfd62aee5b829653f28ab1889e5b46) )
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )  /* start vector */
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )
+	ROM_LOAD( "dice-sp.ic23",    0x0000, 0x20000, CRC(73e8796e) SHA1(3edcc462254ec42a80be036e3c87c3a506b00679) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "dice-c0.ic66",    0x000000, 0x20000, CRC(a1eda342) SHA1(59f23528d0d04115a0bd062911772446e342520d) )
+	ROM_LOAD( "dice-c1.ic67",    0x020000, 0x20000, CRC(20850a15) SHA1(b1e3478ae883a9de5accd3b79a64b27138c79829) )
+	ROM_LOAD( "dice-c2.ic68",    0x040000, 0x20000, CRC(6c39915f) SHA1(5862f2b442417c243e4c34122f88d4903497d8f4) )
+	ROM_LOAD( "dice-c3.ic69",    0x060000, 0x20000, CRC(81d58e68) SHA1(af0e34f276d2607f5c7ed2c50e417b2e7fcef83d) )
+
+	ROM_REGION( 0x20000, "m72", 0 ) /* samples */
+	ROM_LOAD( "dice-v0.ic20",    0x0000, 0x20000, CRC(04dc9196) SHA1(3e3ecbf0e2b6e691f9894698aaf41a64ec7b41f1) )
+ROM_END
 
 
 void m90_state::init_quizf1()
 {
 	m_mainbank->configure_entries(0, 16, memregion("user1")->base(), 0x10000);
 }
-
-
 
 void m90_state::init_bomblord()
 {
@@ -1269,20 +1333,21 @@ void m90_state::init_bomblord()
 
 
 
-GAME( 1991, hasamu,   0,        hasamu,   hasamu,   m90_state, empty_init,    ROT0, "Irem", "Hasamu (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dynablst, 0,        bombrman, dynablst, m90_state, empty_init,    ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bombrman, dynablst, bombrman, bombrman, m90_state, empty_init,    ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, atompunk, dynablst, bombrman, atompunk, m90_state, empty_init,    ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dynablstb,dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dynablstb2,dynablst,dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dynablstb3,dynablst,dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // PCB has Playmark labels
-GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   m90_state, empty_init,    ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bbmanwj,  bbmanw,   bbmanw,   bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bbmanwja, bbmanw,   bbmanwj,  bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan, revised sound hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, newapunk, bbmanw,   bbmanw,   newapunk, m90_state, empty_init,    ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   m90_state, init_bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quizf1,   0,        quizf1,   quizf1,   m90_state, init_quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, riskchal, 0,        riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Risky Challenge", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gussun,   riskchal, riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Gussun Oyoyo (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, matchit2, 0,        matchit2, matchit2, m90_state, empty_init,    ROT0, "Tamtex", "Match It II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  m90_state, empty_init,    ROT0, "Tamtex", "Shisensho II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hasamu,    0,        hasamu,   hasamu,   m90_state, empty_init,    ROT0, "Irem", "Hasamu (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, dynablst,  0,        bombrman, dynablst, m90_state, empty_init,    ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bombrman,  dynablst, bombrman, bombrman, m90_state, empty_init,    ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, atompunk,  dynablst, bombrman, atompunk, m90_state, empty_init,    ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb, dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb2,dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb3,dynablst, dynablsb, dynablsb, m90_state, empty_init,    ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // PCB has Playmark labels
+GAME( 1991, dicegame,  0,        dicegame, dicegame, m90_state, empty_init,    ROT0, "bootleg (Tuning)", "Dice - The Dice Game!", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // German bootleg of Irem Dice Dice Dice
+GAME( 1992, bbmanw,    0,        bbmanw,   bbmanw,   m90_state, empty_init,    ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bbmanwj,   bbmanw,   bbmanw,   bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bbmanwja,  bbmanw,   bbmanwj,  bbmanwj,  m90_state, empty_init,    ROT0, "Irem", "Bomber Man World (Japan, revised sound hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, newapunk,  bbmanw,   bbmanw,   newapunk, m90_state, empty_init,    ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bomblord,  bbmanw,   bomblord, bbmanw,   m90_state, init_bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quizf1,    0,        quizf1,   quizf1,   m90_state, init_quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, riskchal,  0,        riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Risky Challenge", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gussun,    riskchal, riskchal, riskchal, m90_state, empty_init,    ROT0, "Irem", "Gussun Oyoyo (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, matchit2,  0,        matchit2, matchit2, m90_state, empty_init,    ROT0, "Tamtex", "Match It II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shisen2,   matchit2, matchit2, shisen2,  m90_state, empty_init,    ROT0, "Tamtex", "Shisensho II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -81,24 +81,24 @@ private:
 	optional_shared_ptr<uint16_t> m_bubsys_control_ram;
 
 	/* video-related */
-	tilemap_t *m_background;
-	tilemap_t *m_foreground;
-	int       m_spriteram_words;
-	int       m_tilemap_flip;
-	int       m_flipscreen;
-	uint8_t     m_irq_port_last;
+	tilemap_t *m_background = nullptr;
+	tilemap_t *m_foreground = nullptr;
+	int       m_spriteram_words = 0;
+	int       m_tilemap_flip = 0;
+	int       m_flipscreen = 0;
+	uint8_t     m_irq_port_last = 0;
 	uint8_t     m_blank_tile[8*8];
 	uint8_t     m_palette_lookup[32];
 
 	/* misc */
-	int       m_irq_on;
-	int       m_irq1_on;
-	int       m_irq2_on;
-	int       m_irq4_on;
-	uint8_t    m_selected_ip; // needed for Hyper Crash
-	int       m_gx400_irq1_cnt;
-	uint8_t     m_frame_counter;
-	uint16_t    m_scanline_counter;
+	int       m_irq_on = 0;
+	int       m_irq1_on = 0;
+	int       m_irq2_on = 0;
+	int       m_irq4_on = 0;
+	uint8_t    m_selected_ip = 0; // needed for Hyper Crash
+	int       m_gx400_irq1_cnt = 0;
+	uint8_t     m_frame_counter = 0;
+	uint16_t    m_scanline_counter = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

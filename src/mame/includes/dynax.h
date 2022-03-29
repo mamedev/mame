@@ -95,12 +95,12 @@ protected:
 	optional_device<dynax_blitter_rev2_device> m_blitter;
 
 	/* input / output */
-	uint8_t m_input_sel;
-	uint8_t m_input_mode;
-	uint8_t m_dsw_sel;
-	uint8_t m_keyb;
-	uint8_t m_coins;
-	uint8_t m_hopper;
+	uint8_t m_input_sel = 0U;
+	uint8_t m_input_mode = 0U;
+	uint8_t m_dsw_sel = 0U;
+	uint8_t m_keyb = 0U;
+	uint8_t m_coins = 0U;
+	uint8_t m_hopper = 0U;
 
 	DECLARE_VIDEO_START(hnoridur);
 
@@ -303,50 +303,50 @@ private:
 	output_finder<> m_led;
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
-	std::unique_ptr<uint8_t[]>  m_pixmap[8][2];
+	std::unique_ptr<uint8_t[]>  m_pixmap[8][2]{};
 
 	/* irq */
-	bool m_blitter_irq_mask;
-	bool m_blitter2_irq_mask;
+	bool m_blitter_irq_mask = false;
+	bool m_blitter2_irq_mask = false;
 
 	/* blitters */
-	int m_blit_scroll_x;
-	int m_blit2_scroll_x;
-	int m_blit_scroll_y;
-	int m_blit2_scroll_y;
-	int m_blit_dest;
-	int m_blit2_dest;
-	int m_blit_palbank;
-	int m_blit2_palbank;
-	int m_blit_palettes;
-	int m_blit2_palettes;
-	int m_layer_enable;
-	int m_blit_backpen;
+	int m_blit_scroll_x = 0;
+	int m_blit2_scroll_x = 0;
+	int m_blit_scroll_y = 0;
+	int m_blit2_scroll_y = 0;
+	int m_blit_dest = 0;
+	int m_blit2_dest = 0;
+	int m_blit_palbank = 0;
+	int m_blit2_palbank = 0;
+	int m_blit_palettes = 0;
+	int m_blit2_palettes = 0;
+	int m_layer_enable = 0;
+	int m_blit_backpen = 0;
 
-	int m_hanamai_layer_half;
-	int m_hnoridur_layer_half2;
+	int m_hanamai_layer_half = 0;
+	int m_hnoridur_layer_half2 = 0;
 
-	int m_extra_scroll_x;
-	int m_extra_scroll_y;
-	int m_flipscreen;
+	int m_extra_scroll_x = 0;
+	int m_extra_scroll_y = 0;
+	int m_flipscreen = 0;
 
-	int m_layer_layout;
+	int m_layer_layout = 0;
 
-	const int *m_priority_table;
-	int m_hanamai_priority;
+	const int *m_priority_table = nullptr;
+	int m_hanamai_priority = 0;
 
 	/* misc */
-	uint8_t m_palette_ram[16*256*2];
-	int m_palbank;
-	int m_msm5205next;
-	int m_resetkludge;
-	int m_toggle;
-	int m_toggle_cpu1;
-	int m_rombank;
-	uint8_t m_tenkai_p5_val;
-	int m_tenkai_6c;
-	int m_tenkai_70;
-	uint8_t m_gekisha_val[2];
+	uint8_t m_palette_ram[16*256*2]{};
+	int m_palbank = 0;
+	int m_msm5205next = 0;
+	int m_resetkludge = 0;
+	int m_toggle = 0;
+	int m_toggle_cpu1 = 0;
+	int m_rombank = 0;
+	uint8_t m_tenkai_p5_val = 0U;
+	int m_tenkai_6c = 0;
+	int m_tenkai_70 = 0;
+	uint8_t m_gekisha_val[2]{};
 
 };
 

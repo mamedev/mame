@@ -53,9 +53,9 @@ public:
 	}
 
 	std::unique_ptr<uint8_t[]> m_depth_buffer;
-	int m_video_field;
-	uint8_t m_io_latch;
-	uint8_t m_reset_latch;
+	int m_video_field = 0;
+	uint8_t m_io_latch = 0;
+	uint8_t m_reset_latch = 0;
 	required_device<simutrek_special_device> m_laserdisc;
 	required_device<cpu_device> m_maincpu;
 	required_device<cquestrot_cpu_device> m_rotatecpu;

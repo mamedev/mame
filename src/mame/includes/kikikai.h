@@ -48,7 +48,7 @@ private:
 	required_shared_ptr<u8> m_mainram;
 
 	/* video-related */
-	int      m_charbank;
+	int      m_charbank = 0;
 
 	/* devices */
 	optional_device<cpu_device>         m_subcpu;   // kicknrun / mexico86 only
@@ -58,9 +58,9 @@ private:
 	required_device<palette_device>     m_palette;
 
 	/* queue */
-	//u8 m_queue[64];
-	//int m_qfront;
-	//int m_qstate;
+	//u8 m_queue[64]{};
+	//int m_qfront = 0;
+	//int m_qstate = 0;
 	void kicknrun_sub_output_w(uint8_t data);
 	virtual void main_f008_w(uint8_t data);
 
@@ -75,11 +75,11 @@ private:
 	void mcu_map(address_map& map);
 
 	/* Kiki KaiKai / Kick 'n Run MCU */
-	uint8_t    m_port3_in;
-	uint8_t    m_port1_out;
-	uint8_t    m_port2_out;
-	uint8_t    m_port3_out;
-	uint8_t    m_port4_out;
+	uint8_t    m_port3_in = 0U;
+	uint8_t    m_port1_out = 0U;
+	uint8_t    m_port2_out = 0U;
+	uint8_t    m_port3_out = 0U;
+	uint8_t    m_port4_out = 0U;
 
 	void kikikai_mcu_port1_w(uint8_t data);
 	void kikikai_mcu_port2_w(uint8_t data);
@@ -115,10 +115,10 @@ private:
 
 	/* mcu */
 	/* mexico86 68705 protection */
-	u8       m_port_a_out;
-	u8       m_port_b_out;
-	int      m_address;
-	u8       m_latch;
+	u8       m_port_a_out = 0U;
+	u8       m_port_b_out = 0U;
+	int      m_address = 0;
+	u8       m_latch = 0U;
 
 };
 
@@ -144,8 +144,8 @@ private:
 	void mcu_simulate(  );
 
 	/* kikikai mcu simulation */
-	int      m_kikikai_simulated_mcu_running;
-	int      m_kikikai_simulated_mcu_initialised;
-	bool     m_coin_last[2];
-	u8       m_coin_fract;
+	int      m_kikikai_simulated_mcu_running = 0;
+	int      m_kikikai_simulated_mcu_initialised = 0;
+	bool     m_coin_last[2]{};
+	u8       m_coin_fract = 0U;
 };

@@ -37,6 +37,8 @@ public:
 	void tigeroad(machine_config &config);
 	void f1dream_comad(machine_config &config);
 
+	void init_tigeroadb();
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -58,9 +60,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<tigeroad_spr_device> m_spritegen;
 
-	u8 m_bgcharbank;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	u8 m_bgcharbank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	void comad_sound_io_map(address_map &map);
 	void comad_sound_map(address_map &map);

@@ -47,8 +47,8 @@ public:
 protected:
 	struct atarisy4_polydata
 	{
-		uint16_t color;
-		uint16_t *screen_ram;
+		uint16_t color = 0;
+		uint16_t *screen_ram = nullptr;
 	};
 
 	class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, POLY_FLAG_NO_WORK_QUEUE>
@@ -69,51 +69,51 @@ protected:
 		uint32_t xy_to_screen_addr(uint32_t x, uint32_t y) const;
 
 		/* Memory-mapped registers */
-		uint16_t gr[8];   /* Command parameters */
+		uint16_t gr[8]{};   /* Command parameters */
 
-		uint16_t bcrw;    /* Screen buffer W control */
-		uint16_t bcrx;    /* Screen buffer X control */
-		uint16_t bcry;    /* Screen buffer Y control */
-		uint16_t bcrz;    /* Screen buffer Z control */
-		uint16_t psrw;
-		uint16_t psrx;
-		uint16_t psry;
-		uint16_t psrz;
+		uint16_t bcrw = 0;    /* Screen buffer W control */
+		uint16_t bcrx = 0;    /* Screen buffer X control */
+		uint16_t bcry = 0;    /* Screen buffer Y control */
+		uint16_t bcrz = 0;    /* Screen buffer Z control */
+		uint16_t psrw = 0;
+		uint16_t psrx = 0;
+		uint16_t psry = 0;
+		uint16_t psrz = 0;
 
-		uint16_t dpr;
-		uint16_t ctr;
-		uint16_t lfr;
-		uint16_t ifr;
-		uint16_t ecr;     /* Execute command register */
-		uint16_t far;
-		uint16_t mcr;     /* Interrupt control */
-		uint16_t qlr;
-		uint16_t qar;
+		uint16_t dpr = 0;
+		uint16_t ctr = 0;
+		uint16_t lfr = 0;
+		uint16_t ifr = 0;
+		uint16_t ecr = 0;     /* Execute command register */
+		uint16_t far = 0;
+		uint16_t mcr = 0;     /* Interrupt control */
+		uint16_t qlr = 0;
+		uint16_t qar = 0;
 
-		uint16_t dhr;     /* Scanline counter */
-		uint16_t dlr;
+		uint16_t dhr = 0;     /* Scanline counter */
+		uint16_t dlr = 0;
 
 		/* Others */
-		uint16_t idr;
-		uint16_t icd;
+		uint16_t idr = 0;
+		uint16_t icd = 0;
 
-		uint8_t  transpose;
-		uint8_t  vblank_wait;
+		uint8_t  transpose = 0;
+		uint8_t  vblank_wait = 0;
 
 		/* Polygon points */
 		struct
 		{
-			int16_t x;
-			int16_t y;
+			int16_t x = 0;
+			int16_t y = 0;
 		} points[16];
 
-		uint16_t pt_idx;
-		bool   poly_open;
+		uint16_t pt_idx = 0;
+		bool   poly_open = false;
 
-		uint16_t clip_min_x;
-		uint16_t clip_max_x;
-		uint16_t clip_min_y;
-		uint16_t clip_max_y;
+		uint16_t clip_min_x = 0;
+		uint16_t clip_max_x = 0;
+		uint16_t clip_min_y = 0;
+		uint16_t clip_max_y = 0;
 	};
 
 	void gpu_w(offs_t offset, uint16_t data);
@@ -151,8 +151,8 @@ protected:
 
 	required_memory_bank m_dsp0_bank1;
 
-	uint16_t m_dsp_bank[2];
-	uint8_t m_csr[2];
+	uint16_t m_dsp_bank[2]{};
+	uint8_t m_csr[2]{};
 	std::unique_ptr<uint16_t[]> m_shared_ram[2];
 
 private:
@@ -168,9 +168,9 @@ private:
 
 	gpu m_gpu;
 
-	uint8_t m_r_color_table[256];
-	uint8_t m_g_color_table[256];
-	uint8_t m_b_color_table[256];
+	uint8_t m_r_color_table[256]{};
+	uint8_t m_g_color_table[256]{};
+	uint8_t m_b_color_table[256]{};
 };
 
 

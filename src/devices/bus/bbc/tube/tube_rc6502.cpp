@@ -129,7 +129,7 @@ void bbc_tube_rc6502_device::add_common_devices(machine_config &config)
 
 void bbc_tube_rc6502_device::device_add_mconfig(machine_config &config)
 {
-	M65C02(config, m_maincpu, 44.2368_MHz_XTAL);
+	W65C02S(config, m_maincpu, 44.2368_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_rc6502_device::tube_rc6502_mem);
 
 	add_common_devices(config);

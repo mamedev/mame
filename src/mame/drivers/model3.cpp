@@ -3365,7 +3365,7 @@ ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13346, ROM board ID# 834-13347 */
+ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13496, ROM board ID# 834-13497 VS2 VER98 STEP2 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20917.17",  0x400006, 0x100000, CRC(c3bbb270) SHA1(16b2342031ff72408f2290e775df5c8aa344c2e4) )
@@ -5519,7 +5519,7 @@ ROM_START( fvipers2o )   /* Step 2.0 */
 	ROM_PARAMETER( ":315_5881:key", "29260e96" )
 ROM_END
 
-ROM_START( spikeout )   /* Step 2.1, Sega game ID# is 833-13592, ROM board ID# 834-13593 SPK */
+ROM_START( spikeout )   /* Step 2.1, Sega game ID# is 833-13592, ROM board ID# 834-13593 SPK, Security board ID# 837-13584-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21214c.17", 0x000006, 0x200000, CRC(8dc0a85c) SHA1(c75088fd0594964a4ed78b80a2585d3d89c85464) )
@@ -5933,10 +5933,13 @@ ROM_END
 ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM board ID# 834-13600-01 RCS EXP (Export), Security board ID# 837-13599-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	ROM_LOAD64_WORD_SWAP( "epr-21435.17",  0x000006, 0x200000, CRC(9b169446) SHA1(285cbe5afd439d83c50f0499a878f71b8e5b94e5) )
-	ROM_LOAD64_WORD_SWAP( "epr-21433.18",  0x000004, 0x200000, CRC(60aa9d76) SHA1(b27741568a4fd0494b2254e468faea569e2d9fef) )
-	ROM_LOAD64_WORD_SWAP( "epr-21436.19",  0x000002, 0x200000, CRC(22bcbca3) SHA1(fe9c46ad5b01f9f8d19854e59e229d07c0649e8c) )
-	ROM_LOAD64_WORD_SWAP( "epr-21434.20",  0x000000, 0x200000, CRC(e028d7ca) SHA1(7e5d1cef6d9ef767f07320e9c099004e081f52dd) )
+
+	// Marked as BAD_DUMP because a single instruction appears to be faulty (a bit is flipped) requiring a patch in the SuperModel emulator to run
+	// It is possible only one of these is faulty, but at a minimum these 4 should be redumped, and ideally the whole set should be checked.
+	ROM_LOAD64_WORD_SWAP( "epr-21435.17",  0x000006, 0x200000, BAD_DUMP CRC(9b169446) SHA1(285cbe5afd439d83c50f0499a878f71b8e5b94e5) )
+	ROM_LOAD64_WORD_SWAP( "epr-21433.18",  0x000004, 0x200000, BAD_DUMP CRC(60aa9d76) SHA1(b27741568a4fd0494b2254e468faea569e2d9fef) )
+	ROM_LOAD64_WORD_SWAP( "epr-21436.19",  0x000002, 0x200000, BAD_DUMP CRC(22bcbca3) SHA1(fe9c46ad5b01f9f8d19854e59e229d07c0649e8c) )
+	ROM_LOAD64_WORD_SWAP( "epr-21434.20",  0x000000, 0x200000, BAD_DUMP CRC(e028d7ca) SHA1(7e5d1cef6d9ef767f07320e9c099004e081f52dd) )
 
 	// CROM0
 	ROM_LOAD64_WORD_SWAP( "mpr-21423.1",   0x800006, 0x400000, CRC(4ee0060a) SHA1(61e155ea382f2c79ece78eeba12129645ea260f1) )

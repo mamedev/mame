@@ -35,7 +35,7 @@ public:
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
-	virtual void write_cart(offs_t offset, uint8_t data) {};
+	virtual void write_cart(offs_t offset, uint8_t data) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);

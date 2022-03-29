@@ -410,7 +410,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	u8 m_val;
+	u8 m_val = 0;
 };
 
 void igs_incdec_device::reset_w(u8 data)
@@ -4412,6 +4412,21 @@ ROM_START( genius6a )
 	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b) ) // same as iqblocka
 ROM_END
 
+ROM_START( genius6b ) // PCB N0 - 0132, identical to V133F but for the main CPU ROM
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "genius6_v-132f.u18", 0x00000, 0x40000, CRC(231be791) SHA1(1684395dc93902893dca32952c236617ccdbc269) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "genius6_cg.u7", 0x000000, 0x080000, CRC(1842d021) SHA1(78bfb5108741d39bd19b603cc97623fba7b2a31e) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u8", 0x000000, 0x040000, CRC(7716b601) SHA1(363cddd930fdec4821ebfaced64276f8fa943eae) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b) )
+ROM_END
+
+
 /***************************************************************************
 
 Mahjong Tian Jiang Shen Bing
@@ -5070,6 +5085,7 @@ GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,  
 GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, init_tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS",                      "Genius 6 (V110F)",                            0 )
 GAME( 1997,  genius6a, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS",                      "Genius 6 (V133F)",                            0 ) // clone because it has older copyright year
+GAME( 1997,  genius6b, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS",                      "Genius 6 (V132F)",                            0 ) // "
 GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Caishen (V103CS)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
 GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2
 GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 ) // 龙虎争霸2

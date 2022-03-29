@@ -44,13 +44,13 @@ private:
 	required_shared_ptr<uint8_t> m_pf2_videoram;
 
 	/* video-related */
-	tilemap_t    *m_fg_tilemap;
-	tilemap_t    *m_bg_tilemap;
-	int        m_pf2_bankbase;
-	int        m_pf1_bankbase;
-	int        m_old_pf1;
-	int        m_old_pf2;
-	int        m_gfx_bank;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int        m_pf2_bankbase = 0;
+	int        m_pf1_bankbase = 0;
+	int        m_old_pf1 = 0;
+	int        m_old_pf2 = 0;
+	int        m_gfx_bank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;

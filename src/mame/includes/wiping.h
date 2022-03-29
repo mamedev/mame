@@ -33,10 +33,10 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	int m_flipscreen;
-	uint8_t *m_soundregs;  // if 0-ed
-	uint8_t m_main_irq_mask;
-	uint8_t m_sound_irq_mask;
+	int m_flipscreen = 0;
+	uint8_t *m_soundregs = nullptr;  // if 0-ed
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_sound_irq_mask = 0;
 
 	uint8_t ports_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(main_irq_mask_w);

@@ -16,27 +16,28 @@ Custom  :   IGS011 (blitter, protection)
 NVRAM   :   Battery for main RAM
 
 ---------------------------------------------------------------------------
-Year + Game                PCB        Sound         Chips
+Year + Game                   PCB        Sound         Chips
 ---------------------------------------------------------------------------
-95 Da Ban Cheng            NO-T0084-1 M6295         IGS011 8255
-95 Long Hu Bang V033C      NO-T0093   M6295         IGS011 8255
-95 Long Hu Bang V035C      ?
-95 Mj Ryukobou             NO-T0094   M6295         IGS011 8255
-95 Dragon World V010C      NO-0105-4  M6295 YM3812  IGS011 IGS003
-95 Dragon World V011H      ?
-95 Dragon World V020J      ?          M6295 YM3812  IGS011 IGS003  IGS012
-95 Dragon World V021J      ?
-95 Dragon World V021O      NO-0105-1  M6295 YM3812  IGS011 IGS003  IGS012
-95 Dragon World V030O      NO-0105-1  M6295 YM3812  IGS011 IGS003
-97 Dragon World V040O      NO-0105-5  M6295 YM3812  IGS011 IGS003c
-97 Dragon World V040K      NO-0105-5  M6295 YM3812  IGS011 IGS003c IGS012
-96 Virtua Bowling V100JCM  NO-0101-?  ICS2115       IGS011 IGS003e IGS012
-96 Virtua Bowling V101XCM  NO-0101-1  ICS2115       IGS011 IGS003e IGS012
-96 Virtua Bowling V101HJS  NO-0101-?  ICS2115       IGS011 IGS003e?IGS012
-96 Long Hu Bang II V185H   NO-0115    M6295 YM2413  IGS011 8255
-96 Wanli Changcheng        ?
-96 Xingyun Man Guan        ?
-98 Mj Nenrikishu SP V250J  NO-0115-5  M6295 YM2413  IGS011 8255
+95 Da Ban Cheng               NO-T0084-1 M6295         IGS011 8255
+95 Long Hu Bang V033C         NO-T0093   M6295         IGS011 8255
+95 Long Hu Bang V035C         ?
+95 Mj Ryukobou                NO-T0094   M6295         IGS011 8255
+95 Dragon World V010C         NO-0105-4  M6295 YM3812  IGS011 IGS003
+95 Dragon World V011H (set 1) ?
+95 Dragon World V011H (set 2) NO-T0105   M6295 YM3812  IGS011 IGS003  IGS012
+95 Dragon World V020J         ?          M6295 YM3812  IGS011 IGS003  IGS012
+95 Dragon World V021J         ?
+95 Dragon World V021O         NO-0105-1  M6295 YM3812  IGS011 IGS003  IGS012
+95 Dragon World V030O         NO-0105-1  M6295 YM3812  IGS011 IGS003
+97 Dragon World V040O         NO-0105-5  M6295 YM3812  IGS011 IGS003c
+97 Dragon World V040K         NO-0105-5  M6295 YM3812  IGS011 IGS003c IGS012
+96 Virtua Bowling V100JCM     NO-0101-?  ICS2115       IGS011 IGS003e IGS012
+96 Virtua Bowling V101XCM     NO-0101-1  ICS2115       IGS011 IGS003e IGS012
+96 Virtua Bowling V101HJS     NO-0101-?  ICS2115       IGS011 IGS003e?IGS012
+96 Long Hu Bang II V185H      NO-0115    M6295 YM2413  IGS011 8255
+96 Wanli Changcheng           ?
+96 Xingyun Man Guan           ?
+98 Mj Nenrikishu SP V250J     NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
 To do:
@@ -3993,16 +3994,6 @@ INPUT_PORTS_END
 // for debugging
 
 #if 0
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4, 0, 12,  8, 20,16, 28,24 },
-	{ STEP8(0,8*4) },
-	8*8*4
-};
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -4046,17 +4037,17 @@ static const gfx_layout layout_16x16x1 =
 };
 
 static GFXDECODE_START( gfx_igs011 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, gfx_8x8x4_packed_lsb, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4,       0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,         0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8,       0, 0x08 )
 GFXDECODE_END
 static GFXDECODE_START( gfx_igs011_hi )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
-	GFXDECODE_ENTRY( "blitter_hi", 0, layout_16x16x1, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, gfx_8x8x4_packed_lsb, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4,       0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,         0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8,       0, 0x08 )
+	GFXDECODE_ENTRY( "blitter_hi", 0, layout_16x16x1,    0, 0x80 )
 GFXDECODE_END
 #endif
 
@@ -4384,7 +4375,7 @@ ROM_END
 
 /***************************************************************************
 
-  東方之珠/Dōngfāng Zhī Zhū
+  東方之珠/Dung1 Fong1 Zi1 Zyu1
   (Hong Kong version of 中國龍/Zhōngguó Lóng, V011H)
 
 ***************************************************************************/
@@ -4398,6 +4389,17 @@ ROM_START( drgnwrldv11h )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+ROM_END
+
+ROM_START( drgnwrldv11ha )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "u3", 0x00000, 0x80000, CRC(b68113c4) SHA1(618fbf8ef71fcab5cd887e2d06f08169aec9e59f) ) // label not readable
+
+	ROM_REGION( 0x400000, "blitter", 0 )
+	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "china-dr-sp.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
 
 /***************************************************************************
@@ -4502,7 +4504,7 @@ ROM_END
 
 /***************************************************************************
 
-    Long Hu Bang (V035C)
+    龙虎榜/Lóng hǔ bǎng (V035C)
 
     Other files in the zip:
 
@@ -4529,7 +4531,7 @@ ROM_END
 
 /***************************************************************************
 
-Long Hu Bang (V033C)
+龙虎榜/Lóng hǔ bǎng (V033C)
 
 PCB Layout
 ----------
@@ -4591,7 +4593,7 @@ ROM_END
 
 /***************************************************************************
 
-Da Ban Cheng
+大阪城/Daai6 Baan2 Sing4
 
 PCB Layout
 ----------
@@ -4698,7 +4700,7 @@ ROM_END
 
 /***************************************************************************
 
-Long Hu Bang II
+龍虎榜/Lung4 Fu2 Bong2 II
 IGS, 1996
 
 PCB Layout
@@ -4918,22 +4920,23 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dongfang Zhi Zhu (Hong Kong, V011H)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhb,          0,        lhb,             lhb,       igs011_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhbv33c,      lhb,      lhb,             lhb,       igs011_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dbc,          lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ryukobou,     lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2,         0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Long Hu Bang II (Hong Kong, V185H)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, vbowl,        0,        vbowl,           vbowl,     igs011_state, init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    igs011_state, init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlhk,      vbowl,    vbowlhk,         vbowlhk,   igs011_state, init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp,  igs011_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgnwrld,      0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv40k,  drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv30,   drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21,   drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11h,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 2)",  MACHINE_SUPPORTS_SAVE ) // different encryption and with IGS012
+GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhb,           0,        lhb,             lhb,       igs011_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, vbowl,         0,        vbowl,           vbowl,     igs011_state, init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    igs011_state, init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   igs011_state, init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",        MACHINE_SUPPORTS_SAVE )

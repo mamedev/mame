@@ -404,7 +404,7 @@ offs_t h8500_disassembler::dasm_misc(std::ostream &stream, offs_t pc, u8 ea, con
 		format_reg(stream, op & 0x07, true);
 		stream << ",";
 		format_bdisp(stream, s16(s8(opcodes.r8(pc + 2))), pc + 3);
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 	}
 	else if (ea == 0x11 && (op & 0xf7) == 0x14 && m_expanded)
 	{
@@ -503,7 +503,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 			format_bdisp(stream, s16(opcodes.r16(pc + 1)), pc + 3);
 		else
 			format_bdisp(stream, s16(s8(opcodes.r8(pc + 1))), pc + 2);
-		return (BIT(op, 4) ? 3 : 2) | SUPPORTED;
+		return (BIT(op, 4) ? 3 : 2) | ((op & 0x0e) != 0 ? STEP_COND : 0) | SUPPORTED;
 	}
 	else switch (op)
 	{

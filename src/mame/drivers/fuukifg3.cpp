@@ -442,18 +442,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-/* 8x8x4 */
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,8*4) },
-	8*8*4
-};
-
 /* 16x16x8 */
 static const gfx_layout layout_16x16x8 =
 {
@@ -467,9 +455,9 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_fuuki32 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x400*0, 0x40 ) // [0] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [1] Layer 2
-	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x4,   0x400*3, 0x40 ) // [2] BG Layer
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8,         0x400*0, 0x40 ) // [0] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,         0x400*1, 0x40 ) // [1] Layer 2
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,   0x400*3, 0x40 ) // [2] BG Layer
 GFXDECODE_END
 
 
@@ -481,7 +469,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

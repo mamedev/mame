@@ -683,13 +683,13 @@ INPUT_PORTS_START( j6bigbuk )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Lo")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2/Hi/Exchange Number") // flashes a different lamp for Exchange Number, but same button?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2/Hi")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Auto Nudge")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
 
 	PORT_MODIFY("J10_2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) // unknown, responds in switch test
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Exchange Number")
 
 	PORT_MODIFY("J9_2")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) // unknown, responds in switch test
@@ -11780,12 +11780,12 @@ GAMEL( 199?, j6hapyhr,     0,          impact_nonvideo_disc, j6hapyhr, jpmimpct_
 GAMEL( 199?, j6hapyhra,    j6hapyhr,   impact_nonvideo_disc, j6hapyhr, jpmimpct_state, empty_init, ROT0, "JPM", "Happy Hour (JPM) (IMPACT) (HH2 C5) (set 2)", GAME_FLAGS_WORKING, layout_j6hapyhrb )
 GAMEL( 199?, j6hapyhrb,    j6hapyhr,   impact_nonvideo_disc, j6hapyhr, jpmimpct_state, empty_init, ROT0, "JPM", "Happy Hour (JPM) (IMPACT) (HH2 C5) (set 3)", GAME_FLAGS_WORKING, layout_j6hapyhrb )
 
-GAME(  199?, j6hilosv,     0,          impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6hilosva,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6hilosvb,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6hilosvc,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 4, Whitbread)", GAME_FLAGS )
-GAME(  199?, j6hilosvd,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 5)", GAME_FLAGS ) // incomplete pair
-GAME(  199?, j6hilosve,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 6)", GAME_FLAGS ) // incomplete pair
+GAME(  199?, j6hilosv,     0,          impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi-Lo Silver (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6hilosva,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi-Lo Silver (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6hilosvb,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi-Lo Silver (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6hilosvc,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi-Lo Silver (JPM) (IMPACT) (set 4, Whitbread)", GAME_FLAGS )
+GAME(  199?, j6hilosvd,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi-Lo Silver (JPM) (IMPACT) (set 5)", GAME_FLAGS ) // incomplete pair
+GAME(  199?, j6hilosve,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi-Lo Silver (JPM) (IMPACT) (set 6)", GAME_FLAGS ) // incomplete pair
 
 GAMEL( 199?, j6impuls,     0,          impact_nonvideo, j6impuls, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (IP 5 C13) (set 1)", GAME_FLAGS_WORKING, layout_j6impuls15 )
 GAMEL( 199?, j6impulsa,    j6impuls,   impact_nonvideo, j6impulsa,jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (IP 6 C14) (set 2)", GAME_FLAGS_WORKING, layout_j6impuls )

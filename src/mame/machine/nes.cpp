@@ -68,7 +68,7 @@ void nes_state::machine_start()
 		space.install_write_handler(0x4100, 0x5fff, write8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::write_l)));
 		space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::read_m)));
 		space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::write_m)));
-		for(int i=0; i<4; i++)
+		for(int i = 0; i < 4; i++)
 			space.install_read_bank(0x8000 + 0x2000*i, 0x9fff + 0x2000*i, m_prg_bank[i]);
 		space.install_write_handler(0x8000, 0xffff, write8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::write_h)));
 
@@ -90,6 +90,7 @@ void nes_state::machine_start()
 			BMC_8157,
 			BMC_970630C,
 			BMC_GOLD150,
+			BMC_KC885,
 			BMC_TELETUBBIES,
 			BMC_VT5201,
 			BTL_PALTHENA,

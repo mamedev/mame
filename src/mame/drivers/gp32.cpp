@@ -1606,18 +1606,18 @@ void gp32_state::s3c240x_mmc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void gp32_state::s3c240x_machine_start()
 {
-	m_s3c240x_pwm_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)0);
-	m_s3c240x_pwm_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)1);
-	m_s3c240x_pwm_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)2);
-	m_s3c240x_pwm_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)3);
-	m_s3c240x_pwm_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)4);
-	m_s3c240x_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(uintptr_t)0);
-	m_s3c240x_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(uintptr_t)1);
-	m_s3c240x_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(uintptr_t)2);
-	m_s3c240x_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(uintptr_t)3);
-	m_s3c240x_iic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),this), (void *)(uintptr_t)0);
-	m_s3c240x_iis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),this), (void *)(uintptr_t)0);
-	m_s3c240x_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),this), (void *)(uintptr_t)0);
+	m_s3c240x_pwm_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this));
+	m_s3c240x_pwm_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this));
+	m_s3c240x_pwm_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this));
+	m_s3c240x_pwm_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this));
+	m_s3c240x_pwm_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this));
+	m_s3c240x_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this));
+	m_s3c240x_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this));
+	m_s3c240x_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this));
+	m_s3c240x_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this));
+	m_s3c240x_iic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),this));
+	m_s3c240x_iis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),this));
+	m_s3c240x_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),this));
 	m_eeprom_data = std::make_unique<uint8_t[]>(0x2000); // a dump of the EEPROM (S524AB0X91) resulted to be 0x1000
 	m_nvram->set_base(m_eeprom_data.get(), 0x2000);
 	smc_init();

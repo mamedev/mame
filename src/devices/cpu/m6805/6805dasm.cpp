@@ -129,6 +129,24 @@ offs_t m6805_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		case op_names::rti:
 			flags = STEP_OUT;
 			break;
+		case op_names::brset:
+		case op_names::brclr:
+		case op_names::bhi:
+		case op_names::bls:
+		case op_names::bcc:
+		case op_names::bcs:
+		case op_names::bne:
+		case op_names::beq:
+		case op_names::bhcc:
+		case op_names::bhcs:
+		case op_names::bpl:
+		case op_names::bmi:
+		case op_names::bmc:
+		case op_names::bms:
+		case op_names::bil:
+		case op_names::bih:
+			flags = STEP_COND;
+			break;
 		default:
 			flags = 0;
 		}

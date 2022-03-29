@@ -1229,17 +1229,6 @@ static INPUT_PORTS_START( wbbc97 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
-static const gfx_layout pspikes_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout aerofgt_charlayout =
 {
 	8,8,
@@ -1322,18 +1311,6 @@ static const gfx_layout aerofgt_spritelayout =
 	128*8
 };
 
-static const gfx_layout spikes91_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
 
 
 static const gfx_layout aerfboot_spritelayout =
@@ -1390,7 +1367,7 @@ static const gfx_layout kickball_spritelayout =
 };
 
 static GFXDECODE_START( gfx_pspikes )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,    0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, pspikes_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
@@ -1401,17 +1378,17 @@ GFXDECODE_END
 
 static GFXDECODE_START( gfx_spikes91 )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikesb_charlayout,      0, 64 )   /* colors    0-1023 in 8 banks */
-	GFXDECODE_ENTRY( "gfx2", 0, spikes91_spritelayout, 1024, 64 )   /* colors 1024-2047 in 4 banks */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_planar,    1024, 64 )   /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_kickball )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,     0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, kickball_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_turbofrc )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, pspikes_charlayout,   256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb, 256, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0, pspikes_spritelayout, 512, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, pspikes_spritelayout, 768, 16 )
 GFXDECODE_END
@@ -1437,7 +1414,7 @@ static GFXDECODE_START( gfx_aerfboo2 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_wbbc97 )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, wbbc97_spritelayout, 1024, 64 ) /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 

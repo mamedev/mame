@@ -29,7 +29,7 @@
 
 ALLOW_SAVE_TYPE(pic8259_device::state_t); // allow save_item on a non-fundamental type
 
-void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	/* check the various IRQs */
 	for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
@@ -464,6 +464,7 @@ void pic8259_device::device_reset()
 
 DEFINE_DEVICE_TYPE(PIC8259, pic8259_device, "pic8259", "Intel 8259 PIC")
 DEFINE_DEVICE_TYPE(V5X_ICU, v5x_icu_device, "v5x_icu", "NEC V5X ICU")
+DEFINE_DEVICE_TYPE(MK98PIC, mk98pic_device, "mk98pic", "Elektronika MK-98 PIC")
 
 pic8259_device::pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -483,5 +484,10 @@ pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, d
 
 v5x_icu_device::v5x_icu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic8259_device(mconfig, V5X_ICU, tag, owner, clock)
+{
+}
+
+mk98pic_device::mk98pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic8259_device(mconfig, MK98PIC, tag, owner, clock)
 {
 }

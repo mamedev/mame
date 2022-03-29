@@ -55,30 +55,30 @@ public:
 	// could be changed, but we do not support this (yet). These are defined
 	// in the CHD and must match those of the device. They are stored by the GDDD tag.
 	// The encoding is not stored in the CHD but is also supposed to be immutable.
-	int     cylinders;
-	int     heads;
-	int     sectors_per_track;
-	int     sector_size;
+	int     cylinders = 0;
+	int     heads = 0;
+	int     sectors_per_track = 0;
+	int     sector_size = 0;
 	mfmhd_enc_t     encoding;
 
 	// Parameters like interleave, precompensation, write current can be changed
 	// on every write operation. They are stored by the GDDI tag (first record).
-	int     interleave;
-	int     cylskew;
-	int     headskew;
-	int     write_precomp_cylinder;     // if -1, no wpcom on the disks
-	int     reduced_wcurr_cylinder;     // if -1, no rwc on the disks
+	int     interleave = 0;
+	int     cylskew = 0;
+	int     headskew = 0;
+	int     write_precomp_cylinder = 0;     // if -1, no wpcom on the disks
+	int     reduced_wcurr_cylinder = 0;     // if -1, no rwc on the disks
 
 	// Parameters for the track layout that are supposed to be the same for
 	// all tracks and that do not change (until the next reformat).
 	// Also, they do not have any influence on the CHD file.
 	// They are stored by the GDDI tag (second record).
-	int     gap1;
-	int     gap2;
-	int     gap3;
-	int     sync;
-	int     headerlen;
-	int     ecctype;        // -1 is CRC
+	int     gap1 = 0;
+	int     gap2 = 0;
+	int     gap3 = 0;
+	int     sync = 0;
+	int     headerlen = 0;
+	int     ecctype = 0;        // -1 is CRC
 
 	bool sane_rec() const
 	{
@@ -147,8 +147,8 @@ class mfmhd_image_format_t
 {
 public:
 	mfmhd_image_format_t(): m_lastbit(false), m_current_crc(0)
-		{ m_devtag = std::string("mfmhd_image_format_t"); };
-	virtual ~mfmhd_image_format_t() {};
+		{ m_devtag = std::string("mfmhd_image_format_t"); }
+	virtual ~mfmhd_image_format_t() {}
 
 	// Load the image.
 	virtual std::error_condition load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) = 0;
@@ -195,7 +195,7 @@ protected:
 class mfmhd_generic_format : public mfmhd_image_format_t
 {
 public:
-	mfmhd_generic_format() { m_devtag = std::string("mfmhd_generic_format"); };
+	mfmhd_generic_format() { m_devtag = std::string("mfmhd_generic_format"); }
 	std::error_condition load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
 	std::error_condition save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head) override;
 

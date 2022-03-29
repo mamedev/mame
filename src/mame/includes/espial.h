@@ -48,13 +48,13 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
-	tilemap_t   *m_bg_tilemap;
-	tilemap_t   *m_fg_tilemap;
-	int       m_flipscreen;
+	tilemap_t   *m_bg_tilemap = nullptr;
+	tilemap_t   *m_fg_tilemap = nullptr;
+	int       m_flipscreen = 0;
 
 	/* sound-related */
-	uint8_t     m_main_nmi_enabled;
-	uint8_t     m_sound_nmi_enabled;
+	uint8_t     m_main_nmi_enabled = 0U;
+	uint8_t     m_sound_nmi_enabled = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -360,14 +360,14 @@ private:
 	std::unique_ptr<uint32_t[]>         m_spriteram_old2;
 
 	/* video-related */
-	tilemap_t  *m_scra_tilemap;
-	tilemap_t  *m_scrb_tilemap;
-	tilemap_t  *m_scrc_tilemap;
-	tilemap_t  *m_text_tilemap;
+	tilemap_t  *m_scra_tilemap = nullptr;
+	tilemap_t  *m_scrb_tilemap = nullptr;
+	tilemap_t  *m_scrc_tilemap = nullptr;
+	tilemap_t  *m_text_tilemap = nullptr;
 
 	/* misc */
-	int              m_sndpending;
-	int              m_snd_toggle;
+	int              m_sndpending = 0;
+	int              m_snd_toggle = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -1075,18 +1075,6 @@ INPUT_PORTS_END
 
 /*** GFX DECODE **************************************************************/
 
-static const gfx_layout macrossp_char16x16x4layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28, 32+0,32+4,32+8,32+12,32+16,32+20,32+24,32+28 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64,11*64,12*64,13*64,14*64,15*64},
-	16*64
-};
-
 static const gfx_layout macrossp_char16x16x8layout =
 {
 	16,16,
@@ -1104,7 +1092,7 @@ static GFXDECODE_START( gfx_macrossp )
 	GFXDECODE_ENTRY( "gfx2", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx3", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx4", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
-	GFXDECODE_ENTRY( "gfx5", 0, macrossp_char16x16x4layout,   0x800, 0x80 )
+	GFXDECODE_ENTRY( "gfx5", 0, gfx_16x16x4_packed_msb,       0x800, 0x80 )
 GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/

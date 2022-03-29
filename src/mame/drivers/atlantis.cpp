@@ -124,7 +124,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<mips3_device> m_maincpu;
@@ -139,12 +139,12 @@ private:
 	required_device<ide_pci_device> m_ide;
 	required_device<m48t37_device> m_rtc;
 	optional_ioport_array<8> m_io_analog;
-	emu_timer *m_adc_ready_timer;
+	emu_timer *m_adc_ready_timer = nullptr;
 
 	uint8_t cmos_r(offs_t offset);
 	void cmos_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	uint32_t m_cmos_write_enabled;
-	uint32_t m_serial_count;
+	uint32_t m_cmos_write_enabled = 0;
+	uint32_t m_serial_count = 0;
 
 
 	[[maybe_unused]] void asic_fifo_w(uint32_t data);
@@ -154,7 +154,7 @@ private:
 
 	void user_io_output(uint32_t data);
 	uint32_t user_io_input();
-	int m_user_io_state;
+	int m_user_io_state = 0;
 
 	// Board Ctrl Reg Offsets
 	enum {
@@ -164,8 +164,8 @@ private:
 	};
 	uint32_t board_ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
 	void board_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t m_irq_state;
-	uint32_t board_ctrl[CTRL_SIZE];
+	uint32_t m_irq_state = 0;
+	uint32_t board_ctrl[CTRL_SIZE]{};
 	void update_asic_irq();
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -180,8 +180,8 @@ private:
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
 	uint16_t port_ctrl_r(offs_t offset);
 	void port_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t m_port_data;
-	uint16_t m_a2d_data;
+	uint16_t m_port_data = 0;
+	uint16_t m_a2d_data = 0;
 
 	uint16_t a2d_ctrl_r();
 	void a2d_ctrl_w(offs_t offset, uint16_t data);
@@ -659,7 +659,7 @@ void atlantis_state::machine_reset()
 /*************************************
 *  Timer
 *************************************/
-void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// ADC Ready Timer
 	board_ctrl[STATUS] |= (1 << A2D_IRQ_SHIFT);

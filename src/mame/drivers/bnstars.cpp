@@ -152,7 +152,7 @@ private:
 	required_ioport_array<4> m_p1_keys;
 	required_ioport_array<4> m_p2_keys;
 
-	u32 m_bnstars1_mahjong_select;
+	u32 m_bnstars1_mahjong_select = 0;
 	template <int chip> void ascii_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template <int chip> u16 ascii_vram_r(offs_t offset);
 	template <int chip> void scroll_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -169,9 +169,9 @@ private:
 	template <int chip> TILE_GET_INFO_MEMBER(get_rotate_tile_info);
 	template <int chip> void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	template <int chip> void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	tilemap_t *m_ascii_tilemap[2];
-	tilemap_t *m_scroll_tilemap[2];
-	tilemap_t *m_rotate_tilemap[2];
+	tilemap_t *m_ascii_tilemap[2]{};
+	tilemap_t *m_scroll_tilemap[2]{};
+	tilemap_t *m_rotate_tilemap[2]{};
 
 	virtual void video_start() override;
 	template <int which> u32 screen_update_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -354,6 +354,8 @@ offs_t dsp32c_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 						flags = STEP_OUT;
 					util::stream_format(stream, "if (%s) goto %s", condtable[C], rH);
 				}
+				if (C > 1)
+					flags |= STEP_COND;
 			}
 			break;
 		}

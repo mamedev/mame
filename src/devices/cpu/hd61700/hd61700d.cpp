@@ -166,7 +166,7 @@ const hd61700_disassembler::dasm hd61700_disassembler::ops[256] =
 	{ "rtn",  OP_JX_COND, OP_NULL,   0 }, { "rtn",  OP_JX_COND, OP_NULL,   0 },
 	{ "rtn",  OP_JX_COND, OP_NULL,   0 }, { "rtn",  OP_JX_COND, OP_NULL,   0 },
 	{ "rtn",  OP_JX_COND, OP_NULL,   0 }, { "rtn",  OP_NULL,    OP_NULL,   0 },
-	{ "nop",  OP_JX_COND, OP_NULL,   0 }, { "clt",  OP_NULL,    OP_NULL,   0 },
+	{ "nop",  OP_NULL,    OP_NULL,   0 }, { "clt",  OP_NULL,    OP_NULL,   0 },
 	{ "fst",  OP_NULL,    OP_NULL,   0 }, { "slw",  OP_NULL,    OP_NULL,   0 },
 	{ "can",  OP_NULL,    OP_NULL,   0 }, { "rtni", OP_NULL,    OP_NULL,   0 },
 	{ "off",  OP_NULL,    OP_NULL,   0 }, { "trp",  OP_NULL,    OP_NULL,   0 },
@@ -340,18 +340,17 @@ uint32_t hd61700_disassembler::get_dasmflags(uint8_t op)
 	switch (op)
 	{
 		case 0x30: case 0x31: case 0x32: case 0x33: //jp
-		case 0x34: case 0x35: case 0x36: case 0x37: //jp
+		case 0x34: case 0x35: case 0x36:            //jp
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3: //jr
+		case 0xb4: case 0xb5: case 0xb6:            //jr
+			return STEP_COND;
 		case 0x70: case 0x71: case 0x72: case 0x73: //cal
 		case 0x74: case 0x75: case 0x76: case 0x77: //cal
-		case 0xb0: case 0xb1: case 0xb2: case 0xb3: //jr
-		case 0xb4: case 0xb5: case 0xb6: case 0xb7: //jr
-		case 0xde:                                  //jp
-		case 0xdf:                                  //jp
-			return STEP_OVER;
+			return STEP_OVER | (op < 0x77 ? STEP_COND : 0);
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: //rtn
 		case 0xf4: case 0xf5: case 0xf6: case 0xf7: //rtn
 		case 0xfd:                                  //rtni
-			return STEP_OUT;
+			return STEP_OUT | (op < 0xf7 ? STEP_COND : 0);
 	}
 
 	return 0;

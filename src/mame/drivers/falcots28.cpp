@@ -89,7 +89,7 @@ private:
 	void attr_map(address_map &map);
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	uint8_t m_key_scan;
+	uint8_t m_key_scan = 0;
 };
 
 

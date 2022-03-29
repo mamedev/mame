@@ -222,7 +222,7 @@ protected:
 	void sound3812_map(address_map &map);
 	void sstrike_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class grmatch_state : public itech8_state
@@ -247,7 +247,7 @@ protected:
 		TIMER_PALETTE = TIMER_BASE_LAST+1,
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void palette_w(uint8_t data);
 	void xscroll_w(uint8_t data);
@@ -257,9 +257,9 @@ protected:
 	void palette_update();
 
 	emu_timer *m_palette_timer;
-	uint8_t m_palcontrol;
-	uint8_t m_xscroll;
-	rgb_t m_palette[2][16];
+	uint8_t m_palcontrol = 0U;
+	uint8_t m_xscroll = 0U;
+	rgb_t m_palette[2][16]{};
 
 	void grmatch_map(address_map &map);
 };

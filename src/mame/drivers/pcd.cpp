@@ -101,14 +101,14 @@ private:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<ram_device> m_ram;
-	uint8_t m_stat, m_led;
-	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
-	uint16_t m_dskctl;
+	uint8_t m_stat = 0, m_led = 0;
+	int m_msg = 0, m_bsy = 0, m_io = 0, m_cd = 0, m_req = 0, m_rst = 0;
+	uint16_t m_dskctl = 0;
 	struct {
-		uint16_t ctl;
-		uint16_t regs[1024];
-		int type;
-		bool sc;
+		uint16_t ctl = 0;
+		uint16_t regs[1024]{};
+		int type = 0;
+		bool sc = 0;
 	} m_mmu;
 
 	void check_scsi_irq();

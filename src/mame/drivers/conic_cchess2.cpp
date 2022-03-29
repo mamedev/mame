@@ -27,11 +27,13 @@ BTANB:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6504.h"
 #include "machine/6821pia.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -234,7 +236,7 @@ INPUT_PORTS_END
 
 void cchess2_state::cncchess2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6504(config, m_maincpu, 1000000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchess2_state::main_map);
 
@@ -251,11 +253,11 @@ void cchess2_state::cncchess2(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	config.set_default_layout(layout_conic_cchess2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -267,7 +269,7 @@ void cchess2_state::cncchess2(machine_config &config)
 ******************************************************************************/
 
 ROM_START( cncchess2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("c11485.u2", 0x1000, 0x1000, CRC(b179d536) SHA1(0b1f9c247a4a3e2ccbf8d3ae5efa62b8938f572f) ) // AMI 2332
 ROM_END
 

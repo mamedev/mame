@@ -29,9 +29,9 @@ private:
 	required_shared_ptr<uint8_t> m_backgroundram;
 	required_shared_ptr<uint8_t> m_foregroundram;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	int m_scroll[4];
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int m_scroll[4]{};
 
 	void bankswitch_w(uint8_t data);
 	void foreground_w(offs_t offset, uint8_t data);

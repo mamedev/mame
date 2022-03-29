@@ -214,7 +214,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	std::unique_ptr<uint8_t[]> m_videoram;
-	uint8_t m_videobank;
+	uint8_t m_videobank = 0;
 
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);

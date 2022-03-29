@@ -37,9 +37,9 @@ public:
 	{ }
 
 	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-	int        m_layerpri[3];
+	int        m_layer_colorbase[3]{};
+	int        m_sprite_colorbase = 0;
+	int        m_layerpri[3]{};
 
 	/* misc */
 	//int        m_nmi_enabled;
@@ -69,7 +69,7 @@ public:
 	void parodius_map(address_map &map);
 	void parodius_sound_map(address_map &map);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_PARODIUS_H

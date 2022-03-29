@@ -136,8 +136,8 @@ This game runs on Sega System 1 hardware.
 
 *******************************************************************************
 
-Chop Lifter
-Sega 1985
+Chop Lifter, Sega 1985
+Hardware info by Guru
 
 This game runs on Sega System 2 hardware.
 
@@ -185,7 +185,7 @@ Notes:
       8255       - NEC D8255 Programmable Peripheral Interface IC (DIP40)
       Z80A(1)    - Sharp LH0080A Z80A CPU, clock 4.000MHz [8/2]
       Z80A(2)    - Sharp LH0080A Z80A CPU, clock 4.000MHz [8/2]
-      CXK5808    - Sony CXK5808 SRAM. Size unknown, maybe 256 bytes x4-bit? (NDIP22)
+      CXK5808    - Sony CXK5808 1kBx8-bit SRAM (NDIP22)
       M5M5165    - Mitsubishi M5M5165 8k x8 SRAM (DIP28)
       SN76489(1) - Texas Instruments SN76489 4-channel Programmable Sound Generator. Clock 4.000MHz [8/2] (DIP16)
       SN76489(2) - Texas Instruments SN76489 4-channel Programmable Sound Generator. Clock 2.000MHz [8/4] (DIP16)
@@ -202,6 +202,90 @@ Notes:
       OSC2  - 19.99982MHz
       VSync - 60.0952Hz
       HSync - 15.4442kHz
+
+***************************************************************************
+
+Pitfall II The Lost Caverns, Sega, 1984
+Hardware info by Guru
+
+This game runs on Sega System 1 hardware. The version documented here is
+the not-encrypted version.
+The same PCB runs a few other games, including some official Sega conversions.
+For example: My Hero, Teddy Boy Blues, Sega Ninja, Ninja Princess and several others.
+The bootleg Pitfall II PCB is an exact 1:1 copy, including using the same encrypted ROMs,
+and the custom chips have been replaced with plug-in daughterboards.
+
+
+Sega Game ID#: 834-5627-10 PITFALL II (sticker). Also seen: -11, -12 and -13 stickers.
+PCB#: 171-5054-02 (seen on some PCBs with (C) 1984). The (C) 1985 PCB does not have a 171 number on the PCB.
+|--------------------------------------------------------------------------------|
+|            20MHz                    315-5063.IC67                              |
+|                                                                            LED |
+|Z80(1)    EPR-6623.IC116        D4168                 315-5062.IC41             |
+|              EPR-6624A.IC109                                                   |
+|                  EPR-6625.IC96                         25LS251  2148 2148 2148 |
+|                                                                                |
+|    EPR-6454A.IC117  X  X   EPR-6455.IC05                        2148 2148 2148 |
+|                                                                                |
+| TLP521-4(x6)     |--|  |--|                                                    |
+|4                 |3 |  |3 |    2148                                            |
+|4         DIPSW_B |1 |  |1 |    2148                                       2147 |
+|W                 |5 |  |5 |    2148                                            |
+|A         DIPSW_A || |  || |    2148           EPR-6473A.IC61                   |
+|Y                 |5 |  |5 |                               315-5025             |
+|                  |0 |  |0 |                   EPR-6474A.IC62    74S201         |
+|    ULN2003       |1 |  |1 |      8128  8128               315-5025             |
+|                  |2 |  |1 |                   EPR-6471A.IC63                   |
+|                  |--|  |--|                               315-5025             |
+|       Z80PIO     Z80        8128              EPR-6472A.IC64                   |
+|      8MHz                                                                      |
+|   VOL     EPR-6462.IC120                      EPR-6469A.IC65                   |
+| LA4460 76489A(1)     8128                                                      |
+|            76489A(2)             PR5317.IC76  EPR-6470A.IC66                   |
+|--------------------------------------------------------------------------------|
+Notes:
+       315-5011 - Sega custom DIP40 IC \
+       315-5012 - Sega custom DIP48 IC / The bootleg replaces these two chips with a plug-in daughterboard containing logic chips
+         Z80(1) - Z80 CPU. Clock input measures 3.76992MHz on first power on and changes to 3.65950MHz or 3.80062MHz during game play.
+                  Replaced with encrypted Z80 with sticker '315-5093' on the encrypted version.
+                  Some factory conversions have been seen with a plug-in daughterboard containing Z80, PAL and PROM and some later games
+                  or later releases of the same game use a stock Z80 without encryption.
+       315-5025 - Sega custom IC. The bootleg replaces this with a plug-in daughterboard containing logic chips: 74LS299 (x6), 74LS273 (x3), 74LS157 (x3)
+      76489A(1) - Texas Instruments SN76489 4-channel Programmable Sound Generator. Clock 4.000MHz [8/2]
+      76489A(2) - Texas Instruments SN76489 4-channel Programmable Sound Generator. Clock 2.000MHz [8/4]
+         LA4460 - Sanyo LA4460 12W AF Power Amplifier
+         PR5317 - Fujitsu MB7114 Bipolar PROM (equivalent to 82S129)
+            Z80 - Zilog Z8400A Z80A CPU or Sharp LH0080A CPU or NEC D780C-1 CPU. Clock input 4.000MHz
+         Z80PIO - Zilog Z8420A Z80A-PIO or Sharp LH0081A Z80A-PIO. Clock input measures the same as the Z80(1) clock
+          D4168 - NEC D4168 8kBx8-bit SRAM, equivalent to 6264
+           8128 - Fujitsu MB8128 2kBx8-bit SRAM, equivalent to 6116
+           2148 - Fujitsu MB2148 1kBx4-bit SRAM
+           2147 - Fujitsu MB2147 4kBx1-bit SRAM
+         74S201 - Texas Instruments 256bx1-bit SRAM
+       315-5063 - National DMPAL16R4
+       315-5062 - National DMPAL16R4
+        25LS251 - AMD AM25LS251 8-Input Multiplexor
+ EPR-6623.IC116 \
+EPR-6624A.IC109  / 27128 16kBx8-bit EPROM (main program, not-encrypted version)
+  EPR-6625.IC96 /
+ EPR-6462.IC120 - 2764 8kBx8-bit EPROM (sound program)
+ EPR-6473A.IC61 \
+ EPR-6474A.IC62  \
+ EPR-6471A.IC63   \
+ EPR-6472A.IC64   / 2764 8kBx8-bit EPROM (background tiles)
+ EPR-6469A.IC65  /
+ EPR-6470A.IC66 /
+EPR-6454A.IC117 \
+  EPR-6455.IC05 / 27128 16kBx8-bit EPROM (sprites)
+              X - Empty socket
+       TLP521-4 - Toshiba TLP521-4 4-Channel Photocoupler
+        ULN2003 - Texas Instruments ULN2003 or Toshiba TD62003 7-channel Darlington Sink Driver
+      DIPSW_A,B - 8-position DIP switch
+            LED - Power LED
+          VSync - 60.0757Hz
+          HSync - 15.2585kHz
+
+***************************************************************************
 
 Flicky sets version notes:
 
@@ -2894,7 +2978,7 @@ ROM_START( mrvikingj )
 ROM_END
 
 
-ROM_START( swat )
+ROM_START( swat ) /* Sega game ID# 834-5388 SWAT */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr5807b.129",   0x0000, 0x2000, CRC(93db9c9f) SHA1(56e9d9a33f04b4d5971c0db24cc8719a52e64678) ) /* encrypted */
 	ROM_LOAD( "epr-5808.130",   0x2000, 0x2000, CRC(67116665) SHA1(e8aa72f2835d38367be5e8a9313e51b64f452ee7) ) /* encrypted */
@@ -3921,9 +4005,9 @@ ROM_START( shtngmst )
 
 	/* These pld's are located on the main board. */
 	ROM_REGION( 0x1000, "plds", 0 )
-	ROM_LOAD( "315-5137.ic10",   0x0000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
-	ROM_LOAD( "315-5138.ic11",   0x0200, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4ACN Located at IC11 */
-	ROM_LOAD( "315-5139.ic50",   0x0400, 0x0943, CRC(4b6036a9) SHA1(a0f838d38b0829f20c61a10d1b9027d85555baa3) ) // PLS153 CK2605 located at IC50 */
+	ROM_LOAD( "315-5137.ic10",   0x0000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN */
+	ROM_LOAD( "315-5138.ic11",   0x0200, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4ACN */
+	ROM_LOAD( "315-5139.ic50",   0x0400, 0x00e7, CRC(943d91b0) SHA1(37c98085d580808aaeb01726a9f59705590378c4) ) // PLS153 CK2605 */
 	// Note that IC7, IC13 and IC19 (315-5155) are not PLDs, but are a custom graphics shifter.
 ROM_END
 
@@ -3966,12 +4050,12 @@ ROM_START( choplift )
 	ROM_LOAD( "pr5317.ic28",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 
 	ROM_REGION( 0x0618, "plds", 0 )
-	ROM_LOAD( "315-5152.bin",   0x00000, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) ) /* PAL16R4A located at IC10. */
-	ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4NC located at IC11. */
-	ROM_LOAD( "315-5139.bin",   0x00000, 0x0104, NO_DUMP ) /* CK2605 located at IC50. */
-	ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC7. */
-	ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC13. */
-	ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC19. */
+	ROM_LOAD( "315-5152.ic10",   0x00000, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) ) /* PAL16R4A */
+	ROM_LOAD( "315-5138.ic11",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4NC */
+	ROM_LOAD( "315-5139.ic50",   0x00000, 0x00e7, CRC(943d91b0) SHA1(37c98085d580808aaeb01726a9f59705590378c4) ) /* CK2605 */
+	ROM_LOAD( "315-5025.ic7",    0x00000, 0x0104, NO_DUMP )
+	ROM_LOAD( "315-5025.ic13",   0x00000, 0x0104, NO_DUMP )
+	ROM_LOAD( "315-5025.ic19",   0x00000, 0x0104, NO_DUMP )
 ROM_END
 
 /*
@@ -4010,12 +4094,12 @@ ROM_START( chopliftu )
 	ROM_LOAD( "pr5317.ic28",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 
 	ROM_REGION( 0x0618, "plds", 0 )
-	ROM_LOAD( "315-5152.bin",   0x00000, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) ) /* PAL16R4A located at IC10. */
-	ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4NC located at IC11. */
-	ROM_LOAD( "315-5139.bin",   0x00000, 0x0104, NO_DUMP ) /* CK2605 located at IC50. */
-	ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC7. */
-	ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC13. */
-	ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC19. */
+	ROM_LOAD( "315-5152.ic10",   0x00000, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) ) /* PAL16R4A */
+	ROM_LOAD( "315-5138.ic11",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4NC */
+	ROM_LOAD( "315-5139.ic50",   0x00000, 0x00e7, CRC(943d91b0) SHA1(37c98085d580808aaeb01726a9f59705590378c4) ) /* CK2605 */
+	ROM_LOAD( "315-5025.ic7",    0x00000, 0x0104, NO_DUMP )
+	ROM_LOAD( "315-5025.1c13",   0x00000, 0x0104, NO_DUMP )
+	ROM_LOAD( "315-5025.ic19",   0x00000, 0x0104, NO_DUMP )
 ROM_END
 
 /*
@@ -5223,8 +5307,8 @@ ROM_END
 
 /*
 
-Noboranka
-Data East, 1986
+Noboranka, Data East, 1986
+Hardware info by Guru
 
 PCB Layout
 ----------

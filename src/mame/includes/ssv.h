@@ -78,15 +78,15 @@ protected:
 	optional_shared_ptr<uint16_t> m_input_sel;
 	optional_memory_bank_array<2> m_srmp7_esbank;
 
-	int m_tile_code[16];
-	int m_enable_video;
-	int m_shadow_pen_mask;
-	int m_shadow_pen_shift;
-	uint8_t m_requested_int;
-	uint16_t m_irq_enable;
-	int m_interrupt_ultrax;
+	int m_tile_code[16]{};
+	int m_enable_video = 0;
+	int m_shadow_pen_mask = 0;
+	int m_shadow_pen_shift = 0;
+	uint8_t m_requested_int = 0;
+	uint16_t m_irq_enable = 0;
+	int m_interrupt_ultrax = 0;
 	bool m_raster_interrupt_enabled;
-	uint32_t m_latches[8];
+	uint32_t m_latches[8]{};
 
 	void irq_ack_w(offs_t offset, uint16_t data);
 	void irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -197,7 +197,7 @@ private:
 	required_shared_ptr<uint16_t> m_tmapram;
 	required_shared_ptr<uint16_t> m_tmapscroll;
 
-	tilemap_t *m_tmap;
+	tilemap_t *m_tmap = nullptr;
 };
 
 class eaglshot_state : public ssv_state

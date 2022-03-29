@@ -13,6 +13,9 @@ TODO:
   and softwarelist for the video tapes. We'd also need a VHS player device.
   The emulated lightgun itself appears to be working fine(eg. add a 30hz
   timer to IN.3 to score +100)
+- solution release year, most chips on the PCB were from 1984, but this one
+  was dumped from a licensed product branded for the VWR company, so it
+  could be later than the initial release
 
 ***************************************************************************/
 
@@ -37,10 +40,14 @@ TODO:
 #include "h2hbaskbc.lh"
 #include "h2hhockeyc.lh"
 #include "h2hsoccerc.lh"
+#include "lafootb.lh"
 #include "lchicken.lh" // clickable
 #include "lightfgt.lh" // clickable
+#include "mbaskb2.lh"
 #include "mdallas.lh"
+#include "msoccer2.lh"
 #include "qkracer.lh"
+#include "scat.lh"
 #include "unkeinv.lh"
 #include "vidchal.lh"
 
@@ -58,6 +65,12 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<cop400_cpu_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -65,19 +78,14 @@ public:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_l;                         // MCU port L write data
-	u8 m_g;                         // MCU port G write data
-	u8 m_d;                         // MCU port D write data
-	int m_so;                       // MCU SO line state
-	int m_sk;                       // MCU SK line state
-	u16 m_inp_mux;                  // multiplexed inputs mask
+	u8 m_l = 0;                     // MCU port L write data
+	u8 m_g = 0;                     // MCU port G write data
+	u8 m_d = 0;                     // MCU port D write data
+	int m_so = 0;                   // MCU SO line state
+	int m_sk = 0;                   // MCU SK line state
+	u16 m_inp_mux = ~0;             // multiplexed inputs mask
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -85,14 +93,6 @@ protected:
 
 void hh_cop400_state::machine_start()
 {
-	// zerofill
-	m_l = 0;
-	m_g = 0;
-	m_d = 0;
-	m_so = 0;
-	m_sk = 0;
-	m_inp_mux = ~0;
-
 	// register for savestates
 	save_item(NAME(m_l));
 	save_item(NAME(m_g));
@@ -163,10 +163,12 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void ctstein(machine_config &config);
+
+private:
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_l();
-	void ctstein(machine_config &config);
 };
 
 // handlers
@@ -213,7 +215,7 @@ INPUT_PORTS_END
 
 void ctstein_state::ctstein(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 850000); // approximation - RC osc. R=12K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_g().set(FUNC(ctstein_state::write_g));
@@ -221,11 +223,11 @@ void ctstein_state::ctstein(machine_config &config)
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	m_maincpu->read_l().set(FUNC(ctstein_state::read_l));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ctstein);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -265,13 +267,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void h2hsoccerc(machine_config &config);
+	void h2hbaskbc(machine_config &config);
+	void h2hhockeyc(machine_config &config);
+
+private:
 	void write_d(u8 data);
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_in();
-	void h2hsoccerc(machine_config &config);
-	void h2hbaskbc(machine_config &config);
-	void h2hhockeyc(machine_config &config);
 };
 
 // handlers
@@ -359,7 +363,7 @@ INPUT_PORTS_END
 
 void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=101pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(h2hbaskbc_state::write_d));
@@ -368,12 +372,12 @@ void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 	m_maincpu->read_in().set(FUNC(h2hbaskbc_state::read_in));
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(16, 7);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_h2hbaskbc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -422,13 +426,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void einvaderc(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	void write_l(u8 data);
-	void einvaderc(machine_config &config);
 };
 
 // handlers
@@ -491,7 +497,7 @@ INPUT_PORTS_END
 
 void einvaderc_state::einvaderc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP444L(config, m_maincpu, 850000); // approximation - RC osc. R=47K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->read_in().set_ioport("IN.0");
@@ -501,7 +507,7 @@ void einvaderc_state::einvaderc(machine_config &config)
 	m_maincpu->write_so().set(FUNC(einvaderc_state::write_so));
 	m_maincpu->write_l().set(FUNC(einvaderc_state::write_l));
 
-	/* video hardware */
+	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
 	mask.set_refresh_hz(60);
 	mask.set_size(919, 1080);
@@ -511,7 +517,7 @@ void einvaderc_state::einvaderc(machine_config &config)
 	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_einvaderc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -551,13 +557,14 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void unkeinv(machine_config &config);
+
+private:
 	void update_display();
 	void write_g(u8 data);
 	void write_d(u8 data);
 	void write_l(u8 data);
 	u8 read_l();
-
-	void unkeinv(machine_config &config);
 };
 
 // handlers
@@ -620,7 +627,7 @@ INPUT_PORTS_END
 
 void unkeinv_state::unkeinv(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 850000); // frequency guessed
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_g().set(FUNC(unkeinv_state::write_g));
@@ -630,11 +637,11 @@ void unkeinv_state::unkeinv(machine_config &config)
 	m_maincpu->read_l_tristate().set_constant(0xff);
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	config.set_default_layout(layout_unkeinv);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -674,23 +681,24 @@ public:
 		m_motor_on_out(*this, "motor_on")
 	{ }
 
+	void lchicken(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER(motor_switch_r);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	output_finder<> m_motor_pos_out;
 	output_finder<> m_motor_on_out;
 
 	u8 m_motor_pos = 0;
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
-	DECLARE_READ_LINE_MEMBER(motor_switch_r);
 
 	void write_l(u8 data);
 	void write_d(u8 data);
 	void write_g(u8 data);
 	u8 read_g();
-	DECLARE_WRITE_LINE_MEMBER(write_so);
-	DECLARE_READ_LINE_MEMBER(read_si);
-	void lchicken(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
 };
 
 void lchicken_state::machine_start()
@@ -747,19 +755,6 @@ u8 lchicken_state::read_g()
 	return read_inputs(4, m_g);
 }
 
-WRITE_LINE_MEMBER(lchicken_state::write_so)
-{
-	// SO: speaker out
-	m_speaker->level_w(state);
-	m_so = state;
-}
-
-READ_LINE_MEMBER(lchicken_state::read_si)
-{
-	// SI: SO
-	return m_so;
-}
-
 // config
 
 static INPUT_PORTS_START( lchicken )
@@ -790,23 +785,23 @@ INPUT_PORTS_END
 
 void lchicken_state::lchicken(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 850000); // approximation - RC osc. R=12K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(lchicken_state::write_l));
 	m_maincpu->write_d().set(FUNC(lchicken_state::write_d));
 	m_maincpu->write_g().set(FUNC(lchicken_state::write_g));
 	m_maincpu->read_g().set(FUNC(lchicken_state::read_g));
-	m_maincpu->write_so().set(FUNC(lchicken_state::write_so));
-	m_maincpu->read_si().set(FUNC(lchicken_state::read_si));
+	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_maincpu->read_si().set(m_maincpu, FUNC(cop400_cpu_device::so_r));
 
 	TIMER(config, "chicken_motor").configure_periodic(FUNC(lchicken_state::motor_sim_tick), attotime::from_msec(6000/0x100)); // ~6sec for a full rotation
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 4);
 	config.set_default_layout(layout_lchicken);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -825,7 +820,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Funtronics: Jacks (model 1603)
-  * COP410L MCU bonded directly to PCB (die label COP410L/B NGS)
+  * COP410L MCU die bonded directly to PCB (die label COP410L/B NGS)
   * 8 LEDs, 1-bit sound
 
 ***************************************************************************/
@@ -837,13 +832,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void funjacks(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
 	void write_g(u8 data);
 	u8 read_l();
 	u8 read_g();
-	void funjacks(machine_config &config);
 };
 
 // handlers
@@ -914,7 +911,7 @@ INPUT_PORTS_END
 
 void funjacks_state::funjacks(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP410(config, m_maincpu, 850000); // approximation - RC osc. R=47K, C=56pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funjacks_state::write_d));
@@ -923,11 +920,11 @@ void funjacks_state::funjacks(machine_config &config)
 	m_maincpu->read_l().set(FUNC(funjacks_state::read_l));
 	m_maincpu->read_g().set(FUNC(funjacks_state::read_g));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 2);
 	config.set_default_layout(layout_funjacks);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -946,7 +943,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Funtronics: Red Light Green Light (model 1604)
-  * COP410L MCU bonded directly to PCB (die label COP410L/B NHZ)
+  * COP410L MCU die bonded directly to PCB (die label COP410L/B NHZ)
   * 14 LEDs, 1-bit sound
 
   known releases:
@@ -962,11 +959,13 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void funrlgl(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
 	void write_g(u8 data);
-	void funrlgl(machine_config &config);
 };
 
 // handlers
@@ -1014,7 +1013,7 @@ INPUT_PORTS_END
 
 void funrlgl_state::funrlgl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP410(config, m_maincpu, 800000); // approximation - RC osc. R=51K, C=91pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funrlgl_state::write_d));
@@ -1023,12 +1022,12 @@ void funrlgl_state::funrlgl(machine_config &config)
 	m_maincpu->write_g().set(FUNC(funrlgl_state::write_g));
 	m_maincpu->read_g().set_ioport("IN.0");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	m_display->set_bri_levels(0.005, 0.1); // top led is brighter
 	config.set_default_layout(layout_funrlgl);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1047,7 +1046,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Funtronics: Tag (model 1497)
-  * COP410L MCU bonded directly to PCB (die label COP410L/B GTJ)
+  * COP410L MCU die bonded directly to PCB (die label COP410L/B GTJ)
   * 7 LEDs, 7 buttons, 1-bit sound
 
 ***************************************************************************/
@@ -1059,13 +1058,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void funtag(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
 	void write_g(u8 data);
 	u8 read_l();
 	u8 read_g();
-	void funtag(machine_config &config);
 };
 
 // handlers
@@ -1135,7 +1136,7 @@ INPUT_PORTS_END
 
 void funtag_state::funtag(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=47K, C=91pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funtag_state::write_d));
@@ -1144,11 +1145,11 @@ void funtag_state::funtag(machine_config &config)
 	m_maincpu->read_l().set(FUNC(funtag_state::read_l));
 	m_maincpu->read_g().set(FUNC(funtag_state::read_g));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 2);
 	config.set_default_layout(layout_funtag);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1158,6 +1159,320 @@ void funtag_state::funtag(machine_config &config)
 ROM_START( funtag )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "cop410l_b_gtj", 0x0000, 0x0200, CRC(ce565da6) SHA1(34e5f39e32f220007d353c93787c1a6d117592c1) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Basketball 2 (model 1645), Soccer 2 (model 1642)
+  * PCB label: MA6037/38
+  * dual COP420L MCUs, dies bonded to PCB (see romdefs for rom serials)
+  * 4001, die also bonded to PCB
+  * 2-digit 7seg display, 36 other leds, 1-bit sound
+
+  The clock generator was measured ~527kHz for mbaskb2, ~483kHz for msoccer2,
+  meaning that the internal divider is 8. Main MCU SK connects to the other
+  MCU CKO pin, probably for syncing serial I/O.
+
+  These two are on the same hardware, see patents US4341383 and US4372556
+  for detailed descriptions of the games.
+
+***************************************************************************/
+
+class mbaskb2_state : public hh_cop400_state
+{
+public:
+	mbaskb2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag),
+		m_subcpu(*this, "subcpu"),
+		m_on_timer(*this, "on_timer")
+	{ }
+
+	void mbaskb2(machine_config &config);
+	void msoccer2(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(switch_r);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_device<cop400_cpu_device> m_subcpu;
+	required_device<timer_device> m_on_timer;
+
+	void update_display();
+	void shared_write_l(u8 data);
+	void main_write_g(u8 data);
+	void sub_write_g(u8 data);
+	void sub_write_d(u8 data);
+	u8 sub_read_in();
+};
+
+void mbaskb2_state::machine_reset()
+{
+	hh_cop400_state::machine_reset();
+	m_on_timer->adjust(attotime::from_msec(5));
+}
+
+// handlers
+
+void mbaskb2_state::update_display()
+{
+	m_display->matrix(~(m_d << 4 | m_g), m_l);
+}
+
+void mbaskb2_state::shared_write_l(u8 data)
+{
+	// L: led data (though it's unlikely that maincpu will write valid led data to it)
+	m_l = m_maincpu->l_r() | m_subcpu->l_r();
+	update_display();
+}
+
+void mbaskb2_state::main_write_g(u8 data)
+{
+	// G1: speaker out
+	m_speaker->level_w(data >> 1 & 1);
+}
+
+void mbaskb2_state::sub_write_g(u8 data)
+{
+	// G: led select (low), input mux
+	m_g = m_inp_mux = data & 0xf;
+	update_display();
+}
+
+void mbaskb2_state::sub_write_d(u8 data)
+{
+	// D: led select (high)
+	m_d = data & 0xf;
+	update_display();
+}
+
+u8 mbaskb2_state::sub_read_in()
+{
+	// IN: multiplexed inputs
+	return read_inputs(3, 0xf);
+}
+
+// config
+
+CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
+{
+	// The power switch is off-1-2, and the game relies on power-on starting at 1,
+	// otherwise msoccer2 boots up to what looks like a factory test mode.
+	return (m_inputs[3]->read() & 1) | (m_on_timer->enabled() ? 1 : 0);
+}
+
+static INPUT_PORTS_START( mbaskb2 )
+	PORT_START("IN.0") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+
+	PORT_START("IN.1") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Pass")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shoot")
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.2") // G2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Defense: Man")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Defense: Zone")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Defense: Press")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mbaskb2_state, switch_r)
+
+	PORT_START("IN.3")
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( msoccer2 )
+	PORT_INCLUDE( mbaskb2 )
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Low/High Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Score")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Teammate")
+INPUT_PORTS_END
+
+void mbaskb2_state::mbaskb2(machine_config &config)
+{
+	// basic machine hardware
+	COP420(config, m_maincpu, 500000); // approximation
+	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_SYNC_INPUT, false); // guessed
+	m_maincpu->write_g().set(FUNC(mbaskb2_state::main_write_g));
+	m_maincpu->write_l().set(FUNC(mbaskb2_state::shared_write_l));
+	m_maincpu->read_l().set(m_subcpu, FUNC(cop400_cpu_device::l_r));
+	m_maincpu->read_l_tristate().set_constant(0x80);
+	m_maincpu->read_si().set(m_subcpu, FUNC(cop400_cpu_device::so_r));
+
+	COP420(config, m_subcpu, 500000); // same as maincpu
+	m_subcpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_SYNC_INPUT, false); // guessed
+	m_subcpu->write_d().set(FUNC(mbaskb2_state::sub_write_d));
+	m_subcpu->write_g().set(FUNC(mbaskb2_state::sub_write_g));
+	m_subcpu->write_l().set(FUNC(mbaskb2_state::shared_write_l));
+	m_subcpu->read_l().set(m_maincpu, FUNC(cop400_cpu_device::l_r));
+	m_subcpu->read_l_tristate().set_constant(0x80);
+	m_subcpu->read_in().set(FUNC(mbaskb2_state::sub_read_in));
+	m_subcpu->read_si().set(m_maincpu, FUNC(cop400_cpu_device::so_r));
+	m_subcpu->read_cko().set(m_maincpu, FUNC(cop400_cpu_device::sk_r));
+
+	config.set_perfect_quantum(m_maincpu);
+
+	TIMER(config, "on_timer").configure_generic(nullptr);
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 7);
+	m_display->set_segmask(0xc0, 0x7f);
+	m_display->set_bri_levels(0.008, 0.04); // offense is brighter
+	config.set_default_layout(layout_mbaskb2);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void mbaskb2_state::msoccer2(machine_config &config)
+{
+	mbaskb2(config);
+	config.set_default_layout(layout_msoccer2);
+}
+
+// roms
+
+ROM_START( mbaskb2 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420l_nmp", 0x0000, 0x0400, CRC(afc44378) SHA1(e96435bd1d0b2bea5140efdfe21f4684f2525075) )
+
+	ROM_REGION( 0x0400, "subcpu", 0 )
+	ROM_LOAD( "cop420l_nmq", 0x0000, 0x0400, CRC(70943f6f) SHA1(3f711d8b7c7c5dd13c68bf1ef980d2f784b748f4) )
+ROM_END
+
+ROM_START( msoccer2 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420l_nnm", 0x0000, 0x0400, CRC(c9169aca) SHA1(525486e8a18ec6132e53f9be582b2667172230a9) )
+
+	ROM_REGION( 0x0400, "subcpu", 0 )
+	ROM_LOAD( "cop420l_nnk", 0x0000, 0x0400, CRC(a84dd5f4) SHA1(5d269816248319a2bca1708d5022af455d52682d) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Look Alive! Football (model 1998)
+  * COP421L MCU die bonded directly to PCB (rom serial HCJ)
+  * 2 7seg LEDs, LED matrix and overlay mask, 1-bit sound
+
+  For a detailed description, see patent US4582323. 1st-person view versions
+  for Baseball and Basketball were also announced, but not released.
+
+***************************************************************************/
+
+class lafootb_state : public hh_cop400_state
+{
+public:
+	lafootb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void lafootb(machine_config &config);
+
+private:
+	void update_display();
+	void write_l(u8 data);
+	void write_d(u8 data);
+	u8 read_g();
+};
+
+// handlers
+
+void lafootb_state::update_display()
+{
+	m_display->matrix(~m_d, m_l);
+}
+
+void lafootb_state::write_l(u8 data)
+{
+	// L: led data
+	m_l = data;
+	update_display();
+}
+
+void lafootb_state::write_d(u8 data)
+{
+	// D: led select, D2,D3: input mux
+	m_d = data & 0xf;
+	m_inp_mux = data >> 2 & 3;
+	update_display();
+}
+
+u8 lafootb_state::read_g()
+{
+	// G: multiplexed inputs
+	return read_inputs(2, 7) | (m_inputs[2]->read() & 8);
+}
+
+// config
+
+static INPUT_PORTS_START( lafootb )
+	PORT_START("IN.0") // D2 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Right / Home")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Kick / Yards to go")
+
+	PORT_START("IN.1") // D3 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Left / Visitors")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Up / Time")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Pass / Status")
+
+	PORT_START("IN.2") // G3
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+void lafootb_state::lafootb(machine_config &config)
+{
+	// basic machine hardware
+	COP421(config, m_maincpu, 900000); // approximation - RC osc. R=51K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_l().set(FUNC(lafootb_state::write_l));
+	m_maincpu->write_d().set(FUNC(lafootb_state::write_d));
+	m_maincpu->read_g().set(FUNC(lafootb_state::read_g));
+	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+
+	// video hardware
+	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	mask.set_refresh_hz(60);
+	mask.set_size(1920, 864);
+	mask.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0x4, 0x7f);
+	m_display->set_segmask(0x8, 0xff); // right digit has dp
+	m_display->set_bri_levels(0.005);
+	config.set_default_layout(layout_lafootb);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( lafootb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421l_hcj", 0x0000, 0x0400, CRC(a9cc1e94) SHA1(7a39f5a5f10b8a2bd72da3ff3f3fcfaad35ead5f) )
+
+	ROM_REGION( 38608, "mask", 0)
+	ROM_LOAD( "lafootb.svg", 0, 38608, CRC(35387445) SHA1(7cd9db170820fc84d47545c3db8d991b2c5f4f7f) )
 ROM_END
 
 
@@ -1181,12 +1496,14 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void mdallas(machine_config &config);
+
+private:
 	void update_display();
 	void write_l(u8 data);
 	void write_d(u8 data);
 	void write_g(u8 data);
 	u8 read_in();
-	void mdallas(machine_config &config);
 };
 
 // handlers
@@ -1227,7 +1544,7 @@ u8 mdallas_state::read_in()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     <  ON>  [YES]   [NO]   [NEXT]
     [<W]    [^N]    [Sv]   [E>]
@@ -1277,7 +1594,7 @@ INPUT_PORTS_END
 
 void mdallas_state::mdallas(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP444L(config, m_maincpu, 1000000); // approximation - RC osc. R=57K, C=101pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(mdallas_state::write_l));
@@ -1286,12 +1603,12 @@ void mdallas_state::mdallas(machine_config &config)
 	m_maincpu->read_in().set(FUNC(mdallas_state::read_in));
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_mdallas);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1300,7 +1617,7 @@ void mdallas_state::mdallas(machine_config &config)
 
 ROM_START( mdallas )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "copl444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
+	ROM_LOAD( "cop444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
 ROM_END
 
 
@@ -1325,10 +1642,12 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void plus1(machine_config &config);
+
+private:
 	void write_d(u8 data);
 	void write_l(u8 data);
 	u8 read_l();
-	void plus1(machine_config &config);
 };
 
 // handlers
@@ -1369,7 +1688,7 @@ INPUT_PORTS_END
 
 void plus1_state::plus1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=51K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(plus1_state::write_d));
@@ -1377,9 +1696,9 @@ void plus1_state::plus1(machine_config &config)
 	m_maincpu->write_l().set(FUNC(plus1_state::write_l));
 	m_maincpu->read_l().set(FUNC(plus1_state::read_l));
 
-	/* no visual feedback! */
+	// no visual feedback!
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1422,12 +1741,14 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void lightfgt(machine_config &config);
+
+private:
 	void update_display();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	void write_d(u8 data);
 	void write_l(u8 data);
 	u8 read_g();
-	void lightfgt(machine_config &config);
 };
 
 // handlers
@@ -1503,7 +1824,7 @@ INPUT_PORTS_END
 
 void lightfgt_state::lightfgt(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP421(config, m_maincpu, 950000); // approximation - RC osc. R=82K, C=56pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_so().set(FUNC(lightfgt_state::write_so));
@@ -1512,11 +1833,11 @@ void lightfgt_state::lightfgt(machine_config &config)
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	m_maincpu->read_g().set(FUNC(lightfgt_state::read_g));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5, 5);
 	config.set_default_layout(layout_lightfgt);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1548,12 +1869,14 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void bship82(machine_config &config);
+
+private:
 	void write_d(u8 data);
 	void write_g(u8 data);
 	u8 read_l();
 	u8 read_in();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
-	void bship82(machine_config &config);
 };
 
 // handlers
@@ -1654,7 +1977,7 @@ INPUT_PORTS_END
 
 void bship82_state::bship82(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 750000); // approximation - RC osc. R=14K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(bship82_state::write_d));
@@ -1664,11 +1987,11 @@ void bship82_state::bship82(machine_config &config)
 	m_maincpu->write_so().set(FUNC(bship82_state::write_so));
 	m_maincpu->read_si().set_ioport("IN.4");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship82);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[8] = { 0.0, 1.0/7.0, 2.0/7.0, 3.0/7.0, 4.0/7.0, 5.0/7.0, 6.0/7.0, 1.0 };
@@ -1705,13 +2028,15 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void qkracer(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_in();
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
-	void qkracer(machine_config &config);
 };
 
 // handlers
@@ -1770,13 +2095,13 @@ static INPUT_PORTS_START( qkracer )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.2") // G1 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.3") // G2 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
@@ -1793,7 +2118,7 @@ INPUT_PORTS_END
 
 void qkracer_state::qkracer(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 950000); // approximation - RC osc. R=47K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(qkracer_state::write_d));
@@ -1802,13 +2127,13 @@ void qkracer_state::qkracer(machine_config &config)
 	m_maincpu->read_in().set(FUNC(qkracer_state::read_in));
 	m_maincpu->write_sk().set(FUNC(qkracer_state::write_sk));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
 	config.set_default_layout(layout_qkracer);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -1816,6 +2141,155 @@ void qkracer_state::qkracer(machine_config &config)
 ROM_START( qkracer )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420-npg_n", 0x0000, 0x0400, CRC(17f8e538) SHA1(23d1a1819e6ba552d8da83da2948af1cf5b13d5b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  SCAT specialist calculators
+  * COP404LSN-5 MCU (no internal ROM)
+  * 2KB EPROM (ETC2716Q)
+  * 8-digit 7seg led display
+
+  SCAT = aka South Carolina(SC) Applied Technology, Inc.
+
+  Known products, assumed to be all on the same hardware:
+  - The Dimension (aka Feet & Inch Calculator)
+  - The Solution
+  - Metalmate
+
+  CKI was measured ~1.469MHz, but D0 was measured ~77.44Hz so that means real
+  clock speed is a bit higher than CKI measurement, and the clock divider is 32.
+
+***************************************************************************/
+
+class scat_state : public hh_cop400_state
+{
+public:
+	scat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void scat(machine_config &config);
+
+private:
+	void main_map(address_map &map);
+
+	void update_display();
+	void write_d(u8 data);
+	void write_g(u8 data);
+	void write_l(u8 data);
+	u8 read_in();
+};
+
+// handlers
+
+void scat_state::update_display()
+{
+	m_display->matrix(~(m_d | m_g << 4), bitswap<8>(m_l,0,1,2,3,4,5,6,7));
+}
+
+void scat_state::write_d(u8 data)
+{
+	// D: select digit, input mux (low)
+	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
+	m_d = data & 0xf;
+	update_display();
+}
+
+void scat_state::write_g(u8 data)
+{
+	// G: select digit, input mux (high)
+	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
+	m_g = data & 0xf;
+	update_display();
+}
+
+void scat_state::write_l(u8 data)
+{
+	// L: digit segment data
+	m_l = data;
+	update_display();
+}
+
+u8 scat_state::read_in()
+{
+	// IN: multiplexed inputs
+	return read_inputs(6, 0xf);
+}
+
+void scat_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
+
+// config
+
+static INPUT_PORTS_START( solution )
+	PORT_START("IN.0") // D0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / Enter")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+ / ppm")
+
+	PORT_START("IN.1") // D1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Atoms / Mole")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Atomic Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("- / %")
+
+	PORT_START("IN.2") // D2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / Density Wntd.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Orig. Density")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Eq. Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"× / Normal")
+
+	PORT_START("IN.3") // D3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7 / Conc. Wntd.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8 / Orig. Conc.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / Fmla. Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷ / Molar")
+
+	PORT_START("IN.4") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Milli.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Micro.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Gram")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Liter")
+
+	PORT_START("IN.5") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Known Vol.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Known Wt.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Dil. Wntd.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
+INPUT_PORTS_END
+
+void scat_state::scat(machine_config &config)
+{
+	// basic machine hardware
+	COP404L(config, m_maincpu, 1500000); // R/C OSC via MM74C14N
+	m_maincpu->set_config(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &scat_state::main_map);
+	m_maincpu->write_d().set(FUNC(scat_state::write_d));
+	m_maincpu->write_g().set(FUNC(scat_state::write_g));
+	m_maincpu->write_l().set(FUNC(scat_state::write_l));
+	m_maincpu->read_in().set(FUNC(scat_state::read_in));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
+	config.set_default_layout(layout_scat);
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( solution )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "etc2716q", 0x0000, 0x0800, CRC(cf990f88) SHA1(6d505fdc94028cbdf6445df9e9451156a9d5f372) ) // no custom label
 ROM_END
 
 
@@ -1846,11 +2320,13 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
+	void vidchal(machine_config &config);
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
-	void vidchal(machine_config &config);
 };
 
 // handlers
@@ -1893,7 +2369,7 @@ INPUT_PORTS_END
 
 void vidchal_state::vidchal(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	COP420(config, m_maincpu, 900000); // approximation
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(vidchal_state::write_d));
@@ -1902,12 +2378,12 @@ void vidchal_state::vidchal(machine_config &config)
 	m_maincpu->read_in().set_ioport("IN.0");
 	m_maincpu->write_sk().set(FUNC(vidchal_state::write_sk));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6+1, 8);
 	m_display->set_segmask(0x3f, 0xff);
 	config.set_default_layout(layout_vidchal);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
 }
@@ -1942,16 +2418,21 @@ CONS( 1980, unkeinv,    0,         0, unkeinv,    unkeinv,    unkeinv_state,   e
 
 CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  empty_init, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
-CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, funtag,     0,         0, funtag,     funtag,     funtag_state,    empty_init, "Mattel", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel Electronics", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel Electronics", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, funtag,     0,         0, funtag,     funtag,     funtag_state,    empty_init, "Mattel Electronics", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, mbaskb2,    0,         0, mbaskb2,    mbaskb2,    mbaskb2_state,   empty_init, "Mattel Electronics", "Basketball 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, msoccer2,   0,         0, msoccer2,   msoccer2,   mbaskb2_state,   empty_init, "Mattel Electronics", "Soccer 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, lafootb,    0,         0, lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel Electronics", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel Electronics", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
 CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   empty_init, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1979, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
+COMP( 1984, solution,   0,         0, scat,       solution,   scat_state,      empty_init, "SCAT", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 

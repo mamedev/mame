@@ -726,24 +726,12 @@ static const gfx_layout helper8x8x8_layout =
 	8 * 8 * 8
 };
 
-static const gfx_layout helper8x8x4_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,8*4)  },
-	8 * 8 * 4
-};
-
-
 static GFXDECODE_START( gfx_helper )
 	// dummy standard decodes to see background tiles, not used for drawing
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x8_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x4_layout,  0x0, 32  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x8x8_layout,    0x0, 2  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper8x8x4_layout,    0x0, 32  )
+	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_msb,  0x0, 32  )
 GFXDECODE_END
 
 

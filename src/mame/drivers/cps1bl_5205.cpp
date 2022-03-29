@@ -84,7 +84,7 @@ private:
 	void sf2mdt_map(address_map &map);
 	void captcommb2_z80map(address_map &map);
 
-	bool m_captcommb2_mux_toggle;
+	bool m_captcommb2_mux_toggle = false;
 
 	optional_device_array<ls157_device, 2> m_msm_mux;
 };

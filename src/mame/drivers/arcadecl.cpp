@@ -290,20 +290,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout molayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
-
 static GFXDECODE_START( gfx_arcadecl )
-	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,  256, 16 )
 GFXDECODE_END
 
 

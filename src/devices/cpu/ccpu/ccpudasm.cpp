@@ -23,6 +23,7 @@ offs_t ccpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	unsigned startpc = pc;
 	uint8_t opcode = opcodes.r8(pc++);
 	uint8_t tempval;
+	offs_t flags = 0;
 
 	switch (opcode)
 	{
@@ -85,31 +86,37 @@ offs_t ccpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		/* JMIB/JEHB */
 		case 0x51:
 			util::stream_format(stream, "JMIB/JEHB");
+			flags = STEP_COND;
 			break;
 
 		/* JVNB */
 		case 0x52:
 			util::stream_format(stream, "JVNB");
+			flags = STEP_COND;
 			break;
 
 		/* JLTB */
 		case 0x53:
 			util::stream_format(stream, "JLTB");
+			flags = STEP_COND;
 			break;
 
 		/* JEQB */
 		case 0x54:
 			util::stream_format(stream, "JEQB");
+			flags = STEP_COND;
 			break;
 
 		/* JCZB */
 		case 0x55:
 			util::stream_format(stream, "JCZB");
+			flags = STEP_COND;
 			break;
 
 		/* JOSB */
 		case 0x56:
 			util::stream_format(stream, "JOSB");
+			flags = STEP_COND;
 			break;
 
 		/* SSA */
@@ -125,31 +132,37 @@ offs_t ccpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		/* JMI/JEH */
 		case 0x59:
 			util::stream_format(stream, "JMI/JEH");
+			flags = STEP_COND;
 			break;
 
 		/* JVN */
 		case 0x5a:
 			util::stream_format(stream, "JVN");
+			flags = STEP_COND;
 			break;
 
 		/* JLT */
 		case 0x5b:
 			util::stream_format(stream, "JLT");
+			flags = STEP_COND;
 			break;
 
 		/* JEQ */
 		case 0x5c:
 			util::stream_format(stream, "JEQ");
+			flags = STEP_COND;
 			break;
 
 		/* JCZ */
 		case 0x5d:
 			util::stream_format(stream, "JCZ");
+			flags = STEP_COND;
 			break;
 
 		/* JOS */
 		case 0x5e:
 			util::stream_format(stream, "JOS");
+			flags = STEP_COND;
 			break;
 
 		/* NOP */
@@ -330,5 +343,5 @@ offs_t ccpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			break;
 	}
 
-	return (pc - startpc) | SUPPORTED;
+	return (pc - startpc) | flags | SUPPORTED;
 }

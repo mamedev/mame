@@ -62,17 +62,17 @@ private:
 
 	output_finder<> m_led;
 
-	uint8_t m_magicram_control;
-	uint8_t m_last_shift_data;
-	uint8_t m_intercept;
-	emu_timer *m_irq_timer;
-	emu_timer *m_nmi_timer;
-	uint8_t m_irq_enabled;
-	uint8_t m_nmi_enabled;
-	int m_p1_counter_74ls161;
-	int m_p1_direction;
-	int m_p2_counter_74ls161;
-	int m_p2_direction;
+	uint8_t m_magicram_control = 0;
+	uint8_t m_last_shift_data = 0;
+	uint8_t m_intercept = 0;
+	emu_timer *m_irq_timer = nullptr;
+	emu_timer *m_nmi_timer = nullptr;
+	uint8_t m_irq_enabled = 0;
+	uint8_t m_nmi_enabled = 0;
+	int m_p1_counter_74ls161 = 0;
+	int m_p1_direction = 0;
+	int m_p2_counter_74ls161 = 0;
+	int m_p2_direction = 0;
 
 	uint8_t led_on_r();
 	void led_on_w(uint8_t data);

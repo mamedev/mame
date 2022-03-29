@@ -41,13 +41,13 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_tilemap;
-	tilemap_t    *m_textmap;
-	int        m_video_ctrl;
-	int        m_flipscreen;
+	tilemap_t    *m_tilemap = nullptr;
+	tilemap_t    *m_textmap = nullptr;
+	int        m_video_ctrl = 0;
+	int        m_flipscreen = 0;
 
 	/* misc */
-	int        m_sound_status;
+	int        m_sound_status = 0;
 	void bank_select_w(uint8_t data);
 	void latch_w(uint8_t data);
 	uint8_t sound_status_r();

@@ -24,7 +24,7 @@
     Notes:
     - The hardware has some similarities to cit220.cpp
     - Everything here is guessed (including the system name), no docs available
-	- Other (undumped) terminals from Tab:
+    - Other (undumped) terminals from Tab:
       * 132/15: VT52/VT100/VT132 (1982)
       * 132/15-G: Tektronix graphics (1982)
       * 132/15-H: Honeywell (1983)
@@ -90,7 +90,7 @@ private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 	void palette(palette_device &palette) const;
 
-	bool m_screen_light;
+	bool m_screen_light = false;
 };
 
 

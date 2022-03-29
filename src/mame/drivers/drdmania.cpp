@@ -89,7 +89,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_fgram;
 
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	uint8_t unk_port00_r();
 

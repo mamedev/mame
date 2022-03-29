@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.15" green="0.015" blue="0.0225" /></disk>
+		<disk state="1"><color red="0.65" green="0.07" blue="0.1" /></disk>
+		<disk state="2"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.65" green="0.07" blue="0.1" /></led7seg>
+	</element>
+
+	<element name="text_l1"><text string="Speedway"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l2"><text string="Brain Drain"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l3"><text string="Blackjack"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l4"><text string="Calculator"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="8" right="41.5" top="-1" bottom="11" />
+
+		<repeat count="4">
+			<param name="x" start="11.25" increment="8.333" />
+			<param name="i" start="12" increment="1" />
+
+			<element name="~i~.a" ref="led"><bounds x="~x~" y="0" width="2" height="2" /></element>
+		</repeat>
+
+		<repeat count="4">
+			<param name="x" start="6.25" increment="8.333" />
+			<param name="i" start="1" increment="1" />
+
+			<element ref="text_l~i~"><bounds x="~x~" y="2" width="12" height="1.75" /></element>
+		</repeat>
+
+		<repeat count="12">
+			<param name="x" start="10" increment="2.5" />
+			<param name="i" start="11" increment="-1" />
+
+			<element name="digit~i~" ref="digit"><bounds x="~x~" y="7.1" width="2" height="2.9" /></element>
+			<element name="multi~i~.2" ref="digit" blend="add"><bounds x="~x~" y="7.1" width="2" height="2.9" /></element>
+		</repeat>
+
+	</view>
+</mamelayout>

@@ -58,10 +58,10 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_irq_mask;
-	uint8_t m_SN76496_latch;
+	uint8_t m_irq_mask = 0U;
+	uint8_t m_SN76496_latch = 0U;
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
@@ -69,8 +69,8 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; };
-	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); };
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

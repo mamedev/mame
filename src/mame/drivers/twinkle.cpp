@@ -346,24 +346,24 @@ private:
 	output_finder<2, 7> m_key_leds;
 	output_finder<8> m_spu_leds;
 
-	uint16_t m_spu_ctrl;      // SPU board control register
-	uint32_t m_spu_ata_dma;
-	int m_spu_ata_dmarq;
-	uint32_t m_wave_bank;
+	uint16_t m_spu_ctrl = 0;      // SPU board control register
+	uint32_t m_spu_ata_dma = 0;
+	int m_spu_ata_dmarq = 0;
+	uint32_t m_wave_bank = 0;
 
-	int m_io_offset;
-	int m_output_last[ 0x100 ];
-	uint8_t m_sector_buffer[ 4096 ];
+	int m_io_offset = 0;
+	int m_output_last[ 0x100 ]{};
+	uint8_t m_sector_buffer[ 4096 ]{};
 
-	int m_serial_shift;
-	int m_serial_bits;
-	int m_serial_cs;
-	int m_serial_clock;
+	int m_serial_shift = 0;
+	int m_serial_bits = 0;
+	int m_serial_cs = 0;
+	int m_serial_clock = 0;
 
-	int m_output_shift;
-	int m_output_bits;
-	int m_output_cs;
-	int m_output_clock;
+	int m_output_shift = 0;
+	int m_output_bits = 0;
+	int m_output_cs = 0;
+	int m_output_clock = 0;
 
 	static void cdrom_config(device_t *device);
 };

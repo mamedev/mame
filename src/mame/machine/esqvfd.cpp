@@ -140,7 +140,7 @@ void esqvfd_device::device_reset()
 	memset(m_dirty, 1, sizeof(m_attrs));
 }
 
-void esqvfd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void esqvfd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 }
 

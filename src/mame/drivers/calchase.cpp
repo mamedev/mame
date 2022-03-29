@@ -172,10 +172,10 @@ private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
-	uint8_t m_mtxc_config_reg[256];
-	uint8_t m_piix4_config_reg[4][256];
+	uint8_t m_mtxc_config_reg[256]{};
+	uint8_t m_piix4_config_reg[4][256]{};
 
-	uint32_t m_idle_skip_ram;
+	uint32_t m_idle_skip_ram = 0;
 	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t nvram_r(offs_t offset);

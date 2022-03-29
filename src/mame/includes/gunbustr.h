@@ -11,12 +11,12 @@
 
 struct gb_tempsprite
 {
-	int gfx;
-	int code,color;
-	int flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int primask;
+	int gfx = 0;
+	int code = 0, color = 0;
+	int flipx,flipy = 0;
+	int x = 0, y = 0;
+	int zoomx = 0, zoomy = 0;
+	int primask = 0;
 };
 
 class gunbustr_state : public driver_device
@@ -62,8 +62,8 @@ private:
 	required_ioport_array<2> m_io_light_y;
 
 	bool m_coin_lockout;
-	std::unique_ptr<gb_tempsprite[]> m_spritelist;
-	emu_timer *m_interrupt5_timer;
+	std::unique_ptr<gb_tempsprite[]> m_spritelist{};
+	emu_timer *m_interrupt5_timer = nullptr;
 
 	void motor_control_w(u32 data);
 	u32 gun_r();
@@ -77,7 +77,7 @@ private:
 
 	void gunbustr_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_GUNBUSTR_H

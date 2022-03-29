@@ -58,17 +58,17 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram2;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	int32_t m_flipx;
-	int32_t m_flipy;
-	int32_t m_bgcolor;
-	uint8_t m_charbank[2];
-	uint8_t m_palbank[2];
-	uint8_t m_main_nmi_mask;
-	uint8_t m_sound_nmi_mask;
-	uint8_t m_sprite_bank;
+	int32_t m_flipx = 0;
+	int32_t m_flipy = 0;
+	int32_t m_bgcolor = 0;
+	uint8_t m_charbank[2]{};
+	uint8_t m_palbank[2]{};
+	uint8_t m_main_nmi_mask = 0;
+	uint8_t m_sound_nmi_mask = 0;
+	uint8_t m_sprite_bank = 0;
 
-	int m_dsc0;
-	int m_dsc1;
+	int m_dsc0 = 0;
+	int m_dsc1 = 0;
 
 	uint8_t wiz_protection_r();
 	void wiz_coin_counter_w(offs_t offset, uint8_t data);

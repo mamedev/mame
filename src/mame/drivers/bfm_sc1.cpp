@@ -189,28 +189,28 @@ protected:
 	void sc1_viper(address_map &map);
 
 private:
-	int m_mmtr_latch;
-	int m_triac_latch;
-	int m_vfd_latch;  //initialized but not used
-	int m_irq_status;
-	int m_optic_pattern;
+	int m_mmtr_latch = 0;
+	int m_triac_latch = 0;
+	int m_vfd_latch = 0;  //initialized but not used
+	int m_irq_status = 0;
+	int m_optic_pattern = 0;
 
-	int m_acia_status;
-	int m_locked;
-	int m_is_timer_enabled;
-	int m_coin_inhibits; //initialized but not used
-	int m_mux1_outputlatch;
-	int m_mux1_datalo;
-	int m_mux1_datahi;
-	int m_mux1_input;
-	int m_mux2_outputlatch;
-	int m_mux2_datalo;
-	int m_mux2_datahi;
-	int m_mux2_input;
-	uint8_t m_sc1_Inputs[64];
-	uint8_t m_codec_data[256];
+	int m_acia_status = 0;
+	int m_locked = 0;
+	int m_is_timer_enabled = 0;
+	int m_coin_inhibits = 0; //initialized but not used
+	int m_mux1_outputlatch = 0;
+	int m_mux1_datalo = 0;
+	int m_mux1_datahi = 0;
+	int m_mux1_input = 0;
+	int m_mux2_outputlatch = 0;
+	int m_mux2_datalo = 0;
+	int m_mux2_datahi = 0;
+	int m_mux2_input = 0;
+	uint8_t m_sc1_Inputs[64]{};
+	uint8_t m_codec_data[256]{};
 
-	int m_defaultbank;
+	int m_defaultbank = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 6> m_reels;
 	optional_device<upd7759_device> m_upd7759;

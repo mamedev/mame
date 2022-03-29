@@ -65,14 +65,14 @@ private:
 
 	/* video-related */
 	typedef pen_t (cosmic_state::*color_func)(uint8_t x, uint8_t y);
-	color_func     m_map_color;
-	int            m_color_registers[3];
-	int            m_background_enable;
-	int            m_magspot_pen_mask;
+	color_func     m_map_color{};
+	int            m_color_registers[3]{};
+	int            m_background_enable = 0;
+	int            m_magspot_pen_mask = 0;
 
 	/* sound-related */
 	int            m_sound_enabled;
-	int            m_dive_bomb_b_select;
+	int            m_dive_bomb_b_select = 0;
 
 	/* misc */
 	optional_ioport_array<4> m_in_ports;

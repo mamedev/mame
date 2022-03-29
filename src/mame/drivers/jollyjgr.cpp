@@ -154,15 +154,15 @@ private:
 	optional_shared_ptr<uint8_t> m_bulletram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t      m_nmi_enable;
-	uint8_t      m_flip_x;
-	uint8_t      m_flip_y;
-	uint8_t      m_bitmap_disable;
-	uint8_t      m_tilemap_bank;
-	uint8_t      m_pri;
+	uint8_t      m_nmi_enable = 0;
+	uint8_t      m_flip_x = 0;
+	uint8_t      m_flip_y = 0;
+	uint8_t      m_bitmap_disable = 0;
+	uint8_t      m_tilemap_bank = 0;
+	uint8_t      m_pri = 0;
 	void jollyjgr_videoram_w(offs_t offset, uint8_t data);
 	void jollyjgr_attrram_w(offs_t offset, uint8_t data);
 	void jollyjgr_misc_w(uint8_t data);

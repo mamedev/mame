@@ -114,27 +114,27 @@ protected: // HACK FOR MC6845
 	required_memory_bank_array<4> m_bankhandler_r, m_bankhandler_w;
 
 	char m_memory_config[4];
-	emu_timer *m_keyboard_timer;
-	int m_membank_rom_mask;
-	int m_membank_internal_ram_mask;
-	uint8_t m_poweroff_control;
-	int m_card_status;
-	unsigned char m_uart_control;
-	int m_irq_mask;
-	int m_irq_status;
-	int m_irq_latch;
-	int m_irq_latch_mask;
+	emu_timer *m_keyboard_timer = nullptr;
+	int m_membank_rom_mask = 0;
+	int m_membank_internal_ram_mask = 0;
+	uint8_t m_poweroff_control = 0;
+	int m_card_status = 0;
+	unsigned char m_uart_control = 0;
+	int m_irq_mask = 0;
+	int m_irq_status = 0;
+	int m_irq_latch = 0;
+	int m_irq_latch_mask = 0;
 	int m_sound_channel_periods[2];
-	int m_previous_inputport_10_state;
-	int m_previous_alarm_state;
-	memory_region *m_card_ram;
-	int m_membank_card_ram_mask;
-	int m_card_size;
-	unsigned long m_display_memory_start;
+	int m_previous_inputport_10_state = 0;
+	int m_previous_alarm_state = 0;
+	memory_region *m_card_ram = nullptr;
+	int m_membank_card_ram_mask = 0;
+	int m_card_size = 0;
+	unsigned long m_display_memory_start = 0;
 	const nc_type m_nc_type;
 
-	int m_centronics_ack;
-	int m_centronics_busy;
+	int m_centronics_ack = 0;
+	int m_centronics_busy = 0;
 };
 
 
@@ -204,8 +204,8 @@ private:
 	void nc200_video_set_backlight(int state);
 	void nc200_refresh_uart_interrupt();
 
-	uint8_t m_nc200_uart_interrupt_irq;
-	int m_nc200_backlight;
+	uint8_t m_nc200_uart_interrupt_irq = 0;
+	int m_nc200_backlight = 0;
 };
 
 

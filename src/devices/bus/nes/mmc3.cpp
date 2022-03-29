@@ -79,8 +79,13 @@ nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_TQROM, tag, owner, clock)
+nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_tqrom_device(mconfig, NES_TQROM, tag, owner, clock)
 {
 }
 
@@ -357,7 +362,7 @@ uint8_t nes_txrom_device::read_m(offs_t offset)
 			return m_prgram[offset & (m_prgram.size() - 1)];
 	}
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 
@@ -393,10 +398,10 @@ uint8_t nes_hkrom_device::read_m(offs_t offset)
 	LOG_MMC(("hkrom read_m, offset: %04x\n", offset));
 
 	if (offset < 0x1000)
-		return get_open_bus();    // open bus
+		return get_open_bus();
 
 	if (!(m_mmc6_reg & 0xa0))
-		return get_open_bus();    // open bus
+		return get_open_bus();
 
 	if (BIT(offset, 9) && BIT(m_mmc6_reg, 7))   // access to upper half of 1k when upper read is enabled
 		return m_mmc6_ram[offset & 0x3ff];

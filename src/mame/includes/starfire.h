@@ -67,7 +67,7 @@ protected:
 
 	virtual uint8_t input_r(offs_t offset) = 0;
 	virtual void sound_w(offs_t offset, uint8_t data) = 0;
-	virtual void music_w(offs_t offset, uint8_t data) { };
+	virtual void music_w(offs_t offset, uint8_t data) { }
 
 	void scratch_w(offs_t offset, uint8_t data);
 	uint8_t scratch_r(offs_t offset);
@@ -178,7 +178,7 @@ private:
 	virtual void sound_w(offs_t offset, uint8_t data) override;
 	virtual void music_w(offs_t offset, uint8_t data) override;
 
-	uint8_t m_player_select;
+	uint8_t m_player_select = 0;
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 

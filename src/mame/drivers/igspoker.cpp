@@ -84,6 +84,8 @@ TODO:
 #include "igspoker.lh"
 
 
+namespace {
+
 #define VERBOSE 0
 
 
@@ -124,17 +126,23 @@ public:
 	void init_igs_ncs2();
 	void init_cpokerpk();
 	void init_kungfu();
+	void init_kungfua();
 
 	DECLARE_READ_LINE_MEMBER(hopper_r);
 
+protected:
+	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	uint8_t igs_irqack_r();
-	void igs_irqack_w(uint8_t data);
+	uint8_t irqack_r();
+	void irqack_w(uint8_t data);
 	void bg_tile_w(offs_t offset, uint8_t data);
 	void fg_tile_w(offs_t offset, uint8_t data);
 	void fg_color_w(offs_t offset, uint8_t data);
-	void igs_nmi_and_coins_w(uint8_t data);
-	void igs_lamps_w(uint8_t data);
+	void nmi_and_coins_w(uint8_t data);
+	void lamps_w(uint8_t data);
 	uint8_t custom_io_r();
 	void custom_io_w(uint8_t data);
 	uint8_t exp_rom_r(offs_t offset);
@@ -143,18 +151,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(cpokerpk);
-	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void cpokerpk_io_map(address_map &map);
 	void igspoker_io_map(address_map &map);
 	void igspoker_prg_map(address_map &map);
 	void number10_io_map(address_map &map);
-
-	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_bg_tile_ram;
@@ -165,13 +169,13 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<> m_led;
 	output_finder<6> m_lamps;
-	int m_nmi_enable;
-	int m_bg_enable;
-	int m_hopper;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_out[3];
-	uint8_t m_protection_res;
+	int m_nmi_enable = 0;
+	int m_bg_enable = 0;
+	int m_hopper = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_out[3]{};
+	uint8_t m_protection_res = 0;
 };
 
 
@@ -183,7 +187,7 @@ void igspoker_state::machine_reset()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::interrupt)
 {
 	int scanline = param;
 
@@ -198,13 +202,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
 }
 
 
-uint8_t igspoker_state::igs_irqack_r()
+uint8_t igspoker_state::irqack_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
-void igspoker_state::igs_irqack_w(uint8_t data)
+void igspoker_state::irqack_w(uint8_t data)
 {
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -249,7 +253,7 @@ void igspoker_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igspoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -281,7 +285,7 @@ void igspoker_state::show_out()
 #endif
 }
 
-void igspoker_state::igs_nmi_and_coins_w(uint8_t data)
+void igspoker_state::nmi_and_coins_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
 	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
@@ -299,7 +303,7 @@ void igspoker_state::igs_nmi_and_coins_w(uint8_t data)
 	show_out();
 }
 
-void igspoker_state::igs_lamps_w(uint8_t data)
+void igspoker_state::lamps_w(uint8_t data)
 {
 /*
     - Lbits -
@@ -351,9 +355,8 @@ uint8_t igspoker_state::custom_io_r()
 
 void igspoker_state::custom_io_w(uint8_t data)
 {
-#if VERBOSE
+
 	logerror("PC %06X: Protection write %02x\n",m_maincpu->pc(),data);
-#endif
 
 	switch (data)
 	{
@@ -424,10 +427,10 @@ void igspoker_state::igspoker_io_map(address_map &map)
 	map(0x4004, 0x4004).portr("DSW5");           /* DSW5 */
 	map(0x5080, 0x5083).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5090, 0x5090).w(FUNC(igspoker_state::custom_io_w));
-	map(0x5091, 0x5091).r(FUNC(igspoker_state::custom_io_r)).w(FUNC(igspoker_state::igs_lamps_w));            /* Keyboard */
+	map(0x5091, 0x5091).r(FUNC(igspoker_state::custom_io_r)).w(FUNC(igspoker_state::lamps_w));            /* Keyboard */
 	map(0x50a0, 0x50a0).portr("BUTTONS2");           /* Not connected */
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x50c0, 0x50c0).r(FUNC(igspoker_state::igs_irqack_r)).w(FUNC(igspoker_state::igs_irqack_w));
+	map(0x50c0, 0x50c0).r(FUNC(igspoker_state::irqack_r)).w(FUNC(igspoker_state::irqack_w));
 	map(0x6800, 0x6fff).ram().w(FUNC(igspoker_state::bg_tile_w)).share("bg_tile_ram");
 	map(0x7000, 0x77ff).ram().w(FUNC(igspoker_state::fg_tile_w)).share("fg_tile_ram");
 	map(0x7800, 0x7fff).ram().w(FUNC(igspoker_state::fg_color_w)).share("fg_color_ram");
@@ -1177,14 +1180,14 @@ void igspoker_state::number10_io_map(address_map &map)
 	map(0x4004, 0x4004).portr("DSW5");           /* DSW5 */
 	map(0x4006, 0x4006).portr("DSW6");
 	map(0x4007, 0x4007).portr("DSW7");
-	map(0x50f0, 0x50f0).w(FUNC(igspoker_state::igs_nmi_and_coins_w));
+	map(0x50f0, 0x50f0).w(FUNC(igspoker_state::nmi_and_coins_w));
 	map(0x5080, 0x5080).portr("SERVICE");            /* Services */
 	map(0x5090, 0x5090).w(FUNC(igspoker_state::custom_io_w));
-	map(0x5091, 0x5091).r(FUNC(igspoker_state::custom_io_r)).w(FUNC(igspoker_state::igs_lamps_w));            /* Keyboard */
+	map(0x5091, 0x5091).r(FUNC(igspoker_state::custom_io_r)).w(FUNC(igspoker_state::lamps_w));            /* Keyboard */
 	map(0x50a0, 0x50a0).portr("BUTTONS2");
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	map(0x50b0, 0x50b0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x50c0, 0x50c0).r(FUNC(igspoker_state::igs_irqack_r)).w(FUNC(igspoker_state::igs_irqack_w));
+	map(0x50c0, 0x50c0).r(FUNC(igspoker_state::irqack_r)).w(FUNC(igspoker_state::irqack_w));
 	map(0x7000, 0x77ff).ram().w(FUNC(igspoker_state::fg_tile_w)).share("fg_tile_ram");
 	map(0x7800, 0x7fff).ram().w(FUNC(igspoker_state::fg_color_w)).share("fg_color_ram");
 }
@@ -1199,15 +1202,15 @@ void igspoker_state::cpokerpk_io_map(address_map &map)
 	map(0x4002, 0x4002).portr("DSW3");           /* DSW3 */
 	map(0x4003, 0x4003).portr("DSW4");           /* DSW4 */
 	map(0x4004, 0x4004).portr("DSW5");           /* DSW5 */
-	map(0x50f0, 0x50f0).w(FUNC(igspoker_state::igs_nmi_and_coins_w));
+	map(0x50f0, 0x50f0).w(FUNC(igspoker_state::nmi_and_coins_w));
 	map(0x5081, 0x5081).portr("SERVICE");            /* Services */
 	map(0x5082, 0x5082).portr("COINS");          /* Coing & Kbd */
 	map(0x5090, 0x5090).w(FUNC(igspoker_state::custom_io_w));
-	map(0x5091, 0x5091).r(FUNC(igspoker_state::custom_io_r)).w(FUNC(igspoker_state::igs_lamps_w));            /* Keyboard */
+	map(0x5091, 0x5091).r(FUNC(igspoker_state::custom_io_r)).w(FUNC(igspoker_state::lamps_w));            /* Keyboard */
 	map(0x50a0, 0x50a0).portr("BUTTONS2");
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	map(0x50b0, 0x50b0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x50c0, 0x50c0).r(FUNC(igspoker_state::igs_irqack_r)).w(FUNC(igspoker_state::igs_irqack_w));
+	map(0x50c0, 0x50c0).r(FUNC(igspoker_state::irqack_r)).w(FUNC(igspoker_state::irqack_w));
 	map(0x7000, 0x77ff).ram().w(FUNC(igspoker_state::fg_tile_w)).share("fg_tile_ram");
 	map(0x7800, 0x7fff).ram().w(FUNC(igspoker_state::fg_color_w)).share("fg_color_ram");
 }
@@ -1936,10 +1939,10 @@ void igspoker_state::igspoker(machine_config &config)
 	Z80(config, m_maincpu, 3579545);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igspoker_state::igspoker_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &igspoker_state::igspoker_io_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(igspoker_state::igs_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igspoker_state::interrupt), "screen", 0, 1);
 
 	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set(FUNC(igspoker_state::igs_nmi_and_coins_w));
+	ppi.out_pa_callback().set(FUNC(igspoker_state::nmi_and_coins_w));
 	ppi.in_pb_callback().set_ioport("SERVICE");
 	ppi.in_pc_callback().set_ioport("COINS");
 
@@ -1949,7 +1952,7 @@ void igspoker_state::igspoker(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8); // TODO: wrong screen size!
 	m_screen->set_visarea(0*8, 64*8-1, 0, 32*8-1);
-	m_screen->set_screen_update(FUNC(igspoker_state::screen_update_igs_video));
+	m_screen->set_screen_update(FUNC(igspoker_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igspoker);
@@ -2902,7 +2905,18 @@ ROM_START( igstet341 )
 	ROM_LOAD( "tetris_3.u6",  0x00000, 0x20000, CRC(8159768d) SHA1(b28026afa8206adbc381dfa461eea842354ea5b6) )
 
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
+ROM_END
 
+ROM_START( igstet342 ) // PCB NO- 0159
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetris_v-342r.u23",  0x00000, 0x10000, CRC(f0414c5a) SHA1(e28e730de608f80815a4c6bdd846476093c3d846) )
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "tetris_1.u4",  0x40000, 0x20000, CRC(6bf90dd5) SHA1(280eb3a54cf5e4fbeeee25d87b10900bba360641) )
+	ROM_LOAD( "tetris_2.u5",  0x20000, 0x20000, CRC(7079e79e) SHA1(bc44c446e8a7ee9cb75695ca1c1a27f78e4b3e30) )
+	ROM_LOAD( "tetris_3.u6",  0x00000, 0x20000, CRC(8159768d) SHA1(b28026afa8206adbc381dfa461eea842354ea5b6) )
+
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
 ROM_END
 
 void igspoker_state::init_tet341()
@@ -2951,6 +2965,22 @@ void igspoker_state::init_pktet346()
 	rom[0xbb0c] = 0xc3;
 }
 
+ROM_START( kungfu ) // IGS PCB N0- 0139
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "kung fu v202n.u23", 0x00000, 0x10000, CRC(53396dd3) SHA1(1bab42394f016f800dbd80603c70defc25380fd7) )
+	ROM_LOAD( "kungfu-7.u22",      0x10000, 0x08000, CRC(0568f20b) SHA1(a51a10deee0d581b79d0fee354cedceaa660f55c) ) // 1ST AND 2ND HALF IDENTICAL, otherwise same as the other set
+	ROM_IGNORE(                             0x08000 )
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "kungfu-4.u4", 0x00000, 0x20000, CRC(df4afedb) SHA1(56ab18c46a199653c284417a8e9edc9f32374318) )
+	ROM_LOAD( "kungfu-5.u5", 0x20000, 0x20000, CRC(25c9c98e) SHA1(2d3a399d8d53ee5cb8106d2b35d1ab1778439f81) )
+	ROM_LOAD( "kungfu-6.u6", 0x40000, 0x20000, CRC(f1ec5f0d) SHA1(0aa888e13312ed5d98953c81f03a61c6175c7fec) )
+
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "kungfu-1.u1", 0x00000, 0x4000, CRC(abaada6b) SHA1(a6b910db7451e8ca737f43f32dfc8fc5ecf865f4) )
+	ROM_LOAD( "kungfu-2.u2", 0x10000, 0x4000, CRC(927b3060) SHA1(a780ea5aaee04287cc9533c2d258dc18f8426530) )
+	ROM_LOAD( "kungfu-3.u3", 0x20000, 0x4000, CRC(bbf78e03) SHA1(06fee093e75e2611d00c076c2e0a681938fa8b74) )
+ROM_END
 
 /*
 
@@ -2969,7 +2999,7 @@ Board silkscreend on top                    PCB NO.0013-B
 .41 27128   stickered   2
 .40 27128   stickered   1
 .98 27256   stickered   7   couldn't read chip, but board was silkscreened 27c256
-.97 27512   stickered   ?   looked like japanese writing
+.97 27512   stickered   ?   looked like Japanese writing
 .38 74s287
 .46 18cv8               <--- same checksum as .48
 .47 pal16l8a            <--- checksum was 0
@@ -2984,7 +3014,7 @@ open 24 pin socket @ u54
 
 */
 
-ROM_START( kungfu )
+ROM_START( kungfua )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	// u97 contains leftover x86 code at 0-3fff (compiled with Borland Turbo-C).
 	// You can rename the rom to kungfu.exe and run it (DOS MZ executable)!
@@ -3013,6 +3043,18 @@ ROM_END
 void igspoker_state::init_kungfu()
 {
 	uint8_t *rom = memregion("maincpu")->base();
+	for (int A = 0; A < 0x10000; A++)
+	{
+		rom[A] ^= 0x01;
+		if ((A & 0x0060) == 0x0020) rom[A] ^= 0x20;
+		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
+		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
+	}
+}
+
+void igspoker_state::init_kungfua()
+{
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int A = 0x4000; A < 0x10000; A++)
 	{
@@ -3020,6 +3062,8 @@ void igspoker_state::init_kungfu()
 	}
 	memset( &rom[0xf000], 0, 0x1000);
 }
+
+} // Anonymous namespace
 
 
 GAMEL( 1993?,cpoker,      0,      igspoker, cpoker,   igspoker_state, init_cpoker,      ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
@@ -3053,5 +3097,7 @@ GAMEL( 1998, stellecu,    0,        number10, number10, igspoker_state, empty_in
 
 GAMEL( 1993?,pktet346,    0,        pktetris, pktet346, igspoker_state, init_pktet346,  ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
 GAMEL( 199?, igstet341,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,    ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
+GAMEL( 199?, igstet342,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,    ROT0, "IGS",                  "Tetris (v342R)",                               0, layout_igspoker )
 
-GAMEL( 1992, kungfu,      0,        igspoker, cpoker,   igspoker_state, init_kungfu,    ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 199?, kungfu,     0,         igspoker, cpoker,   igspoker_state, init_kungfu,    ROT0, "IGS",                  "Kung Fu (IGS, v202N)",                         MACHINE_NOT_WORKING, layout_igspoker ) // decryption should be good, needs proper address map
+GAMEL( 1992, kungfua,    kungfu,    igspoker, cpoker,   igspoker_state, init_kungfua,   ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker ) // missing internal ROM dump

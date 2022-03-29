@@ -201,6 +201,8 @@ class Opcode:
             flags = "%d | STEP_OVER" % size
         elif self.name == "rts" or self.name == "rte":
             flags = "%d | STEP_OUT" % size
+        elif self.am1 == "rel8" and self.name != "bt" and self.name != "bf":
+            flags = "%d | STEP_COND" % size
         else:
             flags = "%d" % size
         

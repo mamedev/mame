@@ -43,15 +43,15 @@ protected:
 	optional_region_ptr_array<u8, 2> m_vrom;
 
 	// common
-	u8 m_bg_status;
-	u8 m_flipscreen;
-	u16 m_palette_intensity;
+	u8 m_bg_status = 0U;
+	u8 m_flipscreen = 0U;
+	u16 m_palette_intensity = 0U;
 
 	// argus specific
-	u8 m_vrom_offset;
+	u8 m_vrom_offset = 0U;
 
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg_tilemap[2];
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap[2]{};
 
 	// common
 	void bankselect_w(u8 data);
@@ -129,10 +129,10 @@ private:
 
 	void valtric_map(address_map &map);
 
-	u8 m_valtric_mosaic;
-	bitmap_rgb32 m_mosaicbitmap;
-	u8 m_valtric_unknown;
-	int m_mosaic;
+	u8 m_valtric_mosaic = 0U;
+	bitmap_rgb32 m_mosaicbitmap = 0;
+	u8 m_valtric_unknown = 0U;
+	int m_mosaic = 0;
 };
 
 class butasan_state : public argus_common_state
@@ -175,12 +175,12 @@ private:
 
 	required_shared_ptr<u8> m_butasan_bg1ram;
 
-	u8 *m_butasan_txram;
-	u8 *m_butasan_bg0ram;
-	u8 *m_butasan_bg0backram;
-	u8 *m_butasan_txbackram;
-	std::unique_ptr<u8[]> m_butasan_pagedram[2];
-	u8 m_butasan_page_latch;
-	u8 m_butasan_bg1_status;
-	u8 m_butasan_unknown;
+	u8 *m_butasan_txram = nullptr;
+	u8 *m_butasan_bg0ram = nullptr;
+	u8 *m_butasan_bg0backram = nullptr;
+	u8 *m_butasan_txbackram = nullptr;
+	std::unique_ptr<u8[]> m_butasan_pagedram[2]{};
+	u8 m_butasan_page_latch = 0U;
+	u8 m_butasan_bg1_status = 0U;
+	u8 m_butasan_unknown = 0U;
 };

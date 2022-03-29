@@ -57,7 +57,7 @@ private:
 	void bios_w(offs_t offset, uint8_t data);
 	void eeprom_w(uint8_t data);
 
-	uint16_t m_pci_shadow_reg;
+	uint16_t m_pci_shadow_reg = 0;
 
 	void photoply_io(address_map &map);
 	void photoply_map(address_map &map);
@@ -280,7 +280,10 @@ void photoply_state::photoply(machine_config &config)
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5446_device::screen_update));
 
-	CIRRUS_GD5446(config, "vga", 0).set_screen("screen");
+	cirrus_gd5446_device &vga(CIRRUS_GD5446(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x200000);
+
 
 	EEPROM_93C46_16BIT(config, "eeprom")
 		.write_time(attotime::from_usec(1))
@@ -342,24 +345,40 @@ ROM_START(photoply99sp)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
-	/* The PhotoPlay 1999 parallel port dongle contains, under expoxy resin:
-	   Atmel AT89C2051 MCU (2KBytes internal ROM, UNDUMPED)
-	   Xtal 11.05MHz
-	   24C08W6 SEEPROM
-	   HC132 */
+	/* The Photo Play 1999 parallel port dongle contains, under expoxy resin:
+	    -Atmel AT89C2051 MCU (2KBytes internal ROM)
+	    -Xtal 11.05MHz
+	    -24C08W6 SEEPROM
+	    -HC132
+	   On each dongle there's a sticker with the revision number, but we've found the same MCU program on different revisions and
+	   different SEEPROM contents on the same revision. We're adding here every found combination of MCU program and SEEPROM content.
+	    */
 	ROM_REGION(0xC00, "dongle", 0)
+
+	// Same MCU program as "pp_99_dongle_r3a", and "pp_99_dongle_r1" but with unique SEEPROM content
 	ROM_SYSTEM_BIOS(0, "pp_99_dongle_r3",  "Parallel port dongle Rev. 3")
-	ROMX_LOAD("dongle_photoply_1999_sp_r3_mcu.bin",         0x000, 0x800, NO_DUMP,                                                      ROM_BIOS(0)) // AT89C2051
+	ROMX_LOAD("dongle_photoply_1999_sp_r3_mcu.bin",         0x000, 0x800, CRC(5c31e231) SHA1(5242ff4ccca832c28998aaf9c9c310b66297fd21), ROM_BIOS(0)) // AT89C2051, same program as "pp_99_dongle_r1"
 	ROMX_LOAD("dongle_photoply_1999_sp_r3_seeprom.bin",     0x800, 0x400, CRC(62f68a79) SHA1(72477e07db0982764aede1b7e723aedf58937426), ROM_BIOS(0)) // 24C08W6
+
+	// Same MCU program as "pp_99_dongle_r3", and "pp_99_dongle_r1" but with unique SEEPROM content
 	ROM_SYSTEM_BIOS(1, "pp_99_dongle_r3a", "Parallel port dongle Rev. 3 (alt)")
-	ROMX_LOAD("dongle_photoply_1999_sp_r3_alt_mcu.bin",     0x000, 0x800, NO_DUMP,                                                      ROM_BIOS(1)) // AT89C2051
+	ROMX_LOAD("dongle_photoply_1999_sp_r3_alt_mcu.bin",     0x000, 0x800, CRC(5c31e231) SHA1(5242ff4ccca832c28998aaf9c9c310b66297fd21), ROM_BIOS(1)) // AT89C2051, same program as "pp_99_dongle_r1"
 	ROMX_LOAD("dongle_photoply_1999_sp_r3_alt_seeprom.bin", 0x800, 0x400, CRC(9442d1d7) SHA1(4426542c4dbb3f1df65e7ba798a7d7e0d8b98838), ROM_BIOS(1)) // 24C08W6
+
+	// Same MCU program as "pp_99_dongle_r1a", but with unique SEEPROM content
 	ROM_SYSTEM_BIOS(2, "pp_99_dongle_r2",  "Parallel port dongle Rev. 2")
-	ROMX_LOAD("dongle_photoply_1999_sp_r2_mcu.bin",         0x000, 0x800, NO_DUMP,                                                      ROM_BIOS(2)) // AT89C2051
+	ROMX_LOAD("dongle_photoply_1999_sp_r2_mcu.bin",         0x000, 0x800, CRC(7fa7a6b5) SHA1(611a4debc3b3e00c72fbc59a8e100f67806d73e8), ROM_BIOS(2)) // AT89C2051, same program as "pp_99_dongle_r1a"
 	ROMX_LOAD("dongle_photoply_1999_sp_r2_seeprom.bin",     0x800, 0x400, CRC(52274688) SHA1(786f7407e510b303401120b8e1b082cdb412e648), ROM_BIOS(2)) // 24C08W6
+
+	// Same MCU program as "pp_99_dongle_r3" and "pp_99_dongle_r3a", and same SEEPROM content as "pp_99_dongle_r1a"
 	ROM_SYSTEM_BIOS(3, "pp_99_dongle_r1",  "Parallel port dongle Rev. 1")
-	ROMX_LOAD("dongle_photoply_1999_sp_r1_mcu.bin",         0x000, 0x800, NO_DUMP,                                                      ROM_BIOS(3)) // AT89C2051
-	ROMX_LOAD("dongle_photoply_1999_sp_r1_seeprom.bin",     0x800, 0x400, CRC(fe8f14d2) SHA1(1caad3200a22e0d510238ba44e5d96f561045ec1), ROM_BIOS(3)) // 24C08W6
+	ROMX_LOAD("dongle_photoply_1999_sp_r1_mcu.bin",         0x000, 0x800, CRC(5c31e231) SHA1(5242ff4ccca832c28998aaf9c9c310b66297fd21), ROM_BIOS(3)) // AT89C2051, same program as "pp_99_dongle_r3"
+	ROMX_LOAD("dongle_photoply_1999_sp_r1_seeprom.bin",     0x800, 0x400, CRC(fe8f14d2) SHA1(1caad3200a22e0d510238ba44e5d96f561045ec1), ROM_BIOS(3)) // 24C08W6, Same content as "pp_99_dongle_r1a"
+
+	// Same MCU program as "pp_99_dongle_r2", and same SEEPROM content as "pp_99_dongle_r1"
+	ROM_SYSTEM_BIOS(4, "pp_99_dongle_r1a",  "Parallel port dongle Rev. 1 (alt)")
+	ROMX_LOAD("dongle_photoply_1999_sp_r1_alt_mcu.bin",     0x000, 0x800, CRC(7fa7a6b5) SHA1(611a4debc3b3e00c72fbc59a8e100f67806d73e8), ROM_BIOS(3)) // AT89C2051, same program as "pp_99_dongle_r2"
+	ROMX_LOAD("dongle_photoply_1999_sp_r1_alt_seeprom.bin", 0x800, 0x400, CRC(fe8f14d2) SHA1(1caad3200a22e0d510238ba44e5d96f561045ec1), ROM_BIOS(3)) // 24C08W6, Same content as "pp_99_dongle_r1"
 
 	// Quantum Fireball EX3.2A
 	// C/H/S: 3.2 - 6256/16/63
@@ -420,6 +439,37 @@ ROM_START(photoply2k1it)
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay2k1it", 0, BAD_DUMP SHA1(274ea0ebc051d0f4846bc58a039d342241b4cc28) ) // Manually rebuilded by adding the resources for the folder C:\QP_MSTR from the 2001_NL version
+
+	// Recovery discs for Photo Play 2001
+
+	/* UPDATE 2001 - Disc 1
+	   Info on the CD ring:
+	     A0100344917-0102  35  A1
+	     IFPI L555
+	     Sony DADC
+	     Inner ring, laser engraved: IFPI 94Z5
+	*/
+	DISK_REGION( "recover_upd2k1_d1" )
+	DISK_IMAGE_READONLY( "update_2001_cd1", 0, SHA1(c271c03ba8118203b9790dd924aac77ad68c2b17) )
+
+	/* UPDATE 2001 - Disc 2
+	   Info on the CD ring:
+	     A0100344917-0202  13  B1
+	     IFPI L553
+	     Sony DADC
+	     Inner ring, laser engraved: IFPI 94W6
+	*/
+	DISK_REGION( "recover_upd2k1_d2" )
+	DISK_IMAGE_READONLY( "update_2001_cd2", 0, SHA1(c5797d6a342407136af49443401e83fe9578f5f2) )
+
+	/* SNAKE II Service Release Update 2001
+	   Info on the CD ring:
+	     A0100360706-0101  15  A3
+	     IFPI L555
+	     Sony DADC
+	*/
+	DISK_REGION( "recover_snake2_upd2k1_d1" )
+	DISK_IMAGE_READONLY( "nokia_snake_ii_service_release_update_2001", 0, SHA1(09286cb8b63d3cc771cbbf4b9b3de77e3d15bb7b) )
 ROM_END
 
 // BIOS not provided, might be different

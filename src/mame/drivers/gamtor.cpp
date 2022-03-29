@@ -96,7 +96,9 @@ void gaminator_state::gaminator(machine_config &config)
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 
-	GAMTOR_VGA(config, "vga", 0).set_screen("screen");
+	gamtor_vga_device &vga(GAMTOR_VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x100000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

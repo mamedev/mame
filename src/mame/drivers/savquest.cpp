@@ -94,8 +94,8 @@ private:
 	required_device<s3_vga_device> m_vga;
 	required_device<voodoo_2_device> m_voodoo;
 
-	int m_haspind;
-	int m_haspstate;
+	int m_haspind = 0;
+	int m_haspstate = 0;
 	enum hasp_states
 	{
 		HASPSTATE_NONE,
@@ -103,15 +103,15 @@ private:
 		HASPSTATE_PASSEND,
 		HASPSTATE_READ
 	};
-	int m_hasp_passind;
-	uint8_t m_hasp_tmppass[0x29];
-	uint8_t m_port379;
-	int m_hasp_passmode;
-	int m_hasp_prodind;
+	int m_hasp_passind = 0;
+	uint8_t m_hasp_tmppass[0x29]{};
+	uint8_t m_port379 = 0;
+	int m_hasp_passmode = 0;
+	int m_hasp_prodind = 0;
 
-	uint8_t m_mtxc_config_reg[256];
-	uint8_t m_piix4_config_reg[8][256];
-	uint32_t m_pci_3dfx_regs[0x40];
+	uint8_t m_mtxc_config_reg[256]{};
+	uint8_t m_piix4_config_reg[8][256]{};
+	uint32_t m_pci_3dfx_regs[0x40]{};
 
 	void bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void bios_e0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

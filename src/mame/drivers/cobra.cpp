@@ -800,48 +800,48 @@ public:
 		MAIN_INT_S2M = 0x02
 	};
 
-	uint8_t m_m2s_int_enable;
-	uint8_t m_s2m_int_enable;
-	uint8_t m_vblank_enable;
+	uint8_t m_m2s_int_enable = 0;
+	uint8_t m_s2m_int_enable = 0;
+	uint8_t m_vblank_enable = 0;
 
-	uint8_t m_m2s_int_mode;
-	uint8_t m_s2m_int_mode;
+	uint8_t m_m2s_int_mode = 0;
+	uint8_t m_s2m_int_mode = 0;
 
-	uint8_t m_main_int_active;
+	uint8_t m_main_int_active = 0;
 
 
 	std::unique_ptr<uint32_t[]> m_comram[2];
-	int m_comram_page;
+	int m_comram_page = 0;
 
-	int m_main_debug_state;
-	int m_main_debug_state_wc;
-	int m_sub_debug_state;
-	int m_sub_debug_state_wc;
-	int m_gfx_debug_state;
-	int m_gfx_debug_state_wc;
+	int m_main_debug_state = 0;
+	int m_main_debug_state_wc = 0;
+	int m_sub_debug_state = 0;
+	int m_sub_debug_state_wc = 0;
+	int m_gfx_debug_state = 0;
+	int m_gfx_debug_state_wc = 0;
 
-	uint32_t m_sub_psac_reg;
-	int m_sub_psac_count;
-	uint32_t m_sub_interrupt;
+	uint32_t m_sub_psac_reg = 0;
+	int m_sub_psac_count = 0;
+	uint32_t m_sub_interrupt = 0;
 
-	uint8_t m_gfx_unk_flag;
-	uint32_t m_gfx_re_command_word1;
-	uint32_t m_gfx_re_command_word2;
-	int m_gfx_re_word_count;
-	int m_gfx_re_status;
-	uint32_t m_gfx_unk_status;
+	uint8_t m_gfx_unk_flag = 0;
+	uint32_t m_gfx_re_command_word1 = 0;
+	uint32_t m_gfx_re_command_word2 = 0;
+	int m_gfx_re_word_count = 0;
+	int m_gfx_re_status = 0;
+	uint32_t m_gfx_unk_status = 0;
 
-	uint64_t m_gfx_fifo_mem[256];
-	int m_gfx_fifo_cache_addr;
-	int m_gfx_fifo_loopback;
-	int m_gfx_unknown_v1;
-	int m_gfx_status_byte;
+	uint64_t m_gfx_fifo_mem[256]{};
+	int m_gfx_fifo_cache_addr = 0;
+	int m_gfx_fifo_loopback = 0;
+	int m_gfx_unknown_v1 = 0;
+	int m_gfx_status_byte = 0;
 
-	bool m_has_psac;
+	bool m_has_psac = false;
 
 	std::unique_ptr<int16_t[]> m_sound_dma_buffer_l;
 	std::unique_ptr<int16_t[]> m_sound_dma_buffer_r;
-	uint32_t m_sound_dma_ptr;
+	uint32_t m_sound_dma_ptr = 0;
 
 	void init_racjamdx();
 	void init_bujutsu();

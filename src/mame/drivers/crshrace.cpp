@@ -3,6 +3,7 @@
 /***************************************************************************
 
 Crash Race       (c) 1993 Video System Co.
+VSEC-24 PCB
 
 driver by Nicola Salmoria
 
@@ -367,23 +368,10 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
 static GFXDECODE_START( gfx_crshrace )
-	GFXDECODE_ENTRY( "chars",   0, charlayout,     0,  1 )
-	GFXDECODE_ENTRY( "tiles",   0, tilelayout,   256, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 512, 32 )
+	GFXDECODE_ENTRY( "chars",   0, charlayout,               0,  1 )
+	GFXDECODE_ENTRY( "tiles",   0, tilelayout,             256, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 512, 32 )
 GFXDECODE_END
 
 
@@ -458,68 +446,101 @@ void crshrace_state::crshrace(machine_config &config)
 
 ROM_START( crshrace )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_WORD_SWAP( "1",            0x000000, 0x80000, CRC(21e34fb7) SHA1(be47b4a9bce2d6ce0a127dffe032c61547b2a3c0) )
+	ROM_LOAD16_WORD_SWAP( "1.ic10",            0x000000, 0x80000, CRC(21e34fb7) SHA1(be47b4a9bce2d6ce0a127dffe032c61547b2a3c0) )
 
 	ROM_REGION16_BE( 0x100000, "user1", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w21",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
+	ROM_LOAD16_WORD_SWAP( "w21.ic14",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
 
 	ROM_REGION16_BE( 0x100000, "user2", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w22",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
+	ROM_LOAD16_WORD_SWAP( "w22.ic13",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    // 64k for the audio CPU + banks
-	ROM_LOAD( "2",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
+	ROM_LOAD( "2.ic58",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
 
 	ROM_REGION( 0x100000, "chars", 0 )
-	ROM_LOAD( "h895",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
+	ROM_LOAD( "h895.ic50",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
 
 	ROM_REGION( 0x400000, "tiles", 0 )
-	ROM_LOAD( "w18",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
-	ROM_LOAD( "w19",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
-	ROM_LOAD( "w20",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
+	ROM_LOAD( "w18.rom-a",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
+	ROM_LOAD( "w19.rom-b",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
+	ROM_LOAD( "w20.rom-c",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
 	// 300000-3fffff empty
 
 	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
-	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
+	ROM_LOAD( "h897.ic29",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
+	ROM_LOAD( "h896.ic75",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
 	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // sound samples
-	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
+	ROM_LOAD( "h894.ic73",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
 	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
-	ROM_LOAD( "h893",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
+	ROM_LOAD( "h893.ic69",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
 ROM_END
 
 ROM_START( crshrace2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_WORD_SWAP( "01-ic10.bin",  0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
+	ROM_LOAD16_WORD_SWAP( "01.ic10",  0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
 
 	ROM_REGION16_BE( 0x100000, "user1", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w21",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )    // IC14.BIN
+	ROM_LOAD16_WORD_SWAP( "w21.ic14",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
 
 	ROM_REGION16_BE( 0x100000, "user2", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w22",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )    // IC13.BIN
+	ROM_LOAD16_WORD_SWAP( "w22.ic13",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    // 64k for the audio CPU + banks
-	ROM_LOAD( "2",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )  // 02-IC58.BIN
+	ROM_LOAD( "2.ic58",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
 
 	ROM_REGION( 0x100000, "chars", 0 )
-	ROM_LOAD( "h895",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )    // IC50.BIN
+	ROM_LOAD( "h895.ic50",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
 
 	ROM_REGION( 0x400000, "tiles", 0 )
-	ROM_LOAD( "w18",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )    // ROM-A.BIN
-	ROM_LOAD( "w19",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )    // ROM-B.BIN
-	ROM_LOAD( "w20",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )    // ROM-C.BIN
+	ROM_LOAD( "w18.rom-a",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
+	ROM_LOAD( "w19.rom-b",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
+	ROM_LOAD( "w20.rom-c",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
 	// 300000-3fffff empty
 
 	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )    // IC29.BIN
-	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )    // IC75.BIN
+	ROM_LOAD( "h897.ic29",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
+	ROM_LOAD( "h896.ic75",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
 	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // sound samples
-	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )    // IC73.BIN
+	ROM_LOAD( "h894.ic73",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
 	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
-	ROM_LOAD( "h893",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )    // IC69.BIN
+	ROM_LOAD( "h893.ic69",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
+ROM_END
+
+ROM_START( crshrace2a )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "01.ic10",  0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
+
+	ROM_REGION16_BE( 0x100000, "user1", 0 )  // extra ROM
+	ROM_LOAD16_WORD_SWAP( "w21.ic14",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
+
+	ROM_REGION16_BE( 0x100000, "user2", 0 )  // extra ROM
+	ROM_LOAD16_WORD_SWAP( "w22.ic13",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // 64k for the audio CPU + banks
+	ROM_LOAD( "2.ic58",            0x00000, 0x20000, CRC(7ef4f9dc) SHA1(cf9cc1cf16349b0b930f4572194b7ed3828c3bd8) ) // sldh
+
+	ROM_REGION( 0x100000, "chars", 0 )
+	ROM_LOAD( "h895.ic50",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
+
+	ROM_REGION( 0x400000, "tiles", 0 ) // on a riser board
+	ROM_LOAD( "w18.rom-a",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
+	ROM_LOAD( "w19.rom-b",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
+	ROM_LOAD( "w20.rom-c",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
+	// 300000-3fffff empty
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD( "h897.ic29",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
+	ROM_LOAD( "h896.ic75",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // sound samples
+	ROM_LOAD( "h894.ic73",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
+	ROM_LOAD( "h893.ic69",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
 ROM_END
 
 
@@ -548,5 +569,6 @@ void crshrace_state::init_crshrace2()
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,   0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 1)",                      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace2,  crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 2)",                      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace2a, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 2, alternate sound ROM)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

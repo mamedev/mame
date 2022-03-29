@@ -79,7 +79,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	u8 m_cass_data[5]{};
-	bool m_cassoutbit, m_cassbit, m_cassold;
+	bool m_cassoutbit = false, m_cassbit = false, m_cassold = false;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<i8251_device> m_uart;

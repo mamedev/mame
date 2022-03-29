@@ -49,8 +49,8 @@ public:
 	void set_divide_by_2() { m_divider = 2; }
 	void set_divide_by_4() { m_divider = 4; }
 
-	uint8_t tms7000_unmapped_rf_r(offs_t offset) { if (!machine().side_effects_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
-	void tms7000_unmapped_rf_w(offs_t offset, uint8_t data) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
+	uint8_t tms7000_unmapped_rf_r(offs_t offset) { if (!machine().side_effects_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; }
+	void tms7000_unmapped_rf_w(offs_t offset, uint8_t data) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); }
 
 	uint8_t tms7000_pf_r(offs_t offset);
 	void tms7000_pf_w(offs_t offset, uint8_t data);

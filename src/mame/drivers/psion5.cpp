@@ -127,7 +127,7 @@ void psion5mx_state::check_interrupts()
 	m_maincpu->set_input_line(ARM7_IRQ_LINE, m_pending_ints & m_int_mask & IRQ_IRQ_MASK ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void psion5mx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void psion5mx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

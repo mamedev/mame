@@ -75,12 +75,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_tile_bank;
-	uint8_t m_sound_byte;
-	uint8_t m_nmi_enable;
+	uint8_t m_tile_bank = 0;
+	uint8_t m_sound_byte = 0;
+	uint8_t m_nmi_enable = 0;
 
-	tilemap_t * m_bg_tilemap;
-	tilemap_t * m_fg_tilemap;
+	tilemap_t * m_bg_tilemap = nullptr;
+	tilemap_t * m_fg_tilemap = nullptr;
 
 	void superwng_nmi_enable_w(uint8_t data);
 	void superwng_sound_interrupt_w(uint8_t data);

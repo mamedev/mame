@@ -15,10 +15,10 @@
 
 struct lcd_spi_t
 {
-	int l1;
-	int data;
-	int l3;
-	uint32_t shift, bits;
+	int l1 = 0;
+	int data = 0;
+	int l3 = 0;
+	uint32_t shift = 0, bits = 0;
 };
 
 class hp49gp_state : public driver_device

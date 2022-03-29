@@ -53,7 +53,7 @@ private:
 	required_device<ls259_device> m_keyplatch;
 	required_ioport_array<4> m_keypad;
 
-	u8 m_gpib_data;
+	u8 m_gpib_data = 0;
 };
 
 void si5500_state::machine_start()

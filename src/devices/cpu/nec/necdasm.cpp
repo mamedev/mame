@@ -132,22 +132,22 @@ const nec_disassembler::NEC_I386_OPCODE nec_disassembler::necv_opcode_table1[256
 	{"outmb",           0,              0,                  0,                  0               },
 	{"outmw",           0,              0,                  0,                  0               },
 	// 0x70
-	{"bv",              0,              PARAM_REL8,         0,                  0               },
-	{"bnv",             0,              PARAM_REL8,         0,                  0               },
-	{"bc",              0,              PARAM_REL8,         0,                  0               },
-	{"bnc",             0,              PARAM_REL8,         0,                  0               },
-	{"be",              0,              PARAM_REL8,         0,                  0               },
-	{"bne",             0,              PARAM_REL8,         0,                  0               },
-	{"bnh",             0,              PARAM_REL8,         0,                  0               },
-	{"bh",              0,              PARAM_REL8,         0,                  0               },
-	{"bn",              0,              PARAM_REL8,         0,                  0               },
-	{"bp",              0,              PARAM_REL8,         0,                  0               },
-	{"bpe",             0,              PARAM_REL8,         0,                  0               },
-	{"bpo",             0,              PARAM_REL8,         0,                  0               },
-	{"blt",             0,              PARAM_REL8,         0,                  0               },
-	{"bge",             0,              PARAM_REL8,         0,                  0               },
-	{"ble",             0,              PARAM_REL8,         0,                  0               },
-	{"bgt",             0,              PARAM_REL8,         0,                  0               },
+	{"bv",              0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bnv",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bc",              0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bnc",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"be",              0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bne",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bnh",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bh",              0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bn",              0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bp",              0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bpe",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bpo",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"blt",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bge",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"ble",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bgt",             0,              PARAM_REL8,         0,                  0,              STEP_COND},
 	// 0x80
 	{"immb",            GROUP,          0,                  0,                  0               },
 	{"immw",            GROUP,          0,                  0,                  0               },
@@ -231,7 +231,7 @@ const nec_disassembler::NEC_I386_OPCODE nec_disassembler::necv_opcode_table1[256
 	{"retf",            0,              0,                  0,                  0,              STEP_OUT},
 	{"brk     3",       0,              0,                  0,                  0,              STEP_OVER},
 	{"brk",             0,              PARAM_UI8,          0,                  0,              STEP_OVER},
-	{"brkv",            0,              0,                  0,                  0               },
+	{"brkv",            0,              0,                  0,                  0,              STEP_OVER | STEP_COND},
 	{"reti",            0,              0,                  0,                  0,              STEP_OUT},
 	// 0xd0
 	{"shiftb",          GROUP,          0,                  0,                  0               },
@@ -251,10 +251,10 @@ const nec_disassembler::NEC_I386_OPCODE nec_disassembler::necv_opcode_table1[256
 	{"escape",          FPU,            0,                  0,                  0               },
 	{"escape",          FPU,            0,                  0,                  0               },
 	// 0xe0
-	{"dbnzne",          0,              PARAM_REL8,         0,                  0,              STEP_OVER},
-	{"dbnze",           0,              PARAM_REL8,         0,                  0,              STEP_OVER},
-	{"dbnz",            0,              PARAM_REL8,         0,                  0,              STEP_OVER},
-	{"bcwz",            0,              PARAM_REL8,         0,                  0               },
+	{"dbnzne",          0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"dbnze",           0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"dbnz",            0,              PARAM_REL8,         0,                  0,              STEP_COND},
+	{"bcwz",            0,              PARAM_REL8,         0,                  0,              STEP_COND},
 	{"in",              0,              PARAM_AL,           PARAM_UI8,          0               },
 	{"in",              0,              PARAM_AW,           PARAM_UI8,          0               },
 	{"out",             0,              PARAM_UI8,          PARAM_AL,           0               },
@@ -454,7 +454,7 @@ const nec_disassembler::NEC_I386_OPCODE nec_disassembler::necv_opcode_table2[256
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"btclr",           0,              PARAM_SFREG,        PARAM_I3,           PARAM_REL8      },  /* V25/V35 only */
+	{"btclr",           0,              PARAM_SFREG,        PARAM_I3,           PARAM_REL8,     STEP_COND},  /* V25/V35 only */
 	{"???",             0,              0,                  0,                  0               },
 	{"stop",            0,              0,                  0,                  0               },  /* V25/V35 only */
 	{"???",             0,              0,                  0,                  0               },
@@ -1654,51 +1654,51 @@ offs_t nec_disassembler::dis80(std::ostream &stream, offs_t pc, const data_buffe
 		case 0xbd: util::stream_format(stream, "cmp  bl"); break;
 		case 0xbe: util::stream_format(stream, "cmp  m"); break;
 		case 0xbf: util::stream_format(stream, "cmp  al"); break;
-		case 0xc0: util::stream_format(stream, "rnz"); flags = STEP_OUT; break;
+		case 0xc0: util::stream_format(stream, "rnz"); flags = STEP_OUT | STEP_COND; break;
 		case 0xc1: util::stream_format(stream, "pop  cw"); break;
-		case 0xc2: util::stream_format(stream, "jnz  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xc2: util::stream_format(stream, "jnz  $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xc3: util::stream_format(stream, "jmp  $%04x", params.r16(pc)); pc+=2; break;
 		case 0xc4: util::stream_format(stream, "cnz  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
 		case 0xc5: util::stream_format(stream, "push cw"); break;
 		case 0xc6: util::stream_format(stream, "adi  $%02x", params.r8(pc)); pc++; break;
 		case 0xc7: util::stream_format(stream, "rst  0"); flags = STEP_OVER; break;
-		case 0xc8: util::stream_format(stream, "rz"); flags = STEP_OUT; break;
+		case 0xc8: util::stream_format(stream, "rz"); flags = STEP_OUT | STEP_COND; break;
 		case 0xc9: util::stream_format(stream, "ret"); flags = STEP_OUT; break;
-		case 0xca: util::stream_format(stream, "jz   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xca: util::stream_format(stream, "jz   $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xcb: util::stream_format(stream, "jmp  $%04x", params.r16(pc)); pc+=2; break;
 		case 0xcc: util::stream_format(stream, "cz   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
 		case 0xcd: util::stream_format(stream, "call $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
 		case 0xce: util::stream_format(stream, "aci  $%02x", params.r8(pc)); pc++; break;
 		case 0xcf: util::stream_format(stream, "rst  1"); flags = STEP_OVER; break;
-		case 0xd0: util::stream_format(stream, "rnc"); flags = STEP_OUT; break;
+		case 0xd0: util::stream_format(stream, "rnc"); flags = STEP_OUT | STEP_COND; break;
 		case 0xd1: util::stream_format(stream, "pop  dw"); break;
-		case 0xd2: util::stream_format(stream, "jnc  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xd2: util::stream_format(stream, "jnc  $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xd3: util::stream_format(stream, "out  $%02x", params.r8(pc)); pc++; break;
 		case 0xd4: util::stream_format(stream, "cnc  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
 		case 0xd5: util::stream_format(stream, "push dw"); break;
 		case 0xd6: util::stream_format(stream, "sui  $%02x", params.r8(pc)); pc++; break;
 		case 0xd7: util::stream_format(stream, "rst  2"); flags = STEP_OVER; break;
-		case 0xd8: util::stream_format(stream, "rc"); flags = STEP_OUT; break;
+		case 0xd8: util::stream_format(stream, "rc"); flags = STEP_OUT | STEP_COND; break;
 		case 0xd9: util::stream_format(stream, "shlx d (*)"); break;
-		case 0xda: util::stream_format(stream, "jc   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xda: util::stream_format(stream, "jc   $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xdb: util::stream_format(stream, "in   $%02x", params.r8(pc)); pc++; break;
 		case 0xdc: util::stream_format(stream, "cc   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
 		case 0xdd: util::stream_format(stream, "call $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
 		case 0xde: util::stream_format(stream, "sbi  $%02x", params.r8(pc)); pc++; break;
 		case 0xdf: util::stream_format(stream, "rst  3"); flags = STEP_OVER; break;
-		case 0xe0: util::stream_format(stream, "rpo"); flags = STEP_OUT; break;
+		case 0xe0: util::stream_format(stream, "rpo"); flags = STEP_OUT | STEP_COND; break;
 		case 0xe1: util::stream_format(stream, "pop  bw"); break;
-		case 0xe2: util::stream_format(stream, "jpo  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xe2: util::stream_format(stream, "jpo  $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xe3: util::stream_format(stream, "xthl"); break;
-		case 0xe4: util::stream_format(stream, "cpo  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xe4: util::stream_format(stream, "cpo  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER | STEP_COND; break;
 		case 0xe5: util::stream_format(stream, "push bw"); break;
 		case 0xe6: util::stream_format(stream, "ani  $%02x", params.r8(pc)); pc++; break;
 		case 0xe7: util::stream_format(stream, "rst  4"); flags = STEP_OVER; break;
-		case 0xe8: util::stream_format(stream, "rpe"); flags = STEP_OUT;  break;
+		case 0xe8: util::stream_format(stream, "rpe"); flags = STEP_OUT | STEP_COND; break;
 		case 0xe9: util::stream_format(stream, "pchl"); break;
-		case 0xea: util::stream_format(stream, "jpe  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xea: util::stream_format(stream, "jpe  $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xeb: util::stream_format(stream, "xchg"); break;
-		case 0xec: util::stream_format(stream, "cpe  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xec: util::stream_format(stream, "cpe  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER | STEP_COND; break;
 		case 0xed:
 			switch (params.r8(pc))
 			{
@@ -1712,19 +1712,19 @@ offs_t nec_disassembler::dis80(std::ostream &stream, offs_t pc, const data_buffe
 			break;
 		case 0xee: util::stream_format(stream, "xri  $%02x", params.r8(pc)); pc++; break;
 		case 0xef: util::stream_format(stream, "rst  5"); flags = STEP_OVER; break;
-		case 0xf0: util::stream_format(stream, "rp"); flags = STEP_OUT; break;
+		case 0xf0: util::stream_format(stream, "rp"); flags = STEP_OUT | STEP_COND; break;
 		case 0xf1: util::stream_format(stream, "pop  psw"); break;
-		case 0xf2: util::stream_format(stream, "jp   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xf2: util::stream_format(stream, "jp   $%04x", params.r16(pc)); pc+=2; flags = STEP_COND; break;
 		case 0xf3: util::stream_format(stream, "di"); break;
-		case 0xf4: util::stream_format(stream, "cp   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xf4: util::stream_format(stream, "cp   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER | STEP_COND; break;
 		case 0xf5: util::stream_format(stream, "push psw"); break;
 		case 0xf6: util::stream_format(stream, "ori  $%02x", params.r8(pc)); pc++; break;
 		case 0xf7: util::stream_format(stream, "rst  6"); flags = STEP_OVER; break;
-		case 0xf8: util::stream_format(stream, "rm"); flags = STEP_OUT; break;
+		case 0xf8: util::stream_format(stream, "rm"); flags = STEP_OUT | STEP_COND; break;
 		case 0xf9: util::stream_format(stream, "sphl"); break;
 		case 0xfa: util::stream_format(stream, "jm   $%04x", params.r16(pc)); pc+=2; break;
 		case 0xfb: util::stream_format(stream, "ei"); break;
-		case 0xfc: util::stream_format(stream, "cm   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xfc: util::stream_format(stream, "cm   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER | STEP_COND; break;
 		case 0xfd: util::stream_format(stream, "call $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
 		case 0xfe: util::stream_format(stream, "cpi  $%02x", params.r8(pc)); pc++; break;
 		case 0xff: util::stream_format(stream, "rst  7"); flags = STEP_OVER; break;

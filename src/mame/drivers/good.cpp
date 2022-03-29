@@ -66,8 +66,8 @@ private:
 	required_shared_ptr<uint16_t> m_bg_tilemapram;
 
 	// video-related
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 	void fg_tilemapram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bg_tilemapram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

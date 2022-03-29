@@ -253,7 +253,7 @@ void mc6847_friend_device::update_field_sync_timer()
 //  device_timer
 //-------------------------------------------------
 
-void mc6847_friend_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mc6847_friend_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

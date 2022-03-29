@@ -62,9 +62,9 @@ private:
 	void ts802_io(address_map &map);
 	void ts802_mem(address_map &map);
 
-	uint8_t m_term_data;
-	address_space *m_mem;
-	address_space *m_io;
+	uint8_t m_term_data = 0;
+	address_space *m_mem = nullptr;
+	address_space *m_io = nullptr;
 	required_device<z80_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };

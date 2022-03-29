@@ -249,7 +249,7 @@ protected:
 	void nightmare_sound_io_map(address_map &map);
 	uint32_t screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -260,10 +260,10 @@ protected:
 	required_device<sda2006_device> m_eeprom;
 
 	// cpu state
-	int m_reset;
+	int m_reset = 0;
 };
 
-void nightmare_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nightmare_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

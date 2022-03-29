@@ -78,7 +78,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -96,8 +96,8 @@ private:
 	void tv990_mem(address_map &map);
 
 	uint16_t tvi1111_regs[(0x100/2)+2];
-	emu_timer *m_rowtimer;
-	int m_rowh, m_width, m_height;
+	emu_timer *m_rowtimer = nullptr;
+	int m_rowh = 0, m_width = 0, m_height = 0;
 };
 
 WRITE_LINE_MEMBER(tv990_state::vblank_irq)
@@ -120,7 +120,7 @@ void tv990_state::machine_start()
 	save_item(NAME(m_height));
 }
 
-void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_rowtimer->adjust(m_screen->time_until_pos(m_screen->vpos() + m_rowh));
 	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);

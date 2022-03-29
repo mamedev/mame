@@ -50,7 +50,7 @@ OSC @ 72.576MHz
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/w65c02s.h"
 #include "machine/at29x.h"
 #include "machine/bankdev.h"
 #include "emupal.h"
@@ -80,7 +80,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_bnk2000;
 
-	uint8_t m_irq_mask;
+	uint8_t m_irq_mask = 0;
 
 	void cmmb_charram_w(offs_t offset, uint8_t data);
 	uint8_t cmmb_input_r(offs_t offset);
@@ -409,7 +409,7 @@ void cmmb_state::machine_reset()
 void cmmb_state::cmmb(machine_config &config)
 {
 	/* basic machine hardware */
-	M65SC02(config, m_maincpu, MAIN_CLOCK/5); // Unknown clock, but chip rated for 14MHz
+	W65C02S(config, m_maincpu, MAIN_CLOCK/5); // Unknown clock, but chip rated for 14MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmmb_state::cmmb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cmmb_state::vblank_irq));
 

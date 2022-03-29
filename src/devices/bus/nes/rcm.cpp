@@ -14,9 +14,6 @@
  * RCM Tetris Family 9in1 [mapper 61]
  * RCM 3D Block [mapper 355]
 
- TODO:
- - implement PIC16C54 protection for 3D Block
-
  ***********************************************************************************************************/
 
 
@@ -70,8 +67,8 @@ nes_tf9_device::nes_tf9_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_3DBLOCK, tag, owner, clock), m_irq_count(0)
+nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_3DBLOCK, tag, owner, clock)
 {
 }
 
@@ -93,19 +90,12 @@ void nes_gs2015_device::pcb_reset()
 void nes_3dblock_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_reg));
-	save_item(NAME(m_irq_count));
 }
 
 void nes_3dblock_device::pcb_reset()
 {
 	prg32(0);
 	chr8(0, CHRRAM);
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	m_reg[2] = 0;
-	m_reg[3] = 0;
-	m_irq_count = 0;
 }
 
 
@@ -201,44 +191,8 @@ void nes_tf9_device::write_h(offs_t offset, u8 data)
 
  NES 2.0: mapper 355
 
- In MESS: Very Preliminary Support. What is the purpose
- of the writes to $4800-$4900-$4a00? These writes
- also happens on the RCM version, which however works
- (probably an unused leftover code in that version)
+ In MAME: Not supported.
 
- FCEUmm suggests it might be IRQ related, but
- it does not seem to help much...
+ TODO: implement PIC16C54 protection
 
  -------------------------------------------------*/
-
-void nes_3dblock_device::hblank_irq(int scanline, int vblank, int blanked)
-{
-	if (m_irq_count)
-	{
-		m_irq_count--;
-		if (!m_irq_count)
-			hold_irq_line();
-	}
-}
-
-void nes_3dblock_device::write_l(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("3dblock write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
-
-	switch (offset)
-	{
-		case 0x800: // $4800
-			m_reg[0] = data;
-			break;
-		case 0x900: // $4900
-			m_reg[1] = data;
-			break;
-		case 0xa00: // $4a00
-			m_reg[2] = data;
-			break;
-		case 0xe00: // $4e00
-			m_reg[3] = data; m_irq_count = 0x10;
-			break;
-	}
-}

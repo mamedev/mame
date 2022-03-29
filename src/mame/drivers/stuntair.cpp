@@ -126,13 +126,13 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_bg_xscroll;
-	uint8_t m_nmi_enable;
-	uint8_t m_spritebank0;
-	uint8_t m_spritebank1;
+	uint8_t m_bg_xscroll = 0;
+	uint8_t m_nmi_enable = 0;
+	uint8_t m_spritebank0 = 0;
+	uint8_t m_spritebank1 = 0;
 
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
@@ -435,17 +435,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout tiles8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	8*8
-};
-
 static const gfx_layout tiles8x8x2_layout =
 {
 	8,8,
@@ -470,8 +459,8 @@ static const gfx_layout tiles16x8x2_layout =
 
 
 static GFXDECODE_START( gfx_stuntair )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout, 0xe0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,         0x100, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout,  0xe0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x8x2_layout, 0xe0, 8 )
 GFXDECODE_END
 

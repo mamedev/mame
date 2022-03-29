@@ -32,7 +32,7 @@ public:
 	void trckydoc(machine_config &config);
 	void tecfri(machine_config &config);
 	void sauro(machine_config &config);
-	void saurob(machine_config &config);
+	void saurobl(machine_config &config);
 
 	void init_tecfri();
 
@@ -50,11 +50,11 @@ private:
 	optional_shared_ptr<uint8_t> m_videoram2;
 	optional_shared_ptr<uint8_t> m_colorram2;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_palette_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_palette_bank = 0;
 
-	bool m_irq_enable;
+	bool m_irq_enable = 0;
 
 	virtual void machine_start() override;
 
@@ -92,7 +92,7 @@ private:
 	void sauro_io_map(address_map &map);
 	void sauro_map(address_map &map);
 	void sauro_sound_map(address_map &map);
-	void saurob_sound_map(address_map &map);
+	void saurobl_sound_map(address_map &map);
 	void trckydoc_map(address_map &map);
 };
 

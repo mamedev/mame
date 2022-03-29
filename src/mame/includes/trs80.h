@@ -85,17 +85,17 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	u8 m_irq = 0;
-	u8 m_mask = 0;
-	u8 m_tape_unit = 1;
+	u8 m_irq = 0U;
+	u8 m_mask = 0U;
+	u8 m_tape_unit = 1U;
 	bool m_reg_load = true;
 	bool m_cassette_data = false;
-	emu_timer *m_cassette_data_timer;
+	emu_timer *m_cassette_data_timer = 0;
 	double m_old_cassette_val = 0;
 	bool m_cpl = 0;
-	u8 m_cols = 0xff;
+	u8 m_cols = 0xffU;
 	bool m_7bit = false;
-	u16 m_timeout = 600;
+	u16 m_timeout = 600U;
 	void trs80_io(address_map &map);
 	floppy_image_device *m_fdd;
 	required_device<z80_device> m_maincpu;

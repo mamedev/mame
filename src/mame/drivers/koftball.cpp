@@ -70,8 +70,8 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	tilemap_t *m_tilemap[2];
-	uint16_t m_prot_data;
+	tilemap_t *m_tilemap[2]{};
+	uint16_t m_prot_data = 0;
 
 	uint16_t random_number_r();
 	uint16_t prot_r();

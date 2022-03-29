@@ -1,0 +1,770 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="famibox" description="Nintendo FamicomBox cartridges">
+
+<!-- At least 38 cartridges were released for the FamicomBox/FamicomStation. The cartridges are
+similar to NES cartridges, though with unique PCBs, and generally contain the same data as
+Famicom games. Several games have unique dumps for the system. This includes: Pro Wres and
+Volleyball, which never had FDS to cart conversions in Japan otherwise, and Gradius and TwinBee.
+Some other games have minor header and padding changes, including: Argos no Senshi, Fighting Golf,
+Knight Rider, and Ninja Ryukenden.
+
+PCB info
+========
+    All known board labels follow the pattern SSS-type-revision, where type can also include an
+additional hyphen, and revision is a two digit number. PRG and CHR game data is stored in both
+mask ROMs and EPROMs, and some games may be found in either variation or a mix. In addition to other
+requisite board-specific logic and 'mapper' chips, boards also all feature a 3198A CIC lockout chip.
+
+Known PCBs
+==========
+SSS-NROM-256-0*: these have solder pads to select either 32K (256 kilobit) or 16K (128 kilobit) PRG ROM,
+and H/V solder pads to select mirroring.
+
+SSS-CNROM-0*: these have H/V solder pads to select mirroring.
+
+SSS-UNROM-01, SSS-UN1ROM-01, SSS-UNEPROM-02: these have 8K VRAM, and H/V solder pads to select mirroring.
+
+SSS-SLROM-0*: MMC1 boards.
+
+SSS-PNROM-01: MMC2 board.
+
+SSS-TLEPROM-01: EPROM variant of a TLROM board with MMC3.
+
+
+TODO
+====
+Unverified dumps: 1943, Devil World, Donald Land, Donkey Kong Jr., Excitebike, Ice Climber, Kame no Ongaeshi
+
+Missing dumps: Punch-Out!!
+
+Unverified PCB info: Bomberman, Devil World, Donald Land, Donkey Kong, Donkey Kong Jr., Fighting Golf,
+Gomoku Narabe Renju, Hogan's Alley, Ice Climber, Ice Hockey, Kame no Ongaeshi - Urashima Densetsu,
+Knight Rider, Mike Tyson's Punch-Out!!, Ninja Ryukenden, Punch-Out!!, Rockman, Senjou no Ookami,
+Soccer League - Winner's Cup, Tennis, Wild Gunman, Wrecking Crew
+-->
+
+	<software name="1943">
+		<description>1943 - The Battle of Valhalla</description>
+		<year>1988</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="SSS-UNEPROM-02" />
+			<feature name="mirroring" value="horizontal" /> <!-- real dump is vertical? -->
+			<dataarea name="prg" size="0x20000">
+				<rom name="sss-43 prg" size="0x20000" crc="4e42f13a" sha1="619c8c45c14bb26fee93d0f8646127f30e336128" status="baddump" /> <!-- dump taken from Famicom -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="argos">
+		<description>Argos no Senshi - Hachamecha Daishingeki</description>
+		<year>1987</year>
+		<publisher>Tecmo</publisher>
+		<info name="alt_title" value="アルゴスの戦士 はちゃめちゃ大進撃"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="SSS-UNROM-01" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="sss-ah-0 prg" size="0x20000" crc="fba8113b" sha1="511a4ad60b87e3def630c45910b41eee1f45b850" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball">
+		<description>Baseball</description>
+		<year>1983</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="ベースボール"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-04" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="sss-ba prg" size="0x4000" crc="d18a3dde" sha1="91f7d3e4c9d18c1969ca1fffdc811b763508a0a2" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="sss-ba chr" size="0x2000" crc="c27eef20" sha1="d5bd643b3ba98846e520b4d3f38aae45a29cf250" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombman">
+		<description>Bomberman</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="ボンバーマン"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-04" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hfc-bm-0 prg" size="0x4000" crc="9684657f" sha1="055db2dc8cec0448f3845da1626e108c7692cfc6" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hfc-bm-0 chr" size="0x2000" crc="a775822e" sha1="b0584f9f4172b9e111ae275d8de6644b76372b32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devlwrld">
+		<description>Devil World</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="デビルワールド"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-??" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-dd-1 prg" size="0x4000" crc="b97afb85" sha1="05ec5ba36646ea62ecc877dac8aa6a7747d81c4d" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-dd-0 chr" size="0x2000" crc="3a9aa7a1" sha1="7af9c7ee2e1dff8f4260f11cdb2acec613313093" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="donaldl">
+		<description>Donald Land</description>
+		<year>1988</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="ドナルドランド"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="SSS-SLROM-??" />
+			<feature name="mmc1_type" value="MMC1?" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="dfc-dx-0 prg" size="0x20000" crc="6fd39bd7" sha1="4cfe705617cdd0a50c14ef2176d99f40e0360c3c" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="dfc-dx-0 chr" size="0x20000" crc="e9fc32a9" sha1="22023c08a505c94a5a996d70e3831dcac4454515" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong">
+		<description>Donkey Kong</description>
+		<year>1983</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="ドンキーコング"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-03" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-dk-1 prg" size="0x4000" crc="f56a5b10" sha1="2c4b1d653194df0996d54d9de9188b270d0337d9" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-dk-0 chr" size="0x2000" crc="a21d7c2e" sha1="97c16cd6b1f3656428b682a23e6e4248c1ca3607" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongjr">
+		<description>Donkey Kong Jr.</description>
+		<year>1983</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="ドンキーコングJr"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-??" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-jr-1 prg" size="0x4000" crc="cf6c88b6" sha1="cefc276e7601d14c6a20e545f334281b7a9fe8db" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-jr-0 chr" size="0x2000" crc="852778ab" sha1="307f2245cce164491012f75897eb984af0c3f456" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duckhunt">
+		<description>Duck Hunt</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="ダックハント"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-04" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-dh-0 prg" size="0x4000" crc="90ca616d" sha1="b742576317cd6a04caac25252d5593844c9a0bb6" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-dh-0 chr" size="0x2000" crc="4e049e03" sha1="ffad32a3bab2fb3826bc554b1b9838e837513576" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excitebk">
+		<description>Excitebike</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="エキサイトバイク"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-03" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-eb-0 prg" size="0x4000" crc="3a94fa0b" sha1="6239e91ccefdc017d233cbae388c6568a17ed04b" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-eb-0 chr" size="0x2000" crc="e5f72401" sha1="a8bf028e1a62677e48e88cf421bb2a8051eb800c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1race">
+		<description>F-1 Race</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="F1レース"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-04" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="sss-fr prg" size="0x4000" crc="57970078" sha1="c212294be2a3b8f89ff440df821324fa0d522a55" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="sss-fr chr" size="0x2000" crc="e653dbcb" sha1="f9758fcc8e07890bd733af127defc86bb70f179e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fightglf">
+		<description>Fighting Golf</description>
+		<year>1988</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="ファイティングゴルフ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="SSS-SLROM-01" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="sfx-fi-0 prg" size="0x20000" crc="08aab933" sha1="1f31996f84ac44c61358a91a76d20ce10247ff6d" /> <!-- internal header differs from Famicom version -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="sfx-fi-0 chr" size="0x20000" crc="4d3c6798" sha1="637461bd05f75d45829d4fd8f7998adf9ba0eabf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golf">
+		<description>Golf</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="ゴルフ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-04" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="sss-gf prg" size="0x4000" crc="9c7e6421" sha1="e67e9ff5ee81fbd1af8d7439b86a9ad98499b9dc" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="sss-gf chr" size="0x2000" crc="7dfa75a8" sha1="ee016d37f4c54bea8cbbb9ae125bff4c7e14bfb3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gomokunr">
+		<description>Gomoku Narabe Renju</description>
+		<year>1983</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="五目ならべ 連珠"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-??" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-go-0 prg" size="0x4000" crc="5603f579" sha1="f2b007e3b13a777f9f88ff58f87ead6ae8f26327" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-go-0 chr" size="0x2000" crc="97ea7144" sha1="47d354c654285275d0a9420cc6eb3564f0453eb0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gradius">
+		<description>Gradius</description>
+		<year>1986</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="グラディウス"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="SSS-CNROM-01" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="sss gr-0 prg" size="0x8000" crc="cfe41c0c" sha1="d030d1010ec8e97e8f2fa0ef4cb5b76201db4268" />
+			</dataarea>
+			<dataarea name="chr" size="0x8000">
+				<rom name="sss gr-0 chr" size="0x8000" crc="de963bec" sha1="ecb76b5897658ebac31a07516bb2a5820279474f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hogalley">
+		<description>Hogan's Alley</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="ホーガンズアレイ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-??" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-ha-0 prg" size="0x4000" crc="8963ae6e" sha1="bca489ed0fb58e1e99f36c427bc0d7d805b6c61a" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-ha-0 chr" size="0x2000" crc="5df42fc4" sha1="4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceclimb">
+		<description>Ice Climber</description>
+		<year>1985</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="アイスクライマー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-??" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="0.prg" size="0x4000" crc="d548307f" sha1="e323ebaa2c0be5b9a31a21743ddfe7f3d1580672" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="0.chr" size="0x2000" crc="fd98f4d3" sha1="43720585fe38b24e3bde1560a4ca9945489031a5" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- matches US NES release -->
+	<software name="icehocky">
+		<description>Ice Hockey</description>
+		<year>1988</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="アイスホッケー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-03" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="sss hy-0 prg" size="0x8000" crc="82dff13d" sha1="4edbf555d319dfe1c2a08dc28f484d4344a228ba" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="sss hy-0 chr" size="0x2000" crc="f10fc90a" sha1="1a2a657267de1f5bdf284d1b69ed7d4895dfb281" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="urashima">
+		<description>Kame no Ongaeshi - Urashima Densetsu</description>
+		<year>1988</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="亀の恩返し ウラシマ伝説"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="SSS-SLROM-??" />
+			<feature name="mmc1_type" value="MMC1?" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="hfc-ko-0 prg" size="0x20000" crc="2a601192" sha1="8daed535bb95d12440b4be30f0882f890e359957" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="hfc-ko-0 chr" size="0x20000" crc="520b6bb8" sha1="2cb3effe313da3817c1fc2982b34771520f88a3b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knightr">
+		<description>Knight Rider</description>
+		<year>1988</year>
+		<publisher>Pack-In-Video</publisher>
+		<info name="alt_title" value="ナイトライダー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="SSS-SLROM-02" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="sss-nr-0 prg" size="0x20000" crc="231af1e9" sha1="2cab201416eb767c4055b78591add1b826f68c4c" /> <!-- internal header differs from Famicom version and it has 64K of initial $FF padding -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="sss-nr-0 chr" size="0x20000" crc="7dde11ec" sha1="7fed61552f8af80c9891e457441ebcaa94b461d2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjong">
+		<description>Mahjong</description>
+		<year>1983</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="麻雀"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-03" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc mj-1 prg" size="0x4000" crc="f86d8d8a" sha1="2904137a030ae2370a8cd3e068078a1d59a4f229" offset="0x0000" /> <!-- also found on EPROM with label: SSS-MJ PRG -->
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc mj-1 chr" size="0x2000" crc="6bb45576" sha1="5974787496dfa27a4b7fe6023473fae930ea41dc" /> <!-- also found on EPROM with label: SSS-MJ CHR -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="makaimur">
+		<description>Makaimura</description>
+		<year>1986</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="魔界村"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="SSS-UNEPROM-02" /> <!-- also found on: SSS-UNROM-01 -->
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="cap-mk prg" size="0x20000" crc="bf3635cf" sha1="f8b38262c2ac00cf4e3e653f2987bdadc86f839e" /> <!-- also found with label: SSS-MK PRG -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario">
+		<description>Mario Bros.</description>
+		<year>1983</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="マリオブラザーズ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-02" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="0.prg" size="0x4000" crc="75f6a9f3" sha1="b6f88f7a2f9a49cc9182a244571730198f1edc4b" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="0.chr" size="0x2000" crc="10f77435" sha1="a646c3443832ada84d31a3a8a4b34aebc17cecd5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tysonpo">
+		<description>Mike Tyson's Punch-Out!!</description>
+		<year>1987</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="マイクタイソン・パンチアウト!!"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="pxrom" />
+			<feature name="pcb" value="SSS-PNROM-01" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="sss-pt-1 prg" size="0x20000" crc="f1d861ef" sha1="203be0765e89234ce6986c6fc52f5d44216edf49" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="sss-pt-0 chr" size="0x20000" crc="570b48ea" sha1="33de517b16b61625909d2eb5307c08b337b542c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nryukend">
+		<description>Ninja Ryukenden</description>
+		<year>1988</year>
+		<publisher>Tecmo</publisher>
+		<info name="alt_title" value="忍者龍剣伝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="SSS-SLROM-??" />
+			<feature name="mmc1_type" value="MMC1?" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="tcf-ny-0 prg" size="0x20000" crc="bf273877" sha1="c62e5548a5b26dedbd521e120a23ed37825b2259" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="tcf-ny-0 chr" size="0x20000" crc="d9c285e1" sha1="a39ce82ef1238ff429b81d3d190c34da7ae5e4ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prowres">
+		<description>Pro Wres</description>
+		<year>1986</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="プロレス"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="SSS-UNROM-01" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="sss-pw-0 prg" size="0x20000" crc="01609f57" sha1="6522d58f58e57ef293d1d9df1e36b95e9266148b" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+    <software name="punchout">
+        <description>Punch-Out!!</description>
+        <year>1990</year>
+        <publisher>Nintendo</publisher>
+        <part name="cart" interface="nes_cart">
+            <feature name="slot" value="pxrom" />
+            <feature name="pcb" value="SSS-PNROM??" />
+            <dataarea name="prg" size="0x20000">
+                <rom name="nes-qp-0 prg" size="0x20000" crc="" sha1="" />
+            </dataarea>
+            <dataarea name="chr" size="0x20000">
+                <rom name="nes-qp-0 chr" size="0x20000" crc="" sha1="" />
+            </dataarea>
+        </part>
+    </software>
+-->
+
+	<software name="rockman">
+		<description>Rockman</description>
+		<year>1987</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="ロックマン"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="SSS-UNROM-??" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="cap-rx-0 prg" size="0x20000" crc="d31dc910" sha1="ea93f3f2fd561c1cee59ad51cfcb10f3dd83766f" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="senjokam">
+		<description>Senjou no Ookami</description>
+		<year>1986</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="戦場の狼"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="un1rom" />
+			<feature name="pcb" value="SSS-UN1ROM-01" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="cap-sj-0 prg" size="0x20000" crc="441aeae6" sha1="3eb406f0518dbdf513c0c192f09695f4e4f9cda2" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="senjokama" cloneof="senjokam">
+		<description>Senjou no Ookami (UNEPROM PCB)</description>
+		<year>1986</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="戦場の狼"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="SSS-UNEPROM-02" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="sss-sj prg" size="0x20000" crc="7c2cbb96" sha1="1e6ef6615c6c45f366263ac39f54f312a37c134f" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccerlg">
+		<description>Soccer League - Winner's Cup</description>
+		<year>1988</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="サッカーリーグ ウィナーズカップ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="SSS-SLROM-??" />
+			<feature name="mmc1_type" value="MMC1?" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="dfc-wn-0 prg" size="0x20000" crc="5a7fd507" sha1="0c9a4d06fadb694e1a16ddb2f6d97c0b870daf68" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="dfc-wn-0 chr" size="0x20000" crc="b152fb6c" sha1="c7775feb543a2acfbe9d421bc3f1b99b06d547d0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supchin2">
+		<description>Super Chinese 2 - Dragon Kid</description>
+		<year>1989</year>
+		<publisher>Culture Brain</publisher>
+		<info name="alt_title" value="スーパーチャイニーズ2 ドラゴンキッド"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="SSS-TLEPROM-01" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="sss-c2 prg" size="0x20000" crc="47a57fc3" sha1="d173e8614c9d91fe4de246bbeb005bb63a305b7f" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="sss-c2 chr" size="0x20000" crc="0659da91" sha1="4a53ac90cd1bc966cb8ad9a8542dc43814724964" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smb">
+		<description>Super Mario Bros.</description>
+		<year>1985</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="スーパーマリオブラザーズ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-03" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc sm-0 prg" size="0x8000" crc="5cf548d3" sha1="fefa1097449a3a11ebf8c6199e905996c5dc8fbd" /> <!-- also found with label: SSS-SM PRG -->
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc sm-0 chr" size="0x2000" crc="867b51ad" sha1="394badaf0b0bdd0ea279a1bca89a9d9ddc00b1b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takahash">
+		<description>Takahashi Meijin no Boukenjima</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="高橋名人の冒険島"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="SSS-CNROM-02" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hfc-tb prg" size="0x8000" crc="8090e3d6" sha1="28ef646255dc7c2fcf2165b8b4df9bdc9f7d9d67" /> <!-- also found with label: SSS-TB PRG -->
+			</dataarea>
+			<dataarea name="chr" size="0x8000">
+				<rom name="hfc-tb chr" size="0x8000" crc="a90fb063" sha1="4b70c8bf1ac4a13e18df9b70b248065c5b0cf90c" /> <!-- also found with label: SSS-TB CHR -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis">
+		<description>Tennis</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="テニス"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-03" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-te-0 prg" size="0x4000" crc="8b2e3e81" sha1="e54274c0b0d651458c5459d41872b1f99904d0fb" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-te-0 chr" size="0x2000" crc="3a34c45b" sha1="2cc26a01c38ead50503dccb3ee929ba7a2b6772c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinbee">
+		<description>TwinBee</description>
+		<year>1986</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ツインビー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="SSS-CNROM-01" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="tw-0" size="0x8000" crc="77756583" sha1="d0c3c21d1ec1d8a00df41f3d92757bc2b86d2869" />
+			</dataarea>
+			<dataarea name="chr" size="0x4000">
+				<rom name="sss tw-0 chr" size="0x4000" crc="ebf022eb" sha1="2d1af6ed9411ce41594dcd92387aeb801983467b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volley">
+		<description>Volleyball</description>
+		<year>1986</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="バレーボール"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-02" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="sss vb-0 prg" size="0x8000" crc="9ce5c242" sha1="4cbd1b58333bee32259b9b71bc21877b80ba08ca" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="sss vb-0 chr" size="0x2000" crc="213e3193" sha1="52a477bac8c35ef1c38872070ed11beba0d64025" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wildgunm">
+		<description>Wild Gunman</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="ワイルドガンマン"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-03" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-wg-1 prg" size="0x4000" crc="389960db" sha1="6b38f2c86ef27f653a2bdb9c682ac0bc981c7db6" offset="0x0000" />
+				<rom size="0x4000" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-wg-0 chr" size="0x2000" crc="a5e04856" sha1="9194d89a34f687742216889cbb3e717a9ae81c92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrecking">
+		<description>Wrecking Crew</description>
+		<year>1985</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="レッキングクルー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="SSS-NROM-256-03" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="hvc-wr-0 prg" size="0x8000" crc="4328b273" sha1="764d68f05f4a6e43fb26d7e654e237d2b0258fe4" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="hvc-wr-0 chr" size="0x2000" crc="23f0b9fd" sha1="c7f2d4f5f555490847654b8458687f94fba3bd12" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

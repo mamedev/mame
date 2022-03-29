@@ -40,15 +40,15 @@ private:
 	required_shared_ptr<uint16_t> m_textram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_background_layer;
-	tilemap_t *m_foreground_layer;
-	tilemap_t *m_midground_layer;
-	tilemap_t *m_text_layer;
+	tilemap_t *m_background_layer = nullptr;
+	tilemap_t *m_foreground_layer = nullptr;
+	tilemap_t *m_midground_layer = nullptr;
+	tilemap_t *m_text_layer = nullptr;
 
-	int m_gfx_bank_select;
-	int m_last_gfx_bank;
-	uint16_t m_scroll_ram[6];
-	uint16_t m_layer_en;
+	int m_gfx_bank_select = 0;
+	int m_last_gfx_bank = 0;
+	uint16_t m_scroll_ram[6]{};
+	uint16_t m_layer_en = 0U;
 
 	u8 sdgndmps_sound_comms_r(offs_t offset);
 

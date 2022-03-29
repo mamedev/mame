@@ -144,29 +144,40 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_manager_type["count_players"] = &ioport_manager::count_players;
 	ioport_manager_type["type_pressed"] = sol::overload(
 			&ioport_manager::type_pressed,
-			[] (ioport_manager &im, ioport_type type) { return im.type_pressed(type, 0); });
+			[] (ioport_manager &im, ioport_type type) { return im.type_pressed(type, 0); },
+			[] (ioport_manager &im, input_type_entry const &type) { return im.type_pressed(type.type(), type.player()); });
 	ioport_manager_type["type_name"] = sol::overload(
 			&ioport_manager::type_name,
 			[] (ioport_manager &im, ioport_type type) { return im.type_name(type, 0); });
 	ioport_manager_type["type_group"] = sol::overload(
 			&ioport_manager::type_group,
 			[] (ioport_manager &im, ioport_type type) { return im.type_group(type, 0); });
-	ioport_manager_type["type_seq"] =
+	ioport_manager_type["type_seq"] = sol::overload(
 			[] (ioport_manager &im, ioport_type type, std::optional<int> player, std::optional<char const *> seq_type_string)
 			{
 				if (!player)
 					player = 0;
 				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
 				return im.type_seq(type, *player, seq_type);
-			};
-	ioport_manager_type["set_type_seq"] =
+			},
+			[] (ioport_manager &im, input_type_entry const &type, std::optional<char const *> seq_type_string)
+			{
+				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
+				return im.type_seq(type.type(), type.player(), seq_type);
+			});
+	ioport_manager_type["set_type_seq"] = sol::overload(
 			[] (ioport_manager &im, ioport_type type, std::optional<int> player, std::optional<char const *> seq_type_string, input_seq const &seq)
 			{
 				if (!player)
 					player = 0;
 				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
 				im.set_type_seq(type, *player, seq_type, seq);
-			};
+			},
+			[] (ioport_manager &im, input_type_entry const &type, std::optional<char const *> seq_type_string, input_seq const &seq)
+			{
+				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
+				im.set_type_seq(type.type(), type.player(), seq_type, seq);
+			});
 	ioport_manager_type["token_to_input_type"] =
 			[] (ioport_manager &im, std::string const &string)
 			{
@@ -177,6 +188,7 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_manager_type["input_type_to_token"] = sol::overload(
 				&ioport_manager::input_type_to_token,
 				[] (ioport_manager &im, ioport_type type) { return im.input_type_to_token(type, 0); });
+	ioport_manager_type["types"] = sol::property(&ioport_manager::types);
 	ioport_manager_type["ports"] = sol::property([] (ioport_manager &im) { return tag_object_ptr_map<ioport_list>(im.ports()); });
 
 
@@ -245,6 +257,7 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto ioport_field_type = sol().registry().new_usertype<ioport_field>("ioport_field", sol::no_constructor);
 	ioport_field_type["set_value"] = &ioport_field::set_value;
+	ioport_field_type["clear_value"] = &ioport_field::clear_value;
 	ioport_field_type["set_input_seq"] =
 		[] (ioport_field &f, std::string const &seq_type_string, const input_seq &seq)
 		{
@@ -293,17 +306,31 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["type"] = sol::property(&ioport_field::type);
 	ioport_field_type["name"] = sol::property(&ioport_field::name);
 	ioport_field_type["default_name"] = sol::property(
-			[] (ioport_field &f)
+			[] (ioport_field const &f)
 			{
 				return f.specific_name() ? f.specific_name() : f.manager().type_name(f.type(), f.player());
 			});
 	ioport_field_type["player"] = sol::property(&ioport_field::player, &ioport_field::set_player);
 	ioport_field_type["mask"] = sol::property(&ioport_field::mask);
 	ioport_field_type["defvalue"] = sol::property(&ioport_field::defvalue);
-	ioport_field_type["sensitivity"] = sol::property(&ioport_field::sensitivity);
+	ioport_field_type["minvalue"] = sol::property(
+			[] (ioport_field const &f)
+			{
+				return f.is_analog() ? std::make_optional(f.minval()) : std::nullopt;
+			});
+	ioport_field_type["maxvalue"] = sol::property(
+			[] (ioport_field const &f)
+			{
+				return f.is_analog() ? std::make_optional(f.maxval()) : std::nullopt;
+			});
+	ioport_field_type["sensitivity"] = sol::property(
+			[] (ioport_field const &f)
+			{
+				return f.is_analog() ? std::make_optional(f.sensitivity()) : std::nullopt;
+			});
 	ioport_field_type["way"] = sol::property(&ioport_field::way);
 	ioport_field_type["type_class"] = sol::property(
-			[] (ioport_field &f)
+			[] (ioport_field const &f)
 			{
 				switch (f.type_class())
 				{
@@ -331,7 +358,7 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["crosshair_scale"] = sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale);
 	ioport_field_type["crosshair_offset"] = sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset);
 	ioport_field_type["user_value"] = sol::property(
-			[] (ioport_field &f)
+			[] (ioport_field const &f)
 			{
 				ioport_field::user_settings settings;
 				f.get_user_settings(settings);
@@ -357,6 +384,15 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto ioport_field_live_type = sol().registry().new_usertype<ioport_field_live>("ioport_field_live", sol::no_constructor);
 	ioport_field_live_type["name"] = &ioport_field_live::name;
+
+
+	auto input_type_entry_type = sol().registry().new_usertype<input_type_entry>("input_type_entry", sol::no_constructor);
+	input_type_entry_type["type"] = sol::property(&input_type_entry::type);
+	input_type_entry_type["group"] = sol::property(&input_type_entry::group);
+	input_type_entry_type["player"] = sol::property(&input_type_entry::player);
+	input_type_entry_type["token"] = sol::property(&input_type_entry::token);
+	input_type_entry_type["name"] = sol::property(&input_type_entry::name);
+	input_type_entry_type["is_analog"] = sol::property([] (input_type_entry const &type) { return ioport_manager::type_is_analog(type.type()); });
 
 
 	auto input_type = sol().registry().new_usertype<input_manager>("input", sol::no_constructor);

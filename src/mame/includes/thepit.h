@@ -49,17 +49,17 @@ private:
 	required_shared_ptr<uint8_t> m_attributesram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	uint8_t m_graphics_bank;
-	uint8_t m_flip_x;
-	uint8_t m_flip_y;
-	tilemap_t *m_solid_tilemap;
-	tilemap_t *m_tilemap;
+	uint8_t m_graphics_bank = 0;
+	uint8_t m_flip_x = 0;
+	uint8_t m_flip_y = 0;
+	tilemap_t *m_solid_tilemap = nullptr;
+	tilemap_t *m_tilemap = nullptr;
 	std::unique_ptr<uint8_t[]> m_dummy_tile;
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0;
 
-	int m_question_address;
-	int m_question_rom;
-	int m_remap_address[16];
+	int m_question_address = 0;
+	int m_question_rom = 0;
+	int m_remap_address[16]{};
 
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);

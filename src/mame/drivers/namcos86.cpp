@@ -17,13 +17,13 @@ Custom ICs:
 ----------
 98XX        lamp/coin output
 99XX        sound volume
-CUS27       clock divider
+CUS27       ULA clock divider
 CUS30       sound control
-CUS35/CUS48 sprite address generator [1]
-CUS39       sprite generator
+CUS35/CUS48 ULA sprite address generator [1]
+CUS39       ULA sprite generator
 CUS41       address decoder [2] [3]
 CUS42(x2)   dual scrolling tilemap address generator
-CUS43(x2)   dual tilemap generator
+CUS43(x2)   ULA dual tilemap generator
 CUS47       address decoder
 CUS60       MCU (63701) [2]
 CUS115      expansion board ROM banking [4]
@@ -1010,17 +1010,6 @@ INPUT_PORTS_END
 
 /*******************************************************************/
 
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	32,32,
@@ -1039,9 +1028,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_namcos86 )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   2048*0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   2048*0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 2048*1, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   2048*0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar,   2048*0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       2048*1, 128 )
 GFXDECODE_END
 
 /*******************************************************************/

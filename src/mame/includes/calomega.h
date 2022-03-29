@@ -150,19 +150,19 @@ private:
 	required_ioport m_grn;
 	required_ioport m_blu;
 
-	uint8_t m_vblank, m_timer;
-	int m_s903_mux_data;
-	int m_s905_mux_data;
-	int m_pia_data;
+	uint8_t m_vblank = 0U, m_timer = 0U;
+	int m_s903_mux_data = 0;
+	int m_s905_mux_data = 0;
+	int m_pia_data = 0;
 	bool m_lockout = false;
-	bool m_diverter;
-	int m_kbscan;
-	int m_rxrdy;
-	int r_pot;
-	int g_pot;
-	int b_pot;
+	bool m_diverter = false;
+	int m_kbscan = 0;
+	int m_rxrdy = 0;
+	int r_pot = 0;
+	int g_pot = 0;
+	int b_pot = 0;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 };
 
 #endif // MAME_INCLUDES_CALOMEGA_H

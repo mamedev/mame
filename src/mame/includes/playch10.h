@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "bus/nes_ctrl/zapper_sensor.h"
 #include "cpu/m6502/n2a03.h"
 #include "machine/rp5h01.h"
 #include "video/ppu2c0x.h"
@@ -22,8 +23,11 @@ public:
 		, m_rp5h01(*this, "rp5h01")
 		, m_ram_8w(*this, "ram_8w")
 		, m_videoram(*this, "videoram")
-		, m_work_ram(*this, "work_ram")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_sensor(*this, "sensor")
+		, m_nt_page(*this, "nt_page%u", 0U)
+		, m_prg_banks(*this, "prg%u", 0U)
+		, m_prg_view(*this, "prg_view")
 		, m_vrom_region(*this, "gfx2")
 		, m_timedigits(*this, "digit_%u", 0U)
 	{
@@ -49,12 +53,8 @@ public:
 	void init_pcbboard();
 	void init_pccboard();
 	void init_pcdboard();
-	void init_pcdboard_2();
 	void init_pceboard();
 	void init_pcfboard();
-	void init_pcfboard_2();
-	void init_virus();
-	void init_ttoon();
 	void init_pcgboard();
 	void init_pcgboard_type2();
 	void init_pchboard();
@@ -84,8 +84,6 @@ private:
 	void pc10_in0_w(uint8_t data);
 	uint8_t pc10_in0_r();
 	uint8_t pc10_in1_r();
-	void pc10_nt_w(offs_t offset, uint8_t data);
-	uint8_t pc10_nt_r(offs_t offset);
 	void pc10_chr_w(offs_t offset, uint8_t data);
 	uint8_t pc10_chr_r(offs_t offset);
 	void mmc1_rom_switch_w(offs_t offset, uint8_t data);
@@ -94,14 +92,15 @@ private:
 	void cboard_vrom_switch_w(uint8_t data);
 	void eboard_rom_switch_w(offs_t offset, uint8_t data);
 	void gboard_rom_switch_w(offs_t offset, uint8_t data);
-	void iboard_rom_switch_w(uint8_t data);
 	void hboard_rom_switch_w(offs_t offset, uint8_t data);
+	void iboard_rom_switch_w(uint8_t data);
 	void playch10_videoram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
+	void ppu_map(address_map &map);
 	void cart_map(address_map &map);
 	void cart_a_map(address_map &map);
 	void cart_b_map(address_map &map);
@@ -127,8 +126,6 @@ private:
 	};
 
 	void playch10_palette(palette_device &palette) const;
-	DECLARE_MACHINE_START(playch10_hboard);
-	DECLARE_VIDEO_START(playch10_hboard);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void pc10_set_videorom_bank( int first, int count, int bank, int size );
@@ -149,8 +146,20 @@ private:
 
 	required_shared_ptr<uint8_t> m_ram_8w;
 	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<nes_zapper_sensor_device> m_sensor;
+
+	required_memory_bank_array<4> m_nt_page;
+	std::unique_ptr<u8[]> m_nt_ram;
+	std::unique_ptr<u8[]> m_cart_nt_ram;
+
+	void init_prg_banking();
+	void prg32(int bank);
+	void prg16(int slot, int bank);
+	void prg8(int slot, int bank);
+	memory_bank_array_creator<4> m_prg_banks;
+	memory_view m_prg_view;
+	int m_prg_chunks;
 
 	optional_memory_region m_vrom_region;
 
@@ -173,18 +182,10 @@ private:
 	int m_MMC2_bank_latch[2];
 	uint8_t* m_vrom;
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t* m_nametable[4];
-	std::unique_ptr<uint8_t[]> m_nt_ram;
-	std::unique_ptr<uint8_t[]> m_extra_ram;
 	chr_bank m_chr_page[8];
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;
-	int m_mmc1_rom_mask;
-	int m_gboard_scanline_counter;
-	int m_gboard_scanline_latch;
 	int m_gboard_banks[2];
-	int m_gboard_4screen;
-	int m_gboard_last_bank;
 	int m_gboard_command;
 	int m_IRQ_count;
 	uint8_t m_IRQ_count_latch;

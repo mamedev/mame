@@ -40,9 +40,9 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
-	tilemap_t* m_bg_tilemap;
+	tilemap_t* m_bg_tilemap = nullptr;
 
-	emu_timer *m_int_timer;
+	emu_timer *m_int_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
 	void vram_w(offs_t offset, uint8_t data);
@@ -61,7 +61,7 @@ public:
 	void cball(machine_config &config);
 	void cpu_map(address_map &map);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -102,12 +102,12 @@ uint32_t cball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-void cball_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cball_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in cball_state::device_timer");

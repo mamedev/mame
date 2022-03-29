@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	fs_coco_os9.h
+    fs_coco_os9.h
 
-	Management of CoCo OS-9 floppy images
+    Management of CoCo OS-9 floppy images
 
 ***************************************************************************/
 
@@ -28,28 +28,28 @@ public:
 	public:
 		volume_header(fsblk_t::block_t &&block);
 
-		u32 total_sectors() const			{ return m_block.r24b(0); }
-		u8  track_size_in_sectors() const	{ return m_block.r8(3); }
+		u32 total_sectors() const           { return m_block.r24b(0); }
+		u8  track_size_in_sectors() const   { return m_block.r8(3); }
 		u16 allocation_bitmap_bytes() const { return m_block.r16b(4); }
-		u16 cluster_size() const			{ return m_block.r16b(6); }
-		u32 root_dir_lsn() const			{ return m_block.r24b(8); }
-		u16 owner_id() const				{ return m_block.r16b(11); }
-		u16 disk_id() const					{ return m_block.r16b(14); }
-		u8  format_flags() const			{ return m_block.r8(16); }
-		u16 sectors_per_track() const		{ return m_block.r16b(17); }
-		u32 bootstrap_lsn() const			{ return m_block.r24b(21); }
-		u16 bootstrap_size() const			{ return m_block.r16b(24); }
-		u16 sector_size() const				{ u16 result = m_block.r16b(104); return result != 0 ? result : 256; }
-		u8 sides() const					{ return (format_flags() & 0x01) ? 2 : 1; }
-		bool double_density() const			{ return (format_flags() & 0x02) != 0; }
-		bool double_track() const			{ return (format_flags() & 0x04) != 0; }
-		bool quad_track_density() const		{ return (format_flags() & 0x08) != 0; }
-		bool octal_track_density() const	{ return (format_flags() & 0x10) != 0; }
+		u16 cluster_size() const            { return m_block.r16b(6); }
+		u32 root_dir_lsn() const            { return m_block.r24b(8); }
+		u16 owner_id() const                { return m_block.r16b(11); }
+		u16 disk_id() const                 { return m_block.r16b(14); }
+		u8  format_flags() const            { return m_block.r8(16); }
+		u16 sectors_per_track() const       { return m_block.r16b(17); }
+		u32 bootstrap_lsn() const           { return m_block.r24b(21); }
+		u16 bootstrap_size() const          { return m_block.r16b(24); }
+		u16 sector_size() const             { u16 result = m_block.r16b(104); return result != 0 ? result : 256; }
+		u8 sides() const                    { return (format_flags() & 0x01) ? 2 : 1; }
+		bool double_density() const         { return (format_flags() & 0x02) != 0; }
+		bool double_track() const           { return (format_flags() & 0x04) != 0; }
+		bool quad_track_density() const     { return (format_flags() & 0x08) != 0; }
+		bool octal_track_density() const    { return (format_flags() & 0x10) != 0; }
 
 		std::string name() const;
 
 	private:
-		fsblk_t::block_t	m_block;
+		fsblk_t::block_t    m_block;
 	};
 
 	class file_header
@@ -57,26 +57,26 @@ public:
 	public:
 		file_header(fsblk_t::block_t &&block);
 
-		u8  attributes() const			{ return m_block.r8(0); }
-		u16 owner_id() const			{ return m_block.r16b(1); }
-		u8  link_count() const			{ return m_block.r8(8); }
-		u32 file_size() const			{ return m_block.r32b(9); }
+		u8  attributes() const          { return m_block.r8(0); }
+		u16 owner_id() const            { return m_block.r16b(1); }
+		u8  link_count() const          { return m_block.r8(8); }
+		u32 file_size() const           { return m_block.r32b(9); }
 		util::arbitrary_datetime creation_date() const;
-		bool is_directory() const		{ return (attributes() & 0x80) != 0; }
-		bool is_non_sharable() const	{ return (attributes() & 0x40) != 0; }
-		bool is_public_execute() const	{ return (attributes() & 0x20) != 0; }
-		bool is_public_write() const	{ return (attributes() & 0x10) != 0; }
-		bool is_public_read() const		{ return (attributes() & 0x08) != 0; }
-		bool is_user_execute() const	{ return (attributes() & 0x04) != 0; }
-		bool is_user_write() const		{ return (attributes() & 0x02) != 0; }
-		bool is_user_read() const		{ return (attributes() & 0x01) != 0; }
+		bool is_directory() const       { return (attributes() & 0x80) != 0; }
+		bool is_non_sharable() const    { return (attributes() & 0x40) != 0; }
+		bool is_public_execute() const  { return (attributes() & 0x20) != 0; }
+		bool is_public_write() const    { return (attributes() & 0x10) != 0; }
+		bool is_public_read() const     { return (attributes() & 0x08) != 0; }
+		bool is_user_execute() const    { return (attributes() & 0x04) != 0; }
+		bool is_user_write() const      { return (attributes() & 0x02) != 0; }
+		bool is_user_read() const       { return (attributes() & 0x01) != 0; }
 
 		meta_data metadata() const;
 		int get_sector_map_entry_count() const;
 		void get_sector_map_entry(int entry_number, u32 &start_lsn, u16 &count) const;
 
 	private:
-		fsblk_t::block_t	m_block;
+		fsblk_t::block_t    m_block;
 	};
 
 	coco_os9_image() : manager_t() {}
@@ -112,8 +112,8 @@ private:
 			virtual std::vector<u8> read_all() override;
 
 		private:
-			impl &		m_fs;
-			file_header	m_file_header;
+			impl &      m_fs;
+			file_header m_file_header;
 		};
 
 		class directory : public idir_t {
@@ -128,8 +128,8 @@ private:
 			virtual dir_t dir_get(u64 key) override;
 
 		private:
-			impl &		m_fs;
-			file_header	m_file_header;
+			impl &      m_fs;
+			file_header m_file_header;
 		};
 
 		impl(fsblk_t &blockdev, volume_header &&header);
@@ -139,8 +139,8 @@ private:
 		virtual dir_t root() override;
 
 	private:
-		volume_header	m_volume_header;
-		dir_t			m_root;
+		volume_header   m_volume_header;
+		dir_t           m_root;
 
 		directory *open_directory(u32 lsn);
 		void drop_root_ref();

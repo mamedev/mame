@@ -359,16 +359,16 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap2);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap3);
 
-	tilemap_t *m_bg_tilemap1;
-	tilemap_t *m_bg_tilemap2;
-	tilemap_t *m_bg_tilemap3;
+	tilemap_t *m_bg_tilemap1 = nullptr;
+	tilemap_t *m_bg_tilemap2 = nullptr;
+	tilemap_t *m_bg_tilemap3 = nullptr;
 
 	uint16_t unknown_0x40000x_r();
 
 	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
-	int m_adpcm_data;
+	int m_adpcm_data = 0;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
 };

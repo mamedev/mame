@@ -2,13 +2,13 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-    Finalizer (GX523) (c) 1985 Konami
+Finalizer (GX523) (c) 1985 Konami
 
-    driver by Nicola Salmoria
-
-    2009-03:
-    Added dsw locations and verified factory setting based on Guru's notes
-    (actually for finalizr only, finalizrb locations assumed to be the same)
+TODO:
+- does Konami SND01 MCU have anything custom or is it the same as 8049?
+- bootleg uses ENT0 CLK connected to T1 instead of internal timer, but it doesn't
+  look like MAME can handle it with the speed it wants (eg. with set_t0_clk_cb and
+  clock_device), so right now it's done with machine().time() when it reads T1.
 
 ***************************************************************************/
 
@@ -59,12 +59,12 @@ void finalizr_state::flipscreen_w(uint8_t data)
 	flip_screen_set(~data & 0x08);
 }
 
-void finalizr_state::i8039_irq_w(uint8_t data)
+void finalizr_state::sound_irq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-void finalizr_state::i8039_irqen_w(uint8_t data)
+void finalizr_state::sound_irqen_w(uint8_t data)
 {
 	/*  bit 0x80 goes active low, indicating that the
 	    external IRQ being serviced is complete
@@ -75,36 +75,21 @@ void finalizr_state::i8039_irqen_w(uint8_t data)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(finalizr_state::i8039_t1_r)
+READ_LINE_MEMBER(finalizr_state::bootleg_t1_r)
 {
-	/*  I suspect the clock-out from the I8039 T0 line should be connected
-	    here (See the i8039_t0_w handler below).
-	    The frequency of this clock cannot be greater than I8039 CLKIN / 45
-	    Accounting for the I8039 input clock, and internal/external divisors
-	    the frequency here should be 192KHz (I8039 CLKIN / 48)
-
-	    Here we apply a positive edge every 3.2 reads, to simulate 192KHz
-	    based on the I8039 main xtal clock input frequency of 9.216MHz
+	/*  The clock-out from the MCS48 T0 line should be connected here.
+	    Accounting for the MCS48 input clock, and internal/external divisors
+	    the frequency here should be 192KHz (MCS48 CLKIN / 48)
 	*/
 
-	m_t1_line++;
-	m_t1_line %= 16;
-	return (!(m_t1_line % 3) && (m_t1_line > 0));
-}
-
-void finalizr_state::i8039_t0_w(uint8_t data)
-{
-	/*  This becomes a clock output at a frequency of 3.072MHz (derived
-	    by internally dividing the main xtal clock input by a factor of 3).
-	    This output is divided by a factor of 16, then used as a 192KHz
-	    input clock to the T1 input line.
-	    The I8039 core currently doesn't support clock out on this pin.
-	*/
+	return (machine().time().as_ticks(m_audiocpu->clock() / 48 * 2)) & 1;
 }
 
 void finalizr_state::main_map(address_map &map)
 {
+	map(0x0000, 0x0000).nopw();
 	map(0x0001, 0x0001).writeonly().share(m_scroll);
+	map(0x0002, 0x0002).nopw();
 	map(0x0003, 0x0003).w(FUNC(finalizr_state::videoctrl_w));
 	map(0x0004, 0x0004).w(FUNC(finalizr_state::flipscreen_w));
 //  map(0x0020, 0x003f).writeonly().share(m_scroll);
@@ -118,7 +103,7 @@ void finalizr_state::main_map(address_map &map)
 	map(0x0819, 0x0819).w(FUNC(finalizr_state::coin_w));
 	map(0x081a, 0x081a).w("snsnd", FUNC(sn76489a_device::write));   // This address triggers the SN chip to read the data port.
 	map(0x081b, 0x081b).nopw();        // Loads the snd command into the snd latch
-	map(0x081c, 0x081c).w(FUNC(finalizr_state::i8039_irq_w)); // custom sound chip
+	map(0x081c, 0x081c).w(FUNC(finalizr_state::sound_irq_w)); // custom sound chip
 	map(0x081d, 0x081d).w("soundlatch", FUNC(generic_latch_8_device::write)); // custom sound chip
 	map(0x2000, 0x23ff).ram().share(m_colorram[0]);
 	map(0x2400, 0x27ff).ram().share(m_videoram[0]);
@@ -129,11 +114,6 @@ void finalizr_state::main_map(address_map &map)
 	map(0x3800, 0x39ff).ram().share(m_spriteram[1]);
 	map(0x3a00, 0x3fff).ram();
 	map(0x4000, 0xffff).rom();
-}
-
-void finalizr_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x0fff).rom();
 }
 
 void finalizr_state::sound_io_map(address_map &map)
@@ -212,17 +192,6 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -237,9 +206,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_finalizr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  16*16, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    16*16, 16 )  // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,     0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,         16*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 16*16, 16 )  // to handle 8x8 sprites
 GFXDECODE_END
 
 
@@ -247,7 +216,6 @@ void finalizr_state::machine_start()
 {
 	save_item(NAME(m_spriterambank));
 	save_item(NAME(m_charbank));
-	save_item(NAME(m_t1_line));
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_irq_enable));
 }
@@ -256,7 +224,6 @@ void finalizr_state::machine_reset()
 {
 	m_spriterambank = 0;
 	m_charbank = 0;
-	m_t1_line = 0;
 	m_nmi_enable = 0;
 	m_irq_enable = 0;
 }
@@ -264,17 +231,14 @@ void finalizr_state::machine_reset()
 void finalizr_state::finalizr(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI1(config, m_maincpu, XTAL(18'432'000)/6); // ???
+	KONAMI1(config, m_maincpu, 18.432_MHz_XTAL / 12); // 1.536MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &finalizr_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(finalizr_state::scanline), "screen", 0, 1);
 
-	I8039(config, m_audiocpu, XTAL(18'432'000)/2); // 9.216MHz clkin ??
-	m_audiocpu->set_addrmap(AS_PROGRAM, &finalizr_state::sound_map);
+	I8049(config, m_audiocpu, 18.432_MHz_XTAL / 3); // 6.144MHz
 	m_audiocpu->set_addrmap(AS_IO, &finalizr_state::sound_io_map);
 	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
-	m_audiocpu->p2_out_cb().set(FUNC(finalizr_state::i8039_irqen_w));
-	//m_audiocpu->set_t0_clk_cb(finalizr_state::i8039_t0_w));
-	m_audiocpu->t1_in_cb().set(FUNC(finalizr_state::i8039_t1_r));
+	m_audiocpu->p2_out_cb().set(FUNC(finalizr_state::sound_irqen_w));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -295,9 +259,20 @@ void finalizr_state::finalizr(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	SN76489A(config, "snsnd", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.75);
+	SN76489A(config, "snsnd", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.325); // unknown DAC
+}
+
+void finalizr_state::finalizrb(machine_config &config)
+{
+	finalizr(config);
+
+	I8749(config.replace(), m_audiocpu, 18.432_MHz_XTAL / 2); // ???
+	m_audiocpu->set_addrmap(AS_IO, &finalizr_state::sound_io_map);
+	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_audiocpu->p2_out_cb().set(FUNC(finalizr_state::sound_irqen_w));
+	m_audiocpu->t1_in_cb().set(FUNC(finalizr_state::bootleg_t1_r));
 }
 
 
@@ -314,8 +289,8 @@ ROM_START( finalizr )
 	ROM_LOAD( "523k02.12c",   0x8000, 0x4000, CRC(1bccc696) SHA1(3c29f4a030e76660b5a25347e042e344b0653343) )
 	ROM_LOAD( "523k03.13c",   0xc000, 0x4000, CRC(c48927c6) SHA1(9cf6b285034670370ba0246c33e1fe0a057457e7) )
 
-	ROM_REGION( 0x1000, "audiocpu", 0 ) // 8039
-	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, BAD_DUMP CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )   // this comes from the bootleg, the original has a custom IC
+	ROM_REGION( 0x0800, "audiocpu", 0 ) // Konami custom
+	ROM_LOAD( "snd01_715-057p.8a", 0x0000, 0x0800, CRC(5459ab95) SHA1(3537b1b3ff0196493a6a03a1578cb2878b1c52bd) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "523h04.5e",    0x00000, 0x4000, CRC(c056d710) SHA1(3fe0ab7ef3bce7298c2a073d0985c33f9dc40062) )
@@ -339,8 +314,8 @@ ROM_START( finalizra )
 	ROM_LOAD( "2.12c",   0x8000, 0x4000, CRC(383dc94e) SHA1(f192e16e83ae34cc97af07072a4dc68e7c4c362c) )
 	ROM_LOAD( "3.13c",   0xc000, 0x4000, CRC(ce177f6e) SHA1(034cbe0c1e2baf9577741b3c222a8b4a8ac8c919) )
 
-	ROM_REGION( 0x1000, "audiocpu", 0 ) // 8039
-	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, BAD_DUMP CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )   // this comes from the bootleg, the original has a custom IC
+	ROM_REGION( 0x0800, "audiocpu", 0 ) // Konami custom
+	ROM_LOAD( "snd01_715-057p.8a", 0x0000, 0x0800, CRC(5459ab95) SHA1(3537b1b3ff0196493a6a03a1578cb2878b1c52bd) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "523h04.5e",    0x00000, 0x4000, CRC(c056d710) SHA1(3fe0ab7ef3bce7298c2a073d0985c33f9dc40062) )
@@ -363,7 +338,7 @@ ROM_START( finalizrb )
 	ROM_LOAD( "finalizr.5",   0x4000, 0x8000, CRC(a55e3f14) SHA1(47f6da214b36cc56be547fa4313afcc5572508a2) )
 	ROM_LOAD( "finalizr.6",   0xc000, 0x4000, CRC(ce177f6e) SHA1(034cbe0c1e2baf9577741b3c222a8b4a8ac8c919) )
 
-	ROM_REGION( 0x1000, "audiocpu", 0 ) // 8039
+	ROM_REGION( 0x0800, "audiocpu", 0 ) // 8749
 	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
@@ -383,7 +358,7 @@ ROM_START( finalizrb )
 ROM_END
 
 
-
-GAME( 1985, finalizr,  0,        finalizr, finalizr,  finalizr_state, empty_init, ROT90, "Konami",  "Finalizer - Super Transformation (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizra, finalizr, finalizr, finalizra, finalizr_state, empty_init, ROT90, "Konami",  "Finalizer - Super Transformation (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizrb, finalizr, finalizr, finalizra, finalizr_state, empty_init, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE    INPUT      CLASS           INIT        ROT    COMPANY    FULLNAME                                      FLAGS
+GAME( 1985, finalizr,  0,        finalizr,  finalizr,  finalizr_state, empty_init, ROT90, "Konami",  "Finalizer - Super Transformation (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizra, finalizr, finalizr,  finalizra, finalizr_state, empty_init, ROT90, "Konami",  "Finalizer - Super Transformation (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizrb, finalizra, finalizr_state, empty_init, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

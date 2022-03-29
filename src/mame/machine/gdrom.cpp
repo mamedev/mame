@@ -9,6 +9,18 @@
 #include "emu.h"
 #include "gdrom.h"
 
+#define LOG_WARN    (1U << 1)
+#define LOG_CMD     (1U << 2)
+#define LOG_XFER    (1U << 3)
+
+#define VERBOSE (LOG_WARN | LOG_CMD)
+//#define LOG_OUTPUT_STREAM std::cout
+#include "logmacro.h"
+
+#define LOGWARN(...)      LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGCMD(...)       LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGXFER(...)      LOGMASKED(LOG_XFER, __VA_ARGS__)
+
 #define GDROM_BUSY_STATE    0x00
 #define GDROM_PAUSE_STATE   0x01
 #define GDROM_STANDBY_STATE 0x02
@@ -162,29 +174,29 @@ void gdrom_device::ExecCommand()
 		case 0x11: // REQ_MODE
 			m_phase = SCSI_PHASE_DATAIN;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
-			printf("REQ_MODE %02x %02x %02x %02x %02x %02x\n",
+			LOGCMD("REQ_MODE %02x %02x %02x %02x %02x %02x\n",
 				command[0], command[1],
 				command[2], command[3],
-				command[4], command[5]);
+				command[4], command[5]
+			);
 //          if (SCSILengthFromUINT8( &command[ 4 ] ) < 32) return -1;
 			transferOffset = command[2];
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
 		case 0x12: // SET_MODE
-			logerror("GDROM: SET_MODE\n");
 			m_phase = SCSI_PHASE_DATAOUT;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			//transferOffset = command[2];
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
-			printf("SET_MODE %02x %02x\n",command[2],command[4]);
+			LOGCMD("SET_MODE %02x %02x\n", command[2], command[4]);
 			break;
 
 		case 0x30: // CD_READ
 			if (command[1] & 1)
 			{
-				fatalerror("GDROM: MSF mode used for CD_READ, unsupported\n");
 				m_transfer_length = 0;
+				throw emu_fatalerror("GDROM: MSF mode used for CD_READ, unsupported");
 			}
 			else
 			{
@@ -196,15 +208,19 @@ void gdrom_device::ExecCommand()
 
 				if (read_type != 2) // mode 1
 				{
-					fatalerror("GDROM: Unhandled read_type %d\n", read_type);
+					throw emu_fatalerror("GDROM: Unhandled read_type %d", read_type);
 				}
 
 				if (data_select != 2)   // just sector data
 				{
-					fatalerror("GDROM: Unhandled data_select %d\n", data_select);
+					throw emu_fatalerror("GDROM: Unhandled data_select %d", data_select);
 				}
 
-				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", m_lba, m_blocks, m_blocks * m_sector_bytes, read_type, data_select);
+				LOGCMD("CD_READ %02x %02x\n", command[2], command[4]);
+				LOGCMD("   LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n",
+					m_lba, m_blocks,
+					m_blocks * m_sector_bytes, read_type, data_select
+				);
 
 				if (m_num_subblocks > 1)
 				{
@@ -230,7 +246,8 @@ void gdrom_device::ExecCommand()
 		// READ TOC (GD-ROM ver.)
 		case 0x14:
 		{
-			int start_trk = command[2];// ok?
+			// TODO: is this correct?
+			int start_trk = command[2];
 			int end_trk = cdrom_get_last_track(m_cdrom);
 			int length;
 			int allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
@@ -286,7 +303,7 @@ void gdrom_device::ExecCommand()
 			}
 			else
 			{
-				printf("command 0x40: unhandled subchannel request\n");
+				LOGWARN("command 0x40: unhandled subchannel request\n");
 			}
 			break;
 
@@ -308,22 +325,22 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 	switch ( command[0] )
 	{
 		case 0x11: // REQ_MODE
-			printf("REQ_MODE: dataLength %d\n", dataLength);
+			LOGCMD("REQ_MODE dataLength %d\n", dataLength);
 			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
 			break;
 
 		case 0x30: // CD_READ
-			logerror("GDROM: read %x dataLength, \n", dataLength);
+			LOGCMD("CD_READ read %x dataLength,\n", dataLength);
 			if ((m_cdrom) && (m_blocks))
 			{
 				while (dataLength > 0)
 				{
 					if (!cdrom_read_data(m_cdrom, m_lba, tmp_buffer, CD_TRACK_MODE1))
 					{
-						logerror("GDROM: CD read error!\n");
+						LOGWARN("CD read error!\n");
 					}
 
-					logerror("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
+					LOGXFER("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
 
 					memcpy(data, &tmp_buffer[m_cur_subblock * m_sector_bytes], m_sector_bytes);
 
@@ -350,77 +367,81 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			    our internal routines for tracks use "0" as track 1.  That probably
 			    should be fixed...
 			*/
-			printf("GDROM: READ TOC, format = %d time=%d\n", command[2]&0xf,(command[1]>>1)&1);
+			LOGCMD("READ TOC format = %d time=%d\n",
+				command[2] & 0xf, (command[1] >> 1) & 1
+			);
 			switch (command[2] & 0x0f)
 			{
 				case 0:     // normal
+				{
+					int start_trk;
+					int end_trk;
+					int len;
+					int in_len;
+					int dptr;
+					uint32_t tstart;
+
+					start_trk = command[2];
+					if( start_trk == 0 )
 					{
-						int start_trk;
-						int end_trk;
-						int len;
-						int in_len;
-						int dptr;
-						uint32_t tstart;
-
-						start_trk = command[2];
-						if( start_trk == 0 )
-						{
-							start_trk = 1;
-						}
-
-						end_trk = cdrom_get_last_track(m_cdrom);
-						len = (end_trk * 8) + 2;
-
-						// the returned TOC DATA LENGTH must be the full amount,
-						// regardless of how much we're able to pass back due to in_len
-						dptr = 0;
-						data[dptr++] = (len>>8) & 0xff;
-						data[dptr++] = (len & 0xff);
-						data[dptr++] = 1;
-						data[dptr++] = end_trk;
-
-						if( start_trk == 0xaa )
-						{
-							end_trk = 0xaa;
-						}
-
-						in_len = command[3]<<8 | command[4];
-
-						for (i = start_trk; i <= end_trk; i++)
-						{
-							int cdrom_track = i;
-							if( cdrom_track != 0xaa )
-							{
-								cdrom_track--;
-							}
-
-							if( dptr >= in_len )
-							{
-								break;
-							}
-
-							data[dptr++] = 0;
-							data[dptr++] = cdrom_get_adr_control(m_cdrom, cdrom_track);
-							data[dptr++] = i;
-							data[dptr++] = 0;
-
-							tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
-							if ((command[1]&2)>>1)
-								tstart = lba_to_msf(tstart);
-							data[dptr++] = (tstart>>24) & 0xff;
-							data[dptr++] = (tstart>>16) & 0xff;
-							data[dptr++] = (tstart>>8) & 0xff;
-							data[dptr++] = (tstart & 0xff);
-						}
+						start_trk = 1;
 					}
+
+					end_trk = cdrom_get_last_track(m_cdrom);
+					len = (end_trk * 8) + 2;
+
+					// the returned TOC DATA LENGTH must be the full amount,
+					// regardless of how much we're able to pass back due to in_len
+					dptr = 0;
+					data[dptr++] = (len>>8) & 0xff;
+					data[dptr++] = (len & 0xff);
+					data[dptr++] = 1;
+					data[dptr++] = end_trk;
+
+					if( start_trk == 0xaa )
+					{
+						end_trk = 0xaa;
+					}
+
+					in_len = command[3]<<8 | command[4];
+
+					for (i = start_trk; i <= end_trk; i++)
+					{
+						int cdrom_track = i;
+						if( cdrom_track != 0xaa )
+						{
+							cdrom_track--;
+						}
+
+						if( dptr >= in_len )
+						{
+							break;
+						}
+
+						data[dptr++] = 0;
+						data[dptr++] = cdrom_get_adr_control(m_cdrom, cdrom_track);
+						data[dptr++] = i;
+						data[dptr++] = 0;
+
+						tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
+						if ((command[1]&2)>>1)
+							tstart = lba_to_msf(tstart);
+						data[dptr++] = (tstart>>24) & 0xff;
+						data[dptr++] = (tstart>>16) & 0xff;
+						data[dptr++] = (tstart>>8) & 0xff;
+						data[dptr++] = (tstart & 0xff);
+					}
+
 					break;
+				}
 				default:
-					logerror("GDROM: Unhandled READ TOC format %d\n", command[2]&0xf);
+					LOGWARN("Unhandled READ TOC format %d\n", command[2]&0xf);
 					break;
 			}
 			break;
 
 		case 0x71:
+			LOGCMD("SYS_REQ_SECU\n");
 			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
 			if (is_real_gdrom_disc)
 				data[10] = 0x1f; // needed by dimm board firmware
@@ -534,7 +555,8 @@ void gdrom_device::device_start()
 void gdrom_device::process_buffer()
 {
 	atapi_hle_device::process_buffer();
-	m_sector_number = 0x80 | GDROM_PAUSE_STATE; /// HACK: find out when this should be updated
+	// HACK: find out when this should be updated
+	m_sector_number = 0x80 | GDROM_PAUSE_STATE;
 }
 
 void gdrom_device::signature()

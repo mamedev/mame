@@ -3790,6 +3790,26 @@ ROM_START( fanzonem )
 	ROM_LOAD16_WORD_SWAP( "mpr-21444.ic8",    0x1c00000, 0x0400000, CRC(a82ff33b) SHA1(9559ee4cf1ec487c3847df40d10aa2a4eaee97d2) )
 ROM_END
 
+ROM_START( yattrmnp ) // ROM board stickered 837-13598
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "epr-21122.ic13",    0x0000000, 0x0080000, CRC(49f56e32) SHA1(7d8bdaaf3a4edd9df90becc3ec5e94a69bb29ffc) ) // ST M27C4002-12F1
+	ROM_LOAD16_WORD_SWAP( "mpr-21125.ic02",    0x0400000, 0x0400000, CRC(40f5f119) SHA1(68fc634734ab05b54ff93256259969f16e26807d) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21130.ic03",    0x0800000, 0x0400000, CRC(84cb4e9c) SHA1(675464b0fdf80a3d6e39292e56528e906d388d3c) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21126.ic04",    0x0c00000, 0x0400000, CRC(36095649) SHA1(cd06471943380d80887e389e04008d78c58d14b3) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21131.ic05",    0x1000000, 0x0400000, CRC(b1c860d8) SHA1(474539f86369f10df5f0e51fd5b44febbc846f98) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21127.ic06",    0x1400000, 0x0400000, CRC(f55901d7) SHA1(ab80d82b6707929af9cc5615319bc5b336c13f4a) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21132.ic07",    0x1800000, 0x0400000, CRC(809b1b0e) SHA1(8404a03624ba735cc796a38a2b2b96bf9e37f5ee) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21128.ic08",    0x1c00000, 0x0400000, CRC(c2e2f72e) SHA1(299c60a74caf3ec6641b6369c823059ef2fbdc5e) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21133.ic09",    0x2000000, 0x0400000, CRC(2dc21956) SHA1(6fd7ab435127286a7b212e30b1f29a6f3fbd018b) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21129.ic10",    0x2400000, 0x0400000, CRC(997d67bd) SHA1(f588b4391982df4afe60fe8bf739cd510f98caa0) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21124.ic11",    0x2800000, 0x0400000, CRC(10f073ac) SHA1(8c16d8ad9c435d44a7b4dd327cd44ffd2f7e895c) )
+	ROM_LOAD16_WORD_SWAP( "mpr-21123.ic12",    0x2c00000, 0x0400000, CRC(491b9166) SHA1(f1d5e5b7bef4fc99862b1b8178759e96ba4cb29c) )
+
+	ROM_REGION( 0x200, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-5930.ic19", 0x000, 0x117, CRC(d1201563) SHA1(a133b07240c0a4eb8bae4b438d98fc6148fb7f4f) )
+ROM_END
 
 GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
 
@@ -3908,6 +3928,7 @@ GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,  
 
 /* Gives I/O errors */
 GAME( 1996, magzun,    stvbios, magzun,   stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
+GAME( 1998, yattrmnp,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Yatterman Plus (J 981006 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs emulation of the medal specific hardware
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game, REV.A) (J 990202 V1.000)", MACHINE_NOT_WORKING ) // require SH2's SCI serial port emulated, to communicate with coin/medal-related I/O board
 GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

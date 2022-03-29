@@ -71,7 +71,7 @@ public:
 	// construction/destruction
 	spectrum_disciple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_INPUT_CHANGED_MEMBER(inhibit_button) { if (!newval) m_romcs = 0; };
+	DECLARE_INPUT_CHANGED_MEMBER(inhibit_button) { if (!newval) m_romcs = 0; }
 
 protected:
 	enum
@@ -82,7 +82,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

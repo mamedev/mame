@@ -100,9 +100,9 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 
-	uint8_t m_audio_result;
-	uint8_t m_bank_val;
-	uint8_t m_vblank;
+	uint8_t m_audio_result = 0;
+	uint8_t m_bank_val = 0;
+	uint8_t m_vblank = 0;
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
 	void audio_cpu_assert_nmi();
 };

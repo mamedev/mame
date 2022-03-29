@@ -420,7 +420,7 @@ public:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
-	virtual void sh2_exception(const char *message, int irqline) { fatalerror("sh2_exception in base classs\n"); };
+	virtual void sh2_exception(const char *message, int irqline) { fatalerror("sh2_exception in base classs\n"); }
 
 	virtual void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception) = 0;
 

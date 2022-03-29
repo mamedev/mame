@@ -26,15 +26,15 @@
 
 struct ssi263_t
 {
-	uint8_t dr;
-	uint8_t p;
-	uint16_t i;
-	uint8_t r;
-	uint8_t t;
-	uint8_t c;
-	uint8_t a;
-	uint8_t f;
-	uint8_t mode;
+	uint8_t dr = 0;
+	uint8_t p = 0;
+	uint16_t i = 0;
+	uint8_t r = 0;
+	uint8_t t = 0;
+	uint8_t c = 0;
+	uint8_t a = 0;
+	uint8_t f = 0;
+	uint8_t mode = 0;
 };
 
 class thayers_state : public driver_device
@@ -64,21 +64,21 @@ private:
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
-	uint8_t m_laserdisc_data;
-	int m_rx_bit;
-	int m_keylatch;
-	uint8_t m_keydata;
-	bool m_kbdata;
-	bool m_kbclk;
-	uint8_t m_cop_data_latch;
-	int m_cop_data_latch_enable;
-	uint8_t m_cop_l;
-	uint8_t m_cop_cmd_latch;
-	int m_timer_int;
-	int m_data_rdy_int;
-	int m_ssi_data_request;
-	int m_cart_present;
-	int m_pr7820_enter;
+	uint8_t m_laserdisc_data = 0;
+	int m_rx_bit = 0;
+	int m_keylatch = 0;
+	uint8_t m_keydata = 0;
+	bool m_kbdata = false;
+	bool m_kbclk = false;
+	uint8_t m_cop_data_latch = 0;
+	int m_cop_data_latch_enable = 0;
+	uint8_t m_cop_l = 0;
+	uint8_t m_cop_cmd_latch = 0;
+	int m_timer_int = 0;
+	int m_data_rdy_int = 0;
+	int m_ssi_data_request = 0;
+	int m_cart_present = 0;
+	int m_pr7820_enter = 0;
 	struct ssi263_t m_ssi263;
 	void intrq_w(uint8_t data);
 	uint8_t irqstate_r();
@@ -114,14 +114,14 @@ private:
 	void thayers_io_map(address_map &map);
 	void thayers_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 static const uint8_t led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
 
 /* Interrupts */
 
-void thayers_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void thayers_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

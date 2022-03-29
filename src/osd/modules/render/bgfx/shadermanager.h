@@ -24,18 +24,19 @@
 
 class shader_manager {
 public:
-	shader_manager(osd_options& options) : m_options(options) { }
+	shader_manager() { }
 	~shader_manager();
 
 	// Getters
-	bgfx::ShaderHandle shader(std::string name);
+	bgfx::ShaderHandle get_or_load_shader(osd_options &options, std::string name);
+	static bgfx::ShaderHandle load_shader(osd_options &options, std::string name);
+	static bool is_shader_present(osd_options &options, std::string name);
 
 private:
-	bgfx::ShaderHandle load_shader(std::string name);
+	static std::string make_path_string(osd_options &options, std::string name);
 	static const bgfx::Memory* load_mem(std::string name);
 
 	std::map<std::string, bgfx::ShaderHandle>   m_shaders;
-	osd_options&                                m_options;
 };
 
 #endif // __DRAWBGFX_SHADER_MANAGER__

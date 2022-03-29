@@ -961,7 +961,7 @@ void tandy2k_state::device_reset_after_children()
 	m_pc_keyboard->enable(0);
 }
 
-void tandy2k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tandy2k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

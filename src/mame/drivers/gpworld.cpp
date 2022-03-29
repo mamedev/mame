@@ -71,12 +71,12 @@ public:
 	void init_gpworld();
 
 private:
-	uint8_t m_nmi_enable;
-	uint8_t m_start_lamp;
-	uint8_t m_ldp_read_latch;
-	uint8_t m_ldp_write_latch;
-	uint8_t m_brake_gas;
-	emu_timer *m_irq_stop_timer;
+	uint8_t m_nmi_enable = 0;
+	uint8_t m_start_lamp = 0;
+	uint8_t m_ldp_read_latch = 0;
+	uint8_t m_ldp_write_latch = 0;
+	uint8_t m_brake_gas = 0;
+	emu_timer *m_irq_stop_timer = nullptr;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_palette_ram;
@@ -100,7 +100,7 @@ private:
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -454,7 +454,7 @@ static INPUT_PORTS_START( gpworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

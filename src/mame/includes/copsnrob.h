@@ -59,8 +59,8 @@ private:
 	required_device<discrete_device> m_discrete;
 
 	/* misc */
-	uint8_t          m_misc;
-	uint8_t          m_ic_h3_data;
+	uint8_t          m_misc = 0U;
+	uint8_t          m_ic_h3_data = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

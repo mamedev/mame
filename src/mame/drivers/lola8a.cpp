@@ -51,10 +51,12 @@ TO DO
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -63,6 +65,8 @@ TO DO
 #define AY8910_TAG "g12"
 #define HD46505SP_TAG "h45"
 
+
+namespace {
 
 class lola8a_state : public driver_device
 {
@@ -95,7 +99,7 @@ private:
 	void mem_map(address_map &map);
 
 	u8 m_portb = 0U;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -290,20 +294,22 @@ void lola8a_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x1fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0x8000, 0x9fff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0x8000, 0x9fff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void lola8a_state::machine_start()
@@ -360,6 +366,8 @@ ROM_START( lola8a )
 	ROM_LOAD( "lola 8a r1 w06 22.11.86.c45", 0x2000, 0x2000, CRC(99f8ec9b) SHA1(88eafd09c479f177525fa0039cf04d74bae39dab))
 	ROM_LOAD( "lola 8a r2 w06 22.11.86.h67", 0x4000, 0x2000, CRC(1e7cd46b) SHA1(048b2583ee7baeb9621e629b79ed64583ac5d554))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

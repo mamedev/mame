@@ -67,11 +67,11 @@ private:
 	optional_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
-	uint16_t      m_sprite_ctrl;
-	uint16_t      m_sprites_flipscreen;
+	uint16_t      m_sprite_ctrl = 0;
+	uint16_t      m_sprites_flipscreen = 0;
 
 	/* misc */
-	uint8_t       m_jumping_latch;
+	uint8_t       m_jumping_latch = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

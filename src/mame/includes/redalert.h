@@ -55,7 +55,7 @@ private:
 	required_device<screen_device> m_screen;
 
 	std::unique_ptr<uint8_t[]> m_bitmap_colorram;
-	uint8_t m_control_xor;
+	uint8_t m_control_xor = 0;
 	uint8_t redalert_interrupt_clear_r();
 	void redalert_interrupt_clear_w(uint8_t data);
 	uint8_t panther_interrupt_clear_r();
@@ -79,7 +79,7 @@ private:
 	void demoneye_main_map(address_map &map);
 
 	u8 m_demoneye_bitmap_reg[4];
-	u8 m_demoneye_bitmap_yoffs;
+	u8 m_demoneye_bitmap_yoffs = 0;
 };
 
 #endif // MAME_INCLUDES_REDALERT_H

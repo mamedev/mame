@@ -693,20 +693,9 @@ static INPUT_PORTS_START( gaialast )
 	PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{STEP4(0,1)},
-	{STEP16(0,4)},
-	{STEP16(0,4*16)},
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_dreamwld )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x40 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x800, 0x48 ) // [1] Layer 0 + 1
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_msb, 0x000, 0x40 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 0x800, 0x48 ) // [1] Layer 0 + 1
 GFXDECODE_END
 
 

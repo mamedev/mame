@@ -65,7 +65,7 @@ INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
-void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

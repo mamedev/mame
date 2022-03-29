@@ -76,15 +76,15 @@ protected:
 	required_device<palette_device> m_palette;
 	required_ioport_array<16> m_keyboard;
 
-	uint8_t     *m_vram_base;
-	uint8_t     m_video_mode;
-	uint8_t     m_keyline;
-	uint8_t     m_active_slot;
-	uint8_t     m_int_flipflop;
-	uint8_t     m_col[4];
-	uint8_t     m_vram_bank;
-	uint8_t     m_cassette_ff;
-	uint8_t     m_centronics_ff;
+	uint8_t     *m_vram_base = nullptr;
+	uint8_t     m_video_mode = 0;
+	uint8_t     m_keyline = 0;
+	uint8_t     m_active_slot = 0;
+	uint8_t     m_int_flipflop = 0;
+	uint8_t     m_col[4]{};
+	uint8_t     m_vram_bank = 0;
+	uint8_t     m_cassette_ff = 0;
+	uint8_t     m_centronics_ff = 0;
 
 	void bank_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);

@@ -7,7 +7,6 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "formats/mm_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
@@ -15,11 +14,14 @@
 #include "machine/mm1kb.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/z80sio.h"
 #include "machine/upd765.h"
+#include "machine/z80sio.h"
 #include "video/i8275.h"
 #include "video/upd7220.h"
+
 #include "emupal.h"
+
+#include "formats/mm_dsk.h"
 
 #define SCREEN_TAG      "screen"
 #define I8085A_TAG      "ic40"

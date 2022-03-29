@@ -39,9 +39,9 @@ private:
 	required_region_ptr<uint8_t> m_gfxrom;
 
 	/* misc */
-	int         m_priority;
-	int         m_irqAen;
-	int         m_irqBmask;
+	int         m_priority = 0;
+	int         m_irqAen = 0;
+	int         m_irqBmask = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

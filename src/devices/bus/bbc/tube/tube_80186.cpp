@@ -81,6 +81,7 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_80186").set_original("bbc_flop_80186");
+	SOFTWARE_LIST(config, "pc_disk_list").set_compatible("ibm5150");
 }
 
 void bbc_tube_pcplus_device::device_add_mconfig(machine_config &config)

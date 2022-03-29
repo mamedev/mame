@@ -64,11 +64,11 @@ private:
 	required_shared_ptr<uint16_t> m_fg_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_tilemap;
-	tilemap_t *m_md_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_tilemap = nullptr;
+	tilemap_t *m_md_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
-	uint16_t m_scroll[6];
+	uint16_t m_scroll[6]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

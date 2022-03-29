@@ -59,10 +59,10 @@ private:
 	required_shared_ptr<uint8_t> m_bgvideoram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
-	uint8_t      m_scrollx[2];
-	uint8_t      m_scrolly[2];
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	uint8_t      m_scrollx[2]{};
+	uint8_t      m_scrolly[2]{};
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<ym2203_device, 2> m_ym;

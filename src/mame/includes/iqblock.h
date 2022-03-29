@@ -33,10 +33,10 @@ private:
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 
-	int m_videoenable;
-	int m_video_type;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	int m_videoenable = 0;
+	int m_video_type = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	void iqblock_prot_w(uint8_t data);
 	void grndtour_prot_w(uint8_t data);

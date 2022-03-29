@@ -63,7 +63,7 @@ static constexpr int KCGD_PAGE_1 = 005574;
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGVRAM(...) LOGMASKED(LOG_VRAM, __VA_ARGS__)
@@ -108,7 +108,7 @@ private:
 		KCGD_STATUS_TIMER_VAL = 15
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint16_t vram_addr_r();
 	uint16_t vram_data_r();
@@ -124,7 +124,7 @@ private:
 	void palette_data_w(uint8_t data);
 
 	//emu_timer *m_vsync_on_timer;
-	emu_timer *m_500hz_timer;
+	emu_timer *m_500hz_timer = nullptr;
 
 	void kcgd_mem(address_map &map);
 
@@ -134,10 +134,10 @@ private:
 
 	struct
 	{
-		uint16_t status; // 167770
-		uint8_t control; // 167772
-		int palette_index, vram_addr;
-		uint8_t palette[16];
+		uint16_t status = 0; // 167770
+		uint8_t control = 0; // 167772
+		int palette_index = 0, vram_addr = 0;
+		uint8_t palette[16]{};
 	} m_video;
 	std::unique_ptr<uint32_t[]> m_videoram;
 
@@ -187,7 +187,7 @@ static DEVICE_INPUT_DEFAULTS_START( host_rs232_defaults )
 DEVICE_INPUT_DEFAULTS_END
 
 
-void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

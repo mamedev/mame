@@ -209,7 +209,7 @@ private:
 
 	optional_shared_ptr<u16> m_nvram;
 
-	u16 m_clock_rate;
+	u16 m_clock_rate = 0U;
 
 	void wildpkr_palette(palette_device &palette) const;
 	u8 unknown_read8();

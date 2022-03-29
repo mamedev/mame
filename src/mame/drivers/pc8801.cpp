@@ -24,6 +24,7 @@
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks
       the floppy ports. Wrong info or check for external board anyway?
     - fix "jumps" in PC-8872 mouse pointer (noticeable in balpower);
+    - pc8801mc: implement proper CD-ROM i/f (subset of PC Engine and PCFX);
 
     per-game specific TODO (move to XML):
     - Belloncho Shintai Kensa: hangs
@@ -246,14 +247,14 @@
 #define IRQ_DEBUG       (0)
 #define IRQ_LOG(x) do { if (IRQ_DEBUG) printf x; } while (0)
 
-#define PC8801FH_OSC1	XTAL(28'636'363)
-#define PC8801FH_OSC2	XTAL(42'105'200)
-#define PC8801FH_OSC3	XTAL(31'948'800)	// called OSC1 on PC-8801FE board
+#define PC8801FH_OSC1   XTAL(28'636'363)
+#define PC8801FH_OSC2   XTAL(42'105'200)
+#define PC8801FH_OSC3   XTAL(31'948'800)    // called OSC1 on PC-8801FE board
 
 #define MASTER_CLOCK (PC8801FH_OSC3 / 8)
 // TODO: exact clocks
 #define PIXEL_CLOCK_15KHz (PC8801FH_OSC1 / 2)
-#define PIXEL_CLOCK_24KHz XTAL(21'477'272)	// should be (PC8801FH_OSC2 / 2)?
+#define PIXEL_CLOCK_24KHz XTAL(21'477'272)  // should be (PC8801FH_OSC2 / 2)?
 
 
 /*
@@ -1287,7 +1288,7 @@ void pc8801_state::pc8801_dmac_w(offs_t offset, uint8_t data)
 
 uint8_t pc8801_state::pc8801_dmac_status_r()
 {
-	printf("DMAC R STATUS\n");
+	//printf("DMAC R STATUS\n");
 	return 0xff;
 }
 
@@ -1297,8 +1298,8 @@ void pc8801_state::pc8801_dmac_mode_w(uint8_t data)
 	m_dmac_ff = 0;
 
 	// Valis II sets 0x20
-	if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80 && data != 0x00)
-		printf("%02x DMAC mode\n",data);
+	//if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80 && data != 0x00)
+	//  printf("%02x DMAC mode\n",data);
 }
 
 uint8_t pc8801_state::pc8801_extram_mode_r()
@@ -1398,22 +1399,26 @@ void pc8801_state::pc8801_dic_ctrl_w(uint8_t data)
 		m_dic_ctrl = (data ^ 1) & 1;
 }
 
-uint8_t pc8801_state::pc8801_cdrom_r()
+/*
+ * [8] xxxx xxxx CD data
+ *               ^ if bit 7 is held then system will bring to a
+ *               "CD-System initialize\n[Space]->CD player" screen.
+*/
+uint8_t pc8801_state::pc8801_cdrom_r(offs_t offset)
 {
-	//printf("CD-ROM read [%02x]\n",offset);
-
-	//if(m_has_cdrom)
-	//  return m_cdrom_reg[offset];
+	if(m_has_cdrom)
+		return m_cdrom_reg[offset];
 
 	return 0xff;
 }
 
+/*
+ * [9] ---x ---- CD-ROM BIOS bank
+ *     ---- ---x CD-ROM E-ROM bank (?)
+ */
 void pc8801_state::pc8801_cdrom_w(offs_t offset, uint8_t data)
 {
-	/*
-	[9] ---x ---- CD-ROM BIOS bank
-	    ---- ---x CD-ROM E-ROM bank (?)
-	*/
+
 	//printf("CD-ROM write %02x -> [%02x]\n",data,offset);
 
 	if(m_has_cdrom)
@@ -2191,6 +2196,9 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
 		for(i=0;i<0x10;i++)
 			m_cdrom_reg[i] = 0;
 	}
+
+	// Hold STOP during boot to bypass CDROM BIOS at POST (PC=0x10)
+	m_cdrom_reg[9] = 0x10;
 }
 
 void pc8801_state::pc8801_palette(palette_device &palette) const

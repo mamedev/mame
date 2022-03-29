@@ -121,8 +121,8 @@ private:
 	required_device<floppy_connector> m_flop3;
 	required_ioport_array<8> m_keys;
 
-	u8 m_p1, m_p2, m_data, m_p40;
-	bool m_bsy, m_req, m_ack, m_cd, m_io, m_sel;
+	u8 m_p1 = 0, m_p2 = 0, m_data = 0, m_p40 = 0;
+	bool m_bsy = false, m_req = false, m_ack = false, m_cd = false, m_io = false, m_sel = false;
 };
 
 void alphatpc16_state::machine_start()
@@ -528,7 +528,7 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	EF9345(config, m_ef9345, 0);
 	m_ef9345->set_palette_tag("palette");
 
-	TIMER(config, "scanline").configure_scanline(NAME([this](timer_device &t, void *ptr, s32 p){m_ef9345->update_scanline((uint16_t)p);}), screen, 0, 10);
+	TIMER(config, "scanline").configure_scanline(NAME([this](timer_device &t, s32 p){m_ef9345->update_scanline((uint16_t)p);}), screen, 0, 10);
 
 	// these are supported by the bios, they may not have been available on real hardware
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,192K,256K,384K,448K,512K");

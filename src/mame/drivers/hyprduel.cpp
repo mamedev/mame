@@ -97,9 +97,9 @@ private:
 	required_shared_ptr_array<uint16_t, 3> m_sharedram;
 
 	/* misc */
-	emu_timer *m_vblank_end_timer;
-	int       m_subcpu_resetline;
-	int       m_cpu_trigger;
+	emu_timer *m_vblank_end_timer = nullptr;
+	int       m_subcpu_resetline = 0;
+	int       m_cpu_trigger = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

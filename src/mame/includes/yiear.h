@@ -49,18 +49,18 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
-	uint8_t      m_nmi_enable;
-	uint8_t      m_irq_enable;
+	uint8_t      m_nmi_enable = 0;
+	uint8_t      m_irq_enable = 0;
 	void videoram_w(offs_t offset, uint8_t data);
 	void control_w(uint8_t data);
 	uint8_t speech_r();
 	void VLM5030_control_w(uint8_t data);
 
-	uint8_t m_SN76496_latch;
-	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; };
-	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); };
+	uint8_t m_SN76496_latch = 0;
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

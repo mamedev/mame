@@ -44,7 +44,7 @@ protected:
 	required_device<sn76489a_device> m_sn;
 
 	// video-related
-	tilemap_t * m_bg_tilemap;
+	tilemap_t * m_bg_tilemap = nullptr;
 
 	// misc
 	void videoram_w(offs_t offset, uint8_t data);
@@ -78,11 +78,11 @@ private:
 	required_shared_ptr<uint8_t> m_soundlatch;
 
 	// video-related
-	uint8_t m_spritebank;
+	uint8_t m_spritebank = 0U;
 
 	// misc
-	uint8_t m_interrupt_mask;
-	uint8_t m_interrupt_ticks;
+	uint8_t m_interrupt_mask = 0U;
+	uint8_t m_interrupt_ticks = 0U;
 	void coin_counter_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
 	void sound_w(uint8_t data);

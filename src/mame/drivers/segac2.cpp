@@ -258,7 +258,7 @@ public:
 	void init_pclubjv5();
 
 private:
-	int m_cam_data;
+	int m_cam_data = 0;
 
 	uint16_t printer_r();
 	void print_club_camera_w(uint16_t data);
@@ -2272,6 +2272,18 @@ ROM_START( ichir ) /* Ichidant-R (Puzzle & Action 2)  (c)1994 Sega (World) */
 ROM_END
 
 
+ROM_START( ichirbl ) // bootleg of the World version, only difference is the protection checks are NOPed out
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2.f11", 0x000000, 0x080000, CRC(b8201c2e) SHA1(95ac035ffd5948745324d855ecffdb7d2ff9f0fb) )
+	ROM_LOAD16_BYTE( "1.f10", 0x000001, 0x080000, CRC(af0dd811) SHA1(75b1f51ad93f99933037ffff4106c92f9c2393e6) )
+	ROM_LOAD16_BYTE( "4.f8",  0x100000, 0x080000, CRC(85d73722) SHA1(7ebe81b4d6c89f87f60200a3a8cddb07d581adef) )
+	ROM_LOAD16_BYTE( "3.f9",  0x100001, 0x080000, CRC(bc3bbf25) SHA1(e760ad400bc183b38e9787d88c8ac084fbe2ae21) )
+
+	ROM_REGION( 0x080000, "upd", 0 )
+	ROM_LOAD( "2.e3", 0x000000, 0x080000, CRC(fc7b0da5) SHA1(46770aa7e19b4f8a183be3f433c48ad677b552b1) )
+ROM_END
+
+
 ROM_START( ichirk ) /* Ichidant-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	/* Again the part numbers are quite strange for the Korean verison */
@@ -2897,6 +2909,7 @@ GAME( 1994, stkclmns,   0,        segac2,     stkclmns, segac2_state,    init_st
 GAME( 1994, stkclmnsj,  stkclmns, segac2,     stkclmns, segac2_state,    init_stkclmnj, ROT0,   "Sega", "Stack Columns (Japan)", 0 )
 
 GAME( 1994, ichir,      0,        segac2,     ichir,    segac2_state,    init_ichir,    ROT0,   "Sega", "Puzzle & Action: Ichidant-R (World)", 0 )
+GAME( 1994, ichirbl,    ichir,    segac2,     ichir,    segac2_state,    init_noprot,   ROT0,   "bootleg", "Puzzle & Action: Ichidant-R (World) (bootleg)", 0 )
 GAME( 1994, ichirk,     ichir,    segac2,     ichir,    segac2_state,    init_ichirk,   ROT0,   "Sega", "Puzzle & Action: Ichidant-R (Korea)", 0 )
 GAME( 1994, ichirj,     ichir,    segac2,     ichir,    segac2_state,    init_ichirj,   ROT0,   "Sega", "Puzzle & Action: Ichidant-R (Japan)", 0 )
 GAME( 1994, ichirjbl,   ichir,    segac,      ichir,    segac2_state,    init_ichirjbl, ROT0,   "bootleg", "Puzzle & Action: Ichidant-R (Japan) (bootleg)", 0 ) // C board, no samples

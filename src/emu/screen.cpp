@@ -12,6 +12,7 @@
 #include "screen.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "render.h"
 #include "rendutil.h"
 
@@ -934,7 +935,7 @@ void screen_device::device_post_load()
 //  fires
 //-------------------------------------------------
 
-void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

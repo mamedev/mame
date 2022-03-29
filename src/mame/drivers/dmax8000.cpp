@@ -34,7 +34,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "machine/mm58174.h"
 #include "bus/rs232/rs232.h"
 
-
+namespace {
 
 class dmax8000_state : public driver_device
 {
@@ -205,7 +205,7 @@ ROM_START( dmax8000 )
 	// ROM_LOAD( "rev1_1.rom", 0x0000, 0x001000, CRC(2eb98a61) SHA1(cdd9a58f63ee7e3d3dd1c4ae3fd4376b308fd10f) )  // this is a hacked rom to speed up the serial port
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY    FULLNAME        FLAGS
 COMP( 1981, dmax8000, 0,      0,      dmax8000, dmax8000, dmax8000_state, empty_init, "Datamax", "Datamax 8000", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -543,7 +543,7 @@ WRITE_LINE_MEMBER( comx35_state::irq_w )
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void comx35_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void comx35_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

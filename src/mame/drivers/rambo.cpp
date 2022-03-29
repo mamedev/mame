@@ -44,7 +44,7 @@ private:
 	void rambo_prg_map(address_map &map);
 	void rambo_data_map(address_map &map);
 
-	uint8_t m_port_a;
+	uint8_t m_port_a = 0;
 	required_device<avr8_device> m_maincpu;
 };
 

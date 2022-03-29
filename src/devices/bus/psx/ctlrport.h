@@ -44,7 +44,7 @@ protected:
 private:
 	virtual bool get_pad(int count, uint8_t *odata, uint8_t idata) = 0;
 	virtual void do_pad();
-	void ack_timer(void *ptr, int param);
+	void ack_timer(int32_t param);
 
 	uint8_t m_odata;
 	uint8_t m_idata;

@@ -513,17 +513,6 @@ INPUT_PORTS_END
 
 /* Graphics Layouts */
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -538,7 +527,7 @@ static const gfx_layout spritelayout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( gfx_docastle )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32*2 )
 GFXDECODE_END
 

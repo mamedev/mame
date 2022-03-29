@@ -888,7 +888,7 @@ void z8536_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void cio_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cio_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (counter_enabled(TIMER_1) && !counter_external_count(TIMER_1))
 	{

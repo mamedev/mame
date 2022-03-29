@@ -190,8 +190,9 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(cirrus_gd5428_device::screen_update));
 
-	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, m_vga, 0));
-	vga.set_screen("screen");
+	CIRRUS_GD5428(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x200000);
 
 	speaker_device &speaker(SPEAKER(config, "mono"));
 	speaker.front_center();

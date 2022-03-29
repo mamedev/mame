@@ -24,9 +24,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
     "lives" if you touch the background : you can still be hit by enemies'
     bullets and be stalled if speed is too low.
   - There is a setting which is only available in the "test mode", it's the
-    maximum game time. If you don't set it, the game considers it's illimited
+    maximum game time. If you don't set it, the game considers it as unlimited
     time (full doesn't decrease). But once you set it to a value, it is not
-    possible to turn the value back to 0 even by reseting the game.
+    possible to turn the value back to 0 even by resetting the game.
   - If you go too far without dying, background becomes complete garbage,
     but it then appears again correctly. Is there a bad dumped ROM or is
     emulation bugged somewhere ? Verification against real PCB is needed !
@@ -74,7 +74,7 @@ public:
 private:
 	required_device<galaxian_sound_device> m_custom;
 
-	int m_noise_data;
+	int m_noise_data = 0;
 	void dambustr_noise_enable_w(uint8_t data);
 	void dambustr_map(address_map &map);
 };

@@ -35,9 +35,9 @@ private:
 	int32_t m_dac_counter;
 	int32_t m_sample_rom_offset[2];
 	int32_t m_offset_shift;
-	int32_t m_unk_counter;
+	int32_t m_unk_counter = 0;
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[RLT_NUM_BITMAPS];
-	emu_timer *m_timer;
+	emu_timer *m_timer = nullptr;
 
 	uint16_t io_r();
 	void snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

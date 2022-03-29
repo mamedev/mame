@@ -345,11 +345,9 @@ void mips3_device::generate_exception(int exception, int backup)
 void mips3_device::generate_tlb_exception(int exception, offs_t address)
 {
 	m_core->cpr[0][COP0_BadVAddr] = address;
-	if(exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE || exception == EXCEPTION_TLBLOAD_FILL || exception == EXCEPTION_TLBSTORE_FILL)
-	{
-		m_core->cpr[0][COP0_Context] = (m_core->cpr[0][COP0_Context] & 0xff800000) | ((address >> 9) & 0x007ffff0);
-		m_core->cpr[0][COP0_EntryHi] = (address & 0xffffe000) | (m_core->cpr[0][COP0_EntryHi] & 0xff);
-	}
+	m_core->cpr[0][COP0_Context] = (m_core->cpr[0][COP0_Context] & 0xff800000) | ((address >> 9) & 0x007ffff0);
+	m_core->cpr[0][COP0_EntryHi] = (address & 0xffffe000) | (m_core->cpr[0][COP0_EntryHi] & 0xff);
+
 	generate_exception(exception, 1);
 }
 
@@ -402,14 +400,14 @@ void mips3_device::device_start()
 		if (m_data_bits == 32)
 		{
 			m_program->cache(m_cache32le);
-			m_pr32 = [this](offs_t address) -> u32 { return m_cache32le.read_dword(address); };
-			m_prptr = [this](offs_t address) -> const void * { return m_cache32le.read_ptr(address); };
+			m_pr32 = delegate<u32 (offs_t)>(&memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache::read_dword, &m_cache32le);
+			m_prptr = [this] (offs_t address) -> const void * { return m_cache32le.read_ptr(address); };
 		}
 		else
 		{
 			m_program->cache(m_cache64le);
-			m_pr32 = [this](offs_t address) -> u32 { return m_cache64le.read_dword(address); };
-			m_prptr = [this](offs_t address) -> const void * { return m_cache64le.read_ptr(address); };
+			m_pr32 = delegate<u32 (offs_t)>(&memory_access<32, 3, 0, ENDIANNESS_LITTLE>::cache::read_dword, &m_cache64le);
+			m_prptr = [this] (offs_t address) -> const void * { return m_cache64le.read_ptr(address); };
 		}
 	}
 	else
@@ -417,14 +415,14 @@ void mips3_device::device_start()
 		if (m_data_bits == 32)
 		{
 			m_program->cache(m_cache32be);
-			m_pr32 = [this](offs_t address) -> u32 { return m_cache32be.read_dword(address); };
-			m_prptr = [this](offs_t address) -> const void * { return m_cache32be.read_ptr(address); };
+			m_pr32 = delegate<u32 (offs_t)>(&memory_access<32, 2, 0, ENDIANNESS_BIG>::cache::read_dword, &m_cache32be);
+			m_prptr = [this] (offs_t address) -> const void * { return m_cache32be.read_ptr(address); };
 		}
 		else
 		{
 			m_program->cache(m_cache64be);
-			m_pr32 = [this](offs_t address) -> u32 { return m_cache64be.read_dword(address); };
-			m_prptr = [this](offs_t address) -> const void * { return m_cache64be.read_ptr(address); };
+			m_pr32 = delegate<u32 (offs_t)>(&memory_access<32, 3, 0, ENDIANNESS_BIG>::cache::read_dword, &m_cache64be);
+			m_prptr = [this] (offs_t address) -> const void * { return m_cache64be.read_ptr(address); };
 		}
 	}
 
@@ -1720,7 +1718,7 @@ void mips3_device::set_cop0_reg(int idx, uint64_t val)
 	{
 		case COP0_Cause:
 			CAUSE = (CAUSE & 0xfc00) | (val & ~0xfc00);
-			if (CAUSE & 0x300)
+			if ((CAUSE & SR & 0x300) && (SR & SR_IE) && !(SR & (SR_EXL | SR_ERL)))
 			{
 				/* if we're in a delay slot, propogate the target PC before generating the exception */
 				if (m_nextpc != ~0)
@@ -5208,9 +5206,8 @@ void mips3_device::execute_run()
 					m_core->llbit = 1;
 					if LL_BREAK
 						machine().debug_break();
-					break;
 				}
-				[[fallthrough]];
+				break;
 			case 0x31:  /* LWC1 */
 				if (!(SR & SR_COP1))
 				{
@@ -5231,9 +5228,8 @@ void mips3_device::execute_run()
 					m_core->llbit = 1;
 					if LL_BREAK
 						machine().debug_break();
-					break;
 				}
-				[[fallthrough]];
+				break;
 			case 0x35:  /* LDC1 */
 				if (!(SR & SR_COP1))
 				{

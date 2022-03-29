@@ -149,7 +149,7 @@ public:
 protected:
 	ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void device_start() override { };
+	void device_start() override { }
 	void device_config_complete() override;
 
 	corcomp_fdc_device* m_board;
@@ -169,7 +169,7 @@ public:
 protected:
 	ccfdc_sel_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void device_start() override { };
+	void device_start() override { }
 	virtual void device_config_complete() override =0;
 
 	corcomp_fdc_device* m_board;

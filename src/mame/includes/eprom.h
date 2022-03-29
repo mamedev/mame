@@ -55,8 +55,8 @@ private:
 	required_device<atari_motion_objects_device> m_mob;
 	required_device<atari_jsa_base_device> m_jsa;
 	required_shared_ptr<uint16_t> m_share1;
-	uint8_t m_screen_intensity;
-	uint8_t m_video_disable;
+	uint8_t m_screen_intensity = 0U;
+	uint8_t m_video_disable = 0U;
 	optional_device<adc0808_device> m_adc;
 	optional_device<cpu_device> m_extra;
 	required_device<palette_device> m_palette;

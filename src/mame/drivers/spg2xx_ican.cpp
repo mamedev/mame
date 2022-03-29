@@ -41,8 +41,8 @@ protected:
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
 
-	uint16_t m_inlatch_a;
-	uint16_t m_inlatch_c;
+	uint16_t m_inlatch_a = 0;
+	uint16_t m_inlatch_c = 0;
 	optional_ioport_array<6> m_porta_in;
 	optional_ioport_array<6> m_portc_in;
 

@@ -104,11 +104,11 @@ public:
 	void draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap);
 
 	/* interrupt state */
-	u16 m_int_mask, m_int_active;
+	u16 m_int_mask = 0U, m_int_active = 0U;
 
 	/* video state */
-	rgb_t m_clut[256];
-	int m_blink;
+	rgb_t m_clut[256]{};
+	int m_blink = 0;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 
@@ -120,9 +120,9 @@ public:
 	void keyboard_mem(address_map &map);
 	void cpu_space_map(address_map &map);
 private:
-	u16 kbd_mods;
-	u8 kbd_data;
-	bool kbd_ready;
+	u16 kbd_mods = 0U;
+	u8 kbd_data = 0U;
+	bool kbd_ready = false;
 
 	void irq_encoder(int pin, int state);
 };

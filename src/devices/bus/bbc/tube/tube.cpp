@@ -112,6 +112,8 @@ void bbc_tube_slot_device::host_w(offs_t offset, uint8_t data)
 void bbc_tube_devices(device_slot_interface &device)
 {
 	device.option_add("6502",   BBC_TUBE_6502);    /* Acorn ANC01 6502 2nd processor */
+	device.option_add("6502p",  BBC_TUBE_6502P);   /* Acorn 6502 2nd processor (pre-production) */
+	device.option_add("6502e",  BBC_TUBE_6502E);   /* Acorn Extended 6502 2nd processor */
 	device.option_add("z80",    BBC_TUBE_Z80);     /* Acorn ANC04 Z80 2nd processor */
 	device.option_add("z80w",   BBC_TUBE_Z80W);    /* Acorn ANC04 Z80 2nd processor (Winchester) */
 	device.option_add("16032",  BBC_TUBE_16032);   /* Acorn 16032 2nd processor */
@@ -146,6 +148,7 @@ void bbc_tube_devices(device_slot_interface &device)
 void bbc_extube_devices(device_slot_interface &device)
 {
 	device.option_add("6502",   BBC_TUBE_6502);     /* Acorn ANC01 6502 2nd processor */
+	device.option_add("6502e",  BBC_TUBE_6502E);    /* Acorn Extended 6502 2nd processor */
 	device.option_add("z80",    BBC_TUBE_Z80);      /* Acorn ANC04 Z80 2nd processor */
 	device.option_add("z80w",   BBC_TUBE_Z80W);     /* Acorn ANC04 Z80 2nd processor (Winchester) */
 	device.option_add("32016",  BBC_TUBE_32016);    /* Acorn ANC05 32016 2nd processor */
@@ -187,6 +190,7 @@ void bbc_intube_devices(device_slot_interface &device)
 void electron_tube_devices(device_slot_interface &device)
 {
 	device.option_add("6502",   BBC_TUBE_6502);    /* Acorn ANC01 6502 2nd processor */
+	device.option_add("6502e",  BBC_TUBE_6502E);   /* Acorn Extended 6502 2nd processor */
 	device.option_add("z80",    BBC_TUBE_Z80);     /* Acorn ANC04 Z80 2nd processor */
 	device.option_add("32016",  BBC_TUBE_32016);   /* Acorn ANC05 32016 2nd processor */
 	device.option_add("32016l", BBC_TUBE_32016L);  /* Acorn Large 32016 2nd processor */

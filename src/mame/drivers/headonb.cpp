@@ -63,7 +63,7 @@ private:
 
 	required_shared_ptr<u8> m_video_ram;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
 	void video_ram_w(offs_t offset, u8 data);
 
@@ -216,17 +216,6 @@ INPUT_PORTS_END
     GFX Layouts
 ******************************************************************************/
 
-static const gfx_layout charlayout_1bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout charlayout_3bpp =
 {
 	8,8,
@@ -239,7 +228,7 @@ static const gfx_layout charlayout_3bpp =
 };
 
 static GFXDECODE_START( gfx_foolrace )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_blackhol )

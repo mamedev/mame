@@ -1402,17 +1402,6 @@ static const gfx_layout pbillian_charlayout =
 	32*8
 };
 
-static const gfx_layout sqix_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -1433,9 +1422,9 @@ static GFXDECODE_START( gfx_pbillian )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_sqix )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, sqix_charlayout,   0, 16 )    /* Chars */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sqix_charlayout,   0, 16 )    /* Background tiles */
-	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout,      0, 16 )    /* Sprites */
+	GFXDECODE_ENTRY( "gfx1", 0x00000, gfx_8x8x4_packed_msb,   0, 16 )    /* Chars */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, gfx_8x8x4_packed_msb,   0, 16 )    /* Background tiles */
+	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout,           0, 16 )    /* Sprites */
 GFXDECODE_END
 
 

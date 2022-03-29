@@ -68,11 +68,11 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	optional_shared_ptr<uint16_t> m_control;
 
-	emu_timer *m_setup_gun_timer;
-	int m_beamxadd;
-	int m_beamyadd;
-	int m_palette_bank;
-	uint8_t m_gunx[2];
+	emu_timer *m_setup_gun_timer = nullptr;
+	int m_beamxadd = 0;
+	int m_beamyadd = 0;
+	int m_palette_bank = 0;
+	uint8_t m_gunx[2]{};
 	void get_crosshair_xy(int player, int &x, int &y);
 
 	void rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -102,7 +102,7 @@ private:
 	void rapidfir_map(address_map &map);
 	void tickee_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -133,18 +133,18 @@ inline void tickee_state::get_crosshair_xy(int player, int &x, int &y)
  *
  *************************************/
 
-void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_TRIGGER_GUN_INTERRUPT:
-		trigger_gun_interrupt(ptr, param);
+		trigger_gun_interrupt(param);
 		break;
 	case TIMER_CLEAR_GUN_INTERRUPT:
-		clear_gun_interrupt(ptr, param);
+		clear_gun_interrupt(param);
 		break;
 	case TIMER_SETUP_GUN_INTERRUPTS:
-		setup_gun_interrupts(ptr, param);
+		setup_gun_interrupts(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in tickee_state::device_timer");

@@ -9,9 +9,7 @@
  Here we emulate the following PCBs
 
  * UNL-CONY [mapper 83]
- * UNL-YOKO
-
- TODO: fix glitches and emulate properly the variants
+ * UNL-YOKO [mapper 264]
 
  ***********************************************************************************************************/
 
@@ -33,28 +31,28 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_CONY, nes_cony_device, "nes_cony", "NES Cart Cony PCB")
-DEFINE_DEVICE_TYPE(NES_YOKO, nes_yoko_device, "nes_yoko", "NES Cart Yoko PCB")
+DEFINE_DEVICE_TYPE(NES_CONY,   nes_cony_device,   "nes_cony",   "NES Cart Cony PCB")
+DEFINE_DEVICE_TYPE(NES_CONY1K, nes_cony1k_device, "nes_cony1k", "NES Cart Cony 1K PCB")
+DEFINE_DEVICE_TYPE(NES_YOKO,   nes_yoko_device,   "nes_yoko",   "NES Cart Yoko PCB")
 
 
-nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock)
-	, m_irq_count(0)
-	, m_irq_enable(0)
-	, irq_timer(nullptr)
-	, m_latch1(0)
-	, m_latch2(0)
-	, m_extra1(0)
+nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 extra_addr, u8 mask)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_extra_addr(extra_addr), m_mask(mask), m_mode_reg(0), m_outer_reg(0)
 {
 }
 
-nes_cony_device::nes_cony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_cony_device(mconfig, NES_CONY, tag, owner, clock)
+nes_cony_device::nes_cony_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_cony_device(mconfig, NES_CONY, tag, owner, clock, 0x1100, 0x1f)
 {
 }
 
-nes_yoko_device::nes_yoko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_cony_device(mconfig, NES_YOKO, tag, owner, clock), m_extra2(0)
+nes_cony1k_device::nes_cony1k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_cony_device(mconfig, NES_CONY1K, tag, owner, clock, 0x1100, 0x1f)
+{
+}
+
+nes_yoko_device::nes_yoko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_cony_device(mconfig, NES_YOKO, tag, owner, clock, 0x1400, 0x0f)
 {
 }
 
@@ -70,71 +68,29 @@ void nes_cony_device::device_start()
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 
-	save_item(NAME(m_low_reg));
-	save_item(NAME(m_reg));
-	save_item(NAME(m_extra1));
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
+	save_item(NAME(m_mmc_prg_bank));
+	save_item(NAME(m_mmc_vrom_bank));
+	save_item(NAME(m_extra_ram));
+	save_item(NAME(m_mode_reg));
+	save_item(NAME(m_outer_reg));
 }
 
 void nes_cony_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
-	prg8_cd(0x1e);
-	prg8_ef(0x1f);
-	chr8(0, m_chr_source);
+	prg16_cdef(m_prg_chunks - 1);
+	chr8(0, CHRROM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
 
-	m_latch1 = 0;
-	m_latch2 = 0;
-	m_extra1 = 0;
+	m_mode_reg = 0;
+	m_outer_reg = 0;
 
-	memset(m_low_reg, 0, sizeof(m_low_reg));
-	memset(m_reg, 0, sizeof(m_reg));
-	m_reg[9] = 0x0f;
+	std::fill(std::begin(m_extra_ram), std::end(m_extra_ram), 0x00);
+	std::fill(std::begin(m_mmc_prg_bank), std::end(m_mmc_prg_bank), 0x00);
+	std::fill(std::begin(m_mmc_vrom_bank), std::end(m_mmc_vrom_bank), 0x00);
 }
-
-void nes_yoko_device::device_start()
-{
-	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
-
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_count));
-
-	save_item(NAME(m_low_reg));
-	save_item(NAME(m_reg));
-	save_item(NAME(m_extra1));
-	save_item(NAME(m_extra2));
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
-}
-
-void nes_yoko_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg8_cd(0x1e);
-	prg8_ef(0x1f);
-	chr8(0, m_chr_source);
-
-	m_irq_enable = 0;
-	m_irq_count = 0;
-
-	m_latch1 = 0;
-	m_latch2 = 0;
-	m_extra1 = 0;
-	m_extra2 = 0;
-
-	memset(m_low_reg, 0, sizeof(m_low_reg));
-	memset(m_reg, 0, sizeof(m_reg));
-	m_reg[9] = 0x0f;
-}
-
 
 
 
@@ -156,156 +112,168 @@ void nes_yoko_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_cony_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_cony_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
 		if (m_irq_enable)
 		{
+			m_irq_count += BIT(m_mode_reg, 6) ? -1 : 1;
 			if (!m_irq_count)
 			{
-				hold_irq_line();
+				set_irq_line(ASSERT_LINE);
 				m_irq_enable = 0;
-				m_irq_count = 0xffff;
 			}
-			else
-				m_irq_count--;
 		}
 	}
 }
 
-void nes_cony_device::write_l(offs_t offset, uint8_t data)
+void nes_cony_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("cony write_l, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset >= 0x1000 && offset < 0x1103) // from 0x5100-0x51ff
-		m_low_reg[offset & 0x03] = data;
+	offset += 0x100;
+	if (offset >= m_extra_addr) // scratch ram from 0x5100 or 0x5400
+		m_extra_ram[offset & 0x03] = data;
 }
 
-uint8_t nes_cony_device::read_l(offs_t offset)
+u8 nes_cony_device::read_l(offs_t offset)
 {
 	LOG_MMC(("cony read_l, offset: %04x\n", offset));
 
-	if (offset == 0x0f00)   // 0x5000
-	{
-		// read dipswitch bit! - currently unimplemented
-	}
-	if (offset >= 0x1000 && offset < 0x1103) // from 0x5100-0x51ff
-		return m_low_reg[offset & 0x03];
+	offset += 0x100;
+	if (offset >= m_extra_addr) // scratch ram from 0x5100 or 0x5400
+		return m_extra_ram[offset & 0x03];
+	else if (offset >= 0x1000)   // 0x5000
+		return m_extra_addr >> 10; // FIXME: this should be 2-bit jumper settings; certain games glitch with certain values here
 	else
-		return 0x00;
+		return get_open_bus();
+}
+
+void nes_cony_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("cony write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (!m_battery.empty())
+		m_battery[((m_outer_reg >> 6) * 0x2000 + offset) & (m_battery.size() - 1)] = data;
+}
+
+u8 nes_cony_device::read_m(offs_t offset)
+{
+	LOG_MMC(("cony read_m, offset: %04x\n", offset));
+
+	if (!m_battery.empty())
+		return m_battery[((m_outer_reg >> 6) * 0x2000 + offset) & (m_battery.size() - 1)];
+	else if (BIT(m_mode_reg, 5))
+		return m_prg[(m_mmc_prg_bank[3] * 0x2000 + offset) & (m_prg_size - 1)];
+	else
+		return get_open_bus();
 }
 
 void nes_cony_device::set_prg()
 {
-	prg16_89ab(m_reg[8] & 0x3f);
-	prg16_cdef((m_reg[8] & 0x30) | 0x0f);
+	switch (m_mode_reg & 0x18)
+	{
+		case 0x00:
+			prg16_89ab(m_outer_reg);
+			prg16_cdef(m_outer_reg | m_mask >> 1);
+			break;
+		case 0x08:
+			prg32(m_outer_reg >> 1);
+			break;
+		case 0x10:
+		case 0x18:
+		{
+			int base = (m_outer_reg << 1) & ~m_mask;
+			prg8_89(base | (m_mmc_prg_bank[0] & m_mask));
+			prg8_ab(base | (m_mmc_prg_bank[1] & m_mask));
+			prg8_cd(base | (m_mmc_prg_bank[2] & m_mask));
+			prg8_ef(base | m_mask);
+			break;
+		}
+	}
 }
 
 void nes_cony_device::set_chr()
 {
-	// FIXME: here we emulate at least 3 different boards!!!
-	// one board switches 1k VROM banks only
-	// one writes to 0x8000 and then switches 2k VROM banks only
-	// one writes to 0x831n (n=2,3,4,5) and then switches 2k VROM banks only
-	// we should split them and possibly document the proper behavior of each variant
-	if (m_latch1 && !m_latch2)
-	{
-		chr2_0(m_reg[0], CHRROM);
-		chr2_2(m_reg[1], CHRROM);
-		chr2_4(m_reg[6], CHRROM);
-		chr2_6(m_reg[7], CHRROM);
-	}
-	else
-	{
-		chr1_0(m_reg[0] | ((m_reg[8] & 0x30) << 4), CHRROM);
-		chr1_1(m_reg[1] | ((m_reg[8] & 0x30) << 4), CHRROM);
-		chr1_2(m_reg[2] | ((m_reg[8] & 0x30) << 4), CHRROM);
-		chr1_3(m_reg[3] | ((m_reg[8] & 0x30) << 4), CHRROM);
-		chr1_4(m_reg[4] | ((m_reg[8] & 0x30) << 4), CHRROM);
-		chr1_5(m_reg[5] | ((m_reg[8] & 0x30) << 4), CHRROM);
-		chr1_6(m_reg[6] | ((m_reg[8] & 0x30) << 4), CHRROM);
-		chr1_7(m_reg[7] | ((m_reg[8] & 0x30) << 4), CHRROM);
-	}
+	chr2_0(m_mmc_vrom_bank[0], CHRROM);
+	chr2_2(m_mmc_vrom_bank[1], CHRROM);
+	chr2_4(m_mmc_vrom_bank[6], CHRROM);
+	chr2_6(m_mmc_vrom_bank[7], CHRROM);
 }
 
-void nes_cony_device::write_h(offs_t offset, uint8_t data)
+void nes_cony_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("cony write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset)
+	switch (offset & 0x0300)
 	{
 		case 0x0000:
-			m_latch1 = 1;
-			[[fallthrough]];
-		case 0x3000:
-		case 0x30ff:
-		case 0x31ff:
-			m_reg[8] = data;
+			m_outer_reg = data;
 			set_prg();
 			set_chr();
 			break;
 		case 0x0100:
-			m_extra1 = data & 0x80;
+			m_mode_reg = data;
+			set_prg();
 			switch (data & 0x03)
 			{
-				case 0:
-					set_nt_mirroring(PPU_MIRROR_VERT);
-					break;
-				case 1:
-					set_nt_mirroring(PPU_MIRROR_HORZ);
-					break;
-				case 2:
-					set_nt_mirroring(PPU_MIRROR_LOW);
-					break;
-				case 3:
-					set_nt_mirroring(PPU_MIRROR_HIGH);
-					break;
+				case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x0200:
-			m_irq_count = (m_irq_count & 0xff00) | data;
-			break;
-		case 0x0201:
-			m_irq_enable = m_extra1;
-			m_irq_count = (data << 8) | (m_irq_count & 0xff);
+			if (offset & 1)
+			{
+				m_irq_enable = BIT(m_mode_reg, 7);
+				m_irq_count = data << 8 | (m_irq_count & 0x00ff);
+			}
+			else
+			{
+				m_irq_count = (m_irq_count & 0xff00) | data;
+				set_irq_line(CLEAR_LINE);
+			}
 			break;
 		case 0x0300:
-			prg8_89(data);
-			break;
-		case 0x0301:
-			prg8_ab(data);
-			break;
-		case 0x0302:
-			prg8_cd(data);
-			break;
-		case 0x0312:
-		case 0x0313:
-		case 0x0314:
-		case 0x0315:
-			m_latch2 = 1;
-			[[fallthrough]];
-		case 0x0310:
-		case 0x0311:
-		case 0x0316:
-		case 0x0317:
-			m_reg[offset - 0x0310] = data;
-			set_chr();
-			break;
-		case 0x0318:
-			m_reg[9] = data;    // unused?
-			set_prg();
+			switch (offset & 0x18)
+			{
+				case 0x00:
+				case 0x08:
+					m_mmc_prg_bank[offset & 3] = data;
+					set_prg();
+					break;
+				case 0x10:
+					m_mmc_vrom_bank[offset & 7] = data;
+					set_chr();
+					break;
+			}
 			break;
 	}
 }
 
 /*-------------------------------------------------
 
+ Cony Bootleg Board alternate 1K CHR banking
+
+ -------------------------------------------------*/
+
+void nes_cony1k_device::set_chr()
+{
+	for (int i = 0; i < 8; i++)
+		chr1_x(i, m_mmc_vrom_bank[i] | (m_outer_reg & 0x30) << 4, CHRROM);
+}
+
+/*-------------------------------------------------
+
  Yoko Bootleg Board
 
- Games: Mortal Kombat II, Master Figther VI'
+ Games: Mortal Kombat II, Master Fighter VI'
 
- Very similar to Cony board
+ Seems to be the same as the Cony board (2K CHR
+ banking version) but with address lines A10/A11
+ swapped in for Cony address lines A8/A9.
 
  NES 2.0: mapper 264
 
@@ -313,92 +281,10 @@ void nes_cony_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_yoko_device::write_l(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("yoko write_l, offset: %04x, data: %02x\n", offset, data));
-
-	if (offset >= 0x1300) // from 0x5400
-		m_low_reg[offset & 0x03] = data;
-}
-
-uint8_t nes_yoko_device::read_l(offs_t offset)
-{
-	LOG_MMC(("yoko read_l, offset: %04x\n", offset));
-
-	if (offset >= 0x0f00 && offset < 0x1300)    // 0x5000
-	{
-		// read dipswitch bit! - currently unimplemented
-	}
-	if (offset >= 0x1300) // from 0x5400
-		return m_low_reg[offset & 0x03];
-	else
-		return 0x00;
-}
-
-void nes_yoko_device::set_prg()
-{
-	if (m_extra1 & 0x10)
-	{
-		int base = (m_extra2 & 0x08) << 1;
-		prg8_89(base | (m_reg[0] & 0x0f));
-		prg8_ab(base | (m_reg[1] & 0x0f));
-		prg8_cd(base | (m_reg[2] & 0x0f));
-		prg8_ef(base | 0x0f);
-	}
-	else if (m_extra1 & 0x08)
-		prg32(m_extra2 >> 1);
-	else
-	{
-		prg16_89ab(m_extra2);
-		prg16_cdef(0xff);
-	}
-}
-
-void nes_yoko_device::set_chr()
-{
-	chr2_0(m_reg[4], CHRROM);
-	chr2_2(m_reg[5], CHRROM);
-	chr2_4(m_reg[6], CHRROM);
-	chr2_6(m_reg[7], CHRROM);
-}
-
-void nes_yoko_device::write_h(offs_t offset, uint8_t data)
+void nes_yoko_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("yoko write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x0c17)
-	{
-		case 0x0000:
-			m_extra2 = data;
-			set_prg();
-			break;
-		case 0x400:
-			m_extra1 = data;
-			if (data & 1)
-				set_nt_mirroring(PPU_MIRROR_HORZ);
-			else
-				set_nt_mirroring(PPU_MIRROR_VERT);
-			set_prg();
-			break;
-		case 0x0800:
-			m_irq_count = (m_irq_count & 0xff00) | data;
-			break;
-		case 0x0801:
-			m_irq_enable = m_extra1 & 0x80;
-			m_irq_count = (data << 8) | (m_irq_count & 0xff);
-			break;
-		case 0x0c00:
-		case 0x0c01:
-		case 0x0c02:
-			m_reg[offset & 3] = data;
-			set_prg();
-			break;
-		case 0x0c10:
-		case 0x0c11:
-		case 0x0c16:
-		case 0x0c17:
-			m_reg[4 + (offset & 3)] = data;
-			set_chr();
-			break;
-	}
+	offset = (offset & 0xf0ff) | (offset & 0x0c00) >> 2;
+	nes_cony_device::write_h(offset, data);
 }

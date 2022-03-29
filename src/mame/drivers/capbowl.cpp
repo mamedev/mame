@@ -40,7 +40,7 @@
                                 Bit 5   Player 2 Hook Right
                                 Bit 6   Upright/Cocktail DIP Switch
                                 Bit 7   Coin 2
-    7800          Input port 2  Bit 0-3 Trackball Horizontal Positon
+    7800          Input port 2  Bit 0-3 Trackball Horizontal Position
                                 Bit 4   Player 1 Hook Left
                                 Bit 5   Player 1 Hook Right
                                 Bit 6   Start
@@ -88,17 +88,286 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/capbowl.h"
 
+#include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "machine/ticket.h"
-#include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/ymopn.h"
+#include "video/tms34061.h"
+
+#include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK        XTAL(8'000'000)
 
+// configurable logging
+#define LOG_BLITTER     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_BLITTER)
+
+#include "logmacro.h"
+
+#define LOGBLITTER(...)     LOGMASKED(LOG_BLITTER,     __VA_ARGS__)
+
+
+namespace {
+
+class capbowl_base_state : public driver_device
+{
+public:
+	capbowl_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_audiocpu(*this, "audiocpu"),
+		m_tms34061(*this, "tms34061"),
+		m_screen(*this, "screen"),
+		m_rowaddress(*this, "rowaddress"),
+		m_service(*this, "SERVICE"),
+		m_trackx(*this, "TRACKX"),
+		m_tracky(*this, "TRACKY"),
+		m_in(*this, "IN%u", 0U)
+	{ }
+
+	void base(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+
+	void base_main_map(address_map &map);
+
+private:
+	// devices
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<cpu_device> m_audiocpu;
+	required_device<tms34061_device> m_tms34061;
+	required_device<screen_device> m_screen;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_rowaddress;
+
+	// input-related
+	required_ioport m_service;
+	required_ioport m_trackx;
+	required_ioport m_tracky;
+	required_ioport_array<2> m_in;
+	uint8_t m_last_trackball_val[2]{};
+
+	emu_timer *m_update_timer = nullptr;
+
+	// common
+	template <uint8_t Which> uint8_t track_r();
+	void track_reset_w(uint8_t data);
+	void tms34061_w(offs_t offset, uint8_t data);
+	uint8_t tms34061_r(offs_t offset);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_CALLBACK_MEMBER(update);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline rgb_t pen_for_pixel(uint8_t const *src, uint8_t pix);
+
+	void sound_map(address_map &map);
+};
+
+class capbowl_state : public capbowl_base_state
+{
+public:
+	capbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		capbowl_base_state(mconfig, type, tag),
+		m_mainbank(*this, "mainbank")
+	{ }
+
+	void capbowl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_memory_bank m_mainbank;
+
+	void rom_select_w(uint8_t data);
+
+	void main_map(address_map &map);
+};
+
+class bowlrama_state : public capbowl_base_state
+{
+public:
+	bowlrama_state(const machine_config &mconfig, device_type type, const char *tag) :
+		capbowl_base_state(mconfig, type, tag),
+		m_blitrom(*this, "blitter")
+	{ }
+
+	void bowlrama(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_region_ptr<uint8_t> m_blitrom;
+
+	// video-related
+	offs_t m_blitter_addr = 0U;
+
+	void blitter_w(offs_t offset, uint8_t data);
+	uint8_t blitter_r(offs_t offset);
+
+	void main_map(address_map &map);
+};
+
+
+// video
+
+/*************************************
+ *
+ *  TMS34061 I/O
+ *
+ *************************************/
+
+void capbowl_base_state::tms34061_w(offs_t offset, uint8_t data)
+{
+	int func = (offset >> 8) & 3;
+	int col = offset & 0xff;
+
+	// Column address (CA0-CA8) is hooked up the A0-A7, with A1 being inverted during register access. CA8 is ignored
+	if (func == 0 || func == 2)
+		col ^= 2;
+
+	// Row address (RA0-RA8) is not dependent on the offset
+	m_tms34061->write(col, *m_rowaddress, func, data);
+}
+
+
+uint8_t capbowl_base_state::tms34061_r(offs_t offset)
+{
+	int func = (offset >> 8) & 3;
+	int col = offset & 0xff;
+
+	// Column address (CA0-CA8) is hooked up the A0-A7, with A1 being inverted during register access. CA8 is ignored
+	if (func == 0 || func == 2)
+		col ^= 2;
+
+	// Row address (RA0-RA8) is not dependent on the offset
+	return m_tms34061->read(col, *m_rowaddress, func);
+}
+
+
+
+/*************************************
+ *
+ *  Bowl-o-rama blitter
+ *
+ *************************************/
+
+void bowlrama_state::blitter_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+		case 0x08:    // Write address high byte (only 2 bits used)
+			m_blitter_addr = (m_blitter_addr & ~0xff0000) | (data << 16);
+			break;
+
+		case 0x17:    // Write address mid byte (8 bits)
+			m_blitter_addr = (m_blitter_addr & ~0x00ff00) | (data << 8);
+			break;
+
+		case 0x18:    // Write Address low byte (8 bits)
+			m_blitter_addr = (m_blitter_addr & ~0x0000ff) | (data << 0);
+			break;
+
+		default:
+			LOGBLITTER("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", m_maincpu->pc(), offset, data);
+			break;
+	}
+}
+
+
+uint8_t bowlrama_state::blitter_r(offs_t offset)
+{
+	uint8_t data = m_blitrom[m_blitter_addr];
+	uint8_t result = 0;
+
+	switch (offset)
+	{
+		/* Read Mask: Graphics data are 4bpp (2 pixels per byte).
+		    This function returns 0s for new pixel data.
+		    This allows data to be read as a mask, AND the mask with
+		    the screen data, then OR new data read by read data command. */
+		case 0:
+			if (!(data & 0xf0))
+				result |= 0xf0;     // High nibble is transparent
+			if (!(data & 0x0f))
+				result |= 0x0f;     // Low nibble is transparent
+			break;
+
+		// Read data and increment address
+		case 4:
+			result = data;
+			m_blitter_addr = (m_blitter_addr + 1) & 0x3ffff;
+			break;
+
+		default:
+			LOGBLITTER("PC=%04X Read from unsupported blitter address %02X\n", m_maincpu->pc(), offset);
+			break;
+	}
+
+	return result;
+}
+
+
+
+/*************************************
+ *
+ *  Main refresh
+ *
+ *************************************/
+
+inline rgb_t capbowl_base_state::pen_for_pixel(uint8_t const *src, uint8_t pix)
+{
+	return rgb_t(pal4bit(src[(pix << 1) + 0] >> 0),
+					pal4bit(src[(pix << 1) + 1] >> 4),
+					pal4bit(src[(pix << 1) + 1] >> 0));
+}
+
+
+uint32_t capbowl_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// first get the current display state
+	m_tms34061->get_display_state();
+
+	// if we're blanked, just fill with black
+	if (m_tms34061->blanked())
+	{
+		bitmap.fill(rgb_t::black(), cliprect);
+		return 0;
+	}
+
+	// now regenerate the bitmap
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint8_t const *const src = &m_tms34061->vram(y);
+		uint32_t *dest = &bitmap.pix(y);
+
+		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		{
+			uint8_t pix = src[32 + (x / 2)];
+			*dest++ = pen_for_pixel(src, pix >> 4);
+			*dest++ = pen_for_pixel(src, pix & 0x0f);
+		}
+	}
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -108,10 +377,10 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
+INTERRUPT_GEN_MEMBER(capbowl_base_state::interrupt)
 {
-	if (ioport("SERVICE")->read() & 1)                      /* get status of the F2 key */
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);    /* trigger self test */
+	if (m_service->read() & 1)                      // get status of the F2 key
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);    // trigger self test
 }
 
 
@@ -122,20 +391,7 @@ INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
  *
  *************************************/
 
-void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_UPDATE:
-		update(ptr, param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in capbowl_state::device_timer");
-	}
-}
-
-
-TIMER_CALLBACK_MEMBER(capbowl_state::update)
+TIMER_CALLBACK_MEMBER(capbowl_base_state::update)
 {
 	int scanline = param;
 
@@ -152,10 +408,10 @@ TIMER_CALLBACK_MEMBER(capbowl_state::update)
  *
  *************************************/
 
-void capbowl_state::capbowl_rom_select_w(uint8_t data)
+void capbowl_state::rom_select_w(uint8_t data)
 {
 	// 2009-11 FP: shall we add a check to be sure that bank < 6?
-	membank("bank1")->set_entry(((data & 0x0c) >> 1) + (data & 0x01));
+	m_mainbank->set_entry(((data & 0x0c) >> 1) + (data & 0x01));
 }
 
 
@@ -166,39 +422,19 @@ void capbowl_state::capbowl_rom_select_w(uint8_t data)
  *
  *************************************/
 
-uint8_t capbowl_state::track_0_r()
+template <uint8_t Which>
+uint8_t capbowl_base_state::track_r()
 {
-	return (ioport("IN0")->read() & 0xf0) | ((ioport("TRACKY")->read() - m_last_trackball_val[0]) & 0x0f);
+	return (m_in[Which]->read() & 0xf0) | (((Which ? m_trackx->read() : m_tracky->read()) - m_last_trackball_val[Which]) & 0x0f);
 }
 
-
-uint8_t capbowl_state::track_1_r()
+void capbowl_base_state::track_reset_w(uint8_t data)
 {
-	return (ioport("IN1")->read() & 0xf0) | ((ioport("TRACKX")->read() - m_last_trackball_val[1]) & 0x0f);
-}
-
-
-void capbowl_state::track_reset_w(uint8_t data)
-{
-	/* reset the trackball counters */
-	m_last_trackball_val[0] = ioport("TRACKY")->read();
-	m_last_trackball_val[1] = ioport("TRACKX")->read();
+	// reset the trackball counters
+	m_last_trackball_val[0] = m_tracky->read();
+	m_last_trackball_val[1] = m_trackx->read();
 
 	m_watchdog->watchdog_reset();
-}
-
-
-
-/*************************************
- *
- *  Sound commands
- *
- *************************************/
-
-void capbowl_state::sndcmd_w(uint8_t data)
-{
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-	m_soundlatch->write(data);
 }
 
 
@@ -208,32 +444,31 @@ void capbowl_state::sndcmd_w(uint8_t data)
  *
  *************************************/
 
-void capbowl_state::capbowl_map(address_map &map)
+void capbowl_base_state::base_main_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1");
-	map(0x4000, 0x4000).writeonly().share("rowaddress");
-	map(0x4800, 0x4800).w(FUNC(capbowl_state::capbowl_rom_select_w));
+	map(0x4000, 0x4000).writeonly().share(m_rowaddress);
 	map(0x5000, 0x57ff).ram().share("nvram");
-	map(0x5800, 0x5fff).rw(FUNC(capbowl_state::tms34061_r), FUNC(capbowl_state::tms34061_w));
-	map(0x6000, 0x6000).w(FUNC(capbowl_state::sndcmd_w));
-	map(0x6800, 0x6800).w(FUNC(capbowl_state::track_reset_w)).nopr();   /* + watchdog */
-	map(0x7000, 0x7000).r(FUNC(capbowl_state::track_0_r));         /* + other inputs */
-	map(0x7800, 0x7800).r(FUNC(capbowl_state::track_1_r));         /* + other inputs */
+	map(0x5800, 0x5fff).rw(FUNC(capbowl_base_state::tms34061_r), FUNC(capbowl_base_state::tms34061_w));
+	map(0x6000, 0x6000).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x6800, 0x6800).w(FUNC(capbowl_base_state::track_reset_w)).nopr();   // + watchdog
+	map(0x7000, 0x7000).r(FUNC(capbowl_base_state::track_r<0>));         // + other inputs
+	map(0x7800, 0x7800).r(FUNC(capbowl_base_state::track_r<1>));         // + other inputs
 	map(0x8000, 0xffff).rom();
 }
 
-
-void capbowl_state::bowlrama_map(address_map &map)
+void capbowl_state::main_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(FUNC(capbowl_state::bowlrama_blitter_r), FUNC(capbowl_state::bowlrama_blitter_w));
-	map(0x4000, 0x4000).writeonly().share("rowaddress");
-	map(0x5000, 0x57ff).ram().share("nvram");
-	map(0x5800, 0x5fff).rw(FUNC(capbowl_state::tms34061_r), FUNC(capbowl_state::tms34061_w));
-	map(0x6000, 0x6000).w(FUNC(capbowl_state::sndcmd_w));
-	map(0x6800, 0x6800).w(FUNC(capbowl_state::track_reset_w)).nopr();    /* + watchdog */
-	map(0x7000, 0x7000).r(FUNC(capbowl_state::track_0_r));         /* + other inputs */
-	map(0x7800, 0x7800).r(FUNC(capbowl_state::track_1_r));         /* + other inputs */
-	map(0x8000, 0xffff).rom();
+	base_main_map(map);
+
+	map(0x0000, 0x3fff).bankr(m_mainbank);
+	map(0x4800, 0x4800).w(FUNC(capbowl_state::rom_select_w));
+}
+
+void bowlrama_state::main_map(address_map &map)
+{
+	base_main_map(map);
+
+	map(0x0000, 0x001f).rw(FUNC(bowlrama_state::blitter_r), FUNC(bowlrama_state::blitter_w));
 }
 
 
@@ -244,13 +479,13 @@ void capbowl_state::bowlrama_map(address_map &map)
  *
  *************************************/
 
-void capbowl_state::sound_map(address_map &map)
+void capbowl_base_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x1000, 0x1001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x2000, 0x2000).nopw(); /* watchdog */
+	map(0x2000, 0x2000).nopw(); // watchdog
 	map(0x6000, 0x6000).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x7000, 0x7000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x7000, 0x7000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -264,16 +499,16 @@ void capbowl_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( capbowl )
 	PORT_START("IN0")
-	/* low 4 bits are for the trackball */
+	// low 4 bits are for the trackball
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) /* This version of Bowl-O-Rama */
-	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )             /* is Upright only */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) // This version of Bowl-O-Rama
+	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) ) // is Upright only
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("IN1")
-	/* low 4 bits are for the trackball */
+	// low 4 bits are for the trackball
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
@@ -286,8 +521,8 @@ static INPUT_PORTS_START( capbowl )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(40)
 
 	PORT_START("SERVICE")
-	/* This fake input port is used to get the status of the F2 key, */
-	/* and activate the test mode, which is triggered by a NMI */
+	/* This fake input port is used to get the status of the F2 key,
+	   and activate the test mode, which is triggered by a NMI */
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
 INPUT_PORTS_END
 
@@ -298,60 +533,79 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void capbowl_state::machine_start()
+void capbowl_base_state::machine_start()
 {
-	m_update_timer = timer_alloc(TIMER_UPDATE);
+	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(capbowl_base_state::update), this));
 
-	save_item(NAME(m_blitter_addr));
 	save_item(NAME(m_last_trackball_val));
 }
 
-void capbowl_state::machine_reset()
+void capbowl_state::machine_start()
+{
+	capbowl_base_state::machine_start();
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// configure ROM banks in 0x0000-0x3fff
+	m_mainbank->configure_entries(0, 6, &rom[0x10000], 0x4000);
+}
+
+void bowlrama_state::machine_start()
+{
+	capbowl_base_state::machine_start();
+
+	save_item(NAME(m_blitter_addr));
+}
+
+void capbowl_base_state::machine_reset()
 {
 	m_update_timer->adjust(m_screen->time_until_pos(32), 32);
 
-	m_blitter_addr = 0;
 	m_last_trackball_val[0] = 0;
 	m_last_trackball_val[1] = 0;
 }
 
-
-void capbowl_state::capbowl(machine_config &config)
+void bowlrama_state::machine_reset()
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MASTER_CLOCK / 4); // MC68B09EP
-	m_maincpu->set_addrmap(AS_PROGRAM, &capbowl_state::capbowl_map);
-	m_maincpu->set_vblank_int("screen", FUNC(capbowl_state::interrupt));
+	capbowl_base_state::machine_reset();
+
+	m_blitter_addr = 0;
+}
+
+void capbowl_base_state::base(machine_config &config)
+{
+	// basic machine hardware
+	MC6809E(config, m_maincpu, XTAL(8'000'000) / 4); // MC68B09EP
+	m_maincpu->set_vblank_int("screen", FUNC(capbowl_base_state::interrupt));
 
 	// watchdog: 555 timer 16 cycles, edge triggered, ~0.3s
 	attotime const period = PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6);
 	WATCHDOG_TIMER(config, m_watchdog).set_time(period * 16 - period / 2);
 
-	MC6809E(config, m_audiocpu, MASTER_CLOCK / 4); // MC68B09EP
-	m_audiocpu->set_addrmap(AS_PROGRAM, &capbowl_state::sound_map);
+	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09EP
+	m_audiocpu->set_addrmap(AS_PROGRAM, &capbowl_base_state::sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_size(360, 256);
-	m_screen->set_visarea(0, 359, 0, 244);
 	m_screen->set_refresh_hz(57);
-	m_screen->set_screen_update(FUNC(capbowl_state::screen_update));
+	m_screen->set_screen_update(FUNC(capbowl_base_state::screen_update));
 
 	TMS34061(config, m_tms34061, 0);
-	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
+	m_tms34061->set_rowshift(8);  // VRAM address is (row << rowshift) | col
 	m_tms34061->set_vram_size(0x10000);
 	m_tms34061->int_callback().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 2));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(8'000'000) / 2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	ymsnd.port_a_read_callback().set("ticket", FUNC(ticket_dispenser_device::line_r)).lshift(7);
 	ymsnd.port_b_write_callback().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7); // Also a status LED. See memory map above
@@ -363,17 +617,26 @@ void capbowl_state::capbowl(machine_config &config)
 	DAC0832(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
-
-void capbowl_state::bowlrama(machine_config &config)
+void capbowl_state::capbowl(machine_config &config)
 {
-	capbowl(config);
+	base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &capbowl_state::main_map);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &capbowl_state::bowlrama_map);
+	// video hardware
+	subdevice<screen_device>("screen")->set_visarea(0, 359, 0, 244);
+}
 
-	/* video hardware */
-	m_screen->set_visarea(0, 359, 0, 239);
+void bowlrama_state::bowlrama(machine_config &config)
+{
+	base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &bowlrama_state::main_map);
+
+	// video hardware
+	subdevice<screen_device>("screen")->set_visarea(0, 359, 0, 239);
 }
 
 
@@ -451,26 +714,11 @@ ROM_START( bowlrama )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bowl-o-rama_rev_1.0_u30.u30", 0x08000, 0x08000, CRC(f3168834) SHA1(40b7fbe9c15cc4442f4394b71c0666185afe4c8d) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "blitter", 0 )
 	ROM_LOAD( "bowl-o-rama_rev_1.0_ux7.ux7", 0x00000, 0x40000, CRC(8727432a) SHA1(a81d366c5f8df0bdb97e795bba7752e6526ddba0) ) /* located on daughter card add-on */
 ROM_END
 
-
-
-/*************************************
- *
- *  Driver init
- *
- *************************************/
-
-void capbowl_state::init_capbowl()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	/* configure ROM banks in 0x0000-0x3fff */
-	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
-}
-
+} // anonymous namespace
 
 /*************************************
  *
@@ -478,9 +726,9 @@ void capbowl_state::init_capbowl()
  *
  *************************************/
 
-GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl_state, empty_init,   ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, bowlrama_state, empty_init, ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )

@@ -1,22 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Peter Ferrie
-/*
-    Pinball 2000
+/*****************************************************************************************************************
+PINBALL
+Williams Pinball 2000
 
-    Skeleton by R. Belmont, based on mediagx.c by Ville Linde
+Skeleton by R. Belmont, based on mediagx.c by Ville Linde
 
-    TODO:
-        - Everything!
-        - MediaGX features should be moved out to machine/ and shared with mediagx.c once we know what these games need
+Hardware:
+- Cyrix MediaGX processor/VGA (northbridge)
+- Cyrix CX5520 (southbridge)
+- VS9824AG SuperI/O standard PC I/O chip
+- 1 ISA, 2 PCI slots, 2 IDE headers
+- "Prism" PCI card with PLX PCI9052 PCI-to-random stuff bridge
+   Card also contains DCS2 Stereo sound system with ADSP-2104
 
-    Hardware:
-        - Cyrix MediaGX processor/VGA (northbridge)
-        - Cyrix CX5520 (southbridge)
-        - VS9824AG SuperI/O standard PC I/O chip
-        - 1 ISA, 2 PCI slots, 2 IDE headers
-        - "Prism" PCI card with PLX PCI9052 PCI-to-random stuff bridge
-          Card also contains DCS2 Stereo sound system with ADSP-2104
-*/
+Games:
+- Star Wars Episode 1 (#50069)
+- Revenge from Mars (#50070)
+- Wizard Blocks (#50072) (cancelled)
+- Playboy (cancelled)
+
+Status:
+- Skeletons
+
+TODO:
+- Everything!
+- MediaGX features should be moved out to machine/ and shared with mediagx.c once we know what these games need
+
+****************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
@@ -65,30 +76,30 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<ramdac_device> m_ramdac;
 	required_device<palette_device> m_palette;
-	uint8_t m_pal[768];
+	uint8_t m_pal[768]{};
 
 
-	uint32_t m_disp_ctrl_reg[256/4];
-	int m_frame_width;
-	int m_frame_height;
+	uint32_t m_disp_ctrl_reg[256/4]{};
+	int m_frame_width = 0;
+	int m_frame_height = 0;
 
-	uint32_t m_memory_ctrl_reg[256/4];
-	int m_pal_index;
+	uint32_t m_memory_ctrl_reg[256/4]{};
+	int m_pal_index = 0;
 
-	uint32_t m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4]{};
 
-	uint8_t m_mediagx_config_reg_sel;
-	uint8_t m_mediagx_config_regs[256];
+	uint8_t m_mediagx_config_reg_sel = 0;
+	uint8_t m_mediagx_config_regs[256]{};
 
-	//uint8_t m_controls_data;
-	//uint8_t m_parallel_pointer;
-	//uint8_t m_parallel_latched;
-	//uint32_t m_parport;
-	//int m_control_num;
-	//int m_control_num2;
-	//int m_control_read;
+	//uint8_t m_controls_data = 0U;
+	//uint8_t m_parallel_pointer = 0U;
+	//uint8_t m_parallel_latched = 0U;
+	//uint32_t m_parport = 0U;
+	//int m_control_num = 0;
+	//int m_control_num2 = 0;
+	//int m_control_read = 0;
 
-	uint32_t m_cx5510_regs[256/4];
+	uint32_t m_cx5510_regs[256/4]{};
 
 	uint32_t disp_ctrl_r(offs_t offset);
 	void disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -161,11 +172,8 @@ static const rgb_t cga_palette[16] =
 
 void pinball2k_state::video_start()
 {
-	int i;
-	for (i=0; i < 16; i++)
-	{
+	for (u8 i=0; i < 16; i++)
 		m_palette->set_pen_color(i, cga_palette[i]);
-	}
 }
 
 void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
@@ -194,17 +202,16 @@ void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int width, height;
 	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
-	width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
+	int width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
 	if (m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
 	{
 		width >>= 1;
 	}
 	width += 4;
 
-	height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
+	int height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
 
 	if ( (width != m_frame_width || height != m_frame_height) &&
 			(width > 1 && height > 1 && width <= 640 && height <= 480) )
@@ -649,6 +656,9 @@ void pinball2k_state::init_pinball2k()
 
 /*****************************************************************************/
 
+/*------------------------------
+/ Star Wars Episode 1 (#50069)
+/------------------------------*/
 ROM_START( swe1pb )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD( "awdbios.bin",     0x000000, 0x040000, CRC(854ce8c6) SHA1(7826de74026e052dacce8516382f664004c327ad) )
@@ -667,7 +677,7 @@ ROM_START( swe1pb )
 	ROM_LOAD( "swe1_u106.rom",   0x3000000, 0x800000, CRC(84877e2f) SHA1(6dd8c761b2e26313ae9e159690b3a4a170cb3bd8) )
 	ROM_LOAD( "swe1_u107.rom",   0x3800000, 0x800000, CRC(dc433c89) SHA1(9f1273debc9168c04202078503cfc4f1ca8cb30b) )
 
-	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF) 
+	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD( "28f800.bin",      0x000000, 0x100000, CRC(5fc1fd2c) SHA1(0967db9b6e82d386d3a8415bbef40bcab5a06654) )
 	ROM_LOAD( "swe1_u109.rom",   0x400000, 0x400000, CRC(cc08936b) SHA1(fc428393e8a0cf37b800dd475fd293a1a98c4bcf) )
 	ROM_LOAD( "swe1_u110.rom",   0x800000, 0x400000, CRC(6011ecd9) SHA1(8575958c8942a6cbcb2ac18f291fcada6f8cbc09) )
@@ -676,6 +686,10 @@ ROM_START( swe1pb )
 	ROM_LOAD("cga.chr",          0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
 
+
+/*----------------------------
+/ Revenge from Mars (#50070)
+/----------------------------*/
 ROM_START( rfmpb )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD( "awdbios.bin",     0x000000, 0x040000, CRC(854ce8c6) SHA1(7826de74026e052dacce8516382f664004c327ad) )
@@ -694,7 +708,7 @@ ROM_START( rfmpb )
 	ROM_LOAD( "rfm_u106.rom",    0x3000000, 0x800000, CRC(daf4e1dc) SHA1(0612495468fb962b833057e50f620c5f69cd5840) )
 	ROM_LOAD( "rfm_u107.rom",    0x3800000, 0x800000, CRC(e737ab39) SHA1(0e978923db19e2893fdb4aae69d6ed3c3f664a31) )
 
-	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF) 
+	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD( "28f800.bin",      0x000000, 0x100000, CRC(a57c55ad) SHA1(60ee230b8978b7c5f1482b1b587d1c6db5fdd20e) )
 	ROM_LOAD( "rfm_u109.rom",    0x400000, 0x400000, CRC(385f1255) SHA1(0a3be261cd35cd153eff95335597bca46b760568) )
 	ROM_LOAD( "rfm_u110.rom",    0x800000, 0x400000, CRC(2258dbde) SHA1(0c9e62e45fa7cc03aedd43a6e06fee28b2f288a5) )
@@ -721,7 +735,7 @@ ROM_START( rfmpbr2 )
 	ROM_LOAD( "rfm_u106.rom",    0x3000000, 0x800000, CRC(daf4e1dc) SHA1(0612495468fb962b833057e50f620c5f69cd5840) )
 	ROM_LOAD( "rfm_u107.rom",    0x3800000, 0x800000, CRC(e737ab39) SHA1(0e978923db19e2893fdb4aae69d6ed3c3f664a31) )
 
-	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF) 
+	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD( "28f800.bin",      0x000000, 0x100000, CRC(5fc1fd2c) SHA1(0967db9b6e82d386d3a8415bbef40bcab5a06654) )
 	ROM_LOAD( "rfm_u109.rom",    0x400000, 0x400000, CRC(385f1255) SHA1(0a3be261cd35cd153eff95335597bca46b760568) )
 	ROM_LOAD( "rfm_u110.rom",    0x800000, 0x400000, CRC(2258dbde) SHA1(0c9e62e45fa7cc03aedd43a6e06fee28b2f288a5) )

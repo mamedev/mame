@@ -256,8 +256,8 @@ private:
 	void sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void coin_control_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	uint32_t m_hdd_serial_offset;
-	uint32_t *m_video_base;
+	uint32_t m_hdd_serial_offset = 0U;
+	uint32_t *m_video_base = nullptr;
 
 	uint32_t m_vram_control = 0;
 	uint32_t m_sound_reset = 0;

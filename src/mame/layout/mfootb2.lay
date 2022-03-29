@@ -6,37 +6,37 @@ license:CC0
 
 <!-- define elements -->
 
-	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-	<element name="static_white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
-	<element name="static_green"><rect><color red="0.1" green="0.5" blue="0.2" /></rect></element>
+	<element name="black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="green"><rect><color red="0.1" green="0.5" blue="0.2" /></rect></element>
 
 	<element name="text_down">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="DOWN"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="DOWN"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_home">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="HOME"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="HOME"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_yards">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="YARDS TO GO"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="YARDS TO GO"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_time">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="TIME REMAINING"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="TIME REMAINING"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_field">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="FIELD POSITION"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="FIELD POSITION"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 	<element name="text_visitors">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="VISITORS"><color red="0.2" green="0.2" blue="0.7" /></text>
+		<text string="VISITORS"><color red="0.1" green="0.35" blue="0.7" /></text>
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.25" blue="0.26" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 	<element name="seg" defstate="0">
 		<rect>
@@ -45,15 +45,15 @@ license:CC0
 		</rect>
 		<rect state="0">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="0.13" green="0.0325" blue="0.0338" />
+			<color red="0.1" green="0.01" blue="0.015" />
 		</rect>
 		<rect state="1">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="0.5" green="0.125" blue="0.13" />
+			<color red="0.5" green="0.05" blue="0.075" />
 		</rect>
 		<rect state="2">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="1.0" green="0.25" blue="0.26" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</rect>
 	</element>
 
@@ -61,19 +61,19 @@ license:CC0
 <!-- score/status panel -->
 
 	<group name="panel">
-		<element ref="static_white"><bounds x="2" y="0" width="179" height="48" /></element>
-		<element ref="static_black"><bounds x="4" y="11" width="175" height="26" /></element>
+		<element ref="white"><bounds x="2" y="0" width="179" height="48" /></element>
+		<element ref="black"><bounds x="4" y="11" width="175" height="26" /></element>
 
-		<element name="digit8" ref="digit"><bounds x="19.5"  y="16" width="12" height="16" /></element>
-		<element name="digit9" ref="digit"><bounds x="35.5"  y="16" width="12" height="16" /></element>
-		<element name="digit0" ref="digit"><bounds x="67.5"  y="16" width="12" height="16" /></element>
-		<element name="digit1" ref="digit"><bounds x="83.5"  y="16" width="12" height="16" /></element>
-		<element name="digit2" ref="digit"><bounds x="99.5"  y="16" width="12" height="16" /></element>
-		<element name="digit6" ref="digit"><bounds x="131.5" y="16" width="12" height="16" /></element>
-		<element name="digit7" ref="digit"><bounds x="147.5" y="16" width="12" height="16" /></element>
+		<element name="digit8" ref="digit"><bounds x="21"  y="16" width="12" height="16" /></element>
+		<element name="digit9" ref="digit"><bounds x="37"  y="16" width="12" height="16" /></element>
+		<element name="digit0" ref="digit"><bounds x="69"  y="16" width="12" height="16" /></element>
+		<element name="digit1" ref="digit"><bounds x="85"  y="16" width="12" height="16" /></element>
+		<element name="digit2" ref="digit"><bounds x="101" y="16" width="12" height="16" /></element>
+		<element name="digit6" ref="digit"><bounds x="133" y="16" width="12" height="16" /></element>
+		<element name="digit7" ref="digit"><bounds x="149" y="16" width="12" height="16" /></element>
 
-		<element ref="static_white"><bounds x="58" y="1" width="2" height="46" /></element>
-		<element ref="static_white"><bounds x="123" y="1" width="2" height="46" /></element>
+		<element ref="white"><bounds x="58" y="1" width="2" height="46" /></element>
+		<element ref="white"><bounds x="123" y="1" width="2" height="46" /></element>
 
 		<element ref="text_down"><bounds x="4" y="1" width="54" height="9" /></element>
 		<element ref="text_field"><bounds x="58" y="1" width="67" height="9" /></element>
@@ -90,36 +90,36 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="0" right="203" top="-5.7" bottom="109" />
 
-		<element ref="static_green"><bounds x="-1" y="27" width="205" height="83" /></element>
+		<element ref="green"><bounds x="-1" y="27" width="205" height="83" /></element>
 		<group ref="panel"><bounds x="22" y="-5.7" width="159" height="42.6" /></group>
 
 		<!-- playing field -->
-		<element ref="static_white"><bounds x="-1" y="53" width="205" height="54" /></element>
+		<element ref="white"><bounds x="-1" y="53" width="205" height="54" /></element>
 
-		<element ref="static_black"><bounds x="2" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="22" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="42" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="62" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="82" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="102" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="122" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="142" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="162" y="55" width="19" height="50" /></element>
-		<element ref="static_black"><bounds x="182" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="2" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="22" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="42" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="62" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="82" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="102" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="122" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="142" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="162" y="55" width="19" height="50" /></element>
+		<element ref="black"><bounds x="182" y="55" width="19" height="50" /></element>
 
-		<element ref="static_white"><bounds x="0" y="71" width="203" height="1" /></element>
-		<element ref="static_white"><bounds x="0" y="88" width="203" height="1" /></element>
+		<element ref="white"><bounds x="0" y="71" width="203" height="1" /></element>
+		<element ref="white"><bounds x="0" y="88" width="203" height="1" /></element>
 
-		<element ref="static_black"><bounds x="3.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="23.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="43.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="63.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="83.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="103.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="123.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="143.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="163.5" y="56" width="16" height="48" /></element>
-		<element ref="static_black"><bounds x="183.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="3.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="23.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="43.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="63.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="83.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="103.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="123.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="143.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="163.5" y="56" width="16" height="48" /></element>
+		<element ref="black"><bounds x="183.5" y="56" width="16" height="48" /></element>
 
 		<element name="8.8" ref="seg"><bounds x="7" y="62" width="9" height="2" /></element>
 		<element name="8.9" ref="seg"><bounds x="7" y="79" width="9" height="2" /></element>
@@ -162,9 +162,9 @@ license:CC0
 		<element name="7.10" ref="seg"><bounds x="187" y="96" width="9" height="2" /></element>
 
 		<!-- cut edges -->
-		<element ref="static_black"><bounds x="-10" y="0" width="10" height="150" /></element>
-		<element ref="static_black"><bounds x="203" y="0" width="10" height="150" /></element>
-		<element ref="static_black"><bounds x="-10" y="109" width="300" height="10" /></element>
+		<element ref="black"><bounds x="-10" y="0" width="10" height="150" /></element>
+		<element ref="black"><bounds x="203" y="0" width="10" height="150" /></element>
+		<element ref="black"><bounds x="-10" y="109" width="300" height="10" /></element>
 
 	</view>
 </mamelayout>

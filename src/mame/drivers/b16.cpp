@@ -41,7 +41,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_crtc_vreg[0x100], m_crtc_index;
+	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<mc6845_device> m_mc6845;

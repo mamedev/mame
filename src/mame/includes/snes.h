@@ -322,7 +322,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	enum
 	{
@@ -337,55 +337,55 @@ protected:
 	};
 
 	/* misc */
-	uint16_t                m_hblank_offset;
-	uint32_t                m_wram_address;
-	uint16_t                m_htime;
-	uint16_t                m_vtime;
-	bool                  m_is_pal;
+	uint16_t                m_hblank_offset = 0;
+	uint32_t                m_wram_address = 0;
+	uint16_t                m_htime = 0;
+	uint16_t                m_vtime = 0;
+	bool                    m_is_pal = false;
 
 	/* non-SNES HW-specific flags / variables */
-	uint8_t                 m_is_nss;
-	uint8_t                 m_input_disabled;
-	uint8_t                 m_game_over_flag;
-	uint8_t                 m_joy_flag;
-	uint8_t                 m_is_sfcbox;
+	uint8_t                 m_is_nss = 0;
+	uint8_t                 m_input_disabled = 0;
+	uint8_t                 m_game_over_flag = 0;
+	uint8_t                 m_joy_flag = 0;
+	uint8_t                 m_is_sfcbox = 0;
 
 	/* timers */
-	emu_timer             *m_scanline_timer;
-	emu_timer             *m_hblank_timer;
-	emu_timer             *m_nmi_timer;
-	emu_timer             *m_hirq_timer;
-//  emu_timer             *m_div_timer;
-//  emu_timer             *m_mult_timer;
-	emu_timer             *m_io_timer;
+	emu_timer             *m_scanline_timer = nullptr;
+	emu_timer             *m_hblank_timer = nullptr;
+	emu_timer             *m_nmi_timer = nullptr;
+	emu_timer             *m_hirq_timer = nullptr;
+//  emu_timer             *m_div_timer = nullptr;
+//  emu_timer             *m_mult_timer = nullptr;
+	emu_timer             *m_io_timer = nullptr;
 
 	/* DMA/HDMA-related */
 	struct
 	{
-		uint8_t  dmap;
-		uint8_t  dest_addr;
-		uint16_t src_addr;
-		uint16_t trans_size;
-		uint8_t  bank;
-		uint8_t  ibank;
-		uint16_t hdma_addr;
-		uint16_t hdma_iaddr;
-		uint8_t  hdma_line_counter;
-		uint8_t  unk;
+		uint8_t  dmap = 0;
+		uint8_t  dest_addr = 0;
+		uint16_t src_addr = 0;
+		uint16_t trans_size = 0;
+		uint8_t  bank = 0;
+		uint8_t  ibank = 0;
+		uint16_t hdma_addr = 0;
+		uint16_t hdma_iaddr = 0;
+		uint8_t  hdma_line_counter = 0;
+		uint8_t  unk = 0;
 
-		int    do_transfer;
+		int    do_transfer = 0;
 
-		int    dma_disabled;    // used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
+		int    dma_disabled = 0;    // used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
 	} m_dma_channel[8];
-	uint8_t                 m_hdmaen; /* channels enabled for HDMA */
-	uint8_t                 m_dma_regs[0x80];
-	uint8_t                 m_cpu_regs[0x20];
-	uint8_t                 m_oldjoy1_latch;
+	uint8_t                 m_hdmaen = 0; /* channels enabled for HDMA */
+	uint8_t                 m_dma_regs[0x80]{};
+	uint8_t                 m_cpu_regs[0x20]{};
+	uint8_t                 m_oldjoy1_latch = 0;
 
 	/* input-related */
-	uint16_t                m_data1[4];   // JOY1/JOY2 + 3rd & 4th only used by multitap (hacky support)
-	uint16_t                m_data2[4];   // JOY3/JOY4 + 3rd & 4th only used by multitap (hacky support)
-	uint8_t                 m_read_idx[4];    // 3rd & 4th only used by multitap (hacky support)
+	uint16_t                m_data1[4]{};   // JOY1/JOY2 + 3rd & 4th only used by multitap (hacky support)
+	uint16_t                m_data2[4]{};   // JOY3/JOY4 + 3rd & 4th only used by multitap (hacky support)
+	uint8_t                 m_read_idx[4]{};    // 3rd & 4th only used by multitap (hacky support)
 
 	/* cart related */
 	snes_cart_info m_cart;   // used by NSS/SFCBox only! to be moved in a derived class!

@@ -82,6 +82,7 @@ public:
 	void go_exception(int exception, const char *condition);
 	void go_milliseconds(u64 milliseconds);
 	void go_privilege(const char *condition);
+	void go_branch(bool sense, const char *condition);
 	void go_next_device();
 
 	template <typename Format, typename... Params>
@@ -184,15 +185,16 @@ private:
 	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
 
 	// stepping information
-	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER
+	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER or DEBUG_FLAG_STEPPING_BRANCH
 	int                     m_stepsleft;                // number of steps left until done
+	int                     m_delay_steps;              // number of steps until target address check
 
 	// execution information
 	offs_t                  m_stopaddr;                 // stop address for DEBUG_FLAG_STOP_PC
 	attotime                m_stoptime;                 // stop time for DEBUG_FLAG_STOP_TIME
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
-	std::unique_ptr<parsed_expression> m_privilege_condition;      // expression to evaluate on privilege change
+	std::unique_ptr<parsed_expression> m_stop_condition;           // expression to evaluate on privilege change
 	std::unique_ptr<parsed_expression> m_exception_condition;      // expression to evaluate on exception hit
 	attotime                m_endexectime;              // ending time of the current execution
 	u64                     m_total_cycles;             // current total cycles
@@ -239,10 +241,10 @@ private:
 														//    (0 = not tracing over,
 														//    ~0 = not currently tracing over)
 	};
-	std::unique_ptr<tracer>                m_trace;                    // tracer state
+	std::unique_ptr<tracer>                m_trace;     // tracer state
 
-	std::vector<memory_passthrough_handler *> m_phw;    // passthrough handler reference for each space, write mode
-	std::vector<int>        m_notifiers;                // notifiers for each space
+	std::vector<memory_passthrough_handler> m_phw;      // passthrough handler reference for each space, write mode
+	std::vector<util::notifier_subscription> m_notifiers; // notifiers for each space
 
 	// pc tracking
 	class dasm_pc_tag
@@ -322,12 +324,17 @@ private:
 	static constexpr u32 DEBUG_FLAG_SUSPENDED       = 0x00004000;       // CPU currently suspended
 	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
 	static constexpr u32 DEBUG_FLAG_STOP_PRIVILEGE  = 0x00020000;       // run until execution level changes
+	static constexpr u32 DEBUG_FLAG_STEPPING_BRANCH_TRUE  = 0x0040000;  // run until true branch
+	static constexpr u32 DEBUG_FLAG_STEPPING_BRANCH_FALSE = 0x0080000;  // run until false branch
+	static constexpr u32 DEBUG_FLAG_CALL_IN_PROGRESS = 0x01000000;      // CPU is in the middle of a subroutine call
+	static constexpr u32 DEBUG_FLAG_TEST_IN_PROGRESS = 0x02000000;      // CPU is performing a conditional test and branch
 
-	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
+	static constexpr u32 DEBUG_FLAG_STEPPING_BRANCH = DEBUG_FLAG_STEPPING_BRANCH_TRUE | DEBUG_FLAG_STEPPING_BRANCH_FALSE;
+	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH;
 	static constexpr u32 DEBUG_FLAG_TRACING_ANY     = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
 	static constexpr u32 DEBUG_FLAG_TRANSIENT       = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
 			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK |
-			DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PRIVILEGE;
+			DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PRIVILEGE | DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS;
 };
 
 //**************************************************************************

@@ -85,7 +85,7 @@ protected:
 	u16 gfxram_r(offs_t offset);
 	void gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_post_load() override;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -197,7 +197,7 @@ public:
 	void init_zelos();
 
 private:
-	u16 m_zelos_ctrl;
+	u16 m_zelos_ctrl = 0;
 
 	void zelos_ctrl_w(u16 data);
 	void zelos_main_map(address_map &map);

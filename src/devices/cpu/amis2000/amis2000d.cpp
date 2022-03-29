@@ -33,9 +33,9 @@ const s8 amis2000_disassembler::s_bits[] =
 const u32 amis2000_disassembler::s_flags[] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND, 0, 0,
+	0, STEP_COND, STEP_COND, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND,
 	0, 0, STEP_OVER, STEP_OUT, STEP_OUT, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -88,7 +88,7 @@ offs_t amis2000_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	u8 op = opcodes.r8(pc);
 	u8 instr = s2000_mnemonic[op];
 
-	util::stream_format(stream, "%-5s ", s_mnemonics[instr]);
+	util::stream_format(stream, "%-6s", s_mnemonics[instr]);
 
 	// opcode parameter
 	int mask = s_bits[instr];

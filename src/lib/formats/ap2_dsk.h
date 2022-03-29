@@ -59,7 +59,7 @@ private:
 
 	bool m_prodos_order;
 
-	int m_tracks;
+	int m_tracks = 0;
 };
 
 extern const floppy_format_type FLOPPY_A216S_FORMAT;

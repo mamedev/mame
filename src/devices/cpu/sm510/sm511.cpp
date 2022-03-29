@@ -54,12 +54,12 @@ std::unique_ptr<util::disasm_interface> sm511_device::create_disassembler()
 
 
 // device definitions
-sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm511_device::program_4k), this), 7 /* data width */, address_map_constructor(FUNC(sm511_device::data_96_32x4), this))
-{ }
-
 sm511_device::sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
+{ }
+
+sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm511_device::program_4k), this), 7 /* data width */, address_map_constructor(FUNC(sm511_device::data_96_32x4), this))
 { }
 
 sm512_device::sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -123,8 +123,8 @@ void sm511_device::clock_melody()
 		m_melody_rd |= 2;
 	}
 
-	// clock time base on F8(d7)
-	if ((m_div & 0x7f) == 0)
+	// clock time base on divider F7/F8
+	if ((m_div & melody_step_mask()) == 0)
 	{
 		u8 mask = (cmd & 0x20) ? 0x1f : 0x0f;
 		m_melody_step_count = (m_melody_step_count + 1) & mask;
@@ -251,7 +251,7 @@ void sm511_device::execute_one()
 	} // big switch
 
 	// BM high bit is only valid for 1 step
-	m_sbm = (m_op == 0x02);
+	m_bmask = (m_op == 0x02) ? 0x40 : 0;
 }
 
 bool sm511_device::op_argument()

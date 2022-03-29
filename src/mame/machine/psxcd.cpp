@@ -116,6 +116,7 @@ void psxcd_device::device_start()
 	{
 		m_timers[i] = timer_alloc(i);
 		m_timerinuse[i] = false;
+		m_results[i] = nullptr;
 	}
 
 	save_item(NAME(cmdbuf));
@@ -145,8 +146,8 @@ void psxcd_device::device_stop()
 {
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
-		if(m_timerinuse[i] && m_timers[i]->ptr())
-			delete (command_result *)m_timers[i]->ptr();
+		if(m_timerinuse[i] && m_results[i])
+			delete m_results[i];
 	}
 	while(res_queue)
 	{
@@ -163,8 +164,8 @@ void psxcd_device::device_reset()
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
-		if(m_timerinuse[i] && m_timers[i]->ptr())
-			delete (command_result *)m_timers[i]->ptr();
+		if(m_timerinuse[i] && m_results[i])
+			delete m_results[i];
 		m_timers[i]->adjust(attotime::never, 0, attotime::never);
 		m_timerinuse[i] = false;
 	}
@@ -1182,7 +1183,7 @@ void psxcd_device::stop_read()
 	m_spu->flush_cdda(sector);
 }
 
-void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	if (!m_timerinuse[tid])
 	{
@@ -1197,7 +1198,7 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 		{
 			verboselog(*this, 1, "psxcd: event cmd complete\n");
 
-			cmd_complete((command_result *)ptr);
+			cmd_complete(m_results[tid]);
 			break;
 		}
 
@@ -1225,7 +1226,7 @@ int psxcd_device::add_system_event(int type, uint64_t t, command_result *ptr)
 		if(!m_timerinuse[i])
 		{
 			m_timers[i]->adjust(attotime::from_hz(hz), type, attotime::never);
-			m_timers[i]->set_ptr(ptr);
+			m_results[i] = ptr;
 			m_timerinuse[i] = true;
 			return i;
 		}

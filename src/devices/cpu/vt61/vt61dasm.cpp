@@ -90,13 +90,13 @@ const char *const vt61_disassembler::s_conditions[32][2] = {
 	{ "T",      "F"      }, // TRUE H
 	{ "NVSR",   "VSR"    }, // VID SERV REQ L
 	{ "?H",     "?L"     },
-	{ "?H",     "?L"    },
-	{ "?H",     "?L"    },
-	{ "?H",     "?L"    },
-	{ "?H",     "?L"    },
-	{ "?H",     "?L"    },
-	{ "?H",     "?L"    },
-	{ "?H",     "?L"    }
+	{ "?H",     "?L"     },
+	{ "?H",     "?L"     },
+	{ "?H",     "?L"     },
+	{ "?H",     "?L"     },
+	{ "?H",     "?L"     },
+	{ "?H",     "?L"     },
+	{ "?H",     "?L"     }
 };
 
 u32 vt61_disassembler::opcode_alignment() const
@@ -196,6 +196,8 @@ offs_t vt61_disassembler::disassemble(std::ostream &stream, offs_t pc, const vt6
 	else if (BIT(inst, 14))
 	{
 		util::stream_format(stream, "JMP %s,%03o", s_conditions[(inst & 017400) >> 8][BIT(inst, 13)], inst & 000377);
+		if ((inst & 017400) != 013000)
+			flags |= STEP_COND;
 	}
 	else if (BIT(inst, 13))
 	{

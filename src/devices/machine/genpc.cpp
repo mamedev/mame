@@ -477,25 +477,25 @@ void ibm5160_mb_device::device_add_mconfig(machine_config &config)
 
 static INPUT_PORTS_START( ibm5160_mb )
 	PORT_START("DSW0") /* IN1 */
-	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives") PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0xc0, "4" )
-	PORT_DIPNAME( 0x30, 0x30, "Graphics adapter")
+	PORT_DIPNAME( 0x30, 0x30, "Graphics adapter") PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "EGA/VGA" )
 	PORT_DIPSETTING(    0x10, "Color 40x25" )
 	PORT_DIPSETTING(    0x20, "Color 80x25" )
 	PORT_DIPSETTING(    0x30, "Monochrome" )
-	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
+	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks") PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, "1 - 16/ 64/256K" )
 	PORT_DIPSETTING(    0x04, "2 - 32/128/512K" )
 	PORT_DIPSETTING(    0x08, "3 - 48/192/576K" )
 	PORT_DIPSETTING(    0x0c, "4 - 64/256/640K" )
-	PORT_DIPNAME( 0x02, 0x00, "8087 installed")
+	PORT_DIPNAME( 0x02, 0x00, "8087 installed") PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
-	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
+	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 INPUT_PORTS_END
@@ -636,6 +636,59 @@ void ibm5150_mb_device::device_add_mconfig(machine_config &config)
 	m_cassette->set_interface("ibm5150_cass");
 }
 
+static INPUT_PORTS_START( ibm5150_mb )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives") PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
+	PORT_DIPNAME( 0x30, 0x30, "Graphics adapter") PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "EGA/VGA" )
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Base RAM size") PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, "16K" )
+	PORT_DIPSETTING(    0x04, "32K" )
+	PORT_DIPSETTING(    0x08, "48K" )
+	PORT_DIPSETTING(    0x0c, "64K" )
+	PORT_DIPNAME( 0x02, 0x00, "8087 installed") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy") PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x1f, 0x12, "Extra RAM size") PORT_DIPLOCATION("SW2:1,2,3,4,5")
+	PORT_DIPSETTING(    0x00, "None" )
+	PORT_DIPSETTING(    0x01, "32K" )
+	PORT_DIPSETTING(    0x02, "64K" )
+	PORT_DIPSETTING(    0x03, "96K" )
+	PORT_DIPSETTING(    0x04, "128K" )
+	PORT_DIPSETTING(    0x05, "160K" )
+	PORT_DIPSETTING(    0x06, "192K" )
+	PORT_DIPSETTING(    0x07, "224K" )
+	PORT_DIPSETTING(    0x08, "256K" )
+	PORT_DIPSETTING(    0x09, "288K" )
+	PORT_DIPSETTING(    0x0a, "320K" )
+	PORT_DIPSETTING(    0x0b, "352K" )
+	PORT_DIPSETTING(    0x0c, "384K" )
+	PORT_DIPSETTING(    0x0d, "416K" )
+	PORT_DIPSETTING(    0x0e, "448K" )
+	PORT_DIPSETTING(    0x0f, "480K" )
+	PORT_DIPSETTING(    0x10, "512K" )
+	PORT_DIPSETTING(    0x11, "544K" )
+	PORT_DIPSETTING(    0x12, "576K" )
+	PORT_DIPUNUSED_DIPLOC( 0xe0, 0x00, "SW2:6,7,8" )
+INPUT_PORTS_END
+
+ioport_constructor ibm5150_mb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ibm5150_mb );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -661,31 +714,7 @@ uint8_t ibm5150_mb_device::pc_ppi_porta_r()
 	/* KB port A */
 	if (m_ppi_keyboard_clear)
 	{
-		/*   0  0 - no floppy drives
-		 *   1  Not used
-		 * 2-3  The number of memory banks on the system board
-		 * 4-5  Display mode
-		 *      11 = monochrome
-		 *      10 - color 80x25
-		 *      01 - color 40x25
-		 * 6-7  The number of floppy disk drives
-		 */
-		data = ioport("DSW0")->read() & 0xF3;
-		switch ( m_ram->size() )
-		{
-		case 16 * 1024:
-			data |= 0x00;
-			break;
-		case 32 * 1024: /* Need to verify if this is correct */
-			data |= 0x04;
-			break;
-		case 48 * 1024: /* Need to verify if this is correct */
-			data |= 0x08;
-			break;
-		default:
-			data |= 0x0C;
-			break;
-		}
+		data = ioport("DSW0")->read();
 	}
 	else
 	{
@@ -705,37 +734,11 @@ uint8_t ibm5150_mb_device::pc_ppi_portc_r()
 	/* KB port C: equipment flags */
 	if (m_ppi_portc_switch_high)
 	{
-		/* read hi nibble of SW2 */
-		data = data & 0xf0;
-
-		switch ( m_ram->size() - 64 * 1024 )
-		{
-		case 64 * 1024:     data |= 0x00; break;
-		case 128 * 1024:    data |= 0x02; break;
-		case 192 * 1024:    data |= 0x04; break;
-		case 256 * 1024:    data |= 0x06; break;
-		case 320 * 1024:    data |= 0x08; break;
-		case 384 * 1024:    data |= 0x0A; break;
-		case 448 * 1024:    data |= 0x0C; break;
-		case 512 * 1024:    data |= 0x0E; break;
-		case 576 * 1024:    data |= 0x01; break;
-		case 640 * 1024:    data |= 0x03; break;
-		case 704 * 1024:    data |= 0x05; break;
-		case 768 * 1024:    data |= 0x07; break;
-		case 832 * 1024:    data |= 0x09; break;
-		case 896 * 1024:    data |= 0x0B; break;
-		case 960 * 1024:    data |= 0x0D; break;
-		}
-		if ( m_ram->size() > 960 * 1024 )
-			data |= 0x0D;
-
-		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
+		data = (data & 0xf0) | ioport("DSW1")->read();
 	}
 	else
 	{
-		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (ioport("DSW0")->read() & 0x0f);
-		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
+		data = (data & 0xf0) | (ioport("DSW1")->read() >> 4);
 	}
 
 	if ( ! ( m_ppi_portb & 0x08 ) )
@@ -768,7 +771,7 @@ void ibm5150_mb_device::pc_ppi_portb_w(uint8_t data)
 {
 	/* KB controller port B */
 	m_ppi_portb = data;
-	m_ppi_portc_switch_high = data & 0x08;
+	m_ppi_portc_switch_high = data & 0x04;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
 	m_pit8253->write_gate2(BIT(data, 0));
