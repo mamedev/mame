@@ -12,7 +12,10 @@
 
   * Golden Poker Double Up (Big Boy),                 1981, Bonanza Enterprises, Ltd.
   * Golden Poker Double Up (Mini Boy),                1981, Bonanza Enterprises, Ltd.
-  * Golden Poker Double Up (bootleg),                 198?, Bootleg.
+  * Golden Poker Double Up (bootleg, set 1),          198?, Bootleg.
+  * Golden Poker Double Up (bootleg, set 2),          198?, Bootleg.
+  * Golden Poker Double Up (bootleg, set 3),          1983, Intercoast (bootleg).
+  * Golden Poker Double Up (bootleg, set 4),          1983, Intercoast (bootleg).
   * Videotron Poker (cards selector, set 1),          198?, Unknown.
   * Videotron Poker (cards selector, set 2),          198?, Unknown.
   * Videotron Poker (normal controls),                198?, Unknown.
@@ -4791,6 +4794,120 @@ ROM_START( goldnpkc )
 	ROM_LOAD( "2732-1.bin",  0x5000, 0x1000, CRC(33a3b7c7) SHA1(b9713f534811963284d96239e4d8ab567adfb15a) )
 	ROM_LOAD( "2732-2.bin",  0x6000, 0x1000, CRC(12f403ba) SHA1(e84c0bf235ff3a4b2d54141468e4867c49ea0bd7) )
 	ROM_LOAD( "2732-3.bin",  0x7000, 0x1000, CRC(96a51764) SHA1(c175fadaa87a85af60619edfdb32e0ec7faf6682) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
+	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
+	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+
+	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
+	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
+	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
+	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+
+	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
+	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Unknown Golden Poker.
+  Bio5 Alternate Hi-LO game.
+  
+  Maybe bootleg
+  Running in original Bonanza board.
+
+  Program mapped at 0x5000-0x7fff
+  GFX ROMs are missing.
+*/
+ROM_START( goldnpkd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bio5_1-20_1.bin",  0x5000, 0x1000, CRC(d6612e28) SHA1(ec0e05035283642966f416d3361b94a74076a452) )
+	ROM_LOAD( "bio5_1-20_2.bin",  0x6000, 0x1000, CRC(6b2ade97) SHA1(66adbe69f132f849c0a2a32d5a9575b0740c7a4c) )
+	ROM_LOAD( "bio5_1-20_3.bin",  0x7000, 0x1000, CRC(d1ee95e2) SHA1(95ad7f86f83fda94476508954bda1270fb5f17ad) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
+	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
+	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+
+	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
+	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
+	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
+	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+
+	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
+	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Unknown Golden Poker.
+  G Alternate HI-LO game, french text in copyright
+  
+  Bootleg from Intercoast
+  Running in original Bonanza board.
+
+  Program mapped at 0x5000-0x7fff
+  GFX ROMs are missing.
+
+  The main difference is the way to play the HI-LO game:
+
+  1- When the player wins a hand, game will automatically switch to HI-LO
+     for double-up (no need to press the "double" button)
+	 
+  2- A card is shown to the player, then the game is to guess the drawn card
+    (BIG to guess bigger than actual card, LO to guess a lower card)
+
+  3- The player can still collect without playing double-up by pressing the "TAKE" button
+
+  Also,the "WIN" message looks to be misplaced on the screen (too low)
+
+*/
+ROM_START( goldnpke )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "g_1.bin",  0x5000, 0x1000, CRC(d475cd13) SHA1(7c12b44ab938f26701587e57784f08e248e3afd2) )
+	ROM_LOAD( "g_2.bin",  0x6000, 0x1000, CRC(ce080d66) SHA1(c5e11f7dc52a4d1661661a06d39316ba6a944adc) )
+	ROM_LOAD( "g_3.bin",  0x7000, 0x1000, CRC(9d02b6f4) SHA1(bd01477268543d0edb2cec2a26bab0627a6d3414) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
+	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
+	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+
+	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
+	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
+	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
+	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+
+	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
+	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Unknown Golden Poker.
+  HL Alternate HI-LO game, french text in copyright
+
+  Bootleg from Intercoast
+  Running in original Bonanza board.
+
+  Program mapped at 0x5000-0x7fff
+  GFX ROMs are missing.
+
+  The main difference is the way to play the HI-LO game:
+
+  1- When the player wins a hand, game will automatically switch to HI-LO
+     for double-up (no need to press the "double" button)
+	 
+  2- A card is shown to the player, then the game is to guess the drawn card
+    (BIG to guess bigger than actual card, LO to guess a lower card)
+
+  3- The player can still collect without playing double-up by pressing the "TAKE" button
+
+  Also,the "WIN" message looks to be misplaced on the screen (too low)
+  Coin2 and Coupon/Note are fixed in 1 credit and cannot be changed.
+
+*/
+ROM_START( goldnpkf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hl_1.bin",  0x5000, 0x1000, BAD_DUMP )
+	ROM_LOAD( "hl_2.bin",  0x6000, 0x1000, BAD_DUMP )
+	ROM_LOAD( "hl_3.bin",  0x7000, 0x1000, BAD_DUMP )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
 	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
@@ -11895,7 +12012,10 @@ void goldnpkr_state::init_pokersis()
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                     FLAGS             LAYOUT
 GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",           0,                layout_goldnpkr )
 GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",          0,                layout_goldnpkr )
-GAMEL( 198?, goldnpkc,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg)",           0,                layout_goldnpkr )
+GAMEL( 198?, goldnpkc,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 1)",    0,                layout_goldnpkr )
+GAMEL( 198?, goldnpkd,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 2)",    0,                layout_goldnpkr )
+GAMEL( 1983, goldnpke,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 3)",    0,                layout_goldnpkr )
+GAMEL( 1983, goldnpkf,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 4)",    0,                layout_goldnpkr )
 
 GAMEL( 198?, videtron,  0,        goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)",    0,                layout_goldnpkr )
 GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)",    0,                layout_goldnpkr )
