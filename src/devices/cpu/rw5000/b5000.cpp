@@ -64,18 +64,21 @@ u16 b5000_cpu_device::decode_digit(u8 data)
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
 
 		// ?, ?, newline?, -, ?, ?
-		0, 0, 0x80, 0x40, 0, 0
+		0, 0, 0x00, 0x40, 0, 0
 	};
 
-	u16 seg = lut_segs[data & 0xf] << 1 | BIT(data, 4);
+	u8 dp = BIT(data, 4);
+	u8 seg = lut_segs[data & 0xf];
 
 	// zero suppression logic is done in hardware
-	if (seg & 0x100)
-		m_suppress0 = true;
-	else if (data > 0)
+	if (data > 0)
 		m_suppress0 = false;
+	if (m_suppress0)
+		seg = 0;
+	if ((data & 0xf) >= 0xc)
+		m_suppress0 = true;
 
-	return m_suppress0 ? 0 : (seg & 0xff);
+	return seg << 1 | dp;
 }
 
 

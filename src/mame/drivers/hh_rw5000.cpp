@@ -8,12 +8,14 @@ Mostly calculators on these MCUs, but also Mattel's first couple of handhelds.
 
 ROM source notes when dumped from another model, but confident it's the same:
 - rw18r: Rockwell 8R
+- rw24k: Rockwell 14RD-II
 - misatk: Mattel Space Alert
 
 ***************************************************************************/
 
 #include "emu.h"
 
+#include "cpu/rw5000/a5000.h"
 #include "cpu/rw5000/b5000.h"
 #include "cpu/rw5000/b6000.h"
 #include "cpu/rw5000/b6100.h"
@@ -29,6 +31,7 @@ ROM source notes when dumped from another model, but confident it's the same:
 #include "mfootb.lh"
 #include "misatk.lh"
 #include "rw18r.lh"
+#include "rw24k.lh"
 
 //#include "hh_rw5000_test.lh" // common test-layout - use external artwork
 
@@ -56,7 +59,7 @@ protected:
 	required_device<rw5000_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_ioport_array<5> m_inputs; // max 5
+	optional_ioport_array<9> m_inputs; // max 9
 
 	u16 m_inp_mux = 0;
 
@@ -610,6 +613,8 @@ ROM_END
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by
   Tandy (Radio Shack) as EC-220.
 
+  8R/9TR doesn't have the memory store/recall buttons.
+
 ***************************************************************************/
 
 class rw18r_state : public hh_rw5000_state
@@ -707,6 +712,135 @@ ROM_END
 
 
 
+
+
+/***************************************************************************
+
+  Rockwell 24K aka "the 24K" (see below for more)
+  * A5900 MCU (label A5901CA/A5903CB, die label A59__)
+  * 9-digit 7seg display
+
+  This MCU was used in Rockwell 14RD-II, 24RD-II, 24K, 24K II, 24MS, and
+  probably also in 14RD, 24RD, 22K.
+
+  14RD has 6 less buttons than 24RD, the non-II versions have LED(s) instead
+  of a 9th digit for minus sign and memory status. 24K has an extra button
+  for register exchange. The difference between 24K and 24K II is unknown.
+
+***************************************************************************/
+
+class rw24k_state : public hh_rw5000_state
+{
+public:
+	rw24k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_rw5000_state(mconfig, type, tag)
+	{ }
+
+	void rw24k(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+	u8 read_kb();
+};
+
+// handlers
+
+void rw24k_state::write_str(u16 data)
+{
+	// STR0-STR8: digit select, input mux
+	m_display->write_my(data);
+	m_inp_mux = data;
+}
+
+void rw24k_state::write_seg(u16 data)
+{
+	// SEG0-SEG7: digit segment data
+	m_display->write_mx(bitswap<8>(data,0,7,6,5,4,3,2,1));
+}
+
+u8 rw24k_state::read_kb()
+{
+	// KB: multiplexed inputs
+	return read_inputs(9);
+}
+
+// config
+
+static INPUT_PORTS_START( rw24k )
+	PORT_START("IN.0") // STR0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-") // unpopulated on 14RD
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("M+") // "
+
+	PORT_START("IN.1") // STR1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("M-") // "
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // STR2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // STR3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("MC") // "
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"√") // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("MR") // "
+
+	PORT_START("IN.4") // STR4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.5") // STR5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.6") // STR6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.7") // STR7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.8") // STR8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE/C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME(u8"↔") // register exchange - unpopulated on 14RD/24RD
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+INPUT_PORTS_END
+
+void rw24k_state::rw24k(machine_config &config)
+{
+	// basic machine hardware
+	A5900(config, m_maincpu, 250000); // approximation
+	m_maincpu->write_str().set(FUNC(rw24k_state::write_str));
+	m_maincpu->write_seg().set(FUNC(rw24k_state::write_seg));
+	m_maincpu->read_kb().set(FUNC(rw24k_state::read_kb));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_rw24k);
+}
+
+// roms
+
+ROM_START( rw24k )
+	ROM_REGION( 0x200, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "a5901ca", 0x000, 0x200, CRC(00de7764) SHA1(0f24add4b6d2660aad63ddd4d0003d59a0e39df6) )
+ROM_END
+
+
+
 } // anonymous namespace
 
 /***************************************************************************
@@ -723,3 +857,4 @@ CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_
 CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, rw24k,     0,       0, rw24k,     rw24k,     rw24k_state,     empty_init, "Rockwell", "24K (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

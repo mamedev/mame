@@ -16549,6 +16549,7 @@ mbaseb                          // Mattel
 mfootb                          // Mattel
 misatk                          // Mattel
 rw18r                           // Rockwell
+rw24k                           // Rockwell
 
 @source:hh_sm510.cpp
 atakaast                        // Elektronika

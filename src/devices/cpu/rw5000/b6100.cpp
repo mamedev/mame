@@ -69,65 +69,16 @@ u16 b6100_cpu_device::decode_digit(u8 data)
 
 void b6100_cpu_device::execute_one()
 {
-	switch (m_op & 0xf0)
+	switch (m_op)
 	{
-		case 0x40: op_lax(); break;
-		case 0x60:
-			if (m_op != 0x6f)
-				op_adx();
-			else
-				op_read();
-			break;
+		case 0x1c: case 0x1d: case 0x1e: case 0x1f: op_lb(11); break;
+		case 0x38: case 0x39: case 0x3a: case 0x3b: op_tl(); break;
 
-		case 0x80: case 0x90: case 0xa0: case 0xb0:
-		case 0xc0: case 0xd0: case 0xe0: case 0xf0:
-			m_tra_step = 1; break;
-
-		default:
-			switch (m_op & 0xfc)
-			{
-		case 0x04: op_tdin(); break;
-		case 0x08: op_tm(); break;
-		case 0x10: op_sm(); break;
-		case 0x14: op_rsm(); break;
-		case 0x18: m_ret_step = 1; break;
-
-		case 0x1c: op_lb(11); break;
-		case 0x20: op_lb(7); break;
-		case 0x24: op_lb(10); break;
-		case 0x28: op_lb(9); break;
-		case 0x2c: op_lb(8); break;
-		case 0x3c: op_lb(0); break;
-
-		case 0x30: case 0x34: case 0x38: op_tl(); break;
-
-		case 0x50: op_lda(); break;
-		case 0x54: op_excp(); break;
-		case 0x58: op_exc0(); break;
-		case 0x5c: op_excm(); break;
-		case 0x70: op_add(); break;
-		case 0x78: op_comp(); break;
-		case 0x7c: op_tam(); break;
-
-		default:
-			switch (m_op)
-			{
-		case 0x00: op_nop(); break;
-		case 0x01: op_tc(); break;
-		case 0x02: op_tkb(); break;
-		case 0x03: op_tkbs(); break;
 		case 0x0c: op_sc(); break;
 		case 0x0d: op_rsc(); break;
-		case 0x74: op_kseg(); break;
-		case 0x76: op_atbz(); break;
-		case 0x77: op_atb(); break;
 
-		default: op_illegal(); break;
-			}
-			break; // 0xff
-
-			}
-			break; // 0xfc
+		// rest is same as B6000
+		default: b6000_cpu_device::execute_one(); break;
 	}
 
 	// instead of with TKBS, carry flag directly outputs to SPK

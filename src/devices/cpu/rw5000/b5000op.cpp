@@ -275,7 +275,7 @@ void b5000_cpu_device::op_atb_step()
 {
 	assert(m_atb_step > 0);
 
-	// ATBZ (aka ATB on B5xxx): ATB + load strobe (multi step)
+	// ATB: ATB + load strobe (multi step)
 	switch (m_atb_step)
 	{
 		// step 1: ATB + KSEG
