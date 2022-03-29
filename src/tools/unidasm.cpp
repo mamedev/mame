@@ -377,6 +377,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "alpha_vms",       le,  0, []() -> util::disasm_interface * { return new alpha_disassembler(alpha_disassembler::TYPE_VMS); } },
 	{ "alto2",           be, -2, []() -> util::disasm_interface * { return new alto2_disassembler; } },
 	{ "a5000",           le,  0, []() -> util::disasm_interface * { return new a5000_disassembler; } },
+	{ "a5500",           le,  0, []() -> util::disasm_interface * { return new a5500_disassembler; } },
 	{ "am29000",         be,  0, []() -> util::disasm_interface * { return new am29000_disassembler; } },
 	{ "amis2000",        le,  0, []() -> util::disasm_interface * { return new amis2000_disassembler; } },
 	{ "apexc",           be,  0, []() -> util::disasm_interface * { return new apexc_disassembler; } },

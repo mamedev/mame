@@ -608,7 +608,7 @@ ROM_END
 
   Rockwell 8R, Rockwell 18R
   * B5000 MCU (label B5000CC, die label B5000)
-  * 8-digit 7seg display
+  * 8-digit 7seg LEDs
 
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by
   Tandy (Radio Shack) as EC-220.
@@ -718,7 +718,7 @@ ROM_END
 
   Rockwell 24K aka "the 24K" (see below for more)
   * A5900 MCU (label A5901CA/A5903CB, die label A59__)
-  * 9-digit 7seg display
+  * 9-digit 7seg VFD
 
   This MCU was used in Rockwell 14RD-II, 24RD-II, 24K, 24K II, 24MS, and
   probably also in 14RD, 24RD, 22K.

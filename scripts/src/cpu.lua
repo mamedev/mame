@@ -2855,6 +2855,7 @@ end
 --------------------------------------------------
 -- Rockwell A/B5000 family
 --@src/devices/cpu/rw5000/a5000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/a5500.h,CPUS["RW5000"] = true
 --@src/devices/cpu/rw5000/b5000.h,CPUS["RW5000"] = true
 --@src/devices/cpu/rw5000/b6000.h,CPUS["RW5000"] = true
 --@src/devices/cpu/rw5000/b6100.h,CPUS["RW5000"] = true
@@ -2867,12 +2868,14 @@ if CPUS["RW5000"] then
 		MAME_DIR .. "src/devices/cpu/rw5000/b5000.cpp",
 		MAME_DIR .. "src/devices/cpu/rw5000/b5000.h",
 		MAME_DIR .. "src/devices/cpu/rw5000/b5000op.cpp",
-		MAME_DIR .. "src/devices/cpu/rw5000/a5000.cpp",
-		MAME_DIR .. "src/devices/cpu/rw5000/a5000.h",
 		MAME_DIR .. "src/devices/cpu/rw5000/b6000.cpp",
 		MAME_DIR .. "src/devices/cpu/rw5000/b6000.h",
 		MAME_DIR .. "src/devices/cpu/rw5000/b6100.cpp",
 		MAME_DIR .. "src/devices/cpu/rw5000/b6100.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5500.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5500.h",
 	}
 end
 
