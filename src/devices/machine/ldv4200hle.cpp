@@ -394,26 +394,60 @@ uint8_t pioneer_ldv4200hle_device::process_command(uint8_t cmd_index, uint32_t v
 			break;
 		case CMD_MULTISPEED_FORWARD:
 			LOGMASKED(LOG_COMMANDS, "%s: Command: Multi-Speed Forward (%d) (cancelling search)\n", machine().describe_context(), value == ~0U ? 0 : value);
-			m_mode = MODE_MS_FORWARD;
 			m_search_frame = ~0U;
 			m_search_chapter = ~0U;
-			if (value != ~0U)
+			if (value + 1 == m_curr_frame)
 			{
-				LOGMASKED(LOG_COMMANDS, "%s:          Setting stop frame\n", machine().describe_context());
-				m_mark_frame = value + 1;
-				m_cmd_running = true;
+				LOGMASKED(LOG_COMMANDS, "%s:          Already at desired frame, entering still/pause\n", machine().describe_context(), value == ~0U ? 0 : value);
+				if (is_cav_disc())
+				{
+					m_mode = MODE_STILL;
+					update_video_enable();
+				}
+				else
+				{
+					m_mode = MODE_PAUSE;
+					video_enable(false);
+				}
+			}
+			else
+			{
+				m_mode = MODE_MS_FORWARD;
+				if (value != ~0U)
+				{
+					LOGMASKED(LOG_COMMANDS, "%s:          Setting stop frame\n", machine().describe_context());
+					m_mark_frame = value + 1;
+					m_cmd_running = true;
+				}
 			}
 			break;
 		case CMD_MULTISPEED_REVERSE:
 			LOGMASKED(LOG_COMMANDS, "%s: Command: Multi-Speed Reverse (%d) (cancelling search)\n", machine().describe_context(), value == ~0U ? 0 : value);
-			m_mode = MODE_MS_REVERSE;
 			m_search_frame = ~0U;
 			m_search_chapter = ~0U;
-			if (value != ~0U)
+			if (value + 1 == m_curr_frame)
 			{
-				LOGMASKED(LOG_COMMANDS, "%s:          Setting stop frame\n", machine().describe_context());
-				m_mark_frame = value + 1;
-				m_cmd_running = true;
+				LOGMASKED(LOG_COMMANDS, "%s:          Already at desired frame, entering still/pause\n", machine().describe_context(), value == ~0U ? 0 : value);
+				if (is_cav_disc())
+				{
+					m_mode = MODE_STILL;
+					update_video_enable();
+				}
+				else
+				{
+					m_mode = MODE_PAUSE;
+					video_enable(false);
+				}
+			}
+			else
+			{
+				m_mode = MODE_MS_REVERSE;
+				if (value != ~0U)
+				{
+					LOGMASKED(LOG_COMMANDS, "%s:          Setting stop frame\n", machine().describe_context());
+					m_mark_frame = value + 1;
+					m_cmd_running = true;
+				}
 			}
 			break;
 		case CMD_SPEED_SET:
@@ -768,8 +802,8 @@ void pioneer_ldv4200hle_device::device_timer(emu_timer &timer, device_timer_id i
 				{
 					if (m_mark_frame != ~0U && m_search_frame == ~0U)
 					{
-						int32_t old_delta = (int32_t)old_frame - (int32_t)m_mark_frame;
-						int32_t curr_delta = (int32_t)m_curr_frame - (int32_t)m_mark_frame;
+						int32_t old_delta = (int32_t)m_mark_frame - (int32_t)old_frame;
+						int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
 						LOGMASKED(LOG_STOPS, "%s: Stop Mark is currently %d, old frame is %d, current frame is %d, old delta %d, curr delta %d\n", machine().describe_context(), m_mark_frame, old_frame, m_curr_frame, old_delta, curr_delta);
 						if (curr_delta == 0 || std::signbit(old_delta) != std::signbit(curr_delta))
 						{
@@ -801,7 +835,7 @@ void pioneer_ldv4200hle_device::device_timer(emu_timer &timer, device_timer_id i
 					if (m_search_frame != ~0U)
 					{
 						// TODO: Chapter-search support
-						int32_t delta = (int32_t)m_curr_frame - (int32_t)m_search_frame;
+						int32_t delta = (int32_t)m_search_frame - (int32_t)m_curr_frame;
 						LOGMASKED(LOG_SEARCHES, "%s: Searching from current frame %d with delta %d\n", machine().describe_context(), m_curr_frame, delta);
 						if (delta == 0)
 						{
@@ -829,20 +863,20 @@ void pioneer_ldv4200hle_device::device_timer(emu_timer &timer, device_timer_id i
 								queue_reply("R\x0d");
 							}
 						}
-						else if (delta >= -2 && delta < 0)
+						else if (delta <= 2 && delta > 0)
 						{
-							LOGMASKED(LOG_SEARCHES, "%s: Negative-near delta, letting disc run to current\n", machine().describe_context());
+							LOGMASKED(LOG_SEARCHES, "%s: Positive near delta, letting disc run to current\n", machine().describe_context());
 							// We're approaching our frame, let it run up.
 						}
 						else
 						{
 							if (delta < 0)
 							{
-								advance_slider(std::max(1, -delta / 2));
+								advance_slider(std::min(-2, delta / 2));
 							}
 							else
 							{
-								advance_slider(std::min(-2, -delta / 2));
+								advance_slider(std::max(1, delta / 2));
 							}
 						}
 					}
@@ -891,6 +925,17 @@ int32_t pioneer_ldv4200hle_device::player_update(const vbi_metadata &vbi, int fi
 		m_speed_accum -= elapsed_tracks * 60;
 		if (m_mode == MODE_MS_REVERSE)
 			elapsed_tracks *= -1;
+
+		if (m_mark_frame != ~0U)
+		{
+			int32_t jump_frame = (int32_t)m_curr_frame + elapsed_tracks;
+			int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
+			int32_t next_delta = (int32_t)m_mark_frame - (int32_t)jump_frame;
+			if (std::signbit(curr_delta) != std::signbit(next_delta))
+			{
+				elapsed_tracks = curr_delta;
+			}
+		}
 		return elapsed_tracks;
 	}
 
