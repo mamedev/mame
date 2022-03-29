@@ -114,7 +114,7 @@ Boots to a purple and blue flickering screen, [FDC] dsksync
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
 Not extensively tested
-[Lisa] sprites leaves an empty gap on bottom of playfield 
+[Lisa] sprites leaves an empty gap on bottom of playfield
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -985,7 +985,7 @@ Collision detection is pretty fussy
 Mongols encounter caused wrong colors and Guru Meditation (TODO: verify)
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports Civilization Quiz copy-protection" />
-		
+
 		<!-- Game prompts for Disks 1-2-3-4, but markings are confirmed to be letter based -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -2665,7 +2665,7 @@ Text layer has last 4 chars with wrong violet color, i.e. last 3 digit of score 
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
 Mouse cursor is uncontrollable, [joytest] reset counter
-]]></notes>		
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />

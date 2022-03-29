@@ -168,7 +168,7 @@ public:
 private:
 	int oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf);
 
-	uint16_t m_kb_mask;
+	uint16_t m_kb_mask = 0;
 };
 
 

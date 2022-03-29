@@ -509,10 +509,10 @@ private:
 	output_finder<5> m_ol_out;
 
 	// cartridge
-	u32 m_cart_max_size;
-	u8 *m_cart_base;
+	u32 m_cart_max_size = 0;
+	u8 *m_cart_base = nullptr;
 
-	u8 m_overlay;
+	u8 m_overlay = 0;
 };
 
 void tispeak_state::machine_start()
@@ -533,8 +533,6 @@ void tispeak_state::machine_start()
 
 void tispeak_state::init_cartridge()
 {
-	m_overlay = 0;
-
 	if (m_cart != nullptr && m_cart->exists())
 	{
 		std::string region_tag;

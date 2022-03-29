@@ -207,11 +207,11 @@ private:
 
 	struct
 	{
-		u8 rxd;
-		u8 txd;
-		u8 rst;
-		u8 state;
-		u8 packet_type;
+		u8 rxd = 0U;
+		u8 txd = 0U;
+		u8 rst = 0U;
+		u8 state = 0U;
+		u8 packet_type = 0U;
 	} m_mcu[2];
 
 	bool mcu_parity_check();

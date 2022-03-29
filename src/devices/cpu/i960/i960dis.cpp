@@ -537,6 +537,8 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		disflags = STEP_OVER;
 	else if (op == 0x0a)
 		disflags = STEP_OUT;
+	else if ((op & 0xd8) == 0x10 || (op > 0x38 && op < 0x3f))
+		disflags = STEP_COND;
 
 	switch(mnemonic[op].type)
 	{

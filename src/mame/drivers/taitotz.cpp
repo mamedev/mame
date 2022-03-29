@@ -596,28 +596,28 @@ private:
 	std::unique_ptr<uint32_t[]> m_screen_ram;
 	std::unique_ptr<uint32_t[]> m_frame_ram;
 	std::unique_ptr<uint32_t[]> m_texture_ram;
-	uint32_t m_video_unk_reg[0x10];
+	uint32_t m_video_unk_reg[0x10]{};
 
-	uint32_t m_video_fifo_ptr;
-	uint32_t m_video_ram_ptr;
-	uint32_t m_video_reg;
-	uint32_t m_scr_base;
+	uint32_t m_video_fifo_ptr = 0;
+	uint32_t m_video_ram_ptr = 0;
+	uint32_t m_video_reg = 0;
+	uint32_t m_scr_base = 0;
 
-	//uint64_t m_video_fifo_mem[4];
+	//uint64_t m_video_fifo_mem[4]{};
 
-	uint16_t m_io_share_ram[0x2000];
+	uint16_t m_io_share_ram[0x2000]{};
 
-	const char *m_hdd_serial_number;
+	const char *m_hdd_serial_number = nullptr;
 
 	uint8_t tlcs_common_r(offs_t offset);
 	void tlcs_common_w(offs_t offset, uint8_t data);
 	uint8_t tlcs_rtc_r(offs_t offset);
 	void tlcs_rtc_w(offs_t offset, uint8_t data);
 
-	uint8_t m_rtcdata[8];
+	uint8_t m_rtcdata[8]{};
 
 
-	uint32_t m_reg105;
+	uint32_t m_reg105 = 0;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
 
@@ -692,47 +692,47 @@ private:
 	taitotz_state &m_state;
 	std::unique_ptr<bitmap_rgb32> m_fb;
 	std::unique_ptr<bitmap_ind32> m_zbuffer;
-	uint32_t *m_texture;
-	uint32_t *m_screen_ram;
+	uint32_t *m_texture = nullptr;
+	uint32_t *m_screen_ram = nullptr;
 
 	rectangle m_cliprect;
 
-	PLANE m_clip_plane[6];
-	float m_matrix[4][3];
+	PLANE m_clip_plane[6]{};
+	float m_matrix[4][3]{};
 
-	float m_diffuse_intensity;
-	float m_ambient_intensity;
-	float m_specular_intensity;
-	float m_specular_power;
+	float m_diffuse_intensity = 0;
+	float m_ambient_intensity = 0;
+	float m_specular_intensity = 0;
+	float m_specular_power = 0;
 
-	int m_ambient_r;
-	int m_ambient_g;
-	int m_ambient_b;
-	int m_diffuse_r;
-	int m_diffuse_g;
-	int m_diffuse_b;
-	int m_specular_r;
-	int m_specular_g;
-	int m_specular_b;
+	int m_ambient_r = 0;
+	int m_ambient_g = 0;
+	int m_ambient_b = 0;
+	int m_diffuse_r = 0;
+	int m_diffuse_g = 0;
+	int m_diffuse_b = 0;
+	int m_specular_r = 0;
+	int m_specular_g = 0;
+	int m_specular_b = 0;
 
-	float m_vp_center_x;
-	float m_vp_center_y;
-	float m_vp_focus;
-	float m_vp_x;
-	float m_vp_y;
-	float m_vp_mul;
+	float m_vp_center_x = 0;
+	float m_vp_center_y = 0;
+	float m_vp_focus = 0;
+	float m_vp_x = 0;
+	float m_vp_y = 0;
+	float m_vp_mul = 0;
 
-	uint32_t m_reg_100;
-	uint32_t m_reg_101;
-	uint32_t m_reg_102;
+	uint32_t m_reg_100 = 0;
+	uint32_t m_reg_101 = 0;
+	uint32_t m_reg_102 = 0;
 
-	uint32_t m_reg_10000100;
-	uint32_t m_reg_10000101;
+	uint32_t m_reg_10000100 = 0;
+	uint32_t m_reg_10000101 = 0;
 
-	uint32_t m_tnl_fifo[64];
-	uint32_t m_direct_fifo[64];
-	int m_tnl_fifo_ptr;
-	int m_direct_fifo_ptr;
+	uint32_t m_tnl_fifo[64]{};
+	uint32_t m_direct_fifo[64]{};
+	int m_tnl_fifo_ptr = 0;
+	int m_direct_fifo_ptr = 0;
 };
 
 

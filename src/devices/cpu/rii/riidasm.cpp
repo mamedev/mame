@@ -412,7 +412,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_immediate(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x4800:
@@ -420,7 +420,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_immediate(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x4900:
@@ -428,7 +428,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_immediate(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x4a00:
@@ -466,7 +466,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x5100:
@@ -474,7 +474,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x5200:
@@ -482,7 +482,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x5300:
@@ -490,7 +490,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x5500:
@@ -498,7 +498,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x5600:
@@ -506,7 +506,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x5700:
@@ -514,7 +514,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		stream << ",";
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x5800: case 0x5900: case 0x5a00: case 0x5b00:
@@ -523,7 +523,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		util::stream_format(stream, ",%d,", (opcode & 0x0700) >> 8);
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x6000: case 0x6100: case 0x6200: case 0x6300:
@@ -532,7 +532,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		format_register(stream, opcode & 0x00ff);
 		util::stream_format(stream, ",%d,", (opcode & 0x0700) >> 8);
 		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
-		words = 2;
+		words = 2 | STEP_COND;
 		break;
 
 	case 0x6800: case 0x6900: case 0x6a00: case 0x6b00:

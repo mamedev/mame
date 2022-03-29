@@ -89,11 +89,11 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
-	uint16_t m_paloff;
-	uint16_t m_port10;
-	uint8_t m_rombank;
-	uint16_t m_videoram0[0x10000 / 2];
-	uint16_t m_videoram2[0x10000 / 2];
+	uint16_t m_paloff = 0;
+	uint16_t m_port10 = 0;
+	uint8_t m_rombank = 0;
+	uint16_t m_videoram0[0x10000 / 2]{};
+	uint16_t m_videoram2[0x10000 / 2]{};
 
 	enum class picmode : u8
 	{
@@ -106,20 +106,20 @@ private:
 
 	picmode m_picmodex;
 
-	int m_pic_readaddr;
-	int m_pic_writeaddr;
-	int m_pic_latched;
-	int m_pic_writelatched;
+	int m_pic_readaddr = 0;
+	int m_pic_writeaddr = 0;
+	int m_pic_latched = 0;
+	int m_pic_writelatched = 0;
 
 	std::unique_ptr<uint8_t[]> m_bakram;
 
 	uint16_t m_mainram[0x10000 / 2];
 
-	int m_spritesinit;
-	int m_spriteswidth;
-	int m_spritesaddr;
-	uint16_t* m_rom16;
-	uint8_t* m_rom8;
+	int m_spritesinit = 0;
+	int m_spriteswidth = 0;
+	int m_spritesaddr = 0;
+	uint16_t* m_rom16 = nullptr;
+	uint8_t* m_rom8 = nullptr;
 
 	void paloff_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void paldat_w(uint16_t data);

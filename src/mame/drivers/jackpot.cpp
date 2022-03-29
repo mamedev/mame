@@ -71,7 +71,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_tx_videoram;
 
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	void tx_videoram_w(offs_t offset, uint8_t data);

@@ -151,9 +151,9 @@ private:
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<sc28c94_device> m_quart1;
 
-	uint8_t m_irq_enable;
-	uint8_t m_irq_pend;
-	uint8_t m_timer_count;
+	uint8_t m_irq_enable = 0;
+	uint8_t m_irq_pend = 0;
+	uint8_t m_timer_count = 0;
 };
 
 void igt_gameking_state::video_start()

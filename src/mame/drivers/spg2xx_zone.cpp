@@ -25,10 +25,10 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint8_t m_w60_controller_input;
-	uint16_t m_w60_porta_data;
-	uint16_t m_w60_p1_ctrl_mask;
-	uint16_t m_w60_p2_ctrl_mask;
+	uint8_t m_w60_controller_input = 0;
+	uint16_t m_w60_porta_data = 0;
+	uint16_t m_w60_p1_ctrl_mask = 0;
+	uint16_t m_w60_p2_ctrl_mask = 0;
 	uint8_t m_bankmask;
 
 	void wireless60_porta_w(uint16_t data);
@@ -63,9 +63,9 @@ private:
 	uint16_t zone40_porta_r();
 	void zone40_porta_w(uint16_t data);
 	required_region_ptr<uint16_t> m_romregion;
-	uint16_t m_z40_rombase;
-	uint16_t m_porta_dat;
-	int m_romsize;
+	uint16_t m_z40_rombase = 0;
+	uint16_t m_porta_dat = 0;
+	int m_romsize = 0;
 };
 
 

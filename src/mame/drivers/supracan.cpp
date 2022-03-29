@@ -165,20 +165,20 @@ private:
 
 	struct dma_regs_t
 	{
-		uint32_t source[2];
-		uint32_t dest[2];
-		uint16_t count[2];
-		uint16_t control[2];
+		uint32_t source[2]{};
+		uint32_t dest[2]{};
+		uint16_t count[2]{};
+		uint16_t control[2]{};
 	};
 
 	struct sprdma_regs_t
 	{
-		uint32_t src;
-		uint16_t src_inc;
-		uint32_t dst;
-		uint16_t dst_inc;
-		uint16_t count;
-		uint16_t control;
+		uint32_t src = 0;
+		uint16_t src_inc = 0;
+		uint32_t dst = 0;
+		uint16_t dst_inc = 0;
+		uint16_t count = 0;
+		uint16_t control = 0;
 	};
 
 	required_device<cpu_device> m_maincpu;
@@ -197,59 +197,59 @@ private:
 	dma_regs_t m_dma_regs;
 	sprdma_regs_t m_sprdma_regs;
 
-	uint16_t m_sound_cpu_ctrl;
-	uint8_t m_soundcpu_irq_enable;
-	uint8_t m_soundcpu_irq_source;
-	uint8_t m_sound_cpu_shift_ctrl;
-	uint8_t m_sound_cpu_shift_regs[2];
-	uint16_t m_latched_controls[2];
-	uint8_t m_sound_status;
-	uint8_t m_sound_reg_addr;
+	uint16_t m_sound_cpu_ctrl = 0;
+	uint8_t m_soundcpu_irq_enable = 0;
+	uint8_t m_soundcpu_irq_source = 0;
+	uint8_t m_sound_cpu_shift_ctrl = 0;
+	uint8_t m_sound_cpu_shift_regs[2]{};
+	uint16_t m_latched_controls[2]{};
+	uint8_t m_sound_status = 0;
+	uint8_t m_sound_reg_addr = 0;
 
-	emu_timer *m_video_timer;
-	emu_timer *m_hbl_timer;
-	emu_timer *m_line_on_timer;
-	emu_timer *m_line_off_timer;
+	emu_timer *m_video_timer = nullptr;
+	emu_timer *m_hbl_timer = nullptr;
+	emu_timer *m_line_on_timer = nullptr;
+	emu_timer *m_line_off_timer = nullptr;
 
-	std::vector<uint8_t> m_vram_addr_swapped;
+	std::vector<uint8_t> m_vram_addr_swapped{};
 
 #if 0
-	uint16_t *m_pram;
+	uint16_t *m_pram = nullptr;
 #endif
 
-	uint16_t m_sprite_count;
-	uint32_t m_sprite_base_addr;
-	uint8_t m_sprite_flags;
+	uint16_t m_sprite_count = 0;
+	uint32_t m_sprite_base_addr = 0;
+	uint8_t m_sprite_flags = 0;
 
-	uint32_t m_tilemap_base_addr[3];
-	int m_tilemap_scrollx[3];
-	int m_tilemap_scrolly[3];
-	uint16_t m_video_flags;
-	uint16_t m_tilemap_flags[3];
-	uint16_t m_tilemap_mode[3];
-	uint16_t m_irq_mask;
+	uint32_t m_tilemap_base_addr[3]{};
+	int m_tilemap_scrollx[3]{};
+	int m_tilemap_scrolly[3]{};
+	uint16_t m_video_flags = 0;
+	uint16_t m_tilemap_flags[3]{};
+	uint16_t m_tilemap_mode[3]{};
+	uint16_t m_irq_mask = 0;
 #if 0
-	uint16_t m_hbl_mask;
+	uint16_t m_hbl_mask = 0;
 #endif
 
-	uint32_t m_roz_base_addr;
-	uint16_t m_roz_mode;
-	uint32_t m_roz_scrollx;
-	uint32_t m_roz_scrolly;
-	uint16_t m_roz_tile_bank;
-	uint32_t m_roz_unk_base0;
-	uint32_t m_roz_unk_base1;
-	uint32_t m_roz_unk_base2;
-	uint16_t m_roz_coeffa;
-	uint16_t m_roz_coeffb;
-	uint16_t m_roz_coeffc;
-	uint16_t m_roz_coeffd;
-	int32_t m_roz_changed;
-	uint16_t m_unk_1d0;
+	uint32_t m_roz_base_addr = 0;
+	uint16_t m_roz_mode = 0;
+	uint32_t m_roz_scrollx = 0;
+	uint32_t m_roz_scrolly = 0;
+	uint16_t m_roz_tile_bank = 0;
+	uint32_t m_roz_unk_base0 = 0;
+	uint32_t m_roz_unk_base1 = 0;
+	uint32_t m_roz_unk_base2 = 0;
+	uint16_t m_roz_coeffa = 0;
+	uint16_t m_roz_coeffb = 0;
+	uint16_t m_roz_coeffc = 0;
+	uint16_t m_roz_coeffd = 0;
+	int32_t m_roz_changed = 0;
+	uint16_t m_unk_1d0 = 0;
 
-	uint16_t m_video_regs[256];
+	uint16_t m_video_regs[256]{};
 
-	tilemap_t *m_tilemap_sizes[4][4];
+	tilemap_t *m_tilemap_sizes[4][4]{};
 	bitmap_ind16 m_sprite_final_bitmap;
 	bitmap_ind8 m_sprite_mask_bitmap;
 	bitmap_ind8 m_prio_bitmap;

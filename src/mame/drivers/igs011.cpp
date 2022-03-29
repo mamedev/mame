@@ -3994,16 +3994,6 @@ INPUT_PORTS_END
 // for debugging
 
 #if 0
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4, 0, 12,  8, 20,16, 28,24 },
-	{ STEP8(0,8*4) },
-	8*8*4
-};
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -4047,17 +4037,17 @@ static const gfx_layout layout_16x16x1 =
 };
 
 static GFXDECODE_START( gfx_igs011 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, gfx_8x8x4_packed_lsb, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4,       0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,         0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8,       0, 0x08 )
 GFXDECODE_END
 static GFXDECODE_START( gfx_igs011_hi )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
-	GFXDECODE_ENTRY( "blitter_hi", 0, layout_16x16x1, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, gfx_8x8x4_packed_lsb, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4,       0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,         0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8,       0, 0x08 )
+	GFXDECODE_ENTRY( "blitter_hi", 0, layout_16x16x1,    0, 0x80 )
 GFXDECODE_END
 #endif
 

@@ -19,17 +19,17 @@ public:
 
 	struct cx_timer_t
 	{
-		uint32_t value;
-		uint32_t limit;
-		uint32_t mode;
-		uint32_t timebase;
-		emu_timer *timer;
+		uint32_t value = 0U;
+		uint32_t limit = 0U;
+		uint32_t mode = 0U;
+		uint32_t timebase = 0U;
+		emu_timer *timer = nullptr;
 	};
 
 	struct cx_timer_regs_t
 	{
-		cx_timer_t timer[MAX_CX_TIMERS];
-		uint32_t timer_irq;
+		cx_timer_t timer[MAX_CX_TIMERS]{};
+		uint32_t timer_irq = 0U;
 	};
 
 	cxhumax_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -42,6 +42,9 @@ public:
 	{
 	}
 
+	void cxhumax(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<intel_28f320j3d_device> m_flash;
 	required_shared_ptr<uint32_t> m_ram;
@@ -119,54 +122,53 @@ public:
 
 	uint32_t dummy_flash_r();
 
-	uint32_t m_romdescr_reg;
-	uint32_t m_isaromdescr_regs[0x0C/4];
-	uint32_t m_isadescr_regs[0x10/4];
-	uint32_t m_rommode_reg;
-	uint32_t m_xoemask_reg;
-	uint32_t m_pci_regs[0x08/4];
-	uint32_t m_extdesc_regs[0x80/4];
+	uint32_t m_romdescr_reg = 0U;
+	uint32_t m_isaromdescr_regs[0x0C/4]{};
+	uint32_t m_isadescr_regs[0x10/4]{};
+	uint32_t m_rommode_reg = 0U;
+	uint32_t m_xoemask_reg = 0U;
+	uint32_t m_pci_regs[0x08/4]{};
+	uint32_t m_extdesc_regs[0x80/4]{};
 
-	uint32_t m_scratch_reg;
-	cx_timer_regs_t m_timer_regs;
+	uint32_t m_scratch_reg = 0U;
+	cx_timer_regs_t m_timer_regs{};
 
-	uint32_t m_uart2_regs[0x30/4];
+	uint32_t m_uart2_regs[0x30/4]{};
 
-	uint32_t m_pll_regs[0x14/4];
-	uint32_t m_clkdiv_regs[0x18/4];
-	uint32_t m_pllprescale_reg;
+	uint32_t m_pll_regs[0x14/4]{};
+	uint32_t m_clkdiv_regs[0x18/4]{};
+	uint32_t m_pllprescale_reg = 0U;
 
-	uint32_t m_intctrl_regs[0x38/4];
+	uint32_t m_intctrl_regs[0x38/4]{};
 
-	uint32_t m_ss_regs[0x18/4];
-	uint8_t m_ss_tx_fifo[8];              // 8 entries (size hardcoded to 8 bits per entry - TODO)
+	uint32_t m_ss_regs[0x18/4]{};
+	uint8_t m_ss_tx_fifo[8]{};              // 8 entries (size hardcoded to 8 bits per entry - TODO)
 
-	uint32_t m_i2c0_regs[0x20/4];
-	uint32_t m_i2c1_regs[0x20/4];
+	uint32_t m_i2c0_regs[0x20/4]{};
+	uint32_t m_i2c1_regs[0x20/4]{};
 	required_device<i2cmem_device> m_i2cmem;
-	uint32_t m_i2c2_regs[0x20/4];
+	uint32_t m_i2c2_regs[0x20/4]{};
 
 	void i2cmem_start();
 	void i2cmem_stop();
 	uint8_t i2cmem_read_byte(int last);
 	void i2cmem_write_byte(uint8_t data);
 
-	uint32_t m_mccfg_regs[0x0C/4];
+	uint32_t m_mccfg_regs[0x0C/4]{};
 
-	uint32_t m_chipcontrol_regs[0x74/4];
+	uint32_t m_chipcontrol_regs[0x74/4]{};
 
-	uint32_t m_drm0_regs[0xfc/4];
-	uint32_t m_drm1_regs[0xfc/4];
+	uint32_t m_drm0_regs[0xfc/4]{};
+	uint32_t m_drm1_regs[0xfc/4]{};
 
-	uint32_t m_hdmi_regs[0x400/4];
+	uint32_t m_hdmi_regs[0x400/4]{};
 
-	uint32_t m_gxa_cmd_regs[0x130/4];
+	uint32_t m_gxa_cmd_regs[0x130/4]{};
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_tick);
-	void cxhumax(machine_config &config);
 	void cxhumax_map(address_map &map);
 };
 

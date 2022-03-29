@@ -75,11 +75,11 @@ private:
 	required_device<ay8910_device> m_ay8910;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_top_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_top_tilemap = nullptr;
 
 	/* misc */
-	int      m_ay_data;
+	int      m_ay_data = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void sound_data_w(uint8_t data);
@@ -200,17 +200,6 @@ static INPUT_PORTS_START( dynadice )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout charlayout2 =
 {
 	8,8,
@@ -224,7 +213,7 @@ static const gfx_layout charlayout2 =
 
 
 static GFXDECODE_START( gfx_dynadice )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1 ) /* 1bpp */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,    0, 1 ) /* 1bpp */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  0, 1 ) /* 3bpp */
 GFXDECODE_END
 

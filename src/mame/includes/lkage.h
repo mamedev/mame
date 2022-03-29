@@ -47,18 +47,18 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
-	uint8_t m_bg_tile_bank;
-	uint8_t m_fg_tile_bank;
-	uint8_t m_tx_tile_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	uint8_t m_bg_tile_bank = 0U;
+	uint8_t m_fg_tile_bank = 0U;
+	uint8_t m_tx_tile_bank = 0U;
 
-	int m_sprite_dx;
+	int m_sprite_dx = 0;
 
 	/* lkageb fake mcu */
-	uint8_t m_mcu_val;
-	int m_mcu_ready;    /* cpu data/mcu ready status */
+	uint8_t m_mcu_val = 0U;
+	int m_mcu_ready = 0;    /* cpu data/mcu ready status */
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

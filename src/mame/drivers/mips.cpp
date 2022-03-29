@@ -341,9 +341,9 @@ private:
 	optional_shared_ptr<u32> m_vram;
 
 	// machine state
-	u16 m_mmu[32];
+	u16 m_mmu[32]{};
 
-	u8 m_iop_interface;
+	u8 m_iop_interface = 0;
 };
 
 class rx3230_state : public driver_device
@@ -439,9 +439,9 @@ private:
 		GFX_COLOR_RSV = 0xce, // reserved
 	};
 
-	u8 m_int_reg;
-	int m_int0_state;
-	int m_int1_state;
+	u8 m_int_reg = 0;
+	int m_int0_state = 0;
+	int m_int1_state = 0;
 };
 
 void rx2030_state::machine_start()

@@ -22,7 +22,6 @@ public:
 	void init_srmdb();
 	void init_topshoot();
 	void init_puckpkmn();
-	void init_hshavoc();
 	void init_barek2();
 	void init_barek2ch();
 	void init_barek3();
@@ -56,7 +55,7 @@ private:
 	void puckpkmna_map(address_map &map);
 
 	// bootleg specific
-	int m_aladmdb_mcu_port;
+	int m_aladmdb_mcu_port = 0;
 
 	int m_protcount;
 };

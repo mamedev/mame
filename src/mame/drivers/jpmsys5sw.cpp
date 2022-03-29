@@ -1632,4 +1632,4 @@ GAME(  199?, j5revoa,   j5revo,   jpmsys5_ym, popeye, jpmsys5_state, empty_init,
 
 GAMEL( 199?, j5sizl,    0,        jpmsys5_ym, popeye, jpmsys5_state, empty_init, ROT0, "JPM", "Sizzling (JPM) (SYSTEM5)", GAME_FLAGS, layout_j5sizl )
 
-GAME(  199?, j5hilos,   0,        jpmsys5_ym, popeye, jpmsys5_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (SYSTEM5)", GAME_FLAGS )
+GAME(  1990, j5hilos,   0,        jpmsys5_ym, popeye, jpmsys5_state, empty_init, ROT0, "JPM", "Hi-Lo Silver (JPM) (SYSTEM5)", GAME_FLAGS )

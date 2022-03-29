@@ -47,9 +47,9 @@ private:
 	required_shared_ptr<uint16_t> m_fg_tileram;
 	required_shared_ptr<uint16_t> m_bg_tileram;
 
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void out_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void tx_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

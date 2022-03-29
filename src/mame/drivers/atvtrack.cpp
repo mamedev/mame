@@ -137,15 +137,15 @@ protected:
 	inline u32 decode64_32(offs_t offset64, u64 data, u64 mem_mask, offs_t &offset32);
 	void logbinary(u32 data,int high,int low);
 
-	memory_region *m_nandregion;
-	int m_nandcommand[4], m_nandoffset[4], m_nandaddressstep, m_nandaddress[4];
-	u32 m_area1_data[4];
+	memory_region *m_nandregion = nullptr;
+	int m_nandcommand[4]{}, m_nandoffset[4]{}, m_nandaddressstep = 0, m_nandaddress[4]{};
+	u32 m_area1_data[4]{};
 
 	required_device<sh4_device> m_maincpu;
 	required_device<sh4_device> m_subcpu;
 
-	u16 gpu_irq_pending;
-	u16 gpu_irq_mask;
+	u16 gpu_irq_pending = 0;
+	u16 gpu_irq_mask = 0;
 	void gpu_irq_test();
 	void gpu_irq_set(int);
 
@@ -154,7 +154,7 @@ protected:
 	void atvtrack_sub_map(address_map &map);
 	void atvtrack_sub_port(address_map &map);
 
-	bool m_slaverun;
+	bool m_slaverun = false;
 };
 
 

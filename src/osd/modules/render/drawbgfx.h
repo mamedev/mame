@@ -85,6 +85,8 @@ public:
 	static char const *const WINDOW_PREFIX;
 
 private:
+	void init_bgfx_library();
+
 	void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
 	void render_avi_quad();
 	void update_recording();
@@ -122,6 +124,7 @@ private:
 	uint32_t get_texture_hash(render_primitive *prim);
 
 	osd_options& m_options;
+	bgfx::PlatformData m_platform_data;
 
 	bgfx_target *m_framebuffer;
 	bgfx_texture *m_texture_cache;
@@ -143,8 +146,6 @@ private:
 	std::vector<rectangle_packer::packable_rectangle> m_texinfo;
 	rectangle_packer m_packer;
 
-	uint32_t m_width[16];
-	uint32_t m_height[16];
 	uint32_t m_white[16*16];
 	bgfx_view *m_ortho_view;
 	uint32_t m_max_view;
@@ -160,8 +161,10 @@ private:
 	static const uint32_t PACKABLE_SIZE;
 	static const uint32_t WHITE_HASH;
 
-	static bool s_window_set;
 	static uint32_t s_current_view;
+	static bool s_bgfx_library_initialized;
+	static uint32_t s_width[16];
+	static uint32_t s_height[16];
 };
 
 #endif // RENDER_BGFX

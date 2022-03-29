@@ -259,10 +259,10 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	uint8_t m_communication_port[4];
-	uint8_t m_communication_port_status;
+	uint8_t m_communication_port[4]{};
+	uint8_t m_communication_port_status = 0;
 	bitmap_ind16 m_bitmap;
-	uint8_t m_vid_regs[7];
+	uint8_t m_vid_regs[7]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	output_finder<10> m_lamps;

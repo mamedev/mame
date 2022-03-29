@@ -36,7 +36,7 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	void mogura_tileram_w(offs_t offset, uint8_t data);
 	void mogura_dac_w(uint8_t data);
 	void mogura_gfxram_w(offs_t offset, uint8_t data);

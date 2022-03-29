@@ -45,10 +45,10 @@ private:
 	required_shared_ptr<u16> m_spriteram;
 
 	/* video-related */
-	tilemap_t   *m_bg_layer;
-	tilemap_t   *m_fg_layer;
-	u8          m_tilebank[4];
-	u8          m_tilebankselect;
+	tilemap_t   *m_bg_layer = nullptr;
+	tilemap_t   *m_fg_layer = nullptr;
+	u8          m_tilebank[4]{};
+	u8          m_tilebankselect = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

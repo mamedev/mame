@@ -1234,17 +1234,6 @@ INPUT_PORTS_END
 
 
 /* correct, 4bpp gfxs */
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4 },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
 static const gfx_layout char16layout =
 {
 	16,16,
@@ -1279,7 +1268,7 @@ static const gfx_layout char16layout8bpp =
 };
 
 static GFXDECODE_START( gfx_xavix )
-	GFXDECODE_ENTRY( "bios", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "bios", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout8bpp, 0, 1 )

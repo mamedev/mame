@@ -65,7 +65,7 @@ offs_t i8008_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 										}
 									}
 									break;
-						case 3 :    util::stream_format(stream, "r%c%c",(BIT(op,5) ? 't' : 'f'),flag_names[(op>>3)&3]); break;
+						case 3 :    util::stream_format(stream, "r%c%c",(BIT(op,5) ? 't' : 'f'),flag_names[(op>>3)&3]); flags = STEP_OUT | STEP_COND; break;
 						case 4 :    {
 										switch((op >> 3) & 7) {
 											case 0 :    util::stream_format(stream, "adi %02x",params.r8(pc)); pc++; break;
@@ -81,15 +81,15 @@ offs_t i8008_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 									break;
 						case 5 :    util::stream_format(stream, "rst %02x",(op>>3) & 7); break;
 						case 6 :    util::stream_format(stream, "l%ci %02x",reg[(op >> 3) & 7],params.r8(pc)); pc++; break;
-						case 7 :    util::stream_format(stream, "ret"); break;
+						case 7 :    util::stream_format(stream, "ret"); flags = STEP_OUT; break;
 					}
 					break;
 		case 0x01:  // starting with 01
 					switch(op & 7) {
-						case 0 :    util::stream_format(stream, "j%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; break;
-						case 2 :    util::stream_format(stream, "c%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; break;
+						case 0 :    util::stream_format(stream, "j%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; flags = STEP_COND; break;
+						case 2 :    util::stream_format(stream, "c%c%c %02x%02x",(BIT(op,5)? 't' : 'f'),flag_names[(op>>3)&3], params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; flags = STEP_OVER | STEP_COND; break;
 						case 4 :    util::stream_format(stream, "jmp %02x%02x",params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; break;
-						case 6 :    util::stream_format(stream, "cal %02x%02x",params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; break;
+						case 6 :    util::stream_format(stream, "cal %02x%02x",params.r8(pc+1) & 0x3f,params.r8(pc)); pc+=2; flags = STEP_OVER; break;
 						case 1 :
 						case 3 :
 						case 5 :

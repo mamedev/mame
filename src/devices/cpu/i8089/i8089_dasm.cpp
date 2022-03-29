@@ -302,8 +302,8 @@ std::string i8089_disassembler::do_disassemble()
 	case 0x0c: return inst_ri("movbi", "movi");
 	case 0x0e: return inst_r("inc");
 	case 0x0f: return inst_r("dec");
-	case 0x10: return inst_jr("jnz", "ljnz");
-	case 0x11: return inst_jr("jz", "ljz");
+	case 0x10: m_flags |= STEP_COND; return inst_jr("jnz", "ljnz");
+	case 0x11: m_flags |= STEP_COND; return inst_jr("jz", "ljz");
 
 	case 0x12:
 		if (m_mm == 0 && m_w == 0 && m_aa == 0 && m_wb == 0 && m_brp == 1)
@@ -368,10 +368,10 @@ std::string i8089_disassembler::do_disassemble()
 	case 0x29: return inst_rm("orb", "or");
 	case 0x2a: return inst_rm("andb", "and");
 	case 0x2b: return inst_rm("notb", "not");
-	case 0x2c: return inst_jm("jmce", "ljmce");
-	case 0x2d: return inst_jm("jmcne", "ljmcne");
-	case 0x2e: return inst_jmb("jnbt", "ljnbt");
-	case 0x2f: return inst_jmb("jbt", "ljbt");
+	case 0x2c: m_flags |= STEP_COND; return inst_jm("jmce", "ljmce");
+	case 0x2d: m_flags |= STEP_COND; return inst_jm("jmcne", "ljmcne");
+	case 0x2e: m_flags |= STEP_COND; return inst_jmb("jnbt", "ljnbt");
+	case 0x2f: m_flags |= STEP_COND; return inst_jmb("jbt", "ljbt");
 	case 0x30: return inst_mi("addbi", "addi");
 	case 0x31: return inst_mi("orbi", "ori");
 	case 0x32: return inst_mi("andbi", "andi");
@@ -380,8 +380,8 @@ std::string i8089_disassembler::do_disassemble()
 	case 0x35: return inst_mr("orb", "or");
 	case 0x36: return inst_mr("andb", "and");
 	case 0x37: return inst_mr("notb", "not");
-	case 0x38: return inst_j16("jnzb", "jnz", "ljnzb", "ljnz");
-	case 0x39: return inst_j16("jzb", "jz", "ljzb", "ljz");
+	case 0x38: m_flags |= STEP_COND; return inst_j16("jnzb", "jnz", "ljnzb", "ljnz");
+	case 0x39: m_flags |= STEP_COND; return inst_j16("jzb", "jz", "ljzb", "ljz");
 	case 0x3a: return inst_m("incb", "inc");
 	case 0x3b: return inst_m("decb", "dec");
 	case 0x3d: return inst_b("setb");

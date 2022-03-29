@@ -119,15 +119,15 @@ private:
 	output_finder<> m_led;
 	output_finder<6> m_lamps;
 
-	int m_exp_bank;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_reel_tilemap[3];
-	int m_irq_enable;
-	int m_nmi_enable;
-	int m_bg_enable;
-	int m_hopper;
-	uint8_t m_out[3];
-	uint16_t m_unk_reg[3][5];
+	int m_exp_bank = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_reel_tilemap[3]{};
+	int m_irq_enable = 0;
+	int m_nmi_enable = 0;
+	int m_bg_enable = 0;
+	int m_hopper = 0;
+	uint8_t m_out[3]{};
+	uint16_t m_unk_reg[3][5]{};
 };
 
 

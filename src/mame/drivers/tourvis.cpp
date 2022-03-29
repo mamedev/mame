@@ -220,7 +220,7 @@ private:
 
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
-	uint32_t  m_rom_size;
+	uint32_t  m_rom_size = 0;
 };
 
 DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )

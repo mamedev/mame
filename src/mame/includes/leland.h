@@ -307,11 +307,11 @@ private:
 
 	required_region_ptr<u8> m_xrom_base;
 
-	std::unique_ptr<u8[]> m_ataxx_qram;
-	u8 m_master_bank;
-	u32 m_xrom1_addr;
-	u32 m_xrom2_addr;
-	std::unique_ptr<u8[]> m_extra_tram;
+	std::unique_ptr<u8[]> m_ataxx_qram{};
+	u8 m_master_bank = 0U;
+	u32 m_xrom1_addr = 0U;
+	u32 m_xrom2_addr = 0U;
+	std::unique_ptr<u8[]> m_extra_tram{};
 };
 
 

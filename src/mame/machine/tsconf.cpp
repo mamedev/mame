@@ -50,9 +50,7 @@ rectangle tsconf_state::get_screen_area()
 {
 	rectangle info = screen_area[BIT(m_regs[V_CONFIG], 6, 2)];
 	if (VM == VM_TXT)
-	{
 		info.set_width(info.width() << 1);
-	}
 	return info;
 }
 
@@ -107,183 +105,14 @@ void tsconf_state::tsconf_update_video_mode()
 	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, m_screen->frame_period().as_attoseconds());
 }
 
-uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u8 tsconf_state::get_border_color(u16 hpos, u16 vpos)
 {
-	return 0;
-}
-
-void to_display(rectangle area, unsigned int &x, unsigned int &y)
-{
-	if (y < area.top() || y > area.bottom())
-	{
-		x = area.left();
-		y = area.top();
-	}
-	else if (x < area.left())
-		x = area.left();
-	else if (x > area.right())
-	{
-		x = area.left();
-		to_display(area, x, ++y);
-	}
-}
-
-void tsconf_state::spectrum_UpdateZxScreenBitmap()
-{
-	unsigned int to_x = m_screen->hpos();
-	unsigned int to_y = m_screen->vpos();
-	to_display(m_screen->visible_area(), to_x, to_y);
-
-	if ((m_previous_screen_x == to_x) && (m_previous_screen_y == to_y))
-		return;
-
-	bitmap_ind16 *bm = &m_screen->curbitmap().as_ind16();
-	if (bm->valid())
-	{
-		u8 pal_offset = m_regs[PAL_SEL] << 4;
-		u16 border_color = m_regs[BORDER];
-		bool border_only = VM != VM_ZX || BIT(m_regs[V_CONFIG], 5);
-		rectangle screen = screen_area[0];
-		do
-		{
-			if (border_only || !screen.contains(m_previous_screen_x, m_previous_screen_y))
-				bm->pix(m_previous_screen_y, m_previous_screen_x) = border_color;
-			else
-			{
-				u16 x = m_previous_screen_x - screen.left();
-				if ((x & 7) == 0)
-				{
-					u16 y = m_previous_screen_y - screen.top();
-					u16 *pix = &bm->pix(m_previous_screen_y, m_previous_screen_x);
-					u8 attr = *(m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y & 0xF8) << 2) + (x >> 3) + 0x1800);
-					u8 scr = *(m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y & 7) << 8) + ((y & 0x38) << 2) + ((y & 0xC0) << 5) + (x >> 3));
-					u16 ink = ((attr & 0x07) + ((attr >> 3) & 0x08)) | pal_offset;
-					u16 pap = ((attr >> 3) & 0x0f) | pal_offset;
-
-					if (m_flash_invert && (attr & 0x80))
-						scr = ~scr;
-
-					for (uint8_t b = 0x80; b != 0; b >>= 1)
-						*pix++ = (scr & b) ? ink : pap;
-				}
-			}
-
-			to_display(m_screen->visible_area(), ++m_previous_screen_x, m_previous_screen_y);
-		} while (!((m_previous_screen_x == to_x) && (m_previous_screen_y == to_y)));
-	}
-}
-
-void tsconf_state::tsconf_UpdateTxtBitmap(unsigned int from_x, unsigned int from_y)
-{
-	unsigned int to_x = m_screen->hpos();
-	unsigned int to_y = m_screen->vpos();
-	rectangle screen = get_screen_area();
-	to_display(screen, to_x, to_y);
-
-	u8 pal_offset = m_regs[PAL_SEL] << 4;
-	while (!((from_x == to_x) && (from_y == to_y)))
-	{
-		if (from_x == screen.left() && (from_y == screen.top()))
-			m_rendering_gfx_y_offset = OFFS_512(G_Y_OFFS_L);
-
-		u16 x = from_x - screen.left();
-		u16 *bm = &m_screen->curbitmap().as_ind16().pix(from_y, from_x);
-		s16 width = (screen.width() - x) / 8;
-
-		// TODO u16 x_offset = OFFS_512(G_X_OFFS_L);
-		u8 *font_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01);
-		u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (m_rendering_gfx_y_offset / 8 * 256 + x / 8);
-		for (; width > 0; width--)
-		{
-			u8 char_x = *(font_location + (*text_location * 8) + (m_rendering_gfx_y_offset % 8));
-			u8 font_color = *(text_location + 128) & 0x0f;
-			u8 bg_color = (*(text_location + 128) & 0xf0) >> 4;
-			for (auto i = 7; i >= 0; i--)
-				*bm++ = (BIT(char_x, i) ? font_color : bg_color) | pal_offset;
-			text_location++;
-		}
-
-		if (from_y == to_y)
-			// done - scanline updated partially
-			from_x = to_x;
-		else
-		{
-			from_y += 1;
-			m_rendering_gfx_y_offset = (m_rendering_gfx_y_offset + 1) & 0x1ff;
-			from_x = screen.left();
-			to_display(screen, from_x, from_y);
-		}
-	}
-}
-
-void tsconf_state::tsconf_UpdateGfxBitmap(unsigned int from_x, unsigned int from_y)
-{
-	unsigned int to_x = m_screen->hpos();
-	unsigned int to_y = m_screen->vpos();
-	rectangle screen = get_screen_area();
-	to_display(screen, to_x, to_y);
-
-	u8 pal_offset = m_regs[PAL_SEL] << 4;
-	while (!((from_x == to_x) && (from_y == to_y)))
-	{
-		if (from_x == screen.left() && (from_y == screen.top()))
-			m_rendering_gfx_y_offset = OFFS_512(G_Y_OFFS_L);
-
-		u16 x = from_x - screen.left();
-		u16 x_offset = (OFFS_512(G_X_OFFS_L) + x) & 0x1ff;
-		u16 *bm = &m_screen->curbitmap().as_ind16().pix(from_y, from_x);
-		u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((m_rendering_gfx_y_offset * 512 + x_offset) >> (2 - VM));
-		s16 width = screen.width() - x;
-		if (VM == VM_16C)
-		{
-			if (x_offset & 1)
-			{
-				*bm++ = (*video_location++ & 0x0f) | pal_offset;
-				x_offset++;
-				width--;
-			}
-			for (; width > 0; width -= 2)
-			{
-				if (x_offset == 512)
-					video_location -= 256;
-				u8 pix = *video_location++;
-				*bm++ = (pix >> 4) | pal_offset;
-				if (width == 1)
-					x_offset++;
-				else
-				{
-					*bm++ = (pix & 0x0f) | pal_offset;
-					x_offset += 2;
-				}
-			}
-		}
-		else // VM_256C
-		{
-			for (; width > 0; width--)
-			{
-				if (x_offset == 512)
-					video_location -= 512;
-				*bm++ = *video_location++;
-				x_offset++;
-			}
-		}
-
-		if (from_y == to_y)
-			// done - scanline updated partially
-			from_x = to_x;
-		else
-		{
-			from_y += 1;
-			m_rendering_gfx_y_offset = (m_rendering_gfx_y_offset + 1) & 0x1ff;
-			from_x = screen.left();
-			to_display(screen, from_x, from_y);
-		}
-	}
+	return m_regs[BORDER];
 }
 
 /*
 Layered as:
- + Border
+ + Border - already updated with screen_update_spectrum()
  + Graphics
  + Sprites 0
  + Tiles 0
@@ -291,70 +120,135 @@ Layered as:
  + Tiles 1
  + Sprites 2
 */
-void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
+void tsconf_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rectangle screen = get_screen_area();
-	unsigned int from_x = m_previous_screen_x;
-	unsigned int from_y = m_previous_screen_y;
-
-	spectrum_UpdateZxScreenBitmap();
-	if (!BIT(m_regs[V_CONFIG], 5) && VM != VM_ZX)
+	if (!BIT(m_regs[V_CONFIG], 5))
 	{
-		to_display(screen, from_x, from_y);
-		if (VM == VM_TXT)
-			tsconf_UpdateTxtBitmap(from_x, from_y);
+		if (VM == VM_ZX)
+			tsconf_UpdateZxScreenBitmap(screen, bitmap, cliprect);
+		else if (VM == VM_TXT)
+			tsconf_UpdateTxtBitmap(bitmap, cliprect);
 		else
-			tsconf_UpdateGfxBitmap(from_x, from_y);
+			tsconf_UpdateGfxBitmap(bitmap, cliprect);
+	}
+	else
+	{
+		bitmap.fill(get_border_color(), cliprect);
 	}
 
 	if (!BIT(m_regs[V_CONFIG], 4))
 	{
-		if (m_screen->vpos() == m_previous_tsu_vpos)
-			return;
+		screen.priority().fill(0, cliprect);
+		if (BIT(m_regs[TS_CONFIG], 5))
+			m_ts_tilemap[TM_TILES0]->draw(screen, bitmap, cliprect,
+										  BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1);
 
-		bool draw = false;
-		s16 y = m_screen->vpos() - screen.top();
-		if (m_screen->vpos() == screen.bottom())
+		if (BIT(m_regs[TS_CONFIG], 6))
+			m_ts_tilemap[TM_TILES1]->draw(screen, bitmap, cliprect,
+										  BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2);
+
+		if (BIT(m_regs[TS_CONFIG], 7))
 		{
-			m_previous_tsu_vpos = screen.top();
-			screen.min_y = m_previous_tsu_vpos;
-			draw = true;
-		}
-		else if (y >= 0 && y < screen.height())
-		{
-			// Update unrendered above excluding current line.
-			screen.sety(m_previous_tsu_vpos, m_screen->vpos() - 1);
-			// Too expencive to draw every line. Batch 8+ for now.
-			draw = screen.height() > 7;
-			if (!draw && (screen.bottom() + 1) == get_screen_area().bottom())
-			{
-				screen.max_y++;
-				draw = true;
-			}
-			if (draw)
-				m_previous_tsu_vpos = m_screen->vpos();
-		}
-
-		if (draw)
-		{
-			m_screen->priority().fill(0, screen);
-			if (BIT(m_regs[TS_CONFIG], 5))
-				m_ts_tilemap[TM_TILES0]->draw(*m_screen, m_screen->curbitmap().as_ind16(), screen,
-											  BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1);
-
-			if (BIT(m_regs[TS_CONFIG], 6))
-				m_ts_tilemap[TM_TILES1]->draw(*m_screen, m_screen->curbitmap().as_ind16(), screen,
-											  BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2);
-
-			if (BIT(m_regs[TS_CONFIG], 7))
-				draw_sprites(screen);
+			// draw_sprites(screen, bitmap, cliprect);
+			//  Avoid frequent expensive updates for now. Currently once per frame
+			if (cliprect.bottom() == get_screen_area().bottom() && cliprect.right() == get_screen_area().right())
+				draw_sprites(screen, bitmap, get_screen_area());
 		}
 	}
 }
 
-void tsconf_state::spectrum_UpdateBorderBitmap()
+void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen_d, bitmap_ind16 &bitmap, const rectangle &screen)
 {
-	spectrum_UpdateScreenBitmap();
+	u8 pal_offset = m_regs[PAL_SEL] << 4;
+	u8 *screen_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]);
+	u8 *attrs_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + 0x1800;
+	bool invert_attrs = u64(screen_d.frame_number() / m_frame_invert_count) & 1;
+	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
+	{
+		u16 hpos = screen.left();
+		u16 x = hpos - get_screen_area().left();
+		u16 y = vpos - get_screen_area().top();
+		u8 *scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
+		u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
+		u16 *pix = &(bitmap.pix(vpos, hpos));
+		while (hpos <= screen.right())
+		{
+			u16 ink = pal_offset | ((*attr >> 3) & 0x08) | (*attr & 0x07);
+			u16 pap = pal_offset | ((*attr >> 3) & 0x0f);
+			u8 pix8 = (invert_attrs && (*attr & 0x80)) ? ~*scr : *scr;
+
+			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= screen.right(); b >>= 1, x++, hpos++)
+				*pix++ = (pix8 & b) ? ink : pap;
+			scr++;
+			attr++;
+		}
+	}
+}
+
+void tsconf_state::tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &screen)
+{
+	u8 *font_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01);
+	u8 pal_offset = m_regs[PAL_SEL] << 4;
+	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
+	{
+		u16 hpos = screen.left();
+		u16 x = hpos - get_screen_area().left();
+		u16 y = vpos - get_screen_area().top();
+		u16 y_offset = (OFFS_512(G_Y_OFFS_L) + y) & 0x1ff;
+
+		// TODO? u16 x_offset = OFFS_512(G_X_OFFS_L);
+		u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y_offset / 8 * 256 + x / 8);
+		u16 *pix = &(bitmap.pix(vpos, hpos));
+		while (hpos <= screen.right())
+		{
+			u8 font_color = *(text_location + 128) & 0x0f;
+			u8 bg_color = (*(text_location + 128) & 0xf0) >> 4;
+			u8 char_x = *(font_location + (*text_location * 8) + (y_offset % 8));
+			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= screen.right(); b >>= 1, x++, hpos++)
+				*pix++ = pal_offset | ((char_x & b) ? font_color : bg_color);
+			text_location++;
+		}
+	}
+}
+
+void tsconf_state::tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &screen)
+{
+	u8 pal_offset = m_regs[PAL_SEL] << 4;
+	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
+	{
+		u16 y_offset = (0x200 + OFFS_512(G_Y_OFFS_L) + m_gfx_y_frame_offset + (vpos - get_screen_area().top())) & 0x1ff;
+		u16 x_offset = (OFFS_512(G_X_OFFS_L) + (screen.left() - get_screen_area().left())) & 0x1ff;
+		u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y_offset * 512 + x_offset) >> (2 - VM));
+		u16 *bm = &(bitmap.pix(vpos, screen.left()));
+		s16 width = screen.width();
+		if (VM == VM_16C)
+		{
+			if (x_offset & 1)
+			{
+				*bm++ = pal_offset | (*video_location++ & 0x0f);
+				x_offset++;
+				width--;
+			}
+			for (; width > 0; width -= 2, x_offset += 2)
+			{
+				if (x_offset == 512)
+					video_location -= 256;
+				u8 pix = *video_location++;
+				*bm++ = pal_offset | (pix >> 4);
+				if (width != 1)
+					*bm++ = pal_offset | (pix & 0x0f);
+			}
+		}
+		else // VM_256C
+		{
+			for (; width > 0; width--, x_offset++)
+			{
+				if (x_offset == 512)
+					video_location -= 512;
+				*bm++ = *video_location++;
+			}
+		}
+	}
 }
 
 /*
@@ -366,7 +260,7 @@ SFILE   Reg.16  7       6       5       4       3       2       1       0
 4       R2L     TNUM[7:0]
 5       R2H     SPAL[7:4]                       TNUM[11:8]
 */
-void tsconf_state::draw_sprites(const rectangle &cliprect)
+void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle screen = get_screen_area();
 
@@ -415,7 +309,7 @@ void tsconf_state::draw_sprites(const rectangle &cliprect)
 				u8 tile_col = (code % 64) + flipx * width8;
 				for (auto ix = x; ix <= x + width8 * 8; ix = ix + 8)
 				{
-					m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(m_screen->curbitmap().as_ind16(), cliprect, tmp_tile_oversized_to_code((tile_row % 64) * 64 + (tile_col % 64)), pal, flipx, flipy, ix, iy, m_screen->priority(), pmask, 0);
+					m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(bitmap, cliprect, tmp_tile_oversized_to_code((tile_row % 64) * 64 + (tile_col % 64)), pal, flipx, flipy, ix, iy, screen_d.priority(), pmask, 0);
 					tile_col += flipx ? -1 : 1;
 				}
 				tile_row += flipy ? -1 : 1;
@@ -600,7 +494,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	{
 	case BORDER:
 		if (val_changed)
-			spectrum_UpdateScreenBitmap();
+			m_screen->update_now();
 		break;
 
 	default:
@@ -751,13 +645,9 @@ u8 tsconf_state::tsconf_port_f7_r(offs_t offset)
 	// BFF7
 	u8 data = 0xff;
 	if (m_port_f7_ext == PS2KEYBOARDS_LOG && m_port_f7_gluk_reg == 0xf0)
-	{
 		data = m_keyboard->read();
-	}
 	else if (m_port_f7_ext != DISABLED)
-	{
 		data = m_glukrs->read(m_port_f7_gluk_reg);
-	}
 
 	return data;
 }
@@ -854,14 +744,12 @@ void tsconf_state::update_frame_timer()
 	u16 vpos = OFFS_512(VS_INT_L);
 	u16 hpos = m_regs[HS_INT];
 	if (hpos > 0 && vpos <= 319 && hpos <= 223)
-	{
 		// Only if not overlapping with scanline. Otherwise we need to prioritize.
 		m_frame_irq_timer->adjust(m_screen->time_until_pos(vpos, hpos << 1));
-	}
 	else
-	{
 		m_frame_irq_timer->adjust(attotime::never);
-	}
+
+	m_gfx_y_frame_offset = 0;
 }
 
 INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
@@ -875,7 +763,7 @@ void tsconf_state::dma_ready(int line)
 	if (BIT(m_regs[INT_MASK], 4))
 	{
 		m_maincpu->set_input_line_and_vector(line, ASSERT_LINE, 0xfb);
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
+		timer_set(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))), TIMER_IRQ_OFF, 0);
 	}
 }
 
@@ -888,12 +776,27 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 		if (BIT(m_regs[INT_MASK], 0))
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
+			timer_set(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))), TIMER_IRQ_OFF, 0);
 		}
 		break;
 	}
 	case TIMER_IRQ_SCANLINE:
 	{
+		u16 screen_vpos = m_screen->vpos();
+		m_line_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
+		if (BIT(m_regs[INT_MASK], 1))
+		{
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
+			// Not quite precise. Scanline can't be skipped.
+			timer_set(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))), TIMER_IRQ_OFF, 0);
+		}
+		if (BIT(m_regs[INT_MASK], 0) && OFFS_512(VS_INT_L) == screen_vpos && m_regs[HS_INT] == 0)
+		{
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
+			timer_set(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))), TIMER_IRQ_OFF, 0);
+		}
+
+		m_screen->update_now();
 		for (const auto &[reg, val] : m_scanline_delayed_regs_update)
 		{
 			m_regs[reg] = val;
@@ -901,7 +804,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 			{
 			case G_Y_OFFS_L:
 			case G_Y_OFFS_H:
-				m_rendering_gfx_y_offset = OFFS_512(G_Y_OFFS_L);
+				m_gfx_y_frame_offset = get_screen_area().top() - m_screen->vpos();
 				break;
 
 			default:
@@ -909,21 +812,6 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 			}
 		}
 		m_scanline_delayed_regs_update.clear();
-
-		u16 screen_vpos = m_screen->vpos();
-		m_line_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
-		if (BIT(m_regs[INT_MASK], 1))
-		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
-			// Not quite precise. Scanline can't be skipped.
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
-		}
-		if (BIT(m_regs[INT_MASK], 0) && OFFS_512(VS_INT_L) == screen_vpos && m_regs[HS_INT] == 0)
-		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
-		}
-		spectrum_UpdateScreenBitmap();
 		break;
 	}
 	default:

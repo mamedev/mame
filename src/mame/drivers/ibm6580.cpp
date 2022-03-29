@@ -263,24 +263,24 @@ private:
 	void mcu_io(address_map &map);
 	void mcu_mem(address_map &map);
 
-	uint16_t m_gate;
-	uint8_t m_dma0pg;
-	uint8_t m_p40, m_p4a, m_p50;
-	uint8_t m_kb_data, m_ppi_c, m_led_state;
-	bool m_e000;
-	bool m_kb_data_bit, m_kb_strobe, m_kb_clock;
+	uint16_t m_gate = 0;
+	uint8_t m_dma0pg = 0;
+	uint8_t m_p40 = 0, m_p4a = 0, m_p50 = 0;
+	uint8_t m_kb_data = 0, m_ppi_c = 0, m_led_state = 0;
+	bool m_e000 = false;
+	bool m_kb_data_bit = false, m_kb_strobe = false, m_kb_clock = false;
 
-	uint8_t m_mcu_p1, m_mcu_p2;
-	uint8_t m_mcuppi_a, m_mcuppi_b, m_mcuppi_c;
+	uint8_t m_mcu_p1 = 0, m_mcu_p2 = 0;
+	uint8_t m_mcuppi_a = 0, m_mcuppi_b = 0, m_mcuppi_c = 0;
 
 	void mcu_io_w(offs_t offset, uint8_t data);
 	uint8_t mcu_io_r(offs_t offset);
 
 	void mcuppi_c_w(uint8_t data);
 
-	bool m_floppy_intrq, m_floppy_idle;
-	uint8_t m_floppy_mcu_wrap;
-	struct { floppy_image_device *image; bool hdl; } m_floppy[2];
+	bool m_floppy_intrq = false, m_floppy_idle = false;
+	uint8_t m_floppy_mcu_wrap = 0;
+	struct { floppy_image_device *image = nullptr; bool hdl = false; } m_floppy[2];
 
 	required_shared_ptr<uint16_t> m_p_videoram;
 	required_device<ram_device> m_ram;

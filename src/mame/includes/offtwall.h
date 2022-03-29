@@ -48,12 +48,12 @@ private:
 	required_device<atari_vad_device> m_vad;
 	required_shared_ptr<uint16_t> m_mainram;
 
-	uint16_t *m_bankswitch_base;
+	uint16_t *m_bankswitch_base = nullptr;
 	required_region_ptr<uint16_t> m_bankrom_base;
-	uint32_t m_bank_offset;
+	uint32_t m_bank_offset = 0;
 
-	uint16_t *m_spritecache_count;
-	uint16_t *m_unknown_verify_base;
+	uint16_t *m_spritecache_count = nullptr;
+	uint16_t *m_unknown_verify_base = nullptr;
 
 	static const atari_motion_objects_config s_mob_config;
 };

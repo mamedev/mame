@@ -266,6 +266,7 @@ copsnrob.cpp
 corona.cpp
 cosmic.cpp
 cosmicg.cpp
+cosmos_playc8f.cpp
 cowtipping.cpp
 cps1.cpp
 cps1bl_5205.cpp

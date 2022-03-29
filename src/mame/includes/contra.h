@@ -39,6 +39,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void contra(machine_config &config);
+
+private:
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram;
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram_2;
@@ -52,12 +55,12 @@ public:
 	required_shared_ptr<uint8_t> m_bg_vram;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
-	rectangle m_bg_clip;
-	rectangle m_fg_clip;
-	rectangle m_tx_clip;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	rectangle m_bg_clip{};
+	rectangle m_fg_clip{};
+	rectangle m_tx_clip{};
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -90,7 +93,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void contra(machine_config &config);
 	void contra_map(address_map &map);
 	void sound_map(address_map &map);
 };

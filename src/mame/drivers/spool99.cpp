@@ -133,7 +133,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 
-	tilemap_t *m_sc0_tilemap;
+	tilemap_t *m_sc0_tilemap = nullptr;
 
 	void vram_w(offs_t offset, uint8_t data);
 	void cram_w(offs_t offset, uint8_t data);

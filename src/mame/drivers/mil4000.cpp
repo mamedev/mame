@@ -157,14 +157,14 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;
 
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap;
-	uint16_t m_vblank;
-	uint16_t m_hblank;
-	uint8_t m_mcucomm;
-	uint8_t m_mcudata;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	tilemap_t *m_sc2_tilemap = nullptr;
+	tilemap_t *m_sc3_tilemap = nullptr;
+	uint16_t m_vblank = 0;
+	uint16_t m_hblank = 0;
+	uint8_t m_mcucomm = 0;
+	uint8_t m_mcudata = 0;
 
 	uint16_t hvretrace_r();
 	uint16_t unk_r();

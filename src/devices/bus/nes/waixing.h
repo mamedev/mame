@@ -249,30 +249,6 @@ protected:
 };
 
 
-// ======================> nes_waixing_sgz_device
-
-class nes_waixing_sgz_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-	uint16_t m_irq_count, m_irq_count_latch;
-	int m_irq_enable, m_irq_enable_latch;
-
-	uint8_t m_mmc_vrom_bank[8];
-};
-
-
 // ======================> nes_waixing_sgzlz_device
 
 class nes_waixing_sgzlz_device : public nes_nrom_device
@@ -402,7 +378,6 @@ DECLARE_DEVICE_TYPE(NES_WAIXING_I,     nes_waixing_i_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_J,     nes_waixing_j_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_SH2,   nes_waixing_sh2_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_SEC,   nes_waixing_sec_device)
-DECLARE_DEVICE_TYPE(NES_WAIXING_SGZ,   nes_waixing_sgz_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_SGZLZ, nes_waixing_sgzlz_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_FFV,   nes_waixing_ffv_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_WXZS,  nes_waixing_wxzs_device)

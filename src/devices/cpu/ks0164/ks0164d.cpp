@@ -32,21 +32,21 @@ std::string ks0164_disassembler::off16(s16 dt)
 
 #define P std::ostream &stream, u32 opcode, const data_buffer &opcodes, u32 pc
 const ks0164_disassembler::instruction ks0164_disassembler::instructions[] {
-	{ 0x0000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bne %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x0400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "beq %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x0800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bgeu %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x0c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bltu %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x1000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bpl %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x1400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bmi %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x1800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bvc %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x1c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bvs %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x2000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bnv %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x2400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bgtu %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x2800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bleu %04x", (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x2c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bgts %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x3000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bles %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x3400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bges %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
-	{ 0x3800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "blts %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
+	{ 0x0000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bne %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x0400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "beq %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x0800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bgeu %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x0c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bltu %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x1000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bpl %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x1400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bmi %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x1800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bvc %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x1c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bvs %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x2000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bnv %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x2400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bgtu %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x2800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bleu %04x", (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x2c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bgts %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x3000, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bles %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x3400, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bges %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
+	{ 0x3800, 0xfc00, [](P) -> u32 { util::stream_format(stream, "blts %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2 | STEP_COND; } },
 	{ 0x3c00, 0xfc00, [](P) -> u32 { util::stream_format(stream, "bra %04x",  (pc + 2 + off10(opcode)) & 0xffff); return 2; } },
 
 	{ 0x4000, 0xf800, [](P) -> u32 { util::stream_format(stream, "%s += %s",   regs[(opcode >> 8) & 7], imm8(opcode)); return 2; } },
@@ -215,8 +215,8 @@ const ks0164_disassembler::instruction ks0164_disassembler::instructions[] {
 	{ 0xe007, 0xf88f, [](P) -> u32 { util::stream_format(stream, "(%s%s).b = %s",   regs[(opcode >> 8) & 7], off16(opcodes.r16(pc+2)), regs[(opcode >> 4) & 7]); return 4; } },
 	{ 0xe00f, 0xf88f, [](P) -> u32 { util::stream_format(stream, "(%s%s).w = %s",   regs[(opcode >> 8) & 7], off16(opcodes.r16(pc+2)), regs[(opcode >> 4) & 7]); return 4; } },
 
-	{ 0xf004, 0xf8ff, [](P) -> u32 { util::stream_format(stream, "dbra %s, %04x", regs[(opcode >> 8) & 7], opcodes.r16(pc+2)); return 4; } },
-	{ 0xf00d, 0xf8ff, [](P) -> u32 { util::stream_format(stream, "cmpbeq %s, %04x, %04x", regs[(opcode >> 8) & 7], opcodes.r16(pc+2), opcodes.r16(pc+4)); return 6; } },
+	{ 0xf004, 0xf8ff, [](P) -> u32 { util::stream_format(stream, "dbra %s, %04x", regs[(opcode >> 8) & 7], opcodes.r16(pc+2)); return 4 | STEP_COND; } },
+	{ 0xf00d, 0xf8ff, [](P) -> u32 { util::stream_format(stream, "cmpbeq %s, %04x, %04x", regs[(opcode >> 8) & 7], opcodes.r16(pc+2), opcodes.r16(pc+4)); return 6 | STEP_COND; } },
 
 
 	{ 0x0000, 0x0000, [](P) -> u32 { util::stream_format(stream, "?%04x",   opcode); return 2; } },

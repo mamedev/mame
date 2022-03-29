@@ -41,8 +41,8 @@ public:
 	required_shared_ptr<uint64_t> dc_ram;
 
 	/* machine related */
-	uint32_t dc_sysctrl_regs[0x200/4];
-	uint8_t m_armrst;
+	uint32_t dc_sysctrl_regs[0x200/4]{};
+	uint8_t m_armrst = 0U;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

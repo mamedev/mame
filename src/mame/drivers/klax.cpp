@@ -171,21 +171,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout pfmolayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
-
-static GFXDECODE_START( gfx_klax )
-	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout, 256, 16 ) /* playfield */
-	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,   0, 16 ) /* sprites */
+ static GFXDECODE_START( gfx_klax )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 256, 16 ) /* playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,   0, 16 ) /* sprites */
 GFXDECODE_END
 
 static const gfx_layout bootleg_layout =
@@ -200,8 +188,8 @@ static const gfx_layout bootleg_layout =
 };
 
 static GFXDECODE_START( gfx_klax5bl )
-	GFXDECODE_ENTRY( "gfx1", 0, bootleg_layout, 256, 16 ) /* playfield */
-	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,       0, 16 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, bootleg_layout,     256, 16 ) /* playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0, 16 ) /* sprites */
 GFXDECODE_END
 
 

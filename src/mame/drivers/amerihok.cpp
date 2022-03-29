@@ -51,8 +51,8 @@ private:
 	void amerihok_data_map(address_map &map);
 	void amerihok_map(address_map &map);
 
-	u32 m_outputs[2];
-	u8 m_old_p2;
+	u32 m_outputs[2]{};
+	u8 m_old_p2 = 0U;
 
 	output_finder<6> m_digits;
 	output_finder<> m_lamp;

@@ -54,13 +54,13 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
 
 	/* misc */
-	int        m_psg_latch;
-	int        m_last_write;
-	int        m_colbank;
+	int        m_psg_latch = 0;
+	int        m_last_write = 0;
+	int        m_colbank = 0;
 
 	void ay8910_latch_w(uint8_t data);
 	void ay8910_control_w(uint8_t data);

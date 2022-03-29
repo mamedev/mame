@@ -259,6 +259,7 @@ std::string mb86233_disassembler::alu0_func(u32 alu)
 offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	u32 opcode = opcodes.r32(pc);
+	offs_t flags = 0;
 
 	switch((opcode >> 26) & 0x3f) {
 	case 0x00: { // Dual move AB
@@ -467,6 +468,8 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		switch(subtype) {
 		case 0:
 			util::stream_format(stream, "brif %s #0x%x", condition(cond, invert), data);
+			if (cond != 0x16)
+				flags = STEP_COND;
 			break;
 
 		case 1:
@@ -475,10 +478,13 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				util::stream_format(stream, "%s", regs(opcode & 0x1f));
 			else
 				util::stream_format(stream, "(%s)", memory(opcode & 0x1ff, false, false));
+			if (cond != 0x16)
+				flags = STEP_COND;
 			break;
 
 		case 2:
 			util::stream_format(stream, "bsif %s #0x%x", condition(cond, invert), data);
+			flags = STEP_OVER | (cond != 0x16 ? STEP_COND : 0);
 			break;
 
 		case 3:
@@ -487,10 +493,12 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				util::stream_format(stream, "%s", regs(opcode & 0x1f));
 			else
 				util::stream_format(stream, "(%s)", memory(opcode & 0x1ff, false, false));
+			flags = STEP_OVER | (cond != 0x16 ? STEP_COND : 0);
 			break;
 
 		case 5:
 			util::stream_format(stream, "rtif %s", condition(cond, invert));
+			flags = STEP_OUT | (cond != 0x16 ? STEP_COND : 0);
 			break;
 
 		case 6:
@@ -499,6 +507,7 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		case 7:
 			util::stream_format(stream, "iret");
+			flags = STEP_OUT;
 			break;
 
 		default:
@@ -513,7 +522,7 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		break;
 	}
 
-	return 1 | SUPPORTED;
+	return 1 | flags | SUPPORTED;
 }
 
 u32 mb86233_disassembler::opcode_alignment() const

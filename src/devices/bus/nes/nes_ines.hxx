@@ -284,9 +284,9 @@ static const nes_mmc mmc_list[] =
 	// 248 Unused
 	{ 249, WAIXING_SECURITY },
 	{ 250, NITRA_TDA },
-	// 251 Shen Hua Jian Yun III?? - Unsupported
+	// 251 Unused
 	{ 252, WAIXING_SGZ },
-	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
+	{ 253, HENGG_SHJY3 },
 	{ 254, BTL_PIKACHUY2K },
 	{ 255, BMC_72IN1 },         // duplicate of mapper 225
 

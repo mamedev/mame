@@ -495,20 +495,9 @@ static const gfx_layout pftoplayout =
 	16*8
 };
 
-static const gfx_layout anlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_atarig42 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
 GFXDECODE_END
 

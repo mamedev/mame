@@ -39,12 +39,12 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
-	uint8_t      m_chon;
-	uint8_t      m_objon;
-	uint8_t      m_bgon;
-	uint8_t      m_sprite3bank;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	uint8_t      m_chon = 0U;
+	uint8_t      m_objon = 0U;
+	uint8_t      m_bgon = 0U;
+	uint8_t      m_sprite3bank = 0U;
 	uint8_t gunsmoke_protection_r(offs_t offset);
 	void gunsmoke_videoram_w(offs_t offset, uint8_t data);
 	void gunsmoke_colorram_w(offs_t offset, uint8_t data);

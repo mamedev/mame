@@ -101,7 +101,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	int m_type;
+	int m_type = 0;
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	optional_device<sns_cart_slot_device> m_cartslot;

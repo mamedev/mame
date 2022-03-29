@@ -153,11 +153,11 @@ private:
 	u8 m_row = 0U;
 	u8 m_comma = 0U;
 	u8 m_nvram[0x100]{};
-	bool m_data_ok = 0;
+	bool m_data_ok = false;
 	u8 m_lamp_data = 0U;
-	bool m_memprotect = 0;
+	bool m_memprotect = false;
 	u8 m_game = 0U;
-	emu_timer* m_irq_timer = 0;
+	emu_timer* m_irq_timer = nullptr;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s6_sound_device> m_s6sound;

@@ -64,7 +64,7 @@ private:
 	void rama1_w(u8 data);
 	u8 input_r();
 
-	u8 m_ram[0x100];
+	u8 m_ram[0x100] = { };
 	u8 m_ram_address = 0;
 	u8 m_ram_data = 0;
 	u8 m_ram_control = 0;
@@ -76,8 +76,6 @@ private:
 
 void cr_state::machine_start()
 {
-	memset(m_ram, 0, sizeof(m_ram));
-
 	// register for savestates
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ram_address));

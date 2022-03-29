@@ -283,14 +283,14 @@ protected:
 
 private:
 	// for Sai Yu Gou Ma Roku
-	int            m_adpcm_addr;
-	int            m_i8748_P1;
-	int            m_i8748_P2;
-	int            m_pcm_shift;
-	int            m_pcm_nibble;
-	int            m_mcu_command;
+	int            m_adpcm_addr = 0;
+	int            m_i8748_P1 = 0;
+	int            m_i8748_P2 = 0;
+	int            m_pcm_shift = 0;
+	int            m_pcm_nibble = 0;
+	int            m_mcu_command = 0;
 #if 0
-	int            m_m5205_clk;
+	int            m_m5205_clk = 0;
 #endif
 
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);

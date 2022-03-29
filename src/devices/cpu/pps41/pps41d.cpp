@@ -77,17 +77,17 @@ const u32 pps41_common_disassembler::s_flags[] =
 	// MM76
 	0,
 	0, 0, 0, 0,
-	0, 0, 0,
+	0, 0, STEP_COND,
 	0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND,
+	0, 0, STEP_COND, STEP_COND, 0, 0, 0, STEP_COND, 0, STEP_COND,
 	STEP_OUT, STEP_OUT, 0, 0, 0, STEP_OVER, STEP_OVER, 0,
-	0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_COND, STEP_COND, STEP_COND, 0, 0,
 
 	// MM78
-	0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, 0, 0, 0,
+	STEP_COND, 0, 0, 0, 0, 0,
 	0, STEP_OVER
 };
 
@@ -114,7 +114,7 @@ offs_t pps41_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 		param++;
 
 	// disassemble it
-	util::stream_format(stream, "%-6s ", s_name[instr]);
+	util::stream_format(stream, "%-8s", s_name[instr]);
 	if (mask > 0)
 	{
 		if (bits & 0x10)

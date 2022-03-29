@@ -20,6 +20,7 @@ offs_t superfx_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	uint16_t alt = m_config->get_alt();
 
 	uint8_t bytes_consumed = 1;
+	offs_t flags = 0;
 
 	switch(op)
 	{
@@ -45,42 +46,52 @@ offs_t superfx_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0x06: // BLT
 			util::stream_format(stream, "BLT     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x07: // BGE
 			util::stream_format(stream, "BGE     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x08: // BNE
 			util::stream_format(stream, "BNE     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x09: // BEQ
 			util::stream_format(stream, "BEQ     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x0a: // BPL
 			util::stream_format(stream, "BPL     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x0b: // BMI
 			util::stream_format(stream, "BMI     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x0c: // BCC
 			util::stream_format(stream, "BCC     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x0d: // BCS
 			util::stream_format(stream, "BCS     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x0e: // BVC
 			util::stream_format(stream, "BVC     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 		case 0x0f: // BVS
 			util::stream_format(stream, "BVS     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
+			flags = STEP_COND;
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
@@ -423,5 +434,5 @@ offs_t superfx_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			break;
 	}
 
-	return bytes_consumed | SUPPORTED;
+	return bytes_consumed | flags | SUPPORTED;
 }

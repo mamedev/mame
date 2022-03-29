@@ -43,7 +43,7 @@ private:
 
 	void port_f2_w(uint8_t data);
 
-	uint8_t m_port_f2;
+	uint8_t m_port_f2 = 0;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
 	void h89_io(address_map &map);

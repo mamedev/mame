@@ -55,15 +55,15 @@ private:
 	required_shared_ptr<u16> m_videoram;
 	required_shared_ptr<u16> m_spriteram;
 
-	u8 m_upd_rom_bank;
-	int m_sprite_palette;
-	int m_sprite_xoffs;
-	u16 m_videoflags;
-	u8 m_sprite_pri;
-	u8 m_sprite_num;
-	tilemap_t *m_background[2];
+	u8 m_upd_rom_bank = 0;
+	int m_sprite_palette = 0;
+	int m_sprite_xoffs = 0;
+	u16 m_videoflags = 0;
+	u8 m_sprite_pri = 0;
+	u8 m_sprite_num = 0;
+	tilemap_t *m_background[2]{};
 	std::unique_ptr<bitmap_ind16> m_pixmap;
-	emu_timer *m_crtc_timer;
+	emu_timer *m_crtc_timer = nullptr;
 
 	u16 sound_busy_r();
 	u8 pixmap_r(offs_t offset);

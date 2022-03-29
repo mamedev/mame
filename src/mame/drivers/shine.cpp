@@ -2,9 +2,9 @@
 // copyright-holders:Nigel Barnes
 /***********************************************************************************
 
-    Shine/1
+Shine/1
 
-    TODO: everything to be verified.
+TODO: everything to be verified.
 
 The system rom has an inbuilt monitor program - unknown how to access it.
 
@@ -79,7 +79,7 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* keyboard state */
-	u8 m_keylatch;
+	u8 m_keylatch = 0U;
 };
 
 

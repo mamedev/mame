@@ -61,16 +61,16 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t  *m_do_tilemap;
+	tilemap_t  *m_do_tilemap = nullptr;
 
 	/* misc */
-	int      m_prev_ma6;
-	int      m_adpcm_pos;
-	int      m_adpcm_idle;
-	int      m_adpcm_data;
-	int      m_adpcm_status;
-	uint8_t    m_buffer0[9];
-	uint8_t    m_buffer1[9];
+	int      m_prev_ma6 = 0;
+	int      m_adpcm_pos = 0;
+	int      m_adpcm_idle = 0;
+	int      m_adpcm_data = 0;
+	int      m_adpcm_status = 0;
+	uint8_t    m_buffer0[9]{};
+	uint8_t    m_buffer1[9]{};
 
 	uint8_t docastle_shared0_r(offs_t offset);
 	uint8_t docastle_shared1_r(offs_t offset);

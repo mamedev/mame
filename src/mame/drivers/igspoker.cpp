@@ -169,13 +169,13 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<> m_led;
 	output_finder<6> m_lamps;
-	int m_nmi_enable;
-	int m_bg_enable;
-	int m_hopper;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_out[3];
-	uint8_t m_protection_res;
+	int m_nmi_enable = 0;
+	int m_bg_enable = 0;
+	int m_hopper = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_out[3]{};
+	uint8_t m_protection_res = 0;
 };
 
 

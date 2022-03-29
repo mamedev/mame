@@ -87,11 +87,12 @@ license:CC0
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.25" blue="0.26" /></led7seg>
+		<led7seg><color red="0.5" green="0.05" blue="0.075" /></led7seg>
 	</element>
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.13" green="0.0325" blue="0.0338" /></disk>
-		<disk state="1"><color red="1.0" green="0.25" blue="0.26" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="0.5" green="0.05" blue="0.075" /></disk>
+		<disk state="2"><color red="1.0" green="0.1" blue="0.15" /></disk>
 	</element>
 
 
@@ -143,6 +144,15 @@ license:CC0
 		<element name="digit5" ref="digit"><bounds x="215" y="0" width="42" height="59" /></element>
 		<element name="digit6" ref="digit"><bounds x="259" y="0" width="42" height="59" /></element>
 		<element name="digit7" ref="digit"><bounds x="303" y="0" width="42" height="59" /></element>
+
+		<element name="multi0.2" ref="digit" blend="add"><bounds x="-5"  y="0" width="42" height="59" /></element>
+		<element name="multi1.2" ref="digit" blend="add"><bounds x="39"  y="0" width="42" height="59" /></element>
+		<element name="multi2.2" ref="digit" blend="add"><bounds x="83"  y="0" width="42" height="59" /></element>
+		<element name="multi3.2" ref="digit" blend="add"><bounds x="127" y="0" width="42" height="59" /></element>
+		<element name="multi4.2" ref="digit" blend="add"><bounds x="171" y="0" width="42" height="59" /></element>
+		<element name="multi5.2" ref="digit" blend="add"><bounds x="215" y="0" width="42" height="59" /></element>
+		<element name="multi6.2" ref="digit" blend="add"><bounds x="259" y="0" width="42" height="59" /></element>
+		<element name="multi7.2" ref="digit" blend="add"><bounds x="303" y="0" width="42" height="59" /></element>
 
 		<!-- separators -->
 		<element ref="static_white"><bounds x="-9" y="-52" width="4" height="163" /></element>

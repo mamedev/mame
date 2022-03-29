@@ -154,12 +154,12 @@ private:
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 	rectangle m_sprite_clip;
-	int m_vblirqlevel;
-	int m_bltirqlevel;
-	int m_banking;
+	int m_vblirqlevel = 0;
+	int m_bltirqlevel = 0;
+	int m_banking = 0;
 	std::unique_ptr<uint32_t[]> m_tilemap_ram[4];
-	tilemap_t *m_tilemap[4];
-	emu_timer *m_blit_done_timer;
+	tilemap_t *m_tilemap[4]{};
+	emu_timer *m_blit_done_timer = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
@@ -818,17 +818,6 @@ static const gfx_layout sprite_16x16x8_layout =
 	16*64
 };
 
-static const gfx_layout _8x8x4_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4,0,12,8,20,16,28,24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-
 static const gfx_layout _16x16x4_layout =
 {
 	16,16,
@@ -872,10 +861,10 @@ static GFXDECODE_START( gfx_rabbit )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_16x16x8_layout, 0x0, 0x1000  ) // wrong
 
 	/* this seems to be backgrounds and tilemap gfx */
-	GFXDECODE_ENTRY( "gfx2", 0, _8x8x4_layout,   0x0, 0x1000  )
-	GFXDECODE_ENTRY( "gfx2", 0, _16x16x4_layout, 0x0, 0x1000  )
-	GFXDECODE_ENTRY( "gfx2", 0, _8x8x8_layout,   0x0, 0x1000  )
-	GFXDECODE_ENTRY( "gfx2", 0, _16x16x8_layout, 0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb,   0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx2", 0, _16x16x4_layout,        0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx2", 0, _8x8x8_layout,          0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx2", 0, _16x16x8_layout,        0x0, 0x1000  )
 
 GFXDECODE_END
 

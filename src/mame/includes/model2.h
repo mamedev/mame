@@ -341,10 +341,10 @@ protected:
 	required_region_ptr<u32> m_copro_tgp_tables;
 	required_device<address_map_bank_device> m_copro_tgp_bank;
 
-	u32 m_copro_tgp_bank_reg;
-	u32 m_copro_sincos_base;
-	u32 m_copro_inv_base;
-	u32 m_copro_isqrt_base;
+	u32 m_copro_tgp_bank_reg = 0;
+	u32 m_copro_sincos_base = 0;
+	u32 m_copro_inv_base = 0;
+	u32 m_copro_isqrt_base = 0;
 	u32 m_copro_atan_base[4];
 
 	void copro_function_port_w(offs_t offset, u32 data);
@@ -423,7 +423,7 @@ public:
 	void model2o_maxx_mem(address_map &map);
 
 private:
-	int m_maxxstate;
+	int m_maxxstate = 0;
 };
 
 /*****************************
@@ -445,7 +445,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	int m_gtx_state;
+	int m_gtx_state = 0;
 
 	u8 gtx_r(offs_t offset);
 	void model2o_gtx_mem(address_map &map);

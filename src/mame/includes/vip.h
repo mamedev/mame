@@ -125,10 +125,10 @@ private:
 	int m_exp_ef4;
 
 	// keyboard state
-	int m_keylatch;
+	int m_keylatch = 0;
 
 	// expansion state
-	uint8_t m_byteio_data;
+	uint8_t m_byteio_data = 0;
 	output_finder<3> m_leds;
 };
 

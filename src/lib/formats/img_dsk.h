@@ -36,11 +36,9 @@ public:
 	virtual bool supports_save() const override;
 
 private:
-	uint16_t m_crc;
-
 	static std::vector<uint8_t> interleaved_sectors(unsigned il_factor);
-	void write_mmfm_bit(std::vector<uint32_t> &buffer , bool data_bit , bool clock_bit);
-	void write_mmfm_byte(std::vector<uint32_t> &buffer , uint8_t data , uint8_t clock = 0);
+	void write_mmfm_bit(std::vector<uint32_t> &buffer , bool data_bit , bool clock_bit , uint16_t &crc);
+	void write_mmfm_byte(std::vector<uint32_t> &buffer , uint8_t data , uint16_t &crc , uint8_t clock = 0);
 	void write_sync(std::vector<uint32_t> &buffer);
 	void write_crc(std::vector<uint32_t> &buffer , uint16_t crc);
 	void write_gap(std::vector<uint32_t> &buffer , unsigned size_00 , unsigned size_ff);

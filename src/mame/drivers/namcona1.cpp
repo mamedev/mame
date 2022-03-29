@@ -1357,6 +1357,21 @@ ROM_END
 **************************************/
 
 
+// runs on several Namco NA-2 PCBs. Cabinet pic shows 9 screens for main display + 5 screens (one per terminal)
+ROM_START(bbbingo) // uses NA E4M8 ROM PCB with unpopulated keycus
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("bi1-slp1.6c", 0x000001, 0x080000, CRC(07a9a78d) SHA1(73f8933a26adc7725f046ac99c536e151f5c3fa2))
+	ROM_LOAD16_BYTE("bi1-slp0.6f", 0x000000, 0x080000, CRC(9642b4fa) SHA1(900687e1596e4f18a09b80b3a38a4597c4da16da))
+
+	ROM_REGION16_BE(0x800000, "maskrom", ROMREGION_ERASE00)
+	ROM_LOAD16_BYTE("bi1-slp5.2c", 0x000001, 0x080000, CRC(fb3dbcf2) SHA1(f94d339491215cf05dfe616f963560dc47aed472))
+	ROM_LOAD16_BYTE("bi1-slp4.2f", 0x000000, 0x080000, CRC(82d34c59) SHA1(638af6cfec3b09a4b35139bba51bcd21711efa2b))
+	// 0x100000 - 0x1fffff empty
+	ROM_LOAD16_BYTE("bi1-slp3.3c", 0x200001, 0x080000, CRC(4c1f16c4) SHA1(360eb5aaee83b7e6b6d0902aaab75b045cf72d3f))
+	ROM_LOAD16_BYTE("bi1-slp2.3f", 0x200000, 0x080000, CRC(a09cef53) SHA1(96c666a3a4f1747afe32bf791537b211bc8ac6d8))
+ROM_END
+
+
 ROM_START(emeralda) /* NA-2 Game PCB, clones are NA-1 based; see games listed above */
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD16_BYTE("em2-ep0l.6c", 0x000001, 0x080000, CRC(ff1479dc) SHA1(ea945d97ed909be13fb6e062742c7142c0d96c31)) /* 0xc00000 */
@@ -1542,3 +1557,4 @@ GAME(1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, init_
 GAME(1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, init_xday2, ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1994, zelos,      0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
 GAME(1994, zelost,     0,        zelos,     zelost,        namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, terminal)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // no way to insert medal. Maybe needs communication with main unit?
+GAME(1996, bbbingo,    0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Bin Bin Bingo (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals

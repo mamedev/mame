@@ -8,14 +8,13 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "screen.h"
 #include "zapper.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NES_ZAPPER,   nes_zapper_device,   "nes_zapper",   "Nintendo Zapper Lightgun")
+DEFINE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device, "nes_zapper", "Nintendo Zapper Lightgun")
 DEFINE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device, "nes_bandaihs", "Bandai Hyper Shot Lightgun")
 
 
@@ -33,7 +32,7 @@ static INPUT_PORTS_START( nes_bandaihs )
 	PORT_INCLUDE( nes_zapper )
 
 	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )  // has complete joypad inputs except button A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // has complete joypad inputs except button A
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
@@ -58,6 +57,16 @@ ioport_constructor nes_bandaihs_device::device_input_ports() const
 	return INPUT_PORTS_NAME( nes_bandaihs );
 }
 
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void nes_zapper_device::device_add_mconfig(machine_config &config)
+{
+	NES_ZAPPER_SENSOR(config, m_sensor, 0);
+	if (m_port != nullptr)
+		m_sensor->set_screen_tag(m_port->m_screen);
+}
 
 
 //**************************************************************************
@@ -71,6 +80,7 @@ ioport_constructor nes_bandaihs_device::device_input_ports() const
 nes_zapper_device::nes_zapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
+	, m_sensor(*this, "sensor")
 	, m_lightx(*this, "ZAPPER_X")
 	, m_lighty(*this, "ZAPPER_Y")
 	, m_trigger(*this, "ZAPPER_T")
@@ -113,44 +123,8 @@ void nes_bandaihs_device::device_start()
 u8 nes_zapper_device::read_bit34()
 {
 	u8 ret = m_trigger->read();
-	int x = m_lightx->read();
-	int y = m_lighty->read();
 
-	// radius of circle picked up by the gun's photodiode
-	constexpr int radius = 5;
-	// brightness threshold
-	constexpr int bright = 0xc0;
-	// # of CRT scanlines that sustain brightness
-	constexpr int sustain = 22;
-
-	int vpos = m_port->m_screen->vpos();
-	int hpos = m_port->m_screen->hpos();
-
-	// update the screen if necessary
-	if (!m_port->m_screen->vblank())
-		if (vpos > y - radius || (vpos == y - radius && hpos >= x - radius))
-			m_port->m_screen->update_now();
-
-	int sum = 0;
-	int scanned = 0;
-
-	// sum brightness of pixels nearby the gun position
-	for (int i = x - radius; i <= x + radius; i++)
-		for (int j = y - radius; j <= y + radius; j++)
-			// look at pixels within circular sensor
-			if ((x - i) * (x - i) + (y - j) * (y - j) <= radius * radius)
-			{
-				rgb_t pix = m_port->m_screen->pixel(i, j);
-
-				// only detect light if gun position is near, and behind, where the PPU is drawing on the CRT, from NesDev wiki:
-				// "Zap Ruder test ROM show that the photodiode stays on for about 26 scanlines with pure white, 24 scanlines with light gray, or 19 lines with dark gray."
-				if (j <= vpos && j > vpos - sustain && (j != vpos || i <= hpos))
-					sum += pix.r() + pix.g() + pix.b();
-				scanned++;
-			}
-
-	// light not detected if average brightness is below threshold (default bit 3 is 0: light detected)
-	if (sum < bright * scanned)
+	if (!m_sensor->detect_light(m_lightx->read(), m_lighty->read()))
 		ret |= 0x08;
 
 	return ret;

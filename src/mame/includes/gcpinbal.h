@@ -48,17 +48,17 @@ private:
 	required_shared_ptr<u16> m_d80060_ram;
 
 	/* video-related */
-	tilemap_t     *m_tilemap[3];
-	u16      m_scrollx[3];
-	u16      m_scrolly[3];
-	u16      m_bg0_gfxset;
-	u16      m_bg1_gfxset;
+	tilemap_t     *m_tilemap[3]{};
+	u16      m_scrollx[3]{};
+	u16      m_scrolly[3]{};
+	u16      m_bg0_gfxset = 0U;
+	u16      m_bg1_gfxset = 0U;
 #ifdef MAME_DEBUG
 	u8       m_dislayer[4] = { 0, 0, 0, 0 };
 #endif
 
 	/* sound-related */
-	u32      m_msm_bank;
+	u32      m_msm_bank = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

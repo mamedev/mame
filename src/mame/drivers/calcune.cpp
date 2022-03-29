@@ -49,7 +49,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<sega315_5313_device, 2> m_vdp;
 
-	int m_vdp_state;
+	int m_vdp_state = 0;
 
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);

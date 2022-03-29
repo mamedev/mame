@@ -239,7 +239,7 @@ public:
 	void mgames(machine_config &config);
 
 private:
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
 	uint8_t mixport_r();
 	void outport0_w(uint8_t data);
@@ -259,9 +259,9 @@ private:
 
 	virtual void machine_start() override;
 
-	uint8_t m_output[8];
+	uint8_t m_output[8]{};
 	required_shared_ptr<uint8_t> m_video;
-	int m_mixdata;
+	int m_mixdata = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

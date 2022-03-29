@@ -77,8 +77,8 @@ private:
 
 	required_ioport_array<2> m_analog;
 
-	tilemap_t *m_tilemap[2];
-	uint8_t m_analog_ports[2];
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_analog_ports[2]{};
 };
 
 #endif // MAME_INCLUDES_WRALLY_H

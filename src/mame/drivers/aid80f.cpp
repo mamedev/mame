@@ -55,7 +55,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_region_ptr<u8> m_monitor;
 
-	bool m_ram_enabled;
+	bool m_ram_enabled = false;
 };
 
 void aid80f_state::machine_start()

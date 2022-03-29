@@ -52,16 +52,16 @@ private:
 	required_shared_ptr<uint8_t> m_bg2videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg2_tilemap;
-	uint16_t m_xscroll;
-	uint16_t m_yscroll;
-	uint16_t m_bg2xscroll;
-	uint16_t m_bg2yscroll;
-	int m_adpcm_pos[2];
-	int m_adpcm_end[2];
-	int m_adpcm_data[2];
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg2_tilemap = nullptr;
+	uint16_t m_xscroll = 0;
+	uint16_t m_yscroll = 0;
+	uint16_t m_bg2xscroll = 0;
+	uint16_t m_bg2yscroll = 0;
+	int m_adpcm_pos[2]{};
+	int m_adpcm_end[2]{};
+	int m_adpcm_data[2]{};
 
 	void coincounter_w(uint8_t data);
 	void boardb_bankswitch_w(uint8_t data);

@@ -44,8 +44,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	u8 m_tilebank;
-	s8 m_bg_yoffset;
+	u8 m_tilebank = 0;
+	s8 m_bg_yoffset = 0;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -618,17 +618,6 @@ u32 powerbal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-static const gfx_layout magicstk_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout tilelayout =
 {
 	16,16,
@@ -646,7 +635,7 @@ static const gfx_layout tilelayout =
 
 static GFXDECODE_START( gfx_powerbal )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )    // colors 0x100-0x1ff
-	GFXDECODE_ENTRY( "gfx1", 0, magicstk_charlayout, 0x000, 16 )    // colors 0x000-0x0ff
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,    0x000, 16 )    // colors 0x000-0x0ff
 GFXDECODE_END
 
 

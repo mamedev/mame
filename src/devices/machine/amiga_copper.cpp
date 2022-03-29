@@ -2,24 +2,24 @@
 // copyright-holders:Aaron Giles, Angelo Salese
 /**************************************************************************************************
 
-	Amiga Copper
+    Amiga Copper
 
-	"Co-processor" contained inside Agnus,
-	it's a finite-state machine that either wait to a h/v video beam position or direct writes to
-	the Amiga chipset registers via program lists, ranging from "simple" video mode/color changes
-	to override sprite structures and beyond ...
+    "Co-processor" contained inside Agnus,
+    it's a finite-state machine that either wait to a h/v video beam position or direct writes to
+    the Amiga chipset registers via program lists, ranging from "simple" video mode/color changes
+    to override sprite structures and beyond ...
 
-	TODO:
-	- Current handling is horizontally offset by several pixels, also cfr. amiga video notes
-	  (screen geometry slightly incorrect?);
-	- Fix Bitplane offset corruption in some games (e.g. exile, zoola, AGA games).
-	  Same as above?
-	- Fix missing/corrupt sprites in known nasty examples
-	  (e.g. zoola status bar, parasol score layer on top, riskyw backgrounds);
-	- Find & verify cdang examples (especially for ECS/AGA);
-	- Find & verify examples that uses this non-canonically,
-	  i.e. anything that may use this for controlling Paula, FDC or Blitter;
-	- Add debugger command for printing the current disassembler structure;
+    TODO:
+    - Current handling is horizontally offset by several pixels, also cfr. amiga video notes
+      (screen geometry slightly incorrect?);
+    - Fix Bitplane offset corruption in some games (e.g. exile, zoola, AGA games).
+      Same as above?
+    - Fix missing/corrupt sprites in known nasty examples
+      (e.g. zoola status bar, parasol score layer on top, riskyw backgrounds);
+    - Find & verify cdang examples (especially for ECS/AGA);
+    - Find & verify examples that uses this non-canonically,
+      i.e. anything that may use this for controlling Paula, FDC or Blitter;
+    - Add debugger command for printing the current disassembler structure;
 
 **************************************************************************************************/
 
@@ -28,7 +28,7 @@
 
 #define LOG_WARN    (1U << 1)   // Show warnings
 #define LOG_COPINS  (1U << 2)   // Show instruction fetches thru COPINS
-#define LOG_INST    (1U << 3)   // Show live instruction fetches 
+#define LOG_INST    (1U << 3)   // Show live instruction fetches
 #define LOG_PC      (1U << 4)   // Show PC fetches
 #define LOG_CHIPSET (1U << 5)   // Show custom chipset writes
 
@@ -78,7 +78,7 @@ amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const ch
 
 
 void amiga_copper_device::device_start()
-{	
+{
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 	m_chipmem_r.resolve_safe(0);
 
@@ -92,7 +92,7 @@ void amiga_copper_device::device_start()
 	save_item(NAME(m_state_waitblit));
 	save_item(NAME(m_waitval));
 	save_item(NAME(m_waitmask));
-//	save_item(NAME(m_wait_offset));
+//  save_item(NAME(m_wait_offset));
 	save_item(NAME(m_pending_data));
 	save_item(NAME(m_pending_offset));
 }
@@ -126,7 +126,7 @@ void amiga_copper_device::regs_map(address_map &map)
 	map(0x06, 0x07).w(FUNC(amiga_copper_device::copxlcl_w<1>));
 	map(0x08, 0x09).rw(FUNC(amiga_copper_device::copjmpx_r<0>), FUNC(amiga_copper_device::copjmpx_w<0>));
 	map(0x0a, 0x0b).rw(FUNC(amiga_copper_device::copjmpx_r<1>), FUNC(amiga_copper_device::copjmpx_w<1>));
-//	map(0x0c, 0x0d).w(FUNC(amiga_copper_device::copins_w));
+//  map(0x0c, 0x0d).w(FUNC(amiga_copper_device::copins_w));
 }
 
 void amiga_copper_device::dmacon_set(u16 data)
@@ -135,7 +135,7 @@ void amiga_copper_device::dmacon_set(u16 data)
 	m_dma_copen = bool(BIT(data, 7));
 }
 
-/* 
+/*
  * COPCON 02E W A Copper Control Register
  *
  * ---- ---- ---- --x- CDANG (Copper Danger Mode) setting
@@ -146,10 +146,10 @@ void amiga_copper_device::dmacon_set(u16 data)
  * access to the blitter HW therefore $dff080 is the
  * minimum for non-cdang and $dff040 for cdang mode.
  *
- * In ECS and AGA the latter limitation is lifted so Copper 
+ * In ECS and AGA the latter limitation is lifted so Copper
  * can access $dff000-$dff03f too, which basically means the
  * possibility of accessing disk block regs.
- * (i.e. the other regs are either r/o or wouldn't have much 
+ * (i.e. the other regs are either r/o or wouldn't have much
  *       sense to write via Copper).
  *
  */
@@ -267,7 +267,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		{
 			m_state_waiting = false;
 //#if GUESS_COPPER_OFFSET
-//			return xpos + COPPER_CYCLES_TO_PIXELS(1 + m_wait_offset);
+//          return xpos + COPPER_CYCLES_TO_PIXELS(1 + m_wait_offset);
 //#else
 			return xpos + COPPER_CYCLES_TO_PIXELS(1 + 3);
 //#endif
@@ -289,7 +289,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 	m_host_space->write_word(0xdff08c, word0);
 	m_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
-	
+
 	/* fetch the second data word */
 	word1 = m_chipmem_r(m_pc);
 	m_host_space->write_word(0xdff08c, word1);
@@ -355,7 +355,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		{
 			LOGINST("  Waiting for %04x & %04x (currently %04x)\n",
 				m_waitval,
-				m_waitmask, 
+				m_waitmask,
 				(ypos << 8) | (xpos >> 1)
 			);
 
@@ -367,7 +367,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		{
 			int curpos = (ypos << 8) | (xpos >> 1);
 
-			LOGINST("  Skipping if %04x & %04x (currently %04x)\n", 
+			LOGINST("  Skipping if %04x & %04x (currently %04x)\n",
 				m_waitval,
 				m_waitmask,
 				(ypos << 8) | (xpos >> 1)

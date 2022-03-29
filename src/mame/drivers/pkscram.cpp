@@ -67,11 +67,11 @@ private:
 	required_shared_ptr<uint16_t> m_mdtilemap_ram;
 	required_shared_ptr<uint16_t> m_bgtilemap_ram;
 
-	uint16_t m_out;
-	uint8_t m_interrupt_line_active;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_md_tilemap;
-	tilemap_t *m_bg_tilemap;
+	uint16_t m_out = 0;
+	uint8_t m_interrupt_line_active = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_md_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 };
 
 

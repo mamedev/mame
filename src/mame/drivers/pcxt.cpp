@@ -166,7 +166,7 @@ public:
 	void bg_bank_w(uint8_t data);
 private:
 	required_region_ptr<uint8_t> m_bg;
-	uint8_t m_bg_bank;
+	uint8_t m_bg_bank = 0;
 };
 
 

@@ -405,11 +405,11 @@ private:
 	required_device<cdrom_image_device> m_cdrom;
 	required_region_ptr<uint16_t> m_cd_bios;
 
-	uint32_t m_butch_regs[0x40/4];
-	uint32_t m_butch_cmd_response[0x102];
-	uint8_t m_butch_cmd_index;
-	uint8_t m_butch_cmd_size;
+	uint32_t m_butch_regs[0x40/4]{};
+	uint32_t m_butch_cmd_response[0x102]{};
+	uint8_t m_butch_cmd_index = 0U;
+	uint8_t m_butch_cmd_size = 0U;
 
-	cdrom_file  *m_cd_file;
-	//const cdrom_toc*    m_toc;
+	cdrom_file  *m_cd_file = nullptr;
+	//const cdrom_toc*    m_toc = nullptr;
 };

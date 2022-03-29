@@ -31,8 +31,8 @@ PROGRAM NO-93-01-14-0024
 +------------------------------------------+
 
 Notes:
-  Zilog Z0840004PSC (Z80 cpu, main program CPU)
-  Goldstar Z8400B PS (Z80 cpu, sound CPU)
+  Zilog Z0840004PSC (Z80 CPU, main program CPU)
+  Goldstar Z8400B PS (Z80 CPU, sound CPU)
   Yamaha YM3014/YM3812 (rebadged as 83142/5A12)
   OKI M5205
   TI TPC1020AFN-084C
@@ -42,16 +42,29 @@ Notes:
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
-#include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+// configurable logging
+#define LOG_UNKWRITE     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_UNKWRITE)
+
+#include "logmacro.h"
+
+#define LOGUNKWRITE(...)     LOGMASKED(LOG_UNKWRITE,     __VA_ARGS__)
+
+
+namespace {
 
 class discoboy_state : public driver_device
 {
@@ -64,144 +77,119 @@ public:
 		m_adpcm_select(*this, "adpcm_select"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
 		m_ram_att(*this, "att_ram"),
-		m_rambank1(*this, "rambank1"),
-		m_ram_1(*this, "ram_1"),
-		m_ram_2(*this, "ram_2") { }
+		m_palram(*this, "palram_%u", 1U, 0x800U, ENDIANNESS_LITTLE),
+		m_spriteram(*this, "spriteram", 0x1000U, ENDIANNESS_LITTLE),
+		m_tileram(*this, "tileram", 0x1000U, ENDIANNESS_LITTLE),
+		m_main_rombank(*this, "main_rombank"),
+		m_soundbank(*this, "soundbank"),
+		m_palrambank(*this, "palrambank"),
+		m_spritetilebank(*this, "spritetilebank") { }
 
 	void discoboy(machine_config &config);
 
-	void init_discoboy();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
-	/* video-related */
-	uint8_t    m_gfxbank;
-	uint8_t    m_port_00;
+	// video-related
+	uint8_t m_gfxbank = 0;
+	uint8_t m_port_00 = 0;
 
-	bool       m_toggle;
+	bool m_toggle = false;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
 	required_device<ls157_device> m_adpcm_select;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 
-	/* memory */
+	// memory
 	required_shared_ptr<uint8_t> m_ram_att;
-	required_device<address_map_bank_device> m_rambank1;
-	required_shared_ptr<uint8_t> m_ram_1;
-	required_shared_ptr<uint8_t> m_ram_2;
-	uint8_t    m_ram_3[0x1000];
-	uint8_t    m_ram_4[0x1000];
-	void rambank_select_w(uint8_t data);
+	memory_share_array_creator<uint8_t, 2> m_palram;
+	memory_share_creator<uint8_t> m_spriteram;
+	memory_share_creator<uint8_t> m_tileram;
+	required_memory_bank m_main_rombank;
+	required_memory_bank m_soundbank;
+	required_memory_bank m_palrambank;
+	required_memory_bank m_spritetilebank;
+
+	void palrambank_select_w(uint8_t data);
 	void port_00_w(uint8_t data);
 	void port_01_w(uint8_t data);
 	void port_06_w(uint8_t data);
-	uint8_t rambank2_r(offs_t offset);
-	void rambank2_w(offs_t offset, uint8_t data);
 	uint8_t port_06_r();
-	void yunsung8_sound_bankswitch_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void sound_bankswitch_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
-	void discoboy_map(address_map &map);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void main_prg_map(address_map &map);
 	void io_map(address_map &map);
-	void rambank1_map(address_map &map);
-	void sound_map(address_map &map);
+	void sound_prg_map(address_map &map);
 };
 
-void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void discoboy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flipscreen = 0;
-	int offs, sx, sy;
 
-	for (offs = 0x1000 - 0x40; offs >= 0; offs -= 0x20)
+	for (int offs = 0x1000 - 0x40; offs >= 0; offs -= 0x20)
 	{
-		int code = m_ram_4[offs];
-		int attr = m_ram_4[offs + 1];
+		int code = m_spriteram[offs];
+		int attr = m_spriteram[offs + 1];
 		int color = attr & 0x0f;
-		sx = m_ram_4[offs + 3] + ((attr & 0x10) << 4);
-		sy = ((m_ram_4[offs + 2] + 8) & 0xff) - 8;
+		int sx = m_spriteram[offs + 3] + ((attr & 0x10) << 4);
+		int sy = ((m_spriteram[offs + 2] + 8) & 0xff) - 8;
 		code += (attr & 0xe0) << 3;
 
 		if (code >= 0x400)
 		{
-			if ((m_gfxbank & 0x30) == 0x00)
+			switch (m_gfxbank & 0x30)
 			{
-				code = 0x400 + (code & 0x3ff);
-			}
-			else if ((m_gfxbank & 0x30) == 0x10)
-			{
-				code = 0x400 + (code & 0x3ff) + 0x400;
-			}
-			else if ((m_gfxbank & 0x30) == 0x20)
-			{
-				code = 0x400 + (code & 0x3ff) + 0x800;
-			}
-			else if ((m_gfxbank & 0x30) == 0x30)
-			{
-				code = 0x400 + (code & 0x3ff) + 0xc00;
-			}
-			else
-			{
-				code = machine().rand();
+				case 0x00: code = 0x400 + (code & 0x3ff); break;
+				case 0x10: code = 0x400 + (code & 0x3ff) + 0x400; break;
+				case 0x20: code = 0x400 + (code & 0x3ff) + 0x800; break;
+				case 0x30: code = 0x400 + (code & 0x3ff) + 0xc00; break;
+				default: code = machine().rand();
 			}
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 					code,
 					color,
-					flipscreen,0,
-					sx,sy,15);
+					flipscreen, 0,
+					sx, sy, 15);
 	}
 }
 
 
 uint32_t discoboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t x, y;
-	int i;
 	int count = 0;
 
-	for (i = 0; i < 0x800; i += 2)
+	for (int j = 0; j < 2; j++)
 	{
-		uint16_t pal;
-		int r, g, b;
-		pal = m_ram_1[i] | (m_ram_1[i + 1] << 8);
+		for (int i = 0; i < 0x800; i += 2)
+		{
+			uint16_t pal = m_palram[j][i] | (m_palram[j][i + 1] << 8);
 
-		b = ((pal >> 0) & 0xf) << 4;
-		g = ((pal >> 4) & 0xf) << 4;
-		r = ((pal >> 8) & 0xf) << 4;
+			int b = ((pal >> 0) & 0xf) << 4;
+			int g = ((pal >> 4) & 0xf) << 4;
+			int r = ((pal >> 8) & 0xf) << 4;
 
-		m_palette->set_pen_color(i / 2, rgb_t(r, g, b));
-	}
-
-	for (i = 0; i < 0x800; i += 2)
-	{
-		uint16_t pal;
-		int r,g,b;
-		pal = m_ram_2[i] | (m_ram_2[i + 1] << 8);
-
-		b = ((pal >> 0) & 0xf) << 4;
-		g = ((pal >> 4) & 0xf) << 4;
-		r = ((pal >> 8) & 0xf) << 4;
-
-		m_palette->set_pen_color((i / 2) + 0x400, rgb_t(r, g, b));
+			m_palette->set_pen_color((i / 2) + j * 0x400, rgb_t(r, g, b));
+		}
 	}
 
 	bitmap.fill(0x3ff, cliprect);
 
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 64; x++)
+		for (uint8_t x = 0; x < 64; x++)
 		{
-			uint16_t tileno = m_ram_3[count] | (m_ram_3[count + 1] << 8);
+			uint16_t tileno = m_tileram[count] | (m_tileram[count + 1] << 8);
 
 			if (tileno > 0x2000)
 			{
@@ -223,77 +211,44 @@ uint32_t discoboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void discoboy_state::rambank_select_w(uint8_t data)
+void discoboy_state::palrambank_select_w(uint8_t data)
 {
-	if (data & 0x20)
-		m_rambank1->set_bank(1);
-	else
-		m_rambank1->set_bank(0);
+	m_palrambank->set_entry(BIT(data, 5));
 
-	if (data &= 0x83) logerror("rambank_select_w !!!!!");
+	if (data &= 0x83) LOGUNKWRITE("palrambank_select_w !!!!! %02x\n", data);
 }
 
 void discoboy_state::port_00_w(uint8_t data)
 {
-	if (data & 0xfe) logerror("unk port_00_w %02x\n",data);
-	m_port_00 = data;
+	if (data & 0xfe) LOGUNKWRITE("unk port_00_w %02x\n", data);
+	m_spritetilebank->set_entry(BIT(data, 0));
 }
 
 void discoboy_state::port_01_w(uint8_t data)
 {
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
-	//printf("unk port_01_w %02x\n",data);
+	LOGUNKWRITE("unk port_01_w %02x\n", data);
 	// discoboy gfxbank
 	m_gfxbank = data & 0xf0;
 
-	membank("mainbank")->set_entry(data & 0x07);
+	m_main_rombank->set_entry(data & 0x07);
 }
 
 void discoboy_state::port_06_w(uint8_t data)
 {
-	//printf("unk discoboy_port_06_w %02x\n",data);
-	if (data != 0) logerror("port 06!!!! %02x\n",data);
+	if (data != 0) LOGUNKWRITE("port 06!!!! %02x\n",data);
 }
 
-uint8_t discoboy_state::rambank2_r(offs_t offset)
-{
-	if (m_port_00 == 0x00)
-		return m_ram_3[offset];
-	else if (m_port_00 == 0x01)
-		return m_ram_4[offset];
-	else
-		printf("unk rb2_r\n");
-
-	return machine().rand();
-}
-
-void discoboy_state::rambank2_w(offs_t offset, uint8_t data)
-{
-	if (m_port_00 == 0x00)
-		m_ram_3[offset] = data;
-	else if (m_port_00 == 0x01)
-		m_ram_4[offset] = data;
-	else
-		printf("unk rb2_w\n");
-}
-
-void discoboy_state::discoboy_map(address_map &map)
+void discoboy_state::main_prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
-	map(0xc000, 0xc7ff).m(m_rambank1, FUNC(address_map_bank_device::amap8));
-	map(0xc800, 0xcfff).ram().share("att_ram");
-	map(0xd000, 0xdfff).rw(FUNC(discoboy_state::rambank2_r), FUNC(discoboy_state::rambank2_w));
+	map(0x8000, 0xbfff).bankr(m_main_rombank);
+	map(0xc000, 0xc7ff).bankrw(m_palrambank);
+	map(0xc800, 0xcfff).ram().share(m_ram_att);
+	map(0xd000, 0xdfff).bankrw(m_spritetilebank);
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram();
 }
-
-void discoboy_state::rambank1_map(address_map &map)
-{
-	map(0x0000, 0x07ff).ram().share("ram_1");
-	map(0x0800, 0x0fff).ram().share("ram_2");
-}
-
 
 uint8_t discoboy_state::port_06_r()
 {
@@ -306,34 +261,34 @@ void discoboy_state::io_map(address_map &map)
 	map(0x00, 0x00).portr("DSWA").w(FUNC(discoboy_state::port_00_w));
 	map(0x01, 0x01).portr("SYSTEM").w(FUNC(discoboy_state::port_01_w));
 	map(0x02, 0x02).portr("P1");
-	map(0x03, 0x03).portr("P2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x03, 0x03).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x04, 0x04).portr("DSWB");
 	map(0x06, 0x06).rw(FUNC(discoboy_state::port_06_r), FUNC(discoboy_state::port_06_w)); // ???
-	map(0x07, 0x07).w(FUNC(discoboy_state::rambank_select_w)); // 0x20 is palette bank bit.. others?
+	map(0x07, 0x07).w(FUNC(discoboy_state::palrambank_select_w)); // 0x20 is palette bank bit.. others?
 }
 
-/* Sound */
+// Sound
 
-void discoboy_state::yunsung8_sound_bankswitch_w(uint8_t data)
+void discoboy_state::sound_bankswitch_w(uint8_t data)
 {
-	/* Note: this is bit 5 on yunsung8.cpp */
+	// Note: this is bit 5 on yunsung8.cpp
 	m_msm->reset_w((data & 0x08) >> 3);
 
-	membank("sndbank")->set_entry(data & 0x07);
+	m_soundbank->set_entry(data & 0x07);
 
 	if (data != (data & (~0x0f)))
-		logerror("%s: Bank %02X\n", machine().describe_context(), data);
+		LOGUNKWRITE("%s: Bank %02X\n", machine().describe_context(), data);
 }
 
-void discoboy_state::sound_map(address_map &map)
+void discoboy_state::sound_prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("sndbank");
-	map(0xe000, 0xe000).w(FUNC(discoboy_state::yunsung8_sound_bankswitch_w));
+	map(0x8000, 0xbfff).bankr(m_soundbank);
+	map(0xe000, 0xe000).w(FUNC(discoboy_state::sound_bankswitch_w));
 	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
 	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf800, 0xf800).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
 
@@ -428,13 +383,27 @@ static const gfx_layout tiles8x8_layout2 =
 };
 
 static GFXDECODE_START( gfx_discoboy )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x000, 128 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles8x8_layout, 0x000, 128 )
 	GFXDECODE_ENTRY( "bgtiles", 0, tiles8x8_layout2, 0x000, 128 )
 	GFXDECODE_ENTRY( "bgtiles_bank", 0, tiles8x8_layout2, 0x000, 128 )
 GFXDECODE_END
 
 void discoboy_state::machine_start()
 {
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *audio = memregion("audiocpu")->base();
+
+	m_main_rombank->configure_entries(0, 8, &rom[0x10000], 0x4000);
+	m_main_rombank->set_entry(0);
+	m_soundbank->configure_entries(0, 8, &audio[0x00000], 0x4000);
+	m_soundbank->set_entry(0);
+
+	m_palrambank->configure_entry(0, m_palram[0]);
+	m_palrambank->configure_entry(1, m_palram[1]);
+
+	m_spritetilebank->configure_entry(0, m_tileram);
+	m_spritetilebank->configure_entry(1, m_spriteram);
+
 	save_item(NAME(m_port_00));
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_toggle));
@@ -447,7 +416,7 @@ void discoboy_state::machine_reset()
 	m_toggle = false;
 }
 
-WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
+WRITE_LINE_MEMBER(discoboy_state::adpcm_int)
 {
 	if (!state)
 		return;
@@ -459,18 +428,16 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 
 void discoboy_state::discoboy(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);     /* 6 MHz? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &discoboy_state::discoboy_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(12'000'000) / 2);     // 6 MHz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &discoboy_state::main_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &discoboy_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(discoboy_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(10'000'000)/2); /* 5 MHz? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &discoboy_state::sound_map);
+	Z80(config, m_audiocpu, XTAL(10'000'000) / 2); // 5 MHz?
+	m_audiocpu->set_addrmap(AS_PROGRAM, &discoboy_state::sound_prg_map);
 
-	ADDRESS_MAP_BANK(config, "rambank1").set_map(&discoboy_state::rambank1_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
-
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -482,14 +449,13 @@ void discoboy_state::discoboy(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_discoboy);
 	PALETTE(config, m_palette).set_entries(0x1000);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(10'000'000)/4));   /* 2.5 MHz? */
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(10'000'000) / 4));   // 2.5 MHz?
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.6);
 
@@ -497,8 +463,8 @@ void discoboy_state::discoboy(machine_config &config)
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, XTAL(400'000));
-	m_msm->vck_legacy_callback().set(FUNC(discoboy_state::yunsung8_adpcm_int)); /* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);      /* 4KHz, 4 Bits */
+	m_msm->vck_legacy_callback().set(FUNC(discoboy_state::adpcm_int)); // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);      // 4KHz, 4 Bits
 	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
 	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 }
@@ -513,7 +479,7 @@ ROM_START( discoboy )
 	ROM_LOAD( "2.u28",  0x00000, 0x10000, CRC(7c2ed174) SHA1(ace209dc4cc7a4ffca062842defd84cefc5b10d2) )
 	ROM_LOAD( "1.u45",  0x10000, 0x10000, CRC(c266c6df) SHA1(f76e38ded43f56a486cf6569c679ddb57a4165fb) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "5.u94",   0x00000, 0x10000, CRC(dbd20836) SHA1(d97651626b1dc16b93f8aed28bac19fd177e626f) )
 	ROM_LOAD( "6.u124",  0x10000, 0x40000, CRC(e20d41f8) SHA1(792294a34840867072bc484d6f3cae3502c8bc28) )
 	ROM_LOAD( "7.u95",   0x80000, 0x10000, CRC(1d5617a2) SHA1(6b6bd50c1984748dc8bf6600431d9bb6fe443873) )
@@ -542,7 +508,7 @@ ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game
 	ROM_LOAD( "discob.u28",  0x00000, 0x10000, CRC(7c2ed174) SHA1(ace209dc4cc7a4ffca062842defd84cefc5b10d2) )
 	ROM_LOAD( "discob.u45",  0x10000, 0x10000, CRC(c266c6df) SHA1(f76e38ded43f56a486cf6569c679ddb57a4165fb) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "discob.u94",   0x00000, 0x10000, CRC(c436f1e5) SHA1(511e23b85f1b4fc732bd9648c0582848c20e6378) )
 	ROM_LOAD( "discob.u124",  0x10000, 0x40000, CRC(0b0bf653) SHA1(ce609e9ee270eda6e74612ed5334fd6c3c81ef18) )
 	ROM_LOAD( "discob.u95",   0x80000, 0x10000, CRC(ddea540e) SHA1(b69b94409bb15174f7780c637b183a2563c3d6c3) )
@@ -561,23 +527,8 @@ ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game
 	ROM_LOAD( "discob.u49",   0x0c0000, 0x40000, CRC(9f884db4) SHA1(fd916b0ac54961bbd9b3f23d3ee5d35d747cbf17) )
 ROM_END
 
-void discoboy_state::init_discoboy()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	uint8_t *AUDIO = memregion("audiocpu")->base();
-
-	memset(m_ram_3, 0, sizeof(m_ram_3));
-	memset(m_ram_4, 0, sizeof(m_ram_4));
-
-	save_item(NAME(m_ram_3));
-	save_item(NAME(m_ram_4));
-
-	membank("mainbank")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	membank("mainbank")->set_entry(0);
-	membank("sndbank")->configure_entries(0, 8, &AUDIO[0x00000], 0x4000);
-	membank("sndbank")->set_entry(0);
-}
+} // anonymous namespace
 
 
-GAME( 1993, discoboy,  0,        discoboy, discoboy, discoboy_state, init_discoboy, ROT270, "Soft Art Co.", "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, discoboyp, discoboy, discoboy, discoboy, discoboy_state, init_discoboy, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboy,  0,        discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co.", "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboyp, discoboy, discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

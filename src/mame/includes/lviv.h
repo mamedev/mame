@@ -88,12 +88,12 @@ private:
 	required_ioport_array<12> m_key;
 	required_ioport m_joy_port;
 
-	uint8_t* m_vram;
-	uint16_t m_colortable[1][4];
-	uint8_t m_ppi_port_outputs[2][3];
-	uint8_t m_startup_mem_map;
+	uint8_t* m_vram = nullptr;
+	uint16_t m_colortable[1][4]{};
+	uint8_t m_ppi_port_outputs[2][3]{};
+	uint8_t m_startup_mem_map = 0U;
 
-	/*----------- defined in video/lviv.c -----------*/
+	/*----------- defined in video/lviv.cpp -----------*/
 	static const rgb_t s_palette[8];
 };
 

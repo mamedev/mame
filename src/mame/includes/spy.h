@@ -36,14 +36,14 @@ public:
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_ram;
-	uint8_t      m_pmcram[0x800];
-	std::vector<uint8_t> m_paletteram;
+	uint8_t      m_pmcram[0x800]{};
+	std::vector<uint8_t> m_paletteram{};
 
 	/* misc */
-	int        m_rambank;
-	int        m_pmcbank;
-	int        m_video_enable;
-	int        m_old_3f90;
+	int        m_rambank = 0;
+	int        m_pmcbank = 0;
+	int        m_video_enable = 0;
+	int        m_old_3f90 = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

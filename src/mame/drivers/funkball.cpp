@@ -100,15 +100,15 @@ public:
 	void funkball(machine_config &config);
 
 private:
-	uint8_t m_funkball_config_reg_sel;
-	uint8_t m_funkball_config_regs[256];
-	uint32_t m_cx5510_regs[256/4];
+	uint8_t m_funkball_config_reg_sel = 0;
+	uint8_t m_funkball_config_regs[256]{};
+	uint32_t m_cx5510_regs[256/4]{};
 	std::unique_ptr<uint8_t[]> m_bios_ram;
 
-	uint32_t m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4]{};
 
-	uint32_t flashbank_addr;
-	uint16_t m_latched_timer;
+	uint32_t flashbank_addr = 0;
+	uint16_t m_latched_timer = 0;
 
 	// devices
 	required_device<voodoo_1_device> m_voodoo;
@@ -132,10 +132,10 @@ private:
 	struct
 	{
 		/* PCI */
-		uint32_t command;
-		uint32_t base_addr;
+		uint32_t command = 0;
+		uint32_t base_addr = 0;
 
-		uint32_t init_enable;
+		uint32_t init_enable = 0;
 	} m_voodoo_pci_regs;
 	uint32_t biu_ctrl_r(offs_t offset);
 	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

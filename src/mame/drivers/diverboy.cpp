@@ -251,22 +251,9 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout diverboy_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{  4, 0,  12, 8,  20, 16, 28, 24,
-		36, 32, 44, 40, 52, 48, 60, 56 },
-	{ 0*64, 1*64, 2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	16*64
-};
-
 static GFXDECODE_START( gfx_diverboy )
-	GFXDECODE_ENTRY( "gfx1", 0, diverboy_spritelayout, 0, 4*16 )
-	GFXDECODE_ENTRY( "gfx2", 0, diverboy_spritelayout, 0, 4*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_lsb, 0, 4*16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb, 0, 4*16 )
 GFXDECODE_END
 
 

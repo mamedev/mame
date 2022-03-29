@@ -7,6 +7,7 @@
  *******************************************************************/
 #include "emu.h"
 #include "option.h"
+#include "multifont.h"
 
 DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_BUS_SLOT, bus::epson_qx::option_slot_device, "epson_qx_option_slot", "QX-10 Option slot")
 DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_BUS, bus::epson_qx::option_bus_device, "epson_qx_option_bus", "QX-10 Option Bus")
@@ -205,6 +206,7 @@ void device_option_expansion_interface::interface_pre_start()
 
 void option_bus_devices(device_slot_interface &device)
 {
+	device.option_add("multifont", EPSON_QX_OPTION_MULTIFONT);
 }
 
 }  // namespace bus::epson_qx
