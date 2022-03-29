@@ -736,9 +736,10 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 		case 6: CYCLES(CYCLES_MOV_DR6_7_REG); m_dr[dr] = LOAD_RM32(modrm); break;
 		case 7:
 		{
-			dr7_changed(m_dr[7], rm32);
-			CYCLES(CYCLES_MOV_DR6_7_REG);
+			uint32_t old_dr7 = m_dr[7];
 			m_dr[dr] = rm32;
+			dr7_changed(old_dr7, m_dr[7]);
+			CYCLES(CYCLES_MOV_DR6_7_REG);
 			break;
 		}
 		default:

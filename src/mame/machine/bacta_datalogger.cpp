@@ -68,11 +68,11 @@ void bacta_datalogger_device::tx_queue()
 {
 	if (is_transmit_register_empty())
 	{
-		if (m_output_char != -1)
+		if (m_output_char != 255)
 		{
 			set_tra_rate(1200);
 			transmit_register_setup(m_output_char);
-			m_output_char = -1;
+			m_output_char = 255;
 		}
 	}
 }
