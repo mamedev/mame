@@ -44571,7 +44571,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="100 man dollar kid - maboroshi no teiou hen (japan).prg" size="262144" crc="73e41ac7" sha1="39616a91274232629e40546157c2bf413def5721" offset="00000" status="baddump" />
+				<rom name="100 man dollar kid - maboroshi no teiou hen (japan).prg" size="262144" crc="73e41ac7" sha1="39616a91274232629e40546157c2bf413def5721" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -44606,10 +44606,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="1999 - hore, mita koto ka seikimatsu (japan).chr" size="131072" crc="04ba2be3" sha1="f4b2fdb71db5553d8ed530496c7d03a80e1cf41d" offset="00000" status="baddump" />
+				<rom name="1999 - hore, mita koto ka seikimatsu (japan).chr" size="131072" crc="04ba2be3" sha1="f4b2fdb71db5553d8ed530496c7d03a80e1cf41d" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="1999 - hore, mita koto ka seikimatsu (japan).prg" size="262144" crc="3c5ae54b" sha1="1a25132dac9c14d8e25b7984342869911b5c18ac" offset="00000" status="baddump" />
+				<rom name="1999 - hore, mita koto ka seikimatsu (japan).prg" size="262144" crc="3c5ae54b" sha1="1a25132dac9c14d8e25b7984342869911b5c18ac" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -44626,10 +44626,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb_model" value="HVC-SZROM-01" />
 			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
-				<rom name="phf-ix-0 prg" size="131072" crc="30ca59c8" sha1="8b51c00dfe05a806f61e28e9d031234fe3b933a2" status="baddump" />
+				<rom name="phf-ix-0 prg" size="131072" crc="30ca59c8" sha1="8b51c00dfe05a806f61e28e9d031234fe3b933a2" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
-				<rom name="phf-ix-0 chr" size="16384" crc="dda12121" sha1="c7cfd5246626fc582c8e136780c7f4f866a2aedb" status="baddump" />
+				<rom name="phf-ix-0 chr" size="16384" crc="dda12121" sha1="c7cfd5246626fc582c8e136780c7f4f866a2aedb" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -44652,10 +44652,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="abadox (japan).chr" size="131072" crc="f1569df0" sha1="623c95592c972c3c569f8195951684c904aa5c6c" offset="00000" status="baddump" />
+				<rom name="abadox (japan).chr" size="131072" crc="f1569df0" sha1="623c95592c972c3c569f8195951684c904aa5c6c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="abadox (japan).prg" size="131072" crc="e675ba2a" sha1="566a4484df0dd2a0a19553d93d24c29f26113942" offset="00000" status="baddump" />
+				<rom name="abadox (japan).prg" size="131072" crc="e675ba2a" sha1="566a4484df0dd2a0a19553d93d24c29f26113942" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -44671,10 +44671,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="abarenbou tengu (japan).chr" size="131072" crc="94f6f93b" sha1="c33fcdd36fa49c1032999036e3f7ca69f723896d" offset="00000" status="baddump" />
+				<rom name="abarenbou tengu (japan).chr" size="131072" crc="94f6f93b" sha1="c33fcdd36fa49c1032999036e3f7ca69f723896d" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="abarenbou tengu (japan).prg" size="131072" crc="453be513" sha1="4a6c06fab2474382cc50ffccfeca95e556f97351" offset="00000" status="baddump" />
+				<rom name="abarenbou tengu (japan).prg" size="131072" crc="453be513" sha1="4a6c06fab2474382cc50ffccfeca95e556f97351" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -44690,10 +44690,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="aces - iron eagle 3 (japan).chr" size="262144" crc="fdbdab62" sha1="d1e05932371382c20e084461e3548d556f924c15" offset="00000" status="baddump" />
+				<rom name="aces - iron eagle 3 (japan).chr" size="262144" crc="fdbdab62" sha1="d1e05932371382c20e084461e3548d556f924c15" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="aces - iron eagle 3 (japan).prg" size="262144" crc="37f49572" sha1="9e245df85e86366609bed1528b868623481d1724" offset="00000" status="baddump" />
+				<rom name="aces - iron eagle 3 (japan).prg" size="262144" crc="37f49572" sha1="9e245df85e86366609bed1528b868623481d1724" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -44794,10 +44794,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="air fortress (japan).chr" size="131072" crc="6b6a14c3" sha1="7599345ccc142c06b7857faae9a788a330ae35f5" offset="00000" status="baddump" />
+				<rom name="air fortress (japan).chr" size="131072" crc="6b6a14c3" sha1="7599345ccc142c06b7857faae9a788a330ae35f5" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="air fortress (japan).prg" size="131072" crc="bf9adf43" sha1="e4434c1ea62d0f91e57ab2d8c274a68736932b30" offset="00000" status="baddump" />
+				<rom name="air fortress (japan).prg" size="131072" crc="bf9adf43" sha1="e4434c1ea62d0f91e57ab2d8c274a68736932b30" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -44867,10 +44867,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="alien syndrome (japan).chr" size="131072" crc="72670b66" sha1="56180a64bab42306bebc4f09e4aa18b93b509fea" offset="00000" status="baddump" />
+				<rom name="alien syndrome (japan).chr" size="131072" crc="72670b66" sha1="56180a64bab42306bebc4f09e4aa18b93b509fea" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="alien syndrome (japan).prg" size="131072" crc="e77268ec" sha1="e574a0d3e498b8e67494f7a26104c59e9330e402" offset="00000" status="baddump" />
+				<rom name="alien syndrome (japan).prg" size="131072" crc="e77268ec" sha1="e574a0d3e498b8e67494f7a26104c59e9330e402" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -44886,7 +44886,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="arctic (japan).prg" size="131072" crc="1f74ea6c" sha1="37d8903ab381090873a6c51c39f6120a7213fb6d" offset="00000" status="baddump" />
+				<rom name="arctic (japan).prg" size="131072" crc="1f74ea6c" sha1="37d8903ab381090873a6c51c39f6120a7213fb6d" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -44922,10 +44922,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="asmik-kun land (japan).chr" size="131072" crc="9f81451c" sha1="a74557fb0f85523dd3970ef72c616c2a078157ca" offset="00000" status="baddump" />
+				<rom name="asmik-kun land (japan).chr" size="131072" crc="9f81451c" sha1="a74557fb0f85523dd3970ef72c616c2a078157ca" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="asmik-kun land (japan).prg" size="131072" crc="336e2a6f" sha1="8db9750f2b4532aac61517bceb8d24541b742772" offset="00000" status="baddump" />
+				<rom name="asmik-kun land (japan).prg" size="131072" crc="336e2a6f" sha1="8db9750f2b4532aac61517bceb8d24541b742772" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45042,10 +45042,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="bananan ouji no daibouken (japan).chr" size="131072" crc="5354303a" sha1="76475eaaca355f6cc038448eae80099b460c7ae5" offset="00000" status="baddump" />
+				<rom name="bananan ouji no daibouken (japan).chr" size="131072" crc="5354303a" sha1="76475eaaca355f6cc038448eae80099b460c7ae5" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="bananan ouji no daibouken (japan).prg" size="131072" crc="b548fd2e" sha1="1e7b8b812de48f9105791362335b1e0995c7cd2b" offset="00000" status="baddump" />
+				<rom name="bananan ouji no daibouken (japan).prg" size="131072" crc="b548fd2e" sha1="1e7b8b812de48f9105791362335b1e0995c7cd2b" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45121,10 +45121,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="baseball fighter (japan).chr" size="131072" crc="b0ad7e0b" sha1="7c3520e8267d07991be2f294ad4283d61c596468" offset="00000" status="baddump" />
+				<rom name="baseball fighter (japan).chr" size="131072" crc="b0ad7e0b" sha1="7c3520e8267d07991be2f294ad4283d61c596468" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="baseball fighter (japan).prg" size="262144" crc="fbd87b3e" sha1="beb337ab2e259a595677e3c20048cdb659b4b53d" offset="00000" status="baddump" />
+				<rom name="baseball fighter (japan).prg" size="262144" crc="fbd87b3e" sha1="beb337ab2e259a595677e3c20048cdb659b4b53d" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -45176,7 +45176,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="524288">
-				<rom name="battle baseball (japan).prg" size="524288" crc="83ea7b04" sha1="e521aab5156ee802d9a3d064580249e2011158fe" offset="00000" status="baddump" />
+				<rom name="battle baseball (japan).prg" size="524288" crc="83ea7b04" sha1="e521aab5156ee802d9a3d064580249e2011158fe" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -45217,7 +45217,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
-				<rom name="best keiba - derby stallion (japan).prg" size="131072" crc="41482da3" sha1="7545769a31a1623b6947ec412dda569aae9190f2" offset="00000" status="baddump" />
+				<rom name="best keiba - derby stallion (japan).prg" size="131072" crc="41482da3" sha1="7545769a31a1623b6947ec412dda569aae9190f2" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="hsp-46-0 chr" size="131072" crc="3ef776bd" sha1="ef9518c623e2bcbcf5bea2bdfc405301788ee790" offset="00000" />
@@ -45241,7 +45241,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
-				<rom name="best play pro yakyuu special (japan).prg" size="262144" crc="b8747abf" sha1="340f507cfc3f3827ee0b7269814e08d634b807f4" offset="00000" status="baddump" />
+				<rom name="best play pro yakyuu special (japan).prg" size="262144" crc="b8747abf" sha1="340f507cfc3f3827ee0b7269814e08d634b807f4" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -45334,7 +45334,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="black bass 2, the (japan).prg" size="131072" crc="99a62e47" sha1="7a7a71a08b19d3357ac59187eb108887831752b4" offset="00000" status="baddump" />
+				<rom name="black bass 2, the (japan).prg" size="131072" crc="99a62e47" sha1="7a7a71a08b19d3357ac59187eb108887831752b4" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -45372,10 +45372,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="blue marlin, the (japan).chr" size="131072" crc="d5e72898" sha1="f89fbbc1df7e0abe8c99aca9706e857acf57712e" offset="00000" status="baddump" />
+				<rom name="blue marlin, the (japan).chr" size="131072" crc="d5e72898" sha1="f89fbbc1df7e0abe8c99aca9706e857acf57712e" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="blue marlin, the (japan).prg" size="131072" crc="d24de7f9" sha1="ed477871260db08d399c9107579454b5bc9a9521" offset="00000" status="baddump" />
+				<rom name="blue marlin, the (japan).prg" size="131072" crc="d24de7f9" sha1="ed477871260db08d399c9107579454b5bc9a9521" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45458,7 +45458,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="business wars (japan).prg" size="262144" crc="8d77e5e6" sha1="d2332e93093c5acd2af8e3f1380459db09776329" offset="00000" status="baddump" />
+				<rom name="business wars (japan).prg" size="262144" crc="8d77e5e6" sha1="d2332e93093c5acd2af8e3f1380459db09776329" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -45605,10 +45605,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="chaos world (japan).chr" size="131072" crc="d556e0f2" sha1="1c30139a86ca86c7278de5d036ecf0a5c4190542" offset="00000" status="baddump" />
+				<rom name="chaos world (japan).chr" size="131072" crc="d556e0f2" sha1="1c30139a86ca86c7278de5d036ecf0a5c4190542" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="chaos world (japan).prg" size="262144" crc="076b00ab" sha1="0624d9a24f5dacf04ed5675744d5ae02754c4eec" offset="00000" status="baddump" />
+				<rom name="chaos world (japan).prg" size="262144" crc="076b00ab" sha1="0624d9a24f5dacf04ed5675744d5ae02754c4eec" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -45644,10 +45644,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="chiisana obake - acchi socchi kocchi (japan).chr" size="131072" crc="8164da29" sha1="1208de01338edeef9412e22e38c1b1f5704566f6" offset="00000" status="baddump" />
+				<rom name="chiisana obake - acchi socchi kocchi (japan).chr" size="131072" crc="8164da29" sha1="1208de01338edeef9412e22e38c1b1f5704566f6" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="chiisana obake - acchi socchi kocchi (japan).prg" size="131072" crc="b54db5ef" sha1="2f93fd8595fc97d1727af713f9f5596f17c013ca" offset="00000" status="baddump" />
+				<rom name="chiisana obake - acchi socchi kocchi (japan).prg" size="131072" crc="b54db5ef" sha1="2f93fd8595fc97d1727af713f9f5596f17c013ca" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45663,10 +45663,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="chiki chiki machine mou race (japan).chr" size="131072" crc="c99524c6" sha1="afc100b46545b3b684eafef39dd39de9ca02575d" offset="00000" status="baddump" />
+				<rom name="chiki chiki machine mou race (japan).chr" size="131072" crc="c99524c6" sha1="afc100b46545b3b684eafef39dd39de9ca02575d" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="chiki chiki machine mou race (japan).prg" size="131072" crc="7ca52798" sha1="4a8e935c8bfaf8364bb0248f914eee416e06b2d0" offset="00000" status="baddump" />
+				<rom name="chiki chiki machine mou race (japan).prg" size="131072" crc="7ca52798" sha1="4a8e935c8bfaf8364bb0248f914eee416e06b2d0" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45719,10 +45719,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="chip to dale no daisakusen (japan).chr" size="131072" crc="5101df7a" sha1="39e5f6e0a8368a7f7dfd66b76bd15afd08192c87" offset="00000" status="baddump" />
+				<rom name="chip to dale no daisakusen (japan).chr" size="131072" crc="5101df7a" sha1="39e5f6e0a8368a7f7dfd66b76bd15afd08192c87" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="chip to dale no daisakusen (japan).prg" size="131072" crc="810f3cf0" sha1="22e41a9e1c766506d3a30dd16e0abae41e28ac59" offset="00000" status="baddump" />
+				<rom name="chip to dale no daisakusen (japan).prg" size="131072" crc="810f3cf0" sha1="22e41a9e1c766506d3a30dd16e0abae41e28ac59" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45738,10 +45738,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="chip to dale no daisakusen 2 (japan).chr" size="131072" crc="3cc7c494" sha1="d921f13110b3a7a63f94d127f34c97582bf7e1bc" offset="00000" status="baddump" />
+				<rom name="chip to dale no daisakusen 2 (japan).chr" size="131072" crc="3cc7c494" sha1="d921f13110b3a7a63f94d127f34c97582bf7e1bc" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="chip to dale no daisakusen 2 (japan).prg" size="131072" crc="579e5d0b" sha1="9c86cc2bbedb182031ee98a15e17081efa774933" offset="00000" status="baddump" />
+				<rom name="chip to dale no daisakusen 2 (japan).prg" size="131072" crc="579e5d0b" sha1="9c86cc2bbedb182031ee98a15e17081efa774933" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45776,10 +45776,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="chitei senkuu vazolder (japan).chr" size="131072" crc="65ad6a26" sha1="3a23d063c7d6dc73acbad14636f5cd7fad8d61c4" offset="00000" status="baddump" />
+				<rom name="chitei senkuu vazolder (japan).chr" size="131072" crc="65ad6a26" sha1="3a23d063c7d6dc73acbad14636f5cd7fad8d61c4" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="chitei senkuu vazolder (japan).prg" size="131072" crc="a46aa597" sha1="04696db7a6b93cbb6e16bb23b467d01d75be832a" offset="00000" status="baddump" />
+				<rom name="chitei senkuu vazolder (japan).prg" size="131072" crc="a46aa597" sha1="04696db7a6b93cbb6e16bb23b467d01d75be832a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45815,10 +45815,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="choujin sentai - jetman (japan).chr" size="131072" crc="ee4c114a" sha1="1133a4588353ea9bc7a8a232ba96c8ec19814a43" offset="00000" status="baddump" />
+				<rom name="choujin sentai - jetman (japan).chr" size="131072" crc="ee4c114a" sha1="1133a4588353ea9bc7a8a232ba96c8ec19814a43" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="choujin sentai - jetman (japan).prg" size="131072" crc="4ba8fcb6" sha1="aceeec662e83b7d31ac2a8a2e70992ade147159c" offset="00000" status="baddump" />
+				<rom name="choujin sentai - jetman (japan).prg" size="131072" crc="4ba8fcb6" sha1="aceeec662e83b7d31ac2a8a2e70992ade147159c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45853,7 +45853,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="cocoron (japan).prg" size="262144" crc="78c4460d" sha1="a9a3dc7f4c728b96cc175b2e833c6ba98be3e222" offset="00000" status="baddump" />
+				<rom name="cocoron (japan).prg" size="262144" crc="78c4460d" sha1="a9a3dc7f4c728b96cc175b2e833c6ba98be3e222" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -45893,10 +45893,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="columbus - ougon no yoake (japan).chr" size="131072" crc="952e6d87" sha1="56c02904c25f4a675cb1c50298b644bcdb541dca" offset="00000" status="baddump" />
+				<rom name="columbus - ougon no yoake (japan).chr" size="131072" crc="952e6d87" sha1="56c02904c25f4a675cb1c50298b644bcdb541dca" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="columbus - ougon no yoake (japan).prg" size="131072" crc="6c5dbedf" sha1="826629943ea71c7a4a38bd2e4d94f8d942214aff" offset="00000" status="baddump" />
+				<rom name="columbus - ougon no yoake (japan).prg" size="131072" crc="6c5dbedf" sha1="826629943ea71c7a4a38bd2e4d94f8d942214aff" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -45962,10 +45962,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="cosmo police galivan (japan).chr" size="131072" crc="cc78b77a" sha1="78d61fd1f9009f9ee7b3cf7def996e8601dbce0a" offset="00000" status="baddump" />
+				<rom name="cosmo police galivan (japan).chr" size="131072" crc="cc78b77a" sha1="78d61fd1f9009f9ee7b3cf7def996e8601dbce0a" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="cosmo police galivan (japan).prg" size="131072" crc="720fff06" sha1="03d6d18ea4e7d3ac087dc51e7aba4ca4730714cf" offset="00000" status="baddump" />
+				<rom name="cosmo police galivan (japan).prg" size="131072" crc="720fff06" sha1="03d6d18ea4e7d3ac087dc51e7aba4ca4730714cf" offset="00000" />
 			</dataarea>
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
@@ -46005,10 +46005,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="cross fire (japan).chr" size="131072" crc="ab0ca893" sha1="b8f1753eaf406b8820f59434c180b4c9c7a33d50" offset="00000" status="baddump" />
+				<rom name="cross fire (japan).chr" size="131072" crc="ab0ca893" sha1="b8f1753eaf406b8820f59434c180b4c9c7a33d50" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="cross fire (japan).prg" size="131072" crc="fa918f22" sha1="d8783e3a82a2a088de53ef7d71985eaa2a003bb4" offset="00000" status="baddump" />
+				<rom name="cross fire (japan).prg" size="131072" crc="fa918f22" sha1="d8783e3a82a2a088de53ef7d71985eaa2a003bb4" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46098,10 +46098,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="dark lord (japan).chr" size="131072" crc="4d446988" sha1="9de574b80ce3616056fd5c4b0a996d36756cbe18" offset="00000" status="baddump" />
+				<rom name="dark lord (japan).chr" size="131072" crc="4d446988" sha1="9de574b80ce3616056fd5c4b0a996d36756cbe18" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="dark lord (japan).prg" size="262144" crc="a4a4f4bf" sha1="7b32b6379645727b335311fe8085dd9aea63b59e" offset="00000" status="baddump" />
+				<rom name="dark lord (japan).prg" size="262144" crc="a4a4f4bf" sha1="7b32b6379645727b335311fe8085dd9aea63b59e" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -46122,10 +46122,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
-				<rom name="deblock (japan).chr" size="32768" crc="4c1673b3" sha1="2e9568fb12deb80436763119e87e4de5fef01ac1" offset="00000" status="baddump" />
+				<rom name="deblock (japan).chr" size="32768" crc="4c1673b3" sha1="2e9568fb12deb80436763119e87e4de5fef01ac1" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="deblock (japan).prg" size="32768" crc="54531910" sha1="bac6835910bcaecc45ba996683244f302784f463" offset="00000" status="baddump" />
+				<rom name="deblock (japan).prg" size="32768" crc="54531910" sha1="bac6835910bcaecc45ba996683244f302784f463" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46173,10 +46173,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="dengeki - big bang (japan).chr" size="131072" crc="a7051864" sha1="bab7982ccd43b62897b5a3d079bbea7fead0ddc3" offset="00000" status="baddump" />
+				<rom name="dengeki - big bang (japan).chr" size="131072" crc="a7051864" sha1="bab7982ccd43b62897b5a3d079bbea7fead0ddc3" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="dengeki - big bang (japan).prg" size="131072" crc="9183054e" sha1="ef0d3e6a8b68b96c08528d0d8c9b6a0aadc54237" offset="00000" status="baddump" />
+				<rom name="dengeki - big bang (japan).prg" size="131072" crc="9183054e" sha1="ef0d3e6a8b68b96c08528d0d8c9b6a0aadc54237" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46209,7 +46209,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="die hard (japan).prg" size="131072" crc="8ed0547e" sha1="c73bc77756a1ccdd3b308540310d582f6cac15ac" offset="00000" status="baddump" />
+				<rom name="die hard (japan).prg" size="131072" crc="8ed0547e" sha1="c73bc77756a1ccdd3b308540310d582f6cac15ac" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-57-0 chr" size="131072" crc="0d4d1547" sha1="2d3bbe7d2e5915d2d8c858348871defba12665ad" offset="00000" />
@@ -46261,7 +46261,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="donkey kong jr. (japan).prg" size="16384" crc="1053136e" sha1="fe1514c5b5c9555cdb76718245ebe533b7262126" offset="00000" status="baddump" />
+				<rom name="donkey kong jr. (japan).prg" size="16384" crc="1053136e" sha1="fe1514c5b5c9555cdb76718245ebe533b7262126" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
@@ -46402,7 +46402,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="524288">
-				<rom name="dragon quest iv - michibikareshi monotachi (japan).prg" size="524288" crc="2dd71acb" sha1="a9b21967e5cc71b8c7de63852a6d06fa7cbc4ec1" offset="00000" status="baddump" />
+				<rom name="dragon quest iv - michibikareshi monotachi (japan).prg" size="524288" crc="2dd71acb" sha1="a9b21967e5cc71b8c7de63852a6d06fa7cbc4ec1" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -46445,10 +46445,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="dragon wars (japan).chr" size="131072" crc="f549e6f6" sha1="43c40222fa27e0612b1a2f8ec6f57afd643d18b4" offset="00000" status="baddump" />
+				<rom name="dragon wars (japan).chr" size="131072" crc="f549e6f6" sha1="43c40222fa27e0612b1a2f8ec6f57afd643d18b4" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="dragon wars (japan).prg" size="262144" crc="615d0a50" sha1="a56fe4ae5ec14e65acfd8223885b7781c1a74b39" offset="00000" status="baddump" />
+				<rom name="dragon wars (japan).prg" size="262144" crc="615d0a50" sha1="a56fe4ae5ec14e65acfd8223885b7781c1a74b39" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -46488,10 +46488,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="dragon's lair (japan).chr" size="131072" crc="849921c4" sha1="4a6960af4efcb8ec2fb1ef86f5c598907781c99f" offset="00000" status="baddump" />
+				<rom name="dragon's lair (japan).chr" size="131072" crc="849921c4" sha1="4a6960af4efcb8ec2fb1ef86f5c598907781c99f" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="dragon's lair (japan).prg" size="131072" crc="98aa7cab" sha1="b6169e1e2bda5c530096a0a902f83b7ff6592f2d" offset="00000" status="baddump" />
+				<rom name="dragon's lair (japan).prg" size="131072" crc="98aa7cab" sha1="b6169e1e2bda5c530096a0a902f83b7ff6592f2d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46506,7 +46506,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="CAMERICA-BF9093" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="dreamworld pogie (prototype).prg" size="131072" crc="63d38b86" sha1="2a5c1d05518a1ae1a13bde19c904c8bdb772fbf8" offset="00000" status="baddump"/>
+				<rom name="dreamworld pogie (prototype).prg" size="131072" crc="63d38b86" sha1="2a5c1d05518a1ae1a13bde19c904c8bdb772fbf8" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -46560,10 +46560,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
-				<rom name="dynamite bowl (japan).chr" size="32768" crc="ff39fc7d" sha1="9bd8d768580143c982554f72cb8f5df0587eb52b" offset="00000" status="baddump" />
+				<rom name="dynamite bowl (japan).chr" size="32768" crc="ff39fc7d" sha1="9bd8d768580143c982554f72cb8f5df0587eb52b" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="dynamite bowl (japan).prg" size="32768" crc="42b36609" sha1="99d8258f1610d9daea4672dcfd9d6f36d319fb9f" offset="00000" status="baddump" />
+				<rom name="dynamite bowl (japan).prg" size="32768" crc="42b36609" sha1="99d8258f1610d9daea4672dcfd9d6f36d319fb9f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46672,10 +46672,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="exciting rally - world rally championship (japan).chr" size="131072" crc="37aff978" sha1="05e3d9f90d7b3f125826dbfa9f14fc870580e214" offset="00000" status="baddump" />
+				<rom name="exciting rally - world rally championship (japan).chr" size="131072" crc="37aff978" sha1="05e3d9f90d7b3f125826dbfa9f14fc870580e214" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="exciting rally - world rally championship (japan).prg" size="131072" crc="46752bc8" sha1="0ac0c6af7e957ee68f97176da3e17169fe8c0e37" offset="00000" status="baddump" />
+				<rom name="exciting rally - world rally championship (japan).prg" size="131072" crc="46752bc8" sha1="0ac0c6af7e957ee68f97176da3e17169fe8c0e37" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46710,10 +46710,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="f-1 sensation (japan).chr" size="131072" crc="67853884" sha1="4a170b3dcf365badd2bea6984d0be84651459348" offset="00000" status="baddump" />
+				<rom name="f-1 sensation (japan).chr" size="131072" crc="67853884" sha1="4a170b3dcf365badd2bea6984d0be84651459348" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="f-1 sensation (japan).prg" size="131072" crc="cb106f49" sha1="f4c359b97b0df2aa2942b141ee9d0a9dd7d28e3d" offset="00000" status="baddump" />
+				<rom name="f-1 sensation (japan).prg" size="131072" crc="cb106f49" sha1="f4c359b97b0df2aa2942b141ee9d0a9dd7d28e3d" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -46732,10 +46732,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="famicom doubutsu seitai zukan - katte ni shirokuma - mori o sukue no maki (japan).chr" size="131072" crc="f650077a" sha1="1390b30fec4df3841f7331874987125af7d97488" offset="00000" status="baddump" />
+				<rom name="famicom doubutsu seitai zukan - katte ni shirokuma - mori o sukue no maki (japan).chr" size="131072" crc="f650077a" sha1="1390b30fec4df3841f7331874987125af7d97488" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="famicom doubutsu seitai zukan - katte ni shirokuma - mori o sukue no maki (japan).prg" size="131072" crc="d8e641a3" sha1="b765a147ed2255ff507bf6ba7ed9aed0410d2c7d" offset="00000" status="baddump" />
+				<rom name="famicom doubutsu seitai zukan - katte ni shirokuma - mori o sukue no maki (japan).prg" size="131072" crc="d8e641a3" sha1="b765a147ed2255ff507bf6ba7ed9aed0410d2c7d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46751,10 +46751,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="32768">
-				<rom name="famicom igo nyuumon (japan).chr" size="32768" crc="5d1ed6e0" sha1="0dc665c26137c9de5c294eb806d27664facc7350" offset="00000" status="baddump" />
+				<rom name="famicom igo nyuumon (japan).chr" size="32768" crc="5d1ed6e0" sha1="0dc665c26137c9de5c294eb806d27664facc7350" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="famicom igo nyuumon (japan).prg" size="131072" crc="831f8294" sha1="01bad3a8c278c2f9aee8a561a917dd61883a2069" offset="00000" status="baddump" />
+				<rom name="famicom igo nyuumon (japan).prg" size="131072" crc="831f8294" sha1="01bad3a8c278c2f9aee8a561a917dd61883a2069" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -46794,10 +46794,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="peripheral" value="turbofile" />
 			<dataarea name="chr" size="131072">
-				<rom name="famicom shougi - ryuuousen (japan).chr" size="131072" crc="30989ad9" sha1="6d96e346713547af01adea39751327f8b924e41d" offset="00000" status="baddump" />
+				<rom name="famicom shougi - ryuuousen (japan).chr" size="131072" crc="30989ad9" sha1="6d96e346713547af01adea39751327f8b924e41d" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="famicom shougi - ryuuousen (japan).prg" size="131072" crc="3b05ac54" sha1="f47a38046bf3d9e319d3031898dc920fecf493cd" offset="00000" status="baddump" />
+				<rom name="famicom shougi - ryuuousen (japan).prg" size="131072" crc="3b05ac54" sha1="f47a38046bf3d9e319d3031898dc920fecf493cd" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -46841,7 +46841,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="family school (japan).prg" size="262144" crc="f568a7a4" sha1="ca9257c01f6e190f7ae7998a3c1c681903ee0530" offset="00000" status="baddump" />
+				<rom name="family school (japan).prg" size="262144" crc="f568a7a4" sha1="ca9257c01f6e190f7ae7998a3c1c681903ee0530" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -46962,7 +46962,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
-				<rom name="flying hero (japan).prg" size="131072" crc="f6751d3d" sha1="590b5fb7456d4164ccc4d73eba98dc3ef589dbad" offset="00000" status="baddump" />
+				<rom name="flying hero (japan).prg" size="131072" crc="f6751d3d" sha1="590b5fb7456d4164ccc4d73eba98dc3ef589dbad" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47017,10 +47017,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="fushigi na blobby - blobania no kiki (japan).chr" size="131072" crc="ece05a7b" sha1="68d6a7d5601df1be6ab2c3059dc96b50392c513c" offset="00000" status="baddump" />
+				<rom name="fushigi na blobby - blobania no kiki (japan).chr" size="131072" crc="ece05a7b" sha1="68d6a7d5601df1be6ab2c3059dc96b50392c513c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="fushigi na blobby - blobania no kiki (japan).prg" size="131072" crc="53991500" sha1="5f9c509ca53eb5f1bd78839dbf5a3dc46ec9d17a" offset="00000" status="baddump" />
+				<rom name="fushigi na blobby - blobania no kiki (japan).prg" size="131072" crc="53991500" sha1="5f9c509ca53eb5f1bd78839dbf5a3dc46ec9d17a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47036,10 +47036,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="fushigi no umi no nadia (japan).chr" size="131072" crc="66eb0611" sha1="7ecd79884bf0047d757496cf42ef5101c3af8be5" offset="00000" status="baddump" />
+				<rom name="fushigi no umi no nadia (japan).chr" size="131072" crc="66eb0611" sha1="7ecd79884bf0047d757496cf42ef5101c3af8be5" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="fushigi no umi no nadia (japan).prg" size="131072" crc="3cdea85b" sha1="601172b40269c8142aea735d131f0ee6710be3a1" offset="00000" status="baddump" />
+				<rom name="fushigi no umi no nadia (japan).prg" size="131072" crc="3cdea85b" sha1="601172b40269c8142aea735d131f0ee6710be3a1" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -47115,10 +47115,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="game party (japan).chr" size="131072" crc="65a95b5d" sha1="1170c4ff95e8d0a443a4a7f51ad1c632cfd88671" offset="00000" status="baddump" />
+				<rom name="game party (japan).chr" size="131072" crc="65a95b5d" sha1="1170c4ff95e8d0a443a4a7f51ad1c632cfd88671" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="game party (japan).prg" size="131072" crc="0905e0d5" sha1="3d970d5ef9f430da0375fb58b067d70a23de6fb3" offset="00000" status="baddump" />
+				<rom name="game party (japan).prg" size="131072" crc="0905e0d5" sha1="3d970d5ef9f430da0375fb58b067d70a23de6fb3" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47166,10 +47166,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="32768">
-				<rom name="garfield - a week of garfield (japan).chr" size="32768" crc="34800c4e" sha1="e1479e58aac0c944198798bc34f0659485024242" offset="00000" status="baddump" />
+				<rom name="garfield - a week of garfield (japan).chr" size="32768" crc="34800c4e" sha1="e1479e58aac0c944198798bc34f0659485024242" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="garfield - a week of garfield (japan).prg" size="131072" crc="f7de03e0" sha1="6f65d605b3f6130d21d716ed475fe228bbd34a3d" offset="00000" status="baddump" />
+				<rom name="garfield - a week of garfield (japan).prg" size="131072" crc="f7de03e0" sha1="6f65d605b3f6130d21d716ed475fe228bbd34a3d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47282,10 +47282,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="god slayer - haruka tenkuu no sonata (japan).chr" size="131072" crc="da0003d7" sha1="01d49e3450077acfa29c21679951e13d93577344" offset="00000" status="baddump" />
+				<rom name="god slayer - haruka tenkuu no sonata (japan).chr" size="131072" crc="da0003d7" sha1="01d49e3450077acfa29c21679951e13d93577344" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="god slayer - haruka tenkuu no sonata (japan).prg" size="262144" crc="c17ae2dc" sha1="3da15f3afe11a5266708d60a589b791ae2884e61" offset="00000" status="baddump" />
+				<rom name="god slayer - haruka tenkuu no sonata (japan).prg" size="262144" crc="c17ae2dc" sha1="3da15f3afe11a5266708d60a589b791ae2884e61" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -47323,7 +47323,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="peripheral" value="partytap" />
 			<dataarea name="prg" size="524288">
-				<rom name="gorilla man, the (japan).prg" size="524288" crc="9fd718fd" sha1="d477320dc99b294b5d26995f1527eca0233f2f46" offset="00000" status="baddump" />
+				<rom name="gorilla man, the (japan).prg" size="524288" crc="9fd718fd" sha1="d477320dc99b294b5d26995f1527eca0233f2f46" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47359,10 +47359,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="grand master (japan).chr" size="131072" crc="7636fb3b" sha1="d8f51f40ef9e7bc34d6045b3b1646d77c1d172ea" offset="00000" status="baddump" />
+				<rom name="grand master (japan).chr" size="131072" crc="7636fb3b" sha1="d8f51f40ef9e7bc34d6045b3b1646d77c1d172ea" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="grand master (japan).prg" size="262144" crc="5b11eb85" sha1="d664e1fc580fd03c180dbc402fd5faa87396804d" offset="00000" status="baddump" />
+				<rom name="grand master (japan).prg" size="262144" crc="5b11eb85" sha1="d664e1fc580fd03c180dbc402fd5faa87396804d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47378,7 +47378,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="great deal (japan).prg" size="131072" crc="bcf68611" sha1="d5c89cd8775808c8a85037bc34328bc457e0e696" offset="00000" status="baddump" />
+				<rom name="great deal (japan).prg" size="131072" crc="bcf68611" sha1="d5c89cd8775808c8a85037bc34328bc457e0e696" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47429,10 +47429,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="gun-dec (japan).chr" size="131072" crc="68e02d5a" sha1="e4539dce066221027719839f106c7062a42fd2e7" offset="00000" status="baddump" />
+				<rom name="gun-dec (japan).chr" size="131072" crc="68e02d5a" sha1="e4539dce066221027719839f106c7062a42fd2e7" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="gun-dec (japan).prg" size="131072" crc="14a01c70" sha1="ebd791cd948d6da3bb4d2cc31dad300497ade52c" offset="00000" status="baddump" />
+				<rom name="gun-dec (japan).prg" size="131072" crc="14a01c70" sha1="ebd791cd948d6da3bb4d2cc31dad300497ade52c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47593,10 +47593,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="hook (japan).chr" size="131072" crc="a2a75823" sha1="66c68b4f87a76b3b1eddbc068e9d5270d6d32cca" offset="00000" status="baddump" />
+				<rom name="hook (japan).chr" size="131072" crc="a2a75823" sha1="66c68b4f87a76b3b1eddbc068e9d5270d6d32cca" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="hook (japan).prg" size="131072" crc="db511963" sha1="1149d6413bcd2a68c7255311bec853546237a8e9" offset="00000" status="baddump" />
+				<rom name="hook (japan).prg" size="131072" crc="db511963" sha1="1149d6413bcd2a68c7255311bec853546237a8e9" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47629,10 +47629,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="hudson hawk (japan).chr" size="131072" crc="c0741c64" sha1="2734f0a79b8fdc25af669366ced0d0e3f56417c2" offset="00000" status="baddump" />
+				<rom name="hudson hawk (japan).chr" size="131072" crc="c0741c64" sha1="2734f0a79b8fdc25af669366ced0d0e3f56417c2" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="hudson hawk (japan).prg" size="131072" crc="c6cc7417" sha1="a66b4a518c1e1b3c9ce0d26b2431127c3dc96680" offset="00000" status="baddump" />
+				<rom name="hudson hawk (japan).prg" size="131072" crc="c6cc7417" sha1="a66b4a518c1e1b3c9ce0d26b2431127c3dc96680" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47664,10 +47664,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="hyaku no sekai no monogatari - the tales on a watery wilderness (japan).chr" size="131072" crc="f231ddc9" sha1="f25cf11ae4b206826676ef4aa1437bd4cbd2b823" offset="00000" status="baddump" />
+				<rom name="hyaku no sekai no monogatari - the tales on a watery wilderness (japan).chr" size="131072" crc="f231ddc9" sha1="f25cf11ae4b206826676ef4aa1437bd4cbd2b823" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="hyaku no sekai no monogatari - the tales on a watery wilderness (japan).prg" size="131072" crc="60d88631" sha1="9873d846631998475fc5b55b54d142789c5a123d" offset="00000" status="baddump" />
+				<rom name="hyaku no sekai no monogatari - the tales on a watery wilderness (japan).prg" size="131072" crc="60d88631" sha1="9873d846631998475fc5b55b54d142789c5a123d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47683,10 +47683,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="i love softball (japan).chr" size="131072" crc="0f8a0d4d" sha1="6a57ce8ebe204e0398cf359494809e29b5614731" offset="00000" status="baddump" />
+				<rom name="i love softball (japan).chr" size="131072" crc="0f8a0d4d" sha1="6a57ce8ebe204e0398cf359494809e29b5614731" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="i love softball (japan).prg" size="131072" crc="1dea55eb" sha1="f67e8e7582446e9a2a8915b006d0f631c54bb438" offset="00000" status="baddump" />
+				<rom name="i love softball (japan).prg" size="131072" crc="1dea55eb" sha1="f67e8e7582446e9a2a8915b006d0f631c54bb438" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47702,10 +47702,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
 			<dataarea name="chr" size="8192">
-				<rom name="igo meikan (japan).chr" size="8192" crc="4201e877" sha1="98ae2abf2dfb557bbb783c0c7f40172f318a7bea" offset="00000" status="baddump" />
+				<rom name="igo meikan (japan).chr" size="8192" crc="4201e877" sha1="98ae2abf2dfb557bbb783c0c7f40172f318a7bea" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="igo meikan (japan).prg" size="32768" crc="ae43592d" sha1="c4cac6b526cb9a59b48eb5e30a94688058d7902d" offset="00000" status="baddump" />
+				<rom name="igo meikan (japan).prg" size="32768" crc="ae43592d" sha1="c4cac6b526cb9a59b48eb5e30a94688058d7902d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47721,10 +47721,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="32768">
-				<rom name="igo shinan '92 (japan).chr" size="32768" crc="55e9da78" sha1="366bf80043a98519762d28d3ab51ec378b3cdf6a" offset="00000" status="baddump" />
+				<rom name="igo shinan '92 (japan).chr" size="32768" crc="55e9da78" sha1="366bf80043a98519762d28d3ab51ec378b3cdf6a" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="igo shinan '92 (japan).prg" size="131072" crc="0b561ad2" sha1="be5e84634d2a326db2fa8e7d9946024d3eb4e469" offset="00000" status="baddump" />
+				<rom name="igo shinan '92 (japan).prg" size="131072" crc="0b561ad2" sha1="be5e84634d2a326db2fa8e7d9946024d3eb4e469" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47740,10 +47740,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="32768">
-				<rom name="igo shinan '93 (japan).chr" size="32768" crc="30af69f7" sha1="420c0909f4b9c04a23f6c407cc354ca08108e959" offset="00000" status="baddump" />
+				<rom name="igo shinan '93 (japan).chr" size="32768" crc="30af69f7" sha1="420c0909f4b9c04a23f6c407cc354ca08108e959" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="igo shinan '93 (japan).prg" size="131072" crc="e1acc990" sha1="b28d8c6f2a707b02462936ddd3c887873b57acdf" offset="00000" status="baddump" />
+				<rom name="igo shinan '93 (japan).prg" size="131072" crc="e1acc990" sha1="b28d8c6f2a707b02462936ddd3c887873b57acdf" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47759,10 +47759,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="32768">
-				<rom name="igo shinan '94 (japan).chr" size="32768" crc="55540dc7" sha1="a15c1b46d56b401b52112dffe0bfa0985319015a" offset="00000" status="baddump" />
+				<rom name="igo shinan '94 (japan).chr" size="32768" crc="55540dc7" sha1="a15c1b46d56b401b52112dffe0bfa0985319015a" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="igo shinan '94 (japan).prg" size="131072" crc="6c3ca47b" sha1="70124381e2e8132e45b103d6651391e25e7ef813" offset="00000" status="baddump" />
+				<rom name="igo shinan '94 (japan).prg" size="131072" crc="6c3ca47b" sha1="70124381e2e8132e45b103d6651391e25e7ef813" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47778,10 +47778,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
 			<dataarea name="chr" size="8192">
-				<rom name="igo shinan (japan).chr" size="8192" crc="1d2cd323" sha1="7e64a6dea791d2b6eaf71113cf31b859b6fa99f9" offset="00000" status="baddump" />
+				<rom name="igo shinan (japan).chr" size="8192" crc="1d2cd323" sha1="7e64a6dea791d2b6eaf71113cf31b859b6fa99f9" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="igo shinan (japan).prg" size="32768" crc="17b49292" sha1="b1c27f03a74a7108e9a62a0121f25b36ff1177b0" offset="00000" status="baddump" />
+				<rom name="igo shinan (japan).prg" size="32768" crc="17b49292" sha1="b1c27f03a74a7108e9a62a0121f25b36ff1177b0" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47797,7 +47797,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="ikari ii - dogosoken (japan).prg" size="262144" crc="d2bc86f3" sha1="66d6d30c691b81df9e3537d605fdc418bad6ea93" offset="00000" status="baddump" />
+				<rom name="ikari ii - dogosoken (japan).prg" size="262144" crc="d2bc86f3" sha1="66d6d30c691b81df9e3537d605fdc418bad6ea93" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47816,10 +47816,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="ikari iii (japan).chr" size="131072" crc="9ecd0b51" sha1="8c4e75cb734ebacb853ad37cadfff680f1a7b0df" offset="00000" status="baddump" />
+				<rom name="ikari iii (japan).chr" size="131072" crc="9ecd0b51" sha1="8c4e75cb734ebacb853ad37cadfff680f1a7b0df" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="ikari iii (japan).prg" size="131072" crc="272e96a6" sha1="2ff3e0e41f797dd4d693023061c0a2c08f3a6b61" offset="00000" status="baddump" />
+				<rom name="ikari iii (japan).prg" size="131072" crc="272e96a6" sha1="2ff3e0e41f797dd4d693023061c0a2c08f3a6b61" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47852,10 +47852,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="j.league fighting soccer - the king of ace strikers (japan).chr" size="131072" crc="abb8e92e" sha1="8d8eb15fd2452d65b5fcbe8673c92bba342df8e5" offset="00000" status="baddump" />
+				<rom name="j.league fighting soccer - the king of ace strikers (japan).chr" size="131072" crc="abb8e92e" sha1="8d8eb15fd2452d65b5fcbe8673c92bba342df8e5" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="j.league fighting soccer - the king of ace strikers (japan).prg" size="131072" crc="1f2f4861" sha1="74000b4f3363527f7023202211632974157097e6" offset="00000" status="baddump" />
+				<rom name="j.league fighting soccer - the king of ace strikers (japan).prg" size="131072" crc="1f2f4861" sha1="74000b4f3363527f7023202211632974157097e6" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -47897,7 +47897,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="jangou (japan).prg" size="262144" crc="0973f714" sha1="304f98ae79cbc933ef23ad419c5e518af1006669" offset="00000" status="baddump" />
+				<rom name="jangou (japan).prg" size="262144" crc="0973f714" sha1="304f98ae79cbc933ef23ad419c5e518af1006669" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47957,10 +47957,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="chr" size="8192">
-				<rom name="joust (japan).chr" size="8192" crc="a7d11bbb" sha1="18b81e218900de0847b28217ba62bbee59cd9665" offset="00000" status="baddump" />
+				<rom name="joust (japan).chr" size="8192" crc="a7d11bbb" sha1="18b81e218900de0847b28217ba62bbee59cd9665" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="joust (japan).prg" size="16384" crc="1dac6e97" sha1="b5afe483751cfed58e415f3f80c5ecb8855b7a79" offset="00000" status="baddump" />
+				<rom name="joust (japan).prg" size="16384" crc="1dac6e97" sha1="b5afe483751cfed58e415f3f80c5ecb8855b7a79" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -47977,10 +47977,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="juuouki (japan).chr" size="131072" crc="07208c33" sha1="c2e5d66ff6d5e1e0adde3ed97f77871e9cd0ebac" offset="00000" status="baddump" />
+				<rom name="juuouki (japan).chr" size="131072" crc="07208c33" sha1="c2e5d66ff6d5e1e0adde3ed97f77871e9cd0ebac" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="juuouki (japan).prg" size="131072" crc="c420552f" sha1="ac6b1d4de3c896807a5c9e8dc98cf8bc4c8724db" offset="00000" status="baddump" />
+				<rom name="juuouki (japan).prg" size="131072" crc="c420552f" sha1="ac6b1d4de3c896807a5c9e8dc98cf8bc4c8724db" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48022,7 +48022,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="kabushiki doujou (japan).prg" size="262144" crc="7172f3d4" sha1="6f3bda5fae9b6ed4ea4572307da8c0ce13ecec47" offset="00000" status="baddump" />
+				<rom name="kabushiki doujou (japan).prg" size="262144" crc="7172f3d4" sha1="6f3bda5fae9b6ed4ea4572307da8c0ce13ecec47" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48045,10 +48045,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="kamen no ninja - hanamaru (japan).chr" size="131072" crc="450e7692" sha1="859494ead67a0edf51f1ad9f7eb764c857663546" offset="00000" status="baddump" />
+				<rom name="kamen no ninja - hanamaru (japan).chr" size="131072" crc="450e7692" sha1="859494ead67a0edf51f1ad9f7eb764c857663546" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="kamen no ninja - hanamaru (japan).prg" size="131072" crc="cce0cc10" sha1="4f2370f4bbe5ad75e3b2e971ec76697bea8e6596" offset="00000" status="baddump" />
+				<rom name="kamen no ninja - hanamaru (japan).prg" size="131072" crc="cce0cc10" sha1="4f2370f4bbe5ad75e3b2e971ec76697bea8e6596" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48121,10 +48121,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="kawa no nushi tsuri (japan).chr" size="131072" crc="6d560ad9" sha1="84576222b1c8f118d453291d20cdc081e118e817" offset="00000" status="baddump" />
+				<rom name="kawa no nushi tsuri (japan).chr" size="131072" crc="6d560ad9" sha1="84576222b1c8f118d453291d20cdc081e118e817" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="kawa no nushi tsuri (japan).prg" size="131072" crc="d88293fa" sha1="c24c45e71709815e1925f573af7492757deac7b3" offset="00000" status="baddump" />
+				<rom name="kawa no nushi tsuri (japan).prg" size="131072" crc="d88293fa" sha1="c24c45e71709815e1925f573af7492757deac7b3" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48140,10 +48140,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="kero kero keroppi no daibouken 2 - donuts ike wa oosawagi (japan).chr" size="131072" crc="21b3aa9d" sha1="53ad9cf7b356ef04b76585bb20be705f97c89547" offset="00000" status="baddump" />
+				<rom name="kero kero keroppi no daibouken 2 - donuts ike wa oosawagi (japan).chr" size="131072" crc="21b3aa9d" sha1="53ad9cf7b356ef04b76585bb20be705f97c89547" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="kero kero keroppi no daibouken 2 - donuts ike wa oosawagi (japan).prg" size="131072" crc="0d44bacc" sha1="ba34b97d3cf7acd6fcd1c0f6e9ee29e2f828cd2d" offset="00000" status="baddump" />
+				<rom name="kero kero keroppi no daibouken 2 - donuts ike wa oosawagi (japan).prg" size="131072" crc="0d44bacc" sha1="ba34b97d3cf7acd6fcd1c0f6e9ee29e2f828cd2d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48228,7 +48228,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="knight rider (japan).chr" size="131072" crc="7dde11ec" sha1="7fed61552f8af80c9891e457441ebcaa94b461d2" offset="00000" status="baddump" />
+				<rom name="knight rider (japan).chr" size="131072" crc="7dde11ec" sha1="7fed61552f8af80c9891e457441ebcaa94b461d2" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="knight rider (japan).prg" size="65536" crc="4d2edf70" sha1="7938358a96636de678d465ee7d77ebca3a6474a2" offset="00000" status="baddump" />
@@ -48275,10 +48275,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="kouryuu densetsu villgust gaiden (japan).chr" size="262144" crc="1fb3ba8e" sha1="8be529fb21aa5706ab7aaac5f7fff212e232caa7" offset="00000" status="baddump" />
+				<rom name="kouryuu densetsu villgust gaiden (japan).chr" size="262144" crc="1fb3ba8e" sha1="8be529fb21aa5706ab7aaac5f7fff212e232caa7" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="kouryuu densetsu villgust gaiden (japan).prg" size="131072" crc="294299ef" sha1="8f41f6daaf925592c7610a04ae057dbd467fdaf0" offset="00000" status="baddump" />
+				<rom name="kouryuu densetsu villgust gaiden (japan).prg" size="131072" crc="294299ef" sha1="8f41f6daaf925592c7610a04ae057dbd467fdaf0" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -48299,7 +48299,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="kyoro-chan land (japan).prg" size="131072" crc="5229fcdd" sha1="f0d4a36b8bac7ed47978ce9c8a308ae0abf0e768" offset="00000" status="baddump" />
+				<rom name="kyoro-chan land (japan).prg" size="131072" crc="5229fcdd" sha1="f0d4a36b8bac7ed47978ce9c8a308ae0abf0e768" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48318,10 +48318,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="kyouryuu sentai juuranger (japan).chr" size="131072" crc="5e59ec92" sha1="d4181e4f07b7e9caa82c15b152d69f31e1b994c1" offset="00000" status="baddump" />
+				<rom name="kyouryuu sentai juuranger (japan).chr" size="131072" crc="5e59ec92" sha1="d4181e4f07b7e9caa82c15b152d69f31e1b994c1" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="kyouryuu sentai juuranger (japan).prg" size="131072" crc="817cfa97" sha1="08bd5a50fcd62d8d6833381c458155ffd321d2a1" offset="00000" status="baddump" />
+				<rom name="kyouryuu sentai juuranger (japan).prg" size="131072" crc="817cfa97" sha1="08bd5a50fcd62d8d6833381c458155ffd321d2a1" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48420,10 +48420,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="magic candle, the (japan).chr" size="131072" crc="b619b563" sha1="f70af64c527c972d6eacf462140f532c37baeb3f" offset="00000" status="baddump" />
+				<rom name="magic candle, the (japan).chr" size="131072" crc="b619b563" sha1="f70af64c527c972d6eacf462140f532c37baeb3f" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="magic candle, the (japan).prg" size="262144" crc="f89170c5" sha1="b326fe1f8eb67f86a1946cceec5bc1c3b8a4c9e5" offset="00000" status="baddump" />
+				<rom name="magic candle, the (japan).prg" size="262144" crc="f89170c5" sha1="b326fe1f8eb67f86a1946cceec5bc1c3b8a4c9e5" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -48443,10 +48443,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="magical doropie (japan).chr" size="131072" crc="b2f9ddf5" sha1="a75b62ee24631b8b76affee6da0fe387dd217b82" offset="00000" status="baddump" />
+				<rom name="magical doropie (japan).chr" size="131072" crc="b2f9ddf5" sha1="a75b62ee24631b8b76affee6da0fe387dd217b82" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="magical doropie (japan).prg" size="131072" crc="0154c43f" sha1="e528a2a2b20dcdc6f9e303519c6cefc36713fb61" offset="00000" status="baddump" />
+				<rom name="magical doropie (japan).prg" size="131072" crc="0154c43f" sha1="e528a2a2b20dcdc6f9e303519c6cefc36713fb61" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48500,7 +48500,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="magnum kiki ippatsu - empire city - 1931 (japan).prg" size="131072" crc="8e7abdfc" sha1="c8d644b58d442651748ad81b5552c5e890c10a58" offset="00000" status="baddump" />
+				<rom name="magnum kiki ippatsu - empire city - 1931 (japan).prg" size="131072" crc="8e7abdfc" sha1="c8d644b58d442651748ad81b5552c5e890c10a58" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48520,11 +48520,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-RROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="mahjong (japan).prg" size="16384" crc="32921d8c" sha1="897e8ba18769ce53852f33d9ad3fd349ba26c184" offset="00000" status="baddump" />
+				<rom name="mahjong (japan).prg" size="16384" crc="32921d8c" sha1="897e8ba18769ce53852f33d9ad3fd349ba26c184" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="mahjong (japan).chr" size="8192" crc="e1e96e97" sha1="1dd83c4f5971bde5d2ee33d1232312b1213184b2" offset="00000" status="baddump" />
+				<rom name="mahjong (japan).chr" size="8192" crc="e1e96e97" sha1="1dd83c4f5971bde5d2ee33d1232312b1213184b2" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48540,10 +48540,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="majaventure - mahjong senki (japan).chr" size="131072" crc="172d114b" sha1="99689c3b4f478e1df10a9679bc7594401d23ec4e" offset="00000" status="baddump" />
+				<rom name="majaventure - mahjong senki (japan).chr" size="131072" crc="172d114b" sha1="99689c3b4f478e1df10a9679bc7594401d23ec4e" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="majaventure - mahjong senki (japan).prg" size="131072" crc="09efe54b" sha1="77dfa41f1eedbbaabf90df63170c425e96612e45" offset="00000" status="baddump" />
+				<rom name="majaventure - mahjong senki (japan).prg" size="131072" crc="09efe54b" sha1="77dfa41f1eedbbaabf90df63170c425e96612e45" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48652,7 +48652,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="524288">
-				<rom name="masuzoe youichi - asa made famicom (japan).prg" size="524288" crc="98a97a59" sha1="e8649d3005291b73723e3a9e1ba3d60a848007cc" offset="00000" status="baddump" />
+				<rom name="masuzoe youichi - asa made famicom (japan).prg" size="524288" crc="98a97a59" sha1="e8649d3005291b73723e3a9e1ba3d60a848007cc" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48671,10 +48671,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="max warrior - wakusei kaigenrei (japan).chr" size="131072" crc="2fe7e5d3" sha1="75fe44b3815cf2b264545d305a120828d1c2f6dc" offset="00000" status="baddump" />
+				<rom name="max warrior - wakusei kaigenrei (japan).chr" size="131072" crc="2fe7e5d3" sha1="75fe44b3815cf2b264545d305a120828d1c2f6dc" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="max warrior - wakusei kaigenrei (japan).prg" size="131072" crc="6f96ed15" sha1="20218924cfaeb903632445f4eed26e1cfc54b9ce" offset="00000" status="baddump" />
+				<rom name="max warrior - wakusei kaigenrei (japan).prg" size="131072" crc="6f96ed15" sha1="20218924cfaeb903632445f4eed26e1cfc54b9ce" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48754,7 +48754,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="meiji ishin (japan).prg" size="262144" crc="66dd04e1" sha1="a3e5b8d3fa1030dd3b877e7a37e8f803bdbb48b5" offset="00000" status="baddump" />
+				<rom name="meiji ishin (japan).prg" size="262144" crc="66dd04e1" sha1="a3e5b8d3fa1030dd3b877e7a37e8f803bdbb48b5" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48777,7 +48777,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="meitantei holmes - kiri no london satsujin jiken (japan).prg" size="262144" crc="1a7e97ed" sha1="3070ae548a4cf11be2b21f1c05746e186b29c7a7" offset="00000" status="baddump" />
+				<rom name="meitantei holmes - kiri no london satsujin jiken (japan).prg" size="262144" crc="1a7e97ed" sha1="3070ae548a4cf11be2b21f1c05746e186b29c7a7" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48796,10 +48796,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="metal flame psybuster (japan).chr" size="131072" crc="95256f3b" sha1="bf93361fdc0cfb5322d107fa4f03764490137b1d" offset="00000" status="baddump" />
+				<rom name="metal flame psybuster (japan).chr" size="131072" crc="95256f3b" sha1="bf93361fdc0cfb5322d107fa4f03764490137b1d" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="metal flame psybuster (japan).prg" size="131072" crc="1f864492" sha1="4b33fa0c0ec3e027dfde74533b80c357acf9cf32" offset="00000" status="baddump" />
+				<rom name="metal flame psybuster (japan).prg" size="131072" crc="1f864492" sha1="4b33fa0c0ec3e027dfde74533b80c357acf9cf32" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48908,11 +48908,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<dataarea name="prg" size="32768">
-				<rom name="milli.prg" size="16384" crc="cfa0f7b9" sha1="88e78fdb6e91c65412f738259fe31149b99a71f4" offset="00000" status="baddump" />
+				<rom name="milli.prg" size="16384" crc="cfa0f7b9" sha1="88e78fdb6e91c65412f738259fe31149b99a71f4" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="milli.chr" size="8192" crc="8ab1937f" sha1="14a3e06dbb89144ab1c40fec9224c1e9e4acb583" offset="00000" status="baddump" />
+				<rom name="milli.chr" size="8192" crc="8ab1937f" sha1="14a3e06dbb89144ab1c40fec9224c1e9e4acb583" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48928,10 +48928,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="chr" size="8192">
-				<rom name="millipede (japan).chr" size="8192" crc="d219b570" sha1="b3f992f1a487cc13789dd994c9d3b566e148350c" offset="00000" status="baddump" />
+				<rom name="millipede (japan).chr" size="8192" crc="d219b570" sha1="b3f992f1a487cc13789dd994c9d3b566e148350c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="millipede (japan).prg" size="16384" crc="ee993635" sha1="7a4e0ac88f45a09a2c64b415f7d32d139feaecc5" offset="00000" status="baddump" />
+				<rom name="millipede (japan).prg" size="16384" crc="ee993635" sha1="7a4e0ac88f45a09a2c64b415f7d32d139feaecc5" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -49006,10 +49006,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
-				<rom name="moai-kun (japan).chr" size="32768" crc="5b33d5dd" sha1="377750ea292b10c7057bab81573985e7863c3221" offset="00000" status="baddump" />
+				<rom name="moai-kun (japan).chr" size="32768" crc="5b33d5dd" sha1="377750ea292b10c7057bab81573985e7863c3221" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="moai-kun (japan).prg" size="32768" crc="331cc7ef" sha1="2e41450b6aea65e0bc5f083c77e9f2ddbe88df76" offset="00000" status="baddump" />
+				<rom name="moai-kun (japan).prg" size="32768" crc="331cc7ef" sha1="2e41450b6aea65e0bc5f083c77e9f2ddbe88df76" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49103,10 +49103,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="moeru oniisan (japan).chr" size="131072" crc="5b0127ff" sha1="71650f3b4ad7ca34f6ee6b1cb777ec0a5d897af5" offset="00000" status="baddump" />
+				<rom name="moeru oniisan (japan).chr" size="131072" crc="5b0127ff" sha1="71650f3b4ad7ca34f6ee6b1cb777ec0a5d897af5" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="moeru oniisan (japan).prg" size="131072" crc="fd529896" sha1="3c01140b7d5fc042d1386175a563df72f0c2827e" offset="00000" status="baddump" />
+				<rom name="moeru oniisan (japan).prg" size="131072" crc="fd529896" sha1="3c01140b7d5fc042d1386175a563df72f0c2827e" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49122,7 +49122,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="524288">
-				<rom name="momotarou densetsu gaiden (japan).prg" size="524288" crc="9c58f4a6" sha1="ace5a3f65fb4ab801f1989c05bfa39fc7877f8ea" offset="00000" status="baddump" />
+				<rom name="momotarou densetsu gaiden (japan).prg" size="524288" crc="9c58f4a6" sha1="ace5a3f65fb4ab801f1989c05bfa39fc7877f8ea" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49178,10 +49178,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="moon crystal (japan).chr" size="262144" crc="a6284bd1" sha1="825e779865a401e18321a5d0f699db6e439ec5c0" offset="00000" status="baddump" />
+				<rom name="moon crystal (japan).chr" size="262144" crc="a6284bd1" sha1="825e779865a401e18321a5d0f699db6e439ec5c0" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="moon crystal (japan).prg" size="262144" crc="a56a1bd0" sha1="6815999e47f50a86e81f691b08c54d9e13c77135" offset="00000" status="baddump" />
+				<rom name="moon crystal (japan).prg" size="262144" crc="a56a1bd0" sha1="6815999e47f50a86e81f691b08c54d9e13c77135" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49198,7 +49198,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
-				<rom name="mottomo abunai deka (japan).prg" size="131072" crc="f89300fb" sha1="23b6a40970e21f882b68348b01014db29f5a6b3b" offset="00000" status="baddump" />
+				<rom name="mottomo abunai deka (japan).prg" size="131072" crc="f89300fb" sha1="23b6a40970e21f882b68348b01014db29f5a6b3b" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49237,10 +49237,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="nakayoshi to issho (japan).chr" size="262144" crc="8a86b158" sha1="9bdd63751623e87f6fc7fa638ef4eb471401a4c7" offset="00000" status="baddump" />
+				<rom name="nakayoshi to issho (japan).chr" size="262144" crc="8a86b158" sha1="9bdd63751623e87f6fc7fa638ef4eb471401a4c7" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="nakayoshi to issho (japan).prg" size="131072" crc="8ab9e1ea" sha1="a88bd4956d45b99a4dfd9fd1ea8d78031974372a" offset="00000" status="baddump" />
+				<rom name="nakayoshi to issho (japan).prg" size="131072" crc="8ab9e1ea" sha1="a88bd4956d45b99a4dfd9fd1ea8d78031974372a" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -49280,10 +49280,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="nekketsu street basket - ganbare dunk heroes (japan).chr" size="131072" crc="57004f72" sha1="8eb85ada7560f6b61c9c494475d70f8539bac239" offset="00000" status="baddump" />
+				<rom name="nekketsu street basket - ganbare dunk heroes (japan).chr" size="131072" crc="57004f72" sha1="8eb85ada7560f6b61c9c494475d70f8539bac239" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="nekketsu street basket - ganbare dunk heroes (japan).prg" size="131072" crc="4fb460cd" sha1="6eb0f56092da328bf280de4cf6e02baad905b93f" offset="00000" status="baddump" />
+				<rom name="nekketsu street basket - ganbare dunk heroes (japan).prg" size="131072" crc="4fb460cd" sha1="6eb0f56092da328bf280de4cf6e02baad905b93f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49369,7 +49369,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="nihonichi no mei kantoku (japan).prg" size="262144" crc="da690d17" sha1="45c5816845c047005f5123aaaa220e884c58af72" offset="00000" status="baddump" />
+				<rom name="nihonichi no mei kantoku (japan).prg" size="262144" crc="da690d17" sha1="45c5816845c047005f5123aaaa220e884c58af72" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49392,7 +49392,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="ninja crusaders - ryuuga (japan).prg" size="131072" crc="b5e24324" sha1="3caf40e96ba3d8dd0e6986ebd05c7b6687beff7b" offset="00000" status="baddump" />
+				<rom name="ninja crusaders - ryuuga (japan).prg" size="131072" crc="b5e24324" sha1="3caf40e96ba3d8dd0e6986ebd05c7b6687beff7b" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49459,10 +49459,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-NROM-256" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="hattoriproto.prg" size="32768" crc="3dfb8112" sha1="cfc7683b5b6a62ff4189f5dfe4d9286787e3ca05" status="baddump" />
+				<rom name="hattoriproto.prg" size="32768" crc="3dfb8112" sha1="cfc7683b5b6a62ff4189f5dfe4d9286787e3ca05" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="hattoriproto.chr" size="8192" crc="dc2654ec" sha1="5db8b6054cdb846ee24770eb6677013b3d159547" status="baddump" />
+				<rom name="hattoriproto.chr" size="8192" crc="dc2654ec" sha1="5db8b6054cdb846ee24770eb6677013b3d159547" />
 			</dataarea>
 		</part>
 	</software>
@@ -49495,7 +49495,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="ninja-kun - ashura no shou (japan).prg" size="131072" crc="219dfabf" sha1="3c23c5d89b870591fbb511346772305629305bed" offset="00000" status="baddump" />
+				<rom name="ninja-kun - ashura no shou (japan).prg" size="131072" crc="219dfabf" sha1="3c23c5d89b870591fbb511346772305629305bed" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49553,10 +49553,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="exrom" />
 			<feature name="pcb" value="HVC-EWROM" />
 			<dataarea name="prg" size="524288">
-				<rom name="koe-iz-1 prg" size="524288" crc="02123025" sha1="dc830651fa796d824e91cc4f7f0da1cca05ff2b0" offset="00000" status="baddump" />
+				<rom name="koe-iz-1 prg" size="524288" crc="02123025" sha1="dc830651fa796d824e91cc4f7f0da1cca05ff2b0" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="koe-iz-0 chr" size="262144" crc="5bca457a" sha1="9577bd125828bb76aa70eb91b6d2cb0ca06ade7f" offset="00000" status="baddump" />
+				<rom name="koe-iz-0 chr" size="262144" crc="5bca457a" sha1="9577bd125828bb76aa70eb91b6d2cb0ca06ade7f" offset="00000" />
 			</dataarea>
 			<!-- 32k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="32768">
@@ -49582,7 +49582,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="koe-nu-0 chr" size="131072" crc="5cc0dbf5" sha1="150899d897da06bab6210bdd94dfee5ecf078b80" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="nobunaga no yabou - sengoku gunyuu den (japan) (rev a).prg" size="262144" crc="e59071c4" sha1="843b5354b63dbad7b8d16608b523116080b88894" offset="00000" status="baddump" />
+				<rom name="nobunaga no yabou - sengoku gunyuu den (japan) (rev a).prg" size="262144" crc="e59071c4" sha1="843b5354b63dbad7b8d16608b523116080b88894" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -49608,7 +49608,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sorom" />
 			<feature name="pcb" value="HVC-SOROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="nobunaga no yabou - zenkoku ban (japan) (rev a).prg" size="262144" crc="2b11e0b0" sha1="09d5fe3dbc077fcc3ac9438713f4e60b34749b43" offset="00000" status="baddump" />
+				<rom name="nobunaga no yabou - zenkoku ban (japan) (rev a).prg" size="262144" crc="2b11e0b0" sha1="09d5fe3dbc077fcc3ac9438713f4e60b34749b43" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49653,7 +49653,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="olympus no tatakai (japan).prg" size="131072" crc="03d56cf7" sha1="dc5faa2f861e729b42492c361fbca9927ff454c3" offset="00000" status="baddump" />
+				<rom name="olympus no tatakai (japan).prg" size="131072" crc="03d56cf7" sha1="dc5faa2f861e729b42492c361fbca9927ff454c3" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49673,7 +49673,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="outlanders (japan).prg" size="131072" crc="7aa02377" sha1="ff77d280a645ec2af30397c2e70c374e6f298c07" offset="00000" status="baddump" />
+				<rom name="outlanders (japan).prg" size="131072" crc="7aa02377" sha1="ff77d280a645ec2af30397c2e70c374e6f298c07" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49692,10 +49692,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="over horizon (japan).chr" size="131072" crc="9ea75f49" sha1="fa3850431c3a13d0c33dbb068d7dc331a1d8c52c" offset="00000" status="baddump" />
+				<rom name="over horizon (japan).chr" size="131072" crc="9ea75f49" sha1="fa3850431c3a13d0c33dbb068d7dc331a1d8c52c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="over horizon (japan).prg" size="131072" crc="47f552cd" sha1="9471059f11c261441c4c8318e566a70e11ce0117" offset="00000" status="baddump" />
+				<rom name="over horizon (japan).prg" size="131072" crc="47f552cd" sha1="9471059f11c261441c4c8318e566a70e11ce0117" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -49732,10 +49732,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="262144">
-				<rom name="pachio-kun 3 (japan) (rev a).prg" size="262144" crc="0dc38898" sha1="f0506561aed8b9a0561cd69f2fa7e095996e7ab2" offset="00000" status="baddump" />
+				<rom name="pachio-kun 3 (japan) (rev a).prg" size="262144" crc="0dc38898" sha1="f0506561aed8b9a0561cd69f2fa7e095996e7ab2" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="pachio-kun 3 (japan) (rev a).chr" size="131072" crc="4d63ddae" sha1="9f5182985046e172ebbe3d12d8979fe1398c95fb" offset="00000" status="baddump" />
+				<rom name="pachio-kun 3 (japan) (rev a).chr" size="131072" crc="4d63ddae" sha1="9f5182985046e172ebbe3d12d8979fe1398c95fb" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -49755,10 +49755,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="parallel world (japan).chr" size="131072" crc="95e9e4b1" sha1="07c8867de674960b36c41a059f18113469d0262b" offset="00000" status="baddump" />
+				<rom name="parallel world (japan).chr" size="131072" crc="95e9e4b1" sha1="07c8867de674960b36c41a059f18113469d0262b" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="parallel world (japan).prg" size="131072" crc="e7baa5f6" sha1="81ac95e578e465ab027059967ac58eaa7050da02" offset="00000" status="baddump" />
+				<rom name="parallel world (japan).prg" size="131072" crc="e7baa5f6" sha1="81ac95e578e465ab027059967ac58eaa7050da02" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49885,7 +49885,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-TNROM" />
 			<feature name="peripheral" value="partytap" />
 			<dataarea name="prg" size="262144">
-				<rom name="project q (japan).prg" size="262144" crc="c1ba8bb9" sha1="390443f9b8a69fee3cff5f234a3e92aae8b48102" offset="00000" status="baddump" />
+				<rom name="project q (japan).prg" size="262144" crc="c1ba8bb9" sha1="390443f9b8a69fee3cff5f234a3e92aae8b48102" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49925,7 +49925,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
-				<rom name="puyo puyo (japan).prg" size="131072" crc="fcb5cb1e" sha1="3dbd3b2c3a107d2fdd5085831abe8c7ea5601a5a" offset="00000" status="baddump" />
+				<rom name="puyo puyo (japan).prg" size="131072" crc="fcb5cb1e" sha1="3dbd3b2c3a107d2fdd5085831abe8c7ea5601a5a" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -49961,10 +49961,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
-				<rom name="puzznic (japan).chr" size="32768" crc="ae31eafb" sha1="446f2f69a83a9c40505f4f05e86c40104c3638f8" offset="00000" status="baddump" />
+				<rom name="puzznic (japan).chr" size="32768" crc="ae31eafb" sha1="446f2f69a83a9c40505f4f05e86c40104c3638f8" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="puzznic (japan).prg" size="32768" crc="4468ca43" sha1="4e9c5d3864474b4c47a9fa319444eaa19071076a" offset="00000" status="baddump" />
+				<rom name="puzznic (japan).prg" size="32768" crc="4468ca43" sha1="4e9c5d3864474b4c47a9fa319444eaa19071076a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49978,10 +49978,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="db541a91" sha1="8301b7933ab15eaa8b99054dc6ad2020eb5b84d4" status="baddump" />
+				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="db541a91" sha1="8301b7933ab15eaa8b99054dc6ad2020eb5b84d4" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="mike ditka's big play football (prototype).chr" size="131072" crc="46ff87d1" sha1="70eb35e70af98ad550ef4f56cbced27890ea4fc9" status="baddump" />
+				<rom name="mike ditka's big play football (prototype).chr" size="131072" crc="46ff87d1" sha1="70eb35e70af98ad550ef4f56cbced27890ea4fc9" />
 			</dataarea>
 		</part>
 	</software>
@@ -50027,7 +50027,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="radac tailor-made (sample) (j).prg" size="131072" crc="74ee0ffc" sha1="986f02624db41425d89d8c8632f77f2ffc860d04" offset="00000" status="baddump" />
+				<rom name="radac tailor-made (sample) (j).prg" size="131072" crc="74ee0ffc" sha1="986f02624db41425d89d8c8632f77f2ffc860d04" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -50096,10 +50096,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="red arremar 2 (japan).chr" size="131072" crc="aa2f6e2a" sha1="1d62c77c542040d8afb1b509ab31475fce9a86e9" offset="00000" status="baddump" />
+				<rom name="red arremar 2 (japan).chr" size="131072" crc="aa2f6e2a" sha1="1d62c77c542040d8afb1b509ab31475fce9a86e9" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="red arremar 2 (japan).prg" size="131072" crc="7671bc51" sha1="1396124bdbe5cf07b18fc4d8c8ecdb589b99d930" offset="00000" status="baddump" />
+				<rom name="red arremar 2 (japan).prg" size="131072" crc="7671bc51" sha1="1396124bdbe5cf07b18fc4d8c8ecdb589b99d930" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50166,10 +50166,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="robocop (japan).chr" size="131072" crc="029ac47f" sha1="a8f2aae2d6edfb978159b38a0ec80f8a10a6c888" offset="00000" status="baddump" />
+				<rom name="robocop (japan).chr" size="131072" crc="029ac47f" sha1="a8f2aae2d6edfb978159b38a0ec80f8a10a6c888" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="robocop (japan).prg" size="131072" crc="b9ce6883" sha1="40f5d86a747978feafa94606e37eccf76b101bfc" offset="00000" status="baddump" />
+				<rom name="robocop (japan).prg" size="131072" crc="b9ce6883" sha1="40f5d86a747978feafa94606e37eccf76b101bfc" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50237,7 +50237,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-TGROM" />
 			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="524288">
-				<rom name="rockman 4 - aratanaru yabou (japan) (rev a).prg" size="524288" crc="e0ffeccd" sha1="b6ed268d99655ff9963b054e16696a7a9246d247" offset="00000" status="baddump" />
+				<rom name="rockman 4 - aratanaru yabou (japan) (rev a).prg" size="524288" crc="e0ffeccd" sha1="b6ed268d99655ff9963b054e16696a7a9246d247" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -50276,10 +50276,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txsrom" />
 			<feature name="pcb" value="NES-TLSROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="rpg jinsei game (japan).chr" size="131072" crc="733bcb5e" sha1="446a2fecc737c5bb8880bc384fc5987d941d7f3c" offset="00000" status="baddump" />
+				<rom name="rpg jinsei game (japan).chr" size="131072" crc="733bcb5e" sha1="446a2fecc737c5bb8880bc384fc5987d941d7f3c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="rpg jinsei game (japan).prg" size="262144" crc="42e03e4a" sha1="96260908e8ed3511bd0bfd5025e91c877a62c33b" offset="00000" status="baddump" />
+				<rom name="rpg jinsei game (japan).prg" size="262144" crc="42e03e4a" sha1="96260908e8ed3511bd0bfd5025e91c877a62c33b" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -50386,10 +50386,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="chr-pin26" value="/CE" />
 			<feature name="chr-pin27" value="CE" />
 			<dataarea name="chr" size="8192">
-				<rom name="sansuu 1 nen - keisan game (japan).chr" size="8192" crc="a0d34b1c" sha1="abdfdbb80aade29eb28da19cb811971fbd7a681c" offset="00000" status="baddump" />
+				<rom name="sansuu 1 nen - keisan game (japan).chr" size="8192" crc="a0d34b1c" sha1="abdfdbb80aade29eb28da19cb811971fbd7a681c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="sansuu 1 nen - keisan game (japan).prg" size="32768" crc="87a3f91e" sha1="94ae5ebfaaa13bb317cd2da6c0719f0150df3040" offset="00000" status="baddump" />
+				<rom name="sansuu 1 nen - keisan game (japan).prg" size="32768" crc="87a3f91e" sha1="94ae5ebfaaa13bb317cd2da6c0719f0150df3040" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50440,10 +50440,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
-				<rom name="sansuu 5 &amp; 6 nen - keisan game (japan).chr" size="32768" crc="0ba8b2c2" sha1="1d4900e5d2a51c6d2f75f730ee3d020eb567e0da" offset="00000" status="baddump" />
+				<rom name="sansuu 5 &amp; 6 nen - keisan game (japan).chr" size="32768" crc="0ba8b2c2" sha1="1d4900e5d2a51c6d2f75f730ee3d020eb567e0da" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="sansuu 5 &amp; 6 nen - keisan game (japan).prg" size="32768" crc="b5976b7c" sha1="f0dea5139cf348502150d92b4786f7218b6a3885" offset="00000" status="baddump" />
+				<rom name="sansuu 5 &amp; 6 nen - keisan game (japan).prg" size="32768" crc="b5976b7c" sha1="f0dea5139cf348502150d92b4786f7218b6a3885" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50494,10 +50494,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
-				<rom name="sesame street - countdown (prototype).prg" size="131072" crc="0cb691fd" sha1="e54a80175e489e5132ec97c75bc701e9e045dd8b" status="baddump" />
+				<rom name="sesame street - countdown (prototype).prg" size="131072" crc="0cb691fd" sha1="e54a80175e489e5132ec97c75bc701e9e045dd8b" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="sesame street - countdown (prototype).chr" size="131072" crc="67cd2e44" sha1="39b09df3b27b2e1d355b1266d99d70662120589c" status="baddump" />
+				<rom name="sesame street - countdown (prototype).chr" size="131072" crc="67cd2e44" sha1="39b09df3b27b2e1d355b1266d99d70662120589c" />
 			</dataarea>
 		</part>
 	</software>
@@ -50513,10 +50513,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="shadow brain (japan).chr" size="262144" crc="9be27b4a" sha1="e5da8d40c0b4ef374a950a214a2be90a253a4b27" offset="00000" status="baddump" />
+				<rom name="shadow brain (japan).chr" size="262144" crc="9be27b4a" sha1="e5da8d40c0b4ef374a950a214a2be90a253a4b27" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="shadow brain (japan).prg" size="131072" crc="90597545" sha1="28de67cfc1db82612554705e1aacfed2be8ce821" offset="00000" status="baddump" />
+				<rom name="shadow brain (japan).prg" size="131072" crc="90597545" sha1="28de67cfc1db82612554705e1aacfed2be8ce821" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -50569,7 +50569,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="shougi meikan '92 (japan).prg" size="262144" crc="5a6860f1" sha1="5e4858a07330a7c1fe6eb9adfdce778043ada5c6" offset="00000" status="baddump" />
+				<rom name="shougi meikan '92 (japan).prg" size="262144" crc="5a6860f1" sha1="5e4858a07330a7c1fe6eb9adfdce778043ada5c6" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -50591,7 +50591,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="shougi meikan '93 (japan).prg" size="262144" crc="ae280e20" sha1="0a808a7eb907d1690927ad3468679cdd7a9158ad" offset="00000" status="baddump" />
+				<rom name="shougi meikan '93 (japan).prg" size="262144" crc="ae280e20" sha1="0a808a7eb907d1690927ad3468679cdd7a9158ad" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -50659,7 +50659,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="uxrom" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="the smurfs (prototype).prg" size="131072" crc="38d3ca84" sha1="0fdd6cba5b1d74eb9a4973288b33906cf748fdb1" status="baddump" />
+				<rom name="the smurfs (prototype).prg" size="131072" crc="38d3ca84" sha1="0fdd6cba5b1d74eb9a4973288b33906cf748fdb1" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -50678,10 +50678,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="snow bros. (japan).chr" size="131072" crc="2663ce78" sha1="543d00302ee27a501a53e4f5af2c0a3b0e682cb0" offset="00000" status="baddump" />
+				<rom name="snow bros. (japan).chr" size="131072" crc="2663ce78" sha1="543d00302ee27a501a53e4f5af2c0a3b0e682cb0" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="snow bros. (japan).prg" size="131072" crc="b8e16bd0" sha1="a749530b3b2b1e7b30da710252fb572bdb833ab7" offset="00000" status="baddump" />
+				<rom name="snow bros. (japan).prg" size="131072" crc="b8e16bd0" sha1="a749530b3b2b1e7b30da710252fb572bdb833ab7" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50713,10 +50713,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="softball tengoku (japan).chr" size="131072" crc="f62f0298" sha1="100672a83519a0d80ebfc992d0da13f4984424e7" offset="00000" status="baddump" />
+				<rom name="softball tengoku (japan).chr" size="131072" crc="f62f0298" sha1="100672a83519a0d80ebfc992d0da13f4984424e7" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="softball tengoku (japan).prg" size="131072" crc="5e3f7004" sha1="933c603b2003d581bd6e630b649365f687b8d75c" offset="00000" status="baddump" />
+				<rom name="softball tengoku (japan).prg" size="131072" crc="5e3f7004" sha1="933c603b2003d581bd6e630b649365f687b8d75c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50804,7 +50804,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-SNROM" />
 			<feature name="peripheral" value="4p_adapter" />
 			<dataarea name="prg" size="131072">
-				<rom name="spot - the video game (japan).prg" size="131072" crc="0abdd5ca" sha1="8b62b3fc95957f52d146e7bc3c90ab33c4005aec" offset="00000" status="baddump" />
+				<rom name="spot - the video game (japan).prg" size="131072" crc="0abdd5ca" sha1="8b62b3fc95957f52d146e7bc3c90ab33c4005aec" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -50929,10 +50929,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="star wars (japan) (victor).chr" size="131072" crc="2c1365a8" sha1="4de068690cd880a1aba76d030e4c42257bfec88a" offset="00000" status="baddump" />
+				<rom name="star wars (japan) (victor).chr" size="131072" crc="2c1365a8" sha1="4de068690cd880a1aba76d030e4c42257bfec88a" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="star wars (japan) (victor).prg" size="131072" crc="7d139211" sha1="8825d1698079c7a9cadb70dde8901472e7db9091" offset="00000" status="baddump" />
+				<rom name="star wars (japan) (victor).prg" size="131072" crc="7d139211" sha1="8825d1698079c7a9cadb70dde8901472e7db9091" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -50951,10 +50951,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="star wars - the empire strikes back (japan).chr" size="262144" crc="6f459577" sha1="86448c80585c4a104c2bd4ba78ffa29e26c612d1" offset="00000" status="baddump" />
+				<rom name="star wars - the empire strikes back (japan).chr" size="262144" crc="6f459577" sha1="86448c80585c4a104c2bd4ba78ffa29e26c612d1" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="star wars - the empire strikes back (japan).prg" size="262144" crc="702d9b33" sha1="8a46874d72e4693ef784600d6ee178b867dc1558" offset="00000" status="baddump" />
+				<rom name="star wars - the empire strikes back (japan).prg" size="262144" crc="702d9b33" sha1="8a46874d72e4693ef784600d6ee178b867dc1558" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51026,10 +51026,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="summer carnival '92 - recca (japan).chr" size="131072" crc="825cd716" sha1="0392b0dea1e3f7da79bf8407bf94db9c5f8c4d61" offset="00000" status="baddump" />
+				<rom name="summer carnival '92 - recca (japan).chr" size="131072" crc="825cd716" sha1="0392b0dea1e3f7da79bf8407bf94db9c5f8c4d61" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="summer carnival '92 - recca (japan).prg" size="131072" crc="126ea4a0" sha1="6648622ec0ec429eabc277d5b937315dd45d4207" offset="00000" status="baddump" />
+				<rom name="summer carnival '92 - recca (japan).prg" size="131072" crc="126ea4a0" sha1="6648622ec0ec429eabc277d5b937315dd45d4207" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51062,10 +51062,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="super contra (japan).chr" size="131072" crc="1dfb534c" sha1="03e743e74017a6501df97b17689cbbe0e1d30b69" offset="00000" status="baddump" />
+				<rom name="super contra (japan).chr" size="131072" crc="1dfb534c" sha1="03e743e74017a6501df97b17689cbbe0e1d30b69" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="super contra (japan).prg" size="131072" crc="0bbacf8f" sha1="382fe0e9252da7290ca3160e57765065674bf591" offset="00000" status="baddump" />
+				<rom name="super contra (japan).prg" size="131072" crc="0bbacf8f" sha1="382fe0e9252da7290ca3160e57765065674bf591" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51082,10 +51082,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="0.prg" size="32768" crc="d0eda7ba" sha1="7ae0bb48c4cdd8b634a77af2a486634ff8a1fac4" offset="00000" status="baddump" />
+				<rom name="0.prg" size="32768" crc="d0eda7ba" sha1="7ae0bb48c4cdd8b634a77af2a486634ff8a1fac4" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
-				<rom name="0.chr" size="16384" crc="d3481070" sha1="e4b699c287432a63e3c410c575ff9b92f970571d" offset="00000" status="baddump" />
+				<rom name="0.chr" size="16384" crc="d3481070" sha1="e4b699c287432a63e3c410c575ff9b92f970571d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51136,7 +51136,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="super pinball (japan).prg" size="131072" crc="1a2ea6b9" sha1="befa6b231a57ef9bc16ee8c6c68d909b7ff4f403" offset="00000" status="baddump" />
+				<rom name="super pinball (japan).prg" size="131072" crc="1a2ea6b9" sha1="befa6b231a57ef9bc16ee8c6c68d909b7ff4f403" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51226,10 +51226,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="sword master (japan).chr" size="131072" crc="8f2294ed" sha1="cea03d04c7dd9976c5d4b3d744d71b722c677f24" offset="00000" status="baddump" />
+				<rom name="sword master (japan).chr" size="131072" crc="8f2294ed" sha1="cea03d04c7dd9976c5d4b3d744d71b722c677f24" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="sword master (japan).prg" size="131072" crc="9e1ce13d" sha1="b424cc5f6cc285af4e2ea94a17333b13db360b9a" offset="00000" status="baddump" />
+				<rom name="sword master (japan).prg" size="131072" crc="9e1ce13d" sha1="b424cc5f6cc285af4e2ea94a17333b13db360b9a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51261,10 +51261,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="takahashi meijin no bouken jima iv (japan).chr" size="131072" crc="0d6cc375" sha1="7446645937f65b76e8ecc0f55474e52c571f09cc" offset="00000" status="baddump" />
+				<rom name="takahashi meijin no bouken jima iv (japan).chr" size="131072" crc="0d6cc375" sha1="7446645937f65b76e8ecc0f55474e52c571f09cc" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="takahashi meijin no bouken jima iv (japan).prg" size="262144" crc="ebbc6ba8" sha1="f3e9c5b3be470dd5b5d9c6c1206cdaee8ebccc63" offset="00000" status="baddump" />
+				<rom name="takahashi meijin no bouken jima iv (japan).prg" size="262144" crc="ebbc6ba8" sha1="f3e9c5b3be470dd5b5d9c6c1206cdaee8ebccc63" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51295,7 +51295,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-AMROM" />
 			<feature name="bus_conflict" value="no" />
 			<dataarea name="prg" size="131072">
-				<rom name="the tale - elrond no eiyuu (j) (prototype).prg" size="131072" crc="a8b1d1d1" sha1="e7d61cf5dd5f74937c6db87ebf6a8e844847788d" offset="00000" status="baddump" />
+				<rom name="the tale - elrond no eiyuu (j) (prototype).prg" size="131072" crc="a8b1d1d1" sha1="e7d61cf5dd5f74937c6db87ebf6a8e844847788d" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51314,10 +51314,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="tantei jinguuji saburou - yokohamakou renzoku satsujin jiken (japan).chr" size="131072" crc="03cc8e54" sha1="c54c78aa53e1b32189d6858d20ec18667274de7d" offset="00000" status="baddump" />
+				<rom name="tantei jinguuji saburou - yokohamakou renzoku satsujin jiken (japan).chr" size="131072" crc="03cc8e54" sha1="c54c78aa53e1b32189d6858d20ec18667274de7d" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="tantei jinguuji saburou - yokohamakou renzoku satsujin jiken (japan).prg" size="131072" crc="5b68abd1" sha1="ee7315ae4f0cb2933fbe58dc8448a4ac8dd9c5bf" offset="00000" status="baddump" />
+				<rom name="tantei jinguuji saburou - yokohamakou renzoku satsujin jiken (japan).prg" size="131072" crc="5b68abd1" sha1="ee7315ae4f0cb2933fbe58dc8448a4ac8dd9c5bf" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51333,10 +51333,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="tashiro masashi no princess ga ippai (japan).chr" size="131072" crc="8bb45ac8" sha1="20632f78ad0e3e5f0dfd9068fb35500c367c9b9c" offset="00000" status="baddump" />
+				<rom name="tashiro masashi no princess ga ippai (japan).chr" size="131072" crc="8bb45ac8" sha1="20632f78ad0e3e5f0dfd9068fb35500c367c9b9c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="tashiro masashi no princess ga ippai (japan).prg" size="131072" crc="37d13f96" sha1="ef89bd9be9fc4f8fad0a6e7605657d6c2a483567" offset="00000" status="baddump" />
+				<rom name="tashiro masashi no princess ga ippai (japan).prg" size="131072" crc="37d13f96" sha1="ef89bd9be9fc4f8fad0a6e7605657d6c2a483567" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51352,7 +51352,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="tatakai no banka (japan).prg" size="131072" crc="be95b219" sha1="563786be12f4c37c774fe1cab41f362606211277" offset="00000" status="baddump" />
+				<rom name="tatakai no banka (japan).prg" size="131072" crc="be95b219" sha1="563786be12f4c37c774fe1cab41f362606211277" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51388,10 +51388,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-n7-0 prg" size="131072" crc="14dd8bee" sha1="f8f9656aa3d7f2ffbc0e67ac859f184ad17d69b9" offset="00000" status="baddump" />
+				<rom name="nes-n7-0 prg" size="131072" crc="14dd8bee" sha1="f8f9656aa3d7f2ffbc0e67ac859f184ad17d69b9" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="nes-n7-0 chr" size="262144" crc="fefb9179" sha1="8bdd2dc2709b815f505993b2467813260ba4b167" offset="00000" status="baddump" />
+				<rom name="nes-n7-0 chr" size="262144" crc="fefb9179" sha1="8bdd2dc2709b815f505993b2467813260ba4b167" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -51444,7 +51444,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="tenchi o kurau (japan) (rev a).prg" size="262144" crc="637a7acb" sha1="a1bc81c0a467c114b3af255a64a236d2d427b0dd" offset="00000" status="baddump" />
+				<rom name="tenchi o kurau (japan) (rev a).prg" size="262144" crc="637a7acb" sha1="a1bc81c0a467c114b3af255a64a236d2d427b0dd" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51467,7 +51467,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TNROM" />
 			<dataarea name="prg" size="524288">
-				<rom name="tenchi o kurau ii - shokatsu koumei den (japan) (rev a).prg" size="524288" crc="b84a73cc" sha1="35fe1b2bf778872e144f02a147a08db29adfe959" offset="00000" status="baddump" />
+				<rom name="tenchi o kurau ii - shokatsu koumei den (japan) (rev a).prg" size="524288" crc="b84a73cc" sha1="35fe1b2bf778872e144f02a147a08db29adfe959" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51490,10 +51490,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="terminator 2 - judgment day (japan).chr" size="131072" crc="29363189" sha1="83832ade2e38fbca3e20fe4409664a2caf7e0cd1" offset="00000" status="baddump" />
+				<rom name="terminator 2 - judgment day (japan).chr" size="131072" crc="29363189" sha1="83832ade2e38fbca3e20fe4409664a2caf7e0cd1" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="terminator 2 - judgment day (japan).prg" size="131072" crc="c4cd7431" sha1="d7a16c5fce24f6b6c30890c5d82571d10280ced7" offset="00000" status="baddump" />
+				<rom name="terminator 2 - judgment day (japan).prg" size="131072" crc="c4cd7431" sha1="d7a16c5fce24f6b6c30890c5d82571d10280ced7" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51525,10 +51525,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="tetrastar - the fighter (japan).chr" size="262144" crc="3337eba0" sha1="bd3790e49e6dbcad0d2bda78f52bebaba4e62677" offset="00000" status="baddump" />
+				<rom name="tetrastar - the fighter (japan).chr" size="262144" crc="3337eba0" sha1="bd3790e49e6dbcad0d2bda78f52bebaba4e62677" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="tetrastar - the fighter (japan).prg" size="262144" crc="af3ec4b1" sha1="1ccacb4819ce6157e2643e33516588efbf13dcd7" offset="00000" status="baddump" />
+				<rom name="tetrastar - the fighter (japan).prg" size="262144" crc="af3ec4b1" sha1="1ccacb4819ce6157e2643e33516588efbf13dcd7" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51544,10 +51544,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
 			<dataarea name="chr" size="16384">
-				<rom name="tetris (bulletproof) (japan).chr" size="16384" crc="e201dd0e" sha1="b6743e40d3d56b314fcd2502f5eb4c30291bb270" offset="00000" status="baddump" />
+				<rom name="tetris (bulletproof) (japan).chr" size="16384" crc="e201dd0e" sha1="b6743e40d3d56b314fcd2502f5eb4c30291bb270" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="tetris (bulletproof) (japan).prg" size="32768" crc="f5fe896f" sha1="269bd17cfb0b32c0db67922e9a6f03908a32b2da" offset="00000" status="baddump" />
+				<rom name="tetris (bulletproof) (japan).prg" size="32768" crc="f5fe896f" sha1="269bd17cfb0b32c0db67922e9a6f03908a32b2da" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51630,7 +51630,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="tetris 2 + bombliss (japan) (rev a).prg" size="131072" crc="fd45e9c1" sha1="7a06ef6867f116cb9217d66813cc6e94e3da4a33" offset="00000" status="baddump" />
+				<rom name="tetris 2 + bombliss (japan) (rev a).prg" size="131072" crc="fd45e9c1" sha1="7a06ef6867f116cb9217d66813cc6e94e3da4a33" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51705,10 +51705,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B3" />
 			<dataarea name="prg" size="131072">
-				<rom name="tokyo pachi slot adventure (jpn).prg" size="131072" crc="19248981" sha1="5d02cf3f47671a51a0e8a4b57a16c6a31ad0950b" offset="00000" status="baddump" />
+				<rom name="tokyo pachi slot adventure (jpn).prg" size="131072" crc="19248981" sha1="5d02cf3f47671a51a0e8a4b57a16c6a31ad0950b" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="tokyo pachi slot adventure (jpn).chr" size="131072" crc="92f6ee7f" sha1="2ec29131c4193ba8e6930e55b97052ba313a2019" offset="00000" status="baddump" />
+				<rom name="tokyo pachi slot adventure (jpn).chr" size="131072" crc="92f6ee7f" sha1="2ec29131c4193ba8e6930e55b97052ba313a2019" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51724,10 +51724,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="tom &amp; jerry (and tuffy) (japan).chr" size="131072" crc="f676d22a" sha1="0fa351a0510f7c9ae6659bcd353e826c51d8019d" offset="00000" status="baddump" />
+				<rom name="tom &amp; jerry (and tuffy) (japan).chr" size="131072" crc="f676d22a" sha1="0fa351a0510f7c9ae6659bcd353e826c51d8019d" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="tom &amp; jerry (and tuffy) (japan).prg" size="131072" crc="7a748058" sha1="a527fcf92fc24d0bcc6c31a746f182df651b6afc" offset="00000" status="baddump" />
+				<rom name="tom &amp; jerry (and tuffy) (japan).prg" size="131072" crc="7a748058" sha1="a527fcf92fc24d0bcc6c31a746f182df651b6afc" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51761,7 +51761,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="totsuzen macchoman (japan).prg" size="131072" crc="e24df353" sha1="704bcb055eede102d2489dc4533b5be622db0a2b" offset="00000" status="baddump" />
+				<rom name="totsuzen macchoman (japan).prg" size="131072" crc="e24df353" sha1="704bcb055eede102d2489dc4533b5be622db0a2b" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51817,7 +51817,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
-				<rom name="tsuri kichi sanpei - blue marlin hen (japan).prg" size="131072" crc="5a18f611" sha1="77241a57cb0b40d9ecac451f86198abbacbc717c" offset="00000" status="baddump" />
+				<rom name="tsuri kichi sanpei - blue marlin hen (japan).prg" size="131072" crc="5a18f611" sha1="77241a57cb0b40d9ecac451f86198abbacbc717c" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51960,10 +51960,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="ushio to tora - shinen no taiyou (japan).chr" size="262144" crc="3acfae6e" sha1="322b691efa23db0b18eb9052499a5aaa2b30e38c" offset="00000" status="baddump" />
+				<rom name="ushio to tora - shinen no taiyou (japan).chr" size="262144" crc="3acfae6e" sha1="322b691efa23db0b18eb9052499a5aaa2b30e38c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="ushio to tora - shinen no taiyou (japan).prg" size="131072" crc="fe4e5b11" sha1="2a7691e9b7f1b3c31dfbaba8756208d8d8882828" offset="00000" status="baddump" />
+				<rom name="ushio to tora - shinen no taiyou (japan).prg" size="131072" crc="fe4e5b11" sha1="2a7691e9b7f1b3c31dfbaba8756208d8d8882828" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -51983,10 +51983,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="utsurun desu (japan).chr" size="131072" crc="58e17fab" sha1="141976d904d617400320e0be57281c9f7e67ec8b" offset="00000" status="baddump" />
+				<rom name="utsurun desu (japan).chr" size="131072" crc="58e17fab" sha1="141976d904d617400320e0be57281c9f7e67ec8b" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="utsurun desu (japan).prg" size="131072" crc="6bbd9f11" sha1="5fb6a8e8d49f1e92310b73c3c600851bfa01b1e0" offset="00000" status="baddump" />
+				<rom name="utsurun desu (japan).prg" size="131072" crc="6bbd9f11" sha1="5fb6a8e8d49f1e92310b73c3c600851bfa01b1e0" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52085,10 +52085,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="western kids (japan).chr" size="262144" crc="a641730a" sha1="092c3276d58083e5d124a2e1a8eb440fbb3a1d9c" offset="00000" status="baddump" />
+				<rom name="western kids (japan).chr" size="262144" crc="a641730a" sha1="092c3276d58083e5d124a2e1a8eb440fbb3a1d9c" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="western kids (japan).prg" size="262144" crc="567dccbd" sha1="0bff6c23288cc6428704d6eefc0906e4750d73d8" offset="00000" status="baddump" />
+				<rom name="western kids (japan).prg" size="262144" crc="567dccbd" sha1="0bff6c23288cc6428704d6eefc0906e4750d73d8" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52137,10 +52137,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="world boxing (japan).chr" size="131072" crc="c68adb9e" sha1="7b93ba84f3899d0baa357af584ca7e3c3c2818d5" offset="00000" status="baddump" />
+				<rom name="world boxing (japan).chr" size="131072" crc="c68adb9e" sha1="7b93ba84f3899d0baa357af584ca7e3c3c2818d5" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="world boxing (japan).prg" size="131072" crc="ddfb8dd5" sha1="44297534c50e238b5bfdbf576a5a199a8e422f26" offset="00000" status="baddump" />
+				<rom name="world boxing (japan).prg" size="131072" crc="ddfb8dd5" sha1="44297534c50e238b5bfdbf576a5a199a8e422f26" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52157,7 +52157,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="wwf wrestlemania challenge (japan).prg" size="131072" crc="f3808245" sha1="1b32d273a0b8884e96f4814099dec32fc925ac55" offset="00000" status="baddump" />
+				<rom name="wwf wrestlemania challenge (japan).prg" size="131072" crc="f3808245" sha1="1b32d273a0b8884e96f4814099dec32fc925ac55" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
