@@ -245,7 +245,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 
 		case TIMER_VRTC:
-			LOG("UPD3301 VRTC: %u\n", param);
+			LOG("UPD3301 VRTC: %u %d\n", param, screen().vpos());
 
 			m_write_vrtc(param);
 			m_vrtc = param;
@@ -254,16 +254,18 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			if(!(m_status & STATUS_VE))
 				break;
 
-			if(!param)
+			if (!param)
+			{
 				reset_fifo_vrtc();
+				set_drq(1);
+			}
 
 			if (param && !m_me)
 			{
 				m_status |= STATUS_E;
 				set_interrupt(1);
 			}
-			else if(!param)
-				set_drq(1);
+
 			break;
 
 		case TIMER_DRQ:
@@ -679,7 +681,7 @@ void upd3301_device::set_interrupt(int state)
 
 void upd3301_device::set_drq(int state)
 {
-	LOG("UPD3301 DRQ: %u\n", state);
+	LOG("UPD3301 DRQ: %u %d\n", state, screen().vpos());
 
 	m_write_drq(state);
 }
@@ -736,11 +738,12 @@ void upd3301_device::update_hrtc_timer(int state)
 
 void upd3301_device::update_vrtc_timer(int state)
 {
-	int next_y = state ? (m_l * m_r) : 0;
+	const bool next_state = !state;
+	int next_y = next_state ? (m_l * m_r) : 0;
 
 	attotime duration = screen().time_until_pos(next_y, 0);
 
-	m_vrtc_timer->adjust(duration, !state);
+	m_vrtc_timer->adjust(duration, next_state);
 }
 
 

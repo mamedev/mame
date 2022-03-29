@@ -1987,6 +1987,7 @@ void pc8801_state::machine_start()
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
+	// TODO: ready signal connected to FDRDY, presumably for the floppy ch.0 and 1
 	m_dma->ready_w(1);
 
 	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
