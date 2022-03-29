@@ -2179,14 +2179,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 
 WRITE_LINE_MEMBER(pc8801_state::vrtc_irq_w)
 {
-//  bool irq_state = m_vrtc_irq_enable & state;
+	bool irq_state = m_vrtc_irq_enable & state;
 
-	if (m_vrtc_irq_enable)
-	{
-		//machine().debug_break();
-		m_pic->r_w(7 ^ 1, 0);
-	}
-//  printf("%d %d\n", m_vrtc_irq_enable, state);
+	m_pic->r_w(7 ^ 1, !irq_state);
+	// TODO: pending
 }
 
 WRITE_LINE_MEMBER(pc8801_state::irq_w)
@@ -2247,7 +2243,8 @@ void pc8801_state::pc8801(machine_config &config)
 	m_crtc->set_attribute_fetch_callback(FUNC(pc8801_state::attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->rvv_wr_callback().set(FUNC(pc8801_state::crtc_reverse_w));
-	m_crtc->int_wr_callback().set(FUNC(pc8801_state::vrtc_irq_w));
+//  Note: 3301 isn't actually connected to INT so its internal irq mask doesn't have any effect in PC88
+	m_crtc->vrtc_wr_callback().set(FUNC(pc8801_state::vrtc_irq_w));
 	m_crtc->set_screen(m_screen);
 
 	I8257(config, m_dma, MASTER_CLOCK);
