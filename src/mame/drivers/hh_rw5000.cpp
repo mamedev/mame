@@ -16,6 +16,7 @@ ROM source notes when dumped from another model, but confident it's the same:
 #include "emu.h"
 
 #include "cpu/rw5000/a5000.h"
+#include "cpu/rw5000/a5500.h"
 #include "cpu/rw5000/b5000.h"
 #include "cpu/rw5000/b6000.h"
 #include "cpu/rw5000/b6100.h"
@@ -32,6 +33,7 @@ ROM source notes when dumped from another model, but confident it's the same:
 #include "misatk.lh"
 #include "rw18r.lh"
 #include "rw24k.lh"
+#include "rw31r.lh"
 
 //#include "hh_rw5000_test.lh" // common test-layout - use external artwork
 
@@ -608,7 +610,7 @@ ROM_END
 
   Rockwell 8R, Rockwell 18R
   * B5000 MCU (label B5000CC, die label B5000)
-  * 8-digit 7seg LEDs
+  * 8-digit 7seg LED display
 
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by
   Tandy (Radio Shack) as EC-220.
@@ -708,6 +710,111 @@ ROM_START( rw18r )
 	ROM_REGION( 0x200, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "b5000cc", 0x000, 0x0c0, CRC(ace32614) SHA1(23cf11acf2e73ce2dfc165cb87f86fab15f69ff7) )
 	ROM_CONTINUE(        0x100, 0x100 )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Rockwell 31R
+  * A5500 MCU (label A5502PA, die label A5500)
+  * 9-digit 7seg LED display
+
+***************************************************************************/
+
+class rw31r_state : public hh_rw5000_state
+{
+public:
+	rw31r_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_rw5000_state(mconfig, type, tag)
+	{ }
+
+	void rw31r(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+	u8 read_kb();
+};
+
+// handlers
+
+void rw31r_state::write_str(u16 data)
+{
+	// STR0-STR7: digit select
+	// STR4-STR8: input mux
+	m_display->write_my(data);
+	m_inp_mux = data >> 4;
+}
+
+void rw31r_state::write_seg(u16 data)
+{
+	// SEG0-SEG7: digit segment data
+	m_display->write_mx(bitswap<8>(data,0,7,6,5,4,3,2,1));
+}
+
+u8 rw31r_state::read_kb()
+{
+	// KB: multiplexed inputs
+	return read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( rw31r )
+	PORT_START("IN.0") // STR4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(". / +/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("F / CF") // function
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+ / M+")
+
+	PORT_START("IN.1") // STR5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("- / M-")
+
+	PORT_START("IN.2") // STR6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"× / x²")
+
+	PORT_START("IN.3") // STR7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷ / 1/x")
+
+	PORT_START("IN.4") // STR8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("C / MC")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME(u8"X↔Y / X↔M")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME(u8"% / √x")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / MR")
+INPUT_PORTS_END
+
+void rw31r_state::rw31r(machine_config &config)
+{
+	// basic machine hardware
+	A5500(config, m_maincpu, 250000); // approximation
+	m_maincpu->write_str().set(FUNC(rw31r_state::write_str));
+	m_maincpu->write_seg().set(FUNC(rw31r_state::write_seg));
+	m_maincpu->read_kb().set(FUNC(rw31r_state::read_kb));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_rw31r);
+}
+
+// roms
+
+ROM_START( rw31r )
+	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "a5502pa", 0x000, 0x280, CRC(6ee0b30a) SHA1(42e5d1e29bdef4b4faaafee3592cacc0e66b982f) )
+	ROM_CONTINUE(        0x380, 0x080 )
 ROM_END
 
 
@@ -857,4 +964,5 @@ CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_
 CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw31r,     0,       0, rw31r,     rw31r,     rw31r_state,     empty_init, "Rockwell", "31R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, rw24k,     0,       0, rw24k,     rw24k,     rw24k_state,     empty_init, "Rockwell", "24K (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
