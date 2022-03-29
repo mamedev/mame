@@ -111,8 +111,8 @@ private:
 	const address_space_config m_mac_config;
 
 	required_memory_region m_rom;
-	memory_share_creator<uint8_t> m_segment_ram;
-	memory_share_creator<uint16_t> m_page_ram;
+	memory_share_creator<u8> m_segment_ram;
+	memory_share_creator<u16> m_page_ram;
 
 	required_device<watchdog_timer_device> m_watchdog;
 
