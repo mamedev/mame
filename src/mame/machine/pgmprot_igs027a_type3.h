@@ -29,15 +29,15 @@ protected:
 
 private:
 	// svg
-	int m_svg_ram_sel;
+	int m_svg_ram_sel = 0;
 	std::unique_ptr<u32[]> m_svg_shareram[2];    //for 5585G MACHINE
 
-	u32 m_svg_latchdata_68k_w;
-	u32 m_svg_latchdata_arm_w;
+	u32 m_svg_latchdata_68k_w = 0;
+	u32 m_svg_latchdata_arm_w = 0;
 	required_shared_ptr<u32> m_arm_ram;
 	required_shared_ptr<u32> m_arm_ram2;
 
-	u32* m_armrom;
+	u32* m_armrom = nullptr;
 
 	optional_device<cpu_device> m_prot;
 

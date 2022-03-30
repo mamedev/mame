@@ -425,7 +425,7 @@ const psxcd_device::cdcmd psxcd_device::cmd_table[]=
 
 void psxcd_device::write_command(uint8_t byte)
 {
-	if(byte > 31)
+	if(byte > 30)   // coverity 140157
 		illegalcmd(byte);
 	else
 		(this->*cmd_table[byte])();

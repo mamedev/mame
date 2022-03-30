@@ -973,9 +973,9 @@ void naomi_gdrom_board::device_start()
 		cdrom_read_data(gdromfile, path_table, buffer, CD_TRACK_MODE1);
 
 		// directory
-		uint8_t dir_sector[2048];
+		uint8_t dir_sector[2048]{};
 		// find data of file
-		uint32_t file_start, file_size;
+		uint32_t file_start = 0, file_size = 0;
 
 		if (netpic == 0) {
 			uint32_t dir = ((buffer[0x2 + 0] << 0) |
