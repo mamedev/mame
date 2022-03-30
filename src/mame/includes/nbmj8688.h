@@ -102,8 +102,8 @@ private:
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
 	std::unique_ptr<uint16_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_clut;
-	int m_flipscreen_old;
-	emu_timer *m_blitter_timer;
+	int m_flipscreen_old = 0;
+	emu_timer *m_blitter_timer = nullptr;
 
 	// common
 	uint8_t ff_r();

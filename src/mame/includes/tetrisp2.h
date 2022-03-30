@@ -115,7 +115,7 @@ protected:
 	u16 m_rockn_protectdata = 0;
 	u16 m_rockn_adpcmbank = 0;
 	u16 m_rockn_soundvolume = 0;
-	int m_rot_ofsx, m_rot_ofsy = 0;
+	int m_rot_ofsx = 0, m_rot_ofsy = 0;
 	int m_bank_lo = 0;
 	int m_bank_hi = 0;
 

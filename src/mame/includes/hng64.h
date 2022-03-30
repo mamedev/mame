@@ -182,7 +182,7 @@ public:
 	void init_ss64();
 	void init_hng64_fght();
 
-	uint8_t *m_texturerom;
+	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -264,7 +264,7 @@ private:
 	int m_samsho64_3d_hack;
 	int m_roadedge_3d_hack;
 
-	uint8_t m_fbcontrol[4];
+	uint8_t m_fbcontrol[4]{};
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -272,13 +272,13 @@ private:
 	/* Communications stuff */
 	std::unique_ptr<uint8_t[]> m_com_op_base;
 	std::unique_ptr<uint8_t[]> m_com_virtual_mem;
-	uint8_t m_com_shared[8];
+	uint8_t m_com_shared[8]{};
 
-	int32_t m_dma_start;
-	int32_t m_dma_dst;
-	int32_t m_dma_len;
+	int32_t m_dma_start = 0;
+	int32_t m_dma_dst = 0;
+	int32_t m_dma_len = 0;
 
-	uint16_t m_mcu_en;
+	uint16_t m_mcu_en = 0;
 
 	uint32_t m_activeDisplayList = 0U;
 	uint32_t m_no_machine_error_code = 0U;
@@ -307,7 +307,7 @@ private:
 	uint16_t m_old_tileflags[4]{};
 
 	// 3d State
-	int m_paletteState3d;
+	int m_paletteState3d = 0;
 	float m_projectionMatrix[16]{};
 	float m_modelViewMatrix[16]{};
 	float m_cameraMatrix[16]{};

@@ -68,7 +68,7 @@ private:
 	tilemap_t *m_spr1_tilemap_flipx = nullptr;
 	tilemap_t *m_spr2_tilemap = nullptr;
 
-	bool m_nmi_mask;
+	bool m_nmi_mask = false;
 	uint8_t spunchout_exp_r(offs_t offset);
 	void spunchout_exp_w(offs_t offset, uint8_t data);
 	void spunchout_rp5h01_reset_w(uint8_t data);
