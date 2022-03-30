@@ -4810,13 +4810,17 @@ ROM_END
 
 /*
   Unknown Golden Poker.
-  Bio5 Alternate Hi-LO game.
-  
+  Bio5 set.
+
   Maybe bootleg
   Running in original Bonanza board.
 
   Program mapped at 0x5000-0x7fff
   GFX ROMs are missing.
+
+  Always get a winning Flush hand.
+  (Seems protection. Need to analyze the code)
+
 */
 ROM_START( goldnpkd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4839,8 +4843,8 @@ ROM_END
 
 /*
   Unknown Golden Poker.
-  G Alternate HI-LO game, french text in copyright
-  
+  G set. Alternate HI-LO game, french text in copyright.
+
   Bootleg from Intercoast
   Running in original Bonanza board.
 
@@ -4858,6 +4862,10 @@ ROM_END
   3- The player can still collect without playing double-up by pressing the "TAKE" button
 
   Also,the "WIN" message looks to be misplaced on the screen (too low)
+  Will show correctly if the system runs in 50hz.
+
+  This set has the following sequence of coin2/credits in setup:
+  1-6-4-5-8-10-20-50-100. This is odd...
 
 */
 ROM_START( goldnpke )
@@ -4900,6 +4908,8 @@ ROM_END
   3- The player can still collect without playing double-up by pressing the "TAKE" button
 
   Also,the "WIN" message looks to be misplaced on the screen (too low)
+  Will show correctly if the system runs in 50hz.
+
   Coin2 and Coupon/Note are fixed in 1 credit and cannot be changed.
 
 */
@@ -12013,7 +12023,7 @@ void goldnpkr_state::init_pokersis()
 GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",           0,                layout_goldnpkr )
 GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",          0,                layout_goldnpkr )
 GAMEL( 198?, goldnpkc,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 1)",    0,                layout_goldnpkr )
-GAMEL( 198?, goldnpkd,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 2)",    0,                layout_goldnpkr )
+GAMEL( 198?, goldnpkd,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 2)",    MACHINE_NOT_WORKING, layout_goldnpkr )  // always get a winning flush
 GAMEL( 1983, goldnpke,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 3)",    0,                layout_goldnpkr )
 GAMEL( 1983, goldnpkf,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 4)",    0,                layout_goldnpkr )
 
