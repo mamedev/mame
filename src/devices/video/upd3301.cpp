@@ -17,12 +17,13 @@
     - reset counters;
     - proper DMA timing (now the whole screen is transferred at the end of the frame,
         accurate timing requires CCLK timer which kills performance)
-    - DMA burst mode;
+    - DMA burst mode (reportedly not working in pc8801 arch,
+	    should return a blank screen for reasons);
+	- DMA underrun (sorcerml in pc8801?). Should throw a status U irq;
     - cleanup: variable namings should be more verbose
-      (i.e. not be a single letter like m_y, m_z, m_b ...);
-    - sorcerml (pc8801) has buggy DMA burst mode, causing an underrun (hence a status U interrupt);
+        (i.e. not be a single letter like m_y, m_z, m_b ...);
     - jettermi (pc8801) expects to colorize its underlying 400 b&w mode by masking with the
-      text color attributes here;
+        text color attributes here;
     - xak2 (pc8801) throws text garbage on legacy renderer (verify);
 
 */
@@ -32,9 +33,25 @@
 
 #include "screen.h"
 
-//#define VERBOSE 1
+#define LOG_WARN    (1U << 1) // Illegal setup attempts
+#define LOG_CMD     (1U << 2) // Command r/w
+#define LOG_CURSOR  (1U << 3) // Cursor position (verbose)
+#define LOG_CRTC    (1U << 4) // CRTC parameters
+#define LOG_INT     (1U << 5) // INT, VRTC and DRQ lines
+#define LOG_HRTC    (1U << 6) // HRTC (verbose)
+
+#define VERBOSE (LOG_WARN)
+//#define VERBOSE (LOG_WARN|LOG_CMD)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
+#define LOGWARN(...)      LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGCMD(...)       LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGCURSOR(...)    LOGMASKED(LOG_CURSOR, __VA_ARGS__)
+#define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
+#define LOGINT(...)       LOGMASKED(LOG_INT, __VA_ARGS__)
+#define LOGHRTC(...)      LOGMASKED(LOG_HRTC, __VA_ARGS__)
 
 
 //**************************************************************************
@@ -236,7 +253,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 		case TIMER_HRTC:
-			LOG("UPD3301 HRTC: %u\n", param);
+			LOGHRTC("HRTC: %u at beam %d x %d\n", param, screen().hpos(), screen().vpos());
 
 			m_write_hrtc(param);
 			m_hrtc = param;
@@ -245,7 +262,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 
 		case TIMER_VRTC:
-			LOG("UPD3301 VRTC: %u %d\n", param, screen().vpos());
+			LOGINT("VRTC: %u at y %d\n", param, screen().vpos());
 
 			m_write_vrtc(param);
 			m_vrtc = param;
@@ -321,8 +338,8 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					m_h = (data & 0x7f) + 2;
 					if (m_h > 80)
 						popmessage("Illegal width set %d", m_h);
-					LOG("UPD3301 DMA Mode: %s\n", m_dma_mode ? "character" : "burst");
-					LOG("UPD3301 H: %u\n", m_h);
+					LOGCMD("DMA Mode: %s\n", m_dma_mode ? "character" : "burst");
+					LOGCMD("H: %u (characters per line)\n", m_h);
 					break;
 
 				case 1:
@@ -331,8 +348,8 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					// number of lines displayed -1
 					// (or in other words, tilemap y size)
 					m_l = (data & 0x3f) + 1;
-					LOG("UPD3301 B: %u\n", m_b);
-					LOG("UPD3301 L: %u\n", m_l);
+					LOGCMD("B: %u (cursor blink rate)\n", m_b);
+					LOGCMD("L: %u (number of lines displayed)\n", m_l);
 					break;
 
 				case 2:
@@ -351,9 +368,9 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 						popmessage("cursor mode %02x", m_c);
 					// Number of lines per character -1
 					m_r = (data & 0x1f) + 1;
-					LOG("UPD3301 S: %u\n", m_s);
-					LOG("UPD3301 C: %u\n", m_c);
-					LOG("UPD3301 R: %u\n", m_r);
+					LOGCMD("S: %u (skip line)\n", m_s);
+					LOGCMD("C: %u (cursor mode)\n", m_c);
+					LOGCMD("R: %u (number of lines per character)\n", m_r);
 					break;
 
 				case 3:
@@ -361,8 +378,8 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					m_v = (data >> 5) + 1;
 					// hblank width -2 (6 to 33)
 					m_z = (data & 0x1f) + 2;
-					LOG("UPD3301 V: %u\n", m_v);
-					LOG("UPD3301 Z: %u\n", m_z);
+					LOGCMD("V: %u (vblank lines)\n", m_v);
+					LOGCMD("Z: %u (hblank width)\n", m_z);
 					recompute_parameters();
 					break;
 
@@ -383,8 +400,10 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					// Max number of attributes per line -1
 					// can't be higher than 20
 					m_attr = std::min((data & 0x1f) + 1, 20);
-					LOG("UPD3301 AT1: %u AT0: %u SC: %u\n", BIT(data, 7), BIT(data, 6), BIT(data, 5));
-					LOG("UPD3301 ATTR: %u\n", m_attr);
+					LOGCMD("AT1: %u AT0: %u SC: %u (gfx mode = %02x)\n",
+						BIT(data, 7), BIT(data, 6), BIT(data, 5), m_gfx_mode
+					);
+					LOGCMD("ATTR: %u (num attributes per line)\n", m_attr);
 
 					m_mode = MODE_NONE;
 					break;
@@ -398,12 +417,12 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				{
 				case 0:
 					m_cx = data & 0x7f;
-					LOG("UPD3301 CX: %u\n", m_cx);
+					LOGCURSOR("CX: %u\n", m_cx);
 					break;
 
 				case 1:
 					m_cy = data & 0x3f;
-					LOG("UPD3301 CY: %u\n", m_cy);
+					LOGCURSOR("CY: %u\n", m_cy);
 
 					m_mode = MODE_NONE;
 					break;
@@ -413,7 +432,7 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				break;
 
 			default:
-				LOG("UPD3301 Invalid Parameter Byte %02x!\n", data);
+				LOGWARN("Invalid Parameter Byte %02x!\n", data);
 			}
 			break;
 
@@ -424,7 +443,7 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 			switch (data & 0xe0)
 			{
 			case COMMAND_RESET:
-				LOG("UPD3301 Reset\n");
+				LOGCMD("Reset\n");
 				m_mode = MODE_RESET;
 				// TODO: this also disables external display such as Graphic VRAM in PC-8801
 				set_display(0);
@@ -433,8 +452,9 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 
 			case COMMAND_START_DISPLAY:
 			{
-				LOG("UPD3301 Start Display\n");
+				LOGCMD("Start Display\n");
 				bool new_rvv = bool(BIT(data, 0));
+				LOGCMD("RVV: %u (reverse display)\n", new_rvv);
 				// misscmd (pc8001) enables this
 				if (m_reverse_display != new_rvv)
 				{
@@ -442,7 +462,7 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					if (!m_write_rvv.isnull())
 						m_write_rvv(m_reverse_display);
 					else if (m_reverse_display == true)
-						logerror("%s: reverse display enabled (warning)\n", machine().describe_context());
+						logerror("%s: RVV reverse display enabled (warning)\n", machine().describe_context());
 				}
 				set_display(1);
 				reset_counters();
@@ -450,38 +470,38 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 			}
 
 			case COMMAND_SET_INTERRUPT_MASK:
-				LOG("UPD3301 Set Interrupt Mask\n");
+				LOGCMD("Set Interrupt Mask\n");
 				// vblank irq mask
 				m_me = BIT(data, 0);
 				// special control character irq mask
 				m_mn = BIT(data, 1);
-				// TODO: writing a negated bit 0 makes status bit 7 to be held high?
-				LOG("UPD3301 ME: %u\n", m_me);
-				LOG("UPD3301 MN: %u\n", m_mn);
+				// TODO: Apparently unmasking ME should be reflected in undocumented status bit 7
+				LOGCMD("ME: %u (vblank irq mask)\n", m_me);
+				LOGCMD("MN: %u (special control char irq mask)\n", m_mn);
 				break;
 
 			case COMMAND_READ_LIGHT_PEN:
-				LOG("UPD3301 Read Light Pen\n");
+				LOGCMD("Read Light Pen\n");
 				// TODO: similar to cursor parameters except on read
 				// (plus an HR to bit 7 param [0])
 				m_mode = MODE_READ_LIGHT_PEN;
 				break;
 
 			case COMMAND_LOAD_CURSOR_POSITION:
-				LOG("UPD3301 Load Cursor Position\n");
+				LOGCURSOR("Load Cursor Position\n");
 				m_mode = MODE_LOAD_CURSOR_POSITION;
 				// (1) show cursor (0) disable cursor
 				m_cm = BIT(data, 0);
-				LOG("UPD3301 CM: %u\n", m_cm);
+				LOGCURSOR("CM: %u\n", m_cm);
 				break;
 
 			case COMMAND_RESET_INTERRUPT:
-				LOG("UPD3301 Reset Interrupt\n");
+				LOGCMD("Reset Interrupt\n");
 				set_interrupt(0);
 				break;
 
 			case COMMAND_RESET_COUNTERS:
-				LOG("UPD3301 Reset Counters\n");
+				LOGCMD("Reset Counters\n");
 				m_mode = MODE_RESET_COUNTERS;
 				reset_counters();
 				break;
@@ -497,6 +517,7 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 
 void upd3301_device::dack_w(uint8_t data)
 {
+	// TODO: underrun condition
 	if (m_y >= (m_l * m_r))
 	{
 		return;
@@ -547,7 +568,7 @@ void upd3301_device::lpen_w(int state)
 
 
 //-------------------------------------------------
-//  hrtc_r -
+//  hrtc_r - Horizontal ReTraCe
 //-------------------------------------------------
 
 int upd3301_device::hrtc_r()
@@ -557,7 +578,7 @@ int upd3301_device::hrtc_r()
 
 
 //-------------------------------------------------
-//  vrtc_r -
+//  vrtc_r - Vertical ReTraCe
 //-------------------------------------------------
 
 int upd3301_device::vrtc_r()
@@ -664,7 +685,7 @@ uint32_t upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void upd3301_device::set_interrupt(int state)
 {
-	LOG("UPD3301 Interrupt: %u\n", state);
+	LOGINT("Interrupt: %u\n", state);
 
 	m_write_int(state);
 
@@ -681,7 +702,7 @@ void upd3301_device::set_interrupt(int state)
 
 void upd3301_device::set_drq(int state)
 {
-	LOG("UPD3301 DRQ: %u %d\n", state, screen().vpos());
+	LOGINT("DRQ: %u %d\n", state, screen().vpos());
 
 	m_write_drq(state);
 }
@@ -762,8 +783,8 @@ void upd3301_device::recompute_parameters()
 
 	visarea.set(0, (m_h * m_width) - 1, 0, (m_l * m_r) - 1);
 
-	LOG("UPD3301 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-	LOG("UPD3301 Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	LOGCRTC("Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	LOGCRTC("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 
 	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 

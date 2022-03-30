@@ -335,8 +335,6 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_text_bitmap.fill(m_crtc_palette->pen(0), cliprect);
 
-//  popmessage("%04x %04x %02x",m_dma_address[2],m_dma_counter[2],m_dmac_mode);
-
 	if(m_gfx_ctrl & 8)
 	{
 		if(m_gfx_ctrl & 0x10)
