@@ -16,9 +16,9 @@ public:
 
 	uint16_t killbld_igs025_prot_r(offs_t offset);
 	// use setters instead of making public?
-	const uint8_t (*m_kb_source_data)[0xec];
-	uint32_t m_kb_game_id;
-	uint32_t m_kb_region;
+	const uint8_t (*m_kb_source_data)[0xec]{};
+	uint32_t m_kb_game_id = 0;
+	uint32_t m_kb_region = 0;
 
 	template <typename... T> void set_external_cb(T &&... args) { m_execute_external.set(std::forward<T>(args)...); }
 
@@ -33,14 +33,14 @@ protected:
 
 	igs025_execute_external m_execute_external;
 
-	uint16_t        m_kb_prot_hold;
-	uint16_t        m_kb_prot_hilo;
-	uint16_t        m_kb_prot_hilo_select;
+	uint16_t        m_kb_prot_hold = 0;
+	uint16_t        m_kb_prot_hilo = 0;
+	uint16_t        m_kb_prot_hilo_select = 0;
 
-	int           m_kb_cmd;
-	int           m_kb_reg;
-	int           m_kb_ptr;
-	uint8_t         m_kb_swap;
+	int           m_kb_cmd = 0;
+	int           m_kb_reg = 0;
+	int           m_kb_ptr = 0;
+	uint8_t         m_kb_swap = 0;
 
 	void killbld_protection_calculate_hilo();
 	void killbld_protection_calculate_hold(int y, int z);
@@ -48,8 +48,8 @@ protected:
 	void no_callback_setup(void);
 
 
-	uint16_t        m_olds_bs;
-	uint16_t        m_kb_cmd3;
+	uint16_t        m_olds_bs = 0;
+	uint16_t        m_kb_cmd3 = 0;
 
 };
 

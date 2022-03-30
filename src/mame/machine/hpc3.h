@@ -130,12 +130,12 @@ protected:
 		bool m_active;
 		uint32_t m_cur_ptr;
 		uint32_t m_desc_ptr;
-		uint32_t m_desc_flags;
-		uint32_t m_next_ptr;
-		uint32_t m_bytes_left;
-		uint32_t m_config;
-		uint32_t m_control;
-		emu_timer *m_timer;
+		uint32_t m_desc_flags = 0;
+		uint32_t m_next_ptr = 0;
+		uint32_t m_bytes_left = 0;
+		uint32_t m_config = 0;
+		uint32_t m_control = 0;
+		emu_timer *m_timer = nullptr;
 	};
 
 	enum

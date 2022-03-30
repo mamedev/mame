@@ -45,25 +45,25 @@ private:
 	std::unique_ptr<output_finder<16> > m_outputs;
 	uint8_t m_port_val;
 
-	int m_cursor_pos;
-	int m_window_start;     // display window start pos 0-15
-	int m_window_end;       // display window end   pos 0-15
-	int m_window_size;      // window  size
-	int m_shift_count;
-	int m_shift_data;
-	int m_pcursor_pos;
-	int m_scroll_active;
-	int m_display_mode;
-	int m_flash_rate;
-	int m_flash_control;
-	int m_sclk;
-	int m_data;
+	int m_cursor_pos = 0;
+	int m_window_start = 0;     // display window start pos 0-15
+	int m_window_end = 0;       // display window end   pos 0-15
+	int m_window_size = 0;      // window  size
+	int m_shift_count = 0;
+	int m_shift_data = 0;
+	int m_pcursor_pos = 0;
+	int m_scroll_active = 0;
+	int m_display_mode = 0;
+	int m_flash_rate = 0;
+	int m_flash_control = 0;
+	int m_sclk = 0;
+	int m_data = 0;
 
-	uint8_t m_cursor;
-	uint16_t m_chars[16];
-	uint8_t m_attrs[16];
-	uint16_t m_user_data;             // user defined character data (16 bit)
-	uint16_t m_user_def;          // user defined character state
+	uint8_t m_cursor = 0;
+	uint16_t m_chars[16]{};
+	uint8_t m_attrs[16]{};
+	uint16_t m_user_data = 0;             // user defined character data (16 bit)
+	uint16_t m_user_def = 0;          // user defined character state
 };
 
 DECLARE_DEVICE_TYPE(BFM_BD1, bfm_bd1_device)

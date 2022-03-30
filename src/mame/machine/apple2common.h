@@ -35,11 +35,11 @@ protected:
 private:
 	optional_device<g65816_device> m_GScpu;
 
-	double m_x_calibration, m_y_calibration;
-	double m_joystick_x1_time;
-	double m_joystick_y1_time;
-	double m_joystick_x2_time;
-	double m_joystick_y2_time;
+	double m_x_calibration = 0, m_y_calibration = 0;
+	double m_joystick_x1_time = 0;
+	double m_joystick_y1_time = 0;
+	double m_joystick_x2_time = 0;
+	double m_joystick_y2_time = 0;
 
 	offs_t com_2byte_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
 	offs_t com_3byte_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);

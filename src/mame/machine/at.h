@@ -55,16 +55,16 @@ private:
 	required_device<mc146818_device> m_mc146818;
 	optional_device<at_keyboard_controller_device> m_keybc; // removed in mtouchxl.cpp and vis.cpp
 
-	uint8_t m_at_spkrdata;
-	uint8_t m_pit_out2;
-	int m_dma_channel;
-	bool m_cur_eop, m_cur_eop2;
-	uint8_t m_dma_offset[2][4];
-	uint8_t m_at_pages[0x10];
-	uint16_t m_dma_high_byte;
-	uint8_t m_at_speaker;
-	uint8_t m_channel_check;
-	uint8_t m_nmi_enabled;
+	uint8_t m_at_spkrdata = 0;
+	uint8_t m_pit_out2 = 0;
+	int m_dma_channel = 0;
+	bool m_cur_eop = false, m_cur_eop2 = false;
+	uint8_t m_dma_offset[2][4]{};
+	uint8_t m_at_pages[0x10]{};
+	uint16_t m_dma_high_byte = 0;
+	uint8_t m_at_speaker = 0;
+	uint8_t m_channel_check = 0;
+	uint8_t m_nmi_enabled = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
 

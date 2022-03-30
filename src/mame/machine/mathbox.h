@@ -32,10 +32,10 @@ protected:
 	// internal state
 
 	/* math box scratch registers */
-	int16_t m_reg[16];
+	int16_t m_reg[16]{};
 
 	/* math box result */
-	int16_t m_result;
+	int16_t m_result = 0;
 };
 
 DECLARE_DEVICE_TYPE(MATHBOX, mathbox_device)
