@@ -19,6 +19,7 @@
 #include "machine/input_merger.h"
 #include "machine/upd1990a.h"
 #include "machine/ng_memcard.h"
+#include "video/alpha68k_palette.h"
 #include "video/neogeo_spr.h"
 
 #include "bus/neogeo/slot.h"
@@ -77,8 +78,6 @@ protected:
 	uint8_t audio_cpu_bank_select_r(offs_t offset);
 	void audio_cpu_enable_nmi_w(offs_t offset, uint8_t data);
 	uint16_t unmapped_r(address_space &space);
-	uint16_t paletteram_r(offs_t offset);
-	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t video_register_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
 	void video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -125,7 +124,7 @@ protected:
 	required_device<neosprite_optimized_device> m_sprgen;
 
 	required_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
+	optional_device<alpha68k_palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
 	required_device<hc259_device> m_systemlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -186,7 +185,6 @@ private:
 	void set_display_counter_lsb(uint16_t data);
 	void set_video_control(uint16_t data);
 
-	void create_rgb_lookups();
 	void set_pens();
 
 	// internal state
@@ -204,12 +202,6 @@ private:
 	uint16_t get_video_control();
 
 	required_device<input_merger_device> m_audionmi;
-
-	// color/palette related
-	std::vector<uint16_t> m_paletteram;
-	uint8_t      m_palette_lookup[32][4];
-	int          m_screen_shadow;
-	int          m_palette_bank;
 };
 
 
