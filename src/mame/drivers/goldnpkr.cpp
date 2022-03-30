@@ -4915,9 +4915,9 @@ ROM_END
 */
 ROM_START( goldnpkf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hl_1.bin",  0x5000, 0x1000, NO_DUMP )
-	ROM_LOAD( "hl_2.bin",  0x6000, 0x1000, NO_DUMP )
-	ROM_LOAD( "hl_3.bin",  0x7000, 0x1000, NO_DUMP )
+	ROM_LOAD( "hl_1.bin",  0x5000, 0x1000, BAD_DUMP CRC(d475cd13) SHA1(7c12b44ab938f26701587e57784f08e248e3afd2) )
+	ROM_LOAD( "hl_2.bin",  0x6000, 0x1000, BAD_DUMP CRC(304eb644) SHA1(c876e0d6121dee594c4f5d75273c74982c5bd524) )
+	ROM_LOAD( "hl_3.bin",  0x7000, 0x1000, BAD_DUMP CRC(47c15f44) SHA1(da7af46a8d17abffd30fffe6eb091d15f9f8f92c) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
 	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
