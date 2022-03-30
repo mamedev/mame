@@ -952,8 +952,8 @@ license:CC0
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="171-5486" />
 			<dataarea name="rom" size="262144">
-				<rom name="nightmare 0" size="131072" crc="31715c15" sha1="f0437f9d2716f56b1424f6441854eaf0101ee1cc" offset="0x00000" /> <!-- original label: ナイトメア 0 -->
-				<rom name="nightmare 1" size="131072" crc="08835d51" sha1="396f9cd1416a152545d150107970746e362a9400" offset="0x20000" /> <!-- original label: ナイトメア 1 -->
+				<rom name="nightmare_0.ic1" size="131072" crc="31715c15" sha1="f0437f9d2716f56b1424f6441854eaf0101ee1cc" offset="0x00000" /> <!-- original label: ナイトメア 0 -->
+				<rom name="nightmare_1.ic2" size="131072" crc="08835d51" sha1="396f9cd1416a152545d150107970746e362a9400" offset="0x20000" /> <!-- original label: ナイトメア 1 -->
 			</dataarea>
 		</part>
 	</software>
@@ -3003,7 +3003,7 @@ license:CC0
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="171-5486" />
 			<dataarea name="rom" size="131072">
-				<rom name="g-axe 2ca8 ces" size="131072" crc="a471f450" sha1="201ae127514a1debea786e7a1a3dae617937b539" offset="000000" />
+				<rom name="g-axe_2ca8_ces.ic1" size="131072" crc="a471f450" sha1="201ae127514a1debea786e7a1a3dae617937b539" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5389,8 +5389,8 @@ license:CC0
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="171-5486" />
 			<dataarea name="rom" size="262144">
-				<rom name="psycho fox (usa, europe).bin" size="131072" crc="601f6aec" sha1="92cd843a8278e33632207a667d2447f9d901de30" offset="0x00000" />
-				<rom name="psycho fox (usa, europe).bin" size="131072" crc="d875bff5" sha1="ea4124286e8e93975ee89db67b2441c43da365dc" offset="0x20000" />
+				<rom name="fox-0_5a04.ic1" size="131072" crc="601f6aec" sha1="92cd843a8278e33632207a667d2447f9d901de30" offset="0x00000" />
+				<rom name="fox-1_dd75.ic2" size="131072" crc="d875bff5" sha1="ea4124286e8e93975ee89db67b2441c43da365dc" offset="0x20000" />
 			</dataarea>
 		</part>
 	</software>
