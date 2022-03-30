@@ -175,8 +175,8 @@
      * Dictionary: 0xc000 - 0xffff (32 Banks)
 
     References:
-	- https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
-	- http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
+    - https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
+    - http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
     - http://www7b.biglobe.ne.jp/~crazyunit/pc88.html
 
 *************************************************************************************************************************************/
@@ -482,7 +482,7 @@ void pc8801_state::draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gf
 
 	uint8_t y_height = lines_per_char;
 	uint8_t y_double = pixel_clock();
-	// elthlead uses latter
+	// elthlead uses former
 	uint8_t y_step = (non_special) ? 80 : 120;
 	uint8_t is_cursor = 0;
 
@@ -971,7 +971,7 @@ void pc8801_state::port31_w(uint8_t data)
 {
 	m_gfx_ctrl = data;
 
-//	set_screen_frequency((data & 0x11) != 0x11);
+//  set_screen_frequency((data & 0x11) != 0x11);
 //  dynamic_res_change();
 }
 
@@ -1869,8 +1869,8 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPNAME( 0x08, 0x00, "Auto-boot floppy at start-up" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
-//	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
+//  PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
+//  PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: Coming from the old legacy driver as "EXSWITCH", where this maps?
@@ -2233,7 +2233,7 @@ void pc8801_state::pc8801(machine_config &config)
 	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//	m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
+//  m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
 	m_screen->set_raw(PIXEL_CLOCK_15KHz, 896, 0, 640, 260, 0, 200);
 	m_screen->set_screen_update(FUNC(pc8801_state::screen_update));
 //  m_screen->set_palette(m_palette);

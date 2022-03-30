@@ -18,8 +18,8 @@
     - proper DMA timing (now the whole screen is transferred at the end of the frame,
         accurate timing requires CCLK timer which kills performance)
     - DMA burst mode (reportedly not working in pc8801 arch,
-	    should return a blank screen for reasons);
-	- DMA underrun (sorcerml in pc8801?). Should throw a status U irq;
+        should return a blank screen for reasons);
+    - DMA underrun (sorcerml in pc8801?). Should throw a status U irq;
     - cleanup: variable namings should be more verbose
         (i.e. not be a single letter like m_y, m_z, m_b ...);
     - jettermi (pc8801) expects to colorize its underlying 400 b&w mode by masking with the
@@ -198,12 +198,15 @@ void upd3301_device::device_start()
 
 void upd3301_device::device_reset()
 {
+	set_display(0);
 	set_interrupt(0);
 	set_drq(0);
 
 	m_cm = 0;
 	m_b = 48;
 	m_reverse_display = false;
+	if (!m_write_rvv.isnull())
+		m_write_rvv(m_reverse_display);
 
 	recompute_parameters();
 }
@@ -304,7 +307,7 @@ uint8_t upd3301_device::read(offs_t offset)
 		case 0: // data
 			// TODO: light pen
 			if (!machine().side_effects_disabled())
-				popmessage("light pen reading");
+				popmessage("light pen reading?");
 			break;
 
 		case 1: // status
@@ -395,11 +398,13 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 					//m_at0 = BIT(data, 6);
 					//m_sc = BIT(data, 5);
 					m_gfx_mode = (data & 0xe0) >> 5;
-					if (m_gfx_mode & 0x5)
+					if (m_gfx_mode & 0x4)
 						popmessage("attr mode %02x", m_gfx_mode);
+
 					// Max number of attributes per line -1
 					// can't be higher than 20
-					m_attr = std::min((data & 0x1f) + 1, 20);
+					// overriden to 0 in no attribute/no sc mode
+					m_attr = (m_gfx_mode == 1) ? 0 : std::min((data & 0x1f) + 1, 20);
 					LOGCMD("AT1: %u AT0: %u SC: %u (gfx mode = %02x)\n",
 						BIT(data, 7), BIT(data, 6), BIT(data, 5), m_gfx_mode
 					);
@@ -595,6 +600,14 @@ UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 {
 	const u8 attr_max_size = 80;
 	std::array<u16, attr_max_size> attr_extend_info;
+
+	// elthlead (pc8801) uses b&w no attributes/no special control mode
+	// 0-fill buffer seems enough
+	if (m_gfx_mode == 1)
+	{
+		std::fill(attr_extend_info.begin(), attr_extend_info.end(), 0x00);
+		return attr_extend_info;
+	}
 
 	// TODO: may actually fetch in LIFO order
 	for (int ex = 0; ex < attr_fifo_size; ex+=2)
