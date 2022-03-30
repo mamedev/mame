@@ -58,7 +58,7 @@ int st_format::identify(util::random_read &io, uint32_t form_factor, const std::
 	find_size(io, track_count, head_count, sector_count);
 
 	if(track_count)
-		return 50;
+		return FIFID_SIZE;
 	return 0;
 }
 
@@ -224,7 +224,7 @@ int msa_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		(head == 0 || head == 1) &&
 		strack <= etrack &&
 		etrack < 82)
-		return 100;
+		return FIFID_SIGN | FIFID_STRUCT;
 	return 0;
 }
 

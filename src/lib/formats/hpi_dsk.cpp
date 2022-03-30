@@ -95,7 +95,7 @@ int hpi_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	unsigned dummy_tracks;
 	if (((form_factor == floppy_image::FF_8) || (form_factor == floppy_image::FF_UNKNOWN)) &&
 		geometry_from_size(size , dummy_heads , dummy_tracks)) {
-		return 50;
+		return FIFID_SIZE;
 	} else {
 		return 0;
 	}

@@ -146,7 +146,7 @@ int victor9k_format::identify(util::random_read &io, uint32_t form_factor, const
 	int type = find_size(io, form_factor);
 
 	if (type != -1)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }

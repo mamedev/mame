@@ -426,7 +426,7 @@ int d88_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0, h, 32, actual);
 	if((little_endianize_int32(*(uint32_t *)(h+0x1c)) == size) &&
 		(h[0x1b] == 0x00 || h[0x1b] == 0x10 || h[0x1b] == 0x20 || h[0x1b] == 0x30 || h[0x1b] == 0x40))
-		return 100;
+		return FIFID_SIZE|FIFID_STRUCT;
 
 	return 0;
 }

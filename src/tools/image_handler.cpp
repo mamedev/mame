@@ -246,6 +246,8 @@ std::vector<std::pair<u8, const floppy_format_info *>> image_handler::identify(c
 
 	for(const auto &e : formats.floppy_format_info_by_key) {
 		u8 score = e.second->m_format->identify(*io, floppy_image::FF_UNKNOWN, variants);
+		if(score && e.second->m_format->extension_matches(m_on_disk_path.c_str()))
+			score |= floppy_image_format_t::FIFID_EXT;
 		if(score)
 			res.emplace_back(std::make_pair(score, e.second));
 	}

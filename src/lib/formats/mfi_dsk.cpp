@@ -107,7 +107,7 @@ int mfi_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		(h.cyl_count >> RESOLUTION_SHIFT) < 3 &&
 		h.head_count <= 2 &&
 		(!form_factor || !h.form_factor || h.form_factor == form_factor))
-		return 100;
+		return FIFID_SIGN|FIFID_STRUCT;
 	return 0;
 }
 

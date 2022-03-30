@@ -126,9 +126,9 @@ int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const s
 		io.read_at(512, sectdata, 512, actual);
 		// check value in RT-11 home block.  see src/tools/imgtool/modules/rt11.cpp
 		if (pick_integer_le(sectdata, 0724, 2) == 6)
-			return 100;
+			return FIFID_SIGN|FIFID_SIZE;
 		else
-			return 75;
+			return FIFID_SIZE;
 
 	}
 

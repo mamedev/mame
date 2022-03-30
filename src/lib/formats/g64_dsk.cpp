@@ -38,7 +38,7 @@ int g64_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	size_t actual;
 	io.read_at(0, h, 8, actual);
 	if (!memcmp(h, G64_FORMAT_HEADER, 8))
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }

@@ -39,7 +39,7 @@ int svi_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 
 	if (size == 172032 || size == 346112)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }

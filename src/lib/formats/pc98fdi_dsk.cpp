@@ -51,7 +51,7 @@ int pc98fdi_format::identify(util::random_read &io, uint32_t form_factor, const 
 	uint32_t const sides = little_endianize_int32(*(uint32_t *) (h + 0x18));
 	uint32_t const ntrk = little_endianize_int32(*(uint32_t *) (h + 0x1c));
 	if(size == hsize + psize && psize == ssize*scnt*sides*ntrk)
-		return 100;
+		return FIFID_STRUCT;
 
 	return 0;
 }

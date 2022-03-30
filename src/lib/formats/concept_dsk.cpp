@@ -93,7 +93,7 @@ int cc525dsdd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	find_size(io, track_count, head_count, sector_count);
 
 	if (track_count)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }

@@ -76,7 +76,7 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 	if (size == header_size + heads * tracks * track_size)
 	{
-		return 70;
+		return FIFID_STRUCT|FIFID_SIZE;
 	}
 
 	return 0;

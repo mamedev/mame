@@ -112,7 +112,7 @@ int nfd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0, h, 16, actual);
 
 	if (strncmp((const char *)h, "T98FDDIMAGE.R0", 14) == 0 || strncmp((const char *)h, "T98FDDIMAGE.R1", 14) == 0)
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }

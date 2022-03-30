@@ -95,7 +95,7 @@ int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	size_t actual;
 	io.read_at(0, h, 3, actual);
 	if (memcmp(h, "FSD", 3) == 0) {
-		return 100;
+		return FIFID_SIGN;
 	}
 	LOG_FORMATS("fsd: no match\n");
 	return 0;

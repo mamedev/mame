@@ -64,7 +64,7 @@ int dfi_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	char sign[4];
 	size_t actual;
 	io.read_at(0, sign, 4, actual);
-	return memcmp(sign, "DFE2", 4) ? 0 : 100;
+	return memcmp(sign, "DFE2", 4) ? 0 : FIFID_SIGN;
 }
 
 bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const

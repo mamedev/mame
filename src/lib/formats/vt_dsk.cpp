@@ -227,7 +227,7 @@ int vtech_bin_format::identify(util::random_read &io, uint32_t form_factor, cons
 		return 0;
 
 	if(size == 40*16*256)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -256,7 +256,7 @@ int vtech_dsk_format::identify(util::random_read &io, uint32_t form_factor, cons
 			count_sd++;
 	}
 
-	return count_sh >= 30*16 && count_sd >= 30*16 ? 100 : 0;
+	return count_sh >= 30*16 && count_sd >= 30*16 ? FIFID_STRUCT : 0;
 }
 
 bool vtech_bin_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const

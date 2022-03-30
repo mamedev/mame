@@ -69,7 +69,7 @@ int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 	if (size == HEADER_SIZE + heads * tracks * TOTAL_TRACK_SIZE)
 	{
-		return 100;
+		return FIFID_SIGN|FIFID_SIZE|FIFID_STRUCT;
 	}
 
 	return 0;

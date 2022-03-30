@@ -108,11 +108,11 @@ int dcp_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	// in theory track map should be enough (former check), but some images have it wrong!
 	// hence, if this check fails, we also allow for images with all tracks and wrong track map
 	if (size - 0xa2 == (heads * count_tracks * spt * bps) || size - 0xa2 == (heads * tracks * spt * bps))
-		return 100;
+		return FIFID_STRUCT|FIFID_SIZE;
 
 	// for disk type 0x11 the head 0 track 0 has 26 sectors of half width, so we need to compensate calculation
 	if (is_hdb && (size - 0xa2 + (0x80 * 26) == (heads * count_tracks * spt * bps) || size - 0xa2 + (0x80 * 26) == (heads * tracks * spt * bps)))
-		return 100;
+		return FIFID_STRUCT|FIFID_SIZE;
 
 	return 0;
 }

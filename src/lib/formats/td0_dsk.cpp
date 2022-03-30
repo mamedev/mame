@@ -816,7 +816,7 @@ int td0_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0, h, 7, actual);
 	if(((h[0] == 'T') && (h[1] == 'D')) || ((h[0] == 't') && (h[1] == 'd')))
 	{
-		return 100;
+		return FIFID_SIGN;
 	}
 	return 0;
 }

@@ -45,7 +45,7 @@ int dip_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 
 	if (size == 0x134000 + 0x100)
-		return 100;
+		return FIFID_SIZE;
 
 	return 0;
 }

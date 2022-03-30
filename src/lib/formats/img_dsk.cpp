@@ -52,7 +52,7 @@ int img_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 	if (((form_factor == floppy_image::FF_8) || (form_factor == floppy_image::FF_UNKNOWN)) &&
 		size == IMG_IMAGE_SIZE) {
-		return 50;
+		return FIFID_SIZE;
 	} else {
 		return 0;
 	}

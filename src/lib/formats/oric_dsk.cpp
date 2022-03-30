@@ -54,7 +54,7 @@ int oric_dsk_format::identify(util::random_read &io, uint32_t form_factor, const
 	if(sides < 0 || sides > 2 || geom != 1 || size != 256+6400*sides*tracks)
 		return 0;
 
-	return 100;
+	return FIFID_SIGN|FIFID_SIZE|FIFID_STRUCT;
 }
 
 bool oric_dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
@@ -138,7 +138,7 @@ int oric_jasmin_format::identify(util::random_read &io, uint32_t form_factor, co
 
 	bool const can_ds = variants.empty() || has_variant(variants, floppy_image::DSDD);
 	if(size == 41*17*256 || (can_ds && size == 41*17*256*2))
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }

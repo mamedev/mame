@@ -601,6 +601,8 @@ image_init_result floppy_image_device::call_load()
 	const floppy_image_format_t *best_format = nullptr;
 	for (const floppy_image_format_t *format : fif_list) {
 		int score = format->identify(*io, form_factor, variants);
+		if(score && format->extension_matches(filename()))
+			score |= floppy_image_format_t::FIFID_EXT;
 		if(score > best) {
 			best = score;
 			best_format = format;

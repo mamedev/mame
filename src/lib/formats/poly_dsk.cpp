@@ -54,7 +54,7 @@ int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const
 		io.read_at(0, boot, 16, actual);
 		if (memcmp(boot, "\x86\xc3\xb7\x00\x00\x8e\x10\xc0\xbf\x00\x01\xbf\xe0\x60\x00\x00", 16) == 0)
 		{
-			return 100;
+			return FIFID_SIZE|FIFID_SIGN;
 		}
 	}
 

@@ -1258,7 +1258,7 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 		return 0;
 	}
 
-	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? 100 : 0;
+	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? FIFID_STRUCT|FIFID_STRUCT : 0;
 }
 
 bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
@@ -1448,7 +1448,7 @@ int apple_gcr_format::identify(util::random_read &io, uint32_t form_factor, cons
 		return 0;
 
 	if(size == 409600 || (size == 819200 && (variants.empty() || has_variant(variants, floppy_image::DSDD))))
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -1557,13 +1557,13 @@ int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, cons
 	io.read_at(0, signature, 4, actual);
 	if (!strncmp(reinterpret_cast<char *>(signature), "2IMG", 4))
 	{
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	// Bernie ][ The Rescue wrote 2MGs with the signature byte-flipped, other fields are valid
 	if (!strncmp(reinterpret_cast<char *>(signature), "GMI2", 4))
 	{
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	return 0;

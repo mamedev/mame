@@ -113,7 +113,7 @@ int acorn_ssd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 90;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -246,7 +246,7 @@ int acorn_dsd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 90;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -351,7 +351,7 @@ int opus_ddos_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 90;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -448,7 +448,7 @@ int acorn_adfs_old_format::identify(util::random_read &io, uint32_t form_factor,
 	int type = find_size(io, form_factor, variants);
 
 	if(type != -1)
-		return 100;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -552,7 +552,7 @@ int acorn_adfs_new_format::identify(util::random_read &io, uint32_t form_factor,
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 100;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -633,7 +633,7 @@ int acorn_dos_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 90;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -695,7 +695,7 @@ int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, con
 	}
 
 	if (size == 819200 && memcmp(h, "Slogger ", 8) == 0)
-		return 100;
+		return FIFID_SIGN | FIFID_SIZE;
 
 	LOG_FORMATS("ddcpm: no match\n");
 	return 0;

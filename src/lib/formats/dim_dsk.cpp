@@ -41,7 +41,7 @@ int dim_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0xab, h, 16, actual);
 
 	if(strncmp((const char *)h, "DIFC HEADER", 11) == 0)
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }

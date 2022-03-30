@@ -943,7 +943,7 @@ int ti99_sdf_format::identify(util::random_read &io, uint32_t form_factor, const
 	case 368640:    // DSDD
 	case 737280:    // DSDD80
 	case 1474560:   // DSQD
-		vote = 50;
+		vote = FIFID_SIZE;
 		break;
 	default:
 		vote = 0;
@@ -961,7 +961,7 @@ int ti99_sdf_format::identify(util::random_read &io, uint32_t form_factor, const
 		if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
 		{
 			LOGMASKED(LOG_INFO, "[ti99_dsk] Found formatted SDF disk medium\n");
-			vote = 100;
+			vote |= FIFID_SIGN;
 		}
 		else
 		{
@@ -1239,7 +1239,7 @@ int ti99_tdf_format::identify(util::random_read &io, uint32_t form_factor, const
 
 	// Do we have a plausible image size? From the size alone we only give a 50 percent vote.
 	if (sector_count != 0)
-		vote = 50;
+		vote = FIFID_SIZE;
 
 	if (vote > 0)
 	{
@@ -1283,7 +1283,7 @@ int ti99_tdf_format::identify(util::random_read &io, uint32_t form_factor, const
 		else
 		{
 			LOGMASKED(LOG_INFO, "[ti99_dsk] Image format complies with TDF\n");
-			vote = 100;
+			vote |= FIFID_STRUCT;
 		}
 	}
 	else LOGMASKED(LOG_INFO, "[ti99_dsk] Disk image is not a TDF image\n");

@@ -261,7 +261,7 @@ int cqm_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0, h, 3, actual);
 
 	if (h[0] == 'C' && h[1] == 'Q' && h[2] == 0x14)
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }

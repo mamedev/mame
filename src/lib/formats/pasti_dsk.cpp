@@ -49,7 +49,7 @@ int pasti_format::identify(util::random_read &io, uint32_t form_factor, const st
 
 	if(!memcmp(h, "RSY\0\3\0", 6) &&
 		(1 || (h[10] >= 80 && h[10] <= 82) || (h[10] >= 160 && h[10] <= 164)))
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }

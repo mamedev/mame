@@ -594,12 +594,81 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	uint32_t expected_size = APPLE2_TRACK_COUNT * 16 * 256;
 
 	// check standard size plus some oddball sizes in our softlist
-	if ((size == expected_size) || (size == 35 * 16 * 256) || (size == 143403) || (size == 143363) || (size == 143358))
+	if ((size != expected_size) && (size != 35 * 16 * 256) && (size != 143403) && (size != 143363) && (size != 143358))
 	{
-		return 50;
+		return 0;
 	}
 
-	return 0;
+	uint8_t sector_data[256*2];
+	static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
+	static const unsigned char pascal2_block1[4] = { 0xff, 0xa2, 0x00, 0x8e };
+	static const unsigned char dos33_block1[4] = { 0xa2, 0x02, 0x8e, 0x52 };
+	static const unsigned char sos_block1[4] = { 0xc9, 0x20, 0xf0, 0x3e };
+	static const unsigned char a3a2emul_block1[6] = { 0x8d, 0xd0, 0x03, 0x4c, 0xc7, 0xa4 };
+	static const unsigned char cpm22_block1[8] = { 0xa2, 0x55, 0xa9, 0x00, 0x9d, 0x00, 0x0d, 0xca };
+	static const unsigned char subnod_block1[8] = { 0x63, 0xaa, 0xf0, 0x76, 0x8d, 0x63, 0xaa, 0x8e };
+ 
+	size_t actual;
+	io.read_at(0, sector_data, 256*2, actual);
+
+	bool prodos_order = false;
+	// check ProDOS boot block
+	if (!memcmp("PRODOS", &sector_data[0x103], 6))
+	{
+		prodos_order = true;
+	}   // check for alternate version ProDOS boot block
+	if (!memcmp("PRODOS", &sector_data[0x121], 6))
+	{
+		prodos_order = true;
+	}   // check for ProDOS order SOS disk
+	else if (!memcmp(sos_block1, &sector_data[0x100], 4))
+	{
+		prodos_order = true;
+	}   // check for Apple III A2 emulator disk in ProDOS order
+	else if (!memcmp(a3a2emul_block1, &sector_data[0x100], 6))
+	{
+		prodos_order = true;
+	}   // check for PCPI Applicard software in ProDOS order
+	else if (!memcmp("COPYRIGHT (C) 1979, DIGITAL RESEARCH", &sector_data[0x118], 36))
+	{
+		prodos_order = true;
+	}   // check Apple II Pascal
+	else if (!memcmp("SYSTEM.APPLE", &sector_data[0xd7], 12))
+	{
+		// Pascal discs can still be DOS order.
+		// Check for the second half of the boot code at 0x100
+		// (which means ProDOS order)
+		if (!memcmp(pascal_block1, &sector_data[0x100], 4))
+		{
+			prodos_order = true;
+		}
+	}   // check for DOS 3.3 disks in ProDOS order
+	else if (!memcmp(dos33_block1, &sector_data[0x100], 4))
+	{
+		prodos_order = true;
+	}   // check for a later version of the Pascal boot block
+	else if (!memcmp(pascal2_block1, &sector_data[0x100], 4))
+	{
+		prodos_order = true;
+	}   // check for CP/M disks in ProDOS order
+	else if (!memcmp(cpm22_block1, &sector_data[0x100], 8))
+	{
+		prodos_order = true;
+	}   // check for subnodule disk
+	else if (!memcmp(subnod_block1, &sector_data[0x100], 8))
+	{
+		prodos_order = true;
+	}   // check for ProDOS 2.5's new boot block
+	else if (!memcmp("PRODOS", &sector_data[0x3a], 6))
+	{
+		prodos_order = true;
+	}
+	else if (!memcmp("PRODOS", &sector_data[0x40], 6))
+	{
+		prodos_order = true;
+	}
+
+	return FIFID_SIZE | (m_prodos_order == prodos_order ? FIFID_HINT : 0);
 }
 
 bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
@@ -984,7 +1053,7 @@ int a2_rwts18_format::identify(util::random_read &io, uint32_t form_factor, cons
 		if(io.length(size))
 			return 0;
 		uint32_t const expected_size = APPLE2_TRACK_COUNT * 16 * 256;
-		return size == expected_size;
+		return size == expected_size ? FIFID_SIZE : 0;
 }
 
 bool a2_rwts18_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
@@ -1465,7 +1534,7 @@ int a2_edd_format::identify(util::random_read &io, uint32_t form_factor, const s
 	uint64_t size;
 	if (io.length(size))
 		return 0;
-	return ((size == 2244608) || (size == 2310144)) ? 50 : 0;
+	return ((size == 2244608) || (size == 2310144)) ? FIFID_SIZE : 0;
 }
 
 uint8_t a2_edd_format::pick(const uint8_t *data, int pos)
@@ -1592,8 +1661,8 @@ int a2_woz_format::identify(util::random_read &io, uint32_t form_factor, const s
 	uint8_t header[8];
 	size_t actual;
 	io.read_at(0, header, 8, actual);
-	if (!memcmp(header, signature, 8)) return 100;
-	if (!memcmp(header, signature2, 8)) return 100;
+	if (!memcmp(header, signature, 8)) return FIFID_SIGN;
+	if (!memcmp(header, signature2, 8)) return FIFID_SIGN;
 	return 0;
 }
 
@@ -1898,7 +1967,7 @@ int a2_nib_format::identify(util::random_read &io, uint32_t form_factor, const s
 		return 0;
 
 	if (size == expected_size_35t || size == expected_size_40t)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }

@@ -226,7 +226,7 @@ int jv3_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 	}
 
-	return 80;
+	return FIFID_STRUCT;
 }
 
 bool jv3_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const

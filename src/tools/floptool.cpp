@@ -139,7 +139,13 @@ static int identify(int argc, char *argv[])
 
 		bool first = true;
 		for(const auto &e : scores) {
-			printf("%-*s %c %3d - %-*s %s\n", sz, first ? argv[i] : "", first ? ':' : ' ', e.first, sz2, e.second->m_format->name(), e.second->m_format->description());
+			printf("%-*s %c %c%c%c%c%c - %-*s %s\n", sz, first ? argv[i] : "", first ? ':' : ' ',
+				   e.first & 0x10 ? '+' : '.',
+				   e.first & 0x08 ? '+' : '.',
+				   e.first & 0x04 ? '+' : '.',
+				   e.first & 0x02 ? '+' : '.',
+				   e.first & 0x01 ? '+' : '.',
+				   sz2, e.second->m_format->name(), e.second->m_format->description());
 			first = false;
 		}
 	}

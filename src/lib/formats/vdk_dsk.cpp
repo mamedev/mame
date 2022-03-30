@@ -41,7 +41,7 @@ int vdk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0, id, 2, actual);
 
 	if (id[0] == 'd' && id[1] == 'k')
-		return 50;
+		return FIFID_SIGN;
 	else
 		return 0;
 }

@@ -37,7 +37,7 @@ int ipf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0, h, 12, actual);
 
 	if(!memcmp(h, refh, 12))
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }

@@ -35,6 +35,18 @@ class floppy_image_format_t
 public:
 	virtual ~floppy_image_format_t() = default;
 
+	// The result of identify is a binary or of these flags, comparison afterwards is numerical.
+	// If a match is incorrect (bad signature for instance), result must be 0.  The non-zero
+	// result helps to decide how reliable the identification is, for choice classification.
+
+	enum {
+		FIFID_HINT   = 0x01, // All other things being equal, favorise this format
+		FIFID_EXT    = 0x02, // Extension matches one of the list (set outside of identify)
+		FIFID_SIZE   = 0x04, // File size matches what is expected
+		FIFID_SIGN   = 0x08, // The file signature matches
+		FIFID_STRUCT = 0x10, // Some file internal structure aspects have been verified
+	};
+
 	/*! @brief Identify an image.
 	  The identify function tests if the image is valid
 	  for this particular format.
@@ -42,7 +54,7 @@ public:
 	  @param form_factor Physical form factor of disk, from the enum
 	  in floppy_image
 	  @param variants the variants from floppy_image the drive can handle
-	  @return 1 if image valid, 0 otherwise.
+	  @return Binary or of FIFID flags, 0 if invalid for that format
 	*/
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const = 0;
 

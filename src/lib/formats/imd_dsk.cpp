@@ -420,7 +420,7 @@ int imd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	size_t actual;
 	io.read_at(0, h, 4, actual);
 	if(!memcmp(h, "IMD ", 4))
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }

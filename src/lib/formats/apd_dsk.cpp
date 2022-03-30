@@ -96,7 +96,7 @@ const char *apd_format::extensions() const
 int apd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
-	if (io.length(size))
+	if (io.length(size) || !size)
 		return 0;
 
 	std::vector<uint8_t> img(size);
@@ -129,7 +129,7 @@ int apd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	}
 
 	if (!memcmp(&img[0], APD_HEADER, sizeof(APD_HEADER))) {
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	return 0;

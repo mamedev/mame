@@ -135,7 +135,7 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 	// The JVC format has a header whose size is the size of the image modulo 256.  Currently, we only
 	// handle up to five header bytes
 	uint64_t size;
-	if (io.length(size))
+	if (io.length(size) || !size)
 		return false;
 	header_size = size % 256;
 	uint8_t header[5];
@@ -178,7 +178,7 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 int jvc_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int header_size, tracks, heads, sectors, sector_size, sector_base_id;
-	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? 50 : 0;
+	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? FIFID_STRUCT|FIFID_SIZE : 0;
 }
 
 bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const

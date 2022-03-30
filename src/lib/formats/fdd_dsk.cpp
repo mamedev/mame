@@ -66,7 +66,7 @@ int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0, h, 7, actual);
 
 	if (strncmp((const char *)h, "VFD1.0", 6) == 0)
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
