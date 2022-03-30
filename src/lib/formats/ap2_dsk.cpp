@@ -1674,7 +1674,21 @@ bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std:
 				if (r32(img, trks_off + 4) == 0)
 					return false;
 
-				generate_track_from_bitstream(track, head, &img[boff], r32(img, trks_off + 4), image, subtrack, 0xffff);
+				uint32_t track_size = r32(img, trks_off + 4);
+
+				// With 5.25 floppies the end-of-track may be missing
+				// if unformatted.  Accept track length down to 95% of
+				// 51090, otherwise pad it
+
+				bool short_track = !is_35 && track_size < 48535;
+
+				if(short_track) {
+					std::vector<uint8_t> buffer(6387, 0);
+					memcpy(buffer.data(), &img[boff], (track_size + 7) / 8);
+					generate_track_from_bitstream(track, head, buffer.data(), 51090, image, subtrack, 0xffff);
+
+				} else
+					generate_track_from_bitstream(track, head, &img[boff], track_size, image, subtrack, 0xffff);
 
 				if(is_35 && !track && head)
 					image->set_variant(r32(img, trks_off + 4) >= 90000 ? floppy_image::DSHD : floppy_image::DSDD);

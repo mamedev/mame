@@ -228,7 +228,6 @@ protected:
 	attotime revolution_start_time, rev_time;
 	uint32_t revolution_count;
 	int cyl, subcyl;
-
 	/* Current floppy zone cache */
 	attotime cache_start_time, cache_end_time, cache_weak_start;
 	attotime amplifier_freakout_time;
@@ -246,15 +245,24 @@ protected:
 	wpt_cb cur_wpt_cb;
 	led_cb cur_led_cb;
 
+
+	// Temporary structure storing a write span
+	struct wspan {
+		int start, end;
+		std::vector<int> flux_change_positions;
+	};
+
+	static void wspan_split_on_wrap(std::vector<wspan> &wspans);
+	static void wspan_remove_damaged(std::vector<wspan> &wspans, const std::vector<uint32_t> &track);
+	static void wspan_write(const std::vector<wspan> &wspans, std::vector<uint32_t> &track);
+
 	void register_formats();
 
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
 	int find_index(uint32_t position, const std::vector<uint32_t> &buf) const;
-	bool test_track_last_entry_warps(const std::vector<uint32_t> &buf) const;
 	attotime position_to_time(const attotime &base, int position) const;
 
-	void write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg);
 	void commit_image();
 
 	u32 hash32(u32 val) const;

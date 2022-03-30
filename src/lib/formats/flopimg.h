@@ -230,8 +230,9 @@ protected:
 	*/
 	static void generate_track_from_levels(int track, int head, std::vector<uint32_t> &trackbuf, int splice_pos, floppy_image *image);
 
-	//! Normalize the times in a cell buffer to sum up to 200000000
-	static void normalize_times(std::vector<uint32_t> &buffer);
+	//! Normalize the times in a cell buffer to bring the
+	//! 0..last_position range up to 0..200000000
+	static void normalize_times(std::vector<uint32_t> &buffer, uint32_t last_position);
 
 	// Some conversion tables for gcr
 	static const uint8_t gcr5fw_tb[0x10], gcr5bw_tb[0x20];
@@ -450,19 +451,22 @@ private:
 //! Internal format is close but not identical to the mfi format.
 //!
 //!
+
 //! Track data consists of a series of 32-bits lsb-first values
-//! representing magnetic cells.  Bits 0-27 indicate the absolute
-//! position of the start of the cell (not the size), and bits
-//! 28-31 the type.  Type can be:
-//! - 0, MG_A -> Magnetic orientation A
-//! - 1, MG_B -> Magnetic orientation B
-//! - 2, MG_N -> Non-magnetized zone (neutral)
-//! - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
+//! representing the magnetic state.  Bits 0-27 indicate the absolute
+//! position of encoded event, and bits ! 28-31 the type.  Type can be:
+//! - 0, MG_F -> Flux orientation change
+//! - 1, MG_N -> Start of a non-magnetized zone (neutral)
+//! - 2, MG_D -> Start of a damaged zone, reads as neutral but cannot be changed by writing
+//! - 3, MG_E -> End of one of the previous zones, *inclusive*
 //!
 //! The position is in angular units of 1/200,000,000th of a turn.
-//! The last cell implicit end position is of course 200,000,000.
+//! A N or D zone must not wrap at the 200,000,000 position, it has to
+//! be split in two (the first finishing at 199,999,999, the second
+//! starting at 0)
 //!
-//! Unformatted tracks are encoded as zero-size.
+//! Unformatted tracks are encoded as zero-size, and are strictly equivalent
+//! to (MG_N, 0), (MG_E, 199,999,999)
 //!
 //! The "track splice" information indicates where to start writing
 //! if you try to rewrite a physical disk with the data.  Some
@@ -491,10 +495,10 @@ public:
 		TIME_MASK = 0x0fffffff,
 		MG_MASK   = 0xf0000000,
 		MG_SHIFT  = 28, //!< Bitshift constant for magnetic orientation data
-		MG_A      = (0 << MG_SHIFT),    //!< - 0, MG_A -> Magnetic orientation A
-		MG_B      = (1 << MG_SHIFT),    //!< - 1, MG_B -> Magnetic orientation B
-		MG_N      = (2 << MG_SHIFT),    //!< - 2, MG_N -> Non-magnetized zone (neutral)
-		MG_D      = (3 << MG_SHIFT)     //!< - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
+		MG_F      = (0 << MG_SHIFT),    //!< - 0, MG_F -> Flux orientation change
+		MG_N      = (1 << MG_SHIFT),    //!< - 1, MG_N -> Non-magnetized zone (neutral)
+		MG_D      = (2 << MG_SHIFT),    //!< - 2, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
+		MG_E      = (3 << MG_SHIFT)     //!< - 3, MG_E -> End of zone
 	};
 
 

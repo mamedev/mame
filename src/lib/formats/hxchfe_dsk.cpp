@@ -316,16 +316,10 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	// HFE does not define subtracks; set to 0
 
 	// MG_1 / MG_0 are (logical) levels that indicate transition / no change
-	// MG_A / MG_B are physical flux directions
-	//
-	// Cell: | AAAABBBB | = MG_1 = | BBBBAAAA |
-	//       | AAAAAAAA | = MG_0 = | BBBBBBBB |
+	// MG_F is the position of a flux transition
 
 	std::vector<uint32_t> &dest = image->get_buffer(cyl, head, 0);
 	dest.clear();
-
-	// Start with MG_A
-	uint32_t cbit = floppy_image::MG_A;
 
 	int offset = 0x100;
 
@@ -337,10 +331,6 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 
 	uint8_t current = 0;
 	int time  = 0;
-
-	dest.push_back(cbit | time);
-
-	cbit = floppy_image::MG_B;
 
 	// Oversampled FM images (250 kbit/s) start with a 0, where a 1 is
 	// expected for 125 kbit/s.
@@ -384,13 +374,8 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 		{
 			time += samplelength;
 			if ((current & 1)!=0)
-			{
 				// Append another transition to the vector
-				dest.push_back(cbit | time);
-
-				// Toggle the cell level
-				cbit = (cbit == floppy_image::MG_A)? floppy_image::MG_B : floppy_image::MG_A;
-			}
+				dest.push_back(floppy_image::MG_F | time);
 
 			// HFE uses little-endian bit order
 			current >>= 1;

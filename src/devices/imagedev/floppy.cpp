@@ -1127,11 +1127,6 @@ uint32_t floppy_image_device::find_position(attotime &base, const attotime &when
 	return res;
 }
 
-bool floppy_image_device::test_track_last_entry_warps(const std::vector<uint32_t> &buf) const
-{
-	return !((buf[buf.size() - 1]^buf[0]) & floppy_image::MG_MASK);
-}
-
 attotime floppy_image_device::position_to_time(const attotime &base, int position) const
 {
 	return base + attotime::from_double(position/angular_speed);
@@ -1141,19 +1136,13 @@ void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int
 {
 	int cells = buf.size();
 
-	if(index != 0 || !test_track_last_entry_warps(buf)) {
-		cache_index = index;
-		cache_start_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
-	} else {
-		cache_index = cells - 1;
-		cache_start_time = position_to_time(base - rev_time, buf[cache_index] & floppy_image::TIME_MASK);
-	}
-
+	cache_index = index;
+	cache_start_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
 	cache_entry = buf[cache_index];
 
 	index ++;
 	if(index >= cells) {
-		index = test_track_last_entry_warps(buf) ? 1 : 0;
+		index = 0;
 		base += rev_time;
 	}
 
@@ -1268,161 +1257,146 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	track_dirty = true;
 	cache_clear();
 
-	attotime base;
-	int start_pos = find_position(base, start);
-	int end_pos   = find_position(base, end);
+	std::vector<wspan> wspans(1);
 
-	std::vector<int> trans_pos(transition_count);
+	attotime base;
+	wspans[0].start = find_position(base, start);
+	wspans[0].end   = find_position(base, end);
+
 	for(int i=0; i != transition_count; i++)
-		trans_pos[i] = find_position(base, transitions[i]);
+		wspans[0].flux_change_positions.push_back(find_position(base, transitions[i]));
+
+	wspan_split_on_wrap(wspans);
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
 
-	int index;
-	if(!buf.empty())
-		index = find_index(start_pos, buf);
-	else {
-		index = 0;
+	if(buf.empty()) {
 		buf.push_back(floppy_image::MG_N);
+		buf.push_back(floppy_image::MG_E | 199999999);
 	}
 
-	uint32_t cur_mg;
-	if((buf[index] & floppy_image::TIME_MASK) == start_pos) {
-		if(index)
-			cur_mg = buf[index-1];
-		else
-			cur_mg = buf[buf.size() - 1];
-	} else
-			cur_mg = buf[index];
+	wspan_remove_damaged(wspans, buf);
+	wspan_write(wspans, buf);
 
-	cur_mg &= floppy_image::MG_MASK;
-	if(cur_mg == floppy_image::MG_N || cur_mg == floppy_image::MG_D)
-		cur_mg = floppy_image::MG_A;
-
-	uint32_t pos = start_pos;
-	int ti = 0;
-	int cells = buf.size();
-	if(transition_count != 0 && trans_pos[0] == pos) {
-		cur_mg = cur_mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-		ti ++;
-	}
-	while(pos != end_pos) {
-		if(buf.size() < cells+10)
-			buf.resize(cells+200);
-		uint32_t next_pos;
-		if(ti != transition_count)
-			next_pos = trans_pos[ti++];
-		else
-			next_pos = end_pos;
-		if(next_pos > pos)
-			write_zone(&buf[0], cells, index, pos, next_pos, cur_mg);
-		else {
-			write_zone(&buf[0], cells, index, pos, 200000000, cur_mg);
-			index = 0;
-			write_zone(&buf[0], cells, index, 0, next_pos, cur_mg);
-		}
-		pos = next_pos;
-		cur_mg = cur_mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-	}
-
-	buf.resize(cells);
+	cache_clear();
 }
 
-void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg)
+void floppy_image_device::wspan_split_on_wrap(std::vector<wspan> &wspans)
 {
-	cache_clear();
-	while(spos < epos) {
-		while(index != cells-1 && (buf[index+1] & floppy_image::TIME_MASK) <= spos)
-			index++;
+	int ne = wspans.size();
+	for(int i=0; i != ne; i++)
+		if(wspans[i].end < wspans[i].start) {
+			wspans.resize(wspans.size()+1);
+			auto &ws = wspans[i];
+			auto &we = wspans.back();
+			we.start = 0;
+			we.end = ws.end;
+			ws.end = 200000000;
+			int start = ws.start;
+			int split_index;
+			for(split_index = 0; split_index != ws.flux_change_positions.size(); split_index++)
+				if(ws.flux_change_positions[split_index] < start)
+					break;
+			if(split_index == 0)
+				std::swap(ws.flux_change_positions, we.flux_change_positions);
 
-		uint32_t ref_start = buf[index] & floppy_image::TIME_MASK;
-		uint32_t ref_end   = index == cells-1 ? 200000000 : buf[index+1] & floppy_image::TIME_MASK;
-		uint32_t ref_mg    = buf[index] & floppy_image::MG_MASK;
+			else {
+				we.flux_change_positions.resize(ws.flux_change_positions.size() - split_index);
+				std::copy(ws.flux_change_positions.begin() + split_index, ws.flux_change_positions.end(), we.flux_change_positions.begin());
+				ws.flux_change_positions.erase(ws.flux_change_positions.begin() + split_index, ws.flux_change_positions.end());
+			}
+		}
+}
 
-		// Can't overwrite a damaged zone
-		if(ref_mg == floppy_image::MG_D) {
-			spos = ref_end;
-			continue;
+void floppy_image_device::wspan_remove_damaged(std::vector<wspan> &wspans, const std::vector<uint32_t> &track)
+{
+	for(size_t pos = 0; pos != track.size(); pos++)
+		if((track[pos] & floppy_image::MG_MASK) == floppy_image::MG_D) {
+			int start = track[pos] & floppy_image::TIME_MASK;
+			int end = track[pos+1] & floppy_image::TIME_MASK;
+			int ne = wspans.size();
+			for(int i=0; i != ne; i++) {
+				// D range outside of span range
+				if(wspans[i].start > end || wspans[i].end <= start)
+					continue;
+
+				// D range covers span range
+				if(wspans[i].start >= start && wspans[i].end-1 <= end) {
+					wspans.erase(wspans.begin() + i);
+					i --;
+					ne --;
+					continue;
+				}
+
+				// D range covers the start of the span range
+				if(wspans[i].start >= start && wspans[i].end-1 > end) {
+					wspans[i].start = end+1;
+					while(!wspans[i].flux_change_positions.empty() && wspans[i].flux_change_positions[0] <= end)
+						wspans[i].flux_change_positions.erase(wspans[i].flux_change_positions.begin());
+					continue;
+				}
+
+				// D range covers the end of the span range
+				if(wspans[i].start < start && wspans[i].end-1 <= end) {
+					wspans[i].end = start;
+					while(!wspans[i].flux_change_positions.empty() && wspans[i].flux_change_positions[wspans[i].flux_change_positions.size()-1] >= start)
+						wspans[i].flux_change_positions.erase(wspans[i].flux_change_positions.end()-1);
+					continue;
+				}
+
+				// D range is inside the span range, need to split
+				int id = wspans.size();
+				wspans.resize(id+1);
+				wspans[id].start = end+1;
+				wspans[id].end = wspans[i].end;
+				wspans[id].flux_change_positions = wspans[i].flux_change_positions;
+				wspans[i].end = start;
+				while(!wspans[i].flux_change_positions.empty() && wspans[i].flux_change_positions[wspans[i].flux_change_positions.size()-1] >= start)
+					wspans[i].flux_change_positions.erase(wspans[i].flux_change_positions.end()-1);
+				while(!wspans[id].flux_change_positions.empty() && wspans[id].flux_change_positions[0] <= end)
+					wspans[id].flux_change_positions.erase(wspans[id].flux_change_positions.begin());
+			}
+		}
+}
+
+void floppy_image_device::wspan_write(const std::vector<wspan> &wspans, std::vector<uint32_t> &track)
+{
+	for(const auto &ws : wspans) {
+		unsigned si, ei;
+		for(si = 0; si != track.size(); si++)
+			if((track[si] & floppy_image::TIME_MASK) >= ws.start)
+				break;
+		for(ei = si; ei != track.size(); ei++)
+			if((track[ei] & floppy_image::TIME_MASK) >= ws.end)
+				break;
+
+		// Reduce neutral zone at the start, if there's one
+		if(si != track.size() && (track[si] & floppy_image::MG_MASK) == floppy_image::MG_E) {
+			// Neutral zone is over the whole range, split it and adapt si/ei
+			if(si == ei) {
+				track.insert(track.begin() + si, floppy_image::MG_E | (ws.start-1));
+				track.insert(track.begin() + si + 1, (track[si-1] & floppy_image::MG_MASK) | ws.end);
+				si = ei = si+1;
+			} else {
+				// Reduce the zone size
+				track[si] = floppy_image::MG_E | (ws.start-1);
+				si ++;
+			}
+		} 
+
+		// Check for a neutral zone at the end and reduce it if needed
+		if(ei != track.size() && (track[ei] & floppy_image::MG_MASK) == floppy_image::MG_E) {
+			track[ei-1] = floppy_image::MG_N | ws.end;
+			ei --;
 		}
 
-		// If the zone is of the type we want, we don't need to touch it
-		if(ref_mg == mg) {
-			spos = ref_end;
-			continue;
-		}
+		// Clear the covered zone
+		track.erase(track.begin() + si, track.begin() + ei);
 
-		//  Check the overlaps, act accordingly
-		if(spos == ref_start) {
-			if(epos >= ref_end) {
-				// Full overlap, that cell is dead, we need to see which ones we can extend
-				uint32_t prev_mg = index != 0       ? buf[index-1] & floppy_image::MG_MASK : ~0;
-				uint32_t next_mg = index != cells-1 ? buf[index+1] & floppy_image::MG_MASK : ~0;
-				if(prev_mg == mg) {
-					if(next_mg == mg) {
-						// Both match, merge all three in one
-						memmove(buf+index, buf+index+2, (cells-index-2)*sizeof(uint32_t));
-						cells -= 2;
-						index--;
-
-					} else {
-						// Previous matches, drop the current cell
-						memmove(buf+index, buf+index+1, (cells-index-1)*sizeof(uint32_t));
-						cells --;
-					}
-
-				} else {
-					if(next_mg == mg) {
-						// Following matches, extend it
-						memmove(buf+index, buf+index+1, (cells-index-1)*sizeof(uint32_t));
-						cells --;
-						buf[index] = mg | spos;
-					} else {
-						// None match, convert the current cell
-						buf[index] = mg | spos;
-						index++;
-					}
-				}
-				spos = ref_end;
-
-			} else {
-				// Overlap at the start only
-				// Check if we can just extend the previous cell
-				if(index != 0 && (buf[index-1] & floppy_image::MG_MASK) == mg)
-					buf[index] = ref_mg | epos;
-				else {
-					// Otherwise we need to insert a new cell
-					if(index != cells-1)
-						memmove(buf+index+1, buf+index, (cells-index)*sizeof(uint32_t));
-					cells++;
-					buf[index] = mg | spos;
-					buf[index+1] = ref_mg | epos;
-				}
-				spos = epos;
-			}
-
-		} else {
-			if(epos >= ref_end) {
-				// Overlap at the end only
-				// If we can't just extend the following cell, we need to insert a new one
-				if(index == cells-1 || (buf[index+1] & floppy_image::MG_MASK) != mg) {
-					if(index != cells-1)
-						memmove(buf+index+2, buf+index+1, (cells-index-1)*sizeof(uint32_t));
-					cells++;
-				}
-				buf[index+1] = mg | spos;
-				index++;
-				spos = ref_end;
-
-			} else {
-				// Full inclusion
-				// We need to split the zone in 3
-				if(index != cells-1)
-					memmove(buf+index+3, buf+index+1, (cells-index-1)*sizeof(uint32_t));
-				cells += 2;
-				buf[index+1] = mg | spos;
-				buf[index+2] = ref_mg | epos;
-				spos = epos;
-			}
+		// Insert the flux changes
+		for(auto f : ws.flux_change_positions) {
+			track.insert(track.begin() + si, floppy_image::MG_F | f);
+			si ++;
 		}
 	}
 }

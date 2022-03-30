@@ -177,9 +177,7 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 #endif
 		index_count = 0;
 		//index_polarity = 0;
-		uint32_t mg = floppy_image::MG_A;
 		int tpos = 0;
-		buf[tpos++] = mg;
 		for(int i=0; i<tsize; i++) {
 			uint8_t v = data[i];
 			if((v & 0x7f) == 0x7f) // 0x7F : no transition, but a carry (FF is a board-on-fire error and is checked for above)
@@ -202,23 +200,19 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				//if (trans_time <= MIN_THRESH) osd_printf_verbose("dfi_dsk: Throwing out short transition of length %d\n", trans_time);
 				// the normal case: write the transition at the appropriate time
 				if ((prev_time == 0) || ((trans_time > MIN_THRESH) && (trans_time <= MAX_THRESH))) {
-					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | uint32_t((200000000ULL*cur_time)/index_time);
+					buf[tpos++] = floppy_image::MG_F | uint32_t((200000000ULL*cur_time)/index_time);
 					prev_time = cur_time;
 				}
 				// the long case: we probably missed a transition, stuff an extra guessed one in there to see if it helps
 				if (trans_time > MAX_THRESH) {
-					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					if (((track%2)==0)&&(head==0)) osd_printf_info("dfi_dsk: missed transition, total time for transition is %d\n",trans_time);
 #ifndef FAKETRANS_ONE
-					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
+					buf[tpos++] = floppy_image::MG_F | uint32_t((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
 #else
-					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-((trans_time*2)/3)))/index_time);
-					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-(trans_time/3)))/index_time);
+					buf[tpos++] = floppy_image::MG_F | uint32_t((200000000ULL*(cur_time-((trans_time*2)/3)))/index_time);
+					buf[tpos++] = floppy_image::MG_F | uint32_t((200000000ULL*(cur_time-(trans_time/3)))/index_time);
 #endif
-					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | uint32_t(200000000ULL*cur_time/index_time); // generate transition now
+					buf[tpos++] = floppy_image::MG_F | uint32_t(200000000ULL*cur_time/index_time); // generate transition now
 					prev_time = cur_time;
 				}
 			}
