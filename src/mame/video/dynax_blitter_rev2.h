@@ -61,12 +61,12 @@ protected:
 	devcb_write_line m_ready_cb;
 
 	// internal registers
-	u8 m_blit_pen;
-	u8 m_blit_wrap_enable;
-	u8 m_blit_x;
-	u8 m_blit_y;
-	u8 m_blit_flags;
-	u32 m_blit_src;
+	u8 m_blit_pen = 0;
+	u8 m_blit_wrap_enable = 0;
+	u8 m_blit_x = 0;
+	u8 m_blit_y = 0;
+	u8 m_blit_flags = 0;
+	u32 m_blit_src = 0;
 };
 
 // ======================> cdracula_blitter_device

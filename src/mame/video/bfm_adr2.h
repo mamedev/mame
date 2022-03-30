@@ -47,23 +47,23 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	int m_screen_page_reg;              // access/display select
-	int m_c101;
-	int m_rx;
-	bool m_vbl_triggered;               // flag, VBL IRQ triggered
-	bool m_acia_triggered;              // flag, ACIA receive IRQ
+	int m_screen_page_reg = 0;              // access/display select
+	int m_c101 = 0;
+	int m_rx = 0;
+	bool m_vbl_triggered = 0;               // flag, VBL IRQ triggered
+	bool m_acia_triggered = 0;              // flag, ACIA receive IRQ
 
-	uint8_t m_adder_ram[0xE80];         // normal RAM
-	uint8_t m_screen_ram[2][0x1180];    // paged  display RAM
+	uint8_t m_adder_ram[0xE80]{};         // normal RAM
+	uint8_t m_screen_ram[2][0x1180]{};    // paged  display RAM
 
-	tilemap_t *m_tilemap0;  // tilemap screen0
-	tilemap_t *m_tilemap1;  // tilemap screen1
+	tilemap_t *m_tilemap0 = nullptr;  // tilemap screen0
+	tilemap_t *m_tilemap1 = nullptr;  // tilemap screen1
 
-	bool m_data_from_sc2;
-	bool m_data_to_sc2;
+	bool m_data_from_sc2 = false;
+	bool m_data_to_sc2 = false;
 
-	uint8_t m_adder2_data;
-	uint8_t m_sc2data;
+	uint8_t m_adder2_data = 0;
+	uint8_t m_sc2data = 0;
 
 	optional_device<cpu_device> m_cpu;
 

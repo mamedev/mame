@@ -35,7 +35,7 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	address_space *m_vramspace;
+	address_space *m_vramspace = nullptr;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

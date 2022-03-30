@@ -41,7 +41,7 @@ private:
 	std::unique_ptr<uint32_t[]>     m_palette;
 
 	required_region_ptr<uint8_t> m_gfxrom;
-	bool m_enable_bilinear;
+	bool m_enable_bilinear = false;
 };
 
 
