@@ -154,8 +154,8 @@ private:
 	struct namcos22_scenenode *m_scenenode_cur;
 	std::list<namcos22_scenenode> m_scenenode_alloc;
 
-	float m_clipx;
-	float m_clipy;
+	float m_clipx = 0.0;
+	float m_clipy = 0.0;
 	rectangle m_cliprect;
 
 	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }

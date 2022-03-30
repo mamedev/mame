@@ -79,7 +79,7 @@ private:
 	int m_transpen;
 
 	// live state
-	uint8_t m_bgflag;
+	uint8_t m_bgflag = 0;
 	uint8_t m_spritectrl[4];
 	std::unique_ptr<uint8_t[]> m_spriteylow;
 	std::unique_ptr<uint8_t[]> m_spritecodelow; // tnzs.cpp stuff only uses half?
