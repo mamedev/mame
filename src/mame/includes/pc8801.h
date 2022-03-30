@@ -65,6 +65,7 @@ protected:
 
 	uint8_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint8_t data);
+	virtual uint8_t dma_mem_r(offs_t offset) override;
 
 	virtual attotime mouse_limit_hz();
 

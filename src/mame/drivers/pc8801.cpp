@@ -363,6 +363,12 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
+uint8_t pc8801_state::dma_mem_r(offs_t offset)
+{
+	// TODO: TVRAM readback
+	return m_work_ram[offset & 0xffff];
+}
+
 #if 0
 /*
 CRTC command params:

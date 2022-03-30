@@ -59,7 +59,7 @@ protected:
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
 	UPD3301_FETCH_ATTRIBUTE( attr_fetch );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	uint8_t dma_mem_r(offs_t offset);
+	virtual uint8_t dma_mem_r(offs_t offset);
 
 private:
 	bool m_screen_reverse;
