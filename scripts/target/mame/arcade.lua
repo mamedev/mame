@@ -3737,8 +3737,6 @@ files {
 	MAME_DIR .. "src/mame/video/dynduke.cpp",
 	MAME_DIR .. "src/mame/drivers/feversoc.cpp",
 	MAME_DIR .. "src/mame/drivers/goal92.cpp",
-	MAME_DIR .. "src/mame/includes/goal92.h",
-	MAME_DIR .. "src/mame/video/goal92.cpp",
 	MAME_DIR .. "src/mame/drivers/goodejan.cpp",
 	MAME_DIR .. "src/mame/drivers/kncljoe.cpp",
 	MAME_DIR .. "src/mame/includes/kncljoe.h",
