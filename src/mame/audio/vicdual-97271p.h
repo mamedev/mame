@@ -29,7 +29,7 @@ protected:
 private:
 	required_device<samples_device> m_samples;
 
-	uint8_t m_state;
+	uint8_t m_state = 0;
 };
 
 // device type definition
