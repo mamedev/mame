@@ -484,6 +484,7 @@ irisha.cpp
 iris_power.cpp
 is48x.cpp
 isbc.cpp
+isbc660.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp

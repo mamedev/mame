@@ -17476,6 +17476,9 @@ isbc8605                        //
 isbc8630                        //
 sm1810                          //
 
+@source:isbc660.cpp
+isbc660                         // Intel iSBC 660 System Chassis
+
 @source:isbc8010.cpp
 isbc8010                        //
 isbc8010a                       //

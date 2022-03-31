@@ -2771,6 +2771,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ipc.cpp",
 	MAME_DIR .. "src/mame/drivers/ipds.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc.cpp",
+	MAME_DIR .. "src/mame/drivers/isbc660.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc8010.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc8030.cpp",
 	MAME_DIR .. "src/mame/machine/imm6_76.cpp",
