@@ -47603,4 +47603,130 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dainterv">
+		<description>Descending/Ascending Intervals (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Descending/Ascending Intervals" is a 1986 educational program developed by Penny Pursell and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="descending-ascending intervals (4am crack).dsk" size="143360" crc="bbef08f0" sha1="81ac265fa435ba0c233430153a5894adc8c74f97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhsecdom">
+		<description>Functional Harmony: Secondary Dominants (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Functional Harmony: Secondary Dominants" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- secondary dominants (4am crack).dsk" size="143360" crc="e58f2315" sha1="2b9797450a1ec616aac1de2bf59ecadb37cff0e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybndrl">
+		<description>Keyboard Note Drill (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Keyboard Note Drill" is a 1985 educational program developed by John M. Eddins and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard note drill (4am crack).dsk" size="143360" crc="bf5837ed" sha1="b07e169398ae828f3e71bc98716851b8e28193fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdicbegl">
+		<description>Melodic Dictation: Beginning Level (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Melodic Dictation: Beginning Level" is a 1988 educational program developed by Penny Pursell and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="melodic dictation - beginning level (4am crack).dsk" size="143360" crc="d943a185" sha1="e31e6466f4ace7748d9ee2ca6675612019c8346b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdicintl">
+		<description>Melodic Dictation: Intermediate Level (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Melodic Dictation: Intermediate Level" is a 1988 educational program developed by Penny Pursell and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="melodic dictation - intermediate level (4am crack).dsk" size="143360" crc="8c32f0b7" sha1="25ddf535414a286cb1b0f791d85c4f1e539e8126"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpquiz">
+		<description>Music Composer Quiz (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Music Composer Quiz" is a 1985 educational program developed by Joseph A. Brownlee and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="music composer quiz (4am crack).dsk" size="143360" crc="debe0831" sha1="99c071c9dada9df9fc3e491ef90b9097a86d3d88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstermin">
+		<description>Music Terminology (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Music Terminology" is a 1984 educational program developed by Vincent Oddo and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="music terminology (4am crack).dsk" size="143360" crc="55e03305" sha1="ba3f200155a076f6be4001d7f8d0644e5b58c2c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapit">
+		<description>Tap-It (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Tap-It" is a 1987 educational program developed by G. David Peters and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tap-it (4am crack).dsk" size="143360" crc="193c5293" sha1="3e4afbef063161782d66533c73c609682b301061"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoopupth">
+		<description>Zoo Puppet Theater (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware</publisher>
+		<info name="release" value="2022-03-28"/>
+		<!--"Zoo Puppet Theater" is a 1989 educational program developed and distributed by Electronic Courseware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoo puppet theater (4am crack).dsk" size="143360" crc="fa74042f" sha1="8eccccffd1ca8416b536934290bf5811e4880e47"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
