@@ -31736,6 +31736,9 @@ mvme162                         // (c) 1993 Motorola
 18w                             // 653 (c) 1979 Midway
 18w2                            // 653 (c) 1979 Midway
 
+@source:mw4pole.cpp
+mw4pole                         // (c) 1995 Waldorf Electronics GmbH Germany
+
 @source:mw8080bw.cpp
 280zzzap                        // 610 [1976]
 blueshrk                        // 742 [1978]

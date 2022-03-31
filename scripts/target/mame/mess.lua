@@ -4713,6 +4713,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mstation.cpp",
 	MAME_DIR .. "src/mame/drivers/mt735.cpp",
 	MAME_DIR .. "src/mame/drivers/mtd1256.cpp",
+	MAME_DIR .. "src/mame/drivers/mw4pole.cpp",
 	MAME_DIR .. "src/mame/drivers/mx2178.cpp",
 	MAME_DIR .. "src/mame/drivers/mycom.cpp",
 	MAME_DIR .. "src/mame/drivers/myvision.cpp",
