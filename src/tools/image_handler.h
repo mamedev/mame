@@ -9,6 +9,7 @@
 #pragma once
 
 #include "formats/fsmgr.h"
+#include "harddisk.h"
 
 #include <cstdint>
 #include <map>

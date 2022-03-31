@@ -255,7 +255,7 @@ void s1410_device::ExecCommand()
 
 			while (m_blocks > 0)
 			{
-				if (!hard_disk_write(m_disk, m_lba, &data[0]))
+				if (!m_disk->write(m_lba, &data[0]))
 				{
 					logerror("S1410: HD write error!\n");
 				}
