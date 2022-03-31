@@ -75982,10 +75982,10 @@ Other
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="pokemon silver (little nemo hack) [p1].chr" size="131072" crc="63ddf4cc" sha1="7bf369348d1694aa9819f04a659add47242f496f" offset="00000" status="baddump" />
+				<rom name="pokemon silver (little nemo hack) [p1].chr" size="131072" crc="37f60363" sha1="1eb7f250014cb627c1d4f0be650b74df97ac9e68" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="pokemon silver (little nemo hack) [p1].prg" size="131072" crc="265734e6" sha1="04d3c814154717a894421448d3953d68319f3456" offset="00000" status="baddump" />
+				<rom name="pokemon silver (little nemo hack) [p1].prg" size="131072" crc="265734e6" sha1="04d3c814154717a894421448d3953d68319f3456" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
