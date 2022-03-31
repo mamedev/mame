@@ -178,6 +178,7 @@
     - https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
     - http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
     - http://www7b.biglobe.ne.jp/~crazyunit/pc88.html
+	- http://www.maroon.dti.ne.jp/youkan/pc88/index.html
 
 *************************************************************************************************************************************/
 
@@ -247,7 +248,7 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 					int res_x = x + xi;
 					int res_y = y + yi;
 					// still need to check against cliprect,
-					// in the rare case that 3301 CRTC is set to non-canon values. 
+					// in the rare case that 3301 CRTC is set to non-divisible values.
 					if (cliprect.contains(res_x, res_y))
 						bitmap.pix(res_y, res_x) = m_palette->pen(pen & 7);
 				}
@@ -262,7 +263,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 	// (we currently draw it in b&w, should be colorized)
 	uint32_t count = 0;
 	uint8_t color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
-	uint8_t is_cursor = 0;
+	//uint8_t is_cursor = 0;
 
 	for(int y = 0; y < 200; y++)
 	{
@@ -274,8 +275,8 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 			for(int xi = 0; xi < 8; xi++)
 			{
 				int pen = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
-				if(is_cursor)
-					pen^=1;
+				//if(is_cursor)
+				//	pen^=1;
 
 				if((m_gfx_ctrl & 1))
 				{
@@ -310,8 +311,8 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 				for(int xi = 0; xi < 8; xi++)
 				{
 					int pen = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
-					if(is_cursor)
-						pen^=1;
+					//if(is_cursor)
+					//	pen^=1;
 
 					if(cliprect.contains(x+xi, y))
 						bitmap.pix(y, x+xi) = m_palette->pen(pen ? 7 : 0);

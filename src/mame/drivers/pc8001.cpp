@@ -229,7 +229,7 @@ void pc8001_state::port10_w(uint8_t data)
  * --11 ----           RS-232C sync mode
  * ---- x--- MTON: CMT motor control (active high)
  * ---- -x-- CDS: CMT carrier control (1) mark (0) space
- * ---- --x- /COLOR: CRT display mode control (1) color mode (0) monochrome
+ * ---- --x- /COLOR: CRT display mode control (0) color mode (1) monochrome
  * ---- ---x /40: CRT display format control (1) 80 chars per line (0) 40 chars
  *
  */
