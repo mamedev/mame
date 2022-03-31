@@ -3729,6 +3729,17 @@ license:CC0
 			</diskarea>
 		</part>
 	</software>
+	<software name="winxpsp3">
+		<description>Windows XP Professional (With Service Pack 3) (en 5.1.2600)</description>
+		<year>2001</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: Internet Archive (https://archive.org/download/WinXPProSP3x86/en_windows_xp_professional_with_service_pack_3_x86_cd_vl_x14-73974.iso) -->
+			<diskarea name="cdrom">
+				<disk name="en_windows_xp_professional_with_service_pack_3_x86_cd_vl_x14-73974" sha1="66ac289ae27724c5ae17139227cbe78c01eefe40"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="win2kps4">
 		<description>Windows 2000 Professional (with Service Pack 4) (en 5.00.2195.6717)</description>
