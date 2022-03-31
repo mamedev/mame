@@ -54,6 +54,7 @@ protected:
 	void port30_w(u8 data);
 	virtual void machine_start() override;
 	void set_screen_frequency(bool is_24KHz) { m_screen_is_24KHz = is_24KHz; }
+	bool get_screen_frequency() { return m_screen_is_24KHz; }
 
 	DECLARE_WRITE_LINE_MEMBER( crtc_reverse_w );
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );

@@ -223,42 +223,35 @@ void pc8801_state::palette_reset()
 
 void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
-	uint32_t count = 0;
+	uint16_t y_double = get_screen_frequency(); //pixel_clock();
+	int32_t y_line_size = y_double + 1;
 
-	uint16_t y_double = 1;//pixel_clock();
-	uint16_t y_size = (y_double+1) * 200;
-
-	for(int y = 0; y < y_size; y+=(y_double + 1))
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
 	{
-		for(int x = 0; x < 640; x+=8)
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
 		{
+			u32 bitmap_offset = (y >> y_double) * 80 + (x >> 3);
 			for(int xi = 0; xi < 8; xi++)
 			{
 				int pen = 0;
 
 				/* note: layer masking doesn't occur in 3bpp mode, Bug Attack relies on this */
-				pen |= ((m_gvram[count+0x0000] >> (7-xi)) & 1) << 0;
-				pen |= ((m_gvram[count+0x4000] >> (7-xi)) & 1) << 1;
-				pen |= ((m_gvram[count+0x8000] >> (7-xi)) & 1) << 2;
+				pen |= ((m_gvram[bitmap_offset+0x0000] >> (7-xi)) & 1) << 0;
+				pen |= ((m_gvram[bitmap_offset+0x4000] >> (7-xi)) & 1) << 1;
+				pen |= ((m_gvram[bitmap_offset+0x8000] >> (7-xi)) & 1) << 2;
 
-				if(y_double)
+				// TODO: some real HW snaps implies that output is only even or odd line when in 3bpp mode, verify
+				// 3301 skip line? interlace artifact? other?
+				for (int yi = 0; yi < y_line_size; yi ++)
 				{
-					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix(y+0, x+xi) = m_palette->pen(pen & 7);
-
-					// TODO: real HW seems to actually just output to either even or odd line when in 3bpp mode
-					// investigate which is right
-					if(cliprect.contains(x+xi, y+1))
-						bitmap.pix(y+1, x+xi) = m_palette->pen(pen & 7);
-				}
-				else
-				{
-					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix(y, x+xi) = m_palette->pen(pen & 7);
+					int res_x = x + xi;
+					int res_y = y + yi;
+					// still need to check against cliprect,
+					// in the rare case that 3301 CRTC is set to non-canon values. 
+					if (cliprect.contains(res_x, res_y))
+						bitmap.pix(res_y, res_x) = m_palette->pen(pen & 7);
 				}
 			}
-
-			count++;
 		}
 	}
 }
@@ -1201,7 +1194,11 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
 	// Preserve content? Translation? Undefined?
 	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
-	// TODO: at least analog mode can do rasters
+	// TODO: at least analog mode can do rasters, unconfirmed for digital mode
+	// p8suite Analog RGB test cross bars (reportedly works in 24 kHz / 80 column only)
+	// NB: it uses a bunch of non-waitstate related opcodes to cycle time it right,
+	// implying a stress-test for Z80 opcode cycles.
+	m_screen->update_partial(m_screen->vpos());
 }
 
 
@@ -1569,8 +1566,10 @@ void pc8801_state::main_io(address_map &map)
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
 //  map(0x33, 0x33) PC8001mkIISR port, mirror on PC8801?
 	// TODO: ALU not installed on pre-mkIISR machines
+	// NB: anything after 0x32 reads 0xff on a PC8801MA real HW test
 	map(0x34, 0x34).w(FUNC(pc8801_state::alu_ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
+//	map(0x35, 0x35).r <unknown>, accessed by cancanb during OP, mistake? Mirror for intended HW?
 	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
 //  map(0x44, 0x47).rw internal OPN/OPNA sound card for 8801mkIISR and beyond
 //  uPD3301
