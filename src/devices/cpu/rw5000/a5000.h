@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Rockwell A5000/A5900 MCU
+  Rockwell A5000 MCU
 
 */
 
@@ -29,20 +29,9 @@ protected:
 
 	// opcode handlers
 	virtual void op_mtd_step() override;
-	virtual void op_read() override;
-};
-
-class a5900_cpu_device : public a5000_cpu_device
-{
-public:
-	a5900_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	void program_512x8(address_map &map);
 };
 
 
 DECLARE_DEVICE_TYPE(A5000, a5000_cpu_device)
-DECLARE_DEVICE_TYPE(A5900, a5900_cpu_device)
 
 #endif // MAME_CPU_RW5000_A5000_H

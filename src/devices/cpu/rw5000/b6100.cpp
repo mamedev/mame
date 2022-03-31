@@ -16,12 +16,8 @@ DEFINE_DEVICE_TYPE(B6100, b6100_cpu_device, "b6100", "Rockwell B6100")
 
 
 // constructor
-b6100_cpu_device::b6100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
-	b6000_cpu_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
-{ }
-
 b6100_cpu_device::b6100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	b6100_cpu_device(mconfig, B6100, tag, owner, clock, 10, address_map_constructor(FUNC(b6100_cpu_device::program_896x8), this), 6, address_map_constructor(FUNC(b6100_cpu_device::data_48x4), this))
+	b6000_cpu_device(mconfig, B6100, tag, owner, clock, 10, address_map_constructor(FUNC(b6100_cpu_device::program_896x8), this), 6, address_map_constructor(FUNC(b6100_cpu_device::data_48x4), this))
 { }
 
 
@@ -88,12 +84,12 @@ void b6100_cpu_device::execute_one()
 
 bool b6100_cpu_device::op_is_tl(u8 op)
 {
-	return ((op & 0xf8) == 0x30) || ((op & 0xfc) == 0x38);
+	return b6000_cpu_device::op_is_tl(op) || ((op & 0xfc) == 0x38);
 }
 
 bool b6100_cpu_device::op_is_lb(u8 op)
 {
-	return ((op & 0xfc) == 0x1c) || ((op & 0xf0) == 0x20) || ((op & 0xfc) == 0x3c);
+	return b6000_cpu_device::op_is_lb(op) || ((op & 0xfc) == 0x1c);
 }
 
 

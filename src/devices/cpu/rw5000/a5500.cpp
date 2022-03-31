@@ -16,12 +16,8 @@ DEFINE_DEVICE_TYPE(A5500, a5500_cpu_device, "a5500", "Rockwell A5500")
 
 
 // constructor
-a5500_cpu_device::a5500_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
-	a5000_cpu_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
-{ }
-
 a5500_cpu_device::a5500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	a5500_cpu_device(mconfig, A5500, tag, owner, clock, 10, address_map_constructor(FUNC(a5500_cpu_device::program_768x8), this), 6, address_map_constructor(FUNC(a5500_cpu_device::data_48x4), this))
+	a5000_cpu_device(mconfig, A5500, tag, owner, clock, 10, address_map_constructor(FUNC(a5500_cpu_device::program_768x8), this), 6, address_map_constructor(FUNC(a5500_cpu_device::data_48x4), this))
 { }
 
 
@@ -61,7 +57,6 @@ void a5500_cpu_device::execute_one()
 
 		case 0x0c: op_sc(); break;
 		case 0x0d: op_rsc(); break;
-		case 0x6f: b5000_cpu_device::op_read(); break;
 
 		// rest is same as A5000
 		default: a5000_cpu_device::execute_one(); break;
@@ -70,10 +65,10 @@ void a5500_cpu_device::execute_one()
 
 bool a5500_cpu_device::op_is_tl(u8 op)
 {
-	return ((op & 0xf8) == 0x30) || ((op & 0xfc) == 0x38);
+	return a5000_cpu_device::op_is_tl(op) || ((op & 0xfc) == 0x38);
 }
 
 bool a5500_cpu_device::op_is_lb(u8 op)
 {
-	return ((op & 0xfc) == 0x1c) || ((op & 0xf0) == 0x20) || ((op & 0xfc) == 0x3c);
+	return a5000_cpu_device::op_is_lb(op) || ((op & 0xfc) == 0x1c);
 }
