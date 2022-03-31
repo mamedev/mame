@@ -571,7 +571,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 		image_line = read_line(image);
 		u32 length = image_line.length();
 
-		if (length < 9)
+		if (length < 8)
 		{
 			image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
 			return image_init_result::FAIL;
@@ -583,7 +583,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 		if (image.is_filetype("snp"))
 		{
-			if (length < 38)
+			if (length < 37)
 			{
 				image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
 				return image_init_result::FAIL;
