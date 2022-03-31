@@ -60684,6 +60684,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sa0037" />
 			<feature name="pcb" value="UNL-SA-0037" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
 				<rom name="av hanafuda club (japan) (unl).chr" size="65536" crc="54ab3688" sha1="ed11e82020eaedab2ff3af560bf008ede2179d42" offset="00000" status="baddump" />
 			</dataarea>
@@ -60778,6 +60779,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sa0037" />
 			<feature name="pcb" value="UNL-SA-0037" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
 				<rom name="av soccer (japan) (unl).chr" size="65536" crc="44b5ea8b" sha1="6ab0e33a9f9bc5de72ed6c89bd7deb169ab0e0b4" offset="00000" status="baddump" />
 			</dataarea>
