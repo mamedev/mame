@@ -421,7 +421,7 @@ std::error_condition cdrom_file::read_partial_sector(void *dest, uint32_t lbasec
 		sourcefileoffset += chdsector * bytespersector + startoffs;
 
 		if (EXTRA_VERBOSE)
-			printf("Reading sector %d from track %d at offset %lu\n", chdsector, tracknum, sourcefileoffset);
+			printf("Reading sector %d from track %d at offset %lu\n", chdsector, tracknum, (unsigned long)sourcefileoffset);
 
 		size_t actual;
 		result = srcfile.seek(sourcefileoffset, SEEK_SET);
