@@ -64,9 +64,9 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_eram;
-	uint8_t m_stateparam[16];
-	uint8_t m_lut[256 * 3];
-	int m_accel;
+	uint8_t m_stateparam[16]{};
+	uint8_t m_lut[256 * 3]{};
+	int m_accel = 0;
 };
 
 

@@ -107,8 +107,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint16_t m_gpio_regs[4];
-	uint8_t m_gpio_write_only, m_gpio_dirs;
+	uint16_t m_gpio_regs[4]{};
+	uint8_t m_gpio_write_only = 0, m_gpio_dirs = 0;
 };
 
 
@@ -380,7 +380,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint32_t m_src, m_dst, m_nblock;
+	uint32_t m_src = 0, m_dst = 0, m_nblock = 0;
 };
 
 

@@ -42,7 +42,7 @@ protected:
 private:
 	optional_device_array<bbc_romslot_device, 16> m_rom;
 
-	uint8_t m_romsel;
+	uint8_t m_romsel = 0;
 };
 
 

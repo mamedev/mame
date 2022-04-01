@@ -38,9 +38,9 @@ private:
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
 
-	int m_adb_state;
-	int m_kbd_row;
-	int m_our_last_adb_state;
+	int m_adb_state = 0;
+	int m_kbd_row = 0;
+	int m_our_last_adb_state = 0;
 };
 
 DECLARE_DEVICE_TYPE(ADB_A9M0330, a9m0330_device)

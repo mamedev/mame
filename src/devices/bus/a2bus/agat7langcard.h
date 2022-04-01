@@ -49,7 +49,7 @@ private:
 	int m_dxxx_bank;
 	int m_main_bank;
 	uint8_t m_ram[32 * 1024];
-	uint8_t m_mode;
+	uint8_t m_mode = 0;
 	uint8_t m_csr;
 };
 

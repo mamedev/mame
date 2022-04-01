@@ -58,7 +58,7 @@ private:
 	int m_in_bit;
 
 	int m_shift_count;
-	emu_timer *m_shift_timer;
+	emu_timer *m_shift_timer = nullptr;
 };
 
 // device type definition

@@ -52,7 +52,7 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 
-	bool m_cs;
+	bool m_cs = false;
 
 	void databoard_4107_io(address_map &map);
 	void databoard_4107_mem(address_map &map);

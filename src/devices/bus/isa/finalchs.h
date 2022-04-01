@@ -39,7 +39,7 @@ private:
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
 
-	bool m_installed;
+	bool m_installed = false;
 
 	uint8_t finalchs_r(offs_t offset);
 	void finalchs_w(offs_t offset, uint8_t data);

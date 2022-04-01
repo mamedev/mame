@@ -62,7 +62,7 @@ protected:
 	required_region_ptr<uint8_t> m_rom;
 	required_shared_ptr_array<uint8_t, 2> m_vram;
 
-	uint16_t m_plane_mask;
+	uint16_t m_plane_mask = 0;
 	uint8_t m_intreg;
 	uint8_t m_ints;
 };

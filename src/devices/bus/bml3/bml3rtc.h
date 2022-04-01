@@ -42,8 +42,8 @@ protected:
 private:
 	required_device<msm5832_device> m_rtc;
 
-	uint8_t m_addr_latch;
-	uint8_t m_data_latch;
+	uint8_t m_addr_latch = 0;
+	uint8_t m_data_latch = 0;
 };
 
 // device type definition

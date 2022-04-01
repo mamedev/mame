@@ -42,7 +42,7 @@ protected:
 
 	uint16_t m_chip_ID;
 	uint16_t m_membounds;
-	bool display_mode_change;
+	bool display_mode_change = false;
 
 };
 
@@ -170,18 +170,18 @@ protected:
 	virtual uint16_t offset() override;
 
 	// hardware pointer
-	bool m_cursor_enable;
-	uint32_t m_cursor_address;
-	uint16_t m_cursor_horizontal;
-	uint16_t m_cursor_vertical;
-	uint8_t m_cursor_colour0_b;
-	uint8_t m_cursor_colour0_r;
-	uint8_t m_cursor_colour0_g;
-	uint8_t m_cursor_colour1_b;
-	uint8_t m_cursor_colour1_r;
-	uint8_t m_cursor_colour1_g;
-	uint8_t m_cursor_offset_horizontal;
-	uint8_t m_cursor_offset_vertical;
+	bool m_cursor_enable = false;
+	uint32_t m_cursor_address = 0;
+	uint16_t m_cursor_horizontal = 0;
+	uint16_t m_cursor_vertical = 0;
+	uint8_t m_cursor_colour0_b = 0;
+	uint8_t m_cursor_colour0_r = 0;
+	uint8_t m_cursor_colour0_g = 0;
+	uint8_t m_cursor_colour1_b = 0;
+	uint8_t m_cursor_colour1_r = 0;
+	uint8_t m_cursor_colour1_g = 0;
+	uint8_t m_cursor_offset_horizontal = 0;
+	uint8_t m_cursor_offset_vertical = 0;
 
 };
 

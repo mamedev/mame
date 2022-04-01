@@ -34,7 +34,7 @@ protected:
 private:
 	required_device<chessmachine_device> m_chessm;
 
-	bool m_installed;
+	bool m_installed = false;
 
 	uint8_t chessmdr_r(offs_t offset);
 	void chessmdr_w(offs_t offset, uint8_t data);

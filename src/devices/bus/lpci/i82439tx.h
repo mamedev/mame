@@ -51,14 +51,14 @@ private:
 	// system management ram setup
 	struct {
 		int tseg_en;
-		int tseg_sz;
-		int e_smerr;
+		int tseg_sz = 0;
+		int e_smerr = 0;
 		int h_smrame;
-		int c_base_seg;
-		int g_smrame;
-		int d_lck;
-		int d_cls;
-		int d_open;
+		int c_base_seg = 0;
+		int g_smrame = 0;
+		int d_lck = 0;
+		int d_cls = 0;
+		int d_open = 0;
 		int smiact_n;
 		int tseg_size;
 		int mapping;
