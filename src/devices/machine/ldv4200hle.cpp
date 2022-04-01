@@ -78,10 +78,10 @@ pioneer_ldv4200hle_device::pioneer_ldv4200hle_device(const machine_config &mconf
 	, m_chapter(0)
 	, m_time(0)
 	, m_frame(0)
-	, m_search_chapter(~0U)
-	, m_search_frame(~0U)
-	, m_mark_chapter(~0U)
-	, m_mark_frame(~0U)
+	, m_search_chapter(~uint32_t(0))
+	, m_search_frame(~uint32_t(0))
+	, m_mark_chapter(~uint32_t(0))
+	, m_mark_frame(~uint32_t(0))
 	, m_key_lock(0)
 	, m_video_switch(1)
 	, m_audio_switch(0)
@@ -209,7 +209,7 @@ void pioneer_ldv4200hle_device::process_command_buffer()
 			break;
 		}
 
-		uint32_t value = ~0U;
+		uint32_t value = ~uint32_t(0);
 		if (is_number(m_cmd_buffer[cmd_index]))
 		{
 			cmd_index += parse_numeric_value(cmd_index, value, err);
@@ -347,19 +347,19 @@ uint8_t pioneer_ldv4200hle_device::process_command(uint8_t cmd_index, uint32_t v
 			set_audio_squelch(true, true);
 			break;
 		case CMD_PLAY:
-			LOGMASKED(LOG_COMMANDS, "%s: Command: Play [%d] (cancelling search)\n", machine().describe_context(), value == ~0U ? 0 : value);
+			LOGMASKED(LOG_COMMANDS, "%s: Command: Play [%d] (cancelling search)\n", machine().describe_context(), value == ~uint32_t(0) ? 0 : value);
 			m_speed_accum = 0;
 			m_mode = MODE_PLAY;
 			update_audio_squelch();
 			update_video_enable();
-			if (value != ~0U)
+			if (value != ~uint32_t(0))
 			{
 				LOGMASKED(LOG_COMMANDS, "%s:          Setting stop frame\n", machine().describe_context());
 				m_mark_frame = value + 1;
 				m_cmd_running = true;
 			}
-			m_search_frame = ~0U;
-			m_search_chapter = ~0U;
+			m_search_frame = ~uint32_t(0);
+			m_search_chapter = ~uint32_t(0);
 			break;
 		case CMD_PAUSE:
 			LOGMASKED(LOG_COMMANDS, "%s: Command: Pause\n", machine().describe_context());
@@ -376,14 +376,14 @@ uint8_t pioneer_ldv4200hle_device::process_command(uint8_t cmd_index, uint32_t v
 			LOGMASKED(LOG_COMMANDS, "%s: Command: Step Forward\n", machine().describe_context());
 			m_mode = MODE_STILL;
 			set_audio_squelch(true, true);
-			m_mark_frame = ~0U;
+			m_mark_frame = ~uint32_t(0);
 			advance_slider(1);
 			break;
 		case CMD_STEP_REVERSE:
 			LOGMASKED(LOG_COMMANDS, "%s: Command: Step Reverse\n", machine().describe_context());
 			m_mode = MODE_STILL;
 			set_audio_squelch(true, true);
-			m_mark_frame = ~0U;
+			m_mark_frame = ~uint32_t(0);
 			advance_slider(-1);
 			break;
 		case CMD_SCAN_FORWARD:
@@ -393,12 +393,12 @@ uint8_t pioneer_ldv4200hle_device::process_command(uint8_t cmd_index, uint32_t v
 			LOGMASKED(LOG_COMMANDS, "%s: Command: Scan Reverse\n", machine().describe_context());
 			break;
 		case CMD_MULTISPEED_FORWARD:
-			LOGMASKED(LOG_COMMANDS, "%s: Command: Multi-Speed Forward (%d) (cancelling search)\n", machine().describe_context(), value == ~0U ? 0 : value);
-			m_search_frame = ~0U;
-			m_search_chapter = ~0U;
+			LOGMASKED(LOG_COMMANDS, "%s: Command: Multi-Speed Forward (%d) (cancelling search)\n", machine().describe_context(), value == ~uint32_t(0) ? 0 : value);
+			m_search_frame = ~uint32_t(0);
+			m_search_chapter = ~uint32_t(0);
 			if (value + 1 == m_curr_frame)
 			{
-				LOGMASKED(LOG_COMMANDS, "%s:          Already at desired frame, entering still/pause\n", machine().describe_context(), value == ~0U ? 0 : value);
+				LOGMASKED(LOG_COMMANDS, "%s:          Already at desired frame, entering still/pause\n", machine().describe_context(), value == ~uint32_t(0) ? 0 : value);
 				if (is_cav_disc())
 				{
 					m_mode = MODE_STILL;
@@ -413,7 +413,7 @@ uint8_t pioneer_ldv4200hle_device::process_command(uint8_t cmd_index, uint32_t v
 			else
 			{
 				m_mode = MODE_MS_FORWARD;
-				if (value != ~0U)
+				if (value != ~uint32_t(0))
 				{
 					LOGMASKED(LOG_COMMANDS, "%s:          Setting stop frame\n", machine().describe_context());
 					m_mark_frame = value + 1;
@@ -422,12 +422,12 @@ uint8_t pioneer_ldv4200hle_device::process_command(uint8_t cmd_index, uint32_t v
 			}
 			break;
 		case CMD_MULTISPEED_REVERSE:
-			LOGMASKED(LOG_COMMANDS, "%s: Command: Multi-Speed Reverse (%d) (cancelling search)\n", machine().describe_context(), value == ~0U ? 0 : value);
-			m_search_frame = ~0U;
-			m_search_chapter = ~0U;
+			LOGMASKED(LOG_COMMANDS, "%s: Command: Multi-Speed Reverse (%d) (cancelling search)\n", machine().describe_context(), value == ~uint32_t(0) ? 0 : value);
+			m_search_frame = ~uint32_t(0);
+			m_search_chapter = ~uint32_t(0);
 			if (value + 1 == m_curr_frame)
 			{
-				LOGMASKED(LOG_COMMANDS, "%s:          Already at desired frame, entering still/pause\n", machine().describe_context(), value == ~0U ? 0 : value);
+				LOGMASKED(LOG_COMMANDS, "%s:          Already at desired frame, entering still/pause\n", machine().describe_context(), value == ~uint32_t(0) ? 0 : value);
 				if (is_cav_disc())
 				{
 					m_mode = MODE_STILL;
@@ -442,7 +442,7 @@ uint8_t pioneer_ldv4200hle_device::process_command(uint8_t cmd_index, uint32_t v
 			else
 			{
 				m_mode = MODE_MS_REVERSE;
-				if (value != ~0U)
+				if (value != ~uint32_t(0))
 				{
 					LOGMASKED(LOG_COMMANDS, "%s:          Setting stop frame\n", machine().describe_context());
 					m_mark_frame = value + 1;
@@ -746,10 +746,10 @@ void pioneer_ldv4200hle_device::device_reset()
 	m_chapter = 0;
 	m_time = 0;
 	m_frame = 0;
-	m_search_chapter = ~0U;
-	m_search_frame = ~0U;
-	m_mark_chapter = ~0U;
-	m_mark_frame = ~0U;
+	m_search_chapter = ~uint32_t(0);
+	m_search_frame = ~uint32_t(0);
+	m_mark_chapter = ~uint32_t(0);
+	m_mark_frame = ~uint32_t(0);
 	m_key_lock = 0;
 	m_video_switch = 1;
 	m_audio_switch = 0;
@@ -800,14 +800,14 @@ void pioneer_ldv4200hle_device::device_timer(emu_timer &timer, device_timer_id i
 
 				if (m_mode != MODE_STILL && m_mode != MODE_PAUSE)
 				{
-					if (m_mark_frame != ~0U && m_search_frame == ~0U)
+					if (m_mark_frame != ~uint32_t(0) && m_search_frame == ~uint32_t(0))
 					{
 						int32_t old_delta = (int32_t)m_mark_frame - (int32_t)old_frame;
 						int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
 						LOGMASKED(LOG_STOPS, "%s: Stop Mark is currently %d, old frame is %d, current frame is %d, old delta %d, curr delta %d\n", machine().describe_context(), m_mark_frame, old_frame, m_curr_frame, old_delta, curr_delta);
 						if (curr_delta == 0 || std::signbit(old_delta) != std::signbit(curr_delta))
 						{
-							m_mark_frame = ~0U;
+							m_mark_frame = ~uint32_t(0);
 							if (is_cav_disc())
 							{
 								LOGMASKED(LOG_STOPS | LOG_SQUELCHES, "%s: Stop Mark: Zero delta w/ CAV disc, entering still mode and squelching audio\n", machine().describe_context());
@@ -832,7 +832,7 @@ void pioneer_ldv4200hle_device::device_timer(emu_timer &timer, device_timer_id i
 						}
 					}
 
-					if (m_search_frame != ~0U)
+					if (m_search_frame != ~uint32_t(0))
 					{
 						// TODO: Chapter-search support
 						int32_t delta = (int32_t)m_search_frame - (int32_t)m_curr_frame;
@@ -840,7 +840,7 @@ void pioneer_ldv4200hle_device::device_timer(emu_timer &timer, device_timer_id i
 						if (delta == 0)
 						{
 							// We've found our frame, enter play, pause or still mode.
-							m_search_frame = ~0U;
+							m_search_frame = ~uint32_t(0);
 							if (is_cav_disc())
 							{
 								LOGMASKED(LOG_SEARCHES | LOG_SQUELCHES, "%s: Search Mark: Zero delta w/ CAV disc, entering still mode and squelching audio\n", machine().describe_context());
@@ -926,7 +926,7 @@ int32_t pioneer_ldv4200hle_device::player_update(const vbi_metadata &vbi, int fi
 		if (m_mode == MODE_MS_REVERSE)
 			elapsed_tracks *= -1;
 
-		if (m_mark_frame != ~0U)
+		if (m_mark_frame != ~uint32_t(0))
 		{
 			int32_t jump_frame = (int32_t)m_curr_frame + elapsed_tracks;
 			int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
