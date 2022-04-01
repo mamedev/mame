@@ -66,6 +66,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/tsconf.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -256,11 +257,11 @@ void tsconf_state::machine_reset()
 void tsconf_state::tsconf(machine_config &config)
 {
 	spectrum_128(config);
-	m_maincpu->set_clock(3.5_MHz_XTAL);
 
 	config.device_remove("exp");
 	config.device_remove("palette");
 
+	Z80(config.replace(), m_maincpu, 14_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tsconf_state::tsconf_mem);
 	m_maincpu->set_addrmap(AS_IO, &tsconf_state::tsconf_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &tsconf_state::tsconf_switch);
@@ -271,7 +272,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	GLUKRS(config, m_glukrs);
 
-	TSCONF_DMA(config, m_dma, 7_MHz_XTAL);
+	TSCONF_DMA(config, m_dma, 14_MHz_XTAL / 2);
 	m_dma->in_mreq_callback().set(FUNC(tsconf_state::ram_read16));
 	m_dma->out_mreq_callback().set(FUNC(tsconf_state::ram_write16));
 	m_dma->in_spireq_callback().set(FUNC(tsconf_state::spi_read16));
@@ -293,7 +294,7 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(2, "rspeaker", 0.50);
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
-	m_screen->set_raw(7_MHz_XTAL, 448, with_hblank(), 448, 320, with_vblank(), 320);
+	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(), 448, 320, with_vblank(), 320);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
 	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6

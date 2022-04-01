@@ -111,7 +111,7 @@ private:
 	required_shared_ptr<uint8_t> m_xscroll;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t m_scroll_ctrl;
 	uint8_t m_irq_source;
@@ -126,7 +126,7 @@ private:
 	uint8_t m_packet_write_pos;
 	bool m_packet_reset;
 
-	u8 m_strnskil_slave_irq;
+	u8 m_strnskil_slave_irq = 0;
 };
 
 #endif // MAME_INCLUDES_MARKHAM_H

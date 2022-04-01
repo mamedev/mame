@@ -59,12 +59,12 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_scrollram;
 
-	int m_msm5205next;
-	int m_toggle;
+	int m_msm5205next = 0;
+	int m_toggle = 0;
 
-	tilemap_t *m_background_layer;
-	tilemap_t *m_foreground_layer;
-	tilemap_t *m_text_layer;
+	tilemap_t *m_background_layer = nullptr;
+	tilemap_t *m_foreground_layer = nullptr;
+	tilemap_t *m_text_layer = nullptr;
 
 	void tokib_soundcommand_w(uint16_t data);
 	uint16_t pip_r();

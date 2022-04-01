@@ -164,20 +164,20 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	u8 m_mapper[32], m_rtcram[2];
+	u8 m_mapper[32]{}, m_rtcram[2]{};
 
 	// crtc
-	u8 m_crtc[64], m_cursor_start_ras;
-	u16 m_disp_start_addr, m_cursor_addr, m_window_start_addr;
-	int m_register_address_latch;
-	bool m_graphics_mode;
+	u8 m_crtc[64]{}, m_cursor_start_ras = 0;
+	u16 m_disp_start_addr = 0, m_cursor_addr = 0, m_window_start_addr = 0;
+	int m_register_address_latch = 0;
+	bool m_graphics_mode = false;
 
 	// from pt68k4.cpp
-	bool m_kclk;
-	uint8_t m_kdata;
-	uint8_t m_scancode;
-	uint8_t m_kbdflag;
-	int m_kbit;
+	bool m_kclk = false;
+	uint8_t m_kdata = 0;
+	uint8_t m_scancode = 0;
+	uint8_t m_kbdflag = 0;
+	int m_kbit = 0;
 };
 
 

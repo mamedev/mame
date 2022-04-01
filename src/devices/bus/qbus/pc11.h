@@ -61,17 +61,17 @@ private:
 	int m_rxvec;
 	int m_txvec;
 
-	device_image_interface *m_fd;
+	device_image_interface *m_fd = nullptr;
 
-	line_state m_rxrdy;
-	line_state m_txrdy;
+	line_state m_rxrdy{};
+	line_state m_txrdy{};
 
-	uint16_t m_rcsr;
-	uint16_t m_rbuf;
-	uint16_t m_tcsr;
-	uint16_t m_tbuf;
+	uint16_t m_rcsr = 0;
+	uint16_t m_rbuf = 0;
+	uint16_t m_tcsr = 0;
+	uint16_t m_tbuf = 0;
 
-	const char *pc11_regnames[4];
+	const char *pc11_regnames[4]{};
 };
 
 

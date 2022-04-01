@@ -39,7 +39,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	bool m_is_sound_alu;
+	bool m_is_sound_alu = false;
 
 	uint8_t m_alu_oprand[4];
 	uint8_t m_alu_oprand_mult[2];

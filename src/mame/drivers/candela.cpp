@@ -169,9 +169,9 @@ protected:
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;
 
-	uint8_t m_banksel;
-	uint8_t *m_plap;
-	uint8_t *m_epromp;
+	uint8_t m_banksel = 0;
+	uint8_t *m_plap = nullptr;
+	uint8_t *m_epromp = nullptr;
 
 	uint8_t m_ram0[1024 *  8]; // IC3
 	uint8_t m_ram1[1024 * 32]; // IC4

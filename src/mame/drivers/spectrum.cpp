@@ -339,30 +339,21 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
  bit 3: MIC/Tape Output
  bit 2-0: border colour
 */
-
 void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 {
-	unsigned char Changed;
-
-	Changed = m_port_fe_data^data;
+	unsigned char Changed = m_port_fe_data^data;
 
 	/* border colour changed? */
 	if ((Changed & 0x07)!=0)
-	{
-		spectrum_UpdateBorderBitmap();
-	}
+		m_screen->update_now();
 
 	if ((Changed & (1<<4))!=0)
-	{
 		/* DAC output state */
 		m_speaker->level_w(BIT(data, 4));
-	}
 
 	if ((Changed & (1<<3))!=0)
-	{
 		/* write cassette data */
 		m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
-	}
 
 	// Some exp devices use ula port unused bits 5-7:
 	// Beta v2/3/plus use bit 7, Beta clones use bits 6 and 7
@@ -508,8 +499,9 @@ uint8_t spectrum_state::floating_bus_r()
 	// peek into attribute ram when beam is in display area
 	// ula always returns ff when in border area (or h/vblank)
 
-	if ((hpos >= 48 && hpos < 304) && (vpos >= 48 && vpos < 240))
-		data = m_video_ram[0x1800 + (((vpos-48)/8)*32) + ((hpos-48)/8)];
+	rectangle screen = get_screen_area();
+	if (screen.contains(hpos, vpos))
+		data = m_screen_location[0x1800 + (((vpos - screen.top()) / 8) * 32) + ((hpos - screen.left()) / 8)];
 
 	return data;
 }
@@ -713,10 +705,15 @@ INPUT_PORTS_START( spec_plus )
 INPUT_PORTS_END
 
 /* Machine initialization */
-
 void spectrum_state::init_spectrum()
 {
 	m_specmem->space(AS_PROGRAM).install_ram(0x5b00, m_ram->size() + 0x3fff, m_ram->pointer() + 0x1b00);
+}
+
+void spectrum_state::machine_start()
+{
+	save_item(NAME(m_port_fe_data));
+	//TODO more
 }
 
 void spectrum_state::machine_reset()
@@ -728,32 +725,39 @@ void spectrum_state::machine_reset()
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	96,                 /* 96 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8, 8,           /* 8 x 8 characters */
+	96,             /* 96 characters */
+	1,              /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
+	{STEP8(0, 1)},  /* x offsets */
+	{STEP8(0, 8)},  /* y offsets */
+	8*8             /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( gfx_spectrum )
-	GFXDECODE_ENTRY( "maincpu", 0x3d00, spectrum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x3d00, spectrum_charlayout, 7, 8 )
 GFXDECODE_END
 
 void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
+	case TIMER_IRQ_ON:
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		timer_set(m_maincpu->clocks_to_attotime(32), TIMER_IRQ_OFF, 0);
+		break;
 	case TIMER_IRQ_OFF:
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_SCANLINE:
-		m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
-		spectrum_UpdateScreenBitmap();
+	{
+		auto vpos_next = m_screen->vpos() + 1;
+		if(vpos_next <= get_screen_area().bottom()) {
+			m_scanline_timer->adjust(m_screen->time_until_pos(vpos_next), get_screen_area().left());
+			m_screen->update_now();
+		}
 		break;
+	}
 	default:
 		throw emu_fatalerror("Unknown id in spectrum_state::device_timer");
 	}
@@ -761,8 +765,14 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	timer_set(m_screen->time_until_pos(0), TIMER_IRQ_ON, 0);
+
+	/* Default implementation performs screen updates per scanline. Some other
+	clones e.g. pentagon do updates based on video_ram access, border updates,
+	and full frame refresh (for attributes flashing). Such clones may define own
+	*_interrupt config. */
+	if (m_scanline_timer != nullptr)
+		m_scanline_timer->adjust(m_screen->time_until_pos(get_screen_area().top() + 1));
 }
 
 void spectrum_state::spectrum_common(machine_config &config)
@@ -784,9 +794,9 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(X1 / 2, 448, 0, 352, 312, 0, 296);
+
+	m_screen->set_raw(X1 / 2, 448, 312, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
 	m_screen->set_screen_update(FUNC(spectrum_state::screen_update_spectrum));
-	m_screen->screen_vblank().set(FUNC(spectrum_state::screen_vblank_spectrum));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(spectrum_state::spectrum_palette), 16);
@@ -1151,7 +1161,7 @@ COMP( 1993, didakm93, spectrum, 0,      spectrum_clone, spec_plus, spectrum_stat
 COMP( 1988, mistrum,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Amaterske RADIO",       "Mistrum",               0 )  // keyboard could be spectrum in some models (since it was a build-yourself design)
 COMP( 198?, bk08,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Orel",                  "BK-08",                 0 )
 COMP( 1990, blitzs,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Blic",                  0 )  // no keyboard images found
-COMP( 1990, byte,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Byte",                  0 )  // no keyboard images found
+COMP( 1990, byte,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "BEMZ",                  "PEVM Byte",             0 )  // no keyboard images found
 COMP( 199?, orizon,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Orizon-Micro",          0 )  // no keyboard images found
 COMP( 1993, quorum48, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kvorum 48K",            MACHINE_NOT_WORKING )
 COMP( 1993, magic6,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Magic 6",               MACHINE_NOT_WORKING )   // keyboard should be spectrum, but image was not clear

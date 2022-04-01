@@ -68,9 +68,9 @@ private:
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	tilemap_t     *m_text_tilemap;
-	tilemap_t     *m_fore_tilemap;
-	tilemap_t     *m_back_tilemap;
+	tilemap_t     *m_text_tilemap = nullptr;
+	tilemap_t     *m_fore_tilemap = nullptr;
+	tilemap_t     *m_back_tilemap = nullptr;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

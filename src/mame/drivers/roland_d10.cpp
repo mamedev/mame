@@ -93,11 +93,11 @@ private:
 	void d110_map(address_map &map);
 	void d110_bank_map(address_map &map);
 
-	uint8_t  m_lcd_data_buffer[256];
-	int      m_lcd_data_buffer_pos;
-	uint8_t  m_midi;
-	int      m_midi_pos;
-	uint8_t  m_port0;
+	uint8_t  m_lcd_data_buffer[256]{};
+	int      m_lcd_data_buffer_pos = 0;
+	uint8_t  m_midi = 0;
+	int      m_midi_pos = 0;
+	uint8_t  m_port0 = 0;
 	required_device<address_map_bank_device> m_bank;
 	required_device<nvram_device> m_rams;
 	required_device<nvram_device> m_memcs;

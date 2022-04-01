@@ -6055,6 +6055,75 @@ ROM_START( tharrierb )
 	ROM_LOAD( "20h.512", 0x70000, 0x10000, CRC(5ccd9205) SHA1(6e5443d6af5a896d6dd4b4e06d5c3151826bf8b5) )
 ROM_END
 
+
+/***************************************************************************
+
+USAAF Mustang (UPL, 1990)
+Hardware info by Guru
+
+UPL-90058
+|-------------------------------------------------------------------------|
+| LA4460  LM358 YM2203  76C28                        55257                |
+|        Y3014          7.IC141                                           |
+|                NMK004                              55257                |
+|90058-6.IC219          90058-4.IC142                                     |
+|        90058-5.IC185                               55257                |
+|                                   NMK903                                |
+|                                                    55257                |
+|         SW1                                                             |
+|                                   6264                                  |
+|                                                                         |
+|J              1.IC160             6264                                  |
+|A                                                                        |
+|M                                                          90058-9.IC35  |
+|M                    NMK903        NMK901                                |
+|A                                                          90058-8.IC36  |
+|                                                                         |
+|         SW2                             10.IC120                        |
+|               2016   2016         NMK902                                |
+|                                         11.IC121                        |
+|               2.IC166                                                   |
+|                                            12MHz                        |
+|               3.IC167                                                   |
+|                                                                         |
+|                                                                         |
+| 6116                  55257                6116                         |
+| 6116          68000   55257                6116                         |
+|      8MHz                                                               |
+|-------------------------------------------------------------------------|
+Notes:
+         68000 - Clock 8.000MHz
+        YM2203 - Clock 1.500MHz [12/8]
+         M6295 - 4.000MHz [12/3] and pin 7 LOW (both)
+         VSync - 56Hz
+         HSync - 15.5kHz
+         SW1/2 - 8-position DIP switch
+         55257 - Toshiba TC55257 32kBx8-bit SRAM
+          6116 - 2kBx8-bit SRAM
+          2016 - 2kBx8-bit SRAM
+          6264 - 8kBx8-bit SRAM
+         76C28 - Goldstar GM76C28 2kBx8-bit SRAM
+        NMK901 - Custom chip
+        NMK902 - Custom chip
+        NMK903 - Custom chip
+        NMK904 - Toshiba TMP90C840AF with 8Kbyte internal ROM disguised as a custom chip. Clock input 8.000MHz. Clock output on pin 17 is 2.000MHz
+        LA4460 - Sanyo LA4460 Audio Power Amplifier
+         LM358 - Texas Instruments LM358 Dual Operational Amplifier
+         Y3014 - Yamaha YM3014 DAC
+ 90058-1.IC160 - 27C010 128kBx8-bit EPROM (foreground tiles)
+ 90058-2.IC166 - 27C010 128kBx8-bit EPROM (main program)
+ 90058-3.IC167 - 27C010 128kBx8-bit EPROM (main program)
+ 90058-7.IC141 - 27C512 64kBx8-bit EPROM ( sound program)
+ 90058-4.IC142 - 4Mbit mask ROM (background tiles)
+ 90058-5.IC185 - 4Mbit mask ROM (OKI M6295 samples)
+ 90058-6.IC219 - 4Mbit mask ROM (OKI M6295 samples)
+  90058-8.IC36 - 4Mbit mask ROM (sprites)
+  90058-9.IC35 - TC574000 512kBx8-bit EPROM (sprites)
+90058-10.IC120 - Harris M1-7649 bipolar PROM
+90058-11.IC121 - Harris M1-7621 bipolar PROM
+
+***************************************************************************/
+
 ROM_START( mustang )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2.bin",    0x00000, 0x20000, CRC(bd9f7c89) SHA1(a0af46a8ff82b90bece2515e1bd74e7a7ddf5379) )

@@ -47,7 +47,7 @@ protected:
 private:
 	uint8_t *m_rom;
 
-	uint8_t m_control;
+	uint8_t m_control = 0;
 
 	static void floppy_drives(device_slot_interface &device);
 };

@@ -290,7 +290,7 @@ static floperr_t basicdsk_get_indexed_sector_info(floppy_image_legacy *floppy, i
 
 static void basicdsk_default_geometry(const struct FloppyFormat *format, struct basicdsk_geometry *geometry)
 {
-	int sector_length;
+	int sector_length = 0;
 	memset(geometry, 0, sizeof(*geometry));
 
 	auto err = util::option_resolution::get_default(format->param_guidelines, PARAM_HEADS,           &geometry->heads);

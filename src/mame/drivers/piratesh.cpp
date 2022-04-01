@@ -92,15 +92,15 @@ private:
 
 	optional_shared_ptr<uint16_t> m_spriteram;
 
-	int m_layer_colorbase[6];
-	int m_sprite_colorbase;
-	int m_lvc_colorbase;
+	int m_layer_colorbase[6]{};
+	int m_sprite_colorbase = 0;
+	int m_lvc_colorbase = 0;
 
-	uint8_t m_int_enable;
-	uint8_t m_int_status;
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_nmi_clk;
-	uint16_t m_control;
+	uint8_t m_int_enable = 0;
+	uint8_t m_int_status = 0;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_nmi_clk = 0;
+	uint16_t m_control = 0;
 
 	void update_interrupts();
 

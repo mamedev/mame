@@ -60,7 +60,7 @@ private:
 	void count_inner_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// timer setups
-	emu_timer *m_command_timer;
+	emu_timer *m_command_timer = nullptr;
 	inline void command_start();
 	inline void command_run();
 	inline void command_done();
@@ -81,8 +81,7 @@ private:
 	struct {
 		u32 base;
 		s16 xstep, ystep;
-
-		u32 ptr; /**< Current pixel address */
+		u32 ptr = 0; /**< Current pixel address */
 	} m_a1;
 };
 

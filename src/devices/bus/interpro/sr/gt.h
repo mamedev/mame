@@ -208,38 +208,38 @@ protected:
 	u16 m_bsga_width;
 	u16 m_bsga_tmp;
 
-	u16 m_bsga_xmin; // clipping boundary minimum x (left)
-	u16 m_bsga_ymin; // clipping boundary minimum y (top)
-	u16 m_bsga_xmax; // clipping boundary maximum x (right)
-	u16 m_bsga_ymax; // clipping boundary maximum y (bottom)
+	u16 m_bsga_xmin = 0; // clipping boundary minimum x (left)
+	u16 m_bsga_ymin = 0; // clipping boundary minimum y (top)
+	u16 m_bsga_xmax = 0; // clipping boundary maximum x (right)
+	u16 m_bsga_ymax = 0; // clipping boundary maximum y (bottom)
 
-	u16 m_bsga_status;
+	u16 m_bsga_status = 0;
 
-	u16 m_bsga_xin1;
-	u16 m_bsga_yin1;
-	u16 m_bsga_xin2;
-	u16 m_bsga_yin2;
+	u16 m_bsga_xin1 = 0;
+	u16 m_bsga_yin1 = 0;
+	u16 m_bsga_xin2 = 0;
+	u16 m_bsga_yin2 = 0;
 
-	u16 m_bsga_xin; // most recently written xin1/xin2
-	u16 m_bsga_yin; // most recently written yin1/yin2
+	u16 m_bsga_xin = 0; // most recently written xin1/xin2
+	u16 m_bsga_yin = 0; // most recently written yin1/yin2
 
-	u32 m_ri_initial_distance;
-	u32 m_ri_distance_both;
-	u32 m_ri_distance_major;
-	u32 m_ri_initial_address;
-	u32 m_ri_address_both;
-	u32 m_ri_address_major;
-	u32 m_ri_initial_error;
-	u32 m_ri_error_both;
-	u32 m_ri_error_major;
-	u32 m_ri_stop_count;
-	u32 m_ri_control;
-	u32 m_ri_xfer;
+	u32 m_ri_initial_distance = 0;
+	u32 m_ri_distance_both = 0;
+	u32 m_ri_distance_major = 0;
+	u32 m_ri_initial_address = 0;
+	u32 m_ri_address_both = 0;
+	u32 m_ri_address_major = 0;
+	u32 m_ri_initial_error = 0;
+	u32 m_ri_error_both = 0;
+	u32 m_ri_error_major = 0;
+	u32 m_ri_stop_count = 0;
+	u32 m_ri_control = 0;
+	u32 m_ri_xfer = 0;
 
 private:
-	emu_timer *m_blit_timer;
-	emu_timer *m_line_timer;
-	emu_timer *m_done_timer;
+	emu_timer *m_blit_timer = nullptr;
+	emu_timer *m_line_timer = nullptr;
+	emu_timer *m_done_timer = nullptr;
 
 	const bool m_double_buffered;
 	const bool m_masked_reads;
@@ -296,11 +296,11 @@ protected:
 	required_device<z80scc_device> m_scc;
 
 private:
-	u8 m_mouse_int;
-	u32 m_fifo_control;
+	u8 m_mouse_int = 0;
+	u32 m_fifo_control = 0;
 
-	u8 m_mouse_x;
-	u8 m_mouse_y;
+	u8 m_mouse_x = 0;
+	u8 m_mouse_y = 0;
 };
 
 class mpcb963_device : public gt_device

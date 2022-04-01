@@ -58,7 +58,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	uint32_t m_slot_size;
+	uint32_t m_slot_size = 0;
 
 private:
 	device_bbc_rom_interface*   m_cart;
@@ -136,7 +136,7 @@ public:
 protected:
 	device_bbc_rom_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_romslot_device *m_slot;
+	bbc_romslot_device *m_slot = nullptr;
 
 private:
 	// internal state

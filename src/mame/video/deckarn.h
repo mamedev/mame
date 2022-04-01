@@ -24,7 +24,7 @@ protected:
 
 private:
 	colpri_cb_delegate m_colpri_cb;
-	bool m_flip_screen;
+	bool m_flip_screen = false;
 };
 
 DECLARE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device)

@@ -42,8 +42,8 @@ public:
 	void sub(machine_config &config);
 
 private:
-	bool m_int_en;
-	bool m_nmi_en;
+	bool m_int_en = false;
+	bool m_nmi_en = false;
 
 	DECLARE_WRITE_LINE_MEMBER(int_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
@@ -66,7 +66,7 @@ private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;

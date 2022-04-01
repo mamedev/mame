@@ -75,21 +75,21 @@ protected:
 	required_device<i8255_device> m_d15;
 
 private:
-	legacy_floppy_image_device *m_floppy;
-	bool m_side;
+	legacy_floppy_image_device *m_floppy = nullptr;
+	bool m_side = false;
 
 	std::unique_ptr<uint16_t[]> m_tracks[160];
-	int m_count_read;
-	int m_count_write;
-	bool m_seen_magic;
-	int m_current_track;
+	int m_count_read = 0;
+	int m_count_write = 0;
+	bool m_seen_magic = false;
+	int m_current_track = 0;
 
-	u8 m_mxcs;
-	int m_unit;
-	int m_state;
+	u8 m_mxcs = 0;
+	int m_unit = 0;
+	int m_state = 0;
 
-	int m_seektime;
-	int m_waittime;
+	int m_seektime = 0;
+	int m_waittime = 0;
 
 	emu_timer *m_timer_wait = nullptr;
 	emu_timer *m_timer_seek = nullptr;

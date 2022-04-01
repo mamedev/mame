@@ -37,7 +37,7 @@ private:
 	// internal state
 	std::unique_ptr<u16[]> m_ram;
 
-	tilemap_t   *m_tilemap;
+	tilemap_t   *m_tilemap = nullptr;
 
 	u16         m_ctrl[8];
 	int         m_base_color;

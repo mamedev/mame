@@ -66,7 +66,7 @@ protected:
 private:
 	required_address_space m_iospace;
 
-	device_vtech_ioexp_interface *m_module;
+	device_vtech_ioexp_interface *m_module = nullptr;
 };
 
 // class representing interface-specific live ioexp device

@@ -70,18 +70,18 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;
 
-	int m_joy_mode;
-	int m_last_nmi_state;
+	int m_joy_mode = 0;
+	int m_last_nmi_state = 0;
 
 	// analog controls
-	attotime m_joy_pulse_reload[2];
-	emu_timer *m_joy_pulse_timer[2];
-	emu_timer *m_joy_irq_timer[2];
-	emu_timer *m_joy_d7_timer[2];
-	int m_joy_irq_state[2];
-	int m_joy_d7_state[2];
-	uint8_t m_joy_analog_state[2];
-	uint8_t m_joy_analog_reload[2];
+	attotime m_joy_pulse_reload[2]{};
+	emu_timer *m_joy_pulse_timer[2]{};
+	emu_timer *m_joy_irq_timer[2]{};
+	emu_timer *m_joy_d7_timer[2]{};
+	int m_joy_irq_state[2]{};
+	int m_joy_d7_state[2]{};
+	uint8_t m_joy_analog_state[2]{};
+	uint8_t m_joy_analog_reload[2]{};
 
 	optional_ioport m_ctrlsel;
 	required_ioport m_std_keypad1;
@@ -133,8 +133,8 @@ private:
 	void bit90_map(address_map &map);
 	void bit90_io_map(address_map &map);
 
-	uint8_t m_keyselect;
-	uint8_t m_unknown;
+	uint8_t m_keyselect = 0U;
+	uint8_t m_unknown = 0U;
 };
 
 #endif

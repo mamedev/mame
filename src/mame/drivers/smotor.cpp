@@ -167,8 +167,8 @@ private:
 	required_shared_ptr<uint8_t> m_videoreg;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void cpu_io_videoreg_w(offs_t offset, uint8_t data);

@@ -120,9 +120,9 @@ private:
 
 //  virtual void video_start() override;
 
-	bool m_master_irq_enable;
-	bool m_slave_irq_enable;
-	uint8_t m_pal_bank;
+	bool m_master_irq_enable = false;
+	bool m_slave_irq_enable = false;
+	uint8_t m_pal_bank = 0;
 
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);

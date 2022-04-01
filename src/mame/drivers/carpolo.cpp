@@ -208,21 +208,10 @@ static const gfx_layout goallayout =
 	0
 };
 
-static const gfx_layout alphalayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_carpolo )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,         12 )
 	GFXDECODE_ENTRY( "gfx2", 0, goallayout,   12*2,      2 )
-	GFXDECODE_ENTRY( "gfx3", 0, alphalayout,  12*2+2*16, 4 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x1,    12*2+2*16, 4 )
 GFXDECODE_END
 
 /*************************************

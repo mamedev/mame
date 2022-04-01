@@ -363,7 +363,7 @@ namespace webpp {
 					if(first_bytes[1]>=128) {
 						const std::string reason("message from server masked");
 						auto kept_connection=connection;
-						send_close(1002, reason, [this, kept_connection](const std::error_code& /*ec*/) {});
+						send_close(1002, reason, [](const std::error_code& /*ec*/) {});
 						if(on_close)
 							on_close(1002, reason);
 						return;
@@ -441,7 +441,7 @@ namespace webpp {
 
 						auto reason=message->string();
 						auto kept_connection=connection;
-						send_close(status, reason, [this, kept_connection](const std::error_code& /*ec*/) {});
+						send_close(status, reason, [](const std::error_code& /*ec*/) {});
 						if(on_close)
 							on_close(status, reason);
 						return;

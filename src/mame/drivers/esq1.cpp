@@ -214,15 +214,15 @@ protected:
 
 private:
 	struct filter {
-		uint8_t vca, vpan, vq, vfc;
-		double amp, lamp, ramp;
-		double a[5], b[5];
-		double x[4], y[4];
+		uint8_t vca = 0, vpan = 0, vq = 0, vfc = 0;
+		double amp = 0, lamp = 0, ramp = 0;
+		double a[5]{}, b[5]{};
+		double x[4]{}, y[4]{};
 	};
 
-	filter filters[8];
+	filter filters[8]{};
 
-	sound_stream *stream;
+	sound_stream *stream = nullptr;
 
 	void recalc_filter(filter &f);
 };
@@ -427,10 +427,10 @@ private:
 
 	uint8_t es5503_sample_r(offs_t offset);
 
-	int m_mapper_state;
-	int m_seq_bank;
-	uint8_t m_seqram[0x10000];
-	uint8_t m_dosram[0x2000];
+	int m_mapper_state = 0;
+	int m_seq_bank = 0;
+	uint8_t m_seqram[0x10000]{};
+	uint8_t m_dosram[0x2000]{};
 	virtual void machine_reset() override;
 
 	void send_through_panel(uint8_t data);
@@ -438,8 +438,8 @@ private:
 	void sq80_map(address_map &map);
 	void sq80_es5503_map(address_map &map);
 
-	bool kpc_calibrated;  // sq80 requires keyboard calibration acknowledgement
-	int m_adc_target;     // adc poll target (index into the table below)
+	bool kpc_calibrated = false;  // sq80 requires keyboard calibration acknowledgement
+	int m_adc_target = 0;     // adc poll target (index into the table below)
 	uint8_t m_adc_value[6] = { 0,0,128,0,0,0 }; // VALV,PEDV,PITV,MODV,FILV,BATV
 };
 

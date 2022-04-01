@@ -53,13 +53,13 @@ protected:
 	output_finder<> m_out_power; // power state, eg. led
 
 	// misc common
-	u16 m_r;                        // MCU R-pins data
-	u16 m_o;                        // MCU O-pins data
-	u32 m_inp_mux;                  // multiplexed inputs mask
-	bool m_power_on;
+	u16 m_r = 0U;                        // MCU R-pins data
+	u16 m_o = 0U;                        // MCU O-pins data
+	u32 m_inp_mux = 0U;                  // multiplexed inputs mask
+	bool m_power_on = false;
 
-	u32 m_grid;                     // VFD/LED current row data
-	u32 m_plate;                    // VFD/LED current column data
+	u32 m_grid = 0U;                     // VFD/LED current row data
+	u32 m_plate = 0U;                    // VFD/LED current column data
 
 	u8 read_inputs(int columns);
 	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);

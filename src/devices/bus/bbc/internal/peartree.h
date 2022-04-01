@@ -43,7 +43,7 @@ protected:
 	virtual uint8_t paged_r(offs_t offset) override;
 	virtual void paged_w(offs_t offset, uint8_t data) override;
 
-	uint8_t m_romsel;
+	uint8_t m_romsel = 0;
 };
 
 
@@ -90,7 +90,7 @@ protected:
 	virtual uint8_t paged_r(offs_t offset) override;
 	virtual void paged_w(offs_t offset, uint8_t data) override;
 
-	uint8_t m_romsel;
+	uint8_t m_romsel = 0;
 };
 
 

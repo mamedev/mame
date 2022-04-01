@@ -118,7 +118,7 @@ protected:
 
 	// callbacks
 	devcb_write_line        m_vme_j1_callback;
-	device_vme_card_interface *m_card;
+	device_vme_card_interface *m_card = nullptr;
 };
 
 DECLARE_DEVICE_TYPE(VME, vme_device)
@@ -195,12 +195,12 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	cpu_device   *m_maincpu = nullptr;
 
 	// address spaces
-	address_space *m_prgspace;
-	int m_prgwidth;
-	bool m_allocspaces;
+	address_space *m_prgspace = nullptr;
+	int m_prgwidth = 0;
+	bool m_allocspaces = false;
 
 	const char                 *m_cputag;
 

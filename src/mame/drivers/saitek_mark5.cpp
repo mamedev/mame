@@ -126,7 +126,7 @@ private:
 	u8 m_lcd_rowsel = 0;
 	u8 m_cb_mux = 0;
 
-	emu_timer *m_irqtimer;
+	emu_timer *m_irqtimer = nullptr;
 	TIMER_CALLBACK_MEMBER(interrupt);
 	void write_lcd(int state);
 };

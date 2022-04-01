@@ -107,12 +107,12 @@ namespace
 		virtual void set_sound_enable(bool sound_enable) override;
 
 	private:
-		u8                                      m_reset_line;
-		bool                                    m_tms7000_busy;
-		u8                                      m_tms7000_porta;
-		u8                                      m_tms7000_portb;
-		u8                                      m_tms7000_portc;
-		u8                                      m_tms7000_portd;
+		u8                                      m_reset_line = 0;
+		bool                                    m_tms7000_busy = false;
+		u8                                      m_tms7000_porta = 0;
+		u8                                      m_tms7000_portb = 0;
+		u8                                      m_tms7000_portc = 0;
+		u8                                      m_tms7000_portd = 0;
 		required_device<tms7040_device>         m_tms7040;
 		required_device<ram_device>             m_staticram;
 		required_device<ay8910_device>          m_ay;

@@ -52,7 +52,7 @@ protected:
 	void main_map(address_map &map);
 
 	std::vector<uint16_t> m_vram;
-	uint16_t m_flags;
+	uint16_t m_flags = 0;
 };
 
 

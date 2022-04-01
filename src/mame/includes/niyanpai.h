@@ -52,21 +52,21 @@ private:
 	int m_clutmode[VRAM_MAX];
 	int m_transparency[VRAM_MAX];
 	int m_clutsel[VRAM_MAX];
-	int m_screen_refresh;
-	int m_nb19010_busyctr;
-	int m_nb19010_busyflag;
+	int m_screen_refresh = 0;
+	int m_nb19010_busyctr = 0;
+	int m_nb19010_busyflag = 0;
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
 	std::unique_ptr<uint16_t[]> m_videoram[VRAM_MAX];
 	std::unique_ptr<uint16_t[]> m_videoworkram[VRAM_MAX];
 	std::unique_ptr<uint16_t[]> m_palette_ptr;
 	std::unique_ptr<uint8_t[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
-	emu_timer *m_blitter_timer;
+	emu_timer *m_blitter_timer = nullptr;
 
 	// musobana and derived machine configs
-	int m_musobana_inputport;
-	int m_musobana_outcoin_flag;
-	uint8_t m_motor_on;
+	int m_musobana_inputport = 0;
+	int m_musobana_outcoin_flag = 0;
+	uint8_t m_motor_on = 0;
 
 	// common
 	uint16_t dipsw_r();

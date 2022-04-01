@@ -34,7 +34,7 @@ public:
 protected:
 	device_saturn_control_port_interface(const machine_config &mconfig, device_t &device);
 
-	uint8_t m_ctrl_id;
+	uint8_t m_ctrl_id = 0;
 	saturn_control_port_device *m_port;
 };
 

@@ -71,17 +71,17 @@ public:
 private:
 	struct hit_t
 	{
-		uint16_t x1p, y1p, z1p, x1s, y1s, z1s;
-		uint16_t x2p, y2p, z2p, x2s, y2s, z2s;
-		uint16_t org;
+		uint16_t x1p = 0, y1p = 0, z1p = 0, x1s = 0, y1s = 0, z1s = 0;
+		uint16_t x2p = 0, y2p = 0, z2p = 0, x2s = 0, y2s = 0, z2s = 0;
+		uint16_t org = 0;
 
-		uint16_t x1_p1, x1_p2, y1_p1, y1_p2, z1_p1, z1_p2;
-		uint16_t x2_p1, x2_p2, y2_p1, y2_p2, z2_p1, z2_p2;
-		uint16_t x1tox2, y1toy2, z1toz2;
-		int16_t x_in, y_in, z_in;
-		uint16_t flag;
+		uint16_t x1_p1 = 0, x1_p2 = 0, y1_p1 = 0, y1_p2 = 0, z1_p1 = 0, z1_p2 = 0;
+		uint16_t x2_p1 = 0, x2_p2 = 0, y2_p1 = 0, y2_p2 = 0, z2_p1 = 0, z2_p2 = 0;
+		uint16_t x1tox2 = 0, y1toy2 = 0, z1toz2 = 0;
+		int16_t x_in = 0, y_in = 0, z_in = 0;
+		uint16_t flag = 0;
 
-		uint8_t disconnect;
+		uint8_t disconnect = 0;
 	};
 
 	required_device<sh2_device> m_maincpu;
@@ -110,31 +110,31 @@ private:
 	bitmap_ind8 m_tilemap_bitmapflags_lower;
 	bitmap_ind16 m_tilemap_bitmap_higher;
 	bitmap_ind8 m_tilemap_bitmapflags_higher;
-	int m_depthA;
-	int m_depthB;
-	int m_use_spc_bright;
-	int m_use_v3_bright;
-	uint8_t m_bright_spc_b;
-	uint8_t m_bright_spc_g;
-	uint8_t m_bright_spc_r;
-	uint8_t m_bright_spc_b_trans;
-	uint8_t m_bright_spc_g_trans;
-	uint8_t m_bright_spc_r_trans;
-	uint8_t m_bright_v3_b;
-	uint8_t m_bright_v3_g;
-	uint8_t m_bright_v3_r;
-	uint8_t m_bright_v3_b_trans;
-	uint8_t m_bright_v3_g_trans;
-	uint8_t m_bright_v3_r_trans;
-	int m_spc_changed;
-	int m_v3_changed;
-	int m_palette_updated;
-	int m_alt_enable_background;
-	int m_alt_enable_sprites;
-	tilemap_t *m_tilemap_A;
-	tilemap_t *m_tilemap_B;
-	uint8_t *m_btiles;
-	uint8_t m_region;
+	int m_depthA = 0;
+	int m_depthB = 0;
+	int m_use_spc_bright = 0;
+	int m_use_v3_bright = 0;
+	uint8_t m_bright_spc_b = 0;
+	uint8_t m_bright_spc_g = 0;
+	uint8_t m_bright_spc_r = 0;
+	uint8_t m_bright_spc_b_trans = 0;
+	uint8_t m_bright_spc_g_trans = 0;
+	uint8_t m_bright_spc_r_trans = 0;
+	uint8_t m_bright_v3_b = 0;
+	uint8_t m_bright_v3_g = 0;
+	uint8_t m_bright_v3_r = 0;
+	uint8_t m_bright_v3_b_trans = 0;
+	uint8_t m_bright_v3_g_trans = 0;
+	uint8_t m_bright_v3_r_trans = 0;
+	int m_spc_changed = 0;
+	int m_v3_changed = 0;
+	int m_palette_updated = 0;
+	int m_alt_enable_background = 0;
+	int m_alt_enable_sprites = 0;
+	tilemap_t *m_tilemap_A = nullptr;
+	tilemap_t *m_tilemap_B = nullptr;
+	uint8_t *m_btiles = nullptr;
+	uint8_t m_region = 0;
 
 	void hit_w(offs_t offset, uint32_t data);
 	void hit2_w(uint32_t data);

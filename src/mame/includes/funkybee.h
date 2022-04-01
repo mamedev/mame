@@ -31,8 +31,8 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	int        m_gfx_bank;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int        m_gfx_bank = 0;
 	uint8_t funkybee_input_port_0_r();
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);

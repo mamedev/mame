@@ -136,7 +136,7 @@ bool windows_osd_interface::window_init()
 		VIDEO_MODE_NONE,    // GDI -> NONE
 		VIDEO_MODE_D3D,     // BGFX -> D3D
 #if (USE_OPENGL)
-		VIDEO_MODE_GDI,     // OPENGL -> GDI
+		-1,                 // OPENGL -> no fallback
 #endif
 		-1,                 // No SDL2ACCEL on Windows OSD
 #if (USE_OPENGL)

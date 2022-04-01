@@ -40,13 +40,13 @@ const u32 ucom4_disassembler::s_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, STEP_COND, STEP_COND, 0, STEP_COND, STEP_COND, STEP_COND, 0, STEP_COND, 0, 0,
+	0, 0, 0, 0, 0, 0, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER, STEP_OVER, STEP_OUT, STEP_OUT,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND,
+	STEP_COND, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	0, 0, STEP_COND, STEP_COND, 0, STEP_COND, STEP_COND, 0, STEP_COND, 0, 0
 };
 
 

@@ -139,7 +139,7 @@ const abc800_format::format abc800_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_ABC800_FORMAT = &floppy_image_format_creator<abc800_format>;
+const abc800_format FLOPPY_ABC800_FORMAT;
 
 void abc800_format::build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const
 {

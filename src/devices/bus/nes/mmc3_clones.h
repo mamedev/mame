@@ -187,7 +187,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	int m_prot;
+	int m_prot = 0;
 };
 
 
@@ -320,7 +320,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_prot;
+	uint8_t m_prot = 0;
 };
 
 

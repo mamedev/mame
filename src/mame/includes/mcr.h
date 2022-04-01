@@ -113,12 +113,12 @@ protected:
 	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
 	void mcr_init(int cpuboard, int vidboard, int ssioboard);
 
-	int8_t m_mcr12_sprite_xoffs_flip;
-	uint8_t m_input_mux;
-	uint8_t m_last_op4;
-	tilemap_t *m_bg_tilemap;
+	int8_t m_mcr12_sprite_xoffs_flip = 0;
+	uint8_t m_input_mux = 0;
+	uint8_t m_last_op4 = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_mcr_cocktail_flip;
+	uint8_t m_mcr_cocktail_flip = 0;
 
 	required_device<z80_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_spriteram;
@@ -136,10 +136,10 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
-	uint32_t m_mcr_cpu_board;
-	uint32_t m_mcr_sprite_board;
+	uint32_t m_mcr_cpu_board = 0;
+	uint32_t m_mcr_sprite_board = 0;
 
-	int8_t m_mcr12_sprite_xoffs;
+	int8_t m_mcr12_sprite_xoffs = 0;
 };
 
 class mcr_dpoker_state : public mcr_state
@@ -213,9 +213,9 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	int m_ipu_sio_txda;
-	int m_ipu_sio_txdb;
-	emu_timer *m_ipu_watchdog_timer;
+	int m_ipu_sio_txda = 0;
+	int m_ipu_sio_txdb = 0;
+	emu_timer *m_ipu_watchdog_timer = nullptr;
 
 	required_device<z80_device> m_ipu;
 	required_device<z80sio_device> m_ipu_sio;

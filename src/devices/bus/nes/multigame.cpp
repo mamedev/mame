@@ -1327,7 +1327,7 @@ void nes_caltron6in1_device::write_h(offs_t offset, u8 data)
 void nes_caltron9in1_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("caltron9in1 write_h, offset: %04x, data: %02x\n", offset, data));
-	int nibble = (offset >> 12) & 0x07;
+	int nibble = BIT(offset, 12, 3);
 	m_latch[std::min(nibble, 2)] = offset & 0x7f;
 
 	if (BIT(m_latch[1], 1))
@@ -2205,7 +2205,7 @@ u8 nes_bmc_tf2740_device::read_m(offs_t offset)
 void nes_bmc_tj03_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_tj03 write_h, offset: %04x, data: %02x\n", offset, data));
-	u8 bank = (offset >> 8) & 0x03;
+	u8 bank = BIT(offset, 8, 2);
 	prg32(bank);
 	chr8(bank, CHRROM);
 	set_nt_mirroring(BIT(offset, 9) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -2316,7 +2316,7 @@ void nes_bmc_g146_device::write_h(offs_t offset, u8 data)
 void nes_bmc_2751_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_2751 write_h, offset: %04x, data: %02x\n", offset, data));
-	u8 bank = (offset >> 4) & 0x07;
+	u8 bank = BIT(offset, 4, 3);
 	u8 mode = BIT(offset, 7);
 	prg16_89ab(bank & ~mode);
 	prg16_cdef(bank | mode);
@@ -2345,7 +2345,7 @@ void nes_bmc_8157_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_8157 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	u8 bank = (offset >> 2) & 0x1f;
+	u8 bank = BIT(offset, 2, 5);
 	prg16_89ab(bank);
 	if (BIT(offset, 9))
 		bank |= 0x07;
@@ -3138,7 +3138,7 @@ uint8_t nes_bmc_gold150_device::read_h(offs_t offset)
 {
 	LOG_MMC(("bmc_gold150 read_h, offset: %04x\n", offset));
 
-	if (m_latch)    // open bus
+	if (m_latch)
 		return get_open_bus();
 	else
 		return hi_access_rom(offset);

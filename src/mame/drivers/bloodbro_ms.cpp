@@ -243,7 +243,7 @@ ROM_START( bloodbrom )
 	ROM_LOAD( "1-2_bb101.ic12",  0x00000, 0x10000, CRC(3e184e74) SHA1(031cd37fe6d09daf8c9e88562da99fde03f52109) )
 
 	// dumper's note: ROMs [bb4b1, bb4b2, bb4b3, bb4b4] and [bb4a1, bb4a2, bb4a3, bb4a4] have a strange setup
-	// with pins 32, 31 and 31 soldered together and pin 2 connected between all four chips,
+	// with pins 32, 31 and 30 soldered together and pin 2 connected between all four chips,
 	// while the sockets are for 28 pin chips (with 27C512 silkscreened on the PCB behind the chips)
 	ROM_REGION( 0x80000, "gfx1", 0 ) // on one of the MOD 4/3 boards
 	ROM_LOAD32_BYTE( "4-3-a_bb4a1.ic17",  0x00003, 0x20000, CRC(499c91db) SHA1(bd7142a311a4f3e606f8a31aafc0b504f3d5a2e4) )

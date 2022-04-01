@@ -37,7 +37,7 @@ protected:
 	char m_manufacturer[8];
 	char m_product[16];
 	char m_revision[4];
-	uint8_t m_data;
+	uint8_t m_data = 0;
 };
 
 class dec_rrd45_device : public scsicd512_device

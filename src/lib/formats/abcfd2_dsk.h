@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_ABC_FD2_FORMAT;
+extern const abc_fd2_format FLOPPY_ABC_FD2_FORMAT;
 
 #endif // MAME_FORMATS_ABCFD2_DSK_H

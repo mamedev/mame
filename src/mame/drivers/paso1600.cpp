@@ -54,9 +54,9 @@ private:
 	void paso1600_io(address_map &map);
 	void paso1600_map(address_map &map);
 
-	uint8_t m_crtc_vreg[0x100], m_crtc_index;
+	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 	struct {
-		uint8_t portb;
+		uint8_t portb = 0;
 	} m_keyb;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

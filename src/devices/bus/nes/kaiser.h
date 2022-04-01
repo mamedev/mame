@@ -23,7 +23,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	u8 m_latch;
+	u8 m_latch = 0;
 };
 
 
@@ -63,7 +63,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch;
+	uint8_t m_latch = 0;
 };
 
 
@@ -88,11 +88,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	u8 m_reg[8];
+	u8 m_reg[8]{};
 
 private:
 	void prg_update();
-	u8 m_latch;
+	u8 m_latch = 0;
 
 	u16 m_irq_count, m_irq_count_latch;
 	int m_irq_enable;
@@ -136,7 +136,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	u8 m_latch;
+	u8 m_latch = 0;
 	const u8 m_a15_flip;
 };
 
@@ -171,7 +171,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	uint8_t m_latch;
+	uint8_t m_latch = 0;
 
 	uint16_t m_irq_count;
 	uint8_t m_irq_status;
@@ -218,7 +218,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	u8 m_latch;
+	u8 m_latch = 0;
 };
 
 
@@ -327,7 +327,7 @@ protected:
 
 private:
 	void update_prg();
-	uint8_t m_latch;
+	uint8_t m_latch = 0;
 	uint8_t m_reg[8];
 };
 

@@ -119,19 +119,19 @@ protected:
 
 	output_finder<> m_led;
 
-	emu_timer *m_buserror;
+	emu_timer *m_buserror = nullptr;
 
 private:
-	u8 m_nmr; // nonvolatile memory register
-	u16 m_per; // parity error register
-	u8 m_scr; // system control register
-	u8 m_ssr; // system status register
+	u8 m_nmr = 0; // nonvolatile memory register
+	u16 m_per = 0; // parity error register
+	u8 m_scr = 0; // system control register
+	u8 m_ssr = 0; // system status register
 
 	// ram parity state
 	memory_passthrough_handler m_parity_mph;
 	std::unique_ptr<u32 []> m_parity_flag;
-	unsigned m_parity_bad;
-	bool m_parity_check;
+	unsigned m_parity_bad = 0;
+	bool m_parity_check = 0;
 };
 
 class tek6100_state : public tekigw_state_base
@@ -185,10 +185,10 @@ private:
 	optional_device<ram_device> m_dpu_cram;
 	optional_device<ram_device> m_dpu_vram;
 
-	u8 m_hcr; // hard disk control register
+	u8 m_hcr = 0; // hard disk control register
 
 	// hard disk controller buffer
-	u16 m_hdc_ptr;
+	u16 m_hdc_ptr = 0;
 	std::unique_ptr<u8[]> m_hdc_buf;
 };
 

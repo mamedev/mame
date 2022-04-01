@@ -154,8 +154,8 @@ private:
 	struct namcos22_scenenode *m_scenenode_cur;
 	std::list<namcos22_scenenode> m_scenenode_alloc;
 
-	float m_clipx;
-	float m_clipy;
+	float m_clipx = 0.0;
+	float m_clipy = 0.0;
 	rectangle m_cliprect;
 
 	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
@@ -591,17 +591,17 @@ private:
 	optional_device<timer_device> m_pc_pedal_interrupt;
 	optional_device_array<timer_device, 2> m_ar_tb_interrupt;
 
-	int m_spotram_enable;
-	int m_spotram_address;
+	int m_spotram_enable = 0;
+	int m_spotram_address = 0;
 	std::unique_ptr<u16[]> m_spotram;
 	std::unique_ptr<u16[]> m_banked_czram[4];
 	u32 m_cz_was_written[4];
 
-	u32 m_alpinesa_protection;
-	int m_motor_status;
-	u8 m_mcu_iocontrol;
-	u8 m_mcu_outdata;
-	int m_chipselect;
+	u32 m_alpinesa_protection = 0;
+	int m_motor_status = 0;
+	u8 m_mcu_iocontrol = 0;
+	u8 m_mcu_outdata = 0;
+	int m_chipselect = 0;
 };
 
 #endif // MAME_INCLUDES_NAMCOS22_H

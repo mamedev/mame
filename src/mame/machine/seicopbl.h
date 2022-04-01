@@ -47,17 +47,17 @@ protected:
 
 private:
 	required_device<cpu_device> m_host_cpu;
-	address_space *m_host_space;
+	address_space *m_host_space = nullptr;
 	const address_space_config      m_space_config;
 	inline uint16_t read_word(offs_t address);
 	inline void write_word(offs_t address, uint16_t data);
 
-	uint32_t m_reg[8];
-	uint16_t m_angle,m_dist,m_status;
-	int m_dx,m_dy;
-	uint32_t m_d104_move_offset;
-	uint16_t m_prng_max;
-	uint16_t m_scale;
+	uint32_t m_reg[8]{};
+	uint16_t m_angle = 0, m_dist = 0, m_status = 0;
+	int m_dx = 0, m_dy = 0;
+	uint32_t m_d104_move_offset = 0;
+	uint16_t m_prng_max = 0;
+	uint16_t m_scale = 0;
 	//required_device<raiden2cop_device> m_raiden2cop;
 };
 

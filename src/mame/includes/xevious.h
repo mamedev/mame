@@ -99,12 +99,12 @@ private:
 
 	required_device<timer_device> m_nmi_timer;
 
-	uint8_t m_customio[16];
-	char m_customio_command;
-	char m_customio_prev_command;
-	char m_customio_command_count;
-	char m_customio_data;
-	char m_sound_played;
+	uint8_t m_customio[16]{};
+	char m_customio_command = 0;
+	char m_customio_prev_command = 0;
+	char m_customio_command_count = 0;
+	char m_customio_data = 0;
+	char m_sound_played = 0;
 };
 
 #endif // MAME_INCLUDES_XEVIOUS

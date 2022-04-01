@@ -166,49 +166,49 @@ private:
 	int     m_cd_motor_on;
 	int     m_selected;
 	std::unique_ptr<uint8_t[]>  m_command_buffer;
-	int     m_command_buffer_index;
-	int     m_status_sent;
-	int     m_message_after_status;
-	int     m_message_sent;
+	int     m_command_buffer_index = 0;
+	int     m_status_sent = 0;
+	int     m_message_after_status = 0;
+	int     m_message_sent = 0;
 	std::unique_ptr<uint8_t[]> m_data_buffer;
-	int     m_data_buffer_size;
-	int     m_data_buffer_index;
-	int     m_data_transferred;
+	int     m_data_buffer_size = 0;
+	int     m_data_buffer_index = 0;
+	int     m_data_transferred = 0;
 
 	/* Arcade Card specific */
 	std::unique_ptr<uint8_t[]>  m_acard_ram;
-	uint8_t   m_acard_latch;
+	uint8_t   m_acard_latch = 0;
 	uint8_t   m_acard_ctrl[4];
 	uint32_t  m_acard_base_addr[4];
 	uint16_t  m_acard_addr_offset[4];
 	uint16_t  m_acard_addr_inc[4];
-	uint32_t  m_acard_shift;
-	uint8_t   m_acard_shift_reg;
+	uint32_t  m_acard_shift = 0;
+	uint8_t   m_acard_shift_reg = 0;
 
-	uint32_t  m_current_frame;
-	uint32_t  m_end_frame;
-	uint32_t  m_last_frame;
-	uint8_t   m_cdda_status;
-	uint8_t   m_cdda_play_mode;
+	uint32_t  m_current_frame = 0;
+	uint32_t  m_end_frame = 0;
+	uint32_t  m_last_frame = 0;
+	uint8_t   m_cdda_status = 0;
+	uint8_t   m_cdda_play_mode = 0;
 	std::unique_ptr<uint8_t[]>   m_subcode_buffer;
-	uint8_t   m_end_mark;
+	uint8_t   m_end_mark = 0;
 
 	required_device<msm5205_device> m_msm;
 	required_device<cdda_device> m_cdda;
 	required_device<nvram_device> m_nvram;
 	required_device<cdrom_image_device> m_cdrom;
 
-	cdrom_file  *m_cd_file;
-	const cdrom_toc*    m_toc;
-	emu_timer   *m_data_timer;
-	emu_timer   *m_adpcm_dma_timer;
+	cdrom_file  *m_cd_file = nullptr;
+	const cdrom_file::toc*  m_toc = nullptr;
+	emu_timer   *m_data_timer = nullptr;
+	emu_timer   *m_adpcm_dma_timer = nullptr;
 
-	emu_timer   *m_cdda_fadeout_timer;
-	emu_timer   *m_cdda_fadein_timer;
-	double  m_cdda_volume;
-	emu_timer   *m_adpcm_fadeout_timer;
-	emu_timer   *m_adpcm_fadein_timer;
-	double  m_adpcm_volume;
+	emu_timer   *m_cdda_fadeout_timer = nullptr;
+	emu_timer   *m_cdda_fadein_timer = nullptr;
+	double  m_cdda_volume = 0;
+	emu_timer   *m_adpcm_fadeout_timer = nullptr;
+	emu_timer   *m_adpcm_fadein_timer = nullptr;
+	double  m_adpcm_volume = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
 	void nvram_init(nvram_device &nvram, void *data, size_t size);

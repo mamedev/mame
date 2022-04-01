@@ -139,8 +139,8 @@ private:
 	u8 m_iram_write_snes, m_iram_write_sa1;
 	// $2230-$2231
 	u8 m_dma_ctrl, m_dma_ccparam;
-	u8 m_dma_cconv_size;
-	u8 m_dma_cconv_bits;
+	u8 m_dma_cconv_size = 0;
+	u8 m_dma_cconv_bits = 8;
 	// DMA Control (DCNT)
 	inline const bool DCNT_DMAEN()   { return BIT(m_dma_ctrl, 7); }                        // DMA Enable control
 	//inline const bool DCNT_DPRIO() { return BIT(m_dma_ctrl, 6); }                        // Processing priority between SA-1 CPU and DMA; Not emulated currently

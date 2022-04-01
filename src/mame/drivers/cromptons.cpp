@@ -57,7 +57,7 @@ private:
 	void prg_map(address_map &map);
 	void io_map(address_map &map);
 
-	u8 m_port_select;
+	u8 m_port_select = 0;
 };
 
 void cromptons_state::machine_start()

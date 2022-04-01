@@ -182,7 +182,7 @@ private:
 	/* misc */
 	int       m_oki_bank[2];
 	int       m_toggle;
-	int       m_xoffset;
+	int       m_xoffset = 0;
 
 	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template<int Layer> void scrollx_w(uint16_t data);

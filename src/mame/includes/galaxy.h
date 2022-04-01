@@ -49,14 +49,14 @@ private:
 	void galaxyp_io(address_map &map);
 	void galaxyp_mem(address_map &map);
 
-	int m_interrupts_enabled;
-	uint8_t m_latch_value;
-	uint32_t m_gal_cnt;
-	uint8_t m_code;
-	uint8_t m_first;
-	uint32_t m_start_addr;
-	emu_timer *m_gal_video_timer;
-	bitmap_ind16 m_bitmap;
+	int m_interrupts_enabled = 0;
+	uint8_t m_latch_value = 0U;
+	uint32_t m_gal_cnt = 0U;
+	uint8_t m_code = 0U;
+	uint8_t m_first = 0U;
+	uint32_t m_start_addr = 0U;
+	emu_timer *m_gal_video_timer = nullptr;
+	bitmap_ind16 m_bitmap{};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

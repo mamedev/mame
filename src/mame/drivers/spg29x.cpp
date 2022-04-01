@@ -131,9 +131,9 @@ private:
 	void gpio_out_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void timers_clk_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	uint16_t m_tve_control;
-	uint8_t  m_tve_fade_offset;
-	uint16_t m_gpio_out;
+	uint16_t m_tve_control = 0;
+	uint8_t  m_tve_fade_offset = 0;
+	uint16_t m_gpio_out = 0;
 };
 
 class spg29x_nand_game_state : public spg29x_game_state
@@ -152,7 +152,7 @@ protected:
 
 private:
 	std::vector<uint8_t> m_strippedrom;
-	int m_firstvector;
+	int m_firstvector = 0;
 };
 
 class spg29x_zone3d_game_state : public spg29x_game_state

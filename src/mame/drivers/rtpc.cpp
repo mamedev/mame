@@ -195,19 +195,19 @@ protected:
 
 	required_region_ptr<u32> m_ipl;
 
-	u8 m_mcu_p0;
-	u8 m_mcu_p1;
-	u8 m_mcu_p2;
-	u8 m_mcu_p3;
+	u8 m_mcu_p0 = 0;
+	u8 m_mcu_p1 = 0;
+	u8 m_mcu_p2 = 0;
+	u8 m_mcu_p3 = 0;
 
-	u8 m_ppi_pb;
-	u8 m_mcu_uart;
+	u8 m_ppi_pb = 0;
+	u8 m_mcu_uart = 0;
 
-	u8 m_ch8er; // dma channel 8 enable register
-	u8 m_crra; // component reset register a
-	u8 m_crrb; // component reset register b
+	u8 m_ch8er = 0; // dma channel 8 enable register
+	u8 m_crra = 0; // component reset register a
+	u8 m_crrb = 0; // component reset register b
 
-	u8 m_ext[2]; // external serial registers
+	u8 m_ext[2]{}; // external serial registers
 };
 
 static double const speaker_levels[4] = { 0.0, 1.0 / 3.0, 2.0 / 3.0, 1.0 };

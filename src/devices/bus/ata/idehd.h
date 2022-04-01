@@ -102,12 +102,12 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_disk ? 0 : hard_disk_read(m_disk, lba, buffer); }
-	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_disk ? 0 : hard_disk_write(m_disk, lba, buffer); }
+	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_disk ? 0 : m_disk->read(lba, buffer); }
+	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_disk ? 0 : m_disk->write(lba, buffer); }
 	virtual uint8_t calculate_status() override;
 
-	chd_file       *m_handle;
-	hard_disk_file *m_disk;
+	chd_file       *m_handle = nullptr;
+	hard_disk_file *m_disk = nullptr;
 
 	enum
 	{
@@ -117,7 +117,7 @@ protected:
 private:
 	required_device<harddisk_image_device> m_image;
 
-	emu_timer *     m_last_status_timer;
+	emu_timer *     m_last_status_timer = nullptr;
 };
 
 // device type definition

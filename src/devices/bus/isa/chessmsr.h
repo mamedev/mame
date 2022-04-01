@@ -39,9 +39,9 @@ private:
 	required_device<generic_latch_8_device> m_sublatch;
 	std::unique_ptr<u32[]> m_ram;
 
-	u8 m_ram_offset;
-	bool m_suspended;
-	bool m_installed;
+	u8 m_ram_offset = 0;
+	bool m_suspended = false;
+	bool m_installed = false;
 
 	uint8_t chessmsr_r(offs_t offset);
 	void chessmsr_w(offs_t offset, uint8_t data);

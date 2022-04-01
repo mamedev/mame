@@ -112,22 +112,22 @@ private:
 
 	required_ioport_array<8> m_kbdio;
 
-	uint8_t m_p1_spkrdata;
-	uint8_t m_p1_input;
+	uint8_t m_p1_spkrdata = 0;
+	uint8_t m_p1_input = 0;
 
-	uint8_t m_kbpoll_mask;
-	uint8_t m_vsync;
-	uint8_t m_hsync;
+	uint8_t m_kbpoll_mask = 0;
+	uint8_t m_vsync = 0;
+	uint8_t m_hsync = 0;
 
 	struct
 	{
-		uint8_t trap[4];
-		std::unique_ptr<uint8_t[]> videoram_base;
-		uint8_t *videoram;
-		uint8_t mode_control_6a;
-		uint8_t color_select_68;
-		uint8_t palette_lut_2bpp[4];
-		int stride;
+		uint8_t trap[4]{};
+		std::unique_ptr<uint8_t[]> videoram_base{};
+		uint8_t *videoram = nullptr;
+		uint8_t mode_control_6a = 0;
+		uint8_t color_select_68 = 0;
+		uint8_t palette_lut_2bpp[4]{};
+		int stride = 0;
 		void *update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *videoram, uint16_t ma, uint8_t ra, uint8_t stride);
 	} m_video;
 

@@ -294,7 +294,7 @@ private:
 
 	required_device_array<fujitsu_29f016a_device, 4> m_flash8;
 
-	uint32_t m_flash_address;
+	uint32_t m_flash_address = 0;
 };
 
 void konamigv_state::konamigv_map(address_map &map)

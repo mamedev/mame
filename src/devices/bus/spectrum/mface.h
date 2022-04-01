@@ -53,8 +53,8 @@ protected:
 	required_memory_region m_rom;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
-	int m_romcs;
-	int m_nmi_pending;
+	int m_romcs = 0;
+	int m_nmi_pending = 0;
 	std::unique_ptr<uint8_t[]> m_ram;
 };
 
@@ -143,7 +143,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	int m_hidden;
+	int m_hidden = 0;
 };
 
 class spectrum_mface128v1_device : public spectrum_mface128_base_device
@@ -163,7 +163,7 @@ protected:
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
-	int m_d3_ff;  // no initial state
+	int m_d3_ff = 0;  // no initial state
 };
 
 class spectrum_mface128_device : public spectrum_mface128v1_device
@@ -200,8 +200,8 @@ protected:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 private:
-	uint8_t m_reg_file[4];  // no initial state
-	int m_disable;
+	uint8_t m_reg_file[4]{};  // no initial state
+	int m_disable = 0;
 };
 
 class spectrum_mprint_device : public spectrum_mface128_base_device
@@ -227,7 +227,7 @@ private:
 
 	required_device<centronics_device> m_centronics;
 
-	int m_busy;
+	int m_busy = 0;
 };
 
 

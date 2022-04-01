@@ -170,9 +170,9 @@ private:
 	void cio_portb_w(uint8_t data);
 	void cio_portc_w(uint8_t data);
 
-	floppy_image_device *m_cur_floppy;
-	bool m_apvid;
-	uint8_t m_cpu_control;
+	floppy_image_device *m_cur_floppy = nullptr;
+	bool m_apvid = false;
+	uint8_t m_cpu_control = 0;
 };
 
 

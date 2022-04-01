@@ -21,27 +21,27 @@ public:
 	// construction/destruction
 	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	bool m_page2;
-	bool m_flash;
-	bool m_mix;
-	bool m_graphics;
-	bool m_hires;
-	bool m_dhires;
-	bool m_80col;
-	bool m_altcharset;
-	bool m_an2;
-	bool m_80store;
-	bool m_monohgr;
-	u8 m_GSfg, m_GSbg, m_GSborder, m_newvideo, m_monochrome, m_rgbmode;
-	u32 m_GSborder_colors[16], m_shr_palette[256];
+	bool m_page2 = false;
+	bool m_flash = false;
+	bool m_mix = false;
+	bool m_graphics = false;
+	bool m_hires = false;
+	bool m_dhires = false;
+	bool m_80col = false;
+	bool m_altcharset = false;
+	bool m_an2 = false;
+	bool m_80store = false;
+	bool m_monohgr = false;
+	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_monochrome = 0, m_rgbmode = 0;
+	u32 m_GSborder_colors[16]{}, m_shr_palette[256]{};
 	std::unique_ptr<bitmap_ind16> m_8bit_graphics;
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
 	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
 
-	uint8_t *m_ram_ptr, *m_aux_ptr, *m_char_ptr;
-	int m_char_size;
+	uint8_t *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;
+	int m_char_size = 0;
 
-	int m_sysconfig;
+	int m_sysconfig = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(txt_w);
 	DECLARE_WRITE_LINE_MEMBER(mix_w);

@@ -46,8 +46,8 @@ protected:
 private:
 	required_device_array<generic_slot_device, 8> m_eproms;
 
-	uint8_t m_bank, m_socket;
-	int m_reset;
+	uint8_t m_bank = 0, m_socket = 0;
+	int m_reset = 0;
 };
 
 

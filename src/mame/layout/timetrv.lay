@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Ryan Holtz
+-->
+
+<mamelayout version="2">
+	<element name="led">
+		<led14seg>
+			<color red="0.0" green="1.0" blue="0.0" />
+		</led14seg>
+	</element>
+
+	<element name="dp">
+		<rect state="0"><color alpha="0.125" red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state="1"><color alpha="1.0" red="0.0" green="1.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="reversal_cube" defstate="0">
+		<rect state="0"><color red="0.0" green="0.447" blue="0.682" /></rect>
+		<rect state="1"><color red="0.357" green="0.882" blue="1.0" /></rect>
+	</element>
+
+	<element name="p1_lamp" defstate="0">
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="PLAYER 1"><color red="0.3" green="0.3" blue="0.3" /></text>
+	</element>
+
+	<element name="p2_lamp" defstate="0">
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<text string="PLAYER 2"><color red="0.3" green="0.3" blue="0.3" /></text>
+	</element>
+
+	<view name="Lamps and LEDs Separate">
+		<bounds x="0" y="0" width="704" height="544" />
+
+		<screen index="0">
+			<bounds left="0" top="16" right="704" bottom="544" />
+		</screen>
+
+		<repeat count="16">
+			<param name="digit" start="0" increment="1" />
+			<param name="digit_x" start="256" increment="12" />
+			<param name="dp_x" start="265" increment="12" />
+			<element name="digit~digit~" ref="led" blend="add" state="0">
+				<bounds x="~digit_x~" y="0" width="10" height="16"/>
+			</element>
+			<element name="decimal~digit~" ref="dp" blend="add" state="0">
+				<bounds x="~dp_x~" y="14" width="2" height="2"/>
+			</element>
+		</repeat>
+
+		<element name="cube_lamp" ref="reversal_cube">
+			<bounds x="120" y="0" width="16" height="16" />
+		</element>
+
+		<element name="player_lamp1" ref="p1_lamp">
+			<bounds x="464" y="0" width="96" height="16" />
+		</element>
+
+		<element name="player_lamp2" ref="p2_lamp">
+			<bounds x="592" y="0" width="96" height="16" />
+		</element>
+	</view>
+</mamelayout>

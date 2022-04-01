@@ -46,6 +46,12 @@ void playch10_state::machine_start()
 	// this is on the main board and does not belong to the cart board
 	m_nt_ram = std::make_unique<u8[]>(0x800);
 
+	for (int i = 0; i < 4; i++)
+		if (m_cart_nt_ram != nullptr && i >= 2) // extra cart RAM for 4 screen mirroring
+			m_nt_page[i]->configure_entries(0, 2, m_cart_nt_ram.get(), 0x400);
+		else
+			m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
+
 	if (m_vram != nullptr)
 		set_videoram_bank(0, 8, 0, 8);
 	else
@@ -148,16 +154,6 @@ void playch10_state::pc10_prot_w(uint8_t data)
 	}
 }
 
-// Some prototypes/location test games need this
-void playch10_state::init_rp5h01_fix()
-{
-	u8 *ROM = memregion("rp5h01")->base();
-	u32 len = memregion("rp5h01")->bytes();
-
-	for (int i = 0; i < len; i++)
-		ROM[i] = ~bitswap<8>(ROM[i], 0, 1, 2, 3, 4, 5, 6, 7);
-}
-
 /*************************************
  *
  *  Input Ports
@@ -228,18 +224,6 @@ uint8_t playch10_state::pc10_in1_r()
  *
  *************************************/
 
-void playch10_state::pc10_nt_w(offs_t offset, uint8_t data)
-{
-	int page = BIT(offset, 10, 2);
-	m_nametable[page][offset & 0x3ff] = data;
-}
-
-uint8_t playch10_state::pc10_nt_r(offs_t offset)
-{
-	int page = BIT(offset, 10, 2);
-	return m_nametable[page][offset & 0x3ff];
-}
-
 void playch10_state::pc10_chr_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 10;
@@ -259,31 +243,24 @@ void playch10_state::pc10_set_mirroring(int mirroring)
 {
 	switch (mirroring)
 	{
-	case PPU_MIRROR_LOW:
-		m_nametable[0] = m_nametable[1] = m_nametable[2] = m_nametable[3] = m_nt_ram.get();
-		break;
-	case PPU_MIRROR_HIGH:
-		m_nametable[0] = m_nametable[1] = m_nametable[2] = m_nametable[3] = m_nt_ram.get() + 0x400;
-		break;
-	case PPU_MIRROR_HORZ:
-		m_nametable[0] = m_nt_ram.get();
-		m_nametable[1] = m_nt_ram.get();
-		m_nametable[2] = m_nt_ram.get() + 0x400;
-		m_nametable[3] = m_nt_ram.get() + 0x400;
-		break;
-	case PPU_MIRROR_VERT:
-	default:
-		m_nametable[0] = m_nt_ram.get();
-		m_nametable[1] = m_nt_ram.get() + 0x400;
-		m_nametable[2] = m_nt_ram.get();
-		m_nametable[3] = m_nt_ram.get()+ 0x400;
-		break;
-	case PPU_MIRROR_4SCREEN:
-		m_nametable[0] = m_nt_ram.get();
-		m_nametable[1] = m_nt_ram.get() + 0x400;
-		m_nametable[2] = m_cart_nt_ram.get();
-		m_nametable[3] = m_cart_nt_ram.get() + 0x400;
-		break;
+		case PPU_MIRROR_LOW:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(0);
+			break;
+		case PPU_MIRROR_HIGH:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(1);
+			break;
+		case PPU_MIRROR_HORZ:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(BIT(i, 1));
+			break;
+		case PPU_MIRROR_VERT:
+		case PPU_MIRROR_4SCREEN:
+		default:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(i & 1);
+			break;
 	}
 }
 
@@ -670,14 +647,6 @@ void playch10_state::init_pcfboard()
 	init_prg_banking();
 }
 
-void playch10_state::init_virus()
-{
-	// common init
-	init_pcfboard();
-
-	init_rp5h01_fix();
-}
-
 //**********************************************************************************
 // G Board (MMC3) games (Super Mario Bros. 3, etc)
 
@@ -803,14 +772,6 @@ void playch10_state::init_pcgboard_type2()
 	// 2K on the cart board, in addition to the 2K on the main board
 	m_cart_nt_ram = std::make_unique<u8[]>(0x800);
 	m_mirroring = PPU_MIRROR_4SCREEN;
-}
-
-void playch10_state::init_ttoon()
-{
-	// common init
-	init_pcgboard();
-
-	init_rp5h01_fix();
 }
 
 //**********************************************************************************

@@ -67,11 +67,11 @@ private:
 	required_device<timer_device> m_onbutton_timer;
 	required_ioport_array<7> m_inputs;
 
-	bool m_power_on;
-	u8 m_inp_mux;
-	u8 m_phoneme;
-	int m_speech_strobe;
-	u64 m_vfd_data;
+	bool m_power_on = false;
+	u8 m_inp_mux = 0;
+	u8 m_phoneme = 0x3f;
+	int m_speech_strobe = 0;
+	u64 m_vfd_data = 0;
 
 	void vfd_output_w(u64 data);
 	void mcu_p0_w(u8 data);

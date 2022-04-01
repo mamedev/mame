@@ -98,11 +98,11 @@ private:
 	required_shared_ptr<uint8_t> m_bgattr;
 	required_shared_ptr<uint8_t> m_sprram;
 
-	bool m_master_nmi_enable;
-	bool m_master_irq_enable;
-	bool m_slave_nmi_enable;
-	bool m_screen_enable;
-	uint8_t m_bg_scrollx, m_bg_scrolly;
+	bool m_master_nmi_enable = false;
+	bool m_master_irq_enable = false;
+	bool m_slave_nmi_enable = false;
+	bool m_screen_enable = false;
+	uint8_t m_bg_scrollx = 0, m_bg_scrolly = 0;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -370,10 +370,10 @@ private:
 	devcb_write_line::array<4> m_gpio_out;
 
 	// Registers
-	uint32_t    m_mcfg;
-	uint32_t    m_mref;
-	uint32_t    m_mcntl;
-	uint32_t    m_reset;
+	uint32_t    m_mcfg = 0;
+	uint32_t    m_mref = 0;
+	uint32_t    m_mcntl = 0;
+	uint32_t    m_reset = 0;
 };
 
 

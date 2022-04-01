@@ -104,7 +104,7 @@ private:
 
 	compucolor_floppy_port_device *m_owner;
 
-	emu_timer *m_timer;
+	emu_timer *m_timer = nullptr;
 };
 
 

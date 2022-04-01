@@ -56,9 +56,9 @@ private:
 	required_ioport_array<9> m_keys;
 	required_device<pia6821_device> m_pia1;
 
-	uint8_t m_key_scan;
-	bool m_shift;
-	bool m_ctrl;
+	uint8_t m_key_scan = 0;
+	bool m_shift = false;
+	bool m_ctrl = false;
 };
 
 

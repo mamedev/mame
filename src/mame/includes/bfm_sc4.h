@@ -108,15 +108,15 @@ protected:
 	output_finder<32 + 2> m_digits;
 
 	// serial vfd
-	int vfd_enabled;
-	bool vfd_old_clock;
+	int vfd_enabled = 0;
+	bool vfd_old_clock = false;
 
-	uint8_t vfd_ser_value;
-	int vfd_ser_count;
+	uint8_t vfd_ser_value = 0U;
+	int vfd_ser_count = 0;
 
 	// 34 segment custom encoding used by some sc4/5 machines such as Box Clever, Break The Bank, The Big Deal, The Crazy Chair, The Perfect Game
-	bool m_segment_34_encoding;
-	uint8_t m_segment_34_cache[32];
+	bool m_segment_34_encoding = false;
+	uint8_t m_segment_34_cache[32]{};
 
 	virtual void machine_start() override;
 
@@ -156,19 +156,19 @@ public:
 	required_ioport m_in_coin;
 	optional_device_array<stepper_device, 6> m_reel;
 
-	int m_reel12_latch;
-	int m_reel3_latch;
-	int m_reel4_latch;
-	int m_reel56_latch;
-	int m_optic_pattern;
+	int m_reel12_latch = 0;
+	int m_reel3_latch = 0;
+	int m_reel4_latch = 0;
+	int m_reel56_latch = 0;
+	int m_optic_pattern = 0;
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
-	int m_meterstatus;
+	int m_meterstatus = 0;
 
 	int m_chk41addr;
 	bool m_dochk41;
 
-	uint16_t m_mainram[0x10000/2];
+	uint16_t m_mainram[0x10000/2]{};
 
 	uint8_t read_input_matrix(int row);
 
@@ -654,7 +654,7 @@ public:
 	{ }
 
 	required_region_ptr<uint32_t> m_adder4cpuregion;
-	std::unique_ptr<uint32_t[]> m_adder4ram;
+	std::unique_ptr<uint32_t[]> m_adder4ram{};
 
 	uint32_t adder4_mem_r(offs_t offset, uint32_t mem_mask = ~0);
 	void adder4_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

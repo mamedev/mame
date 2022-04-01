@@ -1199,20 +1199,17 @@ void rainbow_base_state::machine_reset()
 
 		if (local_hard_disk)
 		{
-			hard_disk_info *info;
-			if ((info = hard_disk_get_info(local_hard_disk)))
-			{
-				m_leds[0] = 1;
+			const auto &info = local_hard_disk->get_info();
+			m_leds[0] = 1;
 
-				uint32_t max_sector = (info->cylinders) * (info->heads) * (info->sectors);
-				popmessage("DEC %u (%3.2f) MB HARD DISK MOUNTED.\nGEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
-					max_sector * info->sectorbytes / 1000000,
-					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
-					info->heads, RD51_MAX_HEAD,
-					info->cylinders, RD51_MAX_CYLINDER,
-					info->sectors, RD51_SECTORS_PER_TRACK,
-					info->sectorbytes);
-			}
+			uint32_t max_sector = (info.cylinders) * (info.heads) * (info.sectors);
+			popmessage("DEC %u (%3.2f) MB HARD DISK MOUNTED.\nGEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
+					   max_sector * info.sectorbytes / 1000000,
+					   (float)max_sector * (float)info.sectorbytes / 1048576.0f,
+					   info.heads, RD51_MAX_HEAD,
+					   info.cylinders, RD51_MAX_CYLINDER,
+					   info.sectors, RD51_SECTORS_PER_TRACK,
+					   info.sectorbytes);
 		}
 	}
 
@@ -1693,42 +1690,39 @@ hard_disk_file *rainbow_base_state::rainbow_hdc_file(int drv)
 		return nullptr;
 
 	hard_disk_file *file = img->get_hard_disk_file();
-	hard_disk_info *info = hard_disk_get_info(file);
+	const auto &info = file->get_info();
 
 	// MFM ALLOWS UP TO 17 SECTORS / TRACK.
 	// CYLINDERS: 151 (~ 5 MB) to 1024 (max. cylinders on WD1010 controller)
-	if (((info->sectors <= RD51_SECTORS_PER_TRACK)) &&
-		((info->heads >= 1) && (info->heads <= RD51_MAX_HEAD)) &&            // HEADS WITHIN 1...8
-		((info->cylinders > 150) && (info->cylinders <= RD51_MAX_CYLINDER)))
+	if (((info.sectors <= RD51_SECTORS_PER_TRACK)) &&
+		((info.heads >= 1) && (info.heads <= RD51_MAX_HEAD)) &&            // HEADS WITHIN 1...8
+		((info.cylinders > 150) && (info.cylinders <= RD51_MAX_CYLINDER)))
 	{
 		m_hdc_drive_ready = true;
 		return file;  // HAS SANE GEOMETRY
 	}
 	else
 	{
-		uint32_t max_sector = info->cylinders * info->heads * info->sectors;
+		uint32_t max_sector = info.cylinders * info.heads * info.sectors;
 		popmessage("DEC %u (%3.2f) MB HARD DISK REJECTED.\nGEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
-					max_sector * info->sectorbytes / 1000000,
-					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
-					info->heads, RD51_MAX_HEAD,
-					info->cylinders, RD51_MAX_CYLINDER,
-					info->sectors, RD51_SECTORS_PER_TRACK,
-					info->sectorbytes);
+					max_sector * info.sectorbytes / 1000000,
+					(float)max_sector * (float)info.sectorbytes / 1048576.0f,
+					info.heads, RD51_MAX_HEAD,
+					info.cylinders, RD51_MAX_CYLINDER,
+					info.sectors, RD51_SECTORS_PER_TRACK,
+					info.sectorbytes);
 		logerror("<<< === HARD DISK IMAGE REJECTED = (invalid geometry) === >>>\n");
 		return nullptr;
 	}
 }
 
 // LBA sector from CHS
-static uint32_t get_and_print_lbasector(device_t *device, hard_disk_info *info, uint16_t cylinder, uint8_t head, uint8_t sector_number)
+static uint32_t get_and_print_lbasector(device_t *device, const hard_disk_file::info &info, uint16_t cylinder, uint8_t head, uint8_t sector_number)
 {
-	if (info == nullptr)
-		return 0;
-
 	// LBA_ADDRESS = (C * HEADS + H) * NUMBER_SECTORS + (S - 1)
-	uint32_t lbasector = (double)cylinder * info->heads; // LBA : ( x 4 )
+	uint32_t lbasector = (double)cylinder * info.heads; // LBA : ( x 4 )
 	lbasector += head;
-	lbasector *= info->sectors;   // LBA : ( x 16 )
+	lbasector *= info.sectors;   // LBA : ( x 16 )
 	lbasector += (sector_number - 1); // + (sector number - 1)
 
 //  device->logerror(" CYLINDER %u - HEAD %u - SECTOR NUMBER %u (LBA-SECTOR %u) ", cylinder, head, sector_number, lbasector);
@@ -1756,30 +1750,26 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
 			uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
 			uint8_t sector_number = m_hdc->read(0x03);
 
-			hard_disk_file *local_hard_disk;
-			local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
+			hard_disk_file *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
 			if (local_hard_disk)
 			{
 				read_status = 3;
 
-				hard_disk_info *info;
-				if ((info = hard_disk_get_info(local_hard_disk)))
+				const auto &info = local_hard_disk->get_info();
+				read_status = 4;
+				m_leds[0] = 1;
+
+				// Pointer to info + C + H + S
+				uint32_t lbasector = get_and_print_lbasector(this, info, cylinder, sdh & 0x07, sector_number);
+				
+				if ((cylinder <= info.cylinders) &&                          // filter invalid ranges
+					(SECTOR_SIZES[(sdh >> 5) & 0x03] == info.sectorbytes)    // may not vary in image!
+					)
 				{
-					read_status = 4;
-					m_leds[0] = 1;
-
-					// Pointer to info + C + H + S
-					uint32_t lbasector = get_and_print_lbasector(this, info, cylinder, sdh & 0x07, sector_number);
-
-					if ((cylinder <= info->cylinders) &&                          // filter invalid ranges
-						(SECTOR_SIZES[(sdh >> 5) & 0x03] == info->sectorbytes)    // may not vary in image!
-						)
-					{
-						read_status = 5;
-						if (hard_disk_read(local_hard_disk, lbasector, m_hdc_buffer)) // accepts LBA sector (uint32_t) !
-							read_status = 0; //  logerror("...success!\n");
-					}
+					read_status = 5;
+					if (local_hard_disk->read(lbasector, m_hdc_buffer)) // accepts LBA sector (uint32_t) !
+						read_status = 0; //  logerror("...success!\n");
 				}
 				m_hdc_buf_offset = 0;
 				m_hdc->buffer_ready(true);
@@ -1862,40 +1852,37 @@ int rainbow_base_state::do_write_sector()
 
 	if (local_hard_disk)
 	{
-		hard_disk_info *info = hard_disk_get_info(local_hard_disk);
-		if (info)
+		const auto &info = local_hard_disk->get_info();
+		feedback = 10;
+		m_leds[0] = 1; // OFF
+
+		uint8_t sdh = (m_hdc->read(0x06));
+
+		int hi = (m_hdc->read(0x05)) & 0x07;
+		uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
+
+		int sector_number = m_hdc->read(0x03);
+		int sector_count = m_hdc->read(0x02); // (1 = single sector)
+
+		if (!(cylinder <= info.cylinders &&                     // filter invalid cylinders
+			  SECTOR_SIZES[(sdh >> 5) & 0x03] == info.sectorbytes // 512, may not vary
+			  ))
 		{
-			feedback = 10;
-			m_leds[0] = 1; // OFF
+			logerror("...*** SANITY CHECK FAILED (CYLINDER %u vs. info.cylinders %u - - SECTOR_SIZE %u vs. info.sectorbytes %u) ***\n",
+					 cylinder, info.cylinders, SECTOR_SIZES[(sdh >> 5) & 0x03], info.sectorbytes);
+			return 50;
+		}
+		// Pointer to info + C + H + S
+		uint32_t lbasector = get_and_print_lbasector(this, info, cylinder, sdh & 0x07, sector_number);
 
-			uint8_t sdh = (m_hdc->read(0x06));
+		if (sector_count != 1) // ignore all SECTOR_COUNTS != 1
+			return 88; // logerror(" - ** IGNORED (SECTOR_COUNT !=1) **\n");
 
-			int hi = (m_hdc->read(0x05)) & 0x07;
-			uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
+		if (local_hard_disk->write(lbasector, m_hdc_buffer))  // accepts LBA sector (uint32_t) !
+			feedback = 99; // success
+		else
+			logerror("...FAILURE **** \n");
 
-			int sector_number = m_hdc->read(0x03);
-			int sector_count = m_hdc->read(0x02); // (1 = single sector)
-
-			if (!(cylinder <= info->cylinders &&                     // filter invalid cylinders
-				SECTOR_SIZES[(sdh >> 5) & 0x03] == info->sectorbytes // 512, may not vary
-				))
-			{
-				logerror("...*** SANITY CHECK FAILED (CYLINDER %u vs. info->cylinders %u - - SECTOR_SIZE %u vs. info->sectorbytes %u) ***\n",
-					cylinder, info->cylinders, SECTOR_SIZES[(sdh >> 5) & 0x03], info->sectorbytes);
-				return 50;
-			}
-			// Pointer to info + C + H + S
-			uint32_t lbasector = get_and_print_lbasector(this, info, cylinder, sdh & 0x07, sector_number);
-
-			if (sector_count != 1) // ignore all SECTOR_COUNTS != 1
-				return 88; // logerror(" - ** IGNORED (SECTOR_COUNT !=1) **\n");
-
-			if (hard_disk_write(local_hard_disk, lbasector, m_hdc_buffer))  // accepts LBA sector (uint32_t) !
-				feedback = 99; // success
-			else
-				logerror("...FAILURE **** \n");
-
-		} // IF 'info' not nullptr
 	} // IF hard disk present
 	return feedback;
 }

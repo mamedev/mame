@@ -148,8 +148,8 @@ private:
 	required_shared_ptr<uint16_t> m_scroll;
 
 	// video
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fix_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fix_tilemap = nullptr;
 
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);

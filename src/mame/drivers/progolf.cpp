@@ -184,12 +184,12 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_fbram;
 
-	uint8_t m_char_pen;
-	uint8_t m_char_pen_vreg;
+	uint8_t m_char_pen = 0;
+	uint8_t m_char_pen_vreg = 0;
 	std::unique_ptr<uint8_t[]> m_fg_fb;
-	uint8_t m_scrollx_hi;
-	uint8_t m_scrollx_lo;
-	uint8_t m_gfx_switch;
+	uint8_t m_scrollx_hi = 0;
+	uint8_t m_scrollx_lo = 0;
+	uint8_t m_gfx_switch = 0;
 
 	void charram_w(offs_t offset, uint8_t data);
 	void char_vregs_w(uint8_t data);

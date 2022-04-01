@@ -109,7 +109,7 @@ void spg290_cdservo_device::device_timer(emu_timer &timer, device_timer_id id, i
 
 		if (BIT(m_control0, 15))        // CDDA
 		{
-			cdrom_read_data(m_cdrom->get_cdrom_file(), m_cur_sector - 150 - SPG290_LEADIN_LEN, cdbuf, CD_TRACK_AUDIO);
+			m_cdrom->get_cdrom_file()->read_data(m_cur_sector - 150 - SPG290_LEADIN_LEN, cdbuf, cdrom_file::CD_TRACK_AUDIO);
 
 			for (int i=0; i<2352; i++)
 			{
@@ -120,13 +120,13 @@ void spg290_cdservo_device::device_timer(emu_timer &timer, device_timer_id id, i
 		}
 		else
 		{
-			cdrom_read_data(m_cdrom->get_cdrom_file(), m_cur_sector - 150 - SPG290_LEADIN_LEN, cdbuf, CD_TRACK_MODE1_RAW);
+			m_cdrom->get_cdrom_file()->read_data(m_cur_sector - 150 - SPG290_LEADIN_LEN, cdbuf, cdrom_file::CD_TRACK_MODE1_RAW);
 
 			// FIXME: this is required for load iso images
-			if (cdrom_get_track_type(m_cdrom->get_cdrom_file(), m_qsub[m_cur_sector * 12 + 1] - 1) == CD_TRACK_MODE1)
+			if (m_cdrom->get_cdrom_file()->get_track_type(m_qsub[m_cur_sector * 12 + 1] - 1) == cdrom_file::CD_TRACK_MODE1)
 			{
 				int lba = (bcd_2_dec(cdbuf[12]) * 60 + bcd_2_dec(cdbuf[13])) * 75 + bcd_2_dec(cdbuf[14]);
-				uint32_t msf = lba_to_msf(lba + 150);
+				uint32_t msf = cdrom_file::lba_to_msf(lba + 150);
 				cdbuf[12] = (msf >> 16) & 0xff;
 				cdbuf[13] = (msf >> 8) & 0xff;
 				cdbuf[14] = (msf >> 0) & 0xff;
@@ -357,9 +357,9 @@ void spg290_cdservo_device::add_qsub(int sector, uint8_t addrctrl, uint8_t track
 
 void spg290_cdservo_device::generate_qsub(cdrom_file *cdrom)
 {
-	const cdrom_toc *toc = cdrom_get_toc(cdrom);
-	int numtracks = cdrom_get_last_track(cdrom);
-	uint32_t total_sectors = cdrom_get_track_start(cdrom, numtracks - 1) + toc->tracks[numtracks - 1].frames + 150;
+	const cdrom_file::toc &toc = cdrom->get_toc();
+	int numtracks = cdrom->get_last_track();
+	uint32_t total_sectors = cdrom->get_track_start(numtracks - 1) + toc.tracks[numtracks - 1].frames + 150;
 
 	m_tot_sectors = SPG290_LEADIN_LEN + total_sectors + SPG290_LEADOUT_LEN;
 	m_qsub = std::make_unique<uint8_t[]>(m_tot_sectors * 12);
@@ -369,54 +369,54 @@ void spg290_cdservo_device::generate_qsub(cdrom_file *cdrom)
 	// 7500 sectors lead-in
 	for (int s=0; s < SPG290_LEADIN_LEN; s += numtracks + 3)
 	{
-		if (lba < SPG290_LEADIN_LEN)     add_qsub(lba++, 0x14, 0, 0xa0, lba_to_msf(s + 0), 1 << 16);                      // first track number
-		if (lba < SPG290_LEADIN_LEN)     add_qsub(lba++, 0x14, 0, 0xa1, lba_to_msf(s + 1), numtracks << 16);              // last track number
-		if (lba < SPG290_LEADIN_LEN)     add_qsub(lba++, 0x14, 0, 0xa2, lba_to_msf(s + 2), lba_to_msf(total_sectors));    // start time of lead-out
+		if (lba < SPG290_LEADIN_LEN)     add_qsub(lba++, 0x14, 0, 0xa0, cdrom_file::lba_to_msf(s + 0), 1 << 16);                      // first track number
+		if (lba < SPG290_LEADIN_LEN)     add_qsub(lba++, 0x14, 0, 0xa1, cdrom_file::lba_to_msf(s + 1), numtracks << 16);              // last track number
+		if (lba < SPG290_LEADIN_LEN)     add_qsub(lba++, 0x14, 0, 0xa2, cdrom_file::lba_to_msf(s + 2), cdrom_file::lba_to_msf(total_sectors));    // start time of lead-out
 
 		for(int track = 0; track < numtracks; track++)
 		{
-			uint32_t track_start = cdrom_get_track_start(cdrom, track) + 150;
+			uint32_t track_start = cdrom->get_track_start(track) + 150;
 			if (lba < SPG290_LEADIN_LEN)
-				add_qsub(lba++, cdrom_get_adr_control(cdrom, track), 0, dec_2_bcd(track + 1), lba_to_msf(s + 3 + track), lba_to_msf(track_start));
+				add_qsub(lba++, cdrom->get_adr_control(track), 0, dec_2_bcd(track + 1), cdrom_file::lba_to_msf(s + 3 + track), cdrom_file::lba_to_msf(track_start));
 		}
 	}
 
 	// data tracks
 	for(int track = 0; track < numtracks; track++)
 	{
-		uint32_t control = cdrom_get_adr_control(cdrom, track);
-		uint32_t track_start = cdrom_get_track_start(cdrom, track);
+		uint32_t control = cdrom->get_adr_control(track);
+		uint32_t track_start = cdrom->get_track_start(track);
 
 		// pregap
-		uint32_t pregap = toc->tracks[track].pregap;
+		uint32_t pregap = toc.tracks[track].pregap;
 
 		// first track should have a 150 frames pregap
-		if (track == 0 && toc->tracks[0].pregap == 0)
+		if (track == 0 && toc.tracks[0].pregap == 0)
 			pregap = 150;
-		else if (track != 0 && toc->tracks[0].pregap == 0)
+		else if (track != 0 && toc.tracks[0].pregap == 0)
 			track_start += 150;
 
 		for(int s = 0; s < pregap; s++)
-			add_qsub(lba++, control, dec_2_bcd(track + 1), 0, lba_to_msf(s), lba_to_msf(track_start + s));
+			add_qsub(lba++, control, dec_2_bcd(track + 1), 0, cdrom_file::lba_to_msf(s), cdrom_file::lba_to_msf(track_start + s));
 
 		track_start += pregap;
 
-		for(int s = 0; s < toc->tracks[track].frames; s++)
+		for(int s = 0; s < toc.tracks[track].frames; s++)
 		{
 			// TODO: if present use subcode from CHD
-			add_qsub(lba++, control, dec_2_bcd(track + 1), 1, lba_to_msf(s), lba_to_msf(track_start + s));
+			add_qsub(lba++, control, dec_2_bcd(track + 1), 1, cdrom_file::lba_to_msf(s), cdrom_file::lba_to_msf(track_start + s));
 		}
 
-		track_start += toc->tracks[track].frames;
+		track_start += toc.tracks[track].frames;
 
 		// postgap
-		for(int s = 0; s < toc->tracks[track].postgap; s++)
-			add_qsub(lba++, control, dec_2_bcd(track + 1), 2, lba_to_msf(s), lba_to_msf(track_start + s));
+		for(int s = 0; s < toc.tracks[track].postgap; s++)
+			add_qsub(lba++, control, dec_2_bcd(track + 1), 2, cdrom_file::lba_to_msf(s), cdrom_file::lba_to_msf(track_start + s));
 
-		track_start += toc->tracks[track].postgap;
+		track_start += toc.tracks[track].postgap;
 	}
 
 	// 6750 sectors lead-out
 	for(int s = 0; s < SPG290_LEADOUT_LEN; s++)
-		add_qsub(lba++, 0x14, 0xaa, 1, lba_to_msf(s), lba_to_msf(total_sectors + s));
+		add_qsub(lba++, 0x14, 0xaa, 1, cdrom_file::lba_to_msf(s), cdrom_file::lba_to_msf(total_sectors + s));
 }

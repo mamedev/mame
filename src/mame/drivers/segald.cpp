@@ -47,7 +47,7 @@ public:
 	void init_astron();
 
 private:
-	uint8_t m_nmi_enable;
+	uint8_t m_nmi_enable = 0;
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_obj_ram;
@@ -55,8 +55,8 @@ private:
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_shared_ptr<uint8_t> m_fix_ram;
 
-	uint8_t m_ldv1000_input_latch;
-	uint8_t m_ldv1000_output_latch;
+	uint8_t m_ldv1000_input_latch = 0;
+	uint8_t m_ldv1000_output_latch = 0;
 
 	uint8_t astron_DISC_read(offs_t offset);
 	uint8_t astron_OUT_read(offs_t offset);

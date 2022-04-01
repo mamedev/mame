@@ -55,7 +55,7 @@ protected:
 private:
 	u8  m_enable;
 	u8  m_speed;
-	u32 m_state;
+	u32 m_state = 0;
 	u16 m_offset;
 	u8  m_count;
 };

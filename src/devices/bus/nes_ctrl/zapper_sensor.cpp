@@ -3,7 +3,7 @@
 /**********************************************************************
 
     HLE of the common photodiode reading routine used in the NES,
-    Vs. System, and Playchoice-10 light guns, and R.O.B.
+    Vs. System, and PlayChoice-10 light guns, and R.O.B.
 
     These all use a Sharp IR3T07, though the NES zapper is (always?)
     seen with the IR3T07A revision.

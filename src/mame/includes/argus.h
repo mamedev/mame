@@ -50,7 +50,7 @@ protected:
 	// argus specific
 	u8 m_vrom_offset = 0U;
 
-	tilemap_t *m_tx_tilemap = 0;
+	tilemap_t *m_tx_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap[2]{};
 
 	// common
@@ -175,10 +175,10 @@ private:
 
 	required_shared_ptr<u8> m_butasan_bg1ram;
 
-	u8 *m_butasan_txram = 0;
-	u8 *m_butasan_bg0ram = 0;
-	u8 *m_butasan_bg0backram = 0;
-	u8 *m_butasan_txbackram = 0;
+	u8 *m_butasan_txram = nullptr;
+	u8 *m_butasan_bg0ram = nullptr;
+	u8 *m_butasan_bg0backram = nullptr;
+	u8 *m_butasan_txbackram = nullptr;
 	std::unique_ptr<u8[]> m_butasan_pagedram[2]{};
 	u8 m_butasan_page_latch = 0U;
 	u8 m_butasan_bg1_status = 0U;

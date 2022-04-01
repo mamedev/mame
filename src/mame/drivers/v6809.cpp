@@ -103,7 +103,7 @@ private:
 	void v6809_mem(address_map &map);
 
 	u16 m_video_address = 0U;
-	bool m_speaker_en = 0;
+	bool m_speaker_en = false;
 	u8 m_video_index = 0U;
 	u8 m_term_data = 0U;
 	u8 m_vidbyte = 0U;
@@ -336,7 +336,7 @@ void v6809_state::v6809(machine_config &config)
 	pia1.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	ptm6840_device &ptm(PTM6840(config, "ptm", 16_MHz_XTAL / 4));
-	ptm.set_external_clocks(4000000/14, 4000000/14, 4000000/14/8);
+	ptm.set_external_clocks(4000000.0/14.0, 4000000.0/14.0, (4000000.0/14.0)/8.0);
 	ptm.o1_callback().set(FUNC(v6809_state::speaker_en_w));
 	ptm.o2_callback().set(FUNC(v6809_state::speaker_w));
 	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);

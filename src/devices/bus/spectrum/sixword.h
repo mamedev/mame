@@ -64,10 +64,10 @@ protected:
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_joy;
 
-	int m_romcs;
-	u8 m_ram[0x2000];
-	u16 m_rombank;
-	u8 m_control;
+	int m_romcs = 0;
+	u8 m_ram[0x2000]{};
+	u16 m_rombank = 0;
+	u8 m_control = 0;
 };
 
 class spectrum_swiftdisc2_device :

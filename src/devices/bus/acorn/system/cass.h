@@ -44,9 +44,9 @@ private:
 
 	required_device<cassette_image_device> m_cass;
 
-	uint8_t m_cass_data[4];
-	bool m_cass_state;
-	bool m_cassold;
+	uint8_t m_cass_data[4]{};
+	bool m_cass_state = false;
+	bool m_cassold = false;
 };
 
 

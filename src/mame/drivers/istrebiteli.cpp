@@ -192,16 +192,16 @@ private:
 	required_device<istrebiteli_sound_device> m_sound_dev;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t moto_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t coin_count;
-	uint8_t m_spr_ctrl[2];
-	uint8_t m_spr_collision[2];
-	uint8_t m_spr_xy[8];
-	uint8_t m_tileram[16];
-	uint8_t m_road_scroll;
+	uint8_t coin_count = 0;
+	uint8_t m_spr_ctrl[2]{};
+	uint8_t m_spr_collision[2]{};
+	uint8_t m_spr_xy[8]{};
+	uint8_t m_tileram[16]{};
+	uint8_t m_road_scroll = 0;
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);

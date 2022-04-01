@@ -608,29 +608,16 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/* Graphics Layouts */
-
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ STEP8(0, 4) },
-	{ STEP8(0, 4*8) },
-	4*8*8
-};
-
 /* Graphics Decode Info */
 
 static GFXDECODE_START( gfx_twin16 )
-	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
-	GFXDECODE_RAM(  "zipram", 0, tile_layout, 512, 16 )
+	GFXDECODE_ENTRY( "fixed", 0, gfx_8x8x4_packed_msb,   0, 16 )
+	GFXDECODE_RAM(  "zipram", 0, gfx_8x8x4_packed_msb, 512, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_fround )
-	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 512, 16 )
+	GFXDECODE_ENTRY( "fixed", 0, gfx_8x8x4_packed_msb,   0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 512, 16 )
 GFXDECODE_END
 
 /* Sound Interfaces */

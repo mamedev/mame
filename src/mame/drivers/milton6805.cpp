@@ -56,8 +56,8 @@ private:
 	required_device<milton_filter_device> m_filter;
 	required_ioport_array<5> m_inputs;
 
-	u8 m_data;
-	u8 m_control;
+	u8 m_data = 0;
+	u8 m_control = 0xff;
 
 	void data_w(u8 data);
 	u8 data_r();
@@ -93,7 +93,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	sound_stream *m_stream;
+	sound_stream *m_stream = nullptr;
 	output_finder<> m_led_out;
 };
 

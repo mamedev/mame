@@ -25,6 +25,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_vectorram(*this, "vectorram") { }
 
+	void aztarac(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<x2212_device> m_nvram;
@@ -55,7 +58,6 @@ public:
 	INTERRUPT_GEN_MEMBER(snd_timed_irq);
 
 	inline void read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c);
-	void aztarac(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

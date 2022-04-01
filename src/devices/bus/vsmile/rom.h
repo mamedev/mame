@@ -31,7 +31,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 
-	uint32_t m_bank_offset;
+	uint32_t m_bank_offset = 0;
 };
 
 

@@ -285,17 +285,17 @@ void nes_eh8813a_device::pcb_reset()
 
  iNES: mapper 144
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_agci_device::write_h(offs_t offset, uint8_t data)
+void nes_agci_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("agci write_h, offset: %04x, data: %02x\n", offset, data));
 
 	// this pcb is subject to bus conflict
-	uint8_t temp = account_bus_conflict(offset, 0xff);
-	data = (data & temp) | (temp & 1);
+	// bit 0 is always determined by the ROM value at the offset due to a resistor on the board
+	data = account_bus_conflict(offset, data | 1);
 
 	chr8(data >> 4, CHRROM);
 	prg32(data);
@@ -479,70 +479,28 @@ void nes_magseries_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 156
 
- In MESS: Supported.
+ In MAME: Supported.
 
  Notes: Metal Force and Buzz & Waldog only use the first 4
  regs and no mirroring. Janggun ui Adeul uses all features
 
  -------------------------------------------------*/
 
-void nes_daou306_device::write_h(offs_t offset, uint8_t data)
+void nes_daou306_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("daou306 write_h, offset: %04x, data: %02x\n", offset, data));
-	int reg = BIT(offset, 2) ? 8 : 0;
 
-	switch (offset)
+	if (offset >= 0x4000 && offset < 0x4010)
 	{
-		case 0x4000:
-		case 0x4004:
-			m_reg[reg + 0] = data;
-			chr1_0(m_reg[0] | (m_reg[8] << 8), CHRROM);
-			break;
-		case 0x4001:
-		case 0x4005:
-			m_reg[reg + 1] = data;
-			chr1_1(m_reg[1] | (m_reg[9] << 8), CHRROM);
-			break;
-		case 0x4002:
-		case 0x4006:
-			m_reg[reg + 2] = data;
-			chr1_2(m_reg[2] | (m_reg[10] << 8), CHRROM);
-			break;
-		case 0x4003:
-		case 0x4007:
-			m_reg[reg + 3] = data;
-			chr1_3(m_reg[3] | (m_reg[11] << 8), CHRROM);
-			break;
-		case 0x4008:
-		case 0x400c:
-			m_reg[reg + 4] = data;
-			chr1_4(m_reg[4] | (m_reg[12] << 8), CHRROM);
-			break;
-		case 0x4009:
-		case 0x400d:
-			m_reg[reg + 5] = data;
-			chr1_5(m_reg[5] | (m_reg[13] << 8), CHRROM);
-			break;
-		case 0x400a:
-		case 0x400e:
-			m_reg[reg + 6] = data;
-			chr1_6(m_reg[6] | (m_reg[14] << 8), CHRROM);
-			break;
-		case 0x400b:
-		case 0x400f:
-			m_reg[reg + 7] = data;
-			chr1_7(m_reg[7] | (m_reg[15] << 8), CHRROM);
-			break;
-		case 0x4010:
-			prg16_89ab(data);
-			break;
-		case 0x4014:
-			if (data & 1)
-				set_nt_mirroring(PPU_MIRROR_HORZ);
-			else
-				set_nt_mirroring(PPU_MIRROR_VERT);
-			break;
+		int reg = bitswap<4>(offset, 2, 3, 1, 0);
+		m_reg[reg] = data;
+		reg &= 0x07;
+		chr1_x(reg, m_reg[reg] | (m_reg[reg | 8] << 8), CHRROM);
 	}
+	else if (offset == 0x4010)
+		prg16_89ab(data);
+	else if (offset == 0x4014)
+		set_nt_mirroring(data & 1 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------
@@ -607,7 +565,7 @@ void nes_edu2k_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("edu2k write_h, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(data & 0x1f);
-	m_latch = (data & 0xc0) >> 6;
+	m_latch = BIT(data, 6, 2);
 }
 
 void nes_edu2k_device::write_m(offs_t offset, uint8_t data)
@@ -822,6 +780,6 @@ uint8_t nes_fujiya_device::read_m(offs_t offset)
 	if (offset == 0x7001 || offset == 0x7777)
 		return m_latch | ((offset >> 8) & 0x7f);
 
-	return get_open_bus();  // open bus
+	return get_open_bus();
 }
 #endif

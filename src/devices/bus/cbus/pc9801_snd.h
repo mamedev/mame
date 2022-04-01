@@ -20,11 +20,11 @@ public:
 protected:
 	u8 opn_porta_r();
 	void opn_portb_w(u8 data);
-	u16 m_io_base;
+	u16 m_io_base = 0;
 	virtual u16 read_io_base() = 0;
 
 private:
-	u8 m_joy_sel;
+	u8 m_joy_sel = 0;
 };
 
 //DECLARE_DEVICE_TYPE(PC9801_SND, pc9801_snd_device)

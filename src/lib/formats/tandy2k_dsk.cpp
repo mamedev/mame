@@ -37,4 +37,4 @@ const tandy2k_format::format tandy2k_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_TANDY_2000_FORMAT = &floppy_image_format_creator<tandy2k_format>;
+const tandy2k_format FLOPPY_TANDY_2000_FORMAT;

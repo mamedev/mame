@@ -32,10 +32,10 @@ private:
 	required_shared_ptr<uint8_t> m_digdug_posram;
 	required_shared_ptr<uint8_t> m_digdug_flpram;
 
-	uint8_t m_bg_select;
-	uint8_t m_tx_color_mode;
-	uint8_t m_bg_disable;
-	uint8_t m_bg_color_bank;
+	uint8_t m_bg_select = 0U;
+	uint8_t m_tx_color_mode = 0U;
+	uint8_t m_bg_disable = 0U;
+	uint8_t m_bg_color_bank = 0U;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

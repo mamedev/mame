@@ -120,6 +120,8 @@ offs_t h6280_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case _rel:
 			util::stream_format(stream, "%-5s$%04X", token[opc], (PC + 1 + (signed char)params.r8(PC)) & 0xffff);
 			PC+=1;
+			if (opc != _bra && opc != _bsr)
+				flags = STEP_COND;
 			break;
 		case _imm:
 			util::stream_format(stream, "%-5s#$%02X", token[opc], params.r8(PC));

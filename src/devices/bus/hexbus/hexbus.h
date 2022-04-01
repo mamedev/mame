@@ -69,7 +69,7 @@ protected:
 	hexbus_device *m_hexbus_outbound;
 
 	// Common AND of all private values
-	uint8_t m_current_bus_value;
+	uint8_t m_current_bus_value = 0;
 
 	// From device_ti_hexbus_interface
 	virtual uint8_t bus_read(int dir) override;

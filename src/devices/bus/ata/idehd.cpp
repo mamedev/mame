@@ -826,12 +826,12 @@ void ide_hdd_device::device_reset()
 
 	if (m_disk != nullptr && !m_can_identify_device)
 	{
-		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
-		if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)
+		const auto &hdinfo = m_disk->get_info();
+		if (hdinfo.sectorbytes == IDE_DISK_SECTOR_SIZE)
 		{
-			m_num_cylinders = hdinfo->cylinders;
-			m_num_sectors = hdinfo->sectors;
-			m_num_heads = hdinfo->heads;
+			m_num_cylinders = hdinfo.cylinders;
+			m_num_sectors = hdinfo.sectors;
+			m_num_heads = hdinfo.heads;
 			if (PRINTF_IDE_COMMANDS) osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
 			osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
 		}

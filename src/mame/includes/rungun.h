@@ -67,27 +67,27 @@ private:
 	required_shared_ptr<uint16_t> m_sysreg;
 
 	/* video-related */
-	tilemap_t   *m_ttl_tilemap[2];
-	tilemap_t   *m_936_tilemap[2];
+	tilemap_t   *m_ttl_tilemap[2]{};
+	tilemap_t   *m_936_tilemap[2]{};
 	std::unique_ptr<uint16_t[]> m_psac2_vram;
 	std::unique_ptr<uint16_t[]>    m_ttl_vram;
 	std::unique_ptr<uint16_t[]>   m_pal_ram;
-	uint8_t       m_current_display_bank;
-	int         m_ttl_gfx_index;
-	int         m_sprite_colorbase;
+	uint8_t       m_current_display_bank = 0;
+	int         m_ttl_gfx_index = 0;
+	int         m_sprite_colorbase = 0;
 
-	uint8_t       *m_roz_rom;
-	uint8_t       m_roz_rombase;
+	uint8_t       *m_roz_rom = nullptr;
+	uint8_t       m_roz_rombase = 0;
 
 	/* sound */
-	uint8_t       m_sound_ctrl;
-	uint8_t       m_sound_status;
-	uint8_t       m_sound_nmi_clk;
+	uint8_t       m_sound_ctrl = 0;
+	uint8_t       m_sound_status = 0;
+	uint8_t       m_sound_nmi_clk = 0;
 
-	bool        m_video_priority_mode;
+	bool        m_video_priority_mode = false;
 	std::unique_ptr<uint16_t[]> m_banked_ram;
-	bool        m_single_screen_mode;
-	uint8_t       m_video_mux_bank;
+	bool        m_single_screen_mode = false;
+	uint8_t       m_video_mux_bank = 0;
 
 	uint16_t sysregs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

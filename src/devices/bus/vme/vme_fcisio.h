@@ -48,7 +48,7 @@ private:
 	required_device<bim68153_device> m_bim;
 
 	// Pointer to System ROMs needed by bootvect_r
-	uint16_t  *m_sysrom;
+	uint16_t  *m_sysrom = nullptr;
 };
 
 #endif // MAME_BUS_VME_VME_FCISIO_H

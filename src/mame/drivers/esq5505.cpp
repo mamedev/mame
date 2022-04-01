@@ -266,11 +266,11 @@ private:
 
 	void es5505_clock_changed(u32 data);
 
-	int m_system_type;
-	uint8_t m_duart_io;
-	uint8_t m_otis_irq_state;
-	uint8_t m_dmac_irq_state;
-	uint8_t m_duart_irq_state;
+	int m_system_type = 0;
+	uint8_t m_duart_io = 0;
+	uint8_t m_otis_irq_state = 0;
+	uint8_t m_dmac_irq_state = 0;
+	uint8_t m_duart_irq_state = 0;
 
 	void update_irq_to_maincpu();
 

@@ -171,11 +171,11 @@ protected:
 	optional_device<centronics_device> m_centronics;
 	required_device<screen_device> m_screen;
 
-	uint8_t *m_videoram;
-	uint8_t m_misccr;
-	uint8_t m_pia_a;
-	uint8_t m_pia_b;
-	uint8_t m_ppu[4];
+	uint8_t *m_videoram = nullptr;
+	uint8_t m_misccr = 0;
+	uint8_t m_pia_a = 0;
+	uint8_t m_pia_b = 0;
+	uint8_t m_ppu[4]{};
 };
 
 void bitgraph_state::bitgrapha_mem(address_map &map)

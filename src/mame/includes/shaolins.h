@@ -37,9 +37,9 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	int m_palettebank;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_nmi_enable;
+	int m_palettebank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_nmi_enable = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);

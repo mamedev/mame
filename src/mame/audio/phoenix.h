@@ -27,25 +27,25 @@ protected:
 private:
 	struct c_state
 	{
-		int32_t counter;
-		int32_t level;
+		int32_t counter = 0;
+		int32_t level = 0;
 	};
 
 	struct n_state
 	{
-		int32_t counter;
-		int32_t polyoffs;
-		int32_t polybit;
-		int32_t lowpass_counter;
-		int32_t lowpass_polybit;
+		int32_t counter = 0;
+		int32_t polyoffs = 0;
+		int32_t polybit = 0;
+		int32_t lowpass_counter = 0;
+		int32_t lowpass_polybit = 0;
 	};
 
 	// internal state
 	struct c_state      m_c24_state;
 	struct c_state      m_c25_state;
 	struct n_state      m_noise_state;
-	uint8_t               m_sound_latch_a;
-	sound_stream *      m_channel;
+	uint8_t               m_sound_latch_a = 0;
+	sound_stream *      m_channel = nullptr;
 	std::unique_ptr<uint32_t[]> m_poly18;
 	required_device<discrete_device> m_discrete;
 	required_device<tms36xx_device> m_tms;

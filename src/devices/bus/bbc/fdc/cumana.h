@@ -45,11 +45,11 @@ protected:
 	required_device<mb8877_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
-	bool m_invert;
+	bool m_invert = false;
 
 private:
 	int m_drive_control;
-	int m_fdc_ie;
+	int m_fdc_ie = 0;
 };
 
 class bbc_cumana1_device : public bbc_cumanafdc_device

@@ -61,13 +61,13 @@ private:
 	required_device<nscsi_bus_device> m_scsibus;
 
 	// DSR ROM
-	uint8_t* m_eprom;
+	uint8_t* m_eprom = nullptr;
 
 	// Recent address
-	int m_address;
+	int m_address = 0;
 
 	// Settings
-	int m_sw2;
+	int m_sw2 = 0;
 
 	// Latches for the lines
 	// Should be removed and accessor functions be added to ncr5380

@@ -37,8 +37,8 @@ private:
 
 	void mem_map(address_map &map);
 
-	uint8_t m_unit;
-	uint8_t m_cmd;
+	uint8_t m_unit = 0;
+	uint8_t m_cmd = 0;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<t11_device> m_maincpu;

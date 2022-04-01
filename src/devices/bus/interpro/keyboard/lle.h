@@ -48,13 +48,13 @@ private:
 
 	output_finder<8> m_leds;
 
-	u8 m_txd;
-	u8 m_p1;
-	u8 m_p2;
-	u8 m_bus;
+	u8 m_txd = 0;
+	u8 m_p1 = 0;
+	u8 m_p2 = 0;
+	u8 m_bus = 0;
 
-	u8 m_row;
-	u8 m_count;
+	u8 m_row = 0;
+	u8 m_count = 0;
 };
 
 class lle_en_us_device : public lle_device_base

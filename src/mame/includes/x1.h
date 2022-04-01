@@ -189,26 +189,26 @@ public:
 protected:
 	struct scrn_reg_t
 	{
-		uint8_t disp_bank;
-		uint8_t pcg_mode;
-		uint8_t v400_mode;
-		uint8_t ank_sel;
+		uint8_t disp_bank = 0;
+		uint8_t pcg_mode = 0;
+		uint8_t v400_mode = 0;
+		uint8_t ank_sel = 0;
 
-		uint8_t pri;
-		uint8_t blackclip; // x1 turbo specific
+		uint8_t pri = 0;
+		uint8_t blackclip = 0; // x1 turbo specific
 	};
 
 	struct turbo_reg_t
 	{
-		uint8_t pal;
-		uint8_t gfx_pal;
-		uint8_t txt_pal[8];
-		uint8_t txt_disp;
+		uint8_t pal = 0;
+		uint8_t gfx_pal = 0;
+		uint8_t txt_pal[8]{};
+		uint8_t txt_disp = 0;
 	};
 
 	struct x1_rtc_t
 	{
-		uint8_t sec, min, hour, day, wday, month, year;
+		uint8_t sec = 0, min = 0, hour = 0, day = 0, wday = 0, month = 0, year = 0;
 	};
 
 	void x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,uint16_t pen,uint8_t width,uint8_t height);
@@ -234,52 +234,52 @@ protected:
 	std::unique_ptr<uint8_t[]> m_pcg_ram;       /**< Pointer for PCG GFX RAM */
 	required_region_ptr<uint8_t> m_cg_rom;        /**< Pointer for GFX ROM */
 	required_region_ptr<uint8_t> m_kanji_rom;     /**< Pointer for Kanji ROMs */
-	int m_xstart,           /**< Start X offset for screen drawing. */
-		m_ystart;           /**< Start Y offset for screen drawing. */
-	uint8_t m_hres_320;       /**< Pixel clock divider setting: (1) 48 (0) 24 */
-	uint8_t m_io_switch;      /**< Enable access for special bitmap RMW phase in isolated i/o. */
-	uint8_t m_io_sys;         /**< Read-back for PPI port C */
-	uint8_t m_vsync;          /**< Screen V-Sync bit, active low */
-	uint8_t m_vdisp;          /**< Screen V-Disp bit, active high */
+	int m_xstart = 0,           /**< Start X offset for screen drawing. */
+		m_ystart = 0;           /**< Start Y offset for screen drawing. */
+	uint8_t m_hres_320 = 0;       /**< Pixel clock divider setting: (1) 48 (0) 24 */
+	uint8_t m_io_switch = 0;      /**< Enable access for special bitmap RMW phase in isolated i/o. */
+	uint8_t m_io_sys = 0;         /**< Read-back for PPI port C */
+	uint8_t m_vsync = 0;          /**< Screen V-Sync bit, active low */
+	uint8_t m_vdisp = 0;          /**< Screen V-Disp bit, active high */
 	std::unique_ptr<uint8_t[]> m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
-	uint8_t m_pcg_reset;      /**< @todo Unused variable. */
-	uint8_t m_sub_obf;        /**< MCU side: OBF flag active low, indicates that there are parameters in comm buffer. */
-	uint8_t m_ctc_irq_flag;       /**< @todo Unused variable. */
+	uint8_t m_pcg_reset = 0;      /**< @todo Unused variable. */
+	uint8_t m_sub_obf = 0;        /**< MCU side: OBF flag active low, indicates that there are parameters in comm buffer. */
+	uint8_t m_ctc_irq_flag = 0;       /**< @todo Unused variable. */
 	scrn_reg_t m_scrn_reg;      /**< Base Video Registers. */
 	turbo_reg_t m_turbo_reg;    /**< Turbo Z Video Registers. */
 	x1_rtc_t m_rtc;         /**< Struct for RTC related variables */
-	emu_timer *m_rtc_timer;     /**< Pointer for RTC timer. */
-	uint8_t m_pcg_write_addr;     /**< @todo Unused variable. */
-	uint8_t m_sub_cmd;        /**< MCU side: current command issued from Main to Sub. */
-	uint8_t m_sub_cmd_length;     /**< MCU side: number of parameters, in bytes. */
-	uint8_t m_sub_val[8];     /**< MCU side: parameters buffer. */
-	int m_sub_val_ptr;      /**< MCU side: index for parameter read-back */
-	int m_key_i;            /**< MCU side: index for keyboard read-back during OBF phase. */
-	uint8_t m_irq_vector;     /**< @todo Unused variable. */
-	uint8_t m_cmt_current_cmd;    /**< MCU side: CMT command issued. */
-	uint8_t m_cmt_test;       /**< MCU side: Tape BREAK status bit. */
-	uint8_t m_rom_index[3];       /**< Current ROM address. */
-	uint32_t m_kanji_offset;      /**< @todo Unused variable. */
-	uint8_t m_bios_offset;        /**< @todo Unused variable. */
-	uint8_t m_x_b;            /**< Palette Register for Blue Gun */
-	uint8_t m_x_g;            /**< Palette Register for Green Gun */
-	uint8_t m_x_r;            /**< Palette Register for Red Gun */
-	uint16_t m_kanji_addr_latch;  /**< Internal Kanji ROM address. */
-	uint32_t m_kanji_addr;        /**< Latched Kanji ROM address. */
-	uint8_t m_kanji_eksel;        /**< Kanji ROM register bit for latch phase. */
-	uint8_t m_pcg_reset_occurred; /**< @todo Unused variable. */
-	uint32_t m_old_key1;      /**< Keyboard read buffer for i/o port "key1" */
-	uint32_t m_old_key2;      /**< Keyboard read buffer for i/o port "key2" */
-	uint32_t m_old_key3;      /**< Keyboard read buffer for i/o port "key3" */
-	uint32_t m_old_key4;      /**< Keyboard read buffer for i/o port "tenkey" */
-	uint32_t m_old_fkey;      /**< Keyboard read buffer for i/o port "f_keys" */
-	uint32_t m_emm_addr;      /**< EMM RAM current address */
+	emu_timer *m_rtc_timer = nullptr;     /**< Pointer for RTC timer. */
+	uint8_t m_pcg_write_addr = 0;     /**< @todo Unused variable. */
+	uint8_t m_sub_cmd = 0;        /**< MCU side: current command issued from Main to Sub. */
+	uint8_t m_sub_cmd_length = 0;     /**< MCU side: number of parameters, in bytes. */
+	uint8_t m_sub_val[8]{};     /**< MCU side: parameters buffer. */
+	int m_sub_val_ptr = 0;      /**< MCU side: index for parameter read-back */
+	int m_key_i = 0;            /**< MCU side: index for keyboard read-back during OBF phase. */
+	uint8_t m_irq_vector = 0;     /**< @todo Unused variable. */
+	uint8_t m_cmt_current_cmd = 0;    /**< MCU side: CMT command issued. */
+	uint8_t m_cmt_test = 0;       /**< MCU side: Tape BREAK status bit. */
+	uint8_t m_rom_index[3]{};       /**< Current ROM address. */
+	uint32_t m_kanji_offset = 0;      /**< @todo Unused variable. */
+	uint8_t m_bios_offset = 0;        /**< @todo Unused variable. */
+	uint8_t m_x_b = 0;            /**< Palette Register for Blue Gun */
+	uint8_t m_x_g = 0;            /**< Palette Register for Green Gun */
+	uint8_t m_x_r = 0;            /**< Palette Register for Red Gun */
+	uint16_t m_kanji_addr_latch = 0;  /**< Internal Kanji ROM address. */
+	uint32_t m_kanji_addr = 0;        /**< Latched Kanji ROM address. */
+	uint8_t m_kanji_eksel = 0;        /**< Kanji ROM register bit for latch phase. */
+	uint8_t m_pcg_reset_occurred = 0; /**< @todo Unused variable. */
+	uint32_t m_old_key1 = 0;      /**< Keyboard read buffer for i/o port "key1" */
+	uint32_t m_old_key2 = 0;      /**< Keyboard read buffer for i/o port "key2" */
+	uint32_t m_old_key3 = 0;      /**< Keyboard read buffer for i/o port "key3" */
+	uint32_t m_old_key4 = 0;      /**< Keyboard read buffer for i/o port "tenkey" */
+	uint32_t m_old_fkey = 0;      /**< Keyboard read buffer for i/o port "f_keys" */
+	uint32_t m_emm_addr = 0;      /**< EMM RAM current address */
 	std::unique_ptr<uint8_t[]> m_pal_4096;      /**< X1 Turbo Z: pointer for 4096 palette entries */
-	uint8_t m_crtc_vreg[0x100],   /**< CRTC register buffer. */
-			m_crtc_index;       /**< CRTC register index. */
-	uint8_t m_is_turbo;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */
-	uint8_t m_ex_bank;        /**< X1 Turbo Z: RAM bank register */
-	uint8_t m_ram_bank;       /**< Regular RAM bank for 0x0000-0x7fff memory window: (0) ROM/IPL (1) RAM */
+	uint8_t m_crtc_vreg[0x100]{},   /**< CRTC register buffer. */
+			m_crtc_index = 0;       /**< CRTC register index. */
+	uint8_t m_is_turbo = 0;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */
+	uint8_t m_ex_bank = 0;        /**< X1 Turbo Z: RAM bank register */
+	uint8_t m_ram_bank = 0;       /**< Regular RAM bank for 0x0000-0x7fff memory window: (0) ROM/IPL (1) RAM */
 	/**
 	@brief Refresh current bitmap palette.
 	*/
@@ -333,7 +333,7 @@ protected:
 	*/
 	uint16_t check_keyboard_press();
 
-	uint8_t m_fdc_ctrl;
+	uint8_t m_fdc_ctrl = 0;
 
 };
 

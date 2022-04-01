@@ -55,7 +55,7 @@ private:
 	void puckpkmna_map(address_map &map);
 
 	// bootleg specific
-	int m_aladmdb_mcu_port;
+	int m_aladmdb_mcu_port = 0;
 
 	int m_protcount;
 };

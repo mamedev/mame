@@ -86,9 +86,9 @@ protected:
 	void fdc_drq_w(int state);
 	virtual void nmi_check() override;
 
-	uint8_t m_control;
-	int m_intrq;
-	int m_drq;
+	uint8_t m_control = 0;
+	int m_intrq = 0;
+	int m_drq = 0;
 };
 
 class spectrum_d80_device :

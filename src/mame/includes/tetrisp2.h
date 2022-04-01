@@ -112,16 +112,16 @@ protected:
 	required_shared_ptr<u16> m_paletteram;
 	output_finder<45> m_leds;
 
-	u16 m_rockn_protectdata;
-	u16 m_rockn_adpcmbank;
-	u16 m_rockn_soundvolume;
-	int m_rot_ofsx, m_rot_ofsy;
-	int m_bank_lo;
-	int m_bank_hi;
+	u16 m_rockn_protectdata = 0;
+	u16 m_rockn_adpcmbank = 0;
+	u16 m_rockn_soundvolume = 0;
+	int m_rot_ofsx = 0, m_rot_ofsy = 0;
+	int m_bank_lo = 0;
+	int m_bank_hi = 0;
 
-	tilemap_t *m_tilemap_bg;
-	tilemap_t *m_tilemap_fg;
-	tilemap_t *m_tilemap_rot;
+	tilemap_t *m_tilemap_bg = nullptr;
+	tilemap_t *m_tilemap_fg = nullptr;
+	tilemap_t *m_tilemap_rot = nullptr;
 };
 
 class rocknms_state : public tetrisp2_state
@@ -182,12 +182,12 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_rot);
 
-	u16 m_rocknms_main2sub;
-	u16 m_rocknms_sub2main;
+	u16 m_rocknms_main2sub = 0;
+	u16 m_rocknms_sub2main = 0;
 
-	tilemap_t *m_tilemap_sub_bg;
-	tilemap_t *m_tilemap_sub_fg;
-	tilemap_t *m_tilemap_sub_rot;
+	tilemap_t *m_tilemap_sub_bg = nullptr;
+	tilemap_t *m_tilemap_sub_fg = nullptr;
+	tilemap_t *m_tilemap_sub_rot = nullptr;
 
 	DECLARE_WRITE_LINE_MEMBER(sub_flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(sub_timer_irq_w);
@@ -225,8 +225,8 @@ public:
 
 private:
 	u16 stepstag_coins_r();
-	u16 vj_upload_idx;
-	bool vj_upload_fini;
+	u16 vj_upload_idx = 0;
+	bool vj_upload_fini = false;
 	void stepstag_b00000_w(u16 data);
 	void stepstag_b20000_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void stepstag_main2pc_w(u16 data);

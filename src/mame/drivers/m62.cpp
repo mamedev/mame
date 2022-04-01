@@ -771,19 +771,6 @@ INPUT_PORTS_END
 
 
 
-
-static const gfx_layout tile_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 static const gfx_layout battroad_charlayout =
 {
 	8,8,    /* 8*8 characters */
@@ -864,7 +851,7 @@ static GFXDECODE_START( gfx_m62_sprites )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_m62_tiles )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_charlayout,       0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,       0, 32 )
 GFXDECODE_END
 
 /* per game modified decodes */
@@ -874,7 +861,7 @@ static GFXDECODE_START( gfx_m62_tiles_lotlot )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_m62_tiles_spelunk2 )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_charlayout,         0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,         0, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_m62_tiles_youjyudn )

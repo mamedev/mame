@@ -110,7 +110,7 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_sc0_vram;
 	required_shared_ptr<uint8_t> m_sc0_attr;
-	tilemap_t *m_sc0_tilemap;
+	tilemap_t *m_sc0_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<5> m_lamps;

@@ -675,7 +675,7 @@ private:
 
 void mfootb2_state::update_display()
 {
-	m_display->matrix(m_d, (m_r & 0x7f) | (m_d >> 4 & 0x80) | (m_r << 1 & 0x700));
+	m_display->matrix(m_d, (m_r << 1 & 0x700) | (m_d >> 4 & 0x80) | (m_r & 0x7f));
 }
 
 void mfootb2_state::write_d(u16 data)
@@ -715,8 +715,8 @@ static INPUT_PORTS_START( mfootb2 )
 
 	PORT_START("IN.1") // DIO11
 	PORT_CONFNAME( 0x400, 0x000, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(     0x000, "1" )
-	PORT_CONFSETTING(     0x400, "2" )
+	PORT_CONFSETTING(     0x000, "1" ) // PRO 1
+	PORT_CONFSETTING(     0x400, "2" ) // PRO 2
 INPUT_PORTS_END
 
 void mfootb2_state::mfootb2(machine_config &config)
@@ -741,7 +741,7 @@ void mfootb2_state::mfootb2(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -903,7 +903,7 @@ void brainbaf_state::brainbaf(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -1081,7 +1081,7 @@ void horocomp_state::horocomp(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -1572,7 +1572,7 @@ void rdqa_state::rdqa(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms

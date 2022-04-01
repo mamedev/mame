@@ -194,7 +194,7 @@ public:
 	void init_hb();
 
 private:
-	uint32_t* m_cpuregion;
+	uint32_t* m_cpuregion = 0;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
 	uint32_t pluto5_mem_r(offs_t offset, uint32_t mem_mask = ~0);

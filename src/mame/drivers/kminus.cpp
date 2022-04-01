@@ -49,7 +49,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<fd1793_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-	floppy_image_device *m_selected_floppy;
+	floppy_image_device *m_selected_floppy = nullptr;
 
 	memory_view m_view;
 
@@ -60,7 +60,7 @@ private:
 
 	void kbd_put(uint8_t data);
 	uint8_t kbd_r();
-	uint8_t m_kbd_data;
+	uint8_t m_kbd_data = 0;
 };
 
 

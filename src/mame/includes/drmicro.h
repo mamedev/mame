@@ -29,16 +29,16 @@ public:
 
 private:
 	/* memory pointers */
-	std::unique_ptr<uint8_t[]>       m_videoram;
+	std::unique_ptr<uint8_t[]>       m_videoram{};
 
 	/* video-related */
-	tilemap_t        *m_bg1;
-	tilemap_t        *m_bg2;
-	int            m_flipscreen;
+	tilemap_t        *m_bg1 = nullptr;
+	tilemap_t        *m_bg2 = nullptr;
+	int            m_flipscreen = 0;
 
 	/* misc */
-	int            m_nmi_enable;
-	int            m_pcm_adr;
+	int            m_nmi_enable = 0;
+	int            m_pcm_adr = 0;
 
 	/* devices */
 	required_device<msm5205_device> m_msm;

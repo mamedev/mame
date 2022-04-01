@@ -60,7 +60,7 @@ private:
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<14> m_keys;
 
-	u16 m_key_row;
+	u16 m_key_row = 0U;
 };
 
 

@@ -44,7 +44,7 @@ private:
 	void ay3_address_w(uint8_t data);
 	void ay3_data_latch_w(uint8_t data);
 
-	uint8_t m_ay3_latch;
+	uint8_t m_ay3_latch = 0;
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ay8910_device>  m_ay1;

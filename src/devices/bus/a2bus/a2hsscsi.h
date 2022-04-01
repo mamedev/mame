@@ -57,7 +57,7 @@ private:
 	int m_rambank, m_rombank;
 	uint8_t m_drq;
 	uint8_t m_bank;
-	uint8_t m_dma_control;
+	uint8_t m_dma_control = 0;
 	uint8_t m_c0ne, m_c0nf;
 	uint16_t m_dma_addr, m_dma_size;
 };

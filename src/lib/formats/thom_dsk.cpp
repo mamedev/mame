@@ -82,5 +82,5 @@ const thomson_35_format::format thomson_35_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_THOMSON_525_FORMAT = &floppy_image_format_creator<thomson_525_format>;
-const floppy_format_type FLOPPY_THOMSON_35_FORMAT = &floppy_image_format_creator<thomson_35_format>;
+const thomson_525_format FLOPPY_THOMSON_525_FORMAT;
+const thomson_35_format FLOPPY_THOMSON_35_FORMAT;

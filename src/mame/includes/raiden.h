@@ -44,11 +44,11 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 
-	bool m_bg_layer_enabled;
-	bool m_fg_layer_enabled;
-	bool m_tx_layer_enabled;
-	bool m_sp_layer_enabled;
-	bool m_flipscreen;
+	bool m_bg_layer_enabled = 0;
+	bool m_fg_layer_enabled = 0;
+	bool m_tx_layer_enabled = 0;
+	bool m_sp_layer_enabled = 0;
+	bool m_flipscreen = 0;
 
 	virtual void video_start() override;
 
@@ -69,9 +69,9 @@ protected:
 	required_shared_ptr<u16> m_bgram;
 	required_shared_ptr<u16> m_fgram;
 
-	tilemap_t *m_bg_layer;
-	tilemap_t *m_fg_layer;
-	tilemap_t *m_tx_layer;
+	tilemap_t *m_bg_layer = nullptr;
+	tilemap_t *m_fg_layer = nullptr;
+	tilemap_t *m_tx_layer = nullptr;
 
 	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);

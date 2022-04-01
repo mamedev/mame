@@ -142,7 +142,7 @@ private:
 		TIMER_CR
 	};
 
-	emu_timer *m_cr_timer;
+	emu_timer *m_cr_timer = nullptr;
 };
 
 // ======================> epson_ap2000_t

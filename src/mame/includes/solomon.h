@@ -38,10 +38,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_colorram2;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0;
 	void solomon_sh_command_w(uint8_t data);
 	uint8_t solomon_0xe603_r();
 	void nmi_mask_w(uint8_t data);

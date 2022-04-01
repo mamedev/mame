@@ -80,11 +80,11 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_ram_1;
 	std::unique_ptr<uint8_t[]> m_ram_2;
-	uint8_t m_ram_bank;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_port_last;
-	uint8_t m_port_last2;
+	uint8_t m_ram_bank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_port_last = 0;
+	uint8_t m_port_last2 = 0;
 
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t ram_r(offs_t offset);

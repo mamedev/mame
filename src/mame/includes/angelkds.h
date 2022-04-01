@@ -38,9 +38,9 @@ private:
 	required_shared_ptr<uint8_t> m_txvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t    *m_tx_tilemap = 0;
-	tilemap_t    *m_bgbot_tilemap = 0;
-	tilemap_t    *m_bgtop_tilemap = 0;
+	tilemap_t    *m_tx_tilemap = nullptr;
+	tilemap_t    *m_bgbot_tilemap = nullptr;
+	tilemap_t    *m_bgtop_tilemap = nullptr;
 	int        m_txbank = 0;
 	int        m_bgbotbank = 0;
 	int        m_bgtopbank = 0;

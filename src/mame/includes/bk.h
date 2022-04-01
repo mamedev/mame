@@ -28,13 +28,13 @@ public:
 	void bk0010fd(machine_config &config);
 
 private:
-	uint16_t m_scroll;
-	uint16_t m_kbd_state;
-	uint16_t m_key_code;
-	uint16_t m_key_pressed;
-	uint16_t m_key_irq_vector;
-	uint16_t m_drive;
-	emu_timer *m_kbd_timer;
+	uint16_t m_scroll = 0U;
+	uint16_t m_kbd_state = 0U;
+	uint16_t m_key_code = 0U;
+	uint16_t m_key_pressed = 0U;
+	uint16_t m_key_irq_vector = 0U;
+	uint16_t m_drive = 0U;
+	emu_timer *m_kbd_timer = nullptr;
 	uint16_t key_state_r();
 	uint16_t key_code_r();
 	uint16_t vid_scroll_r();

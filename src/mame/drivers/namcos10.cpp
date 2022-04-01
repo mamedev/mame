@@ -485,7 +485,7 @@ private:
 	uint16_t sprot_r();
 	void sprot_w(uint16_t data);
 
-	uint8_t *nand_base;
+	uint8_t *nand_base = nullptr;
 	void nand_copy( uint32_t *dst, uint32_t address, int len );
 
 	void namcos10_map(address_map &map);
@@ -499,16 +499,16 @@ private:
 		I2CP_RECIEVE_ACK_0
 	};
 
-	uint32_t bank_base;
-	uint32_t nand_address;
-	uint16_t block[0x1ff];
+	uint32_t bank_base = 0;
+	uint32_t nand_address = 0;
+	uint16_t block[0x1ff]{};
 
-	uint16_t i2c_host_clock, i2c_host_data, i2c_dev_clock, i2c_dev_data, i2c_prev_clock, i2c_prev_data;
-	int i2cp_mode;
-	uint8_t i2c_byte;
-	int i2c_bit;
+	uint16_t i2c_host_clock = 0, i2c_host_data = 0, i2c_dev_clock = 0, i2c_dev_data = 0, i2c_prev_clock = 0, i2c_prev_data = 0;
+	int i2cp_mode = 0;
+	uint8_t i2c_byte = 0;
+	int i2c_bit = 0;
 
-	int sprot_bit, sprot_byte;
+	int sprot_bit = 0, sprot_byte = 0;
 	uint16_t nand_read( uint32_t address );
 	uint16_t nand_read2( uint32_t address );
 

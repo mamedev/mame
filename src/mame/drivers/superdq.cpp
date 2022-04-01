@@ -53,12 +53,12 @@ protected:
 
 private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	uint8_t m_ld_in_latch;
-	uint8_t m_ld_out_latch;
+	uint8_t m_ld_in_latch = 0;
+	uint8_t m_ld_out_latch = 0;
 
 	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_tilemap;
-	int m_color_bank;
+	tilemap_t *m_tilemap = nullptr;
+	int m_color_bank = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

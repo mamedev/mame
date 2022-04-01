@@ -41,7 +41,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	address_space *m_iospace;
+	address_space *m_iospace = nullptr;
 private:
 
 	const address_space_config m_io_space_config;

@@ -147,15 +147,15 @@ private:
 
 	void irq5_update();
 
-	uint8_t m_hiram[0x800];
+	uint8_t m_hiram[0x800]{};
 
-	bool m_kclk;
-	uint8_t m_kdata;
-	uint8_t m_scancode;
-	uint8_t m_kbdflag;
-	int m_kbit;
-	int m_lastdrive;
-	bool m_irq5_duart1, m_irq5_isa;
+	bool m_kclk = false;
+	uint8_t m_kdata = 0;
+	uint8_t m_scancode = 0;
+	uint8_t m_kbdflag = 0;
+	int m_kbit = 0;
+	int m_lastdrive = 0;
+	bool m_irq5_duart1 = false, m_irq5_isa = false;
 };
 
 void pt68k4_state::floppy_formats(format_registration &fr)

@@ -46,7 +46,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
-	int m_fdc_ie;
+	int m_fdc_ie = 0;
 };
 
 

@@ -88,7 +88,7 @@ private:
 	int          m_bgscrollx, m_bgscrolly, m_fgscrollx, m_fgscrolly;
 
 	/* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
-	tilemap_t    *m_tilemap[3][2];
+	tilemap_t    *m_tilemap[3][2]{};
 
 	s32          m_bg_colbank[2], m_tx_colbank;
 	int          m_dblwidth;

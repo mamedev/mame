@@ -303,13 +303,13 @@ void wd1010_device::end_command()
 int wd1010_device::get_lbasector()
 {
 	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
-	hard_disk_info *info = hard_disk_get_info(file);
+	const auto &info = file->get_info();
 	int lbasector;
 
 	lbasector = m_cylinder;
-	lbasector *= info->heads;
+	lbasector *= info.heads;
 	lbasector += head();
-	lbasector *= info->sectors;
+	lbasector *= info.sectors;
 	lbasector += m_sector_number;
 
 	return lbasector;
@@ -535,10 +535,10 @@ void wd1010_device::cmd_read_sector()
 	}
 
 	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
-	hard_disk_info *info = hard_disk_get_info(file);
+	const auto &info = file->get_info();
 
 	// verify that we can read
-	if (head() > info->heads)
+	if (head() > info.heads)
 	{
 		// out of range
 		LOG("--> Head out of range, aborting\n");
@@ -557,7 +557,7 @@ void wd1010_device::cmd_read_sector()
 
 	LOGDATA("--> Transferring sector to buffer (lba = %08x)\n", get_lbasector());
 
-	hard_disk_read(file, get_lbasector(), buffer);
+	file->read(get_lbasector(), buffer);
 
 	for (int i = 0; i < 512; i++)
 		m_out_data_cb(buffer[i]);
@@ -626,7 +626,7 @@ void wd1010_device::cmd_write_sector()
 			buffer[i] = m_in_data_cb();
 	}
 
-	hard_disk_write(file, get_lbasector(), buffer);
+	file->write(get_lbasector(), buffer);
 
 	// save last read head and sector number
 	m_drives[drive()].head = head();

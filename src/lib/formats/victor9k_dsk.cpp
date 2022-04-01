@@ -141,12 +141,12 @@ int victor9k_format::find_size(util::random_read &io, uint32_t form_factor)
 	return -1;
 }
 
-int victor9k_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int victor9k_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor);
 
 	if (type != -1)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
@@ -248,7 +248,7 @@ floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f,
 	return desc;
 }
 
-void victor9k_format::build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, desc_s *sectors, int sector_count) const
+void victor9k_format::build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, desc_s *sectors, int sector_count)
 {
 	for (int i = 0; i < sector_count; i++) {
 		sectors[i].data = sectdata + sect_offs;
@@ -259,7 +259,7 @@ void victor9k_format::build_sector_description(const format &f, uint8_t *sectdat
 	}
 }
 
-bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int const type = find_size(io, form_factor);
 	if(type == -1)
@@ -408,7 +408,7 @@ const int victor9k_format::rpm[9] =
 	252, 267, 283, 300, 321, 342, 368, 401, 417
 };
 
-bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	const format &f = formats[0];
 
@@ -449,4 +449,4 @@ void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc
 	}
 }
 
-const floppy_format_type FLOPPY_VICTOR_9000_FORMAT = &floppy_image_format_creator<victor9k_format>;
+const victor9k_format FLOPPY_VICTOR_9000_FORMAT;

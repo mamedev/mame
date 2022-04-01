@@ -38,15 +38,15 @@ protected:
 private:
 	required_device<hp98032_gpio_slot_device> m_gpio;
 
-	uint16_t m_output;
-	uint16_t m_input;
-	bool m_int_en;
-	bool m_dma_en;
-	bool m_busy;    // U5B
-	bool m_pready;
-	bool m_flag;
-	bool m_auto_ah;
-	bool m_eir;
+	uint16_t m_output = 0;
+	uint16_t m_input = 0;
+	bool m_int_en = false;
+	bool m_dma_en = false;
+	bool m_busy = false;    // U5B
+	bool m_pready = false;
+	bool m_flag = false;
+	bool m_auto_ah = false;
+	bool m_eir = false;
 
 	DECLARE_WRITE_LINE_MEMBER(pflg_w);
 	DECLARE_WRITE_LINE_MEMBER(psts_w);
@@ -181,9 +181,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint16_t m_output;
-	uint8_t m_ext_control;
-	bool m_io;
+	uint16_t m_output = 0;
+	uint8_t m_ext_control = 0;
+	bool m_io = false;
 };
 
 // device type definitions

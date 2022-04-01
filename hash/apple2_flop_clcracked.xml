@@ -30494,6 +30494,7 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Boot"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the weather machine (4am crack) disk 2a (boot).dsk" size="143360" crc="382babb9" sha1="8162acc9ea4244d0ca7dba8385191b6df7fa3de0" />
 			</dataarea>
@@ -39254,6 +39255,7 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot"/>
 			<dataarea name="flop" size="143360">
 				<rom name="scott adams graphic adventure 13 - the sorcerer of claymorgue castle v2.2-122 (4am crack) side b (boot).dsk" size="143360" crc="c09ae2dc" sha1="9ffcdf7f78f394ff57d0bf92fca3beac02714a77"/>
 			</dataarea>
@@ -47026,7 +47028,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Society for Visual Education</publisher>
 		<info name="release" value="2022-01-11"/>
-		<!--"Ripley's Believe It Or Not: Beginning Library Research Skills" is a 1984 educational program developed and distribute by Society for Visual Education. It is preserved here for the first time.&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;Enter TEACHER (password TEACHER) for the administration menu.&lt;/div&gt;-->
+		<!--"Ripley's Believe It Or Not: Beginning Library Research Skills" is a 1984 educational program developed and distribute by Society for Visual Education. It is preserved here for the first time. Enter TEACHER (password TEACHER) for the administration menu.-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -47038,6 +47040,565 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="ripley's beginning library research skills (4am crack) side b.dsk" size="143360" crc="ece690ff" sha1="7eae9eed3ed1bfa0ed1037a9f995aefaeeebc0dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="notespelr">
+		<description>Note Speller (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Note Speller" is a 1984 educational program developed by Lolita Walker Gilkes and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="note speller (4am crack).dsk" size="143360" crc="c8c3a19a" sha1="dbd40352ce2aa2a9b0cb977714504887dcb037c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="permushist">
+		<description>Perspectives in Music History (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Perspectives in Music History" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="perspectives in music history (4am crack).dsk" size="143360" crc="d51b35b2" sha1="0b48300464a387a5bcc9637305f062ee23b5168e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quenbigc">
+		<description>Quentin Visits The Big City (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2022-01-29"/>
+		<!--"Quentin Visits The Big City" is a 1992 educational program developed by Pelican Software and distributed by Queue. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quentin visits the big city (4am crack) disk 1a.dsk" size="143360" crc="5c11de98" sha1="4cb7c2016bf64c90a6b3cfd0040c5c76a23a70ff"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quentin visits the big city (4am crack) disk 1b.dsk" size="143360" crc="61cc85b5" sha1="796b926827d11ea9efdacc2241d31899f897bd4d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quentin visits the big city (4am crack) disk 2a.dsk" size="143360" crc="8233b926" sha1="22bb1fa1f94d9823f04e393acde8be1881091259"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quentin visits the big city (4am crack) disk 2b.dsk" size="143360" crc="dd52214a" sha1="63d6f6e34b41fb532f2f98d40c44be1c0d6c4495"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsrepb02">
+		<description>pfs:report (Version B.02) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-02-03"/>
+		<!--"pfs:report" is a 1982 productivity program developed and distributed by Software Publishing Corporation. This is version B.02. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs report vb.02 (4am crack).dsk" size="143360" crc="90331e8c" sha1="900165dee2d26f5e727cc8609ce94bea5dc8eb71"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ripleyuos">
+		<description>Ripley's Using Other Sources (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-02-03"/>
+		<!--"Ripley's Using Other Sources" is a 1985 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ripley's using other sources (4am crack) side a.dsk" size="143360" crc="c74261f1" sha1="9b6f2978fa29efb6378351fb4bae04c76f6163f1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ripley's using other sources (4am crack) side b.dsk" size="143360" crc="262b468c" sha1="99309281f6a31ff288e4dd90051d06d0ad88f3ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mat1mech">
+		<description>Math #1: The Mechanics of Math Words (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>The Ellen Nelson Learning Library</publisher>
+		<info name="release" value="2022-02-03"/>
+		<!--"Math #1: The Mechanics of Math Words" is a 1986 educational program developed and distributed by The Ellen Nelson Learning Library. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math 1- the mechanics of math words (4am crack).dsk" size="143360" crc="4e21f13c" sha1="3a2cac4fb1c352d5363802615d47c169285c9d71"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readamac20">
+		<description>The Readability Machine (Version 2.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Prentice-Hall</publisher>
+		<info name="release" value="2022-02-03"/>
+		<!--"The Readability Machine" is a 1984 educational program developed by Brian Pasch and distributed by Prentice-Hall. This is version 2.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the readability machine v2.0 (4am crack).dsk" size="143360" crc="b4f3db86" sha1="17f550ffbc58719e678556531fe08d0a9bea4461"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lexpwordp">
+		<description>Let's Explore Word Processing (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2022-02-03"/>
+		<!--"Let's Explore Word Processing" is a 1984 educational program developed and distributed by Milton Bradley. It is preserved here for the first time. Note: due to coding bugs unrelated to the copy protection, this program will crash on anything but an Apple ][+.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="let's explore word processing (4am crack).dsk" size="143360" crc="c00e42b3" sha1="ac9fb79ae9ad1fa143a2268e361b5c64960cb520"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clefnote">
+		<description>Clef Notes (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-13"/>
+		<!--"Clef Notes" is a 1983 educational program developed by David Peters and distribute by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="clef notes (4am crack).dsk" size="143360" crc="4588d8e5" sha1="5d2d8946cc787ac18ba5e39bfe47204caeb870ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elvesshoemkr">
+		<description>The Elves and The Shoemaker (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2022-01-21"/>
+		<!--"The Elves and The Shoemaker" is a 1987 educational program developed and distributed by Troll Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the elves and the shoemaker (4am crack).dsk" size="143360" crc="15115aec" sha1="1558f7b68f7ce388d8545cc8e5120722f3c408e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="12btunes">
+		<description>12-Bar Tunesmith (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-21"/>
+		<!--"12-Bar Tunesmith" is a 1983 educational program developed by Fred Willman and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="12-bar tunesmith (4am crack).dsk" size="143360" crc="fc332203" sha1="859ca82f02ac1d0f61a77285f137adc12595a482"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asbchrds">
+		<description>Aural Skills: Basic Chords (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Aural Skills: Basic Chords" is a 1983 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="aural skills trainer- basic chords (4am crack).dsk" size="143360" crc="21f69bd0" sha1="d412b744c31f1bbb8febc0b8357c0f83bd5989e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fbcollprep">
+		<description>Funbunch College Prep (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2022-02-04"/>
+		<!--"Funbunch College Prep" is a 1983 educational program developed by June S. Stark and Brett W. Sperry, and distributed by Unicorn Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="funbunch college prep (4am and san inc crack).dsk" size="143360" crc="5e8c4ce3" sha1="be4cc0100733c7034f69792fe0115d82457228db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asinterv">
+		<description>Aural Skills: Intervals (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Aural Skills: Intervals" is a 1983 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="aural skills trainer- intervals (4am crack).dsk" size="143360" crc="94deba21" sha1="c7ca6b485c070f807ea7785aa080e10fbf30e42c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="as7thchd">
+		<description>Aural Skills: Seventh Chords (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Aural Skills: Seventh Chords" is a 1983 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="aural skills trainer- seventh chords (4am crack).dsk" size="143360" crc="9b5d891b" sha1="018c073610c14fafdfa467f22dd443b917149e38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earchlng">
+		<description>Ear Challenger: A Music Game (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Ear Challenger: A Music Game" is a 1982 educational program developed by Chris Alix and Stephen L. Walker, and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ear challenger (4am crack).dsk" size="143360" crc="373bcf01" sha1="43ab2c9aa068891aa783fc76a05b0ed2f0450453"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eartrskl">
+		<description>Ear Training Skills (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Ear Training Skills" is a 1985 educational program developed by Penny Pursell and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ear training skills (4am crack).dsk" size="143360" crc="9f6b1e92" sha1="e2aaf6b3c48977619dfb5f6d54f2fd83002024fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="findtune">
+		<description>Find That Tune (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Find That Tune" is a 1985 educational program developed by Penny Pursell and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="find that tune (4am crack).dsk" size="143360" crc="2cd7a442" sha1="edb20db5603062cb063a16709665cfb1b4e95887"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybtutr">
+		<description>Keyboard Tutor (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Keyboard Tutor" is a 1987 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard tutor (4am crack).dsk" size="143360" crc="efad3427" sha1="5d1a92664913d1d8880168c12d6238136d9722a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="listenms">
+		<description>Listen! A Music Skills Program (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Listen! A Music Skills Program" is a 1985 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="listen a music skills program (4am crack).dsk" size="143360" crc="c39fe4c0" sha1="bb816d121e4ebd781fd4f66c041abf240646c95f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musaptml">
+		<description>Music Appreciation: The Musical Language (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Music Appreciation: The Musical Language" is a 1986 educational program developed by Joseph E. Koob and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music appreciation- the musical language (4am crack) side a.dsk" size="143360" crc="3a76c487" sha1="618e9f985c6cfb0cbc930c57227dd5bc45bd537e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music appreciation- the musical language (4am crack) side b.dsk" size="143360" crc="ecec5c44" sha1="46708fcd36bf964e48986507f140d0e8dcdfe327"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musapmush">
+		<description>Music Appreciation: Music History (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Music Appreciation: Music History" is a 1986 educational program developed by Joseph E. Koob and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music appreciation- music history (4am crack) side a.dsk" size="143360" crc="c253a847" sha1="13a908efe8e928872b74c05c092c5e4be6e9fb6b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music appreciation- music history (4am crack) side b.dsk" size="143360" crc="dd5e735b" sha1="29ded79a22705bbf53bffa4487af17377eb63072"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhrcomp">
+		<description>Music History Review: Composers (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-23"/>
+		<!--"Music History Review: Composers" is a 1988 educational program developed by William R. Higgins and Ronald L. Miller, and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="music history review- composers (4am crack).dsk" size="143360" crc="1996a711" sha1="81b8b21f1d5010d294ae7ac9a2bce391a6ee46f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patpitl1">
+		<description>Patterns in Pitch: Level One (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-03-09"/>
+		<!--"Patterns in Pitch: Level One" is a 1986 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in pitch- level one (4am crack).dsk" size="143360" crc="38999691" sha1="0d915d0196a7f702d944b3fcea29d5cf71e6db7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patpitl2">
+		<description>Patterns in Pitch: Level Two (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-03-09"/>
+		<!--"Patterns in Pitch: Level Two" is a 1986 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in pitch- level two (4am crack).dsk" size="143360" crc="b1f90ab6" sha1="0c1147489a0aa3f096e79206b66230db806e3f5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patpitl3">
+		<description>Patterns in Pitch: Level Three (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-03-09"/>
+		<!--"Patterns in Pitch: Level Three" is a 1985 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in pitch- level three (4am crack).dsk" size="143360" crc="d73aea3a" sha1="18a5159a69861938939aaa134b2afdc895bfb24a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patrhyl2">
+		<description>Patterns in Rhythm: Level Two (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-03-09"/>
+		<!--"Patterns in Rhythm: Level Two" is a 1986 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in rhythm- level two (4am crack).dsk" size="143360" crc="45680647" sha1="0c05a7a359411d25c8cbe8c16a08384d625e3243"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacconq">
+		<description>Space Conquerors (Version 1.5) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Softsmith</publisher>
+		<info name="release" value="2022-03-13"/>
+		<!--"Space Conquerors" is a 1981 simulation game developed by Edu-Ware Services and distributed by Softsmith. It is a rebranded version of Edu-Ware's "Empire I: World Builders." This is version 1.5. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space conquerors (4am and san inc crack).dsk" size="143360" crc="12b9360b" sha1="6ec2865f6b99d49b953cfcbdb10bee2fb038c13a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nd1elem">
+		<description>Note Detective I: Elementary Level (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-03-13"/>
+		<!--"Note Detective I: Elementary Level" is a 1989 educational program developed by Reid Alexander and JoEllen DeVilbiss, and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="note detective i- elementary level (4am crack).dsk" size="143360" crc="0bdf95cf" sha1="355a54d958f8f92d80865aeb8ad6f276837b1996"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patrhyl3">
+		<description>Patterns in Rhythm: Level Three (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-03-13"/>
+		<!--"Patterns in Rhythm: Level Three" is a 1984 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in rhythm- level three (4am crack).dsk" size="143360" crc="dad7cec3" sha1="0de0f94c2754d2810b998e3ac6d82e4bc16fa2fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrwgr5">
+		<description>Mindscape's Reading Workshop: Grade 5 (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2022-03-13"/>
+		<!--"Mindscape's Reading Workshop: Grade 5" is a 1986 educational program developed by Reid J. Daitzman, Ph.D. and Andrew G. Singer, and distributed by Mindscape. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mindscape's reading workshop- grade 5 (4am crack) disk 1a.dsk" size="143360" crc="59fdda8b" sha1="29943a2ab78f791c123ece3d6387efdb112f7461"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mindscape's reading workshop- grade 5 (4am crack) disk 1b.dsk" size="143360" crc="370d6a9a" sha1="409f8a27b64497a37fbf23cd36961046211ad992"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mindscape's reading workshop- grade 5 (4am crack) disk 2a.dsk" size="143360" crc="d9a55592" sha1="00b5832285d2af3a7e7eb7fcf5f2516a4ba8e0e7"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mindscape's reading workshop- grade 5 (4am crack) disk 2b.dsk" size="143360" crc="851b98c1" sha1="1d2cf2b83a569b866c33e3f42a5455e08199bc3f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mindscape's reading workshop- grade 5 (4am crack) disk 3a.dsk" size="143360" crc="c7d5d38c" sha1="5deb8c4199d018109bd17df50a539fa07cca609b"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mindscape's reading workshop- grade 5 (4am crack) disk 3b.dsk" size="143360" crc="07bbd763" sha1="eb0b42edd969dd7f78992cb84907fc69af2e49b4"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Toolkit"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mindscape's reading workshop- grade 5 (4am crack) disk 4 - toolkit.dsk" size="143360" crc="8ae6505f" sha1="15f77df74a472db0ae7135859a0afb13f1a18fb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="luckmhat">
+		<description>Lucky's Magic Hat (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Advanced Ideas</publisher>
+		<info name="release" value="2022-03-18"/>
+		<!--"Lucky's Magic Hat" is a 1984 educational program developed by Lee Ann Horton and distributed by Advanced Ideas. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="lucky's magic hat (4am crack) side a.dsk" size="143360" crc="1683a732" sha1="f58e530b45c1ed64ccf0227d25f8c043f4e6107d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="lucky's magic hat (4am crack) side b.dsk" size="143360" crc="3e22196e" sha1="73cf705740fa52d98f6676c573322db787616f34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtflscrd">
+		<description>Music Theory Flash Cards (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-03-02"/>
+		<!--"Music Theory Flash Cards" is a 1984 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. This version is dated 10/2/84. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music theory flash cards (4am crack) disk 1.dsk" size="143360" crc="956664c8" sha1="6d1120f6fcb8da7d871c9b2e17ed84222b1a1d7d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music theory flash cards (4am crack) disk 2.dsk" size="143360" crc="5b251d38" sha1="73915f53108d92eeb2f2c7573808299fc2c6ed6c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music theory flash cards (4am crack) disk 3.dsk" size="143360" crc="a5a757a0" sha1="7bb6b29759431f5ed3ada0cfc079ad50fc8d3919"/>
 			</dataarea>
 		</part>
 	</software>

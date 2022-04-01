@@ -102,7 +102,7 @@ private:
 	u16 m_gfxno;
 
 	tmap038_cb_delegate m_038_cb;
-	tilemap_t* m_tmap;
+	tilemap_t* m_tmap = nullptr;
 
 	int m_xoffs, m_flipped_xoffs;
 	int m_yoffs, m_flipped_yoffs;

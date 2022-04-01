@@ -357,13 +357,13 @@ private:
 	optional_device<ymz280b_device> m_ymz280b;
 
 	// ATAPI
-	cdrom_file *m_available_cdroms;
+	cdrom_file *m_available_cdroms = nullptr;
 
 	// Konami SIO
-	uint16_t    m_sio_data;
+	uint16_t    m_sio_data = 0;
 
-	uint32_t    m_ata_int; // TEST
-	emu_timer *m_atapi_timer;
+	uint32_t    m_ata_int = 0; // TEST
+	emu_timer *m_atapi_timer = nullptr;
 
 	TIMER_CALLBACK_MEMBER( atapi_delay )
 	{
@@ -696,7 +696,7 @@ void konamim2_state::machine_start()
 	m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 	m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 
-	m_available_cdroms = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
+	m_available_cdroms = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom"));
 
 	// TODO: REMOVE
 	m_atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamim2_state::atapi_delay), this));

@@ -6780,7 +6780,7 @@ license:CC0
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2340"/>
 		<info name="release" value="19971205"/>
-		<info name="alt_title" value=""/>
+		<info name="alt_title" value="幕末浪漫 月華の剣士"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -6817,7 +6817,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGH-2340"/>
-		<info name="release" value="19900129"/>
+		<info name="release" value="19980129"/>
 		<info name="alt_title" value="幕末浪漫 月華の剣士"/>
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />

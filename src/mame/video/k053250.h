@@ -46,16 +46,16 @@ protected:
 
 private:
 	// configuration
-	int m_offx, m_offy;
+	int m_offx = 0, m_offy = 0;
 
 	// internal state
 	required_region_ptr<uint8_t> m_rom;
 	std::vector<uint8_t> m_unpacked_rom;
 	std::vector<uint16_t> m_ram;
-	uint16_t *m_buffer[2];
-	uint8_t m_regs[8];
-	uint8_t m_page;
-	int32_t m_frame;
+	uint16_t *m_buffer[2]{};
+	uint8_t m_regs[8]{};
+	uint8_t m_page = 0;
+	int32_t m_frame = 0;
 
 	// internal helpers
 	void unpack_nibbles();

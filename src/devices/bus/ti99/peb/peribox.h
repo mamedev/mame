@@ -191,7 +191,7 @@ protected:
 	device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_config_complete() override;
 
-	peribox_slot_device *m_slot;        // using a link to the slot for callbacks
+	peribox_slot_device *m_slot = nullptr;        // using a link to the slot for callbacks
 	int m_senila;
 	int m_senilb;
 

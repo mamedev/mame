@@ -27,28 +27,28 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	sound_stream *m_stream;
+	sound_stream *m_stream = nullptr;
 
 protected:
 	static constexpr unsigned CHANNELS        = 4;
 
 	struct s_snd_channel {
-		int8_t        playing;    // the sound is playing
+		int8_t        playing = 0;    // the sound is playing
 
 		// state when sound was enabled
-		uint32_t      env_steptime;       // Envelope step time
-		uint8_t       env0;               // Envelope data
-		uint8_t       env1;               // Envelope data
-		uint8_t       volLeft;            // Left output volume
-		uint8_t       volRight;           // Right output volume
-		uint8_t       sample[580];        // sample to play
-		int         sample_len;         // length of sample
+		uint32_t      env_steptime = 0;       // Envelope step time
+		uint8_t       env0 = 0;               // Envelope data
+		uint8_t       env1 = 0;               // Envelope data
+		uint8_t       volLeft = 0;            // Left output volume
+		uint8_t       volRight = 0;           // Right output volume
+		uint8_t       sample[580]{};        // sample to play
+		int         sample_len = 0;         // length of sample
 
 		// values that change, as the sample is played
-		int         offset;             // current offset in sample
-		int         time;               // the duration that this sample is to be played
-		uint8_t       envelope;           // Current envelope level (604)
-		int         env_time;           // The duration between envelope decay/grow (608)
+		int         offset = 0;             // current offset in sample
+		int         time = 0;               // the duration that this sample is to be played
+		uint8_t       envelope = 0;           // Current envelope level (604)
+		int         env_time = 0;           // The duration between envelope decay/grow (608)
 	};
 
 	struct s_regchan {
@@ -80,7 +80,7 @@ protected:
 	uint16_t waveTimer2LenTbl[32];
 	uint16_t waveEnv2LenTbl[8];
 
-	emu_timer *m_timer;
+	emu_timer *m_timer = nullptr;
 
 	uint8_t m_aram[0x600];
 };

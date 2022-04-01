@@ -547,8 +547,8 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	output_finder<2> m_leds;
 
-	uint16_t m_mmpanic_leds;  /* A led for each of the 9 buttons */
-	uint8_t m_funkyfig_lockout;
+	uint16_t m_mmpanic_leds = 0;  /* A led for each of the 9 buttons */
+	uint8_t m_funkyfig_lockout = 0;
 };
 
 class hanakanz_state : public ddenlovr_state
@@ -628,9 +628,9 @@ private:
 
 	output_finder<> m_led;
 
-	uint8_t m_romdata[2];
-	int m_palette_index;
-	uint8_t m_daimyojn_palette_sel;
+	uint8_t m_romdata[2]{};
+	int m_palette_index = 0;
+	uint8_t m_daimyojn_palette_sel = 0;
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)

@@ -124,7 +124,7 @@ private:
 	void palette_data_w(uint8_t data);
 
 	//emu_timer *m_vsync_on_timer;
-	emu_timer *m_500hz_timer;
+	emu_timer *m_500hz_timer = nullptr;
 
 	void kcgd_mem(address_map &map);
 
@@ -134,10 +134,10 @@ private:
 
 	struct
 	{
-		uint16_t status; // 167770
-		uint8_t control; // 167772
-		int palette_index, vram_addr;
-		uint8_t palette[16];
+		uint16_t status = 0; // 167770
+		uint8_t control = 0; // 167772
+		int palette_index = 0, vram_addr = 0;
+		uint8_t palette[16]{};
 	} m_video;
 	std::unique_ptr<uint32_t[]> m_videoram;
 

@@ -33,6 +33,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void ajax(machine_config &config);
+
+private:
 	void sound_bank_w(uint8_t data);
 	uint8_t ls138_f10_r(offs_t offset);
 	void ls138_f10_w(offs_t offset, uint8_t data);
@@ -46,7 +49,6 @@ public:
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	void ajax(machine_config &config);
 	void ajax_main_map(address_map &map);
 	void ajax_sound_map(address_map &map);
 	void ajax_sub_map(address_map &map);

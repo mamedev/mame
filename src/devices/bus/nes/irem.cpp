@@ -174,7 +174,7 @@ void nes_lrog017_device::write_h(offs_t offset, uint8_t data)
 	data = account_bus_conflict(offset, data);
 
 	prg32(data);
-	chr2_0((data >> 4), CHRROM);
+	chr2_0(data >> 4, CHRROM);
 }
 
 /*-------------------------------------------------

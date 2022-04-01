@@ -84,16 +84,16 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	// game specific initialization
-	int m_is_senjyo;
-	int m_scrollhack;
+	int m_is_senjyo = 0;
+	int m_scrollhack = 0;
 
-	uint8_t m_sound_cmd;
-	int m_single_volume;
-	int m_sound_state;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg1_tilemap;
-	tilemap_t *m_bg2_tilemap;
-	tilemap_t *m_bg3_tilemap;
+	uint8_t m_sound_cmd = 0;
+	int m_single_volume = 0;
+	int m_sound_state = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg1_tilemap = nullptr;
+	tilemap_t *m_bg2_tilemap = nullptr;
+	tilemap_t *m_bg3_tilemap = nullptr;
 
 	void flip_screen_w(uint8_t data);
 	void starforb_scrolly2(offs_t offset, uint8_t data);

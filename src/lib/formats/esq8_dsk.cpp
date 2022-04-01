@@ -92,18 +92,18 @@ void esq8img_format::find_size(util::random_read &io, int &track_count, int &hea
 	track_count = head_count = sector_count = 0;
 }
 
-int esq8img_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int esq8img_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
 	if(track_count)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-bool esq8img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool esq8img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -143,7 +143,7 @@ bool esq8img_format::load(util::random_read &io, uint32_t form_factor, const std
 	return true;
 }
 
-bool esq8img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool esq8img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t file_offset = 0;
 	int track_count, head_count, sector_count;
@@ -190,4 +190,4 @@ bool esq8img_format::save(util::random_read_write &io, const std::vector<uint32_
 	return true;
 }
 
-const floppy_format_type FLOPPY_ESQ8IMG_FORMAT = &floppy_image_format_creator<esq8img_format>;
+const esq8img_format FLOPPY_ESQ8IMG_FORMAT;

@@ -43,7 +43,7 @@ private:
 	uint8_t    *m_colorram_0;
 	uint8_t    *m_colorram_1;
 
-	tilemap_t  *m_tilemap[2];
+	tilemap_t  *m_tilemap[2]{};
 	int      m_flipscreen, m_int_enabled;
 	uint8_t    m_regs[8];
 	uint16_t   m_scrollx[2];

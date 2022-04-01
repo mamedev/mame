@@ -34,6 +34,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
+	void bishi(machine_config &config);
+
+private:
 	uint16_t control_r();
 	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -43,7 +46,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
 	K056832_CB_MEMBER(tile_callback);
 
-	void bishi(machine_config &config);
 	void main_map(address_map &map);
 protected:
 	virtual void machine_start() override;
@@ -51,11 +53,11 @@ protected:
 	virtual void video_start() override;
 private:
 	/* misc */
-	uint16_t     m_cur_control;
-	uint16_t     m_cur_control2;
+	uint16_t     m_cur_control = 0U;
+	uint16_t     m_cur_control2 = 0U;
 
 	/* video-related */
-	int        m_layer_colorbase[4];
+	int        m_layer_colorbase[4]{};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

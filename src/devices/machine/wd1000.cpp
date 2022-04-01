@@ -241,35 +241,35 @@ void wd1000_device::end_command()
 int wd1000_device::get_lbasector()
 {
 	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
-	hard_disk_info *info = hard_disk_get_info(file);
+	const auto &info = file->get_info();
 	int lbasector;
 
-	if (m_cylinder > info->cylinders)
+	if (m_cylinder > info.cylinders)
 	{
-		logerror("%s: Unexpected cylinder %d for range 0 to %d\n", machine().describe_context(), m_cylinder, info->cylinders - 1);
+		logerror("%s: Unexpected cylinder %d for range 0 to %d\n", machine().describe_context(), m_cylinder, info.cylinders - 1);
 	}
 
-	if (head() >= info->heads)
+	if (head() >= info.heads)
 	{
-		logerror("%s: Unexpected head %d for range 0 to %d\n", machine().describe_context(), head(), info->heads - 1);
+		logerror("%s: Unexpected head %d for range 0 to %d\n", machine().describe_context(), head(), info.heads - 1);
 	}
 
 	int16_t sector = m_sector_number - m_sector_base;
 
-	if (sector < 0 || sector >= info->sectors)
+	if (sector < 0 || sector >= info.sectors)
 	{
-		logerror("%s: Unexpected sector number %d for range %d to %d\n", machine().describe_context(), m_sector_number, m_sector_base, info->sectors + m_sector_base);
+		logerror("%s: Unexpected sector number %d for range %d to %d\n", machine().describe_context(), m_sector_number, m_sector_base, info.sectors + m_sector_base);
 	}
 
-	if (sector_bytes() != info->sectorbytes)
+	if (sector_bytes() != info.sectorbytes)
 	{
-		logerror("%s: Unexpected sector bytes %d, expected %d\n", machine().describe_context(), sector_bytes(), info->sectorbytes);
+		logerror("%s: Unexpected sector bytes %d, expected %d\n", machine().describe_context(), sector_bytes(), info.sectorbytes);
 	}
 
 	lbasector = m_cylinder;
-	lbasector *= info->heads;
+	lbasector *= info.heads;
 	lbasector += head();
-	lbasector *= info->sectors;
+	lbasector *= info.sectors;
 	lbasector += sector;
 
 	return lbasector;
@@ -578,7 +578,7 @@ void wd1000_device::cmd_read_sector()
 	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
 	uint8_t dma = BIT(m_command, 3);
 
-	hard_disk_read(file, get_lbasector(), m_buffer);
+	file->read(get_lbasector(), m_buffer);
 
 	m_buffer_index = 0;
 	m_buffer_end = 512;
@@ -603,7 +603,7 @@ void wd1000_device::cmd_write_sector()
 		logerror("%s: Unexpected unfilled buffer on write, only %d or %d bytes filled\n", machine().describe_context(), m_buffer_index, sector_bytes());
 	}
 
-	hard_disk_write(file, get_lbasector(), m_buffer);
+	file->write(get_lbasector(), m_buffer);
 
 	end_command();
 }
@@ -619,7 +619,7 @@ void wd1000_device::cmd_format_sector()
 	for (int i = 0; i < m_sector_count; i++)
 	{
 		std::fill(std::begin(buffer), std::end(buffer), 0);
-		hard_disk_write(file, get_lbasector(), buffer);
+		file->write(get_lbasector(), buffer);
 	}
 
 	m_sector_count = 0;

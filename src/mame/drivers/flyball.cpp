@@ -104,20 +104,20 @@ private:
 	output_finder<> m_lamp;
 
 	/* video-related */
-	tilemap_t  *m_tmap;
-	uint8_t    m_pitcher_vert;
-	uint8_t    m_pitcher_horz;
-	uint8_t    m_pitcher_pic;
-	uint8_t    m_ball_vert;
-	uint8_t    m_ball_horz;
+	tilemap_t  *m_tmap = nullptr;
+	uint8_t    m_pitcher_vert = 0;
+	uint8_t    m_pitcher_horz = 0;
+	uint8_t    m_pitcher_pic = 0;
+	uint8_t    m_ball_vert = 0;
+	uint8_t    m_ball_horz = 0;
 
 	/* misc */
-	uint8_t    m_potmask;
-	uint8_t    m_potsense;
+	uint8_t    m_potmask = 0;
+	uint8_t    m_potsense = 0;
 
-	emu_timer *m_pot_assert_timer[64];
-	emu_timer *m_pot_clear_timer;
-	emu_timer *m_quarter_timer;
+	emu_timer *m_pot_assert_timer[64]{};
+	emu_timer *m_pot_clear_timer = nullptr;
+	emu_timer *m_quarter_timer = nullptr;
 };
 
 

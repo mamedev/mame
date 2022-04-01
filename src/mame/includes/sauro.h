@@ -50,11 +50,11 @@ private:
 	optional_shared_ptr<uint8_t> m_videoram2;
 	optional_shared_ptr<uint8_t> m_colorram2;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_palette_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_palette_bank = 0;
 
-	bool m_irq_enable;
+	bool m_irq_enable = 0;
 
 	virtual void machine_start() override;
 

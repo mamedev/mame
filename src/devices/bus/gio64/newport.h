@@ -56,14 +56,14 @@ private:
 	// Initializers
 	void set_revision(uint32_t revision) { m_revision = revision; }
 
-	uint32_t m_config;
-	uint32_t m_revision;
-	uint32_t m_fifo_available;
-	//uint32_t m_entries;
-	uint32_t m_cursor_cmap;
-	uint32_t m_popup_cmap;
-	uint32_t m_mode_table_idx;
-	uint32_t m_mode_table[0x20];
+	uint32_t m_config = 0;
+	uint32_t m_revision = 0;
+	uint32_t m_fifo_available = 0;
+	//uint32_t m_entries = 0;
+	uint32_t m_cursor_cmap = 0;
+	uint32_t m_popup_cmap = 0;
+	uint32_t m_mode_table_idx = 0;
+	uint32_t m_mode_table[0x20]{};
 };
 
 DECLARE_DEVICE_TYPE(XMAP9, xmap9_device)
@@ -107,10 +107,10 @@ private:
 	// Initializers
 	void set_revision(uint32_t revision) { m_revision = revision; }
 
-	uint32_t m_status;
-	uint32_t m_revision;
-	uint16_t m_palette_idx;
-	uint32_t m_palette[0x10000];
+	uint32_t m_status = 0;
+	uint32_t m_revision = 0;
+	uint16_t m_palette_idx = 0;
+	uint32_t m_palette[0x10000]{};
 };
 
 DECLARE_DEVICE_TYPE(CMAP, cmap_device)
@@ -255,21 +255,21 @@ private:
 
 	void set_global_mask(uint32_t global_mask) { m_global_mask = global_mask; }
 
-	uint32_t  m_global_mask;
-	uint32_t  m_write_mask;
-	bool      m_blend;
-	bool      m_fast_clear;
-	bool      m_rgbmode;
-	bool      m_dblsrc;
-	uint8_t   m_plane_enable;
-	uint8_t   m_draw_depth;
-	uint32_t  m_draw_bpp;
-	uint8_t   m_logicop;
-	uint8_t   m_src_shift;
-	uint8_t   m_dst_shift;
+	uint32_t  m_global_mask = 0;
+	uint32_t  m_write_mask = 0;
+	bool      m_blend = false;
+	bool      m_fast_clear = false;
+	bool      m_rgbmode = false;
+	bool      m_dblsrc = false;
+	uint8_t   m_plane_enable = 0;
+	uint8_t   m_draw_depth = 0;
+	uint32_t  m_draw_bpp = 0;
+	uint8_t   m_logicop = 0;
+	uint8_t   m_src_shift = 0;
+	uint8_t   m_dst_shift = 0;
 
-	uint32_t *m_dest_buf;
-	uint32_t *m_buf_ptr;
+	uint32_t *m_dest_buf = nullptr;
+	uint32_t *m_buf_ptr = nullptr;
 
 	std::unique_ptr<uint32_t[]> m_rgbci;
 	std::unique_ptr<uint32_t[]> m_cidaux;

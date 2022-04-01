@@ -38,7 +38,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	int     m_gfx_bank;
+	int     m_gfx_bank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

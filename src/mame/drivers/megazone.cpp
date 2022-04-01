@@ -239,11 +239,11 @@ private:
 
 	// video-related
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
-	bool m_flipscreen;
+	bool m_flipscreen = 0;
 
 	// misc
-	uint8_t m_i8039_status;
-	bool m_irq_mask;
+	uint8_t m_i8039_status = 0;
+	bool m_irq_mask = false;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

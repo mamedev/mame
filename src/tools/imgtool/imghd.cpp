@@ -120,7 +120,7 @@ imgtoolerr_t imghd_open(imgtool::stream &stream, struct mess_hard_disk_file *har
 		goto done;
 	}
 
-	hard_disk->hard_disk = hard_disk_open(&hard_disk->chd);
+	hard_disk->hard_disk = new hard_disk_file(&hard_disk->chd);
 	if (!hard_disk->hard_disk)
 	{
 		err = IMGTOOLERR_UNEXPECTED;
@@ -145,7 +145,7 @@ void imghd_close(struct mess_hard_disk_file *disk)
 {
 	if (disk->hard_disk)
 	{
-		hard_disk_close(disk->hard_disk);
+		delete disk->hard_disk;
 		disk->hard_disk = nullptr;
 	}
 	if (disk->stream)
@@ -164,7 +164,7 @@ void imghd_close(struct mess_hard_disk_file *disk)
 */
 imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, uint32_t lbasector, void *buffer)
 {
-	uint32_t reply = hard_disk_read(disk->hard_disk, lbasector, buffer);
+	uint32_t reply = disk->hard_disk->read(lbasector, buffer);
 	return reply ? IMGTOOLERR_SUCCESS : IMGTOOLERR_READERROR;
 }
 
@@ -177,7 +177,7 @@ imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, uint32_t lbasector, vo
 */
 imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, uint32_t lbasector, const void *buffer)
 {
-	uint32_t reply = hard_disk_write(disk->hard_disk, lbasector, buffer);
+	uint32_t reply = disk->hard_disk->write(lbasector, buffer);
 	return reply ? IMGTOOLERR_SUCCESS : IMGTOOLERR_WRITEERROR;
 }
 
@@ -188,11 +188,9 @@ imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, uint32_t lbasector, c
 
     Return pointer to the header of MAME HD image
 */
-const hard_disk_info *imghd_get_header(struct mess_hard_disk_file *disk)
+const hard_disk_file::info &imghd_get_header(struct mess_hard_disk_file *disk)
 {
-	const hard_disk_info *reply;
-	reply = hard_disk_get_info(disk->hard_disk);
-	return reply;
+	return disk->hard_disk->get_info();
 }
 
 

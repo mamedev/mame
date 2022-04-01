@@ -72,5 +72,5 @@ const kaypro2x_format::format kaypro2x_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_KAYPROII_FORMAT = &floppy_image_format_creator<kayproii_format>;
-const floppy_format_type FLOPPY_KAYPRO2X_FORMAT = &floppy_image_format_creator<kaypro2x_format>;
+const kayproii_format FLOPPY_KAYPROII_FORMAT;
+const kaypro2x_format FLOPPY_KAYPRO2X_FORMAT;
