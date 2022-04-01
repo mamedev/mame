@@ -314,7 +314,7 @@ public:
 	// PRG
 	inline int prg_8k_bank_num(int bank);
 	inline void update_prg_banks(int prg_bank_start, int prg_bank_end);
-	memory_bank *m_prg_bank_mem[4];
+	memory_bank *m_prg_bank_mem[4]{};
 	int m_prg_bank[4];
 	uint32_t m_prg_chunks;
 	uint32_t m_prg_mask;
@@ -337,7 +337,7 @@ public:
 	//because some of these change multiple times per scanline!
 	int m_chr_src[8]; //defines source of base pointer
 	int m_chr_orig[8]; //defines offset of 0x400 byte segment at base pointer
-	uint8_t *m_chr_access[8];  //source translated + origin -> valid pointer!
+	uint8_t *m_chr_access[8]{};  //source translated + origin -> valid pointer!
 
 	uint32_t m_vrom_chunks;
 	uint32_t m_vram_chunks;
@@ -371,7 +371,7 @@ public:
 	int m_nt_src[4];
 	int m_nt_orig[4];
 	int m_nt_writable[4];
-	uint8_t *m_nt_access[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
+	uint8_t *m_nt_access[4]{};  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
 	void set_nt_page(int page, int source, int bank, int writable);
 	void set_nt_mirroring(int mirroring);

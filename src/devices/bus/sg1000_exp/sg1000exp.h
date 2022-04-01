@@ -72,7 +72,7 @@ public:
 protected:
 	device_sg1000_expansion_slot_interface(const machine_config &mconfig, device_t &device);
 
-	sg1000_expansion_slot_device *m_port;
+	sg1000_expansion_slot_device *m_port = nullptr;
 };
 
 

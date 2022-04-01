@@ -51,7 +51,7 @@ protected:
 private:
 	required_device<tanbus_device> m_tanbus;
 
-	int m_bus_num;
+	int m_bus_num = 0;
 };
 
 // device type definition

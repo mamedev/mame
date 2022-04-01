@@ -87,7 +87,7 @@ private:
 	bool    m_inDsrArea;
 
 	// When true the CPU is halted while DRQ/IRQ are true.
-	bool    m_WAITena;
+	bool    m_WAITena = false;
 
 	// WD chip selected
 	bool    m_WDsel;
@@ -105,7 +105,7 @@ private:
 	uint8_t*  m_dsrrom;
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy[3];
+	floppy_image_device*    m_floppy[3]{};
 
 	// Currently selected floppy drive
 	int  m_sel_floppy;

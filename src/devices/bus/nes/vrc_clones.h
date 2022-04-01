@@ -148,7 +148,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	u8 m_reg;
+	u8 m_reg = 0;
 };
 
 
@@ -203,7 +203,7 @@ protected:
 
 private:
 	u16 m_irq_count;
-	u8 m_irq_latch;
+	u8 m_irq_latch = 0;
 	int m_irq_enable;
 
 	static const device_timer_id TIMER_IRQ = 0;
@@ -230,7 +230,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	u8 m_chr_mask, m_chr_match;
+	u8 m_chr_mask = 0, m_chr_match;
 };
 
 // ======================> nes_hengg_shjy3_device

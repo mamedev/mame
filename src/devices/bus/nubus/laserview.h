@@ -40,8 +40,8 @@ private:
 
 	std::vector<uint8_t> m_vram;
 	uint32_t m_vbl_disable, m_palette[2];
-	int m_prot_state;
-	int m_toggle;
+	int m_prot_state = 0;
+	int m_toggle = 0;
 };
 
 // device type definition

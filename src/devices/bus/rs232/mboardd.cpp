@@ -57,8 +57,8 @@ private:
 	void c000_w(u8 data) { m_c000_latch = data; };
 
 	void m6803_mem(address_map &map);
-	int m_rx_state;
-	u8 m_c000_latch;
+	int m_rx_state = 0;
+	u8 m_c000_latch = 0;
 };
 
 mockingboard_d_device::mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

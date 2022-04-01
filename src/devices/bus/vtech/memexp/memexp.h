@@ -89,7 +89,7 @@ private:
 	devcb_write_line m_nmi_handler;
 	devcb_write_line m_reset_handler;
 
-	device_vtech_memexp_interface *m_module;
+	device_vtech_memexp_interface *m_module = nullptr;
 };
 
 // class representing interface-specific live memexp device

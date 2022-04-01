@@ -46,8 +46,8 @@ private:
 	required_ioport_array<16> m_matrix;
 	output_finder<3> m_leds;
 
-	u8 m_porta;
-	u8 m_portc;
+	u8 m_porta = 0;
+	u8 m_portc = 0;
 };
 
 // device type definition

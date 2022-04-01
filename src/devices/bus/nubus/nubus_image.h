@@ -37,13 +37,13 @@ protected:
 
 	struct nbfilectx
 	{
-		uint32_t curcmd;
-		char filename[128];
+		uint32_t curcmd = 0;
+		char filename[128]{};
 		std::string curdir;
 		osd::directory::ptr dirp;
 		osd_file::ptr fd;
-		uint64_t filelen;
-		uint32_t bytecount;
+		uint64_t filelen = 0;
+		uint32_t bytecount = 0;
 	};
 
 	nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -49,10 +49,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	uint8_t bim_irq_state;
-	int bim_irq_level;
+	uint8_t bim_irq_state = 0;
+	int bim_irq_level = 0;
 
-	emu_timer *m_arbiter_start; // Need a startup delay because it is hooked up to the sense inputs of the PIT
+	emu_timer *m_arbiter_start = nullptr; // Need a startup delay because it is hooked up to the sense inputs of the PIT
 
 	required_device<cpu_device> m_maincpu;
 
@@ -78,7 +78,7 @@ private:
 	required_device<mpcc68561_device> m_mpcc3;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint32_t    *m_sysrom;
+	uint32_t    *m_sysrom = nullptr;
 	uint32_t    m_sysram[2];
 	void        update_irq_to_maincpu();
 	const fc_board_t  m_board_id;
