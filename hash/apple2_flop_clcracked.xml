@@ -47729,4 +47729,95 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="volcanoes">
+		<description>Volcanoes (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Earthware Computer Services</publisher>
+		<info name="release" value="2022-04-01"/>
+		<!--"Volcanoes" is a 1981 educational program developed by G.G. and D.J. Goles, and distributed by Earthware Computer Services. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="volcanoes (4am crack) side a.dsk" size="143360" crc="019098e4" sha1="31541553c492708c1845b491b44ce6771edbf3e9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="volcanoes (4am crack) side b.dsk" size="143360" crc="178e5244" sha1="5693ec45dbb4138eff6e7791098444cdb4e42249"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="measecon">
+		<description>Measuring Economic Activity (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2022-04-01"/>
+		<!--"Measuring Economic Activity" is a 1985 educational program developed by Mark D. Rothman, Ph.D., and distributed by Focus Media. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="measuring economic activity (4am crack).dsk" size="143360" crc="7d7b5cd8" sha1="b33a3bdfbb733d03af008bc48eff76cabfe543b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmmelody">
+		<description>Media Magic: The Melody Studio (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Pelican Software</publisher>
+		<info name="release" value="2022-04-01"/>
+		<!--"Media Magic: The Melody Studio" is a 1990 sound program developed and distributed by Pelican Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="media magic- the melody studio (4am crack) disk 1 - program.dsk" size="143360" crc="909e334b" sha1="76a278e2b2d7dce81796969bde3a0906db2ebbb6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Songs disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="media magic- the melody studio (4am crack) disk 2 - songs.dsk" size="143360" crc="ae5f5c4c" sha1="ead8d10b5f65611b6029c81a6efcb6929903dcec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timexplo">
+		<description>Time Explorers (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2022-04-01"/>
+		<!--"Time Explorers" is a 1991 educational game developed by Terri Poteet and Byron Smith, and distributed by Gamco Industries. This is version 4.1.7. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="time explorers (4am crack) side a.dsk" size="143360" crc="88da583d" sha1="95253d72877761a230164f495b863e9eb8029587"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="time explorers (4am crack) side b.dsk" size="143360" crc="1e39db7f" sha1="8a4c9a582916ac1e759cc18fe0bb9695402ce193"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ot3kgerm">
+		<description>On Target: 3000 Words of German (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Langenscheidt Languageware</publisher>
+		<info name="release" value="2022-04-01"/>
+		<!--"On Target: 3000 Words of German" is a 1984 educational game developed by John W. Hall and distributed by Langenscheidt Languageware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="on target- 3000 words of german (4am crack).dsk" size="143360" crc="4559e449" sha1="2ad31ee57922e91de3f6e16f4600a842afc80419"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

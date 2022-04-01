@@ -21781,7 +21781,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lsmith60A">
+	<software name="lsmith60a">
 		<description>Locksmith (Version 6.0 Revision A) </description>
 		<year>1986</year>
 		<publisher>Alpha Logic Business Systems</publisher>
@@ -22335,6 +22335,61 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234779">
 				<rom name="copy ii plus v8.3.woz" size="234779" crc="b548da95" sha1="fe50cee6796abdf0f336904c9c4c0b4d72c39d65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kraking">
+		<description>Kraking by The Disk Jockey</description>
+		<year>1984</year>
+		<publisher>Pirate's Harbor</publisher>
+		<info name="release" value="2022-03-31"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Kraking by The Disk Jockey" is a 1984 educational program developed by The Disk Jockey and distributed by Pirate's Harbor. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234784">
+				<rom name="kraking by the disk jockey side a.woz" size="234784" crc="b4fac6c2" sha1="6323cfc61ae5f0cab30f7e82a75637c02acbb5e2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234784">
+				<rom name="kraking by the disk jockey side b.woz" size="234784" crc="a1fb6333" sha1="c3fa8345fa2f7b073899b1fb1c3911511fd80768"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="handmath135">
+		<description>Hands-On Math! Volume I (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Ventura Educational Systems</publisher>
+		<info name="release" value="2022-03-31"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"Hands-On Math! Volume I" is a 1988 educational program developed and distributed by Ventura Educational Systems. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296178">
+				<rom name="hands-on math volume 1 800k.woz" size="1296178" crc="100c9d29" sha1="7d73389edc6dc343c6ade6b6f9774780e8b4cc31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scpearth">
+		<description>Science Corner: Planet Earth (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-03-31"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"Science Corner: Planet Earth" is a 1989 educational program developed by Learningways, Inc. and distributed by Society for Visual Education. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296201">
+				<rom name="science corner- planet earth 800k.woz" size="1296201" crc="39eed016" sha1="9385d2f29b831d4c1b04442d3a3d7a63b671e723"/>
 			</dataarea>
 		</part>
 	</software>
