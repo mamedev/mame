@@ -1609,6 +1609,12 @@ void lua_engine::initialize()
 	floppy_image_format_type["extensions"] = sol::property(&floppy_image_format_t::extensions);
 	floppy_image_format_type["supports_save"] = sol::property(&floppy_image_format_t::supports_save);
 
+	/*  FS meta_data
+	 *
+	 * emu.fs_meta_data()
+	 */
+	auto fs_meta_data = emu.new_usertype<fs::meta_data>("fs_meta_data", sol::call_constructor, sol::constructors<sol::types<>>());
+
 	auto floppy_fs_type = sol().registry().new_usertype<floppy_image_device::fs_info>("floppy_fs_info", sol::no_constructor);
 	floppy_fs_type["name"] = sol::property(&floppy_image_device::fs_info::name);
 	floppy_fs_type["description"] = sol::property(&floppy_image_device::fs_info::description);
@@ -1666,6 +1672,8 @@ void lua_engine::initialize()
 				return "FF_UNKNOWN";
 			}
 		};
+	floppy_type["finish_load"] = &floppy_image_device::finish_load;	// in src/frontends/mame/ui/floppycntrl.cpp, this function was described as a hack
+	floppy_type["init_fs"] = &floppy_image_device::init_fs;
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);
 	image_type["load"] = &device_image_interface::load;
