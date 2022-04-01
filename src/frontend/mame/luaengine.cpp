@@ -1629,7 +1629,7 @@ void lua_engine::initialize()
 		{
 			int index = 1;
 			sol::table ret = sol().create_table();
-			for (floppy_image_format_t *format : floppy.get_formats())
+			for (const floppy_image_format_t *format : floppy.get_formats())
 				ret[index++] = format;
 			return ret;
 		});
