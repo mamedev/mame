@@ -17,6 +17,7 @@
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -34,9 +35,7 @@ public:
 		m_bg_data(*this, "bg_data"),
 		m_fg_data(*this, "fg_data"),
 		m_tx_data(*this, "tx_data"),
-		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
-		m_buffered_spriteram(*this, "buffered_spriteram", 0x800, ENDIANNESS_BIG),
 		m_soundbank(*this, "soundbank"),
 		m_in(*this, "IN%u", 1U),
 		m_dsw(*this, "DSW%u", 1U),
@@ -44,7 +43,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_buffered_spriteram(*this, "buffered_spriteram")
 	{ }
 
 	void goal92(machine_config &config);
@@ -59,9 +59,7 @@ private:
 	required_shared_ptr<uint16_t> m_bg_data;
 	required_shared_ptr<uint16_t> m_fg_data;
 	required_shared_ptr<uint16_t> m_tx_data;
-	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_scrollram;
-	memory_share_creator<uint16_t> m_buffered_spriteram;
 	required_memory_bank m_soundbank;
 
 	// video-related
@@ -82,6 +80,7 @@ private:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<buffered_spriteram16_device> m_buffered_spriteram;
 
 	uint16_t inputs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void adpcm_data_w(uint8_t data);
@@ -95,7 +94,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
@@ -185,11 +183,13 @@ TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
 
 void goal92_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
+	uint16_t *buffered_spriteram = m_buffered_spriteram->buffer();
+
 	for (int offs = 3; offs <= 0x400 - 5; offs += 4)
 	{
-		uint16_t data = m_buffered_spriteram[offs + 2];
+		uint16_t data = buffered_spriteram[offs + 2];
 
-		int y = m_buffered_spriteram[offs + 0];
+		int y = buffered_spriteram[offs + 0];
 
 		if (y & 0x8000)
 			break;
@@ -197,12 +197,12 @@ void goal92_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (!(data & 0x8000))
 			continue;
 
-		int sprite = m_buffered_spriteram[offs + 1];
+		int sprite = buffered_spriteram[offs + 1];
 
 		if ((sprite >> 14) != pri)
 			continue;
 
-		int x = m_buffered_spriteram[offs + 3];
+		int x = buffered_spriteram[offs + 3];
 
 		sprite &= 0x1fff;
 
@@ -270,13 +270,6 @@ uint32_t goal92_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-WRITE_LINE_MEMBER(goal92_state::screen_vblank)
-{
-	// rising edge
-	if (state)
-		memcpy(m_buffered_spriteram, m_spriteram, 0x400 * 2);
-}
-
 
 // machine
 
@@ -312,7 +305,7 @@ void goal92_state::main_map(address_map &map)
 	map(0x102000, 0x102fff).ram().w(FUNC(goal92_state::text_w)).share(m_tx_data);
 	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x104000, 0x13ffff).ram();
-	map(0x140000, 0x1407ff).ram().share(m_spriteram);
+	map(0x140000, 0x1407ff).ram().share("buffered_spriteram");
 	map(0x140800, 0x140801).nopw();
 	map(0x140802, 0x140803).nopw();
 	map(0x180000, 0x18000f).r(FUNC(goal92_state::inputs_r));
@@ -531,13 +524,15 @@ void goal92_state::goal92(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &goal92_state::sound_map);  // IRQs are triggered by the main CPU
 
 	// video hardware
+	BUFFERED_SPRITERAM16(config, m_buffered_spriteram);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1); // black border at bottom is a game bug...
 	screen.set_screen_update(FUNC(goal92_state::screen_update));
-	screen.screen_vblank().set(FUNC(goal92_state::screen_vblank));
+	screen.screen_vblank().set(m_buffered_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goal92);
