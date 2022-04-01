@@ -13,7 +13,7 @@
 #pragma once
 
 #include "chd.h"
-#include "corefile.h"
+#include "ioprocs.h"
 #include "osdcore.h"
 
 class cdrom_file {
@@ -116,7 +116,7 @@ public:
 
 
 	cdrom_file(chd_file *chd);
-	cdrom_file(const char *inputfile);
+	cdrom_file(std::string_view inputfile);
 	~cdrom_file();
 
 
@@ -131,13 +131,13 @@ public:
 	chd_file *get_chd() const { return chd; }
 
 	/* TOC utilities */
-	static std::error_condition parse_nero(const char *tocfname, toc &outtoc, track_input_info &outinfo);
-	static std::error_condition parse_iso(const char *tocfname, toc &outtoc, track_input_info &outinfo);
-	static std::error_condition parse_gdi(const char *tocfname, toc &outtoc, track_input_info &outinfo);
-	static std::error_condition parse_cue(const char *tocfname, toc &outtoc, track_input_info &outinfo);
-	static bool is_gdicue(const char *tocfname);
-	static std::error_condition parse_gdicue(const char *tocfname, toc &outtoc, track_input_info &outinfo);
-	static std::error_condition parse_toc(const char *tocfname, toc &outtoc, track_input_info &outinfo);
+	static std::error_condition parse_nero(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
+	static std::error_condition parse_iso(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
+	static std::error_condition parse_gdi(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
+	static std::error_condition parse_cue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
+	static bool is_gdicue(std::string_view tocfname);
+	static std::error_condition parse_gdicue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
+	static std::error_condition parse_toc(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	int get_last_track() const { return cdtoc.numtrks; }
 	int get_adr_control(int track) const { return track == 0xaa || cdtoc.tracks[track].trktype == CD_TRACK_AUDIO ? 0x10 : 0x14; }
 	int get_track_type(int track) const { return cdtoc.tracks[track].trktype; }
@@ -242,7 +242,7 @@ private:
 	/** @brief  Information describing the track. */
 	track_input_info     cdtrack_info;       /* track info */
 	/** @brief  The fhandle[ CD maximum tracks]. */
-	util::core_file::ptr fhandle[MAX_TRACKS];/* file handle */
+	util::random_read::ptr fhandle[MAX_TRACKS];/* file handle */
 
 	inline uint32_t physical_to_chd_lba(uint32_t physlba, uint32_t &tracknum) const;
 	inline uint32_t logical_to_chd_lba(uint32_t physlba, uint32_t &tracknum) const;
@@ -253,10 +253,10 @@ private:
 	std::error_condition read_partial_sector(void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length, bool phys=false);
 
 	static std::string get_file_path(std::string &path);
-	static uint64_t get_file_size(const char *filename);
+	static uint64_t get_file_size(std::string_view filename);
 	static int tokenize( const char *linebuffer, int i, int linebuffersize, char *token, int tokensize );
 	static int msf_to_frames( char *token );
-	static uint32_t parse_wav_sample(const char *filename, uint32_t *dataoffs);
+	static uint32_t parse_wav_sample(std::string_view filename, uint32_t *dataoffs);
 	static uint16_t read_uint16(FILE *infile);
 	static uint32_t read_uint32(FILE *infile);
 	static uint64_t read_uint64(FILE *infile);

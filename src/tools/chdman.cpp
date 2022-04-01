@@ -1987,7 +1987,7 @@ static void do_create_cd(parameters_map &params)
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		std::error_condition err = cdrom_file::parse_toc(input_file_str->second->c_str(), toc, track_info);
+		std::error_condition err = cdrom_file::parse_toc(*input_file_str->second, toc, track_info);
 		if (err)
 			report_error(1, "Error parsing input file (%s: %s)\n", *input_file_str->second, err.message());
 	}
