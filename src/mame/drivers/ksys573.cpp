@@ -1107,8 +1107,8 @@ void ksys573_state::driver_start()
 	m_atapi_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( ksys573_state::atapi_xfer_end ),this ) );
 	m_atapi_timer->adjust( attotime::never );
 
-	m_available_cdroms[ 0 ] = cdrom_open(machine().rom_load().get_disk_handle(":cdrom0"));
-	m_available_cdroms[ 1 ] = cdrom_open(machine().rom_load().get_disk_handle(":cdrom1"));
+	m_available_cdroms[ 0 ] = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom0"));
+	m_available_cdroms[ 1 ] = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom1"));
 
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );

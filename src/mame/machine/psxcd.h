@@ -103,8 +103,8 @@ private:
 
 	uint8_t bcd_to_decimal(const uint8_t bcd) { return ((bcd>>4)*10)+(bcd&0xf); }
 	uint8_t decimal_to_bcd(const uint8_t dec) { return ((dec/10)<<4)|(dec%10); }
-	uint32_t msf_to_lba_ps(uint32_t msf) { msf = msf_to_lba(msf); return (msf>150)?(msf-150):msf; }
-	uint32_t lba_to_msf_ps(uint32_t lba) { return lba_to_msf_alt(lba+150); }
+	uint32_t msf_to_lba_ps(uint32_t msf) { msf = cdrom_file::msf_to_lba(msf); return (msf>150)?(msf-150):msf; }
+	uint32_t lba_to_msf_ps(uint32_t lba) { return cdrom_file::lba_to_msf_alt(lba+150); }
 
 	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;   //480;  //8000; //2000<<2;
 	static const unsigned int raw_sector_size=2352;

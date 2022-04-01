@@ -261,10 +261,10 @@ void pce_cd_device::late_setup()
 	m_cd_file = m_cdrom->get_cdrom_file();
 	if (m_cd_file)
 	{
-		m_toc = cdrom_get_toc(m_cd_file);
+		m_toc = &m_cd_file->get_toc();
 		m_cdda->set_cdrom(m_cd_file);
-		m_last_frame = cdrom_get_track_start(m_cd_file, cdrom_get_last_track(m_cd_file) - 1);
-		m_last_frame += m_toc->tracks[cdrom_get_last_track(m_cd_file) - 1].frames;
+		m_last_frame = m_cd_file->get_track_start(m_cd_file->get_last_track() - 1);
+		m_last_frame += m_toc->tracks[m_cd_file->get_last_track() - 1].frames;
 		m_end_frame = m_last_frame;
 	}
 
@@ -466,7 +466,7 @@ void pce_cd_device::nec_set_audio_start_position()
 			frame = f + 75 * (s + m * 60);
 			// PCE tries to be clever here and set (start of track + track pregap size) to skip the pregap
 			// (I guess it wants the TOC to have the real start sector for data tracks and the start of the pregap for audio?)
-			frame -= m_toc->tracks[cdrom_get_track(m_cd_file, frame)].pregap;
+			frame -= m_toc->tracks[m_cd_file->get_track(frame)].pregap;
 			break;
 		}
 		case 0x80:
@@ -503,7 +503,7 @@ void pce_cd_device::nec_set_audio_start_position()
 		else
 		{
 			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			m_end_frame = m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) ].logframeofs + m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) ].logframes; //get the end of THIS track
+			m_end_frame = m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframeofs + m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes; //get the end of THIS track
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_end_mark = 0;
 			m_cdda_play_mode = 3;
@@ -637,11 +637,11 @@ void pce_cd_device::nec_get_subq()
 			break;
 	}
 
-	msf_abs = lba_to_msf_alt(frame);
-	track = cdrom_get_track(m_cd_file, frame);
-	msf_rel = lba_to_msf_alt(frame - cdrom_get_track_start(m_cd_file, track));
+	msf_abs = cdrom_file::lba_to_msf_alt(frame);
+	track = m_cd_file->get_track(frame);
+	msf_rel = cdrom_file::lba_to_msf_alt(frame - m_cd_file->get_track_start(track));
 
-	m_data_buffer[1] = 0x01 | ((cdrom_get_track_type(m_cd_file, cdrom_get_track(m_cd_file, track+1)) == CD_TRACK_AUDIO) ? 0x00 : 0x40);
+	m_data_buffer[1] = 0x01 | ((m_cd_file->get_track_type(m_cd_file->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
 	m_data_buffer[2] = dec_2_bcd(track+1);       /* track */
 	m_data_buffer[3] = 1;                          /* index */
 	m_data_buffer[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);/* M (relative) */
@@ -662,7 +662,6 @@ void pce_cd_device::nec_get_subq()
 void pce_cd_device::nec_get_dir_info()
 {
 	uint32_t frame, msf, track = 0;
-	const cdrom_toc *toc;
 	logerror("nec get dir info\n");
 
 	if (!m_cd_file)
@@ -671,19 +670,19 @@ void pce_cd_device::nec_get_dir_info()
 		reply_status_byte(SCSI_CHECK_CONDITION);
 	}
 
-	toc = cdrom_get_toc(m_cd_file);
+	const cdrom_file::toc &toc = m_cd_file->get_toc();
 
 	switch (m_command_buffer[1])
 	{
 		case 0x00:      /* Get first and last track numbers */
 			m_data_buffer[0] = dec_2_bcd(1);
-			m_data_buffer[1] = dec_2_bcd(toc->numtrks);
+			m_data_buffer[1] = dec_2_bcd(toc.numtrks);
 			m_data_buffer_size = 2;
 			break;
 		case 0x01:      /* Get total disk size in MSF format */
-			frame = toc->tracks[toc->numtrks-1].logframeofs;
-			frame += toc->tracks[toc->numtrks-1].frames;
-			msf = lba_to_msf(frame + 150);
+			frame = toc.tracks[toc.numtrks-1].logframeofs;
+			frame += toc.tracks[toc.numtrks-1].frames;
+			msf = cdrom_file::lba_to_msf(frame + 150);
 
 			m_data_buffer[0] = (msf >> 16) & 0xFF;   /* M */
 			m_data_buffer[1] = (msf >> 8) & 0xFF;    /* S */
@@ -693,17 +692,17 @@ void pce_cd_device::nec_get_dir_info()
 		case 0x02:      /* Get track information */
 			if (m_command_buffer[2] == 0xAA)
 			{
-				frame = toc->tracks[toc->numtrks-1].logframeofs;
-				frame += toc->tracks[toc->numtrks-1].frames;
+				frame = toc.tracks[toc.numtrks-1].logframeofs;
+				frame += toc.tracks[toc.numtrks-1].frames;
 				m_data_buffer[3] = 0x04;   /* correct? */
 			} else
 			{
 				track = std::max(bcd_2_dec(m_command_buffer[2]), 1U);
-				frame = toc->tracks[track-1].logframeofs;
-				m_data_buffer[3] = (toc->tracks[track-1].trktype == CD_TRACK_AUDIO) ? 0x00 : 0x04;
+				frame = toc.tracks[track-1].logframeofs;
+				m_data_buffer[3] = (toc.tracks[track-1].trktype == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x04;
 			}
 			logerror("track = %d, frame = %d\n", track, frame);
-			msf = lba_to_msf(frame + 150);
+			msf = cdrom_file::lba_to_msf(frame + 150);
 			m_data_buffer[0] = (msf >> 16) & 0xFF;   /* M */
 			m_data_buffer[1] = (msf >> 8) & 0xFF;    /* S */
 			m_data_buffer[2] = msf & 0xFF;             /* F */
@@ -978,7 +977,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 	{
 		/* Read next data sector */
 		logerror("read sector %d\n", m_current_frame);
-		if (! cdrom_read_data(m_cd_file, m_current_frame, m_data_buffer.get(), CD_TRACK_MODE1))
+		if (! m_cd_file->read_data(m_current_frame, m_data_buffer.get(), cdrom_file::CD_TRACK_MODE1))
 		{
 			logerror("Mode1 CD read failed for frame #%d\n", m_current_frame);
 		}

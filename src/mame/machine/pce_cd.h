@@ -199,7 +199,7 @@ private:
 	required_device<cdrom_image_device> m_cdrom;
 
 	cdrom_file  *m_cd_file = nullptr;
-	const cdrom_toc*    m_toc = nullptr;
+	const cdrom_file::toc*  m_toc = nullptr;
 	emu_timer   *m_data_timer = nullptr;
 	emu_timer   *m_adpcm_dma_timer = nullptr;
 
