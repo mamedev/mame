@@ -440,7 +440,7 @@ protected:
 	uint8_t *position_device_descriptor(int &size);
 	uint8_t *position_configuration_descriptor(int index, int &size);
 	uint8_t *position_string_descriptor(int index, int &size);
-	ohci_usb_controller *busmanager;
+	ohci_usb_controller *busmanager = nullptr;
 	struct {
 		int type;
 		int controldirection;

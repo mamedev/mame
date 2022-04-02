@@ -172,20 +172,20 @@ private:
 	uint8_t interrupt_status_r(offs_t offset);
 
 	std::unique_ptr<uint8_t[]>   m_nvram8;
-	uint8_t   m_irq_status;
-	uint32_t  m_dlba;
+	uint8_t   m_irq_status = 0;
+	uint32_t  m_dlba = 0;
 	std::unique_ptr<uint16_t[]> m_paletteram;
-	uint8_t m_palette_number;
-	uint32_t  m_speedup_count;
-	uint32_t  m_tms_io_regs[0x80];
+	uint8_t m_palette_number = 0;
+	uint32_t  m_speedup_count = 0;
+	uint32_t  m_tms_io_regs[0x80]{};
 	bitmap_ind16 m_update_bitmap;
 	
-	uint8_t m_port2_data;
-	uint32_t m_last_watchdog;
-	int m_left_volume;
-	int m_right_volume;
-	uint8_t m_interrupt_mask;
-	uint8_t m_dsp_ctrl_data;
+	uint8_t m_port2_data = 0;
+	uint32_t m_last_watchdog = 0;
+	int m_left_volume = 0;
+	int m_right_volume = 0;
+	uint8_t m_interrupt_mask = 0;
+	uint8_t m_dsp_ctrl_data = 0;
 };
 
 class fbcrazy_state : public rastersp_state

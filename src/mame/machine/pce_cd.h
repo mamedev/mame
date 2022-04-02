@@ -103,7 +103,7 @@ private:
 	uint16_t m_adpcm_latch_address;
 	uint8_t m_adpcm_control;
 	uint8_t m_adpcm_dma_reg;
-	uint8_t m_fade_reg;
+	uint8_t m_fade_reg = 0;
 
 	void regs_map(address_map &map);
 	void adpcm_stop(uint8_t irq_flag);
@@ -138,33 +138,33 @@ private:
 
 	std::unique_ptr<uint8_t[]>   m_bram;
 	std::unique_ptr<uint8_t[]>   m_adpcm_ram;
-	int     m_bram_locked;
-	int     m_adpcm_read_ptr;
-	uint8_t   m_adpcm_read_buf;
-	int     m_adpcm_write_ptr;
-	uint8_t   m_adpcm_write_buf;
-	int     m_adpcm_length;
-	int     m_adpcm_clock_divider;
-	uint32_t  m_msm_start_addr;
-	uint32_t  m_msm_end_addr;
-	uint32_t  m_msm_half_addr;
-	uint8_t   m_msm_nibble;
-	uint8_t   m_msm_idle;
-	uint8_t   m_msm_repeat;
+	int     m_bram_locked = 0;
+	int     m_adpcm_read_ptr = 0;
+	uint8_t   m_adpcm_read_buf = 0;
+	int     m_adpcm_write_ptr = 0;
+	uint8_t   m_adpcm_write_buf = 0;
+	int     m_adpcm_length = 0;
+	int     m_adpcm_clock_divider = 0;
+	uint32_t  m_msm_start_addr = 0;
+	uint32_t  m_msm_end_addr = 0;
+	uint32_t  m_msm_half_addr = 0;
+	uint8_t   m_msm_nibble = 0;
+	uint8_t   m_msm_idle = 0;
+	uint8_t   m_msm_repeat = 0;
 
 	/* SCSI signals */
-	int     m_scsi_BSY;   /* Busy. Bus in use */
-	int     m_scsi_SEL;   /* Select. Initiator has won arbitration and has selected a target */
-	int     m_scsi_CD;    /* Control/Data. Target is sending control (data) information */
-	int     m_scsi_IO;    /* Input/Output. Target is sending (receiving) information */
-	int     m_scsi_MSG;   /* Message. Target is sending or receiving a message */
-	int     m_scsi_REQ;   /* Request. Target is requesting a data transfer */
-	int     m_scsi_ACK;   /* Acknowledge. Initiator acknowledges that it is ready for a data transfer */
-	int     m_scsi_ATN;   /* Attention. Initiator has a message ready for the target */
-	int     m_scsi_RST;   /* Reset. Initiator forces all targets and any other initiators to do a warm reset */
-	int     m_scsi_last_RST;  /* To catch setting of RST signal */
-	int     m_cd_motor_on;
-	int     m_selected;
+	int     m_scsi_BSY = 0;   /* Busy. Bus in use */
+	int     m_scsi_SEL = 0;   /* Select. Initiator has won arbitration and has selected a target */
+	int     m_scsi_CD = 0;    /* Control/Data. Target is sending control (data) information */
+	int     m_scsi_IO = 0;    /* Input/Output. Target is sending (receiving) information */
+	int     m_scsi_MSG = 0;   /* Message. Target is sending or receiving a message */
+	int     m_scsi_REQ = 0;   /* Request. Target is requesting a data transfer */
+	int     m_scsi_ACK = 0;   /* Acknowledge. Initiator acknowledges that it is ready for a data transfer */
+	int     m_scsi_ATN = 0;   /* Attention. Initiator has a message ready for the target */
+	int     m_scsi_RST = 0;   /* Reset. Initiator forces all targets and any other initiators to do a warm reset */
+	int     m_scsi_last_RST = 0;  /* To catch setting of RST signal */
+	int     m_cd_motor_on = 0;
+	int     m_selected = 0;
 	std::unique_ptr<uint8_t[]>  m_command_buffer;
 	int     m_command_buffer_index = 0;
 	int     m_status_sent = 0;

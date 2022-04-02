@@ -40,28 +40,28 @@ protected:
 
 private:
 	/////////////// simulations
-	u16 m_value0;
-	u16 m_value1;
-	u16 m_valuekey;
-	u16 m_ddp3lastcommand;
-	u32 m_valueresponse;
-	int m_curslots;
-	u32 m_slots[0x100];
+	u16 m_value0 = 0;
+	u16 m_value1 = 0;
+	u16 m_valuekey = 0;
+	u16 m_ddp3lastcommand = 0;
+	u32 m_valueresponse = 0;
+	int m_curslots = 0;
+	u32 m_slots[0x100]{};
 
 	// pstars / oldsplus / kov
-	u16 m_pstar_e7_value;
-	u16 m_pstar_b1_value;
-	u16 m_pstar_ce_value;
-	u16 m_kov_c0_value;
-	u16 m_kov_cb_value;
-	u16 m_kov_fe_value;
-	u16 m_extra_ram[0x100];
+	u16 m_pstar_e7_value = 0;
+	u16 m_pstar_b1_value = 0;
+	u16 m_pstar_ce_value = 0;
+	u16 m_kov_c0_value = 0;
+	u16 m_kov_cb_value = 0;
+	u16 m_kov_fe_value = 0;
+	u16 m_extra_ram[0x100]{};
 	// puzzli2
 	s32 m_puzzli_54_trigger;
 
 	typedef void (pgm_arm_type1_state::*pgm_arm_sim_command_handler)(int pc);
 
-	pgm_arm_sim_command_handler arm_sim_handler;
+	pgm_arm_sim_command_handler arm_sim_handler{};
 
 	/////////////// emulation
 	u16 m_arm_type1_highlatch_arm_w = 0;
@@ -102,7 +102,7 @@ private:
 	void arm7_type1_sim_w(offs_t offset, u16 data);
 	u16 arm7_type1_sim_protram_r(offs_t offset);
 	u16 pstars_arm7_type1_sim_protram_r(offs_t offset);
-	int m_simregion;
+	int m_simregion = 0;
 
 	/* puzzli2 protection internal state stuff */
 	int stage = 0;

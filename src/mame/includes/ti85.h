@@ -36,12 +36,12 @@ enum ti85_model {
 
 typedef struct
 {
-	uint8_t loop;
-	uint8_t setup;
-	float divsor;
-	bool interrupt;
-	uint8_t max;
-	uint8_t count;
+	uint8_t loop = 0;
+	uint8_t setup = 0;
+	float divsor = 1;
+	bool interrupt = false;
+	uint8_t max = 0;
+	uint8_t count = 0;
 } ti83pse_timer;
 
 typedef enum TI83PSE_CTIMER

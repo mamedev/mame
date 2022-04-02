@@ -390,28 +390,28 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( sio0_w );
 
-	uint8_t m_port7;
-	uint8_t m_port1;
+	uint8_t m_port7 = 0;
+	uint8_t m_port1 = 0;
 
-	int m_ex_ramaddr;
-	int m_ex_ramaddr_upper;
+	int m_ex_ramaddr = 0;
+	int m_ex_ramaddr_upper = 0;
 
 	TIMER_CALLBACK_MEMBER(tempio_irqon_callback);
 	TIMER_CALLBACK_MEMBER(tempio_irqoff_callback);
-	emu_timer *m_tempio_irqon_timer;
-	emu_timer *m_tempio_irqoff_timer;
+	emu_timer *m_tempio_irqon_timer = nullptr;
+	emu_timer *m_tempio_irqoff_timer = nullptr;
 	void init_io();
 
 	void init_hng64_reorder_gfx();
 
 	void set_irq(uint32_t irq_vector);
-	uint32_t m_irq_pending;
+	uint32_t m_irq_pending = 0;
 
 	TIMER_CALLBACK_MEMBER(comhack_callback);
-	emu_timer *m_comhack_timer;
+	emu_timer *m_comhack_timer = nullptr;
 
 
-	int m_irq_level;
+	int m_irq_level = 0;
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_16x16_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile1_8x8_info);
@@ -450,10 +450,10 @@ private:
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
 	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
-	emu_timer *m_3dfifo_timer;
+	emu_timer *m_3dfifo_timer = nullptr;
 
-	uint16_t* m_vertsrom;
-	int m_vertsrom_size;
+	uint16_t* m_vertsrom = nullptr;
+	int m_vertsrom_size = 0;
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	void clear3d();

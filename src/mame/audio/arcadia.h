@@ -25,7 +25,7 @@ protected:
 
 	sound_stream *m_channel = nullptr;
 	uint8_t m_reg[3]{};
-	int m_size = 0, m_pos,m_tval = 0, m_nval = 0;
+	int m_size = 0, m_pos = 0, m_tval = 0, m_nval = 0;
 	unsigned m_mode = 0, m_omode = 0;
 	unsigned m_volume = 0;
 	unsigned m_lfsr = 0;

@@ -224,14 +224,14 @@ private:
 	// RSP Interface (SP) registers
 	void sp_dma(int direction);
 
-	uint32_t sp_mem_addr;
-	uint32_t sp_dram_addr;
-	uint32_t sp_mem_addr_start;
-	uint32_t sp_dram_addr_start;
-	int sp_dma_length;
-	int sp_dma_count;
-	int sp_dma_skip;
-	uint32_t sp_semaphore;
+	uint32_t sp_mem_addr = 0;
+	uint32_t sp_dram_addr = 0;
+	uint32_t sp_mem_addr_start = 0;
+	uint32_t sp_dram_addr_start = 0;
+	int sp_dma_length = 0;
+	int sp_dma_count = 0;
+	int sp_dma_skip = 0;
+	uint32_t sp_semaphore = 0;
 
 	// Disk Drive (DD) registers and functions
 	void dd_set_zone_and_track_offset();
@@ -239,27 +239,27 @@ private:
 	void dd_write_sector();
 	void dd_read_sector();
 	void dd_read_C2();
-	uint32_t dd_buffer[256];
-	uint32_t dd_sector_data[64];
-	uint32_t dd_ram_seq_data[16];
-	uint32_t dd_data_reg;
-	uint32_t dd_status_reg;
-	uint32_t dd_track_reg;
-	uint32_t dd_buf_status_reg;
-	uint32_t dd_sector_err_reg;
-	uint32_t dd_seq_status_reg;
-	uint32_t dd_seq_ctrl_reg;
-	uint32_t dd_sector_reg;
-	uint32_t dd_reset_reg;
-	uint32_t dd_current_reg;
-	bool dd_bm_reset_held;
-	bool dd_write;
-	uint8_t dd_int;
-	uint8_t dd_start_block;
-	uint8_t dd_start_sector;
-	uint8_t dd_sectors_per_block;
-	uint8_t dd_sector_size;
-	uint8_t dd_zone;
+	uint32_t dd_buffer[256]{};
+	uint32_t dd_sector_data[64]{};
+	uint32_t dd_ram_seq_data[16]{};
+	uint32_t dd_data_reg = 0;
+	uint32_t dd_status_reg = 0;
+	uint32_t dd_track_reg = 0;
+	uint32_t dd_buf_status_reg = 0;
+	uint32_t dd_sector_err_reg = 0;
+	uint32_t dd_seq_status_reg = 0;
+	uint32_t dd_seq_ctrl_reg = 0;
+	uint32_t dd_sector_reg = 0;
+	uint32_t dd_reset_reg = 0;
+	uint32_t dd_current_reg = 0;
+	bool dd_bm_reset_held = false;
+	bool dd_write = 0;
+	uint8_t dd_int = 0;
+	uint8_t dd_start_block = 0;
+	uint8_t dd_start_sector = 0;
+	uint8_t dd_sectors_per_block = 0;
+	uint8_t dd_sector_size = 0;
+	uint8_t dd_zone = 0;
 	uint32_t dd_track_offset = 0;
 
 	// Peripheral Interface (PI) registers and functions

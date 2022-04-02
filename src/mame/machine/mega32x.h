@@ -87,7 +87,7 @@ public:
 
 	void render_videobuffer_to_screenbuffer_helper(int scanline);
 	void render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr);
-	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
+	int sh2_master_pwmint_enable = 0, sh2_slave_pwmint_enable = 0;
 
 	void check_framebuffer_swap(bool enabled);
 	void check_irqs();
