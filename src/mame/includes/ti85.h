@@ -34,7 +34,7 @@ enum ti85_model {
 	TI84PSE
 };
 
-typedef struct
+struct ti83pse_timer
 {
 	uint8_t loop = 0;
 	uint8_t setup = 0;
@@ -42,7 +42,7 @@ typedef struct
 	bool interrupt = false;
 	uint8_t max = 0;
 	uint8_t count = 0;
-} ti83pse_timer;
+};
 
 typedef enum TI83PSE_CTIMER
 {
