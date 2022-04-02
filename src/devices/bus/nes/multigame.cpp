@@ -8,9 +8,9 @@
 
  Here we emulate several PCBs used in multigame pirate carts (not MMC-3 based)
 
- TODO: Investigate further Gunsmoke on mc_8et40 and mc_2gn91. Both exhibit the
- same bug where enemies/barrels don't appear until they are halfway down the
- screen. They are both almost the same minor hack of the US release.
+ TODO: Investigate further Gunsmoke on mc_8et40, mc_2gn91, mc_8x801. All have
+ the same bug where enemies/barrels don't appear until they are halfway down
+ the screeen. They all seem to be a minor hack of the US release.
 
  ***********************************************************************************************************/
 
@@ -65,8 +65,11 @@ DEFINE_DEVICE_TYPE(NES_BMC_HP898F,     nes_bmc_hp898f_device,     "nes_bmc_hp898
 DEFINE_DEVICE_TYPE(NES_BMC_K1029,      nes_bmc_k1029_device,      "nes_bmc_k1029",      "NES Cart BMC K-1029 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device,      "nes_bmc_k3036",      "NES Cart BMC K-3036 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device,      "nes_bmc_k3046",      "NES Cart BMC K-3046 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_K3071,      nes_bmc_k3071_device,      "nes_bmc_k3071",      "NES Cart BMC K-3071 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_S009,       nes_bmc_s009_device,       "nes_bmc_s009",       "NES Cart BMC S-009 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device,     "nes_bmc_sa005a",     "NES Cart BMC SA005-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_TF2740,     nes_bmc_tf2740_device,     "nes_bmc_tf2740",     "NES Cart BMC TF2740 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_TH2348,     nes_bmc_th2348_device,     "nes_bmc_th2348",     "NES Cart BMC TH2348 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device,       "nes_bmc_tj03",       "NES Cart BMC TJ-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device,         "nes_bmc_ws",         "NES Cart BMC WS PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device,      "nes_bmc_1160",       "NES Cart BMC-1160 PCB")
@@ -272,6 +275,16 @@ nes_bmc_k3046_device::nes_bmc_k3046_device(const machine_config &mconfig, const 
 {
 }
 
+nes_bmc_k3071_device::nes_bmc_k3071_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_K3071, tag, owner, clock)
+{
+}
+
+nes_bmc_s009_device::nes_bmc_s009_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_S009, tag, owner, clock), m_reg(0)
+{
+}
+
 nes_bmc_sa005a_device::nes_bmc_sa005a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_SA005A, tag, owner, clock)
 {
@@ -279,6 +292,11 @@ nes_bmc_sa005a_device::nes_bmc_sa005a_device(const machine_config &mconfig, cons
 
 nes_bmc_tf2740_device::nes_bmc_tf2740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_TF2740, tag, owner, clock), m_jumper(0)
+{
+}
+
+nes_bmc_th2348_device::nes_bmc_th2348_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_TH2348, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -834,6 +852,28 @@ void nes_bmc_k3046_device::pcb_reset()
 	chr8(0, CHRRAM);
 }
 
+void nes_bmc_k3071_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(0);
+	chr8(0, CHRROM);
+}
+
+void nes_bmc_s009_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_s009_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_reg = 0;
+}
+
 void nes_bmc_sa005a_device::pcb_reset()
 {
 	prg16_89ab(0);
@@ -855,6 +895,21 @@ void nes_bmc_tf2740_device::pcb_reset()
 	chr8(0, CHRROM);
 
 	m_reg[0] = m_reg[1] = m_reg[2] = 0;
+}
+
+void nes_bmc_th2348_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_bmc_th2348_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
 }
 
 void nes_bmc_ws_device::device_start()
@@ -2116,6 +2171,64 @@ void nes_bmc_k3046_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
+ BMC-K-3071
+
+ Games: 110 in 1
+
+ NES 2.0: mapper 438
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_k3071_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_k3071 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	u8 bank = BIT(offset, 1, 5);
+	u8 mode = BIT(offset, 0);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
+
+	chr8(BIT(data, 1, 5), CHRROM);
+	set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ BMC-S-009
+
+ Games: 8 in 1
+
+ NES 2.0: mapper 434
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_s009_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_s009 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	m_reg = (data & 0x07) << 3;
+	prg16_89ab(m_reg);
+	prg16_cdef(m_reg | 0x07);
+
+	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+}
+
+void nes_bmc_s009_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_s009 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	prg16_89ab(m_reg | (data & 0x07));
+}
+
+/*-------------------------------------------------
+
  BMC-SA005-A
 
  Games: 16 in 1
@@ -2188,6 +2301,43 @@ u8 nes_bmc_tf2740_device::read_m(offs_t offset)
 {
 	LOG_MMC(("bmc_tf2740 read_m, offset: %04x\n", offset));
 	return (get_open_bus() & ~0x03) | m_jumper;    // TODO: add jumper settings, m_jumper is 0 for now
+}
+
+/*-------------------------------------------------
+
+ BMC-TH2348
+
+ Games: Golden 8 in 1
+
+ NES 2.0: mapper 437
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_th2348_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_th2348 write_l, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+	if (offset >= 0x1000)
+	{
+		m_latch = (offset & 0x07) << 3;
+		prg16_89ab(m_latch);
+		prg16_cdef(m_latch | 0x07);
+
+		set_nt_mirroring(BIT(offset, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
+}
+
+void nes_bmc_th2348_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_th2348 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	prg16_89ab(m_latch | (data & 0x07));
 }
 
 /*-------------------------------------------------
