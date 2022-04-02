@@ -67,7 +67,7 @@ protected:
 	virtual void device_post_load() override;
 
 private:
-	uint8_t             m_busnum;
+	uint8_t             m_busnum = 0;
 	pci_bus_legacy_read_delegate::array<32> m_read_callback;
 	pci_bus_legacy_write_delegate::array<32> m_write_callback;
 	optional_device<pci_bus_legacy_device> m_father;
@@ -75,10 +75,10 @@ private:
 	uint8_t             m_siblings_busnum[8];
 	int                 m_siblings_count;
 
-	offs_t              m_address;
-	int8_t              m_devicenum; // device number we are addressing
-	int8_t              m_busnumber; // pci bus number we are addressing
-	pci_bus_legacy_device * m_busnumaddr; // pci bus we are addressing
+	offs_t              m_address = 0;
+	int8_t              m_devicenum = 0; // device number we are addressing
+	int8_t              m_busnumber = 0; // pci bus number we are addressing
+	pci_bus_legacy_device * m_busnumaddr = nullptr; // pci bus we are addressing
 };
 
 // device type definition

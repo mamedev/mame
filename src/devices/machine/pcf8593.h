@@ -49,17 +49,17 @@ private:
 	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
 
 	// internal state
-	uint8_t       m_data[16];
-	int         m_pin_scl;
-	int         m_pin_sda;
-	int         m_inp;
-	int         m_active;
-	int         m_bits;
-	uint8_t       m_data_recv_index;
-	uint8_t       m_data_recv[50];
-	uint8_t       m_mode;
-	uint8_t       m_pos;
-	emu_timer * m_timer;
+	uint8_t       m_data[16]{};
+	int         m_pin_scl = 0;
+	int         m_pin_sda = 0;
+	int         m_inp = 0;
+	int         m_active = 0;
+	int         m_bits = 0;
+	uint8_t       m_data_recv_index = 0;
+	uint8_t       m_data_recv[50]{};
+	uint8_t       m_mode = 0;
+	uint8_t       m_pos = 0;
+	emu_timer * m_timer = nullptr;
 	enum        { RTC_MODE_NONE, RTC_MODE_SEND, RTC_MODE_RECV };
 };
 

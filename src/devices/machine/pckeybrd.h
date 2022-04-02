@@ -112,7 +112,7 @@ private:
 
 	output_finder<3> m_leds;
 	int m_scan_code_set;
-	int m_input_state;
+	int m_input_state = 0;
 };
 
 INPUT_PORTS_EXTERN( pc_keyboard );

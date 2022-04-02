@@ -76,15 +76,15 @@ private:
 	static constexpr u8 IRQ_HOUR = 3;
 
 	// state
-	u8                          m_reg[3];
-	u8                          m_irq_flag;
-	u8                          m_irq_type;
-	u16                         m_tick;
+	u8                          m_reg[3]{};
+	u8                          m_irq_flag = 0;
+	u8                          m_irq_type = 0;
+	u16                         m_tick = 0;
 
 	// incidentals
 	devcb_write_line m_out_int_handler;
-	emu_timer *                 m_timer;
-	u64                         m_last_update_time; // last update time, in clock cycles
+	emu_timer *                 m_timer = 0;
+	u64                         m_last_update_time = 0; // last update time, in clock cycles
 
 	// methods
 	void rtc_timer_callback();

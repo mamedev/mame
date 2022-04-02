@@ -61,17 +61,17 @@ protected:
 	};
 
 private:
-	uint8_t m_command;
-	ldp1000_status m_status;
-	ldp1000_player_state m_player_state;
-	bool m_audio_enable[2];
+	uint8_t m_command = 0;
+	ldp1000_status m_status{};
+	ldp1000_player_state m_player_state{};
+	bool m_audio_enable[2]{};
 	// TODO: sub-class into a specific internal player state
 	void set_new_player_state(ldp1000_player_state which);
 	void set_new_player_bcd(uint8_t data);
 	uint32_t bcd_to_raw();
 	void exec_enter_cmd();
-	uint8_t m_internal_bcd[0x10];
-	uint8_t m_index_state;
+	uint8_t m_internal_bcd[0x10]{};
+	uint8_t m_index_state = 0;
 
 };
 

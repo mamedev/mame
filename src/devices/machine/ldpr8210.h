@@ -87,15 +87,15 @@ protected:
 	class pioneer_pia
 	{
 	public:
-		uint8_t               frame[7];               // (20-26) 7 characters for the chapter/frame
-		uint8_t               text[17];               // (20-30) 17 characters for the display
-		uint8_t               control;                // (40) control lines
-		uint8_t               latchdisplay;           //   flag: set if the display was latched
-		uint8_t               portb;                  // (60) port B value (LEDs)
-		uint8_t               display;                // (80) display enable
-		uint8_t               porta;                  // (A0) port A value (from serial decoder)
-		uint8_t               vbi1;                   // (C0) VBI decoding state 1
-		uint8_t               vbi2;                   // (E0) VBI decoding state 2
+		uint8_t               frame[7]{};                 // (20-26) 7 characters for the chapter/frame
+		uint8_t               text[17]{};                 // (20-30) 17 characters for the display
+		uint8_t               control = 0;                // (40) control lines
+		uint8_t               latchdisplay = 0;           //   flag: set if the display was latched
+		uint8_t               portb = 0;                  // (60) port B value (LEDs)
+		uint8_t               display = 0;                // (80) display enable
+		uint8_t               porta = 0;                  // (A0) port A value (from serial decoder)
+		uint8_t               vbi1 = 0;                   // (C0) VBI decoding state 1
+		uint8_t               vbi2 = 0;                   // (E0) VBI decoding state 2
 	};
 
 	// internal overlay helpers

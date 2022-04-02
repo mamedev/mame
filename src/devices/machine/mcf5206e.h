@@ -173,31 +173,31 @@ private:
 
 	uint8_t m_ICR[MAX_ICR];
 
-	uint16_t m_CSAR[8];
-	uint32_t m_CSMR[8];
-	uint16_t m_CSCR[8];
+	uint16_t m_CSAR[8]{};
+	uint32_t m_CSMR[8]{};
+	uint16_t m_CSCR[8]{};
 
-	uint16_t m_DMCR;
-	uint16_t m_PAR;
+	uint16_t m_DMCR = 0;
+	uint16_t m_PAR = 0;
 
-	emu_timer *m_timer1;
-	uint16_t m_TMR1;
-	uint16_t m_TRR1;
-	uint8_t m_TER1;
-	uint16_t m_TCN1;
+	emu_timer *m_timer1 = nullptr;
+	uint16_t m_TMR1 = 0;
+	uint16_t m_TRR1 = 0;
+	uint8_t m_TER1 = 0;
+	uint16_t m_TCN1 = 0;
 
 
-	uint8_t m_PPDDR;
-	uint8_t m_PPDAT;
+	uint8_t m_PPDDR = 0;
+	uint8_t m_PPDAT = 0;
 
-	uint16_t m_IMR;
+	uint16_t m_IMR = 0;
 
-	uint8_t m_MBCR;
-	uint8_t m_MBSR;
-	uint8_t m_MFDR;
-	uint8_t m_MBDR;
+	uint8_t m_MBCR = 0;
+	uint8_t m_MBSR = 0;
+	uint8_t m_MFDR = 0;
+	uint8_t m_MBDR = 0;
 
-	uint32_t m_coldfire_regs[0x400/4];
+	uint32_t m_coldfire_regs[0x400/4]{};
 };
 
 

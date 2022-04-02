@@ -23,10 +23,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint16_t m_kbd_cmd;
-	uint16_t m_kbd_row;
-	uint16_t m_kbd_col;
-	uint16_t m_kbd_level;
+	uint16_t m_kbd_cmd = 0;
+	uint16_t m_kbd_row = 0;
+	uint16_t m_kbd_col = 0;
+	uint16_t m_kbd_level = 0;
 };
 
 DECLARE_DEVICE_TYPE(LOCOMO, locomo_device)

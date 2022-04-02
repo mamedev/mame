@@ -63,8 +63,8 @@ protected:
 
 	required_device<cpu_device> m_ee;
 
-	uint32_t m_status;
-	uint32_t m_mask;
+	uint32_t m_status = 0;
+	uint32_t m_mask = 0;
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_INTC, ps2_intc_device)

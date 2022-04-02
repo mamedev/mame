@@ -115,7 +115,7 @@ protected:
 
 		uint32_t m_addr;
 		uint32_t m_qwc;
-		uint32_t m_tag_addr;
+		uint32_t m_tag_addr = 0;
 	};
 
 	void transfer_vif1();
@@ -134,16 +134,16 @@ protected:
 
 	int m_icount;
 
-	uint32_t m_ctrl;
-	uint32_t m_mem_drain;
-	bool m_enabled;
+	uint32_t m_ctrl = 0;
+	uint32_t m_mem_drain = 0;
+	bool m_enabled = false;
 
-	uint32_t m_disable_mask;
+	uint32_t m_disable_mask = 0;
 
-	uint32_t m_istat;
-	uint32_t m_imask;
+	uint32_t m_istat = 0;
+	uint32_t m_imask = 0;
 
-	uint32_t m_last_serviced;
+	uint32_t m_last_serviced = 0;
 	channel_t m_channels[10];
 };
 

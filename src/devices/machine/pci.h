@@ -217,13 +217,13 @@ protected:
 	void propagate_config_write(uint8_t bus, uint8_t device, uint16_t reg, uint32_t data, uint32_t mem_mask);
 	void config_write(uint8_t bus, uint8_t device, uint16_t reg, uint32_t data, uint32_t mem_mask);
 
-	pci_device *sub_devices[32*8];
+	pci_device *sub_devices[32*8]{};
 	std::vector<pci_device *> all_devices;
 	std::vector<pci_bridge_device *> all_bridges;
 
-	uint32_t prefetch_baseu, prefetch_limitu;
-	uint16_t bridge_control, memory_base, memory_limit, prefetch_base, prefetch_limit, iobaseu, iolimitu;
-	uint8_t primary_bus, secondary_bus, subordinate_bus, iobase, iolimit;
+	uint32_t prefetch_baseu = 0, prefetch_limitu = 0;
+	uint16_t bridge_control = 0, memory_base = 0, memory_limit = 0, prefetch_base = 0, prefetch_limit = 0, iobaseu = 0, iolimitu = 0;
+	uint8_t primary_bus = 0, secondary_bus = 0, subordinate_bus = 0, iobase = 0, iolimit = 0;
 
 private:
 	address_space_config configure_space_config;
@@ -259,12 +259,12 @@ protected:
 
 	void regenerate_mapping();
 
-	address_space *memory_space, *io_space;
+	address_space *memory_space = nullptr, *io_space = nullptr;
 
-	uint64_t memory_window_start, memory_window_end, memory_offset;
-	uint64_t io_window_start, io_window_end, io_offset;
+	uint64_t memory_window_start = 0, memory_window_end = 0, memory_offset = 0;
+	uint64_t io_window_start = 0, io_window_end = 0, io_offset = 0;
 
-	uint32_t config_address;
+	uint32_t config_address = 0;
 };
 
 class pci_root_device : public device_t {

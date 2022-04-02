@@ -32,27 +32,27 @@ protected:
 	void complete(s32 param);
 
 private:
-	emu_timer *m_complete;
+	emu_timer *m_complete = nullptr;
 
 	// registers
-	u32 m_fsr;
-	u32 m_f[8];
+	u32 m_fsr = 0;
+	u32 m_f[8]{};
 
 	// operating state
-	u8 m_idbyte;
-	u16 m_opword;
+	u8 m_idbyte = 0;
+	u16 m_opword = 0;
 	struct operand
 	{
-		unsigned expected;
-		unsigned issued;
+		unsigned expected = 0;
+		unsigned issued = 0;
 		u64 value;
 	}
-	m_op[3];
-	u16 m_status;
+	m_op[3]{};
+	u16 m_status = 0;
 
 	// implementation state
-	unsigned m_state;
-	unsigned m_tcy;
+	unsigned m_state = 0;
+	unsigned m_tcy = 0;
 };
 
 DECLARE_DEVICE_TYPE(NS32081, ns32081_device)
