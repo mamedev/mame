@@ -335,15 +335,19 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 
 uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->pen(BGPAL_PEN), cliprect);
-
 	if(m_gfx_ctrl & 8)
 	{
-		if(m_gfx_ctrl & 0x10)
+		// BG Pal applies to 1bpp mode only, sharrier draws blue backdrop with pen #0
+		const bool bitmap_color_mode = bool(m_gfx_ctrl & 0x10);
+		bitmap.fill(m_palette->pen(bitmap_color_mode ? 0 : BGPAL_PEN), cliprect);
+		
+		if(bitmap_color_mode)
 			draw_bitmap_3bpp(bitmap,cliprect);
 		else
 			draw_bitmap_1bpp(bitmap,cliprect);
 	}
+	else
+		bitmap.fill(0, cliprect);
 
 	if(!(m_layer_mask & 1))
 	{
