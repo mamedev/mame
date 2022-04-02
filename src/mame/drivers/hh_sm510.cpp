@@ -5326,7 +5326,7 @@ ROM_END
 /***************************************************************************
 
   Nelsonic Game Watches on SM530*, wristwatch with an LCD game on it.
-  *: Older games are on different a MCU, several seen with OKI MSM5055.
+  *: Older games are on a different MCU, several seen with OKI MSM5055.
   Newer ones: to be investigated, maybe SM5x.
 
   Hardware notes:
