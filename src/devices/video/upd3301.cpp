@@ -249,6 +249,9 @@ inline void upd3301_device::reset_fifo_vrtc()
 		m_attr_frame = 0;
 		m_attr_blink = !m_attr_blink;
 	}
+	// Clear the buffer here.
+	// Needed in particular by PC88, which disables DMA transfer in order to show the GVRAM layer only
+	m_bitmap.fill(rgb_t(0x00, 0x00, 0x00), screen().visible_area());
 }
 
 void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int param)

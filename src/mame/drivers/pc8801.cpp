@@ -236,7 +236,7 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 			{
 				int pen = 0;
 
-				/* note: layer masking doesn't occur in 3bpp mode, Bug Attack relies on this */
+				// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
 				pen |= ((m_gvram[bitmap_offset+0x0000] >> (7-xi)) & 1) << 0;
 				pen |= ((m_gvram[bitmap_offset+0x4000] >> (7-xi)) & 1) << 1;
 				pen |= ((m_gvram[bitmap_offset+0x8000] >> (7-xi)) & 1) << 2;
@@ -1199,7 +1199,7 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 	// p8suite Analog RGB test cross bars (reportedly works in 24 kHz / 80 column only)
 	// NB: it uses a bunch of non-waitstate related opcodes to cycle time it right,
 	// implying a stress-test for Z80 opcode cycles.
-	m_screen->update_partial(m_screen->vpos());
+//	m_screen->update_partial(m_screen->vpos());
 }
 
 
