@@ -679,7 +679,7 @@ class unidasm_data_buffer : public util::disasm_interface::data_buffer
 {
 public:
 	std::vector<u8> data;
-	offs_t base_pc;
+	offs_t base_pc = 0;
 	u32 size;
 
 	unidasm_data_buffer(util::disasm_interface *disasm, const dasm_table_entry *entry);

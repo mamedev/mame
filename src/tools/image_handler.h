@@ -107,10 +107,10 @@ private:
 
 	floppy_image m_floppy_image;
 
-	const floppy_image_format_t *m_floppy_fs_converter;
+	const floppy_image_format_t *m_floppy_fs_converter = nullptr;
 	std::vector<u8> m_sector_image;
 	std::unique_ptr<fs::fsblk_t> m_fsblk;
-	const fs::manager_t *m_fsm;
+	const fs::manager_t *m_fsm = nullptr;
 	std::unique_ptr<fs::filesystem_t> m_fs;
 
 };
