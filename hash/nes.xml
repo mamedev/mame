@@ -60814,14 +60814,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="HKI-09"/>
 		<info name="alt_title" value="花札遊侠伝 流れ花お竜"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
+			<feature name="slot" value="sa0037" />
+			<feature name="pcb" value="UNL-SA-0037" />
 			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="hanafuda yuukyou den - nagarebana oryuu (japan) (unl).chr" size="32768" crc="26b24de2" sha1="c59fb7c8ae3612783f64f2caa74344ceb13b5e8e" offset="00000" status="baddump" />
+			<dataarea name="chr" size="65536">
+				<rom name="hanafuda yuukyou den - nagarebana oryuu (japan) (unl).chr" size="65536" crc="989f52f5" sha1="444265fdf725d1237aa4e45c5513f338f09556db" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="hanafuda yuukyou den - nagarebana oryuu (japan) (unl).prg" size="32768" crc="e44d95b5" sha1="e156171835b698d25015d50fed1be248fa134b1f" offset="00000" status="baddump" />
+				<rom name="hanafuda yuukyou den - nagarebana oryuu (japan) (unl).prg" size="32768" crc="e44d95b5" sha1="e156171835b698d25015d50fed1be248fa134b1f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61098,36 +61098,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- nointro -->
-	<!-- Apparently, soapanic has corrupted graphics after middle of level 2, soapanica fixes this by using Magic Bubble CHR chunks -->
+<!-- This has a fixed graphics ROM by using Magic Bubble CHR chunks? -->
 	<software name="soapanic">
-		<description>Soap Panic (Jpn, Bad CHR?)</description>
+		<description>Soap Panic (Japan, fixed CHR?)</description>
 		<year>1991</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-11"/>
 		<info name="alt_title" value="ソープパニック"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="32768">
-				<rom name="soap panic (japan) (unl).chr" size="32768" crc="adc6501d" sha1="b0fafa791b5203a86ef99f126544c5eeca4694a1" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="soap panic (japan) (unl).prg" size="32768" crc="52c78553" sha1="82700b29a6dd650ae1f835b93fb220fe81bf56be" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="soapanica" cloneof="soapanic">
-		<description>Soap Panic (Jpn, Fixed CHR?)</description>
-		<year>1991</year>
-		<publisher>Hacker International</publisher>
-		<info name="serial" value="HKI-11"/>
-		<info name="alt_title" value="ソープパニック"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
+			<feature name="slot" value="sa0037" />
+			<feature name="pcb" value="UNL-SA-0037" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
 				<rom name="soap panic (hacker) [f1].chr" size="65536" crc="61dcc562" sha1="956f94577309ffaeab30b43cbf159f0f755dabe9" offset="00000" status="baddump" />
@@ -75998,10 +75978,10 @@ Other
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="pokemon silver (little nemo hack) [p1].chr" size="131072" crc="63ddf4cc" sha1="7bf369348d1694aa9819f04a659add47242f496f" offset="00000" status="baddump" />
+				<rom name="pokemon silver (little nemo hack) [p1].chr" size="131072" crc="37f60363" sha1="1eb7f250014cb627c1d4f0be650b74df97ac9e68" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="pokemon silver (little nemo hack) [p1].prg" size="131072" crc="265734e6" sha1="04d3c814154717a894421448d3953d68319f3456" offset="00000" status="baddump" />
+				<rom name="pokemon silver (little nemo hack) [p1].prg" size="131072" crc="265734e6" sha1="04d3c814154717a894421448d3953d68319f3456" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
