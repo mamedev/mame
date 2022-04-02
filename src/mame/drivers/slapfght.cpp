@@ -1036,7 +1036,7 @@ void slapfght_state::slapfigh(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(36_MHz_XTAL/6, 388, 8, 288, 270, 16, 256);
+	m_screen->set_raw(36_MHz_XTAL/6, 388, 8, 288, 270, 16, 255);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_slapfight));
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
