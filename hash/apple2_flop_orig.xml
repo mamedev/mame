@@ -22394,4 +22394,91 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bnckmg">
+		<description>Bouncing Kamungas!</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Bouncing Kamungas!" is a 1983 action game developed by Tom Becklund and distributed by Penguin Software. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81700">
+				<rom name="bouncing kamungas.woz" size="81700" crc="c4de657e" sha1="f2f6299d5efa68eeb087990daf3df560911e3950"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigpen">
+		<description>Pig Pen</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Pig Pen" is a 1982 action game developed by TMQ Software and distributed by Datamost. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="pig pen.woz" size="234773" crc="5b6f8c25" sha1="b5e998751eaa35f884fe89b5dde3e7bf74c5de3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ricochet">
+		<description>Ricochet</description>
+		<year>1982</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Ricochet" is a 1982 action game developed and distributed by Automated Simulations. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234805">
+				<rom name="ricochet.woz" size="234805" crc="ce1c4d9d" sha1="775f043ba627970753250732c9da7964f5ab9e54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gseaskies">
+		<description>Grey Seas, Grey Skies</description>
+		<year>1983</year>
+		<publisher>Simulations Canada</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Grey Seas, Grey Skies" is a 1983 simulation game developed by W. J. Nichols and distributed by Simulations Canada. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="grey seas, grey skies.woz" size="234783" crc="13f63025" sha1="e4710714eea886f901787570d2b8d73724c7b74f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcleaderb">
+		<description>World Class Leader Board</description>
+		<year>1987</year>
+		<publisher>Access Software</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"World Class Leader Board" is a 1987 sports game developed by Bruce and Roger Carver, ported to the Apple II by Vance Cook, and distributed by Access Software. It requires a 64K Apple ][+ or later. This archive also includes "World Class Famous Course Disk Volume 1", originally sold separately.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234815">
+				<rom name="world class leader board side a.woz" size="234815" crc="ac7104f3" sha1="b913bbcab30a3dad52cb28556bdeb4d34e67a4b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241471">
+				<rom name="world class leader board side b.woz" size="241471" crc="14e4bd7c" sha1="ee2fa7be8a79549f07f62925c1635b2ed6768ffd"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
