@@ -501,7 +501,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint16_t m_retvalue;
+	uint16_t m_retvalue = 0;
 };
 
 

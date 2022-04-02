@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_APPLIX_FORMAT;
+extern const applix_format FLOPPY_APPLIX_FORMAT;
 
 #endif // MAME_FORMATS_APPLIX_DSK_H

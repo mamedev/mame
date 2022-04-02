@@ -220,7 +220,7 @@ private:
 	void horshoes_tile_cb(u32 &code);
 
 	void bankg_w(u8 data);
-	int m_horshoes_gfxbank;
+	int m_horshoes_gfxbank = 0;
 
 	void horshoes_map(address_map &map);
 };

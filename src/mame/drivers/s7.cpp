@@ -48,7 +48,7 @@ Thunderball                       508  1                         unknown
 HyperBall                         509  1                         unknown
 Barracora                         510  ASD hit 1                 ASD
 Varkon                            512  AX hit 1                  AX
-Spellbinder (unreleased)          513  (mnw)
+Spellbinder (unreleased)          513
 Reflex (unreleased)               514
 Time Fantasy                      515  1                         X
 Warlok                            516  1                         X
@@ -66,17 +66,13 @@ Starlight                         530  AS hit 1                  AS
 *Wild Texas is a clone/bootleg of Firepower II, and shows the same game number.
 
 Status:
-- All machines are playable (except Spellbinder).
+- All machines are playable
 - Thunderball: turn Speech DIP off, or you get corrupt sound.
 
 ToDo:
 - Some games have an additional alphanumeric display, or different display arrangements
 - Mechanical sounds vary per machine
 - Hyperball, status display is different
-- Spellbinder, appears to be a non-working beta, runs into the weeds. If num-0 pressed it
-     fills everything with FF and freezes. Uses another PIA at 4000. Display is bad. If
-     game started it will soon end by itself. Makes random loud noises even in attract
-     mode. Doesn't display the game number on first boot, unlike every other game.
 
 *****************************************************************************************/
 
@@ -153,11 +149,11 @@ private:
 	u8 m_row = 0U;
 	u8 m_comma = 0U;
 	u8 m_nvram[0x100]{};
-	bool m_data_ok = 0;
+	bool m_data_ok = false;
 	u8 m_lamp_data = 0U;
-	bool m_memprotect = 0;
+	bool m_memprotect = false;
 	u8 m_game = 0U;
-	emu_timer* m_irq_timer = 0;
+	emu_timer* m_irq_timer = nullptr;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s6_sound_device> m_s6sound;
@@ -981,21 +977,6 @@ ROM_START(vrkon_l1)
 	ROM_LOAD("sound12.716",  0x4800, 0x0800, CRC(d13db2bb) SHA1(862546bbdd1476906948f7324b7434c29df79baa) )
 ROM_END
 
-/*----------------------------------------------------------------------
-/ Spellbinder (#513) Not-working beta.
-/ Reconstructed from the source by jessakey
-/ No soundrom supplied, using one from hyperball (as PinMAME has done).
-/----------------------------------------------------------------------*/
-ROM_START(splbn_l0)
-	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("ic20.532",     0x0000, 0x1000, CRC(ff765ebf) SHA1(14d42735291c3f6e112f19bd49a39e00059cf907) )
-	ROM_LOAD("ic14.532",     0x1000, 0x1000, CRC(940a817a) SHA1(2583ff6f6b6985d3ac85b4f120ebb002a10b65af) )
-	ROM_LOAD("ic17.532",     0x2000, 0x1000, CRC(b38fde72) SHA1(17ef3ca354431307b6a79992c50cb2491b8a7631) )
-
-	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("sound12.532",  0x4000, 0x1000, CRC(06051e5e) SHA1(f0ab4be812ceaf771829dd549f2a612156102a93) )
-ROM_END
-
 /*-----------------------------
 / Time Fantasy (#515)
 /-----------------------------*/
@@ -1138,7 +1119,6 @@ GAME( 1981, hypbl_l3, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams
 GAME( 1981, hypbl_l2, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-2)",                   MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1981, barra_l1, 0,        s7, barra, s7_state, empty_init, ROT0, "Williams",  "Barracora (L-1)",                   MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, vrkon_l1, 0,        s7, vrkon, s7_state, empty_init, ROT0, "Williams",  "Varkon (L-1)",                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, splbn_l0, 0,        s7, s7,    s7_state, empty_init, ROT0, "Williams",  "Spellbinder (L-0)",                 MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, tmfnt_l5, 0,        s7, tmfnt, s7_state, empty_init, ROT0, "Williams",  "Time Fantasy (L-5)",                MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, wrlok_l3, 0,        s7, wrlok, s7_state, empty_init, ROT0, "Williams",  "Warlok (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, dfndr_l4, 0,        s7, dfndr, s7_state, empty_init, ROT0, "Williams",  "Defender (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL )

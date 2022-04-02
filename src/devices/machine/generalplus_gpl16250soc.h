@@ -149,49 +149,49 @@ protected:
 	uint16_t m_7863_porta_attribute;
 
 	uint16_t m_786a_portb_direction;
-	uint16_t m_786b_portb_attribute;
+	uint16_t m_786b_portb_attribute = 0;
 
-	uint16_t m_7872_portc_direction;
-	uint16_t m_7873_portc_attribute;
+	uint16_t m_7872_portc_direction = 0;
+	uint16_t m_7873_portc_attribute = 0;
 
-	uint16_t m_787a_portd_direction;
-	uint16_t m_787b_portd_attribute;
+	uint16_t m_787a_portd_direction = 0;
+	uint16_t m_787b_portd_attribute = 0;
 
-	uint16_t m_7870;
+	uint16_t m_7870 = 0;
 
-	//uint16_t m_7871;
+	//uint16_t m_7871 = 0;
 
 
-	uint16_t m_7882;
-	uint16_t m_7883;
+	uint16_t m_7882 = 0;
+	uint16_t m_7883 = 0;
 
-	uint16_t m_78a0;
+	uint16_t m_78a0 = 0;
 
-	uint16_t m_78a4;
-	uint16_t m_78a5;
-	uint16_t m_78a6;
+	uint16_t m_78a4 = 0;
+	uint16_t m_78a5 = 0;
+	uint16_t m_78a6 = 0;
 
-	uint16_t m_78a8;
+	uint16_t m_78a8 = 0;
 
-	uint16_t m_78b0;
-	uint16_t m_78b1;
-	uint16_t m_78b2;
+	uint16_t m_78b0 = 0;
+	uint16_t m_78b1 = 0;
+	uint16_t m_78b2 = 0;
 
-	uint16_t m_78b8;
+	uint16_t m_78b8 = 0;
 
-	uint16_t m_78f0;
+	uint16_t m_78f0 = 0;
 
-	uint16_t m_78fb;
+	uint16_t m_78fb = 0;
 
 	// unk 79xx
-	uint16_t m_7934;
-	uint16_t m_7935;
-	uint16_t m_7936;
+	uint16_t m_7934 = 0;
+	uint16_t m_7935 = 0;
+	uint16_t m_7936 = 0;
 
-	uint16_t m_7960;
-	uint16_t m_7961;
+	uint16_t m_7960 = 0;
+	uint16_t m_7961 = 0;
 
-	uint16_t m_system_dma_memtype;
+	uint16_t m_system_dma_memtype = 0;
 
 	devcb_read16 m_nand_read_cb;
 	uint32_t m_csbase;
@@ -359,7 +359,7 @@ private:
 
 	void checkirq6();
 
-	emu_timer *m_unk_timer;
+	emu_timer *m_unk_timer = nullptr;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	inline uint16_t read_space(uint32_t offset);
@@ -423,21 +423,21 @@ private:
 	void nand_785d_w(uint16_t data);
 	uint16_t nand_785e_r();
 
-	uint16_t m_nandcommand;
+	uint16_t m_nandcommand = 0;
 
-	uint16_t m_nand_addr_low;
-	uint16_t m_nand_addr_high;
+	uint16_t m_nand_addr_low = 0;
+	uint16_t m_nand_addr_high = 0;
 
-	uint16_t m_nand_dma_ctrl;
-	uint16_t m_nand_7850;
-	uint16_t m_nand_785d;
-	uint16_t m_nand_785c;
-	uint16_t m_nand_785b;
-	uint16_t m_nand_7856;
-	uint16_t m_nand_7857;
+	uint16_t m_nand_dma_ctrl = 0;
+	uint16_t m_nand_7850 = 0;
+	uint16_t m_nand_785d = 0;
+	uint16_t m_nand_785c = 0;
+	uint16_t m_nand_785b = 0;
+	uint16_t m_nand_7856 = 0;
+	uint16_t m_nand_7857 = 0;
 
-	int m_curblockaddr;
-	uint32_t m_effectiveaddress;
+	int m_curblockaddr = 0;
+	uint32_t m_effectiveaddress = 0;
 };
 
 
@@ -497,7 +497,7 @@ private:
 	void spi_direct_78e8_w(uint16_t data);
 	uint16_t spi_direct_79f4_r();
 
-	uint16_t m_7af0;
+	uint16_t m_7af0 = 0;
 };
 
 

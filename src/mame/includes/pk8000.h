@@ -36,15 +36,15 @@ protected:
 	void pk8000_palette(palette_device &palette) const;
 	uint32_t video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *videomem);
 
-	uint8_t m_text_start;
-	uint8_t m_chargen_start;
-	uint8_t m_video_start;
-	uint8_t m_color_start;
+	uint8_t m_text_start = 0;
+	uint8_t m_chargen_start = 0;
+	uint8_t m_video_start = 0;
+	uint8_t m_color_start = 0;
 
-	uint8_t m_video_mode;
-	uint8_t m_video_color;
+	uint8_t m_video_mode = 0;
+	uint8_t m_video_color = 0;
 	uint8_t m_color[32];
-	uint8_t m_video_enable;
+	uint8_t m_video_enable = 0;
 	required_device<cpu_device> m_maincpu;
 };
 

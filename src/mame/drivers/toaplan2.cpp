@@ -3245,17 +3245,6 @@ INPUT_PORTS_END
 // Text layer graphics -- ROM based in some games, RAM based in others
 // See video/gp9001.cpp for the main graphics layouts
 
-static const gfx_layout rom_textlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
 #define XOR(a) WORD_XOR_LE(a)
 #define LOC(x) (x+XOR(0))
 
@@ -3286,7 +3275,7 @@ static GFXDECODE_START( gfx_truxton2 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_textrom )
-	GFXDECODE_ENTRY( "text", 0, rom_textlayout, 64*16, 64 )
+	GFXDECODE_ENTRY( "text", 0, gfx_8x8x4_packed_msb, 64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_batrider )

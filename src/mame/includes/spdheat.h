@@ -56,7 +56,7 @@ private:
 	required_device<input_merger_any_high_device> m_audio_irq;
 	required_shared_ptr_array<uint16_t, 4> m_fg_ram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	tilemap_t *m_fg_tilemap[4];
+	tilemap_t *m_fg_tilemap[4]{};
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette0;
@@ -65,10 +65,10 @@ private:
 	required_device<palette_device> m_palette3;
 	required_device<dac_byte_interface> m_dac;
 
-	uint32_t m_sound_data[4];
-	uint32_t m_sound_status;
-	uint32_t m_sub_data;
-	uint32_t m_sub_status;
+	uint32_t m_sound_data[4]{};
+	uint32_t m_sound_status = 0;
+	uint32_t m_sub_data = 0;
+	uint32_t m_sub_status = 0;
 
 	void main_map(address_map &map);
 	void sub_map(address_map &map);

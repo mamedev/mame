@@ -30,13 +30,13 @@ protected:
 	static constexpr device_timer_id TIMER_OSC = 0;
 
 	struct df_t {
-		uint8_t   top;
-		uint8_t   bottom;
-		uint8_t   low;
-		uint8_t   high;
-		uint8_t   flag;
-		uint8_t   music_mode;     /* Only used by data fetchers 5,6, and 7 */
-		uint8_t   osc_clk;        /* Only used by data fetchers 5,6, and 7 */
+		uint8_t   top = 0;
+		uint8_t   bottom = 0;
+		uint8_t   low = 0;
+		uint8_t   high = 0;
+		uint8_t   flag = 0;
+		uint8_t   music_mode = 0;     /* Only used by data fetchers 5,6, and 7 */
+		uint8_t   osc_clk = 0;        /* Only used by data fetchers 5,6, and 7 */
 	};
 
 	// device-level overrides

@@ -82,13 +82,15 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	int m_icount;
+	int m_state_count;
+
 	u8 m_bu_bits;
 	u16 m_bu_mask;
 	u8 m_callstack_bits;  // number of program counter bits held in callstack
 	u16 m_callstack_mask;
 	u8 m_callstack_depth; // callstack levels: 3 on 2000/2150, 5 on 2200/2400
 	u16 m_callstack[5];   // max 5
-	int m_icount;
 	u16 m_pc;             // 13-bit program counter
 	u8 m_ppr;             // prepared page register (PP 1)
 	u8 m_pbr;             // prepared bank register (PP 2)

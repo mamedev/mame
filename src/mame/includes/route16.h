@@ -78,10 +78,10 @@ protected:
 	optional_ioport_array<8> m_key;
 	uint8_t m_protection_data;
 
-	uint8_t m_jongpute_port_select;
-	uint8_t m_flipscreen;
-	uint8_t m_palette_1;
-	uint8_t m_palette_2;
+	uint8_t m_jongpute_port_select = 0;
+	uint8_t m_flipscreen = 0;
+	uint8_t m_palette_1 = 0;
+	uint8_t m_palette_2 = 0;
 };
 
 #endif // MAME_INCLUDES_ROUTE16_H

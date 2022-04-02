@@ -83,6 +83,9 @@ public:
 		m_bus2(*this, BUS2_TAG)
 	{ }
 
+	void abc1600(machine_config &config);
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<abc1600_mac_device> m_mac;
 	required_device<z80dma_device> m_dma0;
@@ -121,7 +124,7 @@ public:
 	void spec_contr_reg_w(uint8_t data);
 
 	void dbrq_w(int state);
-	
+
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
 	void cio_pb_w(uint8_t data);
@@ -143,25 +146,23 @@ public:
 	void scc_irq_w(int state) { m_scc_irq = state; m_maincpu->set_input_line(M68K_IRQ_5, (m_dart_irq || m_scc_irq) ? ASSERT_LINE : CLEAR_LINE); }
 
 	// DMA
-	int m_dmadis;
-	int m_sysscc;
-	int m_sysfs;
-	int m_partst;               // parity test
+	int m_dmadis = 0;
+	int m_sysscc = 0;
+	int m_sysfs = 0;
 
-	void abc1600(machine_config &config);
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);
 
 	// peripherals
-	int m_cs7;                  // card select address bit 7
-	int m_bus0;                 // BUS 0 selected
-	uint8_t m_csb;                // card select
-	int m_atce;                 // V.24 channel A external clock enable
-	int m_btce;                 // V.24 channel B external clock enable
-	bool m_sccrq_a;
-	bool m_sccrq_b;
-	int m_scc_irq;
-	int m_dart_irq;
+	int m_cs7 = 0;                  // card select address bit 7
+	int m_bus0 = 0;                 // BUS 0 selected
+	uint8_t m_csb = 0U;             // card select
+	int m_atce = 0;                 // V.24 channel A external clock enable
+	int m_btce = 0;                 // V.24 channel B external clock enable
+	bool m_sccrq_a = 0;
+	bool m_sccrq_b = 0;
+	int m_scc_irq = 0;
+	int m_dart_irq = 0;
 };
 
 

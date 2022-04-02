@@ -56,16 +56,16 @@ protected:
 	virtual void video_start() override;
 
 private:
-	int m_palreg;
-	int m_gfx_bank;
-	int m_question_bank;
-	int m_b000_val;
-	int m_b000_ret;
-	int m_b800_prev;
+	int m_palreg = 0;
+	int m_gfx_bank = 0;
+	int m_question_bank = 0;
+	int m_b000_val = 0;
+	int m_b000_ret = 0;
+	int m_b800_prev = 0;
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_bg_videoram;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 	void ettrivia_fg_w(offs_t offset, uint8_t data);
 	void ettrivia_bg_w(offs_t offset, uint8_t data);
 	void ettrivia_control_w(uint8_t data);

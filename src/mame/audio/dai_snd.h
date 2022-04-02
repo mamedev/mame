@@ -30,10 +30,10 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	sound_stream *      m_mixer_channel;
-	int                 m_dai_input[3];
-	uint8_t             m_osc_volume[3];
-	uint8_t             m_noise_volume;
+	sound_stream *      m_mixer_channel = nullptr;
+	int                 m_dai_input[3]{};
+	uint8_t             m_osc_volume[3]{};
+	uint8_t             m_noise_volume = 0;
 
 	static const uint16_t s_osc_volume_table[];
 	static const uint16_t s_noise_volume_table[];

@@ -66,9 +66,9 @@ private:
 	uint8_t cass_in();
 	void cass_out(uint8_t data);
 	bool m_last_state;
-	uint8_t m_key_pressed;
-	uint8_t m_keyb_column;
-	uint8_t m_cass_conf;
+	uint8_t m_key_pressed = 0;
+	uint8_t m_keyb_column = 0;
+	uint8_t m_cass_conf = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);

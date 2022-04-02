@@ -29,7 +29,7 @@ public:
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_shared_ptr<uint8_t> m_spriteram;
 	void pokechmp_bank_w(uint8_t data);
 	void pokechmp_sound_bank_w(uint8_t data);

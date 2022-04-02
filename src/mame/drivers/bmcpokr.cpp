@@ -67,32 +67,32 @@ private:
 	required_device<palette_device> m_palette;
 
 	// Protection
-	uint16_t m_prot_val;
+	uint16_t m_prot_val = 0;
 	uint16_t prot_r();
 	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t unk_r();
 
 	// I/O
-	uint8_t m_mux;
+	uint8_t m_mux = 0;
 	void mux_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	uint16_t dsw_r();
 	uint16_t mjmaglmp_dsw_r();
 	uint16_t mjmaglmp_key_r();
 
 	// Interrrupts
-	uint8_t m_irq_enable;
+	uint8_t m_irq_enable = 0;
 	void irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void irq_ack_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	// Video
-	tilemap_t *m_tilemap[2];
+	tilemap_t *m_tilemap[2]{};
 	template<unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
 	template<unsigned N> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
-	uint8_t m_pixpal;
+	uint8_t m_pixpal = 0;
 	void pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 

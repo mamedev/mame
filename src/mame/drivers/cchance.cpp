@@ -62,8 +62,8 @@ private:
 	void output_1_w(uint8_t data);
 	void main_map(address_map &map);
 
-	uint8_t m_hop_io;
-	uint8_t m_bell_io;
+	uint8_t m_hop_io = 0;
+	uint8_t m_bell_io = 0;
 };
 
 

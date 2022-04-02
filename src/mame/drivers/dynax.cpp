@@ -4703,7 +4703,7 @@ void dynax_state::jantouki(machine_config &config)
 
 	/* video hardware */
 	PALETTE(config, m_palette, FUNC(dynax_state::sprtmtch_palette), 512); // static palette
-	config.set_default_layout(layout_dualhuov);
+	config.set_default_layout(layout_dualhovu);
 
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
 	top.set_refresh_hz(60);

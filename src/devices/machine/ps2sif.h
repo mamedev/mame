@@ -46,14 +46,14 @@ protected:
 
 	required_device<ps2_intc_device> m_intc;
 
-	uint32_t m_ms_mailbox;
-	uint32_t m_sm_mailbox;
-	uint32_t m_ms_flag;
-	uint32_t m_sm_flag;
-	uint32_t m_ctrl;
+	uint32_t m_ms_mailbox = 0;
+	uint32_t m_sm_mailbox = 0;
+	uint32_t m_ms_flag = 0;
+	uint32_t m_sm_flag = 0;
+	uint32_t m_ctrl = 0;
 
 	std::unique_ptr<uint32_t[]> m_fifo[2];
-	uint32_t m_fifo_curr[2];
+	uint32_t m_fifo_curr[2]{};
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_SIF, ps2_sif_device)

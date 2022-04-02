@@ -182,7 +182,7 @@ public:
 	void init_ss64();
 	void init_hng64_fght();
 
-	uint8_t *m_texturerom;
+	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -264,7 +264,7 @@ private:
 	int m_samsho64_3d_hack;
 	int m_roadedge_3d_hack;
 
-	uint8_t m_fbcontrol[4];
+	uint8_t m_fbcontrol[4]{};
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -272,48 +272,48 @@ private:
 	/* Communications stuff */
 	std::unique_ptr<uint8_t[]> m_com_op_base;
 	std::unique_ptr<uint8_t[]> m_com_virtual_mem;
-	uint8_t m_com_shared[8];
+	uint8_t m_com_shared[8]{};
 
-	int32_t m_dma_start;
-	int32_t m_dma_dst;
-	int32_t m_dma_len;
+	int32_t m_dma_start = 0;
+	int32_t m_dma_dst = 0;
+	int32_t m_dma_len = 0;
 
-	uint16_t m_mcu_en;
+	uint16_t m_mcu_en = 0;
 
-	uint32_t m_activeDisplayList;
-	uint32_t m_no_machine_error_code;
+	uint32_t m_activeDisplayList = 0U;
+	uint32_t m_no_machine_error_code = 0U;
 
-	uint32_t m_unk_vreg_toggle;
-	uint32_t m_p1_trig;
+	uint32_t m_unk_vreg_toggle = 0U;
+	uint32_t m_p1_trig = 0U;
 
-	//uint32_t *q2;
+	//uint32_t *q2 = nullptr;
 
 	std::vector< std::pair <int, uint32_t *> > m_spritelist;
 
-	uint8_t m_screen_dis;
+	uint8_t m_screen_dis = 0U;
 
 	struct hng64_tilemap {
-		tilemap_t *m_tilemap_8x8;
-		tilemap_t *m_tilemap_16x16;
-		tilemap_t *m_tilemap_16x16_alt;
+		tilemap_t *m_tilemap_8x8 = nullptr;
+		tilemap_t *m_tilemap_16x16 = nullptr;
+		tilemap_t *m_tilemap_16x16_alt = nullptr;
 	};
 
-	hng64_tilemap m_tilemap[4];
+	hng64_tilemap m_tilemap[4]{};
 
-	uint8_t m_additive_tilemap_debug;
+	uint8_t m_additive_tilemap_debug = 0U;
 
-	uint32_t m_old_animmask;
-	uint32_t m_old_animbits;
-	uint16_t m_old_tileflags[4];
+	uint32_t m_old_animmask = 0U;
+	uint32_t m_old_animbits = 0U;
+	uint16_t m_old_tileflags[4]{};
 
 	// 3d State
-	int m_paletteState3d;
-	float m_projectionMatrix[16];
-	float m_modelViewMatrix[16];
-	float m_cameraMatrix[16];
+	int m_paletteState3d = 0;
+	float m_projectionMatrix[16]{};
+	float m_modelViewMatrix[16]{};
+	float m_cameraMatrix[16]{};
 
-	float m_lightStrength;
-	float m_lightVector[3];
+	float m_lightStrength = 0;
+	float m_lightVector[3]{};
 
 	uint32_t hng64_com_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -390,28 +390,28 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( sio0_w );
 
-	uint8_t m_port7;
-	uint8_t m_port1;
+	uint8_t m_port7 = 0;
+	uint8_t m_port1 = 0;
 
-	int m_ex_ramaddr;
-	int m_ex_ramaddr_upper;
+	int m_ex_ramaddr = 0;
+	int m_ex_ramaddr_upper = 0;
 
 	TIMER_CALLBACK_MEMBER(tempio_irqon_callback);
 	TIMER_CALLBACK_MEMBER(tempio_irqoff_callback);
-	emu_timer *m_tempio_irqon_timer;
-	emu_timer *m_tempio_irqoff_timer;
+	emu_timer *m_tempio_irqon_timer = nullptr;
+	emu_timer *m_tempio_irqoff_timer = nullptr;
 	void init_io();
 
 	void init_hng64_reorder_gfx();
 
 	void set_irq(uint32_t irq_vector);
-	uint32_t m_irq_pending;
+	uint32_t m_irq_pending = 0;
 
 	TIMER_CALLBACK_MEMBER(comhack_callback);
-	emu_timer *m_comhack_timer;
+	emu_timer *m_comhack_timer = nullptr;
 
 
-	int m_irq_level;
+	int m_irq_level = 0;
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_16x16_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile1_8x8_info);
@@ -450,10 +450,10 @@ private:
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
 	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
-	emu_timer *m_3dfifo_timer;
+	emu_timer *m_3dfifo_timer = nullptr;
 
-	uint16_t* m_vertsrom;
-	int m_vertsrom_size;
+	uint16_t* m_vertsrom = nullptr;
+	int m_vertsrom_size = 0;
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	void clear3d();

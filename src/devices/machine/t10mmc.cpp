@@ -72,7 +72,7 @@ t10mmc::toc_format_t t10mmc::toc_format()
 int t10mmc::toc_tracks()
 {
 	int start_track = command[6];
-	int end_track = cdrom_get_last_track(m_cdrom);
+	int end_track = m_cdrom->get_last_track();
 
 	if (start_track == 0)
 	{
@@ -229,8 +229,8 @@ void t10mmc::ExecCommand()
 			// A request for LBA 0 will return something different depending on the type of media being played.
 			// For data and mixed media, LBA 0 is assigned to MSF 00:02:00 (= LBA 150).
 			// For audio media, LBA 0 is assigned to the actual starting address of track 1.
-			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
-				m_lba = cdrom_get_track_start(m_cdrom, 0);
+			if (m_cdrom->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
+				m_lba = m_cdrom->get_track_start(0);
 			else
 				m_lba = 150;
 		}
@@ -241,9 +241,9 @@ void t10mmc::ExecCommand()
 
 		//m_device->logerror("T10MMC: PLAY AUDIO(10) at LBA %x for %x blocks\n", m_lba, m_blocks);
 
-		trk = cdrom_get_track(m_cdrom, m_lba);
+		trk = m_cdrom->get_track(m_lba);
 
-		if (cdrom_get_track_type(m_cdrom, trk) == CD_TRACK_AUDIO)
+		if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			m_cdda->start_audio(m_lba, m_blocks);
 			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
@@ -265,8 +265,8 @@ void t10mmc::ExecCommand()
 
 		if (m_lba == 0)
 		{
-			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
-				m_lba = cdrom_get_track_start(m_cdrom, 0);
+			if (m_cdrom->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
+				m_lba = m_cdrom->get_track_start(0);
 			else
 				m_lba = 150;
 		}
@@ -278,9 +278,9 @@ void t10mmc::ExecCommand()
 		//m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n",
 			//m_lba, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
 
-		trk = cdrom_get_track(m_cdrom, m_lba);
+		trk = m_cdrom->get_track(m_lba);
 
-		if (cdrom_get_track_type(m_cdrom, trk) == CD_TRACK_AUDIO)
+		if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			m_cdda->start_audio(m_lba, m_blocks);
 			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
@@ -308,7 +308,7 @@ void t10mmc::ExecCommand()
 			// be careful: tracks here are zero-based, but the SCSI command
 			// uses the real CD track number which is 1-based!
 			//m_device->logerror("T10MMC: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], m_blocks);
-			int end_track = cdrom_get_last_track(m_cdrom);
+			int end_track = m_cdrom->get_last_track();
 			if (end_track > command[7])
 				end_track = command[7];
 
@@ -319,11 +319,11 @@ void t10mmc::ExecCommand()
 			if (m_sotc)
 				end_track = command[4];
 
-			m_lba = cdrom_get_track_start(m_cdrom, command[4] - 1);
-			m_blocks = cdrom_get_track_start(m_cdrom, end_track) - m_lba;
-			trk = cdrom_get_track(m_cdrom, m_lba);
+			m_lba = m_cdrom->get_track_start(command[4] - 1);
+			m_blocks = m_cdrom->get_track_start(end_track) - m_lba;
+			trk = m_cdrom->get_track(m_lba);
 
-			if (cdrom_get_track_type(m_cdrom, trk) == CD_TRACK_AUDIO)
+			if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
 			{
 				m_cdda->start_audio(m_lba, m_blocks);
 				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
@@ -382,8 +382,8 @@ void t10mmc::ExecCommand()
 
 		if (m_lba == 0)
 		{
-			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
-				m_lba = cdrom_get_track_start(m_cdrom, 0);
+			if (m_cdrom->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
+				m_lba = m_cdrom->get_track_start(0);
 			else
 				m_lba = 150;
 		}
@@ -394,9 +394,9 @@ void t10mmc::ExecCommand()
 
 		//m_device->logerror("T10MMC: PLAY AUDIO(12) at LBA %x for %x blocks\n", m_lba, m_blocks);
 
-		trk = cdrom_get_track(m_cdrom, m_lba);
+		trk = m_cdrom->get_track(m_lba);
 
-		if (cdrom_get_track_type(m_cdrom, trk) == CD_TRACK_AUDIO)
+		if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			m_cdda->start_audio(m_lba, m_blocks);
 			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
@@ -476,7 +476,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 	case T10SBC_CMD_READ_CAPACITY:
 		m_device->logerror("T10MMC: READ CAPACITY\n");
 
-		temp = cdrom_get_track_start(m_cdrom, 0xaa);
+		temp = m_cdrom->get_track_start(0xaa);
 		temp--; // return the last used block on the disc
 
 		data[0] = (temp>>24) & 0xff;
@@ -496,7 +496,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		{
 			while (dataLength > 0)
 			{
-				if (!cdrom_read_data(m_cdrom, m_lba, tmp_buffer, CD_TRACK_MODE1))
+				if (!m_cdrom->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
 				{
 					m_device->logerror("T10MMC: CD read error!\n");
 				}
@@ -571,7 +571,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[3] = 12;       // data length
 					data[4] = 0x01; // sub-channel format code
 					data[5] = 0x10 | (audio_active ? 0 : 4);
-					data[6] = cdrom_get_track(m_cdrom, m_last_lba) + 1; // track
+					data[6] = m_cdrom->get_track(m_last_lba) + 1; // track
 					data[7] = 0;    // index
 
 					uint32_t frame = m_last_lba;
@@ -586,7 +586,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[10] = (frame>>8)&0xff;
 					data[11] = frame&0xff;
 
-					frame = m_last_lba - cdrom_get_track_start(m_cdrom, data[6] - 1);
+					frame = m_last_lba - m_cdrom->get_track_start(data[6] - 1);
 
 					if (msf)
 					{
@@ -634,7 +634,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[dptr++] = (len>>8) & 0xff;
 					data[dptr++] = (len & 0xff);
 					data[dptr++] = 1;
-					data[dptr++] = cdrom_get_last_track(m_cdrom);
+					data[dptr++] = m_cdrom->get_last_track();
 
 					int first_track = command[6];
 					if (first_track == 0)
@@ -658,11 +658,11 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						}
 
 						data[dptr++] = 0;
-						data[dptr++] = cdrom_get_adr_control(m_cdrom, cdrom_track);
+						data[dptr++] = m_cdrom->get_adr_control(cdrom_track);
 						data[dptr++] = track;
 						data[dptr++] = 0;
 
-						uint32_t tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
+						uint32_t tstart = m_cdrom->get_track_start(cdrom_track);
 
 						if (msf)
 						{
@@ -688,11 +688,11 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[dptr++] = 1;
 
 					data[dptr++] = 0;
-					data[dptr++] = cdrom_get_adr_control(m_cdrom, 0);
+					data[dptr++] = m_cdrom->get_adr_control(0);
 					data[dptr++] = 1;
 					data[dptr++] = 0;
 
-					uint32_t tstart = cdrom_get_track_start(m_cdrom, 0);
+					uint32_t tstart = m_cdrom->get_track_start(0);
 
 					if (msf)
 					{

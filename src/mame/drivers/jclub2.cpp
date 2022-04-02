@@ -269,8 +269,8 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	tilemap_t *m_tmap;
-	tilemap_t *m_tmap2;
+	tilemap_t *m_tmap = nullptr;
+	tilemap_t *m_tmap2 = nullptr;
 };
 
 

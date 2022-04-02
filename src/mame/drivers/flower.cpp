@@ -162,9 +162,9 @@ private:
 
 	bool m_audio_nmi_enable = false;
 	bool m_flip_screen = false;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 };
 
 TILE_GET_INFO_MEMBER(flower_state::get_tx_tile_info)

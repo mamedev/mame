@@ -55,8 +55,8 @@ private:
 	required_shared_ptr_array<u16, 4> m_pf_rowscroll;
 
 	/* misc */
-	u16    m_prot;
-	int    m_pri;
+	u16    m_prot = 0U;
+	int    m_pri = 0;
 
 	void prot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 prot_r();

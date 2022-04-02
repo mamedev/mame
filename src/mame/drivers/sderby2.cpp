@@ -81,9 +81,9 @@ private:
 	required_region_ptr<uint8_t> m_proms;
 	required_device<palette_device> m_palette;
 
-	uint8_t sub_data;
-	uint8_t main_data;
-	uint8_t host_io_40;
+	uint8_t sub_data = 0;
+	uint8_t main_data = 0;
+	uint8_t host_io_40 = 0;
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sub_io_map(address_map &map);

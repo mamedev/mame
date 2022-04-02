@@ -82,9 +82,9 @@ protected:
 
 	required_ioport_array<2> m_key;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_keyboard_cmd;
-	uint8_t m_gfxbank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_keyboard_cmd = 0;
+	uint8_t m_gfxbank = 0;
 };
 
 

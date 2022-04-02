@@ -46,11 +46,11 @@ private:
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	memory_passthrough_handler m_rom_shadow_tap;
-	bool m_bus_error;
-	emu_timer *m_bus_error_timer;
+	bool m_bus_error = false;
+	emu_timer *m_bus_error_timer = nullptr;
 
-	uint8_t bim_irq_state;
-	int bim_irq_level;
+	uint8_t bim_irq_state = 0;
+	int bim_irq_level = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(bim_irq_callback);
 	void update_irq_to_maincpu();

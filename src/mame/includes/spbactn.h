@@ -51,10 +51,10 @@ private:
 	optional_shared_ptr<uint8_t> m_extraram;
 	optional_shared_ptr<uint8_t> m_extraram2;
 
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
 
-	tilemap_t    *m_extra_tilemap;
+	tilemap_t    *m_extra_tilemap = nullptr;
 
 	void main_irq_ack_w(uint16_t data);
 

@@ -42,8 +42,8 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_vectors;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_irq_mask;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_irq_mask = 0;
 
 	void interrupt_vector_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);

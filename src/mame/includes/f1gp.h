@@ -55,11 +55,11 @@ protected:
 	optional_memory_bank m_z80bank;
 
 	/* video-related */
-	tilemap_t   *m_fg_tilemap;
-	tilemap_t   *m_roz_tilemap;
-	int       m_flipscreen;
-	int       m_gfxctrl;
-	int       m_scroll[2];
+	tilemap_t   *m_fg_tilemap = nullptr;
+	tilemap_t   *m_roz_tilemap = nullptr;
+	int       m_flipscreen = 0;
+	int       m_gfxctrl = 0;
+	int       m_scroll[2]{};
 	template<int Chip> uint32_t tile_callback( uint32_t code );
 
 	/* devices */
@@ -119,7 +119,7 @@ public:
 
 private:
 	/* video-related */
-	int       m_roz_bank;
+	int       m_roz_bank = 0;
 
 	/* devices */
 	optional_device<vsystem_spr_device> m_spr; // f1gp2

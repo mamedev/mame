@@ -380,14 +380,14 @@ private:
 	void winner82_sound_cpu_io_map(address_map &map);
 	void winner82_sound_map(address_map &map);
 
-	uint8_t m_blitter_x_reg;
-	uint8_t m_blitter_y_reg;
-	uint8_t m_blitter_aux_reg;
-	uint8_t m_blitter_unk_reg;
+	uint8_t m_blitter_x_reg = 0;
+	uint8_t m_blitter_y_reg = 0;
+	uint8_t m_blitter_aux_reg = 0;
+	uint8_t m_blitter_unk_reg = 0;
 	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp;
-	uint8_t m_lamp_old;
-	uint8_t m_input_selector;
+	uint8_t m_lamp = 0;
+	uint8_t m_lamp_old = 0;
+	uint8_t m_input_selector = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;

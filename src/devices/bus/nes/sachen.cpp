@@ -467,7 +467,7 @@ void nes_sachen_tcu01_device::write_l(offs_t offset, uint8_t data)
 
 	if ((offset & 0x103) == 0x002)
 	{
-		prg32(((data >> 6) & 0x02) | ((data >> 2) & 0x01));
+		prg32(bitswap<2>(data, 7, 2));
 		chr8(data >> 3, CHRROM);
 	}
 }

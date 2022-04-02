@@ -44,7 +44,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<tms34010_device> m_tms;
 
-	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
+	int m_shiftfull = 0; // this might be a driver specific hack for a TMS bug.
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);

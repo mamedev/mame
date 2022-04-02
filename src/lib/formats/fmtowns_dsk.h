@@ -25,6 +25,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_FMTOWNS_FORMAT;
+extern const fmtowns_format FLOPPY_FMTOWNS_FORMAT;
 
 #endif // MAME_FORMATS_FMTOWNS_DSK_H

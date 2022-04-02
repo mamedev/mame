@@ -311,7 +311,7 @@ public:
 	struct floppy_enumerator {
 		virtual ~floppy_enumerator() = default;
 
-		virtual void add(floppy_format_type type, u32 image_size, const char *name, const char *description) = 0;
+		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) = 0;
 		virtual void add_raw(const char *name, u32 key, const char *description) = 0;
 	};
 

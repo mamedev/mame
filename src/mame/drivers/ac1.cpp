@@ -53,7 +53,7 @@ private:
 	u32 screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u8 ac1_port_b_r();
 	u8 ac1_port_a_r();
-	bool has_lowercase;
+	bool has_lowercase = 0;
 	void machine_start() override;
 	void ac1_port_a_w(u8 data);
 	void ac1_port_b_w(u8 data);

@@ -144,8 +144,8 @@ private:
 	optional_shared_ptr<uint8_t> m_videoram;
 	output_finder<16> m_digits;
 
-	uint8_t m_last_misc;
-	uint8_t m_laserdisc_data;
+	uint8_t m_last_misc = 0;
+	uint8_t m_laserdisc_data = 0;
 };
 
 

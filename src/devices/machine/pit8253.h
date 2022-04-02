@@ -82,31 +82,31 @@ private:
 	void set_clockin(double new_clockin);
 
 	// internal state
-	int m_index;                // index number of the timer
-	double m_clockin;           // input clock frequency in Hz
-	attotime m_clock_period;    // precomputed input clock period
-	int m_clock_signal;         // clock signal when clockin is 0
+	int m_index = 0;                // index number of the timer
+	double m_clockin = 0;           // input clock frequency in Hz
+	attotime m_clock_period;        // precomputed input clock period
+	int m_clock_signal = 0;         // clock signal when clockin is 0
 
-	attotime m_last_updated;    // time when last updated
-	attotime m_next_update;     // time of next update
+	attotime m_last_updated;        // time when last updated
+	attotime m_next_update;         // time of next update
 
-	emu_timer *m_updatetimer;   // MAME timer to process updates
+	emu_timer *m_updatetimer = nullptr;   // MAME timer to process updates
 
-	uint16_t m_value;           // current counter value ("CE" in Intel docs)
-	uint16_t m_latch;           // latched counter value ("OL" in Intel docs)
-	uint16_t m_count;           // new counter value ("CR" in Intel docs)
-	uint8_t m_control;          // 6-bit control byte
-	uint8_t m_status;           // status byte - 8254 only
-	uint8_t m_lowcount;         // LSB of new counter value for 16-bit writes
-	bool m_rmsb;                // true = Next read is MSB of 16-bit value
-	bool m_wmsb;                // true = Next write is MSB of 16-bit value
-	int m_output;               // 0 = low, 1 = high
+	uint16_t m_value = 0;           // current counter value ("CE" in Intel docs)
+	uint16_t m_latch = 0;           // latched counter value ("OL" in Intel docs)
+	uint16_t m_count = 0;           // new counter value ("CR" in Intel docs)
+	uint8_t m_control = 0;          // 6-bit control byte
+	uint8_t m_status = 0;           // status byte - 8254 only
+	uint8_t m_lowcount = 0;         // LSB of new counter value for 16-bit writes
+	bool m_rmsb = 0;                // true = Next read is MSB of 16-bit value
+	bool m_wmsb = 0;                // true = Next write is MSB of 16-bit value
+	int m_output = 0;               // 0 = low, 1 = high
 
-	int m_gate;                 // gate input (0 = low, 1 = high)
-	int m_latched_count;        // number of bytes of count latched
-	int m_latched_status;       // 1 = status latched (8254 only)
-	int m_null_count;           // 1 = mode control or count written, 0 = count loaded
-	int m_phase;                // see phase definition tables in simulate2(), below
+	int m_gate = 0;                 // gate input (0 = low, 1 = high)
+	int m_latched_count = 0;        // number of bytes of count latched
+	int m_latched_status = 0;       // 1 = status latched (8254 only)
+	int m_null_count = 0;           // 1 = mode control or count written, 0 = count loaded
+	int m_phase = 0;                // see phase definition tables in simulate2(), below
 };
 
 DECLARE_DEVICE_TYPE(PIT_COUNTER, pit_counter_device)

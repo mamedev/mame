@@ -45,8 +45,6 @@ end
 		MAME_DIR .. "src/lib/util/cdrom.h",
 		MAME_DIR .. "src/lib/util/chd.cpp",
 		MAME_DIR .. "src/lib/util/chd.h",
-		MAME_DIR .. "src/lib/util/chdcd.cpp",
-		MAME_DIR .. "src/lib/util/chdcd.h",
 		MAME_DIR .. "src/lib/util/chdcodec.cpp",
 		MAME_DIR .. "src/lib/util/chdcodec.h",
 		MAME_DIR .. "src/lib/util/client_http.hpp",

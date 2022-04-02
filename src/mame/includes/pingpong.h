@@ -23,8 +23,8 @@ public:
 		m_banks(*this, "bank%d", 1U)
 	{ }
 
-	int m_intenable;
-	int m_question_addr_high;
+	int m_intenable = 0;
+	int m_question_addr_high = 0;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -32,7 +32,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_memory_bank_array<8> m_banks;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void cashquiz_question_bank_high_w(uint8_t data);
 	void cashquiz_question_bank_low_w(uint8_t data);

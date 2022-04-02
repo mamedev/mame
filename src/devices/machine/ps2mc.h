@@ -53,17 +53,17 @@ protected:
 		CMD_UNKNOWN_F3  = 0xf3,
 	};
 
-	uint8_t m_recv_buf[512]; // Buffer size is a guess
-	uint8_t m_xmit_buf[512];
-	uint32_t m_curr_recv;
-	uint32_t m_curr_xmit;
-	uint32_t m_end_recv;
-	uint32_t m_end_xmit;
+	uint8_t m_recv_buf[512]{}; // Buffer size is a guess
+	uint8_t m_xmit_buf[512]{};
+	uint32_t m_curr_recv = 0;
+	uint32_t m_curr_xmit = 0;
+	uint32_t m_end_recv = 0;
+	uint32_t m_end_xmit = 0;
 
-	uint8_t m_cmd;
-	uint32_t m_cmd_size;
-	uint8_t m_terminator;
-	uint8_t m_status;
+	uint8_t m_cmd = 0;
+	uint32_t m_cmd_size = 0;
+	uint8_t m_terminator = 0;
+	uint8_t m_status = 0;
 
 	static const size_t BUFFER_SIZE;
 	static const uint8_t DEFAULT_TERMINATOR;

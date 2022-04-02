@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )

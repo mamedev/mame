@@ -78,22 +78,22 @@ private:
 	void lss_start();
 	void lss_sync();
 
-	floppy_image_device *floppy;
-	int active, bits;
-	uint8_t data_reg;
-	uint16_t address;
-	uint64_t cycles;
+	floppy_image_device *floppy = nullptr;
+	int active = 0, bits = 0;
+	uint8_t data_reg = 0;
+	uint16_t address = 0;
+	uint64_t cycles = 0;
 
-	u8 m_mxcs;
-	int m_unit;
-	int m_state;
+	u8 m_mxcs = 0;
+	int m_unit = 0;
+	int m_state = 0;
 
-	int m_seektime;
-	int m_waittime;
+	int m_seektime = 0;
+	int m_waittime = 0;
 
-	emu_timer *m_timer_lss;
-	emu_timer *m_timer_seek;
-	emu_timer *m_timer_motor;
+	emu_timer *m_timer_lss = nullptr;
+	emu_timer *m_timer_seek = nullptr;
+	emu_timer *m_timer_motor = nullptr;
 
 	uint8_t *m_rom;
 	uint8_t *m_rom_d6;

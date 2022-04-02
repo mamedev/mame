@@ -120,7 +120,7 @@ class ds1994_device : public device_t, public device_nvram_interface
 	uint8_t  m_regs[REGS_SIZE];
 	int      m_state[6];
 	int      m_state_ptr;
-	bool     m_auth;
+	bool     m_auth = false;
 	bool     m_offs_ro;
 
 	attotime t_samp, t_rdv, t_rstl, t_pdh, t_pdl;

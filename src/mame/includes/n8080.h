@@ -195,14 +195,14 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_ioport_array<2> m_pot;
 
-	int m_dac_phase;
-	double m_dac_volume;
-	double m_dac_timing;
+	int m_dac_phase = 0;
+	double m_dac_volume = 0;
+	double m_dac_timing = 0;
 
-	int m_flash;
+	int m_flash = 0;
 	uint8_t m_LSFR[63];
-	unsigned m_mv;
-	unsigned m_sc; // IC56
+	unsigned m_mv = 0;
+	unsigned m_sc = 0; // IC56
 };
 
 

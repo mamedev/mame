@@ -80,7 +80,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_bnk2000;
 
-	uint8_t m_irq_mask;
+	uint8_t m_irq_mask = 0;
 
 	void cmmb_charram_w(offs_t offset, uint8_t data);
 	uint8_t cmmb_input_r(offs_t offset);

@@ -42,11 +42,11 @@ public:
 protected:
 	struct evpc_palette
 	{
-		uint8_t       read_index, write_index, mask;
-		int         read;
-		int         state;
-		struct { uint8_t red, green, blue; } color[0x100];
-		//int dirty;
+		uint8_t       read_index = 0, write_index = 0, mask = 0;
+		int         read = 0;
+		int         state = 0;
+		struct { uint8_t red = 0, green = 0, blue = 0; } color[0x100];
+		//int dirty = 0;
 	};
 
 	void device_start() override;
@@ -66,7 +66,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt_in );
 
-	int     m_address;
+	int     m_address = 0;
 	int     m_dsr_page;
 	bool    m_inDsrArea;
 	bool    m_novram_accessed;

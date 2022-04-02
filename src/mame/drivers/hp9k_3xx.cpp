@@ -134,8 +134,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dio_irq6_w) { m_maincpu->set_input_line(M68K_IRQ_6, state); };
 	DECLARE_WRITE_LINE_MEMBER(dio_irq7_w) { m_maincpu->set_input_line(M68K_IRQ_7, state); };
 
-	bool m_bus_error;
-	emu_timer *m_bus_error_timer;
+	bool m_bus_error = false;
+	emu_timer *m_bus_error_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(bus_error_timeout);
 };
 

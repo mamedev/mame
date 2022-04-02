@@ -53,8 +53,8 @@ private:
 	void iomap_bank(uint8_t *rom);
 	void bank_switch();
 
-	u8 m_mem_page;
-	u8 m_win_mem_page;
+	u8 m_mem_page = 0U;
+	u8 m_win_mem_page = 0U;
 
 	required_device<ram_device> m_ram;
 	required_device<fd1793_device> m_fdc;

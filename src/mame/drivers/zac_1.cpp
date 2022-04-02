@@ -5,8 +5,6 @@
 PINBALL
 Zaccaria Generation 1
 
-Made working in Sept 2012 [Robbbert]
-
 Setup is via a menu - there are no dipswitches.
 
 If you see 6 and 9 flashing at start- this indicates the battery is flat,
@@ -16,9 +14,31 @@ At start, the highscore will be set to a random value. Beating this score will
  award a bonus. Tilting will cause the high score to advance by 100,000.
 
 If at any time you 'clock' the machine (ie exceed 999,990), the last digit will
- flash, indicating you have a million.
+ flash, indicating you have a million. All games have 6-digit displays - don't be
+ fooled by the numerous videos of recreations on YouTube.
 
-The ball number is how many balls are left. 1 = last ball.
+All games:
+- To start, press 1
+- Press X to end ball
+- Ball counter runs backwards, so 1 = last ball.
+- Earth Wind Fire, Locomotion:
+    When on the last ball, scoring points racks up a bonus counter. At the end, you get
+     an extra timed part, with infinite balls until the time runs out. Then press X.
+
+Games:
+- Combat
+- Winter Sports
+- House of Diamonds
+- Future World
+- Shooting the Rapids
+- Hot Wheels
+- Fire Mountain
+- Star God
+- Space Shuttle
+- Earth Wind Fire
+- Locomotion
+**** Other Manufacturer ****
+- Horror (conversion of Space Shuttle)
 
 Sound - there's 5 sound boards
  1. 4 audio oscillators which can be switched on and off independently. It's shown
@@ -42,8 +62,9 @@ Status:
 
 ToDo:
 - Monotone oscillator frequencies are guesses. We assume that only one tone at a time is used.
-- NE555 for hotwheel,strapids,stargod,stargodb,firemntn.
-- Sound for stargoda
+- hotwheel,strapids,stargod,stargodb,firemntn: NE555 to add
+- stargod: Sound is totally bad (stargodb is ok)
+- stargoda: Different unknown sound card
 - No machines sound like the real ones
 - Inbuilt Printer
 
@@ -92,16 +113,21 @@ public:
 	void zac4(machine_config &config);
 
 private:
-	uint8_t ctrl_r();
-	void ctrl_w(uint8_t data);
+	u8 ctrl_r();
+	void ctrl_w(u8 data);
+	DECLARE_READ_LINE_MEMBER(audio_t1_r);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	DECLARE_WRITE_LINE_MEMBER(noise_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	uint8_t reset_int_r();
-	void reset_int_w(uint8_t data);
+	u8 reset_int_r();
+	void reset_int_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	void audio_command_w(u8 data);
+	u8 audio_command_r();
 
 	void locomotp_data(address_map &map);
 	void locomotp_io(address_map &map);
@@ -112,22 +138,18 @@ private:
 	void audio_data(address_map &map);
 	void audio_io(address_map &map);
 
-	uint8_t m_t_c = 0U;
-	uint8_t m_out_offs = 0U;
-	uint8_t m_input_line = 0U;
+	u8 m_t_c = 0U;
+	u8 m_out_offs = 0U;
+	u8 m_input_line = 0U;
 	u8 m_sn_store = 0xffU;
-	bool m_clock_state = 0;
-	bool m_noise_state = 0;
 	u8 m_40193 = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void audio_command_w(uint8_t data);
-	uint8_t audio_command_r();
-	DECLARE_READ_LINE_MEMBER(audio_t1_r);
+	bool m_clock_state = false;
+	bool m_noise_state = false;
+
 	required_device<s2650_device> m_maincpu;
 	optional_device<i8035_device> m_audiocpu;
 	optional_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<uint8_t> m_p_ram;
+	required_shared_ptr<u8> m_p_ram;
 	optional_device<clock_device> m_monotone;
 	optional_device<clock_device> m_astable;
 	optional_device<dac_byte_interface> m_dac;
@@ -169,9 +191,9 @@ void zac_1_state::audio_io(address_map &map)
 	map(0x80, 0xff).r(FUNC(zac_1_state::audio_command_r)); // 40097
 }
 
-static INPUT_PORTS_START( zac_1 )
+static INPUT_PORTS_START( common )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Test") PORT_CODE(KEYCODE_3_PAD) // doesn't seem to do anything
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("CPU Test") PORT_CODE(KEYCODE_3_PAD) // doesn't seem to do anything
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x10, 0x10, "Sound Test" )
@@ -196,8 +218,11 @@ static INPUT_PORTS_START( zac_1 )
 	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD )  // Another tilt
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Burn Test") PORT_CODE(KEYCODE_2_PAD)
+INPUT_PORTS_END
 
-	// from here there are variations per game
+static INPUT_PORTS_START( firemntn )
+	PORT_INCLUDE( common )
+
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("LH Flap") PORT_CODE(KEYCODE_A)
@@ -231,100 +256,131 @@ static INPUT_PORTS_START( zac_1 )
 	PORT_START("X5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("LH Bank Target 1") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("LH Bank Target 2") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("LH Bank Target 3") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("LH Bank Target 4") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RH Bank Target 1") PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RH Bank Target 2") PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RH Bank Target 3") PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RH Bank Target 4") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("LH Bank Target 3") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("LH Bank Target 4") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RH Bank Target 1") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RH Bank Target 2") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RH Bank Target 3") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RH Bank Target 4") PORT_CODE(KEYCODE_ENTER)
 INPUT_PORTS_END
 
-void zac_1_state::audio_command_w(uint8_t data)
+static INPUT_PORTS_START( zac_1 )
+	PORT_INCLUDE( common )
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP17") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP18") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP19") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP20") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP21") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP22") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP23") PORT_CODE(KEYCODE_G)
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP24") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP25") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP26") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP27") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP28") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP29") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP30") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP31") PORT_CODE(KEYCODE_O)
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP32") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP33") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP34") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP35") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP36") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP37") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP38") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP39") PORT_CODE(KEYCODE_W)
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP40") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP41") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP42") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP43") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP44") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP45") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP46") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP47") PORT_CODE(KEYCODE_ENTER)
+INPUT_PORTS_END
+
+void zac_1_state::audio_command_w(u8 data)
 {
+	static const double res[8] { RES_INF, 4700, 2000, 820, 680, 560, 470, 330 }; // locomotp slf resistors
+
 	if (m_soundlatch)
 		m_soundlatch->write(data);
 
 	if (m_sn)
 	{
-		if (m_p_ram[0x86]==1 || m_p_ram[0xb2]==1) // check for game over or tilt
-		{
-			m_sn->enable_w(1);
+		//if (m_p_ram[0x86]==1 || m_p_ram[0xb2]==1) // check for game over or tilt
+		//{
+			//m_sn->enable_w(1);
+			//return;
+		//}
+
+		if (data == m_sn_store)
 			return;
-		}
+		m_sn_store = data;
+
 		// Locomotion
 		if (m_astable)
 		{
+			// check for the steam whistle
+			if (data == 3)
+				m_astable->set_unscaled_clock(1277);
+			else
+			{
+				m_astable->set_unscaled_clock(0);
+				m_clock_state = 0;
+			}
+
+			// 4028 (U12) choose an action upon the 40193 (increment, decrement, reset)
 			switch (data)
 			{
-				case 0:
-					m_astable->set_unscaled_clock(0);
-					m_clock_state = 0;
+				case 7: // schematic says 0 in error
 					m_40193 = 0;
 					break;
 				case 1:
-					m_astable->set_unscaled_clock(0);
-					m_clock_state = 0;
 					if (m_40193 < 7)
 						m_40193++;
 					break;
 				case 2:
-					m_astable->set_unscaled_clock(0);
-					m_clock_state = 0;
 					if (m_40193 > 1)
 						m_40193--;
 					break;
-				case 3:
-					m_astable->set_unscaled_clock(1277);
-					break;
-				default:
+				default: // other numbers are for electronic sounds
 					break;
 			}
 
-			m_sn->envelope_1_w(0);
-			m_sn->envelope_2_w(1);
-			m_sn->mixer_b_w(0);
-			m_sn->mixer_c_w(1);
-
-			switch (m_40193)
+			if (m_40193)
 			{
-				case 0:
-					m_sn->envelope_1_w(1);
-					m_sn->envelope_2_w(0);
-					m_sn->mixer_b_w(1);
-					m_sn->mixer_c_w(0);
-					break;
-				case 1:
-					m_sn->slf_res_w(RES_K(4700));
-					break;
-				case 2:
-					m_sn->slf_res_w(RES_K(2000));
-					break;
-				case 3:
-					m_sn->slf_res_w(RES_K(820));
-					break;
-				case 4:
-					m_sn->slf_res_w(RES_K(680));
-					break;
-				case 5:
-					m_sn->slf_res_w(RES_K(560));
-					break;
-				case 6:
-					m_sn->slf_res_w(RES_K(470));
-					break;
-				case 7:
-					m_sn->slf_res_w(RES_K(330));
-					break;
-				default:
-					break;
+				// select locomotive speed (jiggle B and V to adjust throttle)
+				m_sn->envelope_1_w(0);
+				m_sn->envelope_2_w(1);
+				m_sn->mixer_b_w(0);
+				m_sn->mixer_c_w(1);
+				m_sn->slf_res_w(RES_K(res[m_40193 & 7]));
+				m_sn->enable_w(0);
 			}
-			m_sn->enable_w(0);
+			else
+			{
+				// constant hiss of steam
+				m_sn->envelope_1_w(1);
+				m_sn->envelope_2_w(0);
+				m_sn->mixer_b_w(1);
+				m_sn->mixer_c_w(0);
+				m_sn->slf_res_w(RES_INF);  // pin is disconnected
+				m_sn->enable_w(1);
+			}
 		}
 		else
 		{
 			// Hotwheels, Stargod, Strapids, Firemntn
-			if (data == m_sn_store)
-				return;
-			m_sn_store = data;
 			if (!BIT(data, 0))
 				m_sn->enable_w(1);
 			m_sn->vco_w(1);
@@ -333,6 +389,7 @@ void zac_1_state::audio_command_w(uint8_t data)
 			m_sn->vco_res_w(RES_K(100));
 			m_sn->slf_res_w(RES_M(1));
 			m_sn->one_shot_res_w(RES_K(1500));
+			m_sn->set_pitch_voltage(2.5); // wrong, this is varied by a waveform from the 555.
 			// These extra resistors are in parallel with the above ones, the resultant value is used.
 			switch (data >> 1)
 			{
@@ -396,7 +453,7 @@ WRITE_LINE_MEMBER( zac_1_state::clock_w )
 	m_speaker->level_w((m_clock_state && m_noise_state) ? 1 : 0);
 }
 
-uint8_t zac_1_state::audio_command_r()
+u8 zac_1_state::audio_command_r()
 {
 	return m_soundlatch->read() | (ioport("DSW2")->read() & 0x30);
 }
@@ -406,7 +463,7 @@ READ_LINE_MEMBER(zac_1_state::audio_t1_r)
 	return (m_soundlatch->read() == 0);
 }
 
-uint8_t zac_1_state::ctrl_r()
+u8 zac_1_state::ctrl_r()
 {
 // reads inputs
 	if (m_input_line == 0xfe)
@@ -430,12 +487,12 @@ uint8_t zac_1_state::ctrl_r()
 		return 0xff;
 }
 
-void zac_1_state::ctrl_w(uint8_t data)
+void zac_1_state::ctrl_w(u8 data)
 {
 	m_input_line = data;
 }
 
-void zac_1_state::reset_int_w(uint8_t data)
+void zac_1_state::reset_int_w(u8 data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
@@ -453,7 +510,6 @@ WRITE_LINE_MEMBER( zac_1_state::serial_w )
 
 void zac_1_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -471,7 +527,7 @@ void zac_1_state::machine_reset()
 	else
 	{
 		m_p_ram[0xc0] = 3; // 3 balls
-		for (uint8_t i=0xc1; i < 0xd6; i++)
+		for (u8 i=0xc1; i < 0xd6; i++)
 			m_p_ram[i] = 1; // enable match & coin slots
 		m_p_ram[0xf7] = 5;
 		m_p_ram[0xf8] = 0x0a;
@@ -480,7 +536,6 @@ void zac_1_state::machine_reset()
 
 void zac_1_state::machine_start()
 {
-	genpin_class::machine_start();
 	m_digits.resolve();
 	m_io_outputs.resolve();
 
@@ -506,7 +561,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_inttimer)
    182E-183F is a storage area for inputs. */
 TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	m_out_offs++;
 	if (m_out_offs > 0xbf)
 		m_out_offs = 0;
@@ -516,8 +571,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 	// display
 	if (m_out_offs < 0x2e)
 	{
-		uint8_t display = (m_out_offs >> 3) & 7;
-		uint8_t digit = m_out_offs & 7;
+		u8 display = (m_out_offs >> 3) & 7;
+		u8 digit = m_out_offs & 7;
 		m_digits[display * 10 + digit] = patterns[data];
 		if (m_out_offs == 0x16)
 			audio_command_w(data);
@@ -636,9 +691,9 @@ void zac_1_state::zac3(machine_config &config)
 	m_sn->set_pitch_voltage(5.0);
 	m_sn->set_slf_params(CAP_U(2.2), RES_M(1));
 	m_sn->set_oneshot_params(CAP_U(2.2), RES_K(1500));
-	m_sn->set_vco_mode(0);
-	m_sn->set_mixer_params(1, 1, 1);
-	m_sn->set_envelope_params(0, 1);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
 	m_sn->add_route(ALL_OUTPUTS, "mono", 0.30);
 	// add NE555 here - it provides external vco control,
 	// with 2 fixed frequencies and an auto-sliding frequency
@@ -671,7 +726,7 @@ void zac_1_state::locomotp_data(address_map &map)
 	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(zac_1_state::reset_int_r));
 }
 
-uint8_t zac_1_state::reset_int_r()
+u8 zac_1_state::reset_int_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return 0;
@@ -697,7 +752,7 @@ void zac_1_state::locomotp(machine_config &config)
 	m_sn->set_slf_params(CAP_N(220), RES_K(560));
 	m_sn->set_oneshot_params(CAP_U(1), RES_K(330));
 	m_sn->set_mixer_params(0, 0, 0);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.30);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.125);
 
 	// MM5837 noise device
 	mm5837_device &noise(MM5837(config, "noise"));
@@ -709,6 +764,30 @@ void zac_1_state::locomotp(machine_config &config)
 	m_astable->signal_handler().set(FUNC(zac_1_state::clock_w));
 }
 
+/* SYSTEM-1 ALTERNATE ROMS =======================================================================
+
+This is a list of known alternate roms.
+
+Hot Wheels (alternatives for rom3)
+ROM_LOAD( "hw04-3-425i.bin", 0x0800, 0x0400, CRC(ef0dcd76) SHA1(2250ecb883534df394466bdae96cef1ab7adf190) )
+ROM_LOAD( "hw04-3-429a.bin", 0x0800, 0x0400, CRC(997daff6) SHA1(c0889f1c48e72cdf4b10548442002b31499d4123) )
+ROM_LOAD( "hw04-3-5245.bin", 0x0800, 0x0400, CRC(2067112a) SHA1(8a6c21c6d0fff97b3577f0334d0f5e45a1f076c8) )
+
+Locomotion (tested, not working)
+ROM_LOAD( "loc-2.fil",  0x1c00, 0x0800, CRC(2ca902ac) SHA1(39d2728194933527f2aa4b2f5c2b2695b31bbedf) )
+ROM_LOAD( "loc-4.fil",  0x0c00, 0x0800, CRC(c370a033) SHA1(e21c008662d7253d0eabf68832f93eb458999748) )
+ROM_LOAD( "loc-5.fil",  0x1000, 0x0800, CRC(ba1f3e71) SHA1(f691a9b50295a1ec60c85c820c90d4af629ebc9c) )
+
+Space Shuttle
+ROM_LOAD( "campioneflash1-2-3.bin", 0x0000, 0x0800, CRC(61894206) SHA1(f78724b416c27c26990ad28c1c4f5376353be55b) )
+ROM_LOAD( "flash17.bin",  0x0000, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef) )
+ROM_LOAD( "spaceshuttle3.bin", 0x0800, 0x0400, CRC(c6a95dfc) SHA1(135e65264455da41c35a68378227b1b84517f98c) )
+
+Star God (tested, not working)
+ROM_LOAD( "stargod5.lgc", 0x1000, 0x0400, CRC(03cd4e24) SHA1(b73d383dc71e44277de9116a702b899a54ce32b9) )
+ROM_LOAD( "stargod.snd",  0x7800, 0x0800, CRC(5079e493) SHA1(51d366cdd09ad00b8b016b0ea1c85ac95ef94d71) )
+
+*/
 
 /*--------------------------------
 / Earth Wind Fire (04/81)
@@ -765,10 +844,6 @@ ROM_START(hotwheel)
 	ROM_LOAD ( "htwhls_4.u4", 0x0c00, 0x0400, CRC(974804ba) SHA1(f35c1b52327b2d3170a9a28dbee4d1437f1f594a))
 	ROM_LOAD ( "htwhls_5.u5", 0x1000, 0x0400, CRC(e28f3c60) SHA1(eb780be60b41017d105288cef71906d15474b8fa))
 ROM_END
-// Alternatives for rom3
-//  ROM_LOAD( "hw04-3-425i.bin", 0x0800, 0x0400, CRC(ef0dcd76) SHA1(2250ecb883534df394466bdae96cef1ab7adf190) )
-//  ROM_LOAD( "hw04-3-429a.bin", 0x0800, 0x0400, CRC(997daff6) SHA1(c0889f1c48e72cdf4b10548442002b31499d4123) )
-//  ROM_LOAD( "hw04-3-5245.bin", 0x0800, 0x0400, CRC(2067112a) SHA1(8a6c21c6d0fff97b3577f0334d0f5e45a1f076c8) )
 
 /*--------------------------------
 // House of Diamonds (07/78)
@@ -797,10 +872,6 @@ ROM_START(locomotp)
 	ROM_REGION(0x1000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("loc-snd.fil", 0x0000, 0x0800, CRC(51ea9d2a) SHA1(9a68687af2c1cad2a261f61a67a625d906c502e1))
 ROM_END
-// Alternate dumps (not working)
-//  ROM_LOAD( "loc-2.fil",  0x1c00, 0x0800, CRC(2ca902ac) SHA1(39d2728194933527f2aa4b2f5c2b2695b31bbedf) )
-//  ROM_LOAD( "loc-4.fil",  0x0c00, 0x0800, CRC(c370a033) SHA1(e21c008662d7253d0eabf68832f93eb458999748) )
-//  ROM_LOAD( "loc-5.fil",  0x1000, 0x0800, CRC(ba1f3e71) SHA1(f691a9b50295a1ec60c85c820c90d4af629ebc9c) )
 
 /*--------------------------------
 / Shooting the Rapids (04/79)
@@ -827,10 +898,6 @@ ROM_START(sshtlzac)
 
 	ROM_REGION(0x1000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("spcshtl.snd", 0x0000, 0x0800, CRC(9a61781c) SHA1(0293640653d8cc9532debd31bbb70f025b4e6d03))
-// Alternate dumps
-//  ROM_LOAD( "campioneflash1-2-3.bin", 0x0000, 0x0800, CRC(61894206) SHA1(f78724b416c27c26990ad28c1c4f5376353be55b) )
-//  ROM_LOAD( "flash17.bin",  0x0000, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef) )
-//  ROM_LOAD( "spaceshuttle3.bin", 0x0800, 0x0400, CRC(c6a95dfc) SHA1(135e65264455da41c35a68378227b1b84517f98c) )
 ROM_END
 
 /*--------------------------------
@@ -866,9 +933,6 @@ ROM_START(stargodb) // alternate version of the stargod set, with variable repla
 	ROM_LOAD ( "stargod.u4",  0x0c00, 0x0400, CRC(fdfbb31f) SHA1(b64a529a097a7e2589ff124998160d375153d16c))
 	ROM_LOAD ( "stargod.u5",  0x1000, 0x0400, CRC(536484f8) SHA1(7c40bf7e8b5b21cce44d96633581730ea9eeb176))
 ROM_END
-// Alternate stargod dumps (not working)
-//  ROM_LOAD( "stargod5.lgc", 0x1000, 0x0400, CRC(03cd4e24) SHA1(b73d383dc71e44277de9116a702b899a54ce32b9) )
-//  ROM_LOAD( "stargod.snd",  0x7800, 0x0800, CRC(5079e493) SHA1(51d366cdd09ad00b8b016b0ea1c85ac95ef94d71) )
 
 /*--------------------------------
 / Winter Sports (01/78)
@@ -885,23 +949,23 @@ ROM_END
 } // anonymous namespace
 
 // Basic audio
-GAME(1978, futurwld,  0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Future World",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1978, hod,       0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "House of Diamonds",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1978, wsports,   0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Winter Sports",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(1978, wsports,   0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Winter Sports",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1978, hod,       0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "House of Diamonds",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1978, futurwld,  0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Future World",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
 
 // 1B1125 audio (SN76477, NE555)
-GAME(1980, firemntn,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Fire Mountain",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1979, hotwheel,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Hot Wheels",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1979, strapids,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Shooting the Rapids",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1980, stargod,   0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1980, stargodb,  stargod, zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (variable replay score)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(1979, strapids,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Shooting the Rapids",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1979, hotwheel,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Hot Wheels",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1980, firemntn,  0,       zac3,  firemntn, zac_1_state, empty_init, ROT0, "Zaccaria", "Fire Mountain",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1980, stargod,   0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1980, stargodb,  stargod, zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (variable replay score)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
 
 // 1B1346 audio (i8035, MC1408)
-GAME(1981, ewf,       0,       zac2,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Earth Wind Fire",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(1980, sshtlzac,  0,       zac2,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Space Shuttle (Zaccaria)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(1980, sshtlzac,  0,       zac2,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Space Shuttle (Zaccaria)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1981, ewf,       0,       zac2,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Earth Wind Fire",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
 
 // 1B1146 audio (i8035, MC1408, SN76477, NE555, MM5837)
-GAME(1981, locomotp,  0,       locomotp, zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Locomotion",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(1981, locomotp,  0,       locomotp, zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Locomotion",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
 
 // unknown audio
-GAME(1980, stargoda,  stargod, zac4,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (alternate sound)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(1980, stargoda,  stargod, zac4,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (alternate sound)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )

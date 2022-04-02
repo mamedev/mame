@@ -168,17 +168,17 @@ protected:
 	int avg_common_strobe2();
 	int avg_common_strobe3();
 
-	int m_xmax, m_ymax;
+	int m_xmax = 0, m_ymax = 0;
 
-	u8 m_dvy12;
-	u16 m_timer;
+	u8 m_dvy12 = 0;
+	u16 m_timer = 0;
 
-	u8 m_int_latch;
-	u8 m_bin_scale;
-	u8 m_color;
+	u8 m_int_latch = 0;
+	u8 m_bin_scale = 0;
+	u8 m_color = 0;
 
-	u16 m_xdac_xor;
-	u16 m_ydac_xor;
+	u16 m_xdac_xor = 0;
+	u16 m_ydac_xor = 0;
 };
 
 
@@ -215,11 +215,11 @@ private:
 	required_shared_ptr<u8> m_colorram;
 	required_region_ptr<u8> m_bank_region;
 
-	u8 m_enspkl;
-	u8 m_spkl_shift;
-	u8 m_map;
+	u8 m_enspkl = 0;
+	u8 m_spkl_shift = 0;
+	u8 m_map = 0;
 
-	u16 m_lst;
+	u16 m_lst = 0;
 };
 
 
@@ -270,14 +270,14 @@ protected:
 	virtual int handler_7() override;
 
 private:
-	u16 m_hst;
-	u16 m_lst;
-	u16 m_izblank;
+	u16 m_hst = 0;
+	u16 m_lst = 0;
+	u16 m_izblank = 0;
 
-	s32 m_clipx_min;
-	s32 m_clipy_min;
-	s32 m_clipx_max;
-	s32 m_clipy_max;
+	s32 m_clipx_min = 0;
+	s32 m_clipy_min = 0;
+	s32 m_clipx_max = 0;
+	s32 m_clipy_max = 0;
 };
 
 

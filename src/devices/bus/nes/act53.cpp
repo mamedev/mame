@@ -155,7 +155,7 @@ void nes_action53_device::write_l(offs_t offset, u8 data)
 	LOG_MMC(("action 53 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 	if (offset >= 0x1000)
-		m_sel = BIT(data, 0) | (BIT(data, 7) << 1);
+		m_sel = bitswap<2>(data, 7, 0);
 }
 
 

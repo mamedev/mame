@@ -52,7 +52,7 @@ private:
 	optional_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
 	std::unique_ptr<u16[]> m_spriteram;
-	size_t m_spriteram_size;
+	size_t m_spriteram_size = 0;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 

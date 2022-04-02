@@ -23,8 +23,8 @@ public:
 
 private:
 	// kov2
-	u32        m_kov2_latchdata_68k_w;
-	u32        m_kov2_latchdata_arm_w;
+	u32        m_kov2_latchdata_68k_w = 0;
+	u32        m_kov2_latchdata_arm_w = 0;
 
 	required_shared_ptr<u32> m_arm_ram;
 	required_shared_ptr<u32> m_arm7_shareram;

@@ -351,7 +351,7 @@ function cheatfind.startplugin()
 			for num, func in ipairs(menu) do
 				local item, f = func()
 				if item then
-					menu_list[#menu_list + 1] = item
+					table.insert(menu_list, item)
 					menu_func[#menu_list] = f
 				end
 			end
@@ -715,9 +715,9 @@ function cheatfind.startplugin()
 				end
 				local m
 				if optable[opsel] == "ltv" or optable[opsel] == "gtv" or optable[opsel] == "eqv" or optable[opsel] == "nev" then
-					m = { _("Value"), value, "" }
+					m = { _("Value"), tostring(value), "" }
 				else
-					m = { _("Difference"), value, "" }
+					m = { _("Difference"), tostring(value), "" }
 				end
 				local max = 100 -- max value?
 				menu_lim(value, 0, max, m)
@@ -792,7 +792,7 @@ function cheatfind.startplugin()
 				end
 				menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 				menu[#menu + 1] = function()
-					local m = { _("Match block"), matchsel, "" }
+					local m = { _("Match block"), tostring(matchsel), "" }
 					menu_lim(matchsel, 0, #matches[#matches], m)
 					if matchsel == 0 then
 						m[2] = _("All")
@@ -1017,7 +1017,7 @@ function cheatfind.startplugin()
 				end
 				if matches[#matches].count > 100 then
 					menu[#menu + 1] = function()
-						local m = { _("Page"), matchpg, "on" }
+						local m = { _("Page"), tostring(matchpg), "on" }
 						local max
 						if matchsel == 0 then
 							max = math.ceil(matches[#matches].count / 100) - 1

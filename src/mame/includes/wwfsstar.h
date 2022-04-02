@@ -46,11 +46,11 @@ private:
 	required_shared_ptr<uint16_t> m_fg0_videoram;
 	required_shared_ptr<uint16_t> m_bg0_videoram;
 
-	int m_vblank;
-	int m_scrollx;
-	int m_scrolly;
-	tilemap_t *m_fg0_tilemap;
-	tilemap_t *m_bg0_tilemap;
+	int m_vblank = 0;
+	int m_scrollx = 0;
+	int m_scrolly = 0;
+	tilemap_t *m_fg0_tilemap = nullptr;
+	tilemap_t *m_bg0_tilemap = nullptr;
 
 	void scroll_w(offs_t offset, uint16_t data);
 	void flipscreen_w(uint16_t data);

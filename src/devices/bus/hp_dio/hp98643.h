@@ -79,8 +79,8 @@ private:
 
 	std::array<uint16_t, 8192> m_ram;
 
-	uint16_t m_sc;
-	bool m_installed_io;
+	uint16_t m_sc = 0;
+	bool m_installed_io = false;
 };
 
 } // namespace bus::hp_dio

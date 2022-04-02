@@ -60,18 +60,18 @@ protected:
 	required_device<z80scc_device> m_scc;
 
 private:
-	u32 m_reg0;
+	u32 m_reg0 = 0;
 
-	u32 m_control;
-	u32 m_status;
-	u32 m_fifo;
-	u32 m_kernel;
-	u32 m_attention;
+	u32 m_control = 0;
+	u32 m_status = 0;
+	u32 m_fifo = 0;
+	u32 m_kernel = 0;
+	u32 m_attention = 0;
 
-	u32 m_ififo_lwm;
-	u32 m_ififo_hwm;
+	u32 m_ififo_lwm = 0;
+	u32 m_ififo_hwm = 0;
 
-	u32 m_srx_master_control;
+	u32 m_srx_master_control = 0;
 };
 
 class edge2_processor_device_base : public device_t, public device_srx_card_interface
@@ -130,16 +130,16 @@ protected:
 
 
 private:
-	u32 m_control;
-	u32 m_status;
-	u32 m_attention;
-	u32 m_mapping;
-	u32 m_kernel;
+	u32 m_control = 0;
+	u32 m_status = 0;
+	u32 m_attention = 0;
+	u32 m_mapping = 0;
+	u32 m_kernel = 0;
 
-	u32 m_ififo_lwm;
-	u32 m_ififo_hwm;
+	u32 m_ififo_lwm = 0;
+	u32 m_ififo_hwm = 0;
 
-	u32 m_reg0;
+	u32 m_reg0 = 0;
 
 	screen_device *m_screen;
 	ram_device *m_sram;
@@ -172,8 +172,8 @@ protected:
 	required_device_array<bt457_device, 3> m_ramdac;
 
 private:
-	u32 m_unk_304;
-	u32 m_select;
+	u32 m_unk_304 = 0;
+	u32 m_select = 0;
 };
 
 class mpcb828_device : public edge1_device_base

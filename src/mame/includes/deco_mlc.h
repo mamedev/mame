@@ -61,15 +61,15 @@ private:
 
 	required_region_ptr<u8> m_gfx2;
 
-	int m_irqLevel;
-	u32 m_vbl_i;
-	u32 m_colour_mask;
-	u32 m_shadow_mask;
-	u32 m_shadow_shift;
+	int m_irqLevel = 0;
+	u32 m_vbl_i = 0U;
+	u32 m_colour_mask = 0U;
+	u32 m_shadow_mask = 0U;
+	u32 m_shadow_shift = 0U;
 
-	std::unique_ptr<u16[]> m_spriteram;
-	std::unique_ptr<u16[]> m_spriteram_spare;
-	std::unique_ptr<u16[]> m_buffered_spriteram;
+	std::unique_ptr<u16[]> m_spriteram{};
+	std::unique_ptr<u16[]> m_spriteram_spare{};
+	std::unique_ptr<u16[]> m_buffered_spriteram{};
 
 	u32 mlc_440008_r();
 	u32 mlc_44001c_r(offs_t offset);

@@ -103,15 +103,15 @@ private:
 	uint32_t screen_update_schick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_VIDEO_START(schick);
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_charbank;
-	uint8_t m_spritebank;
-	uint8_t m_palettebank;
-	uint8_t m_colortablebank;
-	uint8_t m_flipscreen;
-	uint8_t m_bgpriority;
-	uint8_t m_inv_spr;
-	uint8_t m_extrabank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_charbank = 0;
+	uint8_t m_spritebank = 0;
+	uint8_t m_palettebank = 0;
+	uint8_t m_colortablebank = 0;
+	uint8_t m_flipscreen = 0;
+	uint8_t m_bgpriority = 0;
+	uint8_t m_inv_spr = 0;
+	uint8_t m_extrabank = 0;
 };
 
 #define MASTER_CLOCK        (18432000)

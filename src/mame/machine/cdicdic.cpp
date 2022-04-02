@@ -931,7 +931,7 @@ void cdicdic_device::process_disc_sector()
 	LOGMASKED(LOG_SECTORS, "Disc sector, current LBA: %08x, MSF: %02x %02x %02x\n", real_lba, mins_bcd, secs_bcd, frac_bcd);
 
 	uint8_t buffer[2560] = { 0 };
-	cdrom_read_data(m_cd, m_curr_lba, buffer, CD_TRACK_RAW_DONTCARE);
+	m_cd->read_data(m_curr_lba, buffer, cdrom_file::CD_TRACK_RAW_DONTCARE);
 
 	// Detect (badly) if we're dealing with a byteswapped loose-bin image
 	if (buffer[0] == 0xff && buffer[1] == 0x00)
@@ -1022,23 +1022,23 @@ void cdicdic_device::process_disc_sector()
 	if (m_disc_mode == DISC_TOC)
 	{
 		uint8_t *toc_buffer = buffer;
-		const cdrom_toc *toc = cdrom_get_toc(m_cd);
+		const cdrom_file::toc &toc = m_cd->get_toc();
 		uint32_t entry_count = 0;
 
 		// Determine total frame count for data, and total audio track count
-		uint32_t frames = toc->tracks[0].pregap;
+		uint32_t frames = toc.tracks[0].pregap;
 		int audio_tracks = 0;
 		int other_tracks = 0;
-		uint32_t audio_starts[CD_MAX_TRACKS];
-		for (uint32_t i = 0; i < toc->numtrks; i++)
+		uint32_t audio_starts[cdrom_file::MAX_TRACKS];
+		for (uint32_t i = 0; i < toc.numtrks; i++)
 		{
-			if (toc->tracks[i].trktype != CD_TRACK_AUDIO)
+			if (toc.tracks[i].trktype != cdrom_file::CD_TRACK_AUDIO)
 			{
-				frames += toc->tracks[i].frames + toc->tracks[i].extraframes;
+				frames += toc.tracks[i].frames + toc.tracks[i].extraframes;
 			}
 			else
 			{
-				audio_starts[audio_tracks++] = toc->tracks[i].logframeofs;
+				audio_starts[audio_tracks++] = toc.tracks[i].logframeofs;
 			}
 		}
 
@@ -1572,7 +1572,7 @@ void cdicdic_device::device_reset()
 	else
 	{
 		// Arcade case
-		m_cd = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
+		m_cd = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom"));
 	}
 
 	m_audio_timer->adjust(attotime::from_hz(75), 0, attotime::from_hz(75));

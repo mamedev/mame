@@ -73,7 +73,7 @@ protected:
 	virtual void interface_pre_start() override;
 
 	void set_screen(screen_device *screen) { m_screen = screen; }
-	screen_device *m_screen;
+	screen_device *m_screen = nullptr;
 
 private:
 	astrocade_accessory_port_device *const m_port;

@@ -219,9 +219,9 @@ private:
 	void sun3_460_mem(address_map &map);
 	void sun3_80_mem(address_map &map);
 
-	uint32_t m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
-	uint32_t m_iommu[0x800];
-	bool m_bInBusErr;
+	uint32_t m_enable = 0, m_buserr = 0, m_diag = 0, m_printer = 0, m_irqctrl = 0, m_memreg = 0, m_memerraddr = 0;
+	uint32_t m_iommu[0x800]{};
+	bool m_bInBusErr = false;
 };
 
 void sun3x_state::sun3_80_mem(address_map &map)

@@ -61,16 +61,16 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t *m_tilemap_0;
-	tilemap_t *m_tilemap_1;
-	tilemap_t *m_tilemap_2;
+	tilemap_t *m_tilemap_0 = nullptr;
+	tilemap_t *m_tilemap_1 = nullptr;
+	tilemap_t *m_tilemap_2 = nullptr;
 
 	bitmap_ind16 m_tmpbitmap;
-	uint8_t m_palbank;
-	uint8_t m_priority;
-	uint8_t m_pixbank;
-	int m_sprite_inc;
-	int m_irq_count;
+	uint8_t m_palbank = 0;
+	uint8_t m_priority = 0;
+	uint8_t m_pixbank = 0;
+	int m_sprite_inc = 0;
+	int m_irq_count = 0;
 
 	// common
 	void rombank_w(uint8_t data);

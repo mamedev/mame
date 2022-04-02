@@ -1534,9 +1534,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	uint8_t read_buffer[0x20];
-	uint8_t write_buffer[0x20];
-	chihiro_state *chihirosystem;
+	uint8_t read_buffer[0x20]{};
+	uint8_t write_buffer[0x20]{};
+	chihiro_state *chihirosystem{};
 	static const int size_factor = 2;
 };
 

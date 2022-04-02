@@ -64,23 +64,23 @@ protected:
 	output_finder<> m_lamp;
 
 	// machine state
-	uint8_t       m_i8279_scanlines;
+	uint8_t       m_i8279_scanlines = 0;
 
 	// sound state
-	uint8_t       m_sound_state[3];
+	uint8_t       m_sound_state[3]{};
 
 	// video state
-	tilemap_t * m_fg_tilemap;
+	tilemap_t * m_fg_tilemap = nullptr;
 
 	struct sprite_info
 	{
-		uint16_t  ve;                 // VE0-15 signals for this row
-		uint8_t   lst;                // LST0-7 signals for this row
-		uint32_t  latched[8];         // latched pixel data
-		uint8_t   plb[8];             // latched PLB state
-		uint32_t  offset[8];          // current offset for this row
-		uint32_t  frac[8];            // leftover fraction
-		uint32_t  step[8];            // stepping value
+		uint16_t  ve = 0;                 // VE0-15 signals for this row
+		uint8_t   lst = 0;                // LST0-7 signals for this row
+		uint32_t  latched[8]{};         // latched pixel data
+		uint8_t   plb[8]{};             // latched PLB state
+		uint32_t  offset[8]{};          // current offset for this row
+		uint32_t  frac[8]{};            // leftover fraction
+		uint32_t  step[8]{};            // stepping value
 	};
 
 	sprite_info m_sprite_info;
@@ -170,17 +170,17 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	uint8_t       m_col;
-	uint8_t       m_ply;
-	uint8_t       m_flip;
-	uint8_t       m_mdis;
-	uint8_t       m_mdir;
-	uint8_t       m_tdis;
-	uint8_t       m_tdir;
-	uint8_t       m_fdis;
-	uint8_t       m_fdir;
-	uint8_t       m_hdis;
-	uint8_t       m_hdir;
+	uint8_t       m_col = 0;
+	uint8_t       m_ply = 0;
+	uint8_t       m_flip = 0;
+	uint8_t       m_mdis = 0;
+	uint8_t       m_mdir = 0;
+	uint8_t       m_tdis = 0;
+	uint8_t       m_tdir = 0;
+	uint8_t       m_fdis = 0;
+	uint8_t       m_fdir = 0;
+	uint8_t       m_hdis = 0;
+	uint8_t       m_hdir = 0;
 
 	void ppi0a_w(uint8_t data);
 	void ppi0b_w(uint8_t data);

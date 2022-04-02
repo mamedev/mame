@@ -51,15 +51,15 @@ public:
 
 private:
 	/* Registers */
-	uint8_t CR;  /* Command register */
-	uint8_t CSR; /* Clock select register */
+	uint8_t CR = 0;  /* Command register */
+	uint8_t CSR = 0; /* Clock select register */
 	uint8_t MR1; /* Mode register 1 */
 	uint8_t MR2; /* Mode register 2 */
-	uint8_t MR_ptr; /* Mode register pointer */
+	uint8_t MR_ptr = 0; /* Mode register pointer */
 	uint8_t SR;  /* Status register */
 
 	/* State */
-	int tx_baud_rate, rx_baud_rate;
+	int tx_baud_rate = 0, rx_baud_rate = 0;
 
 	/* Receiver */
 	uint8_t rx_enabled;
@@ -68,18 +68,18 @@ private:
 	int   rx_fifo_write_ptr;
 	int   rx_fifo_num;
 
-	int m_ch;
+	int m_ch = 0;
 
 	/* Transmitter */
 	uint8_t tx_enabled;
-	uint8_t tx_data;
-	uint8_t tx_ready;
+	uint8_t tx_data = 0;
+	uint8_t tx_ready = 0;
 	bool m_tx_break;
 
 	/* Rx/Tx clocking */
-	uint8_t m_rx_prescaler , m_tx_prescaler;
+	uint8_t m_rx_prescaler = 0, m_tx_prescaler = 0;
 
-	duart_base_device *m_uart;
+	duart_base_device *m_uart = nullptr;
 
 	void write_MR(uint8_t data);
 	void write_CR(uint8_t data);
@@ -219,7 +219,7 @@ protected:
 private:
 	bool m_read_vector; // if this is read and IRQ is active, it counts as pulling IACK
 
-	uint8_t IVR;  /* Interrupt Vector Register */
+	uint8_t IVR = 0;  /* Interrupt Vector Register */
 };
 
 class sc28c94_device : public duart_base_device

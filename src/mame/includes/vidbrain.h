@@ -82,14 +82,14 @@ private:
 	uint8_t memory_read_byte(offs_t offset);
 
 	// keyboard state
-	uint8_t m_keylatch;
-	int m_joy_enable;
+	uint8_t m_keylatch = 0;
+	int m_joy_enable = 0;
 
 	// sound state
-	int m_sound_clk;
+	int m_sound_clk = 0;
 
 	// timers
-	emu_timer *m_timer_ne555;
+	emu_timer *m_timer_ne555 = nullptr;
 	void vidbrain_io(address_map &map);
 	void vidbrain_mem(address_map &map);
 };

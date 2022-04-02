@@ -65,7 +65,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<20> m_io_keyboard;
-	bool m_spr_bit;
+	bool m_spr_bit = false;
 };
 
 

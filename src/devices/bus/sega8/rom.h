@@ -392,8 +392,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint8_t m_gamesel;
-	uint8_t m_readxor;
+	uint8_t m_gamesel = 0;
+	uint8_t m_readxor = 0;
 };
 
 
@@ -420,7 +420,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t m_block;
+	uint8_t m_block = 0;
 };
 
 
@@ -447,7 +447,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t m_block;
+	uint8_t m_block = 0;
 };
 
 class sega8_x_terminator_device : public sega8_rom_device

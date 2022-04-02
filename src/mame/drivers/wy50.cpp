@@ -82,12 +82,12 @@ private:
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr_array<u8, 2> m_videoram;
 
-	u8 m_cur_attr;
-	u8 m_last_row_attr;
-	u8 m_row_buffer_char;
-	bool m_font2;
-	bool m_rev_prot;
-	bool m_is_132;
+	u8 m_cur_attr = 0U;
+	u8 m_last_row_attr = 0U;
+	u8 m_row_buffer_char = 0U;
+	bool m_font2 = false;
+	bool m_rev_prot = false;
+	bool m_is_132 = false;
 };
 
 void wy50_state::machine_start()

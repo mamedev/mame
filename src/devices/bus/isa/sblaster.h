@@ -73,35 +73,35 @@ protected:
 
 	struct sb8_mixer
 	{
-		uint8_t status;
-		uint8_t main_vol;
-		uint8_t dac_vol;
-		uint8_t fm_vol;
-		uint8_t mic_vol;
-		uint8_t in_filter;
-		uint8_t stereo_sel;
-		uint8_t cd_vol;
-		uint8_t line_vol;
+		uint8_t status = 0;
+		uint8_t main_vol = 0;
+		uint8_t dac_vol = 0;
+		uint8_t fm_vol = 0;
+		uint8_t mic_vol = 0;
+		uint8_t in_filter = 0;
+		uint8_t stereo_sel = 0;
+		uint8_t cd_vol = 0;
+		uint8_t line_vol = 0;
 	};
 
 	struct sb16_mixer
 	{
-		uint8_t data;
-		uint8_t status;
-		uint8_t main_vol[2];
-		uint8_t dac_vol[2];
-		uint8_t fm_vol[2];
-		uint8_t cd_vol[2];
-		uint8_t line_vol[2];
-		uint8_t mic_vol;
-		uint8_t pc_speaker_vol;
-		uint8_t output_ctl;
-		uint8_t input_ctl[2];
-		uint8_t input_gain[2];
-		uint8_t output_gain[2];
-		uint8_t agc;
-		uint8_t treble[2];
-		uint8_t bass[2];
+		uint8_t data = 0;
+		uint8_t status = 0;
+		uint8_t main_vol[2]{};
+		uint8_t dac_vol[2]{};
+		uint8_t fm_vol[2]{};
+		uint8_t cd_vol[2]{};
+		uint8_t line_vol[2]{};
+		uint8_t mic_vol = 0;
+		uint8_t pc_speaker_vol = 0;
+		uint8_t output_ctl = 0;
+		uint8_t input_ctl[2]{};
+		uint8_t input_gain[2]{};
+		uint8_t output_gain[2]{};
+		uint8_t agc = 0;
+		uint8_t treble[2]{};
+		uint8_t bass[2]{};
 	};
 
 	// construction/destruction

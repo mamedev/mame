@@ -79,13 +79,13 @@ private:
 
 	void        hold_load();
 	void        device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	int         m_intlines;
-	int         m_int_level;
-	emu_timer*  m_nmi_timer;
+	int         m_intlines = 0;
+	int         m_int_level = 0;
+	emu_timer*  m_nmi_timer = nullptr;
 	void        reset_int_lines();
 	void        set_int_line(int line, int state);
 
-	bool        m_ckon_state;
+	bool        m_ckon_state = 0;
 
 	// Connected devices
 	required_device<tms9900_device>     m_maincpu;

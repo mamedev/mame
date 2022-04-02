@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_EXCALI64_FORMAT;
+extern const excali64_format FLOPPY_EXCALI64_FORMAT;
 
 #endif // MAME_FORMATS_EXCALI64_DSK_H

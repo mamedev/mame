@@ -100,12 +100,12 @@ protected:
 	// internal state
 	required_device<sparc_base_device> m_maincpu;
 	required_address_space m_type1space;
-	address_space *m_space;
+	address_space *m_space = nullptr;
 
 	devcb_write_line::array<7> m_irq_cb;
 	devcb_write32 m_buserr;
 
-	device_sbus_card_interface *m_device_list[3];
+	device_sbus_card_interface *m_device_list[3]{};
 
 private:
 	void slot1_timeout_map(address_map &map);
@@ -148,7 +148,7 @@ protected:
 
 	optional_device<sbus_device> m_sbus_finder;
 	sbus_device *m_sbus;
-	const char *m_sbus_slottag;
+	const char *m_sbus_slottag = nullptr;
 	int m_slot;
 	uint32_t m_base;
 };

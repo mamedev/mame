@@ -82,6 +82,7 @@ known chips:
  *A86     HD44820  1983, Chess King Pocket Micro
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
+ *A13     HD44840  1982, CXG Computachess II
  *A14     HD44840  1982, CXG Computachess II / Advanced Portachess
 
  *B55     HD44860  1987, Saitek Pro Bridge 100

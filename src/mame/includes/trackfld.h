@@ -101,17 +101,17 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	int      m_bg_bank;
-	int      m_sprite_bank1;
-	int      m_sprite_bank2;
-	int      m_old_gfx_bank;                    // needed by atlantol
-	int      m_sprites_gfx_banked;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	int      m_bg_bank = 0;
+	int      m_sprite_bank1 = 0;
+	int      m_sprite_bank2 = 0;
+	int      m_old_gfx_bank = 0;                    // needed by atlantol
+	int      m_sprites_gfx_banked = 0;
 
-	bool     m_irq_mask;
-	bool     m_nmi_mask;
+	bool     m_irq_mask = false;
+	bool     m_nmi_mask = false;
 
-	uint8_t m_SN76496_latch;
+	uint8_t m_SN76496_latch = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);

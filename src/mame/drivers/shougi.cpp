@@ -123,8 +123,8 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	uint8_t m_nmi_enabled;
-	int m_r;
+	uint8_t m_nmi_enabled = 0;
+	int m_r = 0;
 };
 
 

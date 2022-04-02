@@ -116,6 +116,9 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	int m_icount;
+	int m_state_count;
+
 	int m_prgwidth;
 	int m_datawidth;
 	int m_prgmask;
@@ -129,7 +132,6 @@ protected:
 	u8 m_arg;            // opcode argument for 2-byte opcodes
 	u8 m_bitmask;        // opcode bit argument
 	bool m_skip;         // skip next opcode
-	int m_icount;
 	emu_timer *m_timer;
 
 	u16 m_pc;            // program counter

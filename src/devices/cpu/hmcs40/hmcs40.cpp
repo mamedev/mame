@@ -199,12 +199,6 @@ std::unique_ptr<util::disasm_interface> hmcs40_cpu_device::create_disassembler()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	HMCS40_PC=1, HMCS40_A, HMCS40_B,
-	HMCS40_X, HMCS40_SPX, HMCS40_Y, HMCS40_SPY
-};
-
 void hmcs40_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -282,17 +276,18 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_d));
 
 	// register state for debugger
-	state_add(HMCS40_PC,  "PC",  m_pc).formatstr("%04X");
-	state_add(HMCS40_A,   "A",   m_a).formatstr("%01X");
-	state_add(HMCS40_B,   "B",   m_b).formatstr("%01X");
-	state_add(HMCS40_X,   "X",   m_x).formatstr("%01X");
-	state_add(HMCS40_SPX, "SPX", m_spx).formatstr("%01X");
-	state_add(HMCS40_Y,   "Y",   m_y).formatstr("%01X");
-	state_add(HMCS40_SPY, "SPY", m_spy).formatstr("%01X");
-
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_s).formatstr("%2s").noshow();
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 2
+	state_add(++m_state_count, "B", m_b).formatstr("%01X"); // 3
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 4
+	state_add(++m_state_count, "SPX", m_spx).formatstr("%01X"); // 5
+	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 6
+	state_add(++m_state_count, "SPY", m_spy).formatstr("%01X"); // 7
 
 	set_icountptr(m_icount);
 }

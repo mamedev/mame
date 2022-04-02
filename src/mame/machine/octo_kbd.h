@@ -24,9 +24,9 @@ protected:
 private:
 	virtual void received_byte(uint8_t data) override;
 
-	int m_delay;  // keypress delay after initial press
-	int m_repeat; // keypress repeat rate
-	uint8_t m_enabled;  // keyboard enabled?
+	int m_delay = 0;  // keypress delay after initial press
+	int m_repeat = 0; // keypress repeat rate
+	uint8_t m_enabled = 0;  // keyboard enabled?
 };
 
 DECLARE_DEVICE_TYPE(OCTOPUS_KEYBOARD, octopus_keyboard_device)

@@ -46,7 +46,7 @@ uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	std::sort(order.begin(), order.end(), layer_sort(*m_vmixer));
 
-	int spri[4];
+	int spri[4]{};
 	int level = 0;
 	for(int i=0; i<12; i++)
 		if(order[i] < 8)

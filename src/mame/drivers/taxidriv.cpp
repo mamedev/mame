@@ -462,17 +462,6 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout charlayout2 =
 {
 	4,4,
@@ -486,10 +475,10 @@ static const gfx_layout charlayout2 =
 
 
 static GFXDECODE_START( gfx_taxidriv )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb, 0, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_lsb, 0, 1 )
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_lsb, 0, 1 )
 	GFXDECODE_ENTRY( "gfx5", 0, charlayout2, 0, 1 )
 GFXDECODE_END
 

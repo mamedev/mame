@@ -115,15 +115,15 @@ private:
 	required_shared_ptr<uint8_t> m_bitmapram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t       m_trackball_offset;
-	uint8_t       m_ctrld;
-	uint8_t       m_videoram[0x10000];
+	uint8_t       m_trackball_offset = 0U;
+	uint8_t       m_ctrld = 0U;
+	uint8_t       m_videoram[0x10000]{};
 
-	bool m_planet_select;
+	bool m_planet_select = false;
 
 	// The following array collects the 2 different planet
 	// descriptions, which are selected by planetbit
-	planet m_planets[2];
+	planet m_planets[2]{};
 };
 
 #endif // MAME_INCLUDES_LIBERATR_H

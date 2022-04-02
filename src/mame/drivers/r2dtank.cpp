@@ -94,9 +94,9 @@ private:
 	required_device<ay8910_device> m_ay1;
 	required_device<ay8910_device> m_ay2;
 
-	uint8_t m_flipscreen;
-	uint32_t m_ttl74123_output;
-	uint8_t m_AY8910_selected;
+	uint8_t m_flipscreen = 0;
+	uint32_t m_ttl74123_output = 0;
+	uint8_t m_AY8910_selected = 0;
 
 	uint8_t audio_command_r();
 	void audio_command_w(uint8_t data);
@@ -391,9 +391,9 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )

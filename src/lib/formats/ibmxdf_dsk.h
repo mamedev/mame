@@ -23,13 +23,13 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 	virtual bool supports_save() const override { return false; }
 
-	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual int get_image_offset(const format &f, int head, int track) override;
-	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track) override;
+	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual int get_image_offset(const format &f, int head, int track) const override;
+	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track) const override;
 
 private:
 	static const format formats[];
@@ -40,6 +40,6 @@ private:
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
 };
 
-extern const floppy_format_type FLOPPY_IBMXDF_FORMAT;
+extern const ibmxdf_format FLOPPY_IBMXDF_FORMAT;
 
 #endif // MAME_FORMATS_IBMXDF_DSK_H

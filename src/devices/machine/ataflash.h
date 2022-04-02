@@ -30,10 +30,10 @@ protected:
 	uint8_t calculate_status() override { return ata_hle_device::calculate_status(); }
 
 private:
-	uint8_t m_cis[512];
-	uint8_t m_configuration_option;
-	uint8_t m_configuration_and_status;
-	uint8_t m_pin_replacement;
+	uint8_t m_cis[512]{};
+	uint8_t m_configuration_option = 0;
+	uint8_t m_configuration_and_status = 0;
+	uint8_t m_pin_replacement = 0;
 };
 
 DECLARE_DEVICE_TYPE(TAITO_PCCARD1, taito_pccard1_device)

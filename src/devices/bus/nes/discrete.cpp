@@ -156,7 +156,7 @@ void nes_74x139x74_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("74x139x74 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(((data & 0x02) >> 1) | ((data & 0x01) << 1), CHRROM);
+	chr8(bitswap<2>(data, 0, 1), CHRROM);
 }
 
 /*-------------------------------------------------

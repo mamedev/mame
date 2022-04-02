@@ -67,13 +67,13 @@ to the crappy artwork of the person that did the bootleg.
 Dip switches are not complete and they don't seem to differ from
 the original machine.
 
-Last but not least, the set of ROMs i have for Euro League seem to have
+Last but not least, the set of ROMs I have for Euro League seem to have
 the sprites corrupted. The game seems to be exactly the same as the
 World Cup 90 bootleg.
 
 Noted added by ClawGrip 28-Mar-2008:
 -----------------------------------
--Dumped and added the all the PCB GALs.
+-Dumped and added all the PCB GALs.
 -Removed the second YM2203, Ernesto said it wasn't present on his board,
  and also isn't on mine.
 -My PCB has a different ROM (a05.bin), but only two bytes are different.
@@ -85,41 +85,350 @@ Noted added by ClawGrip 28-Mar-2008:
 */
 
 #include "emu.h"
-#include "includes/wc90b.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "sound/msm5205.h"
 #include "sound/ymopn.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-#define TEST_DIPS false /* enable to test unmapped dip switches */
+namespace {
 
-#define MASTER_CLOCK XTAL(14'318'181)/2
-#define SOUND_CLOCK XTAL(20'000'000)/4
-#define YM2203_CLOCK XTAL(20'000'000)/16
-#define MSM5205_CLOCK XTAL(384'000)
+class wc90b_state : public driver_device
+{
+public:
+	wc90b_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm"),
+		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_txvideoram(*this, "txvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_mainbank(*this, "mainbank"),
+		m_subbank(*this, "subbank"),
+		m_audiobank(*this, "audiobank"),
+		m_scrollx(*this, "scrollx%u", 1U),
+		m_scrolly(*this, "scrolly%u", 1U),
+		m_scroll_x_lo(*this, "scroll_x_lo")
+	{ }
 
+	void wc90b(machine_config &config);
+	void eurogael(machine_config &config);
+
+	void init_wc90b();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_txvideoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_memory_bank m_mainbank;
+	required_memory_bank m_subbank;
+	required_memory_bank m_audiobank;
+
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void txvideoram_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+
+private:
+	optional_shared_ptr_array<uint8_t, 2> m_scrollx;
+	optional_shared_ptr_array<uint8_t, 2> m_scrolly;
+	optional_shared_ptr<uint8_t> m_scroll_x_lo;
+
+	void main_map(address_map &map);
+
+	uint8_t m_msm5205next;
+	uint8_t m_toggle;
+
+	void sub_bankswitch_w(uint8_t data);
+	void adpcm_data_w(uint8_t data);
+	void adpcm_control_w(uint8_t data);
+	uint8_t master_irq_ack_r();
+	void slave_irq_ack_w(uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+};
+
+
+class eurogael_state : public wc90b_state
+{
+public:
+	eurogael_state(const machine_config &mconfig, device_type type, const char *tag) :
+		wc90b_state(mconfig, type, tag),
+		m_bgscroll(*this, "bgscroll")
+	{ }
+
+	void eurogael(machine_config &config);
+
+protected:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority) override;
+
+private:
+	void master_irq_ack_w(uint8_t data);
+	required_shared_ptr<uint8_t> m_bgscroll;
+
+	void main_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(wc90b_state::get_bg_tile_info)
+{
+	int attr = m_bgvideoram[tile_index];
+	int tile = m_bgvideoram[tile_index + 0x800];
+	tileinfo.set(1,
+			 ((((attr & 3) + ((attr >> 1) & 4))) << 8) | tile | 0x800,
+			(attr >> 4) | 0x10,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(wc90b_state::get_fg_tile_info)
+{
+	int attr = m_fgvideoram[tile_index];
+	int tile = m_fgvideoram[tile_index + 0x800];
+	tileinfo.set(1,
+			((((attr & 3) + ((attr >> 1) & 4))) << 8) | tile,
+			attr >> 4,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(wc90b_state::get_tx_tile_info)
+{
+	tileinfo.set(0,
+			m_txvideoram[tile_index + 0x800] + ((m_txvideoram[tile_index] & 0x07) << 8),
+			m_txvideoram[tile_index] >> 4,
+			0);
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void wc90b_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90b_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90b_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90b_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void wc90b_state::bgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+}
+
+void wc90b_state::fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
+}
+
+void wc90b_state::txvideoram_w(offs_t offset, uint8_t data)
+{
+	m_txvideoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+void wc90b_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+{
+	// draw all visible sprites of specified priority
+	for (int offs = m_spriteram.bytes() - 8 ; offs >= 0 ; offs -= 8)
+	{
+		if ((~(m_spriteram[offs + 3] >> 7 ) & 1) == priority)
+		{
+
+			// 0   bbbb bbff   b = tile lower , f = flip bits
+			// 1   yyyy yyyy
+			// 2   xxxx xxxx
+			// 3   PXcc cccc   P = priority X = x high, c = tile upper
+			// 4   pppp ----   palette
+
+			int tilehigh = (m_spriteram[offs + 3] & 0x3f) << 6;
+			int tilelow = m_spriteram[offs + 0];
+			int flags = m_spriteram[offs + 4];
+
+			tilehigh += (tilelow & 0xfc) >> 2;
+
+			int sx = m_spriteram[offs + 2];
+			if (!(m_spriteram[offs + 3] & 0x40)) sx -= 0x0100;
+
+			int sy = 240 - m_spriteram[offs + 1];
+
+			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, tilehigh,
+					flags >> 4, // color
+					tilelow & 1,   // flipx
+					tilelow & 2,   // flipy
+					sx,
+					sy, 15);
+		}
+	}
+}
+
+uint32_t wc90b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scrollx(0, 8 * (m_scrollx[1][0] & 0x7f) + 256 - 4 + (m_scroll_x_lo[0] & 0x07));
+	m_bg_tilemap->set_scrolly(0, m_scrolly[1][0] + 1 + ((m_scrollx[1][0] & 0x80) ? 256 : 0));
+	m_fg_tilemap->set_scrollx(0, 8 * (m_scrollx[0][0] & 0x7f) + 256 - 6 + ((m_scroll_x_lo[0] & 0x38) >> 3));
+	m_fg_tilemap->set_scrolly(0, m_scrolly[0][0] + 1 + ((m_scrollx[0][0] & 0x80) ? 256 : 0));
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	// TODO: if scoring on same Y as GOAL message, ball will be above it. Might be a BTANB (or needs single pass draw + mix?)
+	draw_sprites(bitmap, cliprect, 0);
+	return 0;
+}
+
+void eurogael_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+{
+	// draw all visible sprites of specified priority
+
+	// entry at start of RAM might not be a sprite
+	for (int offs = 0x200 - 4 ; offs >= 4 ; offs -= 4)
+	{
+		if (((m_spriteram[offs + 3] >> 4) & 1) == priority)
+		{
+			// this is wrong
+
+			// 0      bbbb bbbb   b = tile lower
+			// 1      yyyy yyyy
+			// 2      xxxx xxxx
+			// 3      ffXP cccc   f = flip bits, P = priority (inverted vs. other bootlegs) X = X high?, c = tile upper
+			// 0x200  ---- -ppp   p = palette
+
+			int tilehigh = (m_spriteram[offs + 3] & 0x0f) << 8;
+			int attr = (m_spriteram[offs + 3] & 0xf0) >> 4;
+
+			int tilelow = m_spriteram[offs + 0];
+			int flags = m_spriteram[offs + 0x200];
+
+			tilehigh += tilelow;
+
+			int sx = m_spriteram[offs + 2];
+			if (!(attr & 0x02)) sx -= 0x0100;
+
+			int sy = 240 - m_spriteram[offs + 1];
+
+			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, tilehigh,
+					(flags & 0x7) | 8, // color - palettes 0x0 - 0x7 never written?
+					attr & 4,   // flipx
+					attr & 8,   // flipy
+					sx,
+					sy, 15);
+		}
+	}
+}
+
+uint32_t eurogael_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// the code to write / clear tilemaps for fb and tx layers has been specifically modified to avoid writing to the last 4 bytes
+	// and the game instead writes scroll values there instead, there is no code to copy from there, so it looks like these are the scroll regs
+
+	// each of the 3 layer has its own PCB, all PCBs look identical, so why does handling differ slightly?
+
+	int fg_scrollx = ((m_fgvideoram[0xffc]) | (m_fgvideoram[0xffd] << 8)) + 33;
+	int fg_scrolly = ((m_fgvideoram[0xffe]) | (m_fgvideoram[0xfff] << 8)) + 1;
+	int bg_scrollx = ((m_bgscroll[0xf00]) | (m_bgscroll[0xf01] << 8)) + 33;
+	int bg_scrolly = ((m_bgscroll[0xf02]) | (m_bgscroll[0xf03] << 8)) + 1;
+	int tx_scrollx = ((m_txvideoram[0xffc]) | (m_txvideoram[0xffd] << 8)) + 33;
+	int tx_scrolly = ((m_txvideoram[0xffe]) | (m_txvideoram[0xfff] << 8)) + 1;
+
+	m_bg_tilemap->set_scrollx(0, bg_scrollx);
+	m_bg_tilemap->set_scrolly(0, bg_scrolly);
+	m_fg_tilemap->set_scrollx(0, fg_scrollx);
+	m_fg_tilemap->set_scrolly(0, fg_scrolly);
+	m_tx_tilemap->set_scrollx(0, tx_scrollx);
+	m_tx_tilemap->set_scrolly(0, tx_scrolly);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 0);
+	return 0;
+}
+
+
+// machine
 
 void wc90b_state::bankswitch_w(uint8_t data)
 {
-	membank("mainbank")->set_entry(data >> 3);
+	m_mainbank->set_entry(data >> 3);
 }
 
-void wc90b_state::bankswitch1_w(uint8_t data)
+void wc90b_state::sub_bankswitch_w(uint8_t data)
 {
-	membank("subbank")->set_entry(data >> 3);
-}
-
-void wc90b_state::sound_command_w(uint8_t data)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
+	m_subbank->set_entry(data >> 3);
 }
 
 void wc90b_state::adpcm_control_w(uint8_t data)
 {
-	membank("audiobank")->set_entry(data & 0x01);
+	m_audiobank->set_entry(data & 0x01);
 	m_msm->reset_w(data & 0x08);
 }
 
@@ -130,32 +439,32 @@ void wc90b_state::adpcm_data_w(uint8_t data)
 
 uint8_t wc90b_state::master_irq_ack_r()
 {
-	m_maincpu->set_input_line(0,CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
 void wc90b_state::slave_irq_ack_w(uint8_t data)
 {
-	m_subcpu->set_input_line(0,CLEAR_LINE);
+	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-void wc90b_state::wc90b_map1(address_map &map)
+void wc90b_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram(); /* Main RAM */
-	map(0xa000, 0xafff).ram().w(FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
-	map(0xc000, 0xcfff).ram().w(FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
-	map(0xe000, 0xefff).ram().w(FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
-	map(0xf000, 0xf7ff).bankr("mainbank");
-	map(0xf800, 0xfbff).ram().share("share1");
+	map(0x8000, 0x9fff).ram(); // Main RAM
+	map(0xa000, 0xafff).ram().w(FUNC(wc90b_state::fgvideoram_w)).share(m_fgvideoram);
+	map(0xc000, 0xcfff).ram().w(FUNC(wc90b_state::bgvideoram_w)).share(m_bgvideoram);
+	map(0xe000, 0xefff).ram().w(FUNC(wc90b_state::txvideoram_w)).share(m_txvideoram);
+	map(0xf000, 0xf7ff).bankr(m_mainbank);
+	map(0xf800, 0xfbff).ram().share("main_sub");
 	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch_w));
-	map(0xfd00, 0xfd00).w(FUNC(wc90b_state::sound_command_w));
-	map(0xfd04, 0xfd04).writeonly().share("scroll1y");
-	map(0xfd06, 0xfd06).writeonly().share("scroll1x");
-	map(0xfd08, 0xfd08).writeonly().share("scroll2y");
-	map(0xfd0a, 0xfd0a).writeonly().share("scroll2x");
-	map(0xfd0e, 0xfd0e).writeonly().share("scroll_x_lo");
+	map(0xfd00, 0xfd00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xfd04, 0xfd04).writeonly().share(m_scrolly[0]);
+	map(0xfd06, 0xfd06).writeonly().share(m_scrollx[0]);
+	map(0xfd08, 0xfd08).writeonly().share(m_scrolly[1]);
+	map(0xfd0a, 0xfd0a).writeonly().share(m_scrollx[1]);
+	map(0xfd0e, 0xfd0e).writeonly().share(m_scroll_x_lo);
 	map(0xfd00, 0xfd00).portr("P1");
 	map(0xfd02, 0xfd02).portr("P2");
 	map(0xfd06, 0xfd06).portr("DSW1");
@@ -163,56 +472,56 @@ void wc90b_state::wc90b_map1(address_map &map)
 	map(0xfd0c, 0xfd0c).r(FUNC(wc90b_state::master_irq_ack_r));
 }
 
-void wc90b_state::wc90b_map2(address_map &map)
+void wc90b_state::sub_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd000, 0xd7ff).ram().share(m_spriteram);
 	map(0xd800, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe800, 0xefff).rom();
-	map(0xf000, 0xf7ff).bankr("subbank");
-	map(0xf800, 0xfbff).ram().share("share1");
-	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch1_w));
+	map(0xf000, 0xf7ff).bankr(m_subbank);
+	map(0xf800, 0xfbff).ram().share("main_sub");
+	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::sub_bankswitch_w));
 	map(0xfd0c, 0xfd0c).w(FUNC(wc90b_state::slave_irq_ack_w));
 }
 
-void wc90b_state::sound_cpu(address_map &map)
+void wc90b_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xe000, 0xe000).w(FUNC(wc90b_state::adpcm_control_w));
 	map(0xe400, 0xe400).w(FUNC(wc90b_state::adpcm_data_w));
 	map(0xe800, 0xe801).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xec00, 0xec01).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf800, 0xf800).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
 
 void eurogael_state::master_irq_ack_w(uint8_t data)
 {
 	// this seems to be write based instead of read based
-	m_maincpu->set_input_line(0,CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void eurogael_state::map1(address_map &map)
+void eurogael_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram(); /* Main RAM */
-	map(0xa000, 0xafff).ram().w(FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
-	map(0xc000, 0xcfff).ram().w(FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
-	map(0xd000, 0xdfff).ram().share("bgscroll"); // there are a bunch of read / write accesses in here (is it meant to mirror the bgram? - bg scroll regs are at df00 - df03
-	map(0xe000, 0xefff).ram().w(FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
-	map(0xf000, 0xf7ff).bankr("mainbank");
-	map(0xf800, 0xfbff).ram().share("share1");
-	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch_w));
+	map(0x8000, 0x9fff).ram(); // Main RAM
+	map(0xa000, 0xafff).ram().w(FUNC(eurogael_state::fgvideoram_w)).share(m_fgvideoram);
+	map(0xc000, 0xcfff).ram().w(FUNC(eurogael_state::bgvideoram_w)).share(m_bgvideoram);
+	map(0xd000, 0xdfff).ram().share(m_bgscroll); // there are a bunch of read / write accesses in here (is it meant to mirror the bgram? - bg scroll regs are at df00 - df03
+	map(0xe000, 0xefff).ram().w(FUNC(eurogael_state::txvideoram_w)).share(m_txvideoram);
+	map(0xf000, 0xf7ff).bankr(m_mainbank);
+	map(0xf800, 0xfbff).ram().share("main_sub");
+	map(0xfc00, 0xfc00).w(FUNC(eurogael_state::bankswitch_w));
 	map(0xfd00, 0xfd00).portr("P1");
 	map(0xfd02, 0xfd02).portr("P2");
 	map(0xfd06, 0xfd06).portr("DSW1");
 	map(0xfd08, 0xfd08).portr("DSW2");
 	map(0xfd0c, 0xfd0c).w(FUNC(eurogael_state::master_irq_ack_w));
-	map(0xfd0e, 0xfd0e).w(FUNC(wc90b_state::sound_command_w));
+	map(0xfd0e, 0xfd0e).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
 
@@ -298,32 +607,32 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,4),   /* 2048 characters */
-	4,  /* 4 bits per pixel */
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },    /* the bitplanes are separated */
+	8,8,    // 8*8 characters
+	RGN_FRAC(1,4),   // 2048 characters
+	4,  // 4 bits per pixel
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },    // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 32*32 characters */
+	16,16,  // 32*32 characters
 	RGN_FRAC(1,4),
-	4,  /* 4 bits per pixel */
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* the bitplanes are separated */
+	4,  // 4 bits per pixel
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		(16*8)+0, (16*8)+1, (16*8)+2, (16*8)+3, (16*8)+4, (16*8)+5, (16*8)+6, (16*8)+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		8*8, 8*8+1*8, 8*8+2*8, 8*8+3*8, 8*8+4*8, 8*8+5*8, 8*8+6*8, 8*8+7*8 },
-	32*8    /* every char takes 128 consecutive bytes */
+	32*8    // every char takes 128 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_wc90b )
 	GFXDECODE_ENTRY( "chargfx",   0x00000, charlayout,   0x100, 0x10 )
 	GFXDECODE_ENTRY( "tilegfx",   0x00000, spritelayout, 0x200, 0x20 )
-	GFXDECODE_ENTRY( "spritegfx", 0x00000, spritelayout, 0x000, 0x10 ) // sprites
+	GFXDECODE_ENTRY( "spritegfx", 0x00000, spritelayout, 0x000, 0x10 )
 GFXDECODE_END
 
 
@@ -342,9 +651,9 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 
 void wc90b_state::machine_start()
 {
-	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
-	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
-	membank("audiobank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
+	m_subbank->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
+	m_audiobank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 
 	save_item(NAME(m_msm5205next));
 	save_item(NAME(m_toggle));
@@ -353,20 +662,20 @@ void wc90b_state::machine_start()
 
 void wc90b_state::wc90b(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wc90b_state::wc90b_map1);
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(14'318'181) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wc90b_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wc90b_state::irq0_line_assert));
 
-	Z80(config, m_subcpu, MASTER_CLOCK);
-	m_subcpu->set_addrmap(AS_PROGRAM, &wc90b_state::wc90b_map2);
+	Z80(config, m_subcpu, XTAL(14'318'181) / 2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &wc90b_state::sub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(wc90b_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, SOUND_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &wc90b_state::sound_cpu);
-	/* IRQs are triggered by the main CPU */
+	Z80(config, m_audiocpu, XTAL(20'000'000) / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wc90b_state::sound_map);
+	// IRQs are triggered by the main CPU
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -378,17 +687,17 @@ void wc90b_state::wc90b(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wc90b);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024).set_endianness(ENDIANNESS_BIG);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	YM2203(config, "ymsnd1", YM2203_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.40);
-	YM2203(config, "ymsnd2", YM2203_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2203(config, "ymsnd1", XTAL(20'000'000) / 16).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2203(config, "ymsnd2", XTAL(20'000'000) / 16).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MSM5205(config, m_msm, MSM5205_CLOCK);
-	m_msm->vck_legacy_callback().set(FUNC(wc90b_state::adpcm_int)); /* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 4KHz 4-bit */
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(wc90b_state::adpcm_int)); // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  // 4KHz 4-bit
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 
@@ -399,20 +708,20 @@ void eurogael_state::eurogael(machine_config &config)
 	// DSWs are on the sound board near the YM2203Cs
 	// use is guessed
 
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &eurogael_state::map1);
-	m_maincpu->set_vblank_int("screen", FUNC(wc90b_state::irq0_line_assert));
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eurogael_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(eurogael_state::irq0_line_assert));
 
-	Z80(config, m_subcpu, XTAL(16'000'000)/2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &wc90b_state::wc90b_map2);
-	m_subcpu->set_vblank_int("screen", FUNC(wc90b_state::irq0_line_assert));
+	Z80(config, m_subcpu, XTAL(16'000'000) / 2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &eurogael_state::sub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(eurogael_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, XTAL(20'000'000)/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &wc90b_state::sound_cpu);
-	/* IRQs are triggered by the main CPU */
+	Z80(config, m_audiocpu, XTAL(20'000'000) / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &eurogael_state::sound_map);
+	// IRQs are triggered by the main CPU
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -424,22 +733,22 @@ void eurogael_state::eurogael(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wc90b);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	YM2203(config, "ymsnd1", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.40); // YM2203C
-	YM2203(config, "ymsnd2", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.40); // YM2203C
+	YM2203(config, "ymsnd1", XTAL(16'000'000) / 4).add_route(ALL_OUTPUTS, "mono", 0.40); // YM2203C
+	YM2203(config, "ymsnd2", XTAL(16'000'000) / 4).add_route(ALL_OUTPUTS, "mono", 0.40); // YM2203C
 
-	MSM5205(config, m_msm, MSM5205_CLOCK);
-	m_msm->vck_legacy_callback().set(FUNC(wc90b_state::adpcm_int)); /* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 4KHz 4-bit */
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(eurogael_state::adpcm_int)); // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  // 4KHz 4-bit
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 
 
-/* these were dumped from unprotected pal16l8 devices found on a twcup90b2 set, probably the same for all sets? */
+// these were dumped from unprotected pal16l8 devices found on a twcup90b2 set, probably the same for all sets?
 #define TWCUP90B_PLD_DEVICES \
 	ROM_LOAD( "pal16l8.1",  0x0000, 0x0104, CRC(1f13c98f) SHA1(dbcac8a47bd6fe050a731132396b42dc35704dde) ) \
 	ROM_LOAD( "pal16l8.2",  0x0200, 0x0104, CRC(54af6bf3) SHA1(9373250b501ec4a9cd4ef697da40b41c2411f046) ) \
@@ -450,12 +759,12 @@ void eurogael_state::eurogael(machine_config &config)
 
 ROM_START( twcup90b1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "a02.bin", 0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  /* c000-ffff is not used */
-	ROM_LOAD( "a03.bin", 0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
+	ROM_LOAD( "a02.bin", 0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  // c000-ffff is not used
+	ROM_LOAD( "a03.bin", 0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  // banked at f000-f7ff
 
-	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
-	ROM_LOAD( "a04.bin", 0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  /* c000-ffff is not used */
-	ROM_LOAD( "a05.bin", 0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  /* banked at f000-f7ff */
+	ROM_REGION( 0x20000, "sub", 0 )
+	ROM_LOAD( "a04.bin", 0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  // c000-ffff is not used
+	ROM_LOAD( "a05.bin", 0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  // banked at f000-f7ff
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a01.bin", 0x00000, 0x10000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
@@ -495,11 +804,11 @@ ROM_END
 */
 ROM_START( twcup90ba )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "a02.bin", 0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  /* c000-ffff is not used */
-	ROM_LOAD( "a03.bin", 0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
+	ROM_LOAD( "a02.bin", 0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  // c000-ffff is not used
+	ROM_LOAD( "a03.bin", 0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  // banked at f000-f7ff
 
-	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
-	ROM_LOAD( "a04.bin",              0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  /* c000-ffff is not used */
+	ROM_REGION( 0x20000, "sub", 0 )
+	ROM_LOAD( "a04.bin",              0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  // c000-ffff is not used
 	ROM_LOAD( "el_ic98_27c512_05.bin",0x10000, 0x10000, CRC(c70d8c13) SHA1(365718725ea7d0355c68ba703b7f9624cb1134bc) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -537,7 +846,7 @@ ROM_START( twcup90b2 )
 	ROM_LOAD( "a02",     0x00000, 0x08000, CRC(84cb2bf5) SHA1(de8343c991fc752de46448e4f6db1c3a70fc4459) )  // 2x 27c256
 	ROM_LOAD( "a03.bin", 0x10000, 0x08000, CRC(68156be5) SHA1(c90b873a147d00f313084cbe5d0a5a7688af1485) )
 
-	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
+	ROM_REGION( 0x20000, "sub", 0 )
 	ROM_LOAD( "a04.bin", 0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  // 2x 27c512
 	ROM_LOAD( "a05.bin", 0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )
 
@@ -585,7 +894,7 @@ ROM_START( twcup90bb )
 	ROM_LOAD( "27c512.02", 0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )
 	ROM_LOAD( "27c512.03", 0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )
 
-	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
+	ROM_REGION( 0x20000, "sub", 0 )
 	ROM_LOAD( "27c512.04", 0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )
 	ROM_LOAD( "27c512.05", 0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )
 
@@ -624,12 +933,12 @@ ROM_END
 // Modular System is a stack of boards in a cage, there are apparently other games on this 'system' that wouldn't even share any hardware with this apart from the metal cage itself.
 ROM_START( eurogael )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "3z-1_fu301.ic17", 0x00000, 0x10000, CRC(74acc161) SHA1(d8660dd6d05164df4a66125c68627e955b35bef3) )  /* c000-ffff is not used */
-	ROM_LOAD( "3z-1_fu302.ic15", 0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
+	ROM_LOAD( "3z-1_fu301.ic17", 0x00000, 0x10000, CRC(74acc161) SHA1(d8660dd6d05164df4a66125c68627e955b35bef3) )  // c000-ffff is not used
+	ROM_LOAD( "3z-1_fu302.ic15", 0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  // banked at f000-f7ff
 
-	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
-	ROM_LOAD( "3z-1_fu303.ic19", 0x00000, 0x10000, CRC(348195fa) SHA1(41c59e38ec4ba4f3c2185dd32dbf4ea0318ab375) )  /* c000-ffff is not used */
-	ROM_LOAD( "3z-1_fu304.ic16", 0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  /* banked at f000-f7ff */
+	ROM_REGION( 0x20000, "sub", 0 )
+	ROM_LOAD( "3z-1_fu303.ic19", 0x00000, 0x10000, CRC(348195fa) SHA1(41c59e38ec4ba4f3c2185dd32dbf4ea0318ab375) )  // c000-ffff is not used
+	ROM_LOAD( "3z-1_fu304.ic16", 0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  // banked at f000-f7ff
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "system2_fu101.ic6", 0x00000, 0x10000, CRC(712566ca) SHA1(9e46f9d449ff549b7a6d82283d8f903189b058e7) )
@@ -698,6 +1007,8 @@ void wc90b_state::init_wc90b()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
+
+} // anonymous namespace
 
 
 GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

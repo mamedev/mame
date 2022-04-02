@@ -96,21 +96,22 @@ private:
 	optional_ioport m_io_config;
 	required_device<screen_device> m_screen;
 
-	address_space *m_program;
-	emu_timer *m_tape_input, *m_ula_hsync;
+	address_space *m_program = nullptr;
+	emu_timer *m_tape_input = nullptr, *m_ula_hsync = nullptr;
 
-	bool m_vsync_active, m_hsync_active, m_nmi_on, m_nmi_generator_active;
-	uint64_t m_base_vsync_clock, m_vsync_start_time;
-	uint32_t m_ypos;
+	bool m_vsync_active = false, m_hsync_active = false;
+	bool m_nmi_on = false, m_nmi_generator_active = false;
+	uint64_t m_base_vsync_clock = 0, m_vsync_start_time = 0;
+	uint32_t m_ypos = 0;
 
-	uint8_t m_prev_refresh;
-	uint8_t m_speaker_state;
+	uint8_t m_prev_refresh = 0;
+	uint8_t m_speaker_state = 0;
 
 	std::unique_ptr<bitmap_ind16> m_bitmap_render;
 	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
 
-	uint16_t m_ula_char_buffer;
-	double m_cassette_cur_level;
+	uint16_t m_ula_char_buffer = 0;
+	double m_cassette_cur_level = 0;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 

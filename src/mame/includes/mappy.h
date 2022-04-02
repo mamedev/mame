@@ -59,16 +59,16 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	bitmap_ind16 m_sprite_bitmap;
 
-	uint8_t m_scroll;
+	uint8_t m_scroll = 0;
 
-	uint8_t m_main_irq_mask;
-	uint8_t m_sub_irq_mask;
-	uint8_t m_sub2_irq_mask;
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_sub_irq_mask = 0;
+	uint8_t m_sub2_irq_mask = 0;
 
-	emu_timer *m_namcoio_run_timer[2];
+	emu_timer *m_namcoio_run_timer[2]{};
 
 	DECLARE_WRITE_LINE_MEMBER(int_on_w);
 	DECLARE_WRITE_LINE_MEMBER(int_on_2_w);

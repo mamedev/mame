@@ -40,8 +40,8 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override;
 
 private:
-	emu_timer   *m_poll_timer;
-	emu_timer   *m_send_timer;
+	emu_timer   *m_poll_timer = nullptr;
+	emu_timer   *m_send_timer = nullptr;
 
 	static constexpr unsigned KEYQUEUESIZE = 256;
 	static constexpr unsigned MAXKEYMSGLENGTH = 10;
@@ -55,7 +55,7 @@ private:
 	required_ioport_array<8> m_keys;
 
 	int m_queue_length;
-	int     m_queue_head;
+	int     m_queue_head = 0;
 	uint8_t   m_queue[KEYQUEUESIZE];
 	uint32_t  m_key_state_save[4];
 	int m_autorepeat_code;
@@ -63,22 +63,22 @@ private:
 	bool m_fake_shift_state;
 	bool m_fake_unshift_state;
 
-	bool m_left_shift;
-	bool m_right_shift;
-	bool m_left_ctrl;
-	bool m_right_ctrl;
-	bool m_left_alt;
-	bool m_altgr;
-	bool m_numlock;
+	bool m_left_shift = false;
+	bool m_right_shift = false;
+	bool m_left_ctrl = false;
+	bool m_right_ctrl = false;
+	bool m_left_alt = false;
+	bool m_altgr = false;
+	bool m_numlock = false;
 
 	bool m_resetting;
 
 	line_state m_clock_line;
 	line_state m_data_line;
-	int m_reset_timer;
+	int m_reset_timer = 0;
 
-	int m_shift_reg;
-	int m_shift_count;
+	int m_shift_reg = 0;
+	int m_shift_count = 0;
 };
 
 

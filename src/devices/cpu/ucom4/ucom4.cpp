@@ -151,12 +151,6 @@ std::unique_ptr<util::disasm_interface> ucom4_cpu_device::create_disassembler()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	UCOM4_PC=1, UCOM4_DPL, UCOM4_DPH,
-	UCOM4_ACC
-};
-
 void ucom4_cpu_device::device_start()
 {
 	assert(PORTA == 0);
@@ -219,14 +213,15 @@ void ucom4_cpu_device::device_start()
 	save_item(NAME(m_int_line));
 
 	// register state for debugger
-	state_add(UCOM4_PC, "PC",  m_pc).formatstr("%04X");
-	state_add(UCOM4_DPL, "DPL", m_dpl).formatstr("%01X");
-	state_add(UCOM4_DPH, "DPH", m_dph).formatstr("%01X");
-	state_add(UCOM4_ACC, "ACC", m_acc).formatstr("%01X");
-
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_carry_f).formatstr("%5s").noshow(); // dummy
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "DPL", m_dpl).formatstr("%01X"); // 2
+	state_add(++m_state_count, "DPH", m_dph).formatstr("%01X"); // 3
+	state_add(++m_state_count, "ACC", m_acc).formatstr("%01X"); // 4
 
 	set_icountptr(m_icount);
 }

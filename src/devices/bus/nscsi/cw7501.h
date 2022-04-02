@@ -32,7 +32,7 @@ private:
 
 	required_device<m37710s4_device> m_cdcpu;
 
-	u8 m_mystery_address;
+	u8 m_mystery_address = 0;
 };
 
 class cdr4210_device : public cw7501_device

@@ -108,21 +108,21 @@ protected:
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	uint8_t m_410x[0xc];
+	uint8_t m_410x[0xc]{};
 
-	uint8_t m_vdma_ctrl;
-	int m_timer_irq_enabled;
-	int m_timer_running;
-	int m_timer_val;
+	uint8_t m_vdma_ctrl = 0;
+	int m_timer_irq_enabled = 0;
+	int m_timer_running = 0;
+	int m_timer_val = 0;
 
-	uint8_t m_8000_scramble[8];
-	uint8_t m_410x_scramble[2];
+	uint8_t m_8000_scramble[8]{};
+	uint8_t m_410x_scramble[2]{};
 
-	uint8_t m_8000_addr_latch;
+	uint8_t m_8000_addr_latch = 0;
 
-	uint8_t m_4242;
-	uint8_t m_411c;
-	uint8_t m_411d;
+	uint8_t m_4242 = 0;
+	uint8_t m_411c = 0;
+	uint8_t m_411d = 0;
 
 	uint8_t m_initial_e000_bank;
 	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
@@ -141,7 +141,7 @@ private:
 
 	address_space_config        m_space_config;
 
-	int m_bankaddr[4];
+	int m_bankaddr[4]{};
 
 	devcb_write8 m_write_0_callback;
 	devcb_read8 m_read_0_callback;
@@ -159,8 +159,8 @@ private:
 
 	uint8_t m_2012_2017_descramble[0x6]; // passed to PPU in reset
 	vtxx_pal_mode m_default_palette_mode;
-	bool m_force_baddma;
-	bool m_use_raster_timing_hack;
+	bool m_force_baddma = false;
+	bool m_use_raster_timing_hack = false;
 };
 
 class nes_vt02_vt03_soc_pal_device : public nes_vt02_vt03_soc_device

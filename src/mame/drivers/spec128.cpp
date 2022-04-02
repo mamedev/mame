@@ -213,7 +213,7 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 			return;
 
 	if ((m_port_7ffd_data ^ data) & 0x08)
-		spectrum_UpdateScreenBitmap();
+		m_screen->update_now();
 
 	/* store new state */
 	m_port_7ffd_data = data;
@@ -246,19 +246,6 @@ uint8_t spectrum_128_state::spectrum_port_r(offs_t offset)
 		return m_exp->iorq_r(offset | 1);
 
 	return floating_bus_r();
-}
-
-uint8_t spectrum_128_state::floating_bus_r()
-{
-	// very basic "floating bus" implementation, see notes in spectrum.cpp
-	uint8_t data = 0xff;
-	int hpos = m_screen->hpos();
-	int vpos = m_screen->vpos();
-
-	if ((hpos >= 48 && hpos < 304) && (vpos >= 48 && vpos < 240))
-		data = m_screen_location[0x1800 + (((vpos-48)/8)*32) + ((hpos-48)/8)];
-
-	return data;
 }
 
 void spectrum_128_state::spectrum_128_io(address_map &map)
@@ -304,30 +291,31 @@ void spectrum_128_state::machine_reset()
 	spectrum_128_update_memory();
 }
 
-/* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	96,                 /* 96 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8, 8,           /* 8 x 8 characters */
+	96,             /* 96 characters */
+	1,              /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
+	{STEP8(0, 1)},  /* x offsets */
+	{STEP8(0, 8)},  /* y offsets */
+	8*8             /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( spec128 )
-	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 7, 8 )
 GFXDECODE_END
 
+rectangle spectrum_128_state::get_screen_area()
+{
+	return rectangle{48, 48 + 255, 63, 63 + 191};
+}
 
 void spectrum_128_state::spectrum_128(machine_config &config)
 {
 	spectrum(config);
 
-	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 5);
+	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_128_state::spectrum_128_mem);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_128_state::spectrum_128_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_128_state::spectrum_128_fetch);
@@ -335,12 +323,12 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	m_screen->set_raw(X1_128_SINCLAIR / 2.5, 456, 0, 352,  311, 0, 296);
+	m_screen->set_raw(X1_128_SINCLAIR / 5, 456, 311, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
 	/* sound hardware */
-	AY8912(config, "ay8912", X1_128_SINCLAIR / 10).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay8912", X1_128_SINCLAIR / 20).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);
@@ -353,14 +341,11 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 }
 
 
-
-
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
-
 
 ROM_START(spec128)
 	ROM_REGION(0x18000,"maincpu",0)

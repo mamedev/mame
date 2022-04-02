@@ -52,8 +52,8 @@ protected:
 	required_ioport m_io_kbdc;
 
 private:
-	bool m_ruslat;
-	uint8_t *m_rom;
+	bool m_ruslat = false;
+	uint8_t *m_rom = nullptr;
 
 	devcb_write16 m_keyboard_cb;
 	devcb_write_line m_sdv_cb;

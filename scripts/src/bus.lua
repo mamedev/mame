@@ -325,6 +325,8 @@ if (BUSES["ARCHIMEDES_ECONET"]~=null) then
 		MAME_DIR .. "src/devices/bus/archimedes/econet/slot.h",
 		MAME_DIR .. "src/devices/bus/archimedes/econet/econet.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/econet/econet.h",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/midi.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/midi.h",
 		MAME_DIR .. "src/devices/bus/archimedes/econet/rtfmjoy.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/econet/rtfmjoy.h",
 	}
@@ -374,6 +376,8 @@ if (BUSES["ARCHIMEDES_PODULE"]~=null) then
 		MAME_DIR .. "src/devices/bus/archimedes/podule/lark.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/laserd.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/laserd.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/midi_emr.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/midi_emr.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/midimax.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/midimax.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/nexus.cpp",
@@ -3038,6 +3042,8 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/partytap.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/rob.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/rob.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.cpp",
@@ -3046,6 +3052,16 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/turbofile.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper_sensor.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper_sensor.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/nes_ctrl/rob.cpp",   GEN_DIR .. "emu/layout/nes_rob.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "nes_rob"),
 	}
 end
 
@@ -3548,6 +3564,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_fdc.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_rs232.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_rs232.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/tipi.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/tipi.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_ide.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_ide.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_usbsm.cpp",
@@ -3747,6 +3765,8 @@ end
 ---------------------------------------------------
 if (BUSES["EPSON_QX"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/multifont.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/multifont.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.h",
 	}
@@ -4647,6 +4667,12 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/multibus.h",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.h",
+		MAME_DIR .. "src/devices/bus/multibus/isbc8024.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/isbc8024.h",
+		MAME_DIR .. "src/devices/bus/multibus/cpuap.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/cpuap.h",
+		MAME_DIR .. "src/devices/bus/multibus/serad.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/serad.h",
 	}
 end
 

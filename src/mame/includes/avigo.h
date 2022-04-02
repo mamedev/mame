@@ -104,18 +104,18 @@ protected:
 	required_shared_ptr<uint8_t> m_nvram;
 
 	// driver state
-	uint8_t               m_key_line;
-	uint8_t               m_irq;
-	uint8_t               m_port2;
-	uint8_t               m_bank2_l;
-	uint8_t               m_bank2_h;
-	uint8_t               m_bank1_l;
-	uint8_t               m_bank1_h;
-	uint8_t               m_ad_control_status;
-	uint16_t              m_ad_value;
-	std::unique_ptr<uint8_t[]> m_video_memory;
-	uint8_t               m_screen_column;
-	uint8_t               m_warm_start;
+	uint8_t               m_key_line = 0U;
+	uint8_t               m_irq = 0U;
+	uint8_t               m_port2 = 0U;
+	uint8_t               m_bank2_l = 0U;
+	uint8_t               m_bank2_h = 0U;
+	uint8_t               m_bank1_l = 0U;
+	uint8_t               m_bank1_h = 0U;
+	uint8_t               m_ad_control_status = 0U;
+	uint16_t              m_ad_value = 0U;
+	std::unique_ptr<uint8_t[]> m_video_memory{};
+	uint8_t               m_screen_column = 0U;
+	uint8_t               m_warm_start = 0U;
 };
 
 #endif // MAME_INCLUDES_AVIGO_H

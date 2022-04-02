@@ -45,7 +45,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	void dealem_memmap(address_map &map);
 	TILE_GET_INFO_MEMBER(tile_info);
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 };
 
 

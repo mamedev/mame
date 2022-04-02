@@ -425,7 +425,7 @@ const psxcd_device::cdcmd psxcd_device::cmd_table[]=
 
 void psxcd_device::write_command(uint8_t byte)
 {
-	if(byte > 31)
+	if(byte > 30)   // coverity 140157
 		illegalcmd(byte);
 	else
 		(this->*cmd_table[byte])();
@@ -473,7 +473,7 @@ void psxcd_device::cdcmd_setloc()
 void psxcd_device::cdcmd_play()
 {
 	if(cmdbuf[0] && m_param_count)
-			loc.w = lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, bcd_to_decimal(cmdbuf[0]) - 1));
+			loc.w = lba_to_msf_ps(m_cdrom_handle->get_track_start(bcd_to_decimal(cmdbuf[0]) - 1));
 
 	curpos.w = loc.w;
 	if (!curpos.w)
@@ -631,8 +631,8 @@ void psxcd_device::cdcmd_getlocl()
 void psxcd_device::cdcmd_getlocp()
 {
 	CDPOS tloc, start;
-	uint8_t track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(loc.w)) + 1;
-	start.w = (track == 1) ? 0x000200 : lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, track - 1));
+	uint8_t track = m_cdrom_handle->get_track(msf_to_lba_ps(loc.w)) + 1;
+	start.w = (track == 1) ? 0x000200 : lba_to_msf_ps(m_cdrom_handle->get_track_start(track - 1));
 	tloc.w = sub_loc(loc, start);
 
 	unsigned char data[8]=
@@ -664,7 +664,7 @@ void psxcd_device::cdcmd_gettn()
 		{
 			status,
 			decimal_to_bcd(1),
-			decimal_to_bcd(cdrom_get_last_track(m_cdrom_handle))
+			decimal_to_bcd(m_cdrom_handle->get_last_track())
 		};
 
 		send_result(intr_complete,data,3);
@@ -678,14 +678,14 @@ void psxcd_device::cdcmd_gettn()
 void psxcd_device::cdcmd_gettd()
 {
 	uint8_t track = bcd_to_decimal(cmdbuf[0]);
-	uint8_t last = cdrom_get_last_track(m_cdrom_handle);
+	uint8_t last = m_cdrom_handle->get_last_track();
 	if(track <= last)
 	{
 		CDPOS trkstart;
 		if(!track) // length of disk
-			trkstart.w = lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, 0xaa));
+			trkstart.w = lba_to_msf_ps(m_cdrom_handle->get_track_start(0xaa));
 		else
-			trkstart.w = lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, track - 1));
+			trkstart.w = lba_to_msf_ps(m_cdrom_handle->get_track_start(track - 1));
 
 		unsigned char data[3]=
 		{
@@ -760,7 +760,7 @@ void psxcd_device::cdcmd_id()
 		memset(cdid, '\0', 8);
 
 		send_result(intr_complete);
-		if(cdrom_get_track_type(m_cdrom_handle, 0) == CD_TRACK_AUDIO)
+		if(m_cdrom_handle->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			irq = intr_diskerror;
 			cdid[0] = status | status_invalid;
@@ -954,7 +954,7 @@ void psxcd_device::read_sector()
 		bool isend = false;
 		uint32_t sector = msf_to_lba_ps(curpos.w);
 		uint8_t *buf = secbuf[sectail];
-		if (cdrom_read_data(m_cdrom_handle, sector, buf, CD_TRACK_RAW_DONTCARE))
+		if (m_cdrom_handle->read_data(sector, buf, cdrom_file::CD_TRACK_RAW_DONTCARE))
 		{
 			subheader *sub=(subheader *)(buf+16);
 			memcpy(lastsechdr, buf+12, 8);
@@ -1027,14 +1027,14 @@ void psxcd_device::play_sector()
 	{
 		uint32_t sector = msf_to_lba_ps(curpos.w);
 
-		if(cdrom_read_data(m_cdrom_handle, sector, secbuf[sectail], CD_TRACK_AUDIO))
+		if(m_cdrom_handle->read_data(sector, secbuf[sectail], cdrom_file::CD_TRACK_AUDIO))
 		{
 			if(!m_mute)
 				m_spu->play_cdda(0, secbuf[sectail]);
 		}
 		else
 		{
-			if(!cdrom_read_data(m_cdrom_handle, sector, secbuf[sectail], CD_TRACK_RAW_DONTCARE))
+			if(!m_cdrom_handle->read_data(sector, secbuf[sectail], cdrom_file::CD_TRACK_RAW_DONTCARE))
 			{
 				stop_read(); // assume we've reached the end
 				cmd_complete(prepare_result(intr_dataend));
@@ -1074,7 +1074,7 @@ void psxcd_device::play_sector()
 		if ((mode&mode_report) && !(sector & 15)) // slow the int rate
 		{
 			auto res=new command_result;
-			uint8_t track = cdrom_get_track(m_cdrom_handle, sector) + 1;
+			uint8_t track = m_cdrom_handle->get_track(sector) + 1;
 			res->res=intr_dataready;
 
 			res->data[0]=status;
@@ -1083,7 +1083,7 @@ void psxcd_device::play_sector()
 			if(sector & 0x10)
 			{
 				CDPOS tloc, start;
-				start.w = (track == 1) ? 0x000200 : lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, track - 1));
+				start.w = (track == 1) ? 0x000200 : lba_to_msf_ps(m_cdrom_handle->get_track_start(track - 1));
 				tloc.w = sub_loc(loc, start);
 				res->data[3]=decimal_to_bcd(tloc.b[M]);
 				res->data[4]=decimal_to_bcd(tloc.b[S]) | 0x80;
@@ -1115,7 +1115,7 @@ void psxcd_device::start_read()
 
 	assert((status&(status_reading|status_playing))==0);
 
-	if(!(mode & mode_cdda) && (cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, sector + 150)) == CD_TRACK_AUDIO))
+	if(!(mode & mode_cdda) && (m_cdrom_handle->get_track_type(m_cdrom_handle->get_track(sector + 150)) == cdrom_file::CD_TRACK_AUDIO))
 	{
 		stop_read();
 		cmd_complete(prepare_result(intr_diskerror, nullptr, 0, 0x40));
@@ -1139,9 +1139,9 @@ void psxcd_device::start_read()
 
 void psxcd_device::start_play()
 {
-	uint8_t track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w) + 150);
+	uint8_t track = m_cdrom_handle->get_track(msf_to_lba_ps(curpos.w) + 150);
 
-	if(cdrom_get_track_type(m_cdrom_handle, track) != CD_TRACK_AUDIO)
+	if(m_cdrom_handle->get_track_type(track) != cdrom_file::CD_TRACK_AUDIO)
 		verboselog(*this, 0, "psxcd: playing data track\n");
 
 	status|=status_playing;
@@ -1150,8 +1150,8 @@ void psxcd_device::start_play()
 
 	if (mode&mode_autopause)
 	{
-		auto toc = cdrom_get_toc(m_cdrom_handle);
-		autopause_sector = cdrom_get_track_start(m_cdrom_handle, track) + toc->tracks[track].logframes;
+		const auto &toc = m_cdrom_handle->get_toc();
+		autopause_sector = m_cdrom_handle->get_track_start(track) + toc.tracks[track].logframes;
 //      printf("pos=%d auto=%d\n",pos,autopause_sector);
 	}
 

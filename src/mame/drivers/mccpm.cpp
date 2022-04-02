@@ -65,7 +65,7 @@ private:
 	template <int N> void bd_q_w(offs_t offset, u8 data);
 
 	u8 m_fdc_status = 0U;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank;

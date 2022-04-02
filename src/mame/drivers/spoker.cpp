@@ -83,22 +83,22 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_bg_tile_ram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	output_finder<7> m_leds;
 
 	// common
-	int m_nmi_ack;
-	uint8_t m_out[3];
+	int m_nmi_ack = 0;
+	uint8_t m_out[3]{};
 
 	// spk116it and spk115it specific
-	int m_video_enable;
-	int m_hopper;
-	uint8_t m_igs_magic[2];
+	int m_video_enable = 0;
+	int m_hopper = 0;
+	uint8_t m_igs_magic[2]{};
 
 	// common
 	void bg_tile_w(offs_t offset, uint8_t data);

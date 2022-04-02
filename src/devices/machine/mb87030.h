@@ -138,8 +138,8 @@ private:
 	constexpr static uint8_t SDGC_DIAG_ACK = 0x40;
 	constexpr static uint8_t SDGC_DIAG_REQ = 0x80;
 
-	emu_timer *m_timer;
-	emu_timer *m_delay_timer;
+	emu_timer *m_timer = nullptr;
+	emu_timer *m_delay_timer = nullptr;
 
 	enum TimerId {
 		Delay,
@@ -188,33 +188,33 @@ private:
 	TIMER_CALLBACK_MEMBER(timeout);
 
 	// registers
-	uint8_t m_bdid;
-	uint8_t m_sctl;
-	uint8_t m_scmd;
-	uint8_t m_tmod;
-	uint8_t m_ints;
-	uint8_t m_sdgc;
-	uint8_t m_ssts;
-	uint8_t m_serr;
-	uint8_t m_pctl;
-	uint8_t m_mbc;
-	uint8_t m_dreg;
-	uint8_t m_temp;
-	uint8_t m_tch;
-	uint8_t m_tcm;
-	uint32_t m_tc;
-	uint8_t m_exbf;
+	uint8_t m_bdid = 0;
+	uint8_t m_sctl = 0;
+	uint8_t m_scmd = 0;
+	uint8_t m_tmod = 0;
+	uint8_t m_ints = 0;
+	uint8_t m_sdgc = 0;
+	uint8_t m_ssts = 0;
+	uint8_t m_serr = 0;
+	uint8_t m_pctl = 0;
+	uint8_t m_mbc = 0;
+	uint8_t m_dreg = 0;
+	uint8_t m_temp = 0;
+	uint8_t m_tch = 0;
+	uint8_t m_tcm = 0;
+	uint32_t m_tc = 0;
+	uint8_t m_exbf = 0;
 
-	uint8_t m_bus_data;
-	uint8_t m_hdb;
-	bool m_hdb_loaded;
-	bool m_send_atn_during_selection;
+	uint8_t m_bus_data = 0;
+	uint8_t m_hdb = 0;
+	bool m_hdb_loaded = false;
+	bool m_send_atn_during_selection = false;
 	util::fifo <uint8_t, 8> m_fifo;
 
-	uint8_t m_scsi_phase;
-	uint32_t m_scsi_ctrl;
+	uint8_t m_scsi_phase = 0;
+	uint32_t m_scsi_ctrl = 0;
 
-	bool m_dma_transfer;
+	bool m_dma_transfer = false;
 };
 
 

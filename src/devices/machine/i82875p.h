@@ -41,14 +41,14 @@ protected:
 private:
 	void agp_translation_map(address_map &map);
 
-	int ram_size;
+	int ram_size = 0;
 	required_device<device_memory_interface> cpu;
 	std::vector<uint32_t> ram;
 
-	uint8_t agpm, fpllcont, pam[8], smram, esmramc;
-	uint8_t apsize, amtt, lptt;
-	uint16_t toud, mchcfg, errcmd, smicmd, scicmd, skpd;
-	uint32_t agpctrl, attbase;
+	uint8_t agpm = 0, fpllcont = 0, pam[8]{}, smram = 0, esmramc = 0;
+	uint8_t apsize = 0, amtt = 0, lptt = 0;
+	uint16_t toud = 0, mchcfg = 0, errcmd = 0, smicmd = 0, scicmd = 0, skpd = 0;
+	uint32_t agpctrl = 0, attbase = 0;
 
 	uint8_t agpm_r();
 	void agpm_w(uint8_t data);
@@ -130,8 +130,8 @@ protected:
 private:
 	void overflow_map(address_map &map);
 
-	uint8_t dram_row_boundary[8], dram_row_attribute[4];
-	uint32_t dram_timing, dram_controller_mode;
+	uint8_t dram_row_boundary[8]{}, dram_row_attribute[4]{};
+	uint32_t dram_timing = 0, dram_controller_mode = 0;
 };
 
 DECLARE_DEVICE_TYPE(I82875P_HOST,     i82875p_host_device)

@@ -448,7 +448,7 @@ uint8_t nes_namcot340_device::n340_loread(offs_t offset)
 			set_irq_line(CLEAR_LINE); // FIXME: unreachable
 			[[fallthrough]];
 		case 0x1800:
-			return (m_irq_count >> 8) & 0xff;
+			return m_irq_count >> 8;
 			set_irq_line(CLEAR_LINE); // FIXME: unreachable
 			[[fallthrough]];
 		default:
@@ -524,7 +524,7 @@ uint8_t nes_namcot175_device::read_m(offs_t offset)
 	if (!m_battery.empty() && !m_wram_protect)
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 void nes_namcot175_device::write_m(offs_t offset, uint8_t data)
@@ -605,7 +605,7 @@ uint8_t nes_namcot163_device::read_m(offs_t offset)
 	if (!m_battery.empty() && offset < m_battery.size())
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 void nes_namcot163_device::write_m(offs_t offset, uint8_t data)
@@ -656,7 +656,6 @@ void nes_namcot163_device::set_mirror(uint8_t page, uint8_t data)
 
 void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 {
-	int page;
 	LOG_MMC(("namcot163 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7800)
@@ -666,14 +665,13 @@ void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 		case 0x2000: case 0x2800:
 		case 0x3000: case 0x3800:
 			m_chr_bank = data;
-			chr1_x(offset / 0x800, m_chr_bank, CHRROM);
+			chr1_x(offset >> 11, m_chr_bank, CHRROM);
 			break;
 		case 0x4000:
 		case 0x4800:
 		case 0x5000:
 		case 0x5800:
-			page = (offset & 0x1800) >> 11;
-			set_mirror(page, data);
+			set_mirror(BIT(offset, 11, 2), data);
 			break;
 		case 0x6000:
 			m_namco163snd->disable_w((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);

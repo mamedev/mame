@@ -46,12 +46,12 @@ protected:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_cpu2_ram;
 
-	int m_fake8910_0;
-	int m_fake8910_1;
-	int m_charbank;
-	int m_charpalbank;
-	int m_flipscreen;
-	tilemap_t *m_bg_tilemap;
+	int m_fake8910_0 = 0;
+	int m_fake8910_1 = 0;
+	int m_charbank = 0;
+	int m_charpalbank = 0;
+	int m_flipscreen = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	// common
 	void videoram_w(offs_t offset, u8 data);

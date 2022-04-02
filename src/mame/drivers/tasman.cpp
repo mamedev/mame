@@ -82,7 +82,7 @@ private:
 	uint32_t test_r();
 	// uint32_t rng_r();
 
-	uint8_t m_irq_mask;
+	uint8_t m_irq_mask = 0;
 
 	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	WRITE_LINE_MEMBER(vblank_irq_ack_w);

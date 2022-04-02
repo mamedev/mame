@@ -400,9 +400,11 @@ void spectrum_state::setup_sp(uint8_t *snapdata, uint32_t snapsize)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, intr);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
+	/* Not supported as it's wrong anyway: even if we define current invert it can change to opposite either on next frame or N frames later depending on current state.
 	data = BIT(status, 5);
 	m_flash_invert = data;
 	logerror("FLASH state: %s\n", data ? "PAPER on INK" : "INK on PAPER");
+	*/
 
 	// Memory dump
 	logerror("Loading %04X bytes of RAM at %04X\n", size, start);

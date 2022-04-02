@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_CAMPLYNX_FORMAT;
+extern const camplynx_format FLOPPY_CAMPLYNX_FORMAT;
 
 #endif // MAME_FORMATS_CAMPLYNX_DSK_H

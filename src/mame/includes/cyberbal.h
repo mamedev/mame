@@ -48,12 +48,12 @@ protected:
 	required_device<tilemap_device> m_alpha;
 	required_device<atari_motion_objects_device> m_mob;
 
-	uint16_t    m_current_slip[2];
+	uint16_t    m_current_slip[2]{};
 
 private:
-	uint8_t     m_playfield_palette_bank[2];
-	uint16_t    m_playfield_xscroll[2];
-	uint16_t    m_playfield_yscroll[2];
+	uint8_t     m_playfield_palette_bank[2]{};
+	uint16_t    m_playfield_xscroll[2]{};
+	uint16_t    m_playfield_yscroll[2]{};
 };
 
 

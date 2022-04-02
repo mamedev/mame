@@ -113,12 +113,6 @@ std::unique_ptr<util::disasm_interface> amis2000_base_device::create_disassemble
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	S2000_PC = STATE_GENPC, S2000_BL = 0, S2000_BU,
-	S2000_ACC, S2000_E, S2000_CY
-};
-
 void amis2000_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -175,15 +169,17 @@ void amis2000_base_device::device_start()
 	save_item(NAME(m_a));
 
 	// register state for debugger
-	state_add(S2000_PC,     "PC",     m_pc    ).formatstr("%04X");
-	state_add(S2000_BL,     "BL",     m_bl    ).formatstr("%01X");
-	state_add(S2000_BU,     "BU",     m_bu    ).formatstr("%01X");
-	state_add(S2000_ACC,    "ACC",    m_acc   ).formatstr("%01X");
-	state_add(S2000_E,      "E",      m_e     ).formatstr("%01X");
-	state_add(S2000_CY,     "CY",     m_carry ).formatstr("%01X");
-
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "CURFLAGS", m_f).formatstr("%6s").noshow();
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "BL", m_bl).formatstr("%01X"); // 2
+	state_add(++m_state_count, "BU", m_bu).formatstr("%01X"); // 3
+	state_add(++m_state_count, "ACC", m_acc).formatstr("%01X"); // 4
+	state_add(++m_state_count, "E", m_e).formatstr("%01X"); // 5
+	state_add(++m_state_count, "CY", m_carry).formatstr("%01X"); // 6
 
 	set_icountptr(m_icount);
 }

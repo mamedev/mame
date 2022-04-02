@@ -47,17 +47,17 @@ private:
 	required_shared_ptr<uint8_t> m_ps5_palette_ram_sp;
 	required_shared_ptr<uint8_t> m_ps5_palette_ram_tx;
 
-	uint8_t m_bank_latch;
-	uint8_t m_ps5_vram_page;
-	uint8_t m_bg_clip_mode;
-	uint8_t m_title_screen;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint16_t m_palette_intensity;
-	uint8_t m_bombsa_unknown;
-	int m_sx1;
-	int m_sy1;
-	int m_sy2;
+	uint8_t m_bank_latch = 0;
+	uint8_t m_ps5_vram_page = 0;
+	uint8_t m_bg_clip_mode = 0;
+	uint8_t m_title_screen = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint16_t m_palette_intensity = 0;
+	uint8_t m_bombsa_unknown = 0;
+	int m_sx1 = 0;
+	int m_sy1 = 0;
+	int m_sy2 = 0;
 
 	uint8_t bankselect_r();
 	uint8_t vram_page_select_r();

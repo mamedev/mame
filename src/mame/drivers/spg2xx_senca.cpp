@@ -39,14 +39,14 @@ protected:
 
 	uint16_t an3_r();
 
-	int m_porta_dat;
-	int m_portb_dat;
-	int m_portc_dat;
-	int m_porta_mask;
+	int m_porta_dat = 0;
+	int m_portb_dat = 0;
+	int m_portc_dat = 0;
+	int m_porta_mask = 0;
 
-	int m_upperbank;
+	int m_upperbank = 0;
 
-	int m_basebank;
+	int m_basebank = 0;
 };
 
 class mywicogt_state : public zon32bit_state

@@ -14,6 +14,7 @@ enum {
 
 DECLARE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device)
 DECLARE_DEVICE_TYPE(MC68HC11D0, mc68hc11d0_device)
+DECLARE_DEVICE_TYPE(MC68HC11E1, mc68hc11e1_device)
 DECLARE_DEVICE_TYPE(MC68HC811E2, mc68hc811e2_device)
 DECLARE_DEVICE_TYPE(MC68HC11F1, mc68hc11f1_device)
 DECLARE_DEVICE_TYPE(MC68HC11K1, mc68hc11k1_device)
@@ -571,6 +572,18 @@ protected:
 
 private:
 	uint8_t reg01_r();
+};
+
+class mc68hc11e1_device : public mc68hc11_cpu_device
+{
+public:
+	// construction/destruction
+	mc68hc11e1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+
+	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
 };
 
 class mc68hc811e2_device : public mc68hc11_cpu_device

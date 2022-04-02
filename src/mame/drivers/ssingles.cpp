@@ -178,10 +178,10 @@ protected:
 private:
 	uint8_t m_videoram[VMEM_SIZE];
 	uint8_t m_colorram[VMEM_SIZE];
-	uint8_t m_prot_data;
+	uint8_t m_prot_data = 0;
 	pen_t m_pens[NUM_PENS];
 
-	uint8_t m_atamanot_prot_state;
+	uint8_t m_atamanot_prot_state = 0;
 
 	required_device<cpu_device> m_maincpu;
 

@@ -70,8 +70,8 @@ protected:
 	// internal state
 	uint32_t *m_rom;  // this points to the cart rom region
 	uint32_t m_rom_size;  // this is the actual game size, not the rom region size!
-	uint32_t *m_romhlp;
-	uint32_t m_romhlp_size;
+	uint32_t *m_romhlp = nullptr;
+	uint32_t m_romhlp_size = 0;
 	std::vector<uint32_t> m_nvram;
 };
 

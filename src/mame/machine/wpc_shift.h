@@ -19,8 +19,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint16_t adr;
-	uint8_t val1, val2;
+	uint16_t adr = 0;
+	uint8_t val1 = 0, val2 = 0;
 
 	uint8_t adrh_r();
 	void adrh_w(uint8_t data);

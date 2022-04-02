@@ -60,12 +60,6 @@ cops1_base_device::cops1_base_device(const machine_config &mconfig, device_type 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	COPS1_PC=1, COPS1_SA, COPS1_SB,
-	COPS1_A, COPS1_C, COPS1_H, COPS1_B, COPS1_F
-};
-
 void cops1_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -125,15 +119,16 @@ void cops1_base_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prev_pc).formatstr("%03X").noshow();
 
-	state_add(COPS1_PC, "PC", m_pc).formatstr("%03X");
-	state_add(COPS1_SA, "SA", m_sa).formatstr("%03X");
-	state_add(COPS1_SB, "SB", m_sb).formatstr("%03X");
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%03X"); // 1
+	state_add(++m_state_count, "SA", m_sa).formatstr("%03X"); // 2
+	state_add(++m_state_count, "SB", m_sb).formatstr("%03X"); // 3
 
-	state_add(COPS1_A, "A", m_a).formatstr("%01X");
-	state_add(COPS1_C, "C", m_c).formatstr("%01X");
-	state_add(COPS1_H, "H", m_h).formatstr("%01X");
-	state_add(COPS1_B, "B", m_b).formatstr("%02X");
-	state_add(COPS1_F, "F", m_f).formatstr("%01X");
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 4
+	state_add(++m_state_count, "C", m_c).formatstr("%01X"); // 5
+	state_add(++m_state_count, "H", m_h).formatstr("%01X"); // 6
+	state_add(++m_state_count, "B", m_b).formatstr("%02X"); // 7
+	state_add(++m_state_count, "F", m_f).formatstr("%01X"); // 8
 
 	set_icountptr(m_icount);
 }

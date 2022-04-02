@@ -91,13 +91,13 @@ protected:
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
 	optional_device<starfield_05xx_device> m_starfield; // not present on battles, digdug, xevious
-	emu_timer *m_cpu3_interrupt_timer;
+	emu_timer *m_cpu3_interrupt_timer = nullptr;
 
 	uint32_t m_galaga_gfxbank; // used by gatsbee
 
 	/* shared */
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;

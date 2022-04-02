@@ -159,9 +159,9 @@ protected:
 
 	virtual void timer_start(uint8_t value) override;
 
-	u8 m_timer_count;
-	u8 m_timer_modulo;
-	bool m_timer_start;
+	u8 m_timer_count = 0;
+	u8 m_timer_modulo = 0;
+	bool m_timer_start = false;
 };
 
 class f38t56_device : public f3856_device

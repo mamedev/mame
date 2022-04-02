@@ -70,9 +70,9 @@ protected:
 	u8                          m_io_kbd_state[12][8];
 
 	int m_x, m_y;
-	u8 m_first_byte;
-	u8 m_second_byte;
-	u8 m_modifier_keys;
+	u8 m_first_byte = 0;
+	u8 m_second_byte = 0;
+	u8 m_modifier_keys = 0;
 };
 
 class jb3000_keyboard_device : public myb3k_keyboard_device

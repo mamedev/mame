@@ -116,7 +116,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	int m_centronics_busy;
+	int m_centronics_busy = 0;
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);

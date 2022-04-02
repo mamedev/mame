@@ -51,14 +51,14 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	output_helper::ptr m_vfds;
-	int m_cursx, m_cursy;
-	int m_savedx, m_savedy;
-	int const m_rows, m_cols;
-	uint8_t m_curattr;
-	uint8_t m_lastchar;
-	uint8_t m_chars[2][40];
-	uint8_t m_attrs[2][40];
-	uint8_t m_dirty[2][40];
+	int m_cursx = 0, m_cursy = 0;
+	int m_savedx = 0, m_savedy = 0;
+	int const m_rows = 0, m_cols = 0;
+	uint8_t m_curattr = 0;
+	uint8_t m_lastchar = 0;
+	uint8_t m_chars[2][40]{};
+	uint8_t m_attrs[2][40]{};
+	uint8_t m_dirty[2][40]{};
 };
 
 class esq1x22_device : public esqvfd_device {

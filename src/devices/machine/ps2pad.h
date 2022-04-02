@@ -58,16 +58,16 @@ protected:
 		CMD_GET_MODE        = 0x4c,
 	};
 
-	uint8_t m_recv_buf[64]; // Buffer size is a guess
-	uint8_t m_xmit_buf[64];
-	uint8_t m_curr_recv;
-	uint8_t m_curr_xmit;
-	uint8_t m_end_recv;
-	uint8_t m_end_xmit;
+	uint8_t m_recv_buf[64]{}; // Buffer size is a guess
+	uint8_t m_xmit_buf[64]{};
+	uint8_t m_curr_recv = 0;
+	uint8_t m_curr_xmit = 0;
+	uint8_t m_end_recv = 0;
+	uint8_t m_end_xmit = 0;
 
-	uint8_t m_cmd;
-	uint8_t m_cmd_size;
-	bool m_configuring;
+	uint8_t m_cmd = 0;
+	uint8_t m_cmd_size = 0;
+	bool m_configuring = false;
 
 	static const size_t BUFFER_SIZE;
 };

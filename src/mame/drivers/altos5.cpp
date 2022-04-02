@@ -73,7 +73,7 @@ private:
 	uint8_t m_port09 = 0U;
 	bool m_ipl = 0;
 	offs_t m_curr_bank = 0;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = 0;
 	std::unique_ptr<u8[]> m_ram;  // main ram 192k
 	std::unique_ptr<u8[]> m_dummy;  // for wrpt
 	required_device<z80_device> m_maincpu;

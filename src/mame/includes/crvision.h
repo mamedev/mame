@@ -57,7 +57,7 @@ protected:
 	optional_ioport_array<8> m_io_keypad[4];
 
 	virtual void machine_start() override;
-	uint8_t m_keylatch;
+	uint8_t m_keylatch = 0U;
 
 private:
 	void crvision_map(address_map &map);
@@ -94,9 +94,9 @@ private:
 	required_ioport_array<8> m_inp_y;
 	required_ioport_array<4> m_inp_joy;
 
-	uint8_t m_joylatch;
-	int m_centronics_busy;
-	int m_psg_ready;
+	uint8_t m_joylatch = 0U;
+	int m_centronics_busy = 0;
+	int m_psg_ready = 0;
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_psg_ready );

@@ -78,7 +78,7 @@ protected:
 	required_device<screen_device> m_screen;
 
 private:
-	uint16_t m_current_screen_height;
+	uint16_t m_current_screen_height = 0U;
 };
 
 
@@ -137,8 +137,8 @@ private:
 	required_memory_bank m_bank;
 	required_ioport m_a8;
 	required_ioport m_swb;
-	emu_timer *m_reset_timer;
-	emu_timer *m_game_select_button_timer;
+	emu_timer *m_reset_timer = 0;
+	emu_timer *m_game_select_button_timer = 0;
 };
 
 

@@ -48,7 +48,7 @@ protected:
 private:
 	// internal state
 	address_space_config m_space_config;
-	emu_timer *m_write_timer;
+	emu_timer *m_write_timer = nullptr;
 	int m_a9_12v;
 	int m_oe_12v;
 	int m_last_write;

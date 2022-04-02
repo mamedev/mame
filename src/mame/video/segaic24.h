@@ -53,7 +53,7 @@ private:
 	std::unique_ptr<uint16_t[]> char_ram;
 	std::unique_ptr<uint16_t[]> tile_ram;
 	int char_gfx_index;
-	tilemap_t *tile_layer[4];
+	tilemap_t *tile_layer[4]{};
 	uint16_t tile_mask;
 
 	static const gfx_layout char_layout;

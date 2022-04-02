@@ -473,16 +473,9 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 
 DECLARE_WRITE_LINE_MEMBER(device_nes_cart_interface::set_irq_line)
 {
-	// use hold_irq_line for HOLD_LINE semantics (not recommended)
 	assert(state == ASSERT_LINE || state == CLEAR_LINE);
 
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state);
-}
-
-void device_nes_cart_interface::hold_irq_line()
-{
-	// hack which requires the CPU object
-	m_maincpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
 }
 
 void device_nes_cart_interface::reset_cpu()
@@ -500,7 +493,7 @@ void device_nes_cart_interface::reset_cpu()
 // the memory banks)
 uint8_t device_nes_cart_interface::hi_access_rom(uint32_t offset)
 {
-	int bank = (offset & 0x6000) >> 13;
+	int bank = BIT(offset, 13, 2);
 	return m_prg[m_prg_bank[bank] * 0x2000 + (offset & 0x1fff)];
 }
 
@@ -525,7 +518,7 @@ uint8_t device_nes_cart_interface::account_bus_conflict(uint32_t offset, uint8_t
 
 void device_nes_cart_interface::chr_w(offs_t offset, uint8_t data)
 {
-	int bank = offset >> 10;
+	int bank = BIT(offset, 10, 3);
 
 	if (m_chr_src[bank] == CHRRAM)
 		m_chr_access[bank][offset & 0x3ff] = data;
@@ -533,14 +526,14 @@ void device_nes_cart_interface::chr_w(offs_t offset, uint8_t data)
 
 uint8_t device_nes_cart_interface::chr_r(offs_t offset)
 {
-	int bank = offset >> 10;
+	int bank = BIT(offset, 10, 3);
 	return m_chr_access[bank][offset & 0x3ff];
 }
 
 
 void device_nes_cart_interface::nt_w(offs_t offset, uint8_t data)
 {
-	int page = (offset & 0xc00) >> 10;
+	int page = BIT(offset, 10, 2);
 
 	if (!m_nt_writable[page])
 		return;
@@ -550,7 +543,7 @@ void device_nes_cart_interface::nt_w(offs_t offset, uint8_t data)
 
 uint8_t device_nes_cart_interface::nt_r(offs_t offset)
 {
-	int page = (offset & 0xc00) >> 10;
+	int page = BIT(offset, 10, 2);
 	return m_nt_access[page][offset & 0x3ff];
 }
 

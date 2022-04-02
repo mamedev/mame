@@ -26,6 +26,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_CPIS_FORMAT;
+extern const cpis_format FLOPPY_CPIS_FORMAT;
 
 #endif // MAME_FORMATS_CPIS_DSK_H

@@ -48,7 +48,7 @@ protected:
 private:
 	required_device<ins8250_device> m_uart;
 
-	uint8_t m_vector;
+	uint8_t m_vector = 0;
 };
 
 

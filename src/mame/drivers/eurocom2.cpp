@@ -107,14 +107,14 @@ protected:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	emu_timer *m_sst;
+	emu_timer *m_sst = nullptr;
 
-	floppy_image_device *m_floppy;
-	bool m_sst_state, m_kbd_ready;
+	floppy_image_device *m_floppy = nullptr;
+	bool m_sst_state = false, m_kbd_ready = false;
 	bitmap_ind16 m_tmpbmp;
 
-	uint8_t m_vico[2];
-	uint8_t m_kbd_data;
+	uint8_t m_vico[2]{};
+	uint8_t m_kbd_data = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia1;
@@ -151,8 +151,8 @@ private:
 
 	void waveterm_map(address_map &map);
 
-	bool m_driveh;
-	uint8_t m_drive;
+	bool m_driveh = false;
+	uint8_t m_drive = 0;
 
 	required_device<pia6821_device> m_pia3;
 	required_device<ptm6840_device> m_ptm;

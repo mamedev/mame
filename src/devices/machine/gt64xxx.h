@@ -95,7 +95,7 @@ private:
 	{
 		uint32_t low_addr;
 		uint32_t high_addr;
-		address_space* space;
+		address_space* space = nullptr;
 		galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
 	};
 

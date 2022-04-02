@@ -101,37 +101,37 @@ private:
 	void mz800_io(address_map &map);
 	void mz800_mem(address_map &map);
 
-	int m_mz700;                /* 1 if running on an mz700 */
+	int m_mz700 = 0;                /* 1 if running on an mz700 */
 
-	int m_cursor_bit;
-	int m_other_timer;
+	int m_cursor_bit = 0;
+	int m_other_timer = 0;
 
-	int m_intmsk;   /* PPI8255 pin PC2 */
+	int m_intmsk = 0;   /* PPI8255 pin PC2 */
 
-	int m_mz700_ram_lock;       /* 1 if ram lock is active */
-	int m_mz700_ram_vram;       /* 1 if vram is banked in */
+	int m_mz700_ram_lock = 0;       /* 1 if ram lock is active */
+	int m_mz700_ram_vram = 0;       /* 1 if vram is banked in */
 
 	/* mz800 specific */
 	std::unique_ptr<uint8_t[]> m_cgram;
-	uint8_t *m_p_chargen;
+	uint8_t *m_p_chargen = nullptr;
 
-	int m_mz700_mode;           /* 1 if in mz700 mode */
-	int m_mz800_ram_lock;       /* 1 if lock is active */
-	int m_mz800_ram_monitor;    /* 1 if monitor rom banked in */
+	int m_mz700_mode = 0;           /* 1 if in mz700 mode */
+	int m_mz800_ram_lock = 0;       /* 1 if lock is active */
+	int m_mz800_ram_monitor = 0;    /* 1 if monitor rom banked in */
 
-	int m_hires_mode;           /* 1 if in 640x200 mode */
-	int m_screennum;           /* screen designation */
+	int m_hires_mode = 0;           /* 1 if in 640x200 mode */
+	int m_screennum = 0;           /* screen designation */
 
-	int m_centronics_busy;
-	int m_centronics_perror;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
 
-	uint8_t *m_colorram;
+	uint8_t *m_colorram = nullptr;
 	std::unique_ptr<uint8_t[]> m_videoram;
-	uint8_t m_speaker_level;
-	uint8_t m_prev_state;
-	uint16_t m_mz800_ramaddr;
+	uint8_t m_speaker_level = 0;
+	uint8_t m_prev_state = 0;
+	uint16_t m_mz800_ramaddr = 0;
 	uint8_t m_mz800_palette[4];
-	uint8_t m_mz800_palette_bank;
+	uint8_t m_mz800_palette_bank = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;

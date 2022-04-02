@@ -198,10 +198,10 @@ protected:
 	void copy_ram_to_eeprom();
 	void copy_eeprom_to_ram();
 	void device_start() override;
-	uint8_t m_ram_length;
-	uint16_t m_ram_data[16];
-	uint16_t m_reading;
-	uint8_t m_store_latch;
+	uint8_t m_ram_length = 0;
+	uint16_t m_ram_data[16]{};
+	uint16_t m_reading = 0;
+	uint8_t m_store_latch = 0;
 };
 
 

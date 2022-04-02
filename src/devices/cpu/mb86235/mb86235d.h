@@ -29,7 +29,7 @@ private:
 
 	void dasm_ea(std::ostream &stream, int md, int arx, int ary, int disp);
 	void dasm_alu_mul(std::ostream &stream, uint64_t opcode, bool twoop);
-	void dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	offs_t dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode);
 	void dasm_double_xfer1(std::ostream &stream, uint64_t opcode);
 	void dasm_xfer1(std::ostream &stream, uint64_t opcode);
 	void dasm_double_xfer2_field(std::ostream &stream, int sd, bool isbbus, uint32_t field);

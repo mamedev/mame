@@ -224,14 +224,14 @@ private:
 	// RSP Interface (SP) registers
 	void sp_dma(int direction);
 
-	uint32_t sp_mem_addr;
-	uint32_t sp_dram_addr;
-	uint32_t sp_mem_addr_start;
-	uint32_t sp_dram_addr_start;
-	int sp_dma_length;
-	int sp_dma_count;
-	int sp_dma_skip;
-	uint32_t sp_semaphore;
+	uint32_t sp_mem_addr = 0;
+	uint32_t sp_dram_addr = 0;
+	uint32_t sp_mem_addr_start = 0;
+	uint32_t sp_dram_addr_start = 0;
+	int sp_dma_length = 0;
+	int sp_dma_count = 0;
+	int sp_dma_skip = 0;
+	uint32_t sp_semaphore = 0;
 
 	// Disk Drive (DD) registers and functions
 	void dd_set_zone_and_track_offset();
@@ -239,62 +239,62 @@ private:
 	void dd_write_sector();
 	void dd_read_sector();
 	void dd_read_C2();
-	uint32_t dd_buffer[256];
-	uint32_t dd_sector_data[64];
-	uint32_t dd_ram_seq_data[16];
-	uint32_t dd_data_reg;
-	uint32_t dd_status_reg;
-	uint32_t dd_track_reg;
-	uint32_t dd_buf_status_reg;
-	uint32_t dd_sector_err_reg;
-	uint32_t dd_seq_status_reg;
-	uint32_t dd_seq_ctrl_reg;
-	uint32_t dd_sector_reg;
-	uint32_t dd_reset_reg;
-	uint32_t dd_current_reg;
-	bool dd_bm_reset_held;
-	bool dd_write;
-	uint8_t dd_int;
-	uint8_t dd_start_block;
-	uint8_t dd_start_sector;
-	uint8_t dd_sectors_per_block;
-	uint8_t dd_sector_size;
-	uint8_t dd_zone;
-	uint32_t dd_track_offset;
+	uint32_t dd_buffer[256]{};
+	uint32_t dd_sector_data[64]{};
+	uint32_t dd_ram_seq_data[16]{};
+	uint32_t dd_data_reg = 0;
+	uint32_t dd_status_reg = 0;
+	uint32_t dd_track_reg = 0;
+	uint32_t dd_buf_status_reg = 0;
+	uint32_t dd_sector_err_reg = 0;
+	uint32_t dd_seq_status_reg = 0;
+	uint32_t dd_seq_ctrl_reg = 0;
+	uint32_t dd_sector_reg = 0;
+	uint32_t dd_reset_reg = 0;
+	uint32_t dd_current_reg = 0;
+	bool dd_bm_reset_held = false;
+	bool dd_write = 0;
+	uint8_t dd_int = 0;
+	uint8_t dd_start_block = 0;
+	uint8_t dd_start_sector = 0;
+	uint8_t dd_sectors_per_block = 0;
+	uint8_t dd_sector_size = 0;
+	uint8_t dd_zone = 0;
+	uint32_t dd_track_offset = 0;
 
 	// Peripheral Interface (PI) registers and functions
-	emu_timer *pi_dma_timer;
-	uint32_t pi_dram_addr;
-	uint32_t pi_cart_addr;
-	uint32_t pi_rd_len;
-	uint32_t pi_wr_len;
-	uint32_t pi_status;
-	uint32_t pi_bsd_dom1_lat;
-	uint32_t pi_bsd_dom1_pwd;
-	uint32_t pi_bsd_dom1_pgs;
-	uint32_t pi_bsd_dom1_rls;
-	uint32_t pi_bsd_dom2_lat;
-	uint32_t pi_bsd_dom2_pwd;
-	uint32_t pi_bsd_dom2_pgs;
-	uint32_t pi_bsd_dom2_rls;
-	uint32_t pi_dma_dir;
+	emu_timer *pi_dma_timer = nullptr;
+	uint32_t pi_dram_addr = 0;
+	uint32_t pi_cart_addr = 0;
+	uint32_t pi_rd_len = 0;
+	uint32_t pi_wr_len = 0;
+	uint32_t pi_status = 0;
+	uint32_t pi_bsd_dom1_lat = 0;
+	uint32_t pi_bsd_dom1_pwd = 0;
+	uint32_t pi_bsd_dom1_pgs = 0;
+	uint32_t pi_bsd_dom1_rls = 0;
+	uint32_t pi_bsd_dom2_lat = 0;
+	uint32_t pi_bsd_dom2_pwd = 0;
+	uint32_t pi_bsd_dom2_pgs = 0;
+	uint32_t pi_bsd_dom2_rls = 0;
+	uint32_t pi_dma_dir = 0;
 
 	// Serial Interface (SI) registers and functions
-	emu_timer *si_dma_timer;
+	emu_timer *si_dma_timer = nullptr;
 	void pif_dma(int direction);
 	void handle_pif();
 	int pif_channel_handle_command(int channel, int slength, uint8_t *sdata, int rlength, uint8_t *rdata);
 	uint8_t calc_mempak_crc(uint8_t *buffer, int length);
-	uint8_t pif_ram[0x40];
-	uint8_t pif_cmd[0x40];
-	uint32_t si_dram_addr;
-	uint32_t si_pif_addr;
-	uint32_t si_pif_addr_rd64b;
-	uint32_t si_pif_addr_wr64b;
-	uint32_t si_status_val;
-	uint32_t si_dma_dir;
-	uint32_t cic_status;
-	int cic_type;
+	uint8_t pif_ram[0x40]{};
+	uint8_t pif_cmd[0x40]{};
+	uint32_t si_dram_addr = 0;
+	uint32_t si_pif_addr = 0;
+	uint32_t si_pif_addr_rd64b = 0;
+	uint32_t si_pif_addr_wr64b = 0;
+	uint32_t si_status_val = 0;
+	uint32_t si_dma_dir = 0;
+	uint32_t cic_status = 0;
+	int cic_type = 0;
 
 	n64_savable_data_t savable_data;
 
@@ -302,11 +302,11 @@ private:
 	void vi_recalculate_resolution();
 	void video_update16(bitmap_rgb32 &bitmap);
 	void video_update32(bitmap_rgb32 &bitmap);
-	uint8_t random_seed;        // %HACK%, adds 19 each time it's read and is more or less random
+	uint8_t random_seed = 0x55;        // %HACK%, adds 19 each time it's read and is more or less random
 	uint8_t get_random() { return random_seed += 0x13; }
 
-	int32_t m_gamma_table[256];
-	int32_t m_gamma_dither_table[0x4000];
+	int32_t m_gamma_table[256]{};
+	int32_t m_gamma_dither_table[0x4000]{};
 
 };
 

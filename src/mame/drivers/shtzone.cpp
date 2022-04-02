@@ -93,8 +93,8 @@ private:
 	required_device_array<sega8_cart_slot_device, 5> m_slots;
 	output_finder<> m_led;
 
-	uint8_t m_control;
-	uint8_t m_selected_cart;
+	uint8_t m_control = 0;
+	uint8_t m_selected_cart = 0;
 
 	uint8_t cart_select_r();
 	void cart_select_w(uint8_t data);

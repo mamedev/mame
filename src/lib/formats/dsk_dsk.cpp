@@ -302,17 +302,17 @@ bool dsk_format::supports_save() const
 	return false;
 }
 
-int dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[16];
 
 	size_t actual;
 	io.read_at(0, &header, sizeof(header), actual);
 	if ( memcmp( header, DSK_FORMAT_HEADER, 8 ) ==0) {
-		return 100;
+		return FIFID_SIGN;
 	}
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
-		return 100;
+		return FIFID_SIGN;
 	}
 	return 0;
 }
@@ -348,7 +348,7 @@ struct sector_header
 
 #pragma pack()
 
-bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 
@@ -497,4 +497,4 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-const floppy_format_type FLOPPY_DSK_FORMAT = &floppy_image_format_creator<dsk_format>;
+const dsk_format FLOPPY_DSK_FORMAT;

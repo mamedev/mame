@@ -38,9 +38,9 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
-	int download;
-	uint8_t buffer[ 65536 ];
-	int bufferOffset;
+	int download = 0;
+	uint8_t buffer[ 65536 ]{};
+	int bufferOffset = 0;
 };
 
 // device type definition

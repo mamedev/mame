@@ -64,7 +64,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch;
+	uint8_t m_latch = 0;
 	uint8_t m_ram[0xb00];
 };
 
@@ -174,7 +174,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch;
+	uint8_t m_latch = 0;
 };
 
 
@@ -198,7 +198,7 @@ protected:
 
 private:
 	void update_banks();
-	u8 m_latch;
+	u8 m_latch = 0;
 	u8 m_reg[6];
 
 	u16 m_irq_count, m_irq_count_latch;
@@ -224,7 +224,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint16_t m_latch;
+	uint16_t m_latch = 0;
 };
 
 
@@ -247,7 +247,7 @@ protected:
 
 private:
 	u8 m_jumper;
-	u16 m_latch;
+	u16 m_latch = 0;
 	u8 m_reg;
 };
 
@@ -272,7 +272,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch;
+	uint8_t m_latch = 0;
 };
 #endif
 

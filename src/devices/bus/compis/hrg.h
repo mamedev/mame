@@ -48,7 +48,7 @@ protected:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_video_ram;
 
-	uint8_t m_unk_video;
+	uint8_t m_unk_video = 0;
 
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );

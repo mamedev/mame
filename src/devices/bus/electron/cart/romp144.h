@@ -48,8 +48,8 @@ private:
 
 	required_device_array<generic_slot_device, 7> m_romslot;
 
-	uint8_t m_rom_select;
-	uint8_t m_rom_latch;
+	uint8_t m_rom_select = 0;
+	uint8_t m_rom_latch = 0;
 };
 
 

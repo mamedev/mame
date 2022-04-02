@@ -30,6 +30,7 @@ Volcano                           667  1 then M=                             M t
 Black Hole                        668  1 then R (wait for score to flash)    L then R (wait for flash or match)
 Haunted House                     669  1                                     X
 Eclipse                           671  1 then RW                             X
+Critical Mass
 
 Status:
 - All machines are playable but read notes below.

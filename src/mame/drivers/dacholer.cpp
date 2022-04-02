@@ -112,18 +112,18 @@ private:
 	output_finder<2> m_leds;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_bg_bank;
-	uint8_t    m_scroll_x;
-	uint8_t    m_scroll_y;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int      m_bg_bank = 0;
+	uint8_t    m_scroll_x = 0;
+	uint8_t    m_scroll_y = 0;
 
 	/* sound-related */
-	int m_msm_data;
-	int m_msm_toggle;
-	uint8_t m_snd_interrupt_enable;
-	uint8_t m_music_interrupt_enable;
-	uint8_t m_snd_ack;
+	int m_msm_data = 0;
+	int m_msm_toggle = 0;
+	uint8_t m_snd_interrupt_enable = 0;
+	uint8_t m_music_interrupt_enable = 0;
+	uint8_t m_snd_ack = 0;
 
 };
 
@@ -547,39 +547,16 @@ static INPUT_PORTS_START( itaten )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4,0,12,8,20,16,28,24,36,32,44,40,52,48,60,56 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_dacholer )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x10, 1 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x10, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0x00, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb,   0x10, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_packed_lsb, 0x10, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_itaten )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x00, 1 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x10, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0x00, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb,   0x00, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_packed_lsb, 0x10, 1 )
 GFXDECODE_END
 
 

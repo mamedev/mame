@@ -69,10 +69,10 @@ protected:
 	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 
 	// video-related
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_palettebank;
-	uint8_t m_charbank;
-	uint8_t m_spriterambank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_palettebank = 0U;
+	uint8_t m_charbank = 0U;
+	uint8_t m_spriterambank = 0U;
 };
 
 class ironhors_state : public ironhors_base_state

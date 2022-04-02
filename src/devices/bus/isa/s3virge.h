@@ -137,50 +137,50 @@ protected:
 
 	struct
 	{
-		uint32_t linear_address;
-		uint8_t linear_address_size;
-		uint32_t linear_address_size_full;
-		bool linear_address_enable;
-		uint32_t interrupt_enable;
+		uint32_t linear_address = 0;
+		uint8_t linear_address_size = 0;
+		uint32_t linear_address_size_full = 0;
+		bool linear_address_enable = false;
+		uint32_t interrupt_enable = 0;
 
 		struct
 		{
-			int state;
-			bool busy;
+			int state = 0;
+			bool busy = false;
 			struct
 			{
-				uint32_t reg[256];
-				int op_type;
+				uint32_t reg[256]{};
+				int op_type = 0;
 			} cmd_fifo[16];
-			int cmd_fifo_next_ptr;  // command added here in FIFO
-			int cmd_fifo_current_ptr;  // command currently being processed in FIFO
-			int cmd_fifo_slots_free;
+			int cmd_fifo_next_ptr = 0;  // command added here in FIFO
+			int cmd_fifo_current_ptr = 0;  // command currently being processed in FIFO
+			int cmd_fifo_slots_free = 0;
 
-			uint8_t pattern[0xc0];
-			uint32_t reg[5][256];
+			uint8_t pattern[0xc0]{};
+			uint32_t reg[5][256]{};
 
 			// BitBLT command state
-			uint16_t bitblt_x_src;
-			uint16_t bitblt_y_src;
-			uint16_t bitblt_x_dst;
-			uint16_t bitblt_y_dst;
-			int16_t bitblt_x_current;
-			int16_t bitblt_y_current;
-			int16_t bitblt_x_src_current;
-			int16_t bitblt_y_src_current;
-			int8_t bitblt_pat_x;
-			int8_t bitblt_pat_y;
-			uint16_t bitblt_height;
-			uint16_t bitblt_width;
-			uint32_t bitblt_step_count;
-			uint64_t bitblt_mono_pattern;
-			uint32_t bitblt_current_pixel;
-			uint32_t bitblt_pixel_pos;  // current position in a pixel (for packed 24bpp colour image transfers)
-			uint32_t image_xfer;  // source data via image transfer ports
-			uint16_t clip_l;
-			uint16_t clip_r;
-			uint16_t clip_t;
-			uint16_t clip_b;
+			uint16_t bitblt_x_src = 0;
+			uint16_t bitblt_y_src = 0;
+			uint16_t bitblt_x_dst = 0;
+			uint16_t bitblt_y_dst = 0;
+			int16_t bitblt_x_current = 0;
+			int16_t bitblt_y_current = 0;
+			int16_t bitblt_x_src_current = 0;
+			int16_t bitblt_y_src_current = 0;
+			int8_t bitblt_pat_x = 0;
+			int8_t bitblt_pat_y = 0;
+			uint16_t bitblt_height = 0;
+			uint16_t bitblt_width = 0;
+			uint32_t bitblt_step_count = 0;
+			uint64_t bitblt_mono_pattern = 0;
+			uint32_t bitblt_current_pixel = 0;
+			uint32_t bitblt_pixel_pos = 0;  // current position in a pixel (for packed 24bpp colour image transfers)
+			uint32_t image_xfer = 0;  // source data via image transfer ports
+			uint16_t clip_l = 0;
+			uint16_t clip_r = 0;
+			uint16_t clip_t = 0;
+			uint16_t clip_b = 0;
 		} s3d;
 	} s3virge;
 
@@ -243,7 +243,7 @@ protected:
 	devcb_write_line m_linear_config_changed_cb;
 
 private:
-	emu_timer* m_draw_timer;
+	emu_timer* m_draw_timer = nullptr;
 	void bitblt_step();
 	void bitblt_colour_step();
 	void bitblt_monosrc_step();

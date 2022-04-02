@@ -106,8 +106,8 @@ private:
 	required_shared_ptr<uint16_t> m_sprregs;
 
 	bitmap_ind16 m_sprite_bitmap;
-	uint16_t m_priority_buffer_scrollx;
-	uint16_t m_priority_buffer_scrolly;
+	uint16_t m_priority_buffer_scrollx = 0;
+	uint16_t m_priority_buffer_scrolly = 0;
 	std::unique_ptr<uint32_t[]> m_spriteram32;
 	std::unique_ptr<uint32_t[]> m_spc_regs;
 

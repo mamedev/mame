@@ -51,7 +51,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// driver state
-	uint8_t m_control;
+	uint8_t m_control = 0;
 
 	// member functions
 	void control_w(uint8_t data);

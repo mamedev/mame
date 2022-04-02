@@ -99,7 +99,7 @@ protected:
 	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
-	bool     m_grom_selected;
+	bool     m_grom_selected = false;
 };
 
 } // end namespace bus::ti99::gromport

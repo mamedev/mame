@@ -49,13 +49,13 @@ private:
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_scrollreg;
 
-	uint8_t m_popflame_prot_seed;
-	int m_r_index;
-	int m_prot_count;
-	int m_question_offset;
-	int m_cocktail;
-	uint8_t m_palreg;
-	int m_bankreg;
+	uint8_t m_popflame_prot_seed = 0;
+	int m_r_index = 0;
+	int m_prot_count = 0;
+	int m_question_offset = 0;
+	int m_cocktail = 0;
+	uint8_t m_palreg = 0;
+	int m_bankreg = 0;
 	bitmap_ind16 m_tmpbitmap;
 
 	uint8_t in0_port_r();

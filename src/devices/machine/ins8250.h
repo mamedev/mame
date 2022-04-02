@@ -125,13 +125,13 @@ protected:
 	virtual u8 pop_rx() override;
 private:
 	void set_timer() { m_timeout->adjust(attotime::from_hz((clock()*4*8)/(m_regs.dl*16))); }
-	int m_rintlvl;
-	u8 m_rfifo[16];
-	u8 m_efifo[16];
-	u8 m_tfifo[16];
-	int m_rhead, m_rtail, m_rnum;
-	int m_thead, m_ttail;
-	emu_timer *m_timeout;
+	int m_rintlvl = 0;
+	u8 m_rfifo[16]{};
+	u8 m_efifo[16]{};
+	u8 m_tfifo[16]{};
+	int m_rhead = 0, m_rtail = 0, m_rnum = 0;
+	int m_thead = 0, m_ttail = 0;
+	emu_timer *m_timeout = nullptr;
 };
 
 class pc16552_device : public device_t
@@ -146,8 +146,8 @@ protected:
 	virtual void device_start() override;
 
 private:
-	ns16550_device *m_chan0;
-	ns16550_device *m_chan1;
+	ns16550_device *m_chan0 = nullptr;
+	ns16550_device *m_chan1 = nullptr;
 };
 
 DECLARE_DEVICE_TYPE(PC16552D, pc16552_device)

@@ -49,8 +49,8 @@ private:
 	void sub_io(address_map &map);
 	void sub_map(address_map &map);
 
-	u8 m_port01;
-	bool m_clock_en;
+	u8 m_port01 = 0;
+	bool m_clock_en = false;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

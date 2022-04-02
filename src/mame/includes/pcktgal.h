@@ -35,8 +35,8 @@ public:
 
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	int m_msm5205next;
-	int m_toggle;
+	int m_msm5205next = 0;
+	int m_toggle = 0;
 
 	void bank_w(uint8_t data);
 	void sound_bank_w(uint8_t data);

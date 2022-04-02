@@ -61,10 +61,10 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 private:
-	bool irq, drq, fdc_drq, fdc_irq;
+	bool irq = false, drq = false, fdc_drq = false, fdc_irq = false;
 	uint8_t dor;
 
-	floppy_image_device *floppy[4];
+	floppy_image_device *floppy[4]{};
 
 	void check_irq();
 	void check_drq();

@@ -40,7 +40,7 @@ protected:
 private:
 	required_ioport_array<4> m_joy;
 	required_ioport_array<2> m_ss;
-	uint8_t m_ctrl_sel;
+	uint8_t m_ctrl_sel = 0;
 };
 
 

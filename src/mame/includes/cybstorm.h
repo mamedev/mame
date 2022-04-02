@@ -59,8 +59,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	uint32_t m_latch_data;
-	uint8_t m_alpha_tile_bank;
+	uint32_t m_latch_data = 0U;
+	uint8_t m_alpha_tile_bank = 0U;
 
 	static const atari_motion_objects_config s_mob_config;
 };

@@ -101,13 +101,14 @@ enum
 	BMC_830425C, BMC_830506C, BMC_830928C, BMC_850437C, BMC_891227, BMC_970630C,
 	BMC_N32_4IN1, BMC_NC20MB, BMC_NT639, BMC_NTD_03, BMC_SRPG_5IN1,
 	BMC_EL860947C, BMC_EL861121C, BMC_FAM250, BMC_FK23C, BMC_FK23CA,
-	BMC_JY012005, BMC_JY820845C, BMC_PJOY84, BMC_TH22913, BMC_11160, BMC_G146,
+	BMC_JY012005, BMC_JY820845C, BMC_PJOY84,
+	BMC_S009, BMC_TH22913, BMC_TH2348, BMC_11160, BMC_G146,
 	BMC_2751, BMC_8157, BMC_00202650,
 	BMC_411120C, BMC_810305C, BMC_820720C, BMC_830118C,
 	BMC_830832C, BMC_YY841101C, BMC_YY841155C,
 	BMC_GOLD150, BMC_GOLD260,
 	BMC_12IN1, BMC_4IN1RESET, BMC_42IN1RESET, BMC_LITTLECOM160,
-	BMC_K1029, BMC_K3006, BMC_K3033, BMC_K3036, BMC_K3046, BMC_SA005A,
+	BMC_K1029, BMC_K3006, BMC_K3033, BMC_K3036, BMC_K3046, BMC_K3071, BMC_SA005A,
 	BMC_TF2740, BMC_TJ03, BMC_RESETSXROM, BMC_RESETTXROM, BMC_TECHLINE9IN1,
 	// Unlicensed
 	UNL_8237, UNL_8237A, UNL_CC21, UNL_AX40G, UNL_AX5705, UNL_KN42,
@@ -266,7 +267,6 @@ protected:
 	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 
 	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
-	[[deprecated("IRQs should be cleared explicitly")]] void hold_irq_line();
 	void reset_cpu();
 
 	// internal state
@@ -315,7 +315,7 @@ public:
 	// PRG
 	inline int prg_8k_bank_num(int bank);
 	inline void update_prg_banks(int prg_bank_start, int prg_bank_end);
-	memory_bank *m_prg_bank_mem[4];
+	memory_bank *m_prg_bank_mem[4]{};
 	int m_prg_bank[4];
 	uint32_t m_prg_chunks;
 	uint32_t m_prg_mask;
@@ -338,7 +338,7 @@ public:
 	//because some of these change multiple times per scanline!
 	int m_chr_src[8]; //defines source of base pointer
 	int m_chr_orig[8]; //defines offset of 0x400 byte segment at base pointer
-	uint8_t *m_chr_access[8];  //source translated + origin -> valid pointer!
+	uint8_t *m_chr_access[8]{};  //source translated + origin -> valid pointer!
 
 	uint32_t m_vrom_chunks;
 	uint32_t m_vram_chunks;
@@ -372,7 +372,7 @@ public:
 	int m_nt_src[4];
 	int m_nt_orig[4];
 	int m_nt_writable[4];
-	uint8_t *m_nt_access[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
+	uint8_t *m_nt_access[4]{};  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
 	void set_nt_page(int page, int source, int bank, int writable);
 	void set_nt_mirroring(int mirroring);

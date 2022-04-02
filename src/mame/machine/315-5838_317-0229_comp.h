@@ -47,20 +47,20 @@ private:
 	void write_prot_data(uint32_t data, uint32_t mem_mask, int rev_words);
 	void set_prot_addr(uint32_t data, uint32_t mem_mask);
 
-	uint32_t m_srcoffset;
-	uint32_t m_srcstart; // failsafe
-	bool m_abort;
+	uint32_t m_srcoffset = 0;
+	uint32_t m_srcstart = 0; // failsafe
+	bool m_abort = false;
 
 	struct {
-		uint16_t mode;
+		uint16_t mode = 0;
 		struct {
-			uint8_t len;       /* in bits */
-			uint8_t idx;       /* in the dictionary */
-			uint16_t pattern;  /* of the first node */
+			uint8_t len = 0;       /* in bits */
+			uint8_t idx = 0;       /* in the dictionary */
+			uint16_t pattern = 0;  /* of the first node */
 		} tree[12];
-		int it2;
-		uint8_t dictionary[256];
-		int id;
+		int it2 = 0;
+		uint8_t dictionary[256]{};
+		int id = 0;
 	} m_compstate;
 
 	void set_table_upload_mode_w(uint16_t val);
@@ -69,10 +69,10 @@ private:
 	uint8_t get_decompressed_byte(void);
 	uint16_t decipher(uint16_t c);
 
-	int m_num_bits_compressed;
-	uint16_t m_val_compressed;
-	int m_num_bits;
-	uint16_t m_val;
+	int m_num_bits_compressed = 0;
+	uint16_t m_val_compressed = 0;
+	int m_num_bits = 0;
+	uint16_t m_val = 0;
 
 	int m_hackmode;
 #ifdef SEGA315_DUMP_DEBUG

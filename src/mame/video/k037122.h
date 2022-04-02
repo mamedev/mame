@@ -33,11 +33,11 @@ protected:
 
 private:
 	// internal state
-	tilemap_t* m_tilemap_128;
-	tilemap_t* m_tilemap_256;
+	tilemap_t* m_tilemap_128 = nullptr;
+	tilemap_t* m_tilemap_256 = nullptr;
 
-	uint32_t m_palette_base;
-	uint32_t m_tilemap_base;
+	uint32_t m_palette_base = 0;
+	uint32_t m_tilemap_base = 0;
 
 	std::unique_ptr<uint32_t[]>       m_tile_ram;
 	std::unique_ptr<uint32_t[]>       m_char_ram;

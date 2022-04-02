@@ -30,8 +30,8 @@ private:
 	template <int Size>
 	static int adjust_spritecode(int dx, int dy, int code);
 
-	const uint8_t *m_scale_table_ptr;
-	uint8_t m_scale_line_count;
+	const uint8_t *m_scale_table_ptr = nullptr;
+	uint8_t m_scale_line_count = 0;
 
 	required_region_ptr<uint8_t> m_scale_table;
 	required_device<buffered_spriteram16_device> m_spriteram;

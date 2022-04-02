@@ -58,7 +58,7 @@ private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	uint8_t m_inputport_selected;
+	uint8_t m_inputport_selected = 0;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_textram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -68,13 +68,13 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_tx_tilemap;
-	uint8_t m_priority;
-	uint16_t m_scroll_x;
-	uint16_t m_scroll_y;
-	uint8_t m_main_irq_mask;
-	uint8_t m_mcu_irq_mask;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	uint8_t m_priority = 0;
+	uint16_t m_scroll_x = 0;
+	uint16_t m_scroll_y = 0;
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_mcu_irq_mask = 0;
 };
 
 #endif // MAME_INCLUDES_SKYKID_H

@@ -64,9 +64,9 @@ public:
 protected:
 	struct intctrl_t
 	{
-		uint8_t m_mask;
-		uint8_t m_status;
-		bool m_enabled;
+		uint8_t m_mask = 0;
+		uint8_t m_status = 0;
+		bool m_enabled = false;
 	};
 
 	class channel_t
@@ -155,8 +155,8 @@ protected:
 	channel_t m_channels[16];
 	intctrl_t m_int_ctrl[2];
 
-	uint32_t m_running_mask;
-	uint32_t m_last_serviced;
+	uint32_t m_running_mask = 0;
+	uint32_t m_last_serviced = 0;
 };
 
 DECLARE_DEVICE_TYPE(SONYIOP_DMA, iop_dma_device)

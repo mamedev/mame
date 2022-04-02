@@ -39,7 +39,7 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport_array<8> m_inputs;
-	u8 m_strobe;
+	u8 m_strobe = 0;
 };
 
 

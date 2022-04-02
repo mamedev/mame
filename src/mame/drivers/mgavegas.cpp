@@ -69,66 +69,66 @@ public:
 	void init_mgavegas133();
 
 private:
-	uint8_t m_int;
+	uint8_t m_int = 0;
 
 	//OUT1
-	uint8_t m_ckmod;
-	uint8_t m_dmod;
-	uint8_t m_emod;
-	uint8_t m_inh;
-	uint8_t m_hop;
-	uint8_t m_seg;
-	uint8_t m_printer;
-	uint8_t m_auxp;
+	uint8_t m_ckmod = 0;
+	uint8_t m_dmod = 0;
+	uint8_t m_emod = 0;
+	uint8_t m_inh = 0;
+	uint8_t m_hop = 0;
+	uint8_t m_seg = 0;
+	uint8_t m_printer = 0;
+	uint8_t m_auxp = 0;
 
 	//helper...
-	uint8_t m_old_ckmod;
-	uint8_t m_old_emod;
+	uint8_t m_old_ckmod = 0;
+	uint8_t m_old_emod = 0;
 
 	//OUT2
-	uint8_t m_bobina_ctrl;
-	uint8_t m_timbre;
-	uint8_t m_coil_1;
-	uint8_t m_coil_2;
-	uint8_t m_coil_3;
-	uint8_t m_cont_ent;
-	uint8_t m_cont_sal;
-	uint8_t m_cont_caj;
+	uint8_t m_bobina_ctrl = 0;
+	uint8_t m_timbre = 0;
+	uint8_t m_coil_1 = 0;
+	uint8_t m_coil_2 = 0;
+	uint8_t m_coil_3 = 0;
+	uint8_t m_cont_ent = 0;
+	uint8_t m_cont_sal = 0;
+	uint8_t m_cont_caj = 0;
 
 	//lamps out
-	uint64_t m_custom_data;
-	uint8_t m_auxs;
-	uint8_t m_anal;
-	uint8_t m_anacl;
-	uint8_t m_anacr;
-	uint8_t m_anar;
-	uint8_t m_pl;
-	uint8_t m_pc;
-	uint8_t m_pr;
-	uint8_t m_luz_250_rul;
-	uint8_t m_luz_100_rul;
-	uint8_t m_luz_50_rlul;
-	uint8_t m_luz_25_lrul;
-	uint8_t m_luz_25_rrul;
-	uint8_t m_fl;
-	uint8_t m_fc;
-	uint8_t m_fr;
-	uint8_t m_insert_coin;
-	uint8_t m_no_cambio;
-	uint8_t m_fuse;
-	uint8_t m_falta;
-	uint8_t m_anag;
-	uint8_t m_cl;
-	uint8_t m_cc;
-	uint8_t m_cr;
-	uint8_t m_premio_s;
-	uint8_t m_100;
-	uint8_t m_200;
-	uint8_t m_300;
-	uint8_t m_500;
-	uint8_t m_ml;
-	uint8_t m_mc;
-	uint8_t m_mr;
+	uint64_t m_custom_data = 0L;
+	uint8_t m_auxs = 0;
+	uint8_t m_anal = 0;
+	uint8_t m_anacl = 0;
+	uint8_t m_anacr = 0;
+	uint8_t m_anar = 0;
+	uint8_t m_pl = 0;
+	uint8_t m_pc = 0;
+	uint8_t m_pr = 0;
+	uint8_t m_luz_250_rul = 0;
+	uint8_t m_luz_100_rul = 0;
+	uint8_t m_luz_50_rlul = 0;
+	uint8_t m_luz_25_lrul = 0;
+	uint8_t m_luz_25_rrul = 0;
+	uint8_t m_fl = 0;
+	uint8_t m_fc = 0;
+	uint8_t m_fr = 0;
+	uint8_t m_insert_coin = 0;
+	uint8_t m_no_cambio = 0;
+	uint8_t m_fuse = 0;
+	uint8_t m_falta = 0;
+	uint8_t m_anag = 0;
+	uint8_t m_cl = 0;
+	uint8_t m_cc = 0;
+	uint8_t m_cr = 0;
+	uint8_t m_premio_s = 0;
+	uint8_t m_100 = 0;
+	uint8_t m_200 = 0;
+	uint8_t m_300 = 0;
+	uint8_t m_500 = 0;
+	uint8_t m_ml = 0;
+	uint8_t m_mc = 0;
+	uint8_t m_mr = 0;
 
 	uint8_t start_read();
 

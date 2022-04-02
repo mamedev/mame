@@ -140,13 +140,13 @@ protected:
 
 	std::unique_ptr<u16[]> m_net_ram;
 
-	emu_timer *m_timer;
+	emu_timer *m_timer = nullptr;
 
-	u8 m_intst;
-	u8 m_inten;
+	u8 m_intst = 0;
+	u8 m_inten = 0;
 
-	bool m_int_state[3];
-	bool m_scc_irq_state;
+	bool m_int_state[3]{};
+	bool m_scc_irq_state = 0;
 };
 
 void news_38xx_state::machine_start()

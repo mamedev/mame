@@ -50,7 +50,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	bool m_cs;
+	bool m_cs = false;
 
 	void unidisk_io(address_map &map);
 	void unidisk_mem(address_map &map);

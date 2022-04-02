@@ -74,15 +74,15 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_fontram;
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t   *m_ram_0000;
-	uint8_t   *m_ram_c000;
-	uint8_t   m_temp_attr;
-	emu_timer *m_video_timer;
+	uint8_t   *m_ram_0000 = nullptr;
+	uint8_t   *m_ram_c000 = nullptr;
+	uint8_t   m_temp_attr = 0;
+	emu_timer *m_video_timer = nullptr;
 
 	/* PIA 0 (UD12) */
-	uint8_t   m_pia0_porta;
-	uint8_t   m_pia0_portb;
-	int     m_pia0_cb2;         /* 60/50 */
+	uint8_t   m_pia0_porta = 0;
+	uint8_t   m_pia0_portb = 0;
+	int     m_pia0_cb2 = 0;         /* 60/50 */
 
 	/* PIA 1 (UD8) */
 

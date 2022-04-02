@@ -197,7 +197,7 @@ public:
 	void init_zelos();
 
 private:
-	u16 m_zelos_ctrl;
+	u16 m_zelos_ctrl = 0;
 
 	void zelos_ctrl_w(u16 data);
 	void zelos_main_map(address_map &map);

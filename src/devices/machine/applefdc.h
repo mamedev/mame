@@ -90,15 +90,15 @@ protected:
 
 private:
 	// data that is constant for the lifetime of the emulation
-	emu_timer * m_motor_timer;
+	emu_timer * m_motor_timer = nullptr;
 	applefdc_t  m_type;
 	const applefdc_interface *m_interface;
 
 	// data that changes at emulation time
-	uint8_t       m_write_byte;
-	uint8_t       m_lines;                    /* flags from IWM_MOTOR - IWM_Q7 */
-	uint8_t       m_mode;                     /* 0-31; see above */
-	uint8_t       m_handshake_hack;           /* not sure what this is for */
+	uint8_t       m_write_byte = 0;
+	uint8_t       m_lines = 0;                    /* flags from IWM_MOTOR - IWM_Q7 */
+	uint8_t       m_mode = 0;                     /* 0-31; see above */
+	uint8_t       m_handshake_hack = 0;           /* not sure what this is for */
 
 	// functions
 	const applefdc_interface *get_interface();

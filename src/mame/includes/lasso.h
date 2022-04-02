@@ -62,10 +62,10 @@ private:
 	optional_shared_ptr<uint8_t> m_track_scroll;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_track_tilemap;
-	uint8_t    m_gfxbank;     /* used by lasso, chameleo, wwjgtin and pinbo */
-	uint8_t    m_track_enable;    /* used by wwjgtin */
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_track_tilemap = nullptr;
+	uint8_t    m_gfxbank = 0U;     /* used by lasso, chameleo, wwjgtin and pinbo */
+	uint8_t    m_track_enable = 0U;    /* used by wwjgtin */
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

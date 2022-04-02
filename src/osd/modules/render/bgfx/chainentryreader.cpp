@@ -35,11 +35,11 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 {
 	if (!validate_parameters(value, prefix))
 	{
-		printf("Failed validation\n");
+		osd_printf_error("Chain entry failed validation.\n");
 		return nullptr;
 	}
 
-	bgfx_effect* effect = chains.effects().effect(value["effect"].GetString());
+	bgfx_effect* effect = chains.effects().get_or_load_effect(chains.options(), value["effect"].GetString());
 	if (effect == nullptr)
 	{
 		return nullptr;
