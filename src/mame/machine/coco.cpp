@@ -1023,7 +1023,7 @@ void coco_state::poll_hires_joystick(void)
 
 			attotime duration;
 
-			if( is_cocomax3 )
+			if (is_cocomax3)
 			{
 				value *= 2500.0;
 				value += 400.0;
