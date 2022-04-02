@@ -1097,6 +1097,12 @@ void pc8801_state::irq_mask_w(uint8_t data)
 	// Pulled high when cassette LOAD command is issued
 	m_rxrdy_irq_enable = bool(BIT(data, 2));
 
+	if (m_vrtc_irq_pending && m_vrtc_irq_enable)
+		vrtc_irq_w(m_vrtc_irq_pending);
+	
+	if (!m_vrtc_irq_enable)
+		m_pic->r_w(7 ^ 1, 1);
+
 	if (m_timer_irq_enable && m_timer_irq_pending)
 	{
 		m_timer_irq_pending = false;
@@ -2155,7 +2161,6 @@ IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 	u8 level = m_pic->a_r();
 //  printf("%d\n", level);
 	m_pic->r_w(level, 1);
-	m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	return (7 - level) * 2;
 }
@@ -2184,16 +2189,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 
 WRITE_LINE_MEMBER(pc8801_state::vrtc_irq_w)
 {
-	bool irq_state = m_vrtc_irq_enable & state;
+//	bool irq_state = m_vrtc_irq_enable & state;
 
-	m_pic->r_w(7 ^ 1, !irq_state);
-	// TODO: pending
+	if (state)
+	{
+		if (m_vrtc_irq_enable)
+		{
+			m_vrtc_irq_pending = false;
+			m_pic->r_w(7 ^ 1, 0);
+		}
+		else
+			m_vrtc_irq_pending = true;
+	}
 }
 
 WRITE_LINE_MEMBER(pc8801_state::irq_w)
 {
-	if (state)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
