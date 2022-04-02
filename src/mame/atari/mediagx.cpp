@@ -3,7 +3,7 @@
 /*  Atari MediaGX
 
     Driver by Ville Linde
-
+		Updates by Ben Wilson
 */
 
 /*
@@ -101,6 +101,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		// This describes mapping the External ports as INPUTs w/ various arrays into our device
+		// I.e. the inputs we're providing need to be mapped FROM m_ports into this machine
 		m_ports(*this, "IN%u", 0U)
 	{ }
 
@@ -185,18 +187,25 @@ private:
 	uint32_t m_memory_ctrl_reg[256/4]{};
 	int m_pal_index = 0;
 
-	uint32_t m_biu_ctrl_reg[256/4]{};
+	// Bus Interface Unit (BIU) Control Register
+	uint32_t m_biu_ctrl_reg[256/4];
 
 	uint8_t m_mediagx_config_reg_sel = 0;
 	uint8_t m_mediagx_config_regs[256]{};
 
-	//uint8_t m_controls_data = 0;
-	uint8_t m_parallel_pointer = 0;
-	uint8_t m_parallel_latched = 0;
-	uint32_t m_parport = 0;
-	//int m_control_num = 0;
-	//int m_control_num2 = 0;
-	//int m_control_read = 0;
+	// Parallel Port stuff
+	// Points to a port in the list of m_ports, allows selection of coin, inputs, controls, etc.
+	uint8_t m_parallel_pointer;
+	// This latches the value retrieved from m_ports[m_parallel_pointer], allowing us to read it later
+	uint8_t m_parallel_latched;
+	// The parallel port itself, data is written here, and data is read from here
+	uint32_t m_parport;
+	// simple control register for the parallel port
+	// updates on writes, changing the state, and reflected in the subsequent reads
+	uint8_t m_parport_control_reg;
+	//int m_control_num;
+	//int m_control_num2;
+	//int m_control_read;
 
 	uint32_t m_cx5510_regs[256/4]{};
 
@@ -458,6 +467,7 @@ void mediagx_state::memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	{
 		if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
+			// TODO no clue but this seems important?
 			// guess: crtc params?
 			// ...
 		}
@@ -506,6 +516,7 @@ void mediagx_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void mediagx_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	//printf("bios_ram_w %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
 uint8_t mediagx_state::io20_r(offs_t offset)
@@ -536,42 +547,170 @@ void mediagx_state::io20_w(offs_t offset, uint8_t data)
 	}
 }
 
+#define PARPORT_STATE_0 0x18
+#define PARPORT_STATE_1 0x2F
+#define PARPORT_STATE_2 0x3E
+#define PARPORT_STATE_3 0x40
+#define PARPORT_STATE_4 0x50
+#define PARPORT_STATE_5 0x60
+#define PARPORT_STATE_6 0xFF
+#define PARPORT_STATE_7 0xFC
+#define PARPORT_STATE_8 0x10U
+
+// uint32_t toffset = 0;
+// bool lock = false;
+
+// Reads from the parallel port, seems to hit what we're looking for?
+// 'offset' seems to be nearly constant in this case
+// the 'mem_mask' changes between (L) 0000FF00 and (H) 00FF0000
 uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
+	// if m_ports[0] is 000 AND m_parallel_latched != 0, then say START, else COIN
+
+	// This is NOT a constant, it shifts so every other call altenates between the L/H 8-bits to read
+	//
+	// ACCESSING_BITS_8_15 is a synonym for the following
+	// ((mem_mask & 0x0000ff00U) != 0)
+	//
 	if (ACCESSING_BITS_8_15)
 	{
-		uint8_t nibble = m_parallel_latched;
-		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
+		// This is important for token reads to work
+		//uint8_t nibble = m_parallel_latched;
+		// this nibble sucks ass
+		//r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
+
 		logerror("%08X:parallel_port_r()\n", m_maincpu->pc());
-#if 0
-		if (m_controls_data == 0x18)
-		{
-			r |= m_ports[0]->read() << 8;
-		}
-		else if (m_controls_data == 0x60)
-		{
-			r |= m_ports[1]->read() << 8;
-		}
-		else if (m_controls_data == 0xff || m_controls_data == 0x50)
-		{
-			r |= m_ports[2]->read() << 8;
+
+		uint32_t mp0;
+
+		switch(m_parport_control_reg) {
+			case PARPORT_STATE_0:
+				// read from port 0
+				//r |= m_ports[0]->read() << 8;
+				// check to allow system menu
+				mp0 = m_ports[0]->read();
+				if(mp0 & 1) {
+					r |= 0x1000;
+				}
+				break;
+
+			case PARPORT_STATE_1:
+				// read from port 1
+				//r |= m_ports[1]->read() << 8;
+				break;
+
+			case PARPORT_STATE_2:
+				// read from port 2
+				//r |= m_ports[2]->read() << 8;
+				break;
+
+			case PARPORT_STATE_3:
+				// check for coins 1-4 (5-9)
+				mp0 = m_ports[0]->read();
+				if(mp0 & 0xf0) {
+					// drop a coin in
+					r |= 0x800;
+				}
+				break;
+
+			case PARPORT_STATE_4:
+				// TODO something here?
+				break;
+
+			case PARPORT_STATE_5:
+				// TODO something here as well..
+				break;
+
+			case PARPORT_STATE_6:
+				// TODO FC
+				// TODO needs fixing
+				break;
+
+			case PARPORT_STATE_7:
+				// TODO '10'
+				break;
+
+			default:
+				//printf("UNRECOGNIZED PARPORT_STATE = %08X\n", m_parport_control_reg);
+				break;
 		}
 
-		//r |= m_control_read << 8;
-#endif
+		// #if 0
+		// if (m_controls_data == 0x18)
+		// This coincides with reading from port 0
+		// {
+		// 	r |= m_ports[0]->read() << 8;
+		// }
+		// else if (m_controls_data == 0x60)
+		// {
+		// Coincides w/ a watchdog reset
+		// 	r |= m_ports[1]->read() << 8;
+		// }
+		// else if (m_controls_data == 0xff || m_controls_data == 0x50)
+		// {
+		//	Coincides w/ Kicker or unknown
+		// 	r |= m_ports[2]->read() << 8;
+		// }
+		//
+		// Default read
+		// //r |= m_control_read << 8;
+		// #endif
+
 	}
-	if (ACCESSING_BITS_16_23)
+	else if (ACCESSING_BITS_16_23)
 	{
-		r |= m_parport & 0xff0000;
+		// whoever wrote this didn't know what they were doing, I think
+		//r |= m_parport & 0xff0000;
+		r |= m_parport & mem_mask;
+		// // ////////////////////
+		// uint32_t mp0 = 0;
+		// mp0 = m_ports[0]->read();
+		// // if(mp0 & 0xf00) {
+		// // 	printf("> %08X\n", mp0);
+		// // 	r |= 0x400;
+		// // }
+		//
+		// if(mp0 & 0x400 && !lock) {
+		// 	// hit it normally
+		// 	toffset = rand() % 0xffffffffU;
+		// 	lock = true;
+		// }
+		//
+		// if(mp0 & 0x100 && lock) {
+		// 	// hit it normally
+		// 	//uint32_t to = 0x00000001 << toffset;
+		// 	r = toffset;
+		// 	printf("> %08X\n", r);
+		// 	lock = false;
+		// }
+		// ////////////////////
+
 	}
 
 	return r;
 }
 
+//
+// Writes to m_parport and m_parallel_latched
+// Updates the m_parallel_pointer to the next port, but used only internally here
+// Uses a mask of 0x00FF0000 and 0x000000FF only, alternating
+//
 void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	//printf("o,m: %d, %08X\n", offset, mem_mask);
+
+	// Combines the data at the m_parport w/ what's already present, and w/ the updated data ONLY given the mem_mask
+	//
+	// (*(varptr) = (*(varptr) & ~mem_mask) | (data & mem_mask))
+	// where varptr = &m_parport
+	//
+	// So updates what we're writing off the parallel port, so the ParallelPort IS m_parport
+	// TODO this should probably come last?
+	//
+	// TODO, this update doesn't really do much...
+
 	COMBINE_DATA( &m_parport );
 
 	if (ACCESSING_BITS_0_7)
@@ -593,13 +732,26 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 
 		logerror("%08X:", m_maincpu->pc());
 
+		// Using the parallel pointer, we read in some data, probably w/ no offset.
+		// THEN, we take that same data, and shift if right by 4 * (the remainder of 3 on the parallel pointer)
+		// Why? And then also only the low 4-bits, weird
+		// Ah, so this reads the given input for the given 'pointer', and normalizes it so it can be used below
+		// TODO can remove parallel latched if it keeps being useless
 		m_parallel_latched = (m_ports[m_parallel_pointer / 3].read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
+
 		//parallel_pointer++;
 		//logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
-		switch (data & 0xfc)
+
+		// update the control register
+		// this controls our parallel reads
+		m_parport_control_reg = data & 0xfc;
+
+		switch (m_parport_control_reg) // data & 0xfc
 		{
 			case 0x18:
+				// 18 = reset internal pointer to 0
 				m_parallel_pointer = data & 3;
+				//printf("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
 				logerror("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
 				break;
 
@@ -607,6 +759,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x24:
 			case 0x28:
 			case 0x2c:
+				//printf("[%02X] General purpose output = x%X\n", data, data & 0x0f);
 				logerror("[%02X] General purpose output = x%X\n", data, data & 0x0f);
 				break;
 
@@ -614,13 +767,17 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x34:
 			case 0x38:
 			case 0x3c:
+				//printf("[%02X] General purpose output = x%X\n", data, data & 0x0f);
 				logerror("[%02X] General purpose output = %Xx\n", data, data & 0x0f);
 				break;
+
+				// TODO if these are the coin counters I should check these as well???
 
 			case 0x40:
 			case 0x44:
 			case 0x48:
 			case 0x4c:
+				//printf("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
 				logerror("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
 				break;
 
@@ -628,6 +785,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x54:
 			case 0x58:
 			case 0x5c:
+				//printf("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
 				logerror("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
 				break;
 
@@ -635,6 +793,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x64:
 			case 0x68:
 			case 0x6c:
+				//printf("[%02X] Watchdog reset\n", data);
 				logerror("[%02X] Watchdog reset\n", data);
 				break;
 
@@ -642,10 +801,14 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 				if (data >= 0x70)
 				{
 					m_parallel_pointer++;
+					//printf("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
 					logerror("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
 				}
 				else
+				{
+					//printf("[%02X] Unknown write\n", data);
 					logerror("[%02X] Unknown write\n", data);
+				}
 				break;
 		}
 	}
@@ -704,6 +867,7 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 	}
 }
 
+// >> ANALOG DEVICES AD1847JP 'SOUNDPORT' (PLCC44, surface mounted)
 uint32_t mediagx_state::ad1847_r(offs_t offset)
 {
 	switch (offset)
@@ -714,6 +878,7 @@ uint32_t mediagx_state::ad1847_r(offs_t offset)
 	return 0;
 }
 
+// >> ANALOG DEVICES AD1847JP 'SOUNDPORT' (PLCC44, surface mounted)
 void mediagx_state::ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
@@ -743,27 +908,62 @@ void mediagx_state::ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void mediagx_state::mediagx_map(address_map &map)
 {
+	// region for the main ram
 	map(0x00000000, 0x0009ffff).ram().share(m_main_ram);
+	//  additional ram region, pad?
 	map(0x000a0000, 0x000affff).ram();
+	// CGA ram follows
 	map(0x000b0000, 0x000b7fff).ram().share(m_cga_ram);
+	// bios RAM follows after this, we likely won't touch that
 	map(0x000c0000, 0x000fffff).ram().share(m_bios_ram);
+	// pad
 	map(0x00100000, 0x00ffffff).ram();
+	// 256-bit region for BIU Control
 	map(0x40008000, 0x400080ff).rw(FUNC(mediagx_state::biu_ctrl_r), FUNC(mediagx_state::biu_ctrl_w));
+	// 256-bit region for Diplsay control
 	map(0x40008300, 0x400083ff).rw(FUNC(mediagx_state::disp_ctrl_r), FUNC(mediagx_state::disp_ctrl_w));
+	// 256-bit region for Memory Control
+	// Handles R/W to mem, probably useful for me?
 	map(0x40008400, 0x400084ff).rw(FUNC(mediagx_state::memory_ctrl_r), FUNC(mediagx_state::memory_ctrl_w));
+	// Larger chunk for VRAM
 	map(0x40800000, 0x40bfffff).ram().share(m_vram);
+	// BIOS itself lives at the end
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
+// Maps address ranges to I/O Functions
+// These IO functions are defined for the MediaGX device specifically
 void mediagx_state::mediagx_io(address_map &map)
 {
 	pcat32_io_common(map);
+
+	// W/e IO20 is...
+	// 2-bits
 	map(0x0022, 0x0023).rw(FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
+
+	// 4-bits for w/e this is?
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
+
+	// IDE is an interface for connecting an HDD w/ the computer
+	// 8-bits
 	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+
+	// 4-bytes
+	// Maps parallel port R/W to an address range in this system
+	// The question is 'what' is reading from this parallel port, would give a better idea of what we're looking for
+	// 0x0378, 0x037b
 	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+
+	// More Integrated Drive Electronics (IDE) controller stuff, for interfacing w/ external storage
+	// 8-bits
 	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+
+	// AD1847 Audio stuff
+	// 256-bits
 	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
+
+	// Not sure what the PCIbus will be doing?
+	// 8-bits
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 
@@ -771,7 +971,8 @@ void mediagx_state::mediagx_io(address_map &map)
 
 static const gfx_layout CGA_charlayout =
 {
-	8,8,                    /* 8 x 16 characters */
+	8,8,                    /* 8 x 16 characters .... but says 8 intead? */
+	// TODO 8x16 above or 8x8? Written as 8x8 but says 8x16, okay...
 	256,                    /* 256 characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
@@ -797,6 +998,8 @@ static INPUT_PORTS_START(mediagx)
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
 	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
+	// TODO NO volume up button! Just volume down???
+	//PORT_BIT( 0x00., IP_ACTIVE_HIGH, IPT_VOLUME_UP )
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -876,6 +1079,7 @@ void mediagx_state::mediagx(machine_config &config)
 	/* basic machine hardware */
 	MEDIAGX(config, m_maincpu, 166000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mediagx_state::mediagx_map);
+	// Map address regions to I/O
 	m_maincpu->set_addrmap(AS_IO, &mediagx_state::mediagx_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
@@ -894,6 +1098,7 @@ void mediagx_state::mediagx(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//printf("\n\n--> At the mediaxgx setup position, for refresh rate in Hz\n\n");
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 639, 0, 239);
@@ -917,8 +1122,12 @@ void mediagx_state::init_mediagx()
 {
 	m_frame_width = m_frame_height = 1;
 	m_parallel_pointer = 0;
+	// set these ranges to 0, keeps registers all zeroed out as well
+	// clears the display control register
 	std::fill(std::begin(m_disp_ctrl_reg), std::end(m_disp_ctrl_reg), 0);
+	// clears the 'BIU' control register
 	std::fill(std::begin(m_biu_ctrl_reg), std::end(m_biu_ctrl_reg), 0);
+	// clears the 'speedup hits' registers, just a cache of some form
 	std::fill(std::begin(m_speedup_hits), std::end(m_speedup_hits), 0);
 }
 
