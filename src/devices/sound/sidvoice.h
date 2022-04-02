@@ -77,7 +77,7 @@ struct sidOperator
 	int noiseIsLocked = 0;
 
 	uint8_t ADSRctrl = 0;
-//  int gateOnCtrl, gateOffCtrl;
+//  int gateOnCtrl = 0, gateOffCtrl = 0;
 	uint16_t (*ADSRproc)(sidOperator *) = nullptr;
 
 #ifdef SID_FPUENVE
