@@ -601,7 +601,7 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 1" />
 			<dataarea name="flop" size="3528460">
-				<rom name="dinosaur_scenario_disk_1.mfm" size="3528460" crc="b2144bf0" sha1="9ca582cbb17e9f1e82535cbe91c71b5c81f05dc9"/>
+				<rom name="dinosaur_scenario_disk_1.mfm" size="3528460" crc="90ca24af" sha1="b1897a224fe0f4d80c4de6ed3e8b8a4b3c680a50"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
@@ -1398,7 +1398,7 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Ending Disk" />
 			<dataarea name="flop" size="3444648">
-				<rom name="lord_monarch_ending_disk.mfm" size="3444648" crc="9bb132e0" sha1="ed720bb07be36e6706d0f42b685bfb2864fce1e3"/>
+				<rom name="lord_monarch_ending_disk.mfm" size="3444648" crc="15b9b1ce" sha1="65b4b8e7fc9031a7d7e9ba5b75bbb9a36541b9d0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
@@ -1431,7 +1431,7 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="3594134">
-				<rom name="maririndx_diska.mfm" size="3594134" crc="61706c9d" sha1="c6ae5412211d03e604bfc58b8d40107a4f3912fe"/>
+				<rom name="maririndx_diska.mfm" size="3594134" crc="98e3418f" sha1="f7279a025ae962b154dda7efa814071c9340abc0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -2210,7 +2210,7 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="3444635">
-				<rom name="tenshi-tachi_no_gogo_vi_disk_a.mfm" size="3444635" crc="f7af9038" sha1="f30bfa2ba530799ff657b11957e1319e53b13c61"/>
+				<rom name="tenshi-tachi_no_gogo_vi_disk_a.mfm" size="3444635" crc="f442e05d" sha1="b548f97aeb1b07c1f89354434026adefe0020077"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
