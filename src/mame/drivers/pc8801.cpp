@@ -220,6 +220,8 @@ void pc8801_state::palette_reset()
 		m_palram[i].g = i & 4 ? 7 : 0;
 		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
+	m_palette->set_pen_color(8, 0, 0, 0);
+	m_palette->set_pen_color(9, 0, 0, 0);
 }
 
 void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect)
@@ -234,12 +236,15 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 			u32 bitmap_offset = (y >> y_double) * 80 + (x >> 3);
 			for(int xi = 0; xi < 8; xi++)
 			{
-				int pen = 0;
+				u8 pen_dot = 0;
 
 				// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
-				pen |= ((m_gvram[bitmap_offset+0x0000] >> (7-xi)) & 1) << 0;
-				pen |= ((m_gvram[bitmap_offset+0x4000] >> (7-xi)) & 1) << 1;
-				pen |= ((m_gvram[bitmap_offset+0x8000] >> (7-xi)) & 1) << 2;
+				pen_dot |= ((m_gvram[bitmap_offset+0x0000] >> (7-xi)) & 1) << 0;
+				pen_dot |= ((m_gvram[bitmap_offset+0x4000] >> (7-xi)) & 1) << 1;
+				pen_dot |= ((m_gvram[bitmap_offset+0x8000] >> (7-xi)) & 1) << 2;
+
+				if (pen_dot == 0)
+					continue;
 
 				// TODO: some real HW snaps implies that output is only even or odd line when in 3bpp mode, verify
 				// 3301 skip line? interlace artifact? other?
@@ -248,9 +253,9 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 					int res_x = x + xi;
 					int res_y = y + yi;
 					// still need to check against cliprect,
-					// in the rare case that 3301 CRTC is set to non-divisible values.
+					// in the rare case that 3301 CRTC is set to non-canon values (such as any width != 640).
 					if (cliprect.contains(res_x, res_y))
-						bitmap.pix(res_y, res_x) = m_palette->pen(pen & 7);
+						bitmap.pix(res_y, res_x) = m_palette->pen(pen_dot);
 				}
 			}
 		}
@@ -274,22 +279,24 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 
 			for(int xi = 0; xi < 8; xi++)
 			{
-				int pen = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
+				int pen_dot = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
 				//if(is_cursor)
 				//	pen^=1;
+				if (!pen_dot)
+					continue;
 
 				if((m_gfx_ctrl & 1))
 				{
 					if(cliprect.contains(x+xi, y*2+0))
-						bitmap.pix(y*2+0, x+xi) = m_palette->pen(pen ? color : 0);
+						bitmap.pix(y*2+0, x+xi) = m_palette->pen(color);
 
 					if(cliprect.contains(x+xi, y*2+1))
-						bitmap.pix(y*2+1, x+xi) = m_palette->pen(pen ? color : 0);
+						bitmap.pix(y*2+1, x+xi) = m_palette->pen(color);
 				}
 				else
 				{
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix(y, x+xi) = m_palette->pen(pen ? color : 0);
+						bitmap.pix(y, x+xi) = m_palette->pen(color);
 				}
 			}
 
@@ -310,12 +317,14 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 
 				for(int xi = 0; xi < 8; xi++)
 				{
-					int pen = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
+					int pen_dot = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
 					//if(is_cursor)
 					//	pen^=1;
+					if (!pen_dot)
+						continue;
 
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix(y, x+xi) = m_palette->pen(pen ? 7 : 0);
+						bitmap.pix(y, x+xi) = m_palette->pen(color);
 				}
 
 				count++;
@@ -326,8 +335,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 
 uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->pen(0), cliprect);
-	m_text_bitmap.fill(m_crtc_palette->pen(0), cliprect);
+	bitmap.fill(m_palette->pen(8), cliprect);
 
 	if(m_gfx_ctrl & 8)
 	{
@@ -338,8 +346,11 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 
 	if(!(m_layer_mask & 1))
+	{
+		m_text_bitmap.fill(0, cliprect);
 		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
-	copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, m_crtc_palette->pen(0));
+		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
+	}
 
 #if 0
 	//popmessage("%02x %02x %02x %02x %02x",m_layer_mask,m_dmac_mode,m_crtc.status,m_crtc.irq_mask,m_gfx_ctrl);
@@ -1020,6 +1031,7 @@ inline attotime pc8801fh_state::mouse_limit_hz()
  * ---- -x-- CCK: upd1990a clock bit
  * ---- --x- CSTB: upd1990a strobe bit
  * ---- ---x /PSTB: printer strobe (active low)
+ *
  */
 void pc8801_state::port40_w(uint8_t data)
 {
@@ -1163,16 +1175,20 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
  * I/O Port $52 "Border and background color control"
  *
  * -RGB ---- BGx: Background color, index for pen #0
- * ---- -RGB Rx: Border color?
- *           (NB: according to some sources a V2 equipped machine hardwires this to black)
+ * ---- -RGB Rx: Border color
+ *
+ * NB: according to several sources a non-vanilla PC8801 hardwires border to black,
+ *     leaving this portion unconnected.
+ *     For debugging reasons we leave it in for every machine instead.
  *
  */
 void pc8801_state::bgpal_w(uint8_t data)
 {
-	// TODO: sorcerml uses index on main playlist (0x10 setting, should have blue instead of black)
-
-	if(data)
-		logerror("BG Pal %02x\n",data);
+	// sorcerml uses BG Pal extensively:
+	// - On bootup message it sets register $54 to white and bgpal to 0, expecting the layer to be transparent;
+	// - On playlist sets BG Pal to 0x10 (blue background);
+	m_palette->set_pen_color(8, pal1bit(BIT(data, 6)), pal1bit(BIT(data, 5)), pal1bit(BIT(data, 4)));
+	m_palette->set_pen_color(9, pal1bit(BIT(data, 2)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 0)));
 }
 
 void pc8801_state::palram_w(offs_t offset, uint8_t data)
@@ -1196,8 +1212,6 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 		m_palram[offset].g = data & 4 ? 7 : 0;
 	}
 
-	// TODO: sorcerml writes white to pen #0 on initial bootup, causing the underlying message to not be visible
-	// "Press space to load disk in drive 2\nSound Board installed (Y/N)"
 	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
 	// Preserve content? Translation? Undefined?
 	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
@@ -2251,7 +2265,7 @@ void pc8801_state::pc8801(machine_config &config)
 //  m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
-	PALETTE(config, m_palette, palette_device::BLACK, 0x8);
+	PALETTE(config, m_palette, palette_device::BLACK, 0x8 + 2); // +2 for BG Pal and border colors
 	PALETTE(config, m_crtc_palette, palette_device::BRG_3BIT);
 
 	UPD3301(config, m_crtc, PIXEL_CLOCK_15KHz);

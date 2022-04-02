@@ -249,9 +249,9 @@ inline void upd3301_device::reset_fifo_vrtc()
 		m_attr_frame = 0;
 		m_attr_blink = !m_attr_blink;
 	}
-	// Clear the buffer here.
-	// Needed in particular by PC88, which disables DMA transfer in order to show the GVRAM layer only
-	m_bitmap.fill(rgb_t(0x00, 0x00, 0x00), screen().visible_area());
+	// Clear the buffer here. Needed in particular by PC-88, which usually disables
+	// DMA transfer in order to show Graphic layer only (i.e. bugattac).
+	m_bitmap.fill(0, screen().visible_area());
 }
 
 void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int param)
@@ -308,14 +308,14 @@ uint8_t upd3301_device::read(offs_t offset)
 	switch (offset & 0x01)
 	{
 		case 0: // data
-			// TODO: light pen
 			if (!machine().side_effects_disabled())
 				popmessage("light pen reading?");
 			break;
 
 		case 1: // status
 			data = m_status;
-			m_status &= ~(STATUS_LP | STATUS_E |STATUS_N | STATUS_U);
+			if (!machine().side_effects_disabled())
+				m_status &= ~(STATUS_LP | STATUS_E |STATUS_N | STATUS_U);
 			break;
 	}
 
@@ -453,7 +453,9 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 			case COMMAND_RESET:
 				LOGCMD("Reset\n");
 				m_mode = MODE_RESET;
-				// TODO: this also disables external display such as Graphic VRAM in PC-8801
+				// This should also disable external display such as Graphic layer in PC-8801
+				// sorcerml contradicts with it tho: it just issue a reset command without caring about
+				// re-enabling display.
 				set_display(0);
 				set_interrupt(0);
 				break;
@@ -684,7 +686,8 @@ void upd3301_device::draw_scanline()
 
 uint32_t upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(rgb_t(0x00,0x00,0x00), cliprect);
+	// TODO: non-transparent modes
+	bitmap.fill(0, cliprect);
 
 	if (!(m_status & STATUS_VE))
 		return 0;

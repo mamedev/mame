@@ -155,7 +155,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 
 //  if (m_width80)
 	{
-		u8 pen;
+		u8 pen_dot;
 
 		for (int xi = 0; xi < tile_width; xi += dot_width)
 		{
@@ -164,16 +164,17 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 			{
 				u8 mask = (xi & (4 << (dot_width - 1))) ? 0x10 : 0x01;
 				mask <<= (lc & (0x3 << y_double)) >> y_double;
-				pen = tile & mask;
+				pen_dot = tile & mask;
 			}
 			else
 			{
-				pen = tile;
-				pen = (pen >> (7 - (xi >> (dot_width - 1)))) & 1;
+				pen_dot = tile;
+				pen_dot = (pen_dot >> (7 - (xi >> (dot_width - 1)))) & 1;
 			}
 
-			for (int di = 0; di < dot_width; di++)
-				bitmap.pix(y, res_x + di) = m_crtc_palette->pen(pen ? color : 0);
+			if (pen_dot)
+				for (int di = 0; di < dot_width; di++)
+					bitmap.pix(y, res_x + di) = m_crtc_palette->pen(color);
 		}
 	}
 }
