@@ -267,7 +267,6 @@ protected:
 	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 
 	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
-	void reset_cpu();
 
 	// internal state
 	uint8_t *m_prg;
