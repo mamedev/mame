@@ -48,6 +48,7 @@ Thunderball                       508  1                         unknown
 HyperBall                         509  1                         unknown
 Barracora                         510  ASD hit 1                 ASD
 Varkon                            512  AX hit 1                  AX
+Spellbinder (unreleased)          513
 Reflex (unreleased)               514
 Time Fantasy                      515  1                         X
 Warlok                            516  1                         X
