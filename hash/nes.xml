@@ -44224,11 +44224,7 @@ license:CC0
 			<feature name="pcb" value="CAMERICA-GAMEGENIE" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
-				<rom name="genie v1.5" size="16384" crc="02b26e69" sha1="8bb0d98c4515cba77a805bc8b06788dd6ed6263c" offset="00000" />    <!-- an alt PCB with rom labeled v1.5a was dumped and the content was the same as this -->
-				<rom size="16384" offset="0x4000" loadflag="reload" />
-			</dataarea>
-			<dataarea name="chr" size="8192">
-				<rom name="0.chr" size="8192" crc="e698cc99" sha1="16a152a1e81328c8c66d9c5781d102b018bb6c36" offset="00000" />
+				<rom name="genie v1.5" size="4096" crc="1a3a22a1" sha1="aaa9833c3de2213f2b0326769b715651fd13fd84" offset="00000" />    <!-- an alt PCB with rom labeled v1.5a was dumped and the content was the same as this -->
 			</dataarea>
 		</part>
 	</software>

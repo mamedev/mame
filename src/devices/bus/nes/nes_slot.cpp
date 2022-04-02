@@ -478,12 +478,6 @@ DECLARE_WRITE_LINE_MEMBER(device_nes_cart_interface::set_irq_line)
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state);
 }
 
-void device_nes_cart_interface::reset_cpu()
-{
-	// another hack
-	m_maincpu->set_pc(0xfffc);
-}
-
 //-------------------------------------------------
 //  Other helpers
 //-------------------------------------------------
