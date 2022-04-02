@@ -547,16 +547,6 @@ void mediagx_state::io20_w(offs_t offset, uint8_t data)
 	}
 }
 
-#define PARPORT_STATE_0 0x18
-#define PARPORT_STATE_1 0x2F
-#define PARPORT_STATE_2 0x3E
-#define PARPORT_STATE_3 0x40
-#define PARPORT_STATE_4 0x50
-#define PARPORT_STATE_5 0x60
-#define PARPORT_STATE_6 0xFF
-#define PARPORT_STATE_7 0xFC
-#define PARPORT_STATE_8 0x10U
-
 // uint32_t toffset = 0;
 // bool lock = false;
 
@@ -584,57 +574,51 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 		logerror("%08X:parallel_port_r()\n", m_maincpu->pc());
 
 		uint32_t mp0;
+		uint8_t mpcrClip = m_parport_control_reg & 0xf0;
 
-		switch(m_parport_control_reg) {
-			case PARPORT_STATE_0:
-				// read from port 0
-				//r |= m_ports[0]->read() << 8;
-				// check to allow system menu
-				mp0 = m_ports[0]->read();
-				if(mp0 & 1) {
-					r |= 0x1000;
-				}
-				break;
+		if(m_parport_control_reg == 0x10) {
+			// TODO something here
 
-			case PARPORT_STATE_1:
-				// read from port 1
-				//r |= m_ports[1]->read() << 8;
-				break;
+		} else if(m_parport_control_reg == 0x18) {
+			// read from port 0
+			//r |= m_ports[0]->read() << 8;
+			// Check for F2 to open the system menu
+			mp0 = m_ports[0]->read();
+			if(mp0 & 1) {
+				r |= 0x1000;
+			}
 
-			case PARPORT_STATE_2:
-				// read from port 2
-				//r |= m_ports[2]->read() << 8;
-				break;
+		} else if(mpcrClip == 0x20) {
+			// TODO OLD
+			// read from port 1
+			//r |= m_ports[1]->read() << 8;
 
-			case PARPORT_STATE_3:
-				// check for coins 1-4 (5-9)
-				mp0 = m_ports[0]->read();
-				if(mp0 & 0xf0) {
-					// drop a coin in
-					r |= 0x800;
-				}
-				break;
+		} else if(mpcrClip == 0x30) {
+			// TODO OLD
+			// read from port 2
+			//r |= m_ports[2]->read() << 8;
 
-			case PARPORT_STATE_4:
-				// TODO something here?
-				break;
+		} else if(mpcrClip == 0x40) {
+			// check for coins 1-4
+			mp0 = m_ports[0]->read();
+			if(mp0 & 0xf0) {
+				// drop a coin in
+				r |= 0x800;
+			}
 
-			case PARPORT_STATE_5:
-				// TODO something here as well..
-				break;
+		} else if(mpcrClip == 0x50) {
+			// TODO Can control watchdogged outputs here I think, kickers,
 
-			case PARPORT_STATE_6:
-				// TODO FC
-				// TODO needs fixing
-				break;
+		} else if(mpcrClip == 0x60) {
+			// TODO Reset watchdogs?
 
-			case PARPORT_STATE_7:
-				// TODO '10'
-				break;
+		} else if(mpcrClip == 0xF0) {
+			// TODO Internal pointer advance?
 
-			default:
-				//printf("UNRECOGNIZED PARPORT_STATE = %08X\n", m_parport_control_reg);
-				break;
+		} else {
+			// unrecognized parport state, report this for debugging
+			printf("UNRECOGNIZED PARPORT_STATE = %08X\n", m_parport_control_reg);
+
 		}
 
 		// #if 0
@@ -706,11 +690,11 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 	// (*(varptr) = (*(varptr) & ~mem_mask) | (data & mem_mask))
 	// where varptr = &m_parport
 	//
+
+
 	// So updates what we're writing off the parallel port, so the ParallelPort IS m_parport
 	// TODO this should probably come last?
-	//
 	// TODO, this update doesn't really do much...
-
 	COMBINE_DATA( &m_parport );
 
 	if (ACCESSING_BITS_0_7)
@@ -744,6 +728,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 
 		// update the control register
 		// this controls our parallel reads
+		// TODO this just clips off the bottom nibble (4-bits), not really helpful honestly...
 		m_parport_control_reg = data & 0xfc;
 
 		switch (m_parport_control_reg) // data & 0xfc
@@ -950,8 +935,6 @@ void mediagx_state::mediagx_io(address_map &map)
 
 	// 4-bytes
 	// Maps parallel port R/W to an address range in this system
-	// The question is 'what' is reading from this parallel port, would give a better idea of what we're looking for
-	// 0x0378, 0x037b
 	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
 
 	// More Integrated Drive Electronics (IDE) controller stuff, for interfacing w/ external storage
