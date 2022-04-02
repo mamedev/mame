@@ -92,7 +92,6 @@ function addprojectflags()
 	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
 		buildoptions_cpp {
 			"-Wsuggest-override",
-			"-flifetime-dse=1",
 		}
 	end
 end
