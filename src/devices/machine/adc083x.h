@@ -67,7 +67,7 @@ private:
 	int32_t m_clk;
 	int32_t m_di;
 	int32_t m_se;
-	int32_t m_sars = 0;
+	int32_t m_sars;
 	int32_t m_do;
 	int32_t m_sgl;
 	int32_t m_odd;

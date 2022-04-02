@@ -46,7 +46,7 @@ protected:
 private:
 	required_device_array<generic_slot_device, 7> m_eprom;
 
-	uint8_t m_bank = 0;
+	uint8_t m_bank;
 };
 
 

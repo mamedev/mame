@@ -71,8 +71,8 @@ private:
 	// Timing-related values
 	uint16_t  m_last_cylinder;      // Last cylinder accessed - for calculating seek times
 	uint32_t  m_delay;              // Delay in microseconds for callback
-	emu_timer   *m_timeout_timer = nullptr; // Four-second timer for timeouts
-	emu_timer *m_cmd_timer = nullptr;
+	emu_timer   *m_timeout_timer; // Four-second timer for timeouts
+	emu_timer *m_cmd_timer;
 	bool   m_invalid_command_flag;       // I hate this, but it saves a lot more tests
 
 	//
@@ -344,8 +344,8 @@ private:
 
 	// Command size structure (number of bytes to xmit and recv for each command)
 	struct corvus_cmd_t {
-		uint16_t  recv_bytes = 0;                         // Number of bytes from host for this command
-		uint16_t  xmit_bytes = 0;                         // Number of bytes to return to host
+		uint16_t  recv_bytes;                         // Number of bytes from host for this command
+		uint16_t  xmit_bytes;                         // Number of bytes to return to host
 	};
 
 	void dump_buffer(uint8_t *buffer, uint16_t length);

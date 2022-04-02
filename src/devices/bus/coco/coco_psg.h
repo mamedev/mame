@@ -47,8 +47,8 @@ private:
 	void flash5555_w(offs_t offset, u8 data);
 
 	std::unique_ptr<u8[]> m_sram;
-	u8 m_bank[2]{};
-	u8 m_control = 0;
+	u8 m_bank[2];
+	u8 m_control;
 };
 
 

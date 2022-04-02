@@ -44,8 +44,8 @@ protected:
 	int        m_cycle_time;        // ms
 	int        m_boot_block_size;
 	int        m_version;
-	int        m_address_mask = 0;
-	int        m_sector_mask = 0;
+	int        m_address_mask;
+	int        m_sector_mask;
 
 private:
 	enum s_cmd_t
@@ -67,22 +67,22 @@ private:
 
 	std::unique_ptr<uint8_t[]>      m_eememory;
 
-	bool        m_lower_bbl = false;              // set when lower boot block lockout is enabled
-	bool        m_higher_bbl = false;             // set when upper boot block lockout is enabled
-	bool        m_sdp = false;                    // set when in software data protect mode
+	bool        m_lower_bbl;              // set when lower boot block lockout is enabled
+	bool        m_higher_bbl;             // set when upper boot block lockout is enabled
+	bool        m_sdp;                    // set when in software data protect mode
 
-	bool        m_id_mode = false;                // set when in chip id mode
-	s_cmd_t     m_cmd{};                          // command state
-	bool        m_enabling_bbl = false;           // set when a boot block lockout command is expecting its parameter
-	bool        m_long_sequence = false;          // set if 0x80 command has just been executed (some command require this prefix)
-	s_pgm_t     m_pgm{};                          // programming state
-	bool        m_enabling_sdb = false;           // set when a sdp enable command is in progress
-	bool        m_disabling_sdb = false;          // set when a sdp disable command is in progress
-	bool        m_toggle_bit = false;             // indicates flashing in progress (toggles for each query)
+	bool        m_id_mode;                // set when in chip id mode
+	s_cmd_t     m_cmd;                    // command state
+	bool        m_enabling_bbl;           // set when a boot block lockout command is expecting its parameter
+	bool        m_long_sequence;          // set if 0x80 command has just been executed (some command require this prefix)
+	s_pgm_t     m_pgm;                    // programming state
+	bool        m_enabling_sdb;           // set when a sdp enable command is in progress
+	bool        m_disabling_sdb;          // set when a sdp disable command is in progress
+	bool        m_toggle_bit;             // indicates flashing in progress (toggles for each query)
 
 	std::unique_ptr<uint8_t[]>      m_programming_buffer;
-	int         m_programming_last_offset = 0;
-	emu_timer*  m_programming_timer = nullptr;
+	int         m_programming_last_offset;
+	emu_timer*  m_programming_timer;
 };
 
 /*

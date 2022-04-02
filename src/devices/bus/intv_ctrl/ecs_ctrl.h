@@ -152,7 +152,7 @@ protected:
 	virtual void write_portA(uint8_t data) override;
 
 private:
-	uint8_t m_psg_portA = 0;
+	uint8_t m_psg_portA;
 	required_ioport_array<7> m_synth;
 };
 

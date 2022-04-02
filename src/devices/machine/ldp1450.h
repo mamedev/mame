@@ -44,11 +44,11 @@ protected:
 	virtual int32_t player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
-	uint8_t m_ld_frame_index = 0;
-	uint8_t m_ld_frame[5]{};
-	uint8_t m_ld_command_current_byte = 0;
-	uint8_t m_ld_command_to_send[5]{};
-	uint8_t m_ld_command_total_bytes = 0;
+	uint8_t m_ld_frame_index;
+	uint8_t m_ld_frame[5];
+	uint8_t m_ld_command_current_byte;
+	uint8_t m_ld_command_to_send[5];
+	uint8_t m_ld_command_total_bytes;
 
 	enum LD_INPUT_STATE
 	{
@@ -71,16 +71,16 @@ protected:
 	};
 
 private:
-	uint8_t m_command = 0;
-	uint8_t m_status = 0;
-	ldp1450_player_state m_player_state{};
-	bool m_audio_enable[2]{};
+	uint8_t m_command;
+	uint8_t m_status;
+	ldp1450_player_state m_player_state;
+	bool m_audio_enable[2];
 	void set_new_player_state(ldp1450_player_state which);
 	void set_new_player_bcd(uint8_t data);
 	uint32_t bcd_to_raw();
 	void exec_enter_cmd();
-	uint8_t m_internal_bcd[0x10]{};
-	uint8_t m_index_state = 0;
+	uint8_t m_internal_bcd[0x10];
+	uint8_t m_index_state;
 
 };
 

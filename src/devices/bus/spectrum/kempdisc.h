@@ -56,8 +56,8 @@ protected:
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
-	int m_romcs = 0;
-//  u8 m_control = 0;
+	int m_romcs;
+//  u8 m_control;
 };
 
 class spectrum_spdos_device :

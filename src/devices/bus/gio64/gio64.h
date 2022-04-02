@@ -120,7 +120,7 @@ protected:
 	virtual void device_start() override;
 
 	// internal state
-	device_gio64_card_interface *m_device_list[3]{};
+	device_gio64_card_interface *m_device_list[3];
 
 private:
 	devcb_write_line::array<3> m_interrupt_cb;

@@ -36,29 +36,29 @@ protected:
 
 private:
 	// registers
-	u32 m_bar = 0;    // breakpoint address register
-	u32 m_bdr = 0;    // breakpoint data register
-	u32 m_bear = 0;   // bus error address register
-	u32 m_bmr = 0;    // breakpoint mask register
-	u32 m_mcr = 0;    // memory management control register
-	u32 m_msr = 0;    // memory management status register
-	u32 m_ptb[2]{};   // page table base registers
-	u32 m_tear = 0;   // translation exception address register
+	u32 m_bar;    // breakpoint address register
+	u32 m_bdr;    // breakpoint data register
+	u32 m_bear;   // bus error address register
+	u32 m_bmr;    // breakpoint mask register
+	u32 m_mcr;    // memory management control register
+	u32 m_msr;    // memory management status register
+	u32 m_ptb[2]; // page table base registers
+	u32 m_tear;   // translation exception address register
 
 	// operating state
-	u16 m_opword = 0;
+	u16 m_opword;
 	struct operand
 	{
-		u32 expected = 0;
-		u32 issued = 0;
-		u64 value = 0;
+		u32 expected;
+		u32 issued;
+		u64 value;
 	}
-	m_op[3]{};
-	u16 m_status = 0;
+	m_op[3];
+	u16 m_status;
 
 	// implementation state
-	u32 m_state = 0;
-	u32 m_tcy = 0;
+	u32 m_state;
+	u32 m_tcy;
 };
 
 DECLARE_DEVICE_TYPE(NS32382, ns32382_device)

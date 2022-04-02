@@ -79,7 +79,7 @@ private:
 	required_device<wd1770_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
-	int m_fdc_ie = 0;
+	int m_fdc_ie;
 };
 
 

@@ -43,9 +43,9 @@ private:
 	void device_add_mconfig(machine_config &config) override;
 
 	// Settings
-	bool m_active = false;
-	uint16_t m_crubase = 0;
-	bool m_pgramplus = false;
+	bool m_active;
+	uint16_t m_crubase;
+	bool m_pgramplus;
 
 	ioport_constructor device_input_ports() const override;
 

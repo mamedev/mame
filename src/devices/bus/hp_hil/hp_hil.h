@@ -178,7 +178,7 @@ protected:
 
 	hp_hil_mlc_device       *m_hp_hil_mlc;
 
-	hp_hil_slot_device *m_slot = nullptr;
+	hp_hil_slot_device *m_slot;
 
 	int                     m_device_id;
 	uint16_t                m_device_id16;

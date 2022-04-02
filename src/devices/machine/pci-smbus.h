@@ -57,11 +57,11 @@ private:
 	uint8_t notify_dlow_r();
 	uint8_t notify_dhigh_r();
 
-	uint16_t slv_data = 0;
+	uint16_t slv_data;
 
-	uint8_t hst_sts = 0, hst_cnt = 0, hst_cmd = 0, xmit_slva = 0, hst_d0 = 0, hst_d1 = 0;
-	uint8_t host_block_db = 0, pec = 0, rcv_slva = 0, aux_sts = 0, aux_ctl = 0;
-	uint8_t smlink_pin_ctl = 0, smbus_pin_ctl = 0, slv_sts = 0, slv_cmd = 0, notify_daddr = 0, notify_dlow = 0, notify_dhigh = 0;
+	uint8_t hst_sts, hst_cnt, hst_cmd, xmit_slva, hst_d0, hst_d1;
+	uint8_t host_block_db, pec, rcv_slva, aux_sts, aux_ctl;
+	uint8_t smlink_pin_ctl, smbus_pin_ctl, slv_sts, slv_cmd, notify_daddr, notify_dlow, notify_dhigh;
 };
 
 DECLARE_DEVICE_TYPE(SMBUS, smbus_device)

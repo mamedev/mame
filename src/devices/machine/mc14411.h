@@ -83,10 +83,10 @@ protected:
 private:
 	void arm_timer(int i);
 
-	emu_timer *m_fx_timer[16]{};
-	emu_timer *m_reset_timer = nullptr;
+	emu_timer *m_fx_timer[16];
+	emu_timer *m_reset_timer;
 
-	uint32_t m_fx_state[16]{}; // F1-F16 output line states
+	uint32_t m_fx_state[16]; // F1-F16 output line states
 
 	// divider matrix
 	static const int s_counter_divider[16];

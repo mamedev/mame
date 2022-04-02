@@ -36,10 +36,10 @@ private:
 	required_ioport_array<8> m_matrix[4];
 	output_finder<3> m_leds;
 
-	bool m_t1 = false;
-	u8 m_bus = 0;
-	u8 m_p1 = 0;
-	u8 m_p2 = 0;
+	bool m_t1;
+	u8 m_bus;
+	u8 m_p1;
+	u8 m_p2;
 };
 
 DECLARE_DEVICE_TYPE(RTPC_KBD, rtpc_kbd_device)

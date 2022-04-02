@@ -59,21 +59,21 @@ protected:
 private:
 	int m_gpib_loop_state;
 	int m_floppy_loop_state;
-	uint8_t m_last_recv_byte = 0;
-	int m_last_recv_eoi = 0;
-	int m_last_recv_atn = 0;
-	uint8_t m_byte_to_send = 0;
-	int m_send_eoi = 0;
+	uint8_t m_last_recv_byte;
+	int m_last_recv_eoi;
+	int m_last_recv_atn;
+	uint8_t m_byte_to_send;
+	int m_send_eoi;
 	bool listening, talking, serial_polling;
 	bool has_srq;
 	uint8_t serial_poll_byte;
-	uint32_t floppy_sector_number = 0;
+	uint32_t floppy_sector_number;
 	int bus_addr;
 	uint8_t *identify_response_ptr;
 	std::vector<uint8_t> m_data_buffer;
 	std::queue<uint8_t> m_output_data_buffer;
-	uint16_t io_size = 0;
-	emu_timer *m_delay_timer = nullptr;
+	uint16_t io_size;
+	emu_timer *m_delay_timer;
 protected:
 	attotime read_delay;
 };

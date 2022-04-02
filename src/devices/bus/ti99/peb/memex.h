@@ -39,7 +39,7 @@ protected:
 private:
 	bool    access_enabled(offs_t offset);
 	required_device<ram_device> m_ram;
-	uint8_t   m_switches = 0;
+	uint8_t   m_switches;
 };
 
 } // end namespace bus::ti99::peb

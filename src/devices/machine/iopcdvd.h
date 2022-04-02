@@ -55,12 +55,12 @@ protected:
 
 	struct drive_channel_t
 	{
-		uint8_t m_buffer[0x10]{}; // Buffer size is a total guess
-		uint8_t m_curr = 0;
-		uint8_t m_end = 0;
+		uint8_t m_buffer[0x10]; // Buffer size is a total guess
+		uint8_t m_curr;
+		uint8_t m_end;
 
-		uint8_t m_status = 0;
-		uint8_t m_command = 0;
+		uint8_t m_status;
+		uint8_t m_command;
 	};
 
 	drive_channel_t m_channel[2];

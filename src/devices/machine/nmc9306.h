@@ -54,16 +54,16 @@ private:
 
 	uint16_t m_register[16];
 
-	int m_bits = 0;
-	int m_state = 0;
-	uint8_t m_command = 0;
-	uint8_t m_address = 0;
-	uint16_t m_data = 0;
-	bool m_ewen = false;
-	int m_cs = 0;
-	int m_sk = 0;
-	int m_do = 0;
-	int m_di = 0;
+	int m_bits;
+	int m_state;
+	uint8_t m_command;
+	uint8_t m_address;
+	uint16_t m_data;
+	bool m_ewen;
+	int m_cs;
+	int m_sk;
+	int m_do;
+	int m_di;
 };
 
 

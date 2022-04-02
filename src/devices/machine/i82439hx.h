@@ -38,15 +38,15 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	int ram_size = 0;
+	int ram_size;
 	required_device<device_memory_interface> cpu;
 	std::vector<uint32_t> ram;
 
-	uint8_t latency_timer = 0, bist = 0;
-	uint8_t acon = 0, pcon = 0, cc = 0, dramec = 0, dramc = 0, dramt = 0;
-	uint8_t pam[7]{}, drb[8]{};
-	uint8_t drt = 0, drat = 0, smram = 0, errcmd = 0, errsts = 0, errsyn = 0;
-	int smiact_n = 0;
+	uint8_t latency_timer, bist;
+	uint8_t acon, pcon, cc, dramec, dramc, dramt;
+	uint8_t pam[7], drb[8];
+	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
+	int smiact_n;
 
 	virtual uint8_t header_type_r() override;
 	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask);

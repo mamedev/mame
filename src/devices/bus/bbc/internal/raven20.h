@@ -40,7 +40,7 @@ private:
 	void enable_w(offs_t offset, uint8_t data);
 	void disable_w(offs_t offset, uint8_t data);
 
-	bool m_shadow = false;
+	bool m_shadow;
 	std::unique_ptr<uint8_t[]> m_ram;
 };
 

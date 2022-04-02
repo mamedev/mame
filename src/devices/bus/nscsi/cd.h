@@ -46,13 +46,13 @@ private:
 	uint32_t bytes_per_block;
 	int lba, cur_sector;
 	required_device<cdrom_image_device> image;
-	uint8_t mode_data[12]{};
+	uint8_t mode_data[12];
 
-	char manufacturer[8]{};
-	char product[16]{};
-	char revision[4]{};
-	uint8_t inquiry_data = 0;
-	uint8_t compliance = 0;
+	char manufacturer[8];
+	char product[16];
+	char revision[4];
+	uint8_t inquiry_data;
+	uint8_t compliance;
 
 	void return_no_cd();
 	static int to_msf(int frame);

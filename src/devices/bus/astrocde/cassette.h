@@ -43,11 +43,11 @@ protected:
 
 private:
 	required_device<cassette_image_device> m_cassette;
-	double m_cass_wave = 0;
-	double m_cass_delta = 0;
-	uint32_t m_cass_wave_ticks = 0;
-	uint32_t m_cass_cycles = 0;
-	bool m_cass_mark = false;
+	double m_cass_wave;
+	double m_cass_delta;
+	uint32_t m_cass_wave_ticks;
+	uint32_t m_cass_cycles;
+	bool m_cass_mark;
 	std::queue<uint8_t> m_cass_data;
 };
 

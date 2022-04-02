@@ -42,27 +42,27 @@ protected:
 	virtual void update_mirror() { update_mirror_typea(); }
 	inline uint8_t unscramble(uint8_t bank);
 
-	uint8_t m_mul[2]{};
-	uint8_t m_latch = 0;
-	uint8_t m_reg[4]{};
-	uint8_t m_chr_latch[2]{};   // type C uses a more complex CHR 4K mode, and these vars are only changed for those games
-	uint8_t m_mmc_prg_bank[4]{};
-	uint16_t m_mmc_nt_bank[4]{};
-	uint16_t m_mmc_vrom_bank[8]{};
-	uint16_t m_extra_chr_bank = 0;
-	uint16_t m_extra_chr_mask = 0;
-	int m_bank_6000 = 0;
+	uint8_t m_mul[2];
+	uint8_t m_latch;
+	uint8_t m_reg[4];
+	uint8_t m_chr_latch[2];   // type C uses a more complex CHR 4K mode, and these vars are only changed for those games
+	uint8_t m_mmc_prg_bank[4];
+	uint16_t m_mmc_nt_bank[4];
+	uint16_t m_mmc_vrom_bank[8];
+	uint16_t m_extra_chr_bank;
+	uint16_t m_extra_chr_mask;
+	int m_bank_6000;
 
-	uint8_t m_irq_mode = 0;
-	uint8_t m_irq_count = 0;
-	uint8_t m_irq_prescale = 0;
-	uint8_t m_irq_prescale_mask = 0;
-	uint8_t m_irq_flip = 0;
-	int m_irq_enable = 0;
-	int m_irq_up = 0, m_irq_down = 0;
+	uint8_t m_irq_mode;
+	uint8_t m_irq_count;
+	uint8_t m_irq_prescale;
+	uint8_t m_irq_prescale_mask;
+	uint8_t m_irq_flip;
+	int m_irq_enable;
+	int m_irq_up, m_irq_down;
 
 	static const device_timer_id TIMER_IRQ = 0;
-	emu_timer *irq_timer = nullptr;
+	emu_timer *irq_timer;
 	attotime timer_freq;
 };
 

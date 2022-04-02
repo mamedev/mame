@@ -67,9 +67,9 @@ protected:
 	const uint16_t m_addr_mask;
 
 	uint32_t m_state;
-	bool m_selected = false;
-	uint8_t m_status = 0;
-	uint16_t m_addr = 0;
+	bool m_selected;
+	uint8_t m_status;
+	uint16_t m_addr;
 };
 
 class m95010_device : public m950x0_device

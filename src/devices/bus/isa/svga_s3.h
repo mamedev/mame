@@ -87,9 +87,9 @@ protected:
 
 private:
 	required_device<s3virgedx_vga_device> m_vga;
-	bool m_lfb_enable = false;
-	uint32_t m_lfb_start = 0;
-	uint32_t m_lfb_end = 0;
+	bool m_lfb_enable;
+	uint32_t m_lfb_start;
+	uint32_t m_lfb_end;
 };
 
 class isa16_stealth3d2kpro_device :

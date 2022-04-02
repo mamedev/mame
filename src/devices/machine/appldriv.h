@@ -53,16 +53,16 @@ public:
 	unsigned int tween_tracks : 1;
 	unsigned int track_loaded : 1;
 	unsigned int track_dirty : 1;
-	int position = 0;
-	int spin_count = 0;         /* simulate drive spin to fool RWTS test at $BD34 */
+	int position;
+	int spin_count;         /* simulate drive spin to fool RWTS test at $BD34 */
 	uint8_t track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
 
 protected:
 	virtual void device_start() override;
 
 private:
-	int m_dividend = 0;
-	int m_divisor = 0;
+	int m_dividend;
+	int m_divisor;
 };
 
 // device type definition

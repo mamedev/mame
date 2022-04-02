@@ -47,20 +47,20 @@ private:
 	u32 m_eia;
 
 	// operating state
-	u8 m_idbyte = 0;
-	u16 m_opword = 0;
+	u8 m_idbyte;
+	u16 m_opword;
 	struct operand
 	{
-		unsigned expected = 0;
-		unsigned issued = 0;
-		u64 value = 0;
+		unsigned expected;
+		unsigned issued;
+		u64 value;
 	}
-	m_op[3]{};
-	u16 m_status = 0;
+	m_op[3];
+	u16 m_status;
 
 	// implementation state
-	unsigned m_state = 0;
-	unsigned m_tcy = 0;
+	unsigned m_state;
+	unsigned m_tcy;
 };
 
 DECLARE_DEVICE_TYPE(NS32082, ns32082_device)

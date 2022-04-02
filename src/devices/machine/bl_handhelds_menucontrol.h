@@ -32,17 +32,17 @@ private:
 	bool m_is_unsp_type_hack;
 
 	// internal state
-	uint16_t m_menupos = 0;
+	uint16_t m_menupos;
 
 	// command handling
-	uint8_t m_clockstate = 0;
-	uint8_t m_datashifterpos = 0;
+	uint8_t m_clockstate;
+	uint8_t m_datashifterpos;
 
-	uint8_t m_responsebit = 0;
-	uint8_t m_response = 0;
+	uint8_t m_responsebit;
+	uint8_t m_response;
 
-	uint8_t m_commandbit = 0;
-	uint8_t m_command = 0;
+	uint8_t m_commandbit;
+	uint8_t m_command;
 
 	void handle_command();
 

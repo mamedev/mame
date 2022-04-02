@@ -100,38 +100,38 @@ private:
 	cpu_device *m_cpu;  // When != nullptr: CPU is suspended in wait state
 	bool m_cpu_rd;
 	uint8_t m_ready_in;
-	uint8_t m_ready_ff = 0; // I-A44 & I-A43
-	bool m_gate_lower = false;  // I-A58-9
-	bool m_irq = false;         // C-A37-9
-	uint8_t m_data_low_out = 0; // C-A43
-	uint8_t m_data_low_in = 0;  // C-A25
-	uint8_t m_cpu_data = 0;
-	uint8_t m_addr_low_out = 0; // C-A41
-	bool m_mem_wrt = false;     // I-A58-4
-	bool m_wrt_inh = false;     // I-A46-13
-	bool m_direction = false;   // I-A58-11
-	bool m_ibus_cached = false;
-	uint8_t m_ibus = 0;
-	uint16_t m_crc = 0;     // I-A62
-	bool m_crc_enabled = false; // I-A58-13
-	bool m_crc_out = false;     // C-A16-2
-	bool m_reading = false;     // I-A46-9
-	bool m_writing = false;     // C-A16-4
-	uint16_t m_data_sr = 0; // C-A36 & C-A29 (MSB), next byte in LSB
-	bool m_last_data_bit = false;   // I-A48-6
-	uint16_t m_clock_sr = 0;    // C-A34 & C-A27 (MSB), next byte in LSB
+	uint8_t m_ready_ff; // I-A44 & I-A43
+	bool m_gate_lower;  // I-A58-9
+	bool m_irq;         // C-A37-9
+	uint8_t m_data_low_out; // C-A43
+	uint8_t m_data_low_in;  // C-A25
+	uint8_t m_cpu_data;
+	uint8_t m_addr_low_out; // C-A41
+	bool m_mem_wrt;     // I-A58-4
+	bool m_wrt_inh;     // I-A46-13
+	bool m_direction;   // I-A58-11
+	bool m_ibus_cached;
+	uint8_t m_ibus;
+	uint16_t m_crc;     // I-A62
+	bool m_crc_enabled; // I-A58-13
+	bool m_crc_out;     // C-A16-2
+	bool m_reading;     // I-A46-9
+	bool m_writing;     // C-A16-4
+	uint16_t m_data_sr; // C-A36 & C-A29 (MSB), next byte in LSB
+	bool m_last_data_bit;   // I-A48-6
+	uint16_t m_clock_sr;    // C-A34 & C-A27 (MSB), next byte in LSB
 	attotime m_last_f_time;
-	bool m_clock_gate = false;  // I-A10-8
-	bool m_amwrt = false;       // I-A58-6
-	bool m_dlyd_amwrt = false;
+	bool m_clock_gate;  // I-A10-8
+	bool m_amwrt;       // I-A58-6
+	bool m_dlyd_amwrt;
 
 	// PLL
 	fdc_pll_t m_pll;
 
 	// Timers
-	emu_timer *m_timeout_timer = nullptr;
-	emu_timer *m_byte_timer = nullptr;
-	emu_timer *m_f_timer = nullptr;
+	emu_timer *m_timeout_timer;
+	emu_timer *m_byte_timer;
+	emu_timer *m_f_timer;
 
 	void set_output();
 	unsigned selected_drive() const;

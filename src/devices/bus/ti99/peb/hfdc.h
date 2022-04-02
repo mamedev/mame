@@ -100,10 +100,10 @@ private:
 	required_device<mm58274c_device> m_clock;
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy_unit[4]{};
+	floppy_image_device*    m_floppy_unit[4];
 
 	// Link to the attached hard disks
-	mfm_harddisk_device*    m_harddisk_unit[3]{};
+	mfm_harddisk_device*    m_harddisk_unit[3];
 
 	// Currently selected floppy drive
 	floppy_image_device*    m_current_floppy;

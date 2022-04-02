@@ -44,19 +44,19 @@ private:
 	void set_drq(int state);
 
 	struct {
-		uint8_t pstr = 0;
-		uint8_t pspr = 0;
-		uint8_t dqtr = 0;
-		uint8_t bcfr = 0;
-		uint8_t pcfr = 0;
-		uint8_t gacfr = 0;
-		uint8_t ctrl = 0;
-		uint8_t streg = 0;
-		uint8_t idcfr = 0;
-		uint16_t da = 0;
-		uint32_t vptr = 0;
-		uint8_t rfmsb = 0;
-		uint8_t rflsb = 0;
+		uint8_t pstr;
+		uint8_t pspr;
+		uint8_t dqtr;
+		uint8_t bcfr;
+		uint8_t pcfr;
+		uint8_t gacfr;
+		uint8_t ctrl;
+		uint8_t streg;
+		uint8_t idcfr;
+		uint16_t da;
+		uint32_t vptr;
+		uint8_t rfmsb;
+		uint8_t rflsb;
 	} m_regs;
 };
 

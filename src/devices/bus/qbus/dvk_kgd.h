@@ -50,12 +50,12 @@ protected:
 
 private:
 	std::unique_ptr<uint8_t[]> m_videoram_base;
-	uint8_t *m_videoram = nullptr;
+	uint8_t *m_videoram;
 
-	uint16_t m_cr = 0;
-	uint16_t m_dr = 0;
-	uint16_t m_ar = 0;
-	uint16_t m_ct = 0;
+	uint16_t m_cr;
+	uint16_t m_dr;
+	uint16_t m_ar;
+	uint16_t m_ct;
 };
 
 

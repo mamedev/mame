@@ -56,7 +56,7 @@ private:
 	required_device<i8272a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 
-	bool m_reset, m_motor, m_fd8 = false;
+	bool m_reset, m_motor, m_fd8;
 };
 
 

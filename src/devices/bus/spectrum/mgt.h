@@ -60,7 +60,7 @@ protected:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 
-	int m_romcs = 0;
+	int m_romcs;
 	uint8_t m_ram[8 * 1024];
 	bool m_centronics_busy;
 };

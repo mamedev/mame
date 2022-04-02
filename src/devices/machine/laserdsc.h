@@ -290,7 +290,7 @@ private:
 
 	// async operations
 	osd_work_queue *    m_work_queue;           // work queue
-	uint32_t            m_queued_hunknum = 0;   // queued hunk
+	uint32_t            m_queued_hunknum;       // queued hunk
 
 	// core states
 	uint8_t             m_audiosquelch;         // audio squelch state: bit 0 = audio 1, bit 1 = audio 2

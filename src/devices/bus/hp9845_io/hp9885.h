@@ -76,32 +76,32 @@ private:
 	};
 
 	required_device<floppy_connector> m_drive_connector;
-	floppy_image_device *m_drive = nullptr;
-	uint16_t m_input = 0;
-	uint16_t m_output = 0;
-	uint16_t m_status = 0;
-	int m_fsm_state = 0;
-	int m_head_state = 0;
-	int m_op = 0;
-	bool m_pctl = false;
-	bool m_ibf = false;
-	bool m_obf = false;
-	bool m_outputting = false;
-	bool m_had_transition = false;
-	bool m_dskchg = false;
-	unsigned m_track = 0;
-	unsigned m_seek_track = 0;
-	unsigned m_seek_sector = 0;
-	unsigned m_sector_cnt = 0;
-	unsigned m_word_cnt = 0;
-	unsigned m_rev_cnt = 0;
-	uint32_t m_am_detector = 0;
-	uint16_t m_crc = 0; // x^15 is stored in LSB
+	floppy_image_device *m_drive;
+	uint16_t m_input;
+	uint16_t m_output;
+	uint16_t m_status;
+	int m_fsm_state;
+	int m_head_state;
+	int m_op;
+	bool m_pctl;
+	bool m_ibf;
+	bool m_obf;
+	bool m_outputting;
+	bool m_had_transition;
+	bool m_dskchg;
+	unsigned m_track;
+	unsigned m_seek_track;
+	unsigned m_seek_sector;
+	unsigned m_sector_cnt;
+	unsigned m_word_cnt;
+	unsigned m_rev_cnt;
+	uint32_t m_am_detector;
+	uint16_t m_crc; // x^15 is stored in LSB
 
 	// Timers
-	emu_timer *m_fsm_timer = nullptr;
-	emu_timer *m_head_timer = nullptr;
-	emu_timer *m_bit_byte_timer = nullptr;
+	emu_timer *m_fsm_timer;
+	emu_timer *m_head_timer;
+	emu_timer *m_bit_byte_timer;
 
 	// PLL
 	fdc_pll_t m_pll;

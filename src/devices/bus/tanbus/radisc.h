@@ -64,8 +64,8 @@ private:
 
 	int m_beeper_state;
 	uint8_t m_drive_control;
-	int m_irq_enable = 0;
-	int m_drq_enable = 0;
+	int m_irq_enable;
+	int m_drq_enable;
 };
 
 

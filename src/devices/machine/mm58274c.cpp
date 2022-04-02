@@ -154,7 +154,7 @@ attotime mm58274c_device::interrupt_period_table(int val)
 
 uint8_t mm58274c_device::read(offs_t offset)
 {
-	int reply = 0;
+	int reply;
 
 	offset &= 0xf;
 

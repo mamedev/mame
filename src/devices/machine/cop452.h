@@ -49,24 +49,24 @@ private:
 	devcb_write_line::array<2> m_out_handlers;
 
 	// Timers
-	emu_timer *m_timers[ 2 ]{};
+	emu_timer *m_timers[ 2 ];
 
 	// State
-	uint8_t m_mode = 0;
-	bool m_clk_div_4 = false;
-	bool m_cs = false;
-	bool m_sk = false;
-	bool m_di = false;
-	bool m_out[ 2 ]{};
-	bool m_regA_b16 = false;
-	uint16_t m_reg[ 2 ]{};
-	uint16_t m_cnt[ 2 ]{};
+	uint8_t m_mode;
+	bool m_clk_div_4;
+	bool m_cs;
+	bool m_sk;
+	bool m_di;
+	bool m_out[ 2 ];
+	bool m_regA_b16;
+	uint16_t m_reg[ 2 ];
+	uint16_t m_cnt[ 2 ];
 	// 0    : idle
 	// 1..5 : shifting instruction in
 	// 6..21: shifting register in
 	// >= 22: done
-	unsigned m_spi_state = 0;
-	uint8_t m_sr = 0;
+	unsigned m_spi_state;
+	uint8_t m_sr;
 
 	// Operating modes
 	enum : uint8_t {

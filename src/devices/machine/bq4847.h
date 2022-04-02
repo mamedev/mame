@@ -70,7 +70,7 @@ private:
 	void update_int();
 	void set_wdo(int state);
 
-	emu_timer *m_update_timer = nullptr;
+	emu_timer *m_update_timer;
 	emu_timer *m_periodic_timer;
 	emu_timer *m_watchdog_timer;
 

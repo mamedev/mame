@@ -236,7 +236,7 @@ private:
 	video_waitstate_generator m_vidws;
 
 	// Pointer to mainboard
-	mainboard8_device* m_mainboard = nullptr;
+	mainboard8_device* m_mainboard;
 };
 
 /*
@@ -323,7 +323,7 @@ private:
 	int m_msast = 0;
 
 	// Pointer to mainboard
-	mainboard8_device* m_mainboard = nullptr;
+	mainboard8_device* m_mainboard;
 };
 
 /*
@@ -381,7 +381,7 @@ private:
 	uint8_t* m_sram = nullptr;
 
 	// Pointer to mainboard
-	mainboard8_device* m_mainboard = nullptr;
+	mainboard8_device* m_mainboard;
 
 	// Keep the system ready state
 	int m_srdy = 0;
