@@ -352,4 +352,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMP  MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, lk3000, 0,      0,    lk3000,  lk3000, lk3000_state, empty_init, "Lexicon", "LK-3000", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1979, lk3000, 0,      0,    lk3000,  lk3000, lk3000_state, empty_init, "Lexicon", "LK-3000", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
