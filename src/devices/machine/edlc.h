@@ -119,21 +119,21 @@ protected:
 		TXC_B = 0x60, // register bank select (80c03 only)
 	};
 
-	emu_timer *m_tx_timer;
-	emu_timer *m_int_timer;
+	emu_timer *m_tx_timer = nullptr;
+	emu_timer *m_int_timer = nullptr;
 
 	// device state
 	devcb_write_line m_out_int;
 	devcb_write_line m_out_rxrdy;
 	devcb_write_line m_out_txrdy;
 
-	int m_int_state;
-	int m_reset_state;
-	u8 m_station_address[6];
-	u8 m_rx_status;
-	u8 m_tx_status;
-	u8 m_rx_command;
-	u8 m_tx_command;
+	int m_int_state = 0;
+	int m_reset_state = 0;
+	u8 m_station_address[6]{};
+	u8 m_rx_status = 0;
+	u8 m_tx_status = 0;
+	u8 m_rx_command = 0;
+	u8 m_tx_command = 0;
 
 	util::fifo<u8, MAX_FRAME_SIZE> m_rx_fifo;
 	util::fifo<u8, MAX_FRAME_SIZE> m_tx_fifo;
@@ -210,14 +210,14 @@ protected:
 		CFG_RXC = 0x40, // receive crc
 		CFG_FRD = 0x80, // fast receive discard
 	};
-	u16 m_tx_cc;
-	u16 m_cc;
-	u8 m_flags;
+	u16 m_tx_cc = 0;
+	u16 m_cc = 0;
+	u8 m_flags = 0;
 
-	u8 m_control;
-	u8 m_config;
+	u8 m_control = 0;
+	u8 m_config = 0;
 
-	u64 m_multicast_filter;
+	u64 m_multicast_filter = 0;
 };
 
 DECLARE_DEVICE_TYPE(SEEQ8003,  seeq8003_device)

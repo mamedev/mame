@@ -133,12 +133,12 @@ protected:
 		ICR1_COMPARE_MASK   = 0x3f
 	};
 
-	uint8_t m_ram[32];
-	uint8_t m_tscr;
-	uint8_t m_pfr;
-	uint8_t m_millis;
+	uint8_t m_ram[32]{};
+	uint8_t m_tscr = 0;
+	uint8_t m_pfr = 0;
+	uint8_t m_millis = 0;
 
-	emu_timer *m_timer;
+	emu_timer *m_timer = nullptr;
 
 	devcb_write_line m_intr_cb;
 	devcb_write_line m_mfo_cb;

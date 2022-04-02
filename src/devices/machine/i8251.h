@@ -109,44 +109,44 @@ private:
 	bool calc_parity(u8 ch);
 
 	/* flags controlling how i8251_control_w operates */
-	uint8_t m_flags;
+	uint8_t m_flags = 0;
 	/* number of sync bytes programmed for sync mode (1 or 2) ; 0 = async mode */
-	uint8_t m_sync_byte_count;
+	uint8_t m_sync_byte_count = 0;
 	/* the sync bytes written */
-	u8 m_sync1;
-	u16 m_sync2;
+	u8 m_sync1 = 0;
+	u16 m_sync2 = 0;
 	/* status of i8251 */
-	uint8_t m_status;
-	uint8_t m_command;
+	uint8_t m_status = 0;
+	uint8_t m_command = 0;
 	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
-	uint8_t m_mode_byte;
-	bool m_delayed_tx_en;
+	uint8_t m_mode_byte = 0;
+	bool m_delayed_tx_en = false;
 
 	bool m_cts;
 	bool m_dsr;
 	bool m_rxd;
 	bool m_rxc;
 	bool m_txc;
-	int m_rxc_count;
-	int m_txc_count;
-	int m_br_factor;
+	int m_rxc_count = 0;
+	int m_txc_count = 0;
+	int m_br_factor = 0;
 
 	/* data being received */
-	uint8_t m_rx_data;
+	uint8_t m_rx_data = 0;
 		/* tx buffer */
-	uint8_t m_tx_data;
+	uint8_t m_tx_data = 0;
 	void sync1_w(uint8_t data);
 	void sync2_w(uint8_t data);
-	uint8_t m_sync8;
-	uint16_t m_sync16;
+	uint8_t m_sync8 = 0;
+	uint16_t m_sync16 = 0;
 	// 1 = ext sync enabled via command
-	bool m_syndet_pin;
-	bool m_hunt_on;
+	bool m_syndet_pin = false;
+	bool m_hunt_on = false;
 	// 1 = ext syndet pin has been set high; 0 = hunt mode activated
-	bool m_ext_syn_set;
+	bool m_ext_syn_set = false;
 	// count of rxd bits
-	u8 m_rxd_bits;
-	u8 m_data_bits_count;
+	u8 m_rxd_bits = 0;
+	u8 m_data_bits_count = 0;
 };
 
 class v5x_scu_device :  public i8251_device
@@ -167,7 +167,7 @@ protected:
 	void simk_w(u8 data) { m_simk = data; }
 
 private:
-	u8 m_simk;
+	u8 m_simk = 0;
 };
 
 

@@ -247,34 +247,34 @@ private:
 	};
 
 	// internal state
-	emu_timer *m_state_timer;
-	state_t m_state;
-	bool m_int_asserted;
+	emu_timer *m_state_timer = nullptr;
+	state_t m_state{};
+	bool m_int_asserted = false;
 
-	u32 m_scsi_ctrl_state;
+	u32 m_scsi_ctrl_state = 0;
 
-	u8 m_address_reg;
+	u8 m_address_reg = 0;
 
 	// registers
-	u32 m_dma_count;
-	bool m_offset_count_zero;
-	u8 m_rev_cntrl;
-	u8 m_status_reg_0;
-	u8 m_status_reg_1;
-	u8 m_scsi_signal_reg;
-	u8 m_scsi_id_data;
-	u8 m_source_dest_id;
-	u8 m_memory_data;
-	u8 m_port_a_latch;
-	u8 m_port_b_latch;
-	u8 m_scsi_latch_data;
+	u32 m_dma_count = 0;
+	bool m_offset_count_zero = false;
+	u8 m_rev_cntrl = 0;
+	u8 m_status_reg_0 = 0;
+	u8 m_status_reg_1 = 0;
+	u8 m_scsi_signal_reg = 0;
+	u8 m_scsi_id_data = 0;
+	u8 m_source_dest_id = 0;
+	u8 m_memory_data = 0;
+	u8 m_port_a_latch = 0;
+	u8 m_port_b_latch = 0;
+	u8 m_scsi_latch_data = 0;
 
-	u8 m_int_msk_reg_0;
-	u8 m_offset_cntrl;
-	u8 m_dma_cntrl;
-	u8 m_int_msk_reg_1;
-	u8 m_control_reg_0;
-	u8 m_control_reg_1;
+	u8 m_int_msk_reg_0 = 0;
+	u8 m_offset_cntrl = 0;
+	u8 m_dma_cntrl = 0;
+	u8 m_int_msk_reg_1 = 0;
+	u8 m_control_reg_0 = 0;
+	u8 m_control_reg_1 = 0;
 
 	util::fifo <u8, 8> m_fifo;
 };

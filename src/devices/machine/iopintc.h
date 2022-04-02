@@ -51,9 +51,9 @@ protected:
 	void update_interrupts();
 
 	required_device<iop_device> m_iop;
-	uint32_t m_status;
-	uint32_t m_mask;
-	bool m_enabled;
+	uint32_t m_status = 0;
+	uint32_t m_mask = 0;
+	bool m_enabled = false;
 };
 
 DECLARE_DEVICE_TYPE(SONYIOP_INTC, iop_intc_device)

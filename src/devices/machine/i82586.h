@@ -296,7 +296,7 @@ private:
 	virtual void cfg_set(int offset, u8 data) override { m_cfg_bytes[offset] = data; }
 
 	u8 m_cfg_bytes[CFG_SIZE];
-	u16 m_rbd_offset; // next available receive buffer descriptor
+	u16 m_rbd_offset = 0; // next available receive buffer descriptor
 };
 
 class i82596_device : public i82586_base_device
@@ -362,10 +362,10 @@ private:
 	inline sysbus_mode mode() const { return (sysbus_mode)(m_sysbus & SYSBUS_M); }
 
 	u8 m_cfg_bytes[CFG_SIZE];
-	u8 m_sysbus;
+	u8 m_sysbus = 0;
 
-	u32 m_rbd_address;  // next available receive buffer descriptor
-	u64 m_mac_multi_ia; // multi-ia address hash table
+	u32 m_rbd_address = 0;  // next available receive buffer descriptor
+	u64 m_mac_multi_ia = 0; // multi-ia address hash table
 };
 
 class i82596_le16_device : public i82596_device

@@ -179,13 +179,13 @@ private:
 	void vidc20_sound_control_w(u32 data);
 	void fsynreg_w(u32 data);
 
-	u8 m_pal_data_index;
+	u8 m_pal_data_index = 0;
 	inline void update_8bpp_palette(u16 index, u32 paldata);
-	bool m_dac_serial_mode;
-	u8 m_pixel_source;
-	u8 m_pixel_rate;
-	u8 m_vco_r_modulo;
-	u8 m_vco_v_modulo;
+	bool m_dac_serial_mode = false;
+	u8 m_pixel_source = 0;
+	u8 m_pixel_rate = 0;
+	u8 m_vco_r_modulo = 0;
+	u8 m_vco_v_modulo = 0;
 };
 
 DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)
