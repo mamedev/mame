@@ -220,8 +220,8 @@ void pc8801_state::palette_reset()
 		m_palram[i].g = i & 4 ? 7 : 0;
 		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
-	m_palette->set_pen_color(8, 0, 0, 0);
-	m_palette->set_pen_color(9, 0, 0, 0);
+	m_palette->set_pen_color(BGPAL_PEN, 0, 0, 0);
+	m_palette->set_pen_color(BORDER_PEN, 0, 0, 0);
 }
 
 void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect)
@@ -335,7 +335,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 
 uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->pen(8), cliprect);
+	bitmap.fill(m_palette->pen(BGPAL_PEN), cliprect);
 
 	if(m_gfx_ctrl & 8)
 	{
@@ -1187,8 +1187,8 @@ void pc8801_state::bgpal_w(uint8_t data)
 	// sorcerml uses BG Pal extensively:
 	// - On bootup message it sets register $54 to white and bgpal to 0, expecting the layer to be transparent;
 	// - On playlist sets BG Pal to 0x10 (blue background);
-	m_palette->set_pen_color(8, pal1bit(BIT(data, 6)), pal1bit(BIT(data, 5)), pal1bit(BIT(data, 4)));
-	m_palette->set_pen_color(9, pal1bit(BIT(data, 2)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 0)));
+	m_palette->set_pen_color(BGPAL_PEN, pal1bit(BIT(data, 6)), pal1bit(BIT(data, 5)), pal1bit(BIT(data, 4)));
+	m_palette->set_pen_color(BORDER_PEN, pal1bit(BIT(data, 2)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 0)));
 }
 
 void pc8801_state::palram_w(offs_t offset, uint8_t data)

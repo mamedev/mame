@@ -121,17 +121,12 @@ private:
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
 	std::unique_ptr<uint8_t[]> m_gvram;
 
-//	uint8_t m_i8255_0_pc;
-//	uint8_t m_i8255_1_pc;
-//	uint8_t m_fdc_irq_opcode;
 	uint8_t m_ext_rom_bank;
 	uint8_t m_vram_sel;
 	uint8_t m_misc_ctrl;
 	uint8_t m_device_ctrl_data;
 	uint8_t m_window_offset_bank;
 	uint8_t m_layer_mask;
-//	uint16_t m_dma_counter[4];
-//	uint16_t m_dma_address[4];
 	uint8_t m_alu_reg[3];
 	uint8_t m_dmac_mode;
 	uint8_t m_alu_ctrl1;
@@ -143,6 +138,11 @@ private:
 
 //	crtc_t m_crtc;
 	struct { uint8_t r, g, b; } m_palram[8];
+	enum {
+		BGPAL_PEN = 8,
+		BORDER_PEN = 9
+	};
+
 //	uint8_t m_dmac_ff;
 	uint32_t m_knj_addr[2];
 	uint32_t m_extram_size;
@@ -181,10 +181,6 @@ private:
 //	void crtc_param_w(uint8_t data);
 //	uint8_t crtc_status_r();
 //	void crtc_cmd_w(uint8_t data);
-//	uint8_t dmac_r(offs_t offset);
-//	void dmac_w(offs_t offset, uint8_t data);
-//	uint8_t dmac_status_r();
-//	void dmac_mode_w(uint8_t data);
 	uint8_t extram_mode_r();
 	void extram_mode_w(uint8_t data);
 	uint8_t extram_bank_r();

@@ -172,9 +172,11 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 				pen_dot = (pen_dot >> (7 - (xi >> (dot_width - 1)))) & 1;
 			}
 
-			if (pen_dot)
-				for (int di = 0; di < dot_width; di++)
-					bitmap.pix(y, res_x + di) = m_crtc_palette->pen(color);
+			if (!pen_dot)
+				continue;
+
+			for (int di = 0; di < dot_width; di++)
+				bitmap.pix(y, res_x + di) = m_crtc_palette->pen(color);
 		}
 	}
 }
