@@ -82,6 +82,9 @@ DEFINE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device, "k573_dio", "Kon
 
 void k573dio_device::amap(address_map &map)
 {
+	// TODO: Split address maps between DDR Solo Bass Mix's FPGA code and the normal FPGA code.
+	// For example, DDR Solo Bass Mix's FPGA code returns 0x7654 for unused registers like mp3_counter_high_r.
+
 	map(0x00, 0x01).r(FUNC(k573dio_device::a00_r));
 	map(0x02, 0x03).r(FUNC(k573dio_device::a02_r));
 	map(0x04, 0x05).r(FUNC(k573dio_device::a04_r));
@@ -95,7 +98,7 @@ void k573dio_device::amap(address_map &map)
 	map(0xa2, 0xa3).rw(FUNC(k573dio_device::mpeg_start_adr_low_r), FUNC(k573dio_device::mpeg_start_adr_low_w));
 	map(0xa4, 0xa5).rw(FUNC(k573dio_device::mpeg_end_adr_high_r), FUNC(k573dio_device::mpeg_end_adr_high_w));
 	map(0xa6, 0xa7).rw(FUNC(k573dio_device::mpeg_end_adr_low_r), FUNC(k573dio_device::mpeg_end_adr_low_w));
-	map(0xa8, 0xa9).rw(FUNC(k573dio_device::mpeg_key_1_r), FUNC(k573dio_device::mpeg_key_1_w));
+	map(0xa8, 0xa9).rw(FUNC(k573dio_device::mpeg_frame_counter_r), FUNC(k573dio_device::mpeg_key_1_w));
 	map(0xaa, 0xab).r(FUNC(k573dio_device::mpeg_ctrl_r));
 	map(0xac, 0xad).rw(FUNC(k573dio_device::mas_i2c_r), FUNC(k573dio_device::mas_i2c_w));
 	map(0xae, 0xaf).rw(FUNC(k573dio_device::fpga_ctrl_r), FUNC(k573dio_device::fpga_ctrl_w));
@@ -144,6 +147,7 @@ void k573dio_device::device_start()
 	save_item(NAME(output_data));
 	save_item(NAME(is_ddrsbm_fpga));
 	save_item(NAME(crypto_key1));
+	save_item(NAME(fpga_counter));
 	save_item(NAME(network_id));
 
 	k573fpga->set_ddrsbm_fpga(is_ddrsbm_fpga);
@@ -154,6 +158,8 @@ void k573dio_device::device_reset()
 	ram_adr = 0;
 	ram_read_adr = 0;
 	crypto_key1 = 0;
+	fpga_counter = 0;
+
 	network_id = 0;
 
 	std::fill(std::begin(output_data), std::end(output_data), 0);
@@ -177,10 +183,6 @@ void k573dio_device::device_add_mconfig(machine_config &config)
 	k573fpga->add_route(1, ":rspeaker", 1.0);
 
 	DS2401(config, digital_id);
-}
-
-void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
 }
 
 uint16_t k573dio_device::a00_r()
@@ -244,9 +246,6 @@ void k573dio_device::mpeg_start_adr_low_w(uint16_t data)
 {
 	LOGMP3("FPGA MPEG start address low %04x\n", data);
 	k573fpga->set_mp3_start_addr((k573fpga->get_mp3_start_addr() & 0xffff0000) | data); // low
-
-	if(is_ddrsbm_fpga)
-		k573fpga->set_crypto_key3(0);
 }
 
 uint16_t k573dio_device::mpeg_end_adr_high_r()
@@ -271,10 +270,9 @@ void k573dio_device::mpeg_end_adr_low_w(uint16_t data)
 	k573fpga->set_mp3_end_addr((k573fpga->get_mp3_end_addr() & 0xffff0000) | data); // low
 }
 
-uint16_t k573dio_device::mpeg_key_1_r()
+uint16_t k573dio_device::mpeg_frame_counter_r()
 {
-	// Dance Dance Revolution Solo Bass Mix reads this key before starting songs
-	return crypto_key1;
+	return k573fpga->get_mp3_frame_count();
 }
 
 void k573dio_device::mpeg_key_1_w(uint16_t data)
@@ -306,7 +304,7 @@ uint16_t k573dio_device::fpga_ctrl_r()
 
 void k573dio_device::fpga_ctrl_w(uint16_t data)
 {
-	k573fpga->set_mpeg_ctrl(data);
+	k573fpga->set_fpga_ctrl(data);
 }
 
 void k573dio_device::ram_write_adr_high_w(uint16_t data)
@@ -348,12 +346,13 @@ void k573dio_device::ram_read_adr_low_w(uint16_t data)
 
 uint16_t k573dio_device::mp3_counter_high_r()
 {
-	return (k573fpga->get_counter() & 0xffff0000) >> 16;
+	return (fpga_counter & 0xffff0000) >> 16;
 }
 
 uint16_t k573dio_device::mp3_counter_low_r()
 {
-	return k573fpga->get_counter() & 0x0000ffff;
+	fpga_counter = k573fpga->get_counter();
+	return fpga_counter & 0x0000ffff;
 }
 
 void k573dio_device::mp3_counter_low_w(uint16_t data)
