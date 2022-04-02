@@ -57,7 +57,7 @@ public:
 	virtual dir_t root() override;
 
 	static u32 cs_to_block(u16 ref);
-	static u16 block_to_cs(u32 block);
+	[[maybe_unused]] static u16 block_to_cs(u32 block);
 
 	bool ref_valid(u16 ref);
 	static std::string read_file_name(const u8 *p);

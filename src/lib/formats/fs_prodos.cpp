@@ -52,7 +52,7 @@ private:
 		u16 m_base_block;
 
 		std::pair<fsblk_t::block_t, const u8 *> get_entry_ro(u64 key);
-		std::pair<fsblk_t::block_t, u8 *> get_entry(u64 key);
+		[[maybe_unused]] std::pair<fsblk_t::block_t, u8 *> get_entry(u64 key);
 	};
 
 	class dir : public root_dir {
