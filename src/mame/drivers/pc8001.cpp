@@ -61,26 +61,31 @@ UPD3301_FETCH_ATTRIBUTE( pc8001_base_state::attr_fetch )
 	// further extend the attributes if we are in color mode
 	if (is_color_mode)
 	{
-		// TODO: defaults
 		// flgworld (pc8001) gameplay sets up:
 		// - 0x00 0x00 0x02 0x88 on playfield
 		// \- (wanting the default from the first defined color)
 		// - 0x00 0x00 0x00 0x48 0x12 0x88 for first row
-		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green wtf)
+		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green)
 		// undermon (pc8001) instruction screen sets up:
 		// - 0x00 0x00 0x06 0xb8
 		// \- (expecting blue fill up to 0x06)
-		u8 attr_color = 0xe8;
-		u8 attr_decoration = 0x00;
+		// xak2 & cancanb (pc8801) really expects that the color / decoration is implictly
+		// latched from previous line (uses semigfx black tiles for masking)
+		if (y == 0)
+		{
+			// TODO: default values for line 0
+			m_attr_color = 0xe8;
+			m_attr_decoration = 0x00;
+		}
 
 		for (int ex = 0; ex < row_size; ex++)
 		{
 			u16 cur_attr = attr_extend_info[ex];
 			if (BIT(cur_attr, 3))
-				attr_color = cur_attr;
+				m_attr_color = cur_attr;
 			else
-				attr_decoration = cur_attr;
-			attr_extend_info[ex] = (attr_color << 8) | attr_decoration;
+				m_attr_decoration = cur_attr;
+			attr_extend_info[ex] = (m_attr_color << 8) | m_attr_decoration;
 		}
 	}
 

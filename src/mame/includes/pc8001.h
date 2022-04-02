@@ -69,6 +69,7 @@ private:
 	/* video state */
 	int m_width80;
 	int m_color;
+	u8 m_attr_color = 0xe8, m_attr_decoration = 0;
 };
 
 class pc8001_state : public pc8001_base_state
