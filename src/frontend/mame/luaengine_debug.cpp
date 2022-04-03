@@ -123,7 +123,7 @@ public:
 				},
 				std::move(setfun),
 				(format && *format) ? *format : "");
-	};
+	}
 	symbol_entry *find(char const *name) const { return m_table.find(name); }
 	symbol_entry *find_deep(char const *name) { return m_table.find_deep(name); }
 

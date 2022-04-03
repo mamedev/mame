@@ -93,6 +93,11 @@ function addprojectflags()
 		buildoptions_cpp {
 			"-Wsuggest-override",
 		}
+		configuration { "linux-*" }
+			buildoptions_cpp {
+				"-flifetime-dse=1", -- GCC for Linux takes issue with Sol's get<std::optional<T> >() otherwise
+			}
+		configuration {}
 	end
 end
 
@@ -1217,7 +1222,7 @@ configuration { "android-arm64" }
 		"-Wno-asm-operand-widths",
 	}
 
-configuration { "linux-*"}
+configuration { "linux-*" }
 		links {
 			"dl",
 			"rt",
