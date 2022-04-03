@@ -2253,7 +2253,7 @@ void nes_fk23c_device::chr_cb(int start, int bank, int source)
 void nes_fk23c_device::fk23c_set_prg()
 {
 	if ((m_reg[0] & 0x07) == 4)
-		prg32((m_reg[1] & 0x7f) >> 1);
+		prg32(BIT(m_reg[1], 1, 6));
 	else if ((m_reg[0] & 0x07) == 3)
 	{
 		prg16_89ab(m_reg[1] & 0x7f);
@@ -3328,7 +3328,7 @@ void nes_bmc_411120c_device::write_m(offs_t offset, u8 data)
 	{
 		m_reg = offset;
 		if (BIT(m_reg, 3))
-			prg32((m_reg & 0x07) << 2 | (m_reg & 0x30) >> 4);
+			prg32(bitswap<5>(m_reg, 2, 1, 0, 5, 4));
 		else
 		{
 			m_prg_base = (m_reg & 0x07) << 4;

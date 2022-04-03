@@ -1113,8 +1113,8 @@ void nes_waixing_dq8_device::write_h(offs_t offset, uint8_t data)
 
 void nes_waixing_wxzs2_device::write_h(offs_t offset, uint8_t data)
 {
-	uint8_t flip = (data & 0x80) >> 7;
-	uint8_t helper = (data & 0x7f) << 1;
+	uint8_t flip = BIT(data, 7);
+	uint8_t helper = data << 1;
 
 	LOG_MMC(("waixing_wxzs2 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1167,13 +1167,12 @@ void nes_waixing_wxzs2_device::write_h(offs_t offset, uint8_t data)
 void nes_waixing_fs304_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fs304 write_l, offset: %04x, data: %02x\n", offset, data));
-	int bank;
-	offset += 0x100;
 
+	offset += 0x100;
 	if (offset >= 0x1000)
 	{
-		m_reg[(offset >> 8) & 3] = data;
-		bank = ((m_reg[2] & 0x0f) << 4) | BIT(m_reg[1], 1) | (m_reg[0] & 0x0e);
+		m_reg[BIT(offset, 8, 2)] = data;
+		int bank = ((m_reg[2] & 0x0f) << 4) | BIT(m_reg[1], 1) | (m_reg[0] & 0x0e);
 		prg32(bank);
 		chr8(0, CHRRAM);
 	}
