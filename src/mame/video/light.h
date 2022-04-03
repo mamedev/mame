@@ -40,28 +40,28 @@ private:
 
 	struct lg1_t
 	{
-		uint32_t m_config_sel;
-		uint32_t m_write_addr;
-		uint32_t m_control;
+		uint32_t m_config_sel = 0;
+		uint32_t m_write_addr = 0;
+		uint32_t m_control = 0;
 
-		uint32_t m_command;
-		uint32_t m_x_start_i;
-		uint32_t m_y_start_i;
-		uint32_t m_xy_move;
-		uint32_t m_color_red_i;
-		uint32_t m_color_green_i;
-		uint32_t m_color_blue_i;
-		uint32_t m_color_back;
-		uint32_t m_z_pattern;
-		uint32_t m_x_end_i;
-		uint32_t m_y_end_i;
-		uint32_t m_x_curr_i;
-		uint32_t m_y_curr_i;
+		uint32_t m_command = 0;
+		uint32_t m_x_start_i = 0;
+		uint32_t m_y_start_i = 0;
+		uint32_t m_xy_move = 0;
+		uint32_t m_color_red_i = 0;
+		uint32_t m_color_green_i = 0;
+		uint32_t m_color_blue_i = 0;
+		uint32_t m_color_back = 0;
+		uint32_t m_z_pattern = 0;
+		uint32_t m_x_end_i = 0;
+		uint32_t m_y_end_i = 0;
+		uint32_t m_x_curr_i = 0;
+		uint32_t m_y_curr_i = 0;
 
-		uint8_t m_palette_idx;
-		uint8_t m_palette_channel;
-		uint8_t m_palette_entry[3];
-		uint8_t m_pix_read_mask[256];
+		uint8_t m_palette_idx = 0;
+		uint8_t m_palette_channel = 0;
+		uint8_t m_palette_entry[3]{};
+		uint8_t m_pix_read_mask[256]{};
 	};
 	lg1_t m_lg1;
 

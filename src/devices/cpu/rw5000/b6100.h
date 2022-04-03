@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_CPU_B5000_B6100_H
-#define MAME_CPU_B5000_B6100_H
+#ifndef MAME_CPU_RW5000_B6100_H
+#define MAME_CPU_RW5000_B6100_H
 
 #pragma once
 
@@ -47,8 +47,6 @@ public:
 	b6100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	b6100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
-
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -71,4 +69,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(B6100, b6100_cpu_device)
 
-#endif // MAME_CPU_B5000_B6100_H
+#endif // MAME_CPU_RW5000_B6100_H

@@ -47,7 +47,7 @@ private:
 	void regs_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void regs_st0032_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	int m_gfxram_bank;
+	int m_gfxram_bank = 0;
 	void gfxram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// blitter
@@ -55,7 +55,7 @@ private:
 	void do_blit_w(uint16_t data);
 
 	// tilemaps
-	tilemap_t *m_tmap[4];
+	tilemap_t *m_tmap[4]{};
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	TILEMAP_MAPPER_MEMBER(scan_16x16);

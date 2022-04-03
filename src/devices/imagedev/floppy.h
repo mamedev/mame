@@ -26,14 +26,14 @@ class format_registration {
 public:
 	format_registration();
 
-	void add(floppy_format_type format);
+	void add(const floppy_image_format_t &format);
 	void add(const fs::manager_t &fs);
 
 	void add_fm_containers();
 	void add_mfm_containers();
 	void add_pc_formats();
 
-	std::vector<floppy_format_type> m_formats;
+	std::vector<const floppy_image_format_t *> m_formats;
 	std::vector<const fs::manager_t *> m_fs;
 };
 
@@ -50,13 +50,13 @@ public:
 
 	struct fs_info {
 		const fs::manager_t *m_manager;
-		floppy_format_type m_type;
+		const floppy_image_format_t *m_type;
 		u32 m_image_size;
 		const char *m_name;
 		u32 m_key;
 		const char *m_description;
 
-		fs_info(const fs::manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) :
+		fs_info(const fs::manager_t *manager, const floppy_image_format_t *type, u32 image_size, const char *name, const char *description) :
 			m_manager(manager),
 			m_type(type),
 			m_image_size(image_size),
@@ -79,11 +79,11 @@ public:
 	virtual ~floppy_image_device();
 
 	void set_formats(std::function<void (format_registration &fr)> formats);
-	const std::vector<floppy_image_format_t *> &get_formats() const;
+	const std::vector<const floppy_image_format_t *> &get_formats() const;
 	const std::vector<fs_info> &get_create_fs() const { return m_create_fs; }
 	const std::vector<fs_info> &get_io_fs() const { return m_io_fs; }
-	floppy_image_format_t *get_load_format() const;
-	floppy_image_format_t *identify(std::string filename);
+	const floppy_image_format_t *get_load_format() const;
+	const floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
@@ -101,7 +101,7 @@ public:
 	virtual const char *file_extensions() const noexcept override { return extension_list; }
 	virtual const char *image_type_name() const noexcept override { return "floppydisk"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "flop"; }
-	void setup_write(floppy_image_format_t *output_format);
+	void setup_write(const floppy_image_format_t *output_format);
 
 	void setup_load_cb(load_cb cb);
 	void setup_unload_cb(unload_cb cb);
@@ -161,7 +161,7 @@ protected:
 
 		fs_enum(floppy_image_device *fid) : fs::manager_t::floppy_enumerator(), m_fid(fid) {}
 
-		virtual void add(floppy_format_type type, u32 image_size, const char *name, const char *description) override;
+		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
 		virtual void add_raw(const char *name, u32 key, const char *description) override;
 	};
 
@@ -183,12 +183,12 @@ protected:
 	void init_floppy_load(bool write_supported);
 
 	std::function<void (format_registration &fr)> format_registration_cb;
-	floppy_image_format_t *input_format;
-	floppy_image_format_t *output_format;
+	const floppy_image_format_t *input_format;
+	const floppy_image_format_t *output_format;
 	std::vector<uint32_t> variants;
 	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
-	std::vector<floppy_image_format_t *> fif_list;
+	std::vector<const floppy_image_format_t *> fif_list;
 	std::vector<fs_info>  m_create_fs, m_io_fs;
 	std::vector<const fs::manager_t *> m_fs_managers;
 	emu_timer             *index_timer;
@@ -228,7 +228,6 @@ protected:
 	attotime revolution_start_time, rev_time;
 	uint32_t revolution_count;
 	int cyl, subcyl;
-
 	/* Current floppy zone cache */
 	attotime cache_start_time, cache_end_time, cache_weak_start;
 	attotime amplifier_freakout_time;
@@ -246,15 +245,24 @@ protected:
 	wpt_cb cur_wpt_cb;
 	led_cb cur_led_cb;
 
+
+	// Temporary structure storing a write span
+	struct wspan {
+		int start, end;
+		std::vector<int> flux_change_positions;
+	};
+
+	static void wspan_split_on_wrap(std::vector<wspan> &wspans);
+	static void wspan_remove_damaged(std::vector<wspan> &wspans, const std::vector<uint32_t> &track);
+	static void wspan_write(const std::vector<wspan> &wspans, std::vector<uint32_t> &track);
+
 	void register_formats();
 
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
 	int find_index(uint32_t position, const std::vector<uint32_t> &buf) const;
-	bool test_track_last_entry_warps(const std::vector<uint32_t> &buf) const;
 	attotime position_to_time(const attotime &base, int position) const;
 
-	void write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg);
 	void commit_image();
 
 	u32 hash32(u32 val) const;

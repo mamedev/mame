@@ -2,21 +2,21 @@
 // copyright-holders:hap
 /*
 
-  Rockwell B5000 family MCU disassembler
+  Rockwell A/B5000 family MCU disassembler
 
 */
 
-#ifndef MAME_CPU_B5000_B5000D_H
-#define MAME_CPU_B5000_B5000D_H
+#ifndef MAME_CPU_RW5000_RW5000D_H
+#define MAME_CPU_RW5000_RW5000D_H
 
 #pragma once
 
 
-class b5000_common_disassembler : public util::disasm_interface
+class rw5000_common_disassembler : public util::disasm_interface
 {
 public:
-	b5000_common_disassembler();
-	virtual ~b5000_common_disassembler() = default;
+	rw5000_common_disassembler();
+	virtual ~rw5000_common_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override { return 1; }
 	virtual u32 interface_flags() const override { return NONLINEAR_PC | PAGED; }
@@ -49,7 +49,31 @@ protected:
 	offs_t common_disasm(const u8 *lut_opmap, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params);
 };
 
-class b5000_disassembler : public b5000_common_disassembler
+class a5000_disassembler : public rw5000_common_disassembler
+{
+public:
+	a5000_disassembler() = default;
+	virtual ~a5000_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 a5000_opmap[0x100];
+};
+
+class a5500_disassembler : public rw5000_common_disassembler
+{
+public:
+	a5500_disassembler() = default;
+	virtual ~a5500_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 a5500_opmap[0x100];
+};
+
+class b5000_disassembler : public rw5000_common_disassembler
 {
 public:
 	b5000_disassembler() = default;
@@ -59,20 +83,30 @@ public:
 
 private:
 	static const u8 b5000_opmap[0x100];
-
 };
 
-class b5500_disassembler : public b5000_common_disassembler
+class b6000_disassembler : public rw5000_common_disassembler
 {
 public:
-	b5500_disassembler() = default;
-	virtual ~b5500_disassembler() = default;
+	b6000_disassembler() = default;
+	virtual ~b6000_disassembler() = default;
 
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const u8 b5500_opmap[0x100];
-
+	static const u8 b6000_opmap[0x100];
 };
 
-#endif // MAME_CPU_B5000_B5000D_H
+class b6100_disassembler : public rw5000_common_disassembler
+{
+public:
+	b6100_disassembler() = default;
+	virtual ~b6100_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 b6100_opmap[0x100];
+};
+
+#endif // MAME_CPU_RW5000_RW5000D_H

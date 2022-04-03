@@ -71,17 +71,17 @@ public:
 private:
 	struct hit_t
 	{
-		uint16_t x1p, y1p, z1p, x1s, y1s, z1s;
-		uint16_t x2p, y2p, z2p, x2s, y2s, z2s;
-		uint16_t org;
+		uint16_t x1p = 0, y1p = 0, z1p = 0, x1s = 0, y1s = 0, z1s = 0;
+		uint16_t x2p = 0, y2p = 0, z2p = 0, x2s = 0, y2s = 0, z2s = 0;
+		uint16_t org = 0;
 
-		uint16_t x1_p1, x1_p2, y1_p1, y1_p2, z1_p1, z1_p2;
-		uint16_t x2_p1, x2_p2, y2_p1, y2_p2, z2_p1, z2_p2;
-		uint16_t x1tox2, y1toy2, z1toz2;
-		int16_t x_in, y_in, z_in;
-		uint16_t flag;
+		uint16_t x1_p1 = 0, x1_p2 = 0, y1_p1 = 0, y1_p2 = 0, z1_p1 = 0, z1_p2 = 0;
+		uint16_t x2_p1 = 0, x2_p2 = 0, y2_p1 = 0, y2_p2 = 0, z2_p1 = 0, z2_p2 = 0;
+		uint16_t x1tox2 = 0, y1toy2 = 0, z1toz2 = 0;
+		int16_t x_in = 0, y_in = 0, z_in = 0;
+		uint16_t flag = 0;
 
-		uint8_t disconnect;
+		uint8_t disconnect = 0;
 	};
 
 	required_device<sh2_device> m_maincpu;

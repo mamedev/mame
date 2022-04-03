@@ -18,9 +18,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint16_t m_p1;
-	uint16_t m_p2;
-	uint16_t m_p3;
+	uint16_t m_p1 = 0;
+	uint16_t m_p2 = 0;
+	uint16_t m_p3 = 0;
 
 public:
 	virtual uint16_t read(offs_t offset) = 0;

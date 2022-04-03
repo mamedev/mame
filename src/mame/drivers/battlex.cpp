@@ -238,17 +238,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout battlex_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28  },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
-};
-
 static const gfx_layout battlex_spritelayout =
 {
 	16,16,
@@ -263,8 +252,8 @@ static const gfx_layout battlex_spritelayout =
 };
 
 static GFXDECODE_START( gfx_battlex )
-	GFXDECODE_ENTRY( "gfx1", 0, battlex_charlayout,   64, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 64, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout,  0, 8 )
 GFXDECODE_END
 
 

@@ -93,14 +93,14 @@ protected:
 private:
 	void internal_io_map(address_map &map);
 
-	lpcbus_host_interface *lpchost;
-	int lpcindex;
-	address_space *memspace;
-	address_space *iospace;
+	lpcbus_host_interface *lpchost = nullptr;
+	int lpcindex = 0;
+	address_space *memspace = nullptr;
+	address_space *iospace = nullptr;
 	bool configuration_mode;
 	int index;
 	int selected;
-	uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
+	uint8_t registers[16][256]{}; // 256 registers for up to 16 devices, registers 0-0x2f common to all
 };
 
 DECLARE_DEVICE_TYPE(XBOX_SUPERIO, xbox_superio_device)

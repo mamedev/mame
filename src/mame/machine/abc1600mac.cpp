@@ -26,6 +26,8 @@
 #define PAGE_WP     BIT(page_data, 14)
 #define PAGE_NONX   BIT(page_data, 15)
 
+#define DMAOK		0x04
+
 
 
 //**************************************************************************
@@ -98,7 +100,7 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_mac_config("mac", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(abc1600_mac_device::mac_map), this)),
 	m_rom(*this, "boot"),
 	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
-	m_page_ram(*this, "page_ram", 0x800, ENDIANNESS_LITTLE),
+	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE),
 	m_watchdog(*this, "watchdog"),
 	m_read_fc(*this),
 	m_write_buserr(*this),
@@ -107,7 +109,8 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_boote(0),
 	m_magic(0),
 	m_task(0),
-	m_cause(0)
+	m_cause(0),
+	m_partst(0)
 {
 }
 
@@ -130,6 +133,7 @@ void abc1600_mac_device::device_start()
 	save_item(NAME(m_task));
 	save_item(NAME(m_dmamap));
 	save_item(NAME(m_cause));
+	save_item(NAME(m_partst));
 
 	// HACK fill segment RAM or abcenix won't boot
 	memset(m_segment_ram, 0xff, 0x200);
@@ -182,6 +186,8 @@ inline offs_t abc1600_mac_device::get_physical_offset(offs_t offset, int task, b
 
 	nonx = PAGE_NONX;
 	wp = PAGE_WP;
+
+	m_cause = ((offset >> 13) & 0x1f) | DMAOK;
 
 	if (LOG && (offset != virtual_offset)) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_read_fc(), m_magic);
@@ -313,10 +319,12 @@ uint8_t abc1600_mac_device::cause_r()
 
 	*/
 
-	uint8_t data = 0x02;
+	uint8_t data = 0;
 
-	// DMA status
-	data |= m_cause;
+	if (!m_partst)
+	{
+		data = 0x02 | m_cause;
+	}
 
 	m_watchdog->watchdog_reset();
 
@@ -573,8 +581,6 @@ uint8_t abc1600_mac_device::dma_mreq_r(int index, int dmamap, offs_t offset)
 	bool rw;
 	offs_t virtual_offset = get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DMRQ R %04x:%06x %c\n", machine().describe_context(), offset, virtual_offset, rw ? 'R' : 'W');
-
 	uint8_t data = 0xff;
 
 	if (rw)
@@ -590,6 +596,9 @@ uint8_t abc1600_mac_device::dma_mreq_r(int index, int dmamap, offs_t offset)
 		space().write_byte(virtual_offset, data);
 	}
 
+	if (LOG_DMA) logerror("%s DMRQ R:%c %04x:%06x=%02x\n", 
+		machine().describe_context(), rw ? 'R' : 'W', offset, virtual_offset, data);
+
 	return data;
 }
 
@@ -603,7 +612,8 @@ void abc1600_mac_device::dma_mreq_w(int index, int dmamap, offs_t offset, uint8_
 	bool rw;
 	offs_t virtual_offset = get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DMRQ W %04x:%06x %c\n", machine().describe_context(), offset, virtual_offset, rw ? 'R' : 'W');
+	if (LOG_DMA) logerror("%s DMRQ W:%c %04x:%06x=%02x\n", 
+		machine().describe_context(), rw ? 'R' : 'W', offset, virtual_offset, data);
 
 	if (!rw)
 	{
@@ -621,7 +631,8 @@ uint8_t abc1600_mac_device::dma_iorq_r(int dmamap, offs_t offset)
 	bool rw;
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DIORQ R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DIORQ R %04x:%06x\n", 
+		machine().describe_context(), offset, virtual_offset);
 
 	return space().read_byte(virtual_offset);
 }
@@ -636,7 +647,8 @@ void abc1600_mac_device::dma_iorq_w(int dmamap, offs_t offset, uint8_t data)
 	bool rw;
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DIORQ W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DIORQ W %04x:%06x=%02x\n", 
+		machine().describe_context(), offset, virtual_offset, data);
 
 	space().write_byte(virtual_offset, data);
 }
@@ -663,9 +675,20 @@ void abc1600_mac_device::dmamap_w(offs_t offset, uint8_t data)
 
 	*/
 
-	if (LOG_DMA) logerror("%s DMAMAP %u:%02x\n", machine().describe_context(), offset & 7, data);
+	if (LOG_DMA) logerror("%s DMAMAP %u:%02x\n",
+		machine().describe_context(), offset & 7, data);
 
 	m_dmamap[offset & 7] = data;
+}
+
+
+//-------------------------------------------------
+//  partst_w - parity test
+//-------------------------------------------------
+
+void abc1600_mac_device::partst_w(int state)
+{
+	m_partst = state;
 }
 
 

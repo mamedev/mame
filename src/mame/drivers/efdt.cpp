@@ -517,17 +517,6 @@ static const gfx_layout tilelayout3bpp =
 	8 * 8
 };
 
-static const gfx_layout tilelayout1bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8 * 8
-};
-
 
 /**************************************************
 *           Graphics Decode Information           *
@@ -535,7 +524,7 @@ static const gfx_layout tilelayout1bpp =
 
 static GFXDECODE_START( gfx_efdt )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout3bpp, 0, 256*6 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout1bpp, 0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x1,      0, 256 )
 GFXDECODE_END
 
 

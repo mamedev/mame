@@ -114,7 +114,7 @@ private:
 	bool m_i2c_scl = false;
 	bool m_i2c_scl_pulse_started = false;
 	bool m_i2c_started = false;
-	i2c_mode m_i2c_mode;
+	i2c_mode m_i2c_mode{};
 	uint8_t m_i2c_addr = 0;
 	uint8_t m_i2c_addr_bits = 0;
 	uint8_t m_i2c_data = 0;

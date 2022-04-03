@@ -8,9 +8,10 @@
 
 #include <stdexcept>
 
-namespace fs {
+using namespace fs;
 
-const oric_jasmin_image ORIC_JASMIN;
+namespace fs { const oric_jasmin_image ORIC_JASMIN; }
+
 
 // Floppy only, format is 41 tracks, 1/2 heads, 17 sectors.
 // Filesystem has no subdirectories.
@@ -44,58 +45,97 @@ const oric_jasmin_image ORIC_JASMIN;
 //     offset 04-05: length of the file in bytes on the first sector, ffff otherwise
 //     offset 06+  : reference to data sectors, (ff, ff) when done
 
-const char *oric_jasmin_image::name() const
-{
-	return "oric_jasmin";
+namespace {
+class impl : public filesystem_t {
+public:
+	impl(fsblk_t &blockdev);
+	virtual ~impl() = default;
+
+	virtual void format(const meta_data &meta) override;
+	virtual meta_data metadata() override;
+	virtual void metadata_change(const meta_data &info) override;
+	virtual dir_t root() override;
+
+	static u32 cs_to_block(u16 ref);
+	[[maybe_unused]] static u16 block_to_cs(u32 block);
+
+	bool ref_valid(u16 ref);
+	static std::string read_file_name(const u8 *p);
+	void drop_root_ref();
+
+	std::vector<u16> allocate_blocks(u32 count);
+	void free_blocks(const std::vector<u16> &blocks);
+	u32 free_block_count();
+
+	static std::string file_name_prepare(std::string name);
+
+private:
+	dir_t m_root;
+
+	class root_dir : public idir_t {
+	public:
+		root_dir(impl &i) : m_fs(i) {}
+		virtual ~root_dir() = default;
+
+		virtual void drop_weak_references() override;
+
+		virtual meta_data metadata() override;
+		virtual void metadata_change(const meta_data &info) override;
+		virtual std::vector<dir_entry> contents() override;
+		virtual file_t file_get(u64 key) override;
+		virtual dir_t dir_get(u64 key) override;
+		virtual file_t file_create(const meta_data &info) override;
+		virtual void file_delete(u64 key) override;
+
+		void update_file(u16 key, const u8 *entry);
+
+	private:
+		impl &m_fs;
+
+		std::pair<fsblk_t::block_t, u32> get_dir_block(u64 key);
+	};
+
+	class file : public impl::ifile_t {
+	public:
+		file(impl &fs, root_dir *dir, const u8 *entry, u16 key);
+		virtual ~file() = default;
+
+		virtual void drop_weak_references() override;
+
+		virtual meta_data metadata() override;
+		virtual void metadata_change(const meta_data &info) override;
+		virtual std::vector<u8> read_all() override;
+		virtual void replace(const std::vector<u8> &data) override;
+
+	private:
+		impl &m_fs;
+		root_dir *m_dir;
+		u16 m_key;
+		u8 m_entry[18];
+	};
+
+	class system_file : public impl::ifile_t {
+	public:
+		system_file(impl &fs, root_dir *dir, const u8 *entry, u16 key);
+		virtual ~system_file() = default;
+
+		virtual void drop_weak_references() override;
+
+		virtual meta_data metadata() override;
+		virtual void metadata_change(const meta_data &info) override;
+		virtual std::vector<u8> read_all() override;
+		virtual void replace(const std::vector<u8> &data) override;
+
+	private:
+		impl &m_fs;
+		root_dir *m_dir;
+		u16 m_key;
+		u8 m_entry[18];
+	};
+};
 }
 
-const char *oric_jasmin_image::description() const
-{
-	return "Oric Jasmin";
-}
-
-void oric_jasmin_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
-{
-	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::DSDD))
-		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
-	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::SSDD))
-		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
-}
-
-std::unique_ptr<filesystem_t> oric_jasmin_image::mount(fsblk_t &blockdev) const
-{
-	return std::make_unique<impl>(blockdev);
-}
-
-bool oric_jasmin_image::can_format() const
-{
-	return true;
-}
-
-bool oric_jasmin_image::can_read() const
-{
-	return true;
-}
-
-bool oric_jasmin_image::can_write() const
-{
-	return true;
-}
-
-bool oric_jasmin_image::has_rsrc() const
-{
-	return false;
-}
-
-std::vector<meta_description> oric_jasmin_image::volume_meta_description() const
-{
-	std::vector<meta_description> res;
-	res.emplace_back(meta_description(meta_name::name, meta_type::string, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "Volume name, up to 8 characters"));
-
-	return res;
-}
-
-meta_data oric_jasmin_image::impl::metadata()
+meta_data impl::metadata()
 {
 	meta_data res;
 	auto bdir = m_blockdev.get(20*17);
@@ -129,7 +169,7 @@ std::vector<meta_description> oric_jasmin_image::file_meta_description() const
 }
 
 
-void oric_jasmin_image::impl::format(const meta_data &meta)
+void impl::format(const meta_data &meta)
 {
 	std::string volume_name = meta.get_string(meta_name::name, "UNTITLED");
 	u32 blocks = m_blockdev.block_count();
@@ -163,11 +203,11 @@ void oric_jasmin_image::impl::format(const meta_data &meta)
 	bdir.w16l(2, 0x0000);
 }
 
-oric_jasmin_image::impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 256), m_root(true)
+impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 256), m_root(true)
 {
 }
 
-bool oric_jasmin_image::impl::ref_valid(u16 ref)
+bool impl::ref_valid(u16 ref)
 {
 	u8 track = ref >> 8;
 	u8 sector = ref & 0xff;
@@ -178,21 +218,21 @@ bool oric_jasmin_image::impl::ref_valid(u16 ref)
 	return true;
 }
 
-u32 oric_jasmin_image::impl::cs_to_block(u16 ref)
+u32 impl::cs_to_block(u16 ref)
 {
 	u8 track = ref >> 8;
 	u8 sector = ref & 0xff;
 	return track * 17 + sector - 1;
 }
 
-u16 oric_jasmin_image::impl::block_to_cs(u32 block)
+u16 impl::block_to_cs(u32 block)
 {
 	u8 track = block / 17;
 	u8 sector = (block % 17) + 1;
 	return (track << 8) | sector;
 }
 
-std::string oric_jasmin_image::impl::read_file_name(const u8 *p)
+std::string impl::read_file_name(const u8 *p)
 {
 	int main_len;
 	for(main_len = 8; main_len > 0; main_len--)
@@ -211,29 +251,29 @@ std::string oric_jasmin_image::impl::read_file_name(const u8 *p)
 }
 
 
-filesystem_t::dir_t oric_jasmin_image::impl::root()
+filesystem_t::dir_t impl::root()
 {
 	if(!m_root)
 		m_root = new root_dir(*this);
 	return m_root.strong();
 }
 
-void oric_jasmin_image::impl::drop_root_ref()
+void impl::drop_root_ref()
 {
 	m_root = nullptr;
 }
 
-void oric_jasmin_image::impl::root_dir::drop_weak_references()
+void impl::root_dir::drop_weak_references()
 {
 	m_fs.drop_root_ref();
 }
 
-meta_data oric_jasmin_image::impl::root_dir::metadata()
+meta_data impl::root_dir::metadata()
 {
 	return meta_data();
 }
 
-std::vector<dir_entry> oric_jasmin_image::impl::root_dir::contents()
+std::vector<dir_entry> impl::root_dir::contents()
 {
 	std::vector<dir_entry> res;
 
@@ -261,7 +301,7 @@ std::vector<dir_entry> oric_jasmin_image::impl::root_dir::contents()
 	return res;
 }
 
-std::pair<fsblk_t::block_t, u32> oric_jasmin_image::impl::root_dir::get_dir_block(u64 key)
+std::pair<fsblk_t::block_t, u32> impl::root_dir::get_dir_block(u64 key)
 {
 	auto bdir = m_fs.m_blockdev.get(20*17+1);
 	while(key >= 14) {
@@ -274,7 +314,7 @@ std::pair<fsblk_t::block_t, u32> oric_jasmin_image::impl::root_dir::get_dir_bloc
 	return std::pair<fsblk_t::block_t, u32>(bdir, 4 + key * 18);
 }
 
-filesystem_t::file_t oric_jasmin_image::impl::root_dir::file_get(u64 key)
+filesystem_t::file_t impl::root_dir::file_get(u64 key)
 {
 	u64 rkey = key;
 	auto [bdir, off] = get_dir_block(rkey);
@@ -288,19 +328,19 @@ filesystem_t::file_t oric_jasmin_image::impl::root_dir::file_get(u64 key)
 	return file_t(new file(m_fs, this, bdir.rodata() + off, key));
 }
 
-void oric_jasmin_image::impl::root_dir::update_file(u16 key, const u8 *entry)
+void impl::root_dir::update_file(u16 key, const u8 *entry)
 {
 	u64 rkey = key;
 	auto [bdir, off] = get_dir_block(rkey);
 	bdir.copy(off, entry, 18);
 }
 
-filesystem_t::dir_t oric_jasmin_image::impl::root_dir::dir_get(u64 key)
+filesystem_t::dir_t impl::root_dir::dir_get(u64 key)
 {
 	throw std::logic_error("Directories not supported");
 }
 
-std::string oric_jasmin_image::impl::file_name_prepare(std::string fname)
+std::string impl::file_name_prepare(std::string fname)
 {
 	std::string nname;
 	size_t i;
@@ -320,16 +360,16 @@ std::string oric_jasmin_image::impl::file_name_prepare(std::string fname)
 	return nname;
 }
 
-oric_jasmin_image::impl::file::file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
+impl::file::file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
 {
 	memcpy(m_entry, entry, 18);
 }
 
-void oric_jasmin_image::impl::file::drop_weak_references()
+void impl::file::drop_weak_references()
 {
 }
 
-meta_data oric_jasmin_image::impl::file::metadata()
+meta_data impl::file::metadata()
 {
 	meta_data res;
 
@@ -346,7 +386,7 @@ meta_data oric_jasmin_image::impl::file::metadata()
 	return res;
 }
 
-std::vector<u8> oric_jasmin_image::impl::file::read_all()
+std::vector<u8> impl::file::read_all()
 {
 	std::vector<u8> data;
 	u16 ref = r16b(m_entry);
@@ -374,16 +414,16 @@ std::vector<u8> oric_jasmin_image::impl::file::read_all()
 	return data;
 }
 
-oric_jasmin_image::impl::system_file::system_file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
+impl::system_file::system_file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
 {
 	memcpy(m_entry, entry, 18);
 }
 
-void oric_jasmin_image::impl::system_file::drop_weak_references()
+void impl::system_file::drop_weak_references()
 {
 }
 
-meta_data oric_jasmin_image::impl::system_file::metadata()
+meta_data impl::system_file::metadata()
 {
 	meta_data res;
 
@@ -396,7 +436,7 @@ meta_data oric_jasmin_image::impl::system_file::metadata()
 	return res;
 }
 
-std::vector<u8> oric_jasmin_image::impl::system_file::read_all()
+std::vector<u8> impl::system_file::read_all()
 {
 	std::vector<u8> data(0x3e00);
 	for(u32 i = 0; i != 62; i++) {
@@ -406,7 +446,7 @@ std::vector<u8> oric_jasmin_image::impl::system_file::read_all()
 	return data;
 }
 
-oric_jasmin_image::impl::file_t oric_jasmin_image::impl::root_dir::file_create(const meta_data &info)
+impl::file_t impl::root_dir::file_create(const meta_data &info)
 {
 	// One block of sector list, one block of data
 	u32 nb = 2;
@@ -460,11 +500,11 @@ oric_jasmin_image::impl::file_t oric_jasmin_image::impl::root_dir::file_create(c
 
 
 
-void oric_jasmin_image::impl::root_dir::file_delete(u64 key)
+void impl::root_dir::file_delete(u64 key)
 {
 }
 
-void oric_jasmin_image::impl::file::replace(const std::vector<u8> &data)
+void impl::file::replace(const std::vector<u8> &data)
 {
 	u32 cur_ns = r16l(m_entry + 0x10);
 	// Data sectors first
@@ -523,11 +563,11 @@ void oric_jasmin_image::impl::file::replace(const std::vector<u8> &data)
 	m_dir->update_file(m_key, m_entry);
 }
 
-void oric_jasmin_image::impl::root_dir::metadata_change(const meta_data &info)
+void impl::root_dir::metadata_change(const meta_data &info)
 {
 }
 
-void oric_jasmin_image::impl::metadata_change(const meta_data &info)
+void impl::metadata_change(const meta_data &info)
 {
 	if(info.has(meta_name::name)) {
 		std::string volume_name = info.get_string(meta_name::name);
@@ -536,7 +576,7 @@ void oric_jasmin_image::impl::metadata_change(const meta_data &info)
 	}
 }
 
-void oric_jasmin_image::impl::file::metadata_change(const meta_data &info)
+void impl::file::metadata_change(const meta_data &info)
 {
 	if(info.has(meta_name::locked))
 		w8  (m_entry+0x02, info.get_flag(meta_name::locked) ? 'L' : 'U');
@@ -549,7 +589,7 @@ void oric_jasmin_image::impl::file::metadata_change(const meta_data &info)
 	m_dir->update_file(m_key, m_entry);
 }
 
-void oric_jasmin_image::impl::system_file::replace(const std::vector<u8> &data)
+void impl::system_file::replace(const std::vector<u8> &data)
 {
 	if(data.size() != 0x3e00)
 		return;
@@ -558,7 +598,7 @@ void oric_jasmin_image::impl::system_file::replace(const std::vector<u8> &data)
 		m_fs.m_blockdev.get(i).copy(0, data.data() + i * 256, 256);
 }
 
-void oric_jasmin_image::impl::system_file::metadata_change(const meta_data &info)
+void impl::system_file::metadata_change(const meta_data &info)
 {
 	if(info.has(meta_name::locked))
 		w8  (m_entry+0x02, info.get_flag(meta_name::locked) ? 'L' : 'U');
@@ -571,7 +611,7 @@ void oric_jasmin_image::impl::system_file::metadata_change(const meta_data &info
 	m_dir->update_file(m_key, m_entry);
 }
 
-std::vector<u16> oric_jasmin_image::impl::allocate_blocks(u32 count)
+std::vector<u16> impl::allocate_blocks(u32 count)
 {
 	std::vector<u16> blocks;
 	if(free_block_count() < count)
@@ -596,7 +636,7 @@ std::vector<u16> oric_jasmin_image::impl::allocate_blocks(u32 count)
 	return blocks;
 }
 
-void oric_jasmin_image::impl::free_blocks(const std::vector<u16> &blocks)
+void impl::free_blocks(const std::vector<u16> &blocks)
 {
 	auto fmap = m_blockdev.get(20*17);
 	for(u16 ref : blocks) {
@@ -610,7 +650,7 @@ void oric_jasmin_image::impl::free_blocks(const std::vector<u16> &blocks)
 	}
 }
 
-u32 oric_jasmin_image::impl::free_block_count()
+u32 impl::free_block_count()
 {
 	auto fmap = m_blockdev.get(20*17);
 	u32 nf = 0;
@@ -625,4 +665,53 @@ u32 oric_jasmin_image::impl::free_block_count()
 	return nf;
 }
 
-} // namespace fs
+const char *oric_jasmin_image::name() const
+{
+	return "oric_jasmin";
+}
+
+const char *oric_jasmin_image::description() const
+{
+	return "Oric Jasmin";
+}
+
+void oric_jasmin_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+{
+	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::DSDD))
+		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
+	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::SSDD))
+		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
+}
+
+std::unique_ptr<filesystem_t> oric_jasmin_image::mount(fsblk_t &blockdev) const
+{
+	return std::make_unique<impl>(blockdev);
+}
+
+bool oric_jasmin_image::can_format() const
+{
+	return true;
+}
+
+bool oric_jasmin_image::can_read() const
+{
+	return true;
+}
+
+bool oric_jasmin_image::can_write() const
+{
+	return true;
+}
+
+bool oric_jasmin_image::has_rsrc() const
+{
+	return false;
+}
+
+std::vector<meta_description> oric_jasmin_image::volume_meta_description() const
+{
+	std::vector<meta_description> res;
+	res.emplace_back(meta_description(meta_name::name, meta_type::string, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "Volume name, up to 8 characters"));
+
+	return res;
+}

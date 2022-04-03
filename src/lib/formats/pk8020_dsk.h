@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_PK8020_FORMAT;
+extern const pk8020_format FLOPPY_PK8020_FORMAT;
 
 #endif // MAME_FORMATS_PK8020_DSK_H

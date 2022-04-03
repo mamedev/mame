@@ -48,10 +48,10 @@ protected:
 private:
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_mlow_tilemap;
-	tilemap_t *m_mhigh_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_mlow_tilemap = nullptr;
+	tilemap_t *m_mhigh_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
@@ -75,7 +75,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* misc */
-	int m_which;
+	int m_which = 0;
 	int m_spritexoffs;
 };
 

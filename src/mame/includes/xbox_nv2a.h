@@ -233,7 +233,7 @@ struct Combiner {
 			float zero[4];
 		} registers;
 		float output[4];
-	} work[WORK_MAX_THREADS];
+	} work[WORK_MAX_THREADS]{};
 	struct {
 		struct {
 			float constantcolor0[4];
@@ -318,7 +318,7 @@ struct Combiner {
 			} mapin_rgb;
 		} final;
 		int stages;
-	} setup;
+	} setup{};
 	int used;
 };
 
@@ -744,8 +744,8 @@ public:
 	uint32_t ramin[0x100000 / 4];
 	uint32_t dma_offset[13];
 	uint32_t dma_size[13];
-	uint8_t *basemempointer;
-	uint8_t *topmempointer;
+	uint8_t *basemempointer = nullptr;
+	uint8_t *topmempointer = nullptr;
 	std::function<void(int state)> irq_callback;
 	rectangle clippingwindows[8];
 	rectangle limits_rendertarget;

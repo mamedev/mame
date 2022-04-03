@@ -35,7 +35,7 @@ private:
 		u32 pri_mask = 0;
 	};
 	colpri_cb_delegate m_colpri_cb;
-	bool m_flip_screen;
+	bool m_flip_screen = false;
 	std::unique_ptr<struct sprite_t[]> m_spritelist;
 };
 

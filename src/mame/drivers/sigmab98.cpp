@@ -1161,17 +1161,6 @@ void sammymdl_state::tdoboon_map(address_map &map)
 
 ***************************************************************************/
 
-static const gfx_layout sigmab98_16x16x4_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4*1,4*0, 4*3,4*2, 4*5,4*4, 4*7,4*6, 4*9,4*8, 4*11,4*10, 4*13,4*12, 4*15,4*14 },
-	{ STEP16(0,16*4) },
-	16*16*4
-};
-
 static const gfx_layout sigmab98_16x16x8_layout =
 {
 	16,16,
@@ -1184,13 +1173,13 @@ static const gfx_layout sigmab98_16x16x8_layout =
 };
 
 static GFXDECODE_START( gfx_sigmab98 )
-	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x4_layout, 0, 0x100/16  )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb,  0, 0x100/16  )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x8_layout, 0, 0x100/256 )
 GFXDECODE_END
 
 // Larger palette
 static GFXDECODE_START( gfx_lufykzku )
-	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x4_layout, 0, 0x1000/16 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb,  0, 0x1000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x8_layout, 0, 0x1000/16 )
 GFXDECODE_END
 

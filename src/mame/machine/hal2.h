@@ -82,27 +82,27 @@ protected:
 	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 
-	uint16_t m_isr;
-	uint16_t m_iar;
-	uint16_t m_idr[4];
+	uint16_t m_isr = 0;
+	uint16_t m_iar = 0;
+	uint16_t m_idr[4]{};
 
-	uint16_t m_codeca_ctrl[2];
-	uint16_t m_codeca_channel;
-	uint16_t m_codeca_clock;
-	uint16_t m_codeca_channel_count;
+	uint16_t m_codeca_ctrl[2]{};
+	uint16_t m_codeca_channel = 0;
+	uint16_t m_codeca_clock = 0;
+	uint16_t m_codeca_channel_count = 0;
 
-	uint16_t m_codecb_ctrl[2];
-	uint16_t m_codecb_channel;
-	uint16_t m_codecb_clock;
-	uint16_t m_codecb_channel_count;
+	uint16_t m_codecb_ctrl[2]{};
+	uint16_t m_codecb_channel = 0;
+	uint16_t m_codecb_clock = 0;
+	uint16_t m_codecb_channel_count = 0;
 
-	uint16_t m_bres_clock_sel[3];
-	uint16_t m_bres_clock_inc[3];
-	uint16_t m_bres_clock_modctrl[3];
-	uint16_t m_bres_clock_freq[3];
-	attotime m_bres_clock_rate[3];
+	uint16_t m_bres_clock_sel[3]{};
+	uint16_t m_bres_clock_inc[3]{};
+	uint16_t m_bres_clock_modctrl[3]{};
+	uint16_t m_bres_clock_freq[3]{};
+	attotime m_bres_clock_rate[3]{};
 
-	uint16_t m_curr_dac;
+	uint16_t m_curr_dac = 0;
 
 	static const uint32_t s_channel_pair[4];
 };

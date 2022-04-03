@@ -394,19 +394,8 @@ static INPUT_PORTS_START( m14 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,right_coin_inserted, 0) //coin x 1
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_m14 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,     0, 0x10 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(m14_state::m14_irq)

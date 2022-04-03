@@ -39,7 +39,7 @@ bool poly_cpm_format::supports_save() const
 	return true;
 }
 
-int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -54,14 +54,14 @@ int poly_cpm_format::identify(util::random_read &io, uint32_t form_factor, const
 		io.read_at(0, boot, 16, actual);
 		if (memcmp(boot, "\x86\xc3\xb7\x00\x00\x8e\x10\xc0\xbf\x00\x01\xbf\xe0\x60\x00\x00", 16) == 0)
 		{
-			return 100;
+			return FIFID_SIZE|FIFID_SIGN;
 		}
 	}
 
 	return 0;
 }
 
-bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size) || io.seek(0, SEEK_SET))
@@ -124,4 +124,4 @@ bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const st
 	return true;
 }
 
-const floppy_format_type FLOPPY_POLY_CPM_FORMAT = &floppy_image_format_creator<poly_cpm_format>;
+const poly_cpm_format FLOPPY_POLY_CPM_FORMAT;

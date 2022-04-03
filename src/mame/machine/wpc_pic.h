@@ -22,7 +22,7 @@ public:
 protected:
 	required_ioport_array<8> swarray;
 
-	uint8_t mem[16], chk[3], curcmd, scrambler, count, chk_count, cmpchk[3];
+	uint8_t mem[16]{}, chk[3]{}, curcmd = 0, scrambler = 0, count = 0, chk_count = 0, cmpchk[3]{};
 	const char *serial;
 
 	virtual void device_start() override;

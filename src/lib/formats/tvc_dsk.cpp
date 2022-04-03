@@ -43,4 +43,4 @@ const tvc_format::format tvc_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_TVC_FORMAT = &floppy_image_format_creator<tvc_format>;
+const tvc_format FLOPPY_TVC_FORMAT;

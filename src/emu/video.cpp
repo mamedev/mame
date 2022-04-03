@@ -597,7 +597,7 @@ bool video_manager::finish_screen_updates()
 	bool has_live_screen = false;
 	for (screen_device &screen : iter)
 	{
-		if (screen.partial_scan_hpos() >= 0) // previous update ended mid-scanline
+		if (screen.partial_scan_hpos() > 0) // previous update ended mid-scanline
 			screen.update_now();
 		screen.update_partial(screen.visible_area().max_y);
 

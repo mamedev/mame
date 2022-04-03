@@ -21,7 +21,6 @@ cartridge types known:
 - CPU + 1KB battery-backed RAM (2*NEC D444)
 
 TODO:
-- external rom access doesn't work ("german" locks up)
 - external ram should be battery-backed
 
 ******************************************************************************/
@@ -33,6 +32,7 @@ TODO:
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "video/dl1416.h"
+
 #include "softlist_dev.h"
 
 // internal artwork
@@ -155,11 +155,11 @@ u8 lk3000_state::p1_r()
 		data |= m_inputs[~m_p4 & 7]->read();
 
 	// read rom data
-	if (~m_p5 & 0x20)
+	if (m_p0 & 0x80)
 	{
-		// P00-P06: A0-A6, P50-P54: A7-A11, P07 selects chip
-		u16 offset = (~m_p0 & 0x7f) | (~m_p5 << 7 & 0xf80) | (~m_p0 << 5 & 0x1000);
-		data |= m_cart->read_rom(offset + 0x800);
+		// P00-P06: A0-A6, P50-P54: A7-A11, P55 selects chip
+		u16 offset = (~m_p0 & 0x7f) | (~m_p5 << 7 & 0x1f80);
+		data |= ~m_cart->read_rom(offset + 0x800);
 	}
 
 	// read ram data
@@ -352,4 +352,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMP  MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, lk3000, 0,      0,    lk3000,  lk3000, lk3000_state, empty_init, "Lexicon", "LK-3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1979, lk3000, 0,      0,    lk3000,  lk3000, lk3000_state, empty_init, "Lexicon", "LK-3000", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

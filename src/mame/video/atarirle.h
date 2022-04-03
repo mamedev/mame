@@ -139,10 +139,10 @@ private:
 	void hilite_object(bitmap_ind16 &bitmap, int hilite);
 
 	// derived state
-	int             m_bitmapwidth;        // width of the full playfield bitmap
-	int             m_bitmapheight;       // height of the full playfield bitmap
-	int             m_bitmapxmask;        // x coordinate mask for the playfield bitmap
-	int             m_bitmapymask;        // y coordinate mask for the playfield bitmap
+	int             m_bitmapwidth = 0;        // width of the full playfield bitmap
+	int             m_bitmapheight = 0;       // height of the full playfield bitmap
+	int             m_bitmapxmask = 0;        // x coordinate mask for the playfield bitmap
+	int             m_bitmapymask = 0;        // y coordinate mask for the playfield bitmap
 	rectangle       m_cliprect;           // clipping rectangle
 
 	// masks
@@ -158,22 +158,22 @@ private:
 
 	// ROM information
 	required_region_ptr<u16> m_rombase;    // pointer to the base of the GFX ROM
-	int                 m_objectcount;        // number of objects in the ROM
+	int                 m_objectcount = 0;        // number of objects in the ROM
 	std::vector<object_info> m_info;               // list of info records
 
 	// rendering state
 	bitmap_ind16     m_vram[2][2];         // pointers to VRAM bitmaps and backbuffers
-	int              m_partial_scanline;   // partial update scanline
+	int              m_partial_scanline = 0;   // partial update scanline
 
 	// control state
-	u8               m_control_bits;       // current control bits
-	u8               m_command;            // current command
+	u8               m_control_bits = 0;       // current control bits
+	u8               m_command = 0;            // current command
 	u16              m_checksums[256];     // checksums for each 0x40000 bytes
 	memory_array     m_ram;
 
 	// tables
 	u8               m_rle_bpp[8];
-	u16 *            m_rle_table[8];
+	u16 *            m_rle_table[8]{};
 	u16              m_rle_table_data[0x500];
 };
 

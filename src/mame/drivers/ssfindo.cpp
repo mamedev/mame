@@ -172,7 +172,7 @@ protected:
 	virtual void machine_reset() override;
 
 	typedef void (ssfindo_state::*speedup_func)();
-	speedup_func m_speedup;
+	speedup_func m_speedup{};
 
 	uint32_t m_flashType = 0;
 

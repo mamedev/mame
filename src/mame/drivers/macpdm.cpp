@@ -47,13 +47,13 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mac_video_sonora_device> m_video;
 
-	floppy_image_device *m_cur_floppy;
+	floppy_image_device *m_cur_floppy = nullptr;
 
-	uint32_t m_model_id;
-	uint64_t m_hmc_reg, m_hmc_buffer;
-	uint8_t m_hmc_bit;
+	uint32_t m_model_id = 0;
+	uint64_t m_hmc_reg = 0, m_hmc_buffer = 0;
+	uint8_t m_hmc_bit = 0;
 
-	uint8_t m_irq_control;
+	uint8_t m_irq_control = 0;
 
 	uint8_t m_via2_ier = 0, m_via2_ifr = 0, m_via2_sier = 0, m_via2_sifr = 0;
 

@@ -67,12 +67,12 @@ protected:
 	virtual void video_start() override;
 
 private:
-	int m_boot;
-	int m_system_status;
-	int m_fdc_interrupt_code;
-	int m_interrupt_counter;
-	uint8_t m_banks[4];
-	unsigned char m_bank_force;
+	int m_boot = 0;
+	int m_system_status = 0;
+	int m_fdc_interrupt_code = 0;
+	int m_interrupt_counter = 0;
+	uint8_t m_banks[4]{};
+	unsigned char m_bank_force = 0;
 	uint8_t m_timer_irq_flag = 0;
 	uint8_t m_nmi_flag = 0;
 	int16_t m_printer_headpos = 0;

@@ -24,12 +24,12 @@ public:
 	virtual const char *extensions() const override;
 
 protected:
-	virtual int get_image_offset(const format &f, int head, int track) override;
+	virtual int get_image_offset(const format &f, int head, int track) const override;
 
 private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_ABC1600_FORMAT;
+extern const abc1600_format FLOPPY_ABC1600_FORMAT;
 
 #endif // MAME_FORMATS_ABC1600_DSK_H

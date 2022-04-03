@@ -49,8 +49,8 @@ protected:
 
 	attotime m_sensordelay;
 	bool m_disable_leds;
-	u8 m_led_data;
-	u8 m_mux;
+	u8 m_led_data = 0;
+	u8 m_mux = 0;
 };
 
 

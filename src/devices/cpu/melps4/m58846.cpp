@@ -27,7 +27,7 @@ void m58846_device::data_128x4(address_map &map)
 
 
 // device definitions
-m58846_device::m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m58846_device::m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: melps4_cpu_device(mconfig, M58846, tag, owner, clock, 11, address_map_constructor(FUNC(m58846_device::program_2kx9), this), 7, address_map_constructor(FUNC(m58846_device::data_128x4), this), 12 /* number of D pins */, 2 /* subroutine page */, 1 /* interrupt page */), m_timer(nullptr)
 { }
 
@@ -93,7 +93,7 @@ void m58846_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	reset_timer();
 }
 
-void m58846_device::write_v(uint8_t data)
+void m58846_device::write_v(u8 data)
 {
 	// d0: enable timer 1 irq
 	// d1: enable timer 2 irq? (TODO)

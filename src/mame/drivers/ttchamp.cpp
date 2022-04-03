@@ -104,7 +104,7 @@ private:
 		SET_READLATCH = 4
 	};
 
-	picmode m_picmodex;
+	picmode m_picmodex{};
 
 	int m_pic_readaddr = 0;
 	int m_pic_writeaddr = 0;

@@ -252,7 +252,7 @@ private:
 	int m_extcnt = 0;
 	uint8_t m_extreg = 0U;
 	uint8_t m_interlace = 0U;
-	uint16_t m_wina, m_winb = 0U;
+	uint16_t m_wina = 0U, m_winb = 0U;
 	uint8_t m_shift256 = 0U, m_dw = 0U, m_8bit_640 = 0U;
 	uint8_t m_crtc_regs[0x32]{};
 };

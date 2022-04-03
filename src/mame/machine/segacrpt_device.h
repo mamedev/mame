@@ -28,7 +28,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void decrypt() = 0;
 
-	const char* m_decrypted_tag;
+	const char* m_decrypted_tag = nullptr;
 	uint8_t* m_decrypted_ptr;
 	uint8_t* m_region_ptr;
 	int m_decode_size;

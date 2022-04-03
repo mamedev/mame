@@ -33,9 +33,9 @@ private:
 	output_finder<> m_led_hiragana;
 	output_finder<> m_led_fullsize;
 
-	int m_delay;  // keypress delay after initial press
-	int m_repeat; // keypress repeat rate
-	uint8_t m_enabled;  // keyboard enabled?
+	int m_delay = 0;  // keypress delay after initial press
+	int m_repeat = 0; // keypress repeat rate
+	uint8_t m_enabled = 0;  // keyboard enabled?
 };
 
 DECLARE_DEVICE_TYPE(X68K_KEYBOARD, x68k_keyboard_device)

@@ -26,6 +26,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_KC85_FORMAT;
+extern const kc85_format FLOPPY_KC85_FORMAT;
 
 #endif // MAME_FORMATS_KC85_DSK_H

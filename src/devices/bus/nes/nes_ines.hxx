@@ -464,16 +464,26 @@ static const nes_mmc mmc_list[] =
 	// 426 PnP
 	// 427 PnP
 	{ 428, BMC_TF2740 },
-	// 429 Unused
-	// 430 Unused
+	// 429 Milowork FCFC1 flash cartridge
+	// 430 MMC3-based 831031C/T-308 multicart
 	{ 431, BMC_GN91B },
 	// 432 Realtec 8090
 	{ 433, BMC_NC20MB },
-	// 434 S-009
-	// 435...442 Unused
+	{ 434, BMC_S009 },
+	// 435 F-1002 multicart
+	// 436 VT02 PnP
+	{ 437, BMC_TH2348 },
+	{ 438, BMC_K3071 },
+	// 439 YS2309 multicart
+	// 440 Dongda Sonic REC-9388 educational computer
+	// 441 841026C and 850335C multicarts
+	// 442 "Golden Key" educational computer 
 	// 443 NC3000M multicart
 	// 444 NC7000M multicart
-	// 445...511 Unused
+	// 445 DG574B MMC3-compatible multicart
+	// 446 Mindkids SMD172B_FPGA board
+	// 447 VRC4-based KL-06 multicart
+	// 448...511 Unused
 	// 512 probably the correct MMC3 clone for chuugokt in nes.xml
 	{ 513, SACHEN_SA9602B },
 	// 514 seems to be for skaraok, currently set to UNKNOWN in nes.xml

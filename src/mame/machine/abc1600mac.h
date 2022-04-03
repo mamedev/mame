@@ -56,6 +56,7 @@ public:
 	uint8_t page_hi_r(offs_t offset);
 	void page_hi_w(offs_t offset, uint8_t data);
 	void dmamap_w(offs_t offset, uint8_t data);
+	void partst_w(int state);
 
 	uint8_t dma0_mreq_r(offs_t offset) { return dma_mreq_r(0, DMAMAP_R0_LO, offset); }
 	void dma0_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(0, DMAMAP_R0_LO, offset, data); }
@@ -111,8 +112,8 @@ private:
 	const address_space_config m_mac_config;
 
 	required_memory_region m_rom;
-	memory_share_creator<uint8_t> m_segment_ram;
-	memory_share_creator<uint16_t> m_page_ram;
+	memory_share_creator<u8> m_segment_ram;
+	memory_share_creator<u16> m_page_ram;
 
 	required_device<watchdog_timer_device> m_watchdog;
 
@@ -122,12 +123,13 @@ private:
 	devcb_read8::array<3> m_read_tren;
 	devcb_write8::array<3> m_write_tren;
 
-	bool m_boote;
-	bool m_magic;
-	int m_task;
+	bool m_boote = 0;
+	bool m_magic = 0;
+	int m_task = 0;
 
 	uint8_t m_dmamap[8];
 	uint8_t m_cause;
+	bool m_partst = 0;
 };
 
 

@@ -2,20 +2,20 @@
 // copyright-holders:hap
 /*
 
-  Rockwell B5000 family MCU cores
+  Rockwell A/B5000 family MCU cores
 
   Don't include this file, include the specific device header instead,
   for example b5000.h
 
 */
 
-#ifndef MAME_CPU_B5000_B5000BASE_H
-#define MAME_CPU_B5000_B5000BASE_H
+#ifndef MAME_CPU_RW5000_RW5000BASE_H
+#define MAME_CPU_RW5000_RW5000BASE_H
 
 #pragma once
 
 
-class b5000_base_device : public cpu_device
+class rw5000_base_device : public cpu_device
 {
 public:
 	// configuration helpers
@@ -38,7 +38,7 @@ public:
 
 protected:
 	// construction/destruction
-	b5000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	rw5000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -89,18 +89,21 @@ protected:
 	u8 m_c;
 	u8 m_prev_c;
 	u8 m_prev2_c;
+	u8 m_prev3_c;
 	bool m_sr;
 	bool m_skip;
 	u16 m_seg;
 	bool m_suppress0;
 
-	u8 m_atbz_step;
+	u8 m_atb_step;
+	u8 m_mtd_step;
 	u8 m_tra_step;
 	u8 m_ret_step;
 
-	virtual void op_atbz() { ; }
-	virtual void op_tra() { ; }
-	virtual void op_ret() { ; }
+	virtual void op_atb_step() { ; }
+	virtual void op_mtd_step() { ; }
+	virtual void op_tra_step() { ; }
+	virtual void op_ret_step() { ; }
 
 	// i/o handlers
 	devcb_read8 m_read_kb;
@@ -111,4 +114,4 @@ protected:
 };
 
 
-#endif // MAME_CPU_B5000_B5000BASE_H
+#endif // MAME_CPU_RW5000_RW5000BASE_H

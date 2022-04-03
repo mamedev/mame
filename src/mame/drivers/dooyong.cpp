@@ -1340,17 +1340,6 @@ const gfx_layout lastday_charlayout =
 	8*8*2
 };
 
-const gfx_layout bluehawk_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
 const gfx_layout tilelayout =
 {
 	32,32,
@@ -1404,18 +1393,18 @@ GFXDECODE_START( gfx_flytiger )
 GFXDECODE_END
 
 GFXDECODE_START( gfx_bluehawk )
-	GFXDECODE_ENTRY( "tx",     0, bluehawk_charlayout, 0, 16 )
-	GFXDECODE_ENTRY( "sprite", 0, spritelayout,      256, 16 )
-	GFXDECODE_ENTRY( "bg0",    0, tilelayout,        768, 16 )
-	GFXDECODE_ENTRY( "fg0",    0, tilelayout,        512, 16 )
-	GFXDECODE_ENTRY( "fg1",    0, tilelayout,          0, 16 )
+	GFXDECODE_ENTRY( "tx",     0, gfx_8x8x4_packed_msb, 0, 16 )
+	GFXDECODE_ENTRY( "sprite", 0, spritelayout,       256, 16 )
+	GFXDECODE_ENTRY( "bg0",    0, tilelayout,         768, 16 )
+	GFXDECODE_ENTRY( "fg0",    0, tilelayout,         512, 16 )
+	GFXDECODE_ENTRY( "fg1",    0, tilelayout,           0, 16 )
 GFXDECODE_END
 
 GFXDECODE_START( gfx_primella )
-	GFXDECODE_ENTRY( "tx",  0, bluehawk_charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "tx",  0, gfx_8x8x4_packed_msb, 0, 16 )
 	/* no sprites */
-	GFXDECODE_ENTRY( "bg0", 0, tilelayout,        768, 16 )
-	GFXDECODE_ENTRY( "fg0", 0, tilelayout,        512, 16 )
+	GFXDECODE_ENTRY( "bg0", 0, tilelayout,         768, 16 )
+	GFXDECODE_ENTRY( "fg0", 0, tilelayout,         512, 16 )
 GFXDECODE_END
 
 GFXDECODE_START( gfx_rshark )

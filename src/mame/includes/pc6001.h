@@ -322,12 +322,12 @@ private:
 	required_shared_ptr<u8> m_sr_scrolly;
 	required_device<ym2203_device> m_ym;
 
-	u8 m_sr_bank_reg[16];
-	bool m_sr_text_mode;
-	u8 m_sr_text_rows;
+	u8 m_sr_bank_reg[16]{};
+	bool m_sr_text_mode = false;
+	u8 m_sr_text_rows = 0;
 	std::unique_ptr<u8 []> m_gvram;
-	u8 m_bitmap_yoffs, m_bitmap_xoffs;
-	u8 m_width80;
+	u8 m_bitmap_yoffs = 0, m_bitmap_xoffs = 0;
+	u8 m_width80 = 0;
 
 //  memory_view m_gvram_view;
 

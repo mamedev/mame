@@ -76,7 +76,7 @@ private:
 	bool m_step;
 	bool m_format;
 
-	const struct hard_disk_info* m_geom[2];
+	const struct hard_disk_file::info* m_geom[2];
 
 	DECLARE_WRITE_LINE_MEMBER(isbx_irq_00_w);
 	DECLARE_WRITE_LINE_MEMBER(isbx_irq_01_w);

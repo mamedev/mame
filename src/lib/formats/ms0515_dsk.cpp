@@ -50,4 +50,4 @@ const ms0515_format::format ms0515_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_MS0515_FORMAT = &floppy_image_format_creator<ms0515_format>;
+const ms0515_format FLOPPY_MS0515_FORMAT;

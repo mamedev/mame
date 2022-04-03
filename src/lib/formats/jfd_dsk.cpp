@@ -189,11 +189,12 @@ const char *jfd_format::extensions() const
 	return "jfd";
 }
 
-int jfd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int jfd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
-	if (io.length(size))
+	if (io.length(size) || !size)
 		return 0;
+
 	std::vector<uint8_t> img(size);
 	size_t actual;
 	io.read_at(0, &img[0], size, actual);
@@ -224,13 +225,13 @@ int jfd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	}
 
 	if (!memcmp(&img[0], JFD_HEADER, sizeof(JFD_HEADER))) {
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	return 0;
 }
 
-bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -375,4 +376,4 @@ bool jfd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_JFD_FORMAT = &floppy_image_format_creator<jfd_format>;
+const jfd_format FLOPPY_JFD_FORMAT;

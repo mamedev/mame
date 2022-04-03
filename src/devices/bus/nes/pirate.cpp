@@ -680,7 +680,7 @@ void nes_43272_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("unl_43272 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if ((m_latch & 0x81) == 0x81)
-		prg32((m_latch & 0x38) >> 3);
+		prg32(BIT(m_latch, 3, 3));
 
 	m_latch = offset & 0xffff;
 }
@@ -778,7 +778,7 @@ uint8_t nes_fujiya_device::read_m(offs_t offset)
 	offset += 0x6000;
 
 	if (offset == 0x7001 || offset == 0x7777)
-		return m_latch | ((offset >> 8) & 0x7f);
+		return m_latch | (BIT(offset, 8, 7));
 
 	return get_open_bus();
 }

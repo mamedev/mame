@@ -164,8 +164,8 @@ private:
 	void audiocpu_nmi_w(u8 data);
 
 	// protection mcu
-	u8 m_audiocpu_to_mcu; // ls374 at 4a
-	u8 m_mcu_to_audiocpu; // ls374 at 5a
+	u8 m_audiocpu_to_mcu = 0; // ls374 at 4a
+	u8 m_mcu_to_audiocpu = 0; // ls374 at 5a
 	u8 m_mcu_p1 = 0;
 	u8 m_mcu_p3;
 
