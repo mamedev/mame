@@ -74,8 +74,9 @@ public:
 			m_description(description)
 		{}
 
-		const char *name() { return m_name; }
-		const char *description() { return m_description; }
+		const fs::manager_t *manager() const { return m_manager; }
+		const char *name() const { return m_name; }
+		const char *description() const { return m_description; }
 	};
 
 	// construction/destruction

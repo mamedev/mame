@@ -1630,9 +1630,73 @@ void lua_engine::initialize()
 	 *
 	 * emu.fs_meta_data()
 	 */
-	auto fs_meta_data = emu.new_usertype<fs::meta_data>("fs_meta_data", sol::call_constructor, sol::constructors<sol::types<>>());
+	auto fs_meta_data_type = emu.new_usertype<fs::meta_data>("fs_meta_data", sol::call_constructor, sol::constructors<sol::types<>>());
+
+	auto fs_meta_description_type = sol().registry().new_usertype<fs::meta_description>("fs_meta_description", sol::no_constructor);
+	fs_meta_description_type["name"] = sol::property([](fs::meta_description const &desc)
+		{
+			return fs::meta_data::entry_name(desc.m_name);
+		});
+	fs_meta_description_type["type"] = sol::property([](fs::meta_description const &desc)
+		{
+			switch (desc.m_type)
+			{
+			case fs::meta_type::date:	return "date";
+			case fs::meta_type::flag:	return "flag";
+			case fs::meta_type::number:	return "number";
+			case fs::meta_type::string:	return "string";
+			default:					return "";
+			}
+		});
+	fs_meta_description_type["default"] = sol::property([](fs::meta_description const &desc)
+		{
+			return desc.m_default.to_string();
+		});
+	fs_meta_description_type["ro"] = sol::property([](fs::meta_description const &desc)
+		{
+			return desc.m_ro;
+		});
+	fs_meta_description_type["tooltip"] = sol::property([](fs::meta_description const &desc)
+		{
+			return desc.m_tooltip;
+		});
+
+	auto fs_manager_type = sol().registry().new_usertype<fs::manager_t>("fs_manager", sol::no_constructor);
+	fs_manager_type["name"] = sol::property(&fs::manager_t::name);
+	fs_manager_type["description"] = sol::property(&fs::manager_t::description);
+	fs_manager_type["can_format"] = sol::property(&fs::manager_t::can_format);
+	fs_manager_type["can_read"] = sol::property(&fs::manager_t::can_read);
+	fs_manager_type["can_write"] = sol::property(&fs::manager_t::can_write);
+	fs_manager_type["has_rsrc"] = sol::property(&fs::manager_t::has_rsrc);
+	fs_manager_type["directory_separator"] = sol::property(&fs::manager_t::directory_separator);
+	fs_manager_type["has_subdirectories"] = sol::property(&fs::manager_t::has_subdirectories);
+	fs_manager_type["volume_meta_description"] = sol::property([this](fs::manager_t const &fs)
+		{
+			int index = 1;
+			sol::table ret = sol().create_table();
+			for (const fs::meta_description &desc : fs.volume_meta_description())
+				ret[index++] = desc;
+			return ret;
+		});
+	fs_manager_type["file_meta_description"] = sol::property([this](fs::manager_t const &fs)
+		{
+			int index = 1;
+			sol::table ret = sol().create_table();
+			for (const fs::meta_description &desc : fs.file_meta_description())
+				ret[index++] = desc;
+			return ret;
+		});
+	fs_manager_type["directory_meta_description"] = sol::property([this](fs::manager_t const &fs)
+		{
+			int index = 1;
+			sol::table ret = sol().create_table();
+			for (const fs::meta_description &desc : fs.directory_meta_description())
+				ret[index++] = desc;
+			return ret;
+		});
 
 	auto floppy_fs_type = sol().registry().new_usertype<floppy_image_device::fs_info>("floppy_fs_info", sol::no_constructor);
+	floppy_fs_type["manager"] = sol::property(&floppy_image_device::fs_info::manager);
 	floppy_fs_type["name"] = sol::property(&floppy_image_device::fs_info::name);
 	floppy_fs_type["description"] = sol::property(&floppy_image_device::fs_info::description);
 
