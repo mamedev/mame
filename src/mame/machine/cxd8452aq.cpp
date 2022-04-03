@@ -188,17 +188,17 @@ void cxd8452aq_device::rx_count_w(offs_t offset, uint32_t data)
 
 void cxd8452aq_device::sonic_bus_map(address_map &map)
 {
-	map(0x00000000U, 0xffffffffU).rw(FUNC(cxd8452aq_device::sonic_r), FUNC(cxd8452aq_device::sonic_w));
+	map(0x0, 0xfffff).mirror(0xfff00000).rw(FUNC(cxd8452aq_device::sonic_r), FUNC(cxd8452aq_device::sonic_w));
 }
 
-uint8_t cxd8452aq_device::sonic_r(offs_t offset, uint8_t mem_mask)
+uint8_t cxd8452aq_device::sonic_r(offs_t offset)
 {
-	return space(0).read_byte(offset & 0xfffff);
+	return space(0).read_byte(offset);
 }
 
-void cxd8452aq_device::sonic_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void cxd8452aq_device::sonic_w(offs_t offset, uint8_t data)
 {
-	space(0).write_byte(offset & 0xfffff, data);
+	space(0).write_byte(offset, data);
 }
 
 TIMER_CALLBACK_MEMBER(cxd8452aq_device::irq_check)
@@ -241,6 +241,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
 			m_irq_check->adjust(attotime::zero);
 		}
 	}
+
 	if (txDmaActive)
 	{
 		// Move byte from main memory to SONIC RAM

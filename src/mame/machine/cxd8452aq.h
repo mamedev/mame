@@ -54,8 +54,8 @@ protected:
 	void sonic_bus_map(address_map &map);
 	address_space_config main_bus_config;
 	address_space_config sonic_config;
-	uint8_t sonic_r(offs_t offset, uint8_t mem_mask);
-	void sonic_w(offs_t offset, uint8_t data, uint8_t mem_mask);
+	uint8_t sonic_r(offs_t offset);
+	void sonic_w(offs_t offset, uint8_t data);
 
 	// Register accessors
 	uint32_t control_r(offs_t offset);
