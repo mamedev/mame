@@ -39,6 +39,7 @@ public:
 		u16 sectors_per_track() const       { return m_block.r16b(17); }
 		u32 bootstrap_lsn() const           { return m_block.r24b(21); }
 		u16 bootstrap_size() const          { return m_block.r16b(24); }
+		util::arbitrary_datetime creation_date() const { return from_os9_date(m_block.r24b(26), m_block.r16b(29)); }
 		u16 sector_size() const             { u16 result = m_block.r16b(104); return result != 0 ? result : 256; }
 		u8 sides() const                    { return (format_flags() & 0x01) ? 2 : 1; }
 		bool double_density() const         { return (format_flags() & 0x02) != 0; }

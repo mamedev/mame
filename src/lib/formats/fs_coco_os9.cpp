@@ -395,6 +395,7 @@ meta_data coco_os9_image::impl::metadata()
 {
 	meta_data results;
 	results.set(meta_name::name, m_volume_header.name());
+	results.set(meta_name::creation_date, m_volume_header.creation_date());
 	return results;
 }
 
