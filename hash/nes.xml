@@ -80114,6 +80114,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="polygond">
+		<description>King Gizzard &amp; the Lizard Wizard - Polygondwanaland - 2nd Edition</description>
+		<year>2019</year>
+		<publisher>5Seven Records</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<dataarea name="prg" size="2097152">
+				<rom name="polygondwanaland.prg" size="2097152" crc="2e86704d" sha1="bd934d2981fa00ca44d5af0023b14c60c7b4b0c4" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kirastar">
 		<description>Kira Kira Star Night DX</description>
 		<year>2016</year>
