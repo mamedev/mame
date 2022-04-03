@@ -176,41 +176,41 @@ private:
 
 	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
 
-	uint32_t m_disp_ctrl_reg[256/4];
-	int m_frame_width;
-	int m_frame_height;
+	uint32_t m_disp_ctrl_reg[256/4]{};
+	int m_frame_width = 0;
+	int m_frame_height = 0;
 
-	uint32_t m_memory_ctrl_reg[256/4];
-	int m_pal_index;
+	uint32_t m_memory_ctrl_reg[256/4]{};
+	int m_pal_index = 0;
 
-	uint32_t m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4]{};
 
-	uint8_t m_mediagx_config_reg_sel;
-	uint8_t m_mediagx_config_regs[256];
+	uint8_t m_mediagx_config_reg_sel = 0;
+	uint8_t m_mediagx_config_regs[256]{};
 
-	//uint8_t m_controls_data;
-	uint8_t m_parallel_pointer;
-	uint8_t m_parallel_latched;
-	uint32_t m_parport;
-	//int m_control_num;
-	//int m_control_num2;
-	//int m_control_read;
+	//uint8_t m_controls_data = 0;
+	uint8_t m_parallel_pointer = 0;
+	uint8_t m_parallel_latched = 0;
+	uint32_t m_parport = 0;
+	//int m_control_num = 0;
+	//int m_control_num2 = 0;
+	//int m_control_read = 0;
 
-	uint32_t m_cx5510_regs[256/4];
+	uint32_t m_cx5510_regs[256/4]{};
 
 	std::unique_ptr<int16_t[]> m_dacl;
 	std::unique_ptr<int16_t[]> m_dacr;
-	int m_dacl_ptr;
-	int m_dacr_ptr;
+	int m_dacl_ptr = 0;
+	int m_dacr_ptr = 0;
 
-	uint8_t m_ad1847_regs[16];
-	uint32_t m_ad1847_sample_counter;
-	uint32_t m_ad1847_sample_rate;
+	uint8_t m_ad1847_regs[16]{};
+	uint32_t m_ad1847_sample_counter = 0;
+	uint32_t m_ad1847_sample_rate = 0;
 
 #if SPEEDUP_HACKS
-	const speedup_entry *m_speedup_table;
-	uint32_t m_speedup_hits[12];
-	int m_speedup_count;
+	const speedup_entry *m_speedup_table = nullptr;
+	uint32_t m_speedup_hits[12]{};
+	int m_speedup_count = 0;
 #endif
 
 	using speedup_handler = std::pair<uint32_t (mediagx_state::*)(address_space &), const char *>;

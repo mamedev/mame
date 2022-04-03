@@ -10,7 +10,6 @@
 
 image_init_result z80bin_load_file(device_image_interface &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr)
 {
-	int ch = 0;
 	uint16_t args[3]{};
 	uint16_t i = 0U, j = 0U, size = 0U;
 	uint8_t data = 0U;
@@ -19,15 +18,10 @@ image_init_result z80bin_load_file(device_image_interface &image, address_space 
 
 	image.fseek(7, SEEK_SET);
 
-	while((ch = image.fgetc()) != 0x1A)
+	char ch = '\0';
+	uint32_t bytes = 0;
+	while ((bytes = image.fread(&ch, 1)) != 0 && ch != 0x1A)
 	{
-		if (ch == EOF)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Unexpected EOF while getting file name");
-			image.message(" Unexpected EOF while getting file name");
-			return image_init_result::FAIL;
-		}
-
 		if (ch != '\0')
 		{
 			if (i >= (std::size(pgmname) - 1))
@@ -40,6 +34,13 @@ image_init_result z80bin_load_file(device_image_interface &image, address_space 
 			pgmname[i] = ch;    /* build program name */
 			i++;
 		}
+	}
+
+	if (bytes == 0)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "Unexpected EOF while getting file name");
+		image.message(" Unexpected EOF while getting file name");
+		return image_init_result::FAIL;
 	}
 
 	pgmname[i] = '\0';  /* terminate string with a null */

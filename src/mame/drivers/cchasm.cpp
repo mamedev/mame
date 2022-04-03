@@ -85,12 +85,12 @@ private:
 
 	required_ioport_array<3> m_inputs;
 
-	int m_sound_flags;
-	int m_coin_flag;
-	int m_output[2];
-	int m_xcenter;
-	int m_ycenter;
-	emu_timer *m_refresh_end_timer;
+	int m_sound_flags = 0;
+	int m_coin_flag = 0;
+	int m_output[2]{};
+	int m_xcenter = 0;
+	int m_ycenter = 0;
+	emu_timer *m_refresh_end_timer = nullptr;
 
 	void led_w(offs_t offset, uint16_t data);
 	void refresh_control_w(offs_t offset, uint8_t data);

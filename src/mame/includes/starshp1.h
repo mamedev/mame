@@ -111,30 +111,30 @@ private:
 	void starshp1_map(address_map &map);
 
 private:
-	int m_analog_in_select;
-	int m_attract;
+	int m_analog_in_select = 0;
+	int m_attract = 0;
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_hpos_ram;
 	required_shared_ptr<uint8_t> m_vpos_ram;
 	required_shared_ptr<uint8_t> m_obj_ram;
-	int m_ship_explode;
-	int m_ship_picture;
-	int m_ship_hoffset;
-	int m_ship_voffset;
-	int m_ship_size;
-	int m_circle_hpos;
-	int m_circle_vpos;
-	int m_circle_size;
-	int m_circle_mod;
-	int m_circle_kill;
-	int m_phasor;
-	int m_collision_latch;
-	int m_starfield_kill;
-	int m_mux;
-	int m_inverse;
+	int m_ship_explode = 0;
+	int m_ship_picture = 0;
+	int m_ship_hoffset = 0;
+	int m_ship_voffset = 0;
+	int m_ship_size = 0;
+	int m_circle_hpos = 0;
+	int m_circle_vpos = 0;
+	int m_circle_size = 0;
+	int m_circle_mod = 0;
+	int m_circle_kill = 0;
+	int m_phasor = 0;
+	int m_collision_latch = 0;
+	int m_starfield_kill = 0;
+	int m_mux = 0;
+	int m_inverse = 0;
 	std::unique_ptr<uint16_t[]> m_LSFR;
 	bitmap_ind16 m_helper;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;

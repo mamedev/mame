@@ -196,4 +196,4 @@ ROM_START( cptlucky )
 ROM_END
 
 
-GAME( 199?, cptlucky, 0, sigmab31, cptlucky, sigmab31_state, empty_init, ROT0, "Sigma", "Captain Lucky", MACHINE_IS_SKELETON_MECHANICAL ) // a 1992 copyright can be found online, but could be for a later version
+GAME( 1988, cptlucky, 0, sigmab31, cptlucky, sigmab31_state, empty_init, ROT0, "Sigma", "Captain Lucky", MACHINE_IS_SKELETON_MECHANICAL ) // 1988 copyright in main CPU ROM

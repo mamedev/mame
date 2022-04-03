@@ -38,12 +38,12 @@ public:
 
 private:
 	/* video-related */
-	int        m_layer_colorbase[4];
-	int        m_sprite_colorbase;
-	int        m_back_colorbase;
+	int        m_layer_colorbase[4]{};
+	int        m_sprite_colorbase = 0;
+	int        m_back_colorbase = 0;
 
 	/* misc */
-	uint8_t      m_cur_control2;
+	uint8_t      m_cur_control2 = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

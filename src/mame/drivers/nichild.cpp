@@ -71,7 +71,7 @@ private:
 	required_device<tmpz84c011_device> m_maincpu;
 	required_device<v9938_device> m_v9938;
 	required_region_ptr<uint8_t> m_gfxrom;
-	uint32_t m_gfx_bank;
+	uint32_t m_gfx_bank = 0;
 };
 
 

@@ -92,7 +92,7 @@ private:
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 
-	uint8_t m_dma0pg, m_p7c;
+	uint8_t m_dma0pg = 0, m_p7c = 0;
 	void peoplepc_io(address_map &map);
 	void peoplepc_map(address_map &map);
 

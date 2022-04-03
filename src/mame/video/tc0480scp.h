@@ -80,7 +80,7 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_bootleg);
 
 	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
-	tilemap_t          *m_tilemap[5][2];
+	tilemap_t          *m_tilemap[5][2]{};
 	s32                m_dblwidth;
 
 	int                m_gfxlayout;

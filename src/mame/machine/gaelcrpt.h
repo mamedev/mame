@@ -26,7 +26,7 @@ protected:
 private:
 	int decrypt(int const enc_prev_word, int const dec_prev_word, int const enc_word);
 
-	int32_t m_lastpc, m_lastoffset, m_lastencword, m_lastdecword;
+	int32_t m_lastpc = 0, m_lastoffset = 0, m_lastencword = 0, m_lastdecword = 0;
 
 	// config
 	uint8_t m_param1;

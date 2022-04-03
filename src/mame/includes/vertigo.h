@@ -62,11 +62,11 @@ private:
 
 	struct am2901
 	{
-		uint32_t ram[16];   /* internal ram */
-		uint32_t d;         /* direct data D input */
-		uint32_t q;         /* Q register */
-		uint32_t f;         /* F ALU result */
-		uint32_t y;         /* Y output */
+		uint32_t ram[16]{};   /* internal ram */
+		uint32_t d = 0;         /* direct data D input */
+		uint32_t q = 0;         /* Q register */
+		uint32_t f = 0;         /* F ALU result */
+		uint32_t y = 0;         /* Y output */
 	};
 
 	class vector_generator
@@ -82,43 +82,43 @@ private:
 		uint32_t adder_a;   /* slope generator A input */
 		uint32_t color;     /* color */
 		uint32_t intensity; /* intensity */
-		uint32_t brez;      /* h/v-counters enable */
-		uint32_t vfin;      /* drawing yes/no */
-		uint32_t hud1;      /* h-counter up or down (stored in L1) */
-		uint32_t hud2;      /* h-counter up or down (stored in L2) */
-		uint32_t vud1;      /* v-counter up or down (stored in L1) */
-		uint32_t vud2;      /* v-counter up or down (stored in L2) */
-		uint32_t hc1;       /* use h- or v-counter in L1 mode */
-		uint32_t ven;       /* vector intensity enable */
+		uint32_t brez = 0;      /* h/v-counters enable */
+		uint32_t vfin = 0;      /* drawing yes/no */
+		uint32_t hud1 = 0;      /* h-counter up or down (stored in L1) */
+		uint32_t hud2 = 0;      /* h-counter up or down (stored in L2) */
+		uint32_t vud1 = 0;      /* v-counter up or down (stored in L1) */
+		uint32_t vud2 = 0;      /* v-counter up or down (stored in L2) */
+		uint32_t hc1 = 0;       /* use h- or v-counter in L1 mode */
+		uint32_t ven = 0;       /* vector intensity enable */
 	};
 
 	struct microcode
 	{
-		uint32_t x;
-		uint32_t a;
-		uint32_t b;
-		uint32_t inst;
-		uint32_t dest;
-		uint32_t cn;
-		uint32_t mreq;
-		uint32_t rsel;
-		uint32_t rwrite;
-		uint32_t of;
-		uint32_t iif;
-		uint32_t oa;
-		uint32_t jpos;
-		uint32_t jmp;
-		uint32_t jcon;
-		uint32_t ma;
+		uint32_t x = 0;
+		uint32_t a = 0;
+		uint32_t b = 0;
+		uint32_t inst = 0;
+		uint32_t dest = 0;
+		uint32_t cn = 0;
+		uint32_t mreq = 0;
+		uint32_t rsel = 0;
+		uint32_t rwrite = 0;
+		uint32_t of = 0;
+		uint32_t iif = 0;
+		uint32_t oa = 0;
+		uint32_t jpos = 0;
+		uint32_t jmp = 0;
+		uint32_t jcon = 0;
+		uint32_t ma = 0;
 	};
 
 	struct vproc
 	{
-		uint16_t sram[64]; /* external sram */
-		uint16_t ramlatch; /* latch between 2901 and sram */
-		uint16_t rom_adr;  /* vector ROM/RAM address latch */
-		uint32_t pc;       /* program counter */
-		uint32_t ret;      /* return address */
+		uint16_t sram[64]{}; /* external sram */
+		uint16_t ramlatch = 0; /* latch between 2901 and sram */
+		uint16_t rom_adr = 0;  /* vector ROM/RAM address latch */
+		uint32_t pc = 0;       /* program counter */
+		uint32_t ret = 0;      /* return address */
 
 	};
 
@@ -136,11 +136,11 @@ private:
 	required_device<adc0808_device> m_adc;
 	required_shared_ptr<uint16_t> m_vectorram;
 	attotime m_irq4_time;
-	uint8_t m_irq_state;
+	uint8_t m_irq_state = 0;
 	vproc m_vs;
 	am2901 m_bsp;
 	vector_generator m_vgen;
-	uint16_t *m_vectorrom;
+	uint16_t *m_vectorrom = nullptr;
 	microcode m_mc[MC_LENGTH];
 };
 

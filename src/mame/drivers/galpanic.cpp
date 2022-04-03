@@ -46,7 +46,7 @@ Stephh's additional notes :
 
   - I added the 'galpanica' romset which is in fact the same as 'galpanic',
     but with the PRG ROMS which aren't overwritten and simulated the CALC1
-    MCU functions
+    ULA functions
     Here are a few notes about what I found :
       * This version is also a World version (0x03ffff.b = 03).
       * In this version, there is a "Coin Mode" Dip Switch, but no
@@ -66,20 +66,133 @@ Stephh's additional notes :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galpanic.h"
+
 #include "includes/galpnipt.h"
+#include "machine/kaneko_hit.h"
+#include "video/kan_pand.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "video/kan_pand.h"
-#include "machine/kaneko_hit.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
+namespace {
+
+class galpanic_state : public driver_device
+{
+public:
+	galpanic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_pandora(*this, "pandora")
+		, m_bgvideoram(*this, "bgvideoram")
+		, m_fgvideoram(*this, "fgvideoram")
+		, m_okibank(*this, "okibank")
+	{ }
+
+	void galpanica(machine_config &config);
+	void galpanic(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<kaneko_pandora_device> m_pandora;
+
+	required_shared_ptr<uint16_t> m_bgvideoram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_memory_bank m_okibank;
+
+	bitmap_ind16 m_bitmap;
+
+	void m6295_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void coin_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void galpanic_map(address_map &map);
+	void oki_map(address_map &map);
+	void galpanica_map(address_map &map);
+};
+
+
+// video
+
+void galpanic_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_bitmap);
+
+	save_item(NAME(m_bitmap));
+}
+
+void galpanic_state::palette(palette_device &palette) const
+{
+	// first 1024 colors are dynamic
+
+	// initialize 555 GRB lookup
+	for (int i = 0; i < 32768; i++)
+		palette.set_pen_color(i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
+}
+
+void galpanic_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data = COMBINE_DATA(&m_bgvideoram[offset]);
+
+	int sy = offset / 256;
+	int sx = offset % 256;
+
+	m_bitmap.pix(sy, sx) = 1024 + (data >> 1);
+}
+
+void galpanic_state::draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_fgvideoram.bytes() / 2; offs++)
+	{
+		int const sx = offs % 256;
+		int const sy = offs / 256;
+		int const color = m_fgvideoram[offs];
+		if (color)
+			bitmap.pix(sy, sx) = color;
+	}
+}
+
+uint32_t galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// copy the temporary bitmap to the screen
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+
+	draw_fgbitmap(bitmap, cliprect);
+
+	m_pandora->update(bitmap, cliprect);
+
+	return 0;
+}
+
+
+// machine
+
 void galpanic_state::machine_start()
 {
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
 WRITE_LINE_MEMBER(galpanic_state::screen_vblank)
@@ -98,7 +211,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::scanline)
 	if(scanline == 224) // vblank-out irq
 		m_maincpu->set_input_line(3, HOLD_LINE);
 
-	/* Pandora "sprite end dma" irq? */
+	// Pandora "sprite end dma" irq?
 	if(scanline == 32)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
@@ -110,10 +223,10 @@ void galpanic_state::m6295_bankswitch_w(offs_t offset, uint16_t data, uint16_t m
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		membank("okibank")->set_entry((data >> 8) & 0x0f);
+		m_okibank->set_entry((data >> 8) & 0x0f);
 
 		// used before title screen
-		m_pandora->set_clear_bitmap((data & 0x8000)>>15);
+		m_pandora->set_clear_bitmap((data & 0x8000) >> 15);
 	}
 }
 
@@ -137,44 +250,44 @@ void galpanic_state::galpanic_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x400001, 0x400001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x500000, 0x51ffff).ram().share("fgvideoram");
-	map(0x520000, 0x53ffff).ram().w(FUNC(galpanic_state::bgvideoram_w)).share("bgvideoram");  /* + work RAM */
-	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  /* 1024 colors, but only 512 seem to be used */
+	map(0x500000, 0x51ffff).ram().share(m_fgvideoram);
+	map(0x520000, 0x53ffff).ram().w(FUNC(galpanic_state::bgvideoram_w)).share(m_bgvideoram);  // + work RAM
+	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // 1024 colors, but only 512 seem to be used
 	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
 	map(0x702000, 0x704fff).ram();
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
 	map(0x900000, 0x900001).w(FUNC(galpanic_state::m6295_bankswitch_w));
-	map(0xa00000, 0xa00001).w(FUNC(galpanic_state::coin_w));  /* coin counters */
-	map(0xb00000, 0xb00001).nopw();    /* ??? */
-	map(0xc00000, 0xc00001).nopw();    /* ??? */
-	map(0xd00000, 0xd00001).nopw();    /* ??? */
+	map(0xa00000, 0xa00001).w(FUNC(galpanic_state::coin_w));  // coin counters
+	map(0xb00000, 0xb00001).nopw();    // ???
+	map(0xc00000, 0xc00001).nopw();    // ???
+	map(0xd00000, 0xd00001).nopw();    // ???
 }
 
 void galpanic_state::galpanica_map(address_map &map)
 {
 	galpanic_map(map);
-	map(0xe00000, 0xe00015).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+	map(0xe00000, 0xe00015).rw("calc1", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
 }
 
-void galpanic_state::galpanic_oki_map(address_map &map)
+void galpanic_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom();
-	map(0x30000, 0x3ffff).bankr("okibank");
+	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
 
 static INPUT_PORTS_START( galpanic )
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2") /* flip screen? - code at 0x000522 */
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2") // flip screen? - code at 0x000522
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW1:4" )
 	COINAGE_WORLD
-	GALS_PANIC_JOYSTICK_4WAY(1)         /* "Shot2" is shown in "test mode" but not used by the game */
+	GALS_PANIC_JOYSTICK_4WAY(1)         // "Shot2" is shown in "test mode" but not used by the game
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
@@ -189,20 +302,20 @@ static INPUT_PORTS_START( galpanic )
 	PORT_DIPSETTING(      0x0030, "3" )
 	PORT_DIPSETTING(      0x0020, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7") /* demo sounds? - see notes */
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7") // demo sounds? - see notes
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Character Test" )    PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	GALS_PANIC_JOYSTICK_4WAY(2)         /* "Shot2" is shown in "test mode" but not used by the game */
+	GALS_PANIC_JOYSTICK_4WAY(2)         // "Shot2" is shown in "test mode" but not used by the game
 
 	SYSTEM_SERVICE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galpanica )
 	PORT_START("DSW1")
-	COINAGE_TEST_LOC        /* Unknown DSW switch 2 is flip screen? - code at 0x00060a */
+	COINAGE_TEST_LOC        // Unknown DSW switch 2 is flip screen? - code at 0x00060a
 	GALS_PANIC_JOYSTICK_4WAY(1)
 
 	PORT_START("DSW2")
@@ -214,23 +327,23 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_galpanic )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 256, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_row_2x2_group_packed_msb, 256, 16 )
 GFXDECODE_END
 
 
 void galpanic_state::galpanic(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb */
+	// basic machine hardware
+	M68000(config, m_maincpu, XTAL(12'000'000)); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &galpanic_state::galpanic_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(galpanic_state::scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // frames per second, vblank duration
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(galpanic_state::screen_update));
@@ -239,17 +352,17 @@ void galpanic_state::galpanic(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galpanic);
 	// fg palette RAM, bit 0 seems to be a transparency flag for the front bitmap
-	PALETTE(config, m_palette, FUNC(galpanic_state::galpanic_palette)).set_format(palette_device::GRBx_555, 1024 + 32768);
+	PALETTE(config, m_palette, FUNC(galpanic_state::palette)).set_format(palette_device::GRBx_555, 1024 + 32768);
 
 	KANEKO_PANDORA(config, m_pandora, 0);
 	m_pandora->set_offsets(0, -16);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/6, okim6295_device::PIN7_LOW)); /* verified on pcb */
-	oki.set_addrmap(0, &galpanic_state::galpanic_oki_map);
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000) / 6, okim6295_device::PIN7_LOW)); // verified on PCB
+	oki.set_addrmap(0, &galpanic_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -259,11 +372,11 @@ void galpanic_state::galpanica(machine_config &config)
 	galpanic(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galpanic_state::galpanica_map);
 
-	/* basic machine hardware */
-	KANEKO_HIT(config, "calc1_mcu").set_type(0);
+	// basic machine hardware
+	KANEKO_HIT(config, "calc1").set_type(0);
 
-	/* arm watchdog */
-	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
+	// arm watchdog
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(3));  // a guess, and certainly wrong
 }
 
 
@@ -273,12 +386,12 @@ void galpanic_state::galpanica(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( galpanic ) /* PAMERA-04 PCB with the PAMERA-SUB daughter card and unpopulated CALC1 MCU socket */
-	ROM_REGION( 0x400000, "maincpu", 0 )    /* 68000 code */
+ROM_START( galpanic ) // PAMERA-04 PCB with the PAMERA-SUB daughter card and unpopulated CALC1 ULA socket
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
 	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
-	ROM_LOAD16_BYTE( "pm112.subic6", 0x000000, 0x20000, CRC(7b972b58) SHA1(a7f619fca665b15f4f004ae739f5776ee2d4d432) ) /* Located on the PAMERA-SUB daughter card */
-	ROM_LOAD16_BYTE( "pm111.subic5", 0x000001, 0x20000, CRC(4eb7298d) SHA1(8858a40ffefbe4ecea7d5b70311c3775b7d987eb) ) /* Located on the PAMERA-SUB daughter card */
+	ROM_LOAD16_BYTE( "pm112.subic6", 0x000000, 0x20000, CRC(7b972b58) SHA1(a7f619fca665b15f4f004ae739f5776ee2d4d432) ) // Located on the PAMERA-SUB daughter card
+	ROM_LOAD16_BYTE( "pm111.subic5", 0x000001, 0x20000, CRC(4eb7298d) SHA1(8858a40ffefbe4ecea7d5b70311c3775b7d987eb) ) // Located on the PAMERA-SUB daughter card
 	ROM_LOAD16_BYTE( "pm004e.8",     0x100001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
 	ROM_LOAD16_BYTE( "pm005e.7",     0x100000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
 	ROM_LOAD16_BYTE( "pm000e.15",    0x200001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
@@ -286,17 +399,17 @@ ROM_START( galpanic ) /* PAMERA-04 PCB with the PAMERA-SUB daughter card and unp
 	ROM_LOAD16_BYTE( "pm002e.17",    0x300001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
 	ROM_LOAD16_BYTE( "pm003e.16",    0x300000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "pm006e.67",    0x000000, 0x100000, CRC(57aec037) SHA1(e6ba095b6892d4dcd76ba3343a97dd98ae29dc24) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
-	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_REGION( 0x100000, "oki", 0 )
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
 	ROM_LOAD( "pm008e.l",     0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
 	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-ROM_START( galpanica ) /* PAMERA-04 PCB with the CALC1 MCU used */
-	ROM_REGION( 0x400000, "maincpu", 0 )    /* 68000 code */
+ROM_START( galpanica ) // PAMERA-04 PCB with the CALC1 ULA used
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
 	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
 	ROM_LOAD16_BYTE( "pm004e.8",     0x100001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
@@ -306,17 +419,17 @@ ROM_START( galpanica ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_LOAD16_BYTE( "pm002e.17",    0x300001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
 	ROM_LOAD16_BYTE( "pm003e.16",    0x300000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "pm006e.67",    0x000000, 0x100000, CRC(57aec037) SHA1(e6ba095b6892d4dcd76ba3343a97dd98ae29dc24) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
-	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_REGION( 0x100000, "oki", 0 )
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
 	ROM_LOAD( "pm008e.l",     0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
 	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-ROM_START( galpanicb ) /* PAMERA-04 PCB with the CALC1 MCU used */
-	ROM_REGION( 0x400000, "maincpu", 0 )    /* 68000 code */
+ROM_START( galpanicb ) // PAMERA-04 PCB with the CALC1 ULA used
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "pm109p.u88-01.ic6", 0x000000, 0x20000, CRC(a6d60dba) SHA1(2a63642709051c27b9a366c433127426bb579c35) ) // read as 27C010
 	ROM_LOAD16_BYTE( "pm110p.u87-01.ic5", 0x000001, 0x20000, CRC(3214fd48) SHA1(d8d77cb6b74caea2545f4e62eb9223aaf770785a) ) // read as 27C010
 	ROM_LOAD16_BYTE( "pm004e.8",          0x100001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
@@ -326,15 +439,18 @@ ROM_START( galpanicb ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_LOAD16_BYTE( "pm002e.17",         0x300001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
 	ROM_LOAD16_BYTE( "pm003e.16",         0x300000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "pm006e.67",    0x000000, 0x100000, CRC(57aec037) SHA1(e6ba095b6892d4dcd76ba3343a97dd98ae29dc24) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
-	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_REGION( 0x100000, "oki", 0 )
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
 	ROM_LOAD( "pm008e.l",     0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
 	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (Unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanica, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
+
+
+GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanica, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

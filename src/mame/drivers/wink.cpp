@@ -46,11 +46,11 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_sound_flag;
-	uint8_t m_tile_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_sound_flag = 0U;
+	uint8_t m_tile_bank = 0U;
 
-	bool m_nmi_enable;
+	bool m_nmi_enable = false;
 
 	void bgram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);

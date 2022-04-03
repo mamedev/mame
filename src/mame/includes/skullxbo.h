@@ -67,7 +67,7 @@ private:
 
 	static const atari_motion_objects_config s_mob_config;
 
-	emu_timer *m_scanline_int_timer;
+	emu_timer *m_scanline_int_timer = nullptr;
 	bool m_scanline_int_state;
 };
 

@@ -200,52 +200,52 @@ struct USBSetupPacket {
 };
 
 struct USBStandardDeviceDescriptor {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint16_t bcdUSB;
-	uint8_t bDeviceClass;
-	uint8_t bDeviceSubClass;
-	uint8_t bDeviceProtocol;
-	uint8_t bMaxPacketSize0;
-	uint16_t idVendor;
-	uint16_t idProduct;
-	uint16_t bcdDevice;
-	uint8_t iManufacturer;
-	uint8_t iProduct;
-	uint8_t iSerialNumber;
-	uint8_t bNumConfigurations;
+	uint8_t bLength = 0;
+	uint8_t bDescriptorType = 0;
+	uint16_t bcdUSB = 0;
+	uint8_t bDeviceClass = 0;
+	uint8_t bDeviceSubClass = 0;
+	uint8_t bDeviceProtocol = 0;
+	uint8_t bMaxPacketSize0 = 0;
+	uint16_t idVendor = 0;
+	uint16_t idProduct = 0;
+	uint16_t bcdDevice = 0;
+	uint8_t iManufacturer = 0;
+	uint8_t iProduct = 0;
+	uint8_t iSerialNumber = 0;
+	uint8_t bNumConfigurations = 0;
 };
 
 struct USBStandardConfigurationDescriptor {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint16_t wTotalLength;
-	uint8_t bNumInterfaces;
-	uint8_t bConfigurationValue;
-	uint8_t iConfiguration;
-	uint8_t bmAttributes;
-	uint8_t MaxPower;
+	uint8_t bLength = 0;
+	uint8_t bDescriptorType = 0;
+	uint16_t wTotalLength = 0;
+	uint8_t bNumInterfaces = 0;
+	uint8_t bConfigurationValue = 0;
+	uint8_t iConfiguration = 0;
+	uint8_t bmAttributes = 0;
+	uint8_t MaxPower = 0;
 };
 
 struct USBStandardInterfaceDescriptor {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint8_t bInterfaceNumber;
-	uint8_t bAlternateSetting;
-	uint8_t bNumEndpoints;
-	uint8_t bInterfaceClass;
-	uint8_t bInterfaceSubClass;
-	uint8_t bInterfaceProtocol;
-	uint8_t iInterface;
+	uint8_t bLength = 0;
+	uint8_t bDescriptorType = 0;
+	uint8_t bInterfaceNumber = 0;
+	uint8_t bAlternateSetting = 0;
+	uint8_t bNumEndpoints = 0;
+	uint8_t bInterfaceClass = 0;
+	uint8_t bInterfaceSubClass = 0;
+	uint8_t bInterfaceProtocol = 0;
+	uint8_t iInterface = 0;
 };
 
 struct USBStandardEndpointDescriptor {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint8_t bEndpointAddress;
-	uint8_t bmAttributes;
-	uint16_t wMaxPacketSize;
-	uint8_t bInterval;
+	uint8_t bLength = 0;
+	uint8_t bDescriptorType = 0;
+	uint8_t bEndpointAddress = 0;
+	uint8_t bmAttributes = 0;
+	uint16_t wMaxPacketSize = 0;
+	uint8_t bInterval = 0;
 };
 
 enum USBPid {
@@ -440,30 +440,30 @@ protected:
 	uint8_t *position_device_descriptor(int &size);
 	uint8_t *position_configuration_descriptor(int index, int &size);
 	uint8_t *position_string_descriptor(int index, int &size);
-	ohci_usb_controller *busmanager;
+	ohci_usb_controller *busmanager = nullptr;
 	struct {
 		int type;
 		int controldirection;
 		int controltype;
 		int controlrecipient;
-		int remain;
-		uint8_t *position;
-		uint8_t buffer[128];
+		int remain = 0;
+		uint8_t *position = nullptr;
+		uint8_t buffer[128]{};
 	} endpoints[256];
-	int state;
-	bool settingaddress;
-	int newaddress;
-	int address;
-	int configurationvalue;
+	int state = 0;
+	bool settingaddress = false;
+	int newaddress = 0;
+	int address = 0;
+	int configurationvalue = 0;
 	std::unique_ptr<uint8_t []> descriptors;
-	int descriptors_pos;
-	bool wantstatuscallback;
+	int descriptors_pos = 0;
+	bool wantstatuscallback = false;
 	USBStandardDeviceDescriptor device_descriptor;
 	std::forward_list<usb_device_configuration> configurations;
 	std::forward_list<usb_device_string> device_strings;
-	usb_device_configuration *latest_configuration;
-	usb_device_interfac_alternate *latest_alternate;
-	usb_device_configuration *selected_configuration;
+	usb_device_configuration *latest_configuration = nullptr;
+	usb_device_interfac_alternate *latest_alternate = nullptr;
+	usb_device_configuration *selected_configuration = nullptr;
 };
 
 /*

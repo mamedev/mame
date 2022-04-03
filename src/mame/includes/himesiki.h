@@ -39,11 +39,11 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	// video-related
-	tilemap_t    *m_bg_tilemap;
-	int          m_scrollx[2];
-	int          m_scrolly;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int          m_scrollx[2]{};
+	int          m_scrolly = 0;
 
-	int        m_flipscreen;
+	int        m_flipscreen = 0;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

@@ -31,7 +31,7 @@ protected:
 
 private:
 	// internal state
-	uint8_t m_lfo_val;
+	uint8_t m_lfo_val = 0;
 };
 
 class mooncrst_sound_device : public galaxian_sound_device

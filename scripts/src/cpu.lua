@@ -2215,6 +2215,10 @@ end
 --------------------------------------------------
 -- Sharp SM510 series
 --@src/devices/cpu/sm510/sm510.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm511.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm530.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm590.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm5a.h,CPUS["SM510"] = true
 --------------------------------------------------
 
 if CPUS["SM510"] then
@@ -2846,6 +2850,41 @@ end
 if opt_tool(CPUS, "SUPERFX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/superfx/sfx_dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/superfx/sfx_dasm.h")
+end
+
+--------------------------------------------------
+-- Rockwell A/B5000 family
+--@src/devices/cpu/rw5000/a5000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/a5500.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/a5900.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b5000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b6000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b6100.h,CPUS["RW5000"] = true
+--------------------------------------------------
+
+if CPUS["RW5000"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/rw5000/rw5000base.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/rw5000base.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000op.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6100.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6100.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5500.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5500.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5900.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5900.h",
+	}
+end
+
+if opt_tool(CPUS, "RW5000") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rw5000/rw5000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rw5000/rw5000d.h")
 end
 
 --------------------------------------------------

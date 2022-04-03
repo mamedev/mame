@@ -106,8 +106,8 @@ private:
 
 	struct PageReg
 	{
-		int     value;          /* Value of the page register */
-		uint8_t *memory;        /* The memory it actually points to */
+		int     value = 0;          /* Value of the page register */
+		uint8_t *memory = nullptr;        /* The memory it actually points to */
 	};
 
 	static void floppy_formats(format_registration &fr);
@@ -127,55 +127,55 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_region_ptr<uint8_t> m_system_rom;
-	int m_LogDatWrites;
-	int m_Keyboard[NoKeyrows];
-	int m_RowShifter;
-	int m_Keyrow;
-	int m_d_pia0_pb_last;
-	int m_d_pia0_cb2_last;
-	int m_KInDat_next;
-	int m_KAny_next;
-	int m_d_pia1_pa_last;
-	int m_d_pia1_pb_last;
-	int m_DMA_NMI_LAST;
-	int m_wd2797_written;
-	int m_TaskReg;
-	int m_PIATaskReg;
-	int m_EnableMapRegs;
-	PageReg m_PageRegs[MaxTasks+1][MaxPage+1];
-	int m_beta_6845_RA; // TODO: most of the variables from here on aren't used anywhere. Left-over or reminder of things to be implemented?
-	int m_beta_scr_x;
-	int m_beta_scr_y;
-	int m_beta_HSync;
-	int m_beta_VSync;
-	int m_beta_DE;
-	int m_LogRegWrites;
-	int m_BoxColour;
-	int m_BoxMinX;
-	int m_BoxMinY;
-	int m_BoxMaxX;
-	int m_BoxMaxY;
-	int m_HSyncMin;
-	int m_VSyncMin;
-	int m_DEPos;
-	int m_NoScreen;
-	bitmap_ind16 *m_bit;
-	int m_MinAddr;
-	int m_MaxAddr;
-	int m_MinX;
-	int m_MaxX;
-	int m_MinY;
-	int m_MaxY;
-	int m_VidAddr;
-	int m_ClkMax;
-	int m_GCtrl;
-	int m_FlashCount;
-	int m_FlashBit;
-	int m_s_DoubleY;
-	int m_DoubleHL;
-	int m_ColourRAM[4];
-	int m_Field;
-	int m_DrawInterlace;
+	int m_LogDatWrites = 0;
+	int m_Keyboard[NoKeyrows]{};
+	int m_RowShifter = 0;
+	int m_Keyrow = 0;
+	int m_d_pia0_pb_last = 0;
+	int m_d_pia0_cb2_last = 0;
+	int m_KInDat_next = 0;
+	int m_KAny_next = 0;
+	int m_d_pia1_pa_last = 0;
+	int m_d_pia1_pb_last = 0;
+	int m_DMA_NMI_LAST = 0;
+	int m_wd2797_written = 0;
+	int m_TaskReg = 0;
+	int m_PIATaskReg = 0;
+	int m_EnableMapRegs = 0;
+	PageReg m_PageRegs[MaxTasks+1][MaxPage+1]{};
+	int m_beta_6845_RA = 0; // TODO: most of the variables from here on aren't used anywhere. Left-over or reminder of things to be implemented?
+	int m_beta_scr_x = 0;
+	int m_beta_scr_y = 0;
+	int m_beta_HSync = 0;
+	int m_beta_VSync = 0;
+	int m_beta_DE = 0;
+	int m_LogRegWrites = 0;
+	int m_BoxColour = 0;
+	int m_BoxMinX = 0;
+	int m_BoxMinY = 0;
+	int m_BoxMaxX = 0;
+	int m_BoxMaxY = 0;
+	int m_HSyncMin = 0;
+	int m_VSyncMin = 0;
+	int m_DEPos = 0;
+	int m_NoScreen = 0;
+	bitmap_ind16 *m_bit = nullptr;
+	int m_MinAddr = 0;
+	int m_MaxAddr = 0;
+	int m_MinX = 0;
+	int m_MaxX = 0;
+	int m_MinY = 0;
+	int m_MaxY = 0;
+	int m_VidAddr = 0;
+	int m_ClkMax = 0;
+	int m_GCtrl = 0;
+	int m_FlashCount = 0;
+	int m_FlashBit = 0;
+	int m_s_DoubleY = 0;
+	int m_DoubleHL = 0;
+	int m_ColourRAM[4]{};
+	int m_Field = 0;
+	int m_DrawInterlace = 0;
 	void dgn_beta_palette(palette_device &palette) const;
 
 	uint8_t d_pia0_pa_r();

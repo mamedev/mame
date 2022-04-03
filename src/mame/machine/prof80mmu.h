@@ -42,8 +42,8 @@ protected:
 private:
 	const address_space_config m_program_space_config;
 
-	uint8_t m_blk[16];
-	bool m_enabled;
+	uint8_t m_blk[16]{};
+	bool m_enabled = false;
 };
 
 

@@ -67,39 +67,39 @@ protected:
 	virtual void video_start() override;
 
 private:
-	int m_boot;
-	int m_system_status;
-	int m_fdc_interrupt_code;
-	int m_interrupt_counter;
-	uint8_t m_banks[4];
-	unsigned char m_bank_force;
-	uint8_t m_timer_irq_flag;
-	uint8_t m_nmi_flag;
-	int16_t m_printer_headpos;
-	uint16_t m_kb_scan_row;
+	int m_boot = 0;
+	int m_system_status = 0;
+	int m_fdc_interrupt_code = 0;
+	int m_interrupt_counter = 0;
+	uint8_t m_banks[4]{};
+	unsigned char m_bank_force = 0;
+	uint8_t m_timer_irq_flag = 0;
+	uint8_t m_nmi_flag = 0;
+	int16_t m_printer_headpos = 0;
+	uint16_t m_kb_scan_row = 0;
 	uint8_t m_mcu_keyboard_data[16];
-	uint8_t m_mcu_transmit_reset_seq;
-	uint8_t m_mcu_transmit_count;
-	uint8_t m_mcu_selected;
-	uint8_t m_mcu_buffer;
-	uint8_t m_mcu_prev;
-	unsigned int m_roller_ram_addr;
-	unsigned short m_roller_ram_offset;
-	unsigned char m_vdu_video_control_register;
-	uint8_t m_printer_serial;  // value if shift/store data pin
-	uint8_t m_printer_shift;  // state of shift register
-	uint8_t m_printer_shift_output;  // output presented to the paper feed motor and print head motor
-	uint8_t m_head_motor_state;
-	uint8_t m_linefeed_motor_state;
-	uint16_t m_printer_pins;
-	uint8_t m_printer_p2;  // MCU port P2 state
-	uint32_t m_paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
+	uint8_t m_mcu_transmit_reset_seq = 0;
+	uint8_t m_mcu_transmit_count = 0;
+	uint8_t m_mcu_selected = 0;
+	uint8_t m_mcu_buffer = 0;
+	uint8_t m_mcu_prev = 0;
+	unsigned int m_roller_ram_addr = 0;
+	unsigned short m_roller_ram_offset = 0;
+	unsigned char m_vdu_video_control_register = 0;
+	uint8_t m_printer_serial = 0;  // value if shift/store data pin
+	uint8_t m_printer_shift = 0;  // state of shift register
+	uint8_t m_printer_shift_output = 0;  // output presented to the paper feed motor and print head motor
+	uint8_t m_head_motor_state = 0;
+	uint8_t m_linefeed_motor_state = 0;
+	uint16_t m_printer_pins = 0;
+	uint8_t m_printer_p2 = 0;  // MCU port P2 state
+	uint32_t m_paper_feed = 0;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
 	std::unique_ptr<bitmap_ind16> m_prn_output;
-	uint8_t m_printer_p2_prev;
-	emu_timer *m_prn_stepper;
-	emu_timer *m_prn_pins;
-	emu_timer *m_pulse_timer;
-	emu_timer *m_beep_setup_timer;
+	uint8_t m_printer_p2_prev = 0;
+	emu_timer *m_prn_stepper = nullptr;
+	emu_timer *m_prn_pins = nullptr;
+	emu_timer *m_pulse_timer = nullptr;
+	emu_timer *m_beep_setup_timer = nullptr;
 	uint8_t pcw_keyboard_r(offs_t offset);
 	uint8_t pcw_keyboard_data_r(offs_t offset);
 	uint8_t pcw_interrupt_counter_r();

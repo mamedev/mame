@@ -83,26 +83,26 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_cannonb_bit_to_read;
-	int m_mystery;
-	uint8_t m_counter;
-	int m_bigbucks_bank;
-	uint8_t m_rocktrv2_question_bank;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_charbank;
-	uint8_t m_spritebank;
-	uint8_t m_palettebank;
-	uint8_t m_colortablebank;
-	uint8_t m_flipscreen;
-	uint8_t m_bgpriority;
-	int m_xoffsethack;
-	uint8_t m_inv_spr;
-	uint8_t m_maketrax_counter;
-	uint8_t m_maketrax_offset;
-	int m_maketrax_disable_protection;
+	uint8_t m_cannonb_bit_to_read = 0;
+	int m_mystery = 0;
+	uint8_t m_counter = 0;
+	int m_bigbucks_bank = 0;
+	uint8_t m_rocktrv2_question_bank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_charbank = 0;
+	uint8_t m_spritebank = 0;
+	uint8_t m_palettebank = 0;
+	uint8_t m_colortablebank = 0;
+	uint8_t m_flipscreen = 0;
+	uint8_t m_bgpriority = 0;
+	int m_xoffsethack = 0;
+	uint8_t m_inv_spr = 0;
+	uint8_t m_maketrax_counter = 0;
+	uint8_t m_maketrax_offset = 0;
+	int m_maketrax_disable_protection = 0;
 
-	bool m_irq_mask;
-	uint8_t m_interrupt_vector;
+	bool m_irq_mask = false;
+	uint8_t m_interrupt_vector = 0;
 
 	void pacman_interrupt_vector_w(uint8_t data);
 	void piranha_interrupt_vector_w(uint8_t data);

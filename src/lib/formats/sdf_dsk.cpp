@@ -39,7 +39,7 @@ const char *sdf_format::extensions() const
 }
 
 
-int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[HEADER_SIZE];
 
@@ -69,14 +69,14 @@ int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 	if (size == HEADER_SIZE + heads * tracks * TOTAL_TRACK_SIZE)
 	{
-		return 100;
+		return FIFID_SIGN|FIFID_SIZE|FIFID_STRUCT;
 	}
 
 	return 0;
 }
 
 
-bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint8_t header[HEADER_SIZE];
@@ -184,16 +184,10 @@ bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool sdf_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	return false;
-}
-
-
 bool sdf_format::supports_save() const
 {
 	return false;
 }
 
 
-const floppy_format_type FLOPPY_SDF_FORMAT = &floppy_image_format_creator<sdf_format>;
+const sdf_format FLOPPY_SDF_FORMAT;

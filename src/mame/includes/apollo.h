@@ -293,10 +293,10 @@ private:
 	void dsp3500_map(address_map &map);
 	void dsp5500_map(address_map &map);
 
-	uint32_t ptm_counter;
-	uint8_t sio_output_data;
-	int m_dma_channel;
-	bool m_cur_eop;
+	uint32_t ptm_counter = 0U;
+	uint8_t sio_output_data = 0U;
+	int m_dma_channel = 0;
+	bool m_cur_eop = 0;
 };
 
 /*----------- machine/apollo_config.cpp -----------*/
@@ -360,7 +360,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t m_csrb;
+	uint8_t m_csrb = 0U;
 };
 
 DECLARE_DEVICE_TYPE(APOLLO_SIO, apollo_sio)
@@ -404,7 +404,7 @@ protected:
 private:
 	optional_device<omti8621_apollo_device> m_wdc;
 	void set_node_id(uint32_t node_id);
-	uint32_t m_node_id;
+	uint32_t m_node_id = 0U;
 };
 
 // device type definition
@@ -507,49 +507,49 @@ protected:
 
 	void screen_update1(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
-	uint16_t m_n_planes;
-	uint16_t m_width;
-	uint16_t m_height;
-	uint16_t m_buffer_width;
-	uint16_t m_buffer_height;
+	uint16_t m_n_planes = 0U;
+	uint16_t m_width = 0U;
+	uint16_t m_height = 0U;
+	uint16_t m_buffer_width = 0U;
+	uint16_t m_buffer_height = 0U;
 
-	uint8_t m_sr;
-	uint8_t m_device_id;
-	uint16_t m_write_enable_register;
-	uint32_t m_rop_register;
-	uint16_t m_diag_mem_request;
-	uint8_t m_cr0;
-	uint8_t m_cr1;
-	uint8_t m_cr2;
-	uint8_t m_cr2b;
-	uint8_t m_cr2_s_data;
-	uint8_t m_cr2_s_plane;
-	uint8_t m_cr2_d_plane;
-	uint8_t m_cr3a;
-	uint8_t m_cr3b;
-	uint8_t m_ad_result;
-	uint8_t m_ad_pending;
+	uint8_t m_sr = 0U;
+	uint8_t m_device_id = 0U;
+	uint16_t m_write_enable_register = 0U;
+	uint32_t m_rop_register = 0U;
+	uint16_t m_diag_mem_request = 0U;
+	uint8_t m_cr0 = 0U;
+	uint8_t m_cr1 = 0U;
+	uint8_t m_cr2 = 0U;
+	uint8_t m_cr2b = 0U;
+	uint8_t m_cr2_s_data = 0U;
+	uint8_t m_cr2_s_plane = 0U;
+	uint8_t m_cr2_d_plane = 0U;
+	uint8_t m_cr3a = 0U;
+	uint8_t m_cr3b = 0U;
+	uint8_t m_ad_result = 0U;
+	uint8_t m_ad_pending = 0U;
 
-	uint8_t m_lut_control;
-	uint8_t m_lut_data;
+	uint8_t m_lut_control = 0U;
+	uint8_t m_lut_data = 0U;
 
-	uint8_t m_update_flag;
-	uint8_t m_update_pending;
+	uint8_t m_update_flag = 0U;
+	uint8_t m_update_pending = 0U;
 
-	uint8_t m_blt_cycle_count;
-	uint32_t m_image_offset;
-	uint32_t m_guard_latch[8];
+	uint8_t m_blt_cycle_count = 0U;
+	uint32_t m_image_offset = 0U;
+	uint32_t m_guard_latch[8]{};
 
-	int m_h_clock;
-	int m_v_clock;
-	int m_p_clock;
-	int m_data_clock;
+	int m_h_clock = 0;
+	int m_v_clock = 0;
+	int m_p_clock = 0;
+	int m_data_clock = 0;
 
-	std::unique_ptr<uint16_t[]> m_image_memory;
-	int m_image_plane_size;
-	int m_image_memory_size;
+	std::unique_ptr<uint16_t[]> m_image_memory{};
+	int m_image_plane_size = 0;
+	int m_image_memory_size = 0;
 
-	uint32_t m_color_lookup_table[16];
+	uint32_t m_color_lookup_table[16]{};
 
 	std::unique_ptr<lut_fifo> m_lut_fifo;
 	std::unique_ptr<bt458> m_bt458;
@@ -605,10 +605,10 @@ public:
 	}
 
 private:
-	uint16_t m_size;
-	uint16_t m_get_index;
-	uint16_t m_put_index;
-	uint8_t m_data[LUT_FIFO_SIZE];
+	uint16_t m_size = 0U;
+	uint16_t m_get_index = 0U;
+	uint16_t m_put_index = 0U;
+	uint8_t m_data[LUT_FIFO_SIZE]{};
 };
 
 //**************************************************************************
@@ -632,17 +632,17 @@ private:
 		return *m_machine;
 	}
 
-	uint8_t m_color_counter;
-	uint8_t m_red;
-	uint8_t m_green;
+	uint8_t m_color_counter = 0U;
+	uint8_t m_red = 0U;
+	uint8_t m_green = 0U;
 
-	uint8_t m_address_register;
-	uint32_t m_color_palette_RAM[256];
-	uint32_t m_overlay_color[4];
-	uint8_t m_read_mask_register;
-	uint8_t m_blink_mask_register;
-	uint8_t m_command_register;
-	uint8_t m_control_test_register;
+	uint8_t m_address_register = 0U;
+	uint32_t m_color_palette_RAM[256]{};
+	uint32_t m_overlay_color[4]{};
+	uint8_t m_read_mask_register = 0U;
+	uint8_t m_blink_mask_register = 0U;
+	uint8_t m_command_register = 0U;
+	uint8_t m_control_test_register = 0U;
 
 	running_machine *m_machine;
 };
@@ -702,11 +702,11 @@ private:
 
 	static const int XMIT_RING_SIZE = 64;
 
-	uint8_t m_xmitring[XMIT_RING_SIZE];
-	int m_xmit_read, m_xmit_write;
-	bool m_tx_busy;
+	uint8_t m_xmitring[XMIT_RING_SIZE]{};
+	int m_xmit_read = 0, m_xmit_write = 0;
+	bool m_tx_busy = 0;
 
-	emu_timer* m_poll_timer;
+	emu_timer* m_poll_timer = 0;
 
 	devcb_write_line m_tx_w;
 };

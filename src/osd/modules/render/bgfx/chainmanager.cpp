@@ -61,11 +61,11 @@ chain_manager::~chain_manager()
 void chain_manager::init_texture_converters()
 {
 	m_converters.push_back(nullptr);
-	m_converters.push_back(m_effects.effect("misc/texconv_palette16"));
-	m_converters.push_back(m_effects.effect("misc/texconv_rgb32"));
+	m_converters.push_back(m_effects.get_or_load_effect(m_options, "misc/texconv_palette16"));
+	m_converters.push_back(m_effects.get_or_load_effect(m_options, "misc/texconv_rgb32"));
 	m_converters.push_back(nullptr);
-	m_converters.push_back(m_effects.effect("misc/texconv_yuy16"));
-	m_adjuster = m_effects.effect("misc/bcg_adjust");
+	m_converters.push_back(m_effects.get_or_load_effect(m_options, "misc/texconv_yuy16"));
+	m_adjuster = m_effects.get_or_load_effect(m_options, "misc/bcg_adjust");
 }
 
 void chain_manager::refresh_available_chains()

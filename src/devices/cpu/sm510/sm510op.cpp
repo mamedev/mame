@@ -118,7 +118,7 @@ void sm510_base_device::op_rtn1()
 void sm510_base_device::op_t()
 {
 	// T xy: jump(transfer) within current page
-	m_pc = (m_pc & ~0x3f) | (m_op & 0x3f);
+	m_pc = (m_pc & ~m_pagemask) | (m_op & m_pagemask);
 }
 
 void sm510_base_device::op_tl()

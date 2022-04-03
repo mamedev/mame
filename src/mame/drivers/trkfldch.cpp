@@ -86,7 +86,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	uint8_t m_which_vector;
+	uint8_t m_which_vector = 0;
 
 	uint8_t tilemap_scroll_window_r(int which, uint8_t reg, uint16_t real_base);
 
@@ -98,35 +98,35 @@ private:
 	void tmap0_scroll_window_w(offs_t offset, uint8_t data);
 	void tmap1_scroll_window_w(offs_t offset, uint8_t data);
 
-	uint8_t m_dmaregs[0xe];
+	uint8_t m_dmaregs[0xe]{};
 
 	uint8_t dmaregs_r(offs_t offset);
 	void dmaregs_w(offs_t offset, uint8_t data);
 
-	uint8_t m_modebank[0xb];
+	uint8_t m_modebank[0xb]{};
 
 	uint8_t modebankregs_r(offs_t offset);
 	void modebankregs_w(offs_t offset, uint8_t data);
 
-	uint8_t m_tilemapbase[0x3];
+	uint8_t m_tilemapbase[0x3]{};
 
 	uint8_t tilemapbase_r(offs_t offset);
 	void tilemapbase_w(offs_t offset, uint8_t data);
 
-	uint8_t m_sysregs[0x10];
+	uint8_t m_sysregs[0x10]{};
 
 	uint8_t sysregs_r(offs_t offset);
 	void sysregs_w(offs_t offset, uint8_t data);
 
-	uint8_t m_unkregs[0x90];
+	uint8_t m_unkregs[0x90]{};
 
 	uint8_t unkregs_r(offs_t offset);
 	void unkregs_w(offs_t offset, uint8_t data);
 
-	uint8_t m_tmapscroll_window[2][0x12];
+	uint8_t m_tmapscroll_window[2][0x12]{};
 
-	uint8_t m_unkdata[0x100000];
-	int m_unkdata_addr;
+	uint8_t m_unkdata[0x100000]{};
+	int m_unkdata_addr = 0;
 
 };
 

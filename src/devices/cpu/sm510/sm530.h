@@ -89,8 +89,6 @@ protected:
 	virtual void execute_one() override;
 	virtual bool op_argument() override;
 
-	using sm510_base_device::do_branch;
-	virtual void do_branch(u8 pu, u8 pl); // does not have Pm
 	virtual void reset_vector() override { do_branch(0xf, 0); }
 	virtual void wakeup_vector() override { do_branch(0, 0); }
 
@@ -109,6 +107,9 @@ protected:
 	virtual u16 melody_step_mask() override { return 0xff; }
 
 	// opcode handlers
+	using sm510_base_device::do_branch;
+	virtual void do_branch(u8 pu, u8 pl); // does not have Pm
+
 	virtual void op_incb() override;
 	virtual void op_lb() override;
 	virtual void op_sabl();

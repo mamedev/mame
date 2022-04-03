@@ -65,12 +65,12 @@ private:
 	void block8_map(address_map &map);
 	void blockc_map(address_map &map);
 
-	u8 m_flashcnt;
-	u8 m_foreign_char_bank;
+	u8 m_flashcnt = 0;
+	u8 m_foreign_char_bank = 0;
 
-	u8 m_pending_interrupts;
-	u8 m_active_interrupts;
-	u8 m_interrupt_mask;
+	u8 m_pending_interrupts = 0;
+	u8 m_active_interrupts = 0;
+	u8 m_interrupt_mask = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_bank_16k;

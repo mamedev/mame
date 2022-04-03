@@ -1015,21 +1015,21 @@ private:
 
 	bitmap_rgb32 m_bitmap;
 	std::vector<uint8_t> m_video_mem;
-	uint16_t m_crt_sad;
-	uint16_t m_crt_bad;
-	uint8_t m_crt_sts;
-	uint8_t m_crt_ctl;
-	uint8_t m_crt_read_byte;
-	uint8_t m_crt_write_byte;
+	uint16_t m_crt_sad = 0;
+	uint16_t m_crt_bad = 0;
+	uint8_t m_crt_sts = 0;
+	uint8_t m_crt_ctl = 0;
+	uint8_t m_crt_read_byte = 0;
+	uint8_t m_crt_write_byte = 0;
 
 	// Printer
-	uint8_t m_prtlen;
-	uint8_t m_prt_idx;
-	uint8_t m_prchar_r;
-	uint8_t m_prchar_w;
-	uint8_t m_prtsts;
-	uint8_t m_prtctl;
-	uint8_t m_prt_buffer[ PRT_BUFFER_SIZE ];
+	uint8_t m_prtlen = 0;
+	uint8_t m_prt_idx = 0;
+	uint8_t m_prchar_r = 0;
+	uint8_t m_prchar_w = 0;
+	uint8_t m_prtsts = 0;
+	uint8_t m_prtctl = 0;
+	uint8_t m_prt_buffer[ PRT_BUFFER_SIZE ]{};
 
 	attotime time_to_video_mem_availability() const;
 	static void get_video_addr(uint16_t addr , uint16_t& byte_addr , bool& lsb_nibble);
@@ -1649,28 +1649,28 @@ private:
 	// Video
 	bitmap_rgb32 m_bitmap;
 	std::unique_ptr<uint8_t []> m_video_mem;
-	uint16_t m_crt_sad;
-	uint16_t m_crt_bad;
-	uint8_t m_crt_sts;
-	uint8_t m_crt_byte;
-	bool m_crt_rdrq;
+	uint16_t m_crt_sad = 0;
+	uint16_t m_crt_bad = 0;
+	uint8_t m_crt_sts = 0;
+	uint8_t m_crt_byte = 0;
+	bool m_crt_rdrq = false;
 
 	// Extended RAM access
-	uint32_t m_emc_ptr1;    // PTR1 (24 bits)
-	uint32_t m_emc_ptr2;    // PTR2 (24 bits)
-	uint8_t m_emc_disp;     // Displacement (3 bits)
-	bool m_emc_mult;        // Multibyte access
-	uint8_t m_emc_mode;     // Mode (3 bits)
+	uint32_t m_emc_ptr1 = 0;    // PTR1 (24 bits)
+	uint32_t m_emc_ptr2 = 0;    // PTR2 (24 bits)
+	uint8_t m_emc_disp = 0;     // Displacement (3 bits)
+	bool m_emc_mult = false;        // Multibyte access
+	uint8_t m_emc_mode = 0;     // Mode (3 bits)
 	enum {
 		  EMC_IDLE,
 		  EMC_INDIRECT_1,
 		  EMC_INDIRECT_2
 	};
-	int m_emc_state;        // EMC indirect access state
-	bool m_lmard;           // LMARD cycles in progress
+	int m_emc_state = 0;        // EMC indirect access state
+	bool m_lmard = false;           // LMARD cycles in progress
 
 	// Run light
-	bool m_rulite;
+	bool m_rulite = false;
 
 	void crtsad_w(uint8_t data);
 	void crtbad_w(uint8_t data);

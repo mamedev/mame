@@ -148,8 +148,8 @@ private:
 	required_shared_ptr<uint16_t> m_scroll;
 
 	// video
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fix_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fix_tilemap = nullptr;
 
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -181,12 +181,12 @@ private:
 	void mcu_data_h_w(uint8_t data);
 	void mcubl_p1_w(uint8_t data);
 
-	uint8_t m_mcu_p0;
-	uint8_t m_mcu_p1;
-	uint8_t m_mcu_p2;
-	uint16_t m_mcu_to_maincpu;
-	uint16_t m_maincpu_to_mcu;
-	bool m_coin_state;
+	uint8_t m_mcu_p0 = 0;
+	uint8_t m_mcu_p1 = 0;
+	uint8_t m_mcu_p2 = 0;
+	uint16_t m_mcu_to_maincpu = 0;
+	uint16_t m_maincpu_to_mcu = 0;
+	bool m_coin_state = false;
 };
 
 

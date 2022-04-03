@@ -70,7 +70,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	bool m_nmi_enable, m_irq_enable, m_firq_enable;
+	bool m_nmi_enable = false, m_irq_enable = false, m_firq_enable = false;
 };
 
 void konblands_state::konblands_palette(palette_device &palette) const
@@ -224,19 +224,9 @@ static INPUT_PORTS_START( konblands )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
 
 static GFXDECODE_START( gfx_konblands )
-	GFXDECODE_ENTRY( "gfx", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb,     0, 1 )
 GFXDECODE_END
 
 

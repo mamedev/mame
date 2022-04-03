@@ -133,22 +133,22 @@ public:
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte);
 
 	// driver state
-	uint8_t *             m_ram_base;
-	std::unique_ptr<uint8_t[]> m_video_ram;
-	int                 m_pio_data[2];
-	int                 m_high_resolution;
-	uint8_t               m_ardy;
-	uint8_t               m_brdy;
-	int                 m_kc85_blink_state;
-	int                 m_k0_line;
-	int                 m_k1_line;
-	uint8_t               m_speaker_level;
+	uint8_t *             m_ram_base = nullptr;
+	std::unique_ptr<uint8_t[]> m_video_ram{};
+	int                 m_pio_data[2]{};
+	int                 m_high_resolution = 0;
+	uint8_t               m_ardy = 0U;
+	uint8_t               m_brdy = 0U;
+	int                 m_kc85_blink_state = 0;
+	int                 m_k0_line = 0;
+	int                 m_k1_line = 0;
+	uint8_t               m_speaker_level = 0U;
 
 	// cassette
-	emu_timer *         m_cassette_timer;
-	emu_timer *         m_cassette_oneshot_timer;
-	int                 m_astb;
-	int                 m_cassette_in;
+	emu_timer *         m_cassette_timer = nullptr;
+	emu_timer *         m_cassette_oneshot_timer = nullptr;
+	int                 m_astb = 0;
+	int                 m_cassette_in = 0;
 
 	void kc85_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
@@ -189,9 +189,9 @@ public:
 	void video_control_w(int data);
 
 	// driver state
-	uint8_t               m_port_84_data;
-	uint8_t               m_port_86_data;
-	uint8_t *             m_display_video_ram;
+	uint8_t               m_port_84_data = 0U;
+	uint8_t               m_port_86_data = 0U;
+	uint8_t *             m_display_video_ram = 0U;
 	void kc85_4(machine_config &config);
 	void kc85_5(machine_config &config);
 	void kc85_4_io(address_map &map);

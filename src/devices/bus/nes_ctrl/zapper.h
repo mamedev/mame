@@ -12,8 +12,9 @@
 
 #pragma once
 
-
 #include "ctrl.h"
+#include "zapper_sensor.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -36,11 +37,13 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual u8 read_bit34() override;
 	virtual u8 read_exp(offs_t offset) override;
 
 private:
+	required_device<nes_zapper_sensor_device> m_sensor;
 	required_ioport m_lightx;
 	required_ioport m_lighty;
 	required_ioport m_trigger;
@@ -71,7 +74,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NES_ZAPPER,   nes_zapper_device)
+DECLARE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device)
 DECLARE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device)
 
 #endif // MAME_BUS_NES_CTRL_ZAPPER

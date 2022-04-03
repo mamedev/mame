@@ -16,6 +16,7 @@
 
 #include <lua.hpp>
 
+#include <cassert>
 #include <system_error>
 
 
@@ -38,53 +39,99 @@ struct lua_engine::tag_object_ptr_map
 };
 
 
-namespace sol {
-
-class buffer
+class lua_engine::buffer_helper
 {
-public:
-	// sol does lua_settop(0), save userdata buffer in registry if necessary
-	buffer(int size, lua_State *L)
-	{
-		ptr = luaL_buffinitsize(L, &buff, size);
-		len = size;
-		if(buff.b != buff.initb)
-		{
-			lua_pushvalue(L, -1);
-			lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
-		}
-	}
-	~buffer()
-	{
-		lua_State *L = buff.L;
-		if(lua_getfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp") != LUA_TNIL)
-		{
-			lua_pushnil(L);
-			lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
-		}
-		else
-			lua_pop(L, -1);
-
-		luaL_pushresultsize(&buff, len);
-	}
-
-	void set_len(int size) { len = size; }
-	int get_len() { return len; }
-	char *get_ptr() { return ptr; }
-
 private:
-	luaL_Buffer buff;
-	int len;
-	char *ptr;
+	class proxy
+	{
+	private:
+		buffer_helper &m_host;
+		char *m_space;
+		size_t const m_size;
+
+	public:
+		proxy(proxy const &) = delete;
+		proxy &operator=(proxy const &) = delete;
+
+		proxy(proxy &&that) : m_host(that.m_host), m_space(that.m_space), m_size(that.m_size)
+		{
+			that.m_space = nullptr;
+		}
+
+		proxy(buffer_helper &host, size_t size) : m_host(host), m_space(luaL_prepbuffsize(&host.m_buffer, size)), m_size(size)
+		{
+			m_host.m_prepared = true;
+		}
+
+		~proxy()
+		{
+			if (m_space)
+			{
+				assert(m_host.m_prepared);
+				luaL_addsize(&m_host.m_buffer, 0U);
+				m_host.m_prepared = false;
+			}
+		}
+
+		char *get()
+		{
+			return m_space;
+		}
+
+		void add(size_t size)
+		{
+			assert(m_space);
+			assert(size <= m_size);
+			assert(m_host.m_prepared);
+			m_space = nullptr;
+			luaL_addsize(&m_host.m_buffer, size);
+			m_host.m_prepared = false;
+		}
+	};
+
+	luaL_Buffer m_buffer;
+	bool m_valid;
+	bool m_prepared;
+
+public:
+	buffer_helper(buffer_helper const &) = delete;
+	buffer_helper &operator=(buffer_helper const &) = delete;
+
+	buffer_helper(lua_State *L)
+	{
+		luaL_buffinit(L, &m_buffer);
+		m_valid = true;
+		m_prepared = false;
+	}
+
+	~buffer_helper()
+	{
+		assert(!m_prepared);
+		if (m_valid)
+			luaL_pushresult(&m_buffer);
+	}
+
+	void push()
+	{
+		assert(m_valid);
+		assert(!m_prepared);
+		luaL_pushresult(&m_buffer);
+		m_valid = false;
+	}
+
+	proxy prepare(size_t size)
+	{
+		assert(m_valid);
+		assert(!m_prepared);
+		return proxy(*this, size);
+	}
 };
 
 
-// don't convert core_optons to a table directly
-template <> struct is_container<core_options> : std::false_type { };
+namespace sol {
 
-// buffer customisation
-sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking);
-int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value);
+// don't convert core_options to a table directly
+template <> struct is_container<core_options> : std::false_type { };
 
 
 // these things should be treated as containers
@@ -444,13 +491,13 @@ struct lua_engine::addr_space
 };
 
 
-template <typename T, size_t SIZE>
+template <typename T, size_t Size>
 class lua_engine::enum_parser
 {
 public:
 	constexpr enum_parser(std::initializer_list<std::pair<std::string_view, T> > values)
 	{
-		if (values.size() != SIZE)
+		if (values.size() != Size)
 			throw false && "size template argument incorrectly specified";
 		std::copy(values.begin(), values.end(), m_map.begin());
 	}
@@ -467,7 +514,7 @@ public:
 	}
 
 private:
-	std::array<std::pair<std::string_view, T>, SIZE> m_map;
+	std::array<std::pair<std::string_view, T>, Size> m_map;
 };
 
 
@@ -480,7 +527,7 @@ template <typename R, typename T, typename D>
 auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc)
 {
 	return
-		[this, setter, dflt, name, desc] (T &self, sol::object cb)
+		[setter, dflt, name, desc] (T &self, sol::object cb)
 		{
 			if (cb == sol::lua_nil)
 			{
@@ -489,7 +536,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 			else if (cb.is<sol::protected_function>())
 			{
 				(self.*setter)(delegate<R ()>(
-							[this, dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
+							[dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
 							{
 								if constexpr (std::is_same_v<R, void>)
 								{
@@ -499,7 +546,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 								}
 								else
 								{
-									auto result(invoke(cbfunc).get<sol::optional<R> >());
+									auto result(invoke(cbfunc).get<std::optional<R> >());
 									if (result)
 									{
 										return *result;
@@ -517,20 +564,6 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 				osd_printf_error("[LUA ERROR] must call %s with function or nil\n", name);
 			}
 		};
-}
-
-
-//-------------------------------------------------
-//  invoke - invokes a function, wrapping profiler
-//-------------------------------------------------
-
-template <typename TFunc, typename... TArgs>
-inline sol::protected_function_result lua_engine::invoke(TFunc &&func, TArgs &&... args)
-{
-	g_profiler.start(PROFILER_LUA);
-	sol::protected_function_result result = func(std::forward<TArgs>(args)...);
-	g_profiler.stop();
-	return result;
 }
 
 #endif // MAME_FRONTEND_MAME_LUAENGINE_IPP

@@ -74,8 +74,8 @@ private:
 	required_device<screen_device> m_screen;
 	output_finder<26> m_lamps;
 
-	tilemap_t * m_tilemap[4];
-	uint8_t m_video_mirror;
+	tilemap_t * m_tilemap[4]{};
+	uint8_t m_video_mirror = 0;
 };
 
 static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
@@ -359,31 +359,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout pflayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
 static GFXDECODE_START( gfx_akkaarrh )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pflayout,      0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,  0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x4_planar,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, gfx_16x16x4_planar, 0, 16 )
 GFXDECODE_END
 
 

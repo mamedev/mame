@@ -885,7 +885,7 @@ void konmedal_state::ddboy(machine_config &config)
 	OKIM6295(config, m_oki, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K051649(config, "k051649", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "mono", 0.45);
+	K051649(config, "k051649", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
 /*
@@ -1025,7 +1025,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	K051649(config, "k051649", XTAL(24'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
+	K051649(config, "k051649", XTAL(24'000'000) / 6).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
 	UPD7759(config, m_upd7759, XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.60);
 }

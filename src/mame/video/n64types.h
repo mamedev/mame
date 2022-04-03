@@ -14,24 +14,24 @@ struct misc_state_t
 		m_min_level = 0;
 	}
 
-	int32_t m_fb_format;          // Framebuffer pixel format index (0 - I, 1 - IA, 2 - CI, 3 - RGBA)
-	int32_t m_fb_size;            // Framebuffer pixel size index (0 - 4bpp, 1 - 8bpp, 2 - 16bpp, 3 - 32bpp)
-	int32_t m_fb_width;           // Framebuffer width, in pixels
-	int32_t m_fb_height;          // Framebuffer height, in pixels
-	uint32_t m_fb_address;        // Framebuffer source address offset (in bytes) from start of RDRAM
+	int32_t m_fb_format = 0;          // Framebuffer pixel format index (0 - I, 1 - IA, 2 - CI, 3 - RGBA)
+	int32_t m_fb_size = 0;            // Framebuffer pixel size index (0 - 4bpp, 1 - 8bpp, 2 - 16bpp, 3 - 32bpp)
+	int32_t m_fb_width = 0;           // Framebuffer width, in pixels
+	int32_t m_fb_height = 0;          // Framebuffer height, in pixels
+	uint32_t m_fb_address = 0;        // Framebuffer source address offset (in bytes) from start of RDRAM
 
-	uint32_t m_zb_address;        // Z-buffer source address offset (in bytes) from start of RDRAM
+	uint32_t m_zb_address = 0;        // Z-buffer source address offset (in bytes) from start of RDRAM
 
-	int32_t m_ti_format;          // Format for Texture Interface (TI) transfers
-	int32_t m_ti_size;            // Size (in bytes) of TI transfers
-	int32_t m_ti_width;           // Width (in pixels) of TI transfers
-	uint32_t m_ti_address;        // Destination address for TI transfers
+	int32_t m_ti_format = 0;          // Format for Texture Interface (TI) transfers
+	int32_t m_ti_size = 0;            // Size (in bytes) of TI transfers
+	int32_t m_ti_width = 0;           // Width (in pixels) of TI transfers
+	uint32_t m_ti_address = 0;        // Destination address for TI transfers
 
 	uint32_t m_max_level;         // Maximum LOD level for texture filtering
 	uint32_t m_min_level;         // Minimum LOD level for texture filtering
 
-	uint16_t m_primitive_z;       // Forced Z value for current primitive, if applicable
-	uint16_t m_primitive_dz;      // Forced Delta-Z value for current primitive, if applicable
+	uint16_t m_primitive_z = 0;       // Forced Z value for current primitive, if applicable
+	uint16_t m_primitive_dz = 0;      // Forced Delta-Z value for current primitive, if applicable
 };
 
 #if 0

@@ -1016,7 +1016,7 @@ uint32_t dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-uint32_t dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_layer_enable;
 
@@ -1034,7 +1034,7 @@ uint32_t dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_i
 	return 0;
 }
 
-uint32_t dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_layer_enable;
 

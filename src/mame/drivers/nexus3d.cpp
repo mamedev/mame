@@ -63,7 +63,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void nexus3d_map(address_map &map);
 
-	uint32_t m_intpend, m_intmask, m_intlevel;
+	uint32_t m_intpend = 0, m_intmask = 0, m_intlevel = 0;
 	uint32_t int_pending_r();
 	void int_ack_w(uint32_t data);
 	uint32_t int_level_r();
@@ -80,12 +80,12 @@ private:
 	void timer_status_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t timer_count_r();
 	void timer_count_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t m_timer_status;
-	uint32_t m_timer_count;
-	emu_timer  *m_timer;
+	uint32_t m_timer_status = 0;
+	uint32_t m_timer_count = 0;
+	emu_timer  *m_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(timercb);
-	bool m_timer_irq;
-	bool m_timer_result;
+	bool m_timer_irq = false;
+	bool m_timer_result = false;
 
 	uint32_t crtc_vblank_r();
 };

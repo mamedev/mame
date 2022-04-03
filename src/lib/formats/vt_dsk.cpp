@@ -17,23 +17,20 @@
 // One  = | 2237 | 6950 |
 // 0.5us ~= 143
 
-void vtech_common_format::wbit(std::vector<uint32_t> &buffer, uint32_t &pos, uint32_t &mg, bool bit)
+void vtech_common_format::wbit(std::vector<uint32_t> &buffer, uint32_t &pos, bool bit)
 {
-	buffer.push_back(pos | mg);
-		mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 	if(bit) {
 		pos += 2237;
-		buffer.push_back(pos | mg);
-		mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
+		buffer.push_back(pos | floppy_image::MG_F);
 		pos += 6950;
 	} else
 		pos += 9187;
 }
 
-void vtech_common_format::wbyte(std::vector<uint32_t> &buffer, uint32_t &pos, uint32_t &mg, uint8_t byte)
+void vtech_common_format::wbyte(std::vector<uint32_t> &buffer, uint32_t &pos, uint8_t byte)
 {
 	for(int i = 7; i >= 0; i--)
-		wbit(buffer, pos, mg, (byte >> i) & 1);
+		wbit(buffer, pos, (byte >> i) & 1);
 }
 
 void vtech_common_format::image_to_flux(const std::vector<uint8_t> &bdata, floppy_image *image)
@@ -44,40 +41,39 @@ void vtech_common_format::image_to_flux(const std::vector<uint8_t> &bdata, flopp
 
 	for(int track = 0; track != 40; track ++) {
 		uint32_t pos = 0;
-		uint32_t mg = floppy_image::MG_A;
 		std::vector<uint32_t> &buffer = image->get_buffer(track, 0);
 		buffer.clear();
 		image->set_write_splice_position(track, 0, 0);
 		// One window of pad at the start to avoid problems with the write splice
-		wbit(buffer, pos, mg, 0);
+		wbit(buffer, pos, 0);
 
 		for(int sector = 0; sector != 16; sector ++) {
 			uint8_t sid = sector_map[sector];
 			for(int i=0; i != 7; i++)
-				wbyte(buffer, pos, mg, 0x80);
-			wbyte(buffer, pos, mg, 0x00);
-			wbyte(buffer, pos, mg, 0xfe);
-			wbyte(buffer, pos, mg, 0xe7);
-			wbyte(buffer, pos, mg, 0x18);
-			wbyte(buffer, pos, mg, 0xc3);
-			wbyte(buffer, pos, mg, track);
-			wbyte(buffer, pos, mg, sid);
-			wbyte(buffer, pos, mg, track+sid);
+				wbyte(buffer, pos, 0x80);
+			wbyte(buffer, pos, 0x00);
+			wbyte(buffer, pos, 0xfe);
+			wbyte(buffer, pos, 0xe7);
+			wbyte(buffer, pos, 0x18);
+			wbyte(buffer, pos, 0xc3);
+			wbyte(buffer, pos, track);
+			wbyte(buffer, pos, sid);
+			wbyte(buffer, pos, track+sid);
 			for(int i=0; i != 5; i++)
-				wbyte(buffer, pos, mg, 0x80);
-			wbyte(buffer, pos, mg, 0x00);
-			wbyte(buffer, pos, mg, 0xc3);
-			wbyte(buffer, pos, mg, 0x18);
-			wbyte(buffer, pos, mg, 0xe7);
-			wbyte(buffer, pos, mg, 0xfe);
+				wbyte(buffer, pos, 0x80);
+			wbyte(buffer, pos, 0x00);
+			wbyte(buffer, pos, 0xc3);
+			wbyte(buffer, pos, 0x18);
+			wbyte(buffer, pos, 0xe7);
+			wbyte(buffer, pos, 0xfe);
 			uint16_t chk = 0;
 			const uint8_t *src = bdata.data() + 16*128*track + 128*sid;
 			for(int i=0; i != 128; i++) {
 				chk += src[i];
-				wbyte(buffer, pos, mg, src[i]);
+				wbyte(buffer, pos, src[i]);
 			}
-			wbyte(buffer, pos, mg, chk);
-			wbyte(buffer, pos, mg, chk >> 8);
+			wbyte(buffer, pos, chk);
+			wbyte(buffer, pos, chk >> 8);
 		}
 		// Rest is just not formatted
 		buffer.push_back(pos | floppy_image::MG_N);
@@ -95,29 +91,37 @@ std::vector<uint8_t> vtech_common_format::flux_to_image(floppy_image *image)
 			continue;
 
 		std::vector<bool> bitstream;
-		int lpos = -1;
-		bool looped = !((buffer[sz-1] ^ buffer[0]) & floppy_image::MG_MASK);
-		int cpos = looped ? sz-1 : 0;
-		while(cpos != lpos) {
-			int dt = looped && cpos == sz-1 ? (200000000 - (buffer[cpos] & floppy_image::TIME_MASK)) + (buffer[1] & floppy_image::TIME_MASK) :
-				cpos == sz-1 ? 200000000 - (buffer[cpos] & floppy_image::TIME_MASK) :
-				(buffer[cpos+1] & floppy_image::TIME_MASK) - (buffer[cpos] & floppy_image::TIME_MASK);
-			int t = dt >= 9187 - 143 ? 0 :
-				dt >= 2237 - 143 && dt <= 2237 + 143 ? 1 :
-				2;
-			if(t <= 1) {
-				if(lpos == -1)
-					lpos = cpos;
-				bitstream.push_back(t);
+		int cpos = 0;
+		while((buffer[cpos] & floppy_image::MG_MASK) != floppy_image::MG_F) {
+			cpos++;
+			if(cpos == sz) {
+				cpos = -1;
+				break;
 			}
-			cpos += 1;
-			if(cpos == sz)
-				cpos = looped ? 1 : 0;
+		}
+		if(cpos == -1)
+			continue;
+		for(;;) {
+			int npos = cpos;
+			for(;;) {
+				npos ++;
+				if(npos == sz)
+					npos = 0;
+				if((buffer[npos] & floppy_image::MG_MASK) == floppy_image::MG_F)
+					break;
+			}
+			int dt = (buffer[npos] & floppy_image::TIME_MASK) - (buffer[cpos] & floppy_image::TIME_MASK);
+			if(dt < 0)
+				cpos += 200000000;
+			bitstream.push_back(dt < 9187 - 143);
+			if(npos <= cpos)
+				break;
+			cpos = npos;
 		}
 		int mode = 0;
-		looped = false;
 		int pos = 0;
 		int count = 0;
+		bool looped = false;
 		uint8_t *dest = nullptr;
 		[[maybe_unused]] uint16_t checksum = 0;
 		uint64_t buf = 0;
@@ -216,19 +220,19 @@ const char *vtech_dsk_format::extensions() const
 	return "dsk";
 }
 
-int vtech_bin_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int vtech_bin_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if(io.length(size))
 		return 0;
 
 	if(size == 40*16*256)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-int vtech_dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int vtech_dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if(io.length(size))
@@ -252,10 +256,10 @@ int vtech_dsk_format::identify(util::random_read &io, uint32_t form_factor, cons
 			count_sd++;
 	}
 
-	return count_sh >= 30*16 && count_sd >= 30*16 ? 100 : 0;
+	return count_sh >= 30*16 && count_sd >= 30*16 ? FIFID_STRUCT : 0;
 }
 
-bool vtech_bin_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vtech_bin_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if(io.length(size) || (size != 40*16*256))
@@ -270,7 +274,7 @@ bool vtech_bin_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if(io.length(size))
@@ -340,7 +344,7 @@ bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-bool vtech_bin_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vtech_bin_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int tracks, heads;
 	image->get_maximal_geometry(tracks, heads);
@@ -353,7 +357,7 @@ bool vtech_bin_format::save(util::random_read_write &io, const std::vector<uint3
 	return true;
 }
 
-bool vtech_dsk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool vtech_dsk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int tracks, heads;
 	image->get_maximal_geometry(tracks, heads);
@@ -407,5 +411,5 @@ bool vtech_dsk_format::save(util::random_read_write &io, const std::vector<uint3
 }
 
 
-const floppy_format_type FLOPPY_VTECH_BIN_FORMAT = &floppy_image_format_creator<vtech_bin_format>;
-const floppy_format_type FLOPPY_VTECH_DSK_FORMAT = &floppy_image_format_creator<vtech_dsk_format>;
+const vtech_bin_format FLOPPY_VTECH_BIN_FORMAT;
+const vtech_dsk_format FLOPPY_VTECH_DSK_FORMAT;

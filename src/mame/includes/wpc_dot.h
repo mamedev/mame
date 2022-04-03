@@ -67,8 +67,8 @@ private:
 	uint8_t m_bankmask = 0U;
 	uint8_t m_ram[0x3000]{};
 	uint8_t m_dmdram[0x2000]{};
-	emu_timer* m_vblank_timer;
-	emu_timer* m_irq_timer;
+	emu_timer* m_vblank_timer = nullptr;
+	emu_timer* m_irq_timer = nullptr;
 };
 
 class wpc_flip1_state : public wpc_dot_state

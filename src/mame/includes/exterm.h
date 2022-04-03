@@ -54,10 +54,10 @@ private:
 	required_ioport_array<2> m_dial;
 	required_ioport_array<2> m_input;
 
-	uint8_t m_aimpos[2];
-	uint8_t m_trackball_old[2];
-	uint8_t m_sound_control;
-	uint16_t m_last;
+	uint8_t m_aimpos[2]{};
+	uint8_t m_trackball_old[2]{};
+	uint8_t m_sound_control = 0U;
+	uint16_t m_last = 0U;
 
 	void host_data_w(offs_t offset, uint16_t data);
 	uint16_t host_data_r(offs_t offset);

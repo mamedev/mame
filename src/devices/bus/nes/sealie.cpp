@@ -132,7 +132,7 @@ void nes_cufrom_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("cufrom write_h, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab((data >> 2) & 0x07);
+	prg16_89ab(BIT(data, 2, 3));
 	chr8(data & 0x03, CHRRAM);
 }
 
@@ -186,7 +186,7 @@ void nes_unrom512_device::write_h(offs_t offset, u8 data)
 	if (m_pcb_ctrl_mirror)
 		set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	prg16_89ab(data & 0x1f);
-	chr8((data >> 5) & 0x03, CHRRAM);
+	chr8(BIT(data, 5, 2), CHRRAM);
 }
 
 /*-------------------------------------------------

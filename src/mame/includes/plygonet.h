@@ -57,20 +57,20 @@ private:
 	required_shared_ptr<uint16_t> m_dsp56156_p_mirror;
 	required_shared_ptr<uint16_t> m_dsp56156_p_8000;
 
-	ioport_port *m_inputs[4];
-	uint8_t m_sys0;
-	uint8_t m_sys1;
+	ioport_port *m_inputs[4]{};
+	uint8_t m_sys0 = 0;
+	uint8_t m_sys1 = 0;
 
 	/* TTL text plane stuff */
-	int m_ttl_gfx_index;
-	tilemap_t *m_ttl_tilemap;
-	tilemap_t *m_roz_tilemap;
+	int m_ttl_gfx_index = 0;
+	tilemap_t *m_ttl_tilemap = nullptr;
+	tilemap_t *m_roz_tilemap = nullptr;
 	uint16_t m_ttl_vram[0x800];
 	uint16_t m_roz_vram[0x800];
 
 	/* sound */
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_intck;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
 
 	/* memory buffers */
 	uint16_t m_dsp56156_bank00_ram[2 * 8 * dsp56156_bank00_size]; /* 2 bank sets, 8 potential banks each */

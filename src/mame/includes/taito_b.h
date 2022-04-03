@@ -144,7 +144,7 @@ protected:
 
 private:
 	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
-	uint16_t        m_realpunc_video_ctrl;
+	uint16_t        m_realpunc_video_ctrl = 0;
 };
 
 class hitice_state : public taitob_state

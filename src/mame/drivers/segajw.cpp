@@ -87,9 +87,9 @@ private:
 	output_finder<16> m_lamps;
 	output_finder<3> m_towerlamps;
 
-	uint64_t      m_coin_start_cycles;
-	uint64_t      m_hopper_start_cycles;
-	uint8_t       m_coin_counter;
+	uint64_t      m_coin_start_cycles = 0;
+	uint64_t      m_hopper_start_cycles = 0;
+	uint8_t       m_coin_counter = 0;
 };
 
 

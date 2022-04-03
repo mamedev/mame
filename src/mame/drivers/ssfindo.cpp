@@ -172,21 +172,21 @@ protected:
 	virtual void machine_reset() override;
 
 	typedef void (ssfindo_state::*speedup_func)();
-	speedup_func m_speedup;
+	speedup_func m_speedup{};
 
-	uint32_t m_flashType;
+	uint32_t m_flashType = 0;
 
-	bool m_i2cmem_clock;
+	bool m_i2cmem_clock = false;
 
 	void sound_w(uint8_t data);
 
 private:
 
 	// ssfindo and ppcar
-	uint32_t m_flashAdr;
-	uint32_t m_flashOffset;
-	uint32_t m_adrLatch;
-	uint32_t m_flashN;
+	uint32_t m_flashAdr = 0;
+	uint32_t m_flashOffset = 0;
+	uint32_t m_adrLatch = 0;
+	uint32_t m_flashN = 0;
 
 	// ssfindo and ppcar
 	uint32_t io_r();
@@ -208,7 +208,7 @@ private:
 
 	uint8_t iolines_r();
 	void iolines_w(uint8_t data);
-	bool m_flash_bank_select;
+	bool m_flash_bank_select = false;
 };
 
 class tetfight_state : public ssfindo_state
@@ -224,7 +224,7 @@ public:
 protected:
 
 private:
-	bool m_i2cdata_hack;
+	bool m_i2cdata_hack = false;
 
 	void tetfight_map(address_map &map);
 

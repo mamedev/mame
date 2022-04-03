@@ -312,7 +312,7 @@ void diablo_hd_device::read_sector()
 		// allocate a buffer for this page
 		m_cache[m_page] = std::make_unique<uint8_t[]>(sizeof(diablo_sector_t));
 		// and read the page from the hard_disk image
-		if (hard_disk_read(m_disk, m_page, m_cache[m_page].get())) {
+		if (m_disk->read(m_page, m_cache[m_page].get())) {
 			LOG_DRIVE(2,"[DHD%u]   CHS:%03d/%d/%02d => page:%d loaded\n", m_unit, m_cylinder, m_head, m_sector, m_page);
 		} else {
 			LOG_DRIVE(0,"[DHD%u]   CHS:%03d/%d/%02d => page:%d read failed\n", m_unit, m_cylinder, m_head, m_sector, m_page);
@@ -770,7 +770,7 @@ void diablo_hd_device::squeeze_sector()
 	m_bits[m_page].reset();
 
 	if (m_disk) {
-		if (!hard_disk_write(m_disk, m_page, m_cache[m_page].get())) {
+		if (!m_disk->write(m_page, m_cache[m_page].get())) {
 			LOG_DRIVE(0,"[DHD%u]   write failed for page #%d\n", m_unit, m_page);
 		}
 	} else {

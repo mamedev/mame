@@ -36,18 +36,18 @@ protected:
 	};
 
 	// internal state
-	uint8_t          m_ram[16];
+	uint8_t          m_ram[16]{};
 
 	devcb_read8::array<4> m_in_cb;
 	devcb_write8::array<2> m_out_cb;
 
-	int            m_reset;
-	int32_t        m_lastcoins, m_lastbuttons;
-	int32_t        m_credits;
-	int32_t        m_coins[2];
-	int32_t        m_coins_per_cred[2];
-	int32_t        m_creds_per_coin[2];
-	int32_t        m_in_count;
+	int            m_reset = 0;
+	int32_t        m_lastcoins = 0, m_lastbuttons = 0;
+	int32_t        m_credits = 0;
+	int32_t        m_coins[2]{};
+	int32_t        m_coins_per_cred[2]{};
+	int32_t        m_creds_per_coin[2]{};
+	int32_t        m_in_count = 0;
 
 	void handle_coins( int swap );
 

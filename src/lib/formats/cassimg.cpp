@@ -11,7 +11,7 @@
 #include "cassimg.h"
 #include "imageutl.h"
 
-#include "corealloc.h" // make_unique_clear
+#include "corealloc.h" // util::make_unique_clear
 
 #include <algorithm>
 #include <cassert>
@@ -191,7 +191,7 @@ cassette_image::error cassette_image::lookup_sample(int channel, size_t sample, 
 		m_blocks.resize(sample_blocknum + 1);
 
 	if (!m_blocks[sample_blocknum])
-		m_blocks[sample_blocknum] = make_unique_clear<int32_t []>(SAMPLES_PER_BLOCK);
+		m_blocks[sample_blocknum] = util::make_unique_clear<int32_t []>(SAMPLES_PER_BLOCK);
 
 	ptr = &m_blocks[sample_blocknum][sample_index];
 	return error::SUCCESS;

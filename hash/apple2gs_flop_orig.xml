@@ -3482,4 +3482,119 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="3stooges">
+		<description>The Three Stooges</description>
+		<year>1987</year>
+		<publisher>Cinemaware</publisher>
+		<info name="release" value="2022-02-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires an Apple IIgs ROM1 or later with 1.25 MB of RAM. -->
+		<!--"The Three Stooges" is a 1987 adventure game developed by John Cutter, Robert Jacob, Phyllis Jacob, Ed Magnin, Russell Truelove, Jim Simmons, and Patrick Cook, and distributed by Cinemaware. It requires an Apple IIgs ROM1 or later with 1.25 MB of RAM.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296239">
+				<rom name="the three stooges iigs - reel 1.woz" size="1296239" crc="e1b20124" sha1="97ac1b2fbdbe77fe05af42284d01fcc966c57783"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1296239">
+				<rom name="the three stooges iigs - reel 2.woz" size="1296239" crc="194170e6" sha1="1ea48fabac3697f6e2c847879f1903c4359e5f79"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logicm15">
+		<description>The Logic Master (Version 1.5)</description>
+		<year>1990</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2022-03-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"The Logic Master" is a 1990 educational program developed by William Demas and June Stark, and distributed by Unicorn Software. This is version 1.5. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296694">
+				<rom name="the logic master iigs disk 1.woz" size="1296694" crc="3189ca98" sha1="990c512542bcc92d7f004330f2e94bcb0aabed49"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296182">
+				<rom name="the logic master iigs disk 2.woz" size="1296182" crc="ead031ec" sha1="c2d82474ff7133fe02c82f4de93b9ee39e8d0da7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mixdupmg20a">
+		<description>Mixed-Up Mother Goose (Version 2.0A)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2022-03-13"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Mixed-Up Mother Goose" is a 1987 adventure game designed by Roberta Williams, with graphics by Jerry Moore, programming by David Slayback, music by Amenda-Lombardo, and distributed by Sierra On-Line. This is version 2.0A. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296242">
+				<rom name="mixed up mother goose iigs disk 1.woz" size="1296242" crc="d20296b0" sha1="38f0d20f2c4e444dd6360d4a2f3786a812d87156"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296242">
+				<rom name="mixed up mother goose iigs disk 2.woz" size="1296242" crc="17e29c48" sha1="53990f6e6d74da67e630057d69ad85bbe8c86155"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gnargolf">
+		<description>Gnarly Golf</description>
+		<year>1989</year>
+		<publisher>Britannica Software</publisher>
+		<info name="release" value="2022-03-16"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Gnarly Golf" is a 1989 sports game developed by Jim Coliz Jr., Darren Bartlett, Andy Hildebrand, and Greg Thomas, and distributed by Britannica Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296181">
+				<rom name="gnarly golf iigs disk 1 - program disk.woz" size="1296181" crc="54df53f2" sha1="a755251a853eb7beb826151b8b51b19ef879d814"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Course disk"/>
+			<dataarea name="flop" size="1296181">
+				<rom name="gnarly golf iigs disk 2 - course disk.woz" size="1296181" crc="d4e59bf4" sha1="7a5ee6acbfe98170c3f42b214a71ee26d9043e33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4thinchs">
+		<description>4th and Inches</description>
+		<year>1988</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2022-03-06"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"4th and Inches" is a 1988 sports program developed by Tony Manso, with music by Ed Bogas, artwork by Les Pardew, and distributed by Accolade. It requires a 512K Apple IIgs.-->
+		<!--"4th and Inches Team Construction Disk" is a 1988 sports program developed by Tony Manso and distributed by Accolade. It requires a 512K Apple IIgs and the main "4th and Inches" disk (&lt;a href="/details/wozaday_4th_and_Inches_IIgs" rel="nofollow"&gt;sold separately&lt;/a&gt;).-->
+		<!-- The Team Construction Set was sold seperatly, but only works with 4th & Inches so it's included as "Disk 2" - FH -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296673">
+				<rom name="4th and inches iigs.woz" size="1296673" crc="bb961693" sha1="65c4c67d8595e7560903eb993a1fbd79f33bc5de"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Team Construction disk"/>
+			<dataarea name="flop" size="1296171">
+				<rom name="4th and inches team construction disk iigs.woz" size="1296171" crc="29e99ddf" sha1="ed9bd3b4603d3722a6b5a348accc535c23b8acdc"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

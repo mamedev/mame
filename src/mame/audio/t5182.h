@@ -54,7 +54,7 @@ private:
 	int m_irqstate;
 	int m_semaphore_main;
 	int m_semaphore_snd;
-	emu_timer *m_setirq_cb;
+	emu_timer *m_setirq_cb = nullptr;
 	TIMER_CALLBACK_MEMBER( setirq_callback );
 
 	void sharedram_semaphore_snd_acquire_w(uint8_t data);

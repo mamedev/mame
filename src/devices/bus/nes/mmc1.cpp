@@ -120,7 +120,7 @@ void nes_sxrom_device::set_prg(int prg_base, int prg_mask)
 {
 	u8 bank = prg_base | (m_reg[3] & prg_mask);
 
-	switch ((m_reg[0] >> 2) & 3)
+	switch (BIT(m_reg[0], 2, 2))
 	{
 		case 0:
 		case 1:
@@ -235,7 +235,6 @@ void nes_sxrom_device::write_h(offs_t offset, uint8_t data)
 	if (data & 0x80)
 	{
 		m_count = 0;
-		m_latch = 0;
 
 		// Set reg at 0x8000 to size 16k and lower half swap - needed for Robocop 3, Dynowars
 		m_reg[0] |= 0x0c;
@@ -243,25 +242,21 @@ void nes_sxrom_device::write_h(offs_t offset, uint8_t data)
 		return;
 	}
 
-	if (m_count < 5)
-	{
-		if (m_count == 0) m_latch = 0;
-		m_latch >>= 1;
-		m_latch |= (data & 0x01) ? 0x10 : 0x00;
-		m_count++;
-	}
+	m_latch >>= 1;
+	m_latch |= (data & 1) << 4;
+	m_count = (m_count + 1) % 5;
 
-	if (m_count == 5)
+	if (!m_count)
 	{
-		m_reg[(offset & 0x6000) >> 13] = m_latch;
-		update_regs((offset & 0x6000) >> 13);
-		m_count = 0;
+		int reg = BIT(offset, 13, 2);
+		m_reg[reg] = m_latch;
+		update_regs(reg);
 	}
 }
 
 void nes_sxrom_device::write_m(offs_t offset, uint8_t data)
 {
-	uint8_t bank = (m_reg[1] >> 2) & 3;
+	uint8_t bank = BIT(m_reg[1], 2, 2);
 	LOG_MMC(("sxrom write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
@@ -275,7 +270,7 @@ void nes_sxrom_device::write_m(offs_t offset, uint8_t data)
 
 uint8_t nes_sxrom_device::read_m(offs_t offset)
 {
-	uint8_t bank = (m_reg[1] >> 2) & 3;
+	uint8_t bank = BIT(m_reg[1], 2, 2);
 	LOG_MMC(("sxrom read_m, offset: %04x\n", offset));
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled

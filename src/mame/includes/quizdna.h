@@ -29,11 +29,11 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_bg_ram;
 	std::unique_ptr<uint8_t[]> m_fg_ram;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 	uint8_t m_bg_xscroll[2];
-	int m_flipscreen;
-	int m_video_enable;
+	int m_flipscreen = 0;
+	int m_video_enable = 0;
 
 	// common
 	void bg_ram_w(offs_t offset, uint8_t data);

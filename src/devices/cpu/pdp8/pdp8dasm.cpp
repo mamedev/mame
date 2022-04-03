@@ -140,7 +140,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 	{
 	case 000:
 		stream << "SKON"; // PDP-8/E and up
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 001:
 		stream << "ION";
@@ -152,7 +152,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 003:
 		stream << "SRQ"; // PDP-8/E and up
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 004:
 		stream << "GTF"; // PDP-8/E and up (used earlier by a PDP-5/Classic-8 ADC option)
@@ -164,7 +164,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 006:
 		stream << "SGT"; // KE8-E
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 007:
 		stream << "CAF"; // PDP-8/E and up
@@ -176,7 +176,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 011:
 		stream << "RSF"; // Paper tape reader
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 012: case 016:
 		stream << "RRB"; // Paper tape reader
@@ -194,7 +194,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 021:
 		stream << "PSF"; // Paper tape punch
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 022:
 		stream << "PCF"; // Paper tape punch
@@ -214,7 +214,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 031:
 		stream << "KSF"; // TTY/keyboard
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 032:
 		stream << "KCC"; // TTY/keyboard
@@ -238,7 +238,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 041:
 		stream << "TSF"; // Teleprinter
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 042:
 		stream << "TCF"; // Teleprinter
@@ -250,7 +250,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 045:
 		stream << "TSK"; // Teleprinter (KL8-E and up; SPI is a later name for this IOT)
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 046:
 		stream << "TLS"; // Teleprinter
@@ -258,7 +258,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 0102:
 		stream << "SPL"; // Automatic restart
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 0201: case 0202: case 0203:
 	case 0211: case 0212: case 0213:
@@ -297,7 +297,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 0254:
 		stream << "SINT"; // Time-sharing extension (LIF on some Intersil peripherals)
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 0264:
 		stream << "CUF"; // Time-sharing extension
@@ -309,7 +309,7 @@ offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	default:
 		util::stream_format(stream, "IOT %03o", dev);
-		break;
+		return 1 | SUPPORTED | STEP_COND; // any IOT can theoretically cause a skip
 	}
 
 	return 1 | SUPPORTED;
@@ -324,7 +324,10 @@ offs_t hd6120_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 		if (BIT(pc, 15))
 			stream << "PRS";
 		else
+		{
 			stream << "SKON";
+			return 1 | SUPPORTED | STEP_COND;
+		}
 		break;
 
 	case 001:
@@ -339,7 +342,10 @@ offs_t hd6120_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 		if (BIT(pc, 15))
 			stream << "PGO";
 		else
+		{
 			stream << "SRQ";
+			return 1 | SUPPORTED | STEP_COND;
+		}
 		break;
 
 	case 004:
@@ -355,7 +361,7 @@ offs_t hd6120_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	case 006:
 		stream << "SGT";
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 007:
 		stream << "CAF";
@@ -432,7 +438,7 @@ offs_t hd6120_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)
 
 	default:
 		util::stream_format(stream, "IOT %03o", dev);
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 	}
 
 	return 1 | SUPPORTED;
@@ -592,7 +598,7 @@ void pdp8_disassembler::dasm_opr_group1(std::ostream &stream, u16 opr)
 // Sequence 1b: SMA, SZA, SZL (skip if any condition holds)
 // Sequence 2: CLA
 // Sequence 3: OSR, HLT
-void pdp8_disassembler::dasm_opr_group2(std::ostream &stream, u16 opr)
+offs_t pdp8_disassembler::dasm_opr_group2(std::ostream &stream, u16 opr)
 {
 	if ((opr & 0170) != 0)
 	{
@@ -643,6 +649,14 @@ void pdp8_disassembler::dasm_opr_group2(std::ostream &stream, u16 opr)
 		if ((opr & 0170) == 0)
 			stream << "!400";
 	}
+
+	// HACK: HLT is a software trap on HD-6120
+	if (m_has_r3l && BIT(opr, 1))
+		return 1 | SUPPORTED | STEP_OVER;
+	else if ((opr & 0160) != 0)
+		return 1 | SUPPORTED | STEP_COND;
+	else
+		return 1 | SUPPORTED;
 }
 
 // Sequence 1: CLA
@@ -777,7 +791,7 @@ offs_t pdp8_disassembler::dasm_opr_group3(std::ostream &stream, u16 opr, offs_t 
 		if ((opr & 0320) != 0)
 			stream << " ";
 		stream << "DPSZ"; // KE8-E Mode B
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 056:
 		if ((opr & 0320) != 0)
@@ -856,7 +870,7 @@ offs_t pdp8_disassembler::disassemble(std::ostream &stream, offs_t pc, const pdp
 	case 2:
 		stream << "ISZ";
 		dasm_memory_reference(stream, inst, pc);
-		break;
+		return 1 | SUPPORTED | STEP_COND;
 
 	case 3:
 		stream << "DCA";
@@ -882,13 +896,7 @@ offs_t pdp8_disassembler::disassemble(std::ostream &stream, offs_t pc, const pdp
 		if (!BIT(inst, 8))
 			dasm_opr_group1(stream, inst & 0777);
 		else if (!BIT(inst, 0))
-		{
-			dasm_opr_group2(stream, inst & 0777);
-
-			// HACK: HLT is a software trap on HD-6120
-			if (m_has_r3l && BIT(inst, 1))
-				return 1 | SUPPORTED | STEP_OVER;
-		}
+			return dasm_opr_group2(stream, inst & 0777);
 		else
 			return dasm_opr_group3(stream, inst & 0777, pc, opcodes);
 		break;

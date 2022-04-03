@@ -49,12 +49,12 @@ private:
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	uint8_t m_nmi_enable;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg_tilemap_noscroll;
-	uint8_t m_flipx;
-	uint8_t m_flipy;
+	uint8_t m_nmi_enable = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap_noscroll = nullptr;
+	uint8_t m_flipx = 0;
+	uint8_t m_flipy = 0;
 
 	void nmi_enable_w(uint8_t data);
 	void coin_lock_w(uint8_t data);

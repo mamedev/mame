@@ -201,15 +201,15 @@ private:
 	void ramdac2_map(address_map &map);
 	void ramdac_map(address_map &map);
 
-	tilemap_t *m_tmap;
+	tilemap_t *m_tmap = nullptr;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr_array<uint8_t, 4> m_reeltiles_ram;
 	required_shared_ptr_array<uint8_t, 4> m_reeltileshigh_ram;
-	tilemap_t *m_reel_tilemap[4];
+	tilemap_t *m_reel_tilemap[4]{};
 	required_shared_ptr_array<uint8_t, 4> m_reelscroll;
-	uint8_t m_nmi_enable;
-	bool m_mbutrfly_prot;
+	uint8_t m_nmi_enable = 0;
+	bool m_mbutrfly_prot = false;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

@@ -138,9 +138,9 @@
   Fruit Star Bonus control panel layout:
 
   .------------------------------------------------------------------------------.
-  | .--------. .--------. .--------. .--------. .--------. .--------. .--------. | 
+  | .--------. .--------. .--------. .--------. .--------. .--------. .--------. |
   | |  BET   | |  TAKE  | | STOP 1 | | STOP 2 | | STOP 3 | | STOP 4 | | START  | |
-  | '--------' '--------' '--------' '--------' '--------' '--------' '--------' | 
+  | '--------' '--------' '--------' '--------' '--------' '--------' '--------' |
   '------------------------------------------------------------------------------'
 
 
@@ -382,8 +382,8 @@
 
 
   [2022-01-16 to 2022-03-04]
-  
-	After hard work....
+
+    After hard work....
 
   - Fixed screen matrix according to the CRTC values.
   - Improved memory map.
@@ -434,7 +434,7 @@
 #include "tilemap.h"
 #include "machine/ticket.h"
 
-#include "fruitstb.lh" 
+#include "fruitstb.lh"
 
 #define MASTER_CLOCK    XTAL(8'000'000)
 
@@ -464,10 +464,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	void mpu12wbk_palette(palette_device &palette) const;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<ticket_dispenser_device> m_hopper; 
+	required_device<ticket_dispenser_device> m_hopper;
 	output_finder<15> m_lamps;
 
 	void mp12wbk_outport(offs_t offset, uint8_t data);
@@ -491,7 +491,7 @@ private:
 
     82s131                 82s147
   ----------       ----------------------
-  3  2  1  0       7  6  5  4  3  2  1  0                     Bits    RESNET (Ohms) 
+  3  2  1  0       7  6  5  4  3  2  1  0                     Bits    RESNET (Ohms)
   |  |  |  |       |  |  |  |  |  |  |  |                     3210
   |  '------------------------------------------- Color R ->  ---x  ----ZZZ(2200)----+---- RED
   |     |  |       |  |  |  |  |  |  |  '-------- Color R ->  --x-  ----ZZZ(1000)----+
@@ -526,7 +526,7 @@ void mpu12wbk_state::mpu12wbk_palette(palette_device &palette) const
 	for (int i = 0; i < palette.entries(); i++)
 	{
 		int data = (color_prom2[i] << 8) | color_prom[i];  // 4bit + 8bit
-        data = bitswap<12>(data, 8, 7, 6, 9, 5, 4, 3, 11, 2, 1, 0, 10);
+		data = bitswap<12>(data, 8, 7, 6, 9, 5, 4, 3, 11, 2, 1, 0, 10);
 
 		int bit0, bit1, bit2, bit3;
 
@@ -614,24 +614,24 @@ WRITE_LINE_MEMBER( mpu12wbk_state::crtc_vs )
 
 void mpu12wbk_state::mpu12wbk_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().share("nvram"); 																// Backed battery MB8464A-10L
-	map(0x1300, 0x1300).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));				// OK
-    map(0x1301, 0x1301).w("ay8910", FUNC(ay8910_device::address_w));										// OK
-	map(0x1400, 0x1400).w("crtc", FUNC(mc6845_device::address_w));											// OK
-	map(0x1401, 0x1401).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));		// OK
-	map(0x1800, 0x1fff).ram().share("nvram2");																// Backed battery MB8464A-10L
-	map(0x2000, 0x2fff).ram().w(FUNC(mpu12wbk_state::mpu12wbk_videoram_w)).share("videoram");				// 1x MB8464A-10L
-	map(0x3000, 0x3fff).ram().w(FUNC(mpu12wbk_state::mpu12wbk_colorram_w)).share("colorram");				// 1x MB8464A-10L
+	map(0x0000, 0x0fff).ram().share("nvram");                                                               // Backed battery MB8464A-10L
+	map(0x1300, 0x1300).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));             // OK
+	map(0x1301, 0x1301).w("ay8910", FUNC(ay8910_device::address_w));                                        // OK
+	map(0x1400, 0x1400).w("crtc", FUNC(mc6845_device::address_w));                                          // OK
+	map(0x1401, 0x1401).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));       // OK
+	map(0x1800, 0x1fff).ram().share("nvram2");                                                              // Backed battery MB8464A-10L
+	map(0x2000, 0x2fff).ram().w(FUNC(mpu12wbk_state::mpu12wbk_videoram_w)).share("videoram");               // 1x MB8464A-10L
+	map(0x3000, 0x3fff).ram().w(FUNC(mpu12wbk_state::mpu12wbk_colorram_w)).share("colorram");               // 1x MB8464A-10L
 
-	map(0x1000, 0x1000).portr("IN0");	// OK
-	map(0x1004, 0x1004).portr("IN1");	// OK
-	map(0x1008, 0x1008).portr("IN2");	// OK
+	map(0x1000, 0x1000).portr("IN0");   // OK
+	map(0x1004, 0x1004).portr("IN1");   // OK
+	map(0x1008, 0x1008).portr("IN2");   // OK
 
 	map(0x100c, 0x1018).w(FUNC(mpu12wbk_state::mp12wbk_outport));    // OK
 
-	map(0x1100, 0x1100).portr("SW1");	// OK
+	map(0x1100, 0x1100).portr("SW1");   // OK
 
-	map(0x8000, 0xffff).rom();			// OK
+	map(0x8000, 0xffff).rom();          // OK
 };
 
 
@@ -643,64 +643,64 @@ void mpu12wbk_state::mpu12wbk_map(address_map &map)
   Fruit Star Bonus - Out Ports
   ----------------------------
 
-  0x100C	D0	Meter Coin ???
-			D1	Meter Coin Out
-			D2	Meter Coin In
-			D3	Lamp Stop Reel 2
-			D4	x
-			D5	x
-			D6	x
-			D7	x
-		
-  0x1010	D0	Lamp Stop Reel 3
-			D1	Lamp Take
-			D2	Lamp Stop Reel 4
-			D3	Lamp Stop Reel 1
-			D4	Start
-			D5	Bet
-			D6	Unused
-			D7	Unused
-		
-  0x1014	D0	?0
-			D1	?0
-			D2	?0
-			D3	?0
-			D4	?0
-			D5	?1
-			D6	?0
-			D7	?0
-		
-  0x1018	D0	?1
-			D1	?1
-			D2	?1
-			D3	?1
-			D4	?1
-			D5	x
-			D6	?1/0
-			D7	x
+  0x100C    D0  Meter Coin ???
+            D1  Meter Coin Out
+            D2  Meter Coin In
+            D3  Lamp Stop Reel 2
+            D4  x
+            D5  x
+            D6  x
+            D7  x
+
+  0x1010    D0  Lamp Stop Reel 3
+            D1  Lamp Take
+            D2  Lamp Stop Reel 4
+            D3  Lamp Stop Reel 1
+            D4  Start
+            D5  Bet
+            D6  Unused
+            D7  Unused
+
+  0x1014    D0  ?0
+            D1  ?0
+            D2  ?0
+            D3  ?0
+            D4  ?0
+            D5  ?1
+            D6  ?0
+            D7  ?0
+
+  0x1018    D0  ?1
+            D1  ?1
+            D2  ?1
+            D3  ?1
+            D4  ?1
+            D5  x
+            D6  ?1/0
+            D7  x
 
 */
 
 void mpu12wbk_state::mp12wbk_outport(offs_t offset, uint8_t data)
 {
-//	logerror("Offset: %x - Data:%x\n", offset, data);
-	
+//  logerror("Offset: %x - Data:%x\n", offset, data);
+
 	switch( offset )
 	{
 		// 0x100C
-		case 0x00:	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // M1 - Coins ???.
+		case 0x00:  machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // M1 - Coins ???.
 					machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // M2 - Coins Out.
 					machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // M3 - Coins In.
 					m_lamps[6] = BIT(data, 3);   // lamp6 (Stop 1) ok
 					break;
 
 		// 0x1010
-		case 0x04:	m_lamps[0] = BIT(data, 0);    // lamp0 (Stop 3) ok
+		case 0x04:  m_lamps[0] = BIT(data, 0);    // lamp0 (Stop 3) ok
 					m_lamps[1] = BIT(data, 1);    // lamp1 (Take)
 					m_lamps[2] = BIT(data, 2);    // lamp2 (Stop 4) ok
 					m_lamps[3] = BIT(data, 3);    // lamp3 (Stop 1) ok
 					m_lamps[4] = BIT(data, 4);    // lamp4 (Start)  ok
-					m_lamps[5] = BIT(data, 5);    // lamp5 (Bet)    ok 
+					m_lamps[5] = BIT(data, 5);    // lamp5 (Bet)    ok
 					break;
 
 		// 0x1014
@@ -708,9 +708,9 @@ void mpu12wbk_state::mp12wbk_outport(offs_t offset, uint8_t data)
 					break;
 
 		// 0x1018
-		case 0x0c: 	break;
+		case 0x0c:  break;
 	}
-};	
+};
 
 
 /********************************
@@ -723,122 +723,122 @@ void mpu12wbk_state::mp12wbk_outport(offs_t offset, uint8_t data)
 
   ---- 0x1000 ----
 
-  D0	KeyOut
-  D1	Coin2 / Change (Partial KeyOut).	(DSW#3 ON for Coin2 Mode. OFF for Change Mode)
-  D2	Payout (Hopper)
-  D3	-
-  D4	Hopper coin out
-  D5	Coin3
-  D6	KeyIn1	->	Stop1	->	100  Credits
-				->	Stop2	->	1000 Credits
-				->	Stop3	->	100  Credits
-				->	Take	->	Clear
-				->	Stop4	->	Accounting
-			
-  D7	Service	->	Stop1	->	Program		->	Stop1	->	Coin In 2           (0-20, 30, 40, 50, 60, 70, 80, 90, 100)
-											->	Stop2	->	Coin In 3           (0-20, 30, 40, 50, 60, 70, 80, 90, 100)
-											->	Stop3	->	Max Bet (DSW#5 ON)  (1, 2, 3, 4, 5, 10, 20)
-											->	Stop4	->	Coin Out            (x1, x2, x3, x4)
-											->	Bet		->	Coin In 1           (0-20, 30, 40, 50, 60, 70, 80, 90, 100)
-											->	Start	->	End
-										
-                ->	Stop2	->	Print Accounting 2
-				->	Stop4	->	Screen Test / Lamp Test
-				->	Start	->	End
-				->	Stop3	->	Hopper Fill
-				->	Take	->	5 Seconds -> Data Clear
-				->	Coin1	->	Button Echo
+  D0    KeyOut
+  D1    Coin2 / Change (Partial KeyOut).    (DSW#3 ON for Coin2 Mode. OFF for Change Mode)
+  D2    Payout (Hopper)
+  D3    -
+  D4    Hopper coin out
+  D5    Coin3
+  D6    KeyIn1  ->  Stop1   ->  100  Credits
+                ->  Stop2   ->  1000 Credits
+                ->  Stop3   ->  100  Credits
+                ->  Take    ->  Clear
+                ->  Stop4   ->  Accounting
 
-			
+  D7    Service ->  Stop1   ->  Program     ->  Stop1   ->  Coin In 2           (0-20, 30, 40, 50, 60, 70, 80, 90, 100)
+                                            ->  Stop2   ->  Coin In 3           (0-20, 30, 40, 50, 60, 70, 80, 90, 100)
+                                            ->  Stop3   ->  Max Bet (DSW#5 ON)  (1, 2, 3, 4, 5, 10, 20)
+                                            ->  Stop4   ->  Coin Out            (x1, x2, x3, x4)
+                                            ->  Bet     ->  Coin In 1           (0-20, 30, 40, 50, 60, 70, 80, 90, 100)
+                                            ->  Start   ->  End
+
+                ->  Stop2   ->  Print Accounting 2
+                ->  Stop4   ->  Screen Test / Lamp Test
+                ->  Start   ->  End
+                ->  Stop3   ->  Hopper Fill
+                ->  Take    ->  5 Seconds -> Data Clear
+                ->  Coin1   ->  Button Echo
+
+
   ---- 0x1004 ----
 
-  D0	Stop2
-  D1	Stop1
-  D2	Stop3
-  D3	Stop4
-  D4	Start/Double
-  D5	Take
-  D6	Bet / Half Gamble
-  D7	KeyIn2	->	Stop1	->	100  Credits
-				->	Stop2	->	1000 Credits
-				->	Stop3	->	100  Credits
-				->	Take	->	Clear
+  D0    Stop2
+  D1    Stop1
+  D2    Stop3
+  D3    Stop4
+  D4    Start/Double
+  D5    Take
+  D6    Bet / Half Gamble
+  D7    KeyIn2  ->  Stop1   ->  100  Credits
+                ->  Stop2   ->  1000 Credits
+                ->  Stop3   ->  100  Credits
+                ->  Take    ->  Clear
 
 
   ---- 0x1008 ----
 
-  D0	Coin1
-  D1	Unknown
-  D2	Operator Accounting
-  D3	Unknown
-  D4	Unknown
-  D5	Unknown
-  D6	Unknown
-  D7	Unknown
+  D0    Coin1
+  D1    Unknown
+  D2    Operator Accounting
+  D3    Unknown
+  D4    Unknown
+  D5    Unknown
+  D6    Unknown
+  D7    Unknown
 
 */
 
 static INPUT_PORTS_START( mpu12wbk )
 	PORT_START("IN0")  // 0x1000
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )											// DSW#2 OFF = Change; DSW#2 ON = Coin2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                          // DSW#2 OFF = Change; DSW#2 ON = Coin2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-4") PORT_CODE(KEYCODE_S)	// unknown
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-4") PORT_CODE(KEYCODE_S)  // unknown
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Supervisor Key") PORT_CODE(KEYCODE_8) PORT_TOGGLE	// key in / other features
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service")        PORT_CODE(KEYCODE_0)				// all settings
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Supervisor Key") PORT_CODE(KEYCODE_8) PORT_TOGGLE   // key in / other features
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service")        PORT_CODE(KEYCODE_0)               // all settings
 
 	PORT_START("IN1")  // 0x1004
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Stop 2")					// button 4 in layout.
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Stop 1")					// button 3 in layout.
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Stop 3 / Paytable")		// button 5 in layout.
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Stop 4 / Paytable")		// button 6 in layout.
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Start / Double (Doppeln)")	// button 7 in layout.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_NAME("Take (Loeschen-Nehmen)")	// button 2 in layout.
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Bet / Half Gamble")		// button 1 in layout.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Stop 2")                   // button 4 in layout.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Stop 1")                   // button 3 in layout.
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Stop 3 / Paytable")        // button 5 in layout.
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Stop 4 / Paytable")        // button 6 in layout.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Start / Double (Doppeln)") // button 7 in layout.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_NAME("Take (Loeschen-Nehmen)")   // button 2 in layout.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Bet / Half Gamble")        // button 1 in layout.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Attendant Key")  PORT_CODE(KEYCODE_9) PORT_TOGGLE  // key in / in-out accounts
 
 	PORT_START("IN2")  // 0x1008
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-2") PORT_CODE(KEYCODE_F)	// unknown
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-2") PORT_CODE(KEYCODE_F)  // unknown
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Operator Accounting") PORT_CODE(KEYCODE_E) PORT_TOGGLE  // in-out accounts
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-4") PORT_CODE(KEYCODE_G)	// unknown
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-5") PORT_CODE(KEYCODE_H)	// unknown
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-6") PORT_CODE(KEYCODE_J)	// unknown
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-7") PORT_CODE(KEYCODE_K)	// unknown
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-8") PORT_CODE(KEYCODE_L)	// unknown
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-4") PORT_CODE(KEYCODE_G)  // unknown
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-5") PORT_CODE(KEYCODE_H)  // unknown
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-6") PORT_CODE(KEYCODE_J)  // unknown
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-7") PORT_CODE(KEYCODE_K)  // unknown
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("2-8") PORT_CODE(KEYCODE_L)  // unknown
 
 PORT_START("SW1")  // 0x1100
-	PORT_DIPNAME( 0x01, 0x01, "Enable Remote Accounts Clear" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Enable Remote Accounts Clear" )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x02, 0x02, "Quick Start on Max Bet" )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Quick Start on Max Bet" )    PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x04, 0x00, "Coin 2 Settings" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Coin 2 Settings" )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, "Change" )
 	PORT_DIPSETTING(    0x00, "Coin 2" )
 
-    PORT_DIPNAME( 0x08, 0x08, "Key In" )         		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Key In" )                PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "Enable" )
 	PORT_DIPSETTING(    0x00, "Disable" )
 
-	PORT_DIPNAME( 0x10, 0x00, "Max Bet Settings" )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, "Max Bet Settings" )      PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "Allow" )
 	PORT_DIPSETTING(    0x00, "Deny" )
 
-	PORT_DIPNAME( 0x20, 0x20, "Currency" )				PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Currency" )              PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, "Credits" )
 	PORT_DIPSETTING(    0x00, "Euro Currency" )
 
-	PORT_DIPNAME( 0x40, 0x40, "Autostop")				PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Autostop")               PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -853,8 +853,8 @@ static const gfx_layout charlayout =
 	4,8,
 	RGN_FRAC(1,3),
 	6,
-//	the first two bitplanes are inverted...  
- 	{ RGN_FRAC(0,3) + 4, RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(1,3) + 4, RGN_FRAC(2,3), RGN_FRAC(2,3) + 4 },
+//  the first two bitplanes are inverted...
+	{ RGN_FRAC(0,3) + 4, RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(1,3) + 4, RGN_FRAC(2,3), RGN_FRAC(2,3) + 4 },
 	{ 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*4*2
@@ -892,8 +892,8 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
 	// Default screen values analyzing the MC6845 setup / init.
-	screen.set_size((48+1)*8, (48+1)*8);				// From MC6845, registers 00 & 04. (value-1)
-	screen.set_visarea(0*8, 48*8-1, 0*8, 32*8-1);		// Driven by MC6845, registers 01 & 06
+	screen.set_size((48+1)*8, (48+1)*8);                // From MC6845, registers 00 & 04. (value-1)
+	screen.set_visarea(0*8, 48*8-1, 0*8, 32*8-1);       // Driven by MC6845, registers 01 & 06
 	screen.set_screen_update(FUNC(mpu12wbk_state::screen_update_mpu12wbk));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mpu12wbk);
@@ -905,7 +905,7 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 	crtc.set_char_width(4);
 	//crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	crtc.out_vsync_callback().set(FUNC(mpu12wbk_state::crtc_vs));
-	
+
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "ay8910", MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.00);   // clock guessed
@@ -985,7 +985,7 @@ ROM_END
 
   The game displays 8.30UNG-200 in the service mode)
 
-  Even when the version is higher in number, 
+  Even when the version is higher in number,
   program and graphics are older.
 
 */
@@ -1021,7 +1021,7 @@ ROM_END
   Program flash ROM is inside a CPU epoxy block
   with M6809 CPU and one PLD.
 
-  Even when the version is higher in number, 
+  Even when the version is higher in number,
   program and graphics are older.
 
 */

@@ -269,30 +269,6 @@ static const gfx_layout layout_8x8 =
 };
 
 
-static const gfx_layout layout_8x8_alt =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
-
-static const gfx_layout layout_16x16 =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ STEP16(0,1) },
-	{ STEP16(0,16) },
-	16*16
-};
-
-
 static const gfx_layout layout_32x32 =
 {
 	32,32,
@@ -305,15 +281,15 @@ static const gfx_layout layout_32x32 =
 };
 
 static GFXDECODE_START( gfx_kickgoal )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8,    0x000, 0x40 ) // FG GFX for even column like CPS1
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16,  0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_32x32,  0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 1, layout_8x8,    0x000, 0x40 ) // FG GFX for odd column like CPS1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8,          0x000, 0x40 ) // FG GFX for even column like CPS1
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_planar,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_32x32,        0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 1, layout_8x8,          0x000, 0x40 ) // FG GFX for odd column like CPS1
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_actionhw )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8_alt, 0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16,   0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_planar, 0x000, 0x40 )
 GFXDECODE_END
 
 /* MACHINE drivers ***********************************************************/

@@ -63,31 +63,31 @@ private:
 	static const size_t MAX_COUNTERS = 32;
 
 	// stuff the SEC stores
-	int         m_counters[MAX_COUNTERS];
-	char        m_strings[MAX_COUNTERS][8];
-	uint8_t     m_market;
-	uint8_t     m_nocnt;
-	uint8_t     m_last;
+	int         m_counters[MAX_COUNTERS]{};
+	char        m_strings[MAX_COUNTERS][8]{};
+	uint8_t     m_market = 0;
+	uint8_t     m_nocnt = 0;
+	uint8_t     m_last = 0;
 
 	// serial comms
-	uint8_t     m_curbyte;
-	uint8_t     m_data;
+	uint8_t     m_curbyte = 0;
+	uint8_t     m_data = 0;
 
-	uint8_t     m_clk;
-	uint8_t     m_clks;
-	uint8_t     m_rxpos;
-	uint8_t     m_rxclk;
-	uint8_t     m_rxdat;
-	uint8_t     m_rxlen;
-	uint8_t     m_chars_left;
+	uint8_t     m_clk = 0;
+	uint8_t     m_clks = 0;
+	uint8_t     m_rxpos = 0;
+	uint8_t     m_rxclk = 0;
+	uint8_t     m_rxdat = 0;
+	uint8_t     m_rxlen = 0;
+	uint8_t     m_chars_left = 0;
 
-	uint8_t     m_reqpos;
+	uint8_t     m_reqpos = 0;
 
 	// communication buffer
-	uint8_t     m_request[12];
-	uint8_t     m_reply[8];
+	uint8_t     m_request[12]{};
+	uint8_t     m_reply[8]{};
 
-	bool        m_enabled;
+	bool        m_enabled = false;
 
 	// execute command
 	void        do_command(void);

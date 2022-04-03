@@ -306,14 +306,14 @@ private:
 	required_device<ticket_dispenser_device> m_hopper;
 	output_finder<16> m_lamps;
 
-	tilemap_t *m_tmap;
-	tilemap_t *m_reel_tilemap[3];
-	int m_tiles_offset;
-	uint8_t m_out_c;
+	tilemap_t *m_tmap = nullptr;
+	tilemap_t *m_reel_tilemap[3]{};
+	int m_tiles_offset = 0;
+	uint8_t m_out_c = 0;
 	std::unique_ptr<uint8_t[]> m_reel_attr[3];
-	uint8_t m_flash_val;
-	uint8_t m_flash_packet;
-	uint8_t m_flash_packet_start;
+	uint8_t m_flash_val = 0;
+	uint8_t m_flash_packet = 0;
+	uint8_t m_flash_packet_start = 0;
 
 	void tiles_offset_w(offs_t offset, uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);

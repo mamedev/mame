@@ -207,8 +207,8 @@ private:
 
 	required_shared_ptr<uint16_t> m_outputs;
 	required_shared_ptr<uint16_t> m_funcube_leds;
-	uint64_t m_coin_start_cycles;
-	uint8_t m_hopper_motor;
+	uint64_t m_coin_start_cycles = 0;
+	uint8_t m_hopper_motor = 0;
 };
 
 

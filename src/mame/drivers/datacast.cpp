@@ -93,7 +93,7 @@ private:
 	required_device_array<i8251_device, 2> m_usart;
 	required_device<com8116_device> m_dbrg;
 
-	uint8_t m_key_col;
+	uint8_t m_key_col = 0;
 };
 
 

@@ -711,17 +711,6 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -734,8 +723,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_m90 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,     0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,       256, 16 )
 GFXDECODE_END
 
 /*****************************************************************************/

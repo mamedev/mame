@@ -92,11 +92,14 @@ void archimedes_econet_slot_device::write(offs_t offset, u8 data)
 
 // slot devices
 #include "econet.h"
+#include "midi.h"
 #include "rtfmjoy.h"
 
 
 void archimedes_econet_devices(device_slot_interface &device)
 {
 	device.option_add("econet", ARC_ECONET);
+	device.option_add("midi", ARC_SERIAL_MIDI);
 	device.option_add("rtfmjoy", ARC_RTFM_JOY);
+	device.option_add("sampler", ARC_SERIAL_SAMPLER);
 }

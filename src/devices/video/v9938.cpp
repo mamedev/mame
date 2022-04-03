@@ -2915,13 +2915,11 @@ void v99x8_device::report_vdp_command(uint8_t Op)
 /*************************************************************/
 uint8_t v99x8_device::command_unit_w(uint8_t Op)
 {
-	int SM;
-
 	// V9938 ops only work in SCREENs 5-8
-	if (m_mode<5)
+	if (m_mode<5 || m_mode>8)
 		return(0);
 
-	SM = m_mode-5;         // Screen mode index 0..3
+	int SM = m_mode-5;         // Screen mode index 0..3
 
 	m_mmc.CM = Op>>4;
 	if ((m_mmc.CM & 0x0C) != 0x0C && m_mmc.CM != 0)

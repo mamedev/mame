@@ -154,6 +154,7 @@ public:
 	void init_pang3();
 	void init_ganbare();
 	void init_pang3b();
+	void init_pang3b4();
 	void init_sf2rb();
 	void init_sf2rb2();
 	void init_sf2thndr();
@@ -202,6 +203,8 @@ protected:
 	void sf2m3_layer_w(offs_t offset, uint16_t data);
 	uint16_t dinohunt_sound_r();
 	void varthb2_cps_a_w(offs_t offset, uint16_t data);
+	uint16_t pang3b4_prot_r();
+	void pang3b4_prot_w(uint16_t data);
 
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
@@ -235,6 +238,7 @@ protected:
 
 	// game-specific
 	uint16_t sf2ceblp_prot;
+	uint16_t pang3b4_prot;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap[3];

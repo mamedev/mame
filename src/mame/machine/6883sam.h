@@ -144,12 +144,12 @@ private:
 	memory_access<14, 0, 0, ENDIANNESS_BIG>::cache m_rom_space[3];
 	memory_access< 5, 0, 0, ENDIANNESS_BIG>::specific m_io_space[3];
 	memory_access< 7, 0, 0, ENDIANNESS_BIG>::cache m_boot_space;
-	uint16_t                    m_counter_mask;
+	uint16_t                    m_counter_mask = 0;
 
 	// SAM state
-	uint16_t                    m_counter;
-	uint8_t                     m_counter_xdiv;
-	uint8_t                     m_counter_ydiv;
+	uint16_t                    m_counter = 0;
+	uint8_t                     m_counter_xdiv = 0;
+	uint8_t                     m_counter_ydiv = 0;
 
 	// typically called by CPU
 	void internal_write(offs_t offset, uint8_t data);

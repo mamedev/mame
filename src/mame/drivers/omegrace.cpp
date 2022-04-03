@@ -270,7 +270,7 @@ private:
 	uint8_t spinner2_r();
 	void outputs_w(uint8_t data);
 
-	emu_timer *m_gbnmi;
+	emu_timer *m_gbnmi = nullptr;
 };
 
 

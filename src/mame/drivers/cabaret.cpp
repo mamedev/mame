@@ -74,10 +74,10 @@ protected:
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	required_shared_ptr<uint8_t> m_bg_scroll;
 	required_shared_ptr<uint8_t> m_bg_tile_ram;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	int m_nmi_enable;
-	uint8_t m_out[3];
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int m_nmi_enable = 0;
+	uint8_t m_out[3]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

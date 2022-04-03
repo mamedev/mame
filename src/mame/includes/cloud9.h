@@ -69,20 +69,20 @@ private:
 	required_device<ls259_device> m_videolatch;
 
 	/* video-related */
-	const uint8_t *m_syncprom;
-	const uint8_t *m_wpprom;
-	const uint8_t *m_priprom;
-	bitmap_ind16 m_spritebitmap;
-	double      m_rweights[3];
-	double      m_gweights[3];
-	double      m_bweights[3];
-	uint8_t       m_bitmode_addr[2];
+	const uint8_t *m_syncprom = nullptr;
+	const uint8_t *m_wpprom = nullptr;
+	const uint8_t *m_priprom = nullptr;
+	bitmap_ind16 m_spritebitmap = 0;
+	double      m_rweights[3]{};
+	double      m_gweights[3]{};
+	double      m_bweights[3]{};
+	uint8_t       m_bitmode_addr[2]{};
 
 	/* misc */
-	int         m_vblank_start;
-	int         m_vblank_end;
-	emu_timer   *m_irq_timer;
-	uint8_t       m_irq_state;
+	int         m_vblank_start = 0;
+	int         m_vblank_end = 0;
+	emu_timer   *m_irq_timer = nullptr;
+	uint8_t       m_irq_state = 0U;
 };
 
 #endif // MAME_INCLUDES_CLOUD9_H

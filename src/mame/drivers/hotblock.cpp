@@ -85,7 +85,7 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 
 	// Misc
-	int m_port0;
+	int m_port0 = 0;
 
 	// Memory
 	required_shared_ptr<uint8_t> m_vram;

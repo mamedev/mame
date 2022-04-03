@@ -32,23 +32,23 @@ public:
 	void init_galaxygame();
 
 private:
-	uint16_t m_clk;
+	uint16_t m_clk = 0;
 
-	uint16_t m_x;
-	uint16_t m_y;
+	uint16_t m_x = 0;
+	uint16_t m_y = 0;
 
-	int16_t m_mq;
-	int16_t m_ac;
+	int16_t m_mq = 0;
+	int16_t m_ac = 0;
 
 	struct
 	{
-		uint16_t x;
-		uint16_t y;
+		uint16_t x = 0;
+		uint16_t y = 0;
 	} m_point_work_list[MAX_POINTS], m_point_display_list[MAX_POINTS];
 
-	int m_point_work_list_index;
-	int m_point_display_list_index;
-	int m_interrupt;
+	int m_point_work_list_index = 0;
+	int m_point_display_list_index = 0;
+	int m_interrupt = 0;
 	uint16_t ke_r(offs_t offset);
 	void ke_w(offs_t offset, uint16_t data);
 	uint16_t x_r();

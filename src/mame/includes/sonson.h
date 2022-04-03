@@ -36,7 +36,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;

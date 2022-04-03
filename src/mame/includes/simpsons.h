@@ -38,13 +38,13 @@ private:
 	std::unique_ptr<uint16_t[]>   m_spriteram;
 
 	/* video-related */
-	int        m_sprite_colorbase;
-	int        m_layer_colorbase[3];
-	int        m_layerpri[3];
+	int        m_sprite_colorbase = 0;
+	int        m_layer_colorbase[3]{};
+	int        m_layerpri[3]{};
 
 	/* misc */
-	int        m_firq_enabled;
-	u64        m_nmi_enabled;
+	int        m_firq_enabled = 0;
+	u64        m_nmi_enabled = 0;
 
 	/* views */
 	memory_view m_palette_view;

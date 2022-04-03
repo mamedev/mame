@@ -11,7 +11,7 @@
    - remove m_input_hack functions, needed to make inputs working
    - lsrquiz2i, lsrquizg: access violation on microtouch_device destructor when exiting emulation
                           Caused by microtouch_device::rcv_complete() overrunning the m_rx_buffer
-						  array space with 149 (array size=16).
+                          array space with 149 (array size=16).
 
 
    Known Games:
@@ -359,9 +359,9 @@ public:
 
 	optional_ioport_array<2> m_player_ports;
 
-	int m_oldstate[2];
-	int m_cd32_shifter[2];
-	uint16_t m_potgo_value;
+	int m_oldstate[2]{};
+	int m_cd32_shifter[2]{};
+	uint16_t m_potgo_value = 0;
 
 	void cubo(machine_config &config);
 	void cubo_mem(address_map &map);
@@ -375,7 +375,7 @@ private:
 	required_device<cdda_device> m_cdda;
 
 	typedef void (cubo_state::*input_hack_func)();
-	input_hack_func m_input_hack;
+	input_hack_func m_input_hack{};
 	void chip_ram_w8_hack(offs_t byteoffs, uint8_t data);
 	void cndypuzl_input_hack();
 	void haremchl_input_hack();
@@ -1070,7 +1070,7 @@ void cubo_state::cubo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cubo_state::cubo_mem);
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cubo_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
- 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cubo_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cubo_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 
 	AMIGA_COPPER(config, m_copper, amiga_state::CLK_28M_PAL / 2);
 	m_copper->set_host_cpu_tag(m_maincpu);

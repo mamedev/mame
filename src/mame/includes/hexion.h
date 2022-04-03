@@ -33,15 +33,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t *m_vram[2];
-	uint8_t *m_unkram;
-	int m_bankctrl;
-	int m_rambank;
-	int m_pmcbank;
-	int m_gfxrom_select;
-	int m_ccu_int_time;
-	int m_ccu_int_time_count;
-	tilemap_t *m_bg_tilemap[2];
+	uint8_t *m_vram[2]{};
+	uint8_t *m_unkram = nullptr;
+	int m_bankctrl = 0;
+	int m_rambank = 0;
+	int m_pmcbank = 0;
+	int m_gfxrom_select = 0;
+	int m_ccu_int_time = 0;
+	int m_ccu_int_time_count = 0;
+	tilemap_t *m_bg_tilemap[2]{};
 
 	void coincntr_w(uint8_t data);
 	void bankswitch_w(uint8_t data);

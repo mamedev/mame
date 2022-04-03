@@ -47,10 +47,10 @@ protected:
 	devcb_write_line m_vblank_pin_w;
 	devcb_write_line m_hblank_pin_w;
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t m_wba_h, m_wba_v, m_wsi_h, m_wsi_v;
+	uint8_t m_wba_h = 0, m_wba_v = 0, m_wsi_h = 0, m_wsi_v = 0;
 
-	emu_timer *m_timer;
-	emu_timer *m_hblank_on_timer;
+	emu_timer *m_timer = nullptr;
+	emu_timer *m_hblank_on_timer = nullptr;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	virtual void draw(int line);

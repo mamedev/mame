@@ -127,7 +127,17 @@ protected:
 	virtual bool is_x86() const override { return true; }
 };
 
+class mk98pic_device : public pic8259_device
+{
+public:
+	mk98pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual bool is_x86() const override { return true; }
+};
+
 DECLARE_DEVICE_TYPE(PIC8259, pic8259_device)
 DECLARE_DEVICE_TYPE(V5X_ICU, v5x_icu_device)
+DECLARE_DEVICE_TYPE(MK98PIC, mk98pic_device)
 
 #endif // MAME_MACHINE_PIC8259_H

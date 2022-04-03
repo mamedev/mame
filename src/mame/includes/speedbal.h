@@ -41,10 +41,10 @@ private:
 	required_shared_ptr<uint8_t> m_foreground_videoram;
 	output_finder<73> m_digits;
 
-	bool m_leds_start;
-	uint32_t m_leds_shiftreg;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	bool m_leds_start = 0;
+	uint32_t m_leds_shiftreg = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	void coincounter_w(uint8_t data);
 	void foreground_videoram_w(offs_t offset, uint8_t data);

@@ -78,18 +78,18 @@ private:
 	optional_shared_ptr<uint8_t> m_toprollr_bg_coloram;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	bool m_flip_x;
-	bool m_flip_y;
-	bool m_swimmer_side_background_enabled;
-	bool m_swimmer_palettebank;
+	bool m_flip_x = false;
+	bool m_flip_y = false;
+	bool m_swimmer_side_background_enabled = false;
+	bool m_swimmer_palettebank = false;
 
-	uint8_t m_yamato_p0;
-	uint8_t m_yamato_p1;
-	uint8_t m_toprollr_rombank;
-	bool m_nmi_mask;
-	tilemap_t *m_pf_tilemap;
-	tilemap_t *m_bs_tilemap;
-	tilemap_t *m_toproller_bg_tilemap;
+	uint8_t m_yamato_p0 = 0U;
+	uint8_t m_yamato_p1 = 0U;
+	uint8_t m_toprollr_rombank = 0U;
+	bool m_nmi_mask = false;
+	tilemap_t *m_pf_tilemap = nullptr;
+	tilemap_t *m_bs_tilemap = nullptr;
+	tilemap_t *m_toproller_bg_tilemap = nullptr;
 	std::unique_ptr<uint8_t[]> m_opcodes;
 
 	void swimmer_sh_soundlatch_w(uint8_t data);

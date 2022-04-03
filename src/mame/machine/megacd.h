@@ -129,51 +129,51 @@ protected:
 	// can't use a memshare because it's 8-bit RAM in a 16-bit address space
 	std::vector<uint8_t> m_backupram;
 
-	uint8_t m_font_color;
+	uint8_t m_font_color = 0;
 
-	uint16_t scd_rammode;
-	uint32_t scd_mode_dmna_ret_flags ;
+	uint16_t scd_rammode = 0;
+	uint32_t scd_mode_dmna_ret_flags = 0;
 
-	tilemap_t    *segacd_stampmap[4];
-
-
-	uint8_t segacd_ram_writeprotect_bits;
-	int segacd_4meg_prgbank;// = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
-	int segacd_memory_priority_mode;// = 0;
-	int segacd_stampsize;
-
-	uint16_t segacd_hint_register;
-	uint16_t segacd_imagebuffer_vdot_size;
-	uint16_t segacd_imagebuffer_vcell_size;
-	uint16_t segacd_imagebuffer_hdot_size;
-
-	int segacd_conversion_active;// = 0;
-	uint16_t segacd_stampmap_base_address;
-	uint16_t segacd_imagebuffer_start_address;
-	uint16_t segacd_imagebuffer_offset;
+	tilemap_t    *segacd_stampmap[4]{};
 
 
-	uint16_t segacd_comms_flags;// = 0x0000;
-	uint16_t segacd_comms_part1[0x8];
-	uint16_t segacd_comms_part2[0x8];
+	uint8_t segacd_ram_writeprotect_bits = 0;
+	int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
+	int segacd_memory_priority_mode = 0;
+	int segacd_stampsize = 0;
 
-	int segacd_redled;// = 0;
-	int segacd_greenled;// = 0;
-	int segacd_ready;// = 1; // actually set 100ms after startup?
-	uint8_t m_irq3_timer_reg;
+	uint16_t segacd_hint_register = 0;
+	uint16_t segacd_imagebuffer_vdot_size = 0;
+	uint16_t segacd_imagebuffer_vcell_size = 0;
+	uint16_t segacd_imagebuffer_hdot_size = 0;
+
+	int segacd_conversion_active = 0;
+	uint16_t segacd_stampmap_base_address = 0;
+	uint16_t segacd_imagebuffer_start_address = 0;
+	uint16_t segacd_imagebuffer_offset = 0;
+
+
+	uint16_t segacd_comms_flags = 0;
+	uint16_t segacd_comms_part1[0x8]{};
+	uint16_t segacd_comms_part2[0x8]{};
+
+	int segacd_redled = 0;
+	int segacd_greenled = 0;
+	int segacd_ready = 1; // actually set 100ms after startup?
+	uint8_t m_irq3_timer_reg = 0;
 
 
 	inline void write_pixel(uint8_t pix, int pixeloffset);
 	uint16_t segacd_1meg_mode_word_read(offs_t offset);
 	void segacd_1meg_mode_word_write(offs_t offset, uint16_t data, uint16_t mem_mask, int use_pm);
 
-	uint16_t m_dmaaddr;
+	uint16_t m_dmaaddr = 0;
 
-	uint16_t m_a12000_halt_reset_reg;
+	uint16_t m_a12000_halt_reset_reg = 0;
 
-	int m_framerate;
-	int m_base_total_scanlines;
-	int m_total_scanlines;
+	int m_framerate = 0;
+	int m_base_total_scanlines = 0;
+	int m_total_scanlines = 0;
 
 	void segacd_mark_tiles_dirty(int offset);
 	int segacd_get_active_stampmap_tilemap(void);

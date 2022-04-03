@@ -81,29 +81,30 @@ private:
 		GAMECARD_BLOCK_BUSY = (1 << 31)
 	};
 
-	uint32_t m_arm7_postflg;
-	uint32_t m_arm9_postflg;
-	uint32_t m_gamecard_ctrl, m_cartdata_len;
-	uint32_t m_ime[2], m_ie[2], m_if[2];
-	uint16_t m_arm7_ipcsync, m_arm9_ipcsync, m_spicnt;
-	uint8_t m_WRAM[0x8000];
-	uint8_t m_wramcnt;
-	uint8_t m_vramcnta, m_vramcntb, m_vramcntc, m_vramcntd, m_vramcnte, m_vramcntf, m_vramcntg, m_vramcnth, m_vramcnti;
-	bool m_arm7halted;
+	uint32_t m_arm7_postflg = 0;
+	uint32_t m_arm9_postflg = 0;
+	uint32_t m_gamecard_ctrl = 0, m_cartdata_len = 0;
+	uint32_t m_ime[2]{}, m_ie[2]{}, m_if[2]{};
+	uint16_t m_arm7_ipcsync = 0, m_arm9_ipcsync = 0, m_spicnt = 0;
+	uint8_t m_WRAM[0x8000]{};
+	uint8_t m_wramcnt = 0;
+	uint8_t m_vramcnta = 0, m_vramcntb = 0, m_vramcntc = 0, m_vramcntd = 0;
+	uint8_t m_vramcnte = 0, m_vramcntf = 0, m_vramcntg = 0, m_vramcnth = 0, m_vramcnti = 0;
+	bool m_arm7halted = false;
 
 	// DMA
-	emu_timer *m_dma_timer[8];
-	//uint32_t m_dma_src[8];
-	//uint32_t m_dma_dst[8];
-	//uint16_t m_dma_cnt[8];
+	emu_timer *m_dma_timer[8]{};
+	//uint32_t m_dma_src[8]{};
+	//uint32_t m_dma_dst[8]{};
+	//uint16_t m_dma_cnt[8]{};
 
 	// Timers
-	uint32_t m_timer_regs[8];
-	uint16_t m_timer_reload[8];
-	int m_timer_recalc[8];
-	double m_timer_hz[8];
+	uint32_t m_timer_regs[8]{};
+	uint16_t m_timer_reload[8]{};
+	int m_timer_recalc[8]{};
+	double m_timer_hz[8]{};
 
-	emu_timer *m_tmr_timer[8], *m_irq_timer;
+	emu_timer *m_tmr_timer[8]{}, *m_irq_timer = nullptr;
 
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	TIMER_CALLBACK_MEMBER(timer_expire);

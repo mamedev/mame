@@ -573,7 +573,7 @@ private:
 
 	void mshuttle_decode(const uint8_t convtable[8][16]);
 
-	uint8_t m_ay8910_cs;
+	uint8_t m_ay8910_cs = 0U;
 };
 
 
@@ -695,7 +695,7 @@ private:
 	void zigzag_map(address_map &map);
 
 	required_memory_bank_array<2> m_rombanks;
-	uint8_t m_ay8910_latch;
+	uint8_t m_ay8910_latch = 0U;
 };
 
 
@@ -804,7 +804,7 @@ protected:
 	required_device<cpu_device> m_audio2;
 	required_device<dac_byte_interface> m_dac;
 
-	uint8_t m_sample_control;
+	uint8_t m_sample_control = 0U;
 };
 
 
@@ -833,10 +833,10 @@ private:
 
 	required_device<dac_byte_interface> m_dac2;
 
-	uint32_t m_monsterz_shift;
-	uint32_t m_monsterz_shift2;
-	uint8_t m_monsterz_audio_portb;
-	uint8_t m_monsterz_sample_portc;
+	uint32_t m_monsterz_shift = 0U;
+	uint32_t m_monsterz_shift2 = 0U;
+	uint8_t m_monsterz_audio_portb = 0U;
+	uint8_t m_monsterz_sample_portc = 0U;
 };
 
 
@@ -862,9 +862,9 @@ private:
 
 	required_ioport_array<2> m_dials;
 
-	uint8_t m_port_select;
-	uint8_t m_direction[2];
-	uint8_t m_counter_74ls161[2];
+	uint8_t m_port_select = 0U;
+	uint8_t m_direction[2]{};
+	uint8_t m_counter_74ls161[2]{};
 };
 
 

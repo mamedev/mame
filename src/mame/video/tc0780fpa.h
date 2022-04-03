@@ -64,14 +64,14 @@ protected:
 private:
 	std::unique_ptr<uint8_t[]> m_texture;
 	std::unique_ptr<uint16_t[]> m_poly_fifo;
-	int m_poly_fifo_ptr;
+	int m_poly_fifo_ptr = 0;
 
 	std::unique_ptr<tc0780fpa_renderer> m_renderer;
 
-	uint16_t m_tex_address;
-	uint16_t m_tex_offset;
-	int m_texbase_x;
-	int m_texbase_y;
+	uint16_t m_tex_address = 0;
+	uint16_t m_tex_offset = 0;
+	int m_texbase_x = 0;
+	int m_texbase_y = 0;
 };
 
 DECLARE_DEVICE_TYPE(TC0780FPA, tc0780fpa_device)

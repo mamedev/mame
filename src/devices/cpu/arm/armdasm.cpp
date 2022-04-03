@@ -226,8 +226,13 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			break;
 		case 0x0d:
 			/* look for mov pc,lr */
-			if (((opcode >> 12) & 0x0f) == 15 && ((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02000000) == 0)
-				dasmflags = STEP_OUT;
+			if (((opcode >> 12) & 0x0f) == 15)
+			{
+				if (((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02000000) == 0)
+					dasmflags = STEP_OUT;
+				if (opcode < 0xe0000000)
+					dasmflags |= STEP_COND;
+			}
 			[[fallthrough]];
 		case 0x0f:
 			WriteDataProcessingOperand(stream, opcode, true, false, pc);
@@ -337,7 +342,11 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 				util::stream_format( stream, "%c%c", ( opcode&0x00800000 ) ? 'I' : 'D', ( opcode&0x01000000 ) ? 'B' : 'A');
 
 			if( opcode & 0x00008000 )
+			{
 				dasmflags = STEP_OUT;
+				if (opcode < 0xe0000000)
+					dasmflags |= STEP_COND;
+			}
 		}
 		else
 		{
@@ -397,6 +406,8 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		{
 			stream << "B";
 		}
+		if (opcode < 0xe0000000)
+			dasmflags |= STEP_COND;
 
 		stream << pConditionCode;
 
@@ -446,6 +457,8 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		WritePadding(stream, start_position);
 		util::stream_format( stream, "&%X", opcode&0x00ffffff );
 		dasmflags = STEP_OVER;
+		if (opcode < 0xe0000000)
+			dasmflags |= STEP_COND;
 	}
 	else
 	{

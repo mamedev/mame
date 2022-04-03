@@ -30,17 +30,17 @@ const char *afs_format::extensions() const
 	return "adl,img";
 }
 
-int afs_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int afs_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-int afs_format::get_image_offset(const format &f, int head, int track)
+int afs_format::get_image_offset(const format &f, int head, int track) const
 {
 	if (f.sector_base_id == -1)
 		return (track * f.head_count + head) * compute_track_size(f);
@@ -58,4 +58,4 @@ const afs_format::format afs_format::formats[] =
 };
 
 
-const floppy_format_type FLOPPY_AFS_FORMAT = &floppy_image_format_creator<afs_format>;
+const afs_format FLOPPY_AFS_FORMAT;

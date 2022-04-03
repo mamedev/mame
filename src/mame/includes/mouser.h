@@ -42,7 +42,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* misc */
-	bool         m_nmi_enable;
+	bool         m_nmi_enable = false;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

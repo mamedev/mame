@@ -86,7 +86,7 @@ private:
 
 	uint32_t screen_update_tomy_princ(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	bool bFirstPort8Read;
+	bool bFirstPort8Read = false;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(tomy_princ_state::scan_interrupt)

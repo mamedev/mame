@@ -141,9 +141,9 @@ private:
 	required_device<filter_rc_device> m_filter_0_2;
 	required_region_ptr<uint8_t> m_blitrom;
 
-	uint8_t  m_blitterdata[4];
-	uint8_t  m_i8039_status;
-	uint8_t  m_last_irq;
+	uint8_t  m_blitterdata[4]{};
+	uint8_t  m_i8039_status = 0;
+	uint8_t  m_last_irq = 0;
 };
 
 

@@ -49,10 +49,10 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	bitmap_ind16 m_sprite_bitmap;
-	uint8_t      m_flipscreen;
-	int        m_punch_through_pen;
-	uint8_t      m_irq_source;
+	bitmap_ind16 m_sprite_bitmap{};
+	uint8_t      m_flipscreen = 0U;
+	int        m_punch_through_pen = 0;
+	uint8_t      m_irq_source = 0U;
 
 	uint8_t ikki_e000_r();
 	void ikki_coin_counters(uint8_t data);

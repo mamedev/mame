@@ -140,10 +140,10 @@ private:
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
 	std::unique_ptr<int32_t[]> m_ovr_tempdraw_map;
-	uint16_t m_frame_count;
-	uint8_t m_displayfb;
-	uint8_t m_drawfb;
-	uint8_t m_row_num;
+	uint16_t m_frame_count = 0;
+	uint8_t m_displayfb = 0;
+	uint8_t m_drawfb = 0;
+	uint8_t m_row_num = 0;
 	attotime m_input_latch_time;
 
 	uint32_t io_r(offs_t offset);

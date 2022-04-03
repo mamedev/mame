@@ -67,8 +67,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<zerohour_stars_device> m_stars;
 
-	tilemap_t   *m_fg_tilemap;
-	int         m_gfxbank;   // redclash only
+	tilemap_t   *m_fg_tilemap = nullptr;
+	int         m_gfxbank = 0;   // redclash only
 };
 
 #endif // MAME_INCLUDES_REDCLASH_H

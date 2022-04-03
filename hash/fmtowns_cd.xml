@@ -131,7 +131,6 @@ Eigo de Eigo ni Tsuyoku Naru 8                                Infortech         
 Eigo de Eigo ni Tsuyoku Naru 9                                Infortech                         1990/4     CD
 Eikan wa Kimi ni 3: Koukou Yakyuu Zenkoku Taikai              Artdink                           1993/8     SET(CD+FD)
 Ei-wa-doku-ro Denki Jutsugo Daijiten                          Ohmsha                            1990/4     CD
-Euphony 2 / MTR V1.1                                          Fujitsu                           1992/11    CD
 Euphony 2 / SCORE V1.1                                        Fujitsu                           1993/4     CD
 Eye of the Beholder 3                                         Ving                              1994/11    CD
 Fancy Illust: Hattori Yuki no Wakuwaku Cut-shuu               CSK Research Institute (CRI)      1990/3     CD
@@ -400,7 +399,6 @@ Sunshine 1-nen                                                Uchida Youkou     
 Sunshine 2-nen                                                Uchida Youkou                     1993/7     CD
 Super Kakitaoshi                                              Nikkonren Kikaku                  1993/?     SET(CD+FD)
 Super Zurukamashi                                             Nikkonren Kikaku                  1993/?     SET(CD+FD)
-Taiken Shiyou! Marty Channel 2                                Fujitsu                           1993/6     CD×02
 Takken Ou                                                     Techno Business                   1994/10    CD
 Tankyuu-kun                                                   Fujitsu                           1996/11    CD
 Tanoshii Sansuu Set 1-2-nen                                   Dainippon Tosho                   1994/3     SET(CD+FD)
@@ -411,7 +409,6 @@ Tenshi-tachi no Gogo Collection 2                             JAST              
 Tenshi-tachi no Gogo V: Nerawareta Tenshi                     JAST                              1992/12    ?
 Tenshi-tachi no Gogo: Tenkousei                               JAST                              1995/7     CD
 * Teo: Mou Hitotsu no Chikyuu                                 Fujitsu Parex                     1995/9     SET(CD+FD)
-Tera Towns 2                                                  Nihon Micom Hanbai                1993/4     CD
 The Book of MIDI                                              Fujitsu                           1992/9     CD
 The Lost Secret                                               DynEd Japan                       1993/7     SET(CD+FD)
 The Manhole 2                                                 Sun Denshi                        1993/5     ?
@@ -427,7 +424,6 @@ Towns Chiri Shizen no Naritachi                               Fujitsu Ooita Soft
 Towns Cruising Chart                                          Raison                            1991/4     SET(CD+FD)
 Towns E to Oto de Manabu Suugaku                              Rand Computer                     1993/3     CD
 Towns Family Genki Yohou                                      Kozu System                       1990/12    CD
-Towns Magazine Vol. 3                                         Fujitsu                           1995/4     CD×02
 Towns Magazine for School Vol. 1                              Fujitsu                           ?          CD
 Towns Magazine for School Vol. 2                              Fujitsu                           ?          CD
 Towns Magazine for School Vol. 3                              Fujitsu                           ?          CD
@@ -557,22 +553,37 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Fails to boot -->
-	<software name="linuxje3" supported="no">
+	<software name="linuxje" supported="no">
 		<!--
-		 Origin: Neo Kobe Collection
-		 <rom name="[OS] Linux + JE3.mdf" size="760707360" crc="2c93db2b" sha1="992b0e991a6bde293edf059e529ee2321ab6469b"/>
-		 <rom name="[OS] Linux + JE3.mds" size="486" crc="9f8751b3" sha1="bea414de9da5a391b5256855d1ec4beee60e677d"/>
-
-		 *after conversion with IsoBuster+EAC *
-		 <rom name="[os] linux + je3.bin" size="760707360" crc="2c93db2b" sha1="992b0e991a6bde293edf059e529ee2321ab6469b"/>
-		 <rom name="[os] linux + je3.cue" size="77" crc="6f8db5a8" sha1="987a7967fd60cba6f61cc3a4246881b2c4119deb"/>
+		 Origin: redump.org
+		<rom name="Nihongo Linux + JE (Japan).bin" size="511635264" crc="45359908" sha1="d627f52e2001930b0bcca53d956bf4ca42d903d7"/>
+		<rom name="Nihongo Linux + JE (Japan).cue" size="115" crc="d4180508" sha1="3523c20c85fc27e303fac13db1af7551d48f552c"/>
 		 -->
-		<description>Linux + JE3</description>
-		<year>1994</year>
+		<description>Nihongo Linux + JE</description>
+		<year>1993</year>
 		<publisher>Laser 5</publisher>
+		<info name="alt_title" value="日本語Ｌｉｎｕｘ＋ＪＥ" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="[os] linux + je3" sha1="1b4378ab060b809d1a6c174902826495961e2f03" />
+				<disk name="nihongo linux + je (japan)" sha1="717abc5ab103c1d08766faa8d5d519de9b8b6a11" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Fails to boot -->
+	<software name="linuxje3" supported="no">
+		<!--
+		 Origin: redump.org
+		<rom name="Nihongo Linux + JE 3 (Japan).bin" size="760707360" crc="2c93db2b" sha1="992b0e991a6bde293edf059e529ee2321ab6469b"/>
+		<rom name="Nihongo Linux + JE 3 (Japan).cue" size="94" crc="3203b7cd" sha1="d35cfa6d10c8f211e7b164bee8e53e1e1344c51f"/>
+		 -->
+		<description>Nihongo Linux + JE3</description>
+		<year>1994</year>
+		<publisher>Laser 5</publisher>
+		<info name="alt_title" value="日本語Ｌｉｎｕｘ＋ＪＥ３" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nihongo linux + je 3 (japan)" sha1="e6030e2323196c21c4ccd3d686030f6a6311ced9" />
 			</diskarea>
 		</part>
 	</software>
@@ -650,6 +661,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="master cd - fresh series-you (japan)" sha1="4a3a0ad499a8bc2f77b7af44a8ef78f51b5a52d9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- This master CD is specifically for the HC, Fresh ES and Fresh ET models -->
+	<software name="mastercdi">
+		<!--
+		Origin: redump.org
+		<rom name="Master CD - Fresh Series-you (Ichitarou Model) (Japan).bin" size="385525728" crc="ac8ae1be" sha1="e16cc708b1842658931c93e92f7e11f07167823b"/>
+		<rom name="Master CD - Fresh Series-you (Ichitarou Model) (Japan).cue" size="120" crc="9f3c43ad" sha1="a8b13307067dbf0cf993a2f58d56b7d1d7cea525"/>
+		 -->
+		<description>Master CD - Fresh Series-you (Ichitarou Model)</description>
+		<year>1995</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="Ｍａｓｔｅｒ　ＣＤ　（Ｆｒｅｓｈシリーズ用） （一太郎モデル）" />
+		<info name="usage" value="Run DO.BAT from the command line" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="master cd - fresh series-you (ichitarou model) (japan)" sha1="375fa0d9ef44f859c1ada8f1e548653a9714ce77" />
 			</diskarea>
 		</part>
 	</software>
@@ -1006,6 +1036,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="B276A520"/>
+		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk" />
 			<dataarea name="flop" size="1261568">
@@ -1037,6 +1068,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="B276A520"/>
+		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk" />
 			<dataarea name="flop" size="1261568">
@@ -1047,6 +1079,45 @@ User/save disks that can be created from the game itself are not included.
 			<feature name="part_id" value="Setup CD-ROM" />
 			<diskarea name="cdrom">
 				<disk name="microsoft windows version 3.1 l11 operating system (japan) (setup cd-rom)" sha1="b1369d6dd3f06121ba5f10585b11f84fef7fc348" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The "normal" setup disk doesn't seem to work correctly with MAME's CD emulation. The MX/MA disk works. -->
+	<software name="win31l10" cloneof="win31l12" supported="partial">
+		<!--
+		 Origin: redump.org (CD) / cyo.the.vile (floppy)
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM) (Track 1).bin" size="105134400" crc="e8fe1c18" sha1="731279799b3fcfa918e8d76ac4ecd505f777db68"/>
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM) (Track 2).bin" size="24296160" crc="84ca1c64" sha1="a5a76ce4664e31a431f0ede7fb595f68f91ea70e"/>
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM) (Track 3).bin" size="33280800" crc="c715fa2a" sha1="d1f949e98d6721569224f487662b4be4379930d1"/>
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM) (Track 4).bin" size="31203984" crc="ddc80416" sha1="e416686251a310ca37ab28d71422aa0a4b8aad5c"/>
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM) (Track 5).bin" size="33687696" crc="6dc2adb0" sha1="f15fbaa51ef779119ea20c2559b2942e0d660bea"/>
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM) (Track 6).bin" size="24484320" crc="6003c48f" sha1="06cf72ab1a8a97967cf505ebf63ababeb253f64d"/>
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM) (Track 7).bin" size="66366384" crc="14c119e5" sha1="f5fc90b31f35f2fff7fe2a71f66359baecb047dc"/>
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM) (Track 8).bin" size="40978896" crc="1d90117b" sha1="cff7da539635aeaf4eed38df39f9afd479550b78"/>
+		<rom name="Microsoft Windows Version 3.1 L10 Operating System (Japan) (Setup CD-ROM).cue" size="1318" crc="1dec6db3" sha1="7251353a0fb1b036448618558d4bc1a3c4f50f0e"/>
+		 -->
+		<description>Microsoft Windows Version 3.1 L10</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276A520"/>
+		<info name="usage" value="Requires 4 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows version 3.1 l10 operating system (japan) (setup disk).hdm" size="1261568" crc="645fbefd" sha1="092d686e5748b36e223ca7c4ebc0b09698d7f8b4" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Setup Disk (Model MX/MA-you)" />
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows version 3.1 l10 operating system (japan) (setup disk - model mx-ma).hdm" size="1261568" crc="e5847c37" sha1="522aaa5a467af715226850a602c063aab94a43c7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<feature name="part_id" value="Setup CD-ROM" />
+			<diskarea name="cdrom">
+				<disk name="microsoft windows version 3.1 l10 operating system (japan) (setup cd-rom)" sha1="afee30cf72f7995c8dd08620728d726d325a4184" />
 			</diskarea>
 		</part>
 	</software>
@@ -1083,11 +1154,9 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="100isshu">
 		<!--
-		 Origin: Neo Kobe Collection
-		 <rom name="Towns Hyakunin Isshu.ccd" size="768" crc="c78291fe" sha1="fb1ba0eff32b21ae3d2d8c62b9606261c533742c"/>
-		 <rom name="Towns Hyakunin Isshu.cue" size="84" crc="20390175" sha1="6b07be3515eeee7f6ebd18fda4fce253f58e4f62"/>
-		 <rom name="Towns Hyakunin Isshu.img" size="64209600" crc="f5292d63" sha1="24ae14ad96bd7ff19976d9d68bdf5ea3bf9af840"/>
-		 <rom name="Towns Hyakunin Isshu.sub" size="2620800" crc="228bd959" sha1="8a9ad3ca2f624ac2aa2fc031b49f687337f19eb2"/>
+		 Origin: redump.org
+		<rom name="Hyakunin Isshu (Japan).bin" size="64209600" crc="f5292d63" sha1="24ae14ad96bd7ff19976d9d68bdf5ea3bf9af840"/>
+		<rom name="Hyakunin Isshu (Japan).cue" size="111" crc="76daa430" sha1="12efc6c752a1e95ba34914be221256e935ff4528"/>
 		 -->
 		<description>Towns Hyakunin Isshu</description>
 		<year>1989</year>
@@ -1098,7 +1167,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="towns hyakunin isshu" sha1="ef05fdcfbcdd8e4777638eaa3b8e7bf1d3e13ba8" />
+				<disk name="hyakunin isshu (japan)" sha1="1a67022fd6cce20e6639c189d5f8642c948e28d5" />
 			</diskarea>
 		</part>
 	</software>
@@ -1676,6 +1745,48 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="aressh4">
 		<!--
+		Origin: redump.org (CD) / cyo.the.vile (floppy)
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 01).bin" size="21168000" crc="55bd2df5" sha1="527352d844c4577a5b490e9224afa551e6da103f"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 02).bin" size="33120864" crc="c7311b34" sha1="93735ff4aaf4c76b7bd8f181e91fa3b05179c75f"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 03).bin" size="39243120" crc="af946187" sha1="82a8d48e8353ec768af506deed0526fc34a32e53"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 04).bin" size="39708816" crc="9b1f33c2" sha1="d3c5f5c1eb0e38e508d7b47b3294f4c1da1302c3"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 05).bin" size="30787680" crc="1b1aaf79" sha1="b0a64430fad99d3dfc03d8f7ba2d32caf1d11023"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 06).bin" size="37773120" crc="1f5ab3b1" sha1="31f390d4e91c38539d86932e2ad96125f2950933"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 07).bin" size="39000864" crc="17765723" sha1="00b68597e787f3e740230c96f16a99a17b9f3a72"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 08).bin" size="4527600" crc="03e82c19" sha1="6b3118ff037a80dbe5e24cfe95e1683a58feff8d"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 09).bin" size="5680080" crc="bb1830e4" sha1="67d1509639dfee65418fa47febf9e7d8631d8e41"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 10).bin" size="6181056" crc="44d9ccdf" sha1="0a46a51d7331d14ca70571ce34dab549139a92ea"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 11).bin" size="6115200" crc="a0e39d79" sha1="c5f8f21d743b142e30d0be9052f6283800f8aa45"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 12).bin" size="19949664" crc="67c4d33e" sha1="f7eca16ff63fbc5e39f333bb7c10c1c25f9c5f70"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 13).bin" size="21645456" crc="5d347ecc" sha1="af8cc01aff956afd733c2bb3b8e9e6ce8eb1ee9e"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 14).bin" size="19780320" crc="33734c1f" sha1="2e39784c6c09c8c41a246ed27ce03d564909bd4e"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 15).bin" size="20685840" crc="ef1d67da" sha1="8c343b0cc69828f12f19231ae43cff42960419ac"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 16).bin" size="19968480" crc="91a7249f" sha1="2eadc1e6aa6058a8be7fa31b24a984974113349c"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 17).bin" size="19749744" crc="4bcf6a33" sha1="44cf6653683bcad34c0fb4cba12c23132ab7047d"/>
+		<rom name="AIV - A Ressha de Ikou 4 (Japan).cue" size="2164" crc="3a7062de" sha1="ab4131675382c4bb6b80bac846ef7d6a12318e10"/>
+		-->
+		<description>AIV - A Ressha de Ikou 4 (1993-12-15 04:00:00)</description>
+		<year>1993</year>
+		<publisher>アートディンク (Artdink)</publisher>
+		<info name="serial" value="HME-256 / MTC-1074"/>
+		<info name="alt_title" value="A列車で行こう4" />
+		<info name="release" value="199312xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="a-iv-systemdisk_new.hdm" size="1261568" crc="09173db4" sha1="9b007c8cbdb46596bef5235daf3be94f22da3967" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="aiv - a ressha de ikou 4 (japan)" sha1="b319db87f0a0e7bb3b3238ec211c03dad0a75bfd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aressh4o" cloneof="aressh4">
+		<!--
 		Origin: redump.org (CD) / wiggy2k (floppy)
 		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 01).bin" size="21168000" crc="55bd2df5" sha1="527352d844c4577a5b490e9224afa551e6da103f"/>
 		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 02).bin" size="33120864" crc="c7311b34" sha1="93735ff4aaf4c76b7bd8f181e91fa3b05179c75f"/>
@@ -1696,7 +1807,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="AIV - A Ressha de Ikou 4 (Japan) (Track 17).bin" size="19749744" crc="4bcf6a33" sha1="44cf6653683bcad34c0fb4cba12c23132ab7047d"/>
 		<rom name="AIV - A Ressha de Ikou 4 (Japan).cue" size="2164" crc="3a7062de" sha1="ab4131675382c4bb6b80bac846ef7d6a12318e10"/>
 		-->
-		<description>AIV - A Ressha de Ikou 4</description>
+		<description>AIV - A Ressha de Ikou 4 (1993-12-15 01:00:00)</description>
 		<year>1993</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="serial" value="HME-256 / MTC-1074"/>
@@ -1706,7 +1817,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="a-iv-systemdisk.hdm" size="1261568" crc="01b1da33" sha1="6aa1850972b6c8bf7ef82a9bbcba022b777a6df8" offset="000000" />
+				<rom name="a-iv-systemdisk_old.hdm" size="1261568" crc="01b1da33" sha1="6aa1850972b6c8bf7ef82a9bbcba022b777a6df8" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2009,7 +2120,7 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="airwar21">
 		<!--
-		Origin: redump.org / wiggy2k
+		Origin: redump.org (CD) / verified by multiple sources (floppy)
 		<rom name="Fujitsu Air Warrior V2 - Version 2.1 Level 10 (Japan) (Track 1).bin" size="31399200" crc="c5da9017" sha1="2e768e1f117fcf921ecde580fd4ffeafc48d405a"/>
 		<rom name="Fujitsu Air Warrior V2 - Version 2.1 Level 10 (Japan) (Track 2).bin" size="22226400" crc="4842bf9d" sha1="bcfaeb803f6c7925ad018ec655e831d15f5fb7af"/>
 		<rom name="Fujitsu Air Warrior V2 - Version 2.1 Level 10 (Japan) (Track 3).bin" size="14112000" crc="6ca56d10" sha1="61e3610f5fca8796062bf81793f4d2f2a09b3eb5"/>
@@ -6969,7 +7080,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 8).bin" size="70376544" crc="a9597842" sha1="07b706406105d4f4d99038aad84a2c9408692ee6"/>
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
 		-->
-		<description>Emit Vol. 1 - Toki no Maigo (Version 1.30 Release 2.00)</description>
+		<description>Emit Vol. 1 - Toki no Maigo (Version 1.30 Release 2.00, 1995-01-20)</description>
 		<year>1994</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="serial" value="HMF-115 / KN10601010"/>
@@ -6978,7 +7089,39 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit1_v1.30_r2.00.hdm" size="1261568" crc="eca37c28" sha1="58d7f1add8ad84ce7200b0661f380608d8d0639a" offset="000000" />
+				<rom name="emit1_v1.30_r2.00_1995-01-20.hdm" size="1261568" crc="68c2fd3b" sha1="aa76ef1e43a943622abe942022b58a24fe64a6bb" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 1 - toki no maigo (japan) (en,ja)" sha1="038ddc530689da76a82b225a8deefd713b0b059e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="emit1a" cloneof="emit1">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 1).bin" size="20281296" crc="4b15bc51" sha1="02433dd33ba55bf686349d1332a5d72914f418c2"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 2).bin" size="42766416" crc="cddb61dc" sha1="f40ae55a596258434672d7975388b2bdbfc08125"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 3).bin" size="151908624" crc="0480ad92" sha1="e62722a8e8c0e54b11a8a293950a55410d1e7086"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 4).bin" size="159395040" crc="3e561925" sha1="c0f4058a6678439d128648e8d48e8344e828bca8"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 5).bin" size="72077040" crc="0c366937" sha1="77f71ca8d795a8c2e6ed0e286750fea7becc1abb"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 6).bin" size="114714096" crc="3422fc41" sha1="57197a1ccb5c7d2a02a84ee6929fcd2d958e7eb7"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 7).bin" size="6837264" crc="a8bb630c" sha1="34c54fa85a566a00e3c9ba4572a347a15d718170"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 8).bin" size="70376544" crc="a9597842" sha1="07b706406105d4f4d99038aad84a2c9408692ee6"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
+		-->
+		<description>Emit Vol. 1 - Toki no Maigo (Version 1.30 Release 2.00, 1994-04-26)</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="serial" value="HMF-115 / KN10601010"/>
+		<info name="release" value="199403xx" />
+		<info name="alt_title" value="エミット Vol. 1 時の迷子" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit1_v1.30_r2.00_1994-04-26.hdm" size="1261568" crc="eca37c28" sha1="58d7f1add8ad84ce7200b0661f380608d8d0639a" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7531,6 +7674,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="etsuraku no gakuen (japan)" sha1="2470af744ee14ad76a2a904d83ab4b8f51a6aa61" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Requires a MIDI interface, not currently emulated by MAME -->
+	<software name="eup2mtr" supported="no">
+		<!--
+		Origin: redump.org
+		<rom name="Euphony II &amp; MTR V1.1 L20 (Japan).bin" size="6879600" crc="9bdec273" sha1="671f7e40e93c958b08bd8389597f41cad9213c17"/>
+		<rom name="Euphony II &amp; MTR V1.1 L20 (Japan).cue" size="122" crc="d5b50347" sha1="2e2b0915482f8ff716b4df61962b9a274dff9272"/>
+		-->
+		<description>Euphony II / MTR V1.1 L20</description>
+		<year>1992</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276E020"/>
+		<info name="release" value="199211xx" />
+		<info name="usage" value="Requires a MIDI interface and 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euphony ii &amp; mtr v1.1 l20 (japan)" sha1="0cf6324f3cbf7e1184bef891bff768d9279bb7a7" />
 			</diskarea>
 		</part>
 	</software>
@@ -9799,7 +9962,7 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="goh2">
 		<!--
-		Origin: redump.org (CD) / Neo Kobe Collection (floppy)
+		Origin: redump.org (CD) / verified by multiple sources (floppy)
 		<rom name="Gou II - Towns Special (Japan).bin" size="10231200" crc="7d384a3b" sha1="2992dda2d7093656331b40ee0ed49c3bef274be9"/>
 		<rom name="Gou II - Towns Special (Japan).cue" size="96" crc="5673f7e2" sha1="5dafb9d80eac928f8d8e272b8a69aa232ad3ef69"/>
 		-->
@@ -10561,7 +10724,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="alt_title" value="花札でPON！" />
 		<info name="release" value="199607xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
-		<!-- This flopy disk contains a patched executable for the game. It was originally distributed as a download on Active's website. -->
+		<!-- This floppy disk contains a patched executable for the game. It was originally distributed as a download on Active's website. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
@@ -15168,7 +15331,7 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="lotr2">
 		<!--
-		Origin: redump.org (CD) / DamienD (floppy)
+		Origin: redump.org (CD) / cyo.the.vile (floppy)
 		<rom name="Yubiwa Monogatari Dainikan - Futatsu no Tou (Japan) (Track 01).bin" size="10231200" crc="19f29b4a" sha1="fbb345bdf30ad8a32da5a7c736f2d9553e37ca5a"/>
 		<rom name="Yubiwa Monogatari Dainikan - Futatsu no Tou (Japan) (Track 02).bin" size="41983200" crc="689f8f99" sha1="a3b543334b5f2131c2ff67f41044e24eeaaca00d"/>
 		<rom name="Yubiwa Monogatari Dainikan - Futatsu no Tou (Japan) (Track 03).bin" size="3880800" crc="fd9be877" sha1="af249847b4dd8626e4e112fafb7f1e45c0a2b453"/>
@@ -15200,9 +15363,9 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199304xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="User Disk" />
+			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="the lord of the rings - the two towers user disk.bin" size="1261568" crc="51c5461f" sha1="31548881ebfd4eb50281b3086709e5ff02a72ddd" offset="000000" />
+				<rom name="lotr2_game_disk.bin" size="1261568" crc="2b2eb562" sha1="96cb6baeccbce2e1cb37b59066415c9e3f92626b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -21295,6 +21458,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199311xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
 				<rom name="psychic_detective_series_vol_1_invitation_remake.hdm" size="1261568" crc="9f790046" sha1="e4737890d114f3afb00e956246ac27c9c8217281" offset="000000" />
 			</dataarea>
@@ -21406,10 +21570,10 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
-	<software name="psydet3r" supported="no">
+	<!-- DOS/V / PC-9821 / FM Towns hybrid. Each version requires a different floppy disk, but the CD is shared between them. -->
+	<software name="psydet3r">
 		<!--
-		Origin: redump.org
+		Origin: redump.org (CD) / cyo.the.vile (floppy)
 		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 1).bin" size="89359536" crc="6915161f" sha1="aa06da54feeb4f0fd8e249cf53c4d4d2539cdd61"/>
 		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 2).bin" size="5743584" crc="f06ba894" sha1="5a243e2c9c64689aed3e850025c329dd32175670"/>
 		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 3).bin" size="17136672" crc="c2b7d833" sha1="3b947afe9fc19d6b974d3a7ab8217f9723168ddb"/>
@@ -21425,6 +21589,13 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="DWDC4022"/>
 		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.3　アヤ" />
 		<info name="release" value="199407xx" />
+		<info name="usage" value="Requires 4 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Key-Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic_detective_series_vol_3_aya_remake.hdm" size="1261568" crc="8780e213" sha1="f5873104bc886a392231d41a6f22b902f36734de" offset="000000" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="psychic detective series vol. 3 - aya (japan) (remake)" sha1="1c887f76a96952b058d74335ce73eb6b06c803f7" />
@@ -21485,6 +21656,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199412xx" />
 		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
 				<rom name="psychic_detective_series_vol_4_orgel_remake.hdm" size="1261568" crc="bbf0a03e" sha1="4f4f6161b5fa0b8f1c4e6f0874a8c476aaa42e4f" offset="000000" />
 			</dataarea>
@@ -21530,10 +21702,10 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
-	<software name="psydet5r" supported="no">
+	<!-- DOS/V / PC-9821 / FM Towns hybrid. Each version requires a different floppy disk, but the CD is shared between them. -->
+	<software name="psydet5r">
 		<!--
-		Origin: redump.org
+		Origin: redump.org (CD) / cyo.the.vile (floppy)
 		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 1).bin" size="116983776" crc="a36646c6" sha1="d5aef069a6a6a5d18442ccba065026be66e8fb7e"/>
 		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 2).bin" size="48079584" crc="00f56a5d" sha1="6bf54e0f1076e73a5efca7716dfb4e0dc63e2704"/>
 		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 3).bin" size="6606768" crc="e14b585d" sha1="9d83445ee246af371ea4191eb49f3d9ce335563f"/>
@@ -21551,6 +21723,14 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="DWDC4024"/>
 		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.5　ナイトメア" />
 		<info name="release" value="199504xx" />
+		<info name="usage" value="Requires 4 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Key-Disk" />
+			<dataarea name="flop" size="1261568">
+				<!-- The original disk contained several bad sectors affecting the IO.SYS file, they have been replaced with the equivalent ones from Orgel -->
+				<rom name="psychic_detective_series_vol_5_nightmare_remake.hdm" size="1261568" crc="ab3cb7c5" sha1="25adac22fbca5c6c0d422554030ebb2295615004" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="psychic detective series vol. 5 - nightmare (japan) (remake)" sha1="b0a088b71f05c1afa037e3dddff116fa95aee503" />
@@ -24302,7 +24482,47 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="softcon1o">
+	<software name="softcon1a" cloneof="softcon1">
+		<!--
+		Origin: redump.org
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 01).bin" size="158407200" crc="49e12d77" sha1="6181f782b2f18b32cacafeae5259d4137536ad12"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 02).bin" size="52096800" crc="e0158890" sha1="b61ddcd5f7da7cd39c12c3eb4ed01a854e568efd"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 03).bin" size="10953264" crc="37a94746" sha1="342aaffc91e10d5fc885b7c8bd3d7417c5a71a9e"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 04).bin" size="7945056" crc="37f60d67" sha1="3d297b9e305aa30cebb71bfe467a2d5ce8ffc5f6"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 05).bin" size="882000" crc="81f7cf71" sha1="3ad64d1bb47ca183c6a1e8a3239aac8e046ab6e5"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 06).bin" size="2116800" crc="615c57fb" sha1="fc9c763a8b9e1cfc00ce9cf902c4d94935045db2"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 07).bin" size="882000" crc="bbc86bab" sha1="b245772452ad9e2310ffa6151653e9b22219549f"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 08).bin" size="2646000" crc="49ac4af4" sha1="dc6b2783ab8d53b4377414b759edcc22b5b2999a"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 09).bin" size="882000" crc="f09f6001" sha1="4eeafd7f91b5d934bbdba4e015a5030332b52eb5"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 10).bin" size="2822400" crc="2bbaa550" sha1="e56872a057fc1b852bf22eb54f9d39c29843f04c"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 11).bin" size="882000" crc="201b9254" sha1="fbf17f2bb22177aa25bda33bd99d3023d3988f57"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 12).bin" size="882000" crc="549a6bc3" sha1="b51028f863c4a2a66201087db851daf8df995446"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 13).bin" size="47185824" crc="47d0c48c" sha1="2484ed98c749ebe82c0076fb75c51b1d703077aa"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 14).bin" size="31382736" crc="e04f0346" sha1="f60b6acc12905753bd85e33134e92fc36ac9de1e"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 15).bin" size="28623840" crc="94bf5f84" sha1="eccc63c486636c0d7b1d00b4eaed0a745d016856"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 16).bin" size="41124720" crc="af35b5be" sha1="620a02eafbb12736bd09c4e086b3a2d007047eeb"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 17).bin" size="47040000" crc="b5f3bcf0" sha1="e6ec0d56fdd2c96950f84b73dc9bbf9cad80aafb"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 18).bin" size="882000" crc="cb9c60ca" sha1="29c071ad08db3587d836bedc38d1d156d40d9db5"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 19).bin" size="44405760" crc="6c07e05b" sha1="59626d5b3ef834befcf95cde3914224ec190bbf8"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 20).bin" size="882000" crc="d74c6972" sha1="82b03faf4110963fad8a4cbb6d6c785198609436"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 21).bin" size="26942160" crc="e84e1616" sha1="04e9e51ecd9f6e3b18e0d3ea0f6d9719de95ef7b"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A) (Track 22).bin" size="43869504" crc="dfb5e9f9" sha1="d868a5c5129ec0abc78d58918a069455698f35f9"/>
+		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Rev A).cue" size="2800" crc="4c482350" sha1="362cb26f5dfbd1182691891b633f386e3e188bd2"/>
+		-->
+		<description>Software Contest Nyuusen Sakuhinshuu 1 (HMC-139A)</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HMC-139A"/>
+		<info name="alt_title" value="ソフトウェアコンテスト入選作品集 1" />
+		<info name="release" value="199111xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="software contest nyuusen sakuhinshuu 1 (japan) (rev a)" sha1="a52c4bd23b19922ff60958e3ba100a142cf5746d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="softcon1o" cloneof="softcon1">
 		<!--
 		Origin: redump.org
 		<rom name="Software Contest Nyuusen Sakuhinshuu 1 (Japan) (Track 01).bin" size="158407200" crc="5202f0f6" sha1="e6f9020516cd3c925819f672ff95dd43a9b50cd7"/>
@@ -25394,6 +25614,58 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="martych2">
+		<!--
+		Origin: redump.org
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 01).bin" size="151351200" crc="183a73c1" sha1="8bd2139b7c9a73c5b6a243271e2d56a4acb8eb3d"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 02).bin" size="2222640" crc="ad7bdc80" sha1="f1d384d3017fc5efbba7faa805159a28e080c283"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 03).bin" size="23150736" crc="9acd9e3c" sha1="76d9cc5eca4aa763f5e2b3bec35f37daa8929e71"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 04).bin" size="10435824" crc="93926ea1" sha1="0283c4362d59a4a7936d152036f1def5d1af5884"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 05).bin" size="16758000" crc="c9830c20" sha1="64f8c8bd1c1e253a11e56a9eb76ac8d9b0188382"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 06).bin" size="3257520" crc="d482bdcf" sha1="c8ddb06953a8bf0872c7ef5d32001a9cd78a0128"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 07).bin" size="4899216" crc="526a968b" sha1="22cdc106af0c0b830fb94e4880a9b406d73d4829"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 08).bin" size="1552320" crc="36102fb0" sha1="fcc47253fef05eaeb06ac2e48f96790e341b1736"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 09).bin" size="44869104" crc="febbe459" sha1="056080ff01f9ade1637854ba087b9d922865283e"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 10).bin" size="44730336" crc="01c6c1b7" sha1="6e4d081d9967847037bc3b8c13407c27beff270f"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 11).bin" size="21525504" crc="700c336b" sha1="beb559ceaebe6205886b02fce4376d63f9d6a929"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 12).bin" size="12453840" crc="5df4b1dc" sha1="f51c697c45ebbf2778fdb086626aa9bc6143d43e"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 13).bin" size="11830560" crc="7a696ec5" sha1="7ea0fa69ee46014c85d6da36fcca14edcd01750b"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 14).bin" size="6239856" crc="b7c7443d" sha1="947bb7ce11082ddef61f14373c19380864cc453f"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 15).bin" size="5461344" crc="6fe11eea" sha1="276e5bcbdaff1fa57a12235f3f138a58345b1a8a"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 16).bin" size="3158736" crc="f211ece2" sha1="23bc3929c9eaca52bda2c066b4bae023bc8080c0"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 17).bin" size="11313120" crc="7a5341b8" sha1="c49375338d10facdb2d92004cff8afec6403b6b5"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 18).bin" size="6197520" crc="6c376d34" sha1="7bce9723b6b35b2c28f25c9c277bf71f2aa86bd7"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 19).bin" size="14794080" crc="13632985" sha1="d8cb0a82780814a4afb14b2dfacbccd250a9a3fb"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 20).bin" size="15939504" crc="f89bbaa5" sha1="a5a98add278a8c4d862872fcd314a0a44337ef8c"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 21).bin" size="25507440" crc="e96d6f3a" sha1="423fe9c5fcecca717f47f8322b5f56fca65030f4"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 22).bin" size="5644800" crc="82fa0548" sha1="f1e267ef0d3b5c038ddcbe61155e8baf206a836e"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 23).bin" size="31928400" crc="3e994bd2" sha1="7a0ecd98a4fc882cb9b75ad47d0e0ed2e7267410"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 24).bin" size="31752000" crc="01afd921" sha1="b7625dbcdf9263963f443b4266dbdd30a68a4fda"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 25).bin" size="5644800" crc="f10fe8c8" sha1="469b3a70ec6e45ab48f49bbe587457d531289cee"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 26).bin" size="47980800" crc="de5b7af0" sha1="7ca2af96d9993bf43049126c0207e22f06588dbf"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 27).bin" size="5115600" crc="88ab9b2d" sha1="03a6860fdc640cfaac5e80332d93a0495ecbb5d8"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 28).bin" size="33339600" crc="34a29c6e" sha1="a9cb0597c9205bd6362b001488aa757f7b147f18"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 29).bin" size="2822400" crc="ce075d5d" sha1="2a1d68ba51c91dbb3407dedd6e3e2afa60ddbc4c"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 30).bin" size="5757696" crc="01b1eec9" sha1="8373918814bd5e42705eb65bccb35cfcb0782f37"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 31).bin" size="16475760" crc="efa9fa85" sha1="58b7b8d7a82e71362efcd13358ae6a8af387c8c0"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 32).bin" size="15610224" crc="b6011fe1" sha1="3edb84af849a9cde2b1e1247ddffc6bb914958fe"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan) (Track 33).bin" size="51943920" crc="8cea595d" sha1="37cafc93e31f5c0940c1e7832a5bf945edb8bb4d"/>
+		<rom name="Taiken Shiyou! Marty Channel II (Japan).cue" size="4312" crc="5aba4151" sha1="b46175190283afc08bc2413aa53edd1c6fd4aa4b"/>
+		-->
+		<description>Taiken Shiyou! Marty Channel II</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HME-904"/>
+		<info name="alt_title" value="体験しよう！マーティチャンネルⅡ" />
+		<info name="release" value="199306xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="taiken shiyou marty channel ii (japan)" sha1="42663bd489ce37782985116bc4177901812f060a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="taikoris">
 		<!--
 		Origin: redump.org (CD) / cyo.the.vile (floppy)
@@ -26164,6 +26436,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="terra towns (japan)" sha1="b7fbba83c5826b740e36cd9cdf1e34076b8ceaf8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="terra2">
+		<!--
+		Origin: redump.org
+		<rom name="Terra Towns II (Japan).bin" size="20815200" crc="d3c1e046" sha1="8a4c78b6f719ccf3285275b08fac7820f83beeb9"/>
+		<rom name="Terra Towns II (Japan).cue" size="88" crc="729581ca" sha1="004651bb291ece9f9e80f2af23d74ca636465d34"/>
+		-->
+		<description>Terra Towns II</description>
+		<year>1993</year>
+		<publisher>日本マイコン販売 (Nihon Micom Hanbai)</publisher>
+		<info name="serial" value="HME-133"/>
+		<info name="alt_title" value="テラＴＯＷＮＳⅡ" />
+		<info name="release" value="199304xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="terra towns ii (japan)" sha1="2ea2404298b5f13cb968ed660d96cbdb52fa85c9" />
 			</diskarea>
 		</part>
 	</software>
@@ -27034,6 +27326,33 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom2" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="townsmagazine vol. 2 (no. 2) (japan)" sha1="2d0a5d5f1c28389ffcd8ca3bfd61e7000d09b6ba" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="townsmg3">
+		<!--
+		Origin: redump.org
+		<rom name="TownsMagazine Vol. 3 (No. 1) (Japan).bin" size="590314368" crc="fb333507" sha1="5c2cf3be1327be0229e857592a65fd5fed464f88"/>
+		<rom name="TownsMagazine Vol. 3 (No. 1) (Japan).cue" size="102" crc="e4034d11" sha1="ba82d6315ed5c79f521ad30640aa004d973de475"/>
+
+		<rom name="TownsMagazine Vol. 3 (No. 2) (Japan).bin" size="324942912" crc="b11f9f8e" sha1="82a5378d55c6d8cb64ced8d8f862a9a49ed11f4f"/>
+		<rom name="TownsMagazine Vol. 3 (No. 2) (Japan).cue" size="102" crc="0fa905ac" sha1="68963b8d8752008ad693362e0bb56d40d9f90166"/>
+		-->
+		<description>Towns Magazine Vol. 3</description>
+		<year>1995</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276F020"/>
+		<info name="release" value="199504xx" />
+		<info name="usage" value="Requires 4 MB RAM"/>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="townsmagazine vol. 3 (no. 1) (japan)" sha1="a0d591fa35f998974de6f2f4615a38623e002b2a" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="townsmagazine vol. 3 (no. 2) (japan)" sha1="1a7e9db9136e5f89301d9766122b177a7341ce84" />
 			</diskarea>
 		</part>
 	</software>

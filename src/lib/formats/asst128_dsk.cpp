@@ -38,4 +38,4 @@ const asst128_format::format asst128_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_ASST128_FORMAT = &floppy_image_format_creator<asst128_format>;
+const asst128_format FLOPPY_ASST128_FORMAT;

@@ -90,8 +90,8 @@ private:
 	int m_collision_fg_car = 0;
 
 	bitmap_ind16 m_colmap_car;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

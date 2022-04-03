@@ -130,12 +130,13 @@ bool windows_osd_interface::window_init()
 	window_thread = GetCurrentThread();
 	window_threadid = main_threadid;
 
+	// initialize the renderer
 	const int fallbacks[VIDEO_MODE_COUNT] = {
 		-1,                 // NONE -> no fallback
 		VIDEO_MODE_NONE,    // GDI -> NONE
 		VIDEO_MODE_D3D,     // BGFX -> D3D
 #if (USE_OPENGL)
-		VIDEO_MODE_GDI,     // OPENGL -> GDI
+		-1,                 // OPENGL -> no fallback
 #endif
 		-1,                 // No SDL2ACCEL on Windows OSD
 #if (USE_OPENGL)
@@ -151,7 +152,7 @@ bool windows_osd_interface::window_init()
 	{
 		bool error = false;
 		switch(current_mode)
-	{
+		{
 			case VIDEO_MODE_NONE:
 				error = renderer_none::init(machine());
 				break;

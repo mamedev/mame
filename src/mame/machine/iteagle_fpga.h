@@ -135,7 +135,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	address_space *m_memory_space;
+	address_space *m_memory_space = nullptr;
 	uint16_t m_sw_version;
 	uint8_t m_hw_version;
 

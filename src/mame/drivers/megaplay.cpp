@@ -88,17 +88,17 @@ private:
 	void megaplay_bios_io_map(address_map &map);
 	void megaplay_bios_map(address_map &map);
 
-	uint32_t m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
+	uint32_t m_bios_mode = 0;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
 
-	uint32_t m_bios_bank; // ROM bank selection
-	uint16_t m_game_banksel;  // Game bank selection
-	uint32_t m_readpos;  // serial bank selection position (9-bit)
-	uint32_t m_bios_bank_addr;
+	uint32_t m_bios_bank = 0; // ROM bank selection
+	uint16_t m_game_banksel = 0;  // Game bank selection
+	uint32_t m_readpos = 0;  // serial bank selection position (9-bit)
+	uint32_t m_bios_bank_addr = 0;
 
-	uint32_t m_bios_width;  // determines the way the game info ROM is read
-	uint8_t m_bios_6600;
-	uint8_t m_bios_6403;
-	uint8_t m_bios_6404;
+	uint32_t m_bios_width = 0;  // determines the way the game info ROM is read
+	uint8_t m_bios_6600 = 0;
+	uint8_t m_bios_6403 = 0;
+	uint8_t m_bios_6404 = 0;
 
 	std::unique_ptr<uint16_t[]> m_ic36_ram;
 	std::unique_ptr<uint8_t[]> m_ic37_ram;

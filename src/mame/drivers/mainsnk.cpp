@@ -343,18 +343,6 @@ static INPUT_PORTS_START( canvas )
 INPUT_PORTS_END
 
 
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	256
-};
-
-
 static const gfx_layout sprite_layout =
 {
 	16,16,
@@ -369,8 +357,8 @@ static const gfx_layout sprite_layout =
 
 
 static GFXDECODE_START( gfx_mainsnk )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0x100, 0x080>>4 )
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0x000, 0x080>>3 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0x100, 0x080>>4 )
+	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,          0x000, 0x080>>3 )
 GFXDECODE_END
 
 

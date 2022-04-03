@@ -17,7 +17,7 @@
 #define MAME_BUS_BBC_TUBE_6502_H
 
 #include "tube.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/m65sc02.h"
 #include "machine/ram.h"
 #include "machine/tube.h"
 
@@ -27,9 +27,9 @@
 
 // ======================> bbc_tube_6502_device
 
-class bbc_tube_6502_device :
-	public device_t,
-	public device_bbc_tube_interface
+class bbc_tube_6502_device
+	: public device_t
+	, public device_bbc_tube_interface
 {
 public:
 	// construction/destruction
@@ -54,7 +54,7 @@ protected:
 	virtual uint8_t tube_r(offs_t offset);
 	virtual void tube_w(offs_t offset, uint8_t data);
 
-	required_device<m65c02_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	memory_view m_view;
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;

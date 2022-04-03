@@ -92,9 +92,9 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	bool m_bookkeeping_mode;
+	bool m_bookkeeping_mode = false;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void wallc_coin_counter_w(uint8_t data);

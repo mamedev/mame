@@ -25,8 +25,8 @@ private:
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	DECLARE_WRITE_LINE_MEMBER(spi_w);
 
-	uint8_t m_spi_bit;
-	uint8_t m_spi_val;
+	uint8_t m_spi_bit = 0;
+	uint8_t m_spi_val = 0;
 };
 
 static INPUT_PORTS_START( tvtouch )

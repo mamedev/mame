@@ -52,16 +52,16 @@ private:
 
 	struct
 	{
-		uint8_t data[8];
-		int index;
-		int x, y;
-		bool mode; // true read does not increase address
-		bool delayed;
-		uint8_t pixels[8][64];
+		uint8_t data[8]{};
+		int index = 0;
+		int x = 0, y = 0;
+		bool mode = false; // true read does not increase address
+		bool delayed = false;
+		uint8_t pixels[8][64]{};
 	} m_video;
 
-	uint8_t m_ports[5];
-	uint8_t m_ram[0x4000];
+	uint8_t m_ports[5]{};
+	uint8_t m_ram[0x4000]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;

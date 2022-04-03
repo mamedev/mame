@@ -46,18 +46,18 @@ private:
 	optional_shared_ptr<uint8_t> m_scratchram;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	uint8_t *m_fg_gfx;   /* prosoccr */
-	std::unique_ptr<uint8_t[]> m_charram;   /* prosoccr */
-	uint8_t m_io_ram[16];
+	uint8_t *m_fg_gfx = nullptr;   /* prosoccr */
+	std::unique_ptr<uint8_t[]> m_charram{};   /* prosoccr */
+	uint8_t m_io_ram[16]{};
 
-	int m_bank;
-	int m_latch;
-	uint8_t m_gfx_rom_readback;
-	int m_background_color;
-	int m_background_disable;
+	int m_bank = 0;
+	int m_latch = 0;
+	uint8_t m_gfx_rom_readback = 0U;
+	int m_background_color = 0;
+	int m_background_disable = 0;
 
-	tilemap_t *m_back_tilemap;
-	tilemap_t *m_fix_tilemap;
+	tilemap_t *m_back_tilemap = nullptr;
+	tilemap_t *m_fix_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

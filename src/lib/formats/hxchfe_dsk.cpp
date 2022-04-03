@@ -111,21 +111,7 @@
 #define HEADER_LENGTH 512
 #define TRACK_TABLE_LENGTH 1024
 
-hfe_format::hfe_format() : floppy_image_format_t(),
-   m_cylinders(0),
-   m_heads(0),
-   m_track_encoding(UNKNOWN_ENCODING),
-   m_bit_rate(0),
-   m_floppy_rpm(0),
-   m_interface_mode(DISABLE_FLOPPYMODE),
-   m_write_allowed(true),
-   m_single_step(true),
-   m_track0s0_has_altencoding(false),
-   m_track0s0_encoding(UNKNOWN_ENCODING),
-   m_track0s1_has_altencoding(false),
-   m_track0s1_encoding(UNKNOWN_ENCODING),
-   m_selected_mode(DISABLE_FLOPPYMODE),
-   m_selected_encoding(UNKNOWN_ENCODING)
+hfe_format::hfe_format() : floppy_image_format_t()
 {
 }
 
@@ -146,26 +132,27 @@ const char *hfe_format::extensions() const
 
 bool hfe_format::supports_save() const
 {
-	return true;
+	return false;
 }
 
-int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int hfe_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[8];
 
 	size_t actual;
 	io.read_at(0, &header, sizeof(header), actual);
 	if ( memcmp( header, HFE_FORMAT_HEADER, 8 ) ==0) {
-		return 100;
+		return FIFID_SIGN;
 	}
 	return 0;
 }
 
-bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint8_t header[HEADER_LENGTH];
 	uint8_t track_table[TRACK_TABLE_LENGTH];
+	header_info info;
 
 	int drivecyl, driveheads;
 	image->get_maximal_geometry(drivecyl, driveheads);
@@ -181,101 +168,101 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 	}
 
-	m_cylinders = header[9] & 0xff;
-	m_heads = header[10] & 0xff;
+	info.m_cylinders = header[9] & 0xff;
+	info.m_heads = header[10] & 0xff;
 
-	if (drivecyl < m_cylinders)
+	if (drivecyl < info.m_cylinders)
 	{
-		if (m_cylinders - drivecyl > DUMP_THRESHOLD)
+		if (info.m_cylinders - drivecyl > DUMP_THRESHOLD)
 		{
-			osd_printf_error("hxchfe: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
+			osd_printf_error("hxchfe: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", info.m_cylinders, drivecyl);
 			return false;
 		}
 		else
 		{
 			// Some dumps has a few excess tracks to be safe,
 			// lets be nice and just skip those tracks
-			osd_printf_warning("hxchfe: Floppy disk has a slight excess of tracks for this drive that will be discarded (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
-			m_cylinders = drivecyl;
+			osd_printf_warning("hxchfe: Floppy disk has a slight excess of tracks for this drive that will be discarded (floppy tracks=%d, drive tracks=%d).\n", info.m_cylinders, drivecyl);
+			info.m_cylinders = drivecyl;
 		}
 	}
 
-	if (m_cylinders <= drivecyl/2)
+	if (info.m_cylinders <= drivecyl/2)
 	{
-		osd_printf_error("hxchfe: Double stepping not yet supported (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
+		osd_printf_error("hxchfe: Double stepping not yet supported (floppy tracks=%d, drive tracks=%d).\n", info.m_cylinders, drivecyl);
 		return false;
 	}
 
-	m_track_encoding = (encoding_t)(header[11] & 0xff);
+	info.m_track_encoding = (encoding_t)(header[11] & 0xff);
 
-	if (m_track_encoding > EMU_FM_ENCODING)
+	if (info.m_track_encoding > EMU_FM_ENCODING)
 	{
-		osd_printf_error("hxchfe: Unknown track encoding %d.\n", m_track_encoding);
+		osd_printf_error("hxchfe: Unknown track encoding %d.\n", info.m_track_encoding);
 		return false;
 	}
 
-	m_bit_rate = (header[12] & 0xff) | ((header[13] & 0xff)<<8);
+	info.m_bit_rate = (header[12] & 0xff) | ((header[13] & 0xff)<<8);
 
-	if (m_bit_rate > 500)
+	if (info.m_bit_rate > 500)
 	{
-		osd_printf_error("hxchfe: Unsupported bit rate %d.\n", m_bit_rate);
+		osd_printf_error("hxchfe: Unsupported bit rate %d.\n", info.m_bit_rate);
 		return false;
 	}
-	int samplelength = 500000 / m_bit_rate;
+	int samplelength = 500000 / info.m_bit_rate;
 
 	// Not used in the HxC emulator
-	m_floppy_rpm = (header[14] & 0xff) | ((header[15] & 0xff)<<8);
+	info.m_floppy_rpm = (header[14] & 0xff) | ((header[15] & 0xff)<<8);
 
-	m_interface_mode = (floppymode_t)(header[16] & 0xff);
-	if (m_interface_mode > S950_HD_FLOPPYMODE)
+	info.m_interface_mode = (floppymode_t)(header[16] & 0xff);
+	if (info.m_interface_mode > S950_HD_FLOPPYMODE)
 	{
-		osd_printf_error("hxchfe: Unknown interface mode %d.\n", m_interface_mode);
+		osd_printf_error("hxchfe: Unknown interface mode %d.\n", info.m_interface_mode);
 		return false;
 	}
 
-	m_write_allowed = (header[20] != 0);
-	m_single_step = (header[21] != 0);
-	m_track0s0_has_altencoding = (header[22] == 0x00);
-	m_track0s0_encoding = (encoding_t)(header[23] & 0xff);
-	m_track0s1_has_altencoding = (header[24] == 0x00);
-	m_track0s1_encoding = (encoding_t)(header[25] & 0xff);
+	info.m_write_allowed = (header[20] != 0);
+	info.m_single_step = (header[21] != 0);
+	info.m_track0s0_has_altencoding = (header[22] == 0x00);
+	info.m_track0s0_encoding = (encoding_t)(header[23] & 0xff);
+	info.m_track0s1_has_altencoding = (header[24] == 0x00);
+	info.m_track0s1_encoding = (encoding_t)(header[25] & 0xff);
 
 	// read track lookup table (multiple of 512)
 	int table_offset = (header[18] & 0xff) | ((header[19] & 0xff)<<8);
 
 	io.read_at(table_offset<<9, track_table, TRACK_TABLE_LENGTH, actual);
 
-	for (int i=0; i < m_cylinders; i++)
+	for (int i=0; i < info.m_cylinders; i++)
 	{
-		m_cyl_offset[i] = (track_table[4*i] & 0xff) | ((track_table[4*i+1] & 0xff)<<8);
-		m_cyl_length[i] = (track_table[4*i+2] & 0xff) | ((track_table[4*i+3] & 0xff)<<8);
+		info.m_cyl_offset[i] = (track_table[4*i] & 0xff) | ((track_table[4*i+1] & 0xff)<<8);
+		info.m_cyl_length[i] = (track_table[4*i+2] & 0xff) | ((track_table[4*i+3] & 0xff)<<8);
 	}
 
 	// Load the tracks
 	std::vector<uint8_t> cylinder_buffer;
-	for(int cyl=0; cyl < m_cylinders; cyl++)
+	for(int cyl=0; cyl < info.m_cylinders; cyl++)
 	{
 		// actual data read
 		// The HFE format defines an interleave of the two sides per cylinder
 		// at every 256 bytes
-		cylinder_buffer.resize(m_cyl_length[cyl]);
-		io.read_at(m_cyl_offset[cyl]<<9, &cylinder_buffer[0], m_cyl_length[cyl], actual);
+		cylinder_buffer.resize(info.m_cyl_length[cyl]);
+		io.read_at(info.m_cyl_offset[cyl]<<9, &cylinder_buffer[0], info.m_cyl_length[cyl], actual);
 
-		generate_track_from_hfe_bitstream(cyl, 0, samplelength, &cylinder_buffer[0], m_cyl_length[cyl], image);
-		if (m_heads == 2)
-			generate_track_from_hfe_bitstream(cyl, 1, samplelength, &cylinder_buffer[0], m_cyl_length[cyl], image);
+		generate_track_from_hfe_bitstream(cyl, 0, samplelength, &cylinder_buffer[0], info.m_cyl_length[cyl], image);
+		if (info.m_heads == 2)
+			generate_track_from_hfe_bitstream(cyl, 1, samplelength, &cylinder_buffer[0], info.m_cyl_length[cyl], image);
 	}
 
 	bool success = true;
 
 	// Find variant
-	if (m_track_encoding == ISOIBM_FM_ENCODING || m_track_encoding == EMU_FM_ENCODING)
+	if (info.m_track_encoding == ISOIBM_FM_ENCODING || info.m_track_encoding == EMU_FM_ENCODING)
 		// FM is for single density
-		image->set_variant((m_heads==1)? floppy_image::SSSD : floppy_image::DSSD);
+		image->set_variant((info.m_heads==1)? floppy_image::SSSD : floppy_image::DSSD);
 	else
 	{
 		// MFM encoding is for everything else
-		if (m_track_encoding == ISOIBM_MFM_ENCODING || m_track_encoding == AMIGA_MFM_ENCODING)
+		if (info.m_track_encoding == ISOIBM_MFM_ENCODING || info.m_track_encoding == AMIGA_MFM_ENCODING)
 		{
 			// Each cylinder contains the samples of both sides, 8 samples per
 			// byte; the bitRate determines how many samples constitute a cell
@@ -286,7 +273,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			// DSED: 2.8 MiB = 2*80*36*512 bytes; 400000 cells/track, 500 ns, 1 Mbit/s
 
 			// Use cylinder 1 (cyl 0 may have special encodings)
-			int cellcount = (m_cyl_length[1] * 8 / 2) * 250 / m_bit_rate;
+			int cellcount = (info.m_cyl_length[1] * 8 / 2) * 250 / info.m_bit_rate;
 			if (cellcount > 300000)
 				image->set_variant(floppy_image::DSED);
 			else
@@ -297,7 +284,7 @@ bool hfe_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				{
 					if (cellcount > 90000)
 						// We cannot distinguish DSDD from DSQD without knowing the size of the floppy disk
-						image->set_variant((m_heads==1)? floppy_image::SSDD : floppy_image::DSDD);
+						image->set_variant((info.m_heads==1)? floppy_image::SSDD : floppy_image::DSDD);
 				}
 			}
 		}
@@ -329,16 +316,10 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	// HFE does not define subtracks; set to 0
 
 	// MG_1 / MG_0 are (logical) levels that indicate transition / no change
-	// MG_A / MG_B are physical flux directions
-	//
-	// Cell: | AAAABBBB | = MG_1 = | BBBBAAAA |
-	//       | AAAAAAAA | = MG_0 = | BBBBBBBB |
+	// MG_F is the position of a flux transition
 
 	std::vector<uint32_t> &dest = image->get_buffer(cyl, head, 0);
 	dest.clear();
-
-	// Start with MG_A
-	uint32_t cbit = floppy_image::MG_A;
 
 	int offset = 0x100;
 
@@ -350,10 +331,6 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 
 	uint8_t current = 0;
 	int time  = 0;
-
-	dest.push_back(cbit | time);
-
-	cbit = floppy_image::MG_B;
 
 	// Oversampled FM images (250 kbit/s) start with a 0, where a 1 is
 	// expected for 125 kbit/s.
@@ -397,13 +374,8 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 		{
 			time += samplelength;
 			if ((current & 1)!=0)
-			{
 				// Append another transition to the vector
-				dest.push_back(cbit | time);
-
-				// Toggle the cell level
-				cbit = (cbit == floppy_image::MG_A)? floppy_image::MG_B : floppy_image::MG_A;
-			}
+				dest.push_back(floppy_image::MG_F | time);
 
 			// HFE uses little-endian bit order
 			current >>= 1;
@@ -419,292 +391,6 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	image->set_write_splice_position(cyl, head, 0, 0);
 }
 
-bool hfe_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	size_t actual;
-	std::vector<uint8_t> cylbuf;
-
-	// Create a buffer that is big enough to handle HD formats. We don't
-	// know the track length until we generate the HFE bitstream.
-	cylbuf.resize(0x10000);
-
-	uint8_t header[HEADER_LENGTH];
-	uint8_t track_table[TRACK_TABLE_LENGTH];
-
-	int track_end = 0x61c0;
-	int samplelength = 2000;
-
-	// Set up header
-	const char* sig = "HXCPICFE";
-	memcpy(header, sig, 8);
-
-	header[8] = 0;
-	// Can we change the number of tracks or heads?
-	image->get_actual_geometry(m_cylinders, m_heads);
-
-	header[9] = m_cylinders;
-	header[10] = m_heads;
-	// Floppy RPM is not used
-	header[14] = 0;
-	header[15] = 0;
-
-	// Bit rate and encoding will be set later, they may have changed by
-	// reformatting. The selected encoding is UNKNOWN_ENCODING unless
-	// explicitly set
-	m_track_encoding = m_selected_encoding;
-
-	// Take the old mode, unless we have specified a mode
-	header[16] = (m_selected_mode != DISABLE_FLOPPYMODE)? m_selected_mode : m_interface_mode;
-	header[17] = 0;
-
-	// The track lookup table is located at offset 0x200 (as 512 multiple)
-	header[18] = 1;
-	header[19] = 0;
-
-	header[20] = m_write_allowed? 0xff : 0x00;
-	header[21] = m_single_step? 0xff : 0x00;
-
-	// TODO: Allow for divergent track 0 format
-	header[22] = m_track0s0_has_altencoding? 0x00 : 0xff;
-	header[23] = m_track0s0_encoding;
-	header[24] = m_track0s1_has_altencoding? 0x00 : 0xff;
-	header[25] = m_track0s1_encoding;
-
-	// Fill the remaining bytes with 0xff
-	for (int i=26; i < HEADER_LENGTH; i++) header[i] = 0xff;
-
-	// Don't write yet; we still have to find out the bit rate.
-
-	// We won't have more than 200000 cells on the track
-	for (int cyl=0; cyl < m_cylinders; cyl++)
-	{
-		// After the call, the encoding will be set to FM or MFM
-		generate_hfe_bitstream_from_track(cyl, 0, samplelength, m_track_encoding, &cylbuf[0], track_end, image);
-		if (m_heads == 2)
-			generate_hfe_bitstream_from_track(cyl, 1, samplelength, m_track_encoding, &cylbuf[0], track_end, image);
-
-		if (cyl==0)
-		{
-			// Complete the header and write it
-			header[11] = m_track_encoding;
-			m_bit_rate = 500000/samplelength;
-			header[12] = m_bit_rate & 0xff;
-			header[13] = (m_bit_rate >> 8) & 0xff;
-
-			// Now write the header
-			io.write_at(0, header, HEADER_LENGTH, actual);
-
-			// Set up the track lookup table
-			// We need the encoding value to be sure about the track length
-			int len = (m_track_encoding==ISOIBM_FM_ENCODING)? 0x61b0 : 0x61c0;
-			int pos = 0x400;
-
-			for (int i=0; i < m_cylinders; i++)
-			{
-				m_cyl_offset[i] = (pos >> 9);
-				m_cyl_length[i] = len;
-				pos += (len + 0x1ff) & 0xfe00;
-				track_table[i*4] = m_cyl_offset[i] & 0xff;
-				track_table[i*4+1] = (m_cyl_offset[i]>>8) & 0xff;
-				track_table[i*4+2] = len & 0xff;
-				track_table[i*4+3] = (len>>8) & 0xff;
-			}
-			// Set the remainder to 0xff
-			for (int i=m_cylinders*4; i < TRACK_TABLE_LENGTH; i++)
-				track_table[i] = 0xff;
-
-			io.write_at(0x200, track_table, TRACK_TABLE_LENGTH, actual);
-		}
-		// Write the current cylinder
-		io.write_at(m_cyl_offset[cyl]<<9, &cylbuf[0], (m_cyl_length[cyl] + 0x1ff) & 0xfe00, actual);
-	}
-	return true;
-}
-
-void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& samplelength, encoding_t& encoding, uint8_t *cylinder_buffer, int track_end, floppy_image *image)
-{
-	// We are using an own implementation here because the result of the
-	// parent class method would require some post-processing that we
-	// can easily avoid.
-
-	// See floppy_image_format_t::generate_bitstream_from_track
-	// as the original code
-
-	// No subtracks definded
-	std::vector<uint32_t> &tbuf = image->get_buffer(cyl, head, 0);
-	if (tbuf.size() <= 1)
-	{
-		// Unformatted track
-		// TODO must handle that according to HFE
-		int track_size = 200000000/samplelength;
-		memset(cylinder_buffer, 0, (track_size+7)/8);
-		return;
-	}
-
-	// Find out whether we have FM or MFM recording, and determine the bit rate.
-	// This is needed for the format header.
-	//
-	// The encoding may have changed by reformatting; we cannot rely on the
-	// header when loading.
-	//
-	// FM:   encoding 1    -> flux length = 4 us (min)          ambivalent
-	//       encoding 10   -> flux length = 8 us (max)          ambivalent
-	// MFM:  encoding 10   -> flux length = 4 us (min, DD)      ambivalent
-	//       encoding 100  -> flux length = 6 us (DD)            significant
-	//       encoding 1000 -> flux length = 8 us (max, DD)      ambivalent
-	//       encoding 10   -> flux length = 2 us (min, HD)       significant
-	//       encoding 100  -> flux length = 3 us (max, HD)       significant
-
-	// If we have MFM, we should very soon detect a flux length of 6 us.
-	// But if we have FM, how long should we search to be sure?
-	// We assume that after 2000 us we should have reached the first IDAM,
-	// which contains a sequence 1001, implying a flux length of 6 us.
-	// If there was no such flux in that area, this can safely be assumed to be FM.
-
-	// Do it only for the first track; the format only supports one encoding.
-	if (encoding == UNKNOWN_ENCODING)
-	{
-		bool mfm_recording = false;
-		int time0 = 0;
-		int minflux = 4000;
-		int fluxlen = 0;
-		// Skip the beginning (may have a short cell)
-		for (int i=2; (i < tbuf.size()-1) && (time0 < 2000000) && !mfm_recording; i++)
-		{
-			time0 = tbuf[i] & floppy_image::TIME_MASK;
-			fluxlen = (tbuf[i+1] & floppy_image::TIME_MASK) - time0;
-			if ((fluxlen < 3500) || (fluxlen > 5500 && fluxlen < 6500))
-				mfm_recording = true;
-			if (fluxlen < minflux) minflux = fluxlen;
-		}
-		encoding = mfm_recording? ISOIBM_MFM_ENCODING : ISOIBM_FM_ENCODING;
-
-		// samplelength = 1000ns => 10^6 cells/sec => 500 kbit/s
-		// samplelength = 2000ns => 250 kbit/s
-		// We stay with double sampling at 250 kbit/s for FM
-		if (minflux < 3500) samplelength = 1000;
-		else samplelength = 2000;
-	}
-
-	// Start at the write splice
-	uint32_t splice = image->get_write_splice_position(cyl, head, 0);
-
-	int cur_pos = splice;
-	int cur_entry = 0;
-
-	// Fast-forward to the write splice position (always 0 in this format)
-	while (cur_entry < int(tbuf.size())-1 && (tbuf[cur_entry+1] & floppy_image::TIME_MASK) < cur_pos)
-		cur_entry++;
-
-	int period = samplelength;
-	int period_adjust_base = period * 0.05;
-
-	int min_period = int(samplelength*0.75);
-	int max_period = int(samplelength*1.25);
-	int phase_adjust = 0;
-	int freq_hist = 0;
-	uint32_t next = 0;
-
-	int offset = 0x100;
-
-	// Prepare offset for the format storage
-	if (head==0)
-	{
-		offset = 0;
-		track_end -= 0x0100;
-	}
-
-	uint8_t bit = 0x01;
-	uint8_t current = 0;
-
-	while (next < 200000000) {
-		int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;
-
-		// Start of track? Use next entry.
-		if (edge==0)
-		{
-			edge = tbuf[++cur_entry] & floppy_image::TIME_MASK;
-		}
-
-		// Wrapped over end?
-		if (edge < cur_pos) edge += 200000000;
-
-		// End of cell
-		next = cur_pos + period + phase_adjust;
-
-		// End of the window is at next; edge is the actual transition
-		if (edge >= next)
-		{
-			// No transition in the window -> 0
-			phase_adjust = 0;
-		}
-		else
-		{
-			// Transition in the window -> 1
-			current |= bit;
-			int delta = edge - (next - period/2);
-
-			phase_adjust = 0.65*delta;
-
-			if (delta < 0)
-			{
-				if (freq_hist < 0) freq_hist--;
-				else freq_hist = -1;
-			}
-			else
-			{
-				if (delta > 0)
-				{
-					if(freq_hist > 0) freq_hist++;
-					else freq_hist = 1;
-				}
-				else freq_hist = 0;
-			}
-
-			if (freq_hist)
-			{
-				int afh = freq_hist < 0 ? -freq_hist : freq_hist;
-				if (afh > 1)
-				{
-					int aper = period_adjust_base*delta/period;
-					if (!aper)
-						aper = freq_hist < 0 ? -1 : 1;
-					period += aper;
-
-					if (period < min_period) period = min_period;
-					else if (period > max_period) period = max_period;
-				}
-			}
-		}
-
-		cur_pos = next;
-
-		bit = (bit << 1) & 0xff;
-		if (bit == 0)
-		{
-			bit = 0x01;
-			cylinder_buffer[offset++] = current;
-			if ((offset & 0xff)==0) offset += 0x100;
-			current = 0;
-		}
-
-		// Fast-forward to next cell
-		while (cur_entry < int(tbuf.size())-1 && (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
-			cur_entry++;
-
-		// Reaching the end of the track
-		if (cur_entry == int(tbuf.size())-1 &&  (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
-		{
-			// Wrap to index 0 or 1 depending on whether there is a transition exactly at the index hole
-			cur_entry = (tbuf[int(tbuf.size())-1] & floppy_image::MG_MASK) != (tbuf[0] & floppy_image::MG_MASK) ?
-			0 : 1;
-		}
-	}
-	// Write the current byte when not done
-	if (bit != 0x01)
-		cylinder_buffer[offset] = current;
-}
-
-const floppy_format_type FLOPPY_HFE_FORMAT = &floppy_image_format_creator<hfe_format>;
+const hfe_format FLOPPY_HFE_FORMAT;
 
 

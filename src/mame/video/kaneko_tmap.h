@@ -87,7 +87,7 @@ private:
 
 	view2_cb_delegate   m_view2_cb;
 	std::unique_ptr<u16[]> m_regs;
-	tilemap_t* m_tmap[2];
+	tilemap_t* m_tmap[2]{};
 };
 
 

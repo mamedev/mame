@@ -56,7 +56,7 @@ protected:
 	optional_ioport m_dswb_io;
 	optional_ioport m_tjump_io;
 
-	u8 m_intenable;
+	u8 m_intenable = 0;
 
 	std::unique_ptr<u16[]> m_tilevram[4];
 	/*
@@ -74,21 +74,21 @@ protected:
 	s32 m_bcu_flipscreen;     /* Tile   controller flip flag */
 	s32 m_fcu_flipscreen;     /* Sprite controller flip flag */
 
-	s32 m_pf_voffs;
-	s32 m_spriteram_offs;
+	s32 m_pf_voffs = 0;
+	s32 m_spriteram_offs = 0;
 
-	s32 m_scrollx[4];
-	s32 m_scrolly[4];
+	s32 m_scrollx[4]{};
+	s32 m_scrolly[4]{};
 
 #ifdef MAME_DEBUG
-	int m_display_pf[4];
-	int m_displog;
+	int m_display_pf[4]{};
+	int m_displog = 0;
 #endif
 
-	s32 m_tiles_offsetx;
-	s32 m_tiles_offsety;
+	s32 m_tiles_offsetx = 0;
+	s32 m_tiles_offsety = 0;
 
-	tilemap_t *m_tilemap[4];
+	tilemap_t *m_tilemap[4]{};
 
 	void intenable_w(u8 data);
 	u8 shared_r(offs_t offset);
@@ -205,11 +205,11 @@ protected:
 
 private:
 	/* Demon world */
-	int m_dsp_on;
-	int m_dsp_bio;
-	int m_dsp_execute;
-	u32 m_dsp_addr_w;
-	u32 m_main_ram_seg;
+	int m_dsp_on = 0;
+	int m_dsp_bio = 0;
+	int m_dsp_execute = 0;
+	u32 m_dsp_addr_w = 0;
+	u32 m_main_ram_seg = 0;
 
 	void dsp_addrsel_w(u16 data);
 	u16 dsp_r();
@@ -241,8 +241,8 @@ protected:
 
 private:
 	// Fire Shark sound
-	u8 m_to_mcu;
-	u8 m_cmdavailable;
+	u8 m_to_mcu = 0;
+	u8 m_cmdavailable = 0;
 
 	void mcu_w(u8 data);
 	u8 soundlatch_r();

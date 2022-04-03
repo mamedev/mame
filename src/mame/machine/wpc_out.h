@@ -32,12 +32,12 @@ public:
 	void set_gi_count(int _count);
 
 protected:
-	uint8_t state[6], gi;
-	bool first_after_led;
+	uint8_t state[6]{}, gi = 0;
+	bool first_after_led = false;
 	attotime previous_gi_update;
-	int gi_count;
+	int gi_count = 0;
 	uint32_t gi_time[5];
-	emu_timer *timer;
+	emu_timer *timer = nullptr;
 	const char *const *names;
 	handler_t handler_cb;
 

@@ -75,19 +75,19 @@ private:
 
 	optional_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t   m_paletteram[0x300];
-	uint16_t  m_palette_write_addr;
+	uint8_t   m_paletteram[0x300]{};
+	uint16_t  m_palette_write_addr = 0;
 	rgb_t   m_pens[0x100];
-	uint8_t   m_controls_mux;
-	uint8_t   m_z80_to_68k_index;
-	uint8_t   m_z80_to_68k_data;
-	uint8_t   m_68k_to_z80_index;
-	uint8_t   m_68k_to_z80_data;
-	uint8_t   m_z80_data_available;
-	uint8_t   m_68k_data_available;
-	uint8_t   m_bsmt_data_l;
-	uint8_t   m_bsmt_data_h;
-	bool    m_bsmt_reset;
+	uint8_t   m_controls_mux = 0;
+	uint8_t   m_z80_to_68k_index = 0;
+	uint8_t   m_z80_to_68k_data = 0;
+	uint8_t   m_68k_to_z80_index = 0;
+	uint8_t   m_68k_to_z80_data = 0;
+	uint8_t   m_z80_data_available = 0;
+	uint8_t   m_68k_data_available = 0;
+	uint8_t   m_bsmt_data_l = 0;
+	uint8_t   m_bsmt_data_h = 0;
+	bool    m_bsmt_reset = false;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

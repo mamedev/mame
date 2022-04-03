@@ -473,8 +473,8 @@ private:
 	void avt_map(address_map &map);
 	void avt_portmap(address_map &map);
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 	required_device<z80_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80pio_device> m_pio0;

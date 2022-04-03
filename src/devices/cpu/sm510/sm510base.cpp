@@ -17,18 +17,11 @@
 
 #include "emu.h"
 #include "sm510base.h"
-#include "debugger.h"
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-enum
-{
-	SM510_PC=1, SM510_ACC, SM510_X, SM510_BL, SM510_BM,
-	SM510_C, SM510_W
-};
 
 void sm510_base_device::device_start()
 {
@@ -36,6 +29,7 @@ void sm510_base_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
+	m_pagemask = 0x3f;
 
 	// resolve callbacks
 	m_read_k.resolve_safe(0);
@@ -110,17 +104,18 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_clk_div));
 
 	// register state for debugger
-	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
-	state_add(SM510_ACC, "ACC", m_acc).formatstr("%01X");
-	state_add(SM510_X,   "X",   m_x).formatstr("%01X");
-	state_add(SM510_BL,  "BL",  m_bl).formatstr("%01X");
-	state_add(SM510_BM,  "BM",  m_bm).formatstr("%01X");
-	state_add(SM510_C,   "C",   m_c).formatstr("%01X");
-	state_add(SM510_W,   "W",   m_w).formatstr("%02X");
-
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "ACC", m_acc).formatstr("%01X"); // 2
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 3
+	state_add(++m_state_count, "BL", m_bl).formatstr("%01X"); // 4
+	state_add(++m_state_count, "BM", m_bm).formatstr("%01X"); // 5
+	state_add(++m_state_count, "C", m_c).formatstr("%01X"); // 6
+	state_add(++m_state_count, "W", m_w).formatstr("%02X"); // 7
 
 	set_icountptr(m_icount);
 
@@ -266,8 +261,9 @@ void sm510_base_device::increment_pc()
 {
 	// PL(program counter low 6 bits) is a simple LFSR: newbit = (bit0==bit1)
 	// PU,PM(high bits) specify page, PL specifies steps within page
-	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : 0x20;
-	m_pc = feed | (m_pc >> 1 & 0x1f) | (m_pc & ~0x3f);
+	int msb = m_pagemask >> 1 ^ m_pagemask;
+	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : msb;
+	m_pc = feed | (m_pc >> 1 & m_pagemask >> 1) | (m_pc & ~m_pagemask);
 }
 
 void sm510_base_device::execute_run()

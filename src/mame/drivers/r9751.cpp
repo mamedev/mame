@@ -128,19 +128,19 @@ private:
 	required_device<wd33c93_device> m_wd33c93;
 	required_shared_ptr<uint32_t> m_main_ram;
 
-	m68000_base_device* ptr_m68000;
+	m68000_base_device* ptr_m68000 = nullptr;
 
 	// Begin registers
-	uint32_t reg_ff050004;
-	uint32_t reg_fff80040;
-	uint32_t fdd_dest_address; // 5FF080B0
-	uint32_t fdd_cmd_complete;
-	uint32_t smioc_dma_bank;
-	uint32_t fdd_dma_bank;
+	uint32_t reg_ff050004 = 0;
+	uint32_t reg_fff80040 = 0;
+	uint32_t fdd_dest_address = 0; // 5FF080B0
+	uint32_t fdd_cmd_complete = 0;
+	uint32_t smioc_dma_bank = 0;
+	uint32_t fdd_dma_bank = 0;
 	attotime timer_32khz_last;
 	// End registers
 
-	address_space *m_mem;
+	address_space *m_mem = nullptr;
 
 	// functions
 	uint32_t swap_uint32( uint32_t val );

@@ -33,9 +33,9 @@ private:
 	void dm7000_scc0_w(offs_t offset, uint8_t data);
 	uint8_t dm7000_scc0_r(offs_t offset);
 	void kbd_put(u8 data);
-	uint8_t m_scc0_lcr;
-	uint8_t m_scc0_lsr;
-	uint8_t m_term_data;
+	uint8_t m_scc0_lcr = 0U;
+	uint8_t m_scc0_lsr = 0U;
+	uint8_t m_term_data = 0U;
 
 
 	void dm7000_gpio0_w(offs_t offset, uint8_t data);
@@ -51,9 +51,9 @@ private:
 	void dcr_w(offs_t offset, uint32_t data);
 
 
-	uint16_t          m_enet_regs[32];
+	uint16_t          m_enet_regs[32]{};
 
-	uint32_t          dcr[1024];
+	uint32_t          dcr[1024]{};
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

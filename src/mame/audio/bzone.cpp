@@ -236,17 +236,17 @@ static const discrete_mixer_desc bzone_final_mixer_desc =
 #define CD4066_R_ON     270
 
 DISCRETE_CLASS_STEP_RESET(bzone_custom_filter, 1,
-	double  m_v_in1_gain;
-	double  m_v_p;
-	double  m_exponent;
-	double  m_gain[2];
-	double  m_out_v;
+	double  m_v_in1_gain = 0;
+	double  m_v_p = 0;
+	double  m_exponent = 0;
+	double  m_gain[2]{};
+	double  m_out_v = 0;
 );
 
 DISCRETE_STEP(bzone_custom_filter)
 {
 	int     in0 = (BZONE_CUSTOM_FILTER__IN0 == 0) ? 0 : 1;
-	double  v;
+	double  v = 0;
 
 	if (BZONE_CUSTOM_FILTER__IN1 > 0)
 		v = 0;

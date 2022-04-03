@@ -235,7 +235,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 					util::stream_format(stream, "ret  %c", cc[rv]);
 			} else
 				util::stream_format(stream, "retc   %c", cc[rv]);
-			flags = STEP_OUT;
+			flags = STEP_OUT | (rv != 3 ? STEP_COND : 0);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
 			if (z80) {
@@ -246,6 +246,8 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			} else
 				util::stream_format(stream, "bctr,%c %s", cc[rv], REL(pc, params));
 			pc+=1;
+			if (rv != 3)
+				flags = STEP_COND;
 			break;
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			if (z80) {
@@ -256,6 +258,8 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			} else
 				util::stream_format(stream, "bcta,%c %s", cc[rv], ADR(pc, params));
 			pc+=2;
+			if (rv != 3)
+				flags = STEP_COND;
 			break;
 		case 0x20: case 0x21: case 0x22: case 0x23:
 			util::stream_format(stream, z80 ? "xor  r0,r%d" : "eorz,%d", rv);
@@ -283,7 +287,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 					util::stream_format(stream, "iret %c", cc[rv]);
 			} else
 				util::stream_format(stream, "rete   %c", cc[rv]);
-			flags = STEP_OUT;
+			flags = STEP_OUT | (rv != 3 ? STEP_COND : 0);
 			break;
 		case 0x38: case 0x39: case 0x3a: case 0x3b:
 			if (z80) {
@@ -294,7 +298,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			} else
 				util::stream_format(stream, "bstr,%c %s", cc[rv], REL(pc, params));
 			pc+=1;
-			flags = STEP_OVER;
+			flags = STEP_OVER | (rv != 3 ? STEP_COND : 0);
 			break;
 		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 			if (z80) {
@@ -305,7 +309,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			} else
 				util::stream_format(stream, "bsta,%c %s", cc[rv], ADR(pc, params));
 			pc+=2;
-			flags = STEP_OVER;
+			flags = STEP_OVER | (rv != 3 ? STEP_COND : 0);
 			break;
 		case 0x40:
 			util::stream_format(stream, "halt");
@@ -335,10 +339,12 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x58: case 0x59: case 0x5a: case 0x5b:
 			util::stream_format(stream, z80 ? "jrnz r%d,%s" : "brnr,%d %s", rv, REL(pc, params));
 			pc+=1;
+			flags = STEP_COND;
 			break;
 		case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 			util::stream_format(stream, z80 ? "jpnz r%d,%s" : "brna,%d %s", rv, ADR(pc, params));
 			pc+=2;
+			flags = STEP_COND;
 			break;
 		case 0x60: case 0x61: case 0x62: case 0x63:
 			util::stream_format(stream, z80 ? "or   r0,r%d" : "iorz,%d", rv);
@@ -377,12 +383,12 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 			util::stream_format(stream, z80 ? "call r%d-nz,%s" : "bsnr,%d %s", rv, REL(pc, params));
 			pc+=1;
-			flags = STEP_OVER;
+			flags = STEP_OVER | STEP_COND;
 			break;
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			util::stream_format(stream, z80 ? "call r%d-nz,%s" : "bsna,%d %s", rv, ADR(pc, params));
 			pc+=2;
-			flags = STEP_OVER;
+			flags = STEP_OVER | STEP_COND;
 			break;
 		case 0x80: case 0x81: case 0x82: case 0x83:
 			util::stream_format(stream, z80 ? "add  r0,r%d" : "addz,%d", rv);
@@ -414,6 +420,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x98: case 0x99: case 0x9a:
 			util::stream_format(stream, z80 ? "jr   n%c,%s" : "bcfr,%c %s", cc[rv], REL(pc, params));
 			pc+=1;
+			flags = STEP_COND;
 			break;
 		case 0x9b:
 			util::stream_format(stream, z80 ? "jr0  %s" : "zbrr   %s", REL0(pc, params));
@@ -459,7 +466,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0xb8: case 0xb9: case 0xba:
 			util::stream_format(stream, z80 ? "calr n%c,%s" : "bsfr,%c %s", cc[rv], REL(pc, params));
 			pc+=1;
-			flags = STEP_OVER;
+			flags = STEP_OVER | STEP_COND;
 			break;
 		case 0xbb:
 			util::stream_format(stream, z80 ? "cal0 %s" : "zbsr   %s", REL0(pc, params));
@@ -469,7 +476,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0xbc: case 0xbd: case 0xbe:
 			util::stream_format(stream, z80 ? "call n%c,%s" : "bsfa,%c %s", cc[rv], ADR(pc, params));
 			pc+=2;
-			flags = STEP_OVER;
+			flags = STEP_OVER | STEP_COND;
 			break;
 		case 0xbf:
 			util::stream_format(stream, z80 ? "call %s+r3" : "bsxa   %s", ADR(pc, params));
@@ -503,12 +510,12 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0xd8: case 0xd9: case 0xda: case 0xdb:
 			util::stream_format(stream, z80 ? "ijnz r%d,%s" : "birr,%d %s", rv, REL(pc, params));
 			pc+=1;
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 		case 0xdc: case 0xdd: case 0xde: case 0xdf:
 			util::stream_format(stream, z80 ? "ijnz r%d,%s" : "bira,%d %s", rv, ADR(pc, params));
 			pc+=2;
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
 			util::stream_format(stream, z80 ? "cp   r0,%d" : "comz,%d", rv);
@@ -535,12 +542,12 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb:
 			util::stream_format(stream, z80 ? "djnz r%d,%s" : "bdrr,%d %s", rv, REL(pc, params));
 			pc+=1;
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 		case 0xfc: case 0xfd: case 0xfe: case 0xff:
 			util::stream_format(stream, z80 ? "djnz r%d,%s" : "bdra,%d %s", rv, ADR(pc, params));
 			pc+=2;
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 	}
 	return (pc - PC) | flags | SUPPORTED;

@@ -3154,7 +3154,7 @@ ROM_START( zeroguna ) /* Zero Gunner (Export), Model 2A */
 	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
 ROM_END
 
-ROM_START( zerogunaj ) /* Zero Gunner (Japan), Model 2A - Sega game ID# 833-11341, Sega ROM board ID# 834-11342 */
+ROM_START( zerogunaj ) /* Zero Gunner (Japan), Model 2A - ROM PCB# 836-13329 ZERO GUNNER, SEGA game# 836-13331 ZERO GUNNER, Security board# 836-13330 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-20288.12", 0x000000, 0x080000, CRC(162305d5) SHA1(c0d67fbb8f89daacd32bbc1ad0d55a73b60016d8) )
 	ROM_LOAD32_WORD("epr-20289.13", 0x000002, 0x080000, CRC(b5acb940) SHA1(e4c66c6bc9d5433b76ea12cf625fc359439144bb) )
@@ -3286,7 +3286,7 @@ ROM_START( gunblade ) /* Gunblade NY Revision A, Model 2B, Sega game ID# 833-125
 	ROM_LOAD16_WORD_SWAP("mpr-18979.34", 0x400000, 0x400000, CRC(f13ea36f) SHA1(a8165116b5e07e031ff960201dd8c9a441544961) )
 ROM_END
 
-ROM_START( vf2 ) /* Virtua Fighter 2 Version 2.1, Model 2A */
+ROM_START( vf2 ) /* Virtua Fighter 2 Version 2.1, Model 2A, Sega game# 833-11341, ROM board# 834-11342 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18385.12",    0x000000, 0x020000, CRC(78ed2d41) SHA1(471c19389ceeec6138107dd81863320bd4825327) )
 	ROM_LOAD32_WORD( "epr-18386.13",    0x000002, 0x020000, CRC(3418f428) SHA1(0f51e389e13efc172a26471331a60c459ad43c38) )
@@ -3332,7 +3332,7 @@ ROM_START( vf2 ) /* Virtua Fighter 2 Version 2.1, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( vf2b ) /* Virtua Fighter 2 Revision B, Model 2A */
+ROM_START( vf2b ) /* Virtua Fighter 2 Revision B, Model 2A, Sega game# 833-11341, ROM board# 834-11342 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17568b.12", 0x000000, 0x020000, CRC(5d966bbf) SHA1(01d46313148ce509fa5641fb07a3f840c00886ac) )
 	ROM_LOAD32_WORD( "epr-17569b.13", 0x000002, 0x020000, CRC(0b8c1ccc) SHA1(ba2e0ac8b31955fed237ba9a5eda9fa14d1db11f) )
@@ -3378,7 +3378,7 @@ ROM_START( vf2b ) /* Virtua Fighter 2 Revision B, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( vf2a ) /* Virtua Fighter 2 Revision A, Model 2A */
+ROM_START( vf2a ) /* Virtua Fighter 2 Revision A, Model 2A, Sega game# 833-11341 VIRTUA FIGHTER 2 REV.A, ROM board# 834-11342 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17568a.12", 0x000000, 0x020000, CRC(5b10f232) SHA1(04df1eb9cf094d8dc5118b95028b544b47d5d328) )
 	ROM_LOAD32_WORD( "epr-17569a.13", 0x000002, 0x020000, CRC(17c208e0) SHA1(260c762d7853fb1d6f894d4dd954d82dfbc92d2d) )
@@ -3424,7 +3424,7 @@ ROM_START( vf2a ) /* Virtua Fighter 2 Revision A, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( vf2o ) /* Virtua Fighter 2, Model 2A */
+ROM_START( vf2o ) /* Virtua Fighter 2, Model 2A, Sega game# 833-11341, ROM board# 834-11342 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17568.12", 0x000000, 0x020000, CRC(cf5d53d1) SHA1(4ed907bbfc1a47e51c9cc11f55645752574adaef) )
 	ROM_LOAD32_WORD( "epr-17569.13", 0x000002, 0x020000, CRC(0fb32808) SHA1(95efb3eeaf95fb5f79ddae4ef20e2211b07f8d30) )
@@ -3646,7 +3646,7 @@ ROM_START( srallycc ) /* Sega Rally Championship Revision A, Model 2A, Sega game
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Single player cabinet - NO LINK option!, Sega ROM board ID# 834-11254 RALLY 50 */
+ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Single player cabinet - NO LINK option!, 833-11253 GAME BD RALLY 50, Sega ROM board ID# 834-11254 RALLY 50,837-11255 SOUND BD RALLY (W/O OPTION), 838-11173 DRIVE BD RALLY */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17760a.12",  0x000000, 0x020000, CRC(2c1b996b) SHA1(28c1196aac1c242e61069ee809c9e8229c061950) ) /* AMD 27C1024 EPROM */
 	ROM_LOAD32_WORD( "epr-17761a.13",  0x000002, 0x020000, CRC(50813f66) SHA1(f27ffb314e06fa18d863fdf172dafe56122cd606) ) /* AMD 27C1024 EPROM */
@@ -3656,8 +3656,8 @@ ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Sing
 	ROM_LOAD32_WORD( "mpr-17747.11", 0x000002, 0x200000, CRC(543593fd) SHA1(5ba63a77e9fc70569af21d50b3171bc8ff4522b8) )
 	ROM_LOAD32_WORD( "mpr-17744.8",  0x400000, 0x200000, CRC(71fed098) SHA1(1d187cad375121a45348d640edd3cc7dce658d28) )
 	ROM_LOAD32_WORD( "mpr-17745.9",  0x400002, 0x200000, CRC(8ecca705) SHA1(ed2b3298aad6f4e52dc672a0168183e457564b43) )
-	ROM_LOAD32_WORD( "mpr-17764a.6", 0x800000, 0x200000, CRC(dcb91e31) SHA1(2725268e97b9f4c14d56c040af38bc82f5020e3e) ) // IC 6 and 7 likely EPROMs
-	ROM_LOAD32_WORD( "mpr-17765a.7", 0x800002, 0x200000, CRC(b657dc48) SHA1(ae0f1bc6e2479fa51ca36f8be3a1785981c4dfe9) )
+	ROM_LOAD32_WORD( "epr-17764a.6", 0x800000, 0x200000, CRC(dcb91e31) SHA1(2725268e97b9f4c14d56c040af38bc82f5020e3e) )
+	ROM_LOAD32_WORD( "epr-17765a.7", 0x800002, 0x200000, CRC(b657dc48) SHA1(ae0f1bc6e2479fa51ca36f8be3a1785981c4dfe9) )
 
 	ROM_REGION32_LE( 0x800000, "copro_data", 0 ) // Copro extra data (collision/height map/etc) (COPRO socket)
 	ROM_LOAD32_WORD( "mpr-17754.28", 0x000000, 0x200000, CRC(81a84f67) SHA1(c0a9b690523a529e4015e9af10dc3fb2a1726f08) )
@@ -3692,7 +3692,7 @@ ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Sing
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( srallycdxa ) // Sega Rally Championship DX, Model 2A? - Single player cabinet - NO LINK option!
+ROM_START( srallycdxa ) // Sega Rally Championship DX, Model 2A - Single player cabinet - NO LINK option!
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17760.12",  0x000000, 0x020000, CRC(2b5c4321) SHA1(5bcdd8cdfd8f3a95062f83be4a417ba999b50e47) ) // AMD 27C1024 EPROM
 	ROM_LOAD32_WORD( "epr-17761.13",  0x000002, 0x020000, CRC(50813f66) SHA1(f27ffb314e06fa18d863fdf172dafe56122cd606) ) // AMD 27C1024 EPROM

@@ -33,21 +33,27 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void crgolfhi(machine_config &config);
+	void crgolf(machine_config &config);
+	void crgolf_video(machine_config &config);
+	void mastrglf(machine_config &config);
+	void init_crgolfhi();
 
+private:
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_videoram_b;
 
-	bool m_color_select;
-	bool m_screen_flip;
-	bool m_screena_enable;
-	bool m_screenb_enable;
+	bool m_color_select = false;
+	bool m_screen_flip = false;
+	bool m_screena_enable = false;
+	bool m_screenb_enable = false;
 
 	/* misc */
-	uint8_t    m_port_select;
-	uint16_t   m_sample_offset;
-	uint8_t    m_sample_count;
+	uint8_t    m_port_select = 0U;
+	uint16_t   m_sample_offset = 0U;
+	uint8_t    m_sample_count = 0U;
 
 	/* devices */
 	required_device<address_map_bank_device> m_vrambank;
@@ -70,7 +76,6 @@ public:
 	uint8_t unk_sub_05_r();
 	uint8_t unk_sub_07_r();
 	void unk_sub_0c_w(uint8_t data);
-	void init_crgolfhi();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void crgolf_palette(palette_device &palette) const;
@@ -78,10 +83,6 @@ public:
 	uint32_t screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(vck_callback);
-	void crgolfhi(machine_config &config);
-	void crgolf(machine_config &config);
-	void crgolf_video(machine_config &config);
-	void mastrglf(machine_config &config);
 	void main_map(address_map &map);
 	void mastrglf_io(address_map &map);
 	void mastrglf_map(address_map &map);

@@ -179,28 +179,28 @@ protected:
 		ICM_CLUT4            = 0xb
 	};
 
-	uint8_t m_csrr[2];
-	uint16_t m_csrw[2];
-	uint16_t m_dcr[2];
-	uint16_t m_vsr[2];
-	uint16_t m_ddr[2];
-	uint16_t m_dcp[2];
-	uint32_t m_dca[2];
-	uint32_t m_clut[256];
-	uint32_t m_image_coding_method;
-	uint32_t m_transparency_control;
-	uint32_t m_plane_order;
-	uint32_t m_clut_bank[2];
-	uint32_t m_transparent_color[2];
-	uint32_t m_mask_color[2];
-	uint32_t m_dyuv_abs_start[2];
-	uint32_t m_cursor_position;
-	uint32_t m_cursor_control;
-	uint32_t m_cursor_pattern[16];
-	uint32_t m_region_control[8];
-	uint32_t m_backdrop_color;
-	uint32_t m_mosaic_hold[2];
-	uint8_t m_weight_factor[2][768];
+	uint8_t m_csrr[2]{};
+	uint16_t m_csrw[2]{};
+	uint16_t m_dcr[2]{};
+	uint16_t m_vsr[2]{};
+	uint16_t m_ddr[2]{};
+	uint16_t m_dcp[2]{};
+	uint32_t m_dca[2]{};
+	uint32_t m_clut[256]{};
+	uint32_t m_image_coding_method = 0;
+	uint32_t m_transparency_control = 0;
+	uint32_t m_plane_order = 0;
+	uint32_t m_clut_bank[2]{};
+	uint32_t m_transparent_color[2]{};
+	uint32_t m_mask_color[2]{};
+	uint32_t m_dyuv_abs_start[2]{};
+	uint32_t m_cursor_position = 0;
+	uint32_t m_cursor_control = 0;
+	uint32_t m_cursor_pattern[16]{};
+	uint32_t m_region_control[8]{};
+	uint32_t m_backdrop_color = 0;
+	uint32_t m_mosaic_hold[2]{};
+	uint8_t m_weight_factor[2][768]{};
 
 	// DYUV color limit arrays.
 	uint32_t m_dyuv_limit_r_lut[3 * 0xff];
@@ -232,11 +232,11 @@ protected:
 	required_shared_ptr<uint16_t> m_planeb;
 
 	// internal state
-	bool m_region_flag[2][768];
-	int m_ica_height;
-	int m_total_height;
-	emu_timer *m_ica_timer;
-	emu_timer *m_dca_timer;
+	bool m_region_flag[2][768]{};
+	int m_ica_height = 0;
+	int m_total_height = 0;
+	emu_timer *m_ica_timer = nullptr;
+	emu_timer *m_dca_timer = nullptr;
 
 	static const uint32_t s_4bpp_color[16];
 

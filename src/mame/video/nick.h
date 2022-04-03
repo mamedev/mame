@@ -135,16 +135,16 @@ private:
 
 	LPT_ENTRY   m_LPT;
 
-	uint32_t *m_dest;
-	int m_dest_pos;
-	int m_dest_max_pos;
+	uint32_t *m_dest = nullptr;
+	int m_dest_pos = 0;
+	int m_dest_max_pos = 0;
 
 	uint8_t m_reg[4];
 
 	/* first clock visible on left hand side */
-	int m_first_visible_clock;
+	int m_first_visible_clock = 0;
 	/* first clock visible on right hand side */
-	int m_last_visible_clock;
+	int m_last_visible_clock = 0;
 
 	/* given a bit pattern, this will get the pen index */
 	uint8_t m_pen_idx_4col[256];
@@ -156,7 +156,7 @@ private:
 	bitmap_rgb32 m_bitmap;
 	rgb_t m_palette[256];
 
-	emu_timer *m_timer_scanline;
+	emu_timer *m_timer_scanline = nullptr;
 };
 
 
