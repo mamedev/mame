@@ -844,6 +844,9 @@ void floppy_image_device::init_fs(const fs_info *fs, const fs::meta_data &meta)
 	} else {
 		fs::unformatted_image::format(fs->m_key, image.get());
 	}
+
+	// intializing a file system makes the floppy dirty
+	image_dirty = true;
 }
 
 /* write protect, active high
