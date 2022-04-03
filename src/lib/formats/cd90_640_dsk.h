@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_CD90_640_FORMAT;
+extern const cd90_640_format FLOPPY_CD90_640_FORMAT;
 
 #endif // MAME_FORMATS_CD90_640_DSK_H

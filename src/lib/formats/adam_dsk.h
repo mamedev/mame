@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_ADAM_FORMAT;
+extern const adam_format FLOPPY_ADAM_FORMAT;
 
 #endif // MAME_FORMATS_ADAM_DSK_H

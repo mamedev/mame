@@ -34,9 +34,9 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 	virtual bool supports_save() const override { return true; }
 
 	static int get_rpm(int head, int track);
@@ -49,16 +49,16 @@ protected:
 	static const int speed_zone[2][80];
 	static const int rpm[9];
 
-	int find_size(util::random_read &io, uint32_t form_factor);
-	void log_boot_sector(uint8_t *data);
-	floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count);
-	void build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, desc_s *sectors, int sector_count) const;
-	int get_image_offset(const format &f, int head, int track);
-	int compute_track_size(const format &f, int head, int track);
-	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count);
+	static int find_size(util::random_read &io, uint32_t form_factor);
+	static void log_boot_sector(uint8_t *data);
+	static floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count);
+	static void build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, desc_s *sectors, int sector_count);
+	static int get_image_offset(const format &f, int head, int track);
+	static int compute_track_size(const format &f, int head, int track);
+	static void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count);
 };
 
-extern const floppy_format_type FLOPPY_VICTOR_9000_FORMAT;
+extern const victor9k_format FLOPPY_VICTOR_9000_FORMAT;
 
 
 #endif // MAME_FORMATS_VICTOR9K_DSK_H

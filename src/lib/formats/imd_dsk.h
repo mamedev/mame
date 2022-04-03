@@ -17,9 +17,8 @@ class imd_format : public floppy_image_format_t
 public:
 	imd_format();
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image* image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -28,21 +27,8 @@ public:
 
 private:
 	void fixnum(char *start, char *end) const;
-
-	std::vector<uint8_t> m_comment;
-	std::vector<std::vector<uint8_t> > m_snum;
-	std::vector<std::vector<uint8_t> > m_tnum;
-	std::vector<std::vector<uint8_t> > m_hnum;
-
-	std::vector<uint8_t> m_mode;
-	std::vector<uint8_t> m_track;
-	std::vector<uint8_t> m_head;
-	std::vector<uint8_t> m_sector_count;
-	std::vector<uint8_t> m_ssize;
-
-	int m_trackmult = 1;
 };
 
-extern const floppy_format_type FLOPPY_IMD_FORMAT;
+extern const imd_format FLOPPY_IMD_FORMAT;
 
 #endif // MAME_FORMATS_IMD_DSK_H

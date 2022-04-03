@@ -105,19 +105,19 @@ const char *nfd_format::extensions() const
 	return "nfd";
 }
 
-int nfd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int nfd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
 	size_t actual;
 	io.read_at(0, h, 16, actual);
 
 	if (strncmp((const char *)h, "T98FDDIMAGE.R0", 14) == 0 || strncmp((const char *)h, "T98FDDIMAGE.R1", 14) == 0)
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
 
-bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint64_t size;
@@ -288,4 +288,4 @@ bool nfd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_NFD_FORMAT = &floppy_image_format_creator<nfd_format>;
+const nfd_format FLOPPY_NFD_FORMAT;

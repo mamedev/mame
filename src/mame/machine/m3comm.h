@@ -51,24 +51,24 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	uint16_t naomi_control;
-	uint16_t naomi_offset;
-	uint16_t m_status0;
-	uint16_t m_status1;
-	uint16_t m_commbank;
+	uint16_t naomi_control = 0;
+	uint16_t naomi_offset = 0;
+	uint16_t m_status0 = 0;
+	uint16_t m_status1 = 0;
+	uint16_t m_commbank = 0;
 
-	uint16_t recv_offset;
-	uint16_t recv_size;
-	uint16_t send_offset;
-	uint16_t send_size;
+	uint16_t recv_offset = 0;
+	uint16_t recv_size = 0;
+	uint16_t send_offset = 0;
+	uint16_t send_size = 0;
 
 
 	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
 	emu_file m_line_tx;    // tx line - is differential, simple serial and toslink
-	char m_localhost[256];
-	char m_remotehost[256];
+	char m_localhost[256]{};
+	char m_remotehost[256]{};
 
-	emu_timer *timer;
+	emu_timer *timer = nullptr;
 
 	required_shared_ptr<uint16_t> m68k_ram;
 	required_device<m68000_device> m_commcpu;

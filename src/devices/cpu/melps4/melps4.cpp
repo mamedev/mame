@@ -40,10 +40,9 @@
 #include "emu.h"
 #include "melps4.h"
 #include "melps4d.h"
-#include "debugger.h"
 
 
-melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, uint8_t sm_page, uint8_t int_page)
+melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, u8 sm_page, u8 int_page)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
@@ -274,7 +273,7 @@ void melps4_cpu_device::device_reset()
 //  i/o handling
 //-------------------------------------------------
 
-uint8_t melps4_cpu_device::read_gen_port(int port)
+u8 melps4_cpu_device::read_gen_port(int port)
 {
 	// input generic port
 	switch (port)
@@ -291,7 +290,7 @@ uint8_t melps4_cpu_device::read_gen_port(int port)
 	return 0;
 }
 
-void melps4_cpu_device::write_gen_port(int port, uint8_t data)
+void melps4_cpu_device::write_gen_port(int port, u8 data)
 {
 	// output generic port
 	switch (port)
@@ -320,7 +319,7 @@ int melps4_cpu_device::read_d_pin(int bit)
 {
 	// read port D, return state of selected pin
 	bit &= 0xf;
-	uint16_t d = (m_port_d | m_read_d(bit, 0xffff)) & m_d_mask;
+	u16 d = (m_port_d | m_read_d(bit, 0xffff)) & m_d_mask;
 	return d >> bit & 1;
 }
 

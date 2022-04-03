@@ -684,15 +684,16 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 	u16 args[2];
 
 	image.fseek(0x100, SEEK_SET);
-	u8 ch = image.fgetc();
-	if (ch != 0xA5)
+	u8 ch = 0;
+	u32 bytes = image.fread(&ch, 1);
+	if (bytes != 1 || ch != 0xA5)
 	{
 		image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 		image.message(" Invalid header");
 		return image_init_result::FAIL;
 	}
 
-	while((ch = image.fgetc()))
+	while ((bytes = image.fread(&ch, 1)) != 0 && ch != 0)
 	{
 		if (i >= (std::size(pgmname) - 1))
 		{

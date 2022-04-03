@@ -34,15 +34,15 @@ enum ti85_model {
 	TI84PSE
 };
 
-typedef struct
+struct ti83pse_timer
 {
-	uint8_t loop;
-	uint8_t setup;
-	float divsor;
-	bool interrupt;
-	uint8_t max;
-	uint8_t count;
-} ti83pse_timer;
+	uint8_t loop = 0;
+	uint8_t setup = 0;
+	float divsor = 1;
+	bool interrupt = false;
+	uint8_t max = 0;
+	uint8_t count = 0;
+};
 
 typedef enum TI83PSE_CTIMER
 {
@@ -87,26 +87,26 @@ private:
 	optional_device<intelfsh8_device> m_flash;
 	optional_device_array<address_map_bank_device, 4> m_membank;
 
-	ti85_model m_model;
+	ti85_model m_model{};
 
-	uint8_t m_LCD_memory_base;
-	uint8_t m_LCD_contrast;
-	uint8_t m_LCD_status;
-	uint8_t m_timer_interrupt_mask;
-	uint8_t m_timer_interrupt_status;
-	uint8_t m_ctimer_interrupt_status;
-	uint8_t m_ON_interrupt_mask;
-	uint8_t m_ON_interrupt_status;
-	uint8_t m_ON_pressed;
-	uint8_t m_flash_unlocked;
-	uint8_t m_ti8x_memory_page_1;
-	uint8_t m_ti8x_memory_page_2;
-	uint8_t m_ti8x_memory_page_3;
-	bool m_booting;
-	uint8_t m_LCD_mask;
-	uint8_t m_power_mode;
-	uint8_t m_cpu_speed;
-	uint8_t m_keypad_mask;
+	uint8_t m_LCD_memory_base = 0;
+	uint8_t m_LCD_contrast = 0;
+	uint8_t m_LCD_status = 0;
+	uint8_t m_timer_interrupt_mask = 0;
+	uint8_t m_timer_interrupt_status = 0;
+	uint8_t m_ctimer_interrupt_status = 0;
+	uint8_t m_ON_interrupt_mask = 0;
+	uint8_t m_ON_interrupt_status = 0;
+	uint8_t m_ON_pressed = 0;
+	uint8_t m_flash_unlocked = 0;
+	uint8_t m_ti8x_memory_page_1 = 0;
+	uint8_t m_ti8x_memory_page_2 = 0;
+	uint8_t m_ti8x_memory_page_3 = 0;
+	bool m_booting = false;
+	uint8_t m_LCD_mask = 0;
+	uint8_t m_power_mode = 0;
+	uint8_t m_cpu_speed = 0;
+	uint8_t m_keypad_mask = 0;
 	uint8_t m_video_buffer_width = 0;
 	uint8_t m_interrupt_speed = 0;
 	uint8_t m_port4_bit0 = 0;

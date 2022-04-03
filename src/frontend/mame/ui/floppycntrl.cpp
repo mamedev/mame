@@ -98,15 +98,15 @@ void menu_control_floppy_image::menu_activated()
 {
 	switch (m_state) {
 	case DO_CREATE: {
-		std::vector<floppy_image_format_t *> format_array;
-		for(floppy_image_format_t *i : fd.get_formats()) {
+		std::vector<const floppy_image_format_t *> format_array;
+		for(const floppy_image_format_t *i : fd.get_formats()) {
 			if(!i->supports_save())
 				continue;
 			if (i->extension_matches(m_current_file.c_str()))
 				format_array.push_back(i);
 		}
 		int ext_match = format_array.size();
-		for(floppy_image_format_t *i : fd.get_formats()) {
+		for(const floppy_image_format_t *i : fd.get_formats()) {
 			if(!i->supports_save())
 				continue;
 			if (!i->extension_matches(m_current_file.c_str()))

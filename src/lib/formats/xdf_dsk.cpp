@@ -42,4 +42,4 @@ const xdf_format::format xdf_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_XDF_FORMAT = &floppy_image_format_creator<xdf_format>;
+const xdf_format FLOPPY_XDF_FORMAT;

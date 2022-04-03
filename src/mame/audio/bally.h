@@ -81,10 +81,10 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_sound_select;
-	uint8_t m_snd_sel;
-	uint8_t m_snd_tone_gen;
-	uint8_t m_snd_div;
+	uint8_t m_sound_select = 0;
+	uint8_t m_snd_sel = 0;
+	uint8_t m_snd_tone_gen = 0;
+	uint8_t m_snd_div = 1;
 	required_region_ptr<uint8_t> m_snd_prom;
 	required_device<discrete_sound_device> m_discrete;
 	required_device<timer_device> m_timer_s_freq;
@@ -154,10 +154,10 @@ protected:
 	void pia_portb_w(uint8_t data);
 
 private:
-	bool m_bc1;
-	bool m_bdir;
-	uint8_t m_sound_select;
-	uint8_t m_ay_data;
+	bool m_bc1 = false;
+	bool m_bdir = false;
+	uint8_t m_sound_select = 0;
+	uint8_t m_ay_data = 0;
 
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
@@ -234,9 +234,9 @@ protected:
 	required_device<dac_byte_interface> m_dac;
 
 private:
-	uint8_t m_sound_select;
-	bool m_sound_int;
-	bool m_sound_ack;
+	uint8_t m_sound_select = 0;
+	bool m_sound_int = 0;
+	bool m_sound_ack = 0;
 
 	devcb_write_line m_sound_ack_w_handler;
 	output_finder<1> m_leds;
@@ -293,7 +293,7 @@ protected:
 	required_device<filter_rc_device> m_speech_filter;
 	required_device<tms5200_device> m_tms5200;
 
-	uint8_t m_sound_select;
+	uint8_t m_sound_select = 0;
 
 	uint8_t pia2_porta_r();
 
@@ -323,9 +323,9 @@ protected:
 	uint8_t pia2_porta_r();
 
 private:
-	bool m_bc1;
-	bool m_bdir;
-	uint8_t m_ay_data;
+	bool m_bc1 = false;
+	bool m_bdir = false;
+	uint8_t m_ay_data = 0;
 
 	required_device_array<filter_rc_device, 3> m_ay_filters;
 	required_device<ay8910_device> m_ay;

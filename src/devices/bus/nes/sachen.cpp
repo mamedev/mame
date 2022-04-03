@@ -628,7 +628,7 @@ void nes_sachen_74x374_device::write_l(offs_t offset, uint8_t data)
 					chr8(m_mmc_vrom_bank, CHRROM);
 					break;
 				case 0x07:
-					set_mirror((data >> 1) & 0x03);
+					set_mirror(BIT(data, 1, 2));
 					break;
 				default:
 					break;

@@ -6,14 +6,14 @@
 
 */
 
-#ifndef MAME_CPU_B5000_B5000_H
-#define MAME_CPU_B5000_B5000_H
+#ifndef MAME_CPU_RW5000_B5000_H
+#define MAME_CPU_RW5000_B5000_H
 
 #pragma once
 
-#include "b5000base.h"
+#include "rw5000base.h"
 
-// pinout reference (preliminary)
+// pinout reference (preliminary, other A/B5xxx pinouts are same or very similar)
 
 /*
             _____   _____
@@ -41,7 +41,7 @@
 
 */
 
-class b5000_cpu_device : public b5000_base_device
+class b5000_cpu_device : public rw5000_base_device
 {
 public:
 	b5000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -76,8 +76,8 @@ protected:
 
 	// opcode handlers
 	virtual void op_tl();
-	virtual void op_tra() override;
-	virtual void op_ret() override;
+	virtual void op_tra_step() override;
+	virtual void op_ret_step() override;
 	virtual void op_nop();
 
 	virtual void op_lb(u8 bl);
@@ -100,7 +100,7 @@ protected:
 	virtual void op_tc();
 
 	virtual void op_kseg();
-	virtual void op_atbz() override;
+	virtual void op_atb_step() override;
 	virtual void op_tkb();
 	virtual void op_tkbs();
 	virtual void op_read();
@@ -110,4 +110,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(B5000, b5000_cpu_device)
 
-#endif // MAME_CPU_B5000_B5000_H
+#endif // MAME_CPU_RW5000_B5000_H

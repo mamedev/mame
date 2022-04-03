@@ -76,7 +76,7 @@ public:
 		const char *read_name = nullptr;
 		write8sm_delegate write;
 		void* data = nullptr;            // non-NULL for banks
-		int isnop;
+		int isnop = 0;
 
 		/* configurable part */
 		uint8_t  state = 0U;             // one of HP48_MODULE_

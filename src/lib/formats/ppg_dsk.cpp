@@ -62,4 +62,4 @@ void ppg_format::build_sector_description(const format &f, uint8_t *sectdata, de
 	}
 }
 
-const floppy_format_type FLOPPY_PPG_FORMAT = &floppy_image_format_creator<ppg_format>;
+const ppg_format FLOPPY_PPG_FORMAT;

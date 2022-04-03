@@ -727,7 +727,7 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 static int compare_screenshots(summary_file *curfile)
 {
 	bitmap_argb32 bitmaps[MAX_COMPARES];
-	int unique[MAX_COMPARES];
+	int unique[MAX_COMPARES]{};
 	int numunique = 0;
 
 	/* iterate over all files and load their bitmaps */

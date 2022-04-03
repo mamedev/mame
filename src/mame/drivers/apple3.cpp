@@ -41,7 +41,8 @@ static void a3_floppies(device_slot_interface &device)
 
 void apple3_state::floppy_formats(format_registration &fr)
 {
-	fr.add(FLOPPY_A216S_FORMAT);
+	fr.add(FLOPPY_A216S_DOS_FORMAT);
+	fr.add(FLOPPY_A216S_PRODOS_FORMAT);
 	fr.add(FLOPPY_RWTS18_FORMAT);
 	fr.add(FLOPPY_EDD_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);

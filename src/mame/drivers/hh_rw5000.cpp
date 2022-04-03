@@ -3,20 +3,24 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-Rockwell B5000 MCU series handhelds (before PPS-4/1)
+Rockwell A/B5000 MCU series handhelds (before PPS-4/1)
 Mostly calculators on these MCUs, but also Mattel's first couple of handhelds.
 
 ROM source notes when dumped from another model, but confident it's the same:
 - rw18r: Rockwell 8R
+- rw24k: Rockwell 14RD-II
 - misatk: Mattel Space Alert
 
 ***************************************************************************/
 
 #include "emu.h"
 
-#include "cpu/b5000/b5000.h"
-#include "cpu/b5000/b6000.h"
-#include "cpu/b5000/b6100.h"
+#include "cpu/rw5000/a5000.h"
+#include "cpu/rw5000/a5500.h"
+#include "cpu/rw5000/a5900.h"
+#include "cpu/rw5000/b5000.h"
+#include "cpu/rw5000/b6000.h"
+#include "cpu/rw5000/b6100.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
 
@@ -28,15 +32,17 @@ ROM source notes when dumped from another model, but confident it's the same:
 #include "mbaseb.lh"
 #include "mfootb.lh"
 #include "misatk.lh"
-#include "rw18r.lh"
+#include "rw10r.lh"
+#include "rw24k.lh"
+#include "rw31r.lh"
 
-//#include "hh_b5000_test.lh" // common test-layout - use external artwork
+//#include "hh_rw5000_test.lh" // common test-layout - use external artwork
 
 
-class hh_b5000_state : public driver_device
+class hh_rw5000_state : public driver_device
 {
 public:
-	hh_b5000_state(const machine_config &mconfig, device_type type, const char *tag) :
+	hh_rw5000_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
@@ -53,10 +59,10 @@ protected:
 	virtual void machine_reset() override;
 
 	// devices
-	required_device<b5000_base_device> m_maincpu;
+	required_device<rw5000_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_ioport_array<5> m_inputs; // max 5
+	optional_ioport_array<9> m_inputs; // max 9
 
 	u16 m_inp_mux = 0;
 
@@ -71,7 +77,7 @@ protected:
 
 // machine start/reset
 
-void hh_b5000_state::machine_start()
+void hh_rw5000_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -79,7 +85,7 @@ void hh_b5000_state::machine_start()
 	save_item(NAME(m_seg));
 }
 
-void hh_b5000_state::machine_reset()
+void hh_rw5000_state::machine_reset()
 {
 }
 
@@ -93,7 +99,7 @@ void hh_b5000_state::machine_reset()
 
 // generic input handlers
 
-u8 hh_b5000_state::read_inputs(int columns)
+u8 hh_rw5000_state::read_inputs(int columns)
 {
 	u8 ret = 0;
 
@@ -105,7 +111,7 @@ u8 hh_b5000_state::read_inputs(int columns)
 	return ret;
 }
 
-void hh_b5000_state::switch_change(int sel, u32 mask, bool next)
+void hh_rw5000_state::switch_change(int sel, u32 mask, bool next)
 {
 	// config switches (for direct control)
 	ioport_field *inp = m_inputs[sel]->field(mask);
@@ -116,7 +122,7 @@ void hh_b5000_state::switch_change(int sel, u32 mask, bool next)
 		inp->select_previous_setting();
 }
 
-INPUT_CHANGED_MEMBER(hh_b5000_state::power_button)
+INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
 {
 	// power button or switch
 	bool power = (param) ? (bool(param - 1)) : !newval;
@@ -150,11 +156,11 @@ namespace {
 
 ***************************************************************************/
 
-class autorace_state : public hh_b5000_state
+class autorace_state : public hh_rw5000_state
 {
 public:
 	autorace_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void autorace(machine_config &config);
@@ -194,11 +200,11 @@ static INPUT_PORTS_START( autorace )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("POWER") // power switch
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_b5000_state, power_button, 0) PORT_NAME("Start / Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Start / Reset")
 
 	PORT_START("SWITCH") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_b5000_state, switch_prev<0>, 0x0c) PORT_NAME("Gear Switch Down")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_b5000_state, switch_next<0>, 0x0c) PORT_NAME("Gear Switch Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_prev<0>, 0x0c) PORT_NAME("Gear Switch Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_next<0>, 0x0c) PORT_NAME("Gear Switch Up")
 INPUT_PORTS_END
 
 void autorace_state::autorace(machine_config &config)
@@ -247,11 +253,11 @@ ROM_END
 
 ***************************************************************************/
 
-class misatk_state : public hh_b5000_state
+class misatk_state : public hh_rw5000_state
 {
 public:
 	misatk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void misatk(machine_config &config);
@@ -288,7 +294,7 @@ static INPUT_PORTS_START( misatk )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("POWER") // power switch
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_b5000_state, power_button, 0) PORT_NAME("Arm / Off")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Arm / Off")
 INPUT_PORTS_END
 
 void misatk_state::misatk(machine_config &config)
@@ -333,11 +339,11 @@ ROM_END
 
 ***************************************************************************/
 
-class mfootb_state : public hh_b5000_state
+class mfootb_state : public hh_rw5000_state
 {
 public:
 	mfootb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void mfootb(machine_config &config);
@@ -433,11 +439,11 @@ ROM_END
 
 ***************************************************************************/
 
-class mbaseb_state : public hh_b5000_state
+class mbaseb_state : public hh_rw5000_state
 {
 public:
 	mbaseb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void mbaseb(machine_config &config);
@@ -528,11 +534,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gravity_state : public hh_b5000_state
+class gravity_state : public hh_rw5000_state
 {
 public:
 	gravity_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void gravity(machine_config &config);
@@ -603,20 +609,133 @@ ROM_END
 
 /***************************************************************************
 
-  Rockwell 8R, Rockwell 18R
+  Rockwell 10R
+  * A5000 MCU (label A5000PA, die label A5000)
+  * 8-digit 7seg LED display
+
+  Rockwell 12R "Square Root"
+  * A5000 MCU (label A5001, die label A5001)
+  * rest is same as 10R
+
+  12R supports square root by pressing × after ÷ (or the other way around).
+
+***************************************************************************/
+
+class rw10r_state : public hh_rw5000_state
+{
+public:
+	rw10r_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_rw5000_state(mconfig, type, tag)
+	{ }
+
+	void rw10r(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+	u8 read_kb();
+};
+
+// handlers
+
+void rw10r_state::write_str(u16 data)
+{
+	// STR0-STR7: digit select
+	// STR4-STR7: input mux
+	m_display->write_my(data);
+	m_inp_mux = data >> 4;
+}
+
+void rw10r_state::write_seg(u16 data)
+{
+	// SEG0-SEG7: digit segment data
+	m_display->write_mx(bitswap<8>(data,0,7,6,5,4,3,2,1));
+}
+
+u8 rw10r_state::read_kb()
+{
+	// KB: multiplexed inputs
+	return read_inputs(4);
+}
+
+// config
+
+static INPUT_PORTS_START( rw10r )
+	PORT_START("IN.0") // STR4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE/C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("+=")
+
+	PORT_START("IN.1") // STR5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.2") // STR6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.3") // STR7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+INPUT_PORTS_END
+
+void rw10r_state::rw10r(machine_config &config)
+{
+	// basic machine hardware
+	A5000(config, m_maincpu, 250000); // approximation
+	m_maincpu->write_str().set(FUNC(rw10r_state::write_str));
+	m_maincpu->write_seg().set(FUNC(rw10r_state::write_seg));
+	m_maincpu->read_kb().set(FUNC(rw10r_state::read_kb));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
+	config.set_default_layout(layout_rw10r);
+}
+
+// roms
+
+ROM_START( rw10r )
+	ROM_REGION( 0x200, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "a5000pa", 0x000, 0x0c0, CRC(db6cbbea) SHA1(3757f303a84e412e8763c4ec2170c9badc172454) )
+	ROM_CONTINUE(        0x100, 0x100 )
+ROM_END
+
+ROM_START( rw12r )
+	ROM_REGION( 0x200, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "a5001", 0x000, 0x0c0, CRC(4337a46b) SHA1(70f4683eac0afa31a6cd9dd44fdf1b6680575f67) )
+	ROM_CONTINUE(      0x100, 0x100 )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Rockwell 8R "Automatic Percent", Rockwell 18R "Memory"
   * B5000 MCU (label B5000CC, die label B5000)
-  * 8-digit 7seg display
+  * 8-digit 7seg LED display
 
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by
   Tandy (Radio Shack) as EC-220.
 
+  8R/9TR doesn't have the memory store/recall buttons.
+
 ***************************************************************************/
 
-class rw18r_state : public hh_b5000_state
+class rw18r_state : public hh_rw5000_state
 {
 public:
 	rw18r_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_b5000_state(mconfig, type, tag)
+		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
 	void rw18r(machine_config &config);
@@ -694,7 +813,7 @@ void rw18r_state::rw18r(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
-	config.set_default_layout(layout_rw18r);
+	config.set_default_layout(layout_rw10r);
 }
 
 // roms
@@ -703,6 +822,240 @@ ROM_START( rw18r )
 	ROM_REGION( 0x200, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "b5000cc", 0x000, 0x0c0, CRC(ace32614) SHA1(23cf11acf2e73ce2dfc165cb87f86fab15f69ff7) )
 	ROM_CONTINUE(        0x100, 0x100 )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Rockwell 31R "Slide Rule Memory"
+  * A5500 MCU (label A5502PA, die label A5500)
+  * 9-digit 7seg LED display
+
+***************************************************************************/
+
+class rw31r_state : public hh_rw5000_state
+{
+public:
+	rw31r_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_rw5000_state(mconfig, type, tag)
+	{ }
+
+	void rw31r(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+	u8 read_kb();
+};
+
+// handlers
+
+void rw31r_state::write_str(u16 data)
+{
+	// STR0-STR8: digit select
+	// STR4-STR8: input mux
+	m_display->write_my(data);
+	m_inp_mux = data >> 4;
+}
+
+void rw31r_state::write_seg(u16 data)
+{
+	// SEG0-SEG7: digit segment data
+	m_display->write_mx(bitswap<8>(data,0,7,6,5,4,3,2,1));
+}
+
+u8 rw31r_state::read_kb()
+{
+	// KB: multiplexed inputs
+	return read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( rw31r )
+	PORT_START("IN.0") // STR4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(". / +/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("F / CF") // function
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+ / M+")
+
+	PORT_START("IN.1") // STR5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("- / M-")
+
+	PORT_START("IN.2") // STR6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"× / x" UTF8_POW_2)
+
+	PORT_START("IN.3") // STR7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷ / 1/x")
+
+	PORT_START("IN.4") // STR8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("C / MC")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("X\xe2\x86\x94Y / X\xe2\x86\x94M")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("% / " UTF8_SQUAREROOT "x")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / MR")
+INPUT_PORTS_END
+
+void rw31r_state::rw31r(machine_config &config)
+{
+	// basic machine hardware
+	A5500(config, m_maincpu, 250000); // approximation
+	m_maincpu->write_str().set(FUNC(rw31r_state::write_str));
+	m_maincpu->write_seg().set(FUNC(rw31r_state::write_seg));
+	m_maincpu->read_kb().set(FUNC(rw31r_state::read_kb));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_rw31r);
+}
+
+// roms
+
+ROM_START( rw31r )
+	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "a5502pa", 0x000, 0x280, CRC(6ee0b30a) SHA1(42e5d1e29bdef4b4faaafee3592cacc0e66b982f) )
+	ROM_CONTINUE(        0x380, 0x080 )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Rockwell 24K aka "the 24K" (see below for more)
+  * A5900 MCU (label A5901CA/A5903CB, die label A59__)
+  * 9-digit 7seg VFD
+
+  This MCU was used in Rockwell 14RD-II, 24RD-II, 24K, 24K II, 24MS, and
+  probably also in 14RD, 24RD, 22K.
+
+  14RD has 6 less buttons than 24RD, the non-II versions have LED(s) instead
+  of a 9th digit for minus sign and memory status. 24K has an extra button
+  for register exchange. The difference between 24K and 24K II is unknown.
+
+***************************************************************************/
+
+class rw24k_state : public hh_rw5000_state
+{
+public:
+	rw24k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_rw5000_state(mconfig, type, tag)
+	{ }
+
+	void rw24k(machine_config &config);
+
+private:
+	void write_str(u16 data);
+	void write_seg(u16 data);
+	u8 read_kb();
+};
+
+// handlers
+
+void rw24k_state::write_str(u16 data)
+{
+	// STR0-STR8: digit select, input mux
+	m_display->write_my(data);
+	m_inp_mux = data;
+}
+
+void rw24k_state::write_seg(u16 data)
+{
+	// SEG0-SEG7: digit segment data
+	m_display->write_mx(bitswap<8>(data,0,7,6,5,4,3,2,1));
+}
+
+u8 rw24k_state::read_kb()
+{
+	// KB: multiplexed inputs
+	return read_inputs(9);
+}
+
+// config
+
+static INPUT_PORTS_START( rw24k )
+	PORT_START("IN.0") // STR0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-") // unpopulated on 14RD
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("M+") // "
+
+	PORT_START("IN.1") // STR1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("M-") // "
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // STR2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // STR3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("MC") // "
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT) // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("MR") // "
+
+	PORT_START("IN.4") // STR4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.5") // STR5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.6") // STR6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.7") // STR7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.8") // STR8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE/C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("\xe2\x86\x94") // register exchange - unpopulated on 14RD/24RD
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+INPUT_PORTS_END
+
+void rw24k_state::rw24k(machine_config &config)
+{
+	// basic machine hardware
+	A5900(config, m_maincpu, 250000); // approximation
+	m_maincpu->write_str().set(FUNC(rw24k_state::write_str));
+	m_maincpu->write_seg().set(FUNC(rw24k_state::write_seg));
+	m_maincpu->read_kb().set(FUNC(rw24k_state::read_kb));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_rw24k);
+}
+
+// roms
+
+ROM_START( rw24k )
+	ROM_REGION( 0x200, "maincpu", 0 )
+	ROM_LOAD( "a5901ca", 0x000, 0x200, CRC(00de7764) SHA1(0f24add4b6d2660aad63ddd4d0003d59a0e39df6) )
 ROM_END
 
 
@@ -722,4 +1075,8 @@ CONS( 1977, mfootb,    0,       0, mfootb,    mfootb,    mfootb_state,    empty_
 CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_init, "Mattel Electronics", "Baseball (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE )
 
+COMP( 1974, rw10r,     0,       0, rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "10R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw12r,     0,       0, rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "12R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw31r,     0,       0, rw31r,     rw31r,     rw31r_state,     empty_init, "Rockwell", "31R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, rw24k,     0,       0, rw24k,     rw24k,     rw24k_state,     empty_init, "Rockwell", "24K (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

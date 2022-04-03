@@ -634,17 +634,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
 static const gfx_layout layout_8x8x8 =
 {
 	8,8,
@@ -679,24 +668,24 @@ static const gfx_layout torus_layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_paradise )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x100, 1  ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,   0x400, 16 ) // [1] Background
-	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,   0x300, 1  ) // [2] Midground
-	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x000, 1  ) // [3] Foreground
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,         0x100, 1  ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,   0x400, 16 ) // [1] Background
+	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,           0x300, 1  ) // [2] Midground
+	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,           0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_torus )
-	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8, 0x100, 1  ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x400, 16 ) // [1] Background
-	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,        0x300, 1  ) // [2] Midground
-	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,        0x000, 1  ) // [3] Foreground
+	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8,  0x100, 1  ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,  0x400, 16 ) // [1] Background
+	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,          0x300, 1  ) // [2] Midground
+	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,          0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_madball )
 	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8, 0x500, 1  ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x400, 16 ) // [1] Background
-	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,        0x300, 1  ) // [2] Midground
-	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,        0x000, 1  ) // [3] Foreground
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x400, 16 ) // [1] Background
+	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,         0x300, 1  ) // [2] Midground
+	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,         0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
 /***************************************************************************

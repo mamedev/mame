@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "tp0320.h"
 #include "tms1k_dasm.h"
-#include "debugger.h"
 
 // TP0320 is TI's first CMOS MCU with integrated LCD controller, the die is still very similar to TMS0980
 // - 2048x9bit ROM, same as on TMS0980 with different row-select

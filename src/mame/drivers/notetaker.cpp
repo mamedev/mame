@@ -185,18 +185,18 @@ private:
 	void ep_mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	//variables
 	//  IPConReg
-	uint8_t m_BootSeqDone;
-	uint8_t m_ProcLock;
-	uint8_t m_CharCtr;
-	uint8_t m_DisableROM;
-	uint8_t m_CorrOn_q;
-	uint8_t m_LedInd6;
-	uint8_t m_LedInd7;
-	uint8_t m_LedInd8;
+	uint8_t m_BootSeqDone = 0;
+	uint8_t m_ProcLock = 0;
+	uint8_t m_CharCtr = 0;
+	uint8_t m_DisableROM = 0;
+	uint8_t m_CorrOn_q = 0;
+	uint8_t m_LedInd6 = 0;
+	uint8_t m_LedInd7 = 0;
+	uint8_t m_LedInd8 = 0;
 	//  FIFOReg
-	uint8_t m_TabletYOn;
-	uint8_t m_TabletXOn;
-	uint8_t m_FrSel2;
+	uint8_t m_TabletYOn = 0;
+	uint8_t m_TabletXOn = 0;
+	uint8_t m_FrSel2 = 0;
 	uint8_t m_FrSel1 = 0;
 	uint8_t m_FrSel0 = 0;
 	uint8_t m_SHConB = 0;
@@ -228,7 +228,7 @@ private:
 	emu_timer *m_FIFO_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(timer_fifoclk);
 	// framebuffer display starting address
-	uint16_t m_DispAddr;
+	uint16_t m_DispAddr = 0;
 
 // separate cpu resets
 	void iop_reset();

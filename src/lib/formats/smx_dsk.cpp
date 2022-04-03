@@ -43,4 +43,4 @@ const smx_format::format smx_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_SMX_FORMAT = &floppy_image_format_creator<smx_format>;
+const smx_format FLOPPY_SMX_FORMAT;

@@ -69,41 +69,41 @@ public:
 	void init_mgavegas133();
 
 private:
-	uint8_t m_int;
+	uint8_t m_int = 0;
 
 	//OUT1
-	uint8_t m_ckmod;
-	uint8_t m_dmod;
-	uint8_t m_emod;
-	uint8_t m_inh;
-	uint8_t m_hop;
-	uint8_t m_seg;
-	uint8_t m_printer;
-	uint8_t m_auxp;
+	uint8_t m_ckmod = 0;
+	uint8_t m_dmod = 0;
+	uint8_t m_emod = 0;
+	uint8_t m_inh = 0;
+	uint8_t m_hop = 0;
+	uint8_t m_seg = 0;
+	uint8_t m_printer = 0;
+	uint8_t m_auxp = 0;
 
 	//helper...
-	uint8_t m_old_ckmod;
-	uint8_t m_old_emod;
+	uint8_t m_old_ckmod = 0;
+	uint8_t m_old_emod = 0;
 
 	//OUT2
-	uint8_t m_bobina_ctrl;
-	uint8_t m_timbre;
-	uint8_t m_coil_1;
-	uint8_t m_coil_2;
-	uint8_t m_coil_3;
-	uint8_t m_cont_ent;
-	uint8_t m_cont_sal;
-	uint8_t m_cont_caj;
+	uint8_t m_bobina_ctrl = 0;
+	uint8_t m_timbre = 0;
+	uint8_t m_coil_1 = 0;
+	uint8_t m_coil_2 = 0;
+	uint8_t m_coil_3 = 0;
+	uint8_t m_cont_ent = 0;
+	uint8_t m_cont_sal = 0;
+	uint8_t m_cont_caj = 0;
 
 	//lamps out
-	uint64_t m_custom_data;
-	uint8_t m_auxs;
-	uint8_t m_anal;
-	uint8_t m_anacl;
-	uint8_t m_anacr;
-	uint8_t m_anar;
-	uint8_t m_pl;
-	uint8_t m_pc;
+	uint64_t m_custom_data = 0L;
+	uint8_t m_auxs = 0;
+	uint8_t m_anal = 0;
+	uint8_t m_anacl = 0;
+	uint8_t m_anacr = 0;
+	uint8_t m_anar = 0;
+	uint8_t m_pl = 0;
+	uint8_t m_pc = 0;
 	uint8_t m_pr = 0;
 	uint8_t m_luz_250_rul = 0;
 	uint8_t m_luz_100_rul = 0;

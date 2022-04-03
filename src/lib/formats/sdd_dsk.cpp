@@ -32,7 +32,7 @@ const char *sdd_format::extensions() const
 	return "sdd";
 }
 
-int sdd_format::get_image_offset(const format &f, int head, int track)
+int sdd_format::get_image_offset(const format &f, int head, int track) const
 {
 	return (f.track_count * head + track) * compute_track_size(f);
 }
@@ -61,4 +61,4 @@ const sdd_format::format sdd_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_SDD_FORMAT = &floppy_image_format_creator<sdd_format>;
+const sdd_format FLOPPY_SDD_FORMAT;

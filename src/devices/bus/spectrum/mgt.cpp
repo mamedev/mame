@@ -227,7 +227,7 @@ static void plusd_floppies(device_slot_interface &device)
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 void spectrum_plusd_device::floppy_formats(format_registration &fr)

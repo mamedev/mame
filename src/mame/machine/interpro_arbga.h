@@ -67,21 +67,21 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	u32 m_sdepid;
-	u32 m_arbsnap;
-	u32 m_fixprils;
-	u32 m_fixprims;
-	u32 m_sysdomls;
-	u32 m_sysdomms;
-	u32 m_tctrl;
-	u8 m_inem;
-	u8 m_enem;
-	u32 m_hog;
-	u32 m_lock;
-	u32 m_lockprs;
-	u32 m_hiblockls;
-	u32 m_hiblockms;
-	u32 m_arbrev;
+	u32 m_sdepid = 0;
+	u32 m_arbsnap = 0;
+	u32 m_fixprils = 0;
+	u32 m_fixprims = 0;
+	u32 m_sysdomls = 0;
+	u32 m_sysdomms = 0;
+	u32 m_tctrl = 0;
+	u8 m_inem = 0;
+	u8 m_enem = 0;
+	u32 m_hog = 0;
+	u32 m_lock = 0;
+	u32 m_lockprs = 0;
+	u32 m_hiblockls = 0;
+	u32 m_hiblockms = 0;
+	u32 m_arbrev = 0;
 };
 
 // device type definition

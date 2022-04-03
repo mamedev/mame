@@ -42,9 +42,9 @@ private:
 	required_device<cpu_device> m_ourcpu;
 	required_device<bsmt2000_device> m_bsmt;
 
-	uint8_t m_bsmt_latch;
-	uint8_t m_bsmt_reset;
-	uint8_t m_bsmt_comms;
+	uint8_t m_bsmt_latch = 0;
+	uint8_t m_bsmt_reset = 0;
+	uint8_t m_bsmt_comms = 0;
 
 	INTERRUPT_GEN_MEMBER(decobsmt_firq_interrupt);
 

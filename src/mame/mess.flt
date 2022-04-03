@@ -406,13 +406,13 @@ hec2hrp.cpp
 hektor.cpp
 hhtiger.cpp
 hh_amis2k.cpp
-hh_b5000.cpp
 hh_cop400.cpp
 hh_cops1.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
 hh_pps41.cpp
+hh_rw5000.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
@@ -484,6 +484,7 @@ irisha.cpp
 iris_power.cpp
 is48x.cpp
 isbc.cpp
+isbc660.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
@@ -690,6 +691,7 @@ multi8.cpp
 mupid2.cpp
 mvme147.cpp
 mvme162.cpp
+mw4pole.cpp
 mx2178.cpp
 myb3k.cpp
 mycom.cpp

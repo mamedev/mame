@@ -1743,7 +1743,7 @@ uint32_t chd_file::guess_unitbytes()
 		!read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) ||
 		!read_metadata(GDROM_OLD_METADATA_TAG, 0, metadata) ||
 		!read_metadata(GDROM_TRACK_METADATA_TAG, 0, metadata))
-		return CD_FRAME_SIZE;
+		return cdrom_file::FRAME_SIZE;
 
 	// otherwise, just map 1:1 with the hunk size
 	return m_hunkbytes;

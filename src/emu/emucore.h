@@ -13,19 +13,25 @@
 
 #pragma once
 
-// standard C includes
-#include <cassert>
-#include <cmath>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <cstdarg>
-
 // some cleanups for Solaris for things defined in stdlib.h
 #if defined(__sun__) && defined(__svr4__)
 #undef si_status
 #undef WWORD
 #endif
+
+// centralised forward declarations
+#include "emufwd.h"
+
+// common stuff from lib/util
+#include "corealloc.h"
+#include "coretmpl.h"
+#include "bitmap.h"
+#include "endianness.h"
+#include "strformat.h"
+#include "vecstream.h"
+
+// common stuff from osd
+#include "osdcomm.h"
 
 // standard C++ includes
 #include <exception>
@@ -33,15 +39,12 @@
 #include <type_traits>
 #include <typeinfo>
 
-// core system includes
-#include "osdcomm.h"
-#include "coretmpl.h"
-#include "bitmap.h"
-#include "endianness.h"
-#include "strformat.h"
-#include "vecstream.h"
-
-#include "emufwd.h"
+// standard C includes
+#include <cassert>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 
 //**************************************************************************
@@ -420,5 +423,12 @@ inline u64 d2u(double d)
 	u.dd = d;
 	return u.vv;
 }
+
+
+//**************************************************************************
+//  USEFUL UTILITIES
+//**************************************************************************
+
+using util::make_unique_clear;
 
 #endif // MAME_EMU_EMUCORE_H

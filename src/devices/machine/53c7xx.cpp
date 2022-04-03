@@ -292,7 +292,8 @@ uint32_t ncr53c7xx_device::read(offs_t offset, uint32_t mem_mask)
 			if (ACCESSING_BITS_0_7)
 			{
 				ret = m_dstat;
-				m_dstat = 0;
+				// DFE isn't cleared on read
+				m_dstat &= DSTAT_DFE;
 				update_irqs();
 			}
 			if (ACCESSING_BITS_8_15)

@@ -87,4 +87,4 @@ const pc98_format::format pc98_format::formats[] = {
 };
 
 
-const floppy_format_type FLOPPY_PC98_FORMAT = &floppy_image_format_creator<pc98_format>;
+const pc98_format FLOPPY_PC98_FORMAT;

@@ -70,17 +70,17 @@ const char *os9_format::extensions() const
 	return "os9,dsk";
 }
 
-int os9_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int os9_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int const type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 75;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-int os9_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int os9_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -224,7 +224,7 @@ int os9_format::find_size(util::random_read &io, uint32_t form_factor, const std
 	return -1;
 }
 
-const wd177x_format::format &os9_format::get_track_format(const format &f, int head, int track)
+const wd177x_format::format &os9_format::get_track_format(const format &f, int head, int track) const
 {
 	int n = -1;
 
@@ -583,4 +583,4 @@ const os9_format::format os9_format::formats_track0[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_OS9_FORMAT = &floppy_image_format_creator<os9_format>;
+const os9_format FLOPPY_OS9_FORMAT;

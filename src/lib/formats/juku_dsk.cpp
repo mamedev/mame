@@ -42,4 +42,4 @@ const juku_format::format juku_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_JUKU_FORMAT = &floppy_image_format_creator<juku_format>;
+const juku_format FLOPPY_JUKU_FORMAT;

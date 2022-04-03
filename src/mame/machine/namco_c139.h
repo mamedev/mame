@@ -47,7 +47,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 private:
 	const address_space_config m_space_config;
-	uint16_t* m_ram;
+	uint16_t* m_ram = nullptr;
 };
 
 

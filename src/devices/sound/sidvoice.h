@@ -16,81 +16,81 @@ struct sidOperator
 {
 	struct sw_storage
 	{
-		uint16_t len;
+		uint16_t len = 0;
 #if defined(DIRECT_FIXPOINT)
-		uint32_t stp;
+		uint32_t stp = 0;
 #else
-		uint32_t pnt;
-		int16_t stp;
+		uint32_t pnt = 0;
+		int16_t stp = 0;
 #endif
 	};
 
-	SID6581_t *sid;
-	uint8_t reg[7];
-	uint32_t SIDfreq;
-	uint16_t SIDpulseWidth;
-	uint8_t SIDctrl;
-	uint8_t SIDAD, SIDSR;
+	SID6581_t *sid = nullptr;
+	uint8_t reg[7]{ 0 };
+	uint32_t SIDfreq = 0;
+	uint16_t SIDpulseWidth = 0;
+	uint8_t SIDctrl = 0;
+	uint8_t SIDAD = 0, SIDSR = 0;
 
-	sidOperator* carrier;
-	sidOperator* modulator;
-	int sync;
+	sidOperator *carrier = nullptr;
+	sidOperator *modulator = nullptr;
+	int sync = 0;
 
-	uint16_t pulseIndex, newPulseIndex;
-	uint16_t curSIDfreq;
-	uint16_t curNoiseFreq;
+	uint16_t pulseIndex = 0, newPulseIndex = 0;
+	uint16_t curSIDfreq = 0;
+	uint16_t curNoiseFreq = 0;
 
-	uint8_t output;//, outputMask;
+	uint8_t output = 0/*, outputMask = 0*/;
 
-	char filtVoiceMask;
-	int filtEnabled;
-	float filtLow, filtRef;
-	int8_t filtIO;
+	char filtVoiceMask = 0;
+	int filtEnabled = 0;
+	float filtLow = 0, filtRef = 0;
+	int8_t filtIO = 0;
 
-	int32_t cycleLenCount;
+	int32_t cycleLenCount = 0;
 #if defined(DIRECT_FIXPOINT)
 	PAIR cycleLen, cycleAddLen;
 #else
-	uint32_t cycleAddLenPnt;
-	uint16_t cycleLen, cycleLenPnt;
+	uint32_t cycleAddLenPnt = 0;
+	uint16_t cycleLen, cycleLenPnt = 0;
 #endif
 
-	int8_t (*outProc)(sidOperator *);
-	void (*waveProc)(sidOperator *);
+	int8_t (*outProc)(sidOperator *) = nullptr;
+	void (*waveProc)(sidOperator *) = nullptr;
 
 #if defined(DIRECT_FIXPOINT)
 	PAIR waveStep, waveStepAdd;
 #else
-	uint16_t waveStep, waveStepAdd;
-	uint32_t waveStepPnt, waveStepAddPnt;
+	uint16_t waveStep = 0, waveStepAdd = 0;
+	uint32_t waveStepPnt = 0, waveStepAddPnt = 0;
 #endif
-	uint16_t waveStepOld;
+	uint16_t waveStepOld = 0;
 	sw_storage wavePre[2];
 
 #if defined(DIRECT_FIXPOINT)
 	PAIR noiseReg;
 #else
-	uint32_t noiseReg;
+	uint32_t noiseReg = 0;
 #endif
-	uint32_t noiseStep, noiseStepAdd;
-	uint8_t noiseOutput;
-	int noiseIsLocked;
+	uint32_t noiseStep = 0, noiseStepAdd = 0;
+	uint8_t noiseOutput = 0;
+	int noiseIsLocked = 0;
 
-	uint8_t ADSRctrl;
-//  int gateOnCtrl, gateOffCtrl;
-	uint16_t (*ADSRproc)(sidOperator *);
+	uint8_t ADSRctrl = 0;
+//  int gateOnCtrl = 0, gateOffCtrl = 0;
+	uint16_t (*ADSRproc)(sidOperator *) = nullptr;
 
 #ifdef SID_FPUENVE
-	float fenveStep, fenveStepAdd;
-	uint32_t enveStep;
+	float fenveStep = 0.0, fenveStepAdd = 0.0;
+	uint32_t enveStep = 0;
 #elif defined(DIRECT_FIXPOINT)
 	PAIR enveStep, enveStepAdd;
 #else
-	uint16_t enveStep, enveStepAdd;
-	uint32_t enveStepPnt, enveStepAddPnt;
+	uint16_t enveStep = 0, enveStepAdd = 0;
+	uint32_t enveStepPnt = 0, enveStepAddPnt = 0;
 #endif
-	uint8_t enveVol, enveSusVol;
-	uint16_t enveShortAttackCount;
+	uint8_t enveVol = 0, enveSusVol = 0;
+	uint16_t enveShortAttackCount = 0;
 
 	void clear();
 

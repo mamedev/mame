@@ -37,9 +37,9 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 	virtual bool supports_save() const override { return true; }
 
 protected:
@@ -62,18 +62,18 @@ protected:
 	const format *formats;
 
 	int find_size(util::random_read &io, uint32_t form_factor) const;
-	virtual int get_physical_track(const format &f, int head, int track);
-	virtual uint32_t get_cell_size(const format &f, int track);
-	virtual int get_sectors_per_track(const format &f, int track);
-	virtual int get_disk_id_offset(const format &f);
-	void get_disk_id(const format &f, util::random_read &io, uint8_t &id1, uint8_t &id2);
-	virtual int get_image_offset(const format &f, int head, int track);
-	int compute_track_size(const format &f, int track);
-	virtual int get_gap2(const format &f, int head, int track) { return f.gap_2; }
-	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2);
+	virtual int get_physical_track(const format &f, int head, int track) const;
+	virtual uint32_t get_cell_size(const format &f, int track) const;
+	virtual int get_sectors_per_track(const format &f, int track) const;
+	virtual int get_disk_id_offset(const format &f) const;
+	void get_disk_id(const format &f, util::random_read &io, uint8_t &id1, uint8_t &id2) const;
+	virtual int get_image_offset(const format &f, int head, int track) const;
+	int compute_track_size(const format &f, int track) const;
+	virtual int get_gap2(const format &f, int head, int track) const { return f.gap_2; }
+	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2) const;
 	void build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, uint32_t error_offs, desc_s *sectors, int sector_count) const;
-	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size);
-	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count);
+	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size) const;
+	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count) const;
 
 	static const format file_formats[];
 
@@ -82,6 +82,6 @@ protected:
 	static const int speed_zone[];
 };
 
-extern const floppy_format_type FLOPPY_D64_FORMAT;
+extern const d64_format FLOPPY_D64_FORMAT;
 
 #endif // MAME_FORMATS_D64_DSK_H

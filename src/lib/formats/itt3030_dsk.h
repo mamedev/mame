@@ -28,6 +28,6 @@ private:
 };
 
 
-extern const floppy_format_type FLOPPY_ITT3030_FORMAT;
+extern const itt3030_format FLOPPY_ITT3030_FORMAT;
 
 #endif // MAME_FORMATS_ITT3030_DSK_H

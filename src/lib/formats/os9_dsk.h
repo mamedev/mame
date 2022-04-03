@@ -21,15 +21,15 @@ public:
 	virtual const char *name() const override;
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track) const override;
 
 private:
 	static const format formats[];
 	static const format formats_track0[];
 };
 
-extern const floppy_format_type FLOPPY_OS9_FORMAT;
+extern const os9_format FLOPPY_OS9_FORMAT;
 
 #endif // MAME_FORMATS_OS9_DSK_H

@@ -97,7 +97,7 @@ void adam_fdc_device::adam_fdc_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 void adam_fdc_device::floppy_formats(format_registration &fr)

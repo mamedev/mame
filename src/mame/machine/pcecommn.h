@@ -36,9 +36,9 @@ public:
 	required_device<huc6260_device> m_huc6260;
 
 private:
-	uint8_t m_io_port_options;    /*driver-specific options for the PCE*/
-	int m_joystick_port_select; /* internal index of joystick ports */
-	int m_joystick_data_select; /* which nibble of joystick data we want */
+	uint8_t m_io_port_options = 0;    /*driver-specific options for the PCE*/
+	int m_joystick_port_select = 0; /* internal index of joystick ports */
+	int m_joystick_data_select = 0; /* which nibble of joystick data we want */
 };
 
 // used by the Arcade bootlegs.

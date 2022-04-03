@@ -53,4 +53,4 @@ const cd90_640_format::format cd90_640_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_CD90_640_FORMAT = &floppy_image_format_creator<cd90_640_format>;
+const cd90_640_format FLOPPY_CD90_640_FORMAT;

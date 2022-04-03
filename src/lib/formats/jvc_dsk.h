@@ -35,15 +35,15 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 	virtual bool supports_save() const override;
 
 private:
-	bool parse_header(util::random_read &io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id);
+	static bool parse_header(util::random_read &io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id);
 };
 
-extern const floppy_format_type FLOPPY_JVC_FORMAT;
+extern const jvc_format FLOPPY_JVC_FORMAT;
 
 #endif // MAME_FORMATS_JVC_DSK_H

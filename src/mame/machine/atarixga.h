@@ -60,9 +60,9 @@ private:
 		FPGA_DECIPHER
 	};
 
-	fpga_mode m_mode;
-	uint16_t m_address;    // last written address
-	uint16_t m_ciphertext; // last written ciphertext
+	fpga_mode m_mode{};
+	uint16_t m_address = 0;    // last written address
+	uint16_t m_ciphertext = 0; // last written ciphertext
 };
 
 class atari_136095_0072_device : public atari_xga_device
@@ -98,13 +98,13 @@ private:
 
 	struct
 	{
-		uint16_t addr;
-		uint32_t data[64];
+		uint16_t addr = 0;
+		uint32_t data[64]{};
 	} m_update;
 
-	fpga_mode m_mode;
-	uint8_t m_poly_lsb;
-	uint16_t m_reply;
+	fpga_mode m_mode{};
+	uint8_t m_poly_lsb = 0;
+	uint16_t m_reply = 0;
 };
 
 

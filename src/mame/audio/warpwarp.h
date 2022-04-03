@@ -35,8 +35,8 @@ private:
 	// internal state
 	std::unique_ptr<int16_t[]> m_decay;
 	sound_stream *m_channel;
-	u32 m_clock_16h;
-	u32 m_clock_1v;
+	u32 m_clock_16h = 0;
+	u32 m_clock_1v = 0;
 	int m_sound_latch;
 	int m_music1_latch;
 	int m_music2_latch;

@@ -37,19 +37,19 @@ bool adf_format::supports_save() const
 	return true;
 }
 
-int adf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int adf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
 		return 0;
 
 	if ((size == 901120) || (size == 912384) || (size == 1802240))
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-bool adf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool adf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	desc_s sectors[22];
 	uint8_t sectdata[512*22];
@@ -121,7 +121,7 @@ uint32_t adf_format::checksum(const std::vector<bool> &trackbuf, uint32_t pos, i
 	return check & 0x55555555;
 }
 
-bool adf_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool adf_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t sectdata[512*22];
 
@@ -159,4 +159,4 @@ bool adf_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const floppy_format_type FLOPPY_ADF_FORMAT = &floppy_image_format_creator<adf_format>;
+const adf_format FLOPPY_ADF_FORMAT;

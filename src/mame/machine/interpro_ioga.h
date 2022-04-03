@@ -412,8 +412,8 @@ protected:
 	void eth_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 private:
-	u32 m_eth_base;
-	u16 m_eth_control;
+	u32 m_eth_base = 0;
+	u16 m_eth_control = 0;
 };
 
 class turquoise_ioga_device : public interpro_ioga_device
@@ -454,8 +454,8 @@ protected:
 	void eth_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 private:
-	u32 m_eth_base;
-	u16 m_eth_control;
+	u32 m_eth_base = 0;
+	u16 m_eth_control = 0;
 };
 
 class sapphire_ioga_device : public interpro_ioga_device
@@ -549,18 +549,18 @@ protected:
 private:
 	static const u8 INTERRUPT_COUNT = 19;
 
-	u32 m_eth_remap;
-	u32 m_eth_mappg;
-	u32 m_eth_control;
+	u32 m_eth_remap = 0;
+	u32 m_eth_mappg = 0;
+	u32 m_eth_control = 0;
 
-	u32 m_timer2_count;
-	u32 m_timer2_value;
-	u32 m_timer3_count;
+	u32 m_timer2_count = 0;
+	u32 m_timer2_value = 0;
+	u32 m_timer3_count = 0;
 
-	emu_timer *m_timer2;
-	emu_timer *m_timer3;
+	emu_timer *m_timer2 = nullptr;
+	emu_timer *m_timer3 = nullptr;
 
-	u16 m_swicr[8];
+	u16 m_swicr[8]{};
 };
 
 // device type definition

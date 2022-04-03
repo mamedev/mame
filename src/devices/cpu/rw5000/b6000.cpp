@@ -16,6 +16,8 @@ TODO:
 #include "emu.h"
 #include "b6000.h"
 
+#include "rw5000d.h"
+
 
 DEFINE_DEVICE_TYPE(B6000, b6000_cpu_device, "b6000", "Rockwell B6000")
 
@@ -34,6 +36,13 @@ b6000_cpu_device::b6000_cpu_device(const machine_config &mconfig, const char *ta
 void b6000_cpu_device::program_512x8(address_map &map)
 {
 	map(0x000, 0x1ff).rom();
+}
+
+
+// disasm
+std::unique_ptr<util::disasm_interface> b6000_cpu_device::create_disassembler()
+{
+	return std::make_unique<b6000_disassembler>();
 }
 
 
