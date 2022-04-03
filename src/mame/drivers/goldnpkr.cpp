@@ -12271,32 +12271,34 @@ void goldnpkr_state::init_pokersis()
 void goldnpkr_state::init_lespendu()
 {
 	uint8_t *ROM0 = memregion("maincpu")->base();
-    uint8_t *ROM1 = memregion("data")->base();
-   
-    ROM0[0x643d] = 0xff; // skip checksum
-    ROM0[0x643f] = 0xff; // skip checksum
-	ROM0[0x6461] = 0xff; // changing value to store at $01c1 (Ram security patch) 
-	
-	ROM1[0x7aa3] = 0x20; // restore to original call, before Ram security patch
+	uint8_t *ROM1 = memregion("data")->base();
+
+	ROM0[0x643d] = 0xff;  // skip checksum
+	ROM0[0x643f] = 0xff;  // skip checksum
+	ROM0[0x6461] = 0xff;  // changing value to store at $01c1 (RAM security patch) 
+
+	ROM1[0x7aa3] = 0x20;  // restore to original call, before RAM security patch
 	ROM1[0x7aa4] = 0xc3; 
-    ROM1[0x7aa5] = 0x78;
+	ROM1[0x7aa5] = 0x78;
+
+	ROM0[0x75de] = 0x1f;  // fix lamps bug
 }
 
 void goldnpkr_state::init_lespenduj()
 {
 	uint8_t *ROM0 = memregion("maincpu")->base();
-    uint8_t *ROM1 = memregion("data")->base();
+	uint8_t *ROM1 = memregion("data")->base();
    
-    ROM0[0x643d] = 0xff; // skip checksum
-    ROM0[0x643f] = 0xff; // skip checksum
-	ROM0[0x6461] = 0xff; // changing value to store at $01c1 (Ram security patch) 
+	ROM0[0x643d] = 0xff;  // skip checksum
+	ROM0[0x643f] = 0xff;  // skip checksum
+	ROM0[0x6461] = 0xff;  // changing value to store at $01c1 (RAM security patch) 
 
-	ROM1[0x7aa3] = 0x20; // restore to original call, before Ram security patch
+	ROM1[0x7aa3] = 0x20;  // restore to original call, before RAM security patch
 	ROM1[0x7aa4] = 0xc8; 
-    ROM1[0x7aa5] = 0x78;
+	ROM1[0x7aa5] = 0x78;
 
-	ROM0[0x766c] = 0x17; // bug lamps
-    ROM0[0x7749] = 0x17; // bug lamps}
+	ROM0[0x766c] = 0x17;  // fix lamps bug
+	ROM0[0x7749] = 0x17;  // fix lamps bug
 }
 
 
