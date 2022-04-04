@@ -135,7 +135,7 @@
     - https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
     - http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
     - http://www7b.biglobe.ne.jp/~crazyunit/pc88.html
-	- http://www.maroon.dti.ne.jp/youkan/pc88/index.html
+    - http://www.maroon.dti.ne.jp/youkan/pc88/index.html
 
 *************************************************************************************************************************************/
 
@@ -160,9 +160,9 @@
 
 void pc8801_state::video_start()
 {
-	// TODO: verify max possible 3301 size
-	m_text_bitmap.allocate(1024, 1024);
-	m_text_bitmap.fill(0);
+	m_screen->register_screen_bitmap(m_text_bitmap);
+
+	save_item(NAME(m_attr_info));
 }
 
 void pc8801_state::palette_reset()
@@ -181,24 +181,43 @@ void pc8801_state::palette_reset()
 	m_palette->set_pen_color(BORDER_PEN, 0, 0, 0);
 }
 
-void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect)
+UPD3301_FETCH_ATTRIBUTE( pc8801_state::attr_fetch )
+{
+	const u8 attr_max_size = 80;
+	std::array<u16, attr_max_size> attr_extend_info = pc8001_base_state::attr_fetch(attr_row, gfx_mode, y, attr_fifo_size, row_size);
+	// In case we are in a b&w mode copy the attribute structure in an internal buffer for color processing.
+	// TBD if decoration attributes applies to bitmap as well
+	if ((m_gfx_ctrl & 0x18) == 0x08)
+	{
+		for (int ey = y; ey < y + m_crtc->lines_per_char(); ey ++)
+			for (int ex = 0; ex < attr_max_size; ex ++)
+				m_attr_info[ey][ex] = attr_extend_info[ex];
+	}
+	return attr_extend_info;
+}
+
+//int pc8801_state::draw_mono_bitmap(u32 bitmap_offset, int xi)
+//{
+//  u8 res = 0;
+
+//}
+
+void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
 {
 	uint16_t y_double = get_screen_frequency(); //pixel_clock();
+	if ((m_gfx_ctrl & 0x11) == 0)
+		y_double = 0;
 	int32_t y_line_size = y_double + 1;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
 	{
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
-			u32 bitmap_offset = (y >> y_double) * 80 + (x >> 3);
+			u8 x_char = (x >> 3);
+			u32 bitmap_offset = (y >> y_double) * 80 + x_char;
 			for(int xi = 0; xi < 8; xi++)
 			{
-				u8 pen_dot = 0;
-
-				// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
-				pen_dot |= ((m_gvram[bitmap_offset+0x0000] >> (7-xi)) & 1) << 0;
-				pen_dot |= ((m_gvram[bitmap_offset+0x4000] >> (7-xi)) & 1) << 1;
-				pen_dot |= ((m_gvram[bitmap_offset+0x8000] >> (7-xi)) & 1) << 2;
+				u8 pen_dot = dot_func(bitmap_offset, y, x_char, 7 - xi);
 
 				if (pen_dot == 0)
 					continue;
@@ -212,13 +231,14 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 					// still need to check against cliprect,
 					// in the rare case that 3301 CRTC is set to non-canon values (such as any width != 640).
 					if (cliprect.contains(res_x, res_y))
-						bitmap.pix(res_y, res_x) = m_palette->pen(pen_dot);
+						bitmap.pix(res_y, res_x) = palette->pen(pen_dot);
 				}
 			}
 		}
 	}
 }
 
+#if 0
 void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	// TODO: jettermi really masks the color attribute from 3301
@@ -238,7 +258,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 			{
 				int pen_dot = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
 				//if(is_cursor)
-				//	pen^=1;
+				//  pen^=1;
 				if (!pen_dot)
 					continue;
 
@@ -276,7 +296,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 				{
 					int pen_dot = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
 					//if(is_cursor)
-					//	pen^=1;
+					//  pen^=1;
 					if (!pen_dot)
 						continue;
 
@@ -289,6 +309,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &clipre
 		}
 	}
 }
+#endif
 
 uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -297,16 +318,67 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		// BG Pal applies to 1bpp mode only, sharrier draws blue backdrop with pen #0
 		const bool bitmap_color_mode = bool(m_gfx_ctrl & 0x10);
 		bitmap.fill(m_palette->pen(bitmap_color_mode ? 0 : BGPAL_PEN), cliprect);
-		
+
 		if(bitmap_color_mode)
-			draw_bitmap_3bpp(bitmap,cliprect);
+			draw_bitmap(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+				u8 res = 0;
+
+				// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
+				for (int plane = 0; plane < 3; plane ++)
+					res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+
+				return res;
+			});
 		else
-			draw_bitmap_1bpp(bitmap,cliprect);
+		{
+			if (m_gfx_ctrl & 1)
+			{
+				// b&w 640x200x3
+				draw_bitmap(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+					u8 res = 0;
+
+					// in this mode all three planes can potentially form the output
+					// it's the only place where I/O $53 bits 1-3 have an actual effect
+					for (int plane = 0; plane < 3; plane ++)
+					{
+						u8 mask = (m_bitmap_layer_mask >> plane) & 1;
+						res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & mask);
+					}
+
+					if (!res)
+						return 0;
+
+					return m_crtc->get_display_status() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+				});
+			}
+			else
+			{
+				// true 400 line mode, 640x400x1
+				// - p1demo2d expects to use CRTC palette on demonstration 
+				//   (white text that is set to black on previous title screen animation, 
+				//    that runs in 3bpp)
+				draw_bitmap(bitmap, cliprect, m_crtc_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+					u8 res = 0;
+					// HW pick ups just the first two planes (R and G), B is unused.
+					// Plane switch happens at half screen
+					// TODO: confirm that a 15 kHz monitor cannot work with this
+					// - jettermi just uses the other b&w mode;
+					// - casablan doesn't bother in changing resolution so only the upper part is drawn;
+					int plane_offset = y >= 200 ? 384 : 0;
+
+					res |= ((m_gvram[bitmap_offset + plane_offset] >> xi) & 1);
+					if (!res)
+						return 0;
+
+					return m_crtc->get_display_status() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+				});
+			}
+		}
 	}
 	else
 		bitmap.fill(0, cliprect);
 
-	if(!(m_layer_mask & 1))
+	if(!m_text_layer_mask)
 	{
 		m_text_bitmap.fill(0, cliprect);
 		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
@@ -1072,7 +1144,7 @@ void pc8801_state::irq_mask_w(uint8_t data)
 
 	if (m_vrtc_irq_pending && m_vrtc_irq_enable)
 		vrtc_irq_w(m_vrtc_irq_pending);
-	
+
 	if (!m_vrtc_irq_enable)
 		m_pic->r_w(7 ^ 1, 1);
 
@@ -1180,7 +1252,7 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 	// p8suite Analog RGB test cross bars (reportedly works in 24 kHz / 80 column only)
 	// NB: it uses a bunch of non-waitstate related opcodes to cycle time it right,
 	// implying a stress-test for Z80 opcode cycles.
-//	m_screen->update_partial(m_screen->vpos());
+//  m_screen->update_partial(m_screen->vpos());
 }
 
 
@@ -1192,7 +1264,8 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
  */
 void pc8801_state::layer_masking_w(uint8_t data)
 {
-	m_layer_mask = data;
+	m_text_layer_mask = bool(BIT(data, 0));
+	m_bitmap_layer_mask = ((data & 0xe) >> 1) ^ 7;
 }
 
 #if 0
@@ -1551,7 +1624,7 @@ void pc8801_state::main_io(address_map &map)
 	// NB: anything after 0x32 reads 0xff on a PC8801MA real HW test
 	map(0x34, 0x34).w(FUNC(pc8801_state::alu_ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
-//	map(0x35, 0x35).r <unknown>, accessed by cancanb during OP, mistake? Mirror for intended HW?
+//  map(0x35, 0x35).r <unknown>, accessed by cancanb during OP, mistake? Mirror for intended HW?
 	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
 //  map(0x44, 0x47).rw internal OPN/OPNA sound card for 8801mkIISR and beyond
 //  uPD3301
@@ -1998,7 +2071,8 @@ void pc8801_state::machine_reset()
 	m_gfx_ctrl = 0x31;
 	m_window_offset_bank = 0x80;
 	m_misc_ctrl = 0x80;
-	m_layer_mask = 0x00;
+	m_text_layer_mask = true;
+	m_bitmap_layer_mask = 0;
 	m_vram_sel = 3;
 
 //  dynamic_res_change();
@@ -2164,7 +2238,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 
 WRITE_LINE_MEMBER(pc8801_state::vrtc_irq_w)
 {
-//	bool irq_state = m_vrtc_irq_enable & state;
+//  bool irq_state = m_vrtc_irq_enable & state;
 
 	if (state)
 	{

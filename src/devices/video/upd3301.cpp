@@ -274,7 +274,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_vrtc = param;
 
 			update_vrtc_timer(param);
-			if(!(m_status & STATUS_VE))
+			if(!get_display_status())
 				break;
 
 			if (!param)
@@ -689,7 +689,7 @@ uint32_t upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	// TODO: non-transparent modes
 	bitmap.fill(0, cliprect);
 
-	if (!(m_status & STATUS_VE))
+	if (!get_display_status())
 		return 0;
 
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
@@ -730,6 +730,12 @@ void upd3301_device::set_drq(int state)
 //-------------------------------------------------
 //  set_display -
 //-------------------------------------------------
+
+bool upd3301_device::get_display_status()
+{
+	return bool(m_status & STATUS_VE);
+}
+
 
 void upd3301_device::set_display(int state)
 {

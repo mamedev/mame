@@ -58,7 +58,7 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER( crtc_reverse_w );
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
-	UPD3301_FETCH_ATTRIBUTE( attr_fetch );
+	virtual UPD3301_FETCH_ATTRIBUTE( attr_fetch );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	virtual uint8_t dma_mem_r(offs_t offset);
 

@@ -54,7 +54,8 @@ public:
 //		, m_cg_rom(*this, "cgrom")
 		, m_kanji_rom(*this, "kanji")
 		, m_kanji_lv2_rom(*this, "kanji_lv2")
-	{ }
+	{
+	}
 
 	void pc8801(machine_config &config);
 
@@ -65,6 +66,9 @@ protected:
 
 	uint8_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint8_t data);
+
+	virtual UPD3301_FETCH_ATTRIBUTE( attr_fetch ) override;
+
 	virtual uint8_t dma_mem_r(offs_t offset) override;
 
 	virtual attotime mouse_limit_hz();
@@ -120,13 +124,15 @@ private:
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
 	std::unique_ptr<uint8_t[]> m_gvram;
+	std::array<std::array<u16, 80>, 400> m_attr_info = {};
 
 	uint8_t m_ext_rom_bank;
 	uint8_t m_vram_sel;
 	uint8_t m_misc_ctrl;
 	uint8_t m_device_ctrl_data;
 	uint8_t m_window_offset_bank;
-	uint8_t m_layer_mask;
+	bool m_text_layer_mask;
+	u8 m_bitmap_layer_mask;
 	uint8_t m_alu_reg[3];
 	uint8_t m_dmac_mode;
 	uint8_t m_alu_ctrl1;
@@ -200,8 +206,10 @@ private:
 
 //	uint8_t pixel_clock(void);
 //	void dynamic_res_change(void);
-	void draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect);
-	void draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+//	u8 draw_3bpp_gvram(u32 bitmap_offset, int xi);
+	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
+//	void draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+//	void draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 //	uint8_t calc_cursor_pos(int x,int y,int yi);
 //	uint8_t extract_text_attribute(uint32_t address,int x, uint8_t width, uint8_t &non_special);
 //	void draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,
