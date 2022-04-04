@@ -97,8 +97,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_190IN1,     nes_bmc_190in1_device,     "nes_bmc_190in
 DEFINE_DEVICE_TYPE(NES_BMC_500IN1,     nes_bmc_500in1_device,     "nes_bmc_500in1",     "NES Cart BMC 500 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_800IN1,     nes_bmc_800in1_device,     "nes_bmc_800in1",     "NES Cart BMC 800 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_1200IN1,    nes_bmc_1200in1_device,    "nes_bmc_1200in1",    "NES Cart BMC 1200 in 1 PCB")
-DEFINE_DEVICE_TYPE(NES_BMC_GOLD150,    nes_bmc_gold150_device,    "nes_bmc_gold150",    "NES Cart BMC Golden 150 in 1 PCB")
-DEFINE_DEVICE_TYPE(NES_BMC_GOLD260,    nes_bmc_gold260_device,    "nes_bmc_gold260",    "NES Cart BMC Golden 260 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_GOLD260,    nes_bmc_gold260_device,    "nes_bmc_gold260",    "NES Cart BMC Golden Game X in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_TH22913,    nes_bmc_th22913_device,    "nes_bmc_th22913",    "NES Cart BMC TH2291-3 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_82AB,       nes_bmc_82ab_device,       "nes_bmc_82ab",       "NES Cart BMC 82AB PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device,  "nes_bmc_4in1reset",  "NES Cart BMC 4 in 1 (Reset Based) PCB")
@@ -437,12 +436,7 @@ nes_bmc_1200in1_device::nes_bmc_1200in1_device(const machine_config &mconfig, co
 {
 }
 
-nes_bmc_gold150_device::nes_bmc_gold150_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_GOLD150, tag, owner, clock), m_latch(0)
-{
-}
-
-nes_bmc_gold260_device::nes_bmc_gold260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bmc_gold260_device::nes_bmc_gold260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_GOLD260, tag, owner, clock)
 {
 }
@@ -1123,33 +1117,6 @@ void nes_bmc_1200in1_device::pcb_reset()
 	prg16_cdef(0);
 	chr8(0, m_chr_source);
 	m_vram_protect = 0;
-}
-
-void nes_bmc_gold150_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_latch));
-}
-
-void nes_bmc_gold150_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-
-	m_latch = 0;
-}
-
-void nes_bmc_gold260_device::device_start()
-{
-	common_start();
-}
-
-void nes_bmc_gold260_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
 }
 
 // This PCB is fully emulated here :)
@@ -3174,88 +3141,32 @@ void nes_bmc_1200in1_device::write_h(offs_t offset, uint8_t data)
 	set_nt_mirroring(BIT(offset, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
-
 /*-------------------------------------------------
 
  BMC-GOLDEN260IN1
 
  Unknown Bootleg Multigame Board
- Games:
+ Games: Golden Game 150 in 1, Golden Game 210 in 1,
+ Golden Game 260 in 1, 1500 in 1
 
  iNES: mapper 235
 
- In MESS: Preliminary Supported.
+ In MAME: Supported.
+
+ TODO: Return open bus when ROM sockets are empty?
 
  -------------------------------------------------*/
 
-void nes_bmc_gold260_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_gold260_device::write_h(offs_t offset, u8 data)
 {
-	int bank = (offset & 0x1f) |  ((offset & 0x0300) >> 3);
 	LOG_MMC(("bmc_gold260 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset & 0x400)
-		set_nt_mirroring(PPU_MIRROR_LOW);
-	else
-		set_nt_mirroring(BIT(offset, 13) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	u8 bank = bitswap<8>(offset, 9, 8, 4, 3, 2, 1, 0, 12);
+	u8 mode = !BIT(offset, 11);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
 
-	if (offset & 0x800)
-	{
-		bank = (bank << 1) | BIT(offset, 12);
-		prg16_89ab(bank);
-		prg16_cdef(bank);
-	}
-	else
-		prg32(bank);
-}
-
-
-/*-------------------------------------------------
-
- BMC-GOLDEN150IN1
-
- Unknown Bootleg Multigame Board
- Games:
-
- iNES: mapper 235
-
- Same as the above + open bus in 0x8000-0xffff when
- enabled
-
- In MESS: Preliminary Supported.
-
- -------------------------------------------------*/
-
-
-void nes_bmc_gold150_device::write_h(offs_t offset, uint8_t data)
-{
-	int bank = (offset & 0x1f) |  ((offset & 0x0200) >> 4);
-	LOG_MMC(("bmc_gold150 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	m_latch = (offset & 0x0100);
-
-	if (offset & 0x400)
-		set_nt_mirroring(PPU_MIRROR_LOW);
-	else
-		set_nt_mirroring(BIT(offset, 13) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	if (offset & 0x800)
-	{
-		bank = (bank << 1) | BIT(offset, 12);
-		prg16_89ab(bank);
-		prg16_cdef(bank);
-	}
-	else
-		prg32(bank);
-}
-
-uint8_t nes_bmc_gold150_device::read_h(offs_t offset)
-{
-	LOG_MMC(("bmc_gold150 read_h, offset: %04x\n", offset));
-
-	if (m_latch)
-		return get_open_bus();
-	else
-		return hi_access_rom(offset);
+	set_nt_mirroring(BIT(offset, 10) ? PPU_MIRROR_LOW : BIT(offset, 13) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------

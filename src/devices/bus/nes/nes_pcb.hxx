@@ -356,7 +356,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_yy841101c",    BMC_YY841101C },
 	{ "bmc_yy841155c",    BMC_YY841155C },
 	{ "pjoy84",           BMC_PJOY84 },
-	{ "bmc_gold150",      BMC_GOLD150 },
 	{ "bmc_gold260",      BMC_GOLD260 },
 	{ "bmc_th22913",      BMC_TH22913 },
 	{ "bmc_reset4",       BMC_4IN1RESET },

@@ -1072,43 +1072,15 @@ private:
 };
 
 
-// ======================> nes_bmc_gold150_device
-
-class nes_bmc_gold150_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_bmc_gold150_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read_h(offs_t offset) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-private:
-	uint8_t m_latch;
-};
-
-
 // ======================> nes_bmc_gold260_device
 
 class nes_bmc_gold260_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_gold260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_gold260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -1413,7 +1385,6 @@ DECLARE_DEVICE_TYPE(NES_BMC_190IN1,     nes_bmc_190in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_500IN1,     nes_bmc_500in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_800IN1,     nes_bmc_800in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_1200IN1,    nes_bmc_1200in1_device)
-DECLARE_DEVICE_TYPE(NES_BMC_GOLD150,    nes_bmc_gold150_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GOLD260,    nes_bmc_gold260_device)
 DECLARE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device)
 DECLARE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device)
