@@ -8319,7 +8319,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 	</software>
 
 	<software name="deja">
-		<description>De・Ja</description>
+		<description>De·Ja</description>
 		<year>1990</year>
 		<publisher>エルフ (Elf)</publisher>
 		<!-- PC8801mk2SR -->
@@ -8393,7 +8393,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 	</software>
 
 	<software name="dejaa" cloneof="deja">
-		<description>De・Ja (alt Disk 1)</description>
+		<description>De·Ja (alt Disk 1)</description>
 		<year>1990</year>
 		<publisher>エルフ (Elf)</publisher>
 		<!-- PC8801mk2SR -->
