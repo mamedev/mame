@@ -305,7 +305,7 @@ ROM_START(photoply98sp)
 	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	ROM_REGION(0x10000, "hdd_fw", 0) // Hard disk firmware
 	ROM_LOAD("m2_at29c512.bin", 0x0000, 0x10000, CRC(22a1c9ce) SHA1(6b695ee56867176d1702273e68b5584db1b94e02) ) // Seagate ST31722A
@@ -344,7 +344,7 @@ ROM_START(photoply99sp)
 	   512MB RAM (2 x M5416258B-30J)
 	   Xtal 14.31818 MHz */
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	/* The Photo Play 1999 parallel port dongle contains, under expoxy resin:
 	    -Atmel AT89C2051 MCU (2KBytes internal ROM)
@@ -397,7 +397,7 @@ ROM_START(photoply99nl)
 	ROM_LOAD("enhanced_bios_1.06.u13", 0x0000, 0x8000, CRC(d05e9d20) SHA1(854501b7b3bf988b10516109d058f7ca2aa07d3e) ) // Centos Combo I/O ROM BIOS for CI-8000/PP2000 v1.06, W27E257
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay99nl", 0, BAD_DUMP SHA1(e3ff2a64f51e0ba07d08cd49cd56cdc866401b4f) ) // Recreated from the CDs using a VM
@@ -414,7 +414,7 @@ ROM_START(photoply2k)
 //  ROM_RELOAD(                   0x00c000, 0x4000 )
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.25.u2", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) ) // Cirrus Logic / Quadtel CL-GD5436/46 PCI VGA BIOS v1.25
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.25.u2", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) ) // Cirrus Logic/Quadtel CL-GD5436/46 PCI VGA BIOS v1.25
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
@@ -428,7 +428,7 @@ ROM_START(photoply2ksp)
 	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	/* The Photo Play 2000 parallel port dongle contains, under resin:
 	   Unknown MCU labeled "MARX(C)95,97 CBN/V/S" (UNDUMPED)
@@ -451,7 +451,7 @@ ROM_START(photoply2knl)
 	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	/* The Photo Play 2000 parallel port dongle contains, under resin:
 	   Unknown MCU labeled "MARX(C)95,97 CBN/V/S" (UNDUMPED)
@@ -472,7 +472,7 @@ ROM_START(photoply2k1it)
 	ROM_LOAD("enhanced_bios_centos.bin", 0x000000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay2k1it", 0, BAD_DUMP SHA1(274ea0ebc051d0f4846bc58a039d342241b4cc28) ) // Manually rebuilded by adding the resources for the folder C:\QP_MSTR from the 2001_NL version
@@ -518,7 +518,7 @@ ROM_START(photoply2k1nl)
 	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay2k1nl", 0, BAD_DUMP SHA1(87c9417119e9566f65db0f1b0f2182db7712c634) ) // Recreated from the CDs using a VM
@@ -564,7 +564,7 @@ ROM_START(photoply2k1mtnl)
 	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay2k1mtnl", 0, BAD_DUMP SHA1(cfa25ce036be9c2379a104a3b50d2aefd851ceeb) ) // Recreated from the CDs using a VM
@@ -579,7 +579,7 @@ ROM_START(photoply2k2be)
 	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic / Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay2k2be", 0, BAD_DUMP SHA1(29719b5db60f4cc3787a3a9f6a5937226e282d46) ) // Recreated from the CDs using a VM
@@ -597,7 +597,7 @@ ROM_START(photoply2k4)
 //  ROM_RELOAD(                   0x00c000, 0x4000 )
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x000000, 0x8000, BAD_DUMP CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) ) // Cirrus Logic / Quadtel CL-GD5436/46 PCI VGA BIOS v1.25
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x000000, 0x8000, BAD_DUMP CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) ) // Cirrus Logic/Quadtel CL-GD5436/46 PCI VGA BIOS v1.25
 
 	DISK_REGION( "ide:0:hdd:image" )
 	// CYLS:1023,HEADS:64,SECS:63,BPS:512.
