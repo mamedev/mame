@@ -1448,9 +1448,9 @@ static INPUT_PORTS_START( bullsdrtg )
 	PORT_INCLUDE( racknrol )
 
 	PORT_MODIFY("IN1")
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
+	PORT_CONFNAME(0x40, 0x00, DEF_STR( Cabinet ) ) // Sense line on wiring harness
+	PORT_CONFSETTING(   0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(   0x40, DEF_STR( Cocktail ) )
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) )
