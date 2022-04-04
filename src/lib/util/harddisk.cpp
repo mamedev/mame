@@ -24,7 +24,7 @@ hard_disk_file::hard_disk_file(chd_file *_chd)
 {
 	chd = _chd;
 	fhandle = nullptr;
-	hdinfo.fileoffset = 0;
+	fileoffset = 0;
 
 	std::string metadata;
 	std::error_condition err;
@@ -56,7 +56,7 @@ hard_disk_file::hard_disk_file(util::random_read_write &corefile, uint32_t skipo
 	hdinfo.cylinders = 0;
 	hdinfo.heads = 0;
 	hdinfo.sectors = 0;
-	hdinfo.fileoffset = skipoffs;
+	fileoffset = skipoffs;
 
 	// attempt to guess geometry in case this is an ATA situation
 	for (uint32_t totalsectors = (length - skipoffs) / hdinfo.sectorbytes; ; totalsectors++)
@@ -113,7 +113,7 @@ bool hard_disk_file::read(uint32_t lbasector, void *buffer)
 	else
 	{
 		size_t actual = 0;
-		std::error_condition err = fhandle->seek(hdinfo.fileoffset + (lbasector * hdinfo.sectorbytes), SEEK_SET);
+		std::error_condition err = fhandle->seek(fileoffset + (lbasector * hdinfo.sectorbytes), SEEK_SET);
 		if (!err)
 			err = fhandle->read(buffer, hdinfo.sectorbytes, actual);
 		return !err && (actual == hdinfo.sectorbytes);
@@ -146,7 +146,7 @@ bool hard_disk_file::write(uint32_t lbasector, const void *buffer)
 	else
 	{
 		size_t actual = 0;
-		std::error_condition err = fhandle->seek(hdinfo.fileoffset + (lbasector * hdinfo.sectorbytes), SEEK_SET);
+		std::error_condition err = fhandle->seek(fileoffset + (lbasector * hdinfo.sectorbytes), SEEK_SET);
 		if (!err)
 			err = fhandle->write(buffer, hdinfo.sectorbytes, actual);
 		return !err && (actual == hdinfo.sectorbytes);
@@ -189,4 +189,29 @@ bool hard_disk_file::set_block_size(uint32_t blocksize)
 		hdinfo.sectorbytes = blocksize;
 		return true;
 	}
+}
+
+
+std::error_condition hard_disk_file::get_inquiry_data(std::vector<uint8_t> &data) const
+{
+	if(chd)
+		return chd->read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, data);
+	else
+		return std::error_condition(chd_file::error::METADATA_NOT_FOUND);
+}
+
+std::error_condition hard_disk_file::get_cis_data(std::vector<uint8_t> &data) const
+{
+	if(chd)
+		return chd->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, data);
+	else
+		return std::error_condition(chd_file::error::METADATA_NOT_FOUND);
+}
+
+std::error_condition hard_disk_file::get_disk_key_data(std::vector<uint8_t> &data) const
+{
+	if(chd)
+		return chd->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, data);
+	else
+		return std::error_condition(chd_file::error::METADATA_NOT_FOUND);
 }
