@@ -32,20 +32,34 @@ const char *meta_data::entry_name(meta_name name)
 	return "";
 }
 
-std::string meta_value::to_string(meta_type type, const meta_value &m)
+std::string meta_value::to_string() const
 {
-	switch(type) {
-	case meta_type::string: return m.as_string();
-	case meta_type::number: return util::string_format("0x%x", m.as_number());
-	case meta_type::flag:   return m.as_flag() ? "t" : "f";
-	case meta_type::date:   {
-		auto dt = m.as_date();
-		return util::string_format("%04d-%02d-%02d %02d:%02d:%02d",
-								   dt.year, dt.month, dt.day_of_month,
-								   dt.hour, dt.minute, dt.second);
-	}
-	}
-	return std::string("");
+	std::string result;
+
+	std::visit([this, &result](auto &&arg)
+	{
+		using T = std::decay_t<decltype(arg)>;
+		if constexpr (std::is_same_v<T, std::string>)
+		{
+			result = as_string();
+		}
+		else if constexpr (std::is_same_v<T, uint64_t>)
+		{
+			result = util::string_format("0x%x", as_number());
+		}
+		else if constexpr (std::is_same_v<T, bool>)
+		{
+			result = as_flag() ? "t" : "f";
+		}
+		else if constexpr (std::is_same_v<T, util::arbitrary_datetime>)
+		{
+			auto dt = as_date();
+			result = util::string_format("%04d-%02d-%02d %02d:%02d:%02d",
+				dt.year, dt.month, dt.day_of_month,
+				dt.hour, dt.minute, dt.second);
+		}
+	}, value);
+	return result;
 }
 
 } // namespace fs
