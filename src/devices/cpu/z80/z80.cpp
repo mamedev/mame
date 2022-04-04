@@ -528,9 +528,9 @@ void z80_device::wm(uint16_t addr, uint8_t value)
 inline void z80_device::wm16(uint16_t addr, PAIR &r)
 {
 	m_icount_executing -= MTM;
-	wm(addr, r.b.l);
-	m_icount_executing += MTM;
 	wm(addr+1, r.b.h);
+	m_icount_executing += MTM;
+	wm(addr, r.b.l);
 }
 
 /***************************************************************
@@ -546,7 +546,7 @@ uint8_t z80_device::rop()
 	if(m_icount_executing) T(m_icount_executing);
 	m_r++;
 	uint8_t res = m_opcodes.read_byte(pc);
-	T(m_cc_op[0]-2);
+	T(execute_min_cycles());
 	refresh(2);
 
 	return res;
