@@ -78,13 +78,13 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	// video-related
-	tilemap_t  *m_fof_bak_tilemap;
-	tilemap_t  *m_fof_mid_tilemap;
-	tilemap_t  *m_fof_txt_tilemap;
+	tilemap_t  *m_fof_bak_tilemap = nullptr;
+	tilemap_t  *m_fof_mid_tilemap = nullptr;
+	tilemap_t  *m_fof_txt_tilemap = nullptr;
 
 	// misc
-	int      m_bbprot_kludge;
-	uint16_t   m_fof_700000_data;
+	int      m_bbprot_kludge = 0;
+	uint16_t   m_fof_700000_data = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;

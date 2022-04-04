@@ -121,7 +121,7 @@ private:
 	uint8_t m_tx_rx_rdy = 0U;
 	uint8_t m_irq = 0U;
 
-	bool    m_printer_prowriter = 0;
+	bool    m_printer_prowriter = false;
 	int     m_printer_fault = 0;
 	int     m_printer_select = 0;
 

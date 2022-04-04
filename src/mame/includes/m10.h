@@ -116,8 +116,8 @@ private:
 	required_device<ttl74123_device> m_ic8j1;
 	required_device<ttl74123_device> m_ic8j2;
 
-	gfx_element *       m_back_gfx;
-	uint8_t             m_bottomline;
+	gfx_element *       m_back_gfx = nullptr;
+	uint8_t             m_bottomline = 0U;
 
 	void m10_ctrl_w(uint8_t data);
 	void m11_ctrl_w(uint8_t data);

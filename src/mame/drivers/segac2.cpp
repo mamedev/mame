@@ -258,7 +258,7 @@ public:
 	void init_pclubjv5();
 
 private:
-	int m_cam_data;
+	int m_cam_data = 0;
 
 	uint16_t printer_r();
 	void print_club_camera_w(uint16_t data);

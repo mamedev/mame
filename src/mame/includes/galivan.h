@@ -52,16 +52,16 @@ private:
 	required_device<buffered_spriteram8_device> m_spriteram;
 
 	/* video-related */
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_tx_tilemap;
-	uint16_t       m_scrollx;
-	uint16_t       m_scrolly;
-	uint8_t        m_galivan_scrollx[2],m_galivan_scrolly[2];
-	uint8_t        m_layers;
-	uint8_t        m_ninjemak_dispdisable;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	tilemap_t     *m_tx_tilemap = nullptr;
+	uint16_t       m_scrollx = 0U;
+	uint16_t       m_scrolly = 0U;
+	uint8_t        m_galivan_scrollx[2]{}, m_galivan_scrolly[2]{};
+	uint8_t        m_layers = 0U;
+	uint8_t        m_ninjemak_dispdisable = 0U;
 
-	uint8_t        m_shift_scroll; //youmab
-	uint32_t       m_shift_val;
+	uint8_t        m_shift_scroll = 0U; //youmab
+	uint32_t       m_shift_val = 0U;
 	void galivan_sound_command_w(uint8_t data);
 	uint8_t soundlatch_clear_r();
 	uint8_t IO_port_c0_r();

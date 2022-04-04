@@ -10,10 +10,86 @@
 
 #include <stdexcept>
 
+using namespace fs;
 
-namespace fs {
+namespace fs { const prodos_image PRODOS; }
 
-const prodos_image PRODOS;
+namespace {
+class impl : public filesystem_t {
+public:
+	impl(fsblk_t &blockdev);
+	virtual ~impl() = default;
+
+	virtual void format(const meta_data &meta) override;
+
+	virtual meta_data metadata() override;
+	virtual dir_t root() override;
+
+	void drop_root_ref();
+
+	static util::arbitrary_datetime prodos_to_dt(u32 date);
+	std::vector<dir_entry> contents(u16 block);
+
+private:
+	static const u8 boot[512];
+
+	dir_t m_root;
+
+	class root_dir : public idir_t {
+	public:
+		root_dir(impl &fs, u16 base_block) : m_fs(fs), m_base_block(base_block) { }
+		virtual ~root_dir() = default;
+
+		virtual void drop_weak_references() override;
+
+		virtual meta_data metadata() override;
+		virtual std::vector<dir_entry> contents() override;
+		virtual file_t file_get(u64 key) override;
+		virtual dir_t dir_get(u64 key) override;
+
+	protected:
+		impl &m_fs;
+		u16 m_base_block;
+
+		std::pair<fsblk_t::block_t, const u8 *> get_entry_ro(u64 key);
+		[[maybe_unused]] std::pair<fsblk_t::block_t, u8 *> get_entry(u64 key);
+	};
+
+	class dir : public root_dir {
+	public:
+		dir(impl &fs, const u8 *entry, u16 base_block, u16 key, root_dir *parent_dir);
+		virtual ~dir() = default;
+
+		virtual meta_data metadata() override;
+
+	protected:
+		root_dir *m_parent_dir;
+		u16 m_key;
+		u8 m_entry[39];
+	};
+
+	class file : public ifile_t {
+	public:
+		file(impl &fs, const u8 *entry, u16 key, root_dir *parent_dir);
+		virtual ~file() = default;
+
+		virtual void drop_weak_references() override;
+
+		virtual meta_data metadata() override;
+		virtual std::vector<u8> read_all() override;
+		virtual std::vector<u8> rsrc_read_all() override;
+
+	private:
+		impl &m_fs;
+		root_dir *m_parent_dir;
+		u16 m_key;
+		u8 m_entry[39];
+
+		std::vector<u8> any_read_all(u8 type, u16 block, u32 length);
+	};
+};
+}
+
 
 const char *prodos_image::name() const
 {
@@ -25,7 +101,7 @@ const char *prodos_image::description() const
 	return "Apple ProDOS";
 }
 
-const u8 prodos_image::impl::boot[512] = {
+const u8 impl::boot[512] = {
 	0x01, 0x38, 0xb0, 0x03, 0x4c, 0x1c, 0x09, 0x78, 0x86, 0x43, 0xc9, 0x03, 0x08, 0x8a, 0x29, 0x70,
 	0x4a, 0x4a, 0x4a, 0x4a, 0x09, 0xc0, 0x85, 0x49, 0xa0, 0xff, 0x84, 0x48, 0x28, 0xc8, 0xb1, 0x48,
 	0xd0, 0x3a, 0xb0, 0x0e, 0xa9, 0x03, 0x8d, 0x00, 0x08, 0xe6, 0x3d, 0xa5, 0x49, 0x48, 0xa9, 0x5b,
@@ -139,7 +215,7 @@ std::vector<meta_description> prodos_image::directory_meta_description() const
 	return res;
 }
 
-void prodos_image::impl::format(const meta_data &meta)
+void impl::format(const meta_data &meta)
 {
 	std::string volume_name = meta.get_string(meta_name::name, "UNTITLED");
 	u32 blocks = m_blockdev.block_count();
@@ -205,11 +281,11 @@ void prodos_image::impl::format(const meta_data &meta)
 	}
 }
 
-prodos_image::impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 512), m_root(true)
+impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 512), m_root(true)
 {
 }
 
-util::arbitrary_datetime prodos_image::impl::prodos_to_dt(u32 date)
+util::arbitrary_datetime impl::prodos_to_dt(u32 date)
 {
 	util::arbitrary_datetime dt;
 	dt.second       = 0;
@@ -224,7 +300,7 @@ util::arbitrary_datetime prodos_image::impl::prodos_to_dt(u32 date)
 	return dt;
 }
 
-meta_data prodos_image::impl::metadata()
+meta_data impl::metadata()
 {
 	meta_data res;
 	auto bdir = m_blockdev.get(2);
@@ -237,31 +313,31 @@ meta_data prodos_image::impl::metadata()
 	return res;
 }
 
-filesystem_t::dir_t prodos_image::impl::root()
+filesystem_t::dir_t impl::root()
 {
 	if(!m_root)
 		m_root = new root_dir(*this, 2);
 	return m_root.strong();
 }
 
-void prodos_image::impl::drop_root_ref()
+void impl::drop_root_ref()
 {
 	m_root = nullptr;
 }
 
 
-void prodos_image::impl::root_dir::drop_weak_references()
+void impl::root_dir::drop_weak_references()
 {
 	if(m_base_block == 2)
 		m_fs.drop_root_ref();
 }
 
-meta_data prodos_image::impl::root_dir::metadata()
+meta_data impl::root_dir::metadata()
 {
 	return meta_data();
 }
 
-std::vector<dir_entry> prodos_image::impl::root_dir::contents()
+std::vector<dir_entry> impl::root_dir::contents()
 {
 	std::vector<dir_entry> res;
 
@@ -290,7 +366,7 @@ std::vector<dir_entry> prodos_image::impl::root_dir::contents()
 }
 
 
-std::pair<fsblk_t::block_t, const u8 *> prodos_image::impl::root_dir::get_entry_ro(u64 key)
+std::pair<fsblk_t::block_t, const u8 *> impl::root_dir::get_entry_ro(u64 key)
 {
 	std::pair<fsblk_t::block_t, const u8 *> res;
 	res.first = m_fs.m_blockdev.get(m_base_block);
@@ -308,7 +384,7 @@ std::pair<fsblk_t::block_t, const u8 *> prodos_image::impl::root_dir::get_entry_
 	return res;
 }
 
-std::pair<fsblk_t::block_t, u8 *> prodos_image::impl::root_dir::get_entry(u64 key)
+std::pair<fsblk_t::block_t, u8 *> impl::root_dir::get_entry(u64 key)
 {
 	std::pair<fsblk_t::block_t, u8 *> res;
 	res.first = m_fs.m_blockdev.get(m_base_block);
@@ -326,7 +402,7 @@ std::pair<fsblk_t::block_t, u8 *> prodos_image::impl::root_dir::get_entry(u64 ke
 	return res;
 }
 
-filesystem_t::file_t prodos_image::impl::root_dir::file_get(u64 key)
+filesystem_t::file_t impl::root_dir::file_get(u64 key)
 {
 	auto [blk, entry] = get_entry_ro(key);
 	if(!blk)
@@ -337,7 +413,7 @@ filesystem_t::file_t prodos_image::impl::root_dir::file_get(u64 key)
 	return new file(m_fs, entry, key, this);
 }
 
-filesystem_t::dir_t prodos_image::impl::root_dir::dir_get(u64 key)
+filesystem_t::dir_t impl::root_dir::dir_get(u64 key)
 {
 	auto [blk, entry] = get_entry_ro(key);
 	if(!blk)
@@ -349,25 +425,25 @@ filesystem_t::dir_t prodos_image::impl::root_dir::dir_get(u64 key)
 	return new dir(m_fs, entry, r16l(entry+0x11), key, this);
 }
 
-prodos_image::impl::dir::dir(impl &fs, const u8 *entry, u16 base_block, u16 key, root_dir *parent_dir) : root_dir(fs, base_block), m_parent_dir(parent_dir), m_key(key)
+impl::dir::dir(impl &fs, const u8 *entry, u16 base_block, u16 key, root_dir *parent_dir) : root_dir(fs, base_block), m_parent_dir(parent_dir), m_key(key)
 {
 	memcpy(m_entry, entry, 39);
 	(void)m_key;
 	(void)m_parent_dir;
 }
 
-prodos_image::impl::file::file(impl &fs, const u8 *entry, u16 key, root_dir *parent_dir) : m_fs(fs), m_parent_dir(parent_dir), m_key(key)
+impl::file::file(impl &fs, const u8 *entry, u16 key, root_dir *parent_dir) : m_fs(fs), m_parent_dir(parent_dir), m_key(key)
 {
 	memcpy(m_entry, entry, 39);
 	(void)m_key;
 	(void)m_parent_dir;
 }
 
-void prodos_image::impl::file::drop_weak_references()
+void impl::file::drop_weak_references()
 {
 }
 
-meta_data prodos_image::impl::file::metadata()
+meta_data impl::file::metadata()
 {
 	meta_data res;
 	u8 type = r8(m_entry);
@@ -383,12 +459,12 @@ meta_data prodos_image::impl::file::metadata()
 		res.set(meta_name::length, r24l(m_entry + 0x15));
 
 	else
-		throw std::runtime_error(util::string_format("prodos_image::impl::file::metadata: Unhandled file type %d", type));
+		throw std::runtime_error(util::string_format("impl::file::metadata: Unhandled file type %d", type));
 
 	return res;
 }
 
-meta_data prodos_image::impl::dir::metadata()
+meta_data impl::dir::metadata()
 {
 	meta_data res;
 	u8 type = r8(m_entry);
@@ -398,7 +474,7 @@ meta_data prodos_image::impl::dir::metadata()
 	return res;
 }
 
-std::vector<u8> prodos_image::impl::file::any_read_all(u8 type, u16 block, u32 length)
+std::vector<u8> impl::file::any_read_all(u8 type, u16 block, u32 length)
 {
 	std::vector<u8> data((length + 511) & ~511);
 	u32 nb = data.size()/512;
@@ -438,14 +514,14 @@ std::vector<u8> prodos_image::impl::file::any_read_all(u8 type, u16 block, u32 l
 	}
 
 	default:
-		throw std::runtime_error(util::string_format("prodos_image::impl::file::get_file_blocks: unknown file type %d", type));
+		throw std::runtime_error(util::string_format("impl::file::get_file_blocks: unknown file type %d", type));
 	}
 
 	data.resize(length);
 	return data;
 }
 
-std::vector<u8> prodos_image::impl::file::read_all()
+std::vector<u8> impl::file::read_all()
 {
 	u8 type = r8(m_entry) >> 4;
 	if(type >= 1 && type <= 3)
@@ -456,10 +532,10 @@ std::vector<u8> prodos_image::impl::file::read_all()
 		return any_read_all(kblk.r8(0x000), kblk.r16l(0x001), kblk.r24l(0x005));
 
 	} else
-		throw std::runtime_error(util::string_format("prodos_image::impl::file::read_all: Unhandled file type %d", type));
+		throw std::runtime_error(util::string_format("impl::file::read_all: Unhandled file type %d", type));
 }
 
-std::vector<u8> prodos_image::impl::file::rsrc_read_all()
+std::vector<u8> impl::file::rsrc_read_all()
 {
 	u8 type = r8(m_entry) >> 4;
 
@@ -468,7 +544,5 @@ std::vector<u8> prodos_image::impl::file::rsrc_read_all()
 		return any_read_all(kblk.r8(0x100), kblk.r16l(0x101), kblk.r24l(0x105));
 
 	} else
-		throw std::runtime_error(util::string_format("prodos_image::impl::file::rsrc_blocks: Unhandled file type %d", type));
+		throw std::runtime_error(util::string_format("impl::file::rsrc_blocks: Unhandled file type %d", type));
 }
-
-} // namespace fs

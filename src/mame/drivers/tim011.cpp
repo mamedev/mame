@@ -42,7 +42,7 @@ private:
 	void fdc_dma_w(uint8_t data);
 	uint8_t print_r();
 	uint8_t scroll_r();
-	uint8_t m_scroll;
+	uint8_t m_scroll = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;

@@ -48,7 +48,7 @@ protected:
 	virtual uint32_t palette_entries() const override { return m_entries; }
 private:
 	std::vector<uint16_t> m_paletteram;
-	u32 m_entries;
+	u32 m_entries = 0;
 	void create_rgb_lookups();
 	uint8_t      m_palette_lookup[32][4];
 	inline void set_color_entry(u16 offset, u16 pal_data, int shift);

@@ -57,7 +57,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* game id */
-	int m_game_id;
+	int m_game_id = 0;
 	uint8_t circus_paddle_r();
 	void circus_videoram_w(offs_t offset, uint8_t data);
 	void circus_clown_x_w(uint8_t data);

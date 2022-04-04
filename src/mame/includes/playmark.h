@@ -92,18 +92,18 @@ private:
 	optional_shared_ptr<u16> m_rowscroll;// wbeachvl
 
 	// video-related
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	// bigtwin and excelsr
-	s32 m_bgscrollx;
-	s16 m_bgscrolly;
-	bool m_bg_enable;
-	bool m_bg_full_size;
+	s32 m_bgscrollx = 0;
+	s16 m_bgscrolly = 0;
+	bool m_bg_enable = false;
+	bool m_bg_full_size = false;
 
 	// wbeachvl
-	u32 m_fgscrollx;
-	bool m_fg_rowscroll_enable;
+	u32 m_fgscrollx = 0;
+	bool m_fg_rowscroll_enable = false;
 
 	// all
 	u16 m_pri_masks[3];
@@ -111,12 +111,12 @@ private:
 
 	// misc
 	// all
-	u8 m_snd_command;
-	u8 m_snd_flag;
-	u8 m_oki_control;
-	u8 m_oki_command;
+	u8 m_snd_command = 0;
+	u8 m_snd_flag = 0;
+	u8 m_oki_control = 0;
+	u8 m_oki_command = 0;
 
-	u8 m_dispenser_latch; // hotmind luckboomh
+	u8 m_dispenser_latch = 0; // hotmind luckboomh
 
 	// devices
 	optional_device<pic16c57_device> m_audio_pic; // all but wbeachvla;

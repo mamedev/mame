@@ -65,8 +65,8 @@ private:
 	devcb_write_line::array<3> m_out_cnt_cb;
 
 	uint8_t m_output_latch[8];
-	uint8_t m_cnt;
-	uint8_t m_dir;
+	uint8_t m_cnt = 0;
+	uint8_t m_dir = 0;
 	uint8_t m_dir_override;
 };
 

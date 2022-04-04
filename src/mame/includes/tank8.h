@@ -100,12 +100,12 @@ private:
 	required_shared_ptr<uint8_t> m_pos_d_ram;
 	required_shared_ptr<uint8_t> m_team;
 
-	int m_collision_index;
-	tilemap_t *m_tilemap;
+	int m_collision_index = 0;
+	tilemap_t *m_tilemap = nullptr;
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
 	bitmap_ind16 m_helper3;
-	emu_timer *m_collision_timer;
+	emu_timer *m_collision_timer = nullptr;
 };
 
 /*----------- defined in audio/tank8.c -----------*/

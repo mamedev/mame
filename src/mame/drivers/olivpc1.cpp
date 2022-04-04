@@ -67,7 +67,7 @@ private:
 	required_device<pc_keyboard_device> m_keyboard;
 	required_device<wd37c65c_device> m_fdc;
 	required_device<address_map_bank_device> m_bank;
-	bool m_obf;
+	bool m_obf = false;
 };
 
 void olivpc1_state::machine_start()

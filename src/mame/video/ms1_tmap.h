@@ -73,12 +73,12 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	// internal state
-	uint16_t m_scrollx;
-	uint16_t m_scrolly;
-	uint16_t m_scroll_flag;
-	uint16_t m_tile_bank;
-	tilemap_t *m_tmap;
-	tilemap_t *m_tilemap[2][4];
+	uint16_t m_scrollx = 0;
+	uint16_t m_scrolly = 0;
+	uint16_t m_scroll_flag = 0;
+	uint16_t m_tile_bank = 0;
+	tilemap_t *m_tmap = nullptr;
+	tilemap_t *m_tilemap[2][4]{};
 
 	// helpers
 	TILEMAP_MAPPER_MEMBER(scan_8x8);

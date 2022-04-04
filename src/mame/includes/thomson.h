@@ -241,7 +241,7 @@ protected:
 	TIMER_CALLBACK_MEMBER( ans );
 	void thom_palette(palette_device &palette);
 
-	int m_centronics_busy;
+	int m_centronics_busy = 0;
 	int m_centronics_perror;
 
 	void to7_map(address_map &map);
@@ -710,10 +710,10 @@ private:
 	required_device<pia6821_device> m_pia_io;
 	required_device<rs232_port_device> m_rs232;
 	int m_last_low;
-	int m_centronics_busy;
-	int m_rxd;
-	int m_cts;
-	int m_dsr;
+	int m_centronics_busy = 0;
+	int m_rxd = 0;
+	int m_cts = 0;
+	int m_dsr = 0;
 
 	/* read data register */
 	uint8_t porta_in();

@@ -279,17 +279,15 @@ int xt_hdc_device::no_dma(void)
 
 int xt_hdc_device::get_lbasector()
 {
-	hard_disk_info *info;
-	hard_disk_file *file;
 	int lbasector;
 
-	file = pc_hdc_file(drv);
-	info = hard_disk_get_info(file);
+	hard_disk_file *file = pc_hdc_file(drv);
+	const auto &info = file->get_info();
 
 	lbasector = cylinder[drv];
-	lbasector *= info->heads;
+	lbasector *= info.heads;
 	lbasector += head[drv];
-	lbasector *= info->sectors;
+	lbasector *= info.sectors;
 	lbasector += sector[drv];
 	return lbasector;
 }
@@ -307,17 +305,15 @@ int xt_hdc_device::get_lbasector()
 int xt_hdc_device::dack_r()
 {
 	uint8_t result;
-	hard_disk_info *info;
-	hard_disk_file *file;
 
-	file = pc_hdc_file(drv);
+	hard_disk_file *file = pc_hdc_file(drv);
 	if (!file)
 		return 0;
-	info = hard_disk_get_info(file);
+	const auto &info = file->get_info();
 
 	if (hdcdma_read == 0)
 	{
-		hard_disk_read(file, get_lbasector(), hdcdma_data);
+		file->read(get_lbasector(), hdcdma_data);
 		hdcdma_read = 512;
 		hdcdma_size -= 512;
 		hdcdma_src = hdcdma_data;
@@ -329,10 +325,10 @@ int xt_hdc_device::dack_r()
 	if( --hdcdma_read == 0 )
 	{
 		/* end of cylinder ? */
-		if (sector[drv] >= info->sectors)
+		if (sector[drv] >= info.sectors)
 		{
 			sector[drv] = 0;
-			if (++head[drv] >= info->heads)     /* beyond heads? */
+			if (++head[drv] >= info.heads)     /* beyond heads? */
 			{
 				head[drv] = 0;                  /* reset head */
 				cylinder[drv]++;                /* next cylinder */
@@ -379,27 +375,24 @@ int xt_hdc_device::dack_rs()
 
 void xt_hdc_device::dack_w(int data)
 {
-	hard_disk_info *info;
-	hard_disk_file *file;
-
-	file = pc_hdc_file(drv);
+	hard_disk_file *file = pc_hdc_file(drv);
 	if (!file)
 		return;
-	info = hard_disk_get_info(file);
+	const auto &info = file->get_info();
 
 	*(hdcdma_dst++) = data;
 
 	if( --hdcdma_write == 0 )
 	{
-		hard_disk_write(file, get_lbasector(), hdcdma_data);
+		file->write(get_lbasector(), hdcdma_data);
 		hdcdma_write = 512;
 		hdcdma_size -= 512;
 
 		/* end of cylinder ? */
-		if( ++sector[drv] >= info->sectors )
+		if( ++sector[drv] >= info.sectors )
 		{
 			sector[drv] = 0;
-			if (++head[drv] >= info->heads)     /* beyond heads? */
+			if (++head[drv] >= info.heads)     /* beyond heads? */
 			{
 				head[drv] = 0;                  /* reset head */
 				cylinder[drv]++;                /* next cylinder */

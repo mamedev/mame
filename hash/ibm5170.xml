@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="ibm5170" description="IBM PC/AT disk images">
+<softwarelist name="ibm5170" description="IBM PC/AT floppy disk images">
 
 	<software name="advdiags">
 		<description>Advanced Diagnostics for the IBM AT (v2.07)</description>
@@ -10070,6 +10070,58 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aitd2de" cloneof="aitd2">
+		<description>Alone in the Dark 2 (Germany)</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="2a5c8e8d" sha1="33c50f3142c806c79845b0d928381ffa807ec186"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="ee5447bc" sha1="16698510544f143b399957604b04ac7e0a27aa54"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="6b5cf77c" sha1="31951a35aa9d0f22f1c751024e3d737bbc9a2533"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="90f2d783" sha1="171ff271462c837f60ceef0a000b411c43a2bbbb"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="309e80e2" sha1="cfc2fa88bd1d7493db1b846285d3e53ed35eedb8"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="f73c3cb1" sha1="ff9112b4a183203b7f9f68ef914f535da9d8ebcc"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="483087e2" sha1="15552b5140795ee6bf25ed5de41d88fcb6e43d74"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="1e6a0ce9" sha1="d25e7fc95c4d2b6c355301fa80347d701dd1f5da"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (Germany) [Infogrames] [1993] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="594b2932" sha1="0505a30ec6ad3ea4dda2dac832ce11bf8ee78e8f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aitd2us" cloneof="aitd2">
 		<description>Alone in the Dark 2 (USA)</description>
 		<year>1994</year>
@@ -10987,7 +11039,7 @@ license:CC0
 	</software>
 
 	<software name="keen6dem" cloneof="keen6">
-		<description>Commander Keen in Aliens Ate My Baby Sitter! (v1.0, Demo, 3.5")</description>
+		<description>Commander Keen in Aliens Ate My Baby Sitter! (v1.0, demo, 3.5")</description>
 		<year>1991</year>
 		<publisher>GT Software</publisher>
 		<info name="developer" value="id Software" />
@@ -11437,7 +11489,7 @@ license:CC0
 
 	<!-- Marked as bad dump (Modified OEM ID) -->
 	<software name="lionkingd" cloneof="lionking">
-		<description>Disney's The Lion King (Playable Demo)</description>
+		<description>Disney's The Lion King (demo)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -11576,7 +11628,7 @@ license:CC0
 
 	<!-- Branded as "Imagineer DOS/V Series", but the game is identical to the English release and doesn't actually require DOS/V -->
 	<software name="doom11j" cloneof="doom">
-		<description>DOOM (Japan, v1.1)</description>
+		<description>DOOM (v1.1, Japan)</description>
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
 		<info name="developer" value="id Software" />
@@ -11893,6 +11945,28 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Desert Strike - Return To Gulf [Gremlin Interactive] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="be380f9d" sha1="c77681b251da7636f24255442ad3cae563dc7f89"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlair">
+		<description>Dragon's Lair</description>
+		<year>1993</year>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Sullivan Bluth Interactive Media" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dragon's Lair [Merit Software] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="ee911edb" sha1="07deef1831f8cd2d0c9cf8f511ef304f070848e0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dragon's Lair [Merit Software] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="6943b985" sha1="0d405a1d43871ca23ae419d9aff5f2b71e1a0592"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dragon's Lair [Merit Software] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="17f130a9" sha1="2b9a069f23241e6622064888c16854f0e2a8bd51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12430,6 +12504,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="eternam">
+		<description>Eternam</description>
+		<year>1992</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Eternam [Infogrames] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="e4d44fbd" sha1="06cb6ce3f93be22528984eeb646e29ded3054c56"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Eternam [Infogrames] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="1aabaeef" sha1="17e53e1fa17916b2be740ad45b4b8d8648b84de9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Eternam [Infogrames] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="81b79230" sha1="ff04090cef596d78b6a9a84e48e80fa57aeea971"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Eternam [Infogrames] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="a31df771" sha1="3a3b324131ab007d179a4f4c14c650c3edcd6fa5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eyebeho3">
 		<description>Eye of the Beholder 3: Assault on Myth Drannor</description>
 		<year>1993</year>
@@ -12694,6 +12794,34 @@ license:CC0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 4).img" size="1474560" crc="3de1063c" sha1="722230054057db52b1809ce9db7c4eca8d71c65f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyrandiade" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (v1.8, 3.5", Germany)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="version" value="1.8" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia (Germany) [Virgin] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="12aca151" sha1="06e2f2d4b061457902bce5dc9b718552e1868240"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia (Germany) [Virgin] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="94c5460b" sha1="0fbba3a1c661dab95f851c6e6a77be0a4c5c74cd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia (Germany) [Virgin] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="794a470a" sha1="dab9ffa62bf1d241c7152fcfdad0b503a62004f8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia (Germany) [Virgin] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="262b2de5" sha1="a350cd2ec43284a142e0cbfb26ad8388a2f92d64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13843,7 +13971,7 @@ license:CC0
 		</part>
 		<part name="flop10" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Inca [Sierra On-Line] [1992] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="7e1bce29" sha1="dbacbd4655c6fc9309a3b285793db07a78e84f9a"/>
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="7e1bce29" sha1="dbacbd4655c6fc9309a3b285793db07a78e84f9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13922,7 +14050,7 @@ license:CC0
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="b2509aa1" sha1="acc6d8b419477c1711190a52f071339e0a660cce"/>
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="1340f805" sha1="7e88457b27e500625c66ffb1ad55ae29975b4abb"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
@@ -13957,7 +14085,7 @@ license:CC0
 		</part>
 		<part name="flop10" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="25c547ad" sha1="452d545c58f29ef0cf5be4386ad14b7b7cc07d7a"/>
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="f391d3f4" sha1="4e7f5cfd980a110b19cb28794e2cbbf970096ed7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15587,7 +15715,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tentaclef" cloneof="tentacle">
+	<software name="tentaclefr" cloneof="tentacle">
 		<description>Maniac Mansion: Day of the Tentacle (France)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
@@ -15626,6 +15754,49 @@ license:CC0
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="4e21650b" sha1="8be9b2ffb1d7dd012ea51349ca5171fb1975f5eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tentaclede" cloneof="tentacle">
+		<description>Maniac Mansion: Day of the Tentacle (Germany)</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<info name="version" value="1.1" />
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="2cb5fbef" sha1="7a1f6ec7d03eb1dbb1c675063686316a697db5e1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="5dd4b450" sha1="01136d3acc46416e07f6525d61ed4e387aa585e0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="71d47c6d" sha1="32c1cf8769b878712c14e8e255ef226485d0c985"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="0678ab72" sha1="2746c9ba45b7891d7634640f43250b44769a65f3"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="bf536968" sha1="3c729aaf19d6341e263ab4e0e2e3cb62f1af3fff"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="7d97d12a" sha1="e315b107fb4d3f8fdb0d2b9390ac8a6560c50e8f"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="70f8e2c4" sha1="e18fc3930f52ed20ae5a4cf2f2423915cd3b6a44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16412,23 +16583,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="nightsft">
-		<description>Night Shift</description>
-		<year>1990</year>
-		<publisher>Lucasfilm</publisher>
-		<info name="developer" value="Attention to Detail" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="Night Shift [Lucasfilm] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="b2146606" sha1="d13067154a2f4f07afe77dc6321d56d515f40bfd"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="Night Shift [Lucasfilm] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="9ebf9eda" sha1="b838c18addd367c05d3d0184ca3be5738ae09bb7"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="nova9_525">
 		<description>Nova 9 (International Version, 5.25")</description>
 		<year>1991</year>
@@ -16908,6 +17062,52 @@ license:CC0
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Prophecy [Sierra] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="3fb8ef2a" sha1="0f4795e52d577c32ea99396dc128517ea70d7cc1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="proshadw">
+		<description>Prophecy of the Shadow (3.5")</description>
+		<year>1993</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Strategic Simulations, Inc." />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Prophecy of the Shadow [SSI] [1992] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="8e6c1816" sha1="c8027bfabca44f30cb18fb53de5306583429eb97" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Prophecy of the Shadow [SSI] [1992] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="7f35f63b" sha1="a5646d7e47b146292e0ce090a35ed5d1f51160b1" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Prophecy of the Shadow [SSI] [1992] [3.5DD] [Disk 3 of 3].img" size="737280" crc="ffceeb72" sha1="1083c1cf49b85678e4da2200d6740e291855aaf5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="proshadw525" cloneof="proshadw">
+		<description>Prophecy of the Shadow (5.25")</description>
+		<year>1993</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Strategic Simulations, Inc." />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Prophecy of the Shadow [SSI] [1992] [5.25HD] [Disk 1 of 3].img" size="1228800" crc="e799e50a" sha1="fb02708e9777760a606e04e812ab311736d520ff" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Prophecy of the Shadow [SSI] [1992] [5.25HD] [Disk 2 of 3].img" size="1228800" crc="f1c7b4e1" sha1="ed964412fe52a13350616b9a07cd8fafafd670a1" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Prophecy of the Shadow [SSI] [1992] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="36dff8b8" sha1="536b077974cbbefefc1fd7173319f7644d0e5079" />
 			</dataarea>
 		</part>
 	</software>
@@ -17650,9 +17850,10 @@ license:CC0
 	</software>
 
 	<software name="settlers">
-		<description>The Settlers</description>
+		<description>The Settlers (Euro)</description>
 		<year>1994</year>
 		<publisher>Blue Byte</publisher>
+		<info name="developer" value="Blue Byte" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Settlers [Blue Byte] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="73d2c2c0" sha1="a8e2ea92022792828b6364c80670d35e3d73536e"/>
@@ -17661,6 +17862,19 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Settlers [Blue Byte] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f18040c0" sha1="2bdf4dde6ff0b3e8b58099fb8597e17fb699d0e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serfcity" cloneof="settlers">
+		<description>Serf City: Life is Feudal (USA)</description>
+		<year>1994</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Blue Byte" />
+		<info name="version" value="v1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Serf City [SSI] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="29098d25" sha1="80c26e9d26eb5a22a1a509975489863dc55705ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17989,6 +18203,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="simcit2kd" cloneof="simcit2k">
+		<description>SimCity 2000 (Interactive demo disk)</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 Interactive Demo [Maxis] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="b8a74b95" sha1="01381f8506edf7af2bb9892a16083c7d7ad728ba"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="simcit2ksc1" cloneof="simcit2k">
 		<description>SimCity 2000 Scenarios Volume 1 - Great Disasters</description>
 		<year>1994</year>
@@ -18003,7 +18228,7 @@ license:CC0
 	<software name="simfarm">
 		<description>SimFarm</description>
 		<year>1993</year>
-		<publisher>Maxis Software Inc.</publisher>
+		<publisher>Maxis</publisher>
 		<info name="developer" value="Leaping Lizard Software, Inc." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -20585,9 +20810,8 @@ license:CC0
 	</software>
 
 	<!-- Needs a drastic redump from Original Disks -->
-
 	<software name="airduel" cloneof="dogfight">
-		<description>Air Duel: 80 Years of Dogfighting</description>
+		<description>Air Duel: 80 Years of Dogfighting (USA)</description>
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">

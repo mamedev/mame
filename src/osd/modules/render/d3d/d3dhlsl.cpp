@@ -505,7 +505,7 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	snap_width = winoptions.d3d_snap_width();
 	snap_height = winoptions.d3d_snap_height();
 
-	this->options = make_unique_clear<hlsl_options>().release();
+	this->options = new hlsl_options;
 	this->options->params_init = false;
 
 	// copy last options if initialized

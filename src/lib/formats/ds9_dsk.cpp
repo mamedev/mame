@@ -78,18 +78,18 @@ void ds9_format::find_size(util::random_read &io, uint8_t &track_count, uint8_t 
 	track_count = head_count = sector_count = 0;
 }
 
-int ds9_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ds9_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
 	if (track_count)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -120,4 +120,4 @@ bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-const floppy_format_type FLOPPY_DS9_FORMAT = &floppy_image_format_creator<ds9_format>;
+const ds9_format FLOPPY_DS9_FORMAT;

@@ -29,7 +29,7 @@ const char *fl1_format::extensions() const
 	return "fl1";
 }
 
-int fl1_format::get_image_offset(const format &f, int head, int track)
+int fl1_format::get_image_offset(const format &f, int head, int track) const
 {
 	return (f.track_count * head + track) * compute_track_size(f);
 }
@@ -54,4 +54,4 @@ const fl1_format::format fl1_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_FL1_FORMAT = &floppy_image_format_creator<fl1_format>;
+const fl1_format FLOPPY_FL1_FORMAT;

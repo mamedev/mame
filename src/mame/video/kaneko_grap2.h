@@ -24,16 +24,16 @@ public:
 	void do_rle(uint32_t address);
 	void set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data);
 
-	uint16_t m_framebuffer_scrolly;
-	uint16_t m_framebuffer_scrollx;
-	uint16_t m_framebuffer_enable;
-	int m_regs1_i;
+	uint16_t m_framebuffer_scrolly = 0;
+	uint16_t m_framebuffer_scrollx = 0;
+	uint16_t m_framebuffer_enable = 0;
+	int m_regs1_i = 0;
 
-	uint16_t m_framebuffer_bright1;
-	uint16_t m_framebuffer_bright2;
+	uint16_t m_framebuffer_bright1 = 0;
+	uint16_t m_framebuffer_bright2 = 0;
 
-	uint16_t m_regs1_address_regs[0x2];
-	uint16_t m_regs2;
+	uint16_t m_regs1_address_regs[0x2]{};
+	uint16_t m_regs2 = 0;
 
 	void framebuffer1_enable_w(uint16_t data) { m_framebuffer_enable = data; }
 

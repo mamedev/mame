@@ -20,7 +20,6 @@
 #include "emu.h"
 #include "amis2000.h"
 #include "amis2000d.h"
-#include "debugger.h"
 
 
 // S2000 is the most basic one, 64 nibbles internal RAM and 1KB internal ROM

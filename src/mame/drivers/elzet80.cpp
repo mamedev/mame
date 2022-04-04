@@ -80,7 +80,7 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dma_device> m_dma;

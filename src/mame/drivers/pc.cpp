@@ -86,7 +86,7 @@ private:
 
 	u8 unk_r();
 
-	double m_turbo_off_speed;
+	double m_turbo_off_speed = 0;
 
 	static void cfg_dual_720K(device_t *device);
 	static void cfg_single_360K(device_t *device);

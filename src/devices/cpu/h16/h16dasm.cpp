@@ -832,9 +832,14 @@ offs_t h16_disassembler::disassemble(std::ostream &stream, offs_t pc, const h16_
 		break;
 
 	case 0xa4: case 0xa5: case 0xa6:
-		util::stream_format(stream, "%-9s", string_format("B%s.%c", s_conditions[opcodes.r8(pc++) & 0x0f], "BWL"[op & 0x03]));
+	{
+		u8 xb = opcodes.r8(pc++);
+		util::stream_format(stream, "%-9s", string_format("B%s.%c", s_conditions[xb & 0x0f], "BWL"[op & 0x03]));
 		dasm_branch_disp(stream, pc, opcodes, op & 0x03);
+		if ((xb & 0x0e) != 0)
+			flags |= STEP_COND;
 		break;
+	}
 
 	case 0xa8: case 0xa9: case 0xaa:
 		util::stream_format(stream, "%-9s", string_format("BSR.%c", "BWL"[op & 0x03]));
@@ -865,6 +870,7 @@ offs_t h16_disassembler::disassemble(std::ostream &stream, offs_t pc, const h16_
 		format_register(stream, 0, xb >> 4);
 		stream << ", ";
 		dasm_branch_disp(stream, pc, opcodes, op & 0x03);
+		flags |= STEP_COND;
 		break;
 	}
 
@@ -995,9 +1001,14 @@ offs_t h16_disassembler::disassemble(std::ostream &stream, offs_t pc, const h16_
 		break;
 
 	case 0xf3:
-		util::stream_format(stream, "TRAP/%s", s_conditions[opcodes.r8(pc++) & 0x0f]);
+	{
+		u8 xb = opcodes.r8(pc++);
+		util::stream_format(stream, "TRAP/%s", s_conditions[xb & 0x0f]);
 		flags |= STEP_OVER;
+		if ((xb & 0x0e) != 0)
+			flags |= STEP_COND;
 		break;
+	}
 
 	case 0xf4:
 		stream << "RTR";

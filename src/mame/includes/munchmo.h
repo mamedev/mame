@@ -77,11 +77,11 @@ private:
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
-	int          m_palette_bank;
-	int          m_flipscreen;
+	int          m_palette_bank = 0;
+	int          m_flipscreen = 0;
 
 	/* misc */
-	int          m_nmi_enable;
+	int          m_nmi_enable = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

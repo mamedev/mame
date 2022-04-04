@@ -53,12 +53,12 @@ private:
 	// internal state
 	std::unique_ptr<uint8_t[]>        m_spriteram;
 	std::unique_ptr<bitmap_ind16> m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
-	int             m_clear_bitmap;
-	int             m_bg_pen; // might work some other way..
+	int             m_clear_bitmap = 0;
+	int             m_bg_pen = 0; // might work some other way..
 	uint8_t           m_gfx_region;
 	int             m_xoffset;
 	int             m_yoffset;
-	bool            m_flip_screen;
+	bool            m_flip_screen = false;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

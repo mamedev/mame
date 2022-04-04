@@ -368,23 +368,10 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
 static GFXDECODE_START( gfx_crshrace )
-	GFXDECODE_ENTRY( "chars",   0, charlayout,     0,  1 )
-	GFXDECODE_ENTRY( "tiles",   0, tilelayout,   256, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 512, 32 )
+	GFXDECODE_ENTRY( "chars",   0, charlayout,               0,  1 )
+	GFXDECODE_ENTRY( "tiles",   0, tilelayout,             256, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 512, 32 )
 GFXDECODE_END
 
 

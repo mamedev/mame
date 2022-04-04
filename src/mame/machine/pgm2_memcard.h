@@ -53,7 +53,7 @@ private:
 	u8 m_memcard_data[0x100];
 	u8 m_protection_data[4];
 	u8 m_security_data[4];
-	bool m_authenticated;
+	bool m_authenticated = false;
 };
 
 

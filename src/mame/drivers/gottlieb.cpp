@@ -1746,16 +1746,6 @@ INPUT_PORTS_END
 
 /* the games can store char gfx data in either a 4k RAM area (128 chars), or */
 /* a 8k ROM area (256 chars). */
-static const gfx_layout bg_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
 
 static const gfx_layout fg_layout =
 {
@@ -1769,9 +1759,9 @@ static const gfx_layout fg_layout =
 };
 
 static GFXDECODE_START( gfxdecode )
-	GFXDECODE_RAM(   "charram", 0, bg_layout, 0, 1 )   /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "bgtiles", 0, bg_layout, 0, 1 )
-	GFXDECODE_ENTRY( "sprites", 0, fg_layout, 0, 1 )
+	GFXDECODE_RAM(   "charram", 0, gfx_8x8x4_packed_msb, 0, 1 )   /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_packed_msb, 0, 1 )
+	GFXDECODE_ENTRY( "sprites", 0, fg_layout,            0, 1 )
 GFXDECODE_END
 
 
@@ -1913,8 +1903,8 @@ void gottlieb_state::cobram3(machine_config &config)
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* sound hardware */
-	subdevice<dac_8bit_r2r_device>("r2sound:dac")->reset_routes();
-	subdevice<dac_8bit_r2r_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
+	subdevice<ad7528_device>("r2sound:dac")->reset_routes();
+	subdevice<ad7528_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
 }
 
 

@@ -48,8 +48,8 @@ private:
 	void mu5_io_map(address_map &map);
 	void ymw258_map(address_map &map);
 
-	u8 m_lcd_ctrl;
-	u8 m_lcd_data;
+	u8 m_lcd_ctrl = 0U;
+	u8 m_lcd_data = 0U;
 
 	void lcd_ctrl_w(u16 data);
 	u16 lcd_ctrl_r();

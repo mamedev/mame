@@ -119,15 +119,15 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t *m_fgmap;
-	tilemap_t *m_bgmap;
-	int m_bgbank;
-	int m_fgbank;
-	int m_bgpalette;
-	int m_fgpalette;
-	int m_bgcolor;
-	bool m_nmi_main;
-	bool m_nmi_sub;
+	tilemap_t *m_fgmap = nullptr;
+	tilemap_t *m_bgmap = nullptr;
+	int m_bgbank = 0;
+	int m_fgbank = 0;
+	int m_bgpalette = 0;
+	int m_fgpalette = 0;
+	int m_bgcolor = 0;
+	bool m_nmi_main = false;
+	bool m_nmi_sub = false;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	[[maybe_unused]] uint8_t protection_r();

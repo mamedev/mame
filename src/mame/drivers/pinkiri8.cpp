@@ -116,12 +116,12 @@ private:
 	required_shared_ptr<uint8_t> m_janshi_paletteram;
 	required_shared_ptr<uint8_t> m_janshi_paletteram2;
 	required_shared_ptr<uint8_t> m_janshi_crtc_regs;
-	uint32_t m_vram_addr;
-	int m_prev_writes;
-	uint8_t m_mux_data;
-	uint8_t m_prot_read_index;
-	uint8_t m_prot_char[5];
-	uint8_t m_prot_index;
+	uint32_t m_vram_addr = 0;
+	int m_prev_writes = 0;
+	uint8_t m_mux_data = 0;
+	uint8_t m_prot_read_index = 0;
+	uint8_t m_prot_char[5]{};
+	uint8_t m_prot_index = 0;
 
 	required_device<hd647180x_device> m_maincpu;
 	required_device<janshi_vdp_device> m_vdp;

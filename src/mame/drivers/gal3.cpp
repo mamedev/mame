@@ -170,8 +170,8 @@ private:
 	required_device_array<namcos21_3d_device, 2> m_namcos21_3d;
 	required_device_array<namcos21_dsp_c67_device, 2> m_namcos21_dsp_c67;
 
-	uint32_t m_led_mst;
-	uint32_t m_led_slv;
+	uint32_t m_led_mst = 0;
+	uint32_t m_led_slv = 0;
 
 	uint32_t led_mst_r();
 	void led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

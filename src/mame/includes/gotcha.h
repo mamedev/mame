@@ -64,11 +64,11 @@ private:
 	optional_device<decospr_device> m_sprgen;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_banksel;
-	uint8_t m_gfxbank[4];
-	uint16_t m_scroll[4];
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_banksel = 0U;
+	uint8_t m_gfxbank[4]{};
+	uint16_t m_scroll[4]{};
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;

@@ -180,7 +180,7 @@ retrieved by building one of these four finders.
 
     [device constructor] m_bank(*this, "name"),
 
-A memory share can be created if it doesn’t exist in a memory map
+A memory bank can be created if it doesn’t exist in a memory map
 through that creator class.  If it already exists it is just
 retrieved.
 

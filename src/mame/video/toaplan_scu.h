@@ -35,8 +35,8 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	pri_cb_delegate m_pri_cb;
-	int m_xoffs;
-	int m_xoffs_flipped;
+	int m_xoffs = 0;
+	int m_xoffs_flipped = 0;
 };
 
 DECLARE_DEVICE_TYPE(TOAPLAN_SCU, toaplan_scu_device)

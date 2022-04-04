@@ -24,112 +24,11 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 
 /*************************************
  *
- *  Input Ports
- *
- *************************************/
-
-void vsnes_state::vsnes_in0_w(uint8_t data)
-{
-	/* Toggling bit 0 high then low resets both controllers */
-	if (m_input_strobe[0] & ~data & 1)
-	{
-		/* load up the latches */
-		m_input_latch[0] = ioport("IN0")->read();
-		m_input_latch[1] = ioport("IN1")->read();
-	}
-
-	m_input_strobe[0] = data;
-}
-
-uint8_t vsnes_state::vsnes_in0_r()
-{
-	if (m_input_strobe[0] & 1)
-		m_input_latch[0] = ioport("IN0")->read();
-
-	int ret = m_input_latch[0] & 1;
-	m_input_latch[0] >>= 1;
-
-	ret |= ioport("COINS")->read();             /* merge coins, etc */
-	ret |= (ioport("DSW0")->read() & 3) << 3;       /* merge 2 dipswitches */
-
-	return ret;
-}
-
-uint8_t vsnes_state::vsnes_in1_r()
-{
-	if (m_input_strobe[0] & 1)
-		m_input_latch[1] = ioport("IN1")->read();
-
-	int ret = m_input_latch[1] & 1;
-	m_input_latch[1] >>= 1;
-
-	ret |= ioport("DSW0")->read() & ~3;         /* merge the rest of the dipswitches */
-
-	return ret;
-}
-
-void vsnes_state::vsnes_in0_1_w(uint8_t data)
-{
-	/* Toggling bit 0 high then low resets both controllers */
-	if (m_input_strobe[1] & ~data & 1)
-	{
-		/* load up the latches */
-		m_input_latch[2] = ioport("IN2")->read();
-		m_input_latch[3] = ioport("IN3")->read();
-	}
-
-	m_input_strobe[1] = data;
-}
-
-uint8_t vsnes_state::vsnes_in0_1_r()
-{
-	if (m_input_strobe[1] & 1)
-		m_input_latch[2] = ioport("IN2")->read();
-
-	int ret = m_input_latch[2] & 1;
-	m_input_latch[2] >>= 1;
-
-	ret |= ioport("COINS2")->read();                /* merge coins, etc */
-	ret |= (ioport("DSW1")->read() & 3) << 3;       /* merge 2 dipswitches */
-
-	return ret;
-}
-
-uint8_t vsnes_state::vsnes_in1_1_r()
-{
-	if (m_input_strobe[1] & 1)
-		m_input_latch[3] = ioport("IN3")->read();
-
-	int ret = m_input_latch[3] & 1;
-	m_input_latch[3] >>= 1;
-
-	ret |= ioport("DSW1")->read() & ~3;         /* merge the rest of the dipswitches */
-
-	return ret;
-}
-
-// all gun games except Freedom Force add VROM banking on top of this
-void vsnes_state::gun_in0_w(u8 data)
-{
-	if (m_input_strobe[0] & ~data & 1)
-	{
-		// load up the latch
-		m_input_latch[0] = ioport("IN0")->read();
-
-		if (m_sensor->detect_light(ioport("GUNX")->read(), ioport("GUNY")->read()))
-			m_input_latch[0] |= 0x40;
-	}
-
-	m_input_strobe[0] = data;
-}
-
-/*************************************
- *
  *  Init machine
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(vsnes_state,vsnes)
+void vsnes_state::machine_reset()
 {
 	m_input_latch[0] = m_input_latch[1] = 0;
 	m_input_latch[2] = m_input_latch[3] = 0;
@@ -249,7 +148,7 @@ void vsnes_state::vsnormal_vrom_banking(u8 data)
 	// bit 1 ( data & 2 ) enables writes to extra ram, we ignore it
 
 	// move along
-	vsnes_in0_w(data);
+	vsnes_in0_w<MAIN>(data);
 }
 
 void vsnes_state::init_vsnormal()
@@ -261,18 +160,10 @@ void vsnes_state::init_vsnormal()
 //**********************************************************************************
 // Gun games: VROM Banking in controller 0 write
 
-void vsnes_state::vsnes_gun_in0_w(uint8_t data)
-{
-	// switch vrom
-	v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
-
-	gun_in0_w(data);
-}
-
 void vsnes_state::init_vsgun()
 {
-	// VROM switching is enabled with bit 2 of $4016
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsnes_gun_in0_w)));
+	init_vsnormal();
+	m_has_gun = true;
 }
 
 //**********************************************************************************
@@ -317,8 +208,8 @@ void vsnes_state::vsgshoe_gun_in0_w(u8 data)
 	// Gumshoe uniquely has a bankable 16K EPROM in addition to the normal unbanked 8K slots
 	m_prg_banks[0]->set_entry(BIT(data, 2));
 
-	// otherwise bank like the other gun games
-	vsnes_gun_in0_w(data);
+	// otherwise do normal CHR banking and IO write
+	vsnormal_vrom_banking(data);
 }
 
 void vsnes_state::init_vsgshoe()
@@ -328,6 +219,8 @@ void vsnes_state::init_vsgshoe()
 
 	// vrom switching is enabled with bit 2 of $4016
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::vsgshoe_gun_in0_w)));
+
+	m_has_gun = true;
 }
 
 //**********************************************************************************
@@ -338,7 +231,6 @@ void vsnes_state::drmario_rom_banking(offs_t offset, u8 data)
 	// reset mapper
 	if (data & 0x80)
 	{
-		m_mmc1_shiftreg = 0;
 		m_mmc1_shiftcount = 0;
 		m_mmc1_prg16k = 1;
 		m_mmc1_switchlow = 1;
@@ -347,12 +239,9 @@ void vsnes_state::drmario_rom_banking(offs_t offset, u8 data)
 		return;
 	}
 
-	// see if we need to clock in data
-	if (m_mmc1_shiftcount < 5)
-	{
-		m_mmc1_shiftreg = m_mmc1_shiftreg >> 1 | (data & 1) << 4;
-		m_mmc1_shiftcount = (m_mmc1_shiftcount + 1) % 5;
-	}
+	// update shift register
+	m_mmc1_shiftreg = (m_mmc1_shiftreg >> 1) | (data & 1) << 4;
+	m_mmc1_shiftcount = (m_mmc1_shiftcount + 1) % 5;
 
 	// are we done shifting?
 	if (!m_mmc1_shiftcount)
@@ -563,8 +452,7 @@ void vsnes_state::init_tkoboxng()
 void vsnes_state::init_vsfdf()
 {
 	init_vs108();
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vsnes_state::gun_in0_w)));
+	m_has_gun = true;
 }
 
 //**********************************************************************************
@@ -636,7 +524,7 @@ void vsnes_state::vsdual_vrom_banking_main(u8 data)
 	m_subcpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
 	// move along
-	vsnes_in0_w(data);
+	vsnes_in0_w<MAIN>(data);
 }
 
 void vsnes_state::vsdual_vrom_banking_sub(u8 data)
@@ -648,7 +536,7 @@ void vsnes_state::vsdual_vrom_banking_sub(u8 data)
 	m_maincpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
 	// move along
-	vsnes_in0_1_w(data);
+	vsnes_in0_w<SUB>(data);
 }
 
 void vsnes_state::init_vsdual()

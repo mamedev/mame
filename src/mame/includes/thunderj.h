@@ -51,7 +51,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_extra;
 
-	uint8_t           m_alpha_tile_bank;
+	uint8_t           m_alpha_tile_bank = 0;
 
 	static const atari_motion_objects_config s_mob_config;
 };

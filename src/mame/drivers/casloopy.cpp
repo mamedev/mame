@@ -191,8 +191,8 @@ private:
 	std::unique_ptr<uint16_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_bitmap_vram;
-	uint16_t sh7021_regs[0x100];
-	int m_gfx_index;
+	uint16_t sh7021_regs[0x100]{};
+	int m_gfx_index = 0;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint16_t vregs_r(offs_t offset);

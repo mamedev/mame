@@ -62,7 +62,7 @@ protected:
 	void config_register_w(uint32_t data);
 
 private:
-	int ram_size;
+	int ram_size = 0;
 	std::vector<uint32_t> ram;
 };
 
@@ -304,25 +304,25 @@ private:
 	required_device<device_memory_interface> cpu;
 	// APU contains 3 dsps: voice processor (VP) global processor (GP) encode processor (EP)
 	struct apu_state {
-		uint32_t memory[0x60000 / 4];
-		uint32_t gpdsp_sgaddress; // global processor scatter-gather
-		uint32_t gpdsp_sgblocks;
-		uint32_t gpdsp_address;
-		uint32_t epdsp_sgaddress; // encoder processor scatter-gather
-		uint32_t epdsp_sgblocks;
-		uint32_t epdsp_sgaddress2;
-		uint32_t epdsp_sgblocks2;
-		int voice_number;
-		uint32_t voices_heap_blockaddr[1024];
-		uint64_t voices_active[4]; //one bit for each voice: 1 playing 0 not
-		uint32_t voicedata_address;
-		int voices_frequency[256]; // sample rate
-		int voices_position[256]; // position in samples * 1000
-		int voices_position_start[256]; // position in samples * 1000
-		int voices_position_end[256]; // position in samples * 1000
-		int voices_position_increment[256]; // position increment every 1ms * 1000
-		emu_timer *timer;
-		address_space *space;
+		uint32_t memory[0x60000 / 4]{};
+		uint32_t gpdsp_sgaddress = 0; // global processor scatter-gather
+		uint32_t gpdsp_sgblocks = 0;
+		uint32_t gpdsp_address = 0;
+		uint32_t epdsp_sgaddress = 0; // encoder processor scatter-gather
+		uint32_t epdsp_sgblocks = 0;
+		uint32_t epdsp_sgaddress2 = 0;
+		uint32_t epdsp_sgblocks2 = 0;
+		int voice_number = 0;
+		uint32_t voices_heap_blockaddr[1024]{};
+		uint64_t voices_active[4]{}; //one bit for each voice: 1 playing 0 not
+		uint32_t voicedata_address = 0;
+		int voices_frequency[256]{}; // sample rate
+		int voices_position[256]{}; // position in samples * 1000
+		int voices_position_start[256]{}; // position in samples * 1000
+		int voices_position_end[256]{}; // position in samples * 1000
+		int voices_position_increment[256]{}; // position increment every 1ms * 1000
+		emu_timer *timer = nullptr;
+		address_space *space = nullptr;
 	} apust;
 	void apu_mmio(address_map &map);
 	uint8_t minimum_grant_r() { return 1; }

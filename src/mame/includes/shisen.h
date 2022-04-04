@@ -33,8 +33,8 @@ private:
 	required_shared_ptr<uint8_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	int m_gfxbank;
-	tilemap_t *m_bg_tilemap;
+	int m_gfxbank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void coin_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);

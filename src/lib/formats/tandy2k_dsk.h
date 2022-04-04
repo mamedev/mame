@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_TANDY_2000_FORMAT;
+extern const tandy2k_format FLOPPY_TANDY_2000_FORMAT;
 
 #endif // MAME_FORMATS_TANDY2K_DSK_H

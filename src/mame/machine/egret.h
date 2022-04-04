@@ -101,28 +101,28 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	uint8_t ddrs[3];
-	uint8_t ports[3];
-	uint8_t pll_ctrl;
-	uint8_t timer_ctrl;
-	uint8_t timer_counter;
-	uint8_t onesec;
-	uint8_t xcvr_session, via_full, sys_session, via_data, via_clock, last_adb;
-	uint64_t last_adb_time;
-	bool egret_controls_power;
-	bool adb_in;
-	int reset_line;
-	int m_adb_dtime;
-	emu_timer *m_timer;
-	uint8_t pram[0x100], disk_pram[0x100];
-	bool pram_loaded;
+	uint8_t ddrs[3]{};
+	uint8_t ports[3]{};
+	uint8_t pll_ctrl = 0;
+	uint8_t timer_ctrl = 0;
+	uint8_t timer_counter = 0;
+	uint8_t onesec = 0;
+	uint8_t xcvr_session = 0, via_full = 0, sys_session = 0, via_data = 0, via_clock = 0, last_adb = 0;
+	uint64_t last_adb_time = 0;
+	bool egret_controls_power = false;
+	bool adb_in = false;
+	int reset_line = 0;
+	int m_adb_dtime = 0;
+	emu_timer *m_timer = nullptr;
+	uint8_t pram[0x100]{}, disk_pram[0x100]{};
+	bool pram_loaded = false;
 
 	#if USE_BUS_ADB
 	optional_device <adb_connector> m_adb_connector[2];
-	adb_device *m_adb_device[2];
-	bool m_adb_device_out[2];
-	bool m_adb_device_poweron[2];
-	bool m_adb_out;
+	adb_device *m_adb_device[2]{};
+	bool m_adb_device_out[2]{};
+	bool m_adb_device_poweron[2]{};
+	bool m_adb_out = false;
 	#endif
 
 	void send_port(uint8_t offset, uint8_t data);

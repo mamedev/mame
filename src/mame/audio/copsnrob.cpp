@@ -268,13 +268,13 @@ static const discrete_555_cc_desc copsnrob_motor01_555cc =
 #define COPSNROB_CUSTOM_NOISE__FREQ     DISCRETE_INPUT(0)
 
 DISCRETE_CLASS_STEP_RESET(copsnrob_custom_noise, 2,
-	int     m_flip_flop;
-	int     m_noise1_had_xtime;
-	int     m_noise2_had_xtime;
-	uint8_t   m_high_byte;
-	uint8_t   m_low_byte;
-	double  m_t_used;
-	double  m_t1;
+	int     m_flip_flop = 0;
+	int     m_noise1_had_xtime = 0;
+	int     m_noise2_had_xtime = 0;
+	uint8_t m_high_byte = 0;
+	uint8_t m_low_byte = 0;
+	double  m_t_used = 0;
+	double  m_t1 = 0;
 );
 
 #define COPSNROB_CUSTOM_NOISE_HIGH  4.2
@@ -284,9 +284,9 @@ DISCRETE_STEP(copsnrob_custom_noise)
 	double  t_used = m_t_used;
 	double  t1 = m_t1;
 	double  x_time = 0;
-	uint8_t   low_byte = m_low_byte;
-	uint8_t   high_byte = m_high_byte;
-	uint8_t   xnor_out;                           /* IC F2, pin 2 */
+	uint8_t low_byte = m_low_byte;
+	uint8_t high_byte = m_high_byte;
+	uint8_t xnor_out;                           /* IC F2, pin 2 */
 	int     last_noise1_bit = (low_byte >> 4) & 0x01;
 	int     last_noise2_bit = (low_byte >> 5) & 0x01;
 
@@ -374,10 +374,10 @@ DISCRETE_RESET(copsnrob_custom_noise)
 #define COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__C     DISCRETE_INPUT(2)
 
 DISCRETE_CLASS_STEP_RESET(copsnrob_zings_555_monostable, 1,
-	double  m_rc;
-	double  m_exponent;
-	double  m_v_cap;
-	int     m_flip_flop;
+	double  m_rc = 0;
+	double  m_exponent = 0;
+	double  m_v_cap = 0;
+	int     m_flip_flop = 0;
 );
 
 DISCRETE_STEP(copsnrob_zings_555_monostable)
@@ -471,13 +471,13 @@ DISCRETE_RESET(copsnrob_zings_555_monostable)
 #define COPSNROB_CUSTOM_ZINGS_555_ASTABLE__HIGH     4.5
 
 DISCRETE_CLASS_STEP_RESET(copsnrob_zings_555_astable, 1,
-	double  m_r2c2;
-	double  m_r_total_cv;
-	double  m_exponent1;
-	double  m_exponent2;
-	double  m_v_cap1;
-	double  m_v_cap2;
-	int     m_flip_flop;
+	double  m_r2c2 = 0;
+	double  m_r_total_cv = 0;
+	double  m_exponent1 = 0;
+	double  m_exponent2 = 0;
+	double  m_v_cap1 = 0;
+	double  m_v_cap2 = 0;
+	int     m_flip_flop = 0;
 );
 
 DISCRETE_STEP(copsnrob_zings_555_astable)

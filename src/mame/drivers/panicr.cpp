@@ -104,11 +104,11 @@ private:
 	required_shared_ptr<uint8_t> m_textram;
 	required_shared_ptr<uint8_t> m_spritebank;
 
-	tilemap_t *m_bgtilemap;
-	tilemap_t *m_infotilemap_2;
-	tilemap_t *m_txttilemap;
+	tilemap_t *m_bgtilemap = nullptr;
+	tilemap_t *m_infotilemap_2 = nullptr;
+	tilemap_t *m_txttilemap = nullptr;
 
-	int m_scrollx;
+	int m_scrollx = 0;
 	std::unique_ptr<bitmap_ind16> m_temprender;
 	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
 	rectangle m_tempbitmap_clip;

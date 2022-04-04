@@ -57,8 +57,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<irem_audio_device> m_audio;
 
-	tilemap_t*             m_bg_tilemap;
-	uint8_t                m_kidniki_background_bank;
+	tilemap_t*             m_bg_tilemap = nullptr;
+	uint8_t                m_kidniki_background_bank = 0;
 
 	void m62_flipscreen_w(uint8_t data);
 	void m62_hscroll_low_w(uint8_t data);
@@ -78,20 +78,20 @@ private:
 	optional_shared_ptr<uint8_t> m_scrollram;
 
 	/* video-related */
-	tilemap_t*             m_fg_tilemap;
-	int                  m_flipscreen;
+	tilemap_t*             m_fg_tilemap = nullptr;
+	int                  m_flipscreen = 0;
 	required_region_ptr<uint8_t> m_sprite_height_prom;
 	required_region_ptr<uint8_t> m_sprite_color_proms;
 	required_region_ptr<uint8_t> m_chr_color_proms;
 	optional_region_ptr<uint8_t> m_fg_color_proms;
-	int32_t                m_m62_background_hscroll;
-	int32_t                m_m62_background_vscroll;
-	int32_t                m_kidniki_text_vscroll;
-	int                  m_ldrun3_topbottom_mask;
-	int32_t                m_spelunkr_palbank;
+	int32_t                m_m62_background_hscroll = 0;
+	int32_t                m_m62_background_vscroll = 0;
+	int32_t                m_kidniki_text_vscroll = 0;
+	int                  m_ldrun3_topbottom_mask = 0;
+	int32_t                m_spelunkr_palbank = 0;
 
 	/* misc */
-	int                 m_ldrun2_bankswap;  //ldrun2
+	int                 m_ldrun2_bankswap = 0;  //ldrun2
 	int                 m_bankcontrol[2];   //ldrun2
 	uint8_t ldrun2_bankswitch_r();
 	void ldrun2_bankswitch_w(offs_t offset, uint8_t data);

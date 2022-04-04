@@ -659,6 +659,8 @@ void pc8001_base_state::machine_start()
 
 void pc8001_state::machine_start()
 {
+	pc8001_base_state::machine_start();
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize RTC */

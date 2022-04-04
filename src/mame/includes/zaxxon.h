@@ -68,26 +68,26 @@ private:
 	optional_shared_ptr<uint8_t> m_colorram;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	uint8_t m_int_enabled;
-	uint8_t m_coin_status[3];
+	uint8_t m_int_enabled = 0;
+	uint8_t m_coin_status[3]{};
 
-	uint8_t m_razmataz_dial_pos[2];
-	uint16_t m_razmataz_counter;
+	uint8_t m_razmataz_dial_pos[2]{};
+	uint16_t m_razmataz_counter = 0;
 
-	uint8_t m_sound_state[3];
-	uint8_t m_bg_enable;
-	uint8_t m_bg_color;
-	uint16_t m_bg_position;
-	uint8_t m_fg_color;
-	bool m_flip_screen;
+	uint8_t m_sound_state[3]{};
+	uint8_t m_bg_enable = 0;
+	uint8_t m_bg_color = 0;
+	uint16_t m_bg_position = 0;
+	uint8_t m_fg_color = 0;
+	bool m_flip_screen = false;
 
-	uint8_t m_congo_fg_bank;
-	uint8_t m_congo_color_bank;
-	uint8_t m_congo_custom[4];
+	uint8_t m_congo_fg_bank = 0;
+	uint8_t m_congo_color_bank = 0;
+	uint8_t m_congo_custom[4]{};
 
 	const uint8_t *m_color_codes;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
 	uint8_t razmataz_counter_r();
 	void zaxxon_control_w(offs_t offset, uint8_t data);

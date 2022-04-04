@@ -562,9 +562,9 @@ public:
 
 	required_ioport_array<2> m_player_ports;
 
-	int m_oldstate[2];
-	int m_cd32_shifter[2];
-	u16 m_potgo_value;
+	int m_oldstate[2]{};
+	int m_cd32_shifter[2]{};
+	u16 m_potgo_value = 0;
 
 	void cd32n(machine_config &config);
 	void cd32(machine_config &config);

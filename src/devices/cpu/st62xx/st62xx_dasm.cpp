@@ -51,6 +51,7 @@ std::string st62xx_disassembler::reg_name(const uint8_t reg)
 offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	offs_t base_pc = pc;
+	offs_t flags = 0;
 	const uint8_t op = opcodes.r8(pc);
 	pc++;
 
@@ -63,6 +64,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const int8_t e = ((int8_t)op) >> 3;
 			util::stream_format(stream, "JRNZ $%d", e);
+			flags = STEP_COND;
 			break;
 		}
 		case 0x01: case 0x11: case 0x21: case 0x31: case 0x41: case 0x51: case 0x61: case 0x71:
@@ -72,6 +74,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			pc++;
 			const uint16_t abc = ((op & 0xf0) >> 4) | (ab << 4);
 			util::stream_format(stream, "CALL %Xh", abc);
+			flags = STEP_OVER;
 			break;
 		}
 		case 0x09: case 0x19: case 0x29: case 0x39: case 0x49: case 0x59: case 0x69: case 0x79:
@@ -90,6 +93,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const int8_t e = ((int8_t)op) >> 3;
 			util::stream_format(stream, "JRNC $%d", e);
+			flags = STEP_COND;
 			break;
 		}
 		case 0x03: case 0x23: case 0x43: case 0x63: case 0x83: case 0xa3: case 0xc3: case 0xe3:
@@ -100,6 +104,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			const int8_t ee = (int8_t)opcodes.r8(pc);
 			pc++;
 			util::stream_format(stream, "JRR  %d,%s,$%Xh", b, reg_name(rr), ee);
+			flags = STEP_COND;
 			break;
 		}
 		case 0x13: case 0x33: case 0x53: case 0x73: case 0x93: case 0xb3: case 0xd3: case 0xf3:
@@ -110,6 +115,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			const int8_t ee = (int8_t)opcodes.r8(pc);
 			pc++;
 			util::stream_format(stream, "JRS  %d,%s,$%Xh", b, reg_name(rr), ee);
+			flags = STEP_COND;
 			break;
 		}
 		case 0x0b: case 0x2b: case 0x4b: case 0x6b: case 0x8b: case 0xab: case 0xcb: case 0xeb:
@@ -135,6 +141,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const int8_t e = ((int8_t)op) >> 3;
 			util::stream_format(stream, "JRZ  $%d", e);
+			flags = STEP_COND;
 			break;
 		}
 		case 0x06: case 0x16: case 0x26: case 0x36: case 0x46: case 0x56: case 0x66: case 0x76:
@@ -144,6 +151,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const int8_t e = ((int8_t)op) >> 3;
 			util::stream_format(stream, "JRC  $%d", e);
+			flags = STEP_COND;
 			break;
 		}
 		case 0x15:
@@ -193,6 +201,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			break;
 		case 0x4d:
 			util::stream_format(stream, "RETI");
+			flags = STEP_OUT;
 			break;
 		case 0x5d:
 			util::stream_format(stream, "DEC  Y"); // y
@@ -214,6 +223,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			break;
 		case 0xcd:
 			util::stream_format(stream, "RET");
+			flags = STEP_OUT;
 			break;
 		case 0xdd:
 			util::stream_format(stream, "DEC  W"); // w
@@ -374,5 +384,5 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			break;
 	}
 
-	return (pc - base_pc) | SUPPORTED;
+	return (pc - base_pc) | flags | SUPPORTED;
 }

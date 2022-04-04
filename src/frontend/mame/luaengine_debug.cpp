@@ -101,6 +101,29 @@ public:
 
 	symbol_entry &add(char const *name) { return m_table.add(name, symbol_table::READ_WRITE); }
 	symbol_entry &add(char const *name, u64 value) { return m_table.add(name, value); }
+	symbol_entry &add(char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter, std::optional<char const *> format)
+	{
+		symbol_table::setter_func setfun;
+		if (setter)
+			setfun = [cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
+		return m_table.add(
+				name,
+				[cbfunc = std::move(getter)] () -> u64
+				{
+					auto result = invoke(cbfunc).get<std::optional<u64> >();
+					if (result)
+					{
+						return *result;
+					}
+					else
+					{
+						osd_printf_error("[LUA EROR] invalid return from symbol value getter callback\n");
+						return 0;
+					}
+				},
+				std::move(setfun),
+				(format && *format) ? *format : "");
+	}
 	symbol_entry *find(char const *name) const { return m_table.find(name); }
 	symbol_entry *find_deep(char const *name) { return m_table.find_deep(name); }
 
@@ -181,30 +204,6 @@ void lua_engine::initialize_debug(sol::table &emu)
 		{ "m", EXPSPACE_REGION }
 	};
 
-	auto const do_add_symbol = [this] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter, std::optional<char const *> format) -> symbol_entry &
-	{
-		symbol_table::setter_func setfun;
-		if (setter)
-			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
-		return st.table().add(
-				name,
-				[this, cbfunc = std::move(getter)] () -> u64
-				{
-					auto result = invoke(cbfunc).get<sol::optional<u64> >();
-					if (result)
-					{
-						return *result;
-					}
-					else
-					{
-						osd_printf_error("[LUA EROR] invalid return from symbol value getter callback\n");
-						return 0;
-					}
-				},
-				std::move(setfun),
-				(format && *format) ? *format : "");
-	};
-
 	auto symbol_table_type = emu.new_usertype<symbol_table_wrapper>(
 			"symbol_table",
 			sol::call_constructor, sol::factories(
@@ -217,49 +216,49 @@ void lua_engine::initialize_debug(sol::table &emu)
 				[] (device_t &device)
 				{ return std::make_shared<symbol_table_wrapper>(device.machine(), nullptr, &device); }));
 	symbol_table_type.set_function("set_memory_modified_func",
-			[this] (symbol_table_wrapper &st, sol::object cb)
+			[] (symbol_table_wrapper &st, sol::object cb)
 			{
 				if (cb == sol::lua_nil)
 					st.table().set_memory_modified_func(nullptr);
 				else if (cb.is<sol::protected_function>())
-					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+					st.table().set_memory_modified_func([cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
 				else
 					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
 			});
 	symbol_table_type["add"] = sol::overload(
 			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *)>(&symbol_table_wrapper::add),
 			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *, u64)>(&symbol_table_wrapper::add),
-			do_add_symbol,
-			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, sol::lua_nil_t, char const *format) -> symbol_entry &
+			static_cast<symbol_entry &(symbol_table_wrapper::*)(char const *, sol::protected_function, std::optional<sol::protected_function>, std::optional<char const *>)>(&symbol_table_wrapper::add),
+			[] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, sol::lua_nil_t, char const *format) -> symbol_entry &
 			{
-				return do_add_symbol(st, name, getter, std::nullopt, format);
+				return st.add(name, getter, std::nullopt, format);
 			},
-			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter) -> symbol_entry &
+			[] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, std::optional<sol::protected_function> setter) -> symbol_entry &
 			{
-				return do_add_symbol(st, name, getter, setter, nullptr);
+				return st.add(name, getter, setter, nullptr);
 			},
-			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, char const *format) -> symbol_entry &
+			[] (symbol_table_wrapper &st, char const *name, sol::protected_function getter, char const *format) -> symbol_entry &
 			{
-				return do_add_symbol(st, name, getter, std::nullopt, format);
+				return st.add(name, getter, std::nullopt, format);
 			},
-			[do_add_symbol] (symbol_table_wrapper &st, char const *name, sol::protected_function getter) -> symbol_entry &
+			[] (symbol_table_wrapper &st, char const *name, sol::protected_function getter) -> symbol_entry &
 			{
-				return do_add_symbol(st, name, getter, std::nullopt, nullptr);
+				return st.add(name, getter, std::nullopt, nullptr);
 			},
-			[this] (symbol_table_wrapper &st, char const *name, int minparams, int maxparams, sol::protected_function execute) -> symbol_entry &
+			[] (symbol_table_wrapper &st, sol::this_state s, char const *name, int minparams, int maxparams, sol::protected_function execute) -> symbol_entry &
 			{
 				return st.table().add(
 						name,
 						minparams,
 						maxparams,
-						[this, cbref = sol::reference(execute)] (int numparams, u64 const *paramlist) -> u64
+						[L = s.L, cbref = sol::reference(execute)] (int numparams, u64 const *paramlist) -> u64
 						{
-							sol::stack_reference traceback(m_lua_state, -sol::stack::push(m_lua_state, sol::default_traceback_error_handler));
+							sol::stack_reference traceback(L, -sol::stack::push(L, sol::default_traceback_error_handler));
 							cbref.push();
-							sol::stack_aligned_stack_handler_function func(m_lua_state, -1, traceback);
+							sol::stack_aligned_stack_handler_function func(L, -1, traceback);
 							for (int i = 0; numparams > i; ++i)
-								lua_pushinteger(m_lua_state, paramlist[i]);
-							auto result = func(sol::stack_count(numparams)).get<sol::optional<u64> >();
+								lua_pushinteger(L, paramlist[i]);
+							auto result = func(sol::stack_count(numparams)).get<std::optional<u64> >();
 							traceback.pop();
 							return result ? *result : 0;
 						});

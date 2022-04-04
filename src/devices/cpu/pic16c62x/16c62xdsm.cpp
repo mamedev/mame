@@ -202,6 +202,8 @@ offs_t pic16c62x_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 		flags = STEP_OVER;
 	else if (!strncmp(cp, "ret", 3))
 		flags = STEP_OUT;
+	else if (!strncmp(cp, "btfs", 4) || !strncmp(cp + 2, "cfsz", 4))
+		flags = STEP_COND;
 
 	while (*cp)
 	{

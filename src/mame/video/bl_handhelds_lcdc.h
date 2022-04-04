@@ -25,12 +25,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	u8 m_displaybuffer[256 * 256 * 2];
-	u16 m_posx, m_posy;
-	u16 m_posminx, m_posmaxx;
-	u16 m_posminy, m_posmaxy;
-	u8 m_command;
-	u8 m_commandstep;
+	u8 m_displaybuffer[256 * 256 * 2]{};
+	u16 m_posx = 0, m_posy = 0;
+	u16 m_posminx = 0, m_posmaxx = 0;
+	u16 m_posminy = 0, m_posmaxy = 0;
+	u8 m_command = 0;
+	u8 m_commandstep = 0;
 
 };
 

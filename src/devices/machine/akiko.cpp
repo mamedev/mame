@@ -11,13 +11,13 @@
     - Chunky to planar converter
     - 2x CIA chips
 
-	TODO:
+    TODO:
     - Reportedly the CD drive should be a Sony KSM-2101BAM,
-	  schematics shows Akiko connected to a laconic "26-pin CD connector"
-	- NVRAM needs inheriting from i2c_24c08_device;
-	- Handle tray open/close events, needed at very least by:
-	  \- cdtv:cdremix2 load sequences;
-	  \- kangfu on cd32 as "out of memory" workaround;
+      schematics shows Akiko connected to a laconic "26-pin CD connector"
+    - NVRAM needs inheriting from i2c_24c08_device;
+    - Handle tray open/close events, needed at very least by:
+      \- cdtv:cdremix2 load sequences;
+      \- kangfu on cd32 as "out of memory" workaround;
 
 ***************************************************************************/
 
@@ -161,21 +161,21 @@ void akiko_device::device_reset()
 	else
 	{
 		// Arcade case
-		m_cdrom = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
+		m_cdrom = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom"));
 	}
 
 	/* create the TOC table */
-	if ( m_cdrom != nullptr && cdrom_get_last_track(m_cdrom) )
+	if ( m_cdrom != nullptr && m_cdrom->get_last_track() )
 	{
 		uint8_t *p;
-		int     i, addrctrl = cdrom_get_adr_control( m_cdrom, 0 );
+		int     i, addrctrl = m_cdrom->get_adr_control( 0 );
 		uint32_t  discend;
 
-		discend = cdrom_get_track_start(m_cdrom,cdrom_get_last_track(m_cdrom)-1);
-		discend += cdrom_get_toc(m_cdrom)->tracks[cdrom_get_last_track(m_cdrom)-1].frames;
-		discend = lba_to_msf(discend);
+		discend = m_cdrom->get_track_start(m_cdrom->get_last_track()-1);
+		discend += m_cdrom->get_toc().tracks[m_cdrom->get_last_track()-1].frames;
+		discend = cdrom_file::lba_to_msf(discend);
 
-		m_cdrom_numtracks = cdrom_get_last_track(m_cdrom)+3;
+		m_cdrom_numtracks = m_cdrom->get_last_track()+3;
 
 		m_cdrom_toc = std::make_unique<uint8_t[]>(13*m_cdrom_numtracks);
 		memset( m_cdrom_toc.get(), 0, 13*m_cdrom_numtracks);
@@ -187,7 +187,7 @@ void akiko_device::device_reset()
 		p += 13;
 		p[1] = 0x01;
 		p[3] = 0xa1; /* last track */
-		p[8] = cdrom_get_last_track(m_cdrom);
+		p[8] = m_cdrom->get_last_track();
 		p += 13;
 		p[1] = 0x01;
 		p[3] = 0xa2; /* disc end */
@@ -196,12 +196,12 @@ void akiko_device::device_reset()
 		p[10] = discend & 0xff;
 		p += 13;
 
-		for( i = 0; i < cdrom_get_last_track(m_cdrom); i++ )
+		for( i = 0; i < m_cdrom->get_last_track(); i++ )
 		{
-			uint32_t  trackpos = cdrom_get_track_start(m_cdrom,i);
+			uint32_t  trackpos = m_cdrom->get_track_start(i);
 
-			trackpos = lba_to_msf(trackpos);
-			addrctrl = cdrom_get_adr_control( m_cdrom, i );
+			trackpos = cdrom_file::lba_to_msf(trackpos);
+			addrctrl = m_cdrom->get_adr_control( i );
 
 			p[1] = ((addrctrl & 0x0f) << 4) | ((addrctrl & 0xf0) >> 4);
 			p[3] = dec_2_bcd( i+1 );
@@ -225,8 +225,8 @@ void akiko_device::device_stop()
 	{
 		if( m_cdrom )
 		{
-			cdrom_close(m_cdrom);
-			m_cdrom = (cdrom_file *)nullptr;
+			delete m_cdrom;
+			m_cdrom = nullptr;
 		}
 	}
 }
@@ -469,11 +469,11 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 
 	if ( m_cdrom_readreqmask & ( 1 << index ) )
 	{
-		uint32_t  track = cdrom_get_track( m_cdrom, m_cdrom_lba_cur );
-		uint32_t  datasize;// = cdrom_get_toc(m_cdrom)->tracks[track].datasize;
-		uint32_t  subsize = cdrom_get_toc( m_cdrom )->tracks[track].subsize;
+		uint32_t  track = m_cdrom->get_track( m_cdrom_lba_cur );
+		uint32_t  datasize;// = m_cdrom->get_toc().tracks[track].datasize;
+		uint32_t  subsize = m_cdrom->get_toc().tracks[track].subsize;
 
-		uint32_t  curmsf = lba_to_msf( m_cdrom_lba_cur );
+		uint32_t  curmsf = cdrom_file::lba_to_msf( m_cdrom_lba_cur );
 		memset( buf, 0, 16 );
 
 		buf[3] = m_cdrom_lba_cur - m_cdrom_lba_start;
@@ -485,7 +485,7 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 		buf[15] = 0x01; /* mode1 */
 
 		datasize = 2048;
-		if ( !cdrom_read_data( m_cdrom, m_cdrom_lba_cur, &buf[16], CD_TRACK_MODE1 ) )
+		if ( !m_cdrom->read_data( m_cdrom_lba_cur, &buf[16], cdrom_file::CD_TRACK_MODE1 ) )
 		{
 			LOGWARN( "AKIKO: Read error trying to read sector %08x!\n", m_cdrom_lba_cur );
 			return;
@@ -493,7 +493,7 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 
 		if ( subsize )
 		{
-			if ( !cdrom_read_subcode( m_cdrom, m_cdrom_lba_cur, &buf[16+datasize] ) )
+			if ( !m_cdrom->read_subcode( m_cdrom_lba_cur, &buf[16+datasize] ) )
 			{
 				LOGWARN( "AKIKO: Read error trying to read subcode for sector %08x!\n", m_cdrom_lba_cur );
 				return;
@@ -695,9 +695,9 @@ void akiko_device::update_cdrom()
 					LOGCD("AKIKO CD: Seek - start lba: %08x - end lba: %08x\n", startpos, endpos );
 					m_cdrom_track_index = 0;
 
-					for( i = 0; i < cdrom_get_last_track(m_cdrom); i++ )
+					for( i = 0; i < m_cdrom->get_last_track(); i++ )
 					{
-						if ( startpos <= cdrom_get_track_start( m_cdrom, i ) )
+						if ( startpos <= m_cdrom->get_track_start( i ) )
 						{
 							/* reset to 0 */
 							m_cdrom_track_index = i + 2;
@@ -733,16 +733,16 @@ void akiko_device::update_cdrom()
 				uint32_t  track;
 				int     addrctrl;
 
-				track = cdrom_get_track(m_cdrom, lba);
-				addrctrl = cdrom_get_adr_control(m_cdrom, track);
+				track = m_cdrom->get_track(lba);
+				addrctrl = m_cdrom->get_adr_control(track);
 
 				resp[2] = 0x00;
 				resp[3] = ((addrctrl & 0x0f) << 4) | ((addrctrl & 0xf0) >> 4);
 				resp[4] = dec_2_bcd(track+1);
 				resp[5] = 0; /* index */
 
-				disk_pos = lba_to_msf(lba);
-				track_pos = lba_to_msf(lba - cdrom_get_track_start(m_cdrom, track));
+				disk_pos = cdrom_file::lba_to_msf(lba);
+				track_pos = cdrom_file::lba_to_msf(lba - m_cdrom->get_track_start(track));
 
 				/* track position */
 				resp[6] = (track_pos >> 16) & 0xff;
@@ -759,7 +759,7 @@ void akiko_device::update_cdrom()
 			{
 				resp[1] = 0x80;
 			}
-			
+
 			// needed by cdtv:defcrown (would otherwise hardlock emulation)
 			m_cdrom_cmd_start = (m_cdrom_cmd_start + 2) & 0xff;
 

@@ -477,6 +477,8 @@ offs_t tms32031_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			char temp[10];
 			sprintf(temp, "B%s%s", condition[(op >> 16) & 31], ((op >> 21) & 1) ? "D" : "");
 			util::stream_format(stream, "%-6s%s", temp, regname[op & 31]);
+			if (((op >> 16) & 31) != 0)
+				flags = STEP_COND | ((op >> 21) & 1 ? step_over_extra(1) : 0);
 			break;
 		}
 
@@ -485,6 +487,8 @@ offs_t tms32031_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			char temp[10];
 			sprintf(temp, "B%s%s", condition[(op >> 16) & 31], ((op >> 21) & 1) ? "D" : "");
 			util::stream_format(stream, "%-6s$%06X", temp, (pc + (((op >> 21) & 1) ? 3 : 1) + (int16_t)op) & 0xffffff);
+			if (((op >> 16) & 31) != 0)
+				flags = STEP_COND | ((op >> 21) & 1 ? step_over_extra(1) : 0);
 			break;
 		}
 
@@ -494,6 +498,7 @@ offs_t tms32031_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			char temp[10];
 			sprintf(temp, "DB%s%s", condition[(op >> 16) & 31], ((op >> 21) & 1) ? "D" : "");
 			util::stream_format(stream, "%-6sAR%d,%s", temp, (op >> 22) & 7, regname[op & 31]);
+			flags = STEP_COND | ((op >> 21) & 1 ? step_over_extra(1) : 0);
 			break;
 		}
 
@@ -502,6 +507,7 @@ offs_t tms32031_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			char temp[10];
 			sprintf(temp, "DB%s%s", condition[(op >> 16) & 31], ((op >> 21) & 1) ? "D" : "");
 			util::stream_format(stream, "%-6sAR%d,$%06X", temp, (op >> 22) & 7, (pc + (((op >> 21) & 1) ? 3 : 1) + (int16_t)op) & 0xffffff);
+			flags = STEP_COND | ((op >> 21) & 1 ? step_over_extra(1) : 0);
 			break;
 		}
 
@@ -537,12 +543,12 @@ offs_t tms32031_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 		case 0x0f0:
 			util::stream_format(stream, "RETI%s", condition[(op >> 16) & 31]);
-			flags = STEP_OUT;
+			flags = STEP_OUT | (((op >> 16) & 31) != 0 ? STEP_COND : 0);
 			break;
 
 		case 0x0f1:
 			util::stream_format(stream, "RETS%s", condition[(op >> 16) & 31]);
-			flags = STEP_OUT;
+			flags = STEP_OUT | (((op >> 16) & 31) != 0 ? STEP_COND : 0);
 			break;
 
 

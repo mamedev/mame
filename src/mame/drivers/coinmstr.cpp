@@ -161,8 +161,8 @@ public:
 	required_shared_ptr<uint8_t> m_attr_ram1;
 	required_shared_ptr<uint8_t> m_attr_ram2;
 	required_shared_ptr<uint8_t> m_attr_ram3;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_question_adr[4];
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_question_adr[4]{};
 	void quizmstr_bg_w(offs_t offset, uint8_t data);
 	void quizmstr_attr1_w(offs_t offset, uint8_t data);
 	void quizmstr_attr2_w(offs_t offset, uint8_t data);

@@ -336,24 +336,11 @@ static const gfx_layout tile_layout =
 	16*8
 };
 
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-		8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-	{ 8*8*0, 8*8*1, 8*8*2, 8*8*3, 8*8*4, 8*8*5, 8*8*6, 8*8*7,
-	8*8*8, 8*8*9, 8*8*10, 8*8*11, 8*8*12, 8*8*13, 8*8*14, 8*8*15 },
-	128*8
-};
-
 static GFXDECODE_START( gfx_baraduke )
-	GFXDECODE_ENTRY( "gfx1", 0,      text_layout,  0, 512 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,  0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0x4000, tile_layout,  0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0,      spritelayout, 0, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0,      text_layout,            0, 512 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,            0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0x4000, tile_layout,            0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0,      gfx_16x16x4_packed_msb, 0, 128 )
 GFXDECODE_END
 
 

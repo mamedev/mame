@@ -101,7 +101,7 @@ private:
 
 	required_device<er2055_device> m_earom;
 
-	uint8_t m_tile_bank;
+	uint8_t m_tile_bank = 0;
 };
 
 

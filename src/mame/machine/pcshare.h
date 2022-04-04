@@ -59,10 +59,10 @@ protected:
 	optional_device<mc146818_device> m_mc146818;
 	required_device<kbdc8042_device> m_kbdc;
 
-	int m_dma_channel;
-	uint8_t m_dma_offset[2][4];
-	uint8_t m_at_pages[0x10];
-	int m_pit_out2;
+	int m_dma_channel = 0;
+	uint8_t m_dma_offset[2][4]{};
+	uint8_t m_at_pages[0x10]{};
+	int m_pit_out2 = 0;
 };
 
 #endif // MAME_MACHINE_PCSHARE_H

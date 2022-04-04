@@ -34,10 +34,10 @@ private:
 	uint8_t rockclim_videoram_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
 
-	uint16_t m_rockclim_v;
-	uint16_t m_rockclim_h;
+	uint16_t m_rockclim_v = 0;
+	uint16_t m_rockclim_h = 0;
 
-	tilemap_t *m_rockclim_tilemap;
+	tilemap_t *m_rockclim_tilemap = nullptr;
 	required_shared_ptr<uint8_t> m_rockclim_videoram;
 	required_device<gfxdecode_device> m_gfxdecode2;
 	required_device<palette_device> m_palette2;

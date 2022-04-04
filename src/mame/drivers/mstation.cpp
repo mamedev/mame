@@ -68,10 +68,10 @@ private:
 	uint8_t m_bank1[2];
 	uint8_t m_bank2[2];
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t m_screen_column;
-	uint8_t m_port2;
-	uint8_t m_irq;
-	uint16_t m_kb_matrix;
+	uint8_t m_screen_column = 0;
+	uint8_t m_port2 = 0;
+	uint8_t m_irq = 0;
+	uint16_t m_kb_matrix = 0;
 
 	uint8_t modem_r();
 	void modem_w(uint8_t data);

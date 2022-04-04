@@ -90,7 +90,7 @@ const char *jv1_format::extensions() const
 	return "jv1,dsk";
 }
 
-int jv1_format::get_track_dam_fm(const format &f, int head, int track)
+int jv1_format::get_track_dam_fm(const format &f, int head, int track) const
 {
 	return (track == 17 && head == 0) ? FM_DDAM : FM_DAM;
 }
@@ -112,7 +112,7 @@ const jv1_format::format jv1_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_JV1_FORMAT = &floppy_image_format_creator<jv1_format>;
+const jv1_format FLOPPY_JV1_FORMAT;
 
 
 #define MAX_SECTORS 19
@@ -137,7 +137,7 @@ const char *jv3_format::extensions() const
 	return "jv3,dsk";
 }
 
-int jv3_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int jv3_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t image_size;
 	if (io.length(image_size))
@@ -226,10 +226,10 @@ int jv3_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 	}
 
-	return 80;
+	return FIFID_STRUCT;
 }
 
-bool jv3_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool jv3_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	// disk has already been validated in every way except if it exceeds drive tracks, we do that below
 	osd_printf_info("Disk detected as JV3\n");
@@ -356,7 +356,7 @@ bool jv3_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool jv3_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool jv3_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int track_count, head_count;
 	image->get_actual_geometry(track_count, head_count);
@@ -455,5 +455,5 @@ bool jv3_format::supports_save() const
 	return true;
 }
 
-const floppy_format_type FLOPPY_JV3_FORMAT = &floppy_image_format_creator<jv3_format>;
+const jv3_format FLOPPY_JV3_FORMAT;
 

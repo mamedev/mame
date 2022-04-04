@@ -37,9 +37,9 @@ public:
 	void tceptor(machine_config &config);
 
 private:
-	uint8_t m_m6809_irq_enable;
-	uint8_t m_m68k_irq_enable;
-	uint8_t m_mcu_irq_enable;
+	uint8_t m_m6809_irq_enable = 0;
+	uint8_t m_m68k_irq_enable = 0;
+	uint8_t m_mcu_irq_enable = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device_array<m65c02_device, 2> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
@@ -50,18 +50,18 @@ private:
 	required_shared_ptr<uint8_t> m_bg_ram;
 	required_shared_ptr<uint8_t> m_m68k_shared_ram;
 	required_shared_ptr<uint16_t> m_sprite_ram;
-	int m_sprite16;
-	int m_sprite32;
-	int m_bg;
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg_tilemap[2];
-	int32_t m_bg_scroll_x[2];
-	int32_t m_bg_scroll_y[2];
+	int m_sprite16 = 0;
+	int m_sprite32 = 0;
+	int m_bg = 0;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap[2]{};
+	int32_t m_bg_scroll_x[2]{};
+	int32_t m_bg_scroll_y[2]{};
 	bitmap_ind16 m_temp_bitmap;
 	std::unique_ptr<uint16_t[]> m_sprite_ram_buffered;
 	std::unique_ptr<uint8_t[]> m_decoded_16;
 	std::unique_ptr<uint8_t[]> m_decoded_32;
-	int m_is_mask_spr[1024/16];
+	int m_is_mask_spr[1024/16]{};
 	uint8_t m68k_shared_r(offs_t offset);
 	void m68k_shared_w(offs_t offset, uint8_t data);
 	void m6809_irq_enable_w(uint8_t data);

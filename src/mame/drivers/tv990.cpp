@@ -96,8 +96,8 @@ private:
 	void tv990_mem(address_map &map);
 
 	uint16_t tvi1111_regs[(0x100/2)+2];
-	emu_timer *m_rowtimer;
-	int m_rowh, m_width, m_height;
+	emu_timer *m_rowtimer = nullptr;
+	int m_rowh = 0, m_width = 0, m_height = 0;
 };
 
 WRITE_LINE_MEMBER(tv990_state::vblank_irq)

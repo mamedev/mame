@@ -40,7 +40,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_mikrosha_font_page;
+	uint8_t m_mikrosha_font_page = 0;
 };
 
 void mikrosha_state::machine_reset()

@@ -123,7 +123,7 @@ uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 	const int extra_pos = (lba * bytes_per_block) % bytes_per_sector;
 	if(sector != cur_sector) {
 		cur_sector = sector;
-		if(!cdrom_read_data(cdrom, sector, sector_buffer, CD_TRACK_MODE1)) {
+		if(!cdrom->read_data(sector, sector_buffer, cdrom_file::CD_TRACK_MODE1)) {
 			LOG("CD READ ERROR sector %d!\n", sector);
 			std::fill_n(sector_buffer, sizeof(sector_buffer), 0);
 		}
@@ -319,7 +319,7 @@ void nscsi_cdrom_device::scsi_command()
 		LOG("command READ CAPACITY\n");
 
 		// get the last used block on the disc
-		const u32 temp = cdrom_get_track_start(cdrom, 0xaa) * (bytes_per_sector / bytes_per_block) - 1;
+		const u32 temp = cdrom->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1;
 
 		scsi_cmdbuf[0] = (temp>>24) & 0xff;
 		scsi_cmdbuf[1] = (temp>>16) & 0xff;
@@ -365,7 +365,7 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x80; // WP, cache
 
 		// get the last used block on the disc
-		const u32 temp = cdrom_get_track_start(cdrom, 0xaa) * (bytes_per_sector / bytes_per_block) - 1;
+		const u32 temp = cdrom->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1;
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 
 		scsi_cmdbuf[pos++] = 0x00; // density code
@@ -469,12 +469,12 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[3] = 1; // first track
 		scsi_cmdbuf[4] = 1; // number of sessions (TODO: session support for CHDv6)
 		scsi_cmdbuf[5] = 1; // first track in last session
-		scsi_cmdbuf[6] = cdrom_get_last_track(cdrom);   // last track in last session
+		scsi_cmdbuf[6] = cdrom->get_last_track();   // last track in last session
 		scsi_cmdbuf[8] = 0; // CD-ROM, not XA
 
 		// lead in start time in MSF
 		{
-			u32 tstart = cdrom_get_track_start(cdrom, 0);
+			u32 tstart = cdrom->get_track_start(0);
 			tstart = to_msf(tstart + 150);
 
 			scsi_cmdbuf[16] = (tstart >> 24) & 0xff;
@@ -483,7 +483,7 @@ void nscsi_cdrom_device::scsi_command()
 			scsi_cmdbuf[19] = (tstart & 0xff);
 
 			// lead-out start time in MSF
-			tstart = cdrom_get_track_start(cdrom, 0xaa);
+			tstart = cdrom->get_track_start(0xaa);
 			tstart = to_msf(tstart + 150);
 
 			scsi_cmdbuf[20] = (tstart >> 24) & 0xff;
@@ -542,7 +542,7 @@ void nscsi_cdrom_device::scsi_command()
 		switch (format) {
 		case 0: {
 			int start_track = scsi_cmdbuf[6];
-			int end_track = cdrom_get_last_track(cdrom);
+			int end_track = cdrom->get_last_track();
 
 			int tracks;
 			if(start_track == 0)
@@ -561,7 +561,7 @@ void nscsi_cdrom_device::scsi_command()
 			scsi_cmdbuf[pos++] = (len>>8) & 0xff;
 			scsi_cmdbuf[pos++] = (len & 0xff);
 			scsi_cmdbuf[pos++] = 1;
-			scsi_cmdbuf[pos++] = cdrom_get_last_track(cdrom);
+			scsi_cmdbuf[pos++] = cdrom->get_last_track();
 
 			if (start_track == 0)
 				start_track = 1;
@@ -575,11 +575,11 @@ void nscsi_cdrom_device::scsi_command()
 				}
 
 				scsi_cmdbuf[pos++] = 0;
-				scsi_cmdbuf[pos++] = cdrom_get_adr_control(cdrom, cdrom_track);
+				scsi_cmdbuf[pos++] = cdrom->get_adr_control(cdrom_track);
 				scsi_cmdbuf[pos++] = track;
 				scsi_cmdbuf[pos++] = 0;
 
-				u32 tstart = cdrom_get_track_start(cdrom, cdrom_track);
+				u32 tstart = cdrom->get_track_start(cdrom_track);
 
 				if(msf)
 					tstart = to_msf(tstart+150);
@@ -601,11 +601,11 @@ void nscsi_cdrom_device::scsi_command()
 			scsi_cmdbuf[pos++] = 1;
 
 			scsi_cmdbuf[pos++] = 0;
-			scsi_cmdbuf[pos++] = cdrom_get_adr_control(cdrom, 0);
+			scsi_cmdbuf[pos++] = cdrom->get_adr_control(0);
 			scsi_cmdbuf[pos++] = 1;
 			scsi_cmdbuf[pos++] = 0;
 
-			u32 tstart = cdrom_get_track_start(cdrom, 0);
+			u32 tstart = cdrom->get_track_start(0);
 
 			if (msf)
 				tstart = to_msf(tstart+150);

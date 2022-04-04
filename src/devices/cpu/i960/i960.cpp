@@ -1457,12 +1457,12 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 
 			case 0x4: // dmovt
 				/*
-					The dmovt instruction moves a 32-bit word from one register to another
-					and tests the least-significant byte of the operand to determine if it is a
-					valid ASCII-coded decimal digit (001100002 through 001110012,
-					corresponding to the decimal digits 0 through 9). For valid digits, the
-					condition code (CC) is set to 000; otherwise the condition code is set to
-					010.
+				    The dmovt instruction moves a 32-bit word from one register to another
+				    and tests the least-significant byte of the operand to determine if it is a
+				    valid ASCII-coded decimal digit (001100002 through 001110012,
+				    corresponding to the decimal digits 0 through 9). For valid digits, the
+				    condition code (CC) is set to 000; otherwise the condition code is set to
+				    010.
 				*/
 				m_icount -= 7;
 				t1 = get_1_ri(opcode);

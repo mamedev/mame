@@ -59,8 +59,8 @@ private:
 	void fill_port();
 	void unfill_port();
 
-	int m_module;               /* memory module where the port is visible */
-	int m_max_size;             /* maximum size, in bytes 128 KB or 4 GB */
+	int m_module = 0;               /* memory module where the port is visible */
+	int m_max_size = 0;             /* maximum size, in bytes 128 KB or 4 GB */
 
 	uint32_t m_port_size;
 	bool m_port_write;

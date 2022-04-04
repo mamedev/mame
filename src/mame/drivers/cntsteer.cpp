@@ -70,22 +70,22 @@ public:
 	required_shared_ptr<uint8_t> m_videoram2;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_bg_bank;
-	int      m_bg_color_bank;
-	int      m_flipscreen;
-	int      m_scrolly;
-	int      m_scrolly_hi;
-	int      m_scrollx;
-	int      m_scrollx_hi;
-	int      m_rotation_x;
-	int      m_rotation_sign;
-	int      m_disable_roz;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int      m_bg_bank = 0;
+	int      m_bg_color_bank = 0;
+	int      m_flipscreen = 0;
+	int      m_scrolly = 0;
+	int      m_scrolly_hi = 0;
+	int      m_scrollx = 0;
+	int      m_scrollx_hi = 0;
+	int      m_rotation_x = 0;
+	int      m_rotation_sign = 0;
+	int      m_disable_roz = 0;
 
 	/* misc */
-	int      m_nmimask; // zerotrgt only
-	bool     m_sub_nmimask; // counter steer only
+	int      m_nmimask = 0; // zerotrgt only
+	bool     m_sub_nmimask = false; // counter steer only
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

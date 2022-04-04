@@ -111,7 +111,7 @@ void harddisk_image_device::device_start()
 	chd_file *handle = machine().rom_load().get_disk_handle(tag());
 	if (handle != nullptr)
 	{
-		m_hard_disk_handle = hard_disk_open(handle);
+		m_hard_disk_handle = new hard_disk_file(handle);
 	}
 	else
 	{
@@ -123,7 +123,7 @@ void harddisk_image_device::device_stop()
 {
 	if (m_hard_disk_handle != nullptr)
 	{
-		hard_disk_close(m_hard_disk_handle);
+		delete m_hard_disk_handle;
 		m_hard_disk_handle = nullptr;
 	}
 }
@@ -184,7 +184,7 @@ void harddisk_image_device::call_unload()
 
 	if (m_hard_disk_handle)
 	{
-		hard_disk_close(m_hard_disk_handle);
+		delete m_hard_disk_handle;
 		m_hard_disk_handle = nullptr;
 	}
 
@@ -247,7 +247,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 
 	if (m_hard_disk_handle)
 	{
-		hard_disk_close(m_hard_disk_handle);
+		delete m_hard_disk_handle;
 		m_hard_disk_handle = nullptr;
 	}
 
@@ -294,7 +294,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 	if (m_chd)
 	{
 		/* open the hard disk file */
-		m_hard_disk_handle = hard_disk_open(m_chd);
+		m_hard_disk_handle = new hard_disk_file(m_chd);
 		if (m_hard_disk_handle)
 			return image_init_result::PASS;
 	}
@@ -325,7 +325,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 				}
 			}
 
-			m_hard_disk_handle = hard_disk_open(image_core_file(), skip);
+			m_hard_disk_handle = new hard_disk_file(image_core_file(), skip);
 			if (m_hard_disk_handle)
 				return image_init_result::PASS;
 		}
@@ -340,20 +340,4 @@ image_init_result harddisk_image_device::internal_load_hd()
 	seterror(err, nullptr);
 
 	return image_init_result::FAIL;
-}
-
-/*************************************
- *
- *  Get the CHD file (from the src/chd.c core)
- *  after an image has been opened with the hd core
- *
- *************************************/
-
-chd_file *harddisk_image_device::get_chd_file()
-{
-	chd_file *result = nullptr;
-	hard_disk_file *hd_file = get_hard_disk_file();
-	if (hd_file)
-		result = hard_disk_get_chd(hd_file);
-	return result;
 }

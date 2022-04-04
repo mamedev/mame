@@ -52,9 +52,9 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
-	int        m_palette_bank;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	int        m_palette_bank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_video_cpu;

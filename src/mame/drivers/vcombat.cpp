@@ -143,7 +143,7 @@ private:
 
 	std::unique_ptr<uint16_t[]> m_m68k_framebuffer[2];
 	std::unique_ptr<uint16_t[]> m_i860_framebuffer[2][2];
-	int m_crtc_select;
+	int m_crtc_select = 0;
 
 	void main_video_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t control_1_r();

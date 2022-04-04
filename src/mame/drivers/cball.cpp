@@ -40,9 +40,9 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
-	tilemap_t* m_bg_tilemap;
+	tilemap_t* m_bg_tilemap = nullptr;
 
-	emu_timer *m_int_timer;
+	emu_timer *m_int_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
 	void vram_w(offs_t offset, uint8_t data);

@@ -3564,6 +3564,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_fdc.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_rs232.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_rs232.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/tipi.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/tipi.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_ide.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_ide.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_usbsm.cpp",
@@ -3763,6 +3765,8 @@ end
 ---------------------------------------------------
 if (BUSES["EPSON_QX"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/multifont.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/multifont.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/option.h",
 	}
@@ -4663,6 +4667,8 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/multibus.h",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.h",
+		MAME_DIR .. "src/devices/bus/multibus/isbc8024.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/isbc8024.h",
 		MAME_DIR .. "src/devices/bus/multibus/cpuap.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/cpuap.h",
 		MAME_DIR .. "src/devices/bus/multibus/serad.cpp",

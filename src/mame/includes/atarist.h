@@ -453,7 +453,7 @@ public:
 	uint16_t cache_r();
 	void cache_w(uint16_t data);
 
-	uint16_t m_cache;
+	uint16_t m_cache = 0;
 	void megaste(machine_config &config);
 	void megaste_map(address_map &map);
 

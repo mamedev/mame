@@ -90,18 +90,18 @@ private:
 	output_finder<2> m_leds;
 
 	/* EPROM state */
-	int m_eprom_oe;
-	int m_eprom_ce;
-	uint16_t m_eprom_addr;
-	uint8_t m_eprom_data;
-	uint8_t m_old_data;
-	std::vector<uint8_t> m_eprom_rom;
+	int m_eprom_oe = 0;
+	int m_eprom_ce = 0;
+	uint16_t m_eprom_addr = 0;
+	uint8_t m_eprom_data = 0;
+	uint8_t m_old_data = 0;
+	std::vector<uint8_t> m_eprom_rom{};
 
 	/* display state */
-	uint8_t m_ls145_p;
-	uint8_t m_segment;
+	uint8_t m_ls145_p = 0;
+	uint8_t m_segment = 0;
 
-	emu_timer *m_led_refresh_timer;
+	emu_timer *m_led_refresh_timer = nullptr;
 };
 
 

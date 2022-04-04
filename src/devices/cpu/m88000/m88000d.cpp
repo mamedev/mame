@@ -1175,7 +1175,7 @@ offs_t m88000_disassembler::dasm_d16(std::ostream &stream, const char *mnemonic,
 	util::stream_format(stream, ",r%d,$%08x", (inst & 0x001f0000) >> 16, pc + disp);
 
 	// Set flags for optional delay slot
-	return 4 | SUPPORTED | (BIT(inst, 26) ? STEP_OVER | step_over_extra(1) : 0);
+	return 4 | SUPPORTED | STEP_COND | (BIT(inst, 26) ? step_over_extra(1) : 0);
 }
 
 offs_t m88000_disassembler::dasm_d26(std::ostream &stream, const char *mnemonic, u32 inst, offs_t pc)

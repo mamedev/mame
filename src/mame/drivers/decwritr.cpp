@@ -76,9 +76,9 @@ private:
 	required_device<ls259_device> m_ledlatch;
 	required_device<dc305_device> m_prtlsi;
 
-	ioport_port* m_col_array[16];
-	uint8_t m_led_7seg_counter;
-	uint8_t m_led_7seg[4];
+	ioport_port* m_col_array[16]{};
+	uint8_t m_led_7seg_counter = 0;
+	uint8_t m_led_7seg[4]{};
 };
 
 IRQ_CALLBACK_MEMBER( decwriter_state::inta_cb )

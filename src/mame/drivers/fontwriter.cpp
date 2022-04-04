@@ -62,7 +62,7 @@ private:
 
 	// driver_device overrides
 	virtual void video_start() override;
-	uint8_t m_vbl, m_vbl2;
+	uint8_t m_vbl = 0, m_vbl2 = 0;
 };
 
 void fontwriter_state::machine_reset()

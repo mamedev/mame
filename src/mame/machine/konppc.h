@@ -80,22 +80,22 @@ private:
 	uint32_t dsp_comm_sharc[MAX_CG_BOARDS][2];
 	uint8_t dsp_shared_ram_bank[MAX_CG_BOARDS];
 
-	int32_t cgboard_id;
+	int32_t cgboard_id = 0;
 	int32_t cgboard_type;
 	int32_t num_cgboards;
 
 	std::unique_ptr<uint32_t[]> dsp_shared_ram[MAX_CG_BOARDS];
 
-	uint32_t dsp_state[MAX_CG_BOARDS];
-	uint32_t nwk_device_sel[MAX_CG_BOARDS];
-	const char *texture_bank[MAX_CG_BOARDS];
+	uint32_t dsp_state[MAX_CG_BOARDS]{};
+	uint32_t nwk_device_sel[MAX_CG_BOARDS]{};
+	const char *texture_bank[MAX_CG_BOARDS]{};
 
-	int nwk_fifo_half_full_r;
-	int nwk_fifo_half_full_w;
-	int nwk_fifo_full;
-	int nwk_fifo_mask;
+	int nwk_fifo_half_full_r = 0;
+	int nwk_fifo_half_full_w = 0;
+	int nwk_fifo_full = 0;
+	int nwk_fifo_mask = 0;
 
-	bool enable_3d[MAX_CG_BOARDS];
+	bool enable_3d[MAX_CG_BOARDS]{};
 
 	std::unique_ptr<uint32_t[]> nwk_fifo[MAX_CG_BOARDS];
 	int32_t nwk_fifo_read_ptr[MAX_CG_BOARDS];

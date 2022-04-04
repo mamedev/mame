@@ -93,10 +93,10 @@ public:
 
 private:
 	// video-related
-	int m_last_frame_flip;
+	int m_last_frame_flip = 0;
 
 	// misc
-	ioport_port       *m_io_disksel;
+	ioport_port       *m_io_disksel = nullptr;
 
 	std::unique_ptr<uint8_t[]>    m_ciram; // PPU nametable RAM - external to PPU!
 

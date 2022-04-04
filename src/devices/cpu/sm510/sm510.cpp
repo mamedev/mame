@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "sm510.h"
 #include "sm510d.h"
-#include "debugger.h"
 
 
 // MCU types

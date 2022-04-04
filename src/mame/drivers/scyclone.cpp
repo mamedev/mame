@@ -111,18 +111,18 @@ private:
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]> m_vram;
 
-	uint8_t m_videowritemask;
-	uint8_t m_videowritemask2;
+	uint8_t m_videowritemask = 0;
+	uint8_t m_videowritemask2 = 0;
 
-	uint8_t m_sprite_xpos;
-	uint8_t m_sprite_ypos;
-	uint8_t m_sprite_colour;
-	uint8_t m_sprite_tile;
-	uint8_t m_starscroll;
-	uint8_t m_p0e;
-	uint8_t m_vidctrl;
+	uint8_t m_sprite_xpos = 0;
+	uint8_t m_sprite_ypos = 0;
+	uint8_t m_sprite_colour = 0;
+	uint8_t m_sprite_tile = 0;
+	uint8_t m_starscroll = 0;
+	uint8_t m_p0e = 0;
+	uint8_t m_vidctrl = 0;
 
-	uint8_t m_hascollided;
+	uint8_t m_hascollided = 0;
 
 	/* video-related */
 	const uint8_t get_sprite_pixel(int x, int y);

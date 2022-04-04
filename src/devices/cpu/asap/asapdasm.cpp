@@ -57,7 +57,7 @@ offs_t asap_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	switch (opcode)
 	{
 		case 0x00:  util::stream_format(stream, "trap   $00"); flags = STEP_OVER;                              break;
-		case 0x01:  util::stream_format(stream, "b%s    $%08x", condition[rdst & 15], pc + ((int32_t)(op << 10) >> 8));   break;
+		case 0x01:  util::stream_format(stream, "b%s    $%08x", condition[rdst & 15], pc + ((int32_t)(op << 10) >> 8)); flags = STEP_COND | step_over_extra(1); break;
 		case 0x02:  if ((op & 0x003fffff) == 3)
 					{
 						uint32_t nextop = opcodes.r32(pc+4);
@@ -132,7 +132,7 @@ offs_t asap_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 					else if (rsrc2_iszero)
 					{
 						if (rsrc1 == 28)
-							flags = STEP_OUT;
+							flags = STEP_OUT | step_over_extra(1);
 						util::stream_format(stream, "jmp%s  %s", setcond[cond], reg[rsrc1]);
 					}
 					else

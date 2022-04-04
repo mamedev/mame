@@ -364,17 +364,6 @@ INPUT_PORTS_END
 
 /****************************************************************************/
 
-static const gfx_layout layout_bg =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4,0,12,8,20,16,28,24 },
-	{ STEP8(0,32) },
-	8*8*4
-};
-
 static const gfx_layout layout_p103a =
 {
 	32,32,
@@ -398,7 +387,7 @@ static const gfx_layout layout_spr =
 };
 
 static GFXDECODE_START( gfx_himesiki )
-	GFXDECODE_ENTRY( "bgtiles",   0, layout_bg, 0x000, 16 )
+	GFXDECODE_ENTRY( "bgtiles",   0, gfx_8x8x4_packed_lsb, 0x000, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_spr, 0x200, 16 )
 	GFXDECODE_ENTRY( "spr_p103a", 0, layout_p103a, 0x200, 16 )
 GFXDECODE_END

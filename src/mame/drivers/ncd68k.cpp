@@ -124,9 +124,9 @@ protected:
 	required_device<screen_device> m_screen;
 
 //private:
-	u8 m_portc, m_to_68k, m_from_68k;
-	u8 m_porta_in, m_porta_out;
-	u8 m_portb_out;
+	u8 m_portc = 0, m_to_68k = 0, m_from_68k = 0;
+	u8 m_porta_in = 0, m_porta_out = 0;
+	u8 m_portb_out = 0;
 };
 
 class ncd16_state : public ncd68k_state

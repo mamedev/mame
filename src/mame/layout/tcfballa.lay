@@ -36,7 +36,7 @@ license:CC0
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.25" blue="0.26" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 	<element name="seg" defstate="0">
 		<rect>
@@ -45,15 +45,15 @@ license:CC0
 		</rect>
 		<rect state="0">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="0.13" green="0.0325" blue="0.0338" />
+			<color red="0.1" green="0.01" blue="0.015" />
 		</rect>
 		<rect state="1">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="0.5" green="0.125" blue="0.13" />
+			<color red="0.5" green="0.05" blue="0.075" />
 		</rect>
 		<rect state="2">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="1.0" green="0.25" blue="0.26" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</rect>
 	</element>
 

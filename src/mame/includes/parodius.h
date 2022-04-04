@@ -37,9 +37,9 @@ public:
 	{ }
 
 	/* video-related */
-	int        m_layer_colorbase[3];
-	int        m_sprite_colorbase;
-	int        m_layerpri[3];
+	int        m_layer_colorbase[3]{};
+	int        m_sprite_colorbase = 0;
+	int        m_layerpri[3]{};
 
 	/* misc */
 	//int        m_nmi_enabled;

@@ -58,7 +58,7 @@ private:
 	uint8_t m_prot_bit_index = 0U;
 	uint16_t m_prot_save = 0U;
 	typedef void (artmagic_state::*prot_func)();
-	prot_func m_protection_handler;
+	prot_func m_protection_handler{};
 	void ultennis_protection();
 	void cheesech_protection();
 	void stonebal_protection();

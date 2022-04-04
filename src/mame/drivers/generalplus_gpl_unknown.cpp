@@ -66,7 +66,7 @@ private:
 
 	required_region_ptr<uint16_t> m_spirom;
 	required_ioport m_testio;
-	
+
 	uint16_t reg3001_r(offs_t offset);
 	void reg3001_w(offs_t offset, uint16_t data);
 	uint16_t reg3002_r(offs_t offset);
@@ -262,7 +262,7 @@ void generalplus_gpl_unknown_state::reg3034_w(offs_t offset, uint16_t data)
 
 void generalplus_gpl_unknown_state::reg3041_audiodac_w(offs_t offset, uint16_t data)
 {
-//	logerror("%s: reg3041_audiodac_w %04x\n", machine().describe_context(), data);
+//  logerror("%s: reg3041_audiodac_w %04x\n", machine().describe_context(), data);
 
 	// mapacman only writes 0000 / 7fff / 8000, but is known to have more limited sound than other units
 
@@ -322,7 +322,7 @@ void generalplus_gpl_unknown_state::reg30e2_w(offs_t offset, uint16_t data)
 	/* this appears to be querying the SPI Flash, eg.
 	   command 0xab = Read Electonic Signature
 	   command 0x9f = Read ID of the SPI Flash
-	
+
 	[:] ':maincpu' (0075DD): reg3001_w 1c00
 	[:] ':maincpu' (00769B): reg3001_w 0c00
 	[:] ':maincpu' (00769F): reg30e2_w 00ab (WITHOUT m_3001 & 0x1000)
@@ -380,9 +380,9 @@ mapacman vectors
         4863 irq 1  - just acks by writing 4000 to 3051, no payload
         486A irq 2 (used - needed to pass check on value in RAM changing in boot) acks with 2000 to 3051
         487D irq 3 (used - needed to pass check on value in RAM changing shortly after) acks with 0100 to 3051?
-        4886 irq 4 - just acks by writing 10 to 3051, no payload 
+        4886 irq 4 - just acks by writing 10 to 3051, no payload
         488C irq 5 - push/pop/return
-        488F irq 6 - push/pop/return 
+        488F irq 6 - push/pop/return
         4892 irq 7 - minimal payload, no 3051 ack?
 */
 
@@ -429,15 +429,15 @@ void generalplus_gpl_unknown_state::reg3092_lcd_w(offs_t offset, uint16_t data)
 			/*
 			if (m_displayposx == 256)
 			{
-				m_displayposy++;
-				m_displayposx = 0;
+			    m_displayposy++;
+			    m_displayposx = 0;
 			}
 			*/
 			/*
 			if (m_displayposy == 128)
 			{
-				m_displayposy = 0;
-				m_displayposx = 0;
+			    m_displayposy = 0;
+			    m_displayposx = 0;
 			}
 			*/
 		}

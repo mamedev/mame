@@ -65,9 +65,9 @@ private:
 	required_device_array<ay8910_device, 2> m_psg;
 	required_device_array<i8212_device, 2> m_soundlatch;
 
-	u8 m_port1_data;
-	bool m_pcs[2];
-	bool m_latch_select;
+	u8 m_port1_data = 0;
+	bool m_pcs[2]{};
+	bool m_latch_select = 0;
 };
 
 void supstarf_state::main_map(address_map &map)

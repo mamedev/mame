@@ -89,16 +89,16 @@ private:
 
 	/* Video related */
 
-	int m_disp_enable;
-	int m_xor_paltype;
-	int m_xor_palette;
+	int m_disp_enable = 0;
+	int m_xor_paltype = 0;
+	int m_xor_palette = 0;
 
-	tilemap_t *m_tilemap;
-	tilemap_t *m_reel_tilemap;
+	tilemap_t *m_tilemap = nullptr;
+	tilemap_t *m_reel_tilemap = nullptr;
 
 	/* Misc related */
 
-	uint8_t m_rambk;
+	uint8_t m_rambk = 0;
 
 	uint8_t m_vid[igrosoft_gamble_VIDRAM_SIZE];
 	required_device<cpu_device> m_maincpu;

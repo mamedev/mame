@@ -1822,6 +1822,9 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case M_RETI:
 		flags = STEP_OUT;
 		break;
+	case M_DJNZ:
+		flags = STEP_COND;
+		break;
 	}
 
 	switch( dasm->operand1 )
@@ -1851,6 +1854,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CC:
 		util::stream_format(stream, " %s", s_cond[op & 0x0F]);
+		if ((op & 0x07) != 0 && dasm->mnemonic != M_SCC)
+			flags |= STEP_COND;
 		break;
 
 	case O_CR8:
@@ -2037,6 +2042,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CC:
 		util::stream_format(stream, ",%s", s_cond[op & 0x0F]);
+		if ((op & 0x07) != 0 && dasm->mnemonic != M_SCC)
+			flags |= STEP_COND;
 		break;
 
 	case O_CR8:

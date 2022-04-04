@@ -183,7 +183,7 @@ void nes_txc_22110_device::pcb_reset()
 void nes_ninjaryu_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("unl_ninjaryu write_h, offset: %04x, data: %02x\n", offset, data));
-	u8 reg = (offset >> 13) & 0x03;
+	u8 reg = BIT(offset, 13, 2);
 	m_reg[reg] = data;
 	update_regs(reg);
 }
@@ -399,7 +399,7 @@ u8 nes_srpg5in1_device::read_m(offs_t offset)
 void nes_txc_22110_device::update_banks()    // used by menu and Space Shadow
 {
 	u8 outer = (m_mode & 0x02) << 1;
-	prg16_89ab(outer | (m_latch0 & 0x30) >> 4);
+	prg16_89ab(outer | BIT(m_latch0, 4, 2));
 	prg16_cdef(outer | 3);
 	chr8(m_latch0 & 0x0f, CHRROM);
 }

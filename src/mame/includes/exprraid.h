@@ -52,12 +52,12 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* protection */
-	uint8_t           m_prot_value;
+	uint8_t           m_prot_value = 0U;
 
 	/* video-related */
-	tilemap_t       *m_bg_tilemap;
-	tilemap_t       *m_fg_tilemap;
-	int             m_bg_index[4];
+	tilemap_t       *m_bg_tilemap = nullptr;
+	tilemap_t       *m_fg_tilemap = nullptr;
+	int             m_bg_index[4]{};
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

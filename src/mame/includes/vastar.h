@@ -30,7 +30,7 @@ protected:
 
 	required_shared_ptr<uint8_t> m_sharedram;
 
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 
@@ -68,15 +68,15 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_priority;
 
 	// these are pointers into m_fgvideoram
-	uint8_t* m_bg1_scroll;
-	uint8_t* m_bg2_scroll;
-	uint8_t* m_spriteram1;
-	uint8_t* m_spriteram2;
-	uint8_t* m_spriteram3;
+	uint8_t* m_bg1_scroll = nullptr;
+	uint8_t* m_bg2_scroll = nullptr;
+	uint8_t* m_spriteram1 = nullptr;
+	uint8_t* m_spriteram2 = nullptr;
+	uint8_t* m_spriteram3 = nullptr;
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg1_tilemap;
-	tilemap_t *m_bg2_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg1_tilemap = nullptr;
+	tilemap_t *m_bg2_tilemap = nullptr;
 
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	void fgvideoram_w(offs_t offset, uint8_t data);

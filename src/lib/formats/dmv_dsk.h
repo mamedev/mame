@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_DMV_FORMAT;
+extern const dmv_format FLOPPY_DMV_FORMAT;
 
 #endif // MAME_FORMATS_DMV_DSK_H

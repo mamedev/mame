@@ -143,8 +143,8 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	std::unique_ptr<uint8_t []> m_videoram;
-	tilemap_t *m_bg_tilemap;
+	std::unique_ptr<uint8_t []> m_videoram{};
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -156,9 +156,9 @@ private:
 	required_device<ticket_dispenser_device> m_hopper;
 	output_finder<8> m_lamps;
 
-	uint8_t m_mc6845_address;
-	uint16_t m_video_update_address;
-	bool m_blink_state;
+	uint8_t m_mc6845_address = 0;
+	uint16_t m_video_update_address = 0;
+	bool m_blink_state = false;
 	static constexpr uint32_t videoram_size = 0x10000;
 };
 

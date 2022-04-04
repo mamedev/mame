@@ -69,16 +69,16 @@ private:
 	required_shared_ptr<uint16_t> ram;
 	required_device<mas3507d_device> mas3507d;
 
-	uint16_t crypto_key1, crypto_key2;
-	uint8_t crypto_key3;
+	uint16_t crypto_key1 = 0, crypto_key2 = 0;
+	uint8_t crypto_key3 = 0;
 
-	uint32_t mp3_start_addr, mp3_cur_addr, mp3_end_addr;
-	bool use_ddrsbm_fpga;
+	uint32_t mp3_start_addr = 0, mp3_cur_addr = 0, mp3_end_addr = 0;
+	bool use_ddrsbm_fpga = false;
 
-	bool is_stream_active, is_timer_active;
-	uint32_t counter_previous, counter_offset;
-	int32_t counter_current;
-	uint32_t last_playback_status;
+	bool is_stream_active = false, is_timer_active = false;
+	uint32_t counter_previous = 0, counter_offset = 0;
+	int32_t counter_current = 0;
+	uint32_t last_playback_status = 0;
 };
 
 #endif // MAME_MACHINE_K573FPGA_H

@@ -70,8 +70,8 @@ protected:
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg_tilemap[2];
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap[2]{};
 	int m_xscroll[2]{};
 	int m_yscroll[2]{};
 	int m_copy_sprites = 0;

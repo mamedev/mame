@@ -151,10 +151,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	uint8_t m_cop_port_l;
+	uint8_t m_cop_port_l = 0;
 
 	// tilemaps
-	tilemap_t * m_bg_tilemap;
+	tilemap_t * m_bg_tilemap = nullptr;
 
 	required_device<tms9995_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

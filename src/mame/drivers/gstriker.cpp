@@ -207,18 +207,6 @@ void gstriker_state::sh_bankswitch_w(uint8_t data)
 
 /*** GFX DECODE **************************************************************/
 
-static const gfx_layout gs_8x8x4_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-
-
 static const gfx_layout gs_16x16x4_layout =
 {
 	16,16,
@@ -236,9 +224,9 @@ static const gfx_layout gs_16x16x4_layout =
 };
 
 static GFXDECODE_START( gfx_gstriker )
-	GFXDECODE_ENTRY( "gfx1", 0, gs_8x8x4_layout,     0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0, gs_16x16x4_layout,   0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0, gs_16x16x4_layout,   0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb, 0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gs_16x16x4_layout,    0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0, gs_16x16x4_layout,    0, 256 )
 GFXDECODE_END
 
 

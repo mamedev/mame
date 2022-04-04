@@ -36,7 +36,7 @@ license:CC0
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.25" blue="0.26" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 	<element name="seg" defstate="0">
 		<rect>
@@ -45,15 +45,15 @@ license:CC0
 		</rect>
 		<rect state="0">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="0.13" green="0.0325" blue="0.0338" />
+			<color red="0.1" green="0.01" blue="0.015" />
 		</rect>
 		<rect state="1">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="0.5" green="0.125" blue="0.13" />
+			<color red="0.5" green="0.05" blue="0.075" />
 		</rect>
 		<rect state="2">
 			<bounds x="0.25" y="0.15" width="0.5" height="0.7" />
-			<color red="1.0" green="0.25" blue="0.26" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</rect>
 	</element>
 
@@ -69,13 +69,13 @@ license:CC0
 		<element ref="static_white"><bounds x="2" y="0" width="179" height="48" /></element>
 		<element ref="static_black"><bounds x="4" y="11" width="175" height="26" /></element>
 
-		<element name="digit7" ref="digit"><bounds x="19.5"  y="16" width="12" height="16" /></element>
-		<element name="digit6" ref="digit"><bounds x="35.5"  y="16" width="12" height="16" /></element>
-		<element name="digit5" ref="digit"><bounds x="67.5"  y="16" width="12" height="16" /></element>
-		<element name="digit4" ref="digit"><bounds x="83.5"  y="16" width="12" height="16" /></element>
-		<element name="digit3" ref="digit"><bounds x="99.5"  y="16" width="12" height="16" /></element>
-		<element name="digit1" ref="digit"><bounds x="131.5" y="16" width="12" height="16" /></element>
-		<element name="digit0" ref="digit"><bounds x="147.5" y="16" width="12" height="16" /></element>
+		<element name="digit7" ref="digit"><bounds x="21"  y="16" width="12" height="16" /></element>
+		<element name="digit6" ref="digit"><bounds x="37"  y="16" width="12" height="16" /></element>
+		<element name="digit5" ref="digit"><bounds x="69"  y="16" width="12" height="16" /></element>
+		<element name="digit4" ref="digit"><bounds x="85"  y="16" width="12" height="16" /></element>
+		<element name="digit3" ref="digit"><bounds x="101" y="16" width="12" height="16" /></element>
+		<element name="digit1" ref="digit"><bounds x="133" y="16" width="12" height="16" /></element>
+		<element name="digit0" ref="digit"><bounds x="149" y="16" width="12" height="16" /></element>
 
 		<element ref="static_white"><bounds x="58" y="1" width="2" height="46" /></element>
 		<element ref="static_white"><bounds x="123" y="1" width="2" height="46" /></element>

@@ -33,9 +33,9 @@ const s8 amis2000_disassembler::s_bits[] =
 const u32 amis2000_disassembler::s_flags[] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND, 0, 0,
+	0, STEP_COND, STEP_COND, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND,
 	0, 0, STEP_OVER, STEP_OUT, STEP_OUT, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };

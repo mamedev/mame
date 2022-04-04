@@ -80,8 +80,8 @@ private:
 	uint8_t m_pal[0x200];
 	uint32_t m_vram0[0x20000 / 4];
 	uint32_t m_vram1[0x20000 / 4];
-	uint8_t m_control;
-	uint8_t m_mux;
+	uint8_t m_control = 0;
+	uint8_t m_mux = 0;
 
 	uint8_t palette_low_r(offs_t offset);
 	uint8_t palette_high_r(offs_t offset);

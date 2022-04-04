@@ -50,4 +50,4 @@ const nascom_format::format nascom_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_NASCOM_FORMAT = &floppy_image_format_creator<nascom_format>;
+const nascom_format FLOPPY_NASCOM_FORMAT;

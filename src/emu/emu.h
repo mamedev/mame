@@ -38,7 +38,6 @@
 #include "profiler.h"
 
 // commonly-referenced utilities imported from lib/util
-#include "corealloc.h"
 #include "corefile.h"
 #include "delegate.h"
 #include "hash.h"

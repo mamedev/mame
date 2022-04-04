@@ -136,9 +136,9 @@ protected:
 	bool m_latcha_in;
 	bool m_latchb_in;
 	bool m_scanflag;
-	emu_timer* m_scan_timer;
+	emu_timer* m_scan_timer = nullptr;
 private:
-	emu_timer* m_resume_timer;
+	emu_timer* m_resume_timer = nullptr;
 };
 
 class hc120_state : public votrhv_state

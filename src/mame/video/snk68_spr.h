@@ -42,8 +42,8 @@ private:
 	required_device<screen_device> m_screen;
 	bool m_flipscreen;
 	int m_partialupdates; // the original hardware needs this, the cloned hardware does not.
-	u8  m_xpos_shift;
-	u16 m_color_entry_mask;
+	u8  m_xpos_shift = 0;
+	u16 m_color_entry_mask = 0;
 };
 
 

@@ -104,7 +104,7 @@ private:
 	void ram_w(uint8_t data);
 
 	std::unique_ptr<uint8_t[]> m_ram;
-	uint16_t m_ram_address;
+	uint16_t m_ram_address = 0;
 };
 
 void snesb51_state::snes_map(address_map &map)

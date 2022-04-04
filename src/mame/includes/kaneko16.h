@@ -101,9 +101,9 @@ protected:
 	optional_ioport m_eepromout_port;
 	optional_ioport_array<3> m_wheel_port;
 
-	u16 m_disp_enable;
+	u16 m_disp_enable = 0U;
 
-	int m_VIEW2_2_pri;
+	int m_VIEW2_2_pri = 0;
 
 	virtual void common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize);
 	void coin_lockout_w(u8 data);
@@ -215,8 +215,8 @@ private:
 	u16 berlwall_spriteregs_r(offs_t offset);
 	void berlwall_spriteregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	u8 m_bg15_select;
-	u8 m_bg15_bright;
+	u8 m_bg15_select = 0U;
+	u8 m_bg15_bright = 0U;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);

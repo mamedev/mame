@@ -85,22 +85,22 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
-	uint8_t m_bank;
-	const uint8_t *m_showdown_bank_data[2];
-	int8_t m_showdown_bank_select;
-	uint8_t m_showdown_bank_offset;
-	uint8_t m_firq_vblank;
-	uint8_t m_firq_beam;
-	uint8_t m_latched_x;
-	std::unique_ptr<uint8_t[]> m_local_videoram;
-	std::unique_ptr<uint8_t[]> m_local_paletteram;
-	uint8_t m_firq_enable;
-	uint8_t m_firq_select;
-	uint8_t m_palettebank_io;
-	uint8_t m_palettebank_vis;
-	emu_timer *m_beam_firq_timer;
-	emu_timer *m_collide_firq_timer;
-	uint8_t m_beam_firq_count;
+	uint8_t m_bank = 0U;
+	const uint8_t *m_showdown_bank_data[2]{};
+	int8_t m_showdown_bank_select = 0;
+	uint8_t m_showdown_bank_offset = 0U;
+	uint8_t m_firq_vblank = 0U;
+	uint8_t m_firq_beam = 0U;
+	uint8_t m_latched_x = 0U;
+	std::unique_ptr<uint8_t[]> m_local_videoram{};
+	std::unique_ptr<uint8_t[]> m_local_paletteram{};
+	uint8_t m_firq_enable = 0U;
+	uint8_t m_firq_select = 0U;
+	uint8_t m_palettebank_io = 0U;
+	uint8_t m_palettebank_vis = 0U;
+	emu_timer *m_beam_firq_timer = nullptr;
+	emu_timer *m_collide_firq_timer = nullptr;
+	uint8_t m_beam_firq_count = 0U;
 };
 
 
@@ -120,7 +120,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_topsecex_yscroll;
+	uint8_t m_topsecex_yscroll = 0U;
 };
 
 #endif // MAME_INCLUDES_EXIDY440_H

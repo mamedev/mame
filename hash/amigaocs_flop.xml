@@ -19,13 +19,13 @@ license:CC0
     - a generic "failed" means that most if not all tracks reports as bad (test didn't complete);
     - C refers to the Track number(s), H is the (U)pper, (L)ower head (if not omitted),
       "1 Sector Bad" reports as one sector being bad, otherwise "Bad" [Track];
-	Notice this is just an extra note added to identify disk behaviour with our FDC:
-	it has no value for the supported flag.
+    Notice this is just an extra note added to identify disk behaviour with our FDC:
+    it has no value for the supported flag.
 
-	Note that disk swaps are known to be quite fussy on Amiga.
-	As a rule of thumb it's really advised to not try a "live swap" of disks,
-	but instead unmount (empty) the disk buffer first then mount whatever the SW asks to.
-	This holds particularly true for anything that don't explictly asks for the user to press any key on devices.
+    Note that disk swaps are known to be quite fussy on Amiga.
+    As a rule of thumb it's really advised to not try a "live swap" of disks,
+    but instead unmount (empty) the disk buffer first then mount whatever the SW asks to.
+    This holds particularly true for anything that don't explictly asks for the user to press any key on devices.
 
     todo (SPS):
     - see if it's possible to better verify these images, the SPS dat only lists the (highly insecure) CRC32s so we're relying on trust here
@@ -19890,7 +19890,7 @@ ATK test: OK
 		<!-- Publisher: Prism Leisure -->
 		<publisher>Addictive</publisher>
 		<notes><![CDATA[
-Guru Meditation during Workbench load after pressing left mouse button on Hot Shot advertisement 
+Guru Meditation during Workbench load after pressing left mouse button on Hot Shot advertisement
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -36207,7 +36207,7 @@ ATK test: failed
 ATK test: OK
 ]]></notes>
 		<!-- TODO: untested afterwards -->
-		<info name="usage" value="Sports code wheel copy-protection"/> 
+		<info name="usage" value="Sports code wheel copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1051)operationharrier.ipf" size="1049612" crc="c1b27e88" sha1="e6a7a0ca4fbf3f4a041262009da77cdaba9c331f"/>
@@ -57088,7 +57088,7 @@ Enables AGA bitplanes == 7 even on OCS and ECS machines
 ATK test: failed
 ]]></notes>
 		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
-		<info name="usage" value="Sports code wheel copy-protection"/> 
+		<info name="usage" value="Sports code wheel copy-protection"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -57146,7 +57146,7 @@ Top-most score display is garbled, [Copper]
 [Paula] gives white noise on BGM loop
 ATK test: failed
 ]]></notes>
-		<info name="usage" value="Sports code wheel copy-protection"/> 
+		<info name="usage" value="Sports code wheel copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1009206">

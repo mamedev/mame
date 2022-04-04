@@ -101,8 +101,8 @@ private:
 	int m_vsync;                    // vertical sync
 	int m_vda;                      // valid data address
 
-	emu_timer *m_vsync_timer;       // vertical sync timer
-	emu_timer *m_flash_timer;       // flash timer
+	emu_timer *m_vsync_timer = nullptr;       // vertical sync timer
+	emu_timer *m_flash_timer = nullptr;       // flash timer
 };
 
 

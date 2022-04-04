@@ -821,28 +821,28 @@ void ide_hdd_device::device_start()
 
 void ide_hdd_device::device_reset()
 {
-	m_handle = m_image->get_chd_file();
 	m_disk = m_image->get_hard_disk_file();
 
 	if (m_disk != nullptr && !m_can_identify_device)
 	{
-		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
-		if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)
+		const auto &hdinfo = m_disk->get_info();
+		if (hdinfo.sectorbytes == IDE_DISK_SECTOR_SIZE)
 		{
-			m_num_cylinders = hdinfo->cylinders;
-			m_num_sectors = hdinfo->sectors;
-			m_num_heads = hdinfo->heads;
+			m_num_cylinders = hdinfo.cylinders;
+			m_num_sectors = hdinfo.sectors;
+			m_num_heads = hdinfo.heads;
 			if (PRINTF_IDE_COMMANDS) osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
 			osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
 		}
 
 		// build the features page
-		uint32_t metalength;
-		if (m_handle && !m_handle->read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, &m_buffer[0], 512, metalength))
+		std::vector<u8> ident;
+		m_disk->get_inquiry_data(ident);
+		if (ident.size() == 512)
 		{
 			for( int w = 0; w < 256; w++ )
 			{
-				m_identify_buffer[w] = (m_buffer[(w * 2) + 1] << 8) | m_buffer[w * 2];
+				m_identify_buffer[w] = (ident[(w * 2) + 1] << 8) | ident[w * 2];
 			}
 		}
 		else

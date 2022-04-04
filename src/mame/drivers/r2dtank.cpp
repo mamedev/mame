@@ -94,9 +94,9 @@ private:
 	required_device<ay8910_device> m_ay1;
 	required_device<ay8910_device> m_ay2;
 
-	uint8_t m_flipscreen;
-	uint32_t m_ttl74123_output;
-	uint8_t m_AY8910_selected;
+	uint8_t m_flipscreen = 0;
+	uint32_t m_ttl74123_output = 0;
+	uint8_t m_AY8910_selected = 0;
 
 	uint8_t audio_command_r();
 	void audio_command_w(uint8_t data);

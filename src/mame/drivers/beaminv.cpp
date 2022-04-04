@@ -77,10 +77,10 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* misc */
-	emu_timer  *m_interrupt_timer;
+	emu_timer  *m_interrupt_timer = nullptr;
 
 	/* input-related */
-	uint8_t      m_controller_select;
+	uint8_t      m_controller_select = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

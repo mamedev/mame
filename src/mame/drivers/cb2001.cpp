@@ -76,13 +76,13 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	int m_videobank;
-	int m_videomode;
-	tilemap_t *m_reel1_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	int m_other1;
-	int m_other2;
+	int m_videobank = 0;
+	int m_videomode = 0;
+	tilemap_t *m_reel1_tilemap = nullptr;
+	tilemap_t *m_reel2_tilemap = nullptr;
+	tilemap_t *m_reel3_tilemap = nullptr;
+	int m_other1 = 0;
+	int m_other2 = 0;
 
 	void cb2001_vidctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void cb2001_vidctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

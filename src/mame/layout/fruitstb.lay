@@ -48,7 +48,7 @@ copyright-holders: Grull Osgo, Roberto Fresca.
 			<bounds x="0" y="0.3" width="1" height="0.4" />
 		</text>
 	</element>
-	
+
 	<element name="stop4" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -61,7 +61,7 @@ copyright-holders: Grull Osgo, Roberto Fresca.
 			<bounds x="0" y="0.3" width="1" height="0.4" />
 		</text>
 	</element>
-	
+
 
 	<element name="take" defstate="0">
 		<rect state="1">
@@ -255,7 +255,7 @@ copyright-holders: Grull Osgo, Roberto Fresca.
 		</element>
 		<element name="lamp6" ref="stop2" inputtag="IN1" inputmask="0x01">
 			<bounds x="1.85" y="3.10" width="0.30" height="0.30" />
-		</element>		
+		</element>
 
 
 	</view>

@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "tms1400.h"
-#include "debugger.h"
 
 // TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pages), and adds a 3-level callstack
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100

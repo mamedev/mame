@@ -183,7 +183,7 @@ private:
 
 	int m_fb_current;
 
-	uint8_t *m_texture_ram;
+	uint8_t *m_texture_ram = nullptr;
 };
 
 template<bool UseZ>

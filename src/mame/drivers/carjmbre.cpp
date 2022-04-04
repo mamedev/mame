@@ -72,9 +72,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	bool m_nmi_enabled;
-	uint8_t m_bgcolor;
-	tilemap_t *m_tilemap;
+	bool m_nmi_enabled = false;
+	uint8_t m_bgcolor = 0;
+	tilemap_t *m_tilemap = nullptr;
 
 	void bgcolor_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);

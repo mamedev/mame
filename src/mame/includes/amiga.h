@@ -317,10 +317,10 @@ public:
 		, m_cia_1(*this, "cia_1")
 		, m_rs232(*this, "rs232")
 		, m_centronics(*this, "centronics")
-// 		, m_agnus(*this, "agnus")
-//		, m_denise(*this, "denise")
+//      , m_agnus(*this, "agnus")
+//      , m_denise(*this, "denise")
 		, m_copper(*this, "copper")
-//		, m_blitter(*this, "blitter")
+//      , m_blitter(*this, "blitter")
 		, m_paula(*this, "paula")
 		, m_fdc(*this, "fdc")
 		, m_screen(*this, "screen")
@@ -365,7 +365,7 @@ public:
 	/* chip RAM access */
 	uint16_t read_chip_ram(offs_t byteoffs)
 	{
-		// We use rand() here so that an attempt to go beyond the allocated chip RAM 
+		// We use rand() here so that an attempt to go beyond the allocated chip RAM
 		// (hopefully) doesn't go unnoticed.
 		// FIXME: most likely open bus instead.
 		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : machine().rand();

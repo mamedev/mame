@@ -90,14 +90,14 @@ private:
 
 	memory_bank_creator m_qs1000_bank;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_md_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_md_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
-	int m_spriteram_bit;
+	int m_spriteram_bit = 0;
 	bitmap_ind16 m_sprites_bitmap;
 	bitmap_ind8 m_sprites_bitmap_pri;
-	int m_prev_sprites_count;
+	int m_prev_sprites_count = 0;
 
 	void coincounter_w(u32 data);
 	void bg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -135,8 +135,8 @@ private:
 	uint8_t audiocpu_p3_r();
 	void audiocpu_p3_w(uint8_t data);
 
-	uint8_t m_audiocpu_p1;
-	uint8_t m_audiocpu_p3;
+	uint8_t m_audiocpu_p1 = 0;
+	uint8_t m_audiocpu_p3 = 0;
 };
 
 /*****************************************************************************************************

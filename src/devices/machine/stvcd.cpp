@@ -478,12 +478,12 @@ int stvcd_device::get_track_index(uint32_t fad)
 	uint32_t rel_fad;
 	uint8_t track;
 
-	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad)) != CD_TRACK_AUDIO)
+	if(cdrom->get_track_type(cdrom->get_track(fad)) != cdrom_file::CD_TRACK_AUDIO)
 		return 1;
 
-	track = cdrom_get_track( cdrom, fad );
+	track = cdrom->get_track( fad );
 
-	rel_fad = fad - cdrom_get_track_start( cdrom, track );
+	rel_fad = fad - cdrom->get_track_start( track );
 
 	if(rel_fad < 150)
 		return 0;
@@ -493,15 +493,22 @@ int stvcd_device::get_track_index(uint32_t fad)
 
 int stvcd_device::sega_cdrom_get_adr_control(cdrom_file *file, int track)
 {
-	return bitswap<8>(cdrom_get_adr_control(file, cur_track),3,2,1,0,7,6,5,4);
+	return bitswap<8>(file->get_adr_control(cur_track),3,2,1,0,7,6,5,4);
 }
 
 void stvcd_device::cr_standard_return(uint16_t cur_status)
 {
-	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
+	if (!cdrom)
+	{
+		cr1 = cur_status;
+		cr2 = 0;
+		cr3 = 0;
+		cr4 = 0;
+	}
+	else if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
 	{
 		/* During seek state, values returned are from the target position */
-		uint8_t seek_track = cdrom_get_track(cdrom, cd_fad_seek-150);
+		uint8_t seek_track = cdrom->get_track(cd_fad_seek-150);
 
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf);
 		cr2 =  (seek_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, seek_track)<<8) | seek_track);
@@ -511,7 +518,7 @@ void stvcd_device::cr_standard_return(uint16_t cur_status)
 	else
 	{
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
-		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, cur_track)<<8) | (cdrom_get_track(cdrom, cd_curfad-150)+1));
+		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, cur_track)<<8) | (cdrom->get_track(cd_curfad-150)+1));
 		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
 		cr4 = cd_curfad;
 	}
@@ -761,7 +768,7 @@ void stvcd_device::cmd_play_disc()
 				cd_curfad = start_pos & 0xfffff;
 
 			logerror("fad mode\n");
-			cur_track = cdrom_get_track(cdrom, cd_curfad-150);
+			cur_track = cdrom->get_track(cd_curfad-150);
 		}
 		else
 		{
@@ -769,7 +776,7 @@ void stvcd_device::cmd_play_disc()
 			if(((start_pos)>>8) != 0)
 			{
 				cur_track = (start_pos)>>8;
-				cd_fad_seek = cdrom_get_track_start(cdrom, cur_track-1);
+				cd_fad_seek = cdrom->get_track_start(cur_track-1);
 				cd_stat = CD_STAT_SEEK;
 				m_cdda->pause_audio(0);
 			}
@@ -795,7 +802,7 @@ void stvcd_device::cmd_play_disc()
 			uint8_t end_track;
 
 			end_track = (end_pos)>>8;
-			fadstoplay = cdrom_get_track_start(cdrom, end_track) - cd_fad_seek;
+			fadstoplay = cdrom->get_track_start(end_track) - cd_fad_seek;
 		}
 	}
 	else    // play until the end of the disc
@@ -811,9 +818,9 @@ void stvcd_device::cmd_play_disc()
 			else
 			{
 				if(end_pos == 0)
-					fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
+					fadstoplay = (cdrom->get_track_start(0xaa)) - cd_curfad;
 				else
-					fadstoplay = (cdrom_get_track_start(cdrom, (end_pos & 0xff00) >> 8)) - cd_curfad;
+					fadstoplay = (cdrom->get_track_start((end_pos & 0xff00) >> 8)) - cd_curfad;
 			}
 			logerror("track mode %08x %08x\n",cd_curfad,fadstoplay);
 		}
@@ -828,8 +835,8 @@ void stvcd_device::cmd_play_disc()
 			// be countless possible combinations ...
 			if(fadstoplay == 0)
 			{
-				cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
-				fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
+				cd_curfad = cdrom->get_track_start(cur_track-1);
+				fadstoplay = cdrom->get_track_start(cur_track) - cd_curfad;
 			}
 			logerror("track resume %08x %08x\n",cd_curfad,fadstoplay);
 		}
@@ -845,7 +852,7 @@ void stvcd_device::cmd_play_disc()
 	playtype = 0;
 
 	// cdda
-	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
+	if(cdrom->get_track_type(cdrom->get_track(cd_curfad)) == cdrom_file::CD_TRACK_AUDIO)
 	{
 		m_cdda->pause_audio(0);
 		//m_cdda->start_audio(cd_curfad, fadstoplay);
@@ -892,7 +899,7 @@ void stvcd_device::cmd_seek_disc()
 		{
 			cd_stat = CD_STAT_PAUSE;
 			cur_track = cr2>>8;
-			cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+			cd_curfad = cdrom->get_track_start(cur_track-1);
 			m_cdda->pause_audio(1);
 			// (index is cr2 low byte)
 		}
@@ -952,13 +959,13 @@ void stvcd_device::cmd_get_subcode_q_rw_channel()
 			xxxx xxxx [11] CRCC
 			*/
 
-			msf_abs = lba_to_msf_alt( cd_curfad - 150 );
-			track = cdrom_get_track( cdrom, cd_curfad );
-			msf_rel = lba_to_msf_alt( cd_curfad - 150 - cdrom_get_track_start( cdrom, track ) );
+			msf_abs = cdrom_file::lba_to_msf_alt( cd_curfad - 150 );
+			track = cdrom->get_track( cd_curfad );
+			msf_rel = cdrom_file::lba_to_msf_alt( cd_curfad - 150 - cdrom->get_track_start( track ) );
 
 			xfertype = XFERTYPE_SUBQ;
 			xfercount = 0;
-			subqbuf[0] = 0x01 | ((cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, track+1)) == CD_TRACK_AUDIO) ? 0x00 : 0x40);
+			subqbuf[0] = 0x01 | ((cdrom->get_track_type(cdrom->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
 			subqbuf[1] = dec_2_bcd(track+1);
 			subqbuf[2] = dec_2_bcd(get_track_index(cd_curfad));
 			subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
@@ -1912,6 +1919,11 @@ void stvcd_device::cd_exec_command()
 		1)
 		logerror("Command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
+	if(!cdrom && ((cr1 >> 8) & 0xff) != 0x00) {
+		hirqreg |= (CMOK);
+		return;
+	}
+
 	switch ((cr1 >> 8) & 0xff)
 	{
 		case 0x00: cmd_get_status(); break;
@@ -2000,13 +2012,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sh1_sim )
 
 TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 {
+	if(!cdrom)
+		return;
+
 	//m_sector_timer->reset();
 
 	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);
 
 	cd_playdata();
 
-	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
+	if(cdrom->get_track_type(cdrom->get_track(cd_curfad)) == cdrom_file::CD_TRACK_AUDIO)
 		m_sector_timer->adjust(attotime::from_hz(75));    // 75 sectors / second = 150kBytes/second (cdda track ignores cd_speed setting)
 	else
 		m_sector_timer->adjust(attotime::from_hz(75*cd_speed));   // 75 / 150 sectors / second = 150 / 300kBytes/second
@@ -2069,7 +2084,7 @@ void stvcd_device::device_reset()
 	for (i = 0; i < MAX_BLOCKS; i++)
 	{
 		blocks[i].size = -1;
-		memset(&blocks[i].data, 0, CD_MAX_SECTOR_DATA);
+		memset(&blocks[i].data, 0, cdrom_file::MAX_SECTOR_DATA);
 	}
 
 	// open device
@@ -2384,7 +2399,7 @@ void stvcd_device::cd_readTOC(void)
 
 	if (cdrom)
 	{
-		ntrks = cdrom_get_last_track(cdrom);
+		ntrks = cdrom->get_last_track();
 	}
 	else
 	{
@@ -2409,7 +2424,7 @@ void stvcd_device::cd_readTOC(void)
 		{
 			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
 			//HACK: ddsom does not enter ingame with the line above!
-			tocbuf[tocptr] = cdrom_get_adr_control(cdrom, i)<<4 | 0x01;
+			tocbuf[tocptr] = cdrom->get_adr_control(i)<<4 | 0x01;
 		}
 		else
 		{
@@ -2418,7 +2433,7 @@ void stvcd_device::cd_readTOC(void)
 
 		if (cdrom)
 		{
-			fad = cdrom_get_track_start(cdrom, i) + 150;
+			fad = cdrom->get_track_start(i) + 150;
 
 			tocbuf[tocptr+1] = (fad>>16)&0xff;
 			tocbuf[tocptr+2] = (fad>>8)&0xff;
@@ -2459,7 +2474,7 @@ void stvcd_device::cd_readTOC(void)
 	tocbuf[tocptr+7] = 0;
 
 	// get total disc length (start of lead-out)
-	fad = cdrom_get_track_start(cdrom, 0xaa) + 150;
+	fad = cdrom->get_track_start(0xaa) + 150;
 
 	tocbuf[tocptr+8] = tocbuf[0];
 	tocbuf[tocptr+9]  = (fad>>16)&0xff;
@@ -2493,7 +2508,7 @@ stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype,
 			}
 		}
 
-		if ((trktype != CD_TRACK_AUDIO) && (curblock.data[15] == 2))
+		if ((trktype != cdrom_file::CD_TRACK_AUDIO) && (curblock.data[15] == 2))
 		{
 			if (flt->mode & 1)  // file number
 			{
@@ -2630,27 +2645,27 @@ stvcd_device::partitionT *stvcd_device::cd_read_filtered_sector(int32_t fad, uin
 	if ((cddevice != nullptr) && (!buffull))
 	{
 		// find out the track's type
-		trktype = cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad-150));
+		trktype = cdrom->get_track_type(cdrom->get_track(fad-150));
 
 		// now get a raw 2352 byte sector - if it's mode 1, get mode1_raw
-		if ((trktype == CD_TRACK_MODE1) || (trktype == CD_TRACK_MODE1_RAW))
+		if ((trktype == cdrom_file::CD_TRACK_MODE1) || (trktype == cdrom_file::CD_TRACK_MODE1_RAW))
 		{
-			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE1_RAW);
+			cdrom->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_MODE1_RAW);
 		}
-		else if (trktype != CD_TRACK_AUDIO) // if not audio it must be mode 2 so get mode2_raw
+		else if (trktype != cdrom_file::CD_TRACK_AUDIO) // if not audio it must be mode 2 so get mode2_raw
 		{
-			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE2_RAW);
+			cdrom->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_MODE2_RAW);
 		}
 		else
 		{
-			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_AUDIO);
+			cdrom->read_data(fad-150, curblock.data, cdrom_file::CD_TRACK_AUDIO);
 		}
 
 		curblock.size = sectlenin;
 		curblock.FAD = fad;
 
 		// if track is Mode 2, get the subheader values
-		if ((trktype != CD_TRACK_AUDIO) && (curblock.data[15] == 2))
+		if ((trktype != cdrom_file::CD_TRACK_AUDIO) && (curblock.data[15] == 2))
 		{
 			curblock.chan = curblock.data[17];
 			curblock.fnum = curblock.data[16];
@@ -2714,7 +2729,7 @@ void stvcd_device::cd_playdata()
 			{
 				uint8_t p_ok;
 
-				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+				if(cdrom->get_track_type(cdrom->get_track(cd_curfad)) != cdrom_file::CD_TRACK_AUDIO)
 				{
 					cd_read_filtered_sector(cd_curfad,&p_ok);
 					m_cdda->stop_audio(); //stop any pending CD-DA
@@ -2752,8 +2767,8 @@ void stvcd_device::cd_playdata()
 							if(cdda_repeat_count < 0xe)
 								cdda_repeat_count++;
 
-							cd_curfad = cdrom_get_track_start(cdrom, cur_track-1) + 150;
-							fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
+							cd_curfad = cdrom->get_track_start(cur_track-1) + 150;
+							fadstoplay = cdrom->get_track_start(cur_track) - cd_curfad;
 						}
 					}
 				}
@@ -2767,7 +2782,7 @@ void stvcd_device::cd_readblock(uint32_t fad, uint8_t *dat)
 {
 	if (cdrom)
 	{
-		cdrom_read_data(cdrom, fad-150, dat, CD_TRACK_MODE1);
+		cdrom->read_data(fad-150, dat, cdrom_file::CD_TRACK_MODE1);
 	}
 }
 

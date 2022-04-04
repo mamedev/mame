@@ -189,14 +189,14 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* misc */
-	int m_blink_count;
-	uint8_t m_sound_latch;
-	uint8_t m_last_sound_data;
-	uint8_t m_protection_data;
-	uint8_t m_flip_screen;
+	int m_blink_count = 0;
+	uint8_t m_sound_latch = 0;
+	uint8_t m_last_sound_data = 0;
+	uint8_t m_protection_data = 0;
+	uint8_t m_flip_screen = 0;
 
-	emu_timer *m_interrupt_clear_timer;
-	emu_timer *m_interrupt_assert_timer;
+	emu_timer *m_interrupt_clear_timer = nullptr;
+	emu_timer *m_interrupt_assert_timer = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

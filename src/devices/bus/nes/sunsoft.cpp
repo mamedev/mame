@@ -426,7 +426,7 @@ uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 /*-------------------------------------------------
@@ -542,7 +542,7 @@ uint8_t nes_sunsoft_fme7_device::read_m(offs_t offset)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
 	}
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 

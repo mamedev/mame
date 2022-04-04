@@ -163,10 +163,10 @@ private:
 	required_shared_ptr<uint8_t> m_ram_attr;
 	required_shared_ptr<uint8_t> m_ram_video;
 	std::unique_ptr<uint8_t[]> m_ram_palette;
-	uint8_t m_lscnblk;
-	int m_extra_video_bank_bit;
-	int m_question_address;
-	int m_decryption_key;
+	uint8_t m_lscnblk = 0;
+	int m_extra_video_bank_bit = 0;
+	int m_question_address = 0;
+	int m_decryption_key = 0;
 	optional_shared_ptr<uint8_t> m_backup_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device_array<i8255_device, 2> m_ppi;

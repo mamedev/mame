@@ -180,8 +180,8 @@ protected:
 	void mem(address_map &map);
 
 	required_device<ay8910_device> m_aysnd; // only faceoffh
-	uint8_t m_ay_cmd;
-	uint8_t m_ay_data;
+	uint8_t m_ay_cmd = 0;
+	uint8_t m_ay_data = 0;
 };
 
 
