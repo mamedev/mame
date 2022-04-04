@@ -4125,7 +4125,6 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<!-- mouse cursor is jumpy -->
 	<!-- TODO: investigate over [SIO] usage -->
 	<!-- Requires floppies to not be write protected -->
 	<software name="balpower" supported="partial">
@@ -53064,7 +53063,8 @@ ExtractDisk  [02]"Disk_B          " -> "pakapaka shoboken dp_02.d88"
 	</software>
 
 	<!-- "PLAY6 file not found", asks for "Login drive"? -->
-	<!-- TODO: throws boot failed if PC8801MA is set to 8MHz, correct? -->
+	<!-- Throws a "boot failed" if PC8801MA is set to 8MHz, definitely a bug given that SW has CPU clock icon detection -->
+	<!-- Has [3301] b&w attribute shift bug -->
 	<software name="play6lim" supported="no">
 		<description>Play6 Limited Version</description>
 		<year>1999</year>
@@ -56411,8 +56411,11 @@ ExtractDisk  [02]"System Disk    " -> "jet-8801a v2.00_02.d88"
 		</part>
 	</software>
 
-	<!-- Wrong GFX colors -->
-	<software name="jettermi" supported="partial">
+	<!-- Has [3301] b&w attribute shift bug -->
+	<!-- TERM option likely requires a [serial] terminal connection of some kind -->
+	<!-- Has several [printer] and [serial] mouse options -->
+	<!-- Tends to lock up on extensive use, [FDC] throws HALT warnings -->
+	<software name="jettermi" supported="no">
 		<description>JET-Terminal v1.0</description>
 		<year>1986</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -56430,7 +56433,6 @@ ExtractDisk  [02]"ﾃﾞｰﾀ          " -> "kaseijin_02.d88"
 	<!-- Hangs when selecting mic option on top right "User Voice" -->
 	<!-- [loops on OPNA EOS status that never goes high, then waits for RAM $6c54 != 0x02] -->
 	<!-- Gives random "Disk I/O" errors when accessing files (last option on top), loads fine when trying again -->
-	<!-- Mouse inputs doesn't work (icon option on top near "CLEAR" icon), [serial]? -->
 	<software name="kaseijin" supported="no">
 		<!-- Title from boot -->
 		<description>Kasei-Jin</description>

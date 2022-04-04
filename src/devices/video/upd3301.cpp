@@ -615,6 +615,7 @@ UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 	}
 
 	// TODO: may actually fetch in LIFO order
+	// Some edge cases in pc8801 N88 Basic (status on bottom), jettermi and play6lim backs up this theory.
 	for (int ex = 0; ex < attr_fifo_size; ex+=2)
 	{
 		u8 attr_start = std::min(attr_row[ex], attr_max_size);

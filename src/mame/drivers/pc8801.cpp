@@ -24,7 +24,7 @@
       - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
         Needs identification effort about what's internal to machine models and what instead
         can be optionally installed;
-    - implement proper joypad / mouse (PC-8872) port connector;
+    - implement proper joypad / mouse (PC-8872) DB9 port connector;
     - implement bus slot mechanism for NEC boards
       (does it have an actual codename or just "PC-8801 EXPansion bus"?);
       \- NEC PC-8801-10
@@ -61,10 +61,6 @@
             (same as HIBIKI-8800 board?)
       \- JMB-X1
             ("Sound Board X", 2x OPM + 1x SSG. Used by NRTDRV, more info at GH #8709);
-
-    list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> regressed with current floppy code):
-    - P1 (app)
-    - Super TII (app)
 
     Notes:
     - Later models have washed out palette with some SWs, with no red component.
@@ -186,8 +182,8 @@ UPD3301_FETCH_ATTRIBUTE( pc8801_state::attr_fetch )
 	const u8 attr_max_size = 80;
 	std::array<u16, attr_max_size> attr_extend_info = pc8001_base_state::attr_fetch(attr_row, gfx_mode, y, attr_fifo_size, row_size);
 	// In case we are in a b&w mode copy the attribute structure in an internal buffer for color processing.
-	// TBD if decoration attributes applies to bitmap as well
-	if ((m_gfx_ctrl & 0x18) == 0x08)
+	// TBD if decoration attributes applies to bitmap as well (very likely)
+	if ((m_gfx_ctrl & 0x18) == 0x08 && gfx_mode == 2)
 	{
 		for (int ey = y; ey < y + m_crtc->lines_per_char(); ey ++)
 			for (int ex = 0; ex < attr_max_size; ex ++)
@@ -280,8 +276,8 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				//    that runs in 3bpp)
 				draw_bitmap(bitmap, cliprect, m_crtc_palette, [&](u32 bitmap_offset, int y, int x, int xi){
 					u8 res = 0;
-					// HW pick ups just the first two planes (R and G), B is unused.
-					// Plane switch happens at half screen
+					// HW pick ups just the first two planes (R and B), G is unused for drawing purposes.
+					// Plane switch happens at half screen, VRAM areas 0x3e80-0x3fff is unused again.
 					// TODO: confirm that a 15 kHz monitor cannot work with this
 					// - jettermi just uses the other b&w mode;
 					// - casablan doesn't bother in changing resolution so only the upper part is drawn;
