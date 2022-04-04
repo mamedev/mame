@@ -528,6 +528,17 @@ void z80_device::wm(uint16_t addr, uint8_t value)
 inline void z80_device::wm16(uint16_t addr, PAIR &r)
 {
 	m_icount_executing -= MTM;
+	wm(addr, r.b.l);
+	m_icount_executing += MTM;
+	wm(addr+1, r.b.h);
+}
+
+/***************************************************************
+ * Write a word to given memory location (backword)
+ ***************************************************************/
+inline void z80_device::wm16back(uint16_t addr, PAIR &r)
+{
+	m_icount_executing -= MTM;
 	wm(addr+1, r.b.h);
 	m_icount_executing += MTM;
 	wm(addr, r.b.l);
@@ -603,7 +614,7 @@ inline void z80_device::pop(PAIR &r)
 inline void z80_device::push(PAIR &r)
 {
 	SP -= 2;
-	wm16(SPD, r);
+	wm16back(SPD, r);
 }
 
 /***************************************************************
@@ -1007,7 +1018,7 @@ inline void z80_device::ex_sp(PAIR &r)
 {
 	PAIR tmp = { { 0, 0, 0, 0 } };
 	rm16(SPD, tmp);
-	wm16(SPD, r);
+	wm16back(SPD, r);
 	r = tmp;
 	WZ = r.d;
 }
