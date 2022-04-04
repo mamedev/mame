@@ -22,7 +22,7 @@
  *         behaviour on NEC Z80 is still unknown.
  *      This Z80 emulator assumes a ZiLOG NMOS model.
  *
- *   Changes in 0.242:
+ *   Changes in 0.243:
  *    Fundation for M cycles emulation. Currently we preserve cc_* tables with total timings.
  *    execute_run() behavior (simplified) ...
  *    Before:
@@ -32,13 +32,11 @@
  *          + execute instruction
  *    Now:
  *      + fetch opcode
- *      + store M1 from cc_rop in m_icount_executing
  *      + call EXEC()
  *        + read cc_* value to m_icount_executing
- *        + apply M1 icount
  *          + execute instruction adjusting icount per each Read (arg(), recursive rop())
- *            + before Write (which is last Mn) use rest of m_icount_executing except count required for write
- *            + use rest m_icount_executing after write
+ *            + before M*Write use rest of m_icount_executing except count required for write
+ *            + adjust write icount
  *    Next:
  *      If gracefully adjust icount for each operation after read and before write we can receive precise M timings without cc_* tables.
  *   Changes in 3.9:
@@ -258,7 +256,7 @@ static const uint8_t cc_ed[0x100] = {
 	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 	8, 8,11,16, 4,10, 4, 5, 8, 8,11,16, 4,10, 4, 5,
 	8, 8,11,16, 4,10, 4, 5, 8, 8,11,16, 4,10, 4, 5,
-	8, 8,11,16, 4,10, 4,10, 8, 8,11,16, 4,10, 4,10,
+	8, 8,11,16, 4,10, 4,14, 8, 8,11,16, 4,10, 4,14,
 	8, 8,11,16, 4,10, 4, 4, 8, 8,11,16, 4,10, 4, 4,
 	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 	4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
@@ -284,29 +282,29 @@ static const uint8_t cc_xy[0x100] = {
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
 	 4, 4, 4, 4, 4, 4,15, 4, 4, 4, 4, 4, 4, 4,15, 4,
-	 5,10,10,10,10,11, 7,11, 5,10,10,12,10,17, 7,11, /* cb -> cc_xycb */
+	 5,10,10,10,10,11, 7,11, 5,10,10, 7,10,17, 7,11, /* cb -> cc_xycb */
 	 5,10,10,11,10,11, 7,11, 5, 4,10,11,10, 4, 7,11, /* dd -> cc_xy again */
-	 5,10,10,15,10,11, 7,11, 5, 4,10, 4,10, 4, 7,11, /* ed -> cc_ed */
+	 5,10,10,19,10,11, 7,11, 5, 4,10, 4,10, 4, 7,11, /* ed -> cc_ed */
 	 5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 4, 7,11  /* fd -> cc_xy again */
 };
 
 static const uint8_t cc_xycb[0x100] = {
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-	 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12
 };
 
 /* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
@@ -329,25 +327,26 @@ static const uint8_t cc_ex[0x100] = {
 	6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2
 };
 
-/* rop()|M1 usually takes 4(NOP|m_op[0]) cycles except some instructions.
-   This value is not intended to be added to instruction execution, just needed for M1 shift calculation in EXEC() after op fetch. */
-static const u8 cc_m1_ext[0x100] = {
-	0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
-	1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
-	0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
-	0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-	1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-	1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-	1, 0, 0, 0, 0, 1, 0, 1, 1, 2, 0, 0, 0, 0, 0, 0
+/* Extra refresh cycles expected for instruction. Note these number is not adding to instruction total timings,
+   just used for shifting icount before M-Write.
+   Opcodes defined as "+0" use direct adjustment in insruction function. */
+static const u8 cc_refresh[0x100] = {
+	 0, 0, 0, 2, 0, 0, 0, 0, 0, 7, 0, 2, 0, 0, 0, 0,
+	 1, 0, 0, 2, 0, 0, 0, 0, 0, 7, 0, 2, 0, 0, 0, 0,
+	 0, 0, 0, 2, 0, 0, 0, 0, 0, 7, 0, 2, 0, 0, 0, 0,
+	 0, 0, 0, 2, 0, 0, 0, 0, 0, 7, 0, 2, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	+0, 0, 0, 0, 0, 1, 0,+0,+0, 0, 0, 0, 0, 0, 0,+0,
+	+0, 0, 0, 0, 0, 1, 0,+0,+0, 0, 0, 0, 0, 0, 0,+0,
+	+0, 0, 0, 0, 0, 1, 0,+0,+0, 0, 0, 0, 0, 0, 0,+0,
+	+0, 0, 0, 0, 0, 1, 0,+0,+0, 2, 0, 0, 0, 0, 0,+0
 };
 
 #define m_cc_dd   m_cc_xy
@@ -368,17 +367,13 @@ static const u8 cc_m1_ext[0x100] = {
 	m_icount_executing -= icount; \
 } while (0)
 
-// M1 equals to NOP|m_op[0] typically implemented as rop() and takes 4 cycles
-#define M1T m_cc_op[0]
-// M2 tipically implemented as arg() and takes 1 cycle less (==3) than op fetch (M1|rop())
-#define M2T (M1T-1)
+// T Memory Address
+#define MTM (m_cc_op[0]-1)
 
 #define EXEC(prefix,opcode) do { \
 	unsigned op = opcode; \
-	int op_fetch_borrowed = m_icount_executing; /* rop() stores borrowed cycles */ \
-	m_icount_executing = 0; \
 	CC(prefix,op); \
-	T(op_fetch_borrowed); \
+	if (strcmp(#prefix, "op") == 0) m_refresh_waiting = (m_cc_refresh == nullptr ? 0 : m_cc_refresh[op]); \
 	switch(op) \
 	{  \
 	case 0x00:prefix##_##00();break; case 0x01:prefix##_##01();break; case 0x02:prefix##_##02();break; case 0x03:prefix##_##03();break; \
@@ -446,6 +441,7 @@ static const u8 cc_m1_ext[0x100] = {
 	case 0xf8:prefix##_##f8();break; case 0xf9:prefix##_##f9();break; case 0xfa:prefix##_##fa();break; case 0xfb:prefix##_##fb();break; \
 	case 0xfc:prefix##_##fc();break; case 0xfd:prefix##_##fd();break; case 0xfe:prefix##_##fe();break; case 0xff:prefix##_##ff();break; \
 	} \
+	refresh(); \
 	if(m_icount_executing) { T(m_icount_executing); } \
 } while (0)
 
@@ -479,7 +475,8 @@ inline void z80_device::leave_halt()
 inline uint8_t z80_device::in(uint16_t port)
 {
 	u8 res = m_io.read_byte(port);
-	T(M1T);
+	T(MTM);
+	refresh(1);
 	return res;
 }
 
@@ -488,9 +485,10 @@ inline uint8_t z80_device::in(uint16_t port)
  ***************************************************************/
 inline void z80_device::out(uint16_t port, uint8_t value)
 {
-	if(m_icount_executing != M1T) T(m_icount_executing - M1T);
+	refresh();
+	if(m_icount_executing != MTM) T(m_icount_executing - MTM);
 	m_io.write_byte(port, value);
-	T(M1T);
+	T(MTM);
 }
 
 /***************************************************************
@@ -499,7 +497,7 @@ inline void z80_device::out(uint16_t port, uint8_t value)
 uint8_t z80_device::rm(uint16_t addr)
 {
 	u8 res = m_data.read_byte(addr);
-	T(M2T);
+	T(MTM);
 	return res;
 }
 
@@ -517,10 +515,11 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
  ***************************************************************/
 void z80_device::wm(uint16_t addr, uint8_t value)
 {
+	refresh();
 	// As we don't count changes between read and write, simply adjust to the end of requested.
-	if(m_icount_executing != M2T) T(m_icount_executing - M2T);
+	if(m_icount_executing != MTM) T(m_icount_executing - MTM);
 	m_data.write_byte(addr, value);
-	T(M2T);
+	T(MTM);
 }
 
 /***************************************************************
@@ -528,9 +527,9 @@ void z80_device::wm(uint16_t addr, uint8_t value)
  ***************************************************************/
 inline void z80_device::wm16(uint16_t addr, PAIR &r)
 {
-	m_icount_executing -= M1T;
+	m_icount_executing -= MTM;
 	wm(addr, r.b.l);
-	m_icount_executing += M1T;
+	m_icount_executing += MTM;
 	wm(addr+1, r.b.h);
 }
 
@@ -545,12 +544,11 @@ uint8_t z80_device::rop()
 	PC++;
 	// Use leftovers from previous instruction. Mainly to support recursive EXEC(.., rop())
 	if(m_icount_executing) T(m_icount_executing);
+	m_r++;
 	uint8_t res = m_opcodes.read_byte(pc);
-	// Store borrowed cycles to be used by EXEC()
-	m_icount_executing = M1T + m_cc_m0_ext[res];
-	m_icount -= 2;
-	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
-	m_icount += 2;
+	T(m_cc_op[0]-2);
+	refresh(2);
+
 	return res;
 }
 
@@ -565,7 +563,7 @@ uint8_t z80_device::arg()
 	unsigned pc = PCD;
 	PC++;
 	u8 res = m_args.read_byte(pc);
-	T(M2T);
+	T(MTM);
 	return res;
 }
 
@@ -692,6 +690,7 @@ inline void z80_device::call_cond(bool cond, uint8_t opcode)
  ***************************************************************/
 inline void z80_device::ret_cond(bool cond, uint8_t opcode)
 {
+	refresh(1);
 	if (cond)
 	{
 		CC(ex, opcode);
@@ -730,6 +729,7 @@ inline void z80_device::ld_r_a()
 {
 	m_r = A;
 	m_r2 = A & 0x80; /* keep bit 7 of r */
+	refresh(1);
 }
 
 /***************************************************************
@@ -740,6 +740,7 @@ inline void z80_device::ld_a_r()
 	A = (m_r & 0x7f) | m_r2;
 	F = (F & CF) | SZ[A] | (m_iff2 << 2);
 	m_after_ldair = true;
+	refresh(1);
 }
 
 /***************************************************************
@@ -748,6 +749,7 @@ inline void z80_device::ld_a_r()
 inline void z80_device::ld_i_a()
 {
 	m_i = A;
+	refresh(1);
 }
 
 /***************************************************************
@@ -758,6 +760,7 @@ inline void z80_device::ld_a_i()
 	A = m_i;
 	F = (F & CF) | SZ[A] | (m_iff2 << 2);
 	m_after_ldair = true;
+	refresh(1);
 }
 
 /***************************************************************
@@ -765,6 +768,7 @@ inline void z80_device::ld_a_i()
  ***************************************************************/
 inline void z80_device::rst(uint16_t addr)
 {
+	refresh(1);
 	push(m_pc);
 	PCD = addr;
 	WZ = PC;
@@ -1026,6 +1030,7 @@ inline void z80_device::add16(PAIR &dr, PAIR &sr)
  ***************************************************************/
 inline void z80_device::adc_hl(PAIR &r)
 {
+	refresh(7);
 	uint32_t res = HLD + r.d + (F & CF);
 	WZ = HL + 1;
 	F = (((HLD ^ res ^ r.d) >> 8) & HF) |
@@ -1041,6 +1046,7 @@ inline void z80_device::adc_hl(PAIR &r)
  ***************************************************************/
 inline void z80_device::sbc_hl(PAIR &r)
 {
+	refresh(7);
 	uint32_t res = HLD - r.d - (F & CF);
 	WZ = HL + 1;
 	F = (((HLD ^ res ^ r.d) >> 8) & HF) | NF |
@@ -1222,6 +1228,7 @@ inline void z80_device::cpi()
  ***************************************************************/
 inline void z80_device::ini()
 {
+	refresh(1);
 	unsigned t;
 	uint8_t io = in(BC);
 	WZ = BC + 1;
@@ -1240,6 +1247,7 @@ inline void z80_device::ini()
  ***************************************************************/
 inline void z80_device::outi()
 {
+	refresh(1);
 	unsigned t;
 	uint8_t io = rm(HL);
 	B--;
@@ -1288,6 +1296,7 @@ inline void z80_device::cpd()
  ***************************************************************/
 inline void z80_device::ind()
 {
+	refresh(1);
 	unsigned t;
 	uint8_t io = in(BC);
 	WZ = BC - 1;
@@ -1306,6 +1315,7 @@ inline void z80_device::ind()
  ***************************************************************/
 inline void z80_device::outd()
 {
+	refresh(1);
 	unsigned t;
 	uint8_t io = rm(HL);
 	B--;
@@ -2257,8 +2267,7 @@ OP(dd,c7) { illegal_1(); op_c7();                            } /* DB   DD       
 OP(dd,c8) { illegal_1(); op_c8();                            } /* DB   DD          */
 OP(dd,c9) { illegal_1(); op_c9();                            } /* DB   DD          */
 OP(dd,ca) { illegal_1(); op_ca();                            } /* DB   DD          */
-OP(dd,cb) { eax(); u8 a=rop(); m_icount_executing = M1T; EXEC(xycb,a); // unlike rop() time is not cc_m1_ext but well known M1T
-                                                             } /* **   DD CB xx    */
+OP(dd,cb) { eax(); EXEC(xycb, arg());                        } /* **   DD CB xx    */
 OP(dd,cc) { illegal_1(); op_cc();                            } /* DB   DD          */
 OP(dd,cd) { illegal_1(); op_cd();                            } /* DB   DD          */
 OP(dd,ce) { illegal_1(); op_ce();                            } /* DB   DD          */
@@ -2549,8 +2558,7 @@ OP(fd,c7) { illegal_1(); op_c7();                            } /* DB   FD       
 OP(fd,c8) { illegal_1(); op_c8();                            } /* DB   FD          */
 OP(fd,c9) { illegal_1(); op_c9();                            } /* DB   FD          */
 OP(fd,ca) { illegal_1(); op_ca();                            } /* DB   FD          */
-OP(fd,cb) { eay(); u8 a=rop(); m_icount_executing = M1T; EXEC(xycb,a); // unlike rop() time is not cc_m1_ext but well known M1T
-                                                             } /* **   FD CB xx    */
+OP(fd,cb) { eay(); EXEC(xycb, arg());                        } /* **   FD CB xx    */
 OP(fd,cc) { illegal_1(); op_cc();                            } /* DB   FD          */
 OP(fd,cd) { illegal_1(); op_cd();                            } /* DB   FD          */
 OP(fd,ce) { illegal_1(); op_ce();                            } /* DB   FD          */
@@ -3139,7 +3147,7 @@ OP(op,c7) { rst(0x00);                                                          
 OP(op,c8) { ret_cond(F & ZF, 0xc8);                                               } /* RET  Z           */
 OP(op,c9) { pop(m_pc); WZ = PCD;                                                  } /* RET              */
 OP(op,ca) { jp_cond(F & ZF);                                                      } /* JP   Z,a         */
-OP(op,cb) { m_r++; EXEC(cb,rop());                                                } /* **** CB xx       */
+OP(op,cb) { EXEC(cb, rop());                                                      } /* **** CB xx       */
 OP(op,cc) { call_cond(F & ZF, 0xcc);                                              } /* CALL Z,a         */
 OP(op,cd) { call();                                                               } /* CALL a           */
 OP(op,ce) { adc_a(arg());                                                         } /* ADC  A,n         */
@@ -3159,7 +3167,7 @@ OP(op,d9) { exx();                                                              
 OP(op,da) { jp_cond(F & CF);                                                      } /* JP   C,a         */
 OP(op,db) { unsigned n = arg() | (A << 8); A = in(n); WZ = n + 1;                 } /* IN   A,(n)       */
 OP(op,dc) { call_cond(F & CF, 0xdc);                                              } /* CALL C,a         */
-OP(op,dd) { m_r++; EXEC(dd,rop());                                                } /* **** DD xx       */
+OP(op,dd) { EXEC(dd, rop());                                                      } /* **** DD xx       */
 OP(op,de) { sbc_a(arg());                                                         } /* SBC  A,n         */
 OP(op,df) { rst(0x18);                                                            } /* RST  3           */
 
@@ -3177,7 +3185,7 @@ OP(op,e9) { PC = HL;                                                            
 OP(op,ea) { jp_cond(F & PF);                                                      } /* JP   PE,a        */
 OP(op,eb) { ex_de_hl();                                                           } /* EX   DE,HL       */
 OP(op,ec) { call_cond(F & PF, 0xec);                                              } /* CALL PE,a        */
-OP(op,ed) { m_r++; EXEC(ed,rop());                                                } /* **** ED xx       */
+OP(op,ed) { EXEC(ed, rop());                                                      } /* **** ED xx       */
 OP(op,ee) { xor_a(arg());                                                         } /* XOR  n           */
 OP(op,ef) { rst(0x28);                                                            } /* RST  5           */
 
@@ -3195,7 +3203,7 @@ OP(op,f9) { SP = HL;                                                            
 OP(op,fa) { jp_cond(F & SF);                                                      } /* JP   M,a         */
 OP(op,fb) { ei();                                                                 } /* EI               */
 OP(op,fc) { call_cond(F & SF, 0xfc);                                              } /* CALL M,a         */
-OP(op,fd) { m_r++; EXEC(fd,rop());                                                } /* **** FD xx       */
+OP(op,fd) { EXEC(fd, rop());                                                      } /* **** FD xx       */
 OP(op,fe) { cp(arg());                                                            } /* CP   n           */
 OP(op,ff) { rst(0x38);                                                            } /* RST  7           */
 
@@ -3224,13 +3232,14 @@ void z80_device::take_interrupt()
 	leave_halt();
 
 	/* 'interrupt latency' cycles */
-	m_icount -= m_cc_ex[0xff];
+	m_icount -= m_cc_ex[0xff]; // 11
 
 	// clear both interrupt flip flops
 	m_iff1 = m_iff2 = 0;
 
 	// say hi
 	m_irqack_cb(true);
+	m_r++;
 
 	// fetch the IRQ vector
 	device_z80daisy_interface *intf = daisy_get_irq_device();
@@ -3245,7 +3254,7 @@ void z80_device::take_interrupt()
 		// even, and all 8 bits will be used; even $FF is handled normally.
 		irq_vector = (irq_vector & 0xff) | (m_i << 8);
 		/* CALL opcode timing */
-		m_icount_executing = m_cc_op[0xcd];
+		m_icount_executing = m_cc_op[0xcd]; // 17
 		PAIR new_pc;
 		rm16(irq_vector, new_pc);
 		push(m_pc);
@@ -3296,11 +3305,30 @@ void z80_device::take_interrupt()
 
 	}
 	WZ=PCD;
+	T(m_icount_executing);
 
 #if HAS_LDAIR_QUIRK
 	/* reset parity flag after LD A,I or LD A,R */
 	if (m_after_ldair) F &= ~PF;
 #endif
+}
+
+/* Takes N refresh cycles from current instruction m_icount_executing.
+In case N < 0 (default) takes all cycles provided in m_refresh_waiting.
+*/
+void z80_device::refresh(s8 cycles)
+{
+	u8 rcount = cycles;
+	if (cycles < 0)
+	{
+		rcount = m_refresh_waiting;
+		m_refresh_waiting = 0;
+	}
+	if (rcount) {
+		// Must be called N times?
+		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
+		T(rcount);
+	}
 }
 
 void nsc800_device::take_interrupt_nsc800()
@@ -3519,6 +3547,7 @@ void z80_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 	m_icount_executing = 0;
+	m_refresh_waiting = 0;
 
 	/* setup cycle tables */
 	m_cc_op = cc_op;
@@ -3527,7 +3556,7 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
-	m_cc_m0_ext = cc_m1_ext;
+	m_cc_refresh = cc_refresh;
 
 	m_irqack_cb.resolve_safe();
 	m_refresh_cb.resolve_safe();
@@ -3583,7 +3612,6 @@ void z80_device::execute_run()
 
 		// check for interrupts before each instruction
 		check_interrupts();
-		T(m_icount_executing);
 
 		m_after_ei = false;
 		m_after_ldair = false;
@@ -3591,7 +3619,6 @@ void z80_device::execute_run()
 		PRVPC = PCD;
 		debugger_instruction_hook(PCD);
 
-		m_r++;
 		uint8_t opcode = rop();
 
 		// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
@@ -3752,7 +3779,7 @@ std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
  * Generic set_info
  **************************************************************************/
 
-void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex, const uint8_t *m1_ext)
+void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex, const uint8_t *refresh)
 {
 	m_cc_op = (op != nullptr) ? op : cc_op;
 	m_cc_cb = (cb != nullptr) ? cb : cc_cb;
@@ -3760,7 +3787,7 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
 	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
 	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
-	m_cc_m0_ext = (m1_ext != nullptr) ? m1_ext : cc_m1_ext;
+	m_cc_refresh = refresh; // if refresh == nullptr, adjustment is disabled
 }
 
 

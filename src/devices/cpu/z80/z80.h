@@ -232,6 +232,7 @@ protected:
 	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
+	void refresh(s8 cycles = -1);
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -278,6 +279,7 @@ protected:
 
 	int               m_icount;
 	int               m_icount_executing;
+	int               m_refresh_waiting;
 	uint8_t           m_rtemp;
 	const uint8_t *   m_cc_op;
 	const uint8_t *   m_cc_cb;
@@ -285,7 +287,7 @@ protected:
 	const uint8_t *   m_cc_xy;
 	const uint8_t *   m_cc_xycb;
 	const uint8_t *   m_cc_ex;
-	const uint8_t *   m_cc_m0_ext;
+	const uint8_t *   m_cc_refresh;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

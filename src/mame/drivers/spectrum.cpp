@@ -333,7 +333,7 @@ void spectrum_state::adjust_contended(offs_t offset)
 	if(contended_pass >= attotime::zero && contended_left < attotime::zero) {
 		u64 clocks = m_maincpu->attotime_to_clocks(contended_pass);
 		u8 i = m_contention_pattern[clocks % m_contention_pattern.size()];
-		m_maincpu->adjust_icount(-i);
+		m_maincpu->eat_cycles(i);
 	}
 }
 
@@ -791,7 +791,8 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	timer_set(m_screen->time_until_pos(0), TIMER_IRQ_ON, 0);
+	// XXX experimentally adjusted. Must be defined in terms of INT latency of Z80
+	timer_set(m_screen->time_until_pos(0) + m_maincpu->cycles_to_attotime(24), TIMER_IRQ_ON, 0);
 
 	/* Default implementation performs screen updates per scanline. Some other
 	clones e.g. pentagon do updates based on video_ram access, border updates,
@@ -937,8 +938,10 @@ ROM_START(spectrum)
 	ROMX_LOAD("diagrom.v50",0x0000,0x4000, CRC(054a2d6a) SHA1(2fa6f3b31d7bb610df78be5c4c80537cf6e5911d), ROM_BIOS(26))
 	ROM_SYSTEM_BIOS(27, "diagv51", "DiagROM v1.51")
 	ROMX_LOAD("diagrom.v51",0x0000,0x4000, CRC(83034df6) SHA1(e57b2c8a8e3563ea02a20eecd1d4cb6be9f9c2df), ROM_BIOS(27))
-	ROM_SYSTEM_BIOS(28, "alford37", "Brian Alford's Test ROM v0.37")
-	ROMX_LOAD("testromv037.bin", 0x0000,0x4000, CRC(a7ea3d1c) SHA1(f699b73abfb1ab53c063ac02ac6283705864c734), ROM_BIOS(28))
+	ROM_SYSTEM_BIOS(28, "diagv56", "DiagROM v1.56")
+	ROMX_LOAD("diagrom.v56",0x0000,0x4000, CRC(0ed22f7a) SHA1(37caf0bbc2d023ca5afaa12b3856ac90dbc83c51), ROM_BIOS(28))
+	ROM_SYSTEM_BIOS(29, "alford37", "Brian Alford's Test ROM v0.37")
+	ROMX_LOAD("testromv037.bin", 0x0000,0x4000, CRC(a7ea3d1c) SHA1(f699b73abfb1ab53c063ac02ac6283705864c734), ROM_BIOS(29))
 ROM_END
 
 ROM_START(specide)
