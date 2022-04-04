@@ -5600,7 +5600,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="De-Ja II (Japan).bin" size="20815200" crc="ee465800" sha1="22cbd9814caefad3913dd12983497f997cf9273c"/>
 		<rom name="De-Ja II (Japan).cue" size="82" crc="ceebb22b" sha1="983dca7632cbab25026bbda8a1d3392259d6588f"/>
 		-->
-		<description>De-Ja II</description>
+		<description>De·Ja II</description>
 		<year>1992</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="serial" value="HMD-157 / AOBA-8"/>
