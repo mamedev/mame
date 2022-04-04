@@ -659,22 +659,6 @@ void nes_ac08_device::pcb_reset()
 	m_latch = 0xff;
 }
 
-void nes_mmalee_device::device_start()
-{
-	common_start();
-}
-
-void nes_mmalee_device::pcb_reset()
-{
-	chr8(0, CHRROM);
-	prg32(0);
-}
-
-void nes_rt01_device::device_start()
-{
-	common_start();
-}
-
 void nes_rt01_device::pcb_reset()
 {
 	chr2_0(0, CHRROM);

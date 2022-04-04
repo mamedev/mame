@@ -154,11 +154,6 @@ void nes_nrom_device::pcb_reset()
 	chr8(0, m_chr_source);
 }
 
-void nes_axrom_device::device_start()
-{
-	common_start();
-}
-
 void nes_axrom_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -166,18 +161,6 @@ void nes_axrom_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	set_nt_mirroring(PPU_MIRROR_LOW);
-}
-
-void nes_bxrom_device::device_start()
-{
-	common_start();
-}
-
-void nes_bxrom_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
 }
 
 void nes_cnrom_device::device_start()
@@ -195,11 +178,6 @@ void nes_cnrom_device::pcb_reset()
 	m_chr_open_bus = 0;
 }
 
-void nes_cprom_device::device_start()
-{
-	common_start();
-}
-
 void nes_cprom_device::pcb_reset()
 {
 	m_chr_source = CHRRAM;
@@ -208,46 +186,12 @@ void nes_cprom_device::pcb_reset()
 	chr4_4(0, m_chr_source);
 }
 
-void nes_gxrom_device::device_start()
-{
-	common_start();
-}
-
-void nes_gxrom_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_uxrom_device::device_start()
-{
-	common_start();
-}
-
 void nes_uxrom_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
-}
-
-void nes_uxrom_cc_device::device_start()
-{
-	common_start();
-}
-
-void nes_uxrom_cc_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_un1rom_device::device_start()
-{
-	common_start();
 }
 
 void nes_un1rom_device::pcb_reset()
