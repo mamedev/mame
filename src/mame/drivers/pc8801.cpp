@@ -63,51 +63,8 @@
             ("Sound Board X", 2x OPM + 1x SSG. Used by NRTDRV, more info at GH #8709);
 
     list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> regressed with current floppy code):
-    - Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING") (REGRESSED with current floppy code)
-    * Chikyuu Senshi Rayieza (fdc CPU crashes)
-    - Choplifter
-    - Columns (code at 0x28c8, copy protection)
-    - Corridor ("THIS SYSTEM NOT KOEI SYSTEM" printed on screen) (REGRESSED with current floppy code)
-    # Craze (returns to basic after logo pops up, tries to self-modify program data via the window offset?)
-    * Crimson
-    * Crimson 3
-    * Cuby Panic (copy protection routine at 0x911A)
-    - Databox (app)
-    - Day Dream ("Bad drive number at 570")
-    * Dennou Tsuushin
-    - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
-    * Dragon Slayer - The Legend of Heroes 2
-    * El Dorado Denki
-    - Emerald Densetsu (dies after few seconds of intro)
-    - Emerald Dragon (it seems to miss a timer)
-    - Explosion (fails to load ADPCM data?)
-    * F15 Strike Eagle
-    - F2 Grand Prix ("Boot dekimasen")
-    - Fantasian
-    - FSD Sample Ongaku Shuu Vol. 1-7
-    - Gaia no Kiba (Disk I/O error at 150)
-    - GC-clusterz Music Disk Vol. 1-7
-
-    - Kaseijin (app) (code snippet is empty at some point)
-    - Lamia: fails to create an user disk (after character creation) -> disk write error
-    - Mr. Pro Yakyuu
     - P1 (app)
-    - Pattern Editor 88 (app)
-    - Super Shunbo II (app) (Load error)
     - Super TII (app)
-    - Tobira wo Akete (random crashes in parent pc8801 only)
-
-    list of games that doesn't like i8214_irq_level == 5 in sound irq
-    - 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
-
-    games that needs to NOT have write-protect floppies (BTANBs):
-    - Balance of Power
-    - Blue Moon Story: moans with a kanji msg;
-    - Mahjong Clinic Zoukangou
-    - Tobira wo Akete (hangs at title screen)
-
-    games that needs to HAVE write-protect floppies (BTANBs):
-    - 100 Yen Disk 7: (doesn't boot in V2 mode)
 
     Notes:
     - Later models have washed out palette with some SWs, with no red component.

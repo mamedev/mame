@@ -4126,7 +4126,8 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 	</software>
 
 	<!-- mouse cursor is jumpy -->
-	<!-- TODO: investigate over SIO usage -->
+	<!-- TODO: investigate over [SIO] usage -->
+	<!-- Requires floppies to not be write protected -->
 	<software name="balpower" supported="partial">
 		<description>Balance of Power</description>
 		<year>1989</year>
@@ -4528,7 +4529,6 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 		</part>
 	</software>
 
-	<!-- wrong masking effect on Pasoket logo -->
 	<!-- Not extensively tested -->
 	<software name="bishojbg" supported="partial">
 		<description>Bishoujo Baseball Gakuen</description>
@@ -4858,6 +4858,7 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 		</part>
 	</software>
 
+	<!-- Requires floppies to not be write protected -->
 	<software name="bluemoon">
 		<description>Blue Moon Story</description>
 		<year>1989</year>
@@ -5631,11 +5632,9 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- [uPD3301] don't mask underlying bitmap on intro -->
-	<!-- [uPD3301] shows text layer frame glitches on gameplay scene transitions (more masking) -->
 	<!-- Keypresses on gameplay seems too fast (verify, PC8801MA) -->
-	<!-- Uses [DAC1BIT] during intro -->
-	<software name="cancanb" supported="no">
+	<!-- Uses [DAC1BIT] during intro, has aliasing issues -->
+	<software name="cancanb" supported="partial">
 		<description>Can Can Bunny</description>
 		<year>1989</year>
 		<publisher>カクテルソフト (Cocktail Soft)</publisher>
@@ -5659,11 +5658,9 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<!-- [uPD3301] don't mask underlying bitmap on intro -->
-	<!-- [uPD3301] shows text layer frame glitches on scene transitions (more masking) -->
 	<!-- Keypresses on gameplay seems too fast (verify, PC8801MA) -->
-	<!-- Uses [DAC1BIT] during intro -->
-	<software name="cancanba" cloneof="cancanb" supported="no">
+	<!-- Uses [DAC1BIT] during intro, has aliasing issues -->
+	<software name="cancanba" cloneof="cancanb" supported="partial">
 		<description>Can Can Bunny (alt?)</description>
 		<year>1989</year>
 		<publisher>カクテルソフト (Cocktail Soft)</publisher>
@@ -6241,8 +6238,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="chikyubo">
+	<!-- Crashes while loading, [FDC]? -->
+	<!-- [old note: disk i/o error during "ESDF SYSTEM LOADING", regressed with current floppy code] -->
+	<software name="chikyubo" supported="no">
 		<description>Chikyu Boeigun</description>
+		<!-- "1987" on loading -->
 		<year>1986</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<!-- PC8801 -->
@@ -6492,7 +6492,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	</software>
 
 	<!-- black screen -->
-	<!-- FDC stalls [never clears HALT state] -->
+	<!-- FDC stalls [never clears HALT state, PC=0x28c8] -->
 	<software name="columns" supported="no">
 		<description>Columns</description>
 		<year>1992</year>
@@ -6899,7 +6899,9 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<software name="craze">
+	<!-- Keeps resetting to BASIC after "Heart Denshi" logo kicks-in -->
+	<!-- [tries to self-modify program data via the window offset?] -->
+	<software name="craze" supported="no">
 		<description>Craze</description>
 		<year>1988</year>
 		<publisher>ハート電子 (Heart Denshi)</publisher>
@@ -7140,7 +7142,9 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<software name="crimson3">
+	<!-- Sports square glitches on gameplay area while loading -->
+	<!-- Not extensively tested -->
+	<software name="crimson3" supported="partial">
 		<description>Crimson 3</description>
 		<year>1990</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
@@ -7525,7 +7529,8 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<software name="cubypan">
+	<!-- Seldomly crashes (cannot reproduce reliably, ["copy protection routine at PC=0x911A", old note] -->
+	<software name="cubypan" supported="no">
 		<description>Cuby Panic</description>
 		<year>1985</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -8200,7 +8205,9 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
-	<software name="daydream">
+	<!-- TODO: input stops responding on PC8801MA (verify) -->
+	<!-- Not extensively tested -->
+	<software name="daydream" supported="partial">
 		<description>Day Dream</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
@@ -9913,6 +9920,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 
 	<!-- Hangs on full screen Door Door title -->
 	<!-- FDC stalls [never clears HALT state, CHRN=(0, 52, ff, 4) then (0, 52, aa, 1)!] -->
+	<!-- [PC=0x7050 FDC CPU] -->
 	<software name="doordmk2" supported="no">
 		<description>Door Door mkII</description>
 		<year>1985</year>
@@ -11189,6 +11197,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198501xx"/>
 		<info name="alt_title" value="エルドラド伝奇"/>
+		<info name="usage" value="Needs BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="eldrad.d88" size="697456" crc="18e7adf1" sha1="eae48b0a686a5d46da7769321ec026a79c52dfe6"/-->
 
@@ -11236,13 +11245,14 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="emerald">
+	<software name="emerald" supported="yes">
 		<description>Emerald Densetsu</description>
 		<year>1990</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900615"/>
 		<info name="alt_title" value="エメラルド伝説"/>
+		<info name="usage" value="Boot with game disks in drives for actual gameplay"/>
 		<!--combined image-->
 		<!--rom name="emerald densetsu.d88" size="1873216" crc="ebd53f66" sha1="52ce86b5146a8cdf51ced54d7e755107ca230cd0"/-->
 
@@ -11738,7 +11748,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="f15se">
+	<software name="f15se" supported="yes">
 		<description>F-15 Strike Eagle</description>
 		<year>1988</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -11764,7 +11774,9 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="f2gp" cloneof="f2gppsg">
+	<!-- Aliased [DAC1BIT] sounds -->
+	<!-- Sports GFX garbage during boot -->
+	<software name="f2gp" cloneof="f2gppsg" supported="partial">
 		<description>F2 Grand Prix</description>
 		<!-- in-game shows 1984 copyright but released in '85 for PC8801 -->
 		<year>1985</year>
@@ -11781,7 +11793,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="f2gppsg">
+	<software name="f2gppsg" supported="yes">
 		<description>F2 Grand Prix(SR PSG ver)</description>
 		<!-- in-game shows 1984 copyright but released in '85 for PC8801 -->
 		<year>1985</year>
@@ -12042,6 +12054,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="ファンタジアン"/>
+		<info name="usage" value="Needs BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="fantasian.d88" size="697680" crc="d5529746" sha1="068e10c8b28f093b61e2a5e6dc7172cf3582e7e5"/-->
 
@@ -19663,13 +19676,14 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="lamia199">
+	<software name="lamia199" supported="yes">
 		<description>Lamia 1999</description>
 		<year>1987</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="ラミア1999"/>
+		<info name="usage" value="Suggested to use BASIC V2 for analog colors"/>
 		<!--combined image-->
 		<!--rom name="lamia 1999.d88" size="1171472" crc="a1a0a96f" sha1="5cd4e17d89439988e20cc63f97e4a326e206cc7f"/-->
 
@@ -21290,6 +21304,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
+	<!-- Requires floppies to not be write protected -->
 	<software name="mjclinic">
 		<description>Mahjong Clinic Zoukan-gou</description>
 		<year>1991</year>
@@ -22630,7 +22645,6 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<!-- Has [uPD3301] layer masking bugs (logo, OP title, gameplay bottom area) -->
 	<!-- Corrupted GFX layer on main menu, is the dump right? (bug not present in metaloraa set) -->
 	<software name="metalora" supported="partial">
 		<description>Cyber Block Metal Orange</description>
@@ -22671,7 +22685,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<!-- Has [uPD3301] layer masking bugs (logo, OP title, gameplay) -->
+	<!-- TODO: not extensively tested -->
 	<software name="metaloraa" cloneof="metalora" supported="partial">
 		<description>Cyber Block Metal Orange (alt)</description>
 		<year>1990</year>
@@ -25587,7 +25601,8 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<!-- Entering into shops causes corrupted text graphics with [uPD3301] text layer -->
+	<!-- no sound on any non-vanilla PC-8801 (verify) -->
+	<!-- [3301] layer is buggy in shops on mkIISR+ machines (uses TVRAM, is it compatible with V1H?) -->
 	<software name="paladin" supported="no">
 		<description>The Paladin</description>
 		<year>1985</year>
@@ -28196,32 +28211,32 @@ ExtractDisk  [07]"DiskD        " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
-	<!-- Crashes on Random House logo [reads DMA ports] -->
-	<software name="riglas" supported="no">
+	<software name="riglas" supported="yes">
 		<description>Riglas</description>
 		<year>1986</year>
 		<publisher>ランダムハウス (Random House)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="リグラス"/>
+		<!-- baddump: non-factory save -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380448">
-				<rom name="riglas.d88" size="380448" crc="8b2767ca" sha1="0fa5d40f33e735096b330d3bccb612ee45253d93"/>
+				<rom name="riglas.d88" size="380448" crc="8b2767ca" sha1="0fa5d40f33e735096b330d3bccb612ee45253d93" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Crashes on Random House logo [reads DMA ports] -->
-	<software name="riglasa" cloneof="riglas" supported="no">
+	<software name="riglasa" cloneof="riglas" supported="yes">
 		<description>Riglas (alt)</description>
 		<year>1986</year>
 		<publisher>ランダムハウス (Random House)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="リグラス"/>
+		<!-- baddump: non-factory save (different than riglas set) -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380432">
-				<rom name="riglas (a).d88" size="380432" crc="5332359d" sha1="9762056cdf2cfe03e7cdb1b1e44b33ed9d7635fe"/>
+				<rom name="riglas (a).d88" size="380432" crc="5332359d" sha1="9762056cdf2cfe03e7cdb1b1e44b33ed9d7635fe" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29023,7 +29038,7 @@ ExtractDisk  [04]"シナリオ2   " -> "rogue alliance_04.d88"
 		</part>
 	</software>
 
-	<!-- TODO: scene number display shows with vertical strips [uPD3301] -->
+	<!-- TODO: scene number display shows with vertical strips [uPD3301]? -->
 	<software name="sammylf">
 		<description>Sammy Lightfoot</description>
 		<year>1985</year>
@@ -29031,6 +29046,7 @@ ExtractDisk  [04]"シナリオ2   " -> "rogue alliance_04.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="サミーライトフット"/>
+		<!-- TODO: looks incompatible with 8 MHz mode -->
 		<info name="usage" value="Needs BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -32504,8 +32520,7 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 ExtractDisk  [01]"B DISK          " -> "sorcerian music library_01.d88"
 ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 -->
-	<!-- Uses [BG Pal] color, white screen on startup [uPD3301] -->
-	<software name="sorcerml" supported="no">
+	<software name="sorcerml" supported="yes">
 		<description>Sorcerian Music Library</description>
 		<year>1987?</year>
 		<publisher>日本ファルコム (Nihon Falcom)?</publisher>
@@ -32555,8 +32570,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		</part>
 	</software>
 
-	<!-- Draws stage names with unemulated text mode [uPD3301] -->
-	<software name="sharrier" supported="partial">
+	<software name="sharrier" supported="yes">
 		<description>Space Harrier</description>
 		<year>1987</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -32582,8 +32596,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		</part>
 	</software>
 
-	<!-- Draws stage names with unemulated text mode [uPD3301] -->
-	<software name="sharriera" cloneof="sharrier" supported="partial">
+	<software name="sharriera" cloneof="sharrier" supported="yes">
 		<description>Space Harrier (alt?)</description>
 		<year>1987</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -34992,7 +35005,8 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 	</software>
 
 	<!-- black screen -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(01 01 24 01)] -->
+	<!-- FDC stalls [Tries to read a missing CHRN=(01 01 24 01), regression?] -->
+	<!-- Requires floppies to not be write protected -->
 	<software name="tobirawo" supported="no">
 		<description>Tobira wo Hirakete</description>
 		<year>1987</year>
@@ -38635,11 +38649,12 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 	</software>
 
 	<software name="xak">
-		<description>Xak</description>
+		<description>Xak: The Art of Visual Stage</description>
 		<year>1989</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198905xx"/>
+		<info name="alt_title" value="サーク"/>
 		<!--combined image-->
 		<!--rom name="xak.d88" size="1997104" crc="9e40a32c" sha1="eaae9b244956cbde1b7691df4091bb9ad9ea9ccb"/-->
 
@@ -38679,13 +38694,15 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<!-- Sports heavy text glitch on new game selection [uPD3301] -->
+	<!-- Hangs while trying to create user disk, [FDC] stalls -->
+	<!-- Mounting provided user disk causes a [Incorrect layout on track 0 head 0, expected_size=100000, current_size=100320] -->
 	<software name="xak2" supported="no">
-		<description>Xak 2</description>
+		<description>Xak II: Rising of the Redmoon</description>
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199009xx"/>
+		<info name="alt_title" value="サークII"/>
 		<!--combined image-->
 		<!--rom name="xak 2.d88" size="3140128" crc="2b98474d" sha1="dd0c5ea2eea94d4d3e403ca557c4b5cf71885c95"/-->
 
@@ -38746,13 +38763,14 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<!-- Sports heavy text glitch on new game selection [uPD3301] -->
+	<!-- Hangs while trying to create user disk, [FDC] stalls -->
 	<software name="xak2a" cloneof="xak2" supported="no">
-		<description>Xak II (alt)</description>
+		<description>Xak II: Rising of the Redmoon (alt)</description>
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199009xx"/>
+		<info name="alt_title" value="サークII"/>
 		<!--combined image-->
 		<!--rom name="xak ii.d88" size="2666480" crc="fb1e73f4" sha1="f957d0293922be0a1c3d99c3e75b333734dcd329"/-->
 
@@ -38806,14 +38824,16 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<!-- Sports heavy text glitch on new game selection [uPD3301] -->
+	<!-- Mounting provided user disk causes a [Incorrect layout on track 0 head 0, expected_size=100000, current_size=100320] -->
 	<software name="xakgazel" supported="no">
-		<description>Xak - Gazel no Tou</description>
+		<!-- title screen and box art both sports this title -->
+		<!-- a.k.a. known as Xak - Gazzel no Tou -->
+		<description>Xak Precious Package: The Tower of Gazzel</description>
 		<year>1991</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910614"/>
-		<info name="alt_title" value="Xak ガゼルの塔"/>
+		<info name="alt_title" value="サーク ガゼルの塔"/>
 		<!--combined image-->
 		<!--rom name="xak gazel no to.d88" size="2759296" crc="1be26269" sha1="fa1dcf787e6dbb30577544b2947853ce1059df0b"/-->
 
@@ -40950,7 +40970,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 
-<!-- DOUJIN! -->
+<!-- DOUJIN -->
 
 	<software name="100yenmd">
 		<description>100-yen Music Disk Vol.1</description>
@@ -41152,10 +41172,10 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<!-- Hangs/crashes after few frames of opening animation (fixed) -->
+	<!-- Hangs/crashes after few frames of opening animation (verify [i8214] irqs) -->
 	<!-- Option 5 from main menu is a [3301] text layer game (verify) -->
 	<!-- Not extensively tested -->
-	<software name="attacker" supported="partial">
+	<software name="attacker" supported="no">
 		<description>Attacker</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -42013,11 +42033,14 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<software name="dennotsu">
+	<!-- Keyboard inputs gets stuck on menu selections -->
+	<!-- Not extensively tested -->
+	<software name="dennotsu" supported="partial">
 		<description>Denno Tsushin Vol. 1</description>
 		<year>1990</year>
 		<publisher>電脳科学研究所 (Denno Kagaku Kenkujo)</publisher>
 		<info name="alt_title" value="電脳通信 vol.1"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="422160">    <!-- Data CRC16: 33482 -->
 				<rom name="denno tsushin 1.d88" size="422160" crc="1e5cc645" sha1="e6800e7c9b50f2c3a69f380db9a4abe968b30182"/>
@@ -42445,7 +42468,7 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		</part>
 	</software>
 
-	<!-- Gameplay draws scrolling [uPD3301] text layer garbage -->
+	<!-- Gameplay draws scrolling [uPD3301] text layer garbage, [wants to draw semigfxs for a kanji masking effect but area isn't populated properly] -->
 	<software name="escapepr" supported="no">
 		<description>Escape Princess</description>
 		<year>19??</year>
@@ -43312,7 +43335,8 @@ Also found as separate images (but equal CRC)
 <!--rom name="fsd sample ongaku-shu(vol.1-7).d88" size="3363488" crc="13c1e55b" sha1="539aa79fe94c16d592913c6e8ad5e8b60016eb49"/-->
 <!-- Disk 1>7 -->
 
-	<software name="fsdsamp1">
+	<!-- Punts to resident BASIC during loading -->
+	<software name="fsdsamp1" supported="no">
 		<description>FSD Sample Ongaku-shuu vol. 1</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43325,7 +43349,8 @@ Also found as separate images (but equal CRC)
 		</part>
 	</software>
 
-	<software name="fsdsamp2">
+	<!-- Punts to resident BASIC during loading -->
+	<software name="fsdsamp2" supported="no">
 		<description>FSD Sample Ongaku-shuu vol. 2</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43354,7 +43379,8 @@ Also found as separate images (but equal CRC)
 		</part>
 	</software>
 
-	<software name="fsdsamp4">
+	<!-- Punts to resident BASIC during loading -->
+	<software name="fsdsamp4" supported="no">
 		<description>FSD Sample Ongaku-shuu vol. 4</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43368,7 +43394,8 @@ Also found as separate images (but equal CRC)
 		</part>
 	</software>
 
-	<software name="fsdsamp5">
+	<!-- Punts to resident BASIC during loading -->
+	<software name="fsdsamp5" supported="no">
 		<description>FSD Sample Ongaku-shuu vol. 5</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43382,6 +43409,7 @@ Also found as separate images (but equal CRC)
 		</part>
 	</software>
 
+	<!-- Punts to resident BASIC during loading -->
 	<software name="fsdsamp6">
 		<description>FSD Sample Ongaku-shuu vol. 6</description>
 		<year>1993</year>
@@ -43396,7 +43424,8 @@ Also found as separate images (but equal CRC)
 		</part>
 	</software>
 
-	<software name="fsdsamp7">
+	<!-- Punts to resident BASIC during loading -->
+	<software name="fsdsamp7" supported="no">
 		<description>FSD Sample Ongaku-shuu vol. 7</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43437,7 +43466,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 <!--rom name="gc-clusterz music disk(vol.1-7).d88" size="2813696" crc="511490ba" sha1="ef31f3e12b02edeb97e72342eb5e8292db663a16"/-->
 <!-- TOSEC sets contain same data with different headers... -->
 
-	<software name="gcclust1">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust1" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 1+</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43450,7 +43480,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="gcclust2">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust2" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 2</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43463,7 +43494,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="gcclust3">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust3" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 3</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43475,7 +43507,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="gcclust4">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust4" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 4</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43495,7 +43528,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="gcclust5">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust5" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 5</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43516,7 +43550,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="gcclust5a" cloneof="gcclust5">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust5a" cloneof="gcclust5" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 5 (alt)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43537,7 +43572,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="gcclust6">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust6" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 6</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43558,7 +43594,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="gcclust6a" cloneof="gcclust6">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust6a" cloneof="gcclust6" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 6 (alt)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43579,7 +43616,8 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="gcclust7">
+	<!-- Tests [Sound Board 2] -->
+	<software name="gcclust7" supported="partial">
 		<description>GC-Clusterz Music Disk vol. 7</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -48024,7 +48062,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 		</part>
 	</software>
 
-	<!-- Hangs at main menu selection, [3301] vblank irq -->
+	<!-- Draws [3301] chars as pure black after title screen (regression) -->
 	<software name="ashurano" supported="no">
 		<description>Ashura no To</description>
 		<year>1990</year>
@@ -48075,7 +48113,6 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 	</software>
 
 	<!-- TODO: verify if it really works on BASIC 1.0 only -->
-	<!-- Doesn't accept input on main menu, [3301] vblank irq regression -->
 	<software name="autumnpa" supported="no">
 		<description>Autumn Park</description>
 		<year>19??</year>
@@ -49333,7 +49370,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 		</part>
 	</software>
 
-	<!-- TODO: text is glitchy, verify with uPD3301 device -->
+	<!-- Not extensively tested -->
 	<software name="midngtch">
 		<description>Midnight Chase 2</description>
 		<year>19??</year>
@@ -51910,6 +51947,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 		<description>Gaia no Kiba</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Moon Light Magic"/>
 		<!--combined image-->
 		<!--rom name="gaia no kiba.d88" size="844320" crc="7ecd4458" sha1="601e1567bd54bbce22b6bdfe6131b37566927f74"/-->
 
@@ -55232,6 +55270,8 @@ ExtractDisk  [02]"Hit88 Data      " -> "hit-88_assembler_02.d88"
 		</part>
 	</software>
 
+	<!-- TODO: these P1 disks seems to be part of the same package, identify how to load them all -->
+
 	<software name="p1cold88">
 		<description>P1 col</description>
 		<year>19??</year>
@@ -55514,9 +55554,9 @@ THE RACER
 	</software>
 
 	<software name="p1demo2d">
-		<description>P1 Demo 2</description>
+		<description>P1 Auto Demo part 2</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>デービーソフト (dB-Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="p1 demo 2.d88" size="348848" crc="b9f82316" sha1="0e33fd4e33f9a4ea9b1285d2ceed4dd3eb6de1c0"/>
@@ -55578,6 +55618,7 @@ THE RACER
 
 	<!-- Hangs on PCM loading screen -->
 	<!-- [Has vblank irq + vblank bit outside check, former takes too much time to execute its code] -->
+	<!-- [Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot] -->
 	<software name="100yens1" supported="no">
 		<description>100-yen Soft #8 Revival Special</description>
 		<year>19??</year>
@@ -56129,13 +56170,13 @@ ExtractDisk  [02]"DATA          " -> "charm copy_02.d88"
 		</part>
 	</software>
 
-	<software name="databox">
+	<!-- TODO: Seems to expect other disks no matter what you select? -->
+	<software name="databox" supported="no">
 		<description>DataBox</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Preload a Disk BASIC then type load &quot;DB.&quot; then run"/>
+		<info name="usage" value="Preload a Disk BASIC then issue a run &quot;DB.&quot;"/>
 
-		<!-- TODO: Seems to expect other disks no matter what you select? -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="databox.d88" size="348848" crc="c25d83ea" sha1="182e35f2d938116083a23b8a12ecb1b92b1f6980"/>
@@ -56188,7 +56229,7 @@ ExtractDisk  [05]"Blank        " -> "disk-basic program library_05.d88"
 		</part>
 	</software>
 
-	<!-- TODO: non bootable, most likely data disk for Exper88 -->
+	<!-- TODO: non bootable, most likely data disk for Expert88 -->
 	<software name="expert88">
 		<description>Expert88 Filer 860727</description>
 		<year>19??</year>
@@ -56386,10 +56427,17 @@ ExtractDisk  [02]"System Disk    " -> "jet-8801a v2.00_02.d88"
 ExtractDisk  [01]"ｼｽﾃﾑ          " -> "kaseijin_01.d88"
 ExtractDisk  [02]"ﾃﾞｰﾀ          " -> "kaseijin_02.d88"
 -->
-	<software name="kaseijin">
-		<description>Kaseijin</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<!-- Hangs when selecting mic option on top right "User Voice" -->
+	<!-- [loops on OPNA EOS status that never goes high, then waits for RAM $6c54 != 0x02] -->
+	<!-- Gives random "Disk I/O" errors when accessing files (last option on top), loads fine when trying again -->
+	<!-- Mouse inputs doesn't work (icon option on top near "CLEAR" icon), [serial]? -->
+	<software name="kaseijin" supported="no">
+		<!-- Title from boot -->
+		<description>Kasei-Jin</description>
+		<year>1988</year>
+		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<!-- "Progrummed by Musical Arts Ltd." (sic) -->
+		<!-- "(c) 1988 Musical Plan Ltd." -->
 		<!--combined image-->
 		<!--rom name="kaseijin.d88" size="697696" crc="eaa5a45b" sha1="6f73b5b8f167bf77026d1126a99792ad22cbb91a"/-->
 
@@ -56993,7 +57041,9 @@ ExtractDisk  [03]"user 2          " -> "sn88dos_03.d88"
 		</part>
 	</software>
 
-	<software name="superedi">
+	<!-- Unknown character editor for a RPG, likely Sorcerian given the BASIC listing printing back "SORCER" label and matching some spell names such as "BOMBARD" and "BLAST BLADE". -->
+	<!-- Goes "Subscript out of range at 1500" without loading whatever user disk it requires -->
+	<software name="superedi" supported="no">
 		<description>Super Editor</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57009,8 +57059,10 @@ ExtractDisk  [01]"辞書ﾃﾞｨｽｸ    " -> "super shunbo ii_01.d88"
 ExtractDisk  [02]"ｼｽﾃﾑﾃﾞｨｽｸ      " -> "super shunbo ii_02.d88"
 ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 -->
-	<software name="supershu">
-		<description>Super Shunbo II</description>
+	<!-- Not extensively tested (Japanese word processor) -->
+	<!-- Has [RTC] check at boot -->
+	<software name="supershu" supported="partial">
+		<description>Super Shunbo II (v1.00)</description>
 		<year>1986</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<!--combined image-->
@@ -57028,9 +57080,11 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 			</dataarea>
 		</part>
 
+		<!-- baddump: has a 2001 file with an user generated table history of computers owned -->
+		<!-- Mildly interesting but definitely non-factory save -->
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="super shunbo ii_03.d88" size="348848" crc="f6d8e1ab" sha1="188e478fee3cf62fe886207b60faf441ecff739c"/>
+				<rom name="super shunbo ii_03.d88" size="348848" crc="f6d8e1ab" sha1="188e478fee3cf62fe886207b60faf441ecff739c" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
