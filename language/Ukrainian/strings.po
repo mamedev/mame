@@ -113,22 +113,22 @@ msgstr "Вертикальне положення %1$s"
 #: src/frontend/mame/ui/ui.cpp:1552
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Горизонтальне розтягування %1$s лазерного диска"
+msgstr "Горизонтальне розтягування %1$s Laserdisc"
 
 #: src/frontend/mame/ui/ui.cpp:1555
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Горизонтальне положення %1$s лазерного диска"
+msgstr "Горизонтальне положення %1$s Laserdisc"
 
 #: src/frontend/mame/ui/ui.cpp:1557
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Вертикальне розтягування %1$s лазерного диска"
+msgstr "Вертикальне розтягування %1$s Laserdisc"
 
 #: src/frontend/mame/ui/ui.cpp:1560
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Вертикальне положення %1$s лазерного диска"
+msgstr "Вертикальне положення %1$s Laserdisc"
 
 #: src/frontend/mame/ui/ui.cpp:1570
 msgid "Vector Flicker"
@@ -1276,7 +1276,7 @@ msgstr "Не BIOS"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr "Оригінали"
+msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
@@ -1351,7 +1351,7 @@ msgstr "Уподобання"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr "Оригінали"
+msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
@@ -2762,7 +2762,7 @@ msgstr "Програма - клон: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:683
 msgid "Software is parent"
-msgstr "Програма - оригінал"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:688
 msgid "Supported: No"
@@ -2778,7 +2778,7 @@ msgstr "Підтримка"
 
 #: src/frontend/mame/ui/selmenu.cpp:714
 msgid "Driver is parent"
-msgstr "Драйвер - оригінал"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
 #, c-format
@@ -2870,7 +2870,7 @@ msgstr "Драйвер - клон\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2910
 msgid "Driver is Parent\t\n"
-msgstr "Драйвер - оригінал\t\n"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2914
 msgid "Analog Controls\tYes\n"
@@ -5394,7 +5394,7 @@ msgstr "Автоматично перемикати призупинення е�
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr "Усі слоти очищено та поточний стан збережено до слота 1."
+msgstr ""
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
@@ -5403,12 +5403,12 @@ msgstr "Розпочати новий пошук"
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr "Стан пам'яті збережено до слота %d."
+msgstr ""
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr "Зберегти поточний стан пам'яті до слота %d."
+msgstr ""
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -5418,27 +5418,27 @@ msgstr "Загалом знайдено %d збігів."
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr "Виконати порівняння: слот %d %s слот %d."
+msgstr ""
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr "Виконати порівняння: слот %d %s слот %d %s %d."
+msgstr ""
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr "Виконати порівняння: слот %d BITWISE%s слот %d."
+msgstr ""
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr "Виконати порівняння: слот %d %s %d."
+msgstr ""
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr "Слот %d"
+msgstr ""
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
@@ -5498,11 +5498,11 @@ msgstr "Формат даних"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr "Значення слота 1"
+msgstr ""
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr "Значення останнього слота"
+msgstr ""
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
@@ -5513,16 +5513,12 @@ msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with something "
 "but lost it)"
 msgstr ""
-"Використовуй для отримання значення слота 1 (наприклад, почато з річчю, але "
-"потім її утрачено)."
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
-"Використовуй для отримання останнього слота (наприклад, почато без речі, але "
-"нарешті її отримано)."
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
