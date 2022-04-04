@@ -20166,6 +20166,9 @@ wsf3                            // (c) 1990 Leland
 @source:lemmings.cpp
 lemmings                        // prototype (c) 1991 Data East USA (US)
 
+@source:lependu.cpp
+lependu							// 198? Voyageur de L'Espace Inc.
+
 @source:lethal.cpp
 lethalen                        // GX191 (c) 1992
 lethaleneaa                     // GX191 (c) 1992
