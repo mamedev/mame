@@ -196,15 +196,9 @@ UPD3301_FETCH_ATTRIBUTE( pc8801_state::attr_fetch )
 	return attr_extend_info;
 }
 
-//int pc8801_state::draw_mono_bitmap(u32 bitmap_offset, int xi)
-//{
-//  u8 res = 0;
-
-//}
-
 void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
 {
-	uint16_t y_double = get_screen_frequency(); //pixel_clock();
+	uint16_t y_double = get_screen_frequency();
 	if ((m_gfx_ctrl & 0x11) == 0)
 		y_double = 0;
 	int32_t y_line_size = y_double + 1;
@@ -237,79 +231,6 @@ void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 		}
 	}
 }
-
-#if 0
-void pc8801_state::draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect)
-{
-	// TODO: jettermi really masks the color attribute from 3301
-	// (we currently draw it in b&w, should be colorized)
-	uint32_t count = 0;
-	uint8_t color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
-	//uint8_t is_cursor = 0;
-
-	for(int y = 0; y < 200; y++)
-	{
-		for(int x = 0; x < 640; x+=8)
-		{
-//          if(!(m_gfx_ctrl & 1))
-//              is_cursor = calc_cursor_pos(x / 8, y / lines_per_char, y & (lines_per_char-1));
-
-			for(int xi = 0; xi < 8; xi++)
-			{
-				int pen_dot = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
-				//if(is_cursor)
-				//  pen^=1;
-				if (!pen_dot)
-					continue;
-
-				if((m_gfx_ctrl & 1))
-				{
-					if(cliprect.contains(x+xi, y*2+0))
-						bitmap.pix(y*2+0, x+xi) = m_palette->pen(color);
-
-					if(cliprect.contains(x+xi, y*2+1))
-						bitmap.pix(y*2+1, x+xi) = m_palette->pen(color);
-				}
-				else
-				{
-					if(cliprect.contains(x+xi, y))
-						bitmap.pix(y, x+xi) = m_palette->pen(color);
-				}
-			}
-
-			count++;
-		}
-	}
-
-	if(!(m_gfx_ctrl & 1)) // 400 lines
-	{
-		count = 0;
-
-		for(int y = 200; y < 400; y++)
-		{
-			for(int x = 0; x < 640; x+=8)
-			{
-				//if(!(m_gfx_ctrl & 1))
-				//  is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
-
-				for(int xi = 0; xi < 8; xi++)
-				{
-					int pen_dot = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
-					//if(is_cursor)
-					//  pen^=1;
-					if (!pen_dot)
-						continue;
-
-					if(cliprect.contains(x+xi, y))
-						bitmap.pix(y, x+xi) = m_palette->pen(color);
-				}
-
-				count++;
-			}
-		}
-	}
-}
-#endif
 
 uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -385,17 +306,6 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
 	}
 
-#if 0
-	//popmessage("%02x %02x %02x %02x %02x",m_layer_mask,m_dmac_mode,m_crtc.status,m_crtc.irq_mask,m_gfx_ctrl);
-
-	if(!(m_layer_mask & 1) && m_dmac_mode & 4 && m_crtc.status & 0x10 && m_crtc.irq_mask == 3)
-	{
-		//popmessage("%02x %02x",m_crtc.param[0][0],m_crtc.param[0][4]);
-
-		draw_text(bitmap,screen_height,m_txt_width);
-	}
-#endif
-
 	return 0;
 }
 
@@ -404,247 +314,6 @@ uint8_t pc8801_state::dma_mem_r(offs_t offset)
 	// TODO: TVRAM readback
 	return m_work_ram[offset & 0xffff];
 }
-
-#if 0
-/*
-CRTC command params:
-0. CRTC reset
-
-[0] *--- ---- <unknown>
-[0] -xxx xxxx screen columns (+2)
-
-[1] xx-- ---- blink speed (in frame unit) (+1, << 3)
-[1] --xx xxxx screen lines (+1)
-
-[2] x--- ---- "skip line"
-[2] -x-- ---- cursor style (reverse on / underscore off)
-[2] --x- ---- cursor blink on/off
-[2] ---x xxxx lines per character (+1)
-
-[3] xxx- ---- Vertical Retrace (+1)
-[3] ---x xxxx Horizontal Retrace (+2)
-
-[4] x--- ---- attribute not separate flag
-[4] -x-- ---- attribute color flag
-[4] --x- ---- attribute not special flag (invalidates next register)
-[4] ---x xxxx attribute size (+1)
-*/
-
-#define screen_width ((m_crtc.param[0][0] & 0x7f) + 2) * 8
-
-#define blink_speed ((((m_crtc.param[0][1] & 0xc0) >> 6) + 1) << 3)
-#define screen_height ((m_crtc.param[0][1] & 0x3f) + 1)
-
-#define lines_per_char ((m_crtc.param[0][2] & 0x1f) + 1)
-
-#define vretrace (((m_crtc.param[0][3] & 0xe0) >> 5) + 1)
-#define hretrace ((m_crtc.param[0][3] & 0x1f) + 2) * 8
-
-#define text_color_flag ((m_crtc.param[0][4] & 0xe0) == 0x40)
-// TODO: not the right condition
-//#define monitor_24KHz ((m_gfx_ctrl & 0x19) == 0x08)
-
-
-
-
-
-
-
-uint8_t pc8801_state::calc_cursor_pos(int x,int y,int yi)
-{
-	if(!(m_crtc.cursor_on)) // don't bother if cursor is off
-		return 0;
-
-	if(x == m_crtc.param[4][0] && y == m_crtc.param[4][1]) /* check if position matches */
-	{
-		/* don't pass through if we are using underscore */
-		if((!(m_crtc.param[0][2] & 0x40)) && yi != 7)
-			return 0;
-
-		/* finally check if blinking is currently active high */
-		if(!(m_crtc.param[0][2] & 0x20))
-			return 1;
-
-		if(((m_screen->frame_number() / blink_speed) & 1) == 0)
-			return 1;
-
-		return 0;
-	}
-
-	return 0;
-}
-
-
-
-uint8_t pc8801_state::extract_text_attribute(uint32_t address,int x, uint8_t width, uint8_t &non_special)
-{
-	uint8_t *vram = m_work_ram.get();
-	int i;
-	int fifo_size;
-	int offset;
-
-	non_special = 0;
-	if(m_crtc.param[0][4] & 0x80)
-	{
-		popmessage("Using non-separate mode for text tilemap, contact MAMEdev");
-		return 0;
-	}
-
-	fifo_size = (m_crtc.param[0][4] & 0x20) ? 0 : ((m_crtc.param[0][4] & 0x1f) + 1);
-
-	if(fifo_size == 0)
-	{
-		non_special = 1;
-		return (text_color_flag) ? 0xe8 : 0;
-	}
-
-	// NB: We offset here as a side effect of how PC8801 really handles uPD3301 attribute fetch
-	offset = (vram[address] == 0) ? 2 : 0;
-
-	for(i = 0; i < fifo_size; i++)
-	{
-		if(x < vram[address+offset])
-		{
-			return vram[address+1];
-		}
-		else
-			address+=2;
-	}
-
-	return vram[address-3+offset];
-}
-
-void pc8801_state::draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special)
-{
-	uint8_t *vram = m_work_ram.get();
-
-	uint8_t y_height = lines_per_char;
-	uint8_t y_double = pixel_clock();
-	// elthlead uses former
-	uint8_t y_step = (non_special) ? 80 : 120;
-	uint8_t is_cursor = 0;
-
-	for(int yi = 0; yi < y_height; yi++)
-	{
-		if(m_gfx_ctrl & 1)
-			is_cursor = calc_cursor_pos(x,y,yi);
-
-		for(int xi = 0; xi < 8; xi++)
-		{
-			int tile = vram[x+(y*y_step)+m_dma_address[2]];
-
-			int res_x = x*8+xi*(width+1);
-			int res_y = y*y_height+yi;
-
-			if(!m_screen->visible_area().contains(res_x, res_y))
-				continue;
-
-			int color;
-			if(gfx_mode)
-			{
-				uint8_t mask;
-
-				mask = (xi & 4) ? 0x10 : 0x01;
-				mask <<= ((yi & (0x6 << y_double)) >> (1+y_double));
-				color = (tile & mask) ? pal : -1;
-			}
-			else
-			{
-				uint8_t blink_mask = 0;
-				if(blink && ((m_screen->frame_number() / blink_speed) & 3) == 1)
-					blink_mask = 1;
-
-				uint8_t char_data;
-				if(yi >= (1 << (y_double+3)) || secret || blink_mask)
-					char_data = 0;
-				else
-					char_data = (m_cgrom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
-
-				if(yi == 0 && upper)
-					char_data = 1;
-
-				if(yi == y_height && lower)
-					char_data = 1;
-
-				if(is_cursor)
-					char_data^=1;
-
-				if(reverse)
-					char_data^=1;
-
-				color = char_data ? pal : -1;
-			}
-
-			if(color != -1)
-			{
-				bitmap.pix(res_y, res_x) = m_palette->pen(color);
-				if(width)
-				{
-					if(!m_screen->visible_area().contains(res_x+1, res_y))
-						continue;
-
-					bitmap.pix(res_y, res_x+1) = m_palette->pen(color);
-				}
-			}
-		}
-	}
-}
-
-void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width)
-{
-	int x,y;
-	uint8_t attr;
-	uint8_t reverse;
-	uint8_t gfx_mode;
-	uint8_t secret;
-	uint8_t upper;
-	uint8_t lower;
-	uint8_t blink;
-	int pal;
-	uint8_t non_special;
-
-	for(y = 0; y < y_size; y++)
-	{
-		for(x = 0; x < 80; x++)
-		{
-			if(x & 1 && !width)
-				continue;
-
-			attr = extract_text_attribute((((y*120)+80+m_dma_address[2]) & 0xffff),(x),width,non_special);
-
-			if(text_color_flag && (attr & 8)) // color mode
-			{
-				pal =  ((attr & 0xe0) >> 5);
-				gfx_mode = (attr & 0x10) >> 4;
-				reverse = 0;
-				secret = 0;
-				upper = 0;
-				lower = 0;
-				blink = 0;
-				pal |= 8; //text PAL bank
-			}
-			else // monochrome
-			{
-				// TODO: bishojbg Pasoket logo wants this to be black instead
-				pal = 7;
-				gfx_mode = (attr & 0x80) >> 7;
-				reverse = (attr & 4) >> 2;
-				secret = (attr & 1);
-				upper = (attr & 0x10) >> 4;
-				lower = (attr & 0x20) >> 5;
-				blink = (attr & 2) >> 1;
-				pal |= 8; //text PAL bank
-				reverse ^= m_crtc.inverse;
-
-				if(attr & 0x80)
-					popmessage("Warning: mono gfx mode enabled, contact MAMEdev");
-			}
-
-			draw_char(bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,!width,non_special);
-		}
-	}
-}
-#endif
 
 uint8_t pc8801_state::alu_r(offs_t offset)
 {
@@ -944,42 +613,6 @@ void pc8801_state::ext_rom_bank_w(uint8_t data)
 	m_ext_rom_bank = data;
 }
 
-#if 0
-uint8_t pc8801_state::pixel_clock(void)
-{
-	// TODO: pinpoint exact condition
-	int ysize = m_screen->height();
-
-	return (ysize >= 400);
-}
-
-void pc8801_state::dynamic_res_change(void)
-{
-	rectangle visarea;
-	int xsize,ysize,xvis,yvis;
-	attoseconds_t refresh;;
-
-	/* bail out if screen params aren't valid */
-	if(!m_crtc.param[0][0] || !m_crtc.param[0][1] || !m_crtc.param[0][2] || !m_crtc.param[0][3])
-		return;
-
-	xvis = screen_width;
-	yvis = screen_height * lines_per_char;
-	xsize = screen_width + hretrace;
-	ysize = screen_height * lines_per_char + vretrace * lines_per_char;
-
-//  popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
-
-	visarea.set(0, xvis - 1, 0, yvis - 1);
-	if(pixel_clock())
-		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_24KHz) * (xsize) * ysize;
-	else
-		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
-
-	m_screen->configure(xsize, ysize, visarea, refresh);
-}
-#endif
-
 // inherited from pc8001.cpp
 #if 0
 void pc8801_state::port30_w(uint8_t data)
@@ -1267,136 +900,6 @@ void pc8801_state::layer_masking_w(uint8_t data)
 	m_text_layer_mask = bool(BIT(data, 0));
 	m_bitmap_layer_mask = ((data & 0xe) >> 1) ^ 7;
 }
-
-#if 0
-uint8_t pc8801_state::crtc_param_r()
-{
-	logerror("CRTC param reading\n");
-	return 0xff;
-}
-
-void pc8801_state::crtc_param_w(uint8_t data)
-{
-	if(m_crtc.param_count < 5)
-	{
-		m_crtc.param[m_crtc.cmd][m_crtc.param_count] = data;
-		if(m_crtc.cmd == 0)
-			dynamic_res_change();
-
-		m_crtc.param_count++;
-	}
-}
-
-uint8_t pc8801_state::crtc_status_r()
-{
-	/*
-	---x ---- video enable
-	---- x--- DMA is running
-	---- -x-- special control character IRQ
-	---- --x- indication end IRQ
-	---- ---x light pen input
-	*/
-
-	return m_crtc.status;
-}
-
-#if 0
-static const char *const crtc_command[] =
-{
-	"Reset / Stop Display",             // 0
-	"Start Display",                    // 1
-	"Set IRQ MASK",                     // 2
-	"Read Light Pen",                   // 3
-	"Load Cursor Position",             // 4
-	"Reset IRQ",                        // 5
-	"Reset Counters",                   // 6
-	"Read Status"                       // 7
-};
-#endif
-
-void pc8801_state::crtc_cmd_w(uint8_t data)
-{
-	m_crtc.cmd = (data & 0xe0) >> 5;
-	m_crtc.param_count = 0;
-
-	switch(m_crtc.cmd)
-	{
-		case 0:  // reset CRTC
-			m_crtc.status &= (~0x16);
-			// TODO: honor device IRQ masks
-			// megamit and babylon in particular expects that the VRTC irq disables during boot
-			// otherwise they hangs up.
-			// i.e. former will try to execute a spurious irq and jump to PC=0
-			// Notice that no SW actually writes a "0" to the IRQ mask register,
-			// which supposedly enable irqs from 3301 according to docs.
-			// Other noteworthy checks that needs to be done on actual device hookup:
-			// - BIOS BASIC itself (definitely needs VRTC irqs otherwise locks up on "How many files" prompt);
-			// - xzr2 (locks up after map -> main gameplay screen if this isn't handled right);
-			// - ashurano (expecting a VRTC after title screen, never reading inputs without, **regressed here**);
-			// - rayieza (no inputs on character creation, wants VRTC **regressed here**);
-			m_vrtc_irq_enable = false;
-			break;
-		case 1:  // start display
-			m_crtc.status |= 0x10;
-			m_crtc.status &= (~0x08);
-			// cfr. pc8001 games for 3301 RVV bit
-			m_crtc.inverse = data & 1;
-			break;
-		case 2:  // set irq mask
-			m_crtc.irq_mask = data & 3;
-			break;
-		case 3:  // read light pen
-			m_crtc.status &= (~0x01);
-			break;
-		case 4:  // load cursor position ON/OFF
-			m_crtc.cursor_on = data & 1;
-			break;
-		case 5:  // reset IRQ
-		case 6:  // reset counters
-			m_crtc.status &= (~0x06);
-			break;
-	}
-
-//  if((data >> 5) != 4)
-//      printf("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
-}
-
-uint8_t pc8801_state::dmac_r(offs_t offset)
-{
-	logerror("DMAC R %08x\n",offset);
-	return 0xff;
-}
-
-// CH0: 5-inch floppy DMA
-// CH1: 8-inch floppy DMA
-// CH2: CRTC
-// CH3: CD-ROM and probably HxC etc.
-void pc8801_state::dmac_w(offs_t offset, uint8_t data)
-{
-	if(offset & 1)
-		m_dma_counter[offset >> 1] = (m_dmac_ff) ? (m_dma_counter[offset >> 1]&0xff)|(data<<8) : (m_dma_counter[offset >> 1]&0xff00)|(data&0xff);
-	else
-		m_dma_address[offset >> 1] = (m_dmac_ff) ? (m_dma_address[offset >> 1]&0xff)|(data<<8) : (m_dma_address[offset >> 1]&0xff00)|(data&0xff);
-
-	m_dmac_ff ^= 1;
-}
-
-uint8_t pc8801_state::dmac_status_r()
-{
-	//logerror("DMAC R STATUS\n");
-	return 0xff;
-}
-
-void pc8801_state::dmac_mode_w(uint8_t data)
-{
-	m_dmac_mode = data;
-	m_dmac_ff = 0;
-
-	// Valis II sets 0x20
-	//if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80 && data != 0x00)
-	//  logerror("%02x DMAC mode\n",data);
-}
-#endif
 
 uint8_t pc8801_state::extram_mode_r()
 {
@@ -2316,7 +1819,10 @@ void pc8801_state::pc8801(machine_config &config)
 	I8257(config, m_dma, MASTER_CLOCK);
 	m_dma->out_hrq_cb().set(FUNC(pc8801_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8801_state::dma_mem_r));
+	// CH0: 5-inch floppy DMA
+	// CH1: 8-inch floppy DMA
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
+	// CH3: CD-ROM and probably HxC etc.
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));
 

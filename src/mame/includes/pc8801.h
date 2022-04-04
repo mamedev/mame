@@ -112,14 +112,6 @@ protected:
 private:
 	void main_map(address_map &map);
 
-/*
-	struct crtc_t
-	{
-		uint8_t cmd,param_count,cursor_on,status,irq_mask;
-		uint8_t param[8][5];
-		uint8_t inverse;
-	};*/
-
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
@@ -139,17 +131,13 @@ private:
 	uint8_t m_alu_ctrl2;
 	uint8_t m_extram_mode;
 	uint8_t m_extram_bank;
-//	uint8_t m_txt_width;
-//	uint8_t m_txt_color;
 
-//	crtc_t m_crtc;
 	struct { uint8_t r, g, b; } m_palram[8];
 	enum {
 		BGPAL_PEN = 8,
 		BORDER_PEN = 9
 	};
 
-//	uint8_t m_dmac_ff;
 	uint32_t m_knj_addr[2];
 	uint32_t m_extram_size;
 
@@ -183,10 +171,6 @@ private:
 	void bgpal_w(uint8_t data);
 	void palram_w(offs_t offset, uint8_t data);
 	void layer_masking_w(uint8_t data);
-//	uint8_t crtc_param_r();
-//	void crtc_param_w(uint8_t data);
-//	uint8_t crtc_status_r();
-//	void crtc_cmd_w(uint8_t data);
 	uint8_t extram_mode_r();
 	void extram_mode_w(uint8_t data);
 	uint8_t extram_bank_r();
@@ -204,17 +188,7 @@ private:
 //	uint8_t opna_r(offs_t offset);
 //	void opna_w(offs_t offset, uint8_t data);
 
-//	uint8_t pixel_clock(void);
-//	void dynamic_res_change(void);
-//	u8 draw_3bpp_gvram(u32 bitmap_offset, int xi);
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
-//	void draw_bitmap_3bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect);
-//	void draw_bitmap_1bpp(bitmap_rgb32 &bitmap,const rectangle &cliprect);
-//	uint8_t calc_cursor_pos(int x,int y,int yi);
-//	uint8_t extract_text_attribute(uint32_t address,int x, uint8_t width, uint8_t &non_special);
-//	void draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,
-//							uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special);
-//	void draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void palette_reset();
