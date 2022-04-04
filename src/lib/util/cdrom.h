@@ -128,7 +128,6 @@ public:
 	uint32_t get_track(uint32_t frame) const;
 	uint32_t get_track_start(uint32_t track) const {return cdtoc.tracks[track == 0xaa ? cdtoc.numtrks : track].logframeofs; }
 	uint32_t get_track_start_phys(uint32_t track) const { return cdtoc.tracks[track == 0xaa ? cdtoc.numtrks : track].physframeofs; }
-	chd_file *get_chd() const { return chd; }
 
 	/* TOC utilities */
 	static std::error_condition parse_nero(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
