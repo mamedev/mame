@@ -245,7 +245,7 @@ VIDEO_START_MEMBER(m92_state,m92)
 {
 	m_spritebuffer_timer = timer_alloc(TIMER_SPRITEBUFFER);
 
-	m_pf_master_control[0] = m_pf_master_control[1] = m_pf_master_control[2] = m_pf_master_control[3] = 0;
+	memset(m_pf_master_control, 0, sizeof(m_pf_master_control));
 	m_videocontrol = 0;
 	m_sprite_list = 0;
 	m_raster_irq_position = 0;
