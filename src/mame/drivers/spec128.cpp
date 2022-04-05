@@ -172,7 +172,7 @@ uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->pre_opcode_fetch(offset);
-	adjust_contended(offset);
+	if (is_contended(offset)) adjust_contended();
 	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_opcode_fetch(offset);
 	return retval;

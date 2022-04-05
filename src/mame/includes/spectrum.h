@@ -128,7 +128,8 @@ protected:
 	uint8_t spectrum_rom_r(offs_t offset);
 	uint8_t spectrum_data_r(offs_t offset);
 	void spectrum_data_w(offs_t offset, uint8_t data);
-	void adjust_contended(offs_t offset);
+	virtual bool is_contended(offs_t offset);
+	void adjust_contended(attotime shift = attotime::zero);
 
 	void spectrum_ula_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_ula_r(offs_t offset);
