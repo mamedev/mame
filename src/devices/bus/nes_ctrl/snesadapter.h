@@ -27,13 +27,13 @@ public:
 	// construction/destruction
 	nes_snesadapter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual u8 read_bit0() override;
+	virtual void write(u8 data) override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual u8 read_bit0() override;
-	virtual void write(u8 data) override;
 
 private:
 	required_device<snes_control_port_device> m_snesctrl;
