@@ -11,15 +11,151 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/surpratk.h"
-#include "includes/konamipt.h"
 
+#include "includes/konamipt.h"
+#include "video/k052109.h"
+#include "video/k053244_k053245.h"
+#include "video/k053251.h"
+#include "video/konami_helper.h"
+
+#include "cpu/m6809/konami.h" // for the callback and the FIRQ IRQ definition
+#include "machine/bankdev.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
-void surpratk_state::surpratk_videobank_w(uint8_t data)
+namespace {
+
+class surpratk_state : public driver_device
+{
+public:
+	surpratk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_bank0000(*this, "bank0000"),
+		m_k052109(*this, "k052109"),
+		m_k053244(*this, "k053244"),
+		m_k053251(*this, "k053251"),
+		m_palette(*this, "palette"),
+		m_mainbank(*this, "mainbank")
+	{ }
+
+	void surpratk(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// video-related
+	uint8_t m_layer_colorbase[3]{};
+	uint8_t m_sprite_colorbase = 0;
+	int m_layerpri[3]{};
+
+	// devices
+	required_device<konami_cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_bank0000;
+	required_device<k052109_device> m_k052109;
+	required_device<k05324x_device> m_k053244;
+	required_device<k053251_device> m_k053251;
+	required_device<palette_device> m_palette;
+
+	required_memory_bank m_mainbank;
+
+	void videobank_w(uint8_t data);
+	void _5fc0_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	K05324X_CB_MEMBER(sprite_callback);
+	K052109_CB_MEMBER(tile_callback);
+	void banking_callback(uint8_t data);
+	void bank0000_map(address_map &map);
+	void main_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(surpratk_state::tile_callback)
+{
+	*flags = (*color & 0x80) ? TILE_FLIPX : 0;
+	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
+	*color = m_layer_colorbase[layer] + ((*color & 0x60) >> 5);
+}
+
+/***************************************************************************
+
+  Callbacks for the K053245
+
+***************************************************************************/
+
+K05324X_CB_MEMBER(surpratk_state::sprite_callback)
+{
+	int pri = 0x20 | ((*color & 0x60) >> 2);
+	if (pri <= m_layerpri[2])
+		*priority = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority = 0xf0 | 0xcc;
+	else
+		*priority = 0xf0 | 0xcc | 0xaa;
+
+	*color = m_sprite_colorbase + (*color & 0x1f);
+}
+
+
+/***************************************************************************
+
+    Start the video hardware emulation.
+
+***************************************************************************/
+
+uint32_t surpratk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI4);
+	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI3);
+
+	m_k052109->tilemap_update();
+
+	int layer[3];
+
+	layer[0] = 0;
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
+	layer[1] = 1;
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
+	layer[2] = 2;
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI3);
+
+	konami_sortlayers3(layer, m_layerpri);
+
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(16 * bg_colorbase, cliprect);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+
+	m_k053244->sprites_draw(bitmap, cliprect, screen.priority());
+	return 0;
+}
+
+
+// machine
+
+void surpratk_state::videobank_w(uint8_t data)
 {
 	if (data & 0xf8)
 		logerror("%s: videobank = %02x\n", machine().describe_context(), data);
@@ -33,10 +169,10 @@ void surpratk_state::surpratk_videobank_w(uint8_t data)
 		m_bank0000->set_bank(BIT(data, 0));
 }
 
-void surpratk_state::surpratk_5fc0_w(uint8_t data)
+void surpratk_state::_5fc0_w(uint8_t data)
 {
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
+		logerror("%04x: 3fc0 = %02x\n", m_maincpu->pc(), data);
 
 	// bit 0/1 = coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -51,11 +187,11 @@ void surpratk_state::surpratk_5fc0_w(uint8_t data)
 
 /********************************************/
 
-void surpratk_state::surpratk_map(address_map &map)
+void surpratk_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
 	map(0x0800, 0x1fff).ram();
-	map(0x2000, 0x3fff).bankr("bank1");                    /* banked ROM */
+	map(0x2000, 0x3fff).bankr(m_mainbank);
 	map(0x4000, 0x7fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0x5f8c, 0x5f8c).portr("P1");
 	map(0x5f8d, 0x5f8d).portr("P2");
@@ -64,9 +200,9 @@ void surpratk_state::surpratk_map(address_map &map)
 	map(0x5f90, 0x5f90).portr("DSW2");
 	map(0x5fa0, 0x5faf).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
 	map(0x5fb0, 0x5fbf).w(m_k053251, FUNC(k053251_device::write));
-	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(surpratk_state::surpratk_5fc0_w));
+	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(surpratk_state::_5fc0_w));
+	map(0x5fc4, 0x5fc4).w(FUNC(surpratk_state::videobank_w));
 	map(0x5fd0, 0x5fd1).w("ymsnd", FUNC(ym2151_device::write));
-	map(0x5fc4, 0x5fc4).w(FUNC(surpratk_state::surpratk_videobank_w));
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 
@@ -134,8 +270,8 @@ INPUT_PORTS_END
 
 void surpratk_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
-	membank("bank1")->set_entry(0);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
+	m_mainbank->set_entry(0);
 
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
@@ -158,27 +294,27 @@ void surpratk_state::machine_reset()
 void surpratk_state::banking_callback(uint8_t data)
 {
 //  logerror("%s: setlines %02x\n", machine().describe_context(), data);
-	membank("bank1")->set_entry(data & 0x1f);
+	m_mainbank->set_entry(data & 0x1f);
 }
 
 void surpratk_state::surpratk(machine_config &config)
 {
-	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &surpratk_state::surpratk_map);
+	// basic machine hardware
+	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2 / 4); // 053248, the clock input is 12MHz, and internal CPU divider of 4
+	m_maincpu->set_addrmap(AS_PROGRAM, &surpratk_state::main_map);
 	m_maincpu->line().set(FUNC(surpratk_state::banking_callback));
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&surpratk_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(surpratk_state::screen_update_surpratk));
+	screen.set_screen_update(FUNC(surpratk_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -196,7 +332,7 @@ void surpratk_state::surpratk(machine_config &config)
 
 	K053251(config, m_k053251, 0);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -216,46 +352,49 @@ void surpratk_state::surpratk(machine_config &config)
 
 
 ROM_START( suratk )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // code + banked roms
 	ROM_LOAD( "911j01.f5", 0x00000, 0x20000, CRC(1e647881) SHA1(241e421d5599ebd9fcfb8be9c48dfd3b4c671958) )
 	ROM_LOAD( "911k02.h5", 0x20000, 0x20000, CRC(ef10e7b6) SHA1(0b41a929c0c579d688653a8d90dd6b40db12cfb3) )
 
-	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION( 0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_WORD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) )
 	ROM_LOAD32_WORD( "911d06.bin", 0x000002, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) )
 
-	ROM_REGION( 0x080000, "k053244", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )  /* sprites */
-	ROM_LOAD32_WORD( "911d04.bin", 0x000002, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )  /* sprites */
+	ROM_REGION( 0x080000, "k053244", 0 ) // sprites
+	ROM_LOAD32_WORD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )
+	ROM_LOAD32_WORD( "911d04.bin", 0x000002, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )
 ROM_END
 
 ROM_START( suratka )
-	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x48000, "maincpu", 0 ) // code + banked roms
 	ROM_LOAD( "911j01.f5", 0x00000, 0x20000, CRC(1e647881) SHA1(241e421d5599ebd9fcfb8be9c48dfd3b4c671958) )
 	ROM_LOAD( "911l02.h5", 0x20000, 0x20000, CRC(11db8288) SHA1(09fe187855172ebf0c57f561cce7f41e47f53114) )
 
-	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION( 0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_WORD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) )
 	ROM_LOAD32_WORD( "911d06.bin", 0x000002, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) )
 
-	ROM_REGION( 0x080000, "k053244", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )  /* sprites */
-	ROM_LOAD32_WORD( "911d04.bin", 0x000002, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )  /* sprites */
+	ROM_REGION( 0x080000, "k053244", 0 ) // sprites
+	ROM_LOAD32_WORD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )
+	ROM_LOAD32_WORD( "911d04.bin", 0x000002, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )
 ROM_END
 
 ROM_START( suratkj )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // code + banked roms
 	ROM_LOAD( "911m01.f5", 0x00000, 0x20000, CRC(ee5b2cc8) SHA1(4b05f7ba4e804a3bccb41fe9d3258cbcfe5324aa) )
 	ROM_LOAD( "911m02.h5", 0x20000, 0x20000, CRC(5d4148a8) SHA1(4fa5947db777b4c742775d588dea38758812a916) )
 
-	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION( 0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_WORD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) )
 	ROM_LOAD32_WORD( "911d06.bin", 0x000002, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) )
 
-	ROM_REGION( 0x080000, "k053244", 0 ) /* graphics */
-	ROM_LOAD32_WORD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )  /* sprites */
-	ROM_LOAD32_WORD( "911d04.bin", 0x000002, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )  /* sprites */
+	ROM_REGION( 0x080000, "k053244", 0 ) // sprites
+	ROM_LOAD32_WORD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )
+	ROM_LOAD32_WORD( "911d04.bin", 0x000002, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

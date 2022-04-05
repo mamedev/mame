@@ -62,7 +62,7 @@ protected:
 	uint8_t dma_mem_r(offs_t offset);
 
 private:
-	bool m_screen_reverse = false;
+	bool m_screen_reverse;
 	bool m_screen_is_24KHz;
 
 	/* video state */

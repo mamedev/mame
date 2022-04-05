@@ -314,6 +314,7 @@ public:
 	void astroamb(machine_config &config);
 	void mimonkey(machine_config &config);
 	void mimonscr(machine_config &config);
+	void galartic(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
@@ -351,6 +352,7 @@ protected:
 	void frogger_sound_portmap(address_map &map);
 	void froggeram_map(address_map &map);
 	void froggermc_map(address_map &map);
+	void galartic_map(address_map &map);
 	void galaxian_map(address_map &map);
 	void galaxian_map_base(address_map &map);
 	void galaxian_map_discrete(address_map &map);
