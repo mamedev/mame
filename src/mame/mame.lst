@@ -13394,6 +13394,7 @@ pvwwcas
 
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
+flyingf                         // (c) 1976 Electra
 
 @source:electron.cpp
 electron                        // 1983 Acorn Electron
@@ -14631,6 +14632,7 @@ fourplay                        // multigame
 galap1                          // hack
 galap4                          // hack
 galapx                          // hack
+galartic                        // Artic System
 galaxbsf                        // hack
 galaxbsf2                       // bootleg
 galaxcirsa                      // bootleg (Cirsa)
@@ -20167,7 +20169,7 @@ wsf3                            // (c) 1990 Leland
 lemmings                        // prototype (c) 1991 Data East USA (US)
 
 @source:lependu.cpp
-lependu							// 198? Voyageur de L'Espace Inc.
+lependu                         // 198? Voyageur de L'Espace Inc.
 
 @source:lethal.cpp
 lethalen                        // GX191 (c) 1992
