@@ -170,18 +170,6 @@ void nes_ks106c_device::pcb_reset()
 	m_latch = (m_latch + 1) & 0x03;
 }
 
-void nes_ks7058_device::device_start()
-{
-	common_start();
-}
-
-void nes_ks7058_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
 void nes_ks7022_device::device_start()
 {
 	common_start();
@@ -268,11 +256,6 @@ void nes_ks7017_device::pcb_reset()
 	m_irq_status = 0;
 }
 
-void nes_ks7021a_device::device_start()
-{
-	common_start();
-}
-
 void nes_ks7021a_device::pcb_reset()
 {
 	prg16_89ab(0);
@@ -296,21 +279,11 @@ void nes_ks7010_device::pcb_reset()
 	m_latch = 0;
 }
 
-void nes_ks7012_device::device_start()
-{
-	common_start();
-}
-
 void nes_ks7012_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0xff);
 	chr8(0, m_chr_source);
-}
-
-void nes_ks7013b_device::device_start()
-{
-	common_start();
 }
 
 void nes_ks7013b_device::pcb_reset()

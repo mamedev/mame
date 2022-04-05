@@ -91,22 +91,12 @@ nes_sunsoft_5_device::nes_sunsoft_5_device(const machine_config &mconfig, const 
 }
 
 
-void nes_sunsoft_1_device::device_start()
-{
-	common_start();
-}
-
 void nes_sunsoft_1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
-}
-
-void nes_sunsoft_2_device::device_start()
-{
-	common_start();
 }
 
 void nes_sunsoft_2_device::pcb_reset()

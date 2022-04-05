@@ -621,11 +621,6 @@ void nes_kn42_device::pcb_reset()
 	chr8(0, CHRRAM);
 }
 
-void nes_a65as_device::device_start()
-{
-	common_start();
-}
-
 void nes_a65as_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -648,18 +643,6 @@ void nes_t262_device::pcb_reset()
 	chr8(0, CHRRAM);
 
 	m_latch = 0;
-}
-
-void nes_studyngame_device::device_start()
-{
-	common_start();
-}
-
-void nes_studyngame_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
 }
 
 void nes_sgun20in1_device::pcb_reset()
@@ -1023,11 +1006,6 @@ void nes_bmc_12in1_device::pcb_reset()
 	update_banks();
 }
 
-void nes_bmc_35in1_device::device_start()
-{
-	common_start();
-}
-
 void nes_bmc_35in1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -1036,22 +1014,12 @@ void nes_bmc_35in1_device::pcb_reset()
 	chr8(0, m_chr_source);
 }
 
-void nes_bmc_36in1_device::device_start()
-{
-	common_start();
-}
-
 void nes_bmc_36in1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(m_prg_chunks - 1);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
-}
-
-void nes_bmc_64in1_device::device_start()
-{
-	common_start();
 }
 
 void nes_bmc_64in1_device::pcb_reset()
