@@ -821,9 +821,9 @@ class nes_bmc_12in1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -833,7 +833,7 @@ protected:
 
 private:
 	void update_banks();
-	uint8_t m_reg[3];
+	u8 m_reg[4];
 };
 
 

@@ -83731,7 +83731,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_7" supported="no">
+	<software name="mc_7">
 		<description>7 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
