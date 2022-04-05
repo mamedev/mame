@@ -5023,14 +5023,18 @@ ROM_START( goldnpkd )
 	ROM_LOAD( "bio5_1-20_2.bin",  0x6000, 0x1000, CRC(6b2ade97) SHA1(66adbe69f132f849c0a2a32d5a9575b0740c7a4c) )
 	ROM_LOAD( "bio5_1-20_3.bin",  0x7000, 0x1000, CRC(d1ee95e2) SHA1(95ad7f86f83fda94476508954bda1270fb5f17ad) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
-	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
-	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0x00 )  // filling the R-G bitplanes.
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_IGNORE(                  0x0800)         // discarding 2nd half (cards deck gfx).
 
-	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
-	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
-	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
-	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "n43.2a",  0x0000, 0x0800, CRC(1419298b) SHA1(9e07c94c858f055d1c4987efd03c76cce936f4da) )  // cards deck gfx, bitplane 1.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "n40.4a",  0x0800, 0x0800, CRC(e0b96dcf) SHA1(b06af94361dd951573f187df575b31a9ada0c3e9) )  // cards deck gfx, bitplane 2.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_CONTINUE(        0x1000, 0x0800)         // discarding 1nd half (chars).
 
 	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
 	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
@@ -5069,14 +5073,18 @@ ROM_START( goldnpke )
 	ROM_LOAD( "g_2.bin",  0x6000, 0x1000, CRC(ce080d66) SHA1(c5e11f7dc52a4d1661661a06d39316ba6a944adc) )
 	ROM_LOAD( "g_3.bin",  0x7000, 0x1000, CRC(9d02b6f4) SHA1(bd01477268543d0edb2cec2a26bab0627a6d3414) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
-	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
-	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0x00 )  // filling the R-G bitplanes.
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_IGNORE(                  0x0800)         // discarding 2nd half (cards deck gfx).
 
-	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
-	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
-	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
-	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "n43.2a",  0x0000, 0x0800, CRC(1419298b) SHA1(9e07c94c858f055d1c4987efd03c76cce936f4da) )  // cards deck gfx, bitplane 1.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "n40.4a",  0x0800, 0x0800, CRC(e0b96dcf) SHA1(b06af94361dd951573f187df575b31a9ada0c3e9) )  // cards deck gfx, bitplane 2.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_CONTINUE(        0x1000, 0x0800)         // discarding 1nd half (chars).
 
 	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
 	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
@@ -5114,14 +5122,18 @@ ROM_START( goldnpkf )
 	ROM_LOAD( "hl_2.bin",  0x6000, 0x1000, CRC(304eb644) SHA1(c876e0d6121dee594c4f5d75273c74982c5bd524) )
 	ROM_LOAD( "hl_3.bin",  0x7000, 0x1000, CRC(47c15f44) SHA1(da7af46a8d17abffd30fffe6eb091d15f9f8f92c) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
-	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
-	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0x00 )  // filling the R-G bitplanes.
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_IGNORE(                  0x0800)         // discarding 2nd half (cards deck gfx).
 
-	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
-	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
-	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
-	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "n43.2a",  0x0000, 0x0800, CRC(1419298b) SHA1(9e07c94c858f055d1c4987efd03c76cce936f4da) )  // cards deck gfx, bitplane 1.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "n40.4a",  0x0800, 0x0800, CRC(e0b96dcf) SHA1(b06af94361dd951573f187df575b31a9ada0c3e9) )  // cards deck gfx, bitplane 2.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_CONTINUE(        0x1000, 0x0800)         // discarding 1nd half (chars).
 
 	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
 	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
