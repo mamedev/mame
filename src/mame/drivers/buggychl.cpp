@@ -183,7 +183,6 @@ private:
 	uint8_t m_sky_on;
 	uint8_t m_sprite_color_base;
 	int32_t m_bg_scrollx;
-	bool m_sound_irq_enable;
 	uint8_t m_sprite_lookup[0x2000];
 
 	void bankswitch_w(uint8_t data);
