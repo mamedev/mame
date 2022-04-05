@@ -451,5 +451,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1984, pfevr_l2, 0,        s8, s8, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1984, pfevr_p3, pfevr_l2, s8, s8, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1984, pfevr_l2, 0,        s8, s8, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984, pfevr_p3, pfevr_l2, s8, s8, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

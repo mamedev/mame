@@ -350,4 +350,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1984, scrzy_l1, 0, s8a, s8a, s8a_state, empty_init, ROT0, "Williams", "Still Crazy", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1984, scrzy_l1, 0, s8a, s8a, s8a_state, empty_init, ROT0, "Williams", "Still Crazy", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

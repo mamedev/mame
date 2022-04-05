@@ -96,7 +96,7 @@ protected:
 	u8 m_resetcnt = 0U;
 	u8 m_kbdrow = 0U;
 	u8 m_segment[5]{};
-	bool m_disp_sw = 0;
+	bool m_disp_sw = false;
 	u8 m_port06 = 0U;
 	u8 m_old_solenoids[8]{};
 	u8 m_soundlatch = 0U;
@@ -631,12 +631,12 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 2)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1982, cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980, zira,      0,     zira,   play_2, zira_state,   init_zira,  ROT0, "Playmatic",      "Zira",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 2)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, zira,      0,     zira,   play_2, zira_state,   init_zira,  ROT0, "Playmatic",      "Zira",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

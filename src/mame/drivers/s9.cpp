@@ -528,12 +528,12 @@ ROM_END
 } // Anonymous namespace
 
 // Novelty
-GAME( 1983, ratrc_l1, 0,        s9, s9,    s9_state, init_rr,    ROT0, "Williams", "Rat Race (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, ratrc_l1, 0,        s9, s9,    s9_state, init_rr,    ROT0, "Williams", "Rat Race (L-1)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // Pinball
-GAME( 1985, sorcr_l1, sorcr_l2, s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, sorcr_l2, 0,        s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, sshtl_l7, 0,        s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-7)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, sshtl_l3, sshtl_l7, s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-3)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, comet_l4, comet_l5, s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-4)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, comet_l5, 0,        s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-5)",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, sorcr_l1, sorcr_l2, s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sorcr_l2, 0,        s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-2)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sshtl_l7, 0,        s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-7)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sshtl_l3, sshtl_l7, s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-3)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comet_l4, comet_l5, s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-4)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comet_l5, 0,        s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-5)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

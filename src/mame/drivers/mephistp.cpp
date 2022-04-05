@@ -70,8 +70,8 @@ private:
 	void sport2k_8051_io(address_map &map);
 
 	u8 m_ay8910_data = 0U;
-	bool m_ay8910_bdir = 0;
-	bool m_ay8910_bc1 = 0;
+	bool m_ay8910_bdir = false;
+	bool m_ay8910_bc1 = false;
 	void ay8910_update();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -335,7 +335,7 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1987,  mephistpn,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (newer?)",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  mephistpn,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (newer?)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
