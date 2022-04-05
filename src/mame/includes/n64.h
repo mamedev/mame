@@ -64,9 +64,9 @@ protected:
 
 struct n64_savable_data_t
 {
-	uint8_t sram[0x20000];
-	uint8_t eeprom[2048];
-	uint8_t mempak[2][0x8000];
+	uint8_t sram[0x20000]{};
+	uint8_t eeprom[2048]{};
+	uint8_t mempak[2][0x8000]{};
 };
 
 class n64_periphs : public device_t,
@@ -75,8 +75,8 @@ class n64_periphs : public device_t,
 private:
 	struct AUDIO_DMA
 	{
-		uint32_t address;
-		uint32_t length;
+		uint32_t address = 0;
+		uint32_t length = 0;
 	};
 
 public:
@@ -127,40 +127,40 @@ public:
 	void video_update(bitmap_rgb32 &bitmap);
 
 	// Video Interface (VI) registers
-	uint32_t vi_width;
-	uint32_t vi_origin;
-	uint32_t vi_control;
-	uint32_t vi_blank;
-	uint32_t vi_hstart;
-	uint32_t vi_vstart;
-	uint32_t vi_xscale;
-	uint32_t vi_yscale;
-	uint32_t vi_burst;
-	uint32_t vi_vsync;
-	uint32_t vi_hsync;
-	uint32_t vi_leap;
-	uint32_t vi_intr;
-	uint32_t vi_vburst;
-	uint8_t field;
+	uint32_t vi_width = 0;
+	uint32_t vi_origin = 0;
+	uint32_t vi_control = 0;
+	uint32_t vi_blank = 0;
+	uint32_t vi_hstart = 0;
+	uint32_t vi_vstart = 0;
+	uint32_t vi_xscale = 0;
+	uint32_t vi_yscale = 0;
+	uint32_t vi_burst = 0;
+	uint32_t vi_vsync = 0;
+	uint32_t vi_hsync = 0;
+	uint32_t vi_leap = 0;
+	uint32_t vi_intr = 0;
+	uint32_t vi_vburst = 0;
+	uint8_t field = 0;
 
 	// nvram-specific for the console
-	device_t *m_nvram_image;
+	device_t *m_nvram_image = nullptr;
 
 	n64_savable_data_t m_save_data;
 
-	uint32_t cart_length;
+	uint32_t cart_length = 0;
 
-	bool dd_present;
-	bool disk_present;
-	bool cart_present;
+	bool dd_present = false;
+	bool disk_present = false;
+	bool cart_present = false;
 
 	// Mouse X2/Y2 for delta position
-	int mouse_x2[4];
-	int mouse_y2[4];
+	int mouse_x2[4]{};
+	int mouse_y2[4]{};
 
 	void poll_reset_button(bool button);
 
-	uint32_t dp_clock;
+	uint32_t dp_clock = 0;
 
 protected:
 	// device-level overrides
@@ -168,58 +168,58 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	n64_state* m_n64;
-	address_space *m_mem_map;
+	n64_state* m_n64 = nullptr;
+	address_space *m_mem_map = nullptr;
 	required_device<mips3_device> m_vr4300;
 	required_device<rsp_device> m_rsp;
 	required_shared_ptr<uint32_t> m_rsp_imem;
 	required_shared_ptr<uint32_t> m_rsp_dmem;
 
-	uint32_t *m_rdram;
-	uint32_t *m_sram;
+	uint32_t *m_rdram = nullptr;
+	uint32_t *m_sram = nullptr;
 
 	void clear_rcp_interrupt(int interrupt);
 
-	bool reset_held;
-	emu_timer *reset_timer;
-	emu_timer *dp_delay_timer;
+	bool reset_held = false;
+	emu_timer *reset_timer = nullptr;
+	emu_timer *dp_delay_timer = nullptr;
 
-	uint8_t is64_buffer[0x10000];
+	uint8_t is64_buffer[0x10000]{};
 
 	// Video interface (VI) registers and functions
-	emu_timer *vi_scanline_timer;
+	emu_timer *vi_scanline_timer = nullptr;
 
 	// Audio Interface (AI) registers and functions
 	void ai_dma();
 	AUDIO_DMA *ai_fifo_get_top();
 	void ai_fifo_push(uint32_t address, uint32_t length);
 	void ai_fifo_pop();
-	bool ai_delayed_carry;
+	bool ai_delayed_carry = false;
 
 	required_device_array<dmadac_sound_device, 2> ai_dac;
-	uint32_t ai_dram_addr;
-	uint32_t ai_len;
-	uint32_t ai_control;
-	int ai_dacrate;
-	int ai_bitrate;
-	uint32_t ai_status;
+	uint32_t ai_dram_addr = 0;
+	uint32_t ai_len = 0;
+	uint32_t ai_control = 0;
+	int ai_dacrate = 0;
+	int ai_bitrate = 0;
+	uint32_t ai_status = 0;
 
-	emu_timer *ai_timer;
+	emu_timer *ai_timer = nullptr;
 
-	AUDIO_DMA ai_fifo[AUDIO_DMA_DEPTH];
-	int ai_fifo_wpos;
-	int ai_fifo_rpos;
-	int ai_fifo_num;
+	AUDIO_DMA ai_fifo[AUDIO_DMA_DEPTH]{};
+	int ai_fifo_wpos = 0;
+	int ai_fifo_rpos = 0;
+	int ai_fifo_num = 0;
 
 	// Memory Interface (MI) registers
-	uint32_t mi_version;
-	uint32_t mi_interrupt;
-	uint32_t mi_intr_mask;
-	uint32_t mi_mode;
+	uint32_t mi_version = 0;
+	uint32_t mi_interrupt = 0;
+	uint32_t mi_intr_mask = 0;
+	uint32_t mi_mode = 0;
 
 	// RDRAM Interface (RI) registers
-	uint32_t rdram_regs[10];
-	uint32_t ri_regs[8];
+	uint32_t rdram_regs[10]{};
+	uint32_t ri_regs[8]{};
 
 	// RSP Interface (SP) registers
 	void sp_dma(int direction);
