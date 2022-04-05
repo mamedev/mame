@@ -361,7 +361,7 @@ nes_bmc_420y2k_device::nes_bmc_420y2k_device(const machine_config &mconfig, cons
 {
 }
 
-nes_bmc_12in1_device::nes_bmc_12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bmc_12in1_device::nes_bmc_12in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_12IN1, tag, owner, clock)
 {
 }
@@ -997,12 +997,7 @@ void nes_bmc_12in1_device::device_start()
 
 void nes_bmc_12in1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	m_reg[2] = 0;
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	update_banks();
 }
 
@@ -2663,42 +2658,37 @@ u8 nes_bmc_420y2k_device::read_h(offs_t offset)
  BMC-12IN1
 
  Unknown Bootleg Multigame Board
- Games:
+ Games: 7 in 1
 
- iNES:
+ NES 2.0: mapper 331
 
- In MESS: Supported.
+ In MAME: Supported.
+
+ TODO: Supposedly PRG banks change depending on what
+ CHR page the PPU is rendering from. This is not
+ emulated but the cart still works since both inner
+ PRG registers are always set to the same value.
 
  -------------------------------------------------*/
 
 void nes_bmc_12in1_device::update_banks()
 {
-	int bank = (m_reg[2] & 3) << 3;
+	u8 outer = (m_reg[3] & 0x03) << 3;
+	u8 mode = BIT(m_reg[3], 3) ? 0x01 : 0x07; // NROM256 or UNROM-like mode
+	prg16_89ab(outer | (m_reg[1] & 0x07));
+	prg16_cdef(outer | (m_reg[2] & 0x07) | mode);
 
-	chr4_0((m_reg[0] >> 3) | (bank << 2), m_chr_source);
-	chr4_4((m_reg[1] >> 3) | (bank << 2), m_chr_source);
+	chr4_0(outer | (m_reg[1] >> 3), m_chr_source);
+	chr4_4(outer | (m_reg[2] >> 3), m_chr_source);
 
-	if (m_reg[2] & 8)
-		prg32(((m_reg[0] & 7) >> 1) | bank);
-	else
-	{
-		prg16_89ab((m_reg[0] & 7) | bank);
-		prg16_cdef(7 | bank);
-	}
-
-	set_nt_mirroring(BIT(m_reg[2], 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(m_reg[3], 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
-void nes_bmc_12in1_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_12in1_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_12in1 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x6000)
-	{
-		case 0x2000: m_reg[0] = data; break;
-		case 0x4000: m_reg[1] = data; break;
-		case 0x6000: m_reg[2] = data; break;
-	}
+	m_reg[BIT(offset, 13, 2)] = data;
 	update_banks();
 }
 
