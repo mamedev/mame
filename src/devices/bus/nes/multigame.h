@@ -397,6 +397,28 @@ public:
 };
 
 
+// ======================> nes_bmc_ds927_device
+
+class nes_bmc_ds927_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_ds927_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch, m_mode;
+};
+
+
 // ======================> nes_bmc_gka_device
 
 class nes_bmc_gka_device : public nes_nrom_device
@@ -1322,6 +1344,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_970630C,    nes_bmc_970630c_device)
 DECLARE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device)
 DECLARE_DEVICE_TYPE(NES_BMC_CTC12IN1,   nes_bmc_ctc12in1_device)
+DECLARE_DEVICE_TYPE(NES_BMC_DS927,      nes_bmc_ds927_device)
 DECLARE_DEVICE_TYPE(NES_BMC_FAM250,     nes_bmc_fam250_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device)

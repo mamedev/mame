@@ -56,6 +56,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_970630C,    nes_bmc_970630c_device,    "nes_bmc_97063
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC12IN1,   nes_bmc_ctc12in1_device,   "nes_bmc_ctc12in1",   "NES Cart BMC CTC-12IN1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_DS927,      nes_bmc_ds927_device,      "nes_bmc_ds927",      "NES Cart BMC DS-9-27 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_FAM250,     nes_bmc_fam250_device,     "nes_bmc_fam250",     "NES Cart BMC FAM250 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
@@ -236,6 +237,11 @@ nes_ntd03_device::nes_ntd03_device(const machine_config &mconfig, const char *ta
 
 nes_bmc_ctc09_device::nes_bmc_ctc09_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_CTC09, tag, owner, clock)
+{
+}
+
+nes_bmc_ds927_device::nes_bmc_ds927_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_DS927, tag, owner, clock), m_latch(0), m_mode(0)
 {
 }
 
@@ -759,6 +765,24 @@ void nes_bmc_ctc09_device::pcb_reset()
 // that games reset to their own title screens. This seems to be this cart's
 // intended behavior as trying to reset to the menu here crashes (due to RAM
 // contents?). Soft reset can similarly crash the main menu (BTANB?).
+}
+
+void nes_bmc_ds927_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_mode));
+}
+
+void nes_bmc_ds927_device::pcb_reset()
+{
+	assert(m_prgram.size() >= 0x2000);
+
+	prg16_89ab(0);
+	prg16_cdef(0);
+
+	m_latch = 0;
+	m_mode = 0;
 }
 
 void nes_bmc_gka_device::device_start()
@@ -1856,6 +1880,73 @@ void nes_bmc_ctc09_device::write_h(offs_t offset, u8 data)
 	}
 	else
 		chr8(data & 0x0f, CHRROM);
+}
+
+/*-------------------------------------------------
+
+ Board DS-9-27
+
+ Games: 190 in 1
+
+ Bizarro board of mostly simple games that has
+ 8K of WRAM that is mappable, with mirroring in
+ NROM128 mode, to anywhere in upper memory.
+
+ NES 2.0: mapper 452
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_bmc_ds927_device::read_h(offs_t offset)
+{
+// LOG_MMC(("bmc_ds927 read_h, offset: %04x\n", offset));
+
+	int bits = m_mode == 1 ? 1 : 2;
+
+	if (BIT(offset, 13, bits) == BIT(m_latch, 4, bits))
+		return m_prgram[offset & 0x1fff];
+
+	return hi_access_rom(offset);
+}
+
+void nes_bmc_ds927_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_ds927 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x6000)
+	{
+		m_latch = data;
+		m_mode = bitswap<2>(data, 3, 1);
+
+		int bank = BIT(offset, 1, 7);
+
+		switch (m_mode)
+		{
+			case 0:
+				prg16_89ab(bank >> 1);
+				prg16_cdef(0);
+				break;
+			case 1:
+				for (int i = 0; i < 4; i++)
+					prg8_x(i, bank);
+				break;
+			case 2:
+			case 3:
+				prg8_89(bank);
+				prg8_ab(bank | 1);
+				prg8_cd(bank | 2);
+				prg8_ef(bank | 3 | (data & 0x04));
+				break;
+		}
+	}
+
+	set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+
+	int bits = m_mode == 1 ? 1 : 2;
+
+	if (BIT(offset, 13, bits) == BIT(m_latch, 4, bits))
+		m_prgram[offset & 0x1fff] = data;
 }
 
 /*-------------------------------------------------

@@ -278,6 +278,7 @@ static const nes_pcb pcb_list[] =
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
 	{ "bmc_ctc12in1",     BMC_CTC_12IN1 },
+	{ "bmc_ds927",        BMC_DS927 },
 	{ "bmc_fam250",       BMC_FAM250 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
