@@ -121,7 +121,7 @@ public:
 	// construction/destruction
 	nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 protected:
 	// device-level overrides
