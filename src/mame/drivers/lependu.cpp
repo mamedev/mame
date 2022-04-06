@@ -107,7 +107,7 @@ public:
 	void lependu(machine_config &config);
 
 	void init_lependu();
-		
+
 	void lamps_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void mux_w(uint8_t data);
@@ -116,7 +116,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
-    virtual void machine_reset() override;
+	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
@@ -180,7 +180,7 @@ TILE_GET_INFO_MEMBER(lependu_state::get_bg_tile_info)
 		color = ((attr & 0x1e) >> 1 );
 	else
 		color = ((attr & 0x1e) >> 2 );
- 
+
 	tileinfo.set(bank, code, color, 0);
 }
 
@@ -551,8 +551,8 @@ void lependu_state::lependu(machine_config &config)
 	m_pia[1]->readpb_handler().set_ioport("SW2");
 	m_pia[1]->writepa_handler().set(FUNC(lependu_state::sound_w));
 	m_pia[1]->writepb_handler().set(FUNC(lependu_state::mux_w)); // mux + bankswitch
-	
- 	// video hardware
+
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(lependu_state::screen_update_lependu));
@@ -565,7 +565,7 @@ void lependu_state::lependu(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lependu);
 	PALETTE(config, m_palette, FUNC(lependu_state::lependu_palette), 256);
- 
+
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, lependu_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
