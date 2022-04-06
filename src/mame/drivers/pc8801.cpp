@@ -271,8 +271,8 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			else
 			{
 				// true 400 line mode, 640x400x1
-				// - p1demo2d expects to use CRTC palette on demonstration 
-				//   (white text that is set to black on previous title screen animation, 
+				// - p1demo2d expects to use CRTC palette on demonstration
+				//   (white text that is set to black on previous title screen animation,
 				//    that runs in 3bpp)
 				draw_bitmap(bitmap, cliprect, m_crtc_palette, [&](u32 bitmap_offset, int y, int x, int xi){
 					u8 res = 0;
@@ -766,22 +766,13 @@ void pc8801_state::irq_level_w(uint8_t data)
  */
 void pc8801_state::irq_mask_w(uint8_t data)
 {
-	m_timer_irq_enable = bool(BIT(data, 0));
-	m_vrtc_irq_enable = bool(BIT(data, 1));
-	// Pulled high when cassette LOAD command is issued
-	m_rxrdy_irq_enable = bool(BIT(data, 2));
+	m_irq_state.enable &= ~7;
+	// mapping reversed to the correlated irq levels
+	m_irq_state.enable |= bitswap<3>(data & 7, 0, 1, 2);
 
-	if (m_vrtc_irq_pending && m_vrtc_irq_enable)
-		vrtc_irq_w(m_vrtc_irq_pending);
-
-	if (!m_vrtc_irq_enable)
-		m_pic->r_w(7 ^ 1, 1);
-
-	if (m_timer_irq_enable && m_timer_irq_pending)
-	{
-		m_timer_irq_pending = false;
-		m_pic->r_w(7 ^ 2, 0);
-	}
+	check_irq(RXRDY_IRQ_LEVEL);
+	check_irq(VRTC_IRQ_LEVEL);
+	check_irq(CLOCK_IRQ_LEVEL);
 }
 
 
@@ -827,8 +818,7 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 
 	m_sound_irq_enable = ((data & 0x80) == 0);
 
-	// refresh INT4 state if irq is enabled
-	// Note: this will map to no irq anyway if there's no internal OPN/OPNA
+	// Note: this will map to no irq anyway if there isn't any device interested in INT4
 	if (m_sound_irq_enable)
 		int4_irq_w(m_sound_irq_pending);
 }
@@ -1574,14 +1564,9 @@ void pc8801_state::machine_reset()
 	m_bitmap_layer_mask = 0;
 	m_vram_sel = 3;
 
-//  dynamic_res_change();
-
 	m_mouse.phase = 0;
 
-//  {
-//      m_txt_color = 2;
-//  }
-
+	// initialize ALU
 	{
 		int i;
 
@@ -1589,31 +1574,17 @@ void pc8801_state::machine_reset()
 			m_alu_reg[i] = 0x00;
 	}
 
-//  {
-//      m_crtc.param_count = 0;
-//      m_crtc.cmd = 0;
-//      m_crtc.status = 0;
-//  }
-
 	m_beeper->set_state(0);
-
-	// initialize I8214 (no way to set these from SW side?)
-	m_pic->etlg_w(1);
-	m_pic->inte_w(1);
 
 	// initialize irq section
 	{
-		m_timer_irq_enable = false;
-		m_timer_irq_pending = false;
-		m_vrtc_irq_enable = false;
-		m_rxrdy_irq_enable = false;
+		m_pic->etlg_w(1);
+		m_pic->inte_w(1);
+		m_irq_state.pending = 0;
+		m_irq_state.enable = 0;
 		m_sound_irq_enable = false;
 		m_sound_irq_pending = false;
 	}
-
-//  {
-//      m_dma_address[2] = 0xf300;
-//  }
 
 	{
 		m_extram_bank = 0;
@@ -1684,9 +1655,8 @@ WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
 
 WRITE_LINE_MEMBER( pc8801_state::rxrdy_irq_w )
 {
-	// TODO: verify if mechanism is correct
-	if (m_rxrdy_irq_enable)
-		m_pic->r_w(7 ^ 0, !state);
+	if (state)
+		assert_irq(RXRDY_IRQ_LEVEL);
 }
 
 /*
@@ -1694,7 +1664,7 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_irq_w )
  * 1 VRTC
  * 2 CLOCK
  * 3 INT3 (GSX-8800)
- * 4 INT4 (any OPN, external boards included with different mask at $aa)
+ * 4 INT4 (any OPN, external boards included with different irq mask at $aa)
  * 5 INT5
  * 6 FDCINT1
  * 7 FDCINT2
@@ -1705,9 +1675,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 	// TODO: schematics sports a μPB8212 too, with DI2-DI4 connected to 8214 A0-A2
 	// Seems just an intermediate bridge for translating raw levels to vectors
 	// with no access from outside world?
-	// TODO: acknowledge should probably be handled from i8214 int_wr_callback state = 0
 	u8 level = m_pic->a_r();
-//  printf("%d\n", level);
 	m_pic->r_w(level, 1);
 
 	return (7 - level) * 2;
@@ -1717,9 +1685,13 @@ WRITE_LINE_MEMBER(pc8801_state::int4_irq_w)
 {
 	bool irq_state = m_sound_irq_enable & state;
 
-	m_pic->r_w(7 ^ 4, !irq_state);
 	// remember current setting so that an enable reg variation will pick up
 	// particularly needed by Telenet games (xzr2, valis2)
+	// TODO: understand how exactly the external irq source works out (Sound Board II)
+	// has a separate irq mask for secondary OPNA but still sends INT4s,
+	// we separate the logic from the others since this exact function needs templatized array for enable and pending anyway
+	// (and won't otherwise work for xzr2 anyway).
+	m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
 	m_sound_irq_pending = state;
 }
 
@@ -1728,26 +1700,42 @@ WRITE_LINE_MEMBER(pc8801_state::int4_irq_w)
 TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 {
 	// TODO: castlex sound notes in BGM loop are pretty erratic
-	// (uses clock irq instead of the dedicated INT4, started happening on last OPN rewrite)
-	if (m_timer_irq_enable)
-		m_pic->r_w(7 ^ 2, 0);
+	// (uses clock irq instead of the dedicated INT4, started happening on last OPN rewrite, is it just missing some interpolation in the sound core?
+	assert_irq(CLOCK_IRQ_LEVEL);
+}
+
+void pc8801_state::check_irq(u8 level)
+{
+	u8 mask = 1 << level;
+
+	// megamit and babylon are particularly fussy if the VRTC irq isn't disabled when requested
+	// - megamit jumps to PC=0
+	// - babylon has just a ret coded in the VRTC irq, so accepting that will wreck the program flow and hang at title screen with no sound (because it expects INT4s)
+	if (!(m_irq_state.enable & mask))
+		m_pic->r_w(7 ^ level, 1);
+	else if (m_irq_state.enable & m_irq_state.pending & mask)
+		assert_irq(level);
+}
+
+void pc8801_state::assert_irq(u8 level)
+{
+	u8 mask = 1 << level;
+
+	if (mask & m_irq_state.enable)
+	{
+		m_irq_state.pending &= ~mask;
+		m_pic->r_w(7 ^ level, 0);
+	}
 	else
-		m_timer_irq_pending = true;
+		m_irq_state.pending |= mask;
 }
 
 WRITE_LINE_MEMBER(pc8801_state::vrtc_irq_w)
 {
 //  bool irq_state = m_vrtc_irq_enable & state;
-
 	if (state)
 	{
-		if (m_vrtc_irq_enable)
-		{
-			m_vrtc_irq_pending = false;
-			m_pic->r_w(7 ^ 1, 0);
-		}
-		else
-			m_vrtc_irq_pending = true;
+		assert_irq(VRTC_IRQ_LEVEL);
 	}
 }
 
@@ -1816,9 +1804,9 @@ void pc8801_state::pc8801(machine_config &config)
 	m_dma->out_hrq_cb().set(FUNC(pc8801_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8801_state::dma_mem_r));
 	// CH0: 5-inch floppy DMA
-	// CH1: 8-inch floppy DMA
+	// CH1: 8-inch floppy DMA, SCSI CD-ROM interface (on MA/MC)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
-	// CH3: CD-ROM and probably HxC etc.
+	// CH3: <autoload only?>
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));
 

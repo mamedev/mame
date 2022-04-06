@@ -38,20 +38,20 @@ class pc8801_state : public pc8001_base_state
 public:
 	pc8801_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8001_base_state(mconfig, type, tag)
-//		, m_maincpu(*this, "maincpu")
+//      , m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_pc80s31(*this, "pc80s31")
 		, m_pic(*this, I8214_TAG)
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_usart(*this, "usart")
-//		, m_cassette(*this, "cassette")
+//      , m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
 		, m_lspeaker(*this, "lspeaker")
 		, m_rspeaker(*this, "rspeaker")
 		, m_palette(*this, "palette")
 		, m_n80rom(*this, "n80rom")
 		, m_n88rom(*this, "n88rom")
-//		, m_cg_rom(*this, "cgrom")
+//      , m_cg_rom(*this, "cgrom")
 		, m_kanji_rom(*this, "kanji")
 		, m_kanji_lv2_rom(*this, "kanji_lv2")
 	{
@@ -80,20 +80,20 @@ protected:
 	virtual bool cdbios_rom_enable();
 	virtual void main_io(address_map &map);
 
-//	required_device<cpu_device> m_maincpu;
+//  required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<pc80s31_device> m_pc80s31;
 	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_usart;
-//	required_device<cassette_image_device> m_cassette;
+//  required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_n80rom;
 	required_region_ptr<u8> m_n88rom;
-//	required_region_ptr<u8> m_cg_rom;
+//  required_region_ptr<u8> m_cg_rom;
 	required_region_ptr<u8> m_kanji_rom;
 	required_region_ptr<u8> m_kanji_lv2_rom;
 
@@ -155,7 +155,7 @@ private:
 	void high_wram_w(offs_t offset, uint8_t data);
 	uint8_t ext_rom_bank_r();
 	void ext_rom_bank_w(uint8_t data);
-//	void port30_w(uint8_t data);
+//  void port30_w(uint8_t data);
 	void port31_w(uint8_t data);
 	uint8_t port40_r();
 	void port40_w(uint8_t data);
@@ -183,10 +183,10 @@ private:
 	void rtc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_irq_w);
-//	uint8_t sound_board_r(offs_t offset);
-//	void sound_board_w(offs_t offset, uint8_t data);
-//	uint8_t opna_r(offs_t offset);
-//	void opna_w(offs_t offset, uint8_t data);
+//  uint8_t sound_board_r(offs_t offset);
+//  void sound_board_w(offs_t offset, uint8_t data);
+//  uint8_t opna_r(offs_t offset);
+//  void opna_w(offs_t offset, uint8_t data);
 
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
 
@@ -200,14 +200,27 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_irq_w);
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	bool m_vrtc_irq_enable;
-	bool m_timer_irq_enable;
-	bool m_rxrdy_irq_enable;
+
+	struct {
+		u8 enable, pending;
+	} m_irq_state;
+
 	bool m_sound_irq_enable;
-	bool m_vrtc_irq_pending;
-	bool m_timer_irq_pending;
-//	bool m_rxrdy_irq_pending;
 	bool m_sound_irq_pending;
+
+	enum {
+		RXRDY_IRQ_LEVEL = 0,
+		VRTC_IRQ_LEVEL,
+		CLOCK_IRQ_LEVEL,
+		INT3_IRQ_LEVEL,
+		INT4_IRQ_LEVEL,
+		INT5_IRQ_LEVEL,
+		FDCINT1_IRQ_LEVEL,
+		FDCINT2_IRQ_LEVEL
+	};
+
+	void assert_irq(u8 level);
+	void check_irq(u8 level);
 };
 
 class pc8801mk2sr_state : public pc8801_state
