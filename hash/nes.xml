@@ -64826,7 +64826,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="ks7013b" />
 			<feature name="pcb" value="UNL-KS7013B" />
 			<dataarea name="prg" size="131072">
-				<rom name="ks114" size="131072" crc="95ce148a" sha1="eabaefb8ef07c701f7c2d8df6b132a7974c1e9b4" status="baddump" />
+				<rom name="ks114" size="131072" crc="95ce148a" sha1="eabaefb8ef07c701f7c2d8df6b132a7974c1e9b4" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -68804,19 +68804,20 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7010" />
 			<feature name="pcb" value="KAISER-KS7010" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="ks110" size="131072" crc="844e28de" sha1="f7f2138b60e782e47d12413ecbb09559b805427a" status="baddump" />
+				<rom name="ks110" size="131072" crc="844e28de" sha1="f7f2138b60e782e47d12413ecbb09559b805427a" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="ks109" size="131072" crc="d752a959" sha1="0d12c7bc3cdb21b72bcfb281237bfe8f171641c5" status="baddump" />
+				<rom name="ks109" size="131072" crc="d752a959" sha1="0d12c7bc3cdb21b72bcfb281237bfe8f171641c5" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="almanfds">
 		<description>Almana no Kiseki (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7017" />
 			<feature name="pcb" value="UNL-KS7017" />
@@ -68853,7 +68854,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 	<software name="almanfdsb" cloneof="almanfds">
 		<description>Almana no Kiseki (Asia, FDS conversion, Alt 2)</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>Whirlwind Manu</publisher>
 		<info name="serial" value="LH29"/>
 		<part name="cart" interface="nes_cart">
@@ -68889,7 +68890,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 	<software name="bublbfds">
 		<description>Bubble Bobble (Asia, FDS conversion)</description>
-		<year>19??</year>
+		<year>1987</year>
 		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7032" />
@@ -68969,8 +68970,9 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7030" />
 			<feature name="pcb" value="KAISER-KS7030" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="ks127" size="131072" crc="1d244a42" sha1="b2a4e4bf31c8d9401c9d706a5bebfd0359d22efc" status="baddump" />
+				<rom name="ks127" size="131072" crc="1d244a42" sha1="b2a4e4bf31c8d9401c9d706a5bebfd0359d22efc" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -68983,14 +68985,14 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 	<software name="drac2fds">
 		<description>Dracula II - Noroi no Fuuin (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<year>1988</year>
+		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7031" />
 			<feature name="pcb" value="UNL-KS7031" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="ks128" size="131072" crc="8b7c2f62" sha1="759801bc77163613a21840591b69a336a8e0a06a" offset="00000" status="baddump" />
+				<rom name="ks128" size="131072" crc="8b7c2f62" sha1="759801bc77163613a21840591b69a336a8e0a06a" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -69005,6 +69007,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7016" />
 			<feature name="pcb" value="KAISER-KS7016" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="exciting basket (fds conversion)[u].prg" size="131072" crc="6aa23323" sha1="3fb2ef872b2c18ce5b39c478d6bfd8084bb07f25" offset="00000" status="baddump" />
 			</dataarea>
@@ -69176,8 +69179,9 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7016b" />
 			<feature name="pcb" value="KAISER-KS7016B" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="ks115" size="131072" crc="2ec5f4c2" sha1="64564bab6cac5e5dbc9dc40457e5d8391dcda07e" status="baddump" />
+				<rom name="ks115" size="131072" crc="2ec5f4c2" sha1="64564bab6cac5e5dbc9dc40457e5d8391dcda07e" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
