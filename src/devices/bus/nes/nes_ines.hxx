@@ -483,7 +483,13 @@ static const nes_mmc mmc_list[] =
 	// 445 DG574B MMC3-compatible multicart
 	// 446 Mindkids SMD172B_FPGA board
 	// 447 VRC4-based KL-06 multicart
-	// 448...511 Unused
+	// 448 VRC4-based 830768C multicart
+	// 449 Super Games King multicart
+	// 450 VRC2-based YY841157C multicart
+	// 451 homebrew Haratyler HP/MP
+	{ 452, BMC_DS927 },
+	// 453 Realtec 8042
+	// 454...511 Unused
 	// 512 probably the correct MMC3 clone for chuugokt in nes.xml
 	{ 513, SACHEN_SA9602B },
 	// 514 seems to be for skaraok, currently set to UNKNOWN in nes.xml
