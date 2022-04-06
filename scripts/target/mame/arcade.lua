@@ -4662,7 +4662,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/s6.cpp",
 	MAME_DIR .. "src/mame/drivers/s7.cpp",
 	MAME_DIR .. "src/mame/drivers/s8.cpp",
-	MAME_DIR .. "src/mame/drivers/s8a.cpp",
 	MAME_DIR .. "src/mame/drivers/s9.cpp",
 	MAME_DIR .. "src/mame/drivers/sam.cpp",
 	MAME_DIR .. "src/mame/drivers/sleic.cpp",

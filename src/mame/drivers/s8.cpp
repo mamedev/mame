@@ -4,9 +4,8 @@
 
 PINBALL
 Williams System 8
-These are not true pinballs in the normal sense, but are unusual novelty
- machines. Unfortunately they were mostly cancelled before production could
- begin.
+These are not true pinballs in the normal sense, but are unusual novelty machines.
+  Unfortunately they were mostly cancelled before production could begin.
 
 Differences to system 7:
 - PIA at 0x2200 removed
@@ -23,9 +22,12 @@ Games:
 
 The first time run, the display will show the model number. Press F3 to clear this.
 
-Pennant Fever is a baseball game where you aim for targets at the top of the
-  playfield, and the players advance towards a home run. There are no bumpers
-  or other 'usual' pinball items. 1 or 2 players.
+
+PENNANT FEVER
+=============
+This is a baseball game where you aim for targets at the top of the playfield, and the
+  players advance towards a home run. There are no bumpers or other 'usual' pinball
+  items. 1 or 2 players.
   Buttons: Pitch (Fast, Curve, Change Up), Bat.
   How to play:
   - Insert coin (credits shows in innings)
@@ -42,15 +44,42 @@ Pennant Fever is a baseball game where you aim for targets at the top of the
   - After 3 Innings, it's game over.
   - Match digit appears in Outs digit.
 
-Gridiron, a conversion kit for Pennant Fever. Didn't get past the prototype stage.
- The display shows Player 1 and 2 (3 digits each), Possessions and Downs (2 digits each).
 
-Still Crazy, also only a prototype. See s8a.cpp for more.
+GRIDIRON
+========
+A conversion kit for Pennant Fever. Didn't get past the prototype stage. The display shows
+  Player 1 and 2 (3 digits each), Possessions and Downs (2 digits each).
 
-Break Street, another failed novelty, not much is known about it. Seems it
-  features a break-dancing toy and a spinning disk.
 
-Arena, a one-off prototype table model, similar idea to the system-7 Defender.
+STILL CRAZY
+===========
+IMDB shows the number as 534, however both the game and the manual say 543. The
+  undumped System 10 game 4-in-1 (Pigskin/Poker/Willy at the Bat/Willy's Cup) also
+  was assigned number 543.
+
+A novelty game where the playfield is completely vertical. It has 4 flippers and the
+  idea is to get the ball up to the alcohol 'still' before the 'revenuers' do. The
+  idea didn't catch on, and the game was not officially released. 1 player.
+  The display shows Score and Batch. There is no credit display.
+  If the number of batches exceeds 9, the 'hidden digit' will show the tens.
+  You cannot get more than 99 batches.
+  The score only has 5 digits, but the game stores the 100,000 digit internally.
+
+How to play: Press 5, press 1, press Z. Add points by pressing F,G,H,J. Press J
+  a number of times to increment the batches. To end the game, hit X until the siren
+  is heard. If you scored > 99999 points, the high score will show 99999.
+
+
+BREAK STREET
+============
+Another failed novelty, not much is known about it. Seems it features a break-dancing
+  toy and a spinning disk.
+
+
+ARENA
+=====
+A one-off prototype table model, similar idea to the system-7 Defender.
+
 
 Status:
 - Playable
@@ -64,11 +93,13 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/m6800/m6800.h"
+#include "audio/williams.h"
 #include "machine/6821pia.h"
 #include "sound/dac.h"
 #include "speaker.h"
 
-#include "s8.lh"
+#include "s8pfevr.lh"
+#include "s8scrzy.lh"
 
 
 namespace {
@@ -85,12 +116,16 @@ public:
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
+		, m_s9sound(*this, "s9sound")
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void s8(machine_config &config);
+	void pfevr(machine_config &config);
+	void scrzy(machine_config &config);
+	void psound(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
@@ -108,6 +143,7 @@ private:
 	void lamp1_w(u8 data);
 	void sol2_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }; // solenoids 8-15
 	void sol3_w(u8 data); // solenoids 0-7
+	void scrzy_sol3_w(u8 data); // solenoids 0-7
 	void sound_w(u8 data);
 	u8 switch_r();
 	void switch_w(u8 data);
@@ -121,6 +157,7 @@ private:
 
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
+	void scrzy_map(address_map &map);
 
 	u8 m_sound_data = 0U;
 	u8 m_strobe = 0U;
@@ -130,12 +167,13 @@ private:
 	emu_timer* m_irq_timer = nullptr;
 	static const device_timer_id TIMER_IRQ = 0;
 	required_device<m6802_cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<pia6821_device> m_pias;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
+	optional_device<williams_s9_sound_device> m_s9sound;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<61> m_digits;
 	output_finder<86> m_io_outputs; // 22 solenoids + 64 lamps
@@ -150,7 +188,14 @@ void s8_state::main_map(address_map &map)
 	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
-	map(0x5000, 0x7fff).rom().region("maincpu", 0);
+	map(0x4000, 0x7fff).rom().region("maincpu", 0);
+}
+
+void s8_state::scrzy_map(address_map &map)
+{
+	main_map(map);
+	map.global_mask(0x7fff);
+	map(0x2200, 0x2200).w(FUNC(s8_state::scrzy_sol3_w)); // solenoids
 }
 
 void s8_state::audio_map(address_map &map)
@@ -160,7 +205,7 @@ void s8_state::audio_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("audiocpu", 0);
 }
 
-static INPUT_PORTS_START( s8 )
+static INPUT_PORTS_START( pfevr )
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Plumb Tilt") // 3 touches before it tilts
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
@@ -207,6 +252,40 @@ static INPUT_PORTS_START( s8 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( scrzy )
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Top L Flip") // INP04
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bot L Flip") // INP05
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Top R Flip") // INP06
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Bot R Flip") // INP07
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Low L Drain") // INP08
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Lower Ramp Limit") // INP09 game mechanics are ready to start
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Top Drain") // INP10
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Middle R Drain") //INP11
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Level 1") // INP12
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Level 2") // INP13
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Level 3") // INP14
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("Level 4") // INP15
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Upper Ramp Limit") // INP16 revenuers have reached the still
+
+	PORT_START("X2")
+	PORT_START("X3")
+	PORT_START("X4")
+	PORT_START("X5")
+	PORT_START("X6")
+	PORT_START("X7")
+
+	PORT_START("DIAGS")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, main_nmi, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
+INPUT_PORTS_END
+
 INPUT_CHANGED_MEMBER( s8_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
@@ -230,6 +309,15 @@ void s8_state::sol3_w(u8 data)
 		m_io_outputs[i] = BIT(data, i);
 }
 
+void s8_state::scrzy_sol3_w(u8 data)
+{
+	if (data==0x0a)
+		m_samples->start(0, 7); // mechanical drum when you have 2 or more batches
+
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i] = BIT(data, i);
+}
+
 void s8_state::sound_w(u8 data)
 {
 	m_sound_data = data;
@@ -244,7 +332,8 @@ READ_LINE_MEMBER( s8_state::pia21_ca1_r )
 WRITE_LINE_MEMBER( s8_state::pia21_ca2_w )
 {
 // sound ns
-	m_pias->ca1_w(state);
+	if (m_pias)
+		m_pias->ca1_w(state);
 }
 
 void s8_state::lamp0_w(u8 data)
@@ -342,7 +431,6 @@ void s8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 
 void s8_state::machine_start()
 {
-	genpin_class::machine_start();
 	m_io_outputs.resolve();
 	m_digits.resolve();
 
@@ -350,7 +438,8 @@ void s8_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
-	save_item(NAME(m_sound_data));
+	if (m_pias)
+		save_item(NAME(m_sound_data));
 
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
@@ -358,9 +447,25 @@ void s8_state::machine_start()
 
 void s8_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
+}
+
+// Pennant Fever sound card has PIA at a custom address
+void s8_state::psound(machine_config &config)
+{
+	M6808(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s8_state::audio_map);
+
+	SPEAKER(config, "speaker").front_center();
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+
+	PIA6821(config, m_pias, 0);
+	m_pias->readpa_handler().set(FUNC(s8_state::sound_r));
+	m_pias->set_port_a_input_overrides_output_mask(0xff);
+	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
+	m_pias->irqb_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
 }
 
 void s8_state::s8(machine_config &config)
@@ -369,9 +474,6 @@ void s8_state::s8(machine_config &config)
 	M6802(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s8_state::main_map);
-
-	/* Video */
-	config.set_default_layout(layout_s8);
 
 	/* Sound */
 	genpin_audio(config);
@@ -411,45 +513,72 @@ void s8_state::s8(machine_config &config)
 	m_pia30->irqb_handler().set(FUNC(s8_state::pia_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
+void s8_state::pfevr(machine_config &config)
+{
+	s8(config);
+
+	/* Video */
+	config.set_default_layout(layout_s8pfevr);
 
 	/* Add the soundcard */
-	M6808(config, m_audiocpu, XTAL(4'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &s8_state::audio_map);
-
-	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-
-	PIA6821(config, m_pias, 0);
-	m_pias->readpa_handler().set(FUNC(s8_state::sound_r));
-	m_pias->set_port_a_input_overrides_output_mask(0xff);
-	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
-	m_pias->irqa_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
-	m_pias->irqb_handler().set_inputline("audiocpu", M6808_IRQ_LINE);
+	psound(config);
 }
+
+void s8_state::scrzy(machine_config &config)
+{
+	s8(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s8_state::scrzy_map);
+
+	/* Video */
+	config.set_default_layout(layout_s8scrzy);
+
+	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
+	m_pia21->ca2_handler().set("s9sound", FUNC(williams_s9_sound_device::strobe));
+
+	/* Add the soundcard */
+	SPEAKER(config, "mono").front_center();
+	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /*------------------------------
 / Pennant Fever (#526) 05/1984
 /-------------------------------*/
 ROM_START(pfevr_l2)
-	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("pf-rom1.u19", 0x0000, 0x1000, CRC(00be42bd) SHA1(72ca21c96e3ffa3c43499165f3339b669c8e94a5))
-	ROM_LOAD("pf-rom2.u20", 0x1000, 0x2000, CRC(7b101534) SHA1(21e886d5872104d71bb528b9affb12230268597a))
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("pf-rom1.u19", 0x1000, 0x1000, CRC(00be42bd) SHA1(72ca21c96e3ffa3c43499165f3339b669c8e94a5))
+	ROM_LOAD("pf-rom2.u20", 0x2000, 0x2000, CRC(7b101534) SHA1(21e886d5872104d71bb528b9affb12230268597a))
 
 	ROM_REGION(0x4000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("cpu_u49.128", 0x0000, 0x4000, CRC(b0161712) SHA1(5850f1f1f11e3ac9b9629cff2b26c4ad32436b55))
 ROM_END
 
 ROM_START(pfevr_p3)
-	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("cpu_u19.732", 0x0000, 0x1000, CRC(03796c6d) SHA1(38c95fcce9d0f357a74f041f0df006b9c6f6efc7))
-	ROM_LOAD("cpu_u20.764", 0x1000, 0x2000, CRC(3a3acb39) SHA1(7844cc30a9486f718a556850fc9cef3be82f26b7))
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cpu_u19.732", 0x1000, 0x1000, CRC(03796c6d) SHA1(38c95fcce9d0f357a74f041f0df006b9c6f6efc7))
+	ROM_LOAD("cpu_u20.764", 0x2000, 0x2000, CRC(3a3acb39) SHA1(7844cc30a9486f718a556850fc9cef3be82f26b7))
 
 	ROM_REGION(0x4000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("cpu_u49.128", 0x0000, 0x4000, CRC(b0161712) SHA1(5850f1f1f11e3ac9b9629cff2b26c4ad32436b55))
 ROM_END
 
+/*----------------------------
+/ Still Crazy (#543) 06/1984
+/-----------------------------*/
+ROM_START(scrzy_l1)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("ic20.bin", 0x2000, 0x2000, CRC(b0df42e6) SHA1(bb10268d7b820d1de0c20e1b79aba558badd072b) )
+
+	ROM_REGION(0x8000, "s9sound:audiocpu", ROMREGION_ERASEFF)
+	// 1st and 2nd halves are identical
+	ROM_LOAD("ic49.bin", 0x4000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
+ROM_END
+
 } // Anonymous namespace
 
 
-GAME(1984, pfevr_l2, 0,        s8, s8, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984, pfevr_p3, pfevr_l2, s8, s8, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984, pfevr_l2, 0,        pfevr, pfevr, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984, pfevr_p3, pfevr_l2, pfevr, pfevr, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984, scrzy_l1, 0,        scrzy, scrzy, s8_state, empty_init, ROT0, "Williams", "Still Crazy",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
