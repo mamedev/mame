@@ -15,6 +15,8 @@ Differences to system 7:
 
 Games:
 - Pennant Fever (#526)
+- Rat Race (#527) (10 produced)
+- Rat Race II (#533)
 - Gridiron (#538)
 - Still Crazy (#543)
 - Break Street
@@ -81,11 +83,29 @@ ARENA
 A one-off prototype table model, similar idea to the system-7 Defender.
 
 
+RAT RACE
+========
+Rat Race is played in a cocktail cabinet, the player uses a joystick to tilt the
+  board, to coax the ball into following lit passages in a maze. After a successful
+  navigation, the maze changes to something else faster and harder. It's almost an
+  arcade game done mechanically. Obviously there is no way to emulate it in its intended
+  form. Probably would have been a nice game, but it never passed the prototype stage.
+  Bad byte at "maincpu" D7FF, although it doesn't seem to cause an issue.
+
+How to play: Press 5, press 1. If you want 2 players, also press 2. The display flashes
+  the ball number. Press Z to get the ball into play. The display alternates between the
+  score and the seconds remaining to accomplish the task. After the series of passages
+  has been followed, a bonus flashes for a few seconds, which you must also run over.
+  While one player is playing, the other player's score shows what seem to be random
+  numbers (but probably are not). The real machine does this too.
+  If time runs out, the ball is over. After 3 balls, it's game over.
+
 Status:
 - Playable
 
 ToDo:
 - Nothing
+- Rat Race: need a manual, playboard switches are unknown.
 
 ************************************************************************************/
 
@@ -99,6 +119,7 @@ ToDo:
 #include "speaker.h"
 
 #include "s8pfevr.lh"
+#include "s8ratrc.lh"
 #include "s8scrzy.lh"
 
 
@@ -124,6 +145,7 @@ public:
 
 	void s8(machine_config &config);
 	void pfevr(machine_config &config);
+	void ratrc(machine_config &config);
 	void scrzy(machine_config &config);
 	void psound(machine_config &config);
 
@@ -139,9 +161,10 @@ private:
 	u8 sound_r();
 	void dig0_w(u8 data);
 	void dig1_w(u8 data);
+	void ratrc_dig1_w(u8 data);
 	void lamp0_w(u8 data);
 	void lamp1_w(u8 data);
-	void sol2_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }; // solenoids 8-15
+	void sol2_w(u8 data);
 	void sol3_w(u8 data); // solenoids 0-7
 	void scrzy_sol3_w(u8 data); // solenoids 0-7
 	void sound_w(u8 data);
@@ -151,8 +174,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { m_comma34 = state; } // comma3&4
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_comma12 = state; } // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 
 	void audio_map(address_map &map);
@@ -162,6 +185,8 @@ private:
 	u8 m_sound_data = 0U;
 	u8 m_strobe = 0U;
 	u8 m_row = 0U;
+	bool m_comma12 = false;
+	bool m_comma34 = false;
 	bool m_data_ok = false;
 	u8 m_lamp_data = 0U;
 	emu_timer* m_irq_timer = nullptr;
@@ -286,6 +311,82 @@ static INPUT_PORTS_START( scrzy )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ratrc )
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) // 2nd player start
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("High Score Reset")
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP12")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP13")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP14")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP15")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP16")
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP18")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP19")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP21")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP22")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP23")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP24")
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP25")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP26")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP27")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP28")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP29")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP30")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP31")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP32")
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP36")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP37")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP38")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP39")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP40")
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP41")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP42")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP43")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP44")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP45")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP46")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP47")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP48")
+
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP49")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP50")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP51")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP52")
+
+	PORT_START("X7")
+	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP57") // Ball entering play (bit 0 = P1, bit 4 = P2)
+
+	PORT_START("DIAGS")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s8_state, main_nmi, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
+INPUT_PORTS_END
+
 INPUT_CHANGED_MEMBER( s8_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
@@ -336,6 +437,15 @@ WRITE_LINE_MEMBER( s8_state::pia21_ca2_w )
 		m_pias->ca1_w(state);
 }
 
+void s8_state::sol2_w(u8 data)
+{
+	m_comma12 = BIT(data, 7);
+	m_comma34 = BIT(data, 6);
+
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[8U+i] = BIT(data, i);
+}
+
 void s8_state::lamp0_w(u8 data)
 {
 	m_lamp_data = data ^ 0xff;
@@ -370,11 +480,21 @@ void s8_state::dig1_w(u8 data)
 	m_data_ok = false;
 }
 
+void s8_state::ratrc_dig1_w(u8 data)
+{
+	static const u8 patterns[16] = { 0x3f,0x06,0xdb,0xcf,0xe6,0xed,0xfd,0x07,0xff,0xef,0,0,0,0,0,0 }; // MC14543
+	if (m_data_ok)
+	{
+		m_digits[m_strobe+16] = patterns[data & 15] | (m_comma34 ? 0xc000 : 0);
+		m_digits[m_strobe] = patterns[data >> 4] | (m_comma12 ? 0xc000 : 0);
+	}
+	m_data_ok = false;
+}
+
 u8 s8_state::switch_r()
 {
 	u8 data = 0;
-	// there's hardware for 8 rows, but machine uses 4
-	for (u8 i = 0; i < 4; i++)
+	for (u8 i = 0; i < 8; i++)
 		if (BIT(m_row, i))
 			data |= m_io_keyboard[i]->read();
 
@@ -438,8 +558,12 @@ void s8_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
+
 	if (m_pias)
 		save_item(NAME(m_sound_data));
+
+	save_item(NAME(m_comma12));
+	save_item(NAME(m_comma34));
 
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
@@ -542,6 +666,15 @@ void s8_state::scrzy(machine_config &config)
 	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void s8_state::ratrc(machine_config &config)
+{
+	scrzy(config);
+	m_pia28->writepb_handler().set(FUNC(s8_state::ratrc_dig1_w));
+
+	/* Video */
+	config.set_default_layout(layout_s8ratrc);
+}
+
 
 /*------------------------------
 / Pennant Fever (#526) 05/1984
@@ -564,6 +697,24 @@ ROM_START(pfevr_p3)
 	ROM_LOAD("cpu_u49.128", 0x0000, 0x4000, CRC(b0161712) SHA1(5850f1f1f11e3ac9b9629cff2b26c4ad32436b55))
 ROM_END
 
+/*-----------------------------------------------------------------------------
+/ Rat Race : (Game #527)- Prototype (displays as #500L1)
+/-----------------------------------------------------------------------------*/
+ROM_START(ratrc_l1)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("ic20.532", 0x1000, 0x1000, CRC(0c5c7c09) SHA1(c93b39ba1460feee5850fcd3ca7cacb72c4c8ff3))
+	ROM_LOAD("ic14.532", 0x2000, 0x1000, CRC(c6f4bcf4) SHA1(d71c86299139abe3dd376a324315a039be82875c))
+	ROM_LOAD("ic17.532", 0x3000, 0x1000, CRC(0800c214) SHA1(3343c07fd550bb0759032628e01bb750135dab15))
+
+	ROM_REGION(0x8000, "s9sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("b486.bin", 0x6000, 0x2000, CRC(c54b9402) SHA1(c56fc5f105fc2c1166e3b22bb09b72af79e0aec1))
+ROM_END
+
+/*-----------------------------
+/ Rat Race II (Game #533)
+/ - never produced
+/-----------------------------*/
+
 /*----------------------------
 / Still Crazy (#543) 06/1984
 /-----------------------------*/
@@ -581,4 +732,5 @@ ROM_END
 
 GAME(1984, pfevr_l2, 0,        pfevr, pfevr, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1984, pfevr_p3, pfevr_l2, pfevr, pfevr, s8_state, empty_init, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983, ratrc_l1, 0,        ratrc, ratrc, s8_state, empty_init, ROT0, "Williams", "Rat Race (L-1)",      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1984, scrzy_l1, 0,        scrzy, scrzy, s8_state, empty_init, ROT0, "Williams", "Still Crazy",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

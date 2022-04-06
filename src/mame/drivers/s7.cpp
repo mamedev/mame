@@ -59,7 +59,6 @@ Firepower II                      521  AS hit 1                  AS
 Wild Texas                      *(521) AS hit 1                  AS
 Guardian (unreleased)             523
 Star Fighter (unreleased)         524
-Rat Race                          527 (10 produced, see s9.cpp)
 Light Speed (unreleased)          528
 Starlight                         530  AS hit 1                  AS
 
