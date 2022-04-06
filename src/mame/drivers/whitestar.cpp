@@ -86,11 +86,16 @@ public:
 		, m_decobsmt(*this, "decobsmt")
 		, m_decodmd(*this, "decodmd")
 		, m_io_keyboard(*this, "X%d", 0U)
+		, m_mainbank(*this, "mainbank")
 	{ }
 
 	void whitestar(machine_config &config);
 	void whitestarm(machine_config &config);
 	void goldcue(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	void bank_w(uint8_t data);
@@ -98,8 +103,6 @@ private:
 
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
 
 	void whitestar_base_map(address_map &map);
@@ -113,6 +116,7 @@ private:
 	optional_device<decobsmt_device> m_decobsmt;
 	required_device<decodmd_type2_device> m_decodmd;
 	required_ioport_array<8> m_io_keyboard;
+	required_memory_bank m_mainbank;
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -231,7 +235,7 @@ void whitestar_state::whitestar_base_map(address_map &map)
 	map(0x3600, 0x3600).w(FUNC(whitestar_state::dmddata_w));
 	map(0x3601, 0x3601).rw(m_decodmd, FUNC(decodmd_type2_device::ctrl_r), FUNC(decodmd_type2_device::ctrl_w));
 	map(0x3700, 0x3700).r(m_decodmd, FUNC(decodmd_type2_device::busy_r));
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
 }
 
@@ -270,7 +274,7 @@ void whitestar_state::switch_w(uint8_t data)
 
 void whitestar_state::bank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x1f);
+	m_mainbank->set_entry(data & 0x1f);
 }
 
 // Whitestar automatically pulses the DMD IRQ line?  DE hardware doesn't do that...
@@ -283,8 +287,8 @@ void whitestar_state::dmddata_w(uint8_t data)
 
 void whitestar_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base(), 0x4000);
-	membank("bank1")->set_entry(0);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base(), 0x4000);
+	m_mainbank->set_entry(0);
 
 	genpin_class::machine_start();
 	//m_io_outputs.resolve();
