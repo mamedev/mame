@@ -23,11 +23,12 @@ Bugs Bunny's Birthday Ball     20009  Hold CD hit 1          CD
 **** Williams (WPC) ****
 Riverboat Gambler              50007  Hold CDE hit 1         CDE
 **** Krell Development ****
-Star Trax                        ---  unknown                unknown
+Star Trax                        ---  X                      unknown
 
 Status:
 - All pinball machines are playable
-- Star Trax has no pinball, but instead has many ball bearings (800 was mentioned), so will not be able to run
+- Star Trax has no pinball, but instead has many ball bearings (800 was mentioned). Although it 
+    can be started, and a score attained, it will eventually say PUMP ERROR and stop responding.
 
 
 ToDo:
