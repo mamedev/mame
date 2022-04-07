@@ -3711,11 +3711,10 @@ ROM_START( mgcrystlo ) /* Master Up: 91/12/10 01:56:06 */
 	ROM_LOAD( "mc030.u32",  0x000000, 0x040000, CRC(c165962e) SHA1(f7e130db387ae9dcb7223f7ad6e51270d3033bc9) )
 ROM_END
 
-// Note: there is a known undumped older Japan set from http://gamesdbase.com/Media/SYSTEM/Arcade/PCB/big/Magical_Crystals_-_1991_-_Kaneko.jpg with code roms ending in -00 instead of -02
 ROM_START( mgcrystlj ) /* Master Up: 92/01/13 14:44:20 */
 	ROM_REGION( 0x040000*2, "maincpu", ROMREGION_ERASE )            /* 68000 Code */
-	ROM_LOAD16_BYTE( "kaneko__mc100-u18j-02.u18", 0x000000, 0x020000, CRC(afe5882d) SHA1(176e6e12e3df63c08d7aff781f5e5a9bd83ec293) ) /* Labeled as MC100J/U18-02 */
-	ROM_LOAD16_BYTE( "kaneko__mc101-u19j-02.u19", 0x000001, 0x040000, CRC(60da5492) SHA1(82b90a617d355825624ce9fb30bddf4714bd0d18) ) /* Labeled as MC101J/U19-02 */
+	ROM_LOAD16_BYTE( "kaneko__mc100-u18j-00.u18", 0x000000, 0x020000, CRC(afe5882d) SHA1(176e6e12e3df63c08d7aff781f5e5a9bd83ec293) ) /* Labeled as MC100J/U18-00 */
+	ROM_LOAD16_BYTE( "kaneko__mc101-u19j-00.u19", 0x000001, 0x040000, CRC(60da5492) SHA1(82b90a617d355825624ce9fb30bddf4714bd0d18) ) /* Labeled as MC101J/U19-00 */
 
 	ROM_REGION( 0x280000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "kaneko__mc-000_0001.u38",  0x000000, 0x100000, CRC(28acf6f4) SHA1(6647ad90ea580b65ed28772f9d65352b06833d0c) ) // Mask rom

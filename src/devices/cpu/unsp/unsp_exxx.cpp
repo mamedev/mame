@@ -5,8 +5,6 @@
 #include "unsp.h"
 #include "unspfe.h"
 
-#include "debugger.h"
-
 #include "unspdasm.h"
 
 #define LOG_UNSP_MULS            (1U << 1)

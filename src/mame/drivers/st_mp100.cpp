@@ -48,6 +48,7 @@ public:
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
 		, m_digits(*this, "digit%d", 0U)
+		, m_io_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -78,9 +79,9 @@ private:
 	u8 m_u10b = 0U;
 	u8 m_u11a = 0U;
 	u8 m_u11b = 0U;
-	bool m_u10_ca2 = 0;
-	bool m_u10_cb2 = 0;
-	bool m_u11_cb2 = 0;
+	bool m_u10_ca2 = false;
+	bool m_u10_cb2 = false;
+	bool m_u11_cb2 = false;
 	u8 m_stored_lamp = 0xffU;
 	u8 m_digit = 0U;
 	u8 m_counter = 0U;
@@ -101,6 +102,7 @@ private:
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
 	output_finder<48> m_digits;
+	output_finder<1> m_io_leds;
 	output_finder<80> m_io_outputs;   // 16 solenoids + 64 lamps
 };
 
@@ -530,7 +532,7 @@ WRITE_LINE_MEMBER( st_mp100_state::u10_cb2_w )
 
 WRITE_LINE_MEMBER( st_mp100_state::u11_ca2_w )
 {
-	output().set_value("led0", !state);
+	m_io_leds[0] = state ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER( st_mp100_state::u11_cb2_w )
@@ -717,8 +719,8 @@ void st_mp100_state::u11_b_w(u8 data)
 
 void st_mp100_state::machine_start()
 {
-	genpin_class::machine_start();
 	m_digits.resolve();
+	m_io_leds.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_u10a));
@@ -737,7 +739,6 @@ void st_mp100_state::machine_start()
 
 void st_mp100_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	m_u10a = 0;
 	m_u10b = 0;
 	m_u10_cb2 = 0;
@@ -976,21 +977,21 @@ ROM_END
 
 
 // chimes
-GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Pinball",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stingray",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stars",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Memory Lane",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978,  blkshpsq,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Astro", "Black Sheep Squadron",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Pinball",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stingray",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stars",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Memory Lane",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978,  blkshpsq,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Astro", "Black Sheep Squadron",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // sound unit B-521
-GAME( 1978,  lectrono,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Lectronamo",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978,  wildfyre,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Wildfyre",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978,  nugent,     0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Nugent",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979,  dracula,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Dracula (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1978,  lectrono,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Lectronamo",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978,  wildfyre,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Wildfyre",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978,  nugent,     0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Nugent",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979,  dracula,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Dracula (Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // different inputs
-GAME( 1979,  trident,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979,  tridento,   trident, st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident (Older set)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979,  hothand,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Hot Hand",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979,  princess,   0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Cosmic Princess",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979,  magic,      0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Magic",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979,  trident,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979,  tridento,   trident, st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident (Older set)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979,  hothand,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Hot Hand",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979,  princess,   0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Cosmic Princess",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979,  magic,      0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Magic",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

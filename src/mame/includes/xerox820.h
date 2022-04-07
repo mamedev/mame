@@ -118,18 +118,18 @@ protected:
 	void update_nmi();
 
 	/* video state */
-	uint8_t m_scroll;                     /* vertical scroll */
-	uint8_t m_framecnt;
-	int m_ncset2;                       /* national character set */
-	int m_vatt;                         /* X120 video attribute */
-	int m_lowlite;                      /* low light attribute */
-	int m_chrom;                        /* character ROM index */
+	uint8_t m_scroll = 0;                     /* vertical scroll */
+	uint8_t m_framecnt = 0;
+	int m_ncset2 = 0;                       /* national character set */
+	int m_vatt = 0;                         /* X120 video attribute */
+	int m_lowlite = 0;                      /* low light attribute */
+	int m_chrom = 0;                        /* character ROM index */
 
 	/* floppy state */
-	bool m_fdc_irq;                     /* interrupt request */
-	bool m_fdc_drq;                     /* data request */
-	int m_8n5;                          /* 5.25" / 8" drive select */
-	int m_400_460;                      /* double sided disk detect */
+	bool m_fdc_irq = false;                     /* interrupt request */
+	bool m_fdc_drq = false;                     /* data request */
+	int m_8n5 = 0;                          /* 5.25" / 8" drive select */
+	int m_400_460 = 0;                      /* double sided disk detect */
 };
 
 class bigboard_state : public xerox820_state
@@ -152,7 +152,7 @@ protected:
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
 
-	bool m_bit5;
+	bool m_bit5 = false;
 };
 
 class xerox820ii_state : public xerox820_state

@@ -12,6 +12,9 @@
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class gs6502_state : public driver_device
 {
 public:
@@ -73,5 +76,8 @@ ROM_START(gs6502)
 	ROM_LOAD("gs6502.bin",   0xc000, 0x4000, CRC(0b1d8348) SHA1(482451aa8cc0c470ce9706b43bfa093df47c8ab1))
 ROM_END
 
-//    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
-COMP( 201?, gs6502,       0,        0,      gs6502,    0,       gs6502_state, empty_init,    "Grant Searle",   "Simple 6502 Machine",  MACHINE_NO_SOUND_HW )
+} // anonymous namespace
+
+
+//    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS         INIT           COMPANY           FULLNAME                FLAGS
+COMP( 2013, gs6502,      0,        0,      gs6502,   0,       gs6502_state, empty_init,    "Grant Searle",   "Simple 6502 Machine",  MACHINE_NO_SOUND_HW ) // schematics are dated 2009-2013

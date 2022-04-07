@@ -263,6 +263,7 @@ public:
 	void init_redhawk();
 	void init_redhawkg();
 	void init_redhawki();
+	void init_redhawksa();
 	void init_spec2k();
 
 private:

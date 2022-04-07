@@ -62,6 +62,7 @@ public:
 
 private:
 	u8 lampst_r();
+	u16 seg8to14(u16 data);
 	u8 switch_r(offs_t offset);
 	void muxen_w(u8 data);
 	void muxld_w(u8 data);
@@ -77,10 +78,10 @@ private:
 	void ccpu_map(address_map &map);
 	void hcpu_map(address_map &map);
 
-	bool m_zcen = 0;
-	bool m_gten = 0;
-	bool m_disp_on = 0;
-	bool m_diag_on = 0;
+	bool m_zcen = false;
+	bool m_gten = false;
+	bool m_disp_on = false;
+	bool m_diag_on = false;
 	u8 m_firqtimer = 0U;
 	u8 m_diag_segments = 0U;
 	virtual void machine_start() override;
@@ -408,7 +409,7 @@ u8 wico_state::lampst_r()
 			j = m_shared_ram[0x7f9 + i];
 		else
 			j = 0;
-		m_digits[i * 10 + (m_shared_ram[0x96] & 7)] = j;
+		m_digits[i * 10 + (m_shared_ram[0x96] & 7)] = seg8to14(j);
 	}
 	// Lamps
 	for (i = 0; i < 16; i++)
@@ -419,6 +420,12 @@ u8 wico_state::lampst_r()
 	}
 
 	return 0xff;
+}
+
+// convert custom 8seg digit to MAME 14seg digit
+u16 wico_state::seg8to14(u16 data)
+{
+	return bitswap<10>(data,7,7,6,6,5,4,3,2,1,0);
 }
 
 // reset watchdog and enable housekeeping cpu
@@ -518,4 +525,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

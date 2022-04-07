@@ -27,10 +27,10 @@ public:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_txt_videoram;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_txt_tilemap;
-	int m_bgbank;
-	int m_txtbank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_txt_tilemap = nullptr;
+	int m_bgbank = 0;
+	int m_txtbank = 0;
 
 	void bg_videoram_w(offs_t offset, uint16_t data);
 	void txt_videoram_w(offs_t offset, uint16_t data);

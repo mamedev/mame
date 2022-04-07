@@ -68,12 +68,12 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	output_finder<2> m_lamps;
 
-	int m_sn76496_latch;
-	int m_sn76496_select;
-	int m_sn1_ready;
-	int m_sn2_ready;
-	int m_sn3_ready;
-	uint8_t m_irq_mask;
+	int m_sn76496_latch = 0;
+	int m_sn76496_select = 0;
+	int m_sn1_ready = 0;
+	int m_sn2_ready = 0;
+	int m_sn3_ready = 0;
+	uint8_t m_irq_mask = 0;
 };
 
 #endif // MAME_INCLUDES_SPCFORCE_H

@@ -47,16 +47,16 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
-	tilemap_t        *m_fg_tilemap;
-	tilemap_t        *m_bg_tilemap;
-	tilemap_t        *m_text_tilemap;
-	tilemap_t        *m_sl_tilemap;
-	bitmap_ind16 m_main_bitmap;
-	int            m_control;
-	int            m_sl_image;
-	int            m_sl_enable;
-	int            m_timer_value;
-	emu_timer *m_countdown_timer;
+	tilemap_t        *m_fg_tilemap = nullptr;
+	tilemap_t        *m_bg_tilemap = nullptr;
+	tilemap_t        *m_text_tilemap = nullptr;
+	tilemap_t        *m_sl_tilemap = nullptr;
+	bitmap_ind16 m_main_bitmap = 0;
+	int            m_control = 0;
+	int            m_sl_image = 0;
+	int            m_sl_enable = 0;
+	int            m_timer_value = 0;
+	emu_timer *m_countdown_timer = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

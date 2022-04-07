@@ -25,6 +25,8 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 
+namespace {
+
 class tim100_state : public driver_device
 {
 public:
@@ -242,5 +244,6 @@ ROM_START( tim100 )
 	ROM_CONTINUE (0x1800, 0x0800)
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
+
 COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

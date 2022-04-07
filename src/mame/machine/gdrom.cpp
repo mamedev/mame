@@ -248,7 +248,7 @@ void gdrom_device::ExecCommand()
 		{
 			// TODO: is this correct?
 			int start_trk = command[2];
-			int end_trk = cdrom_get_last_track(m_cdrom);
+			int end_trk = m_cdrom->get_last_track();
 			int length;
 			int allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
 
@@ -335,7 +335,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			{
 				while (dataLength > 0)
 				{
-					if (!cdrom_read_data(m_cdrom, m_lba, tmp_buffer, CD_TRACK_MODE1))
+					if (!m_cdrom->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
 					{
 						LOGWARN("CD read error!\n");
 					}
@@ -387,7 +387,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 						start_trk = 1;
 					}
 
-					end_trk = cdrom_get_last_track(m_cdrom);
+					end_trk = m_cdrom->get_last_track();
 					len = (end_trk * 8) + 2;
 
 					// the returned TOC DATA LENGTH must be the full amount,
@@ -419,13 +419,13 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 						}
 
 						data[dptr++] = 0;
-						data[dptr++] = cdrom_get_adr_control(m_cdrom, cdrom_track);
+						data[dptr++] = m_cdrom->get_adr_control(cdrom_track);
 						data[dptr++] = i;
 						data[dptr++] = 0;
 
-						tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
+						tstart = m_cdrom->get_track_start(cdrom_track);
 						if ((command[1]&2)>>1)
-							tstart = lba_to_msf(tstart);
+							tstart = cdrom_file::lba_to_msf(tstart);
 						data[dptr++] = (tstart>>24) & 0xff;
 						data[dptr++] = (tstart>>16) & 0xff;
 						data[dptr++] = (tstart>>8) & 0xff;
@@ -494,7 +494,7 @@ void gdrom_device::SetDevice(void *device)
 
 	// try to find if the mounted chd is from an actual gd-rom disc
 	if (m_cdrom)
-		if (cdrom_get_toc(m_cdrom)->flags & CD_FLAG_GDROM)
+		if (m_cdrom->get_toc().flags & cdrom_file::CD_FLAG_GDROM)
 			is_real_gdrom_disc = true;
 }
 

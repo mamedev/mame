@@ -91,16 +91,16 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	/* video-related */
-	tilemap_t   *m_tilemap1;
-	tilemap_t   *m_tilemap2;
-	tilemap_t   *m_tilemap3;
+	tilemap_t   *m_tilemap1 = nullptr;
+	tilemap_t   *m_tilemap2 = nullptr;
+	tilemap_t   *m_tilemap3 = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_tile1_info);
 	TILE_GET_INFO_MEMBER(get_tile2_info);
 	TILE_GET_INFO_MEMBER(get_tile3_info);
 
-	int       m_oki_bank;
-	uint16_t  m_gfx_control;
+	int       m_oki_bank = 0;
+	uint16_t  m_gfx_control = 0;
 
 	void gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void tilemap1_scrollx_w(uint16_t data);

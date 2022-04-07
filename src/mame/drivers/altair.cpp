@@ -2,24 +2,24 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        MITS Altair 8800b Turnkey
+MITS Altair 8800b Turnkey
 
-        04/12/2009 Initial driver by Miodrag Milanovic
+2009-12-04 Initial driver by Miodrag Milanovic
 
-        Supposedly introduced October 1977.
+Supposedly introduced October 1977.
 
-        Commands:
-        All commands must be in uppercase. Address and data is
-        specified in Octal format (not hex).
+Commands:
+ All commands must be in uppercase. Address and data is
+ specified in Octal format (not hex).
 
-        Press space to input your command line (not return).
+ Press space to input your command line (not return).
 
-        D - Memory Dump
-        J - Jump to address
-        M - Modify memory
+D - Memory Dump
+J - Jump to address
+M - Modify memory
 
-        Reference:
-        http://www.computercloset.org/MITSAltair8800bt.htm
+Reference:
+ http://www.computercloset.org/MITSAltair8800bt.htm
 
 ****************************************************************************/
 
@@ -31,6 +31,7 @@
 #include "machine/f4702.h"
 #include "imagedev/snapquik.h"
 
+namespace {
 
 class altair_state : public driver_device
 {
@@ -147,7 +148,7 @@ ROM_START( al8800bt )
 	ROM_LOAD( "88dskrom.bin", 0x0100, 0x0100, CRC(7c5232f3) SHA1(24f940ad70ad2829e1bc800c6790b6e993e6ebf6))
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY  FULLNAME         FLAGS
 COMP( 1977, al8800bt, 0,      0,      altair,  altair,  altair_state, empty_init, "MITS",  "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -57,9 +57,9 @@ const abc1600_format::format abc1600_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_ABC1600_FORMAT = &floppy_image_format_creator<abc1600_format>;
+const abc1600_format FLOPPY_ABC1600_FORMAT;
 
-int abc1600_format::get_image_offset(const format &f, int head, int track)
+int abc1600_format::get_image_offset(const format &f, int head, int track) const
 {
 	int offset = 0;
 

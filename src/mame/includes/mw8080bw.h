@@ -51,7 +51,8 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_main_ram(*this, "main_ram"),
 		m_discrete(*this, "discrete"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_int_enable(true)
 	{ }
 
 	void blueshrk(machine_config &config);
@@ -88,6 +89,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+
 	u8 mw8080bw_shift_result_rev_r();
 
 	int invaders_is_cabinet_cocktail();
@@ -104,18 +107,20 @@ protected:
 	required_device<screen_device> m_screen;
 
 	// misc game specific
-	uint8_t       m_flip_screen;
+	uint8_t       m_flip_screen = 0;
 
 private:
 	// misc game specific
-	uint16_t      m_phantom2_cloud_counter;
-	uint8_t       m_maze_tone_timing_state;   // output of IC C1, pin 5
+	uint16_t      m_phantom2_cloud_counter = 0;
+	uint8_t       m_maze_tone_timing_state = 0;   // output of IC C1, pin 5
 
 	// timers
-	emu_timer   *m_interrupt_timer;
-	emu_timer   *m_maze_tone_timer;
+	emu_timer   *m_interrupt_timer = nullptr;
+	emu_timer   *m_maze_tone_timer = nullptr;
 
 	attotime m_interrupt_time;
+
+	bool m_int_enable;
 
 	void tornbase_io_w(offs_t offset, uint8_t data);
 	void maze_coin_counter_w(uint8_t data);
@@ -253,7 +258,7 @@ private:
 	void gmissile_io_map(address_map &map);
 	void m4_io_map(address_map &map);
 
-	u8 m_rev_shift_res;
+	u8 m_rev_shift_res = 0;
 };
 
 
@@ -286,7 +291,7 @@ private:
 
 	required_ioport_array<2> m_gun_port;
 	required_ioport_array<2> m_dip_sw_0_1;
-	u8 m_controller_select;
+	u8 m_controller_select = 0;
 };
 
 
@@ -341,7 +346,7 @@ private:
 	void spacwalk_io_map(address_map &map);
 
 	required_ioport_array<2> m_controllers;
-	u8 m_controller_select;
+	u8 m_controller_select = 0;
 };
 
 
@@ -367,11 +372,11 @@ private:
 	void io_map(address_map &map);
 
 	required_device<spcenctr_audio_device> m_soundboard;
-	u8 m_trench_width;
-	u8 m_trench_center;
+	u8 m_trench_width = 0;
+	u8 m_trench_center = 0;
 	u8 m_trench_slope[16];  // 16x4 bit RAM
-	u8 m_bright_control;
-	u8 m_brightness;
+	u8 m_bright_control = 0;
+	u8 m_brightness = 0;
 };
 
 

@@ -162,6 +162,18 @@ if (MACHINES["AM2901B"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/amiga_copper.h,MACHINES["AMIGA_COPPER"] = true
+---------------------------------------------------
+
+if (MACHINES["AMIGA_COPPER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/amiga_copper.cpp",
+		MAME_DIR .. "src/devices/machine/amiga_copper.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/machine/arm_iomd.h,MACHINES["ARM_IOMD"] = true
@@ -1959,6 +1971,18 @@ if (MACHINES["LDV1000"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ldv1000.cpp",
 		MAME_DIR .. "src/devices/machine/ldv1000.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ldv4200hle.h,MACHINES["LDV4200HLE"] = true
+---------------------------------------------------
+
+if (MACHINES["LDV4200HLE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ldv4200hle.cpp",
+		MAME_DIR .. "src/devices/machine/ldv4200hle.h",
 	}
 end
 
@@ -4920,5 +4944,16 @@ if (MACHINES["BITMAP_PRINTER"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/bitmap_printer.cpp",
 		MAME_DIR .. "src/devices/machine/bitmap_printer.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ns32382.h,MACHINES["NS32382"] = true
+---------------------------------------------------
+if (MACHINES["NS32382"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ns32382.cpp",
+		MAME_DIR .. "src/devices/machine/ns32382.h",
 	}
 end

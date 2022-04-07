@@ -12,10 +12,10 @@
 #include "pps41d.h"
 
 
-DEFINE_DEVICE_TYPE(MM76, mm76_device, "mm76", "Rockwell MM76") // 640 bytes ROM, 48 nibbles RAM
-DEFINE_DEVICE_TYPE(MM76L, mm76l_device, "mm76l", "Rockwell MM76L") // low-power
-DEFINE_DEVICE_TYPE(MM76E, mm76e_device, "mm76e", "Rockwell MM76E") // ROM extended to 1KB
-DEFINE_DEVICE_TYPE(MM76EL, mm76el_device, "mm76el", "Rockwell MM76EL") // low-power
+DEFINE_DEVICE_TYPE(MM76, mm76_device, "mm76", "Rockwell MM76 A7600") // 640 bytes ROM, 48 nibbles RAM
+DEFINE_DEVICE_TYPE(MM76L, mm76l_device, "mm76l", "Rockwell MM76L B7600") // low-power
+DEFINE_DEVICE_TYPE(MM76E, mm76e_device, "mm76e", "Rockwell MM76E A8600") // ROM extended to 1KB
+DEFINE_DEVICE_TYPE(MM76EL, mm76el_device, "mm76el", "Rockwell MM76EL B8600") // low-power
 
 
 // constructor

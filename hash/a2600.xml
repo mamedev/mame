@@ -535,7 +535,7 @@ X-1414 : Streetracer
 	<software name="advtron">
 		<description>Adventures of Tron</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4317" />
 		<info name="programmer" value="Hal Finney, Glenn Hightower" />
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -577,7 +577,7 @@ X-1414 : Streetracer
 	<software name="airraids">
 		<description>Air Raiders</description>
 		<year>1982</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="5861" />
 		<info name="programmer" value="Larry Zwick" />
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -948,7 +948,7 @@ X-1414 : Streetracer
 	<software name="armoramb">
 		<description>Armor Ambush</description>
 		<year>1982</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="5661, MT5661" />
 		<info name="programmer" value="Hal Finney" />
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -1190,7 +1190,7 @@ X-1414 : Streetracer
 	<software name="astrblst">
 		<description>Astroblast</description>
 		<year>1982</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="5666" />
 		<info name="programmer" value="Hal Finney" />
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -1204,7 +1204,7 @@ X-1414 : Streetracer
 	<software name="astrblst1" cloneof="astrblst">
 		<description>Astroblast (Alt)</description>
 		<year>1982</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="5666" />
 		<info name="programmer" value="Hal Finney" />
 		<part name="cart" interface="a2600_cart">
@@ -1217,7 +1217,7 @@ X-1414 : Streetracer
 	<software name="astrblste" cloneof="astrblst">
 		<description>Astroblast (PAL)</description>
 		<year>1982</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="programmer" value="Hal Finney" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
@@ -1594,7 +1594,7 @@ X-1414 : Streetracer
 	<software name="scbasbal">
 		<description>Super Challenge Baseball (Mattel)</description>
 		<year>1978</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="programmer" value="David Rolfe" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">

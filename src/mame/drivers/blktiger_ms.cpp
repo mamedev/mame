@@ -76,7 +76,7 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_tx_tilemap = nullptr;
 };
 
 

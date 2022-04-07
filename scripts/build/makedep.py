@@ -9,11 +9,10 @@ import os.path
 import sys
 
 
-class ParserBase(object):
-    def process_lines(self, f):
+class ParserBase:
+    def process_lines(self, inputfile):
         self.input_line = 1
-        for line in f:
-            pos = 0
+        for line in inputfile:
             start = 0
             if line.endswith('\n'):
                 line = line[:-1]
@@ -39,7 +38,7 @@ class CppParser(ParserBase):
             [chr(x) for x in range(ord('A'), ord('F') + 1)] +
             [chr(x) for x in range(ord('a'), ord('f') + 1)])
 
-    class Handler(object):
+    class Handler:
         def line(self, text):
             pass
 
@@ -49,7 +48,7 @@ class CppParser(ParserBase):
         def line_comment(self, text):
             pass
 
-    class ParseState(object):
+    class ParseState:
         DEFAULT = 0
         COMMENT = 1
         LINE_COMMENT = 2
@@ -59,7 +58,7 @@ class CppParser(ParserBase):
         NUMERIC_CONSTANT = 6
 
     def __init__(self, handler, **kwargs):
-        super(CppParser, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.handler = handler
         self.processors = {
                 self.ParseState.DEFAULT: self.process_default,
@@ -70,14 +69,14 @@ class CppParser(ParserBase):
                 self.ParseState.CHARACTER_CONSTANT: self.process_text,
                 self.ParseState.NUMERIC_CONSTANT: self.process_numeric }
 
-    def parse(self, f):
+    def parse(self, inputfile):
         self.parse_state = self.ParseState.DEFAULT
         self.comment_line = None
         self.lead_digit = None
         self.radix = None
         self.line_buffer = ''
         self.comment_buffer = ''
-        self.process_lines(f)
+        self.process_lines(inputfile)
         if self.parse_state == self.ParseState.COMMENT:
             raise Exception('unterminated multi-line comment beginning on line %d' % (self.comment_line, ))
         elif self.parse_state == self.ParseState.CHARACTER_CONSTANT:
@@ -238,7 +237,7 @@ class CppParser(ParserBase):
 
 
 class LuaParser(ParserBase):
-    class Handler(object):
+    class Handler:
         def short_comment(self, text):
             pass
 
@@ -251,7 +250,7 @@ class LuaParser(ParserBase):
         def long_comment_end(self):
             pass
 
-    class ParseState(object):
+    class ParseState:
         DEFAULT = 0
         SHORT_COMMENT = 1
         LONG_COMMENT = 2
@@ -259,7 +258,7 @@ class LuaParser(ParserBase):
         LONG_STRING_CONSTANT = 4
 
     def __init__(self, handler, **kwargs):
-        super(LuaParser, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.handler = handler
         self.processors = {
                 self.ParseState.DEFAULT: self.process_default,
@@ -268,20 +267,20 @@ class LuaParser(ParserBase):
                 self.ParseState.STRING_CONSTANT: self.process_string_constant,
                 self.ParseState.LONG_STRING_CONSTANT: self.process_long_string_constant }
 
-    def parse(self, f):
+    def parse(self, inputfile):
         self.parse_state = self.ParseState.DEFAULT
         self.long_bracket_level = None
         self.escape = False
         self.block_line = None
         self.block_level = None
         self.string_quote = None
-        self.process_lines(f)
+        self.process_lines(inputfile)
         if self.parse_state == self.ParseState.LONG_COMMENT:
-            raise Exception('unterminated long comment beginning on line %d' % (self.block_line, ));
-        elif self.parse_state == self.ParseState.STRING_CONSTANT:
-            raise Exception('unterminated string literal on line %d' % (self.input_line, ));
-        elif self.parse_state == self.ParseState.LONG_STRING_CONSTANT:
-            raise Exception('unterminated long string literal beginning on line %d' % (self.block_line, ));
+            raise Exception('unterminated long comment beginning on line %d' % (self.block_line, ))
+        if self.parse_state == self.ParseState.STRING_CONSTANT:
+            raise Exception('unterminated string literal on line %d' % (self.input_line, ))
+        if self.parse_state == self.ParseState.LONG_STRING_CONSTANT:
+            raise Exception('unterminated long string literal beginning on line %d' % (self.block_line, ))
 
     def process_default(self, line):
         pos = 0
@@ -293,7 +292,7 @@ class LuaParser(ParserBase):
                 self.parse_state = self.ParseState.STRING_CONSTANT
                 self.long_bracket_level = None
                 self.escape = False
-                return pos + 1;
+                return pos + 1
             elif (ch == '-') and self.escape:
                 self.parse_state = self.ParseState.SHORT_COMMENT
                 self.long_bracket_level = None
@@ -381,20 +380,20 @@ class LuaParser(ParserBase):
             self.escape = (ch == '\\') and not self.escape
             pos += 1
         if not self.escape:
-            raise Exception('unterminated string literal on line %d' % (self.input_line, ));
+            raise Exception('unterminated string literal on line %d' % (self.input_line, ))
 
     def process_long_string_constant(self, line):
         self.process_long_comment(line) # this works because they're both closed by a matching long bracket
 
 
-class DriverFilter(object):
+class DriverFilter:
     DRIVER_CHARS = frozenset(
             [chr(x) for x in range(ord('0'), ord('9') + 1)] +
             [chr(x) for x in range(ord('a'), ord('z') + 1)] +
             ['_'])
 
     def __init__(self, options, **kwargs):
-        super(DriverFilter, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.parse_filter(options.filter)
         self.parse_list(options.list)
 
@@ -426,7 +425,7 @@ class DriverFilter(object):
                 elif text.startswith('+'):
                     text = text[1:].lstrip()
                     if not text:
-                        sys.stderr.write('%s:%s: Empty driver name\n' % (p, parser.input_line, text))
+                        sys.stderr.write('%s:%s: Empty driver name\n' % (p, parser.input_line))
                         sys.exit(1)
                     elif not all(x in self.DRIVER_CHARS for x in text):
                         sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
@@ -436,7 +435,7 @@ class DriverFilter(object):
                 elif text.startswith('-'):
                     text = text[1:].lstrip()
                     if not text:
-                        sys.stderr.write('%s:%s: Empty driver name\n' % (p, parser.input_line, text))
+                        sys.stderr.write('%s:%s: Empty driver name\n' % (p, parser.input_line))
                         sys.exit(1)
                     elif not all(x in self.DRIVER_CHARS for x in text):
                         sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
@@ -450,16 +449,16 @@ class DriverFilter(object):
             if n not in filters:
                 filters.add(n)
                 try:
-                    f = io.open(n, 'r', encoding='utf-8')
+                    filterfile = io.open(n, 'r', encoding='utf-8')
                 except IOError:
                     sys.stderr.write('Unable to open filter file "%s"\n' % (p, ))
                     sys.exit(1)
-                with f:
+                with filterfile:
                     handler = CppParser.Handler()
                     handler.line = line_hook
                     parser = CppParser(handler)
                     try:
-                        parser.parse(f)
+                        parser.parse(filterfile)
                     except IOError:
                         sys.stderr.write('Error reading filter file "%s"\n' % (p, ))
                         sys.exit(1)
@@ -508,16 +507,16 @@ class DriverFilter(object):
             if n not in lists:
                 lists.add(n)
                 try:
-                    f = io.open(n, 'r', encoding='utf-8')
+                    listfile = io.open(n, 'r', encoding='utf-8')
                 except IOError:
                     sys.stderr.write('Unable to open list file "%s"\n' % (p, ))
                     sys.exit(1)
-                with f:
+                with listfile:
                     handler = CppParser.Handler()
                     handler.line = line_hook
                     parser = CppParser(handler)
                     try:
-                        parser.parse(f)
+                        parser.parse(listfile)
                     except IOError:
                         sys.stderr.write('Error reading list file "%s"\n' % (p, ))
                         sys.exit(1)
@@ -694,16 +693,16 @@ def scan_source_dependencies(options):
     return seen
 
 
-def write_project(options, f, mappings, sources):
+def write_project(options, projectfile, mappings, sources):
     targetsrc = ''
     for source in sorted(sources):
         action = mappings.get(source)
         if action:
             for line in action:
-                f.write(line + '\n')
+                projectfile.write(line + '\n')
         if source.startswith('src/mame/'):
             targetsrc += '        MAME_DIR .. "%s",\n' % (source, )
-    f.write(
+    projectfile.write(
             '\n' \
             'function createProjects_mame_%s(_target, _subtarget)\n' \
             '    project ("mame_%s")\n' \
@@ -740,7 +739,7 @@ def write_project(options, f, mappings, sources):
             'end\n' % (options.target, options.target, options.target, targetsrc, options.target, options.target))
 
 
-def write_filter(options, f):
+def write_filter(options, filterfile):
     drivers = set()
     for source in options.sources:
         components = tuple(x for x in split_path(source) if x)
@@ -749,7 +748,7 @@ def write_filter(options, f):
             if ext.startswith('.c'):
                 drivers.add('/'.join(components[3:]))
     for driver in sorted(drivers):
-        f.write(driver + '\n')
+        filterfile.write(driver + '\n')
 
 
 if __name__ == '__main__':

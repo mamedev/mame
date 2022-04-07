@@ -46,9 +46,9 @@ private:
 	void sound_portmap(address_map &map);
 
 	std::unique_ptr<uint8_t[]>    m_effectram;
-	uint8_t      m_effectcontrol;
-	uint8_t      m_page;
-	uint8_t      m_io_page;
+	uint8_t      m_effectcontrol = 0;
+	uint8_t      m_page = 0;
+	uint8_t      m_io_page = 0;
 };
 
 #endif // MAME_INCLUDES_QUASAR_H

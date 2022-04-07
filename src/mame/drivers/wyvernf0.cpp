@@ -77,9 +77,9 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	// video-related
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	std::unique_ptr<uint8_t[]>      m_objram;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	std::unique_ptr<uint8_t[]>    m_objram{};
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -89,10 +89,10 @@ private:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
 	// misc
-	int         m_sound_nmi_enable;
-	int         m_pending_nmi;
-	uint8_t       m_rombank;
-	uint8_t       m_rambank;
+	int         m_sound_nmi_enable = 0;
+	int         m_pending_nmi = 0;
+	uint8_t       m_rombank = 0U;
+	uint8_t       m_rambank = 0U;
 
 	void rambank_w(uint8_t data);
 	void rombank_w(uint8_t data);

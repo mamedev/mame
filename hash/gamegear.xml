@@ -6453,6 +6453,18 @@ a certain item) -->
 		</part>
 	</software>
 
+<!-- This was compiled from source released by one of the authors -->
+	<software name="pokerfc">
+		<description>Poker Face Paul's Cribbage (prototype)</description>
+		<year>1994</year>
+		<publisher>Spidersoft</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="poker faced paul's cribbage [proto].bin" size="131072" crc="d2e644b4" sha1="232906b3198763dd8d500bf445edbc54e0e3c67e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Alt. Title: Poker Face Paul's Gin (Box) -->
 	<software name="pokerfg">
 		<description>Poker Faced Paul's Gin (USA)</description>

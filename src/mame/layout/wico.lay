@@ -12,9 +12,9 @@ copyright-holders:Robbbert
 		</led7seg>
 	</element>
 	<element name="digit" defstate="0">
-		<led8seg_gts1>
+		<led14seg>
 			<color red="0.0" green="0.75" blue="1.0" />
-		</led8seg_gts1>
+		</led14seg>
 	</element>
 
 	<element name="P0"><text string="Ball / Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>

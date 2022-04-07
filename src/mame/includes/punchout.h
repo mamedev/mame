@@ -61,14 +61,14 @@ private:
 	required_shared_ptr<uint8_t> m_bg_bot_videoram;
 	optional_shared_ptr<uint8_t> m_armwrest_fg_videoram;
 
-	tilemap_t *m_bg_top_tilemap;
-	tilemap_t *m_bg_bot_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_spr1_tilemap;
-	tilemap_t *m_spr1_tilemap_flipx;
-	tilemap_t *m_spr2_tilemap;
+	tilemap_t *m_bg_top_tilemap = nullptr;
+	tilemap_t *m_bg_bot_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_spr1_tilemap = nullptr;
+	tilemap_t *m_spr1_tilemap_flipx = nullptr;
+	tilemap_t *m_spr2_tilemap = nullptr;
 
-	bool m_nmi_mask;
+	bool m_nmi_mask = false;
 	uint8_t spunchout_exp_r(offs_t offset);
 	void spunchout_exp_w(offs_t offset, uint8_t data);
 	void spunchout_rp5h01_reset_w(uint8_t data);

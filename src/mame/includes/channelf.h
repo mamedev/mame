@@ -37,11 +37,11 @@ public:
 	void port_1_w(uint8_t data);
 	void port_4_w(uint8_t data);
 	void port_5_w(uint8_t data);
-	uint8_t *m_p_videoram;
-	uint8_t m_latch[6];
-	uint8_t m_val_reg;
-	uint8_t m_row_reg;
-	uint8_t m_col_reg;
+	uint8_t *m_p_videoram = nullptr;
+	uint8_t m_latch[6]{};
+	uint8_t m_val_reg = 0U;
+	uint8_t m_row_reg = 0U;
+	uint8_t m_col_reg = 0U;
 	uint8_t port_read_with_latch(uint8_t ext, uint8_t latch_state);
 	virtual void video_start() override;
 	virtual void machine_start() override;

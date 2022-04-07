@@ -2320,6 +2320,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				else if (m_accel_unlocked)
 				{
 					// disable acceleration
+					m_accel_fast = false;
 					accel_normal_speed();
 				}
 			}
@@ -2328,6 +2329,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 		case 0x5b: // Zip full speed
 			if (m_accel_unlocked)
 			{
+				m_accel_fast = true;
 				accel_full_speed();
 			}
 			break;

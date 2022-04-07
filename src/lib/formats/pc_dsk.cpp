@@ -34,31 +34,6 @@ const char *pc_format::extensions() const
 	return "dsk,ima,img,ufi,360";
 }
 
-int pc_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
-{
-	uint64_t size;
-	if (io.length(size)) {
-		return 0;
-	}
-
-	/* some 360K images have a 512-byte header */
-	if (size == 368640 + 0x200) {
-		file_header_skip_bytes = 0x200;
-	}
-
-	/* Disk Copy 4.2 images have an 84-byte header */
-	if (size == 1474560 + 84) {
-		file_header_skip_bytes = 84;
-	}
-
-	/* some 1.44MB images have a 1024-byte footer */
-	if (size == 1474560 + 0x400) {
-		file_footer_skip_bytes = 0x400;
-	}
-
-	return upd765_format::identify(io, form_factor, variants);
-}
-
 const pc_format::format pc_format::formats[] = {
 	{   /*  160K 5 1/4 inch double density single sided */
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
@@ -119,4 +94,4 @@ const pc_format::format pc_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_PC_FORMAT = &floppy_image_format_creator<pc_format>;
+const pc_format FLOPPY_PC_FORMAT;

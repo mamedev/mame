@@ -43,9 +43,9 @@ private:
 
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;
-	int m_CollisionBackground;
-	int m_CollisionSprite;
-	tilemap_t *m_bg_tilemap;
+	int m_CollisionBackground = 0;
+	int m_CollisionSprite = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void tinvader_sound_w(uint8_t data);
 	void tinvader_videoram_w(offs_t offset, uint8_t data);

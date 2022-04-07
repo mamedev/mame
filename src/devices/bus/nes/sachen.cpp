@@ -157,88 +157,11 @@ nes_sachen_8259d_device::nes_sachen_8259d_device(const machine_config &mconfig, 
 
 
 
-void nes_sachen_sa009_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa009_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa0036_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa0036_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa0037_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa0037_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa72007_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa72007_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa72008_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa72008_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_tca01_device::device_start()
-{
-	common_start();
-}
-
 void nes_sachen_tca01_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(1);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_tcu01_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_tcu01_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
 	chr8(0, m_chr_source);
 }
 
@@ -467,7 +390,7 @@ void nes_sachen_tcu01_device::write_l(offs_t offset, uint8_t data)
 
 	if ((offset & 0x103) == 0x002)
 	{
-		prg32(((data >> 6) & 0x02) | ((data >> 2) & 0x01));
+		prg32(bitswap<2>(data, 7, 2));
 		chr8(data >> 3, CHRROM);
 	}
 }
@@ -628,7 +551,7 @@ void nes_sachen_74x374_device::write_l(offs_t offset, uint8_t data)
 					chr8(m_mmc_vrom_bank, CHRROM);
 					break;
 				case 0x07:
-					set_mirror((data >> 1) & 0x03);
+					set_mirror(BIT(data, 1, 2));
 					break;
 				default:
 					break;

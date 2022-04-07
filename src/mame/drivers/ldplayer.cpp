@@ -134,10 +134,10 @@ protected:
 	required_device<pioneer_pr8210_device> m_laserdisc;
 
 	// internal state
-	emu_timer *m_bit_timer;
+	emu_timer *m_bit_timer = nullptr;
 	uint32_t m_command_buffer_in;
 	uint32_t m_command_buffer_out;
-	uint8_t m_command_buffer[10];
+	uint8_t m_command_buffer[10]{};
 };
 
 

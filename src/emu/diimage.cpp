@@ -26,6 +26,7 @@
 #include <cctype>
 #include <cstring>
 #include <regex>
+#include <sstream>
 
 
 //**************************************************************************
@@ -683,7 +684,24 @@ bool device_image_interface::load_software(software_list_device &swlist, std::st
 				else
 					filerr = m_mame_file->open(romp->name());
 				if (filerr)
+				{
 					m_mame_file.reset();
+					std::ostringstream msg;
+					util::stream_format(msg,
+							"%s: error opening image file %s: %s (%s:%d)",
+							device().tag(), romp->name(),
+							filerr.message(),
+							filerr.category().name(),
+							filerr.value());
+					if (!searchpath.empty())
+					{
+						msg << " (tried in";
+						for (auto const &path : searchpath)
+							msg << ' ' << path;
+						msg << ')';
+					}
+					osd_printf_error("%s\n", std::move(msg).str());
+				}
 
 				warningcount += verify_length_and_hash(m_mame_file.get(), romp->name(), romp->get_length(), util::hash_collection(romp->hashdata()));
 

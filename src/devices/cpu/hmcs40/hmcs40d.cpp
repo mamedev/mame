@@ -81,7 +81,7 @@ const u32 hmcs40_disassembler::s_flags[] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0,
-	0, STEP_OVER, 0, 0, STEP_OUT,
+	STEP_COND, STEP_OVER | STEP_COND, 0, 0, STEP_OUT,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OUT,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0
@@ -199,7 +199,7 @@ offs_t hmcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	}
 	else
 	{
-		util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
+		util::stream_format(stream, "%-8s", s_mnemonics[instr]);
 
 		// opcode parameter
 		if (bits != 0)

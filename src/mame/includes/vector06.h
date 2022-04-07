@@ -105,16 +105,16 @@ private:
 	required_ioport_array<9> m_io_keyboard;
 	required_ioport m_io_reset;
 
-	uint8_t m_keyboard_mask;
-	uint8_t m_color_index;
-	uint8_t m_romdisk_msb;
-	uint8_t m_romdisk_lsb;
-	uint8_t m_vblank_state;
-	uint8_t m_rambank;
-	uint8_t m_aylatch;
-	bool m_video_mode;
-	bool m_stack_state;
-	bool m_romen;
+	uint8_t m_keyboard_mask = 0;
+	uint8_t m_color_index = 0;
+	uint8_t m_romdisk_msb = 0;
+	uint8_t m_romdisk_lsb = 0;
+	uint8_t m_vblank_state = 0;
+	uint8_t m_rambank = 0;
+	uint8_t m_aylatch = 0;
+	bool m_video_mode = false;
+	bool m_stack_state = false;
+	bool m_romen = false;
 };
 
 #endif // MAME_INCLUDES_VECTOR06_H

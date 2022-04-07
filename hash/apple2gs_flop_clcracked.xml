@@ -2091,6 +2091,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="3stooges">
+		<description>The Three Stooges (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Cinemaware</publisher>
+		<info name="release" value="2022-02-18"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25MB Apple IIgs ROM01 or later. -->
+		<!--"The Three Stooges" is a 1987 adventure game developed by John Cutter, Robert Jacob, Phyllis Jacob, Ed Magnin, Russell Truelove, Jim Simmons, and Patrick Cook and distributed by Cinemaware. -->
+		<!-- Protection: Bad block check for block $10D -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Reel 1"/>
+			<dataarea name="flop" size="819264">
+				<rom name="The Three Stooges IIgs - Reel 1 (trex crack).2mg" size="819264" crc="bdde6b7f" sha1="ae839c996f29692326f06066e1d64082120d1f5d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Reel 2"/>
+			<dataarea name="flop" size="819264">
+				<rom name="The Three Stooges IIgs - Reel 2 (trex crack).2mg" size="819264" crc="d1d46abd" sha1="64bdaea99f69fdff61dade0dbe6f2e57668e70a4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wndanimk">
 		<description>The Wonders of the Animal Kingdom (cleanly cracked)</description>
 		<year>1989</year>
@@ -2473,30 +2497,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="zany golf iigs (trex crack).2mg" size="819264" crc="5e917b13" sha1="37658ef75ca9a35277023e66fe0280058d8a237a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arkandb" cloneof="arkanoid">
-		<description>Arkanoid (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Taito</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="arkanoid (1988)(taito)(trex crack).2mg" size="819264" crc="15aef159" sha1="3691ef5908d48fadab3c9602a2becfc8160dd7ad" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arknd2b" cloneof="arknoid2">
-		<description>Arkanoid II: Revenge of Doh (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Taito</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="arkanoid ii - revenge of doh (1988)(taito)(trex crack).2mg" size="819264" crc="21e92966" sha1="ff1143ee948490666b02c09f6bb532b077cff130" />
 			</dataarea>
 		</part>
 	</software>

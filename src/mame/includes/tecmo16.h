@@ -52,21 +52,21 @@ private:
 	required_shared_ptr<uint16_t> m_charram;
 	required_device<buffered_spriteram16_device> m_spriteram;
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
 	bitmap_ind16 m_tile_bitmap_tx;
-	int m_flipscreen;
-	int m_game_is_riot;
-	uint16_t m_scroll_x_w;
-	uint16_t m_scroll_y_w;
-	uint16_t m_scroll2_x_w;
-	uint16_t m_scroll2_y_w;
-	uint16_t m_scroll_char_x_w;
-	uint16_t m_scroll_char_y_w;
+	int m_flipscreen = 0;
+	int m_game_is_riot = 0;
+	uint16_t m_scroll_x_w = 0;
+	uint16_t m_scroll_y_w = 0;
+	uint16_t m_scroll2_x_w = 0;
+	uint16_t m_scroll2_y_w = 0;
+	uint16_t m_scroll_char_x_w = 0;
+	uint16_t m_scroll_char_y_w = 0;
 
 	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void colorram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

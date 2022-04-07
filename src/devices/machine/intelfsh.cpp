@@ -16,8 +16,6 @@
 #include "emu.h"
 #include "intelfsh.h"
 
-#include "fileio.h"
-
 
 //**************************************************************************
 //  CONSTANTS
@@ -600,9 +598,10 @@ void intelfsh_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void intelfsh_device::nvram_read(emu_file &file)
+bool intelfsh_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_data[0], m_size);
+	size_t actual;
+	return !file.read(&m_data[0], m_size, actual) && actual == m_size;
 }
 
 
@@ -611,9 +610,10 @@ void intelfsh_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void intelfsh_device::nvram_write(emu_file &file)
+bool intelfsh_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_data[0], m_size);
+	size_t actual;
+	return !file.write(&m_data[0], m_size, actual) && actual == m_size;
 }
 
 

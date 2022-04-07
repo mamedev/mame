@@ -60,7 +60,7 @@ private:
 	required_device<scn2674_device> m_avdc;
 	required_region_ptr<u8> m_chargen;
 
-	bool m_132_cols;
+	bool m_132_cols = false;
 };
 
 
@@ -80,7 +80,7 @@ WRITE_LINE_MEMBER(cit220_state::sod_w)
 
 WRITE_LINE_MEMBER(cit220_state::cols_w)
 {
-	if (!state != m_132_cols)
+	if (state == m_132_cols)
 	{
 		m_132_cols = !state;
 		m_avdc->set_character_width(m_132_cols ? 9 : 10);

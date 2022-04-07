@@ -3825,17 +3825,6 @@ INPUT_PORTS_END
 
 /*********************************************************************/
 
-static const gfx_layout charlayout_4bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4*1, 4*0, 4*3, 4*2, 4*5, 4*4, 4*7, 4*6 },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
 static const gfx_layout tilelayout_4bpp =
 {
 	16,16,
@@ -3895,22 +3884,22 @@ static const gfx_layout bigspritelayout_4bpp =
 /*********************************************************************/
 
 static GFXDECODE_START( gfx_marvins )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
-	GFXDECODE_ENTRY( "fg_tiles",   0, charlayout_4bpp,   0x080, 0x080>>4 )
-	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x100, 0x080>>4 )
-	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp, 0x000, 0x080>>3 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x180, 0x080>>4 )
+	GFXDECODE_ENTRY( "fg_tiles",   0, gfx_8x8x4_packed_lsb, 0x080, 0x080>>4 )
+	GFXDECODE_ENTRY( "bg_tiles",   0, gfx_8x8x4_packed_lsb, 0x100, 0x080>>4 )
+	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_tnk3 )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
-	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x080, 0x100>>4 )
-	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp, 0x000, 0x080>>3 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x180, 0x080>>4 )
+	GFXDECODE_ENTRY( "bg_tiles",   0, gfx_8x8x4_packed_lsb, 0x080, 0x100>>4 )
+	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ikari )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x180, 0x080>>4 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_3bpp, 0x080, 0x080>>3 )
@@ -3918,14 +3907,14 @@ static GFXDECODE_START( gfx_ikari )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gwar )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x300, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x200, 0x100>>4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_tdfever )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x200, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x100, 0x100>>4 )
 	/* colors 0x300-0x3ff contain shadows */

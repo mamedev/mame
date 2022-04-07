@@ -9,6 +9,7 @@
 #pragma once
 
 #include "formats/fsmgr.h"
+#include "harddisk.h"
 
 #include <cstdint>
 #include <map>
@@ -22,22 +23,22 @@ using u16 = uint16_t;
 using u32 = uint32_t;
 
 struct floppy_format_info {
-	floppy_image_format_t *m_format;
+	const floppy_image_format_t *m_format;
 	std::string m_category;
 
-	floppy_format_info(floppy_image_format_t *format, std::string category) : m_format(format), m_category(category) {}
+	floppy_format_info(const floppy_image_format_t *format, std::string category) : m_format(format), m_category(category) {}
 };
 
 struct floppy_create_info {
 	const fs::manager_t *m_manager;
 
-	floppy_format_type m_type;
+	const floppy_image_format_t *m_type;
 	u32 m_image_size;
 	u32 m_key;
 	const char *m_name;
 	const char *m_description;
 
-	floppy_create_info(const fs::manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) :
+	floppy_create_info(const fs::manager_t *manager, const floppy_image_format_t *type, u32 image_size, const char *name, const char *description) :
 		m_manager(manager), m_type(type), m_image_size(image_size), m_key(0), m_name(name), m_description(description)
 	{ }
 
@@ -106,10 +107,10 @@ private:
 
 	floppy_image m_floppy_image;
 
-	floppy_format_type m_floppy_fs_converter;
+	const floppy_image_format_t *m_floppy_fs_converter = nullptr;
 	std::vector<u8> m_sector_image;
 	std::unique_ptr<fs::fsblk_t> m_fsblk;
-	const fs::manager_t *m_fsm;
+	const fs::manager_t *m_fsm = nullptr;
 	std::unique_ptr<fs::filesystem_t> m_fs;
 
 };

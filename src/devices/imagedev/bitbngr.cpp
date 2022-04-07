@@ -28,8 +28,6 @@ DEFINE_DEVICE_TYPE(BITBANGER, bitbanger_device, "bitbanger", "Bitbanger")
 bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BITBANGER, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	m_next(nullptr),
-	m_end(nullptr),
 	m_interface(nullptr),
 	m_is_readonly(false)
 {
@@ -54,21 +52,10 @@ void bitbanger_device::output(uint8_t data)
 
 uint32_t bitbanger_device::input(void *buffer, uint32_t length)
 {
-	if (loaded_through_softlist())
-	{
-		size_t const result = std::min<size_t>(length, m_end - m_next);
-		memcpy(buffer, m_next, result);
-		m_next += result;
-		return uint32_t(result);
-	}
-	else if (exists())
-	{
+	if (exists())
 		return fread(buffer, length);
-	}
 	else
-	{
 		return 0;
-	}
 }
 
 
@@ -89,7 +76,7 @@ void bitbanger_device::device_start()
 
 const software_list_loader &bitbanger_device::get_software_list_loader() const
 {
-	return rom_software_list_loader::instance();
+	return image_software_list_loader::instance();
 }
 
 
@@ -100,16 +87,7 @@ const software_list_loader &bitbanger_device::get_software_list_loader() const
 
 image_init_result bitbanger_device::call_load()
 {
-	if (loaded_through_softlist())
-	{
-		auto const length = get_software_region_length("input");
-		m_next = get_software_region("input");
-		m_end = m_next + length;
-	}
-	else
-	{
-		m_next = m_end = nullptr;
-	}
+	// we don't need to do anything special
 	return image_init_result::PASS;
 }
 
@@ -125,5 +103,5 @@ image_init_result bitbanger_device::call_create(int format_type, util::option_re
 
 void bitbanger_device::call_unload()
 {
-	m_next = m_end = nullptr;
+	// we don't need to do anything special
 }

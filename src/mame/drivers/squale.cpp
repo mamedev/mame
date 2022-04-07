@@ -152,13 +152,13 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint8_t keyboard_line;
-	uint8_t fdc_sel0;
-	uint8_t fdc_sel1;
+	uint8_t keyboard_line = 0U;
+	uint8_t fdc_sel0 = 0U;
+	uint8_t fdc_sel1 = 0U;
 
-	uint8_t  cart_addr_counter_inc_ck;
-	uint8_t  cart_addr_counter_reset;
-	uint16_t cart_addr_counter;
+	uint8_t  cart_addr_counter_inc_ck = 0U;
+	uint8_t  cart_addr_counter_reset = 0U;
+	uint16_t cart_addr_counter = 0U;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
@@ -176,7 +176,7 @@ private:
 	floppy_image_device *m_floppy;
 	required_device<generic_slot_device> m_cart;
 
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = 0;
 };
 
 /*****************************************

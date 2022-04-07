@@ -99,6 +99,8 @@ public:
 	unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~unsp_device();
 
+	void set_vectorbase(uint16_t vector) { m_vectorbase = vector; }
+
 	uint8_t get_csb();
 
 	void set_ds(uint16_t ds);
@@ -317,6 +319,7 @@ private:
 	uml::code_handle *m_mem_write;
 
 	bool m_enable_drc;
+	uint16_t m_vectorbase;
 
 	void execute_run_drc();
 	void flush_drc_cache();

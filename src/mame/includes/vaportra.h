@@ -53,7 +53,7 @@ private:
 	required_shared_ptr<uint16_t> m_paletteram_ext;
 
 	/* misc */
-	uint16_t    m_priority[2];
+	uint16_t    m_priority[2]{};
 
 	uint8_t irq6_ack_r();
 	void irq6_ack_w(uint8_t data);

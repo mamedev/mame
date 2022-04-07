@@ -96,15 +96,15 @@ protected:
 
 	struct scsi_dma_t
 	{
-		uint32_t m_desc;
-		uint32_t m_addr;
-		uint32_t m_ctrl;
-		uint32_t m_length;
-		uint32_t m_next;
-		bool m_irq;
-		bool m_drq;
-		bool m_to_mem;
-		bool m_active;
+		uint32_t m_desc = 0;
+		uint32_t m_addr = 0;
+		uint32_t m_ctrl = 0;
+		uint32_t m_length = 0;
+		uint32_t m_next = 0;
+		bool m_irq = false;
+		bool m_drq = false;
+		bool m_to_mem = false;
+		bool m_active = false;
 	};
 
 	static void cdrom_config(device_t *device);
@@ -112,19 +112,19 @@ protected:
 	static void indigo_mice(device_slot_interface &device);
 	void wd33c93(device_t *device);
 
-	uint8_t m_misc_status;
-	uint32_t m_cpu_aux_ctrl;
-	uint32_t m_parbuf_ptr;
-	uint32_t m_local_int_status[2];
-	uint32_t m_local_int_mask[2];
-	bool m_int_status[2];
-	uint32_t m_vme_int_mask[2];
+	uint8_t m_misc_status = 0;
+	uint32_t m_cpu_aux_ctrl = 0;
+	uint32_t m_parbuf_ptr = 0;
+	uint32_t m_local_int_status[2]{};
+	uint32_t m_local_int_mask[2]{};
+	bool m_int_status[2]{};
+	uint32_t m_vme_int_mask[2]{};
 
 	scsi_dma_t m_scsi_dma;
 
-	uint8_t m_duart_int_status;
+	uint8_t m_duart_int_status = 0;
 
-	address_space *m_cpu_space;
+	address_space *m_cpu_space = nullptr;
 
 	static char const *const RS232A_TAG;
 	static char const *const RS232B_TAG;

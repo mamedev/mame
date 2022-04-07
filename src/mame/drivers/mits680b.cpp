@@ -26,6 +26,7 @@ ToDo:
 #include "bus/rs232/rs232.h"
 #include "machine/f4702.h"
 
+namespace {
 
 class mits680b_state : public driver_device
 {
@@ -106,7 +107,7 @@ ROM_START( mits680b )
 	ROM_LOAD( "mits680b.bin", 0x0000, 0x0100, CRC(397e717f) SHA1(257d3eb1343b8611dc05455aeed33615d581f29c))
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
 COMP( 1976, mits680b, 0,      0,      mits680b, mits680b, mits680b_state, empty_init, "MITS",  "Altair 680b", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

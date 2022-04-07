@@ -9,15 +9,15 @@
 
 // internal helpers
 
-inline uint8_t melps4_cpu_device::ram_r()
+inline u8 melps4_cpu_device::ram_r()
 {
-	uint8_t address = (m_z << 6 | m_x << 4 | m_y) & m_datamask;
+	u8 address = (m_z << 6 | m_x << 4 | m_y) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
-inline void melps4_cpu_device::ram_w(uint8_t data)
+inline void melps4_cpu_device::ram_w(u8 data)
 {
-	uint8_t address = (m_z << 6 | m_x << 4 | m_y) & m_datamask;
+	u8 address = (m_z << 6 | m_x << 4 | m_y) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -135,7 +135,7 @@ void melps4_cpu_device::op_lcps()
 		m_cps = m_op & 1;
 
 		// swap registers
-		uint8_t x, y, z, cy;
+		u8 x, y, z, cy;
 		x = m_x;
 		y = m_y;
 		z = m_z;
@@ -172,7 +172,7 @@ void melps4_cpu_device::op_tam()
 void melps4_cpu_device::op_xam()
 {
 	// XAM j: exchange RAM with A, xor X with j
-	uint8_t a = m_a;
+	u8 a = m_a;
 	m_a = ram_r();
 	ram_w(a);
 	m_x ^= m_op & 3;
@@ -228,7 +228,7 @@ void melps4_cpu_device::op_amcs()
 void melps4_cpu_device::op_a()
 {
 	// A n: add immediate to A, skip next on no carry (except when n=6)
-	uint8_t n = m_op & 0xf;
+	u8 n = m_op & 0xf;
 	m_a += n;
 	m_skip = !(m_a & 0x10 || n == 6);
 	m_a &= 0xf;
@@ -261,7 +261,7 @@ void melps4_cpu_device::op_cma()
 void melps4_cpu_device::op_rl()
 {
 	// RL(undocumented): rotate A left through carry
-	uint8_t c = m_a >> 3 & 1;
+	u8 c = m_a >> 3 & 1;
 	m_a = (m_a << 1 | m_cy) & 0xf;
 	m_cy = c;
 }
@@ -269,7 +269,7 @@ void melps4_cpu_device::op_rl()
 void melps4_cpu_device::op_rr()
 {
 	// RR(undocumented): rotate A right through carry
-	uint8_t c = m_a & 1;
+	u8 c = m_a & 1;
 	m_a = m_a >> 1 | m_cy << 3;
 	m_cy = c;
 }
@@ -334,7 +334,7 @@ void melps4_cpu_device::op_taj()
 void melps4_cpu_device::op_xal()
 {
 	// XAL: exchange A with L
-	uint8_t a = m_a;
+	u8 a = m_a;
 	m_a = m_l;
 	m_l = a;
 }
@@ -342,7 +342,7 @@ void melps4_cpu_device::op_xal()
 void melps4_cpu_device::op_xah()
 {
 	// XAH: exchange A with H
-	uint8_t a = m_a;
+	u8 a = m_a;
 	m_a = m_h;
 	m_h = a;
 }
@@ -363,7 +363,7 @@ void melps4_cpu_device::op_dec()
 void melps4_cpu_device::op_shl()
 {
 	// SHL: set bit in L or H designated by C
-	uint8_t mask = 1 << (m_c & 3);
+	u8 mask = 1 << (m_c & 3);
 	if (m_c & 4)
 		m_h |= mask;
 	else
@@ -373,7 +373,7 @@ void melps4_cpu_device::op_shl()
 void melps4_cpu_device::op_rhl()
 {
 	// RHL: reset bit in L or H designated by C
-	uint8_t mask = 1 << (m_c & 3);
+	u8 mask = 1 << (m_c & 3);
 	if (m_c & 4)
 		m_h &= ~mask;
 	else
@@ -499,7 +499,7 @@ void melps4_cpu_device::op_b()
 	// - short call: subroutine page
 	// - short jump: current page, or sub. page + 1 when in sub. mode
 	// - long jump/call(B/BM preceded by SP): temp SP register
-	uint8_t page = m_pc >> 7;
+	u8 page = m_pc >> 7;
 	if ((m_prev_op & ~0xf) == m_sp_mask)
 	{
 		m_sm = false;

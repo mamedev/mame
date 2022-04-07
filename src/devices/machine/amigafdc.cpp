@@ -1,10 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-/***************************************************************************
+/**************************************************************************************************
 
-    Amiga floppy disk controller emulation
+    Amiga floppy disk controller emulation "Trackdisk"
 
-***************************************************************************/
+    Contained inside MOS 8364 Paula device
+
+    TODO:
+    - Some games currently writes 2+ dsksync to the buffer (marked as "[FDC] dsksync" in SW list):
+      Current workaround:
+      1. comment out dma_write in DMA_WAIT_START handling and change the dma_state *only*;
+      2. remove all of the non-DMA_WAIT_START phase inside the dsksync sub-section;
+      NB: according to documentation syncing doesn't really write anything on the bus,
+      so technically this "workaround" is more correct.
+      However it unfortunately causes other SW regressions, most notably in Workbench.
+    - Other games trashes memory or refuses to boot, in a few instances randomly
+      (marked as "[FDC] with adkcon=1100", implies dsksync disabled):
+      they often uses the AmigaDOS trackdisk BIOS functions, which may be expecting a
+      different timing. May be worth testing this out with the SDK;
+    - "[FDC] format" or in general writing to disks doesn't work properly.
+      i.e. formatting a disk in any Workbench version will cause a system crash once it completes.
+    - Fix ready line read handling;
+    - FDC LED output callback;
+
+**************************************************************************************************/
 
 
 #include "emu.h"
@@ -24,7 +43,7 @@
 #define LOGDMA(...)      LOGMASKED(LOG_DMA, __VA_ARGS__)
 #define LOGSYNC(...)     LOGMASKED(LOG_SYNC, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device, "amiga_fdc", "Amiga FDC")
+DEFINE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device, "amiga_fdc", "Amiga \"Trackdisk\" FDC")
 
 void amiga_fdc_device::floppy_formats(format_registration &fr)
 {
@@ -33,16 +52,16 @@ void amiga_fdc_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_IPF_FORMAT);
 }
 
-amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AMIGA_FDC, tag, owner, clock),
-	m_write_index(*this),
-	m_read_dma(*this),
-	m_write_dma(*this),
-	m_write_dskblk(*this),
-	m_write_dsksyn(*this),
-	m_leds(*this, "led%u", 1U),
-	m_fdc_led(*this, "fdc_led"),
-	floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
+amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AMIGA_FDC, tag, owner, clock)
+	, m_write_index(*this)
+	, m_read_dma(*this)
+	, m_write_dma(*this)
+	, m_write_dskblk(*this)
+	, m_write_dsksyn(*this)
+	, m_leds(*this, "led%u", 1U)
+	, m_fdc_led(*this, "fdc_led")
+	, floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
 {
 }
 
@@ -69,7 +88,6 @@ void amiga_fdc_device::device_start()
 
 	t_gen = timer_alloc(0);
 }
-
 
 void amiga_fdc_device::device_reset()
 {
@@ -267,14 +285,7 @@ void amiga_fdc_device::live_run(const attotime &limit)
 			if(!(dskbyt & 0x2000)) {
 				if(cur_live.shift_reg == dsksync) {
 					if(adkcon & 0x0400) {
-						// FIXME: exact dsksync behaviour
-						// - Some games currently writes two dsksync to the buffer (marked as "[FDC] dsksync"),
-						//   removing one will make most of them happy.
-						//   This is reported as 0-lower cylinder good and everything else as bad in the ATK suite;
-						// - Some games trashes memory, mostly the ones with "[FDC] dsksync bootblock":
-						//   they attempt to load the tracks in AmigaDOS in the same way that's done by the
-						//   Kickstart to check if the disk is bootable.
-						//   This is reported as 0-upper cylinder bad in the ATK suite;
+						// FIXME: exact dsksync behaviour, cfr. note at top
 						if(dma_state == DMA_WAIT_START) {
 							cur_live.bit_counter = 0;
 
@@ -298,8 +309,6 @@ void amiga_fdc_device::live_run(const attotime &limit)
 						} else if(cur_live.bit_counter != 8)
 							cur_live.bit_counter = 0;
 					}
-					//else
-					//  LOGSYNC("%s: no DSKSYNC\n", this->tag());
 
 					dskbyt |= 0x1000;
 					m_write_dsksyn(1);
@@ -320,11 +329,10 @@ void amiga_fdc_device::live_run(const attotime &limit)
 						dma_state = DMA_RUNNING_BYTE_1;
 						break;
 
-					case DMA_RUNNING_BYTE_1: {
+					case DMA_RUNNING_BYTE_1:
 						dma_value |= cur_live.shift_reg & 0xff;
 						dma_write(dma_value);
 						break;
-					}
 					}
 				}
 			} else {
@@ -366,9 +374,9 @@ void amiga_fdc_device::dma_check()
 	bool was_writing = dskbyt & 0x2000;
 	dskbyt &= 0x9fff;
 	if(dma_enabled()) {
-		LOGDMA("%s: DMA start dskpt=%08x dsklen=%04x dir=%s adkcon=%04x dsksync=%04x\n",
+		LOGDMA("%s: DMA start dskpt=%08x dsklen=%04x dir=%s adkcon=%04x dsksync=%04x state=%d\n",
 			machine().describe_context(),
-			dskpt, dsklen & 0x3fff, BIT(dsklen, 14) ? "RAM->disk" : "disk->RAM", adkcon, dsksync
+			dskpt, dsklen & 0x3fff, BIT(dsklen, 14) ? "RAM->disk" : "disk->RAM", adkcon, dsksync, dma_state
 		);
 
 		if(dma_state == IDLE) {
@@ -454,7 +462,10 @@ void amiga_fdc_device::dsksync_w(uint16_t data)
 void amiga_fdc_device::dmacon_set(uint16_t data)
 {
 	live_sync();
-	LOGDMA("%s: DMACON set DSKEN %d DMAEN %d (%04x)\n", machine().describe_context(), BIT(data, 4), BIT(data, 9), data);
+	// log changes only
+	// FIXME: needs better boilerplate code on top level
+	if ((data & 0x210) != (dmacon & 0x210))
+		LOGDMA("%s: DMACON set DSKEN %d DMAEN %d (%04x)\n", machine().describe_context(), BIT(data, 4), BIT(data, 9), data);
 	dmacon = data;
 	dma_check();
 	live_run();

@@ -371,7 +371,7 @@ void super6_state::io_write_byte(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 static void super6_floppies(device_slot_interface &device)

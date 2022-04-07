@@ -181,7 +181,7 @@
 
   - [DUMPED]  4 en Línea (Compumatic)
   - [DUMPED]  Olympic Darts (K7 Kursaal. At least three different hardware revisions)
-  - [DUMPED]  Sport Dart TV (Compumatic / Desarrollos y Recambios S.L.)
+  - [DUMPED]  Sport Darts TV (Compumatic / Desarrollos y Recambios S.L.)
   - [MISSING] Dart Queen (Compumatic / Daryde)
 
 **************************************************************************
@@ -249,9 +249,9 @@ private:
 	void k7_out0_w(uint8_t data);
 	void k7_out1_w(uint8_t data);
 
-	uint8_t m_irq_count;
-	uint8_t m_serial_flags;
-	uint8_t m_serial_data[2];
+	uint8_t m_irq_count = 0;
+	uint8_t m_serial_flags = 0;
+	uint8_t m_serial_data[2]{};
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -778,4 +778,4 @@ GAME( 1991, 4enlinea,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_ini
 GAME( 1991, 4enlineb,  4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)", MACHINE_NOT_WORKING )
 GAME( 1994, k7_olym,   0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.11)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1994, k7_olym30, k7_olym,  k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.00)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1993, sprtdart,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Dart TV",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1993, sprtdart,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Darts T.V.",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

@@ -5,6 +5,45 @@
 PINBALL
 Zaccaria Generation 2
 
+All games (except where noted below)
+- To start, press 1
+- Wait for score to flash before you can score (first ball can take a while, jiggle XZ to push
+    things along)
+- Press X to end ball
+- Ball counter runs backwards, so 1 = last ball.
+- When on the last ball, scoring points racks up a bonus counter. At the end, you get
+   an extra timed part, with infinite balls until the time runs out. Then press X.
+
+Games:
+- Pinball Champ '82
+- Soccer Kings
+- Pinball Champ
+- Time Machine
+- Farfalla
+- Devil Riders
+- Magic Castle
+- Robot
+- Clown
+- Pool Champion
+- Mystic Star
+- Black Belt
+- Mexico 86 (not working)
+- Zankor
+- Spooky
+- Star's Phoenix (Multiball game: To start, hit 1, then jiggle ABX. To end ball, press AB)
+- New Star's Phoenix (same as Star's Phoenix)
+**** Other Manufacturer ****
+- Scramble (not working)
+- Thunder Man
+
+Status:
+- Most games are playable
+
+ToDo:
+- Fix scram_tp, mexico
+- Sound
+- Mechanical sounds
+
 ****************************************************************************************************/
 
 
@@ -12,25 +51,31 @@ Zaccaria Generation 2
 #include "machine/genpin.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
+#include "speaker.h"
 #include "zac_2.lh"
 
-class zac_2_state : public driver_device
+namespace {
+
+class zac_2_state : public genpin_class
 {
 public:
 	zac_2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void zac_2(machine_config &config);
+	void init_1() { m_game = 1; }  // 7 digits
 
 private:
-	uint8_t ctrl_r();
-	void ctrl_w(uint8_t data);
-	void data_w(uint8_t data);
+	u8 ctrl_r();
+	u8 data_r();
+	void ctrl_w(u8 data);
+	void data_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
@@ -39,15 +84,17 @@ private:
 	void zac_2_io(address_map &map);
 	void zac_2_map(address_map &map);
 
-	uint8_t m_input_line = 0U;
-	uint8_t m_t_c = 0U;
-	uint8_t m_out_offs = 0U;
+	u8 m_row = 0U;
+	u8 m_t_c = 0U;
+	u8 m_out_offs = 0U;
+	u8 m_game = 0U;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<s2650_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_ram;
-	required_ioport_array<7> m_io_keyboard;
+	required_shared_ptr<u8> m_p_ram;
+	required_ioport_array<8> m_io_keyboard;
 	output_finder<78> m_digits;
+	output_finder<128> m_io_outputs;   // 24 solenoids + 80 lamps
 };
 
 
@@ -70,13 +117,11 @@ void zac_2_state::zac_2_io(address_map &map)
 void zac_2_state::zac_2_data(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_2_state::ctrl_r), FUNC(zac_2_state::ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).portr("DSW").w(FUNC(zac_2_state::data_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(zac_2_state::data_r), FUNC(zac_2_state::data_w));
 }
 
 static INPUT_PORTS_START( zac_2 )
 	PORT_START("DSW")
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // sound board lets cpu know when sound has finished playing
-
 	PORT_DIPNAME( 0x01, 0x01, "Switch A") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
@@ -103,7 +148,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Factory Burn Test")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -159,24 +204,36 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP53")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP54")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP55")
+
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP56")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP57")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP58")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("INP59")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP60")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP61")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP62")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP63")
 INPUT_PORTS_END
 
-uint8_t zac_2_state::ctrl_r()
+u8 zac_2_state::ctrl_r()
 {
-	if (m_input_line < 7)
-		return m_io_keyboard[m_input_line]->read();
-
-	return 0xff;
+	return m_io_keyboard[m_row]->read();
 }
 
-void zac_2_state::ctrl_w(uint8_t data)
+void zac_2_state::ctrl_w(u8 data)
 {
-	m_input_line = data & 7;
+	m_row = data & 7;
 }
 
-void zac_2_state::data_w(uint8_t data)
+u8 zac_2_state::data_r()
 {
-// writes to lines HS0-7, no idea what they do
+	return ioport("DSW")->read();  // and sound card status
+}
+
+void zac_2_state::data_w(u8 data)
+{
+// writes to sound card
 }
 
 READ_LINE_MEMBER( zac_2_state::serial_r )
@@ -190,8 +247,21 @@ WRITE_LINE_MEMBER( zac_2_state::serial_w )
 // to printer
 }
 
+void zac_2_state::machine_start()
+{
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_row));
+	save_item(NAME(m_t_c));
+	save_item(NAME(m_out_offs));
+}
+
 void zac_2_state::machine_reset()
 {
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_t_c = 0;
 }
 
@@ -206,22 +276,63 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 
 TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
+	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	m_out_offs++;
+	u8 data = m_p_ram[m_out_offs] & 15;
+
 // displays, solenoids, lamps
 
 	if (m_out_offs < 0x40)
+		return;
+
+	if (m_out_offs < 0xc0)
 	{
-		uint8_t display = (m_out_offs >> 3) & 7;
-		uint8_t digit = m_out_offs & 7;
-		m_digits[display * 10 + digit] = patterns[m_p_ram[m_out_offs]&15];
+		m_io_outputs[m_out_offs-0x40] = data;
+
+		// These addresses yet to be ascertained
+		if (m_out_offs == 0x4a) // outhole
+		{
+			//if (BIT(data, 0))
+				//m_samples->start(0, 5);
+		}
+		else
+		if (m_out_offs == 0x4b) // knocker
+		{
+			//if (BIT(data, 0))
+				//m_samples->start(0, 6);
+		}
 	}
+	else
+	if (m_out_offs < 0xf0)
+	{
+		u8 display = BIT(m_out_offs, 3, 3);
+		u8 digit = m_out_offs & 7;
+		u16 segment = patterns[data];
+		// fix g segment
+		if (BIT(segment, 6))
+			segment |= 0x80;
+		// add commas
+		if ((digit == 3) || (digit == 6))
+		{
+			if (display < 4)
+				segment |= 0xc000;
+			else
+			if (m_digits[42] && m_digits[44])
+				segment |= 0xc000;
+		}
+		// if 7-digit display, blank unwanted 8th digit
+		if (m_game && (digit == 7))
+			segment = 0;
+		m_digits[display * 10 + digit] = segment;
+	}
+	else
+		m_out_offs = 0x3f;
 }
 
 void zac_2_state::zac_2(machine_config &config)
 {
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 6000000/2);
+	S2650(config, m_maincpu, 6000000/2); // according to sch the speed is half this, but then the last ball timer runs far too slowly
 	m_maincpu->set_addrmap(AS_PROGRAM, &zac_2_state::zac_2_map);
 	m_maincpu->set_addrmap(AS_IO, &zac_2_state::zac_2_io);
 	m_maincpu->set_addrmap(AS_DATA, &zac_2_state::zac_2_data);
@@ -231,11 +342,15 @@ void zac_2_state::zac_2(machine_config &config)
 
 	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
-	TIMER(config, "zac_2_inttimer").configure_periodic(FUNC(zac_2_state::zac_2_inttimer), attotime::from_hz(200));
-	TIMER(config, "zac_2_outtimer").configure_periodic(FUNC(zac_2_state::zac_2_outtimer), attotime::from_hz(187500));
+	TIMER(config, "zac_2_inttimer").configure_periodic(FUNC(zac_2_state::zac_2_inttimer), attotime::from_hz(6'000'000/(8*512)));
+	TIMER(config, "zac_2_outtimer").configure_periodic(FUNC(zac_2_state::zac_2_outtimer), attotime::from_hz((6'000'000/4)/32));
 
 	/* Video */
 	config.set_default_layout(layout_zac_2);
+
+	/* Sound */
+	genpin_audio(config);
+	//SPEAKER(config, "mono").front_center();
 }
 
 /*--------------------------------
@@ -532,9 +647,9 @@ ROM_START(mexico)
 	ROM_LOAD("mex86_f.snd", 0xc000, 0x4000, CRC(301c2b63) SHA1(df4a4cb48d28d53c3728066d3e3fa9eac17c78c5))
 ROM_END
 
-/*--------------------------------
-/ New Star's Phoenix (08/87)
-/-------------------------------*/
+/*------------------------------------------------------------------------------------
+/ New Star's Phoenix (08/87) same roms as Star's Phoenix, playboard slightly changed
+/------------------------------------------------------------------------------------*/
 ROM_START(nstrphnx)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD ( "strphnx1.cpu", 0x0000, 0x0800, CRC(2a31b7da) SHA1(05f2173783e686cc8774bed6eb59b41f7af88d11))
@@ -1069,48 +1184,61 @@ ROM_START(zankor)
 	ROM_LOAD("zan_ic6.128", 0x8000, 0x4000, CRC(13a5b8d4) SHA1(d8c976b3f5e9c7cded0922feefa1531c59432515))
 ROM_END
 
-GAME(1986,  bbeltzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, Italian speech)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986,  bbeltzacg,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, German speech)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986,  bbeltzacf,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, French speech)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  clown,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Clown",                                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  dvlrider,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  dvlrideri,  dvlrider, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  dvlriderg,  dvlrider, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders (German speech)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  dvlriderf,  dvlrider, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders (French speech)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  farfalla,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Farfalla",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  farfallai,  farfalla, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Farfalla (Italian speech)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  farfallag,  farfalla, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Farfalla (German speech)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  mcastle,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  mcastlei,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  mcastleg,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (German speech)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  mcastlef,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (French speech)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986,  mexico,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (German speech)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  nstrphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (Italian speech)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  nstrphnxf,  nstrphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (French speech)",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  pinchamp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  pinchampg,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (German speech)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  pinchampi,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  pinchamp7,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (7 digits)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  pinchamp7g, pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (7 digits German speech)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  pinchamp7i, pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (7 digits Italian speech)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  poolcham,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  poolchami,  poolcham, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  robot,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  roboti,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, Italian speech)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  robotg,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, German speech)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  robotf,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, French speech)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  scram_tp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Tecnoplay",   "Scramble (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  socrking,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  socrkinga,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (alternate set)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  socrkingi,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  socrkingg,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (German speech)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  spookyp,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky",                                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  spookyi,    spookyp,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky (Italian speech)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  strsphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  strsphnxf,  strsphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (French speech)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  thndrman,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Apple Time",  "Thunder Man",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  tmachzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Time Machine (Zaccaria)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  tmachzacg,  tmachzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Time Machine (Zaccaria, German speech)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1983,  tmachzacf,  tmachzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Time Machine (Zaccaria, French speech)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986,  zankor,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (Italian speech)",                 MACHINE_IS_SKELETON_MECHANICAL)
+} // anonymous namespace
+
+// 1B1170 sound (IMDB), 1B1370 (schematics)
+GAME(1982,  socrking,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  socrkinga,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (alternate set)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  socrkingi,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  socrkingg,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (German speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchampg,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (German speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchampi,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp7,  pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp7g, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits German speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp7i, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits Italian speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+
+// 1B11136 or 1B13136
+GAME(1983,  tmachzac,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  tmachzacg,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, German speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  tmachzacf,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, French speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  farfalla,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  farfallai,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (Italian speech)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  farfallag,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (German speech)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  dvlrider,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  dvlrideri,  dvlrider, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  dvlriderg,  dvlrider, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders (German speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  dvlriderf,  dvlrider, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders (French speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  mcastle,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  mcastlei,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  mcastleg,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (German speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  mcastlef,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (French speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  robot,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  roboti,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, Italian speech)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  robotg,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, German speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  robotf,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, French speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+
+// 1B11178
+GAME(1985,  clown,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Clown",                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  poolcham,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  poolchami,  poolcham, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  bbeltzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, Italian speech)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  bbeltzacg,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, German speech)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  bbeltzacf,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, French speech)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  mexico,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (German speech)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  zankor,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (Italian speech)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  spookyp,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  spookyi,    spookyp,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky (Italian speech)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  strsphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  strsphnxf,  strsphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (French speech)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+
+// 1B11183
+GAME(1987,  nstrphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (Italian speech)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  nstrphnxf,  nstrphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (French speech)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+
+// unknown
+GAME(1987,  thndrman,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Apple Time",  "Thunder Man",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+
+// Technoplay sound card
+GAME(1987,  scram_tp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Tecnoplay",   "Scramble (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

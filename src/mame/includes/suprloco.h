@@ -36,8 +36,8 @@ private:
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	tilemap_t *m_bg_tilemap;
-	int m_control;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_control = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void scrollram_w(offs_t offset, uint8_t data);

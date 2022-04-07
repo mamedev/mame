@@ -42,7 +42,6 @@ Mampf (Mampfman?), TCS, 1983
 Mathematik-Lernprogramm
 Mausi, TCS, 1983
 Memory
-Micronopoly, JD Tronics
 Monitor, 1984, TCS (from the book "Das Colour-Genie Buch 3") (Tape and Disk versions)
 Neuer Zeichensatz, TCS, 1983 (from the book "Das Colour-Genie Buch 1")
 Opamp (Operationsverstärker Applikationen) (Uwe Gerber)
@@ -2605,6 +2604,23 @@ is confirmed.
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="8678">
 				<rom name="meteor_32k.cas" size="8678" crc="304b7dd5" sha1="66bb229467f7f613a34e2000c0a05e8bc6c9292f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micronop">
+		<description>Micronopoly</description>
+		<year>1983</year>
+		<publisher>JD Tronics</publisher>
+		<info name="usage" value="Load with CLOAD, enter RUN to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="2599">
+				<rom name="micronopoly_part1.cas" size="2599" crc="7f9132c5" sha1="4f9025f77ced85a233c36e3b073f46557bb5312b" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cgenie_cass">
+			<dataarea name="cass" size="21165">
+				<rom name="micronopoly_part2.cas" size="21165" crc="73983a6d" sha1="57d343b8cb4468e51d29ab64c458b4dd10e30e84" />
 			</dataarea>
 		</part>
 	</software>

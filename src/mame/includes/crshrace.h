@@ -59,10 +59,10 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// video-related
-	tilemap_t *m_tilemap[2];
-	uint8_t m_roz_bank;
-	uint8_t m_gfxctrl;
-	uint8_t m_flipscreen;
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_roz_bank = 0U;
+	uint8_t m_gfxctrl = 0U;
+	uint8_t m_flipscreen = 0U;
 
 	uint32_t tile_callback(uint32_t code);
 	void sh_bankswitch_w(uint8_t data);

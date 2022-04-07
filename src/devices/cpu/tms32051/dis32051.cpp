@@ -128,9 +128,10 @@ void tms32051_disassembler::print_condition_codes(bool pp, int zl, int cv, int t
 	}
 }
 
-void tms32051_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
+uint32_t tms32051_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
 {
 	int subop = opcode & 0xff;
+	uint32_t flags = 0;
 
 	switch (subop)
 	{
@@ -186,8 +187,8 @@ void tms32051_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, const da
 		case 0x4d:  util::stream_format(*output, "setc    xf"); break;
 		case 0x4e:  util::stream_format(*output, "clrc    carry"); break;
 		case 0x4f:  util::stream_format(*output, "setc    carry"); break;
-		case 0x51:  util::stream_format(*output, "trap"); break;
-		case 0x52:  util::stream_format(*output, "nmi"); break;
+		case 0x51:  util::stream_format(*output, "trap"); flags = STEP_OVER; break;
+		case 0x52:  util::stream_format(*output, "nmi"); flags = STEP_OVER; break;
 		case 0x58:  util::stream_format(*output, "zpr"); break;
 		case 0x59:  util::stream_format(*output, "zap"); break;
 		case 0x5a:  util::stream_format(*output, "sath"); break;
@@ -200,7 +201,7 @@ void tms32051_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, const da
 		case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-					util::stream_format(*output, "intr    %d", opcode & 0x1f); break;
+					util::stream_format(*output, "intr    %d", opcode & 0x1f); flags = STEP_OVER; break;
 
 		case 0x80:  util::stream_format(*output, "mpy     #%04X", FETCH(npc, opcodes)); break;
 		case 0x81:  util::stream_format(*output, "and     #%04X", FETCH(npc, opcodes) << 16); break;
@@ -212,6 +213,7 @@ void tms32051_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, const da
 
 		default:    util::stream_format(*output, "???     (group be)"); break;
 	}
+	return flags;
 }
 
 void tms32051_disassembler::dasm_group_bf(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
@@ -376,11 +378,11 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		case 0x78:  util::stream_format(*output, "adrk    #%02X", opcode & 0xff); break;
 		case 0x79:  util::stream_format(*output, "b       %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); break;
 		case 0x7a:  util::stream_format(*output, "call    %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); flags = STEP_OVER; break;
-		case 0x7b:  util::stream_format(*output, "banz    %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); break;
+		case 0x7b:  util::stream_format(*output, "banz    %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); flags = STEP_COND; break;
 		case 0x7c:  util::stream_format(*output, "sbrk    #%02X", opcode & 0xff); break;
 		case 0x7d:  util::stream_format(*output, "bd      %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); break;
-		case 0x7e:  util::stream_format(*output, "calld   %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); flags = STEP_OVER; break;
-		case 0x7f:  util::stream_format(*output, "banzd   %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); break;
+		case 0x7e:  util::stream_format(*output, "calld   %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); flags = STEP_OVER | step_over_extra(1); break;
+		case 0x7f:  util::stream_format(*output, "banzd   %04X, %s", FETCH(npc, opcodes), GET_ADDRESS(1, address)); flags = STEP_COND | step_over_extra(1); break;
 
 		case 0x80: case 0x81: case 0x82: case 0x83:
 		case 0x84: case 0x85: case 0x86: case 0x87:
@@ -454,7 +456,7 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			util::stream_format(*output, "ldp     #%03X", opcode & 0x1ff);
 			break;
 		}
-		case 0xbe:  dasm_group_be(opcode, npc, opcodes); break;
+		case 0xbe:  flags = dasm_group_be(opcode, npc, opcodes); break;
 		case 0xbf:  dasm_group_bf(opcode, npc, opcodes); break;
 
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
@@ -467,6 +469,7 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 			util::stream_format(*output, "bcnd    %04X", FETCH(npc, opcodes));
 			print_condition_codes(true, zl, cv, tp);
+			flags = STEP_COND;
 			break;
 		}
 
@@ -482,6 +485,7 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 			util::stream_format(*output, "xc      %d", n);
 			print_condition_codes(true, zl, cv, tp);
+			flags = STEP_COND;
 			break;
 		}
 
@@ -495,6 +499,7 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 			util::stream_format(*output, "cc      %04X", FETCH(npc, opcodes));
 			print_condition_codes(true, zl, cv, tp);
+			flags = STEP_OVER | STEP_COND;
 			break;
 		}
 
@@ -509,13 +514,14 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			if (opcode == 0xef00)
 			{
 				util::stream_format(*output, "ret");
+				flags = STEP_OUT;
 			}
 			else
 			{
 				util::stream_format(*output, "retc    ");
 				print_condition_codes(false, zl, cv, tp);
+				flags = STEP_OUT | STEP_COND;
 			}
-			flags = STEP_OUT;
 			break;
 		}
 
@@ -529,6 +535,7 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 			util::stream_format(*output, "bcndd   %04X", FETCH(npc, opcodes));
 			print_condition_codes(true, zl, cv, tp);
+			flags = STEP_COND | step_over_extra(1);
 			break;
 		}
 
@@ -542,6 +549,7 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 			util::stream_format(*output, "ccd     %04X", FETCH(npc, opcodes));
 			print_condition_codes(true, zl, cv, tp);
+			flags = STEP_OVER | STEP_COND | step_over_extra(1);
 			break;
 		}
 
@@ -556,13 +564,14 @@ offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			if (opcode == 0xff00)
 			{
 				util::stream_format(*output, "retd");
+				flags = STEP_OUT | step_over_extra(1);
 			}
 			else
 			{
 				util::stream_format(*output, "retcd   ");
 				print_condition_codes(false, zl, cv, tp);
+				flags = STEP_OUT | STEP_COND | step_over_extra(1);
 			}
-			flags = STEP_OUT;
 			break;
 		}
 

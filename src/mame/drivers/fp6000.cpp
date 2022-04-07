@@ -76,7 +76,7 @@ private:
 	void fp6000_io(address_map &map);
 	void fp6000_map(address_map &map);
 
-	emu_timer *m_pit_timer;
+	emu_timer *m_pit_timer = nullptr;
 	void pit_timer0_w(int state);
 	TIMER_CALLBACK_MEMBER(pit_timer0_clear);
 	void pit_timer2_w(int state);
@@ -103,11 +103,11 @@ private:
 	void centronics_fault_w(int state) { m_centronics_fault = state; };
 	void centronics_perror_w(int state) { m_centronics_perror = state; };
 
-	uint8_t m_port_0a;
+	uint8_t m_port_0a = 0;
 
-	int m_centronics_busy;
-	int m_centronics_fault;
-	int m_centronics_perror;
+	int m_centronics_busy = 0;
+	int m_centronics_fault = 0;
+	int m_centronics_perror = 0;
 };
 
 

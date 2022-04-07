@@ -2294,6 +2294,16 @@ ROM_START( cgip30cs )
 	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
 ROM_END
 
+ROM_START( cgip30b )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-3fff, duplicated to fit the ROM size */
+	ROM_LOAD( "u11", 0x0000, 0x8000, CRC(e32400cc) SHA1(f219aa4f35d92581b223a2172ff54cb3a6eaf7fe) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "u27",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) // 0xxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                 0x0800, 0x0800 )
+ROM_END
+
 ROM_START( cgip23b ) // PCB marked 'POKER Version 1.1'. Z0840004PSC + 4 x NEC 82C55AC-2
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u29", 0x0000, 0x8000, CRC(e8ac2803) SHA1(fe545fcc7dad5eb8786fae853262392ba9b067ca) ) // 1ST AND 2ND HALF IDENTICAL
@@ -3772,8 +3782,9 @@ GAMEL( 198?, norautub, 0,       norautp,  norautp,  norautp_state, init_enc,   R
 GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",         0,                   layout_noraut12 )
 GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)", 0,                   layout_noraut12 )
 GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (Noraut Deluxe hack)",   0,                   layout_noraut12 )
-GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                   layout_noraut12 )
-GAMEL( 1998, cgip23b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)", 0,                   layout_noraut12 )
+GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 30C, 21/12/99
+GAMEL( 1999, cgip30b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)", 0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
+GAMEL( 1998, cgip23b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)", 0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
 GAMEL( 19??, cgidjp,   0,       cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",            0,                   layout_noraut12 ) // very similar to df_djpkr
 GAME(  198?, kimblz80, 0,       kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   MACHINE_NOT_WORKING )
 GAME(  1983, pma,      0,       nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                           MACHINE_NOT_WORKING )

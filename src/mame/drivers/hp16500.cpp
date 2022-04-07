@@ -80,7 +80,7 @@ private:
 	optional_device<hp_hil_mlc_device> m_mlc;
 	std::vector<uint8_t> m_vram;
 
-	uint8_t m_mask, m_val;
+	uint8_t m_mask = 0, m_val = 0;
 
 	void palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -109,7 +109,7 @@ private:
 	void hp1650_map(address_map &map);
 	void hp1651_map(address_map &map);
 
-	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
+	uint32_t m_palette[256]{}, m_colors[3]{}, m_count = 0, m_clutoffs = 0;
 };
 
 uint32_t hp16500_state::vbl_state_r()

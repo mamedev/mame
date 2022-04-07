@@ -45,13 +45,13 @@ private:
 	uint8_t ext2_video_ff_r();
 	void ext2_video_ff_w(uint8_t data);
 
-	uint8_t m_pc9821_window_bank;
-	uint8_t m_ext2_ff;
+	uint8_t m_pc9821_window_bank = 0;
+	uint8_t m_ext2_ff = 0;
 
 	struct {
-		uint8_t pal_entry;
-		uint8_t r[0x100],g[0x100],b[0x100];
-		uint16_t bank[2];
+		uint8_t pal_entry = 0;
+		uint8_t r[0x100]{}, g[0x100]{}, b[0x100]{};
+		uint16_t bank[2]{};
 	}m_analog256;
 
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -84,7 +84,7 @@ private:
 	void ext_sdip_address_w(offs_t offset, u8 data);
 	void ext_sdip_access_w(offs_t offset, u8 data);
 
-	uint8_t m_ext_sdip[0x100], m_ext_sdip_addr;
+	uint8_t m_ext_sdip[0x100]{}, m_ext_sdip_addr = 0;
 };
 
 // CanBe
@@ -112,7 +112,7 @@ private:
 	DECLARE_MACHINE_START(pc9821_canbe);
 
 	struct {
-		u8 index;
+		u8 index = 0;
 	}m_remote;
 };
 

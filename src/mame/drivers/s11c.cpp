@@ -23,11 +23,12 @@ Bugs Bunny's Birthday Ball     20009  Hold CD hit 1          CD
 **** Williams (WPC) ****
 Riverboat Gambler              50007  Hold CDE hit 1         CDE
 **** Krell Development ****
-Star Trax                        ---  unknown                unknown
+Star Trax                        ---  X                      unknown
 
 Status:
 - All pinball machines are playable
-- Star Trax has no pinball, but instead has many ball bearings (800 was mentioned), so will not be able to run
+- Star Trax has no pinball, but instead has many ball bearings (800 was mentioned). Although it 
+    can be started, and a score attained, it will eventually say PUMP ERROR and stop responding.
 
 
 ToDo:
@@ -736,38 +737,38 @@ ROM_START(strax_p7)
 ROM_END
 
 
-GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-4)",                                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_lu1,     dd_l2,      s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (LU-1) Europe",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (PA-6)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-6)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l5,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-5)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_le2,   pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LE-2)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  pool_p7,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (PA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_l1,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (G-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (P-3)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rvrbt_p7,   rvrbt_l3,   s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (PA-7)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (L-2)",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PU-1)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_l3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LU-3) Europe",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LG-3) Germany",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-4) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-4)",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  dd_lu1,     dd_l2,      s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (LU-1) Europe",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (PA-6)",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-7)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-6)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  pool_l5,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LA-5)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  pool_le2,   pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (LE-2)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  pool_p7,    pool_l7,    s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Pool Sharks (PA-7)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  radcl_l1,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (G-1)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (P-3)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rvrbt_p7,   rvrbt_l3,   s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (PA-7)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (L-2)",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PU-1)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_l3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LU-3) Europe",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LG-3) Germany",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-4) Europe",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

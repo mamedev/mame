@@ -82,14 +82,14 @@ protected:
 	s32 m_scrolly[4] = {0};
 
 #ifdef MAME_DEBUG
-	int m_display_pf[4];
-	int m_displog;
+	int m_display_pf[4]{};
+	int m_displog = 0;
 #endif
 
 	s32 m_tiles_offsetx = 0;
 	s32 m_tiles_offsety = 0;
 
-	tilemap_t *m_tilemap[4];
+	tilemap_t *m_tilemap[4]{};
 
 	void intenable_w(u8 data);
 	u8 shared_r(offs_t offset);

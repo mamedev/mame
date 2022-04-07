@@ -268,7 +268,7 @@ static const nes_mmc mmc_list[] =
 	{ 232, CAMERICA_BF9096 },
 	{ 233, BMC_42IN1RESET },
 	{ 234, AVE_MAXI15 },
-	{ 235, BMC_GOLD150 },   // 235 Golden Game x-in-1 - Unsupported
+	{ 235, BMC_GOLD260 },   // 235 Golden Game x-in-1 games
 	{ 236, BMC_70IN1 },
 	{ 237, BMC_TELETUBBIES },
 	{ 238, UNL_603_5052 },
@@ -284,9 +284,9 @@ static const nes_mmc mmc_list[] =
 	// 248 Unused
 	{ 249, WAIXING_SECURITY },
 	{ 250, NITRA_TDA },
-	// 251 Shen Hua Jian Yun III?? - Unsupported
+	// 251 Unused
 	{ 252, WAIXING_SGZ },
-	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
+	{ 253, HENGG_SHJY3 },
 	{ 254, BTL_PIKACHUY2K },
 	{ 255, BMC_72IN1 },         // duplicate of mapper 225
 
@@ -464,16 +464,32 @@ static const nes_mmc mmc_list[] =
 	// 426 PnP
 	// 427 PnP
 	{ 428, BMC_TF2740 },
-	// 429 Unused
-	// 430 Unused
+	// 429 Milowork FCFC1 flash cartridge
+	// 430 MMC3-based 831031C/T-308 multicart
 	{ 431, BMC_GN91B },
 	// 432 Realtec 8090
 	{ 433, BMC_NC20MB },
-	// 434 S-009
-	// 435...442 Unused
+	{ 434, BMC_S009 },
+	// 435 F-1002 multicart
+	// 436 VT02 PnP
+	{ 437, BMC_TH2348 },
+	{ 438, BMC_K3071 },
+	// 439 YS2309 multicart
+	// 440 Dongda Sonic REC-9388 educational computer
+	// 441 841026C and 850335C multicarts
+	// 442 "Golden Key" educational computer 
 	// 443 NC3000M multicart
 	// 444 NC7000M multicart
-	// 445...511 Unused
+	// 445 DG574B MMC3-compatible multicart
+	// 446 Mindkids SMD172B_FPGA board
+	// 447 VRC4-based KL-06 multicart
+	// 448 VRC4-based 830768C multicart
+	// 449 Super Games King multicart
+	// 450 VRC2-based YY841157C multicart
+	// 451 homebrew Haratyler HP/MP
+	{ 452, BMC_DS927 },
+	// 453 Realtec 8042
+	// 454...511 Unused
 	// 512 probably the correct MMC3 clone for chuugokt in nes.xml
 	{ 513, SACHEN_SA9602B },
 	// 514 seems to be for skaraok, currently set to UNKNOWN in nes.xml

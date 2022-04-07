@@ -187,8 +187,8 @@ private:
 	output_finder<3> m_leds;
 	output_finder<2> m_lamps;
 
-	uint8_t m_port02_status;
-	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
+	uint8_t m_port02_status = 0;
+	uint32_t m_gfx_rom_bank = 0;  /* graphics ROMs are banked */
 
 	double m_weights_r[2];
 	double m_weights_g[3];
@@ -198,11 +198,11 @@ private:
 	uint8_t m_ls670_0[4];
 	uint8_t m_ls670_1[4];
 
-	uint8_t m_zpu_int_vector;
+	uint8_t m_zpu_int_vector = 0;
 
-	uint8_t m_bcd_7445;
+	uint8_t m_bcd_7445 = 0;
 
-	uint8_t m_vsb_ls273;
+	uint8_t m_vsb_ls273 = 0;
 };
 
 

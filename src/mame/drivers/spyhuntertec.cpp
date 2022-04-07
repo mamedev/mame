@@ -79,15 +79,15 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t m_spyhunt_sprite_color_mask;
-	int16_t m_spyhunt_scroll_offset;
-	int16_t m_spyhunt_scrollx;
-	int16_t m_spyhunt_scrolly;
+	uint8_t m_spyhunt_sprite_color_mask = 0;
+	int16_t m_spyhunt_scroll_offset = 0;
+	int16_t m_spyhunt_scrollx = 0;
+	int16_t m_spyhunt_scrolly = 0;
 
-	int mcr_cocktail_flip;
+	int mcr_cocktail_flip = 0;
 
-	tilemap_t *m_alpha_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_alpha_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 	void spyhuntertec_paletteram_w(offs_t offset, uint8_t data);
 
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -117,8 +117,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(analog_count_callback);
 	void reset_analog_timer();
 
-	uint8_t m_analog_select;
-	uint8_t m_analog_count;
+	uint8_t m_analog_select = 0;
+	uint8_t m_analog_count = 0;
 	void spyhuntertec_map(address_map &map);
 	void spyhuntertec_portmap(address_map &map);
 	void spyhuntertec_sound_map(address_map &map);

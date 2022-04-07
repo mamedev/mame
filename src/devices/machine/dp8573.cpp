@@ -10,8 +10,6 @@
 #include "machine/dp8573.h"
 #include "machine/timehelp.h"
 
-#include "fileio.h"
-
 #define LOG_GENERAL (1 << 0)
 #define LOG_TICKS   (1 << 1)
 #define LOG_ALL     (LOG_GENERAL | LOG_TICKS)
@@ -348,13 +346,18 @@ void dp8573_device::nvram_default()
 	sync_time();
 }
 
-void dp8573_device::nvram_read(emu_file &file)
+bool dp8573_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_ram, 32);
+	size_t actual;
+	if (file.read(m_ram, 32, actual) || actual != 32)
+		return false;
+
 	sync_time();
+	return true;
 }
 
-void dp8573_device::nvram_write(emu_file &file)
+bool dp8573_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_ram, 32);
+	size_t actual;
+	return !file.write(m_ram, 32, actual) && actual == 32;
 }

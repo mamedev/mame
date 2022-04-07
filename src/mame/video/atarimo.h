@@ -201,7 +201,7 @@ private:
 	int                     m_slipramsize;        // total size of SLIP RAM, in entries
 
 	// live state
-	emu_timer *             m_force_update_timer;   // timer for forced updating
+	emu_timer *             m_force_update_timer = nullptr;   // timer for forced updating
 	uint32_t                m_bank;               // current bank number
 	uint32_t                m_xscroll;            // xscroll offset
 	uint32_t                m_yscroll;            // yscroll offset

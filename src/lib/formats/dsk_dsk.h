@@ -19,8 +19,8 @@ class dsk_format : public floppy_image_format_t
 public:
 	dsk_format();
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -28,6 +28,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_DSK_FORMAT;
+extern const dsk_format FLOPPY_DSK_FORMAT;
 
 #endif // MAME_FORMATS_DSK_DSK_H

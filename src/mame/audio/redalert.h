@@ -49,12 +49,12 @@ private:
 	TIMER_CALLBACK_MEMBER(audio_irq_on);
 	TIMER_CALLBACK_MEMBER(audio_irq_off);
 
-	emu_timer *m_audio_irq_on_timer;
-	emu_timer *m_audio_irq_off_timer;
+	emu_timer *m_audio_irq_on_timer = nullptr;
+	emu_timer *m_audio_irq_off_timer = nullptr;
 
-	uint8_t m_sound_hs;
-	uint8_t m_ay8910_latch_1;
-	uint8_t m_ay8910_latch_2;
+	uint8_t m_sound_hs = 0;
+	uint8_t m_ay8910_latch_1 = 0;
+	uint8_t m_ay8910_latch_2 = 0;
 };
 
 
@@ -117,11 +117,11 @@ private:
 	required_device<pia6821_device>         m_sndpia;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	emu_timer *m_audio_irq_on_timer;
-	emu_timer *m_audio_irq_off_timer;
+	emu_timer *m_audio_irq_on_timer = nullptr;
+	emu_timer *m_audio_irq_off_timer = nullptr;
 
-	uint8_t m_ay8910_latch_1;
-	uint8_t m_ay8910_latch_2;
+	uint8_t m_ay8910_latch_1 = 0;
+	uint8_t m_ay8910_latch_2 = 0;
 };
 
 #endif // MAME_AUDIO_REDALERT_H

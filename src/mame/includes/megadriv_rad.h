@@ -73,7 +73,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	uint16_t m_a1630a;
+	uint16_t m_a1630a = 0;
 
 private:
 	uint16_t read_a16300(offs_t offset, uint16_t mem_mask);

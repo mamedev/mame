@@ -58,8 +58,8 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	// internal state
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 	bool m_flip_screen;
 
 	// helpers

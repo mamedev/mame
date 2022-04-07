@@ -68,7 +68,7 @@ private:
 	// internal state
 	std::vector<uint8_t> m_ram;
 	uint8_t m_ctrlram[16];
-	tilemap_t *m_tmap;
+	tilemap_t *m_tmap = nullptr;
 
 	optional_region_ptr<uint8_t> m_zoom_rom;
 

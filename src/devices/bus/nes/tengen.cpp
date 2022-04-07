@@ -65,18 +65,6 @@ nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const 
 
 
 
-void nes_tengen008_device::device_start()
-{
-	common_start();
-}
-
-void nes_tengen008_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
 void nes_tengen032_device::device_start()
 {
 	common_start();

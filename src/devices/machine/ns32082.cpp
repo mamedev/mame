@@ -147,6 +147,7 @@ enum st_mask : unsigned
 
 ns32082_device::ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NS32082, tag, owner, clock)
+	, ns32000_slow_slave_interface(mconfig, *this)
 	, ns32000_mmu_interface(mconfig, *this)
 	, m_bpr{}
 	, m_pf{}

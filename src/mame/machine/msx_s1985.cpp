@@ -3,8 +3,6 @@
 #include "emu.h"
 #include "msx_s1985.h"
 
-#include "fileio.h"
-
 const uint8_t manufacturer_id = 0xfe;
 
 DEFINE_DEVICE_TYPE(MSX_S1985, msx_s1985_device, "msx_s1985", "MSX-Engine S1985")
@@ -38,15 +36,17 @@ void msx_s1985_device::nvram_default()
 }
 
 
-void msx_s1985_device::nvram_read(emu_file &file)
+bool msx_s1985_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_backup_ram, sizeof(m_backup_ram));
+	size_t actual;
+	return !file.read(m_backup_ram, sizeof(m_backup_ram), actual) && actual == sizeof(m_backup_ram);
 }
 
 
-void msx_s1985_device::nvram_write(emu_file &file)
+bool msx_s1985_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_backup_ram, sizeof(m_backup_ram));
+	size_t actual;
+	return !file.write(m_backup_ram, sizeof(m_backup_ram), actual) && actual == sizeof(m_backup_ram);
 }
 
 

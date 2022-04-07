@@ -70,7 +70,6 @@
 #include "mdec.h"
 #include "rcnt.h"
 #include "sound/spu.h"
-#include "debugger.h"
 
 #include "psxdefs.h"
 

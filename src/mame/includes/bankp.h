@@ -27,6 +27,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void bankp(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -34,12 +37,12 @@ public:
 	required_shared_ptr<uint8_t> m_colorram2;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	int     m_scroll_x;
-	int     m_priority;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int     m_scroll_x = 0;
+	int     m_priority = 0;
 
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0;
 	void scroll_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
@@ -56,7 +59,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void bankp(machine_config &config);
 	void bankp_io_map(address_map &map);
 	void bankp_map(address_map &map);
 };

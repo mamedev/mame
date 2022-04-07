@@ -20,6 +20,13 @@ void sm530_device::do_branch(u8 pu, u8 pl)
 
 // RAM address instructions
 
+void sm530_device::op_incb()
+{
+	// INCB: increment BL, but overflow on 3rd bit!
+	sm511_device::op_incb();
+	m_skip = ((m_bl & 7) == 0);
+}
+
 void sm530_device::op_lb()
 {
 	// LB x: load BM/BL with 4-bit immediate value (partial)
@@ -27,11 +34,9 @@ void sm530_device::op_lb()
 	m_bm = m_op >> 2 & 3;
 }
 
-void sm530_device::op_incb()
+void sm530_device::op_sabl()
 {
-	// INCB: increment BL, but overflow on 3rd bit!
-	sm510_base_device::op_incb();
-	m_skip = (m_bl == 8);
+	// SABL: set BL high bit for next opcode - handled in execute_one()
 }
 
 
@@ -49,7 +54,16 @@ void sm530_device::op_trs()
 	m_icount--;
 	push_stack();
 	u8 jump = m_program->read_byte((14 << 6) | (m_op & 0x3f));
-	do_branch(jump >> 5 & 7, jump & 0x1f);
+	do_branch(bitswap<3>(jump, 5,7,6), jump & 0x1f);
+}
+
+
+// Data transfer instructions
+
+void sm530_device::op_dta()
+{
+	// DTA: transfer 1/100s counter to ACC
+	m_acc = m_count_10ms;
 }
 
 
@@ -64,10 +78,60 @@ void sm530_device::op_adx()
 }
 
 
+// Test instructions
+
+void sm530_device::op_tg()
+{
+	// TG x: skip next if gamma flag is set, reset it after
+	m_skip = bool(m_gamma & bitmask(m_op));
+	m_gamma &= ~bitmask(m_op);
+}
+
+
 // I/O instructions
 
-void sm530_device::op_atbp()
+void sm530_device::op_keta()
 {
-	// ATBP: output ACC to BP
-	m_bp = m_acc;
+	// KETA: input KE to ACC
+	m_acc = m_read_k() >> 4 & 0xf;
+}
+
+void sm530_device::op_ats()
+{
+	// ATS: output ACC to S
+	m_write_s(m_acc);
+}
+
+void sm530_device::op_atf()
+{
+	// ATF: output ACC to F
+	m_write_f(m_acc);
+}
+
+void sm530_device::op_sds()
+{
+	// SDS: set display enable
+	m_ds = true;
+}
+
+void sm530_device::op_rds()
+{
+	// RDS: reset display enable
+	m_ds = false;
+}
+
+
+// Special instructions
+
+void sm530_device::op_idiv()
+{
+	// IDIV: reset divider and 1s counter
+	m_div = m_subdiv = 0;
+	m_count_1s = 0;
+}
+
+void sm530_device::op_inis()
+{
+	// INIS: reset 1/100s counter
+	m_count_10ms = 0;
 }

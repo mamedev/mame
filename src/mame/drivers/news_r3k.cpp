@@ -148,15 +148,15 @@ protected:
 
 	std::unique_ptr<u16[]> m_net_ram;
 
-	emu_timer *m_itimer;
+	emu_timer *m_itimer = nullptr;
 
-	u16 m_inten;
-	u16 m_intst;
-	u8 m_debug;
+	u16 m_inten = 0;
+	u16 m_intst = 0;
+	u8 m_debug = 0;
 
-	bool m_int_state[4];
-	bool m_lcd_enable;
-	bool m_lcd_dim;
+	bool m_int_state[4]{};
+	bool m_lcd_enable = false;
+	bool m_lcd_dim = false;
 };
 
 void news_r3k_state::machine_start()

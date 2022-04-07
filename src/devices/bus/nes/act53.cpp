@@ -112,7 +112,7 @@ void nes_action53_device::pcb_reset()
 void nes_action53_device::update_prg()
 {
 	u16 prg_lo, prg_hi;
-	u8 size = (m_reg[2] & 0x30) >> 4;         // Game size
+	u8 size = BIT(m_reg[2], 4, 2);            // Game size
 	u16 mask = ~0 << (size + 1);              // Bits to be taken from PRG regs
 	u8 b32k = !BIT(m_reg[2], 3);              // 32K mode bit
 	u16 outer = m_reg[3] << 1;                // Outer PRG reg bits
@@ -155,7 +155,7 @@ void nes_action53_device::write_l(offs_t offset, u8 data)
 	LOG_MMC(("action 53 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 	if (offset >= 0x1000)
-		m_sel = BIT(data, 0) | (BIT(data, 7) << 1);
+		m_sel = bitswap<2>(data, 7, 0);
 }
 
 

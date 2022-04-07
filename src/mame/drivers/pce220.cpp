@@ -174,7 +174,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t m_g850v_bank_num;
+	uint8_t m_g850v_bank_num = 0;
 
 	SED1560_UPDATE_CB(sed1560_update);
 	uint8_t g850v_bank_r();

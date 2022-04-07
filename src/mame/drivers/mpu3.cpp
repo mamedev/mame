@@ -239,35 +239,35 @@ private:
 	virtual void machine_reset() override;
 	void mpu3_basemap(address_map &map);
 
-	int m_triac_ic3;
-	int m_triac_ic4;
-	int m_triac_ic5;
-	int m_ic3_data;
-	int m_IC11G1;
-	int m_IC11G2A;
-	int m_IC11G2B;
-	int m_IC11GC;
-	int m_IC11GB;
-	int m_IC11GA;
+	int m_triac_ic3 = 0;
+	int m_triac_ic4 = 0;
+	int m_triac_ic5 = 0;
+	int m_ic3_data = 0;
+	int m_IC11G1 = 0;
+	int m_IC11G2A = 0;
+	int m_IC11G2B = 0;
+	int m_IC11GC = 0;
+	int m_IC11GB = 0;
+	int m_IC11GA = 0;
 
-	int m_ic10_output;
-	int m_ic11_active;
-	int m_disp_func;
+	int m_ic10_output = 0;
+	int m_ic11_active = 0;
+	int m_disp_func = 0;
 
-	int m_ic4_input_a;
-	int m_aux1_input;
-	int m_aux2_input;
-	int m_input_strobe;   /* IC11 74LS138 A = CA2 IC3, B = CA2 IC4, C = CA2 IC5 */
-	uint8_t m_lamp_strobe;
-	uint8_t m_led_strobe;
-	int m_signal_50hz;
+	int m_ic4_input_a = 0;
+	int m_aux1_input = 0;
+	int m_aux2_input = 0;
+	int m_input_strobe = 0;   /* IC11 74LS138 A = CA2 IC3, B = CA2 IC4, C = CA2 IC5 */
+	uint8_t m_lamp_strobe = 0;
+	uint8_t m_led_strobe = 0;
+	int m_signal_50hz = 0;
 
-	const mpu3_chr_table* m_current_chr_table;
-	int m_prot_col;
+	const mpu3_chr_table* m_current_chr_table = nullptr;
+	int m_prot_col = 0;
 
-	int m_optic_pattern;
+	int m_optic_pattern = 0;
 
-	emu_timer *m_ic21_timer;
+	emu_timer *m_ic21_timer = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_nvram;

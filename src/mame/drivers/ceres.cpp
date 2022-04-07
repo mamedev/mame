@@ -21,7 +21,7 @@
 
 // various hardware
 #include "machine/ns32081.h"
-//#include "machine/ns32082.h"
+#include "machine/ns32082.h"
 #include "machine/mc68681.h"
 #include "machine/z80scc.h"
 #include "machine/m3002.h"
@@ -49,6 +49,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_fpu(*this, "fpu")
+		, m_mmu(*this, "mmu")
 		, m_ram(*this, "ram")
 		, m_uart(*this, "uart")
 		, m_serial(*this, "v24")
@@ -88,6 +89,7 @@ public:
 protected:
 	required_device<ns32032_device> m_cpu;
 	required_device<ns32081_device> m_fpu;
+	required_device<ns32082_device> m_mmu;
 	required_device<ram_device> m_ram;
 
 	required_device<scn2681_device> m_uart;
@@ -103,9 +105,9 @@ protected:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u32> m_vram;
 
-	u8 m_dcr;
-	u16 m_mouse_x;
-	u16 m_mouse_y;
+	u8 m_dcr = 0;
+	u16 m_mouse_x = 0;
+	u16 m_mouse_y = 0;
 
 	enum wfc_status : u8
 	{
@@ -117,15 +119,15 @@ protected:
 		WFC_S_RDY = 0x40, // drive ready
 		WFC_S_BSY = 0x80, // busy
 	};
-	u8 m_wfc_sram[2048];
-	unsigned m_wfc_offset;
-	u8 m_wfc_error;
-	u8 m_wfc_precomp;
-	u8 m_wfc_count;
-	u8 m_wfc_sector;
-	u16 m_wfc_cylinder;
-	u8 m_wfc_sdh;
-	u8 m_wfc_status;
+	u8 m_wfc_sram[2048]{};
+	unsigned m_wfc_offset = 0;
+	u8 m_wfc_error = 0;
+	u8 m_wfc_precomp = 0;
+	u8 m_wfc_count = 0;
+	u8 m_wfc_sector = 0;
+	u16 m_wfc_cylinder = 0;
+	u8 m_wfc_sdh = 0;
+	u8 m_wfc_status = 0;
 };
 
 void ceres1_state::machine_start()
@@ -200,14 +202,14 @@ void ceres1_state::wfc_command(u8 command)
 		LOG("read sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
 		if (hdf)
-			hard_disk_read(hdf, get_lbasector(hdf), m_wfc_sram);
+			hdf->read(get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 3:
 		LOG("write sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
 		if (hdf)
-			hard_disk_write(hdf, get_lbasector(hdf), m_wfc_sram);
+			hdf->write(get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 4:
@@ -227,12 +229,12 @@ void ceres1_state::wfc_command(u8 command)
 
 int ceres1_state::get_lbasector(hard_disk_file *hdf)
 {
-	hard_disk_info const *info = hard_disk_get_info(hdf);
+	const auto &info = hdf->get_info();
 
 	int lbasector = m_wfc_cylinder & 0x3ff;
-	lbasector *= info->heads;
+	lbasector *= info.heads;
 	lbasector += (m_wfc_sdh >> 0) & 7;
-	lbasector *= info->sectors;
+	lbasector *= info.sectors;
 	lbasector += m_wfc_sector;
 
 	return lbasector;
@@ -340,6 +342,9 @@ void ceres1_state::ceres1(machine_config &config)
 
 	NS32081(config, m_fpu, 10_MHz_XTAL);
 	m_cpu->set_fpu(m_fpu);
+
+	NS32082(config, m_mmu, 10_MHz_XTAL);
+	m_cpu->set_mmu(m_mmu);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("4MiB");

@@ -12,6 +12,8 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
 
+#include <sstream>
+
 #define LOG_CASSETTE_STATE      0
 
 /***************************************************************************
@@ -154,68 +156,76 @@ static uint16_t tape_crc16_byte(uint16_t crc, uint8_t data)
     describes the state of the tape
 -------------------------------------------------*/
 
-const char *decocass_tape_device::describe_state()
+std::string decocass_tape_device::describe_state()
 {
-	static char buffer[40];
-	char temprname[40];
-	const char *rname = temprname;
+	std::ostringstream buffer;
+	util::stream_format(buffer, "{%9d=", m_clockpos);
 
-	if (m_region == REGION_LEADER)
-		rname = "LEAD";
-	else if (m_region == REGION_LEADER_GAP)
-		rname = "LGAP";
-	else if (m_region == REGION_BOT)
-		rname = "BOT ";
-	else if (m_region == REGION_BOT_GAP)
-		rname = "BGAP";
-	else if (m_region == REGION_TRAILER)
-		rname = "TRLR";
-	else if (m_region == REGION_TRAILER_GAP)
-		rname = "TGAP";
-	else if (m_region == REGION_EOT)
-		rname = "EOT ";
-	else if (m_region == REGION_EOT_GAP)
-		rname = "EGAP";
-	else
+	switch (m_region)
 	{
-		char tempbname[40];
-		const char *bname = tempbname;
-		int clk;
+	case REGION_LEADER:
+		buffer << "LEAD}";
+		break;
+	case REGION_LEADER_GAP:
+		buffer << "LGAP}";
+		break;
+	case REGION_BOT:
+		buffer << "BOT }";
+		break;
+	case REGION_BOT_GAP:
+		buffer << "BGAP}";
+		break;
+	case REGION_TRAILER:
+		buffer << "TRLR}";
+		break;
+	case REGION_TRAILER_GAP:
+		buffer << "TGAP}";
+		break;
+	case REGION_EOT:
+		buffer << "EOT }";
+		break;
+	case REGION_EOT_GAP:
+		buffer << "EGAP}";
+		break;
+	default:
+		util::stream_format(buffer, "BL%02X.", m_region - REGION_DATA_BLOCK_0);
 
 		if (m_bytenum <= BYTE_PRE_GAP_33)
-			sprintf(tempbname, "PR%02d", m_bytenum - BYTE_PRE_GAP_0);
+			util::stream_format(buffer, "PR%02d", m_bytenum - BYTE_PRE_GAP_0);
 		else if (m_bytenum == BYTE_LEADIN)
-			bname = "LDIN";
+			buffer << "LDIN";
 		else if (m_bytenum == BYTE_HEADER)
-			bname = "HEAD";
+			buffer << "HEAD";
 		else if (m_bytenum <= BYTE_DATA_255)
-			sprintf(tempbname, "BY%02X", m_bytenum - BYTE_DATA_0);
+			util::stream_format(buffer, "BY%02X", m_bytenum - BYTE_DATA_0);
 		else if (m_bytenum == BYTE_CRC16_MSB)
-			bname = "CRCM";
+			buffer << "CRCM";
 		else if (m_bytenum == BYTE_CRC16_LSB)
-			bname = "CRCL";
+			buffer << "CRCL";
 		else if (m_bytenum == BYTE_TRAILER)
-			bname = "TRLR";
+			buffer << "TRLR";
 		else if (m_bytenum == BYTE_LEADOUT)
-			bname = "LOUT";
+			buffer << "LOUT";
 		else if (m_bytenum == BYTE_LONGCLOCK)
-			bname = "LONG";
+			buffer << "LONG";
 		else
-			sprintf(tempbname, "PO%02d", m_bytenum - BYTE_POSTGAP_0);
+			util::stream_format(buffer, "PO%02d", m_bytenum - BYTE_POSTGAP_0);
 
-		/* in the main data area, the clock alternates at the clock rate */
-		if (m_bytenum >= BYTE_LEADIN && m_bytenum <= BYTE_LEADOUT)
-			clk = ((uint32_t)(m_clockpos - REGION_BOT_GAP_END_CLOCK) & 1) ? 0 : 1;
-		else if (m_bytenum == BYTE_LONGCLOCK)
-			clk = 1;
-		else
-			clk = 0;
+		{
+			// in the main data area, the clock alternates at the clock rate
+			int clk;
+			if (m_bytenum >= BYTE_LEADIN && m_bytenum <= BYTE_LEADOUT)
+				clk = BIT(~uint32_t(m_clockpos - REGION_BOT_GAP_END_CLOCK), 0);
+			else if (m_bytenum == BYTE_LONGCLOCK)
+				clk = 1;
+			else
+				clk = 0;
 
-		sprintf(temprname, "BL%02X.%4s.%d.%d", m_region - REGION_DATA_BLOCK_0, bname, m_bitnum, clk);
+			util::stream_format(buffer, ".%d.%d}", m_bitnum, clk);
+		}
 	}
 
-	sprintf(buffer, "{%9d=%s}", m_clockpos, rname);
-	return buffer;
+	return std::move(buffer).str();
 }
 
 
@@ -271,7 +281,7 @@ TIMER_CALLBACK_MEMBER( decocass_tape_device::tape_clock_callback )
 
 	/* log */
 	if (LOG_CASSETTE_STATE)
-		describe_state();
+		describe_state(); // FIXME: is this supposed to actually do something with the result?
 }
 
 

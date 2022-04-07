@@ -1380,7 +1380,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_cpu->set_relative_mode(true);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp64k_state::cpu_mem_map);
 	m_cpu->set_addrmap(AS_IO, &hp64k_state::cpu_io_map);
-	m_cpu->int_cb().set(FUNC(hp64k_state::int_cb));
+	m_cpu->set_int_cb(FUNC(hp64k_state::int_cb));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
 	TIMER(config, "kb_timer").configure_periodic(FUNC(hp64k_state::hp64k_kb_scan), attotime::from_hz(100));

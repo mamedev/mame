@@ -2060,10 +2060,8 @@ void nemesis_state::salamand(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.08);
-	m_k007232->add_route(0, "rspeaker", 0.08);
-	m_k007232->add_route(1, "lspeaker", 0.08);
-	m_k007232->add_route(1, "rspeaker", 0.08);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.08);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.08);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2101,10 +2099,8 @@ void nemesis_state::blkpnthr(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.10);
-	m_k007232->add_route(0, "rspeaker", 0.10);
-	m_k007232->add_route(1, "lspeaker", 0.10);
-	m_k007232->add_route(1, "rspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2138,26 +2134,20 @@ void nemesis_state::citybomb(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.30);
-	m_k007232->add_route(0, "rspeaker", 0.30);
-	m_k007232->add_route(1, "lspeaker", 0.30);
-	m_k007232->add_route(1, "rspeaker", 0.30);
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
 //  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
-	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
-	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
-	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+	k051649_device &k051649(K051649(config, "k051649", 3579545));
+	k051649.add_route(ALL_OUTPUTS, "mono", 0.38);
 }
 
 void nemesis_state::nyanpani(machine_config &config)
@@ -2183,26 +2173,20 @@ void nemesis_state::nyanpani(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.30);
-	m_k007232->add_route(0, "rspeaker", 0.30);
-	m_k007232->add_route(1, "lspeaker", 0.30);
-	m_k007232->add_route(1, "rspeaker", 0.30);
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
 //  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
-	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
-	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
-	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+	k051649_device &k051649(K051649(config, "k051649", 3579545));
+	k051649.add_route(ALL_OUTPUTS, "mono", 0.38);
 }
 
 void nemesis_state::hcrash(machine_config &config)
@@ -2248,10 +2232,8 @@ void nemesis_state::hcrash(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.10);
-	m_k007232->add_route(0, "rspeaker", 0.10);
-	m_k007232->add_route(1, "lspeaker", 0.10);
-	m_k007232->add_route(1, "rspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2770,7 +2752,7 @@ Notes:
       VSync - 60Hz
       HSync - 15.52kHz
 
-      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64)
+      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64, ULA)
 
 
 Bottom PCB

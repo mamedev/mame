@@ -2,11 +2,11 @@
 // copyright-holders: Robbbert
 /***************************************************************************
 
-        Homebrew Z80-based TV Game computer by Mr. Isizu
+Homebrew Z80-based TV Game computer by Mr. Isizu
 
-        http://w01.tp1.jp/~a571632211/z80tvgame/index.html
+http://w01.tp1.jp/~a571632211/z80tvgame/index.html
 
-        2015-06-12 Driver by Robbbert
+2015-06-12 Driver by Robbbert
 
 ****************************************************************************/
 
@@ -18,6 +18,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class tvgame_state : public driver_device
 {
@@ -136,7 +137,7 @@ ROM_START( tvgame )
 	ROM_LOAD( "video32.bin", 0x0000, 0x1000, CRC(516006e3) SHA1(942b31acccf833cd722cbcb739eb87673dc633d7) )
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT        COMPANY      FULLNAME              FLAGS
 CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  tvgame_state, empty_init, "Mr. Isizu", "Z80 TV Game System", MACHINE_SUPPORTS_SAVE )

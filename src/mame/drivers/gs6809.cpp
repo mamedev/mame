@@ -12,6 +12,9 @@
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class gs6809_state : public driver_device
 {
 public:
@@ -73,5 +76,8 @@ ROM_START(gs6809)
 	ROM_LOAD("gs6809.bin",   0xc000, 0x4000, CRC(f997a378) SHA1(1e0d5997b1b286aa328bdbff776bcddbb68d1c34))
 ROM_END
 
-//    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
-COMP( 201?, gs6809,       0,        0,      gs6809,    0,       gs6809_state, empty_init,    "Grant Searle",   "Simple 6809 Machine",  MACHINE_NO_SOUND_HW )
+} // anonymous namespace
+
+
+//    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS         INIT           COMPANY           FULLNAME                FLAGS
+COMP( 2011, gs6809,      0,        0,      gs6809,   0,       gs6809_state, empty_init,    "Grant Searle",   "Simple 6809 Machine",  MACHINE_NO_SOUND_HW )

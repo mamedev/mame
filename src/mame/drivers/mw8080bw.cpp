@@ -218,9 +218,10 @@ void mw8080bw_state::main_map(address_map &map)
 void mw8080bw_state::mw8080bw_root(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, MW8080BW_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mw8080bw_state::main_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(mw8080bw_state::interrupt_vector));
+	i8080_cpu_device &maincpu(I8080(config, m_maincpu, MW8080BW_CPU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &mw8080bw_state::main_map);
+	maincpu.set_irq_acknowledge_callback(FUNC(mw8080bw_state::interrupt_vector));
+	maincpu.out_inte_func().set(FUNC(mw8080bw_state::int_enable_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state,mw8080bw)
 

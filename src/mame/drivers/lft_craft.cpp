@@ -58,13 +58,13 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_gpio_b;
-	uint8_t m_gpio_c;
+	uint8_t m_gpio_b = 0;
+	uint8_t m_gpio_c = 0;
 
-	uint32_t m_last_cycles;
-	uint64_t m_frame_start_cycle;
+	uint32_t m_last_cycles = 0;
+	uint64_t m_frame_start_cycle = 0;
 
-	uint8_t m_latched_color;
+	uint8_t m_latched_color = 0;
 	std::unique_ptr<uint8_t[]> m_pixels;
 };
 

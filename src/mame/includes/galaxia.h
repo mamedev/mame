@@ -29,7 +29,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	bitmap_ind16 m_temp_bitmap;
 	void galaxia_video_w(offs_t offset, uint8_t data);
 	void galaxia_scroll_w(uint8_t data);

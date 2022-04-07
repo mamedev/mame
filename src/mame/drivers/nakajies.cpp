@@ -330,24 +330,24 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	/* IRQ handling */
-	uint8_t   m_irq_enabled;
-	uint8_t   m_irq_active;
+	uint8_t   m_irq_enabled = 0;
+	uint8_t   m_irq_active = 0;
 
-	uint8_t   m_lcd_memory_start;
+	uint8_t   m_lcd_memory_start = 0;
 
-	uint8_t   m_matrix;
+	uint8_t   m_matrix = 0;
 
 	/* ROM */
-	uint8_t   *m_rom_base;
-	uint32_t  m_rom_size;
+	uint8_t   *m_rom_base = nullptr;
+	uint32_t  m_rom_size = 0;
 
 	/* RAM */
 	std::unique_ptr<uint8_t[]> m_ram_base;
-	uint32_t  m_ram_size;
+	uint32_t  m_ram_size = 0;
 
 	/* Banking */
-	uint8_t   m_bank[8];
-	uint8_t   *m_bank_base[8];
+	uint8_t   m_bank[8]{};
+	uint8_t   *m_bank_base[8]{};
 };
 
 

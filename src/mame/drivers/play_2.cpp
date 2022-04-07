@@ -18,6 +18,16 @@ The IOS board common to all games provides sound effects through the CDP1863.
 - Mad Race uses a Sound Board IV (same as MPU-3 and later), but I/O ports
   that talk to it are unknown.
 
+Test mode:
+- Hold down NUM-0 and hit F3. The displays will show the digits one at a time.
+    The number of any stuck switch will show in the credit area. Pressing Start
+    will do a test of the solenoids (04 will show during this test). Press F3 to
+    exit.
+
+Adjustments:
+- While game is over, press NUM-0. Keep pressing to go through the bookkeeping
+    and the setup. See the manual for specifics.
+
 Status:
 - antar, storm, evlfight, attack, blkfever: Working
 - Mad Race: J is the outhole. Working, no sound.
@@ -86,7 +96,7 @@ protected:
 	u8 m_resetcnt = 0U;
 	u8 m_kbdrow = 0U;
 	u8 m_segment[5]{};
-	bool m_disp_sw = 0;
+	bool m_disp_sw = false;
 	u8 m_port06 = 0U;
 	u8 m_old_solenoids[8]{};
 	u8 m_soundlatch = 0U;
@@ -122,7 +132,7 @@ private:
 	u8 psg_r();
 	void psg_w(u8 data);
 	u8 sound_in_r();
-	u8 m_psg_latch = 0;
+	u8 m_psg_latch = 0U;
 	required_device<ay8910_device> m_ay;
 };
 
@@ -621,12 +631,12 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 2)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1982, cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980, zira,      0,     zira,   play_2, zira_state,   init_zira,  ROT0, "Playmatic",      "Zira",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 2)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, zira,      0,     zira,   play_2, zira_state,   init_zira,  ROT0, "Playmatic",      "Zira",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

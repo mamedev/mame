@@ -60,7 +60,7 @@ private:
 	attotime typematic_delay() const;
 	attotime typematic_period() const;
 
-	bool             m_meta;
+	bool             m_meta = false;
 	u16              m_last_modifiers;
 	devcb_write8     m_keyboard_cb;
 	devcb_write_line m_out_meta_cb;

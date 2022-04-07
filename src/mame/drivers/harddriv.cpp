@@ -2648,6 +2648,41 @@ ROM_START( harddrivc1 )
 ROM_END
 
 
+ROM_START( harddrivcbl ) // 3 board set based on harddrivc. Only slight changes to the first 4 main CPU ROMs (copyright removal and not much more)
+	ROM_REGION( 0x100000, "mainpcb:maincpu", 0 )
+	ROM_LOAD16_BYTE( "08mainic.83", 0x000000, 0x010000, CRC(04ee5e48) SHA1(09632110c6e3bf935cc0046df50431b5e362ca46) )
+	ROM_LOAD16_BYTE( "04mainic.85", 0x000001, 0x010000, CRC(2a37dc5e) SHA1(6e36696a1e67d5756d9b4bc81c52885f2a4223b0) )
+	ROM_LOAD16_BYTE( "07mainic.82", 0x020000, 0x010000, CRC(c8d19312) SHA1(a5c9f133fcd88bebf77219f6ebc598db30c0f649) )
+	ROM_LOAD16_BYTE( "03mainic.66", 0x020001, 0x010000, CRC(7392b8c8) SHA1(3af1fcf10b62ee2fce3adced5863e2816a63e6df) )
+	ROM_LOAD16_BYTE( "06mainic.32", 0x0a0000, 0x010000, CRC(e5ea74e4) SHA1(58a8c0f16573fcc2c8739e6f72e485271e45af88) )
+	ROM_LOAD16_BYTE( "02mainic.34", 0x0a0001, 0x010000, CRC(4d759891) SHA1(b82087d9549ccc2a7eef22591dd8b869f2768075) )
+	ROM_LOAD16_BYTE( "05mainic.13", 0x0c0000, 0x010000, CRC(293c153b) SHA1(6300a50766b19ad203b5c7da28d51bf22054b39e) )
+	ROM_LOAD16_BYTE( "01mainic.15", 0x0c0001, 0x010000, CRC(5630390d) SHA1(cd1932cee70cddd1fb2110d1aeebb573a13f1339) )
+
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )
+	ROM_LOAD16_BYTE( "14snd.h16", 0x000000, 0x008000, CRC(3f20a396) SHA1(f34819796087c543083f6baac6c778e0cdb7340a) )
+	ROM_LOAD16_BYTE( "13snd.h18", 0x000001, 0x008000, CRC(6346bca3) SHA1(707dc86305142722a4757ba431cf6c7e9cf116b3) )
+
+	ROM_REGION16_BE( 0x60000, "mainpcb:user1", 0 )
+	ROM_LOAD16_BYTE( "10dspic.17", 0x000000, 0x010000, BAD_DUMP CRC(1b77f171) SHA1(10434e492e4e9de5cd8543271914d5ba37c52b50) ) // was missing from the romset, but given the rest of the ROMs is identical it's reasonable to assume this is, too
+	ROM_LOAD16_BYTE( "12dspic.16", 0x000001, 0x010000, CRC(e50bec32) SHA1(30c504c730e8e568e78e06c756a23b8923e85b4b) )
+	ROM_LOAD16_BYTE( "09dspic.7",  0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
+	ROM_LOAD16_BYTE( "11dspic.8",  0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
+
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )
+	ROM_LOAD( "15snd.a20", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
+	ROM_LOAD( "16snd.a19", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
+	ROM_LOAD( "17snd.a18", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
+	ROM_LOAD( "18snd.a17", 0x030000, 0x010000, CRC(f46ef09c) SHA1(ba62f73ee3b33d8f26b430ffa468f8792dca23de) )
+
+	ROM_REGION( 0x800, "mainpcb:200e", 0 )
+	ROM_LOAD( "harddrivc.200e",  0x000000, 0x000800, BAD_DUMP CRC(560a0106) SHA1(7295a4f1255869c43c3cf146ddebaea62c30b850) ) // not dumped for this set
+
+	ROM_REGION( 0x800, "mainpcb:210e", 0 )
+	ROM_LOAD( "harddrivc.210e",  0x000000, 0x000800, BAD_DUMP CRC(208bba53) SHA1(c9a36015a66917df528b84d20d255b6b96a90e76) ) // not dumped for this set
+ROM_END
+
+
 ROM_START( stunrun )
 	ROM_REGION( 0x100000, "mainpcb:maincpu", 0 )        /* 1MB for 68000 code */
 	ROM_LOAD16_BYTE( "136070-2102.200r", 0x000000, 0x010000, CRC(e0ed54d8) SHA1(15850568d8308b6499cbe55b5d8308041d906a29) )
@@ -5325,6 +5360,7 @@ GAME(  1990, harddrivc,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_
 GAME(  1990, harddrivcg,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, German, rev 2)", 0 )
 GAME(  1990, harddrivcb,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, British, rev 2)", 0 )
 GAME(  1990, harddrivc1,  harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "Atari Games", "Hard Drivin' (compact, rev 1)", 0 )
+GAME(  1990, harddrivcbl, harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, empty_init, ROT0, "bootleg",     "Hard Drivin' (compact, rev 2 bootleg)", 0 )
 
 GAME(  1989, stunrun,     0,        stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 6)", 0 )
 GAME(  1989, stunrunj,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, empty_init, ROT0, "Atari Games", "S.T.U.N. Runner (rev 7, Japan)", 0 )

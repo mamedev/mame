@@ -47,7 +47,7 @@ public:
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram16(*this, "spriteram16", 0x800 / 2, ENDIANNESS_BIG) { }
+		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_BIG) { }
 
 
 	void actfancr(machine_config &config);

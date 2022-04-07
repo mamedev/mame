@@ -36,4 +36,4 @@ const d71_format::format d71_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_D71_FORMAT = &floppy_image_format_creator<d71_format>;
+const d71_format FLOPPY_D71_FORMAT;

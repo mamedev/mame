@@ -33,25 +33,25 @@ public:
 	bitmap_ind16 m_tree1_bitmap;
 	std::unique_ptr<uint8_t[]>   m_tree_ram;
 	std::unique_ptr<uint8_t[]>   m_memory_devices;
-	uint32_t   m_mem_dev_selected;    /* an offset within memory_devices area */
-	uint32_t   m_slopeROM_bank;
-	uint8_t    m_tree_en;
-	uint8_t    m_horizon;
-	uint8_t    m_v_count_river;
-	uint8_t    m_v_count_tree;
-	int      m_tree_on[2];
-	emu_timer* m_scanline_timer;
+	uint32_t   m_mem_dev_selected = 0U;    /* an offset within memory_devices area */
+	uint32_t   m_slopeROM_bank = 0U;
+	uint8_t    m_tree_en = 0U;
+	uint8_t    m_horizon = 0U;
+	uint8_t    m_v_count_river = 0U;
+	uint8_t    m_v_count_tree = 0U;
+	int        m_tree_on[2]{};
+	emu_timer* m_scanline_timer = nullptr;
 
 	/* misc */
-	uint8_t    m_tree0_col;
-	uint8_t    m_tree1_col;
-	uint8_t    m_left_bank_col;
-	uint8_t    m_right_bank_col;
-	uint8_t    m_boat_shore_col;
-	uint8_t    m_collision_reset;
-	uint8_t    m_tree_collision_reset;
-	uint8_t    m_prev_value_31;
-	int      m_dir_31;
+	uint8_t    m_tree0_col = 0U;
+	uint8_t    m_tree1_col = 0U;
+	uint8_t    m_left_bank_col = 0U;
+	uint8_t    m_right_bank_col = 0U;
+	uint8_t    m_boat_shore_col = 0U;
+	uint8_t    m_collision_reset = 0U;
+	uint8_t    m_tree_collision_reset = 0U;
+	uint8_t    m_prev_value_31 = 0U;
+	int        m_dir_31 = 0;
 
 	/* devices */
 	uint8_t mcu_r();

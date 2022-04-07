@@ -110,7 +110,6 @@ private:
 	void (*m_sector_callback)(void*,int);   //!< callback to call at the start of each sector
 	emu_timer* m_timer;                     //!< sector timer
 	diablo_image_device* m_image;           //!< diablo_image_device interfacing the CHD
-	chd_file* m_handle;                     //!< underlying CHD handle
 	hard_disk_file* m_disk;                 //!< underlying hard disk file
 
 	//! translate C/H/S to a page and read the sector

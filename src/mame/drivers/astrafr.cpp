@@ -49,13 +49,13 @@ public:
 	void init_astradec_sml_dual();
 
 private:
-	uint32_t* m_cpuregion;
-	int  m_cpuregion_size;
-	std::unique_ptr<uint32_t[]> m_mainram;
+	uint32_t* m_cpuregion = nullptr;
+	int  m_cpuregion_size = 0;
+	std::unique_ptr<uint32_t[]> m_mainram{};
 
-	uint32_t* m_slavecpuregion;
-	int  m_slavecpuregion_size;
-	std::unique_ptr<uint32_t[]> m_slaveram;
+	uint32_t* m_slavecpuregion = nullptr;
+	int  m_slavecpuregion_size = 0;
+	std::unique_ptr<uint32_t[]> m_slaveram{};
 
 
 

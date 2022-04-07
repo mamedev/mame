@@ -23,25 +23,29 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void init_bigevglf();
+	void bigevglf(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_spriteram1;
 	required_shared_ptr<uint8_t> m_spriteram2;
 
 	/* video-related */
-	bitmap_ind16 m_tmp_bitmap[4];
-	std::unique_ptr<uint8_t[]>    m_vidram;
-	uint32_t   m_vidram_bank;
-	uint32_t   m_plane_selected;
-	uint32_t   m_plane_visible;
+	bitmap_ind16 m_tmp_bitmap[4]{};
+	std::unique_ptr<uint8_t[]>    m_vidram{};
+	uint32_t   m_vidram_bank = 0U;
+	uint32_t   m_plane_selected = 0U;
+	uint32_t   m_plane_visible = 0U;
 
 	/* MCU related */
-	int      m_mcu_coin_bit5;
+	int      m_mcu_coin_bit5 = 0;
 
 	/* misc */
-	uint32_t   m_beg_bank;
-	uint8_t    m_beg13_ls74[2];
-	uint8_t    m_port_select;     /* for muxed controls */
+	uint32_t   m_beg_bank = 0U;
+	uint8_t    m_beg13_ls74[2]{};
+	uint8_t    m_port_select = 0U;     /* for muxed controls */
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -62,7 +66,6 @@ public:
 	void bigevglf_vidram_addr_w(uint8_t data);
 	void bigevglf_vidram_w(offs_t offset, uint8_t data);
 	uint8_t bigevglf_vidram_r(offs_t offset);
-	void init_bigevglf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -75,7 +78,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void bigevglf(machine_config &config);
 	void bigevglf_portmap(address_map &map);
 	void bigevglf_sub_portmap(address_map &map);
 	void main_map(address_map &map);

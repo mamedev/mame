@@ -40,11 +40,11 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t   *m_tilemap_bg;
-	tilemap_t   *m_tilemap_fg;
+	tilemap_t   *m_tilemap_bg = nullptr;
+	tilemap_t   *m_tilemap_fg = nullptr;
 
 	/* misc */
-	int       m_oki_bank;
+	int       m_oki_bank = 0;
 	void drtomy_vram_fg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void drtomy_vram_bg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void drtomy_okibank_w(uint16_t data);

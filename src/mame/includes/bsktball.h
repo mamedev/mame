@@ -72,25 +72,25 @@ private:
 	required_shared_ptr<uint8_t> m_motion;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint32_t   m_nmi_on;
+	uint32_t   m_nmi_on = 0U;
 
 	/* input-related */
-	int m_ld1;
-	int m_ld2;
-	int m_dir0;
-	int m_dir1;
-	int m_dir2;
-	int m_dir3;
-	int m_last_p1_horiz;
-	int m_last_p1_vert;
-	int m_last_p2_horiz;
-	int m_last_p2_vert;
+	int m_ld1 = 0;
+	int m_ld2 = 0;
+	int m_dir0 = 0;
+	int m_dir1 = 0;
+	int m_dir2 = 0;
+	int m_dir3 = 0;
+	int m_last_p1_horiz = 0;
+	int m_last_p1_vert = 0;
+	int m_last_p2_horiz = 0;
+	int m_last_p2_vert = 0;
 };
 
-/*----------- defined in audio/bsktball.c -----------*/
+/*----------- defined in audio/bsktball.cpp -----------*/
 
 DISCRETE_SOUND_EXTERN( bsktball_discrete );
 

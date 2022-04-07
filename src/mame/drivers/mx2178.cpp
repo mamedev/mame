@@ -32,6 +32,7 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 
+namespace {
 
 class mx2178_state : public driver_device
 {
@@ -194,7 +195,7 @@ ROM_START( mx2178 )
 	ROM_LOAD( "96273883.c7", 0x000000, 0x001000, CRC(8311fadd) SHA1(573bbad23e893ad9374edc929642dc1cba3452d2) )
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME        FLAGS
 COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

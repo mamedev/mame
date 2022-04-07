@@ -61,7 +61,7 @@ protected:
 	void main_map(address_map &map);
 
 private:
-	uint16_t          m_playfield_base;
+	uint16_t          m_playfield_base = 0U;
 
 	required_device<atari_jsa_iiis_device> m_jsa;
 	optional_device<atari_xga_device> m_xga;
@@ -74,16 +74,16 @@ private:
 
 	required_device<adc0808_device> m_adc;
 
-	uint16_t          m_current_control;
-	uint8_t           m_playfield_tile_bank;
-	uint8_t           m_playfield_color_bank;
-	uint16_t          m_playfield_xscroll;
-	uint16_t          m_playfield_yscroll;
+	uint16_t          m_current_control = 0U;
+	uint8_t           m_playfield_tile_bank = 0U;
+	uint8_t           m_playfield_color_bank = 0U;
+	uint16_t          m_playfield_xscroll = 0U;
+	uint16_t          m_playfield_yscroll = 0U;
 
 	// LEGACY PROTECTION
-	uint16_t          m_last_write;
-	uint16_t          m_last_write_offset;
-	uint32_t          m_protection_ram[0x1000];
+	uint16_t          m_last_write = 0U;
+	uint16_t          m_last_write_offset = 0U;
+	uint32_t          m_protection_ram[0x1000]{};
 };
 
 #endif // MAME_INCLUDES_ATARIGX2_H

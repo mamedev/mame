@@ -49,8 +49,8 @@ private:
 	required_device<atari_vad_device> m_vad;
 	required_device<atari_motion_objects_device> m_mob;
 
-	uint16_t          m_latch_data;
-	uint8_t           m_alpha_tile_bank;
+	uint16_t          m_latch_data = 0U;
+	uint8_t           m_alpha_tile_bank = 0U;
 
 	static const atari_motion_objects_config s_mob_config;
 };

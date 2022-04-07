@@ -165,9 +165,10 @@ public:
 	template <typename... T> void set_tas_write_callback(T &&... args) { m_tas_write_callback.set(std::forward<T>(args)...); }
 	u16 get_fc();
 	void set_hmmu_enable(int enable);
+	void set_emmu_enable(int enable);
 	int get_pmmu_enable() const {return m_pmmu_enabled;}
 	void set_fpu_enable(int enable);
-	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc);
+	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun = false);
 	void disable_interrupt_mixer() { m_interrupt_mixer = false; }
 	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
 
@@ -220,6 +221,8 @@ protected:
 	int    m_has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
 	int    m_pmmu_enabled; /* Indicates if the PMMU is enabled */
 	int    m_hmmu_enabled; /* Indicates if the HMMU is enabled */
+	int    m_emmu_enabled; /* Indicates if external MMU is enabled */
+	int    m_instruction_restart; /* Save DA regs for potential instruction restart */
 	int    m_fpu_just_reset; /* Indicates the FPU was just reset */
 
 	/* Clocks required for instructions / exceptions */

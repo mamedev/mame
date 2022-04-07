@@ -67,7 +67,7 @@ private:
 	required_device<discrete_sound_device> m_discrete;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;

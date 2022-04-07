@@ -169,7 +169,7 @@
 #include "emu.h"
 #include "drcbex64.h"
 
-#include "debugger.h"
+#include "debug/debugcpu.h"
 #include "emuopts.h"
 
 #include <cstddef>

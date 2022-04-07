@@ -26,6 +26,7 @@ public:
 	{ }
 
 	void amazon_base(machine_config &config);
+	void horekidb2(machine_config &config);
 	void ym2203(machine_config &config);
 	void ym3526(machine_config &config);
 
@@ -43,10 +44,10 @@ private:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
 
-	uint16_t m_xscroll;
-	uint16_t m_yscroll;
-	tilemap_t *m_background;
-	tilemap_t *m_foreground;
+	uint16_t m_xscroll = 0;
+	uint16_t m_yscroll = 0;
+	tilemap_t *m_background = nullptr;
+	tilemap_t *m_foreground = nullptr;
 	void amazon_sound_w(uint16_t data);
 	uint8_t soundlatch_clear_r();
 	void amazon_background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -61,6 +62,7 @@ private:
 	uint32_t screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
+	void horekidb2_map(address_map &map);
 	void sound_2203_io_map(address_map &map);
 	void sound_3526_io_map(address_map &map);
 	void sound_map(address_map &map);

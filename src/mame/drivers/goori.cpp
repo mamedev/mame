@@ -102,7 +102,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	tilemap_t* m_bg_tilemap;
+	tilemap_t* m_bg_tilemap = nullptr;
 	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };

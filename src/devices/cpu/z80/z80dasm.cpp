@@ -8,7 +8,6 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "z80dasm.h"
 
 
@@ -28,10 +27,10 @@ static const char *const s_mnemonic[] =
 const u32 z80_disassembler::s_flags[] =
 {
 	0        ,0        ,0        ,0        ,STEP_OVER,0    ,0        ,0        ,
-	STEP_OVER,0        ,STEP_OVER,0        ,0        ,0    ,0        ,0        ,
-	STEP_OVER,0        ,0        ,0        ,STEP_OVER,0    ,0        ,0        ,
-	0        ,STEP_OVER,0        ,STEP_OVER,0        ,0    ,0        ,0        ,
-	STEP_OVER,0        ,STEP_OVER,0        ,0        ,0    ,STEP_OVER,STEP_OVER,
+	STEP_COND,0        ,STEP_COND,0        ,0        ,0    ,0        ,0        ,
+	STEP_COND,0        ,0        ,0        ,STEP_OVER,0    ,0        ,0        ,
+	0        ,STEP_COND,0        ,STEP_COND,0        ,0    ,0        ,0        ,
+	STEP_COND,0        ,STEP_COND,0        ,0        ,0    ,STEP_COND,STEP_COND,
 	0        ,0        ,0        ,0        ,0        ,0    ,STEP_OUT ,STEP_OUT ,
 	STEP_OUT ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,STEP_OVER,0        ,0    ,0        ,0        ,
@@ -460,6 +459,7 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		break;
 	}
 
+	uint32_t flags = s_flags[d->mnemonic];
 	if( d->arguments )
 	{
 		util::stream_format(stream, "%-4s ", s_mnemonic[d->mnemonic]);
@@ -474,6 +474,8 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			case 'A':
 				util::stream_format(stream, "$%04X", params.r16(pos) );
 				pos += 2;
+				if (src != d->arguments)
+					flags |= STEP_COND;
 				break;
 			case 'B':   /* Byte op arg */
 				util::stream_format(stream, "$%02X", params.r8(pos++) );
@@ -484,6 +486,8 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 				break;
 			case 'O':   /* Offset relative to PC */
 				util::stream_format(stream, "$%04X", (pc + s8(params.r8(pos++)) + 2) & 0xffff);
+				if (src != d->arguments)
+					flags |= STEP_COND;
 				break;
 			case 'P':   /* Port number */
 				util::stream_format(stream, "$%02X", params.r8(pos++) );
@@ -509,11 +513,13 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			}
 			src++;
 		}
+		if (d->mnemonic == zRET)
+			flags |= STEP_COND;
 	}
 	else
 	{
 		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
-	return (pos - pc) | s_flags[d->mnemonic] | SUPPORTED;
+	return (pos - pc) | flags | SUPPORTED;
 }

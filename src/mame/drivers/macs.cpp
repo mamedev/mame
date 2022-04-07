@@ -90,8 +90,8 @@ protected:
 	void machine_start() override;
 
 private:
-	uint8_t m_mux_data;
-	uint8_t m_rev;
+	uint8_t m_mux_data = 0;
+	uint8_t m_rev = 0;
 	uint8_t m_cart_bank;
 	std::unique_ptr<uint8_t[]> m_ram1;
 	required_shared_ptr<uint8_t> m_ram2;

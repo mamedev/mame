@@ -1532,6 +1532,27 @@ ROM_END
 
 ROM_START( bmcompmx )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "858jac01.6a", 0x000000, 0x80000, CRC(b32693ca) SHA1(6518a8acbd070bb6f9039c4f9997dda2720e8e16) )
+	ROM_LOAD16_BYTE( "858jac02.8a", 0x000001, 0x80000, CRC(0d11d0f4) SHA1(b9fbf2ce062e1ee4a785abe021ac039857ced0d2) )
+
+	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
+	ROM_LOAD16_BYTE( "858jaa03.19a", 0x000000, 0x80000, CRC(8559f457) SHA1(133092994087864a6c29e9d51dcdbef2e2c2a123) )
+	ROM_LOAD16_BYTE( "858jaa04.20a", 0x000001, 0x80000, CRC(770824d3) SHA1(5c21bc39f8128957d76be85bc178c96976987f5f) )
+	ROM_LOAD16_BYTE( "858jaa05.22a", 0x100000, 0x80000, CRC(9ce769da) SHA1(1fe2999f786effdd5e3e74475e8431393eb9403d) )
+	ROM_LOAD16_BYTE( "858jaa06.24a", 0x100001, 0x80000, CRC(0cde6584) SHA1(fb58d2b4f58144b71703431740c0381bb583f581) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )       /* TILEMAP */
+	ROM_LOAD16_BYTE( "858jaa07.22d", 0x000000, 0x80000, CRC(7d183f46) SHA1(7a1b0ccb0407b787af709bdf038d886727199e4e) )
+	ROM_LOAD16_BYTE( "858jaa08.23d", 0x000001, 0x80000, CRC(c731dc8f) SHA1(1a937d76c02711b7f73743c9999456d4408ad284) )
+	ROM_LOAD16_BYTE( "858jaa09.25d", 0x100000, 0x80000, CRC(0b4ad843) SHA1(c01e15053dd1975dc68db9f4e6da47062d8f9b54) )
+	ROM_LOAD16_BYTE( "858jaa10.27d", 0x100001, 0x80000, CRC(00b124ee) SHA1(435d28a327c2707833a8ddfe841104df65ffa3f8) )
+
+	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_IMAGE( "858jaa11", 0, SHA1(bc590472046336a1000f29901fe3fd7b29747e47) ) /* ver 1.00 JA */
+ROM_END
+
+ROM_START( bmcompmxb )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
 	ROM_LOAD16_BYTE( "858jab01.6a", 0x000000, 0x80000, CRC(92841eb5) SHA1(3a9d90a9c4b16cb7118aed2cadd3ab32919efa96) )
 	ROM_LOAD16_BYTE( "858jab02.8a", 0x000001, 0x80000, CRC(7b19969c) SHA1(3545acabbf53bacc5afa72a3c5af3cd648bc2ae1) )
 
@@ -2243,7 +2264,8 @@ GAME( 1997, bm1stmix, 0,        djmainj, bm1stmix,  djmain_state, init_beatmania
 GAME( 1998, bm2ndmix, 0,        djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-B)", 0 )
 GAME( 1998, bm2ndmxa, bm2ndmix, djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-A)", 0 )
 GAME( 1998, bm3rdmix, 0,        djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-A)", 0 )
-GAME( 1999, bmcompmx, 0,        djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
+GAME( 1999, bmcompmx, 0,        djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-C)", 0 )
+GAME( 1999, bmcompmxb,bmcompmx, djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
 GAME( 1999, bmcmxaac, bmcompmx, djmainu, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver AA-C)", 0 )
 GAME( 1999, hmcompmx, bmcompmx, djmainu, bmcompmx,  djmain_state, init_hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", 0 )
 GAME( 1999, bm4thmix, 0,        djmainj, bm4thmix,  djmain_state, init_bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", 0 )

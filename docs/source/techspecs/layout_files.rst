@@ -517,21 +517,6 @@ text
     be an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and
     2 (two) means right-aligned.  If the ``align`` attribute is absent, the text
     will be centred.
-dotmatrix
-    Draws an eight-pixel horizontal segment of a dot matrix display, using
-    circular pixels in the specified colour.  The bits of the element’s state
-    determine which pixels are lit, with the least significant bit corresponding
-    to the leftmost pixel.  Unlit pixels are drawn at low intensity (0x20/0xff).
-dotmatrix5dot
-    Draws a five-pixel horizontal segment of a dot matrix display, using
-    circular pixels in the specified colour.  The bits of the element’s state
-    determine which pixels are lit, with the least significant bit corresponding
-    to the leftmost pixel.  Unlit pixels are drawn at low intensity (0x20/0xff).
-dotmatrixdot
-    Draws a single element of a dot matrix display as a circular pixels in the
-    specified colour.  The least significant bit of the element’s state
-    determines whether the pixel is lit.  An unlit pixel is drawn at low
-    intensity (0x20/0xff).
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
     display in the specified colour.  The low eight bits of the element’s state
@@ -539,14 +524,6 @@ led7seg
     the bits correspond to the top segment, the upper right-hand segment,
     continuing clockwise to the upper left segment, the middle bar, and the
     decimal point.  Unlit segments are drawn at low intensity (0x20/0xff).
-led8seg_gts1
-    Draws an eight-segment digital fluorescent display of the type used in
-    Gottlieb System 1 pinball machines (actually a Futaba part).  Compared to
-    standard seven-segment displays, these displays have no decimal point, the
-    horizontal middle bar is broken in the centre, and there is a broken
-    vertical middle bar controlled by the bit that would control the decimal
-    point in a standard seven-segment display.  Unlit segments are drawn at low
-    intensity (0x20/0xff).
 led14seg
     Draws a standard fourteen-segment alphanumeric LED/fluorescent display in
     the specified colour.  The low fourteen bits of the element’s state control
@@ -1491,12 +1468,12 @@ internal layouts included in MAME.
     This system uses lamps for key gameplay elements.  Blending modes are used
     for the translucent colour overlay placed over the monitor, and the lamps
     reflected in front of the monitor.  Also uses collections to allow parts of
-    the layout to be disabled selectively.  The shapes on the overlay are drawn
-    using embedded SVG images.
+    the layout to be disabled selectively.
 `armora.lay <https://git.redump.net/mame/tree/src/mame/layout/armora.lay?h=mame0235>`_
     This game’s monitor is viewed directly through a translucent colour overlay
     rather than being reflected from inside the cabinet.  This means the overlay
     reflects ambient light as well as affecting the colour of the video image.
+    The shapes on the overlay are drawn using embedded SVG images.
 `tranz330.lay <https://git.redump.net/mame/tree/src/mame/layout/tranz330.lay?h=mame0235>`_
     A multi-segment alphanumeric display and keypad.  The keys are clickable,
     and provide visual feedback when pressed.

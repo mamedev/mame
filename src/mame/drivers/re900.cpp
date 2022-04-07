@@ -125,12 +125,12 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	// re900 specific
-	uint8_t m_psg_pa;
-	uint8_t m_psg_pb;
-	uint8_t m_mux_data;
-	uint8_t m_ledant;
-	uint8_t m_player;
-	uint8_t m_stat_a;
+	uint8_t m_psg_pa = 0;
+	uint8_t m_psg_pb = 0;
+	uint8_t m_mux_data = 0;
+	uint8_t m_ledant = 0;
+	uint8_t m_player = 0;
+	uint8_t m_stat_a = 0;
 	output_finder<84> m_lamps;
 };
 

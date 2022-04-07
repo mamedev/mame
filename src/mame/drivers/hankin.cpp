@@ -48,6 +48,7 @@ public:
 		, m_io_test(*this, "TEST")
 		, m_io_keyboard(*this, { "X0", "X1", "X2", "X3", "X4", "DSW0", "DSW1", "DSW2" })
 		, m_digits(*this, "digit%d%d", 0U, 0U)
+		, m_io_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -78,7 +79,7 @@ private:
 	void main_map(address_map &map);
 	void audio_map(address_map &map);
 
-	bool m_timer_sb = 0;
+	bool m_timer_sb = false;
 	u8 m_timer_s[3]{};
 	u8 m_vol = 0U;
 	u8 m_ic2a = 0U;
@@ -86,11 +87,11 @@ private:
 	u8 m_ic10a = 0U;
 	u8 m_ic10b = 0U;
 	u8 m_ic11a = 0U;
-	bool m_ic11_ca2 = 0;
-	bool m_ic11_cb2 = 0;
-	bool m_ic10_cb2 = 0;
-	bool m_ic2_ca2 = 0;
-	bool m_ic2_cb2 = 0;
+	bool m_ic11_ca2 = false;
+	bool m_ic11_cb2 = false;
+	bool m_ic10_cb2 = false;
+	bool m_ic2_ca2 = false;
+	bool m_ic2_cb2 = false;
 	u8 m_counter = 0U;
 	u8 m_digit = 0U;
 	u8 m_segment[5]{};
@@ -105,6 +106,7 @@ private:
 	required_ioport m_io_test;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<5, 6> m_digits;
+	output_finder<1> m_io_leds;
 	output_finder<96> m_io_outputs;   // 32 solenoids + 64 lamps
 };
 
@@ -325,7 +327,7 @@ void hankin_state::ic10_b_w(u8 data)
 
 WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
 {
-	output().set_value("led0", !state);
+	m_io_leds[0] = state ? 0 : 1;
 	// also sound strobe
 	m_ic2->ca1_w(state);
 }
@@ -439,9 +441,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
 
 void hankin_state::machine_start()
 {
-	genpin_class::machine_start();
-
 	m_digits.resolve();
+	m_io_leds.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_timer_sb));
@@ -464,7 +465,6 @@ void hankin_state::machine_start()
 
 void hankin_state::machine_reset()
 {
-	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -654,8 +654,8 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1978,  fjholden, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "FJ Holden",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1978,  orbit1,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Orbit 1",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980,  shark,    0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Shark",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980,  howzat,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Howzat!",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1981,  empsback, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "The Empire Strike Back", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1978,  fjholden, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "FJ Holden",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  orbit1,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Orbit 1",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  shark,    0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Shark",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  howzat,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Howzat!",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  empsback, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "The Empire Strikes Back (Hankin Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

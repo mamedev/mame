@@ -67,8 +67,7 @@ public:
 		: amiga_state(mconfig, type, tag)
 		, m_bios_region(*this, "user2")
 		, m_rom_board(*this, "user3")
-	{
-	}
+	{ }
 
 	void arcadia(machine_config &config);
 	void argh(machine_config &config);
@@ -212,10 +211,10 @@ void arcadia_amiga_state::a500_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
 	map(0xa00000, 0xbfffff).rw(FUNC(arcadia_amiga_state::cia_r), FUNC(arcadia_amiga_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xc00000, 0xd7ffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xde0000, 0xdeffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
+	map(0xdf0000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xe00000, 0xe7ffff).nopw().r(FUNC(arcadia_amiga_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -294,7 +293,22 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_changed_callback, 1)
 INPUT_PORTS_END
 
+// ar_ldrb manual specifically claims to have 4-way gate sticks.
+static INPUT_PORTS_START( arcadia_4way )
+	PORT_INCLUDE( arcadia )
 
+	PORT_MODIFY("p1_joy")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_4WAY
+
+	PORT_MODIFY("p2_joy")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_4WAY
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -308,7 +322,13 @@ void arcadia_amiga_state::arcadia(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arcadia_amiga_state::arcadia_map);
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&arcadia_amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&arcadia_amiga_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+
+	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
+	m_copper->set_host_cpu_tag(m_maincpu);
+	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->set_ecs_mode(false);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1005,9 +1025,9 @@ GAME( 1987, ar_dart2, ar_dart, arcadia, arcadia, arcadia_amiga_state, init_dart,
 GAME( 1988, ar_fast,  ar_bios, arcadia, arcadia, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
 GAME( 1988, ar_fasta, ar_fast, arcadia, arcadia, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.7)", 0 )
 
-GAME( 1988, ar_ldrb,  ar_bios, arcadia, arcadia, arcadia_amiga_state, init_ldrb,    ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 1, V 2.5)", 0 )
-GAME( 1988, ar_ldrba, ar_ldrb, arcadia, arcadia, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 2, V 2.4)", 0 )
-GAME( 1988, ar_ldrbb, ar_ldrb, arcadia, arcadia, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 3)", 0 )
+GAME( 1988, ar_ldrb,  ar_bios, arcadia, arcadia_4way, arcadia_amiga_state, init_ldrb,    ROT0, "Arcadia Systems", "Leader Board Golf (Arcadia, set 1, V 2.5)", 0 )
+GAME( 1988, ar_ldrba, ar_ldrb, arcadia, arcadia_4way, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Leader Board Golf (Arcadia, set 2, V 2.4)", 0 )
+GAME( 1988, ar_ldrbb, ar_ldrb, arcadia, arcadia_4way, arcadia_amiga_state, init_arcadia, ROT0, "Arcadia Systems", "Leader Board Golf (Arcadia, set 3)", 0 )
 
 GAME( 1987, ar_ninj,  ar_bios, arcadia, arcadia, arcadia_amiga_state, init_ninj,    ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 1, V 2.5)", 0 )
 GAME( 1987, ar_ninj2, ar_ninj, arcadia, arcadia, arcadia_amiga_state, init_ninj,    ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 2)", 0 )

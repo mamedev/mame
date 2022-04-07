@@ -49,13 +49,13 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_charram;
 
-	uint8_t m_sasuke_counter;
-	int m_charbank;
-	int m_backcolor;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	rgb_t m_palette_val[64];
-	uint8_t m_irq_mask;
+	uint8_t m_sasuke_counter = 0;
+	int m_charbank = 0;
+	int m_backcolor = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	rgb_t m_palette_val[64]{};
+	uint8_t m_irq_mask = 0;
 
 	// common
 	void videoram_w(offs_t offset, uint8_t data);

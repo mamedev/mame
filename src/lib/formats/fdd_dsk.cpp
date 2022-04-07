@@ -59,19 +59,19 @@ const char *fdd_format::extensions() const
 	return "fdd";
 }
 
-int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[7];
 	size_t actual;
 	io.read_at(0, h, 7, actual);
 
 	if (strncmp((const char *)h, "VFD1.0", 6) == 0)
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
 
-bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t hsec[0x0c];
 
@@ -153,4 +153,4 @@ bool fdd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_FDD_FORMAT = &floppy_image_format_creator<fdd_format>;
+const fdd_format FLOPPY_FDD_FORMAT;

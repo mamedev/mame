@@ -122,7 +122,7 @@ private:
 	void tc_return();
 	void tc_int();
 	void illegal();
-	const char* disassemble_scripts();
+	std::string disassemble_scripts();
 
 
 	// SCSI registers

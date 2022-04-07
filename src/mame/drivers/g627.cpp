@@ -80,7 +80,7 @@ private:
 	u8 m_portc = 0U;
 	u8 m_motor = 0U;
 	u8 m_last_solenoid = 0U;
-	bool m_type = 0;
+	bool m_type = false;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

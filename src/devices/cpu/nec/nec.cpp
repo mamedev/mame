@@ -108,8 +108,6 @@
 #include "nec.h"
 #include "necdasm.h"
 
-#include "debugger.h"
-
 typedef uint8_t BOOLEAN;
 typedef uint8_t BYTE;
 typedef uint16_t WORD;

@@ -16,6 +16,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+namespace {
+
 class mz6500_state : public driver_device
 {
 public:
@@ -35,8 +37,8 @@ private:
 	required_device<upd765a_device> m_fdc;
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u8 data);
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
+	[[maybe_unused]]void fdc_irq(bool state);
+	[[maybe_unused]]void fdc_drq(bool state);
 	required_shared_ptr<u16> m_vram;
 	void machine_reset() override;
 	void machine_start() override;
@@ -182,7 +184,7 @@ ROM_START( mz6500 )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x40000, CRC(b618e25d) SHA1(1da93337fecde6c0f8a5bd68f3f0b3222a38d63e))
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
 COMP( 198?, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

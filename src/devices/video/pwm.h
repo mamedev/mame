@@ -29,6 +29,7 @@ public:
 	// output callbacks when not using the default output tags
 	auto output_x() { return m_output_x_cb.bind(); } // x = offset >> 6, y = offset & 0x3f
 	auto output_a() { return m_output_a_cb.bind(); }
+	auto output_multi() { return m_output_multi_cb.bind(); } // b = offset >> 6, y = offset & 0x3f
 	auto output_digit() { return m_output_digit_cb.bind(); }
 
 	void reset_bri_levels() { std::fill(std::begin(m_levels), std::end(m_levels), 1.0); }
@@ -68,10 +69,12 @@ protected:
 private:
 	output_finder<0x40, 0x40> m_out_x;
 	output_finder<0x40> m_out_a;
+	output_finder<0x40, 0x40> m_out_multi;
 	output_finder<0x40> m_out_digit;
 
 	devcb_write8 m_output_x_cb;
 	devcb_write8 m_output_a_cb;
+	devcb_write64 m_output_multi_cb;
 	devcb_write64 m_output_digit_cb;
 	bool m_external_output;
 

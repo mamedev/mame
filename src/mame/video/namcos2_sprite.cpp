@@ -10,11 +10,15 @@
     C135 - Checks is object is displayed on Current output line.
     C146 - Steers the Decode Object Pixel data to the correct line buffer A or B
 
-    Metal Hawk requires a different draw function, so might use a different chip unless the hookup is just scrambled (needs checking)
+    Metal Hawk requires a different draw function, so might use a different chip unless the hookup
+    is just scrambled (needs checking).
 
-    used by the following drivers
-    namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see namco_c355spr.cpp)
+    "Shadow" sprites are used in the baseball games to remap the background tile pen, and they're
+    also used a lot in valkyrie.
 
+    Device used by the following drivers:
+    namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours,
+    Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see namco_c355spr.cpp).
 
 */
 
@@ -179,7 +183,10 @@ void namcos2_sprite_device::zdrawgfxzoom(
 										{
 											if (color == 0xf && c == 0xfe)
 											{
-												dest[x] |= 0x800;
+												if (dest[x] & 0x1000)
+													dest[x] |= 0x800;
+												else
+													dest[x] = palette.black_pen();
 											}
 											else
 											{
@@ -376,7 +383,7 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 				}
 				if (sizey < 0x20)
 				{
-					sy += (0x20 - sizey) / 0xC;
+					sy += (0x20 - sizey) / 0xc;
 				}
 				gfx->set_source_clip(0, 32, 0, 32);
 			}

@@ -88,16 +88,16 @@ private:
 	required_shared_ptr_array<u8, 2> m_bgram;
 	required_shared_ptr<u8> m_spriteram;
 
-	tilemap_t   *m_char_tilemap;
-	tilemap_t   *m_bg_tilemaps[2];
+	tilemap_t   *m_char_tilemap = nullptr;
+	tilemap_t   *m_bg_tilemaps[2]{};
 
 	required_memory_bank_array<2> m_rom_banks;
 
-	int     m_vblank;
+	int     m_vblank = 0;
 
-	u8      m_pri;
-	u8      m_scrollx[2][2];
-	u8      m_scrolly[2][2];
+	u8      m_pri = 0;
+	u8      m_scrollx[2][2]{};
+	u8      m_scrolly[2][2]{};
 };
 
 #endif // MAME_INCLUDES_XAIN_H

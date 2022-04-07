@@ -45,8 +45,8 @@ private:
 	required_shared_ptr<uint16_t> m_colorram;
 	required_shared_ptr<uint16_t> m_videoram;
 
-	tilemap_t *m_background_layer;
-	tilemap_t *m_text_layer;
+	tilemap_t *m_background_layer = nullptr;
+	tilemap_t *m_text_layer = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
@@ -97,7 +97,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	int m_sound_command[2];
+	int m_sound_command[2]{};
 
 	void sndcmd_w(offs_t offset, uint16_t data);
 	void sound_irq_trigger_word_w(uint16_t data);

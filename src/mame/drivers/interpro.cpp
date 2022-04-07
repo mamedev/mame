@@ -358,11 +358,11 @@ protected:
 	virtual void machine_reset() override;
 
 	output_finder<> m_diag_led;
-	emu_timer *m_reset_timer;
+	emu_timer *m_reset_timer = nullptr;
 
-	u16 m_error;
-	u16 m_status;
-	u16 m_led;
+	u16 m_error = 0;
+	u16 m_status = 0;
+	u16 m_led = 0;
 };
 
 class emerald_state : public interpro_state
@@ -427,8 +427,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	u16 m_ctrl1;
-	u16 m_ctrl2;
+	u16 m_ctrl1 = 0;
+	u16 m_ctrl2 = 0;
 };
 
 class turquoise_state : public interpro_state
@@ -497,8 +497,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	u16 m_ctrl1;
-	u16 m_ctrl2;
+	u16 m_ctrl1 = 0;
+	u16 m_ctrl2 = 0;
 };
 
 class sapphire_state : public interpro_state
@@ -562,8 +562,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	u16 m_ctrl1;
-	u16 m_ctrl2;
+	u16 m_ctrl1 = 0;
+	u16 m_ctrl2 = 0;
 };
 
 class cbus_sapphire_state : public sapphire_state

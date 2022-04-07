@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_TVC_FORMAT;
+extern const tvc_format FLOPPY_TVC_FORMAT;
 
 #endif // MAME_FORMATS_TVC_DSK_H

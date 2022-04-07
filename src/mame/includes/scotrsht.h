@@ -39,11 +39,11 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	int m_irq_enable;
-	int m_charbank;
-	int m_palette_bank;
+	int m_irq_enable = 0;
+	int m_charbank = 0;
+	int m_palette_bank = 0;
 
 	void ctrl_w(uint8_t data);
 	void soundlatch_w(uint8_t data);

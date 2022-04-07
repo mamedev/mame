@@ -162,7 +162,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram1;
 	required_shared_ptr<uint8_t> m_attr1;
 
-	int m_nmimask;
+	int m_nmimask = 0;
 
 	uint8_t acia_status_hack_r();
 	uint8_t sound_status_r();

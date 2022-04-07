@@ -20,7 +20,7 @@ class galastrm_state;
 
 struct gs_poly_data
 {
-	bitmap_ind16* texbase;
+	bitmap_ind16* texbase = nullptr;
 };
 
 class galastrm_renderer : public poly_manager<float, gs_poly_data, 2>
@@ -77,26 +77,26 @@ private:
 
 	struct gs_tempsprite
 	{
-		u8 gfx;
-		u32 code,color;
-		bool flipx,flipy;
-		int x,y;
-		int zoomx,zoomy;
-		u32 primask;
+		u8 gfx = 0U;
+		u32 code = 0U, color = 0U;
+		bool flipx = false, flipy = false;
+		int x = 0, y = 0;
+		int zoomx = 0, zoomy = 0;
+		u32 primask = 0U;
 	};
 
-	u16 m_frame_counter;
-	int m_tc0610_addr[2];
-	s16 m_tc0610_ctrl_reg[2][8];
-	std::unique_ptr<gs_tempsprite[]> m_spritelist;
-	struct gs_tempsprite *m_sprite_ptr_pre;
-	bitmap_ind16 m_tmpbitmaps;
-	std::unique_ptr<galastrm_renderer> m_poly;
+	u16 m_frame_counter = 0U;
+	int m_tc0610_addr[2]{};
+	s16 m_tc0610_ctrl_reg[2][8]{};
+	std::unique_ptr<gs_tempsprite[]> m_spritelist{};
+	struct gs_tempsprite *m_sprite_ptr_pre{};
+	bitmap_ind16 m_tmpbitmaps{};
+	std::unique_ptr<galastrm_renderer> m_poly{};
 
-	int m_rsxb;
-	int m_rsyb;
-	int m_rsxoffs;
-	int m_rsyoffs;
+	int m_rsxb = 0;
+	int m_rsyb = 0;
+	int m_rsxoffs = 0;
+	int m_rsyoffs = 0;
 
 	template<int Chip> void tc0610_w(offs_t offset, u16 data);
 	void coin_word_w(u8 data);

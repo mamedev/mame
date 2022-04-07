@@ -23,20 +23,31 @@
         ________________________________________________
        |                                                |
 O23 37 |                                                | 24 OS2
+       |                                                |
 O13 38 |                                                | 23 OS3
+       |                                                |
 O44 39 |                                                | 22 OS4
+       |                                                |
 O34 40 |                                                | 21 H1
+       |                                                |
 O24 41 |                                                | 20 H2
-O14 42 |                     SM500                      | 19 Vm
+       |                                                |
+O14 42 |                                                | 19 Vm
+       |                     SM500                      |
 O45 43 |                                                | 18 OSCin
+       |                                                |
 O35 44 |                                                | 17 OSCout
+       |                                                |
 O25 45 |                                                | 16 Vdd
+       |                                                |
 O15 46 |                                                | 15 K4
+       |                                                |
 O46 47 |                                                | 14 K3
-O36 48 | *                                              | 13 K2
+       |                                                |
+O36 48 |  *                                             | 13 K2
        |________________________________________________/
 
-         1   2   3   4   5   6   7   8   9   10  11  12
+          1   2   3   4   5   6   7   8   9  10  11  12
          O26 O16 R4  R3  R2  R1  GND _T  bt  al  ACL K1   note: bt = beta symbol, al = alpha symbol
 */
 
@@ -67,7 +78,6 @@ protected:
 	int m_o_pins; // number of 4-bit O pins
 	u8 m_ox[9];   // W' latch, max 9
 	u8 m_o[9];    // W latch
-	u8 m_cn;
 	u8 m_mx;
 
 	u8 m_cb;
@@ -76,11 +86,12 @@ protected:
 
 	void shift_w();
 	u8 get_digit();
+
+	// opcode handlers
 	void set_su(u8 su) { m_stack[0] = (m_stack[0] & ~0x3c0) | (su << 6 & 0x3c0); }
 	u8 get_su() { return m_stack[0] >> 6 & 0xf; }
 	virtual int get_trs_field() { return 0; }
 
-	// opcode handlers
 	virtual void op_lb() override;
 	virtual void op_incb() override;
 	virtual void op_sbm() override;
@@ -92,7 +103,6 @@ protected:
 	virtual void op_tr();
 	virtual void op_trs();
 
-	virtual void op_atbp() override;
 	virtual void op_ptw() override;
 	virtual void op_tw();
 	virtual void op_pdtw();

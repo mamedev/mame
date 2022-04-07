@@ -69,10 +69,10 @@ protected:
 	// internal state
 	bool                        m_flip;                 // screen flip?
 	uint8_t                       m_bank[16];             // banking redirection
-	int m_xoffs;
-	int m_yoffs;
-	int m_xoffs_flipped;
-	int m_yoffs_flipped;
+	int m_xoffs = 0;
+	int m_yoffs = 0;
+	int m_xoffs_flipped = 0;
+	int m_yoffs_flipped = 0;
 };
 
 
@@ -218,7 +218,7 @@ protected:
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	required_region_ptr<uint64_t>     m_sprite_region_ptr;
-	rotate_info*                    m_segaic16_rotate;
+	rotate_info*                    m_segaic16_rotate = nullptr;
 };
 
 

@@ -1072,7 +1072,13 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 			err = do_open_disk(machine().options(), searchpath, romp, chd->orig_chd(), next_parent);
 			if (err)
 			{
-				handle_missing_file(romp, std::vector<std::string>(), err);
+				std::vector<std::string> tried;
+				for (auto const &paths : searchpath)
+				{
+					for (std::string const &path : paths.get())
+						tried.emplace_back(path);
+				}
+				handle_missing_file(romp, tried, err);
 				chd = nullptr;
 				continue;
 			}
@@ -1222,7 +1228,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	const software_info *const swinfo = swlist.find(std::string(swname));
 	if (swinfo)
 	{
-		// dispay a warning for unsupported software
+		// display a warning for unsupported software
 		// TODO: list supported clones like we do for machines?
 		if (swinfo->supported() == software_support::PARTIALLY_SUPPORTED)
 		{

@@ -16,6 +16,9 @@ TODO:
 - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
 - V11 beeper is too high pitched, related to wrong CPU type too?
   maybe waitstates or clock divider on I/O access.
+- Do the opening book modules work? It detects the rom, but then does nothing
+  with it. Maybe support is limited since the basic CB9/CB16 modules have no use
+  on newer chesscomputers with a large internal opening library.
 
 Currently(May 2020) when compared to the real chesscomputers, to get closer to the
 actual speed, overclock V10 and V11 to 230%. This can be done by starting MAME

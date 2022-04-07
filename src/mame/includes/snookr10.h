@@ -48,17 +48,17 @@ private:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-	int m_outportl;
-	int m_outporth;
-	int m_bit0;
-	int m_bit1;
-	int m_bit2;
-	int m_bit3;
-	int m_bit4;
-	int m_bit5;
+	int m_outportl = 0;
+	int m_outporth = 0;
+	int m_bit0 = 0;
+	int m_bit1 = 0;
+	int m_bit2 = 0;
+	int m_bit3 = 0;
+	int m_bit4 = 0;
+	int m_bit5 = 0;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;

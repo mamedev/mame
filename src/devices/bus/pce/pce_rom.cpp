@@ -12,8 +12,6 @@
 #include "emu.h"
 #include "pce_rom.h"
 
-#include "fileio.h"
-
 
 
 //-------------------------------------------------
@@ -114,14 +112,16 @@ void pce_tennokoe_device::nvram_default()
 	memcpy(m_bram + 0x1800, m_rom + 0x8800, 0x800);
 }
 
-void pce_tennokoe_device::nvram_read(emu_file &file)
+bool pce_tennokoe_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_bram, m_bram_size);
+	size_t actual_size;
+	return !file.read(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
 }
 
-void pce_tennokoe_device::nvram_write(emu_file &file)
+bool pce_tennokoe_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_bram, m_bram_size);
+	size_t actual_size;
+	return !file.write(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
 }
 
 /*-------------------------------------------------

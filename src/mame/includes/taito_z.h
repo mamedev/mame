@@ -175,9 +175,9 @@ private:
 
 	output_finder<2> m_shutter_out;
 
-	int      m_road_palbank;
-	int      m_shutter_toggle;
-	u8       m_shutter_control;
+	int      m_road_palbank = 0;
+	int      m_shutter_toggle = 0;
+	u8       m_shutter_control = 0;
 };
 
 
@@ -248,8 +248,8 @@ private:
 	void racingb_map(address_map &map);
 	void racingb_cpub_map(address_map &map);
 
-	int      m_sci_spriteframe;
-	s32      m_sci_int6;
+	int      m_sci_spriteframe = 0;
+	s32      m_sci_int6 = 0;
 };
 
 

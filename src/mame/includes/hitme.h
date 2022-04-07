@@ -40,10 +40,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t  *m_tilemap;
+	tilemap_t  *m_tilemap = nullptr;
 
 	/* misc */
-	attotime m_timeout_time;
+	attotime m_timeout_time{};
 	void hitme_vidram_w(offs_t offset, uint8_t data);
 	uint8_t hitme_port_0_r();
 	uint8_t hitme_port_1_r();

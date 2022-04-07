@@ -199,6 +199,7 @@ CRUCLK*  51||52  DBIN
 #include "pgram.h"
 #include "sidmaster.h"
 #include "scsicard.h"
+#include "tipi.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CONFIG      (1U<<2)   // Configuration
@@ -503,6 +504,7 @@ void ti99_peribox_slot_standard(device_slot_interface &device)
 	device.option_add("forti",    TI99_FORTI);
 	device.option_add("sidmaster", TI99_SIDMASTER);
 	device.option_add("whtscsi",  TI99_WHTSCSI);
+	device.option_add("tipi",     TI99_TIPI);
 }
 
 void peribox_device::device_add_mconfig(machine_config &config)
@@ -549,6 +551,7 @@ void ti99_peribox_slot_evpc(device_slot_interface &device)
 	device.option_add("forti",    TI99_FORTI);
 	device.option_add("sidmaster", TI99_SIDMASTER);
 	device.option_add("whtscsi",  TI99_WHTSCSI);
+	device.option_add("tipi",     TI99_TIPI);
 }
 
 void peribox_ev_device::device_add_mconfig(machine_config &config)
@@ -606,6 +609,7 @@ void ti99_peribox_slot_geneve(device_slot_interface &device)
 	device.option_add("forti",    TI99_FORTI);
 	device.option_add("sidmaster", TI99_SIDMASTER);
 	device.option_add("whtscsi",  TI99_WHTSCSI);
+	device.option_add("tipi",     TI99_TIPI);
 }
 
 void peribox_gen_device::device_add_mconfig(machine_config &config)
@@ -663,6 +667,7 @@ void ti99_peribox_slot_sgcpu(device_slot_interface &device)
 	device.option_add("forti",    TI99_FORTI);
 	device.option_add("sidmaster", TI99_SIDMASTER);
 	device.option_add("whtscsi",  TI99_WHTSCSI);
+	device.option_add("tipi",     TI99_TIPI);
 }
 
 void peribox_sg_device::device_add_mconfig(machine_config &config)

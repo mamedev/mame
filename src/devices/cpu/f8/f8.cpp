@@ -46,7 +46,6 @@
 #include "emu.h"
 #include "f8.h"
 #include "f8dasm.h"
-#include "debugger.h"
 
 
 /* status flags */

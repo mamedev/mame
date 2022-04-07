@@ -26,6 +26,8 @@
 #define PAGE_WP     BIT(page_data, 14)
 #define PAGE_NONX   BIT(page_data, 15)
 
+#define DMAOK		0x04
+
 
 
 //**************************************************************************
@@ -98,14 +100,17 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_mac_config("mac", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(abc1600_mac_device::mac_map), this)),
 	m_rom(*this, "boot"),
 	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
-	m_page_ram(*this, "page_ram", 0x800, ENDIANNESS_LITTLE),
+	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE),
 	m_watchdog(*this, "watchdog"),
 	m_read_fc(*this),
 	m_write_buserr(*this),
+	m_read_tren(*this),
+	m_write_tren(*this),
 	m_boote(0),
 	m_magic(0),
 	m_task(0),
-	m_cause(0)
+	m_cause(0),
+	m_partst(0)
 {
 }
 
@@ -119,6 +124,8 @@ void abc1600_mac_device::device_start()
 	// resolve callbacks
 	m_read_fc.resolve_safe(0);
 	m_write_buserr.resolve_safe();
+	m_read_tren.resolve_all_safe(0xff);
+	m_write_tren.resolve_all_safe();
 
 	// state saving
 	save_item(NAME(m_boote));
@@ -126,10 +133,11 @@ void abc1600_mac_device::device_start()
 	save_item(NAME(m_task));
 	save_item(NAME(m_dmamap));
 	save_item(NAME(m_cause));
+	save_item(NAME(m_partst));
 
 	// HACK fill segment RAM or abcenix won't boot
-	memset(m_segment_ram, 0xcd, 0x200);
-	memset(m_page_ram, 0xcd, 0x800);
+	memset(m_segment_ram, 0xff, 0x200);
+	memset(m_page_ram, 0xff, 0x800);
 }
 
 
@@ -179,6 +187,8 @@ inline offs_t abc1600_mac_device::get_physical_offset(offs_t offset, int task, b
 	nonx = PAGE_NONX;
 	wp = PAGE_WP;
 
+	m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+
 	if (LOG && (offset != virtual_offset)) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_read_fc(), m_magic);
 
@@ -227,7 +237,8 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 	{
 		if (nonx)
 		{
-			logerror("NONX\n");
+			logerror("%s BUS ERROR R %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
+				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			dump();
 			m_write_buserr(offset, 1);
 		}
@@ -269,13 +280,15 @@ void abc1600_mac_device::write(offs_t offset, uint8_t data)
 	{
 		if (nonx)
 		{
-			logerror("NONX\n");
+			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
+				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			dump();
 			m_write_buserr(offset, 0);
 		}
 		if (!wp)
 		{
-			logerror("WP\n");
+			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
+				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			dump();
 			m_write_buserr(offset, 0);
 		}
@@ -306,10 +319,12 @@ uint8_t abc1600_mac_device::cause_r()
 
 	*/
 
-	uint8_t data = 0x02;
+	uint8_t data = 0;
 
-	// DMA status
-	data |= m_cause;
+	if (!m_partst)
+	{
+		data = 0x02 | m_cause;
+	}
 
 	m_watchdog->watchdog_reset();
 
@@ -543,13 +558,15 @@ void abc1600_mac_device::page_hi_w(offs_t offset, uint8_t data)
 //  get_dma_address -
 //-------------------------------------------------
 
-offs_t abc1600_mac_device::get_dma_address(int index, uint16_t offset)
+offs_t abc1600_mac_device::get_dma_address(int index, offs_t offset, bool &rw)
 {
 	// A0 = DMA15, A1 = BA1, A2 = BA2
 	uint8_t dmamap_addr = index | BIT(offset, 15);
 	uint8_t dmamap = m_dmamap[dmamap_addr];
 
 	m_cause = (dmamap & 0x1f) << 3;
+
+	rw = BIT(dmamap, 7);
 
 	return ((dmamap & 0x1f) << 16) | offset;
 }
@@ -559,13 +576,30 @@ offs_t abc1600_mac_device::get_dma_address(int index, uint16_t offset)
 //  dma_mreq_r - DMA memory read
 //-------------------------------------------------
 
-uint8_t abc1600_mac_device::dma_mreq_r(int index, uint16_t offset)
+uint8_t abc1600_mac_device::dma_mreq_r(int index, int dmamap, offs_t offset)
 {
-	offs_t virtual_offset = get_dma_address(index, offset);
+	bool rw;
+	offs_t virtual_offset = get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DMA MEM R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	uint8_t data = 0xff;
 
-	return space().read_byte(virtual_offset);
+	if (rw)
+	{
+		data = space().read_byte(virtual_offset);
+
+		m_write_tren[index](data);
+	}
+	else
+	{
+		data = m_read_tren[index](data);
+
+		space().write_byte(virtual_offset, data);
+	}
+
+	if (LOG_DMA) logerror("%s DMRQ R:%c %04x:%06x=%02x\n", 
+		machine().describe_context(), rw ? 'R' : 'W', offset, virtual_offset, data);
+
+	return data;
 }
 
 
@@ -573,13 +607,18 @@ uint8_t abc1600_mac_device::dma_mreq_r(int index, uint16_t offset)
 //  dma_mreq_w - DMA memory write
 //-------------------------------------------------
 
-void abc1600_mac_device::dma_mreq_w(int index, uint16_t offset, uint8_t data)
+void abc1600_mac_device::dma_mreq_w(int index, int dmamap, offs_t offset, uint8_t data)
 {
-	offs_t virtual_offset = get_dma_address(index, offset);
+	bool rw;
+	offs_t virtual_offset = get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DMA MEM W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DMRQ W:%c %04x:%06x=%02x\n", 
+		machine().describe_context(), rw ? 'R' : 'W', offset, virtual_offset, data);
 
-	space().write_byte(virtual_offset, data);
+	if (!rw)
+	{
+		space().write_byte(virtual_offset, data);
+	}
 }
 
 
@@ -587,11 +626,13 @@ void abc1600_mac_device::dma_mreq_w(int index, uint16_t offset, uint8_t data)
 //  dma_iorq_r - DMA I/O read
 //-------------------------------------------------
 
-uint8_t abc1600_mac_device::dma_iorq_r(int index, uint16_t offset)
+uint8_t abc1600_mac_device::dma_iorq_r(int dmamap, offs_t offset)
 {
-	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset);
+	bool rw;
+	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DMA I/O R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DIORQ R %04x:%06x\n", 
+		machine().describe_context(), offset, virtual_offset);
 
 	return space().read_byte(virtual_offset);
 }
@@ -601,11 +642,13 @@ uint8_t abc1600_mac_device::dma_iorq_r(int index, uint16_t offset)
 //  dma_iorq_w - DMA I/O write
 //-------------------------------------------------
 
-void abc1600_mac_device::dma_iorq_w(int index, uint16_t offset, uint8_t data)
+void abc1600_mac_device::dma_iorq_w(int dmamap, offs_t offset, uint8_t data)
 {
-	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset);
+	bool rw;
+	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
 
-	if (LOG_DMA) logerror("%s DMA I/O W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+	if (LOG_DMA) logerror("%s DIORQ W %04x:%06x=%02x\n", 
+		machine().describe_context(), offset, virtual_offset, data);
 
 	space().write_byte(virtual_offset, data);
 }
@@ -632,9 +675,20 @@ void abc1600_mac_device::dmamap_w(offs_t offset, uint8_t data)
 
 	*/
 
-	if (LOG_DMA) logerror("%s DMAMAP %u:%02x\n", machine().describe_context(), offset & 7, data);
+	if (LOG_DMA) logerror("%s DMAMAP %u:%02x\n",
+		machine().describe_context(), offset & 7, data);
 
 	m_dmamap[offset & 7] = data;
+}
+
+
+//-------------------------------------------------
+//  partst_w - parity test
+//-------------------------------------------------
+
+void abc1600_mac_device::partst_w(int state)
+{
+	m_partst = state;
 }
 
 

@@ -440,7 +440,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY    FULLNAME           FLAGS
-COMP( 1983, aquarius,  0,        0,      aquarius,  aquarius, aquarius_state, empty_init, "Mattel",  "Aquarius (NTSC)", 0 )
-COMP( 1983, aquariusp, aquarius, 0,      aquariusp, aquarius, aquarius_state, empty_init, "Mattel",  "Aquarius (PAL)",  0 )
-COMP( 1984, aquarius2, aquarius, 0,      aquarius,  aquarius, aquarius_state, empty_init, "Radofin", "Aquarius II",     0 )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY                FULLNAME           FLAGS
+COMP( 1983, aquarius,  0,        0,      aquarius,  aquarius, aquarius_state, empty_init, "Mattel Electronics",  "Aquarius (NTSC)", 0 )
+COMP( 1983, aquariusp, aquarius, 0,      aquariusp, aquarius, aquarius_state, empty_init, "Mattel Electronics",  "Aquarius (PAL)",  0 )
+COMP( 1984, aquarius2, aquarius, 0,      aquarius,  aquarius, aquarius_state, empty_init, "Radofin",             "Aquarius II",     0 )

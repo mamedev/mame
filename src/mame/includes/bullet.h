@@ -113,25 +113,25 @@ protected:
 	required_ioport m_sw1;
 
 	// memory state
-	int m_segst;
-	int m_brom;
+	int m_segst = 0;
+	int m_brom = 0;
 
 	// DMA state
-	uint8_t m_exdma;
-	int m_buf;
+	uint8_t m_exdma = 0U;
+	int m_buf = 0;
 	bool m_fdrdy;
-	int m_dartardy;
-	int m_dartbrdy;
-	int m_winrdy;
-	int m_exrdy1;
-	int m_exrdy2;
+	int m_dartardy = 0;
+	int m_dartbrdy = 0;
+	int m_winrdy = 0;
+	int m_exrdy1 = 0;
+	int m_exrdy2 = 0;
 	bool m_exdsk_sw;
 	bool m_hdcon_sw;
 
-	int m_centronics_busy;
-	int m_centronics_perror;
-	int m_centronics_select;
-	int m_centronics_fault;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
+	int m_centronics_select = 0;
+	int m_centronics_fault = 0;
 };
 
 class bulletf_state : public bullet_state
@@ -148,6 +148,9 @@ public:
 	{
 	}
 
+	void bulletf(machine_config &config);
+
+private:
 	uint8_t mreq_r(offs_t offset);
 	void mreq_w(offs_t offset, uint8_t data);
 	void xdma0_w(uint8_t data);
@@ -163,7 +166,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
 
-	void bulletf(machine_config &config);
 	void bulletf_io(address_map &map);
 	void bulletf_mem(address_map &map);
 protected:
@@ -179,11 +181,11 @@ protected:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
 
-	int m_rome;
-	uint8_t m_xdma0;
-	uint8_t m_mbank;
-	int m_wack;
-	int m_wrdy;
+	int m_rome = 0;
+	uint8_t m_xdma0 = 0U;
+	uint8_t m_mbank = 0U;
+	int m_wack = 0;
+	int m_wrdy = 0;
 };
 
 #endif // MAME_INCLUDES_BULLET_H

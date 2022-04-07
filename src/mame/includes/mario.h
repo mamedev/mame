@@ -104,19 +104,19 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* sound state */
-	uint8_t   m_last;
-	uint8_t   m_portT;
-	const char *m_eabank;
+	uint8_t   m_last = 0;
+	uint8_t   m_portT = 0;
+	const char *m_eabank = nullptr;
 
 	/* video state */
-	uint8_t   m_gfx_bank;
-	uint8_t   m_palette_bank;
-	uint16_t  m_gfx_scroll;
-	uint8_t   m_flip;
-	tilemap_t *m_bg_tilemap;
+	uint8_t   m_gfx_bank = 0;
+	uint8_t   m_palette_bank = 0;
+	uint16_t  m_gfx_scroll = 0;
+	uint8_t   m_flip = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 	int m_monitor;
 
-	bool      m_nmi_mask;
+	bool      m_nmi_mask = false;
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);

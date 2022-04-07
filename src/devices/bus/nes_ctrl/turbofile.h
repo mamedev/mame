@@ -28,6 +28,9 @@ public:
 	// construction/destruction
 	nes_turbofile_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
+
 	DECLARE_INPUT_CHANGED_MEMBER(lock_changed);
 
 protected:
@@ -37,9 +40,6 @@ protected:
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual u8 read_exp(offs_t offset) override;
-	virtual void write(u8 data) override;
 
 private:
 	required_device<nvram_device> m_nvram;

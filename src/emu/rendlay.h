@@ -151,7 +151,6 @@ private:
 	class disk_component;
 	class text_component;
 	class led7seg_component;
-	class led8seg_gts1_component;
 	class led14seg_component;
 	class led16seg_component;
 	class led14segsc_component;
@@ -183,7 +182,6 @@ private:
 	// internal helpers
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode);
-	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode);
 
 	static make_component_map const s_make_component; // maps component XML names to creator functions
 

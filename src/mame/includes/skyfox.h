@@ -46,7 +46,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_bgram;
 
-	int m_bg_ctrl;
+	int m_bg_ctrl = 0;
 
 	void output_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;

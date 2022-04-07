@@ -146,7 +146,7 @@ protected:
 	template<int Layer> void robokid_bg_videoram_w(offs_t offset, uint8_t data);
 	template<int Layer> void robokid_bg_ctrl_w(offs_t offset, uint8_t data);
 	template<int Layer> void robokid_bg_bank_w(uint8_t data);
-	tilemap_t* m_robokid_tilemap[3];
+	tilemap_t* m_robokid_tilemap[3]{};
 
 	void video_init_banked(uint32_t vram_alloc_size);
 	TILEMAP_MAPPER_MEMBER(robokid_bg_scan);
@@ -198,8 +198,8 @@ private:
 	void io_protection_reset();
 
 	uint8_t m_io_protection[3];
-	uint8_t m_io_protection_input;
-	int m_io_protection_tick;
+	uint8_t m_io_protection_input = 0;
+	int m_io_protection_tick = 0;
 };
 
 #endif // MAME_INCLUDES_NINJAKD2_H

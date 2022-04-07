@@ -2,12 +2,10 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    mbee.cpp
+Microbee machine driver
+Originally written by Juergen Buchmueller, Jan 2000
 
-    machine driver
-    Originally written by Juergen Buchmueller, Jan 2000
-
-    Rewritten by Robbbert (see notes in driver file).
+Rewritten by Robbbert (see notes in driver file).
 
 ****************************************************************************/
 
@@ -737,7 +735,7 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 
 		m_pak_extended[pak_index] = (size > 0x2000) ? true : false;
 
-		slot->rom_alloc(m_pak_extended ? 0x4000 : 0x2000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc the amount for a real rom
+		slot->rom_alloc(m_pak_extended[pak_index] ? 0x4000 : 0x2000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc the amount for a real rom
 		slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 		// Validate the rom

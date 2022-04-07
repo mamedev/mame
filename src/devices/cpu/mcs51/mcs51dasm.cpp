@@ -784,6 +784,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 			sym = get_bit_address(params.r8(PC++));
 			rel  = params.r8(PC++);
 			util::stream_format(stream, "jbc   %s,$%04X", sym, PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//ACALL code addr       /* 1: aaa1 0001 */
@@ -846,6 +847,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 			sym = get_bit_address(params.r8(PC++));
 			rel  = params.r8(PC++);
 			util::stream_format(stream, "jb    %s,$%04X", sym, (PC + rel));
+			flags = STEP_COND;
 			break;
 
 		//RET
@@ -894,6 +896,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 			sym = get_bit_address(params.r8(PC++));
 			rel  = params.r8(PC++);
 			util::stream_format(stream, "jnb   %s,$%04X", sym, (PC + rel));
+			flags = STEP_COND;
 			break;
 
 		//RETI
@@ -940,6 +943,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 		case 0x40:              /* 1: 0100 0000 */
 			rel = params.r8(PC++);
 			util::stream_format(stream, "jc    $%04X", PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//ORL data addr, A
@@ -988,6 +992,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 		case 0x50:              /* 1: 0101 0000 */
 			rel = params.r8(PC++);
 			util::stream_format(stream, "jnc   $%04X", PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//Unable to test
@@ -1038,6 +1043,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 		case 0x60:              /* 1: 0110 0000 */
 			rel = params.r8(PC++);
 			util::stream_format(stream, "jz    $%04X", PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//Unable to test
@@ -1087,6 +1093,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 		case 0x70:              /* 1: 0111 0000 */
 			rel = params.r8(PC++);
 			util::stream_format(stream, "jnz   $%04X", PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//Unable to test
@@ -1302,6 +1309,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 			data = params.r8(PC++);
 			rel  = params.r8(PC++);
 			util::stream_format(stream, "cjne  a,#$%02X,$%04X", data, PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//CJNE A, data addr, code addr
@@ -1309,6 +1317,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 			sym = get_data_address(params.r8(PC++));
 			rel  = params.r8(PC++);
 			util::stream_format(stream, "cjne  a,%s,$%04X", sym, PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//Unable to test
@@ -1318,6 +1327,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 			data = params.r8(PC++);
 			rel  = params.r8(PC++);
 			util::stream_format(stream, "cjne  @r%d,#$%02X,$%04X", op&1, data, PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//CJNE R0 to R7, #data, code addr/* 1: 1011 1rrr */
@@ -1332,6 +1342,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 			data = params.r8(PC++);
 			rel  = params.r8(PC++);
 			util::stream_format(stream, "cjne  r%d,#$%02X,$%04X", op&7, data, PC + rel);
+			flags = STEP_COND;
 			break;
 
 		//PUSH data addr
@@ -1408,7 +1419,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 			sym = get_data_address(params.r8(PC++));
 			rel  = params.r8(PC++);
 			util::stream_format(stream, "djnz  %s,$%04X", sym, PC + rel);
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 
 		//XCHD A, @R0/@R1               /* 1: 1101 011i */
@@ -1428,7 +1439,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 		case 0xdf:
 			rel = params.r8(PC++);
 			util::stream_format(stream, "djnz  r%d,$%04X", op&7, (PC + rel));
-			flags = STEP_OVER;
+			flags = STEP_COND;
 			break;
 
 		//MOVX A,@DPTR

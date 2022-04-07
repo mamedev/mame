@@ -49,14 +49,16 @@ Status:
 - All pinball machines are playable
 
 ToDo:
-- Checkpoint: no sound
-- TMNT: no sound
-- Batman: music missing
 - Cut the Cheese: screen goes blank after a short while
 - Test fixture: nothing to see
 
 *********************************************************************************************************************/
 #include "emu.h"
+
+#include "cpu/m6809/m6809.h"
+#include "sound/msm5205.h"
+#include "sound/ymopm.h"
+#include "speaker.h"
 
 #include "audio/decobsmt.h"
 #include "machine/decopincpu.h"
@@ -72,13 +74,19 @@ class de_3_state : public genpin_class
 public:
 	de_3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
+		, m_ym2151(*this, "ym2151")
+		, m_audiocpu(*this, "audiocpu")
+		, m_msm5205(*this, "msm5205")
+		, m_sample_bank(*this, "sample_bank")
 		, m_dmdtype1(*this, "decodmd1")
 		, m_dmdtype2(*this, "decodmd2")
 		, m_dmdtype3(*this, "decodmd3")
 		, m_decobsmt(*this, "decobsmt")
+		, m_sound1(*this, "sound1")
 		, m_io_keyboard(*this, "X%d", 0U)
 	{ }
 
+	void de_3_dmdo(machine_config &config);
 	void de_3_dmd1(machine_config &config);
 	void de_3_dmd2(machine_config &config);
 	void detest(machine_config &config);
@@ -90,6 +98,18 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void de_bg_audio(machine_config &config);
+	void audio_map(address_map &map);
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
+	uint8_t sound_latch_r();
+	void sample_bank_w(uint8_t data);
+	void sample_w(uint8_t data);
+	uint8_t m_sample_data = 0U;
+	uint8_t m_sound_data = 0U;
+	bool m_more_data = false;
+	bool m_nmi_enable = false;
+
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
 	void pia2c_pa_w(uint8_t data);
@@ -109,16 +129,33 @@ private:
 	void de_3(machine_config &config);
 
 	// devices
+	optional_device<ym2151_device> m_ym2151;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm5205;
+	optional_memory_bank m_sample_bank;
 	optional_device<decodmd_type1_device> m_dmdtype1;
 	optional_device<decodmd_type2_device> m_dmdtype2;
 	optional_device<decodmd_type3_device> m_dmdtype3;
 	optional_device<decobsmt_device> m_decobsmt;
+	optional_memory_region m_sound1;
 	required_ioport_array<8> m_io_keyboard;
 
 	uint8_t m_row = 0U;
 	u16 m_sol = 0U;
 };
 
+void de_3_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2400, 0x2400).r(FUNC(de_3_state::sound_latch_r));
+	map(0x2800, 0x2800).w(FUNC(de_3_state::sample_bank_w));
+	// 0x2c00        - 4052(?)
+	map(0x3000, 0x3000).w(FUNC(de_3_state::sample_w));
+	// 0x3800        - Watchdog reset
+	map(0x4000, 0x7fff).bankr("sample_bank");
+	map(0x8000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( de3 )
 	PORT_START("X0")
@@ -205,8 +242,16 @@ INPUT_PORTS_END
 // 6821 PIA at 0x2000
 void de_3_state::sound_w(uint8_t data)
 {
-	if(data != 0xfe)
-		m_decobsmt->bsmt_comms_w(data);
+	if (m_decobsmt)
+	{
+		if(data != 0xfe)
+			m_decobsmt->bsmt_comms_w(data);
+	}
+	if (m_sound1)
+	{
+		m_sound_data = data;
+		m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	}
 }
 
 // 6821 PIA at 0x2400
@@ -371,6 +416,48 @@ void de_3_state::lamps_w(offs_t offset, uint8_t data)
 	}
 }
 
+WRITE_LINE_MEMBER(de_3_state::ym2151_irq_w)
+{
+	m_audiocpu->set_input_line(M6809_IRQ_LINE,state);
+}
+
+WRITE_LINE_MEMBER(de_3_state::msm5205_irq_w)
+{
+	m_msm5205->data_w(m_sample_data >> 4);
+	if(m_more_data)
+	{
+		if(m_nmi_enable)
+			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // generate NMI when we need more data
+		m_more_data = false;
+	}
+	else
+	{
+		m_more_data = true;
+		m_sample_data <<= 4;
+	}
+}
+
+// Sound board
+void de_3_state::sample_w(uint8_t data)
+{
+	m_sample_data = data;
+}
+
+uint8_t de_3_state::sound_latch_r()
+{
+	m_audiocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	return m_sound_data;
+}
+
+void de_3_state::sample_bank_w(uint8_t data)
+{
+	static constexpr uint8_t prescale[4] = { msm5205_device::S96_4B, msm5205_device::S48_4B, msm5205_device::S64_4B, 0 };
+
+	m_sample_bank->set_entry(data & 15);
+	m_nmi_enable = !BIT(data, 7);
+	m_msm5205->playmode_w(prescale[BIT(data, 4, 2)]);
+	m_msm5205->reset_w(BIT(data, 6));
+}
 
 void de_3_state::machine_start()
 {
@@ -378,11 +465,42 @@ void de_3_state::machine_start()
 
 	save_item(NAME(m_row));
 	save_item(NAME(m_sol));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_sample_data));
+	save_item(NAME(m_more_data));
+
+	if (m_sound1)
+	{
+		uint8_t *const ROM = m_sound1->base();
+		m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);
+		m_sample_bank->set_entry(0);
+	}
 }
 
 void de_3_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
+	if (m_sound1)
+		m_sample_bank->set_entry(0);
+}
+
+void de_3_state::de_bg_audio(machine_config &config)
+{
+	/* sound CPU */
+	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_audiocpu->set_addrmap(AS_PROGRAM, &de_3_state::audio_map);
+
+	SPEAKER(config, "bg").front_center();
+
+	YM2151(config, m_ym2151, XTAL(3'579'545));
+	m_ym2151->irq_handler().set(FUNC(de_3_state::ym2151_irq_w));
+	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.40);
+
+	MSM5205(config, m_msm5205, XTAL(384'000));
+	m_msm5205->vck_legacy_callback().set(FUNC(de_3_state::msm5205_irq_w));
+	m_msm5205->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm5205->add_route(ALL_OUTPUTS, "bg", 0.90);
 }
 
 void de_3_state::de_3(machine_config &config)
@@ -399,20 +517,27 @@ void de_3_state::de_3(machine_config &config)
 	decocpu.dmdstatus_read_callback().set(FUNC(de_3_state::dmd_status_r));
 
 	genpin_audio(config);
-
-	DECOBSMT(config, m_decobsmt, 0);
 }
 
 void de_3_state::de_3_dmd2(machine_config &config)
 {
 	de_3(config);
 	DECODMD2(config, m_dmdtype2, 0, "dmdcpu");
+	DECOBSMT(config, m_decobsmt, 0);
 }
 
 void de_3_state::de_3_dmd1(machine_config &config)
 {
 	de_3(config);
 	DECODMD1(config, m_dmdtype1, 0, "dmdcpu");
+	DECOBSMT(config, m_decobsmt, 0);
+}
+
+void de_3_state::de_3_dmdo(machine_config &config)
+{
+	de_3(config);
+	DECODMD1(config, m_dmdtype1, 0, "dmdcpu");
+	de_bg_audio(config);
 }
 
 void de_3_state::de_3b(machine_config &config)
@@ -430,12 +555,11 @@ void de_3_state::de_3b(machine_config &config)
 
 	genpin_audio(config);
 
+	DECODMD3(config, m_dmdtype3, 0, "dmdcpu");
+
 	/* sound hardware */
 	DECOBSMT(config, m_decobsmt, 0);
-
-	DECODMD3(config, m_dmdtype3, 0, "dmdcpu");
 }
-
 
 void de_3_state::detest(machine_config &config)
 {
@@ -514,7 +638,7 @@ ROM_START(btmn_106)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 ROM_START(btmn_103)
@@ -527,7 +651,7 @@ ROM_START(btmn_103)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 ROM_START(btmn_103f)
@@ -540,7 +664,7 @@ ROM_START(btmn_103f)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 ROM_START(btmn_103g)
@@ -553,7 +677,7 @@ ROM_START(btmn_103g)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 ROM_START(btmn_101)
@@ -566,7 +690,7 @@ ROM_START(btmn_101)
 	ROM_LOAD("batman.u7", 0x8000, 0x8000, CRC(b2e88bf5) SHA1(28f814ea73f8eefd1bb5499a599e67a6850c92c0))
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("batman.u17", 0x000000, 0x40000, CRC(b84914dd) SHA1(333d88033428705cbd0a40d70d938c0021bb0015))
-	ROM_LOAD("batman.u21", 0x040000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
+	ROM_LOAD("batman.u21", 0x080000, 0x20000, CRC(42dab6ac) SHA1(facf993db2ce240c9e825ca9a21ac65a0fbba188))
 ROM_END
 
 /*------------------------------------------------------------
@@ -579,9 +703,9 @@ ROM_START(ckpt_a17)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("chkpntds.512", 0x00000, 0x10000, CRC(14d9c6d6) SHA1(5470a4ebe7bc4a056f75aa1fffe3a4e3e24457c6))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("chkpntf7.rom", 0x8000, 0x8000, CRC(e6f6d716) SHA1(a034eb94acb174f7dbe192a55cfd00715ca85a75))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("chkpntf6.rom", 0x00000, 0x20000, CRC(2d08043e) SHA1(476c9945354e733bfc9a854760ca8cfa3bc62294))
 	ROM_LOAD("chkpntf5.rom", 0x20000, 0x20000, CRC(167daa2c) SHA1(458781726c73a09da2b8e8313e1d359cb795a744))
 ROM_END
@@ -1253,9 +1377,9 @@ ROM_START(tmnt_104)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("tmntdsp.104", 0x00000, 0x10000, CRC(545686b7) SHA1(713df7820d024db3406f5e171f62a53e34474f70))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
@@ -1267,9 +1391,9 @@ ROM_START(tmnt_104g)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("tmntdsp.104", 0x00000, 0x10000, CRC(545686b7) SHA1(713df7820d024db3406f5e171f62a53e34474f70))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
@@ -1281,9 +1405,9 @@ ROM_START(tmnt_103)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("tmntdsp.104", 0x00000, 0x10000, CRC(545686b7) SHA1(713df7820d024db3406f5e171f62a53e34474f70))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
@@ -1295,9 +1419,9 @@ ROM_START(tmnt_101)
 	ROM_REGION(0x20000, "dmdcpu", 0)
 	ROM_LOAD("tmntdspa.103", 0x00000, 0x10000, CRC(d52a7d49) SHA1(9249aafe272a052d19f1dd461708e8152516f79f))
 	ROM_RELOAD(0x10000, 0x10000)
-	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
-	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
@@ -1817,105 +1941,105 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1993,  rab_320,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 3.20, display A3.00)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE AUGUST 12, 1993 USA CPU 3.20. DISPLAY VERSION- BULLWINKLE A3.00 5/24/1993
-GAME(1993,  rab_130,       rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.30, display A1.30)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE APRIL 1, 1993 USA CPU 1.30. DISPLAY VERSION- BULLWINKLE A1.30 4/1/1993
-GAME(1993,  rab_103s,      rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.03, display S1.03)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE FEBRUARY 3, 1993 USA CPU 1.03. DISPLAY VERSION- BULLWINKLE S1.03 2/2/1993
-GAME(1992,  aar_101,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Aaron Spelling (1.01)",                                                    MACHINE_IS_SKELETON_MECHANICAL) // AARON SPELLING V1.01 12/23/92
-GAME(1991,  btmn_106,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.06, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.06. DISP VER: BATMAN A1.02
-GAME(1991,  btmn_103,      btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.03, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.03. DISP VER: BATMAN A1.02
-GAME(1991,  btmn_103f,     btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (France 1.03, display F1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // BATMAN FRANCE 1.03. DISP VER: BATMAN F1.03
-GAME(1991,  btmn_103g,     btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (Germany 1.03, display G1.04)",                                     MACHINE_IS_SKELETON_MECHANICAL) // BATMAN GERMANY 1.03. DISP VER: BATMAN G1.04
-GAME(1991,  btmn_101,      btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.01, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL) // BATMAN USA 1.01
-GAME(1991,  ckpt_a17,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Checkpoint (1.7)",                                                         MACHINE_IS_SKELETON_MECHANICAL) // CP80 3/6/91
-GAME(1994,  gnr_300,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 3.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 USA CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
-GAME(1994,  gnr_300f,      gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (French 3.00, display F3.00)",                                MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 FRENCH CPU 3.00. DISPLAY VERSION- GNR F3.00 AUGUST 16, 1994
-GAME(1994,  gnr_300d,      gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (Dutch 3.00, display A3.00)",                                 MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES AUGUST 21, 1994 DUTCH CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
-GAME(1994,  gnr_200,       gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 2.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL) // GUNS-N-ROSES JULY 5, 1994 USA CPU 2.00
-GAME(1992,  hook_408,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.08, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.08. DISPLAY: HOOK A4.01
-GAME(1992,  hook_404,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.04, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.04
-GAME(1992,  hook_401,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.01
-GAME(1992,  hook_401_p,    hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01 with prototype sound, display A4.01)",                      MACHINE_IS_SKELETON_MECHANICAL) // HOOK USA 4.01
-GAME(1992,  hook_e406,     hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (UK 4.06, display A4.01)",                                            MACHINE_IS_SKELETON_MECHANICAL) // HOOK U.K. 4.06
-GAME(1993,  jupk_513,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.13, display A5.10)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK SEP. 28, 1993 USA CPU 5.13. DISPLAY VERSION- JURASSIC A5.10 8/24/1993
-GAME(1993,  jupk_501,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01, display A5.01)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC A5.01 6/24/1993
-GAME(1993,  jupk_501g,     jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01 Germany, display G5.01)",                          MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC G5.01 6/24/1993
-GAME(1993,  jupk_307,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.07, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
-GAME(1993,  jupk_305,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.05, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
-GAME(1993,  lah_112,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.12, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO NOV. 10, 1993 USA CPU 1.12. DISPLAY VERSION- ACTION HERO A1.06 11/11/1993
-GAME(1993,  lah_110,       lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.10, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO OCT. 18, 1993 USA CPU 1.10
-GAME(1993,  lah_xxx_s105,  lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (unknown CPU, display L1.05)",                            MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- ACTION HERO L1.05 11/11/1993
-GAME(1993,  lah_108s,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.08, display L1.04)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 28, 1993 USA CPU 1.08. DISPLAY VERSION- ACTION HERO L1.04 9/5/1993
-GAME(1993,  lah_107,       lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.07, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 22, 1993 USA CPU 1.07
-GAME(1993,  lah_106c,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (Canada 1.06, display A1.04)",                            MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 20, 1993 CANADA CPU 1.06. DISPLAY VERSION- ACTION HERO A1.04 9/5/1993
-GAME(1993,  lah_104f,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.04, display F1.01)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 1, 1993 USA CPU 1.04. DISPLAY VERSION- ACTION HERO F1.01 8/18/1993
-GAME(1993,  lah_104s,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.04, display L1.02)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO SEPT. 1, 1993 USA CPU 1.04. DISPLAY VERSION- ACTION HERO L1.02 8/30/1993
-GAME(1992,  lw3_208,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.08, display A2.06)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 11/17/92 USA CPU 2.08. DISPLAY VERSION- LETHAL WEAPON A2.06 9/29/1992
-GAME(1992,  lw3_207,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.07, display A2.06)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 AUG 31, 1992 USA CPU 2.07
-GAME(1992,  lw3_207c,      lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (Canada 2.07, display A2.06)",                             MACHINE_IS_SKELETON_MECHANICAL) // LW3 AUG 31, 1992 CANADA CPU 2.07
-GAME(1992,  lw3_205,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.05, display A2.05)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 30, 1992 USA CPU 2.05. DISPLAY VERSION- LETHAL WEAPON A2.05 8/14/1992
-GAME(1992,  lw3_204e,      lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (England 2.04, display A2.02)",                            MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 30. 1992 ENGLAND CPU 2.04. DISPLAY VERSION LETHAL WEAPON A2.02 7/17/1992
-GAME(1992,  lw3_203,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.03, display A2.04)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JULY 17, 1992 USA CPU 2.03. DISPLAY VERSION- LETHAL WEAPON  A2.04 7/29/1992
-GAME(1992,  lw3_200,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.00, display A2.04)",                                MACHINE_IS_SKELETON_MECHANICAL) // LW3 JUNE 16, 1992 USA CPU 2.00. DISPLAY VERSION- LETHAL WEAPON A2.04 7/29/1992
-GAME(1992,  mj_130,        0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Michael Jordan (1.30, display A1.03)",                                     MACHINE_IS_SKELETON_MECHANICAL) // MICHAEL JORDAN V 1.30 11/4/92. DISPLAY VERSION- JORDAN A1.03 8/13/1993
-GAME(1992,  trek_201,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 2.01, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STARTREK 4/30/92 USA VER. 2.01. DISPLAY: STARTREK A1.09
-GAME(1992,  trek_200,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 2.00, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STARTREK 4/16/92 USA VER. 2.00
-GAME(1992,  trek_120,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.20, display A1.06)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 1/10 USA VER. 1.20. DISPLAY: STARTREK A1.06
-GAME(1992,  trek_117,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.17, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 12/9 USA VER. 1.17
-GAME(1992,  trek_110,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.10, display A1.06)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 11/14 USA VER. 1.10. DISPLAY: STARTREK A1.06
-GAME(1992,  trek_110_a027, trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.10, display A0.27)",                     MACHINE_IS_SKELETON_MECHANICAL) // STAR TREK 11/14 USA VER. 1.10. DISPLAY: STARTREK A0.27
-GAME(1992,  stwr_106,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display A1.05)",                               MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS 2016 UNOFFICIAL 1.06. DISPLAY VERSION- STAR WARS A1.05 12/4/1992
-GAME(1992,  stwr_106_s105, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display S1.05)",                               MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- STAR WARS S1.05 12/4/1992
-GAME(1992,  stwr_106_a046, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display A0.46)",                               MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- STAR WARS A0.46 10/9/1992
-GAME(1992,  stwr_104,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.04, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.04
-GAME(1992,  stwr_103,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.03, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.03
-GAME(1992,  stwr_103_a104, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.03, display A1.04)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.03. DISPLAY VERSION- STAR WARS A1.04 11/20/1992
-GAME(1992,  stwr_102,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.02, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.02
-GAME(1992,  stwr_102e,     stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (England 1.02, display A1.05)",                                  MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS ENGLAND CPU 1.02
-GAME(1992,  stwr_101,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.01, display A1.02)",                                      MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS USA CPU 1.01. DISPLAY VERSION- STAR WARS A1.02 10/29/1992
-GAME(1992,  stwr_101g,     stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (German 1.01, display G1.02)",                                   MACHINE_IS_SKELETON_MECHANICAL) // STAR WARS GERMAN CPU 1.01. DISPLAY VERSION- STAR WARS G1.02 29/10/1992
-GAME(1993,  tftc_303,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.03, display A3.01)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC FEBRUARY 22,1994 USA CPU 3.03. DISPLAY VERSION- CRYPT A3.01 12/28/1993
-GAME(1993,  tftc_302,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (Dutch 3.02, display A3.01)",                         MACHINE_IS_SKELETON_MECHANICAL) // TFTC JANUARY 06, 1994 DUTCH CPU 3.02
-GAME(1993,  tftc_300,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.00, display A3.00)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC DECEMBER 15, 1993 USA CPU 3.00. DISPLAY VERSION- CRYPT A3.00 12/16/1993
-GAME(1993,  tftc_200,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 2.00, display A2.00)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC DECEMBER 03, 1993 USA CPU 2.00. DISPLAY VERSION- CRYPT A2.00 12/3/1993
-GAME(1993,  tftc_104s,     tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 1.04, display L1.03)",                           MACHINE_IS_SKELETON_MECHANICAL) // TFTC NOVEMBER 19, 1993 USA CPU 1.04. DISPLAY VERSION- CRYPT L1.03 11/11/1993
-GAME(1991,  tmnt_104,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (USA 1.04, display A1.04)",                   MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. USA 1.04. DISPLAY VER: TMNT A1.04
-GAME(1991,  tmnt_104g,     tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (Germany 1.04, display A1.04)",               MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. GERMANY 1.04.
-GAME(1991,  tmnt_103,      tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.03
-GAME(1991,  tmnt_101,      tmnt_104, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.01)",                                      MACHINE_IS_SKELETON_MECHANICAL) // T.M.N.T. A 1.01
-GAME(1994,  tomy_400,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 4.00, display A4.00)",                 MACHINE_IS_SKELETON_MECHANICAL) // TOMMY APRIL 6, 1994 USA CPU 4.00. DISPLAY VERSION- TOMMY A4.00 MAY 5, 1994
-GAME(1994,  tomy_300h,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Dutch 3.00, display A3.00)",               MACHINE_IS_SKELETON_MECHANICAL) // TOMMY FEBRUARY 16, 1994 DUTCH CPU 3.00. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
-GAME(1994,  tomy_102,      tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 1.02, display A3.00)",                 MACHINE_IS_SKELETON_MECHANICAL) // TOMMY JANUARY 26, 1994 USA CPU 1.02. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
-GAME(1994,  wwfr_106,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.06, display A1.02)",                               MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING AUG. 01, 1994 USA CPU 1.06. DISPLAY VERSION- WWF A1.02 JUNE 29, 1994
-GAME(1994,  wwfr_103,      wwfr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.03, display A1.01)",                               MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 USA CPU 1.03. DISPLAY VERSION- WWF A1.01 APRIL 14, 1994
-GAME(1994,  wwfr_103f,     wwfr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (French 1.03, display F1.01)",                            MACHINE_IS_SKELETON_MECHANICAL) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 FRENCH CPU 1.03. DISPLAY VERSION- WWF F1.01 APRIL 14, 1994
-GAME(1995,  batmanf,       0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (4.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf3,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (3.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf2,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (2.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf1,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (1.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_uk,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (English)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_cn,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Canadian)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_no,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Norwegian)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_sv,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Swedish)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_at,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Austrian)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_ch,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Swiss)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_de,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (German)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_be,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Belgian)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_fr,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (French)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_nl,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Dutch)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_it,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Italian)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_sp,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Spanish)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_jp,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Japanese)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_time,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  baywatch,      0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_d300,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (3.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_d400,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 English)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_e400,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_f201,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (2.01 French)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  frankst,       0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Mary Shelley's Frankenstein",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  frankstg,      frankst,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Mary Shelley's Frankenstein (Germany)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_402,       0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.02)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_401,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.01)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_400,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.00)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_100,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Data East", "Maverick (1.00)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1998,  detest,        0,        detest,    de3, de_3_state, empty_init, ROT0, "Data East", "Data East Test Chip",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  ctcheese,      0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Cut The Cheese (Redemption)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  rab_320,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 3.20, display A3.00)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // ROCKY+BULLWINKLE AUGUST 12, 1993 USA CPU 3.20. DISPLAY VERSION- BULLWINKLE A3.00 5/24/1993
+GAME(1993,  rab_130,       rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.30, display A1.30)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // ROCKY+BULLWINKLE APRIL 1, 1993 USA CPU 1.30. DISPLAY VERSION- BULLWINKLE A1.30 4/1/1993
+GAME(1993,  rab_103s,      rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.03, display S1.03)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // ROCKY+BULLWINKLE FEBRUARY 3, 1993 USA CPU 1.03. DISPLAY VERSION- BULLWINKLE S1.03 2/2/1993
+GAME(1992,  aar_101,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Aaron Spelling (1.01)",                                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // AARON SPELLING V1.01 12/23/92
+GAME(1991,  btmn_106,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.06, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // BATMAN USA 1.06. DISP VER: BATMAN A1.02
+GAME(1991,  btmn_103,      btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.03, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // BATMAN USA 1.03. DISP VER: BATMAN A1.02
+GAME(1991,  btmn_103f,     btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (France 1.03, display F1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // BATMAN FRANCE 1.03. DISP VER: BATMAN F1.03
+GAME(1991,  btmn_103g,     btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (Germany 1.03, display G1.04)",                                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // BATMAN GERMANY 1.03. DISP VER: BATMAN G1.04
+GAME(1991,  btmn_101,      btmn_106, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.01, display A1.02)",                                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // BATMAN USA 1.01
+GAME(1991,  ckpt_a17,      0,        de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Checkpoint (1.7)",                                                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // CP80 3/6/91
+GAME(1994,  gnr_300,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 3.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // GUNS-N-ROSES AUGUST 21, 1994 USA CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
+GAME(1994,  gnr_300f,      gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (French 3.00, display F3.00)",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // GUNS-N-ROSES AUGUST 21, 1994 FRENCH CPU 3.00. DISPLAY VERSION- GNR F3.00 AUGUST 16, 1994
+GAME(1994,  gnr_300d,      gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (Dutch 3.00, display A3.00)",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // GUNS-N-ROSES AUGUST 21, 1994 DUTCH CPU 3.00. DISPLAY VERSION- GNR A3.00 AUGUST 16, 1994
+GAME(1994,  gnr_200,       gnr_300,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Guns N Roses (USA 2.00, display A3.00)",                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // GUNS-N-ROSES JULY 5, 1994 USA CPU 2.00
+GAME(1992,  hook_408,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.08, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.08. DISPLAY: HOOK A4.01
+GAME(1992,  hook_404,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.04, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.04
+GAME(1992,  hook_401,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.01
+GAME(1992,  hook_401_p,    hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01 with prototype sound, display A4.01)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.01
+GAME(1992,  hook_e406,     hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (UK 4.06, display A4.01)",                                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK U.K. 4.06
+GAME(1993,  jupk_513,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.13, display A5.10)",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // JURASSIC PARK SEP. 28, 1993 USA CPU 5.13. DISPLAY VERSION- JURASSIC A5.10 8/24/1993
+GAME(1993,  jupk_501,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01, display A5.01)",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC A5.01 6/24/1993
+GAME(1993,  jupk_501g,     jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01 Germany, display G5.01)",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC G5.01 6/24/1993
+GAME(1993,  jupk_307,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.07, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
+GAME(1993,  jupk_305,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.05, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
+GAME(1993,  lah_112,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.12, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LAST ACTION HERO NOV. 10, 1993 USA CPU 1.12. DISPLAY VERSION- ACTION HERO A1.06 11/11/1993
+GAME(1993,  lah_110,       lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.10, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LAST ACTION HERO OCT. 18, 1993 USA CPU 1.10
+GAME(1993,  lah_xxx_s105,  lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (unknown CPU, display L1.05)",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // DISPLAY VERSION- ACTION HERO L1.05 11/11/1993
+GAME(1993,  lah_108s,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.08, display L1.04)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LAST ACTION HERO SEPT. 28, 1993 USA CPU 1.08. DISPLAY VERSION- ACTION HERO L1.04 9/5/1993
+GAME(1993,  lah_107,       lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.07, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LAST ACTION HERO SEPT. 22, 1993 USA CPU 1.07
+GAME(1993,  lah_106c,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (Canada 1.06, display A1.04)",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LAST ACTION HERO SEPT. 20, 1993 CANADA CPU 1.06. DISPLAY VERSION- ACTION HERO A1.04 9/5/1993
+GAME(1993,  lah_104f,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.04, display F1.01)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LAST ACTION HERO SEPT. 1, 1993 USA CPU 1.04. DISPLAY VERSION- ACTION HERO F1.01 8/18/1993
+GAME(1993,  lah_104s,      lah_112,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.04, display L1.02)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LAST ACTION HERO SEPT. 1, 1993 USA CPU 1.04. DISPLAY VERSION- ACTION HERO L1.02 8/30/1993
+GAME(1992,  lw3_208,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.08, display A2.06)",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LW3 11/17/92 USA CPU 2.08. DISPLAY VERSION- LETHAL WEAPON A2.06 9/29/1992
+GAME(1992,  lw3_207,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.07, display A2.06)",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LW3 AUG 31, 1992 USA CPU 2.07
+GAME(1992,  lw3_207c,      lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (Canada 2.07, display A2.06)",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LW3 AUG 31, 1992 CANADA CPU 2.07
+GAME(1992,  lw3_205,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.05, display A2.05)",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LW3 JULY 30, 1992 USA CPU 2.05. DISPLAY VERSION- LETHAL WEAPON A2.05 8/14/1992
+GAME(1992,  lw3_204e,      lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (England 2.04, display A2.02)",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LW3 JULY 30. 1992 ENGLAND CPU 2.04. DISPLAY VERSION LETHAL WEAPON A2.02 7/17/1992
+GAME(1992,  lw3_203,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.03, display A2.04)",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LW3 JULY 17, 1992 USA CPU 2.03. DISPLAY VERSION- LETHAL WEAPON  A2.04 7/29/1992
+GAME(1992,  lw3_200,       lw3_208,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Lethal Weapon 3 (USA 2.00, display A2.04)",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // LW3 JUNE 16, 1992 USA CPU 2.00. DISPLAY VERSION- LETHAL WEAPON A2.04 7/29/1992
+GAME(1992,  mj_130,        0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Michael Jordan (1.30, display A1.03)",                                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // MICHAEL JORDAN V 1.30 11/4/92. DISPLAY VERSION- JORDAN A1.03 8/13/1993
+GAME(1992,  trek_201,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 2.01, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STARTREK 4/30/92 USA VER. 2.01. DISPLAY: STARTREK A1.09
+GAME(1992,  trek_200,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 2.00, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STARTREK 4/16/92 USA VER. 2.00
+GAME(1992,  trek_120,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.20, display A1.06)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR TREK 1/10 USA VER. 1.20. DISPLAY: STARTREK A1.06
+GAME(1992,  trek_117,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.17, display A1.09)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR TREK 12/9 USA VER. 1.17
+GAME(1992,  trek_110,      trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.10, display A1.06)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR TREK 11/14 USA VER. 1.10. DISPLAY: STARTREK A1.06
+GAME(1992,  trek_110_a027, trek_201, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Star Trek 25th Anniversary (USA 1.10, display A0.27)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR TREK 11/14 USA VER. 1.10. DISPLAY: STARTREK A0.27
+GAME(1992,  stwr_106,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display A1.05)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR WARS 2016 UNOFFICIAL 1.06. DISPLAY VERSION- STAR WARS A1.05 12/4/1992
+GAME(1992,  stwr_106_s105, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display S1.05)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // DISPLAY VERSION- STAR WARS S1.05 12/4/1992
+GAME(1992,  stwr_106_a046, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (Unofficial 1.06, display A0.46)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // DISPLAY VERSION- STAR WARS A0.46 10/9/1992
+GAME(1992,  stwr_104,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.04, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR WARS USA CPU 1.04
+GAME(1992,  stwr_103,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.03, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR WARS USA CPU 1.03
+GAME(1992,  stwr_103_a104, stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.03, display A1.04)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR WARS USA CPU 1.03. DISPLAY VERSION- STAR WARS A1.04 11/20/1992
+GAME(1992,  stwr_102,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.02, display A1.05)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR WARS USA CPU 1.02
+GAME(1992,  stwr_102e,     stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (England 1.02, display A1.05)",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR WARS ENGLAND CPU 1.02
+GAME(1992,  stwr_101,      stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (USA 1.01, display A1.02)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR WARS USA CPU 1.01. DISPLAY VERSION- STAR WARS A1.02 10/29/1992
+GAME(1992,  stwr_101g,     stwr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Star Wars (German 1.01, display G1.02)",                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // STAR WARS GERMAN CPU 1.01. DISPLAY VERSION- STAR WARS G1.02 29/10/1992
+GAME(1993,  tftc_303,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.03, display A3.01)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TFTC FEBRUARY 22,1994 USA CPU 3.03. DISPLAY VERSION- CRYPT A3.01 12/28/1993
+GAME(1993,  tftc_302,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (Dutch 3.02, display A3.01)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TFTC JANUARY 06, 1994 DUTCH CPU 3.02
+GAME(1993,  tftc_300,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 3.00, display A3.00)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TFTC DECEMBER 15, 1993 USA CPU 3.00. DISPLAY VERSION- CRYPT A3.00 12/16/1993
+GAME(1993,  tftc_200,      tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 2.00, display A2.00)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TFTC DECEMBER 03, 1993 USA CPU 2.00. DISPLAY VERSION- CRYPT A2.00 12/3/1993
+GAME(1993,  tftc_104s,     tftc_303, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Tales From the Crypt (USA 1.04, display L1.03)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TFTC NOVEMBER 19, 1993 USA CPU 1.04. DISPLAY VERSION- CRYPT L1.03 11/11/1993
+GAME(1991,  tmnt_104,      0,        de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (USA 1.04, display A1.04)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // T.M.N.T. USA 1.04. DISPLAY VER: TMNT A1.04
+GAME(1991,  tmnt_104g,     tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (Germany 1.04, display A1.04)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // T.M.N.T. GERMANY 1.04.
+GAME(1991,  tmnt_103,      tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // T.M.N.T. A 1.03
+GAME(1991,  tmnt_101,      tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.01)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // T.M.N.T. A 1.01
+GAME(1994,  tomy_400,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 4.00, display A4.00)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY APRIL 6, 1994 USA CPU 4.00. DISPLAY VERSION- TOMMY A4.00 MAY 5, 1994
+GAME(1994,  tomy_300h,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Dutch 3.00, display A3.00)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY FEBRUARY 16, 1994 DUTCH CPU 3.00. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
+GAME(1994,  tomy_102,      tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 1.02, display A3.00)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY JANUARY 26, 1994 USA CPU 1.02. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
+GAME(1994,  wwfr_106,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.06, display A1.02)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING AUG. 01, 1994 USA CPU 1.06. DISPLAY VERSION- WWF A1.02 JUNE 29, 1994
+GAME(1994,  wwfr_103,      wwfr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.03, display A1.01)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 USA CPU 1.03. DISPLAY VERSION- WWF A1.01 APRIL 14, 1994
+GAME(1994,  wwfr_103f,     wwfr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (French 1.03, display F1.01)",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 FRENCH CPU 1.03. DISPLAY VERSION- WWF F1.01 APRIL 14, 1994
+GAME(1995,  batmanf,       0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (4.0)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  batmanf3,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (3.0)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  batmanf2,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (2.02)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  batmanf1,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (1.02)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_uk,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (English)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_cn,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Canadian)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_no,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Norwegian)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_sv,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Swedish)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_at,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Austrian)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_ch,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Swiss)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_de,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (German)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_be,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Belgian)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_fr,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (French)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_nl,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Dutch)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_it,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Italian)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_sp,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Spanish)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_jp,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Japanese)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bmf_time,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  baywatch,      0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bay_d300,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (3.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bay_d400,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 English)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bay_e400,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bay_f201,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (2.01 French)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  frankst,       0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Mary Shelley's Frankenstein",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  frankstg,      frankst,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Mary Shelley's Frankenstein (Germany)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  mav_402,       0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.02)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  mav_401,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.01)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  mav_400,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick (Display Rev. 4.00)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  mav_100,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Data East", "Maverick (1.00)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1998,  detest,        0,        detest,    de3, de_3_state, empty_init, ROT0, "Data East", "Data East Test Chip",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1996,  ctcheese,      0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Cut The Cheese (Redemption)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

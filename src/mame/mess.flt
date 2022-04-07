@@ -199,6 +199,7 @@ comx35.cpp
 concept.cpp
 conchess.cpp
 conic_cchess2.cpp
+conic_cchess3.cpp
 consola_emt.cpp
 controlid.cpp
 cortex.cpp
@@ -348,6 +349,7 @@ force68k.cpp
 fp1100.cpp
 fp200.cpp
 fp6000.cpp
+freedom120.cpp
 fs3216.cpp
 ft68m.cpp
 galaxy.cpp
@@ -410,6 +412,7 @@ hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
 hh_pps41.cpp
+hh_rw5000.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
@@ -481,6 +484,7 @@ irisha.cpp
 iris_power.cpp
 is48x.cpp
 isbc.cpp
+isbc660.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
@@ -655,6 +659,7 @@ mk1forth.cpp
 mk14.cpp
 mk85.cpp
 mk90.cpp
+mk98.cpp
 mkit09.cpp
 ml20.cpp
 mmd1.cpp
@@ -686,6 +691,7 @@ multi8.cpp
 mupid2.cpp
 mvme147.cpp
 mvme162.cpp
+mw4pole.cpp
 mx2178.cpp
 myb3k.cpp
 mycom.cpp
@@ -899,6 +905,7 @@ roland_s50.cpp
 roland_sc55.cpp
 roland_sc88.cpp
 roland_tb303.cpp
+roland_tnsc1.cpp
 roland_tr505.cpp
 roland_tr606.cpp
 roland_tr707.cpp

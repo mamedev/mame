@@ -21,9 +21,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	int ce, clk, data;
-	int cur_bit;
-	uint8_t adr, value;
+	int ce = 0, clk = 0, data = 0;
+	int cur_bit = 0;
+	uint8_t adr = 0, value = 0;
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_SETTINGS, namco_settings_device)

@@ -64,20 +64,20 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	std::unique_ptr<uint8_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_bg_vram;
 	std::unique_ptr<uint16_t[]> m_bg_fb;
 	std::unique_ptr<uint16_t[]> m_fg_fb;
-	uint8_t m_rom_bank;
-	uint8_t m_bg_bank;
-	uint8_t m_vreg_bank;
-	uint8_t m_msm5205next;
-	uint8_t m_msm_nmi_mask;
-	uint8_t m_vreg_pen;
-	uint8_t m_palette_switch;
-	uint8_t m_bg_vreg_test;
-	uint8_t m_toggle;
+	uint8_t m_rom_bank = 0;
+	uint8_t m_bg_bank = 0;
+	uint8_t m_vreg_bank = 0;
+	uint8_t m_msm5205next = 0;
+	uint8_t m_msm_nmi_mask = 0;
+	uint8_t m_vreg_pen = 0;
+	uint8_t m_palette_switch = 0;
+	uint8_t m_bg_vreg_test = 0;
+	uint8_t m_toggle = 0;
 
 	uint8_t videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
@@ -473,19 +473,8 @@ WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 	}
 }
 
-static const gfx_layout gfxlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
-};
-
 static GFXDECODE_START( gfx_suprgolf )
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0, 0x80 )
 GFXDECODE_END
 
 void suprgolf_state::machine_reset()

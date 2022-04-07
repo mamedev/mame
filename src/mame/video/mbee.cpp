@@ -1,14 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
 /***************************************************************************
-    mbee.cpp
+Microbee video hardware
+Originally written by Juergen Buchmueller, Dec 1999
 
-    video hardware
-    Originally written by Juergen Buchmueller, Dec 1999
+Rewritten by Robbbert (see notes in driver file).
 
-    Rewritten by Robbbert (see notes in driver file).
-
-    Operation of old keyboard:
+Operation of old keyboard:
     The design is taken from the SY6545 Application Note AN3. As the CRTC
     renders the picture, the MA lines also scan the keyboard. When a keydown
     is detected, the lightpen pin is activated, which sets bit 6 of the status
@@ -21,18 +19,18 @@
     next row will be checked. Once found, the CPU clears bit 6 and port 0B, then
     works out the ascii key code of the pressed key.
 
-    Tests of old keyboard. Start mbeeic.
-    1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
-       it should only fire bullets. If it sometimes starts turning,
-       thrusting or using the shield, then there is a problem.
+Tests of old keyboard. Start mbeeic.
+1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
+   it should only fire bullets. If it sometimes starts turning,
+   thrusting or using the shield, then there is a problem.
 
-    2. Load SCAVENGER and make sure it doesn't go to the next level
-       until you find the Exit.
+2. Load SCAVENGER and make sure it doesn't go to the next level
+   until you find the Exit.
 
-    3. At the Basic prompt, type in EDASM press enter. At the memory size
-       prompt press enter. Now, make sure the keyboard works properly.
+3. At the Basic prompt, type in EDASM press enter. At the memory size
+   prompt press enter. Now, make sure the keyboard works properly.
 
-    See drivers\mbee.cpp for any issues.
+See drivers\mbee.cpp for any issues.
 
 ****************************************************************************/
 

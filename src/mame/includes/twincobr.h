@@ -76,9 +76,9 @@ protected:
 	s32 m_fgoffs = 0;
 	s32 m_bgoffs = 0;
 	bool m_display_on = false;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	void twincobr_dsp_addr_cb(u32 &main_ram_seg, u32 &dsp_addr, u16 data);
 	bool twincobr_dsp_read_cb(u32 main_ram_seg, u32 dsp_addr, u16 &data);

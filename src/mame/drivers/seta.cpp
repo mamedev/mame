@@ -146,6 +146,7 @@ TODO:
 
 Thundercade / Twin Formation
 Taito America Corp./Romstar USA/Seta, 1987
+Hardware info by Guru
 
 PCB Layout
 ---------
@@ -194,8 +195,8 @@ Notes:
                     X1-001 (SDIP64)
                     X1-002 (SDIP64)
                     X1-006 (SDIP64)
-                    X0-006 (SDIP64), also marked 'RP5A10-0001'. This is a 65C02 in disguise,
-                                     possibly with additional ROM or logic acting as a protection chip.
+                    X0-006 (SDIP64), also marked 'RP5A10-0001'. This is a Ricoh 65c02 with ROM, RAM and
+                                     logic acting as a protection chip.
                                      clocks - pin1 16MHz, pin2 2MHz, pin3 59.1845Hz [VSYNC),
                                      pin63 2MHz, pin62 2MHz
                     X1-003 (SDIP42)
@@ -630,6 +631,7 @@ BPGH-013.U70    TC538000
 
 Zombie Raid
 Sammy, 1996
+Hardware info by Guru
 
 This is a gun shooting game using Seta/Allumer hardware.
 
@@ -689,6 +691,7 @@ NEC 71054C  ----???
                                 Kamen Rider
 Kamen Riderclub Battleracer
 Banpresto, 1993
+Hardware info by Guru
 
 Runs on Seta/Allumer hardware
 
@@ -748,6 +751,7 @@ X1-010           X1-006
 
 Allumer, 1993
 This game is a vertical shoot'em-up and runs on fairly standard Allumer hardware.
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -882,6 +886,7 @@ Custom chips:   X1-001A X1-002A
 
 Triple Fun
 ??, 19??
+Hardware info by Guru
 
 
 CPU   : TMP68HC000P-16 (68000)
@@ -1006,6 +1011,7 @@ Other   : Allumer
 
 Banpresto, 1992
 This game runs on Seta/Allumer hardware
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -1081,6 +1087,7 @@ Custom chips:   X1-001A X1-002A
 
 Banpresto, 1992
 Board looks similar to Castle of Dragon PCB.
+Hardware info by Guru
 
 PCB No: P0-077A (Seta Number)
         BP922   (Banpresto Number)
@@ -1116,6 +1123,7 @@ BP-U-003.U13      8M mask (32 pin, 1M x 8),   read as MX27C8000           Sound
 /***************************************************************************
 Ultra Toukon Densetsu
 Banpresto, 1993
+Hardware info by Guru
 
 This game runs on fairly standard Allumer hardware.
 
@@ -1212,6 +1220,7 @@ X1-010                           5168-10       68000-16
 
 Pairs Love
 Allumer, 199x
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -1249,6 +1258,7 @@ Notes:
 
 Rezon (Taito License)
 Allumer / Taito, 1992
+Hardware info by Guru
 
 This game runs on fairly standard Allumer hardware.
 
@@ -1324,7 +1334,7 @@ Notes:
 
 Crazy Fight
 Subsino 1996
-Readme by Guru
+Hardware info by Guru
 This game runs on Allumer-based hardware.
 It is a whack-a-mole type game using 6 buttons.
 
@@ -1363,10 +1373,9 @@ Notes:
       6164         - 8kx8 SRAM (SDIP28)
       62256        - 32kx8 SRAM (SDIP28)
       TD62003      - Toshiba TD62003 7-Channel Darlington Sink Driver (DIP16)
-      DIP42        - Unknown DIP42 IC. Note several pins have no connection.
+      DIP42        - Oki ULA. Note several pins have no connection.
                      Pins 6-26 tied to inputs on JAMMA connector.
                      Some other pins tied to logic.
-                     No pins have a clock so this chip is not a MCU.
       J2           - 4 pin connector. Pin 2 tied to DIP42 IC pin 27
                      and pin 3 tied to TD62003 pin 16
       Custom Chips - X1-007
@@ -4300,6 +4309,20 @@ static INPUT_PORTS_START( daiohp )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+/***************************************************************************
+                       Daioh (prototype, earlier)
+***************************************************************************/
+
+static INPUT_PORTS_START( daiohp2 )
+	PORT_INCLUDE(daiohp)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(      0x8000, "300k and every 800k" )
+	PORT_DIPSETTING(      0xc000, "500k and every 1000k" )
+	PORT_DIPSETTING(      0x4000, "800k and 2000k only" )
+	PORT_DIPSETTING(      0x0000, "1000k Only" )
+INPUT_PORTS_END
 
 /***************************************************************************
                                 Dragon Unit
@@ -10922,7 +10945,7 @@ ROM_START( daiohp2 ) /* Found on the same P0-072-2 PCB as the previous Daioh pro
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
 	ROM_LOAD16_BYTE( "bg2_0.u164", 0x000001, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
 	ROM_LOAD16_BYTE( "bg2_1.u166", 0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
-	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(3119189b) SHA1(3a45ec8db30659d7fd47090cb137df05bbdc1c86) )
+	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(dc8ecfb7) SHA1(a202ff32c74601d5cd0aebdf84a481d36f540403) )
 	ROM_LOAD16_BYTE( "bg2_3.u167", 0x100000, 0x080000, CRC(533ba782) SHA1(b5f62323be95b2def8d1383b400b4ef0d3b3d6cd) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
@@ -12453,7 +12476,7 @@ GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_ini
 GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh", 0 )
 GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )
 GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype)", 0 )
-GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
+GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp2,   seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
 GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
@@ -12462,7 +12485,7 @@ GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_ini
 GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
+GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race / Kamen Rider Club Battle Racer", 0 )
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 

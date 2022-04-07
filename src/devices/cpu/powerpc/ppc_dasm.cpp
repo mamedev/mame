@@ -860,6 +860,8 @@ offs_t powerpc_disassembler::dasm_one(std::ostream &stream, uint32_t pc, uint32_
 					oprs = util::string_format("0x%02X,%d,0x%08X", G_BO(op), G_BI(op), disp + ((op & M_AA) ? 0 : pc));
 				else                    // BI gives us the condition bit
 					oprs = util::string_format("0x%02X,cr%d[%s],0x%08X", G_BO(op), G_BI(op) / 4, crbit[G_BI(op) & 3], disp + ((op & M_AA) ? 0 : pc));
+				if ((G_BO(op) & 0x14) != 0x14)
+					flags |= STEP_COND;
 				break;
 
 			case F_BO_BI:
@@ -867,6 +869,8 @@ offs_t powerpc_disassembler::dasm_one(std::ostream &stream, uint32_t pc, uint32_
 					oprs = util::string_format("0x%02X,%d", G_BO(op), G_BI(op));
 				else
 					oprs = util::string_format("0x%02X,cr%d[%s]", G_BO(op), G_BI(op) / 4, crbit[G_BI(op) & 3]);
+				if ((G_BO(op) & 0x14) != 0x14)
+					flags |= STEP_COND;
 				break;
 
 			case F_CMP:

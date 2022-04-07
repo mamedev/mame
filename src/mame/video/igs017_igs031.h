@@ -82,17 +82,17 @@ private:
 	// the gfx roms were often hooked up with the bits backwards, allow us to handle it here to save doing it in every driver.
 	bool m_revbits;
 
-	u8 m_toggle;
-	int m_debug_addr;
-	int m_debug_width;
-	bool m_video_disable;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	u8 m_toggle = 0;
+	int m_debug_addr = 0;
+	int m_debug_width = 0;
+	bool m_video_disable = false;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 	std::unique_ptr<u8[]> m_sprites_gfx;
-	u32 m_sprites_gfx_size;
+	u32 m_sprites_gfx_size = 0;
 
-	bool m_nmi_enable;
-	bool m_irq_enable;
+	bool m_nmi_enable = false;
+	bool m_irq_enable = false;
 };
 
 DECLARE_DEVICE_TYPE(IGS017_IGS031, igs017_igs031_device)

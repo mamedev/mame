@@ -168,6 +168,72 @@ Notes:
             Vsync: 60Hz
 
 
+***************************************************************************
+
+Master of Weapon, Taito 1989
+Hardware info by Guru
+
+PCB Layout
+----------
+
+B SYSTEM
+K1100424A
+J1100181A
+K1100426A MAST OF WEAPON (sticker)
+|------------------------------------------------------------------|
+|VOL 4556  Y3014    YM2203       PC060HA       CXK58257  CXK58257  |
+|  MB3735           Z80                B72-10.IC32                 |
+|                   2018         B72_07.IC30                       |
+|                                              CXK58257  CXK58257  |
+|      62064  |-----|            TMM2063                           |
+|             |TC0260                                              |
+|J            |DAR  |            27.164MHz     CXK58257  CXK58257  |
+|A            |-----|                                              |
+|M                              |--------|                         |
+|M                              |TAITO   |     CXK58257  CXK58257  |
+|A                              |TC0180  |                         |
+|    48CR-1                     |VCU     |                         |
+|    48CR-1                     |--------|              B72-02.IC6 |
+|    48CR-1                                                        |
+|    48CR-1         TMM2063      TMM2063                B72-01.IC5 |
+|            MB3771                                                |
+| 48CR-1            B72_04.IC34  B72_03.IC25 B72-09.IC23 B72-08.IC3|
+|       TC0040IOC                                            24MHz |
+|   SW2   SW1       B72_06.IC33  B72_12.IC24          68000        |
+|------------------------------------------------------------------|
+Notes:
+      68000 - Motorola MC68000P12 CPU. Clock input 12.000MHz [24/2]
+        Z80 - Zilog Z0840006PSC CPU. Clock input 6.000MHz [24/4]
+     YM2203 - Yamaha YM2203 FM Operator Type-N sound chip. Clock input 3.000MHz [24/8]
+      Y3014 - Yamaha YM3014B Serial Input Floating D/A Converter. Clock input 1.0000MHz [24/24] on pin 5
+    PC060HA - Taito PC060HA CIU custom IC (68K<>Z80 communication)
+  TC0260DAR - Taito TC0260DAR custom IC (palette and RGB output)
+  TC0180VCU - Taito TC0180VCU custom IC (tilemap)
+  TC0040IOC - Taito TC0040IOC custom IC (controls, coin lockout, coin meter, DIP switch management and master reset/watchdog)
+   CXK58257 - Sony CXK58257 32kBx8-bit SRAM (video RAM)
+       2018 - Motorola MCM2018 2kBx8-bit SRAM (palette RAM)
+    TMM2063 - Toshiba TMM2063 8kBx8-bit SRAM (program RAM for 68000 & Z80)
+      62064 - Toshiba TD62064 4-Channel Darlington Sink Driver
+     MB3771 - Fujitsu MB3771 Master Reset IC
+      SW1/2 - 8-position DIP switch
+     48CR-1 - Custom resistor array
+       4556 - NEC uPC4556 Dual Operational Amplifier
+    MBB3735 - Fujitsu MB3735 Audio Power Amplifier
+B72_04.IC34 \
+B72_03.IC25  \ M5M27C101 128kBx8-bit EPROM (main program)
+B72_06.IC33  /
+B72_12.IC24 /
+B72_07.IC30 - 27C512 64kBx8-bit EPROM (sound program)
+ B72-02.IC6 \ 234000 512kBx8-bit mask ROM (equivalent to AM27C400, graphics)
+ B72-01.IC5 /
+B72-09.IC23 - MMI PAL16L8 (PCB marked 'INT')
+ B72-08.IC3 - MMI PAL16L8 (PCB marked 'DEC')
+B72-10.IC32 - MMI PAL16L8
+      HSync - 15.1782kHz \
+      VSync - 60.00000Hz / <-- actual measurements on PCB
+
+***************************************************************************
+
 Real Puncher
 Taito, 1994
 
@@ -3319,6 +3385,11 @@ ROM_START( masterw )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
 ROM_START( masterwu )
@@ -3334,6 +3405,11 @@ ROM_START( masterwu )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
 ROM_START( masterwj )
@@ -3349,6 +3425,11 @@ ROM_START( masterwj )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
 ROM_START( yukiwo ) /* Prototype of Master of Weapon */

@@ -81,6 +81,9 @@
 #include "formats/vdk_dsk.h"
 #include "formats/sdf_dsk.h"
 #include "formats/os9_dsk.h"
+#include "formats/fs_coco_rsdos.h"
+#include "formats/fs_coco_os9.h"
+
 
 //#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_WDFDC   (1U << 1) // Shows register setup
@@ -173,6 +176,8 @@ void coco_family_fdc_device_base::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_VDK_FORMAT);
 	fr.add(FLOPPY_SDF_FORMAT);
 	fr.add(FLOPPY_OS9_FORMAT);
+	fr.add(fs::COCO_RSDOS);
+	fr.add(fs::COCO_OS9);
 }
 
 static void coco_fdc_floppies(device_slot_interface &device)

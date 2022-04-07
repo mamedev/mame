@@ -35,15 +35,15 @@ public:
 
 	// public accessors... for now
 	void nvram_reset() { nvram_default(); }
-	void nvram_load(emu_file &file) { nvram_read(file); }
-	void nvram_save(emu_file &file) { nvram_write(file); }
+	bool nvram_load(util::read_stream &file) { return nvram_read(file); }
+	bool nvram_save(util::write_stream &file) { return nvram_write(file); }
 	bool nvram_can_save() { return nvram_can_write(); }
 
 protected:
 	// derived class overrides
 	virtual void nvram_default() = 0;
-	virtual void nvram_read(emu_file &file) = 0;
-	virtual void nvram_write(emu_file &file) = 0;
+	virtual bool nvram_read(util::read_stream &file) = 0;
+	virtual bool nvram_write(util::write_stream &file) = 0;
 	virtual bool nvram_can_write() { return true; }
 };
 

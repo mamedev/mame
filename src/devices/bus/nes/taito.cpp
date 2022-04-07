@@ -73,11 +73,6 @@ nes_x1_017_device::nes_x1_017_device(const machine_config &mconfig, const char *
 
 
 
-void nes_tc0190fmc_device::device_start()
-{
-	common_start();
-}
-
 void nes_tc0190fmc_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -298,19 +293,19 @@ void nes_x1_005_device::write_m(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0x1ef0:
-			chr2_0((data & 0x7f) >> 1, CHRROM);
+			chr2_0(BIT(data, 1, 6), CHRROM);
 			if (m_x1_005_alt_mirroring)
 			{
-				set_nt_page(0, CIRAM, (data & 0x80) ? 1 : 0, 1);
-				set_nt_page(1, CIRAM, (data & 0x80) ? 1 : 0, 1);
+				set_nt_page(0, CIRAM, BIT(data, 7), 1);
+				set_nt_page(1, CIRAM, BIT(data, 7), 1);
 			}
 			break;
 		case 0x1ef1:
-			chr2_2((data & 0x7f) >> 1, CHRROM);
+			chr2_2(BIT(data, 1, 6), CHRROM);
 			if (m_x1_005_alt_mirroring)
 			{
-				set_nt_page(2, CIRAM, (data & 0x80) ? 1 : 0, 1);
-				set_nt_page(3, CIRAM, (data & 0x80) ? 1 : 0, 1);
+				set_nt_page(2, CIRAM, BIT(data, 7), 1);
+				set_nt_page(3, CIRAM, BIT(data, 7), 1);
 			}
 			break;
 		case 0x1ef2:
@@ -362,7 +357,7 @@ uint8_t nes_x1_005_device::read_m(offs_t offset)
 	if (offset >= 0x1f00 && m_latch == 0xa3)
 		return m_x1_005_ram[offset & 0x7f];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 /*-------------------------------------------------
@@ -465,5 +460,5 @@ uint8_t nes_x1_017_device::read_m(offs_t offset)
 	if (offset < 0x1400 && m_reg[2] == 0x84)
 		return m_x1_017_ram[0x1000 + (offset & 0x3ff)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }

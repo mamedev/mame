@@ -3365,7 +3365,7 @@ ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13346, ROM board ID# 834-13347 */
+ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13496, ROM board ID# 834-13497 VS2 VER98 STEP2 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20917.17",  0x400006, 0x100000, CRC(c3bbb270) SHA1(16b2342031ff72408f2290e775df5c8aa344c2e4) )
@@ -5519,7 +5519,7 @@ ROM_START( fvipers2o )   /* Step 2.0 */
 	ROM_PARAMETER( ":315_5881:key", "29260e96" )
 ROM_END
 
-ROM_START( spikeout )   /* Step 2.1, Sega game ID# is 833-13592, ROM board ID# 834-13593 SPK */
+ROM_START( spikeout )   /* Step 2.1, Sega game ID# is 833-13592, ROM board ID# 834-13593 SPK, Security board ID# 837-13584-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21214c.17", 0x000006, 0x200000, CRC(8dc0a85c) SHA1(c75088fd0594964a4ed78b80a2585d3d89c85464) )

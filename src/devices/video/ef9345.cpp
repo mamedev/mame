@@ -505,7 +505,11 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 	//initialize the color table
 	for(j = 1, n = 0, i = 0; i < 8; i++)
 	{
-		col[n++] = (a & j) ? i : 7;
+		col[i] = 7;
+
+		if (a & j)
+			col[n++] = i;
+
 		j <<= 1;
 	}
 

@@ -19,9 +19,9 @@ class st_format : public floppy_image_format_t
 public:
 	st_format();
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -29,7 +29,7 @@ public:
 	virtual bool supports_save() const override;
 
 private:
-	void find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count);
+	static void find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count);
 };
 
 class msa_format : public floppy_image_format_t
@@ -37,9 +37,9 @@ class msa_format : public floppy_image_format_t
 public:
 	msa_format();
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -47,12 +47,12 @@ public:
 	virtual bool supports_save() const override;
 
 private:
-	bool uncompress(uint8_t *buffer, int csize, int usize);
-	bool compress(const uint8_t *src, int usize, uint8_t *dest, int &csize);
-	void read_header(util::random_read &io, uint16_t &sign, uint16_t &sect, uint16_t &head, uint16_t &strack, uint16_t &etrack);
+	static bool uncompress(uint8_t *buffer, int csize, int usize);
+	static bool compress(const uint8_t *src, int usize, uint8_t *dest, int &csize);
+	static void read_header(util::random_read &io, uint16_t &sign, uint16_t &sect, uint16_t &head, uint16_t &strack, uint16_t &etrack);
 };
 
-extern const floppy_format_type FLOPPY_ST_FORMAT;
-extern const floppy_format_type FLOPPY_MSA_FORMAT;
+extern const st_format FLOPPY_ST_FORMAT;
+extern const msa_format FLOPPY_MSA_FORMAT;
 
 #endif // MAME_FORMATS_ST_DSK_H

@@ -39,10 +39,10 @@ protected:
 	virtual void m52_scroll_w(uint8_t data);
 
 	/* board mod changes? */
-	int m_spritelimit;
-	bool m_do_bg_fills;
+	int m_spritelimit = 0;
+	bool m_do_bg_fills = false;
 
-	tilemap_t*             m_tx_tilemap;
+	tilemap_t*             m_tx_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -54,11 +54,11 @@ private:
 	optional_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	uint8_t                m_bg1xpos;
-	uint8_t                m_bg1ypos;
-	uint8_t                m_bg2xpos;
-	uint8_t                m_bg2ypos;
-	uint8_t                m_bgcontrol;
+	uint8_t                m_bg1xpos = 0U;
+	uint8_t                m_bg1ypos = 0U;
+	uint8_t                m_bg2xpos = 0U;
+	uint8_t                m_bg2ypos = 0U;
+	uint8_t                m_bgcontrol = 0U;
 
 	required_device<gfxdecode_device> m_sp_gfxdecode;
 	required_device<gfxdecode_device> m_tx_gfxdecode;

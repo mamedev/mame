@@ -944,6 +944,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="basketnp1" cloneof="basketn">
+		<description>Basket Ball Nightmare (early prototype)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5486" />
+			<dataarea name="rom" size="262144">
+				<rom name="nightmare_0.ic1" size="131072" crc="31715c15" sha1="f0437f9d2716f56b1424f6441854eaf0101ee1cc" offset="0x00000" /> <!-- original label: ナイトメア 0 -->
+				<rom name="nightmare_1.ic2" size="131072" crc="08835d51" sha1="396f9cd1416a152545d150107970746e362a9400" offset="0x20000" /> <!-- original label: ナイトメア 1 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmanrn">
 		<description>Batman Returns (Euro, Bra)</description>
 		<year>1993</year>
@@ -2980,6 +2994,20 @@ license:CC0
 		</part>
 	</software>
 
+<!-- no sound on smsj -->
+	<software name="goldaxed">
+		<description>Golden Axe CES Demo</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5486" />
+			<dataarea name="rom" size="131072">
+				<rom name="g-axe_2ca8_ces.ic1" size="131072" crc="a471f450" sha1="201ae127514a1debea786e7a1a3dae617937b539" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gaxewarr">
 		<description>Golden Axe Warrior (Euro, USA, Bra)</description>
 		<year>1990</year>
@@ -2998,6 +3026,20 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="game188" supported="no">
+		<description>Game Mo-eumjip 188 Hap (Korea)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="게임모음집188합" />
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="korean_188in1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="game mo-eumjip 188 hap (kr).bin" size="1048576" crc="380d7400" sha1="35a5f9a52cce6d702ba7e68daa7b5a07bce5ca87" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="gerald" cloneof="teddyboy">
@@ -5340,6 +5382,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="psychofp" cloneof="psychof">
+		<description>Psycho Fox (prototype)</description>
+		<year>1989</year>
+		<publisher>Aimo</publisher>
+		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5486" />
+			<dataarea name="rom" size="262144">
+				<rom name="fox-0_5a04.ic1" size="131072" crc="601f6aec" sha1="92cd843a8278e33632207a667d2447f9d901de30" offset="0x00000" />
+				<rom name="fox-1_dd75.ic2" size="131072" crc="d875bff5" sha1="ea4124286e8e93975ee89db67b2441c43da365dc" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="puttputt">
 		<description>Putt &amp; Putter (Euro, Bra)</description>
 		<year>1992</year>
@@ -6925,6 +6981,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sfutebol2" cloneof="wcup90">
+		<description>Super Futebol II (Brazil)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super futebol ii [game box serie esportes] (br).bin" size="131072" crc="551e6f51" sha1="3cc678040b5da8a9b443dd0f459b2d395270255b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skickoff">
 		<description>Super Kick Off (Euro, Bra)</description>
 		<year>1991</year>
@@ -7716,6 +7783,17 @@ license:CC0
 			<feature name="ic1" value="MPR-14686" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-14686.ic1" size="262144" crc="912d92af" sha1="07bc7896efc9eae77a9be68c190071c99eb17a8a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wimbledb" cloneof="wimbled">
+		<description>Wimbledon (Brazil)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="wimbledon [v0] [game box serie esportes] (br).bin" size="262144" crc="b14b6195" sha1="c1b9e6983f7bef612d238183e3a2a9fc1481a967" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

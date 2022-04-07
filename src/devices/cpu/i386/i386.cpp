@@ -25,7 +25,6 @@
 #include "cycles.h"
 #include "i386ops.h"
 
-#include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
@@ -2445,6 +2444,7 @@ void i386_device::zero_state()
 	m_opcode_bytes_length = 0;
 	memset(m_opcode_addrs, 0, sizeof(m_opcode_addrs));
 	m_opcode_addrs_index = 0;
+	m_dri_changed_active = false;
 }
 
 void i386_device::device_reset()

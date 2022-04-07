@@ -28,6 +28,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_RC759_FORMAT;
+extern const rc759_format FLOPPY_RC759_FORMAT;
 
 #endif // MAME_FORMATS_RC759_DSK_H

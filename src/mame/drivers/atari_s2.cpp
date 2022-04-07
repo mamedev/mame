@@ -68,7 +68,7 @@ private:
 	void atari_s2_map(address_map &map);
 	void atari_s3_map(address_map &map);
 
-	bool m_timer_sb = 0;
+	bool m_timer_sb = false;
 	u8 m_timer_s[5]{};
 	u8 m_sound0 = 0U;
 	u8 m_sound1 = 0U;
@@ -582,6 +582,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1979, supermap, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Superman (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, hercules, 0, atari_s2, hercules, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, roadrunr, 0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Road Runner",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, supermap, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Superman (Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hercules, 0, atari_s2, hercules, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, roadrunr, 0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Road Runner",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

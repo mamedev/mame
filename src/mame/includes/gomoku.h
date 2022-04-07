@@ -43,10 +43,10 @@ private:
 	required_region_ptr<uint8_t> m_bg_y;
 	required_region_ptr<uint8_t> m_bg_d;
 
-	bool m_flipscreen;
-	bool m_bg_dispsw;
-	tilemap_t *m_fg_tilemap;
-	bitmap_ind16 m_bg_bitmap;
+	bool m_flipscreen = false;
+	bool m_bg_dispsw = false;
+	tilemap_t *m_fg_tilemap = nullptr;
+	bitmap_ind16 m_bg_bitmap{};
 
 	uint8_t input_port_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
