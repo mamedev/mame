@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "tms32051.h"
 #include "dis32051.h"
-#include "debugger.h"
 
 enum
 {

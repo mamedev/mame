@@ -25,7 +25,6 @@
 #include "emu.h"
 #include "z8.h"
 #include "z8dasm.h"
-#include "debugger.h"
 
 #define LOG_TIMER       (1 << 1U)
 #define LOG_RECEIVE     (1 << 2U)

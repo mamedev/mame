@@ -20,7 +20,6 @@
 #include "emu.h"
 #include "sc61860.h"
 #include "scdasm.h"
-#include "debugger.h"
 
 
 #define I 0

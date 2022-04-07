@@ -24,7 +24,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mips3com.h"
 #include "mips3fe.h"
 #include "mips3dsm.h"

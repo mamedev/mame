@@ -17,7 +17,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "jaguar.h"
 #include "jagdasm.h"
 

@@ -5,8 +5,6 @@
 #include "unsp.h"
 #include "unspfe.h"
 
-#include "debugger.h"
-
 #include "unspdasm.h"
 
 void unsp_device::execute_jumps(const uint16_t op)

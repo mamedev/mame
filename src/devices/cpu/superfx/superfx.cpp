@@ -1,7 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:byuu
 #include "emu.h"
-#include "debugger.h"
 #include "superfx.h"
 
 

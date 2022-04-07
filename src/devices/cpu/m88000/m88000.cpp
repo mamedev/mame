@@ -16,7 +16,7 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
+#include "debug/debugcpu.h"
 #include "m88000.h"
 #include "m88000d.h"
 
