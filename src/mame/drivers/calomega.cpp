@@ -3198,6 +3198,87 @@ static INPUT_PORTS_START( comg159 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( comg170 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")        PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Audit")        PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin-In A")    PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Coin-In B")    PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x07, 0x07, "Max Bet" )                        PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x00, "01" )
+	PORT_DIPSETTING(    0x01, "02" )
+	PORT_DIPSETTING(    0x02, "03" )
+	PORT_DIPSETTING(    0x03, "04" )
+	PORT_DIPSETTING(    0x04, "05" )
+	PORT_DIPSETTING(    0x05, "10" )
+	PORT_DIPSETTING(    0x06, "20" )
+	PORT_DIPSETTING(    0x07, "50" )
+	PORT_DIPNAME( 0x08, 0x08, "Attract" )                        PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Lower Pair to Win" )              PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "Jacks" )
+	PORT_DIPSETTING(    0x20, "Queens" )
+	PORT_DIPSETTING(    0x30, "Kings" )
+	PORT_DIPSETTING(    0x10, "Aces" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin Lockout" )                   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "No Lockout" )
+	PORT_DIPSETTING(    0x40, "No Lockout" )
+	PORT_DIPSETTING(    0x80, "1-Coin Lockout" )
+	PORT_DIPSETTING(    0x00, "2-Coin Lockout" )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( comg172 )
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
@@ -5113,9 +5194,14 @@ ROM_END
 
   Discard poker game with attract.
   The game is only for amusement. It doesn't give back money.
+
   To clean the credits, enter the audit mode and press the service button.
   In audit mode, pressing the BET button a column of extra red values appear.
   To exit the audit mode, just press DEAL.
+
+  Test Mode: Press F2.
+  To exit pres DISCARD buttons 1, 2 & 3 simultaneously.
+
 */
 ROM_START( comg170 )  // Cal Omega v17.0 (Amusement Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6063,7 +6149,7 @@ GAME(  1983, comg157,  0,        sys903,   comg157,  calomega_state, empty_init,
 GAME(  1983, comg159,  0,        sys905,   comg159,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_SUPPORTS_SAVE )
 GAMEL( 1983, comg164,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,  layout_kenokb )    // incomplete dump
 GAMEL( 1983, comg168,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_SUPPORTS_SAVE,                        layout_kenokb )
-GAME(  1983, comg170,  0,        sys905,   comg172,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.0 (Amusement Poker)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1983, comg170,  0,        sys905,   comg170,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.0 (Amusement Poker)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1983, comg172,  0,        sys905,   comg172,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
 GAME(  1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
 GAME(  1982, comg176,  0,        sys903,   nudgensw, calomega_state, init_comg176, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
