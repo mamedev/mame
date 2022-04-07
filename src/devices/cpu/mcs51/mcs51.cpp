@@ -134,8 +134,6 @@
 #include "mcs51.h"
 #include "mcs51dasm.h"
 
-#include "debugger.h"
-
 #define VERBOSE 0
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)

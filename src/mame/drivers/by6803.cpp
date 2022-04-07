@@ -134,8 +134,8 @@ private:
 	u8 m_pia0_b = 0U;
 	u8 m_pia1_a = 0U;
 	u8 m_pia1_b = 0U;
-	bool m_pia0_cb2 = 0;
-	bool m_pia0_timer = 0;
+	bool m_pia0_cb2 = false;
+	bool m_pia0_timer = false;
 	u8 m_port1 = 0U, m_port2 = 0U;
 	u8 m_digit = 0U;
 	u8 m_segment[5]{};
@@ -876,34 +876,34 @@ ROM_END
 
 
 // 1st gen
-GAME( 1985, eballchp,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, beatclck,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, beatclck2, beatclck, gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, ladyluck,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, eballchp,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, beatclck,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, beatclck2, beatclck, gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ladyluck,  0,        gen1,   by6803, by6803_state, empty_init, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // 2nd gen
-GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (rev. D)",                    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, motrdomeb, motrdome, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (rev. B)",                    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (German rev. B)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (Rev C)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, strngscia, strngsci, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (Rev A)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, strngscig, strngsci, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (German, Rev A)",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Special Force",                         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "City Slicker",                          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (rev. D)",                     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, hardbodyc, hardbody, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (rev. C)",                     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (German rev. B)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, hvymetapg, hvymetap, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Heavy Metal Meltdown (German)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, black100,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Blackwater 100",                        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, black100s, black100, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Blackwater 100 (Single Ball Play)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, trucksp3,  0,        s11,    by6803, by6803_state, empty_init, ROT0, "Bally", "Truck Stop (P-3)",                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, trucksp2,  trucksp3, s11,    by6803, by6803_state, empty_init, ROT0, "Bally", "Truck Stop (P-2)",                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1989, atlantip,  0,        s11,    by6803, by6803_state, empty_init, ROT0, "Bally", "Atlantis (rev. 3)",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (rev. D)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, motrdomeb, motrdome, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (rev. B)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (German rev. B)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (Rev C)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, strngscia, strngsci, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (Rev A)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, strngscig, strngsci, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (German, Rev A)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Special Force",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "City Slicker",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (rev. D)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hardbodyc, hardbody, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (rev. C)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (German rev. B)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hvymetapg, hvymetap, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Heavy Metal Meltdown (German)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, black100,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Blackwater 100",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, black100s, black100, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Blackwater 100 (Single Ball Play)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, trucksp3,  0,        s11,    by6803, by6803_state, empty_init, ROT0, "Bally", "Truck Stop (P-3)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, trucksp2,  trucksp3, s11,    by6803, by6803_state, empty_init, ROT0, "Bally", "Truck Stop (P-2)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atlantip,  0,        s11,    by6803, by6803_state, empty_init, ROT0, "Bally", "Atlantis (rev. 3)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "bus/vme/vme_mvme120.h"
+#include "bus/vme/vme_smvme2000.h"
 #include "logmacro.h"
 
 namespace
@@ -29,25 +30,26 @@ namespace
 	static INPUT_PORTS_START(sys1121)
 	INPUT_PORTS_END
 
-	static void mvme120_vme_cards(device_slot_interface &device)
+	static void sys1121_vme_cards(device_slot_interface &device)
 	{
 		device.option_add("mvme120", VME_MVME120);
 		device.option_add("mvme121", VME_MVME121);
 		device.option_add("mvme122", VME_MVME122);
 		device.option_add("mvme123", VME_MVME123);
+		device.option_add("smvme2000", VME_SMVME2000);
 	}
 
 	void sys1121_state::sys1121(machine_config &config)
 	{
 		VME(config, "vme", 0);
-		VME_SLOT(config, "slot1", mvme120_vme_cards, "mvme120", 1, "vme");
-		VME_SLOT(config, "slot2", mvme120_vme_cards, nullptr, 2, "vme");
-		VME_SLOT(config, "slot3", mvme120_vme_cards, nullptr, 3, "vme");
-		VME_SLOT(config, "slot4", mvme120_vme_cards, nullptr, 4, "vme");
-		VME_SLOT(config, "slot5", mvme120_vme_cards, nullptr, 5, "vme");
-		VME_SLOT(config, "slot6", mvme120_vme_cards, nullptr, 6, "vme");
-		VME_SLOT(config, "slot7", mvme120_vme_cards, nullptr, 7, "vme");
-		VME_SLOT(config, "slot8", mvme120_vme_cards, nullptr, 8, "vme");
+		VME_SLOT(config, "slot1", sys1121_vme_cards, "mvme120", 1, "vme");
+		VME_SLOT(config, "slot2", sys1121_vme_cards, nullptr, 2, "vme");
+		VME_SLOT(config, "slot3", sys1121_vme_cards, nullptr, 3, "vme");
+		VME_SLOT(config, "slot4", sys1121_vme_cards, nullptr, 4, "vme");
+		VME_SLOT(config, "slot5", sys1121_vme_cards, nullptr, 5, "vme");
+		VME_SLOT(config, "slot6", sys1121_vme_cards, nullptr, 6, "vme");
+		VME_SLOT(config, "slot7", sys1121_vme_cards, nullptr, 7, "vme");
+		VME_SLOT(config, "slot8", sys1121_vme_cards, nullptr, 8, "vme");
 	}
 
 	// This is a VME chassis so any ROMs are contained in the cards.

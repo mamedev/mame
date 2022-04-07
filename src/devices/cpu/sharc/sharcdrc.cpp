@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sharc.h"
 #include "sharcfe.h"
 #include "cpu/drcfe.h"

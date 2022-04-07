@@ -1753,6 +1753,13 @@ void galaxian_state::galaxian_map(address_map &map)
 	galaxian_map_discrete(map);
 }
 
+void galaxian_state::galartic_map(address_map &map)
+{
+	galaxian_map(map);
+
+	map(0x6002, 0x6002).unmapw(); // no coin lockout
+}
+
 void pisces_state::pisces_map(address_map &map)
 {
 	galaxian_map(map);
@@ -3065,6 +3072,27 @@ static INPUT_PORTS_START( superg )
 	PORT_DIPSETTING(    0x04, "5" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( galartic ) // TODO: any other differences?
+	PORT_INCLUDE(galaxian)
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x80, "A 2C/1C  B 1C/3C" )
+	PORT_DIPSETTING(    0x00, "A 2C/1C  B 1C/5C" )
+	PORT_DIPSETTING(    0xc0, "A 1C/1C  B 1C/3C" )
+	PORT_DIPSETTING(    0x40, "A 1C/1C  B 1C/5C" )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, "7000" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x04, "5" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( swarm )
 	PORT_INCLUDE(galaxian)
@@ -5079,38 +5107,26 @@ static INPUT_PORTS_START( thepitm )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) // turning both of these on boots with 9 credits?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Game Speed" )
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x01, "Fast" )
+	PORT_DIPNAME( 0x02, 0x00, "Time Limit" )
+	PORT_DIPSETTING(    0x00, "Long" )
+	PORT_DIPSETTING(    0x02, "Short" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -7490,6 +7506,13 @@ void galaxian_state::galaxian(machine_config &config)
 	GALAXIAN_SOUND(config, "cust", 0);
 }
 
+void galaxian_state::galartic(machine_config &config)
+{
+	galaxian(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::galartic_map);
+}
+
 void pisces_state::pisces(machine_config &config)
 {
 	galaxian(config);
@@ -9770,6 +9793,22 @@ ROM_START( galap4 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+ROM_START( galartic )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "piii.1", 0x0000, 0x0800, CRC(78dd272d) SHA1(0a4f43a6f40ca65f73adcaac02469fb57f40041d) )
+	ROM_LOAD( "piii.2", 0x0800, 0x0800, CRC(465a9b45) SHA1(9eea6d30b856d959521cb935715006ba9deac53e) )
+	ROM_LOAD( "piii.3", 0x1000, 0x0800, CRC(03e36737) SHA1(3118d684d747dfd607617b0869fb25e4ac147eb1) )
+	ROM_LOAD( "piii.4", 0x1800, 0x0800, CRC(ce012b3f) SHA1(e6f976ae4a224d96376c287212ec50d03ccc6daa) )
+	ROM_LOAD( "piii.5", 0x2000, 0x0800, CRC(9ace06cf) SHA1(ab50baca0507fabcd78650fcf66a3b734ca95b84) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "piii.6", 0x0000, 0x0800, CRC(977e37cf) SHA1(88ff1e4edadf5cfc83413a1fe999aecf4ba72232) )
+	ROM_LOAD( "piii.7", 0x0800, 0x0800, CRC(d0ba22c9) SHA1(678b22d10e1ae7dcea068da838bf6bd648e9ee28) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( swarm )
@@ -15656,6 +15695,7 @@ GAME( 1980, galaxrfgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_
 GAME( 1980, galaxrcgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Covadonga)",            "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Covadonga Spanish bootleg)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianrp,  galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg (Valadon Automation / Rene Pierre)", "Galaxian (Rene Pierre bootleg)",                                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxyx,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxy X (bootleg of Galaxian)",                                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galartic,    galaxian, galartic,   galartic,   galaxian_state, init_galaxian,   ROT270, "bootleg (Artic System)",                     "Galaxian (Artic System bootleg)",                                                              MACHINE_SUPPORTS_SAVE )
 
 // These have the extra 'linescroll effect' title screens, like Moon Alien 2 but made out of a random tile, they lack an energy bar.
 GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien",                          MACHINE_SUPPORTS_SAVE ) // or bootleg?

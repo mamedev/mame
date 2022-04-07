@@ -76,15 +76,15 @@ protected:
 private:
 	struct crtc_t
 	{
-		uint8_t cmd,param_count,cursor_on,status,irq_mask;
-		uint8_t param[8][5];
-		uint8_t inverse;
+		uint8_t cmd = 0, param_count = 0, cursor_on = 0, status = 0, irq_mask = 0;
+		uint8_t param[8][5]{};
+		uint8_t inverse = 0;
 	};
 
 	struct mouse_t
 	{
-		uint8_t phase;
-		uint8_t x,y;
+		uint8_t phase = 0;
+		uint8_t x = 0, y = 0;
 		attotime time;
 	};
 
@@ -92,61 +92,61 @@ private:
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
 	std::unique_ptr<uint8_t[]> m_gvram;
-	uint8_t *m_n80rom;
-	uint8_t *m_n88rom;
-	uint8_t *m_kanji_rom;
-	uint8_t *m_cg_rom;
+	uint8_t *m_n80rom = nullptr;
+	uint8_t *m_n88rom = nullptr;
+	uint8_t *m_kanji_rom = nullptr;
+	uint8_t *m_cg_rom = nullptr;
 
-	uint8_t m_i8255_0_pc;
-	uint8_t m_i8255_1_pc;
-	uint8_t m_fdc_irq_opcode;
-	uint8_t m_ext_rom_bank;
-	uint8_t m_gfx_ctrl;
-	uint8_t m_vram_sel;
-	uint8_t m_misc_ctrl;
-	uint8_t m_device_ctrl_data;
-	uint8_t m_window_offset_bank;
-	uint8_t m_layer_mask;
-	uint16_t m_dma_counter[4];
-	uint16_t m_dma_address[4];
-	uint8_t m_alu_reg[3];
-	uint8_t m_dmac_mode;
-	uint8_t m_alu_ctrl1;
-	uint8_t m_alu_ctrl2;
-	uint8_t m_extram_mode;
-	uint8_t m_extram_bank;
-	uint8_t m_txt_width;
-	uint8_t m_txt_color;
+	uint8_t m_i8255_0_pc = 0;
+	uint8_t m_i8255_1_pc = 0;
+	uint8_t m_fdc_irq_opcode = 0;
+	uint8_t m_ext_rom_bank = 0;
+	uint8_t m_gfx_ctrl = 0;
+	uint8_t m_vram_sel = 0;
+	uint8_t m_misc_ctrl = 0;
+	uint8_t m_device_ctrl_data = 0;
+	uint8_t m_window_offset_bank = 0;
+	uint8_t m_layer_mask = 0;
+	uint16_t m_dma_counter[4]{};
+	uint16_t m_dma_address[4]{};
+	uint8_t m_alu_reg[3]{};
+	uint8_t m_dmac_mode = 0;
+	uint8_t m_alu_ctrl1 = 0;
+	uint8_t m_alu_ctrl2 = 0;
+	uint8_t m_extram_mode = 0;
+	uint8_t m_extram_bank = 0;
+	uint8_t m_txt_width = 0;
+	uint8_t m_txt_color = 0;
 #if USE_PROPER_I8214
-	uint8_t m_timer_irq_mask;
-	uint8_t m_vblank_irq_mask;
-	uint8_t m_sound_irq_mask;
-	uint8_t m_int_state;
+	uint8_t m_timer_irq_mask = 0;
+	uint8_t m_vblank_irq_mask = 0;
+	uint8_t m_sound_irq_mask = 0;
+	uint8_t m_int_state = 0;
 #else
-	uint8_t m_i8214_irq_level;
-	uint8_t m_vrtc_irq_mask;
-	uint8_t m_vrtc_irq_latch;
-	uint8_t m_timer_irq_mask;
-	uint8_t m_timer_irq_latch;
-	uint8_t m_sound_irq_mask;
-	uint8_t m_sound_irq_latch;
-	uint8_t m_sound_irq_pending;
+	uint8_t m_i8214_irq_level = 0;
+	uint8_t m_vrtc_irq_mask = 0;
+	uint8_t m_vrtc_irq_latch = 0;
+	uint8_t m_timer_irq_mask = 0;
+	uint8_t m_timer_irq_latch = 0;
+	uint8_t m_sound_irq_mask = 0;
+	uint8_t m_sound_irq_latch = 0;
+	uint8_t m_sound_irq_pending = 0;
 #endif
-	uint8_t m_has_clock_speed;
-	uint8_t m_clock_setting;
-	uint8_t m_baudrate_val;
-	uint8_t m_has_dictionary;
-	uint8_t m_dic_ctrl;
-	uint8_t m_dic_bank;
-	uint8_t m_has_cdrom;
-	uint8_t m_cdrom_reg[0x10];
+	uint8_t m_has_clock_speed = 0;
+	uint8_t m_clock_setting = 0;
+	uint8_t m_baudrate_val = 0;
+	uint8_t m_has_dictionary = 0;
+	uint8_t m_dic_ctrl = 0;
+	uint8_t m_dic_bank = 0;
+	uint8_t m_has_cdrom = 0;
+	uint8_t m_cdrom_reg[0x10]{};
 	crtc_t m_crtc;
 	mouse_t m_mouse;
-	struct { uint8_t r, g, b; } m_palram[8];
-	uint8_t m_dmac_ff;
-	uint32_t m_knj_addr[2];
-	uint32_t m_extram_size;
-	uint8_t m_has_opna;
+	struct { uint8_t r = 0, g = 0, b = 0; } m_palram[8];
+	uint8_t m_dmac_ff = 0;
+	uint32_t m_knj_addr[2]{};
+	uint32_t m_extram_size = 0;
+	uint8_t m_has_opna = 0;
 
 	uint8_t pc8801_alu_r(offs_t offset);
 	void pc8801_alu_w(offs_t offset, uint8_t data);

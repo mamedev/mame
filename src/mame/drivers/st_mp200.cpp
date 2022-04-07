@@ -129,10 +129,10 @@ private:
 	u8 m_u10b = 0U;
 	u8 m_u11a = 0U;
 	u8 m_u11b = 0U;
-	bool m_u10_ca2 = 0;
-	bool m_u10_cb2 = 0;
-	bool m_u11_cb2 = 0;
-	bool m_7d = 0; // 7-digit display yes/no
+	bool m_u10_ca2 = false;
+	bool m_u10_cb2 = false;
+	bool m_u11_cb2 = false;
+	bool m_7d = false; // 7-digit display yes/no
 	u8 m_stored_lamp = 0xffU;
 	u8 m_digit = 0U;
 	u8 m_counter = 0U;
@@ -1143,34 +1143,34 @@ ROM_END
 
 
 // 6-digit
-GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (First release)",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Galaxy",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Ali",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (First release)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Galaxy",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Ali",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // 7-digit
-GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cheetah (Black Cabinet)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Cheetah (Blue Cabinet)",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Quicksilver",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Big Game",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Seawitch",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Stargazer",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Dragonfist",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  cue,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cue (Prototype)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cheetah (Black Cabinet)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Cheetah (Blue Cabinet)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Quicksilver",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Big Game",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Seawitch",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Stargazer",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Dragonfist",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  cue,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cue (Prototype)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // multiball
-GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Nine Ball",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Lightning",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Flight 2000",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  freefall,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Freefall",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Split Second (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Catacomb (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  viperp,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Viper (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  ironmaid,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Iron Maiden",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Orbitor 1",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Lazer Lord",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Nine Ball",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Lightning",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Flight 2000",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  freefall,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Freefall",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Split Second (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Catacomb (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  viperp,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Viper (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  ironmaid,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Iron Maiden",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Orbitor 1",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Lazer Lord",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // other manufacturer
-GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_sam,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM III Test Fixture",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_sam4,    st_sam,     st_sam4,    mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM IV Test Fixture",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(198?,  st_sam,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM III Test Fixture",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(198?,  st_sam4,    st_sam,     st_sam4,    mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM IV Test Fixture",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -56,30 +56,6 @@ nes_maxi15_device::nes_maxi15_device(const machine_config &mconfig, const char *
 
 
 
-void nes_nina001_device::device_start()
-{
-	common_start();
-}
-
-void nes_nina001_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_nina006_device::device_start()
-{
-	common_start();
-}
-
-void nes_nina006_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
 void nes_maxi15_device::device_start()
 {
 	common_start();

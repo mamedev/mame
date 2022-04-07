@@ -106,7 +106,6 @@ protected:
 	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_disk ? 0 : m_disk->write(lba, buffer); }
 	virtual uint8_t calculate_status() override;
 
-	chd_file       *m_handle;
 	hard_disk_file *m_disk;
 
 	enum

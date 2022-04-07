@@ -12,8 +12,6 @@
 #include "scmp.h"
 #include "scmpdasm.h"
 
-#include "debugger.h"
-
 //#define VERBOSE 1
 #include "logmacro.h"
 

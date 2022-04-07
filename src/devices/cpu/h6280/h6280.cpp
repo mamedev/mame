@@ -113,7 +113,6 @@
 #include "emu.h"
 #include "h6280.h"
 #include "6280dasm.h"
-#include "debugger.h"
 
 /* 6280 flags */
 enum

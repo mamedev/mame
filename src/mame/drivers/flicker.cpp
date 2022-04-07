@@ -434,4 +434,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR   GAME      PARENT  MACHINE   INPUT    CLASS           INIT        ORIENTATION  COMPANY                            DESCRIPTION            FLAGS
-GAME( 1974,  flicker,  0,      flicker,  flicker, flicker_state,  empty_init, ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1974,  flicker,  0,      flicker,  flicker, flicker_state,  empty_init, ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

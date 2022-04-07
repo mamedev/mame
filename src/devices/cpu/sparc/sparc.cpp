@@ -24,8 +24,6 @@
 #include "sparc.h"
 #include "sparcdefs.h"
 
-#include "debugger.h"
-
 #include "softfloat3/source/include/softfloat.h"
 
 #define LOG_BIU_CTRL            (1U << 1)

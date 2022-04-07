@@ -1273,7 +1273,7 @@ std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_
 		// if we didn't find it, just return
 		metadata_entry metaentry;
 		if (!metadata_find(searchtag, searchindex, metaentry))
-			throw std::error_condition(error::METADATA_NOT_FOUND);
+			return std::error_condition(error::METADATA_NOT_FOUND);
 
 		// read the metadata
 		output.assign(metaentry.length, '\0');

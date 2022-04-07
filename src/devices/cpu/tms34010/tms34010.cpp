@@ -16,7 +16,6 @@
 #include "tms34010.h"
 #include "34010dsm.h"
 
-#include "debugger.h"
 #include "screen.h"
 
 #define LOG_GENERAL      (1U << 0)

@@ -43,7 +43,6 @@ public:
 
 	// specific implementation
 	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
-	chd_file *get_chd_file();
 
 protected:
 	// device-level overrides

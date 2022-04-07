@@ -341,19 +341,3 @@ image_init_result harddisk_image_device::internal_load_hd()
 
 	return image_init_result::FAIL;
 }
-
-/*************************************
- *
- *  Get the CHD file (from the src/chd.c core)
- *  after an image has been opened with the hd core
- *
- *************************************/
-
-chd_file *harddisk_image_device::get_chd_file()
-{
-	chd_file *result = nullptr;
-	hard_disk_file *hd_file = get_hard_disk_file();
-	if (hd_file)
-		result = hd_file->get_chd();
-	return result;
-}

@@ -16,7 +16,6 @@ TODO:
 **********************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "cosmac.h"
 
 // permit our enums to be saved

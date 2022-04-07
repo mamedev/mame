@@ -20,13 +20,11 @@ void ata_flash_pccard_device::device_reset()
 {
 	ide_hdd_device::device_reset();
 
-	uint32_t metalength;
-	memset(m_cis, 0xff, 512);
-
-	if (m_handle != nullptr)
+	if (m_disk)
 	{
-		m_handle->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, m_cis, 512, metalength);
+		m_disk->get_cis_data(m_cis);
 	}
+	m_cis.resize(512, 0xff);
 
 	m_configuration_option = 0;
 	m_configuration_and_status = 0;
@@ -137,13 +135,11 @@ void taito_pccard1_device::device_reset()
 {
 	ata_flash_pccard_device::device_reset();
 
-	uint32_t metalength;
-	memset(m_key, 0, sizeof(m_key));
-
-	if (m_handle && !m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength))
+	if (m_disk && !m_disk->get_disk_key_data(m_key) && m_key.size() == 5)
 	{
 		m_locked = 0x1ff;
 	}
+	m_key.resize(5, 0);
 }
 
 uint16_t taito_pccard1_device::read_reg(offs_t offset, uint16_t mem_mask)
@@ -228,13 +224,11 @@ void taito_pccard2_device::device_reset()
 {
 	ata_flash_pccard_device::device_reset();
 
-	uint32_t metalength;
-	memset(m_key, 0, sizeof(m_key));
-
-	if (m_handle && !m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength))
+	if (m_disk && !m_disk->get_disk_key_data(m_key) && m_key.size() == 5)
 	{
 		m_locked = true;
 	}
+	m_key.resize(5, 0);
 }
 
 void taito_pccard2_device::process_command()
@@ -327,13 +321,11 @@ void taito_compact_flash_device::device_reset()
 {
 	ata_flash_pccard_device::device_reset();
 
-	uint32_t metalength;
-	memset(m_key, 0, sizeof(m_key));
-
-	if (m_handle && !m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength))
+	if (m_disk && !m_disk->get_disk_key_data(m_key) && m_key.size() == 5)
 	{
 		m_locked = true;
 	}
+	m_key.resize(5, 0);
 }
 
 void taito_compact_flash_device::process_command()

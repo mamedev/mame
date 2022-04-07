@@ -110,9 +110,9 @@ private:
 	void clockcnt_w(u16 data);
 	u8 m_strobe = 0;
 	u8 m_row = 0;
-	bool m_data_ok = 0;
+	bool m_data_ok = false;
 	u8 m_lamp_data = 0;
-	bool m_irq_in_progress = 0;
+	bool m_irq_in_progress = false;
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
@@ -778,19 +778,19 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1978, topaz_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams", "Topaz (Shuffle) (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, pomp_l1,  0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Pompeii (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1978, arist_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Aristocrat (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, taurs_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams", "Taurus (Shuffle) (L-1)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, kingt_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "King Tut (Shuffle) (L-1)",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, omni_l1,  0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Omni (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, bstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Big Strike (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, tstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Triple Strike (Shuffle) (L-1)",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, szone_l5, 0,        s9,  s9, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-5)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, szone_l2, szone_l5, s9,  s9, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-2)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, alcat_l7, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, tts_l2,   0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, tts_l1,   tts_l2,   s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, gmine_l2, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, tdawg_l1, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, shfin_l1, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1978, topaz_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams", "Topaz (Shuffle) (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, pomp_l1,  0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Pompeii (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, arist_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Aristocrat (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, taurs_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams", "Taurus (Shuffle) (L-1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, kingt_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "King Tut (Shuffle) (L-1)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, omni_l1,  0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Omni (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Big Strike (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Triple Strike (Shuffle) (L-1)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, szone_l5, 0,        s9,  s9, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-5)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, szone_l2, szone_l5, s9,  s9, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-2)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alcat_l7, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tts_l2,   0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tts_l1,   tts_l2,   s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gmine_l2, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tdawg_l1, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, shfin_l1, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

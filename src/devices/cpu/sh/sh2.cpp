@@ -96,7 +96,6 @@
 #include "sh2.h"
 #include "sh2comn.h"
 #include "sh_dasm.h"
-#include "debugger.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -861,7 +860,6 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 #include "sh2.h"
 #include "sh2comn.h"
 #include "cpu/drcumlsh.h"
-#include "debugger.h"
 
 
 const opcode_desc* sh2_device::get_desclist(offs_t pc)

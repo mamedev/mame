@@ -157,88 +157,11 @@ nes_sachen_8259d_device::nes_sachen_8259d_device(const machine_config &mconfig, 
 
 
 
-void nes_sachen_sa009_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa009_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa0036_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa0036_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa0037_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa0037_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa72007_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa72007_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa72008_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa72008_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_tca01_device::device_start()
-{
-	common_start();
-}
-
 void nes_sachen_tca01_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(1);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_tcu01_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_tcu01_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
 	chr8(0, m_chr_source);
 }
 

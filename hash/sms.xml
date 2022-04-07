@@ -3033,6 +3033,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="게임모음집188합" />
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="korean_188in1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game mo-eumjip 188 hap (kr).bin" size="1048576" crc="380d7400" sha1="35a5f9a52cce6d702ba7e68daa7b5a07bce5ca87" offset="000000" />
 			</dataarea>

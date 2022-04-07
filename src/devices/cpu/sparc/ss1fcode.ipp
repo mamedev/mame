@@ -23,7 +23,7 @@ void sparc_base_device::log_fcodes()
 		if (false)//opcode == 0x6304)
 		{
 			m_log_fcodes = true;
-			//machine().debugger().debug_break();
+			//machine().debug_break();
 		}
 		else if (!m_log_fcodes)
 		{

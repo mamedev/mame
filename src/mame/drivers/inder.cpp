@@ -118,7 +118,7 @@ private:
 	void lapbylap_main_map(address_map &map);
 	void lapbylap_audio_map(address_map &map);
 
-	bool m_pc0 = 0;
+	bool m_pc0 = false;
 	u8 m_game = 0U;
 	u8 m_portc = 0U;
 	u8 m_row = 0U;

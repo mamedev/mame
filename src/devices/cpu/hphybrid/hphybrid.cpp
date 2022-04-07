@@ -34,7 +34,6 @@
 #include "emu.h"
 #include "hphybrid.h"
 #include "hphybrid_dasm.h"
-#include "debugger.h"
 
 #include "hphybrid_defs.h"
 

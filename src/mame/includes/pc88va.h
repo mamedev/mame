@@ -70,18 +70,18 @@ public:
 protected:
 	struct tsp_t
 	{
-		uint16_t tvram_vreg_offset;
-		uint16_t attr_offset;
-		uint16_t spr_offset;
-		uint8_t disp_on;
-		uint8_t spr_on;
-		uint8_t pitch;
-		uint8_t line_height;
-		uint8_t h_line_pos;
-		uint8_t blink;
-		uint16_t cur_pos_x,cur_pos_y;
-		uint8_t curn;
-		uint8_t curn_blink;
+		uint16_t tvram_vreg_offset = 0;
+		uint16_t attr_offset = 0;
+		uint16_t spr_offset = 0;
+		uint8_t disp_on = 0;
+		uint8_t spr_on = 0;
+		uint8_t pitch = 0;
+		uint8_t line_height = 0;
+		uint8_t h_line_pos = 0;
+		uint8_t blink = 0;
+		uint16_t cur_pos_x = 0, cur_pos_y = 0;
+		uint8_t curn = 0;
+		uint8_t curn_blink = 0;
 	};
 
 	virtual void machine_start() override;
@@ -102,25 +102,25 @@ private:
 	required_shared_ptr<uint16_t> m_tvram;
 	required_shared_ptr<uint16_t> m_gvram;
 	std::unique_ptr<uint8_t[]> m_kanjiram;
-	uint16_t m_bank_reg;
-	uint16_t m_screen_ctrl_reg;
-	uint8_t m_timer3_io_reg;
-	emu_timer *m_t3_mouse_timer;
+	uint16_t m_bank_reg = 0;
+	uint16_t m_screen_ctrl_reg = 0;
+	uint8_t m_timer3_io_reg = 0;
+	emu_timer *m_t3_mouse_timer = nullptr;
 	tsp_t m_tsp;
-	uint16_t m_video_pri_reg[2];
-	uint8_t m_backupram_wp;
-	uint8_t m_cmd;
-	uint8_t m_buf_size;
-	uint8_t m_buf_index;
-	uint8_t m_buf_ram[16];
-	uint8_t m_portc_test;
-	uint8_t m_fdc_motor_status[2];
+	uint16_t m_video_pri_reg[2]{};
+	uint8_t m_backupram_wp = 0;
+	uint8_t m_cmd = 0;
+	uint8_t m_buf_size = 0;
+	uint8_t m_buf_index = 0;
+	uint8_t m_buf_ram[16]{};
+	uint8_t m_portc_test = 0;
+	uint8_t m_fdc_motor_status[2]{};
 
 	/* floppy state */
-	uint8_t m_i8255_0_pc;
-	uint8_t m_i8255_1_pc;
-	uint8_t m_fdc_mode;
-	uint8_t m_fdc_irq_opcode;
+	uint8_t m_i8255_0_pc = 0;
+	uint8_t m_i8255_1_pc = 0;
+	uint8_t m_fdc_mode = 0;
+	uint8_t m_fdc_irq_opcode = 0;
 	uint8_t idp_status_r();
 	void idp_command_w(uint8_t data);
 	void idp_param_w(uint8_t data);

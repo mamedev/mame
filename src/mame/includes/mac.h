@@ -258,7 +258,7 @@ private:
 	optional_shared_ptr<uint64_t> m_vram64;
 
 	// interrupts
-	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_asc_interrupt, m_last_taken_interrupt;
+	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
 
 	// defined in machine/mac.c
 	void v8_resize();

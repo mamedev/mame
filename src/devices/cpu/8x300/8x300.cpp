@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "8x300.h"
 #include "8x300dasm.h"
-#include "debugger.h"
 
 #define FETCHOP(a)         (m_cache.read_word(a))
 #define CYCLES(x)          do { m_icount -= (x); } while (0)

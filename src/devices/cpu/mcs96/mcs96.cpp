@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mcs96.h"
 
 mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width, address_map_constructor regs_map) :
