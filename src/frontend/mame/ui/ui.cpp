@@ -183,6 +183,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
 	, m_unthrottle_mute(false)
+	, m_image_display_enabled(true)
 	, m_machine_info()
 	, m_unemulated_features()
 	, m_imperfect_features()
@@ -1182,7 +1183,7 @@ void mame_ui_manager::start_load_state()
 void mame_ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
-	if (machine().phase() == machine_phase::RUNNING)
+	if (m_image_display_enabled && machine().phase() == machine_phase::RUNNING)
 	{
 		auto layout = create_layout(machine().render().ui_container());
 
