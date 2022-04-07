@@ -105,6 +105,7 @@ private:
 
 		virtual meta_data metadata() override;
 		virtual dir_t root() override;
+		virtual void format(const meta_data &meta) override;
 
 	private:
 		dir_t m_root;
