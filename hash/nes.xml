@@ -48342,6 +48342,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="lancelot" cloneof="valiant">
+		<description>Little Lancelot (USA)</description>
+		<year>2019</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="release" value="20190415"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<dataarea name="prg" size="131072">
+				<rom name="little lancelot.prg" size="131072" crc="330fa928" sha1="fa89334ded1e654964a68ac0b4598fa744997bd7" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="little lancelot.chr" size="131072" crc="052c1c13" sha1="fe05a23535dc7656ea66f87172b6b33ebc9dfbf7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mermaidjp" cloneof="mermaid">
 		<description>Little Mermaid - Ningyo Hime (Jpn, Prototype)</description>
 		<year>1991</year>
@@ -48814,6 +48830,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="metal force (k).prg" size="262144" crc="c57e1027" sha1="7e09097e89b629b2c13640fbde7875970ff238b2" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metalmaxp" cloneof="metalmax">
+		<description>Metal Max (Japan, prototype)</description>
+		<year>1991</year>
+		<publisher>Data East</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="HVC-TKROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="262144">
+				<rom name="metal_max_1-31_proto.prg" size="262144" crc="90d36195" sha1="21e10460cdb71d2c7ccf961977ef6992fb1efb5d" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="metal_max_1-31_proto.chr" size="262144" crc="f65d98ea" sha1="ec579347fbd4b33641fd7bcbd30cc1ab755f4cf6" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -49965,6 +50002,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="pyramids">
+		<description>Pyramids of Ra (USA)</description>
+		<year>2019</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="release" value="20190415"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<dataarea name="prg" size="262144">
+				<rom name="pyramids of ra.prg" size="262144" crc="1d5eebe0" sha1="b1828212206992ada93c3d93ee57776322508229" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pyramids of ra.chr" size="131072" crc="ba58c82b" sha1="cc9a3930119a1c582eef40e2955516731aca3008" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qbscrambp" cloneof="qbscramb">
 		<description>QuarterBack Scramble (USA, prototype)</description>
 		<year>19??</year>
@@ -50444,9 +50500,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="scarab">
-		<description>Scarabeus (USA, Prototype)</description>
-		<year>19??</year>
+	<software name="scarab" cloneof="pyramids">
+		<description>Scarabeus (USA, prototype)</description>
+		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
@@ -66361,6 +66417,23 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
+	<software name="toobink" cloneof="toobin">
+		<description>Toobin' (Korea)</description>
+		<year>1991?</year>
+		<publisher>Haitai</publisher>
+		<info name="alt_title" value="튜브탐험"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="namcot_3433" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="131072">
+				<rom name="toobin (k).prg" size="131072" crc="05d70600" sha1="4b6e17a1e86a46c766c3a85c990854a19b901ade" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="toobin (k).chr" size="65536" crc="f772fcfd" sha1="c3583fbaf4248baea80e98f3229ee20d6793c2ad" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="toystory" supported="partial">
 		<description>Toy Story</description>
 		<year>19??</year>
@@ -79958,6 +80031,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="abbaye">
+		<description>L'Abbaye des Morts</description>
+		<year>2021</year>
+		<publisher>Broken Studio</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="abbaye des morts.prg" size="131072" crc="054e51a3" sha1="a6188e5e9612d0ee167dfc1598da965cb3ee993b" /> <!-- this is from the .nes file distributed by the developer -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This release is nearly identical to the prototype 1 set but with rebranding -->
 	<software name="airballr" cloneof="airball">
 		<description>Airball (RetroZone)</description>
@@ -79972,6 +80061,23 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="assimil">
+		<description>Assimilate</description>
+		<year>2012</year>
+		<publisher>Nessylum Games</publisher>
+		<info name="release" value="20120317"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<!-- Uses a clone MMC1 chip? -->
+			<dataarea name="prg" size="131072">
+				<rom name="assimilate.prg" size="131072" crc="26e6e823" sha1="3dc8718869f69f229f5423338a9897792bf14d51" /> <!-- PRG/CHR are from the .nes file distributed by the author -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="assimilate.chr" size="131072" crc="8d1434bf" sha1="00bd9c9583a01fa2d90f9f29220ffb1bb166cf51" />
 			</dataarea>
 		</part>
 	</software>
@@ -82226,6 +82332,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="super cool boy 4-in-1 (cb-4035).chr" size="524288" crc="0c0500d0" sha1="6e470058ff439dfd0cd9213dae3ecce43db20284" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4f034">
+		<description>1993 Super HiK 4 in 1 (F-034)</description>
+		<year>1993</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Press reset to switch games."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="resetsxrom" />
+			<dataarea name="prg" size="524288">
+				<rom name="1993 super hik 4-in-1 (f-034).prg" size="524288" crc="f57f23d0" sha1="62e658f7b40e86589214c72fb4c144fa547a51fc" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1993 super hik 4-in-1 (f-034).chr" size="524288" crc="13f3da8c" sha1="1125c2edf918f8c49e8830508d29e5b00351f0ae" />
 			</dataarea>
 		</part>
 	</software>
