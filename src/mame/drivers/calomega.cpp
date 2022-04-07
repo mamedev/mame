@@ -161,7 +161,7 @@
    16.6 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
    16.7 | Poker                    |    ?    |         | PCG      | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
    16.8 | Keno                     |   903   | MAR/83  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   17.0 | Poker                    |   905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | No   |      | No
+   17.0 | Poker                    |   905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | Yes  |      | Yes
    17.1 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
    17.2 | Double/Double Poker      |   905   | MAY/83  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
    17.3 | Casino Poker             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
@@ -5108,6 +5108,35 @@ ROM_START( comg168 )  // Cal Omega v16.8 (Keno)
 	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
+/*
+  Cal Omega v17.0 (Amusement Poker)
+
+  Discard poker game with attract.
+  The game is only for amusement. It doesn't give back money.
+  To clean the credits, enter the audit mode and press the service button.
+  In audit mode, pressing the BET button a column of extra red values appear.
+  To exit the audit mode, just press DEAL.
+*/
+ROM_START( comg170 )  // Cal Omega v17.0 (Amusement Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
+	ROM_LOAD( "17-03.u7",   0x5000, 0x1000, CRC(56ca24db) SHA1(27793d48060b6d1ee080da27d19737a724395f35) )
+	ROM_LOAD( "17-04.u8",   0x6000, 0x1000, CRC(9fcc5761) SHA1(9b1fb265219517c89af8d3700b04d9487b1db45e) )
+	ROM_LOAD( "17-05.u9",   0x7000, 0x1000, CRC(cfdbd4b9) SHA1(7f7d5b0d86d009c2e1af54338d9ead24c97eb3e7) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "pkcg0.u67",  0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "pkcgc.u70",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )
+	ROM_LOAD( "pkcgb.u69",  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )
+	ROM_LOAD( "pkcga.u68",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+ROM_END
+
 ROM_START( comg172 )  // Cal Omega v17.2 (Double Double Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
@@ -6034,6 +6063,7 @@ GAME(  1983, comg157,  0,        sys903,   comg157,  calomega_state, empty_init,
 GAME(  1983, comg159,  0,        sys905,   comg159,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_SUPPORTS_SAVE )
 GAMEL( 1983, comg164,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,  layout_kenokb )    // incomplete dump
 GAMEL( 1983, comg168,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_SUPPORTS_SAVE,                        layout_kenokb )
+GAME(  1983, comg170,  0,        sys905,   comg172,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.0 (Amusement Poker)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1983, comg172,  0,        sys905,   comg172,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
 GAME(  1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
 GAME(  1982, comg176,  0,        sys903,   nudgensw, calomega_state, init_comg176, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
