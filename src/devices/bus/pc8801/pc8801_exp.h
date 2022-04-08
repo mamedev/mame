@@ -45,7 +45,7 @@ protected:
 private:
 	required_address_space m_iospace;
 
-	device_pc8801_exp_interface *m_exp;
+//	device_pc8801_exp_interface *m_exp;
 	
 	devcb_write_line m_int3_cb;
 	devcb_write_line m_int4_cb;
