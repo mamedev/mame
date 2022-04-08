@@ -1223,6 +1223,7 @@ spartanxtec.cpp
 spbactn.cpp
 spcforce.cpp
 spdheat.cpp
+spdamjes.cpp
 spdodgeb.cpp
 special_gambl.cpp
 spectra.cpp
