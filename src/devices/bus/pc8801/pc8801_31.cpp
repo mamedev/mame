@@ -65,6 +65,8 @@ void pc8801_31_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", pc8801_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", pc8801_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:7", pc8801_scsi_devices, nullptr);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("pc8801_cdrom");
 }
 
 
