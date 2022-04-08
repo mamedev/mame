@@ -4,7 +4,7 @@
 
   Skeleton driver for "Sport Damjes 1" darts machine
 
-  PCB labeled as "DARDO" ("Dart" on Spanish) on both sides
+  PCB labeled as "DARDO" ("Dart" in Spanish) on both sides
   _______________________________________________________________________________________________________________
  |   .................   ...                                            .....     ........    ........          |
  |  __________   ___________   ___________                             ___________   ___________   ___________  |
