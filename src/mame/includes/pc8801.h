@@ -25,6 +25,7 @@
 #include "sound/ymopn.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/pc8801/pc8801_31.h"
+#include "bus/pc8801/pc8801_exp.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -54,6 +55,7 @@ public:
 //      , m_cg_rom(*this, "cgrom")
 		, m_kanji_rom(*this, "kanji")
 		, m_kanji_lv2_rom(*this, "kanji_lv2")
+		, m_exp(*this, "exp")
 	{
 	}
 
@@ -96,6 +98,7 @@ protected:
 //  required_region_ptr<u8> m_cg_rom;
 	required_region_ptr<u8> m_kanji_rom;
 	required_region_ptr<u8> m_kanji_lv2_rom;
+	required_device<pc8801_exp_slot_device> m_exp;
 
 	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
 
@@ -177,16 +180,11 @@ private:
 	void extram_bank_w(uint8_t data);
 	void alu_ctrl1_w(uint8_t data);
 	void alu_ctrl2_w(uint8_t data);
-	void pcg8100_w(offs_t offset, uint8_t data);
 	template <unsigned kanji_level> uint8_t kanji_r(offs_t offset);
 	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
 	void rtc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_irq_w);
-//  uint8_t sound_board_r(offs_t offset);
-//  void sound_board_w(offs_t offset, uint8_t data);
-//  uint8_t opna_r(offs_t offset);
-//  void opna_w(offs_t offset, uint8_t data);
 
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
 

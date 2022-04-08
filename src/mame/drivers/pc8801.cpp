@@ -25,42 +25,9 @@
         Needs identification effort about what's internal to machine models and what instead
         can be optionally installed;
     - implement proper joypad / mouse (PC-8872) DB9 port connector;
-    - implement bus slot mechanism for NEC boards
-      (does it have an actual codename or just "PC-8801 EXPansion bus"?);
-      \- NEC PC-8801-10
-            (MIDI interface);
-      \- NEC PC-8801-11
-            ("Sound Board", single YM2203C OPN, single joy port, mono out);
-      \- NEC PC-8801-12
-            (Modem board, full duplex 300bps);
-      \- NEC PC-8801-13
-            (Parallel I/F board);
-      \- NEC PC-8801-17 / -18
-            (VTR capture card "Video art board" / "Video digitizing unit", 16-bit color);
-      \- NEC PC-8801-21
-            (CMT i/f board);
-      \- NEC PC-8801-22
-            ("Multi board B", upgrades a FH to MH and FA to MA (?));
-      \- NEC PC-8801-23 & -24 & -25
-            ("Sound Board 2", single YM2608 OPNA, single joy port, stereo out.
-            -24 is the internal FH / MH version, -25 is the internal FE / FE2 with YM2608B.
-            Standard and on main board instead for FA / MA and onward);
-      \- NEC PC-8801-30 & -31
-            (CD-ROM SCSI i/f, subset of PC Engine and PCFX) **in progress**
-      \- NEC PC-8864
-            (Network board mapping at $a0-$a3)
-      \- HAL PCG-8100
-            (PCG and 3x DAC_1BIT at I/O $01, $02. PIT at $0c-$0f)
-      \- HAL GSX-8800
-            (2x PSG at I/O $a0-$a3, mono out. Has goofy extra connector on top and a couple jumpers,
-             guess it may cascade with another board for 2x extra PSGs at $a4-$a7);
-      \- HIBIKI-8800
-            (YM2151 OPM + YM3802-X MIDI controller, stereo out, has own internal XTAL @ 4MHz.
-             Has an undumped PAL/PROM labeled "HAL-881");
-      \- HAL HMB-20
-            (same as HIBIKI-8800 board?)
-      \- JMB-X1
-            ("Sound Board X", 2x OPM + 1x SSG. Used by NRTDRV, more info at GH #8709);
+    - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
+	  guessing from the back panels seems that each model can install between 1 to 3 cards.
+	  Also note: most cards aren't compatible between each other;
 
     Notes:
     - Later models have washed out palette with some SWs, with no red component.
@@ -922,15 +889,6 @@ void pc8801_state::alu_ctrl2_w(uint8_t data)
 	m_alu_ctrl2 = data;
 }
 
-// TODO: Implement PCG-8100 as a bus option
-// It's an HAL Laboratory custom board with PCG (maps to chars $80-$ff),
-// dual AY-3-891x & PIT, I/O $b0-$b2 is the I/O ID for it?
-// Find a supported SW (only HAL seems to support it) & investigate
-void pc8801_state::pcg8100_w(offs_t offset, uint8_t data)
-{
-	logerror("%s: Possible write to PCG-8100 %02x %02x\n", machine().describe_context(), offset, data);
-}
-
 /*
  * $e8-$eb kanji LV1
  * $ec-$ef kanji LV2
@@ -972,58 +930,6 @@ void pc8801_state::rtc_w(uint8_t data)
 
 	// TODO: remaining bits
 }
-
-#if 0
-uint8_t pc8801_state::sound_board_r(offs_t offset)
-{
-	if(m_has_opna)
-		return m_opna->read(offset);
-
-	return (offset & 2) ? 0xff : m_opn->read(offset);
-}
-
-void pc8801_state::sound_board_w(offs_t offset, uint8_t data)
-{
-	if(m_has_opna)
-		m_opna->write(offset, data);
-	else if((offset & 2) == 0)
-		m_opn->write(offset, data);
-}
-
-uint8_t pc8801_state::opna_r(offs_t offset)
-{
-	if(m_has_opna && (offset & 2) == 0)
-		return m_opna->read((offset & 1) | ((offset & 4) >> 1));
-
-	return 0xff;
-}
-
-void pc8801_state::opna_w(offs_t offset, uint8_t data)
-{
-	if(m_has_opna && (offset & 2) == 0)
-		m_opna->write((offset & 1) | ((offset & 4) >> 1),data);
-	else if(m_has_opna && offset == 2)
-	{
-		// TODO: tied to second sound chip (noticeable in late doujinshi entries)
-		//m_sound_irq_mask = ((data & 0x80) == 0);
-
-		m_sound_irq_mask = ((data & 0x80) == 0);
-
-		if(m_sound_irq_mask == 0)
-			m_sound_irq_latch = 0;
-
-		if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-			m_maincpu->set_input_line(0,CLEAR_LINE);
-
-		if(m_sound_irq_mask && m_sound_irq_pending)
-		{
-			m_maincpu->set_input_line(0,HOLD_LINE);
-			m_sound_irq_latch = 1;
-			m_sound_irq_pending = 0;
-		}
-	}
-}
-#endif
 
 /*
  * PC8801FH overrides (CPU clock switch)
@@ -1102,7 +1008,6 @@ void pc8801_state::main_io(address_map &map)
 	map(0x0d, 0x0d).portr("KEY13");
 	map(0x0e, 0x0e).portr("KEY14");
 	map(0x0f, 0x0f).portr("KEY15");
-	map(0x00, 0x02).w(FUNC(pc8801_state::pcg8100_w));
 	map(0x10, 0x10).w(FUNC(pc8801_state::rtc_w));
 	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
@@ -1524,9 +1429,9 @@ static const gfx_layout kanji_layout =
 
 // debugging only
 static GFXDECODE_START( gfx_pc8801 )
-	GFXDECODE_ENTRY( "cgrom",     0, char_layout,  0, 8 )
-	GFXDECODE_ENTRY( "kanji",     0, kanji_layout, 0, 8 )
-	GFXDECODE_ENTRY( "kanji_lv2", 0, kanji_layout, 0, 8 )
+	GFXDECODE_ENTRY( "cgrom",     0, char_layout,  0, 1 )
+	GFXDECODE_ENTRY( "kanji",     0, kanji_layout, 0, 1 )
+	GFXDECODE_ENTRY( "kanji_lv2", 0, kanji_layout, 0, 1 )
 GFXDECODE_END
 
 void pc8801_state::machine_start()
@@ -1560,7 +1465,8 @@ void pc8801_state::machine_reset()
 	m_gfx_ctrl = 0x31;
 	m_window_offset_bank = 0x80;
 	m_misc_ctrl = 0x80;
-	m_text_layer_mask = true;
+	// N-BASIC never pings $53, definitely expects text layer to be enabled on default
+	m_text_layer_mask = false;
 	m_bitmap_layer_mask = 0;
 	m_vram_sel = 3;
 
@@ -1824,6 +1730,12 @@ void pc8801_state::pc8801(machine_config &config)
 		m_cassette->add_route(ALL_OUTPUTS, speaker, 0.025);
 		m_beeper->add_route(ALL_OUTPUTS, speaker, 0.10);
 	}
+
+	PC8801_EXP_SLOT(config, m_exp, pc8801_exp_devices, nullptr);
+	m_exp->set_iospace(m_maincpu, AS_IO);
+	m_exp->int3_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
+	m_exp->int4_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
+	m_exp->int5_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
 }
 
 void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)

@@ -24,6 +24,8 @@ public:
 	// construction/destruction
 	pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
 	auto rom_bank_cb() { return m_rom_bank_cb.bind(); }
 
 	// I/O operations

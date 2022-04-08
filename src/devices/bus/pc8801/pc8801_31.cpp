@@ -6,6 +6,7 @@
 
     TODO:
     - Interface with PC8801-30 (the actual CD drive);
+    - Make it a slot option for PC-8801MA (does it have same ROM as the internal MC version?)
 
 **************************************************************************************************/
 
