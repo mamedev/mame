@@ -79,24 +79,34 @@ class nes_x1_017_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_x1_017_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_x1_017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual u8 read_ex(offs_t offset) override { return 0; } // no open bus
+	virtual u8 read_l(offs_t offset) override { return 0; } // no open bus
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void set_chr();
-	uint8_t m_latch;
-	uint8_t m_reg[3]; //mapper ram protect
-	uint8_t m_mmc_vrom_bank[6];
+	u8 m_latch;
+	u8 m_reg[3]; // mapper ram enable
+	u8 m_mmc_vrom_bank[6];
 	// Taito X1-017 chip contains 5K of internal ram, battery backed up
-	uint8_t m_x1_017_ram[0x1400];
+	u8 m_x1_017_ram[0x1400];
+
+	u16 m_irq_count;
+	u8 m_irq_count_latch;
+	u8 m_irq_enable;
+
+	static constexpr device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
 };
 
 
@@ -105,6 +115,5 @@ DECLARE_DEVICE_TYPE(NES_TC0190FMC,         nes_tc0190fmc_device)
 DECLARE_DEVICE_TYPE(NES_TC0190FMC_PAL16R4, nes_tc0190fmc_pal16r4_device)
 DECLARE_DEVICE_TYPE(NES_X1_005,            nes_x1_005_device)
 DECLARE_DEVICE_TYPE(NES_X1_017,            nes_x1_017_device)
-
 
 #endif // MAME_BUS_NES_TAITO_H
