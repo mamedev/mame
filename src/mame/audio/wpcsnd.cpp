@@ -121,6 +121,10 @@ void wpcsnd_device::device_start()
 {
 	// resolve callback
 	m_reply_cb.resolve_safe();
+	// save states
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reply));
+	save_item(NAME(m_reply_available));
 }
 
 void wpcsnd_device::device_reset()

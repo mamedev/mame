@@ -58,8 +58,6 @@ Address  Function Register  R/W  When Reset          Remarks
 #include "emu.h"
 #include "spc700.h"
 
-#include "debugger.h"
-
 #include <climits>
 
 

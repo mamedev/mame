@@ -893,4 +893,4 @@ GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state, empty_i
 GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1997, thequest,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "The Quest (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, horses4c,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Horses 4 Courses (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, horses4c,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Horses For Courses (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

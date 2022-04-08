@@ -73,11 +73,6 @@ nes_x1_017_device::nes_x1_017_device(const machine_config &mconfig, const char *
 
 
 
-void nes_tc0190fmc_device::device_start()
-{
-	common_start();
-}
-
 void nes_tc0190fmc_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;

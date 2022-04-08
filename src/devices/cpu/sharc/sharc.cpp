@@ -10,8 +10,6 @@
 #include "sharcfe.h"
 #include "sharcdsm.h"
 
-#include "debugger.h"
-
 
 #define DISABLE_FAST_REGISTERS      1
 

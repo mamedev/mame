@@ -28,6 +28,9 @@ public:
 	// construction/destruction
 	nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual uint8_t read_exp(offs_t offset) override;
+	virtual void write(uint8_t data) override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -35,9 +38,6 @@ protected:
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual uint8_t read_exp(offs_t offset) override;
-	virtual void write(uint8_t data) override;
 
 private:
 	required_device<cassette_image_device> m_cassette;
@@ -48,6 +48,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_FCKEYBOARD, nes_fckeybrd_device)
-
 
 #endif // MAME_BUS_NES_CTRL_FCKEYBOARD_H

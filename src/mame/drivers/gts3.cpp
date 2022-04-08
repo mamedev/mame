@@ -101,8 +101,8 @@ private:
 	void u5a_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	void mem_map(address_map &map);
-	bool m_dispclk = 0;
-	bool m_lampclk = 0;
+	bool m_dispclk = false;
+	bool m_lampclk = false;
 	u8 m_digit = 0U;
 	u8 m_row = 0U; // for lamps and switches
 	u8 m_segment[4]{};

@@ -106,6 +106,7 @@ protected:
 		uint8_t phase;
 		int8_t prev_dx, prev_dy;
 		uint8_t lx, ly;
+
 		attotime time;
 	};
 
@@ -119,7 +120,8 @@ private:
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
 	std::unique_ptr<uint8_t[]> m_gvram;
-	std::array<std::array<u16, 80>, 400> m_attr_info = {};
+
+    std::array<std::array<u16, 80>, 400> m_attr_info = {};
 
 	uint8_t m_ext_rom_bank;
 	uint8_t m_vram_sel;
@@ -183,6 +185,7 @@ private:
 	template <unsigned kanji_level> uint8_t kanji_r(offs_t offset);
 	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
 	void rtc_w(uint8_t data);
+
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_irq_w);
 

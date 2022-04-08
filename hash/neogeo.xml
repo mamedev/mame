@@ -6624,7 +6624,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2320"/>
-		<info name="release" value="1990728"/>
+		<info name="release" value="19970728"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -6661,7 +6661,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGH-2320"/>
-		<info name="release" value="19970321"/>
+		<info name="release" value="19970925"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97"/>
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />

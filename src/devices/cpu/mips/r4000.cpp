@@ -27,7 +27,7 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
+#include "debug/debugcpu.h"
 #include "r4000.h"
 #include "mips3dsm.h"
 #include "unicode.h"

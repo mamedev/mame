@@ -27,14 +27,13 @@ public:
 	// construction/destruction
 	nes_mjpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	virtual u8 read_exp(offs_t offset) override;
-	virtual void write(u8 data) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	void set_latch();

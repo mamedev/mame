@@ -370,22 +370,6 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 	return (uint64_t(r) << 32) | uint64_t(l);
 }
 
-uint64_t naomi_gdrom_board::rev64(uint64_t src)
-{
-	uint64_t ret;
-
-	ret = ((src & 0x00000000000000ffULL) << 56)
-		| ((src & 0x000000000000ff00ULL) << 40)
-		| ((src & 0x0000000000ff0000ULL) << 24)
-		| ((src & 0x00000000ff000000ULL) << 8 )
-		| ((src & 0x000000ff00000000ULL) >> 8 )
-		| ((src & 0x0000ff0000000000ULL) >> 24)
-		| ((src & 0x00ff000000000000ULL) >> 40)
-		| ((src & 0xff00000000000000ULL) >> 56);
-
-	return ret;
-}
-
 uint64_t naomi_gdrom_board::read_to_qword(const uint8_t *region)
 {
 	uint64_t ret = 0;
@@ -1027,11 +1011,11 @@ void naomi_gdrom_board::device_start()
 				gdromfile->read_data(file_start + sec, &dimm_des_data[2048 * sec], cdrom_file::CD_TRACK_MODE1);
 
 			uint32_t des_subkeys[32];
-			des_generate_subkeys(rev64(key), des_subkeys);
+			des_generate_subkeys(swapendian_int64(key), des_subkeys);
 
 			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(&dimm_data[i], rev64(des_encrypt_decrypt(true, rev64(read_to_qword(&dimm_des_data[i])), des_subkeys)));
+				write_from_qword(&dimm_data[i], swapendian_int64(des_encrypt_decrypt(true, swapendian_int64(read_to_qword(&dimm_des_data[i])), des_subkeys)));
 		}
 
 		delete gdromfile;

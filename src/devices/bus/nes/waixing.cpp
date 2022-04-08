@@ -290,35 +290,6 @@ void nes_waixing_ffv_device::pcb_reset()
 	m_reg[0] = m_reg[1] = 0;
 }
 
-void nes_waixing_wxzs_device::device_start()
-{
-	common_start();
-}
-
-void nes_waixing_wxzs_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_waixing_dq8_device::device_start()
-{
-	common_start();
-}
-
-void nes_waixing_dq8_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_waixing_wxzs2_device::device_start()
-{
-	common_start();
-}
-
 void nes_waixing_wxzs2_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;

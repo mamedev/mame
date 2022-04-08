@@ -99,7 +99,7 @@ private:
 	u32 m_player_score[6]{};
 	u8 m_display = 0U;
 	u8 m_bit_counter = 0U;
-	bool m_disp_data = 0;
+	bool m_disp_data = false;
 	u8 m_ic5a = 0U;
 	u8 m_ic6a0 = 0U;
 	u8 m_ic6a1 = 0U;

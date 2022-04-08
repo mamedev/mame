@@ -25,7 +25,6 @@ static const char copyright_notice[] =
 /* ======================================================================== */
 
 #include "emu.h"
-#include "debugger.h"
 #include "m68000.h"
 #include "m68kdasm.h"
 

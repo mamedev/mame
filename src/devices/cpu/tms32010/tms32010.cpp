@@ -60,7 +60,6 @@
 #include "emu.h"
 #include "tms32010.h"
 #include "32010dsm.h"
-#include "debugger.h"
 
 
 

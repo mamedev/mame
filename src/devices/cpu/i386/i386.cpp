@@ -25,7 +25,6 @@
 #include "cycles.h"
 #include "i386ops.h"
 
-#include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 

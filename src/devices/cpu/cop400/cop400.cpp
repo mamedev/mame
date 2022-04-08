@@ -57,7 +57,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "cop400.h"
 #include "cop410ds.h"
 #include "cop420ds.h"

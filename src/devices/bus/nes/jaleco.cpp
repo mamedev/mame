@@ -141,35 +141,6 @@ nes_jf33_device::nes_jf33_device(const machine_config &mconfig, const char *tag,
 
 
 
-void nes_jf11_device::device_start()
-{
-	common_start();
-}
-
-void nes_jf11_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_jf13_device::device_start()
-{
-	common_start();
-}
-
-void nes_jf13_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_jf16_device::device_start()
-{
-	common_start();
-}
-
 void nes_jf16_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -191,18 +162,6 @@ void nes_jf17_device::pcb_reset()
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 	m_latch = 0;
-}
-
-void nes_jf19_device::device_start()
-{
-	common_start();
-}
-
-void nes_jf19_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
 }
 
 void nes_ss88006_device::device_start()

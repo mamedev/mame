@@ -89,7 +89,7 @@ void nes_state::machine_start()
 			BMC_800IN1,
 			BMC_8157,
 			BMC_970630C,
-			BMC_GOLD150,
+			BMC_DS927,
 			BMC_KC885,
 			BMC_TELETUBBIES,
 			BMC_VT5201,

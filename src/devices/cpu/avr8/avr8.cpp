@@ -60,7 +60,6 @@
 #include "emu.h"
 #include "avr8.h"
 #include "avr8dasm.h"
-#include "debugger.h"
 
 #define LOG_UNKNOWN         (1 << 1)
 #define LOG_BOOT            (1 << 2)

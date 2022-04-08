@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "patinhofeio_cpu.h"
 #include "patinho_feio_dasm.h"
-#include "debugger.h"
 #include "includes/patinhofeio.h" // FIXME: this is a dependency from devices on MAME
 
 #define PC       m_pc //The program counter is called "contador de instrucoes" (IC) in portuguese

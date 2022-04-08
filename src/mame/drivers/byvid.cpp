@@ -110,12 +110,12 @@ private:
 	u8 m_u7b = 0U;
 	u8 m_u10a = 0U;
 	u8 m_u10b = 0U;
-	bool m_u10_cb2 = 0;
-	bool m_u11_cb2 = 0;
+	bool m_u10_cb2 = false;
+	bool m_u11_cb2 = false;
 	u8 m_u11a = 0U;
 	u8 m_u11b = 0U;
-	bool m_u10_timer = 0;
-	bool m_u11_timer = 0;
+	bool m_u10_timer = false;
+	bool m_u11_timer = false;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<mc6809_device> m_videocpu;
 	required_device<bally_cheap_squeak_device> m_cheap_squeak;
@@ -915,6 +915,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1982, babypac,  0,       by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, babypac2, babypac, by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, granny,   0,       granny,  granny,  by133_state, empty_init, ROT0,  "Bally",                           "Granny and the Gators", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1982, babypac,  0,       by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, babypac2, babypac, by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, granny,   0,       granny,  granny,  by133_state, empty_init, ROT0,  "Bally",                           "Granny and the Gators", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
