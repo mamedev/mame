@@ -39337,14 +39337,14 @@ spc1000                         //
 @source:spc1500.cpp
 spc1500                         //
 
-@source:spdamjes.cpp
-spdamjes                        // (c) 19?? T-90 S.A.
-
 @source:spcforce.cpp
 meteor                          // (c) 1981 Venture Line
 meteors                         // (c) 1981 Amusement World
 spcforc2                        // bootleg
 spcforce                        // (c) 1980 Venture Line
+
+@source:spdamjes.cpp
+spdamjes                        // (c) 19?? T-90 S.A.
 
 @source:spdheat.cpp
 spdheat                         // A55 (c) 1985 Taito Corporation (World)
