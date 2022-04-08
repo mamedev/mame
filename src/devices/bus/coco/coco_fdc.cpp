@@ -44,11 +44,7 @@
 
 	Disto Super Controller II
 		Mini Expansion Bus
-		No Halt Extension. Implementedby using a read and write cache.
-
-			CachCtrl - Cache Controller
-				$FF74 & $FF75: Read
-					Bit 7 - 0 indicates an interrupt request from the disk controller
+		No Halt Extension. Implemented by using a read and write cache.
 
 			CachDat - Cache Data Register
 				$FF74 & $FF75: Read/Write cache data.
@@ -56,13 +52,24 @@
 				Normally cache size is 256 bytes. But a common upgrade is to change
 				it to 512 bytes.
 
-				$FF76 & $FF77: Write:
+			CachCtrl - Cache Controller
+				$FF76 & $FF77:
+					write
+						clears buffer counter
 
-					Bit
-					3 - 0 - disable CART (masked), 1 - enable CART
-					2 - 0 - normal NMI, 1 - masked NMI
-					1 - 0 - compatible, 1 - cache mode
-					0 - 0 - write operation, 1 - read operation
+					read bit:
+						7:  0 - indicates an interrupt request from the disk controller
+							1 - no interrupt
+						3:  0 - disable CART / FIRQ (masked)
+							1 - enable CART / FIRQ
+						2:  0 - normal NMI
+							1 - masked NMI
+						1:  0 - compatible I/O mode
+							1 - buffered I/O mode
+						0:  0 - buffered write operation
+							1 - buffered read operation
+
+		There was a jumper to set the addresses to be FF58 to FF5B. Not implemented.
 
 *********************************************************************/
 
@@ -89,7 +96,7 @@
 #define LOG_WDIO	(1U << 2) // Shows data read and write
 #define LOG_WDSCII	(1U << 3) // Shows SCII register setup
 
-//#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL|LOG_WDFDC|LOG_WDSCII)
 #include "logmacro.h"
 
 #define LOGWDFDC(...)	LOGMASKED(LOG_WDFDC,  __VA_ARGS__)
@@ -244,16 +251,16 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 
 void coco_fdc_device_base::update_lines()
 {
-		// clear HALT enable under certain circumstances
-		if (intrq() && (dskreg() & 0x20))
-			set_dskreg(dskreg() & ~0x80);  // clear halt enable
+	// clear HALT enable under certain circumstances
+	if (intrq() && (dskreg() & 0x20))
+		set_dskreg(dskreg() & ~0x80);  // clear halt enable
 
-		// set the NMI line
-		set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
+	// set the NMI line
+	set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
 
-		// set the HALT line
-		set_line_value(line::HALT, !drq() && (dskreg() & 0x80));
-	}
+	// set the HALT line
+	set_line_value(line::HALT, !drq() && (dskreg() & 0x80));
+}
 
 
 //-------------------------------------------------
@@ -464,8 +471,9 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC_V11, coco_family_fdc_device_base, coco_fdc_v
 
 ROM_START(coco_scii)
 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-//	   ROM_LOAD("cdos11.bin", 0x0000, 0x4000, CRC(92a2b2c5) SHA1(8a1246758e6957dc7c9689e915e1b65122024c3e))
+// 	ROM_LOAD("cdos11.bin", 0x0000, 0x4000, CRC(92a2b2c5) SHA1(8a1246758e6957dc7c9689e915e1b65122024c3e))
 	ROM_LOAD("cdos12.bin", 0x0000, 0x4000, CRC(172ba592) SHA1(083c5ea91866cfebcf2cb9818dd311d8a0206c4c))
+// 	ROM_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
 ROM_END
 
 namespace
@@ -632,14 +640,11 @@ void coco_scii_device::update_lines()
 
 	if ((m_cache_controler & 0x08) == 0x08)
 	{
-//		set_line_value(line::CART, intrq());
 		m_carts->in_w<0>(intrq());
 	}
 	else
 	{
-//		set_line_value(line::CART, CLEAR_LINE);
 		m_carts->in_w<0>(CLEAR_LINE);
-
 	}
 
 	if ((m_cache_controler & 0x04) == 0x00)
@@ -709,7 +714,8 @@ void coco_scii_device::ff74_write(offs_t offset, u8 data)
 			// reset static ram buffer pointer on any write
 			m_cache_pointer = 0;
 
-			m_cache_controler = (m_cache_controler & 0x80) | (data & 0x7f);
+// 			m_cache_controler = (m_cache_controler & 0x80) | (data & 0x7f);
+			m_cache_controler = data;
 			update_lines();
 			break;
 	}
