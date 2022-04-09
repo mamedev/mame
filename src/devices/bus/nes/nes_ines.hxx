@@ -490,7 +490,7 @@ static const nes_mmc mmc_list[] =
 	{ 452, BMC_DS927 },
 	// 453 Realtec 8042
 	// 454...511 Unused
-	// 512 probably the correct MMC3 clone for chuugokt in nes.xml
+	{ 512, SACHEN_ZGDH },
 	{ 513, SACHEN_SA9602B },
 	// 514 seems to be for skaraok, currently set to UNKNOWN in nes.xml
 	// 515 Korean Family Noraebang karaoke cart with expansion cart, mic, and YM2413!

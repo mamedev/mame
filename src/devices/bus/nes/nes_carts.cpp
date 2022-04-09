@@ -364,7 +364,8 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("sfight3",          NES_SF3);
 	device.option_add_internal("gouder",           NES_GOUDER);
 	device.option_add_internal("sa9602b",          NES_SA9602B);
-	device.option_add_internal("unl_shero",        NES_SACHEN_SHERO);
+	device.option_add_internal("sachen_shero",     NES_SACHEN_SHERO);
+	device.option_add_internal("sachen_zgdh",      NES_SACHEN_ZGDH);
 	device.option_add_internal("a9746",            NES_A9746); // mapper 219
 // misc multigame cart boards
 	device.option_add_internal("benshieng",        NES_BENSHIENG);
