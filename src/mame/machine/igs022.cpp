@@ -1,15 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
-/************************************************************************************************************
+/*
 
- IGS022 is an encrypted DMA device, most likely an MCU of some sort.
- It can safely be swapped between games, so doesn't appear to have any kind of game specific programming.
+ IGS022 is an encrypted DMA device, most likely an MCU of some sort
+ it can safely be swapped between games so doesn't appear to have
+ any kind of game specific programming
 
-************************************************************************************************************/
+*/
 
 #include "emu.h"
 #include "igs022.h"
-#include <sstream>
+
+#include <algorithm>
 
 igs022_device::igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, IGS022, tag, owner, clock)
@@ -20,86 +22,76 @@ igs022_device::igs022_device(const machine_config &mconfig, const char *tag, dev
 
 void igs022_device::device_start()
 {
-	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	// Reset  stuff
+	std::fill(std::begin(m_kb_regs), std::end(m_kb_regs), 0);
 
-	save_item(NAME(m_regs));
-	save_item(NAME(m_stack));
-	save_item(NAME(m_stack_ptr));
+	save_item(NAME(m_kb_regs));
 }
 
 void igs022_device::device_reset()
 {
-	logerror("%s: IGS022 Reset\n", machine().describe_context());
-
-	std::fill(std::begin(m_regs), std::end(m_regs), 0);
-	std::fill(std::begin(m_stack), std::end(m_stack), 0);
-	m_stack_ptr = 0;
+	//printf("igs022_device::device_reset()");
 
 	if (!m_sharedprotram)
 	{
-		logerror("%s: IGS022 m_sharedprotram was not set!\n", machine().describe_context());
+		logerror("m_sharedprotram was not set\n");
 		return;
 	}
+	IGS022_reset();
 
-	reset();
+	std::fill(std::begin(m_kb_regs), std::end(m_kb_regs), 0);
 }
 
-// From IGS022 ROM to shared protection RAM
-void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
+
+void igs022_device::IGS022_do_dma(u16 src, u16 dst, u16 size, u16 mode)
 {
-	logerror("%s: IGS022 DMA src %04x, dst %04x, size %04x, mode %04x\n", machine().describe_context(), src, dst, size, mode);
+	//printf("igs022_device::IGS022_do_dma\n");
 
 	/*
-	P_SRC  = 0x300290 (offset from prot rom base)
-	P_DST  = 0x300292 (words from 0x300000)
-	P_SIZE = 0x300294 (words)
-	P_MODE = 0x300296
+	P_SRC =0x300290 (offset from prot rom base)
+	P_DST =0x300292 (words from 0x300000)
+	P_SIZE=0x300294 (words)
+	P_MODE=0x300296
 
-	Mode 0 plain copy
-	Mode 1,2,3 rom table based ops
-	Mode 4 fixed data ('IGS ') based ops
-	Mode 5 swap bytes
-	Mode 6 swap nibbles
+	Mode 5 direct
+	Mode 6 swap nibbles and bytes
+
+	1,2,3 table based ops
 	*/
 
 	const u16 param = mode >> 8;
 
-	// the initial auto-DMA on killbld/slqz2/lhzb2 has 0x10 set, drgw3 has 0x18 set, not sure how they affect the operation.
-	if (mode & 0x00f8) logerror("%s: IGS022 DMA mode bits %04x set\n", machine().describe_context(), mode & 0x00f8);
+	// the initial DMA on kilbld has 0x10 set, drgw3 has 0x18 set, not sure how they affect the operation.
+	if (mode & 0x00f8) printf("IGS022_do_dma mode bits %04x set\n", mode & 0x00f8);
 
-	mode &= 0x7; // what are the other bits?
+	mode &= 0x7;  // what are the other bits?
 
-	const u16 * const PROTROM = (u16 *)m_rom->base();
-
-	switch (mode)
+	if ((mode == 0) || (mode == 1) || (mode == 2) || (mode == 3)  || (mode == 4))
 	{
-	case 0: case 1: case 2: case 3: case 4:
-		/*
-		    modes 1-3 modify the data being transferred using a 0x100 byte table stored at the start of the protection rom.
+		/* mode3 applies a xor from a 0x100 byte table to the data being
+		   transferred
 
-		    The param used with the mode gives a start offset into the table.
+		   the table is stored at the start of the protection rom.
 
-		    Odd offsets cause an overflow.
+		   the param used with the mode gives a start offset into the table
+
+		   odd offsets cause an overflow
 		*/
+
+		const u16 *PROTROM = (u16*)m_rom->base();
+
 		for (int x = 0; x < size; x++)
 		{
-			u16 dat = PROTROM[src + x];
+			u16 dat2 = PROTROM[src + x];
 
-			const u8 extraoffset        =   param & 0xff;
-			const u8 * const dectable   =   (u8 *)m_rom->base(); // the basic decryption table is at the start of the mcu data rom!
-			const u8 taboff             =   ((x * 2) + extraoffset) & 0xff; // must allow for overflow in instances of odd offsets
+			const u8 extraoffset = param & 0xff;
+			const u8* dectable = (u8*)m_rom->base(); // the basic decryption table is at the start of the mcu data rom!
+			const u8 taboff = ((x * 2) + extraoffset) & 0xff; // must allow for overflow in instances of odd offsets
+			u16 extraxor = ((dectable[taboff + 1]) << 8) | (dectable[taboff + 0] << 0);
 
-			u16 extraxor                =   ((dectable[taboff + 1]) << 8) | (dectable[taboff + 0] << 0);
-
-			switch (mode)
+			if (mode == 4)
 			{
-//          case 0: plain copy
-			case 1: dat -= extraxor;    break;
-			case 2: dat += extraxor;    break;
-			case 3: dat ^= extraxor;    break;
-			case 4:
 				extraxor = 0;
-
 				if ((x & 0x003) == 0x000) extraxor |= 0x0049; // 'I'
 				if ((x & 0x003) == 0x001) extraxor |= 0x0047; // 'G'
 				if ((x & 0x003) == 0x002) extraxor |= 0x0053; // 'S'
@@ -109,301 +101,166 @@ void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 				if ((x & 0x300) == 0x100) extraxor |= 0x4700; // 'G'
 				if ((x & 0x300) == 0x200) extraxor |= 0x5300; // 'S'
 				if ((x & 0x300) == 0x300) extraxor |= 0x2000; // ' '
-
-				logerror("%s: IGS022 DMA mode 4 -> %06x | %04x (%04x)\n", machine().describe_context(), (dst + x) * 2, dat, (u16)(dat - extraxor));
-
-				dat -= extraxor;
-				break;
 			}
 
-			m_sharedprotram[dst + x] = dat;
-		}
-		break;
+			//  mode == 0 plain
+			if (mode == 3) dat2 ^= extraxor;
+			if (mode == 2) dat2 += extraxor;
+			if (mode == 1) dat2 -= extraxor;
 
-	case 5: // byteswapped copy
+			if (mode == 4)
+			{
+				//printf("%06x | %04x (%04x)\n", (dst+x)*2, dat2, (u16)(dat2-extraxor));
+
+				dat2 -= extraxor;
+			}
+
+			m_sharedprotram[dst + x] = dat2;
+		}
+	}
+	else if (mode == 5)
+	{
+		/* mode 5 seems to be a byteswapped copy */
+		const u16 *PROTROM = (u16*)m_rom->base();
 		for (int x = 0; x < size; x++)
 		{
 			u16 dat = PROTROM[src + x];
-
 			dat = ((dat &0x00ff) << 8) | ((dat &0xff00) >> 8);
 
 			m_sharedprotram[dst + x] = dat;
 		}
-		break;
-
-	case 6: // nibble swapped copy
+	}
+	else if (mode == 6)
+	{
+		/* mode 6 seems to be a nibble swapped copy */
+		const u16 *PROTROM = (u16*)m_rom->base();
 		for (int x = 0; x < size; x++)
 		{
 			u16 dat = PROTROM[src + x];
 
-			dat = ((dat & 0xf0f0) >> 4) | ((dat & 0x0f0f) << 4);
+			dat = ((dat & 0xf0f0) >> 4)|
+					((dat & 0x0f0f) << 4);
 
 			m_sharedprotram[dst + x] = dat;
 		}
-		break;
-
-	case 7:
-		logerror("%s: IGS022 DMA unhandled copy mode %04x!\n", machine().describe_context(), mode);
-		// not used by killbld
-		// weird mode, the params get left in memory? - maybe it's a NOP?
-		break;
-
-	default:
-		logerror("%s: IGS022 DMA unhandled copy mode!: %d, src: %04x, dst: %04x, size: %04x, param: %02x\n", machine().describe_context(), mode, src, dst, size, param);
-		// not used by killbld
-		// invalid?
+	}
+	else if (mode == 7)
+	{
+		printf("unhandled copy mode %04x!\n", mode);
+		// not used by killing blade
+		/* weird mode, the params get left in memory? - maybe it's a NOP? */
+	}
+	else
+	{
+		osd_printf_debug("unhandled copy mode %04x!\n", mode);
+		printf ("DMA MODE: %d, src: %4.4x, dst: %4.4x, size: %4.4x, param: %2.2x\n", mode, src, dst, size, param);
+		// not used by killing blade
+		/* invalid? */
 	}
 }
 
 // the internal MCU boot code automatically does this DMA
 // and puts the version # of the data rom in ram
-void igs022_device::reset()
+void igs022_device::IGS022_reset()
 {
-	const u16 * const PROTROM = (u16 *)m_rom->base();
+	const u16 *PROTROM = (u16*)m_rom->base();
 
-	// fill ram with A55A pattern
-	for (int i = 0; i < 0x4000 / 2; i++)
+	// fill ram with A5 patern
+	for (int i = 0; i < 0x4000/2; i++)
 		m_sharedprotram[i] = 0xa55a;
 
-	// the initial auto-DMA
+	// the auto-dma
 	u16 src        = PROTROM[0x100 / 2];
 	const u32 dst  = PROTROM[0x102 / 2];
 	const u16 size = PROTROM[0x104 / 2];
 	u16 mode       = PROTROM[0x106 / 2];
 
-	mode = (mode >> 8) | (mode << 8);
+	mode &= 0xff;
 
 	src >>= 1;
 
-	do_dma(src, dst, size, mode);
+	IGS022_do_dma(src,dst,size,mode);
 
 	// there is also a version ID? (or is it some kind of checksum) that is stored in the data rom, and gets copied..
 	// Dragon World 3 checks it
 	// Setting $3002a0 to #3 causes Dragon World 3 to skip this check
-	m_sharedprotram[0x2a2 / 2] = PROTROM[0x114 / 2];
+	m_sharedprotram[0x2a2/2] = PROTROM[0x114/2];
 }
 
-void igs022_device::push_stack(u32 data)
+void igs022_device::IGS022_handle_command()
 {
-	if (m_stack_ptr < STACK_SIZE - 1)
-		++m_stack_ptr;
+	//printf("igs022_device::IGS022_handle_command\n");
 
-	m_stack[m_stack_ptr] = data;
-}
+	const u16 cmd = m_sharedprotram[0x200/2];
 
-u32 igs022_device::pop_stack()
-{
-	const u32 data = m_stack[m_stack_ptr];
-
-	if (m_stack_ptr > 0)
-		--m_stack_ptr;
-
-	return data;
-}
-
-std::string igs022_device::stack_as_string() const
-{
-	std::stringstream stream;
-	stream << "stack:";
-
-	for (int i = 0; i <= m_stack_ptr; ++i)
-		util::stream_format(stream, " %08x", m_stack[i]);
-
-	return stream.str();
-}
-
-u32 igs022_device::read_reg(u16 offset)
-{
-	if (offset < NUM_REGS)
+	if (cmd == 0x6d)    // Store values to asic ram
 	{
-		return m_regs[offset];
-	}
-	else if (offset == 0x400)
-	{
-		return pop_stack();
-	}
-	else
-	{
-		return 0; // Invalid!
-	}
-}
+		const u32 p1 = (m_sharedprotram[0x298/2] << 16) | m_sharedprotram[0x29a/2];
+		const u32 p2 = (m_sharedprotram[0x29c/2] << 16) | m_sharedprotram[0x29e/2];
 
-void igs022_device::write_reg(u16 offset, u32 data)
-{
-	if (offset < NUM_REGS)
-	{
-		m_regs[offset] = data;
-	}
-	else if (offset == 0x300)
-	{
-		push_stack(data);
-	}
-	else
-	{
-		// Invalid!
-	}
-}
-
-// What does this do? write the completion byte for now...
-void igs022_device::handle_incomplete_command(u16 cmd, u16 res)
-{
-	logerror("%s: IGS022 command %04x: INCOMPLETE (NOP)\n", machine().describe_context(), cmd);
-	m_sharedprotram[0x202 / 2] = res;
-}
-
-void igs022_device::handle_command()
-{
-	const u16 cmd = m_sharedprotram[0x200 / 2];
-
-	switch (cmd)
-	{
-		case 0x12: // Push
+		if ((p2 & 0xffff) == 0x9)   // Set value
 		{
-			const u32 data = (m_sharedprotram[0x288 / 2] << 16) + m_sharedprotram[0x28a / 2];
+			const int reg = (p2 >> 16) & 0xffff;
 
-			push_stack(data);
-
-			logerror("%s: IGS022 command %04x: PUSH {288, 28a} (%08x) %s\n", machine().describe_context(), cmd, data, stack_as_string());
-
-			m_sharedprotram[0x202 / 2] = 0x23; // this mode complete?
-			break;
+			if (reg & 0x300) { // 300?? killbld expects 0x200, drgw3 expects 0x100?
+				m_kb_regs[reg & 0xff] = p1;
+			}
 		}
 
-		case 0x2d: handle_incomplete_command(cmd, 0x3c);    break; // killbld
-
-//      case 0x42: break; // killbld
-
-		case 0x45: // Pop
+		if ((p2 & 0xffff) == 0x6)   // Add value
 		{
-			const u32 data = pop_stack();
+			const int src1 = (p1 >> 16) & 0xff;
+			const int src2 = (p1 >> 0) & 0xff;
+			const int dst = (p2 >> 16) & 0xff;
 
-			m_sharedprotram[0x28c / 2] = (data >> 16) & 0xffff;
-			m_sharedprotram[0x28e / 2] = data & 0xffff;
-
-			logerror("%s: IGS022 command %04x: POP {28c, 28e} (%08x) %s\n", machine().describe_context(), cmd, data, stack_as_string());
-
-			m_sharedprotram[0x202 / 2] = 0x56; // this mode complete?
-			break;
+			m_kb_regs[dst] = m_kb_regs[src2] - m_kb_regs[src1];
 		}
 
-//      case 0x47: // NOP? slqz2/lhzb2
-//          break;
-
-		case 0x4f: // DMA from protection ROM (memcpy with encryption / scrambling)
+		if ((p2 & 0xffff) == 0x1)   // Add Imm?
 		{
-			logerror("%s: IGS022 command %04x: DMA\n", machine().describe_context(), cmd);
+			const int reg = (p2 >> 16) & 0xff;
+			const int imm = (p1 >> 0) & 0xffff;
 
-			const u16 src  = m_sharedprotram[0x290 / 2] >> 1; // External mcu data is 8 bit and addressed as such
-			const u32 dst  = m_sharedprotram[0x292 / 2];
-			const u16 size = m_sharedprotram[0x294 / 2];
-			const u16 mode = m_sharedprotram[0x296 / 2];
-
-			do_dma(src, dst, size, mode);
-
-			m_sharedprotram[0x202 / 2] = 0x5e; // this mode complete?
-			break;
+			m_kb_regs[reg] += imm;
 		}
 
-		case 0x5a: handle_incomplete_command(cmd, 0x4b);    break; // killbld, uses {284} as input
+		if ((p2 & 0xffff) == 0xa)   // Get value
+		{
+			const int reg = (p1 >> 16) & 0xFF;
 
-		case 0x6d: // Set/Get values to/from ASIC RAM, arithmetic operations on them
-			handle_command_6d();
-			break;
+			m_sharedprotram[0x29c/2] = (m_kb_regs[reg] >> 16) & 0xffff;
+			m_sharedprotram[0x29e/2] = m_kb_regs[reg] & 0xffff;
+		}
 
-		default:
-			logerror("%s: IGS022 command %04x: UNKNOWN!\n", machine().describe_context(), cmd);
+		m_sharedprotram[0x202 / 2] = 0x7c;  // this mode complete?
+	}
+
+	// Is this actually what this is suppose to do? Complete guess.
+	if (cmd == 0x12) // copy??
+	{
+		m_sharedprotram[0x28c / 2] = m_sharedprotram[0x288 / 2];
+		m_sharedprotram[0x28e / 2] = m_sharedprotram[0x28a / 2];
+
+		m_sharedprotram[0x202 / 2] = 0x23;  // this mode complete?
+	}
+
+	// what do these do? write the completion byte for now...
+	if (cmd == 0x45) m_sharedprotram[0x202 / 2] = 0x56;
+	if (cmd == 0x5a) m_sharedprotram[0x202 / 2] = 0x4b;
+	if (cmd == 0x2d) m_sharedprotram[0x202 / 2] = 0x3c;
+
+	if (cmd == 0x4f) // memcpy with encryption / scrambling
+	{
+		const u16 src  = m_sharedprotram[0x290 / 2] >> 1; // External mcu data is 8 bit and addressed as such
+		const u32 dst  = m_sharedprotram[0x292 / 2];
+		const u16 size = m_sharedprotram[0x294 / 2];
+		const u16 mode = m_sharedprotram[0x296 / 2];
+
+		IGS022_do_dma(src,dst,size,mode);
+
+		m_sharedprotram[0x202 / 2] = 0x5e;  // this mode complete?
 	}
 }
 
-// Set/Get values to/from ASIC RAM, arithmetic operations on them
-void igs022_device::handle_command_6d()
-{
-	const u32 p1 = (m_sharedprotram[0x298 / 2] << 16) | m_sharedprotram[0x29a / 2];
-	const u32 p2 = (m_sharedprotram[0x29c / 2] << 16) | m_sharedprotram[0x29e / 2];
 
-	std::stringstream stream;
-	util::stream_format(stream, "%s: IGS022 command 006d: ASIC RAM %04x %04x %04x %04x ~ ", machine().describe_context(),
-		(p1 >> 16) & 0xffff, (p1 >> 0) & 0xffff, (p2 >> 16) & 0xffff, (p2 >> 0) & 0xffff
-	);
-
-	switch (p2 & 0xffff)
-	{
-		case 0x0: // Add values
-		{
-			const u16 src1  =   p1 >> 16;
-			const u16 src2  =   p1 >> 0;
-			const u16 dst   =   p2 >> 16;
-
-			const u32 data1 =   read_reg(src1);
-			const u32 data2 =   read_reg(src2);
-			const u32 res   =   data1 + data2;
-
-			write_reg(dst, res);
-
-			util::stream_format(stream, "ADD [%04x] = [%04x] + [%04x] (%08x)\n", dst, src1, src2, res);
-			break;
-		}
-
-		case 0x1: // Sub values (src1 - src2)
-		{
-			const u16 src1  =   p1 >> 16;
-			const u16 src2  =   p1 >> 0;
-			const u16 dst   =   p2 >> 16;
-
-			const u32 data1 =   read_reg(src1);
-			const u32 data2 =   read_reg(src2);
-			const u32 res   =   data1 - data2;
-
-			write_reg(dst, res);
-
-			util::stream_format(stream, "SUB1 [%04x] = [%04x] - [%04x] (%08x)\n", dst, src1, src2, res);
-			break;
-		}
-
-		case 0x6: // Sub values (src2 - src1)
-		{
-			const u16 src1  =   p1 >> 16;
-			const u16 src2  =   p1 >> 0;
-			const u16 dst   =   p2 >> 16;
-
-			const u32 data1 =   read_reg(src1);
-			const u32 data2 =   read_reg(src2);
-			const u32 res   =   data2 - data1;
-
-			write_reg(dst, res);
-
-			util::stream_format(stream, "SUB2 [%04x] = [%04x] - [%04x] (%08x)\n", dst, src2, src1, res);
-			break;
-		}
-
-		case 0x9: // Set value (Shared Protection RAM -> ASIC RAM)
-		{
-			const u16 dst   =   p2 >> 16;
-
-			const u32 data  =   p1;
-
-			write_reg(dst, data);
-
-			util::stream_format(stream, "SET [%04x] = {298, 29a} (%08x)\n", dst, data);
-			break;
-		}
-
-		case 0xa: // Get value (ASIC RAM -> Shared Protection RAM)
-		{
-			const u16 src   =   p1 >> 16;
-
-			const u32 data  =   m_regs[src];
-
-			m_sharedprotram[0x29c / 2] = (data >> 16) & 0xffff;
-			m_sharedprotram[0x29e / 2] = data & 0xffff;
-
-			util::stream_format(stream, "GET {29c, 29e} = [%04x] (%08x)\n", src, data);
-			break;
-		}
-	}
-
-	logerror("%s", stream.str());
-	m_sharedprotram[0x202 / 2] = 0x7c; // this mode complete?
-}
-
-DEFINE_DEVICE_TYPE(IGS022, igs022_device, "igs022", "IGS022 encrypted DMA device")
+DEFINE_DEVICE_TYPE(IGS022, igs022_device, "igs022", "IGS022")
