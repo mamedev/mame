@@ -39,6 +39,7 @@ public:
 		u16 sectors_per_track() const       { return m_block.r16b(17); }
 		u32 bootstrap_lsn() const           { return m_block.r24b(21); }
 		u16 bootstrap_size() const          { return m_block.r16b(24); }
+		util::arbitrary_datetime creation_date() const { return from_os9_date(m_block.r24b(26), m_block.r16b(29)); }
 		u16 sector_size() const             { u16 result = m_block.r16b(104); return result != 0 ? result : 256; }
 		u8 sides() const                    { return (format_flags() & 0x01) ? 2 : 1; }
 		bool double_density() const         { return (format_flags() & 0x02) != 0; }
@@ -137,6 +138,7 @@ private:
 
 		virtual meta_data metadata() override;
 		virtual dir_t root() override;
+		virtual void format(const meta_data &meta) override;
 
 	private:
 		volume_header   m_volume_header;
@@ -148,6 +150,9 @@ private:
 	};
 
 	static std::string pick_os9_string(std::string_view raw_string);
+	static std::string to_os9_string(std::string_view s, size_t length);
+	static util::arbitrary_datetime from_os9_date(u32 os9_date, u16 os9_time = 0);
+	static std::tuple<u32, u16> to_os9_date(const util::arbitrary_datetime &datetime);
 	static u32 pick_integer_be(const u8 *data, int length);
 	static bool validate_filename(std::string_view name);
 	static bool is_ignored_filename(std::string_view name);

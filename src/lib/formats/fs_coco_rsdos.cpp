@@ -41,7 +41,7 @@ void coco_rsdos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const
 
 bool coco_rsdos_image::can_format() const
 {
-	return false;
+	return true;
 }
 
 bool coco_rsdos_image::can_read() const
@@ -103,6 +103,12 @@ filesystem_t::dir_t coco_rsdos_image::impl::root()
 void coco_rsdos_image::impl::drop_root_ref()
 {
 	m_root = nullptr;
+}
+
+void coco_rsdos_image::impl::format(const meta_data &meta)
+{
+	// formatting RS-DOS is easy - just fill everything with 0xFF
+	m_blockdev.fill(0xFF);
 }
 
 fsblk_t::block_t coco_rsdos_image::impl::read_sector(int track, int sector) const

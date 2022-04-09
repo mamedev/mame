@@ -22,7 +22,6 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "axc51-core.h"
 #include "axc51-core_dasm.h"
 

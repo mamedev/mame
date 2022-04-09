@@ -152,8 +152,8 @@ private:
 	u8 m_knocker_prev = 0U;
 	u8 m_joystick_select = 0U;
 	u8 m_track[2]{};
-	emu_timer *m_laserdisc_bit_timer = 0;
-	emu_timer *m_laserdisc_philips_timer = 0;
+	emu_timer *m_laserdisc_bit_timer = nullptr;
+	emu_timer *m_laserdisc_philips_timer = nullptr;
 	u8 m_laserdisc_select = 0U;
 	u8 m_laserdisc_status = 0U;
 	uint16_t m_laserdisc_philips_code = 0U;
@@ -170,6 +170,6 @@ private:
 	u8 m_background_priority = 0U;
 	u8 m_spritebank = 0U;
 	u8 m_transparent0 = 0U;
-	tilemap_t *m_bg_tilemap = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 	double m_weights[4]{};
 };

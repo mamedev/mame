@@ -26,6 +26,7 @@ ToDO:
 - Various PROMs are undumped.
 - Speech is gibberish
 - Display
+- Save states
 - Mechanical sounds
 - The usual: identify lamps, solenoids, contactors
 - Outputs

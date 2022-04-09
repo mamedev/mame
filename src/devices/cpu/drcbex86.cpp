@@ -85,7 +85,7 @@
 #include "emu.h"
 #include "drcbex86.h"
 
-#include "debugger.h"
+#include "debug/debugcpu.h"
 #include "emuopts.h"
 #include "drcuml.h"
 

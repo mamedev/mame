@@ -311,12 +311,12 @@ void nscsi_cdrom_device::scsi_command()
 	}
 
 	case SC_READ_CAPACITY: {
+		LOG("command READ CAPACITY\n");
+
 		if(!cdrom) {
 			return_no_cd();
 			break;
 		}
-
-		LOG("command READ CAPACITY\n");
 
 		// get the last used block on the disc
 		const u32 temp = cdrom->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1;
@@ -365,7 +365,7 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x80; // WP, cache
 
 		// get the last used block on the disc
-		const u32 temp = cdrom->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1;
+		const u32 temp = cdrom ? cdrom->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1 : 0;
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 
 		scsi_cmdbuf[pos++] = 0x00; // density code
@@ -463,6 +463,11 @@ void nscsi_cdrom_device::scsi_command()
 
 	case SC_READ_DISC_INFORMATION:
 		LOG("command READ DISC INFORMATION\n");
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
+
 		std::fill_n(scsi_cmdbuf, 34, 0);
 		scsi_cmdbuf[1] = 32;
 		scsi_cmdbuf[2] = 2; // disc is complete
@@ -537,6 +542,11 @@ void nscsi_cdrom_device::scsi_command()
 			format = (scsi_cmdbuf[9] >> 6) & 3;
 
 		LOG("command READ TOC PMA ATIP, format %s msf=%d size=%d\n", format_names[format], msf, size);
+
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
 
 		int pos = 0;
 		switch (format) {

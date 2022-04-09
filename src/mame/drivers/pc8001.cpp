@@ -644,6 +644,8 @@ uint8_t pc8001_base_state::dma_mem_r(offs_t offset)
 
 void pc8001_base_state::machine_start()
 {
+	m_screen_reverse = false;
+
 	save_item(NAME(m_width80));
 	save_item(NAME(m_color));
 	save_item(NAME(m_screen_reverse));
@@ -652,6 +654,8 @@ void pc8001_base_state::machine_start()
 
 void pc8001_state::machine_start()
 {
+	pc8001_base_state::machine_start();
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize RTC */

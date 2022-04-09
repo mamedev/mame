@@ -693,6 +693,7 @@ lckydraw.cpp
 legionna.cpp
 leland.cpp
 lemmings.cpp
+lependu.cpp
 lethal.cpp
 lethalj.cpp
 lgp.cpp
@@ -1101,7 +1102,6 @@ s4.cpp
 s6.cpp
 s7.cpp
 s8.cpp
-s8a.cpp
 s9.cpp
 safarir.cpp
 sam.cpp

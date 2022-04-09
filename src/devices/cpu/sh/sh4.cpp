@@ -32,7 +32,6 @@
 #include "sh4tmu.h"
 #include "sh_dasm.h"
 #include "cpu/drcumlsh.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(SH3LE, sh3_device,   "sh3le", "Hitachi SH-3 (little)")

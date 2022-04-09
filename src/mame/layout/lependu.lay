@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<element name="BUTTON1" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BUTTON 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+ 		<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>
+
+	<element name="BUTTON2" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BUTTON 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>
+
+	<element name="BUTTON3" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BUTTON 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>
+
+	<element name="BUTTON4" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BUTTON 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>	
+
+	<element name="BUTTON5" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BUTTON 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>
+
+	<element name="BUTTON6" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BUTTON 6">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>	
+	
+	<element name="cpanel">
+		<rect>
+			<color red="0.00" green="0.00" blue="0.00" />
+		</rect>
+	</element>
+
+	
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+	<element ref="cpanel"><bounds left="0" right="4" top="3" bottom="3.40" /></element>	
+
+		<element name="lamp3" ref="BUTTON1" inputtag="IN0-0" inputmask="0x10">
+			<bounds x="0.15" y="3.05" width="0.58" height="0.3" />
+		</element>
+		<element name="lamp1" ref="BUTTON2" inputtag="IN0-1" inputmask="0x08">
+			<bounds x="0.90" y="3.05" width="0.58" height="0.3" />
+		</element>
+		<element name="lamp2" ref="BUTTON3" inputtag="IN0-1" inputmask="0x10">
+			<bounds x="1.65" y="3.05" width="0.58" height="0.3" />
+		</element>
+		<element name="lamp4" ref="BUTTON4" inputtag="IN0-0" inputmask="0x04">
+			<bounds x="2.40" y="3.05" width="0.58" height="0.3" />
+		</element>
+		<element name="lamp0" ref="BUTTON5" inputtag="IN0-1" inputmask="0x04">
+			<bounds x="3.15" y="3.05" width="0.58" height="0.3" />
+		</element>
+			
+	</view>
+</mamelayout>

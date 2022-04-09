@@ -974,7 +974,7 @@ license:CC0
 	</software>
 
 	<software name="deja">
-		<description>De-Ja (SCD)(Jpn)</description>
+		<description>De·Ja (SCD)(Jpn)</description>
 		<year>1996</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="NIPR-1002"/>

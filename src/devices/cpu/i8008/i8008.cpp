@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "i8008.h"
 #include "8008dasm.h"
-#include "debugger.h"
 
 //**************************************************************************
 //  MACROS

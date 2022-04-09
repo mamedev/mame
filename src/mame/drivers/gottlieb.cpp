@@ -230,6 +230,10 @@ void gottlieb_state::machine_start()
 	/* register for save states */
 	save_item(NAME(m_joystick_select));
 	save_item(NAME(m_track));
+	save_item(NAME(m_knocker_prev));
+	save_item(NAME(m_gfxcharlo));
+	save_item(NAME(m_gfxcharhi));
+	save_item(NAME(m_weights));
 
 	/* see if we have a laserdisc */
 	if (m_laserdisc != nullptr)
@@ -2667,33 +2671,33 @@ void gottlieb_state::init_vidvince()
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,    0,        reactor,           reactor,  gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbert,      0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qberta,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbertj,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qberttst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", 0 )
-GAME( 1982, tylz,       0,        tylz,              tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,     0,        gottlieb1_rom,     argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets,   0,        gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", 0 )
-GAME( 1983, mplanetsuk, mplanets, gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,      0,        gottlieb1_rom,     krull,    gottlieb_state, init_ramtiles, ROT270, "Gottlieb",                  "Krull", 0 )
-GAME( 1983, kngtmare,   0,        gottlieb1,         kngtmare, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND ) // Missing sound ROMs
-GAME( 1983, sqbert,     0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, qbertqub,   0,        qbert,             qbertqub, gottlieb_state, init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND )
-GAME( 1984, curvebal,   0,        gottlieb1,         curvebal, gottlieb_state, init_romtiles, ROT270, "Mylstar",                   "Curve Ball", 0 )
+GAME( 1982, reactor,    0,        reactor,           reactor,  gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qbert,      0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qberta,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qbertj,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qberttst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tylz,       0,        tylz,              tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // modified sound hw?
+GAME( 1984, argusg,     0,        gottlieb1_rom,     argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , MACHINE_SUPPORTS_SAVE ) // aka Guardian / Protector?
+GAME( 1983, mplanets,   0,        gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mplanetsuk, mplanets, gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, krull,      0,        gottlieb1_rom,     krull,    gottlieb_state, init_ramtiles, ROT270, "Gottlieb",                  "Krull", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, kngtmare,   0,        gottlieb1,         kngtmare, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // Missing sound ROMs
+GAME( 1983, sqbert,     0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, qbertqub,   0,        qbert,             qbertqub, gottlieb_state, init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, curvebal,   0,        gottlieb1,         curvebal, gottlieb_state, init_romtiles, ROT270, "Mylstar",                   "Curve Ball", MACHINE_SUPPORTS_SAVE )
 
 /* games using rev 2 sound board */
-GAME( 1983, screwloo,   0,        screwloo,          screwloo, gottlieb_state, init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
+GAME( 1983, screwloo,   0,        screwloo,          screwloo, gottlieb_state, init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mach3,      0,        g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
 GAME( 1983, mach3a,     mach3,    g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
 GAME( 1983, mach3b,     mach3,    g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
 GAME( 1984, cobram3,    cobra,    cobram3,           cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
 GAME( 1984, cobram3a,   cobra,    cobram3,           cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
 GAME( 1984, usvsthem,   0,        g2laser,           usvsthem, gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
-GAME( 1984, 3stooges,   0,        gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
-GAME( 1984, 3stoogesa,  3stooges, gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )
-GAME( 1984, vidvince,   0,        gottlieb2_ram_rom, vidvince, gottlieb_state, init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // sprite wrapping issues
-GAME( 1984, wizwarz,    0,        gottlieb2,         wizwarz,  gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", 0 )
+GAME( 1984, 3stooges,   0,        gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 3stoogesa,  3stooges, gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vidvince,   0,        gottlieb2_ram_rom, vidvince, gottlieb_state, init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sprite wrapping issues
+GAME( 1984, wizwarz,    0,        gottlieb2,         wizwarz,  gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", MACHINE_SUPPORTS_SAVE )

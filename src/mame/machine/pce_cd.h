@@ -93,16 +93,16 @@ private:
 	void adpcm_playback_rate_w(uint8_t data);
 	void fade_register_w(uint8_t data);
 
-	uint8_t m_reset_reg;
-	uint8_t m_irq_mask;
-	uint8_t m_irq_status;
-	uint8_t m_cdc_status;
-	uint8_t m_cdc_data;
-	uint8_t m_bram_status;
-	uint8_t m_adpcm_status;
-	uint16_t m_adpcm_latch_address;
-	uint8_t m_adpcm_control;
-	uint8_t m_adpcm_dma_reg;
+	uint8_t m_reset_reg = 0;
+	uint8_t m_irq_mask = 0;
+	uint8_t m_irq_status = 0;
+	uint8_t m_cdc_status = 0;
+	uint8_t m_cdc_data = 0;
+	uint8_t m_bram_status = 0;
+	uint8_t m_adpcm_status = 0;
+	uint16_t m_adpcm_latch_address = 0;
+	uint8_t m_adpcm_control = 0;
+	uint8_t m_adpcm_dma_reg = 0;
 	uint8_t m_fade_reg = 0;
 
 	void regs_map(address_map &map);

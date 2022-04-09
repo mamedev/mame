@@ -101,5 +101,4 @@ void fc_expansion_devices(device_slot_interface &device);
 void famibox_control_port12_devices(device_slot_interface &device);
 void famibox_control_port3_devices(device_slot_interface &device);
 
-
 #endif // MAME_BUS_NES_CTRL_CTRL_H

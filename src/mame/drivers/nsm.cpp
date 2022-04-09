@@ -475,6 +475,6 @@ ROM_START(gamesnsm)
 	ROM_LOAD("151597.ic604", 0x4000, 0x2000, CRC(5c8a3547) SHA1(843a56012227a61ff068bc1e14baf090d4a95fe1))
 ROM_END
 
-GAME(1985,  cosflnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Cosmic Flash (NSM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Hot Fire Birds",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985,  gamesnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "The Games (NSM)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  cosflnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Cosmic Flash (NSM)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Hot Fire Birds",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  gamesnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "The Games (NSM)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

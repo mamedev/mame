@@ -2252,7 +2252,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ac1.cpp",
 	MAME_DIR .. "src/mame/drivers/bcs3.cpp",
 	MAME_DIR .. "src/mame/drivers/c80.cpp",
-	MAME_DIR .. "src/mame/includes/c80.h",
 	MAME_DIR .. "src/mame/drivers/huebler.cpp",
 	MAME_DIR .. "src/mame/includes/huebler.h",
 	MAME_DIR .. "src/mame/drivers/jtc.cpp",

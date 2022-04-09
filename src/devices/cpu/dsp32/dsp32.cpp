@@ -31,7 +31,6 @@
 #include "emu.h"
 #include "dsp32.h"
 #include "dsp32dis.h"
-#include "debugger.h"
 
 
 //**************************************************************************

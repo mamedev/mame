@@ -23,8 +23,6 @@ TODO:
 #include "hcd62121.h"
 #include "hcd62121d.h"
 
-#include "debugger.h"
-
 
 enum
 {

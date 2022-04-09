@@ -16,9 +16,6 @@
 #include "z8000.h"
 #include "z8000cpu.h"
 
-#include "debugger.h"
-#include "debug/debugcon.h"
-
 //#define VERBOSE 1
 #include "logmacro.h"
 

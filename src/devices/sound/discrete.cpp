@@ -353,7 +353,7 @@ discrete_base_node::discrete_base_node() :
 	m_input_intf(nullptr),
 	m_output_intf(nullptr)
 {
-	m_output[0] = 0.0;
+	std::fill(std::begin(m_output), std::end(m_output), 0.0);
 }
 
 

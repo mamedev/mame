@@ -37,7 +37,7 @@
 
 #include "opcode.h"
 
-#include "debugger.h"
+#include "debug/debugcpu.h"
 
 #include "dsp56def.h"
 

@@ -94,12 +94,12 @@ private:
 	emu_timer *m_irq_set_timer = 0;
 	emu_timer *m_irq_advance_timer = 0;
 
-	bool m_digwait = 0;
+	bool m_digwait = false;
 	u8 m_keyrow = 0U;
 	u16 m_digit = 0U;
 	u8 m_vector = 0U;
 	u8 m_snd_cmd = 0U;
-	bool m_snd_ack = 0;
+	bool m_snd_ack = false;
 	u32 m_last_solenoid = 0U;
 };
 
@@ -434,5 +434,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1987,  xforce,  0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  spcteam, 0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  xforce,  0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  spcteam, 0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -498,7 +498,14 @@ int stvcd_device::sega_cdrom_get_adr_control(cdrom_file *file, int track)
 
 void stvcd_device::cr_standard_return(uint16_t cur_status)
 {
-	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
+	if (!cdrom)
+	{
+		cr1 = cur_status;
+		cr2 = 0;
+		cr3 = 0;
+		cr4 = 0;
+	}
+	else if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
 	{
 		/* During seek state, values returned are from the target position */
 		uint8_t seek_track = cdrom->get_track(cd_fad_seek-150);
@@ -1912,6 +1919,11 @@ void stvcd_device::cd_exec_command()
 		1)
 		logerror("Command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
+	if(!cdrom && ((cr1 >> 8) & 0xff) != 0x00) {
+		hirqreg |= (CMOK);
+		return;
+	}
+
 	switch ((cr1 >> 8) & 0xff)
 	{
 		case 0x00: cmd_get_status(); break;
@@ -2000,6 +2012,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sh1_sim )
 
 TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 {
+	if(!cdrom)
+		return;
+
 	//m_sector_timer->reset();
 
 	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);

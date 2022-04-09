@@ -853,17 +853,17 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1984, petaco,   0,        petaco,   odin_dlx, peyper_state, init_1,     ROT0, "Juegos Populares", "Petaco",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Peyper",     "Odin",                     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Sonic",      "Odin De Luxe",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Gamatron (Sonic)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, init_0,     ROT0, "Sonic",      "Pole Position (Sonic)",    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Star Wars (Sonic, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Star Wars (Sonic, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, init_2,     ROT0, "Peyper",     "Wolf Man",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_2,     ROT0, "Peyper",     "Nemesis",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_2,     ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
-GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
-GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // initial program ROM missing; no manual found
+GAME( 1984, petaco,   0,        petaco,   odin_dlx, peyper_state, init_1,     ROT0, "Juegos Populares", "Petaco",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Peyper",     "Odin",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Sonic",      "Odin De Luxe",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Gamatron (Sonic)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, init_0,     ROT0, "Sonic",      "Pole Position (Sonic)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Star Wars (Sonic, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Star Wars (Sonic, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, init_2,     ROT0, "Peyper",     "Wolf Man",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_2,     ROT0, "Peyper",     "Nemesis",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_2,     ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // inputs to be checked
+GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // inputs to be checked
+GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // initial program ROM missing; no manual found

@@ -9957,6 +9957,7 @@ comg157                         // (c) 1983 Cal Omega Inc.
 comg159                         // (c) 1983 Cal Omega Inc.
 comg164                         // (c) 1983 Cal Omega Inc.
 comg168                         // (c) 1983 Cal Omega Inc.
+comg170                         // (c) 1983 Cal Omega Inc.
 comg172                         // (c) 1983 Cal Omega Inc.
 comg175                         // (c) 1984 Cal Omega / Casino Electronics Inc.
 comg176                         // (c) 1982 Cal Omega Inc.
@@ -12645,6 +12646,7 @@ douni                           // 8302  (c) 1983
 dowild                          // 8339A (c) 1984
 idsoccer                        // ????  (c) 1985
 idsoccera                       // ????  (c) 1985
+idsoccert                       // 8461A (c) 1985
 jjack                           // ????  (c) 1984
 kickridr                        // ????  (c) 1984
 spiero                          // ????  (c) 1987
@@ -13394,6 +13396,7 @@ pvwwcas
 
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
+flyingf                         // (c) 1976 Electra
 
 @source:electron.cpp
 electron                        // 1983 Acorn Electron
@@ -14631,6 +14634,7 @@ fourplay                        // multigame
 galap1                          // hack
 galap4                          // hack
 galapx                          // hack
+galartic                        // Artic System
 galaxbsf                        // hack
 galaxbsf2                       // bootleg
 galaxcirsa                      // bootleg (Cirsa)
@@ -15613,8 +15617,8 @@ goldnpkf                        // Intercoast (bootleg)
 goldnpkr                        // (c) 1981 Bonanza
 goodluck                        // Unknown
 jokercar                        // 199?, unknown
-lespendu						// (c) 198? Voyageur de L'Espace Inc.
-lespenduj						// (c) 198? Voyageur de L'Espace Inc.
+lespendu                        // (c) 198? Voyageur de L'Espace Inc.
+lespenduj                       // (c) 198? Voyageur de L'Espace Inc.
 maverik                         // 198?, Unknown
 maxidpkr                        // (c) 1990 Blitz System Inc
 megadpkr                        // (c) 1990 Blitz System Inc
@@ -16347,6 +16351,7 @@ harddrivb6                      // 136052           (c) 1988
 harddrivc                       // 136068           (c) 1990
 harddrivc1                      // 136068           (c) 1990
 harddrivcb                      // 136068           (c) 1990
+harddrivcbl                     // bootleg
 harddrivcg                      // 136068           (c) 1990
 harddrivg                       // 136052           (c) 1988
 harddrivg4                      // 136052           (c) 1988
@@ -17224,12 +17229,13 @@ zhongguo                        // (c) 2000
 
 @source:igs_m036.cpp
 cjddzsp                         // (c) 200?
-lhzb3in1                        // (c) 200?
 cjdh2                           // (c) 200?
 cjdh2a                          // (c) 200?
 cjdh2b                          // (c) 200?
 cjdh2c                          // (c) 200?
 igsm312                         // (c) 200?
+lhtb                            // (c) 200?
+lhzb3in1                        // (c) 200?
 
 @source:igs009.cpp
 gp98                            // (c) 1998
@@ -20163,6 +20169,9 @@ wsf3                            // (c) 1990 Leland
 
 @source:lemmings.cpp
 lemmings                        // prototype (c) 1991 Data East USA (US)
+
+@source:lependu.cpp
+lependu                         // 198? Voyageur de L'Espace Inc.
 
 @source:lethal.cpp
 lethalen                        // GX191 (c) 1992
@@ -37096,14 +37105,12 @@ wrlok_l3                        //
 @source:s8.cpp
 pfevr_l2                        //
 pfevr_p3                        //
-
-@source:s8a.cpp
+ratrc_l1                        //
 scrzy_l1                        //
 
 @source:s9.cpp
 comet_l4                        //
 comet_l5                        //
-ratrc_l1                        //
 sorcr_l1                        //
 sorcr_l2                        //
 sshtl_l3                        //
@@ -41107,9 +41114,11 @@ tascr30g
 
 @source:tasman.cpp
 dragsphr                        //
+horses4c                        //
 ivorytsk                        //
 kingtut                         //
 moneybnk                        //
+thequest                        //
 vikingt                         //
 
 @source:tatsumi.cpp

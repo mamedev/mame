@@ -16,7 +16,128 @@ Credits:
 2008-07
 Dip locations and factory settings verified with manual
 
+***************************************************************************
+
+Contra / Gryzor, Konami 1987
+Hardware info by Guru
+
+GX633 PWB302160
+|-------------------------------------------------------|
+|CN1  LA4445 CN3 CN4  YM2151    68B09     633M03.18A    |
+|             VOL                      633I02.17A 63C09 |
+|CN2          VOL          633E01.12A       007324      |
+|    005924     LM324 YM3012                            |
+|                                                       |
+|                                   8416 8464           |
+|     DIPSW1           24MHz                     007452 |
+|005273(x5)            3.579545MHz           007766     |
+|     DIPSW2                                            |
+|J          633E04.7D             633E06.16D            |
+|A    DIPSW3       |-----------|     |-----------|      |
+|M                 |           |5164 |           |5164  |
+|M                 |  KONAMI   |     |  KONAMI   |      |
+|A|--------|       |  007121   |     |  007121   |      |
+| |        |       |           |     |           |      |
+| | KONAMI |       |           |     |           |      |
+| | 007593 |       |-----------|     |-----------|      |
+| |        |                                            |
+| |        |633E05.7F             633E07.16F            |
+| |--------| 633E08.10G  4464 4464  633E10.18G 4464 4464|
+|                 633E09.12G          633E11.20G        |
+|-------------------------------------------------------|
+Notes:
+      LA4445 - Sanyo LA4445 2-Channel (Stereo) 5.5W Audio Power Amplifier
+       68B09 - 1.7897725MHz [3.579545/2] (audio CPU)
+       63C09 - 3.000MHz [24/8] (main CPU)
+      YM2151 - Yamaha YM2151 FM Operator Type-M (OPM) sound chip. Clock input 3.579545MHz
+      YM3012 - Yamaha YM3012 2-Channel Serial Input Floating D/A Converter (DAC-MS). Clock input 1.7897725MHz [3.579545/2]
+       LM324 - Texas Instruments LM324 Quad Operational Amplifier
+         CN1 - 4-pin connector for additional composite sync output
+         CN2 - 4-pin connector for 2nd speaker for stereo audio output
+         CN3 - 4-pin connector for mono output selector   \ with loopback plug connected to either CN3 or CN4
+         CN4 - 4-pin connector for stereo output selector /
+        8416 - Fujitsu MB8416 2kBx8-bit SRAM (sound program RAM)
+        8464 - Fujitsu MB8464 8kBx8-bit SRAM (main program RAM)
+        5164 - Sharp LH5164 or Fujitsu MB8464 8kBx8-bit SRAM (background RAM)
+        4464 - NEC D4464 64kBx8-bit DRAM (sprite RAM)
+      005273 - Konami custom resistor pack for controls/inputs
+      005924 - Konami custom ceramic coin counter driver
+      007766 - PAL16L8 marked '007766' at location 20D
+      007121 - Konami custom sprite / background generator
+      007324 - Resistor array package containing 8x 150 ohm resistors. The IC looks like a DIP16 logic chip
+               but with an epoxy top. The schematics show it connected to the 6309 data lines (D0-D7) and the
+               program ROM data lines (D0-D7). It is a simple resistor array.
+      007452 - Konami custom chip
+      007593 - Konami custom ceramic color mixer and RGB video DAC
+               Contains some logic and 2x 2kBx8-bit SRAMs for color RAM.
+               This IC also has 16x I/O lines but they are not connected on this PCB.
+  633I02.17A - 27512 64kBx8-bit EPROM \
+  633M03.18A - 27512 64kBx8-bit EPROM / (main program)
+  633E01.12A - 27256 32kBx8-bit EPROM (sound program)
+   633E04.7D - \
+   633E05.7F - |
+  633E06.16D - | 256kBx8-bit (2Mbit) DIP40 mask ROM (graphics)
+  633E07.16F - /
+  633E08.10G - MMI 63S141 256x4-bit Bipolar PROM, compatible with 82S129 (sprite lookup table)
+  633E09.12G - MMI 63S141 256x4-bit Bipolar PROM, compatible with 82S129 (character lookup table)
+  633E10.18G - MMI 63S141 256x4-bit Bipolar PROM, compatible with 82S129 (sprite lookup table)
+  633E11.20G - MMI 63S141 256x4-bit Bipolar PROM, compatible with 82S129 (character lookup table)
+      DIPSW3 - 4-position DIP switch
+    DIPSW1/2 - 8-position DIP switch
+
+
+Contra / Gryzor bootleg
+Hardware info by Guru
+
+(no PCB number)
+|-------------------------------------------------------------------------------------|
+| C1182         51C64 51C64 51C64 51C64 51C64                                  G-4.A17| A
+| VOL  PAL16R6    51C64 51C64 51C64 51C64 51C64                4016 82S129.B15 G-5.B17| B
+|                      |------------------|                         82S129.C15        | C
+|    18MHz      PAL16R8|                  |                                    G-6.D17| D
+|                      |                  |                                           | E
+|                      |----SUB-BOARD-----|                                    G-7.F17| F
+|    G-3.G2     PAL16R4           PAL16L8                                      G-8.G17| G
+|                                                                   PAL16R4           | H
+|J   G-2.J2                                                                    G-9.J17| J
+|A   68B09(1) 6264       PAL16L8                                              G-10.K17| K
+|M   LM324   YM3012                                                 4016      G-11.L17| L
+|M           DIPSW3   YM2151                                                  G-12.M17| M
+|A                    68B09(2)                    PAL20L8  PAL20L8                    | N
+|                                                                             G-13.P17| P
+|     DIPSW1 DIPSW2 G-1.P5  2063    2063                        PAL16R8       G-14.Q17| Q
+|14.31818MHz        2015                                                              | R
+|                                                                             G-15.S17| S
+|                                                                  82S129.T16 G-16.T17| T
+|                                                                        82S129.U16   | U
+|                                                                             G-17.V17| V
+|       6116  6116                                                            G-18.W17| W
+|-------------------------------------------------------------------------------------|
+  1   2   3     4     5     6    7    8    9  10 11  12    13    14    15    16    17
+
+Notes:
+   68B09(1) - Motorola MC68B09EP CPU. Clock input 3.000MHz [18/6]
+   68B09(2) - Motorola MC68B09EP CPU. Clock input 1.7897725MHz [14.31818/8]
+     YM3012 - Yamaha YM3012 2-Channel Serial Input Floating D/A Converter (DAC-MS). Clock input 1.7897725MHz [3.579545/2]
+     YM2151 - Yamaha YM2151 FM Operator Type-M (OPM) sound chip. Clock input 3.579545MHz [14.31818/4]
+      51C64 - Hynix HY51C64 64kBx1-bit DRAM (sprite RAM). Total RAM is 80kBx8-bit whereas the original board has 128kBx8-bit DRAM (4x 4464 chips).
+       6116 - HM6116 2kBx8-bit SRAM (color RAM). At power-on, this is tested as one RAM equivalent to the
+              internal 4kBx8-bit SRAM in the custom color mixer/RGB DAC at 1F on the original board.
+       6264 - Hitachi HM6264 8kBx8-bit SRAM (main program RAM)
+       2063 - Toshiba TMM2063 8kBx8-bit SRAM (background RAM front layer)
+       4016 - NEC D4016 2kBx8-bit SRAM (background RAM back layer)
+       2015 - Toshiba TMM2015 2kBx8-bit SRAM (sound program RAM)
+      C1182 - NEC C1182 Audio Power Amplifier
+      LM324 - Texas Instruments LM324 Quad Operational Amplifier
+  SUB-BOARD - Daughter board containing logic plugged into a DIP40 socket. Might be a re-implementation
+              of Konami 007452 custom chip modified to fit a DIP40 socket.
+     DIPSW3 - 4-position DIP switch
+   DIPSW1/2 - 8-position DIP switch
+      HSync - 15.35929kHz
+      VSync - 61.0208Hz
+
 ***************************************************************************/
+
 
 #include "emu.h"
 
