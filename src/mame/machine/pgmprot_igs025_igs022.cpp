@@ -337,7 +337,7 @@ MACHINE_RESET_MEMBER(pgm_022_025_state, dw3)
 void pgm_022_025_state::igs025_to_igs022_callback( void )
 {
 //  printf("igs025_to_igs022_callback\n");
-	m_igs022->IGS022_handle_command();
+	m_igs022->handle_command();
 }
 
 
