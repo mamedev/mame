@@ -16563,6 +16563,7 @@ rw10r                           // Rockwell
 rw12r                           // Rockwell
 rw18r                           // Rockwell
 rw24k                           // Rockwell
+rw30r                           // Rockwell
 rw31r                           // Rockwell
 
 @source:hh_sm510.cpp
