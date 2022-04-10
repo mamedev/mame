@@ -62,27 +62,27 @@ public:
 	void sound_g_w(uint8_t data);
 	void sound_d_w(uint8_t data);
 
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 
-	int m_ea_bank;
+	int m_ea_bank = 0;
 
 	/* external RAM state */
 	std::vector<uint8_t> m_ext_ram;
-	int m_rambank;
+	int m_rambank = 0;
 
 	/* video state */
-	int m_frame_count;
-	int m_frame_start;
-	int m_video_enable;
-	int m_video_bank;
-	int m_video_hpos;
-	uint8_t m_led_latch[8];
+	int m_frame_count = 0;
+	int m_frame_start = 0;
+	int m_video_enable = 0;
+	int m_video_bank = 0;
+	int m_video_hpos = 0;
+	uint8_t m_led_latch[8] = {};
 	std::unique_ptr<uint8_t []> m_display;
 
 	/* sound state */
-	int m_sound_cmd;
-	int m_sound_d;
-	int m_sound_g;
+	int m_sound_cmd = 0;
+	int m_sound_d = 0;
+	int m_sound_g = 0;
 	void advision_palette(palette_device &palette) const;
 	void advision(machine_config &config);
 	void io_map(address_map &map);

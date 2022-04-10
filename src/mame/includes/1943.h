@@ -59,22 +59,22 @@ private:
 	required_memory_bank m_mainbank;
 
 	/* video-related */
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg2_tilemap;
-	int     m_char_on;
-	int     m_obj_on;
-	int     m_bg1_on;
-	int     m_bg2_on;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg2_tilemap = nullptr;
+	int     m_char_on = 0;
+	int     m_obj_on = 0;
+	int     m_bg1_on = 0;
+	int     m_bg2_on = 0;
 
 	/* protection */
-	u8 m_cpu_to_mcu; // ls374 at 5k
-	u8 m_mcu_to_cpu; // ls374 at 6k
-	u8 m_audiocpu_to_mcu; // ls374 at 5l
-	u8 m_mcu_to_audiocpu; // ls374 at 6l
-	u8 m_mcu_p0;
-	u8 m_mcu_p2;
-	u8 m_mcu_p3;
+	u8 m_cpu_to_mcu = 0; // ls374 at 5k
+	u8 m_mcu_to_cpu = 0; // ls374 at 6k
+	u8 m_audiocpu_to_mcu = 0; // ls374 at 5l
+	u8 m_mcu_to_audiocpu = 0; // ls374 at 6l
+	u8 m_mcu_p0 = 0;
+	u8 m_mcu_p2 = 0;
+	u8 m_mcu_p3 = 0;
 
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	void mcu_p3_w(u8 data);
