@@ -19,6 +19,7 @@ ROM source notes when dumped from another model, but confident it's the same:
 #include "cpu/rw5000/a5500.h"
 #include "cpu/rw5000/a5900.h"
 #include "cpu/rw5000/b5000.h"
+#include "cpu/rw5000/b5500.h"
 #include "cpu/rw5000/b6000.h"
 #include "cpu/rw5000/b6100.h"
 #include "video/pwm.h"
