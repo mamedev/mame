@@ -12277,8 +12277,6 @@ void goldnpkr_state::init_pokersis()
 	ROM[0x7ffd] = 0x5f;
 }
 
-} // anonymous namespace
-
 
 void goldnpkr_state::init_lespendu()
 {
@@ -12312,6 +12310,8 @@ void goldnpkr_state::init_lespenduj()
 	ROM0[0x766c] = 0x17;  // fix lamps bug
 	ROM0[0x7749] = 0x17;  // fix lamps bug
 }
+
+} // anonymous namespace
 
 
 /*********************************************
