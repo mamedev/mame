@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Roberto Fresca, Grull Osgo
-/*********************************************************************
+/**********************************************************************************
 
   Le Pendu.
   Voyageur de L'Espace Inc.
@@ -12,33 +12,39 @@
   Driver by Roberto Fresca & Grull Osgo.
 
 
-**********************************************************************
+***********************************************************************************
 
-  The "mini-boy" poker games made by Bonanza Enterprises were very popular in Quebec
-  back in the early '80s. They were everywhere in small restaurants, bars and stores.
+  The "mini-boy" poker games made by Bonanza Enterprises were very popular
+  in Quebec back in the early '80s. They were everywhere in small restaurants,
+  bars and convenience stores.
 
-  Popularity faded away when the slot machines (lucky 7's) were introduced. (many "miniboy"
-  machines were converted to play lucky 7 slots. A kit was available from a local company).
+  Popularity faded away when the slot machines (lucky 7's) were introduced.
+  Many "miniboy" machines were converted to play lucky 7 slots. (A kit was
+  available from a local company).
 
-  All independent gambling devices were made illegal in 1993, when the government lottery
-  company (lotto-Quebec) took over the video-lottery business. 1000's of machines were
-  stored, destroyed or seized by the police. 
+  All independent gambling devices were made illegal in 1993, when the government
+  lottery company (lotto-Quebec) took over the video-lottery business. Thousands
+  of machines were stored, destroyed or seized by the police. 
 
-  To keep them alive, some of these machines were converted to "Le Pendu / Hangman".
-  A conversion kit was proposed by a local company, developed in Quebec. The kit includes
-  a in-house modification of the "Bonanza" poker board + a new 5 buttons plate to replace
-  the traditional 15 poker buttons, since the game has nothing to do with gambling
-  (Hangman game, you need to guess a word before the character man is hanged).
+  To keep them alive, some of these machines were converted to Le Pendu / Hangman.
+  A conversion kit was proposed by a local company, developed in Quebec.
+  The kit includes a in-house modification of the "Bonanza" poker board, plus a new
+  5 buttons plate to replace the traditional 15 poker buttons, since the game has
+  nothing to do with gambling (Hangman game, you need to guess a word before the
+  character man is hanged).
 
-  It was not a great success, so the game is very rare. On top of that, the designer added
-  copy protection to his work, and the game cannot start when the battery drains.
-  (part of the modification was to remove the battery memory on/off switch)
+  It was not a great success, so the game is very rare. On top of that, the designer
+  added copy protection to his work, and the game cannot start when the battery
+  drains. (part of the modification was to remove the battery memory on/off switch)
 
-  There are some critical registers and rerouted subroutines in the battery backed RAM,
-  hence the game dies once the battery drains.
+  There are some critical registers and rerouted subroutines in the battery backed
+  RAM, hence the game dies once the battery drains.
+
+  Here, you can see a video of the game working for refference:
+  https://youtu.be/e3d8KyUVL_g
 
 
-**********************************************************************
+***********************************************************************************
 
   Le Pendu Bilingue (Version 04)
   ------------------------------
@@ -64,7 +70,7 @@
   Discrete circuitry for sound.
 
 
-*********************************************************************/
+**********************************************************************************/
 
 
 #include "emu.h"
@@ -101,6 +107,8 @@ public:
 		m_discrete(*this, "discrete"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_bank(*this, "bank%u", 0U),
+		m_input(*this, "IN.%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -128,7 +136,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<discrete_device> m_discrete;
+	required_device<discrete_device> m_discrete;
+	
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -139,10 +148,12 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
+	required_memory_bank_array<2> m_bank;
+	required_ioport_array<4> m_input;
 	output_finder<5> m_lamps;
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_mux_data = 0;
+	uint8_t m_mux_data;
 };
 
 
@@ -239,26 +250,21 @@ void lependu_state::lependu_palette(palette_device &palette) const
 *               R/W Handlers               *
 *******************************************/
 
-uint8_t lependu_state::lependu_mux_port_r()
-{
-	switch( m_mux_data & 0xf0 )   // bits 4-7
-	{
-		// normal selector writes 7F-BF-DF-EF
-		case 0x10: return ioport("IN0-0")->read();
-		case 0x20: return ioport("IN0-1")->read();
-		case 0x40: return ioport("IN0-2")->read();
-		case 0x80: return ioport("IN0-3")->read();
-	}
-	return 0xff;
-}
-
 void lependu_state::mux_w(uint8_t data)
 {
-	m_mux_data = data ^ 0xff;   // inverted
-	membank("bank1")->set_entry(data & 0x03);
-	membank("bank2")->set_entry(data & 0x03);
+	m_bank[0]->set_entry(data & 0x03);
+	m_bank[1]->set_entry(data & 0x03);
+	data = ((data ^ 0xff) & 0xf0) >> 4;
+
+	for(u8 i = 0; i < 4 ; i++)
+		if((pow(2,i) == data))
+			m_mux_data = i;
 }
 
+uint8_t lependu_state::lependu_mux_port_r()
+{
+	return m_input[m_mux_data]->read();
+}
 
 /*******************************************
 *            Lamps and Outputs             *
@@ -281,12 +287,8 @@ void lependu_state::lamps_w(uint8_t data)
  */
 	data = data ^ 0xff;
 
-	m_lamps[0] = BIT(data, 3);
-	m_lamps[1] = BIT(data, 4);
-	m_lamps[2] = BIT(data, 5);
-	m_lamps[3] = BIT(data, 6);
-	m_lamps[4] = BIT(data, 7);
-
+	for(u8 i = 0; i < 5 ; i++)
+		m_lamps[i] = BIT(data, i + 3);
 }
 
 
@@ -314,8 +316,8 @@ void lependu_state::lependu_map(address_map &map)
 	map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0800, 0x0bff).ram().w(FUNC(lependu_state::lependu_videoram_w)).share("videoram");
 	map(0x0c00, 0x0fff).ram().w(FUNC(lependu_state::lependu_colorram_w)).share("colorram");
-	map(0x8000, 0x9fff).bankr("bank1");
-	map(0xa000, 0xbfff).bankr("bank2");	
+	map(0x8000, 0x9fff).bankr("bank0");
+	map(0xa000, 0xbfff).bankr("bank1");	
 	map(0xc000, 0xffff).rom();
 }
 
@@ -326,7 +328,7 @@ void lependu_state::lependu_map(address_map &map)
 
 static INPUT_PORTS_START(lependu)
 	// Multiplexed - 4x5bits
-	PORT_START("IN0-0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_NAME("Stats / Meters")                PORT_CODE(KEYCODE_0)  // stats
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Button 4 / Stats Input Test")   PORT_CODE(KEYCODE_V)  // button 4 / stats test mode 
@@ -336,7 +338,7 @@ static INPUT_PORTS_START(lependu)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN0-1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Button 5 / Stats exit")         PORT_CODE(KEYCODE_B)  // button 5 / Stats exit
@@ -346,10 +348,10 @@ static INPUT_PORTS_START(lependu)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN0-2")
+	PORT_START("IN.2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN0-3")
+	PORT_START("IN.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_NAME("Audit")                         PORT_CODE(KEYCODE_9)  // audit? (inside the game) to check...
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -519,14 +521,16 @@ void lependu_state::machine_start()
 
 	uint8_t *ROM1 = memregion("data1")->base();
 	uint8_t *ROM2 = memregion("data2")->base();
-	membank("bank1")->configure_entries(0, 4, &ROM1[0], 0x2000);
-	membank("bank2")->configure_entries(0, 4, &ROM2[0], 0x2000);
+	m_bank[0]->configure_entries(0, 4, &ROM1[0], 0x2000);
+	m_bank[1]->configure_entries(0, 4, &ROM2[0], 0x2000);
+
+	m_mux_data = 0;
 }
 
 void lependu_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	m_bank[0]->set_entry(0);
+	m_bank[1]->set_entry(0);
 }
 
 
