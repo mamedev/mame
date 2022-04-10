@@ -52,8 +52,8 @@ private:
 
 	memory_share_creator<uint8_t> m_spritebank;
 
-	uint8_t m_bgbank[8];
-	tilemap_t *m_bg_tilemap;
+	uint8_t m_bgbank[8]{};
+	tilemap_t *m_bg_tilemap = nullptr;
 	std::unique_ptr<uint16_t[]> m_spriteram_old;
 	std::unique_ptr<uint16_t[]> m_spriteram_older;
 	std::unique_ptr<uint16_t[]> m_spriteram2_old;

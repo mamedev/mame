@@ -43,9 +43,9 @@ private:
 	optional_shared_ptr<u8> m_spriteram;
 	memory_share_creator<u8> m_paletteram;
 
-	u8 m_ninjakun_io_a002_ctrl;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	u8 m_ninjakun_io_a002_ctrl = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	void ninjakun_cpu1_io_A002_w(u8 data);
 	void ninjakun_cpu2_io_A002_w(u8 data);
