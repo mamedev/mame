@@ -174,17 +174,6 @@ void hh_sm510_state::machine_start()
 	m_display_decay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hh_sm510_state::display_decay_tick),this));
 	m_display_decay_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
 
-	// zerofill
-	m_inp_mux = 0;
-	m_speaker_data = 0;
-	m_s = 0;
-	m_r = 0;
-	m_display_x_len = 0;
-	m_display_y_len = 0;
-	m_display_z_len = 0;
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_inp_lines));

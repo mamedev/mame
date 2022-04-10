@@ -54,7 +54,7 @@ protected:
 	bool m_lcd_ready = false;
 	u8 m_lcd_count = 0;
 	u8 m_lcd_command = 0;
-	u8 m_lcd_data[0x40]{};
+	u8 m_lcd_data[0x40];
 };
 
 INPUT_PORTS_EXTERN( saitek_stratos );
