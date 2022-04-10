@@ -87,11 +87,11 @@ private:
 	required_device<ram_device> m_ram;
 
 	required_shared_ptr<uint8_t> m_ram_base;
-	uint8_t m_banks_num;
-	uint8_t m_kp_matrix;
-	uint8_t m_lcd_contrast;
-	int m_lcd_backlight;
-	uint8_t m_status_flag;
+	uint8_t m_banks_num = 0;
+	uint8_t m_kp_matrix = 0;
+	uint8_t m_lcd_contrast = 0;
+	int m_lcd_backlight = 0;
+	uint8_t m_status_flag = 0;
 
 	required_memory_bank m_bank1;
 	required_ioport m_bit0;

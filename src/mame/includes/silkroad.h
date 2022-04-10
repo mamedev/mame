@@ -40,7 +40,7 @@ private:
 
 	required_memory_bank m_okibank;
 
-	tilemap_t *m_tilemap[3];
+	tilemap_t *m_tilemap[3]{};
 
 	void coin_w(uint8_t data);
 	template<int Layer> void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

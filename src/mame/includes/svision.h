@@ -59,16 +59,16 @@ protected:
 private:
 	struct svision_t
 	{
-		emu_timer *timer1;
-		int timer_shot;
+		emu_timer *timer1 = nullptr;
+		int timer_shot = 0;
 	};
 
 	struct svision_pet_t
 	{
-		int state;
-		int on, clock, data;
-		uint8_t input;
-		emu_timer *timer;
+		int state = 0;
+		int on = 0, clock = 0, data = 0;
+		uint8_t input = 0;
+		emu_timer *timer = nullptr;
 	};
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
@@ -117,12 +117,12 @@ private:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 
 	svision_t m_svision;
 	svision_pet_t m_pet;
 	tvlink_t m_tvlink;
-	bool m_dma_finished;
+	bool m_dma_finished = false;
 };
 
 #endif // MAME_INCLUDES_SVISION_H

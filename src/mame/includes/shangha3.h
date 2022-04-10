@@ -53,11 +53,11 @@ private:
 	optional_memory_bank m_okibank;
 
 	// driver init configuration
-	int m_do_shadows;
-	uint8_t m_drawmode_table[16];
+	int m_do_shadows = 0;
+	uint8_t m_drawmode_table[16]{};
 
-	int m_prot_count;
-	uint16_t m_gfxlist_addr;
+	int m_prot_count = 0;
+	uint16_t m_gfxlist_addr = 0;
 	bitmap_ind16 m_rawbitmap;
 
 	// common

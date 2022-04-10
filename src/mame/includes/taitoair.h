@@ -20,13 +20,13 @@
 enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
 
 struct taitoair_spoint {
-	s32 x, y;
+	s32 x = 0, y = 0;
 };
 
 struct taitoair_poly {
 	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT];
-	int pcount;
-	u16 header;
+	int pcount = 0;
+	u16 header = 0;
 };
 
 
@@ -67,7 +67,7 @@ private:
 	taitoair_poly  m_q;
 
 	/* misc */
-	int           m_dsp_hold_signal;
+	int           m_dsp_hold_signal = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -84,15 +84,15 @@ private:
 	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
 
 	/* 3d info */
-	s16 m_frustumLeft;
-	s16 m_frustumBottom;
-	s16 m_eyecoordBuffer[4];  /* homogeneous */
+	s16 m_frustumLeft = 0;
+	s16 m_frustumBottom = 0;
+	s16 m_eyecoordBuffer[4]{};  /* homogeneous */
 
-	bool m_gradbank;
+	bool m_gradbank = false;
 
-	u16 m_dsp_test_object_type;
-	s16 m_dsp_test_or_clip, m_dsp_test_and_clip;
-	s16 m_dsp_test_x, m_dsp_test_y, m_dsp_test_z;
+	u16 m_dsp_test_object_type = 0;
+	s16 m_dsp_test_or_clip = 0, m_dsp_test_and_clip = 0;
+	s16 m_dsp_test_x = 0, m_dsp_test_y = 0, m_dsp_test_z = 0;
 
 	void dsp_test_start_w(u16 data);
 	void dsp_test_x_w(u16 data);
@@ -102,14 +102,14 @@ private:
 	u16 dsp_test_or_clip_r();
 	u16 dsp_test_and_clip_r();
 
-	s16 m_dsp_muldiv_a_1, m_dsp_muldiv_b_1, m_dsp_muldiv_c_1;
+	s16 m_dsp_muldiv_a_1 = 0, m_dsp_muldiv_b_1 = 0, m_dsp_muldiv_c_1 = 0;
 
 	void dsp_muldiv_a_1_w(u16 data);
 	void dsp_muldiv_b_1_w(u16 data);
 	void dsp_muldiv_c_1_w(u16 data);
 	u16 dsp_muldiv_1_r();
 
-	s16 m_dsp_muldiv_a_2, m_dsp_muldiv_b_2, m_dsp_muldiv_c_2;
+	s16 m_dsp_muldiv_a_2 = 0, m_dsp_muldiv_b_2 = 0, m_dsp_muldiv_c_2 = 0;
 
 	void dsp_muldiv_a_2_w(u16 data);
 	void dsp_muldiv_b_2_w(u16 data);

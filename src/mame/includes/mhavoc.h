@@ -88,16 +88,16 @@ private:
 	optional_ioport m_coin;
 	optional_ioport m_service;
 
-	uint8_t m_alpha_data;
-	uint8_t m_alpha_rcvd;
-	uint8_t m_alpha_xmtd;
-	uint8_t m_gamma_data;
-	uint8_t m_gamma_rcvd;
-	uint8_t m_gamma_xmtd;
-	uint8_t m_player_1;
-	uint8_t m_alpha_irq_clock;
-	uint8_t m_alpha_irq_clock_enable;
-	uint8_t m_gamma_irq_clock;
-	uint8_t m_has_gamma_cpu;
-	uint8_t m_speech_write_buffer;
+	uint8_t m_alpha_data = 0;
+	uint8_t m_alpha_rcvd = 0;
+	uint8_t m_alpha_xmtd = 0;
+	uint8_t m_gamma_data = 0;
+	uint8_t m_gamma_rcvd = 0;
+	uint8_t m_gamma_xmtd = 0;
+	uint8_t m_player_1 = 0;
+	uint8_t m_alpha_irq_clock = 0;
+	uint8_t m_alpha_irq_clock_enable = 0;
+	uint8_t m_gamma_irq_clock = 0;
+	uint8_t m_has_gamma_cpu = 0;
+	uint8_t m_speech_write_buffer = 0;
 };
