@@ -5,7 +5,7 @@
     krz2000.cpp - Kurzweil K2000 series
 
     Skeleton driver by R. Belmont
-	Additional improvements by Peter Sobot
+    Additional improvements by Peter Sobot
 
     Hardware in brief:
         TMP68301 CPU @ 16 MHz (with debug port on RXD2/TXD2)
@@ -16,12 +16,12 @@
         HD6303 on I/O board to manage reverb DSP program loading
         VLSI ASIC "Calvin" - Handles maincpu and PCM ROM/RAM addressing, as well as resampling (and possibly DRAM refresh)
          (on later K2000 and all later K-series units this is replaced by a more advanced VLSI ASIC "Janis")
-		 (service manual says "sample fetching tasks")
+         (service manual says "sample fetching tasks")
         2x VLSI ASIC "Hobbes" - specialized DSP processors for sound synthesis (oscillators, filters, etc)
-		 (service manual says "wave form generation and DSP functions")
-		 (each Hobbes chip handles a subset of available voices, and seems independently programmable)
-		Digitech DSP256 Multi Effects VLSI Chip (reverb, chorus, delay, etc)
-		 (EPROM seems avaialble on eBay, but the chip itself is quite custom)
+         (service manual says "wave form generation and DSP functions")
+         (each Hobbes chip handles a subset of available voices, and seems independently programmable)
+        Digitech DSP256 Multi Effects VLSI Chip (reverb, chorus, delay, etc)
+         (EPROM seems avaialble on eBay, but the chip itself is quite custom)
 
 ***************************************************************************/
 
@@ -113,7 +113,7 @@ void k2000_state::swap_bit_ctrl_w(uint16_t data)
 	data &= 0xff;
 	logerror("%02x written to swap_bit_ctrl_w\n", data);
 	// bit 4:
-	// 	0 = program ROM at 0x000000, work RAM    at 0x100000
+	//  0 = program ROM at 0x000000, work RAM    at 0x100000
 	//  1 = work RAM    at 0x000000, program ROM at 0x100000
 	m_1m_bank->set_bank((data >> 4) & 1);
 }
@@ -126,31 +126,37 @@ uint16_t k2000_state::battery_voltage_and_keyscanner_version(offs_t offset)
 	return (((uint16_t) battery_voltage) << 8) | ((uint16_t) keyscanner_version);
 }
 
-uint16_t k2000_state::calvin_read(offs_t offset) {
+uint16_t k2000_state::calvin_read(offs_t offset)
+{
 	logerror("Read from Calvin at %06x\n", offset);
 	return 0;
 }
 
-void k2000_state::calvin_write(offs_t offset, uint16_t data) {
+void k2000_state::calvin_write(offs_t offset, uint16_t data)
+{
 	logerror("Write to Calvin at %06x = %04x\n", offset, data);
 }
 
-uint16_t k2000_state::hobbes0_read(offs_t offset) {
+uint16_t k2000_state::hobbes0_read(offs_t offset)
+{
 	logerror("Read from Hobbes[0] at %06x\n", offset);
 	return 0;
 }
 
-void k2000_state::hobbes0_write(offs_t offset, uint16_t data) {
+void k2000_state::hobbes0_write(offs_t offset, uint16_t data)
+{
 	logerror("Write to Hobbes[0] at %06x = %04x\n", offset, data);
 }
 
 
-uint16_t k2000_state::hobbes1_read(offs_t offset) {
+uint16_t k2000_state::hobbes1_read(offs_t offset)
+{
 	logerror("Read from Hobbes[1] at %06x\n", offset);
 	return 0;
 }
 
-void k2000_state::hobbes1_write(offs_t offset, uint16_t data) {
+void k2000_state::hobbes1_write(offs_t offset, uint16_t data)
+{
 	logerror("Write to Hobbes[1] at %06x = %04x\n", offset, data);
 }
 
@@ -330,7 +336,7 @@ void k2000_state::k2000(machine_config &config)
 	// MIDI_PORT(config, m_midi, midiin_slot, "midiin");
 	// TODO: Uncomment when the TMP68301 has serial/MIDI support, to wire up MIDI I/O and scanner.
 	// MIDI_PORT(config, m_midi, midiout_slot, "midiout");
-	
+
 	// M37450(config, m_scanner, XTAL(10'000'000));
 	// The "Scanner" sub-CPU is connected to main CPU via:
 	//  - MIDI_FM_ENG, going to P34/RxD, which comes from SERTxD, which is INTMIDITxD == TxD1
@@ -374,17 +380,15 @@ static INPUT_PORTS_START( k2000 )
 INPUT_PORTS_END
 
 ROM_START( k2000 )
-	ROM_REGION(/* Length */ 0x140000, "maincpu", 0)
+	ROM_REGION(0x140000, "maincpu", 0)
 	// note that since this firmware revision ends with a J, it is intended for a K2000 with the "Janis" Sample/Addressing ASIC (the later mainboard)
 	// the earlier board has firmware revisions which end with a C, for the "Calvin" Sample/Addressing ASIC, on the older K2000 mainboard
-	// Engine ROMs: 
 	ROM_LOAD16_BYTE( "k2j-k2rj_eng_hi__v2.0j_3b69__=c=_1993_yca.tms27c040.u6", 0x000000, 0x080000, CRC(35c17fc3) SHA1(b91deec0127669b46af05a2acaa212e29e49abfb) ) // TMS27C040 EPROM with sticker: "K2J-K2RJ ENG HI // V2.0J 3B69 // (C) 1993 YCA" @ U6
 	ROM_LOAD16_BYTE( "k2j-k2rj_eng_lo__v2.0j_0db0__=c=_1993_yca.tms27c040.u3", 0x000001, 0x080000, CRC(11c7f436) SHA1(c2afe84b58d71932f223097ea01812eb513bd740) ) // TMS27C040 EPROM with sticker: "K2J-K2RJ ENG LO // V2.0J 0DB0 // (C) 1993 YCA" @ U3
-	// Setup ROMs:
 	ROM_LOAD16_BYTE( "k2j-k2rj_su_hi__v12ts_5e89__=c=_1993_yca.m27c1001.u5", 0x100000, 0x020000, CRC(16e0bdb7) SHA1(962fa10896f6a95210d752be28f02640869893a4) ) // MC27C1001 EPROM with sticker: "K2J-K2RJ SU HI // V12TS 5E89 // (C) 1993 YCA" @ U5
 	ROM_LOAD16_BYTE( "k2j-k2rj_su_lo__v12ts_2f52__=c=_1993_yca.m27c1001.u2", 0x100001, 0x020000, CRC(cb11e837) SHA1(bcdf3d5abe8c53727a142008acb2755ed0ecc6ea) ) // MC27C1001 EPROM with sticker: "K2J-K2RJ SU LO // V12TS 2F52 // (C) 1993 YCA" @ U2
 
-	ROM_REGION16_BE(/* Length */ 0x800000, "pcm", 0) // 23c080(?) 8MBit mask roms, byte-mode, in pairs. These are common on at least several members of the K2000 series; each has a unique number stored in the JEDEC id field.
+	ROM_REGION(0x2000000, "pcm", 0) // 23c080(?) 8MBit mask roms, byte-mode, in pairs. These are common on at least several members of the K2000 series; each has a unique number stored in the JEDEC id field.
 	ROM_LOAD16_BYTE( "k2m1h_25da__830106-01__=c=1991_yca__japan_9322_d.ide6ed.u38", 0x000001, 0x100000, CRC(f110b0e7) SHA1(d8731b74b1ca6761f8fd3f6360bfe2f1cc3077bc) ) // Silkscreen: "K2M1H 25DA // 830106-01 // (C)1991 YCA // JAPAN 9322 D" @ U38; chip JEDEC id = e6 ed
 	ROM_LOAD16_BYTE( "k2m1l_20fe__830107-01__=c=1991_yca__japan_9324_d.idb9a4.u43", 0x000000, 0x100000, CRC(00715fbe) SHA1(99f661096031b794de216c74ce9b780e9889d344) ) // Silkscreen: "K2M1L 20FE // 830107-01 // (C)1991 YCA // JAPAN 9324 D" @ U43; chip JEDEC id = b9 a4
 	ROM_LOAD16_BYTE( "k2m2h_de34__830108-01__=c=1991_yca__japan_9324_d.id0000.u39", 0x200001, 0x100000, CRC(99aae00e) SHA1(7045fb6b19b046f3f068a3581b6498ee62603fb4) ) // Silkscreen: "K2M2H DE34 // 830108-01 // (C)1991 YCA // JAPAN 9324 D" @ U39; chip JEDEC id = 00 00
@@ -431,10 +435,10 @@ ROM_START( k2000 )
 	// Silkscreen: "KZK ROM 1-4 // 830117-01 N // (C) 1993 YCA" @ U4
 	// newer board variant:
 	// https://media.sweetwater.com/api/i/q-82__ha-8bb2b6f5cf9d25a9__hmac-757ef5825b7f607b540327a23b1e1ace1fe15df5/images/items/750/RM126-large.jpg
-	// ROM_LOAD( "k2xxrom1-1__830114-01n__2003kurzweil__0402.u1", 0x800000, 0x200000, CRC(39b55c26) SHA1(5937365835a9c1038dfd73d8624f4d7ab0ec48fa) ) // Silkscreen: "K2xxROM1-1 // 830114-01N // <square symbol>2003KURZWEIL // 0402" @ U1
-	// ROM_LOAD( "k2xxrom1-2__830115-01n__2003kurzweil__0402.u2", 0xa00000, 0x200000, CRC(fba51423) SHA1(4cfdb08c297dca15fddd13963bed0ef501b67c55) ) // Silkscreen: "K2xxROM1-2 // 830115-01N // <square symbol>2003KURZWEIL // 0402" @ U2
-	// ROM_LOAD( "k2xxrom1-3__830116-01n__2003kurzweil__0402.u3", 0xc00000, 0x200000, CRC(4efedf7f) SHA1(b6888d533a6338aae4d51d3b70f964eb96266069) ) // Silkscreen: "K2xxROM1-3 // 830116-01N // <square symbol>2003KURZWEIL // 0402" @ U3
-	// ROM_LOAD( "k2xxrom1-4__830117-01n__2003kurzweil__0402.u4", 0xe00000, 0x200000, CRC(4b83d510) SHA1(061a0e954779cb7214ca17bb3a879bb7bc36eddd) ) // Silkscreen: "K2xxROM1-4 // 830117-01N // <square symbol>2003KURZWEIL // 0402" @ U4
+	ROM_LOAD( "k2xxrom1-1__830114-01n__2003kurzweil__0402.u1", 0x800000, 0x200000, CRC(39b55c26) SHA1(5937365835a9c1038dfd73d8624f4d7ab0ec48fa) ) // Silkscreen: "K2xxROM1-1 // 830114-01N // <square symbol>2003KURZWEIL // 0402" @ U1
+	ROM_LOAD( "k2xxrom1-2__830115-01n__2003kurzweil__0402.u2", 0xa00000, 0x200000, CRC(fba51423) SHA1(4cfdb08c297dca15fddd13963bed0ef501b67c55) ) // Silkscreen: "K2xxROM1-2 // 830115-01N // <square symbol>2003KURZWEIL // 0402" @ U2
+	ROM_LOAD( "k2xxrom1-3__830116-01n__2003kurzweil__0402.u3", 0xc00000, 0x200000, CRC(4efedf7f) SHA1(b6888d533a6338aae4d51d3b70f964eb96266069) ) // Silkscreen: "K2xxROM1-3 // 830116-01N // <square symbol>2003KURZWEIL // 0402" @ U3
+	ROM_LOAD( "k2xxrom1-4__830117-01n__2003kurzweil__0402.u4", 0xe00000, 0x200000, CRC(4b83d510) SHA1(061a0e954779cb7214ca17bb3a879bb7bc36eddd) ) // Silkscreen: "K2xxROM1-4 // 830117-01N // <square symbol>2003KURZWEIL // 0402" @ U4
 
 
 	// 'Contemporary' babyboard AKA "ROM 2" or 'Kurzweil RM-226':
@@ -448,10 +452,10 @@ ROM_START( k2000 )
 	// https://www.mobikin.com/images/android/rom.jpg
 
 	// newer contemporary is 830146-01 4463, 830147-01 C9BE, 830148-01 93B2, 830134-01 F265
-	// ROM_LOAD( "k2xxrom2-1__830146-01n__2003kurzweil__0402.u1", 0x1000000, 0x200000, CRC(03628775) SHA1(1db7dd514c2a7b810d0e5fef6f614498d695879e) ) // Silkscreen: "K2xxROM2-1 // 830146-01N // <square symbol>2003KURZWEIL // 0402" @ U1; from alt ROM labels, sum16 is 4463
-	// ROM_LOAD( "k2xxrom2-2__830147-01n__2003kurzweil__0402.u2", 0x1200000, 0x200000, CRC(7b81c227) SHA1(954d41e9fce54eb4a4ce81b5095227a1478a6828) ) // Silkscreen: "K2xxROM2-2 // 830147-01N // <square symbol>2003KURZWEIL // 0402" @ U2; from alt ROM labels, sum16 is c9be
-	// ROM_LOAD( "k2xxrom2-3__830148-01n__2003kurzweil__0403.u3", 0x1400000, 0x200000, CRC(62af1ba7) SHA1(8910abfd33a939d8a20cd69576c94342f194e23a) ) // Silkscreen: "K2xxROM2-3 // 830148-01N // <square symbol>2003KURZWEIL // 0403" @ U3; from alt ROM labels, sum16 is 93b2
-	// ROM_LOAD( "k2xxrom2-4__830134-01n__2003kurzweil__0402.u4", 0x1600000, 0x200000, CRC(11f3dfb6) SHA1(a74e040b316f7a6042368c6ae9c2b0cda8656614) ) // Silkscreen: "K2xxROM2-4 // 830134-01N // <square symbol>2003KURZWEIL // 0402" @ U4; from alt ROM labels, sum16 is f265
+	ROM_LOAD( "k2xxrom2-1__830146-01n__2003kurzweil__0402.u1", 0x1000000, 0x200000, CRC(03628775) SHA1(1db7dd514c2a7b810d0e5fef6f614498d695879e) ) // Silkscreen: "K2xxROM2-1 // 830146-01N // <square symbol>2003KURZWEIL // 0402" @ U1; from alt ROM labels, sum16 is 4463
+	ROM_LOAD( "k2xxrom2-2__830147-01n__2003kurzweil__0402.u2", 0x1200000, 0x200000, CRC(7b81c227) SHA1(954d41e9fce54eb4a4ce81b5095227a1478a6828) ) // Silkscreen: "K2xxROM2-2 // 830147-01N // <square symbol>2003KURZWEIL // 0402" @ U2; from alt ROM labels, sum16 is c9be
+	ROM_LOAD( "k2xxrom2-3__830148-01n__2003kurzweil__0403.u3", 0x1400000, 0x200000, CRC(62af1ba7) SHA1(8910abfd33a939d8a20cd69576c94342f194e23a) ) // Silkscreen: "K2xxROM2-3 // 830148-01N // <square symbol>2003KURZWEIL // 0403" @ U3; from alt ROM labels, sum16 is 93b2
+	ROM_LOAD( "k2xxrom2-4__830134-01n__2003kurzweil__0402.u4", 0x1600000, 0x200000, CRC(11f3dfb6) SHA1(a74e040b316f7a6042368c6ae9c2b0cda8656614) ) // Silkscreen: "K2xxROM2-4 // 830134-01N // <square symbol>2003KURZWEIL // 0402" @ U4; from alt ROM labels, sum16 is f265
 
 	// Note1: the roms 830122-01 thru 830127-01 are from the Kurzweil MK-10
 	// see https://images.reverb.com/image/upload/s--sBo5xoMU--/a_exif,c_limit,e_unsharp_mask:80,f_auto,fl_progressive,g_south,h_1600,q_80,w_1600/v1504391767/v7iopgveuh6z42kxzobo.jpg
