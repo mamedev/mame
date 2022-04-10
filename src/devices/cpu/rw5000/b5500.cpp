@@ -17,24 +17,8 @@ DEFINE_DEVICE_TYPE(B5500, b5500_cpu_device, "b5500", "Rockwell B5500")
 
 // constructor
 b5500_cpu_device::b5500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	b5000_cpu_device(mconfig, B5500, tag, owner, clock, 10, address_map_constructor(FUNC(b5500_cpu_device::program_768x8), this), 6, address_map_constructor(FUNC(b5500_cpu_device::data_48x4), this))
+	a5500_cpu_device(mconfig, B5500, tag, owner, clock, 10, address_map_constructor(FUNC(b5500_cpu_device::program_768x8), this), 6, address_map_constructor(FUNC(b5500_cpu_device::data_48x4), this))
 { }
-
-
-// internal memory maps
-void b5500_cpu_device::program_768x8(address_map &map)
-{
-	map(0x000, 0x27f).rom();
-	map(0x380, 0x3ff).rom();
-}
-
-void b5500_cpu_device::data_48x4(address_map &map)
-{
-	map(0x00, 0x0b).ram();
-	map(0x10, 0x1b).ram();
-	map(0x20, 0x2b).ram();
-	map(0x30, 0x3b).ram();
-}
 
 
 // disasm
@@ -61,14 +45,4 @@ void b5500_cpu_device::execute_one()
 		// rest is same as B5000
 		default: b5000_cpu_device::execute_one(); break;
 	}
-}
-
-bool b5500_cpu_device::op_is_tl(u8 op)
-{
-	return b5000_cpu_device::op_is_tl(op) || ((op & 0xfc) == 0x38);
-}
-
-bool b5500_cpu_device::op_is_lb(u8 op)
-{
-	return b5000_cpu_device::op_is_lb(op) || ((op & 0xfc) == 0x1c);
 }
