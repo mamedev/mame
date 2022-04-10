@@ -1684,7 +1684,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
 
 	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
-	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
+	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
@@ -2027,20 +2027,20 @@ COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empt
 COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING )
 
 // internal OPN
-COMP( 1985, pc8801mk2sr, pc8801, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr, pc8801, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2fr, pc8801, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2mr, pc8801, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_NOT_WORKING )
+//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_NOT_WORKING )
 
 // internal OPNA
-//COMP( 1986, pc8801fh,    0,      0,      pc8801mk2fr,      pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
-COMP( 1986, pc8801mh,    pc8801, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801fa,    pc8801, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
-COMP( 1987, pc8801ma,    pc8801, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
-//COMP( 1988, pc8801fe,    pc8801, 0,      pc8801fa,      pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
-COMP( 1988, pc8801ma2,   pc8801, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
-//COMP( 1989, pc8801fe2,   pc8801, 0,      pc8801fa,      pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
-COMP( 1989, pc8801mc,    pc8801, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
+//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_NOT_WORKING )
+COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_NOT_WORKING )
+COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_NOT_WORKING )
+COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_NOT_WORKING )
+//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_NOT_WORKING )
+COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_NOT_WORKING )
+//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_NOT_WORKING )
+COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING )
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 //COMP( 1989, pc98do,      0,      0,      pc98do,      pc98do, pc8801_state, empty_init, "NEC",   "PC-98DO",       MACHINE_NOT_WORKING )
