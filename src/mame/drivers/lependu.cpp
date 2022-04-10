@@ -3,7 +3,7 @@
 /**********************************************************************************
 
   Le Pendu.
-  Voyageur de L'Espace Inc.
+  Avenir Amusement Inc.
 
   Very rare French/English bilingual hangman style game.
   Sequel of "Le Super Pendu", with better graphics among other things...
@@ -632,5 +632,5 @@ void lependu_state::init_lependu()
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT    STATE           INIT           ROT     COMPANY                       FULLNAME                           FLAGS            LAYOUT
-GAMEL( 198?, lependu,   0,        lependu,  lependu, lependu_state,  init_lependu,  ROT0,  "Voyageur de L'Espace Inc.",  "Le Pendu (Bilingue, Version 04)",  0,               layout_lependu )
+//     YEAR  NAME       PARENT    MACHINE   INPUT    STATE           INIT           ROT     COMPANY                   FULLNAME                           FLAGS            LAYOUT
+GAMEL( 198?, lependu,   0,        lependu,  lependu, lependu_state,  init_lependu,  ROT0,  "Avenir Amusement Inc.",  "Le Pendu (Bilingue, Version 04)",  0,               layout_lependu )
