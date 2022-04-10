@@ -24,7 +24,7 @@
 
   All independent gambling devices were made illegal in 1993, when the government
   lottery company (lotto-Quebec) took over the video-lottery business. Thousands
-  of machines were stored, destroyed or seized by the police. 
+  of machines were stored, destroyed or seized by the police.
 
   To keep them alive, some of these machines were converted to Le Pendu / Hangman.
   A conversion kit was proposed by a local company, developed in Quebec.
@@ -137,7 +137,6 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<discrete_device> m_discrete;
-	
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -153,7 +152,7 @@ private:
 	output_finder<5> m_lamps;
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_mux_data;
+	uint8_t m_mux_data = 0xff;
 };
 
 
@@ -254,17 +253,20 @@ void lependu_state::mux_w(uint8_t data)
 {
 	m_bank[0]->set_entry(data & 0x03);
 	m_bank[1]->set_entry(data & 0x03);
-	data = ((data ^ 0xff) & 0xf0) >> 4;
-
-	for(u8 i = 0; i < 4 ; i++)
-		if((pow(2,i) == data))
-			m_mux_data = i;
+	m_mux_data = data;
 }
 
 uint8_t lependu_state::lependu_mux_port_r()
 {
-	return m_input[m_mux_data]->read();
+	uint8_t data = 0xff;
+
+	for (int i = 0; i < 4 ; i++)
+		if (BIT(~m_mux_data, i + 4))
+			data &= m_input[i]->read();
+
+	return data;
 }
+
 
 /*******************************************
 *            Lamps and Outputs             *
@@ -283,12 +285,10 @@ void lependu_state::lamps_w(uint8_t data)
   --x- ----  Button 3.
   -x-- ----  Button 1.
   x--- ----  Button 4.
- 
- */
-	data = data ^ 0xff;
 
-	for(u8 i = 0; i < 5 ; i++)
-		m_lamps[i] = BIT(data, i + 3);
+*/
+	for (int i = 0; i < 5 ; i++)
+		m_lamps[i] = BIT(~data, i + 3);
 }
 
 
@@ -317,7 +317,7 @@ void lependu_state::lependu_map(address_map &map)
 	map(0x0800, 0x0bff).ram().w(FUNC(lependu_state::lependu_videoram_w)).share("videoram");
 	map(0x0c00, 0x0fff).ram().w(FUNC(lependu_state::lependu_colorram_w)).share("colorram");
 	map(0x8000, 0x9fff).bankr("bank0");
-	map(0xa000, 0xbfff).bankr("bank1");	
+	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rom();
 }
 
@@ -330,10 +330,10 @@ static INPUT_PORTS_START(lependu)
 	// Multiplexed - 4x5bits
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_NAME("Stats / Meters")                PORT_CODE(KEYCODE_0)  // stats
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Button 4 / Stats Input Test")   PORT_CODE(KEYCODE_V)  // button 4 / stats test mode 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )     PORT_NAME("Stats / Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Button 4 / Stats Input Test")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Button 1")                      PORT_CODE(KEYCODE_Z)  // button 1
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Button 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -341,9 +341,9 @@ static INPUT_PORTS_START(lependu)
 	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Button 5 / Stats exit")         PORT_CODE(KEYCODE_B)  // button 5 / Stats exit
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Button 2")                      PORT_CODE(KEYCODE_X)  // button 2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Button 3")                      PORT_CODE(KEYCODE_C)  // button 3
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Button 5 / Stats Exit")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Button 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Button 3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -352,10 +352,10 @@ static INPUT_PORTS_START(lependu)
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_NAME("Audit")                         PORT_CODE(KEYCODE_9)  // audit? (inside the game) to check...
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )    PORT_NAME("Audit") // audit? (inside the game) to check...
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )    // 25c coin
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )       // 25c coin
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -523,8 +523,6 @@ void lependu_state::machine_start()
 	uint8_t *ROM2 = memregion("data2")->base();
 	m_bank[0]->configure_entries(0, 4, &ROM1[0], 0x2000);
 	m_bank[1]->configure_entries(0, 4, &ROM2[0], 0x2000);
-
-	m_mux_data = 0;
 }
 
 void lependu_state::machine_reset()
@@ -624,7 +622,7 @@ void lependu_state::init_lependu()
 
 	// patch to allow a second game...
 	ROM[0xcc18] = 0x00;
-	
+
 	// fix checksum to avoid RAM clear
 	ROM[0xdd79] = 0xb7;
 }

@@ -832,7 +832,7 @@ ROM_END
 /***************************************************************************
 
   Rockwell 30R "Slide Rule Memory"
-  * B5500 MCU (label B5502PA, die label B5500)
+  * B5500 MCU (label B5500PA, die label B5500)
   * 9-digit 7seg LED display
 
   Rockwell 31R "Slide Rule Memory"
