@@ -426,8 +426,6 @@ void stv_state::init_stv()
 	m_slave->sh2drc_add_fastram(0x00000000, 0x0007ffff, 1, &m_rom[0]);
 	m_slave->sh2drc_add_fastram(0x00200000, 0x002fffff, 0, &m_workram_l[0]);
 	m_slave->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
-
-	m_vdp2.pal = 0;
 }
 
 /*
@@ -1009,12 +1007,12 @@ void stv_state::stv_mem(address_map &map)
 	map(0x05a00000, 0x05afffff).rw(FUNC(stv_state::saturn_soundram_r), FUNC(stv_state::saturn_soundram_w));
 	map(0x05b00000, 0x05b00fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
-	map(0x05c00000, 0x05c7ffff).rw(FUNC(stv_state::saturn_vdp1_vram_r), FUNC(stv_state::saturn_vdp1_vram_w));
-	map(0x05c80000, 0x05cbffff).rw(FUNC(stv_state::saturn_vdp1_framebuffer0_r), FUNC(stv_state::saturn_vdp1_framebuffer0_w));
-	map(0x05d00000, 0x05d0001f).rw(FUNC(stv_state::saturn_vdp1_regs_r), FUNC(stv_state::saturn_vdp1_regs_w));
-	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(stv_state::saturn_vdp2_vram_r), FUNC(stv_state::saturn_vdp2_vram_w));
-	map(0x05f00000, 0x05f7ffff).rw(FUNC(stv_state::saturn_vdp2_cram_r), FUNC(stv_state::saturn_vdp2_cram_w));
-	map(0x05f80000, 0x05fbffff).rw(FUNC(stv_state::saturn_vdp2_regs_r), FUNC(stv_state::saturn_vdp2_regs_w));
+	map(0x05c00000, 0x05c7ffff).rw(m_vdp1, FUNC(saturn_vdp1_device::vram_r), FUNC(saturn_vdp1_device::vram_w));
+	map(0x05c80000, 0x05cbffff).rw(m_vdp1, FUNC(saturn_vdp1_device::framebuffer0_r), FUNC(saturn_vdp1_device::framebuffer0_w));
+	map(0x05d00000, 0x05d0001f).rw(m_vdp1, FUNC(saturn_vdp1_device::regs_r), FUNC(saturn_vdp1_device::regs_w));
+	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(m_vdp2, FUNC(saturn_vdp2_device::vram_r), FUNC(saturn_vdp2_device::vram_w));
+	map(0x05f00000, 0x05f7ffff).rw(m_vdp2, FUNC(saturn_vdp2_device::cram_r), FUNC(saturn_vdp2_device::cram_w));
+	map(0x05f80000, 0x05fbffff).rw(m_vdp2, FUNC(saturn_vdp2_device::regs_r), FUNC(saturn_vdp2_device::regs_w));
 	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //rw(FUNC(stv_state::saturn_scu_r), FUNC(stv_state::saturn_scu_w));
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x60000000, 0x600003ff).nopw();
@@ -1152,15 +1150,23 @@ void stv_state::stv(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
 
 	/* video hardware */
+	constexpr XTAL pixel_clock = MASTER_CLOCK_320 / 8;
+
+	SATURN_VDP1(config, m_vdp1, pixel_clock);
+	m_vdp1->set_hostcpu(m_maincpu);
+
+	SATURN_VDP2(config, m_vdp2, pixel_clock);
+	m_vdp2->set_vdp1(m_vdp1);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: do we need this cargo cult at all?
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 352, 263, 0, 224);
-	m_screen->set_screen_update(FUNC(stv_state::screen_update_stv_vdp2));
-	PALETTE(config, m_palette).set_entries(2048+(2048*2)); //standard palette + extra memory for rgb brightness.
+	m_screen->set_raw(pixel_clock, 427, 0, 352, 263, 0, 224);
+	m_screen->set_screen_update(m_vdp2, FUNC(saturn_vdp2_device::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
+//	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
 
-	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
+//	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1325,9 +1331,6 @@ void stv_state::machine_reset()
 	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
 
 	m_prev_gamebank_select = 0xff;
-
-	m_vdp2.old_crmd = -1;
-	m_vdp2.old_tvmd = -1;
 }
 
 image_init_result stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
@@ -1374,7 +1377,6 @@ void stv_state::machine_start()
 	save_item(NAME(m_port_sel));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_scsp_last_line));
-	save_item(NAME(m_vdp2.odd));
 
 	stv_register_protection_savestates();
 

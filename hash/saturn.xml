@@ -4355,7 +4355,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Gals select screen sports unmasked text layer over box, [VDP2] enables window logic OR on NBG2 with only one window enabled -->
+	<!-- Gal select screen sports unmasked text layer over box, [VDP2] enables window logic OR on NBG2 with only one window enabled -->
 	<software name="gpanicss" supported="no">
 		<description>Gals Panic SS (Jpn)</description>
 		<year>1996</year>

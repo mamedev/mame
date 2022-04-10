@@ -207,8 +207,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 	int scanline = param;
 	int y_step,vblank_line;
 
-	vblank_line = get_vblank_start_position();
-	y_step = get_ystep_count();
+	vblank_line = m_vdp2->get_vblank_start_position();
+	y_step = m_vdp2->get_ystep_count();
 
 	//popmessage("%08x %d T0 %d T1 %d %08x",m_scu.ism ^ 0xffffffff,max_y,m_scu_regs[36],m_scu_regs[37],m_scu_regs[38]);
 
@@ -221,9 +221,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		m_scu->vblank_in_w(1);
 
 		// flip odd bit here
-		m_vdp2.odd ^= 1;
+		m_vdp2->flip_odd_bit();
 		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
-		video_update_vdp1();
+		m_vdp1->video_update();
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 	{
@@ -233,8 +233,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 	if(scanline == (vblank_line+1)*y_step)
 	{
 		/* docs mentions that VBE happens one line after vblank-in. */
-		if(STV_VDP1_VBE)
-			m_vdp1.framebuffer_clear_on_next_frame = 1;
+		m_vdp1->check_fb_clear();
 	}
 
 	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
@@ -252,80 +251,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 	int scanline = param;
 	int y_step,vblank_line;
 
-	vblank_line = get_vblank_start_position();
-	y_step = get_ystep_count();
+	vblank_line = m_vdp2->get_vblank_start_position();
+	y_step = m_vdp2->get_ystep_count();
 
-	if(scanline == vblank_line*y_step)
+	// TODO: verify this, does it really not chain with SCU?
+	if(scanline == vblank_line * y_step)
 		m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43); // SH2
-	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
+	else if((scanline % y_step) == 0 && scanline < vblank_line * y_step)
 		m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41); // SH2
 }
-
-static const gfx_layout tiles8x8x4_layout =
-{
-	8,8,
-	0x100000/(32*8/8),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tiles16x16x4_layout =
-{
-	16,16,
-	0x100000/(32*32/8),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-		32*8+0, 32*8+4, 32*8+8, 32*8+12, 32*8+16, 32*8+20, 32*8+24, 32*8+28,
-
-		},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		32*16, 32*17,32*18, 32*19,32*20,32*21,32*22,32*23
-
-		},
-	32*32
-};
-
-static const gfx_layout tiles8x8x8_layout =
-{
-	8,8,
-	0x100000/(32*8/8),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	32*8    /* really 64*8, but granularity is 32 bytes */
-};
-
-static const gfx_layout tiles16x16x8_layout =
-{
-	16,16,
-	0x100000/(64*16/8),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56,
-	64*8+0, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8
-
-	},
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	64*16, 64*17, 64*18, 64*19, 64*20, 64*21, 64*22, 64*23
-	},
-	64*16   /* really 128*16, but granularity is 32 bytes */
-};
-
-
-
-
-GFXDECODE_START( gfx_stv )
-	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x4_layout,   0x00, (0x80*(2+1))  )
-	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1))  )
-	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x8_layout,   0x00, (0x08*(2+1))  )
-	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x8_layout, 0x00, (0x08*(2+1))  )
-GFXDECODE_END
-
 
 WRITE_LINE_MEMBER( saturn_state::master_sh2_reset_w )
 {
@@ -356,15 +290,14 @@ WRITE_LINE_MEMBER( saturn_state::system_reset_w )
 		return;
 
 	// TODO: actually send a device reset signal to the connected devices
-	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
+	// "Only backup ram and SMPC ram are retained after that this command is issued."
+	// TODO: order of operations is a mystery
 	m_scu->reset();
-	memset(m_sound_ram,0x00,0x080000);
-	memset(m_workram_h,0x00,0x100000);
-	memset(m_workram_l,0x00,0x100000);
-	memset(m_vdp2_regs.get(),0x00,0x040000);
-	memset(m_vdp2_vram.get(),0x00,0x100000);
-	memset(m_vdp2_cram.get(),0x00,0x080000);
-	memset(m_vdp1_vram.get(),0x00,0x100000);
+	memset(m_sound_ram, 0x00, 0x080000);
+	memset(m_workram_h, 0x00, 0x100000);
+	memset(m_workram_l, 0x00, 0x100000);
+	m_vdp2->vram_clear();
+	m_vdp1->vram_clear();
 	//A-Bus
 }
 
@@ -379,11 +312,8 @@ WRITE_LINE_MEMBER(saturn_state::dot_select_w)
 {
 	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
-	m_maincpu->set_unscaled_clock(xtal/2);
-	m_slave->set_unscaled_clock(xtal/2);
+	m_maincpu->set_unscaled_clock( xtal / 2 );
+	m_slave->set_unscaled_clock( xtal / 2 );
 
-	m_vdp2.dotsel = state ^ 1;
-	stv_vdp2_dynamic_res_change();
+	m_vdp2->set_dotsel(state ^ 1);
 }
-
-
