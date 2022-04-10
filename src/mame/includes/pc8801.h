@@ -103,15 +103,15 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
 
 	struct mouse_t {
-		uint8_t phase;
-		int8_t prev_dx, prev_dy;
-		uint8_t lx, ly;
+		uint8_t phase = 0;
+		int8_t prev_dx = 0, prev_dy = 0;
+		uint8_t lx = 0, ly = 0;
 
-		attotime time;
+		attotime time = attotime::never;
 	};
 
 	mouse_t m_mouse;
-	uint8_t m_gfx_ctrl;
+	uint8_t m_gfx_ctrl = 0;
 
 private:
 	void main_map(address_map &map);
@@ -123,28 +123,27 @@ private:
 
     std::array<std::array<u16, 80>, 400> m_attr_info = {};
 
-	uint8_t m_ext_rom_bank;
-	uint8_t m_vram_sel;
-	uint8_t m_misc_ctrl;
-	uint8_t m_device_ctrl_data;
-	uint8_t m_window_offset_bank;
-	bool m_text_layer_mask;
-	u8 m_bitmap_layer_mask;
-	uint8_t m_alu_reg[3];
-	uint8_t m_dmac_mode;
-	uint8_t m_alu_ctrl1;
-	uint8_t m_alu_ctrl2;
-	uint8_t m_extram_mode;
-	uint8_t m_extram_bank;
+	uint8_t m_ext_rom_bank = 0;
+	uint8_t m_vram_sel = 0;
+	uint8_t m_misc_ctrl = 0;
+	uint8_t m_device_ctrl_data = 0;
+	uint8_t m_window_offset_bank = 0;
+	bool m_text_layer_mask = false;
+	u8 m_bitmap_layer_mask = 0;
+	uint8_t m_alu_reg[3]{};
+	uint8_t m_alu_ctrl1 = 0;
+	uint8_t m_alu_ctrl2 = 0;
+	uint8_t m_extram_mode = 0;
+	uint8_t m_extram_bank = 0;
 
-	struct { uint8_t r, g, b; } m_palram[8];
+	struct { uint8_t r = 0, g = 0, b = 0; } m_palram[8];
 	enum {
 		BGPAL_PEN = 8,
 		BORDER_PEN = 9
 	};
 
-	uint32_t m_knj_addr[2];
-	uint32_t m_extram_size;
+	uint32_t m_knj_addr[2]{};
+	uint32_t m_extram_size = 0;
 
 	uint8_t alu_r(offs_t offset);
 	void alu_w(offs_t offset, uint8_t data);
@@ -187,27 +186,27 @@ private:
 	void rtc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(rxrdy_irq_w);
 
+	// video section
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void palette_reset();
 	bitmap_rgb32 m_text_bitmap;
 
-	DECLARE_MACHINE_RESET(pc8801_dic);
-	DECLARE_MACHINE_RESET(pc8801_cdrom);
+	// irq section
+	DECLARE_WRITE_LINE_MEMBER(rxrdy_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(vrtc_irq_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_irq_w);
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 	struct {
-		u8 enable, pending;
+		u8 enable = 0, pending = 0;
 	} m_irq_state;
 
-	bool m_sound_irq_enable;
-	bool m_sound_irq_pending;
+	bool m_sound_irq_enable = false;
+	bool m_sound_irq_pending = false;
 
 	enum {
 		RXRDY_IRQ_LEVEL = 0,
@@ -269,8 +268,8 @@ private:
 	uint8_t baudrate_r();
 	void baudrate_w(uint8_t data);
 
-	uint8_t m_clock_setting;
-	uint8_t m_baudrate_val;
+	uint8_t m_clock_setting = 0;
+	uint8_t m_baudrate_val = 0;
 };
 
 class pc8801ma_state : public pc8801fh_state
@@ -296,8 +295,8 @@ private:
 	void dic_ctrl_w(uint8_t data);
 	required_region_ptr<u8> m_dictionary_rom;
 
-	uint8_t m_dic_ctrl;
-	uint8_t m_dic_bank;
+	uint8_t m_dic_ctrl = 0;
+	uint8_t m_dic_bank = 0;
 };
 
 class pc8801mc_state : public pc8801ma_state
@@ -323,7 +322,7 @@ private:
 	required_device<pc8801_31_device> m_cdrom_if;
 	required_region_ptr<u8> m_cdrom_bios;
 
-	bool m_cdrom_bank;
+	bool m_cdrom_bank = false;
 };
 
 #endif // MAME_INCLUDES_PC8801_H
