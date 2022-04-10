@@ -84,7 +84,7 @@ private:
 		};
 
 		// construction
-		midi_parser(u8 const *data, u32 length, u32 offset);
+		midi_parser(util::random_read &stream, u32 length, u32 offset);
 
 		// end of buffer?
 		bool eob() const { return (m_offset >= m_length); }
@@ -97,11 +97,11 @@ private:
 		midi_parser &reset() { return rewind(m_offset); }
 
 		// read data of various sizes and endiannesses
-		u8 byte() { check_bounds(1); return m_data[m_offset++]; }
-		u16 word_be() { u16 result = byte() << 8; return result | byte(); }
-		u32 triple_be() { u32 result = word_be() << 8; return result | byte(); }
-		u32 dword_be() { u32 result = word_be() << 16; return result | word_be(); }
-		u32 dword_le() { return swapendian_int32(dword_be()); }
+		u8 byte();
+		u16 word_be();
+		u32 triple_be();
+		u32 dword_be();
+		u32 dword_le();
 
 		// special variable reader for MIDI
 		u32 variable();
@@ -111,7 +111,7 @@ private:
 		void check_bounds(u32 length);
 
 		// internal state
-		u8 const *m_data;
+		util::random_read &m_stream;
 		u32 m_length;
 		u32 m_offset;
 	};
@@ -154,7 +154,7 @@ private:
 		void clear() { m_list.clear(); }
 
 		// parse a new sequence
-		bool parse(u8 const *data, u32 length);
+		bool parse(util::random_read &stream, u32 length);
 
 		// rewind to the start of time
 		void rewind(attotime const &basetime);
