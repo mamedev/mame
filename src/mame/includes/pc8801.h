@@ -135,6 +135,7 @@ private:
 	uint8_t m_alu_ctrl2 = 0;
 	uint8_t m_extram_mode = 0;
 	uint8_t m_extram_bank = 0;
+	uint32_t m_extram_size = 0;
 
 	struct { uint8_t r = 0, g = 0, b = 0; } m_palram[8];
 	enum {
@@ -143,7 +144,6 @@ private:
 	};
 
 	uint32_t m_knj_addr[2]{};
-	uint32_t m_extram_size = 0;
 
 	uint8_t alu_r(offs_t offset);
 	void alu_w(offs_t offset, uint8_t data);
@@ -255,6 +255,7 @@ public:
 	void pc8801fh(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void main_io(address_map &map) override;
 
@@ -283,6 +284,7 @@ public:
 	void pc8801ma(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void main_io(address_map &map) override;
@@ -311,6 +313,7 @@ public:
 	void pc8801mc(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void main_io(address_map &map) override;
@@ -322,7 +325,7 @@ private:
 	required_device<pc8801_31_device> m_cdrom_if;
 	required_region_ptr<u8> m_cdrom_bios;
 
-	bool m_cdrom_bank = false;
+	bool m_cdrom_bank = true;
 };
 
 #endif // MAME_INCLUDES_PC8801_H

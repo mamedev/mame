@@ -31,8 +31,8 @@ private:
 	u8 irq_status_r();
 	void irq_mask_w(u8 data);
 
-	bool m_irq_mask;
-	bool m_irq_pending;
+	bool m_irq_mask = false;
+	bool m_irq_pending = false;
 	
 	void opna_map(address_map &map);
 };

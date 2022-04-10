@@ -31,6 +31,7 @@
       \- Expects that ROM [0x0000] is not equal to 0xc3;
       Bottom line: Is it trying to access some custom HW?
 	- Hookup a bridge for internal BIOSes (later PC8801 models);
+	- Save state support (resuming fails latch hookups here);
 
 ===================================================================================================
 

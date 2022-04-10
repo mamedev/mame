@@ -26,8 +26,8 @@
         can be optionally installed;
     - implement proper joypad / mouse (PC-8872) DB9 port connector;
     - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
-	  guessing from the back panels seems that each model can install between 1 to 3 cards.
-	  Also note: most cards aren't compatible between each other;
+      guessing from the back panels seems that each model can install between 1 to 3 cards.
+      Also note: most cards aren't compatible between each other;
 
     Notes:
     - Later models have washed out palette with some SWs, with no red component.
@@ -1436,6 +1436,8 @@ GFXDECODE_END
 
 void pc8801_state::machine_start()
 {
+	pc8001_base_state::machine_start();
+
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
@@ -1451,6 +1453,35 @@ void pc8801_state::machine_start()
 	save_pointer(NAME(m_hi_work_ram), 0x1000);
 	save_pointer(NAME(m_ext_work_ram), 0x8000*0x100);
 	save_pointer(NAME(m_gvram), 0xc000);
+	save_item(STRUCT_MEMBER(m_mouse, phase));
+	save_item(STRUCT_MEMBER(m_mouse, prev_dx));
+	save_item(STRUCT_MEMBER(m_mouse, prev_dy));
+	save_item(STRUCT_MEMBER(m_mouse, lx));
+	save_item(STRUCT_MEMBER(m_mouse, ly));
+//  save_item(STRUCT_MEMBER(m_mouse, time));
+	save_item(NAME(m_mouse.time));
+	save_item(NAME(m_gfx_ctrl));
+	save_item(NAME(m_ext_rom_bank));
+	save_item(NAME(m_vram_sel));
+	save_item(NAME(m_misc_ctrl));
+	save_item(NAME(m_device_ctrl_data));
+	save_item(NAME(m_window_offset_bank));
+	save_item(NAME(m_text_layer_mask));
+	save_item(NAME(m_bitmap_layer_mask));
+	save_pointer(NAME(m_alu_reg), 3);
+	save_item(NAME(m_alu_ctrl1));
+	save_item(NAME(m_alu_ctrl2));
+	save_item(NAME(m_extram_mode));
+	save_item(NAME(m_extram_bank));
+	save_item(NAME(m_extram_size));
+	save_pointer(NAME(m_knj_addr), 2);
+	save_item(STRUCT_MEMBER(m_palram, r));
+	save_item(STRUCT_MEMBER(m_palram, g));
+	save_item(STRUCT_MEMBER(m_palram, b));
+	save_item(STRUCT_MEMBER(m_irq_state, enable));
+	save_item(STRUCT_MEMBER(m_irq_state, pending));
+	save_item(NAME(m_sound_irq_enable));
+	save_item(NAME(m_sound_irq_pending));
 }
 
 void pc8801_state::machine_reset()
@@ -1507,6 +1538,14 @@ void pc8801_state::machine_reset()
 	m_crtc->set_unscaled_clock(pixel_clock_setting ? PIXEL_CLOCK_24KHz : PIXEL_CLOCK_15KHz);
 }
 
+void pc8801fh_state::machine_start()
+{
+	pc8801mk2sr_state::machine_start();
+
+	save_item(NAME(m_clock_setting));
+	save_item(NAME(m_baudrate_val));
+}
+
 void pc8801fh_state::machine_reset()
 {
 	pc8801_state::machine_reset();
@@ -1519,12 +1558,27 @@ void pc8801fh_state::machine_reset()
 	m_baudrate_val = 0;
 }
 
+void pc8801ma_state::machine_start()
+{
+	pc8801fh_state::machine_start();
+
+	save_item(NAME(m_dic_bank));
+	save_item(NAME(m_dic_ctrl));
+}
+
 void pc8801ma_state::machine_reset()
 {
 	pc8801fh_state::machine_reset();
 
 	m_dic_bank = 0;
 	m_dic_ctrl = 0;
+}
+
+void pc8801mc_state::machine_start()
+{
+	pc8801ma_state::machine_start();
+
+	save_item(NAME(m_cdrom_bank));
 }
 
 void pc8801mc_state::machine_reset()

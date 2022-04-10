@@ -63,12 +63,12 @@ protected:
 	virtual uint8_t dma_mem_r(offs_t offset);
 
 private:
-	bool m_screen_reverse;
-	bool m_screen_is_24KHz;
+	bool m_screen_reverse = false;
+	bool m_screen_is_24KHz = false;
 
 	/* video state */
-	int m_width80;
-	int m_color;
+	int m_width80 = 0;
+	int m_color = 0;
 	u8 m_attr_color = 0xe8, m_attr_decoration = 0;
 };
 

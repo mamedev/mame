@@ -24,9 +24,9 @@ protected:
 private:
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	u8 m_pcg_data;
-	u16 m_pcg_address;
-	u8 m_pcg_latch;
+	u8 m_pcg_data = 0;
+	u16 m_pcg_address = 0;
+	u8 m_pcg_latch = 0;
 
 	void pcg_latch_w(u8 data);
 
