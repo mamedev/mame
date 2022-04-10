@@ -160,12 +160,12 @@ Fujitsu FM-8 cassette images
 	</software>
 
 	<software name="kaguya">
-		<description>Ohi! Kaguya Hime - Kinuginu no Wakare</description>
+		<description>Ooi! Kaguya Hime - Kinuginu no Wakare</description>
 		<year>1983</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="serial" value="K40M5047"/>
 		<info name="release" value="198311xx"/>
-		<info name="alt_title" value="おーい!かぐや姫 - 衣衣 のわかれ"/>
+		<info name="alt_title" value="おーい!かぐや姫 - 衣衣の別れ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2274254">
 				<rom name="ooikagu.t77" size="2274254" crc="9f0057ff" sha1="da5947960734ef53cd3b5332e971ad14be680f62"/>
@@ -348,7 +348,7 @@ Fujitsu FM-8 cassette images
 	</software>
 
 	<software name="yama">
-		<description>Yamanotesen Adventure</description>
+		<description>Yamatesen Adventure</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="release" value="198308xx"/>
