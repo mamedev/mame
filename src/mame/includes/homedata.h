@@ -59,22 +59,22 @@ private:
 	optional_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap[2][4];
-	int      m_visible_page;
-	int      m_priority;
-	uint8_t  m_reikaids_which;
-	int      m_flipscreen;
-	uint8_t  m_gfx_bank[2];   // pteacher only uses the first one
-	uint8_t  m_blitter_bank;
-	int      m_blitter_param_count;
-	uint8_t  m_blitter_param[4];      /* buffers last 4 writes to 0x8006 */
+	tilemap_t *m_bg_tilemap[2][4]{};
+	int      m_visible_page = 0;
+	int      m_priority = 0;
+	uint8_t  m_reikaids_which = 0;
+	int      m_flipscreen = 0;
+	uint8_t  m_gfx_bank[2]{};   // pteacher only uses the first one
+	uint8_t  m_blitter_bank = 0;
+	int      m_blitter_param_count = 0;
+	uint8_t  m_blitter_param[4]{};      /* buffers last 4 writes to 0x8006 */
 
 
 	/* misc */
-	int      m_vblank;
-	int      m_keyb;
-	int      m_upd7807_porta;
-	int      m_upd7807_portc;
+	int      m_vblank = 0;
+	int      m_keyb = 0;
+	int      m_upd7807_porta = 0;
+	int      m_upd7807_portc = 0;
 
 	/* device */
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +89,7 @@ private:
 
 	optional_ioport_array<12> m_keys;
 
-	uint8_t m_prot_data;
+	uint8_t m_prot_data = 0;
 	uint8_t mrokumei_keyboard_r(offs_t offset);
 	void mrokumei_keyboard_select_w(uint8_t data);
 	void mrokumei_sound_bank_w(uint8_t data);

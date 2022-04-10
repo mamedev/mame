@@ -130,44 +130,44 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
 
 	// these need to be public for now
-	uint32_t m_flags;
-	int m_enable_mask;
+	uint32_t m_flags = 0;
+	int m_enable_mask = 0;
 
 	void apple3(machine_config &config);
 	void apple3_map(address_map &map);
 private:
-	uint8_t m_via_0_a;
-	uint8_t m_via_0_b;
-	uint8_t m_via_1_a;
-	uint8_t m_via_1_b;
-	offs_t m_zpa;
-	uint8_t m_last_n;
-	uint8_t m_char_mem[0x800];
+	uint8_t m_via_0_a = 0;
+	uint8_t m_via_0_b = 0;
+	uint8_t m_via_1_a = 0;
+	uint8_t m_via_1_b = 0;
+	offs_t m_zpa = 0;
+	uint8_t m_last_n = 0;
+	uint8_t m_char_mem[0x800]{};
 	std::unique_ptr<uint32_t[]> m_hgr_map;
 
-	bool m_sync;
-	bool m_rom_has_been_disabled;
-	int m_cnxx_slot;
-	uint8_t m_indir_bank;
+	bool m_sync = false;
+	bool m_rom_has_been_disabled = false;
+	int m_cnxx_slot = 0;
+	uint8_t m_indir_bank = 0;
 
-	uint8_t *m_bank2, *m_bank3, *m_bank4, *m_bank5, *m_bank8, *m_bank9;
-	uint8_t *m_bank10, *m_bank11;
-	uint8_t *m_bank6, *m_bank7rd, *m_bank7wr;
-	int m_bell_state;
-	int m_c040_time;
-	uint16_t m_lastchar, m_strobe;
-	uint8_t m_transchar;
-	bool m_charwrt;
+	uint8_t *m_bank2 = nullptr, *m_bank3 = nullptr, *m_bank4 = nullptr, *m_bank5 = nullptr, *m_bank8 = nullptr, *m_bank9 = nullptr;
+	uint8_t *m_bank10 = nullptr, *m_bank11 = nullptr;
+	uint8_t *m_bank6 = nullptr, *m_bank7rd = nullptr, *m_bank7wr = nullptr;
+	int m_bell_state = 0;
+	int m_c040_time = 0;
+	uint16_t m_lastchar = 0, m_strobe = 0;
+	uint8_t m_transchar = 0;
+	bool m_charwrt = false;
 
-	emu_timer *m_scanstart, *m_scanend;
+	emu_timer *m_scanstart = nullptr, *m_scanend = nullptr;
 
-	int m_analog_sel;
-	bool m_ramp_active;
-	int m_pdl_charge;
-	int m_va, m_vb, m_vc;
-	int m_smoothscr;
+	int m_analog_sel = 0;
+	bool m_ramp_active = false;
+	int m_pdl_charge = 0;
+	int m_va = 0, m_vb = 0, m_vc = 0;
+	int m_smoothscr = 0;
 
-	int m_inh_state;
+	int m_inh_state = 0;
 };
 
 #endif // MAME_INCLUDES_APPLE3_H

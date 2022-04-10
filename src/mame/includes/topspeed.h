@@ -74,16 +74,16 @@ private:
 	required_ioport m_steer;
 
 	// Misc
-	u16  m_cpua_ctrl;
-	s32  m_ioc220_port;
+	u16  m_cpua_ctrl = 0;
+	s32  m_ioc220_port = 0;
 
 	// ADPCM
 	required_region_ptr_array<u8, 2> m_msm_rom;
-	u16  m_msm_pos[2];
-	u8   m_msm_reset[2];
-	u8   m_msm_nibble[2];
-	u8   m_msm2_vck;
-	u8   m_msm2_vck2;
+	u16  m_msm_pos[2]{};
+	u8   m_msm_reset[2]{};
+	u8   m_msm_nibble[2]{};
+	u8   m_msm2_vck = 0;
+	u8   m_msm2_vck2 = 0;
 
 #ifdef MAME_DEBUG
 	u8   m_dislayer[5] = { 0, 0, 0, 0, 0 };

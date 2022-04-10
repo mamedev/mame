@@ -67,11 +67,11 @@ private:
 
 	struct gaelco3d_object_data
 	{
-		uint32_t tex, color;
-		float ooz_dx, ooz_dy, ooz_base;
-		float uoz_dx, uoz_dy, uoz_base;
-		float voz_dx, voz_dy, voz_base;
-		float z0;
+		uint32_t tex = 0, color = 0;
+		float ooz_dx = 0, ooz_dy = 0, ooz_base = 0;
+		float uoz_dx = 0, uoz_dy = 0, uoz_base = 0;
+		float voz_dx = 0, voz_dy = 0, voz_base = 0;
+		float z0 = 0;
 	};
 
 	class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1>
@@ -91,9 +91,9 @@ private:
 	private:
 		bitmap_ind16 m_screenbits;
 		bitmap_ind16 m_zbuffer;
-		uint32_t m_polygons;
-		offs_t m_texture_size;
-		offs_t m_texmask_size;
+		uint32_t m_polygons = 0;
+		offs_t m_texture_size = 0;
+		offs_t m_texmask_size = 0;
 		std::unique_ptr<uint8_t[]> m_texture;
 		std::unique_ptr<uint8_t[]> m_texmask;
 
@@ -124,22 +124,22 @@ private:
 	optional_ioport_array<4> m_analog;
 	required_memory_bank m_adsp_bank;
 
-	uint8_t m_sound_status;
-	uint8_t m_analog_ports[4];
-	uint32_t m_fp_analog_ports[2];
-	uint32_t m_fp_lenght[2];
-	uint8_t m_fp_clock;
-	uint8_t m_fp_state;
-	uint8_t m_framenum;
-	uint8_t m_adsp_ireg;
-	offs_t m_adsp_ireg_base;
-	offs_t m_adsp_incs;
-	offs_t m_adsp_size;
+	uint8_t m_sound_status = 0;
+	uint8_t m_analog_ports[4]{};
+	uint32_t m_fp_analog_ports[2]{};
+	uint32_t m_fp_lenght[2]{};
+	uint8_t m_fp_clock = 0;
+	uint8_t m_fp_state = 0;
+	uint8_t m_framenum = 0;
+	uint8_t m_adsp_ireg = 0;
+	offs_t m_adsp_ireg_base = 0;
+	offs_t m_adsp_incs = 0;
+	offs_t m_adsp_size = 0;
 	std::unique_ptr<rgb_t[]> m_palette;
 	std::unique_ptr<uint32_t[]> m_polydata_buffer;
-	uint32_t m_polydata_count;
-	int m_lastscan;
-	int m_video_changed;
+	uint32_t m_polydata_count = 0;
+	int m_lastscan = 0;
+	int m_video_changed = 0;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
 
 	void irq_ack_w(uint16_t data);

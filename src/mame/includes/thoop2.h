@@ -52,7 +52,7 @@ private:
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	tilemap_t *m_pant[2];
+	tilemap_t *m_pant[2]{};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;

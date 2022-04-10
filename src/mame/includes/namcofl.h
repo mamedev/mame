@@ -63,11 +63,11 @@ private:
 	optional_ioport m_brake;
 	optional_ioport m_wheel;
 
-	emu_timer *m_raster_interrupt_timer;
-	emu_timer *m_vblank_interrupt_timer;
-	emu_timer *m_network_interrupt_timer;
-	uint8_t m_mcu_port6;
-	uint32_t m_sprbank;
+	emu_timer *m_raster_interrupt_timer = nullptr;
+	emu_timer *m_vblank_interrupt_timer = nullptr;
+	emu_timer *m_network_interrupt_timer = nullptr;
+	uint8_t m_mcu_port6 = 0;
+	uint32_t m_sprbank = 0;
 
 	uint32_t unk1_r();
 	uint8_t network_r(offs_t offset);
