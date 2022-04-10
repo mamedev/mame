@@ -276,15 +276,15 @@ void lependu_state::lamps_w(uint8_t data)
 {
 /********** General Lamps wiring ***********
 
-  7654 3210
-  ---- ---x  Unused.
-  ---- --x-  Unused.
-  ---- -x--  Unused.
-  ---- x---  Button 5.
-  ---x ----  Button 2.
-  --x- ----  Button 3.
-  -x-- ----  Button 1.
-  x--- ----  Button 4.
+    7654 3210
+    ---- ---x  Unused.
+    ---- --x-  Unused.
+    ---- -x--  Unused.
+    ---- x---  Button 5.
+    ---x ----  Button 2.
+    --x- ----  Button 3.
+    -x-- ----  Button 1.
+    x--- ----  Button 4.
 
 */
 	for (int i = 0; i < 5 ; i++)
