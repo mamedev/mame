@@ -1494,12 +1494,14 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="portopia" supported="no">
+	<!-- This dump is missing side B, which contains the FM-8 version of the game -->
+	<software name="portopia">
 		<description>Portopia Renzoku Satsujin Jiken</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="serial" value="E-G034"/>
 		<info name="alt_title" value="ポートピア連続殺人事件"/>
+		<info name="usage" value="Type LOADM&quot;&quot;,R to load, then switch to portopia2.t77 and type RUN&quot;&quot;,R to load the next part. After the initial screens, switch to portopia3.t77 and press ENTER to load the game proper."/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="55320">
 				<rom name="portopia1.t77" size="55320" crc="c828949f" sha1="5a45ca2c832eb41122816bed92f76af0bac605b7"/>
