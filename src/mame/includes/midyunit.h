@@ -77,20 +77,20 @@ private:
 	/* protection data types */
 	struct protection_data
 	{
-		uint16_t  reset_sequence[3];
-		uint16_t  data_sequence[100];
+		uint16_t  reset_sequence[3]{};
+		uint16_t  data_sequence[100]{};
 	};
 
 	struct dma_state_t
 	{
-		uint32_t      offset;         // source offset, in bits
-		int32_t       rowbytes;       // source bytes to skip each row
-		int32_t       xpos;           // x position, clipped
-		int32_t       ypos;           // y position, clipped
-		int32_t       width;          // horizontal pixel count
-		int32_t       height;         // vertical pixel count
-		uint16_t      palette;        // palette base
-		uint16_t      color;          // current foreground color with palette
+		uint32_t      offset = 0;         // source offset, in bits
+		int32_t       rowbytes = 0;       // source bytes to skip each row
+		int32_t       xpos = 0;           // x position, clipped
+		int32_t       ypos = 0;           // y position, clipped
+		int32_t       width = 0;          // horizontal pixel count
+		int32_t       height = 0;         // vertical pixel count
+		uint16_t      palette = 0;        // palette base
+		uint16_t      color = 0;          // current foreground color with palette
 	};
 
 	enum
@@ -117,25 +117,25 @@ private:
 
 	std::unique_ptr<uint16_t[]> m_cmos_ram;
 	std::unique_ptr<uint8_t[]> m_hidden_ram;
-	uint32_t m_cmos_page;
-	uint16_t m_prot_result;
-	uint16_t m_prot_sequence[3];
-	uint8_t m_prot_index;
-	const struct protection_data *m_prot_data;
-	uint8_t m_cmos_w_enable;
-	uint8_t m_chip_type;
-	uint16_t *m_t2_hack_mem;
-	uint8_t *m_cvsd_protection_base;
-	uint8_t m_autoerase_enable;
-	uint32_t m_palette_mask;
+	uint32_t m_cmos_page = 0;
+	uint16_t m_prot_result = 0;
+	uint16_t m_prot_sequence[3]{};
+	uint8_t m_prot_index = 0;
+	const struct protection_data *m_prot_data = nullptr;
+	uint8_t m_cmos_w_enable = 0;
+	uint8_t m_chip_type = 0;
+	uint16_t *m_t2_hack_mem = nullptr;
+	uint8_t *m_cvsd_protection_base = nullptr;
+	uint8_t m_autoerase_enable = 0;
+	uint32_t m_palette_mask = 0;
 	std::unique_ptr<pen_t[]> m_pen_map;
 	std::unique_ptr<uint16_t[]>   m_local_videoram;
-	uint8_t m_videobank_select;
-	uint8_t m_yawdim_dma;
-	uint16_t m_dma_register[16];
+	uint8_t m_videobank_select = 0;
+	uint8_t m_yawdim_dma = 0;
+	uint16_t m_dma_register[16]{};
 	dma_state_t m_dma_state;
-	emu_timer *m_dma_timer;
-	emu_timer *m_autoerase_line_timer;
+	emu_timer *m_dma_timer = nullptr;
+	emu_timer *m_autoerase_line_timer = nullptr;
 	void midyunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t midyunit_cmos_r(offs_t offset);
 	void midyunit_cmos_enable_w(address_space &space, uint16_t data);
