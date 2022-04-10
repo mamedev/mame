@@ -2858,7 +2858,7 @@ end
 --@src/devices/cpu/rw5000/a5500.h,CPUS["RW5000"] = true
 --@src/devices/cpu/rw5000/a5900.h,CPUS["RW5000"] = true
 --@src/devices/cpu/rw5000/b5000.h,CPUS["RW5000"] = true
---@src/devices/cpu/rw5000/b5000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b5500.h,CPUS["RW5000"] = true
 --@src/devices/cpu/rw5000/b6000.h,CPUS["RW5000"] = true
 --@src/devices/cpu/rw5000/b6100.h,CPUS["RW5000"] = true
 --------------------------------------------------
