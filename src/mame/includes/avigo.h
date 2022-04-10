@@ -113,7 +113,7 @@ protected:
 	uint8_t               m_bank1_h = 0U;
 	uint8_t               m_ad_control_status = 0U;
 	uint16_t              m_ad_value = 0U;
-	std::unique_ptr<uint8_t[]> m_video_memory{};
+	std::unique_ptr<uint8_t[]> m_video_memory;
 	uint8_t               m_screen_column = 0U;
 	uint8_t               m_warm_start = 0U;
 };

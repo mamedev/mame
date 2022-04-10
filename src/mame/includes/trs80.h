@@ -90,9 +90,9 @@ protected:
 	u8 m_tape_unit = 1U;
 	bool m_reg_load = true;
 	bool m_cassette_data = false;
-	emu_timer *m_cassette_data_timer = 0;
+	emu_timer *m_cassette_data_timer = nullptr;
 	double m_old_cassette_val = 0;
-	bool m_cpl = 0;
+	bool m_cpl = false;
 	u8 m_cols = 0xffU;
 	bool m_7bit = false;
 	u16 m_timeout = 600U;
