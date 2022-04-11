@@ -1714,21 +1714,12 @@ void lua_engine::initialize()
 				ret[index++] = format;
 			return ret;
 		});
-	floppy_type["create_fs"] = sol::property(
+	floppy_type["fs"] = sol::property(
 		[this](floppy_image_device const &floppy)
 		{
 			int index = 1;
 			sol::table ret = sol().create_table();
-			for (floppy_image_device::fs_info const &fs : floppy.get_create_fs())
-				ret[index++] = &fs;
-			return ret;
-		});
-	floppy_type["io_fs"] = sol::property(
-		[this](floppy_image_device const &floppy)
-		{
-			int index = 1;
-			sol::table ret = sol().create_table();
-			for (floppy_image_device::fs_info const &fs : floppy.get_io_fs())
+			for (floppy_image_device::fs_info const &fs : floppy.get_fs())
 				ret[index++] = &fs;
 			return ret;
 		});
