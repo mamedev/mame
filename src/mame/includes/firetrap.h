@@ -54,23 +54,23 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t       *m_fg_tilemap;
-	tilemap_t       *m_bg1_tilemap;
-	tilemap_t       *m_bg2_tilemap;
-	uint8_t         m_scroll1_x[2];
-	uint8_t         m_scroll1_y[2];
-	uint8_t         m_scroll2_x[2];
-	uint8_t         m_scroll2_y[2];
+	tilemap_t       *m_fg_tilemap = nullptr;
+	tilemap_t       *m_bg1_tilemap = nullptr;
+	tilemap_t       *m_bg2_tilemap = nullptr;
+	uint8_t         m_scroll1_x[2]{};
+	uint8_t         m_scroll1_y[2]{};
+	uint8_t         m_scroll2_x[2]{};
+	uint8_t         m_scroll2_y[2]{};
 
 	/* misc */
-	int           m_sound_irq_enable;
-	int           m_nmi_enable;
-	int           m_adpcm_toggle;
-	int           m_coin_command_pending;
+	int           m_sound_irq_enable = 0;
+	int           m_nmi_enable = 0;
+	int           m_adpcm_toggle = 0;
+	int           m_coin_command_pending = 0;
 
-	uint8_t m_mcu_p3;
-	uint8_t m_maincpu_to_mcu;
-	uint8_t m_mcu_to_maincpu;
+	uint8_t m_mcu_p3 = 0;
+	uint8_t m_maincpu_to_mcu = 0;
+	uint8_t m_mcu_to_maincpu = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

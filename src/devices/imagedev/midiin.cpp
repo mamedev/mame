@@ -173,7 +173,7 @@ image_init_result midiin_device::call_load()
 		// if the parsing succeeds, schedule the start to happen at least
 		// 10 seconds after starting to allow the keyboards to initialize
 		// TODO: this should perhaps be a driver-configurable parameter?
-		if (m_sequence.parse(reinterpret_cast<u8 const *>(ptr()), length()))
+		if (m_sequence.parse(image_core_file(), length()))
 		{
 			m_sequence_start = std::max(machine().time(), attotime(10, 0));
 			m_timer->adjust(attotime::zero);
@@ -273,8 +273,8 @@ static constexpr u32 fourcc_le(char const *string)
 //  midi_parser - constructor
 //-------------------------------------------------
 
-midiin_device::midi_parser::midi_parser(u8 const *data, u32 length, u32 offset) :
-	m_data(data),
+midiin_device::midi_parser::midi_parser(util::random_read &stream, u32 length, u32 offset) :
+	m_stream(stream),
 	m_length(length),
 	m_offset(offset)
 {
@@ -290,7 +290,7 @@ midiin_device::midi_parser::midi_parser(u8 const *data, u32 length, u32 offset) 
 midiin_device::midi_parser midiin_device::midi_parser::subset(u32 length)
 {
 	check_bounds(length);
-	midi_parser result(m_data + m_offset, length, 0);
+	midi_parser result(m_stream, m_offset + length, m_offset);
 	m_offset += length;
 	return result;
 }
@@ -324,6 +324,91 @@ u32 midiin_device::midi_parser::variable()
 			return result;
 	}
 	throw error("Invalid variable length field");
+}
+
+
+//-------------------------------------------------
+//  byte - read 8 bits of data
+//-------------------------------------------------
+
+u8 midiin_device::midi_parser::byte()
+{
+	check_bounds(1);
+
+	u8 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 1, actual) || actual != 1)
+		throw error("Error reading data");
+	m_offset++;
+	return result;
+}
+
+
+//-------------------------------------------------
+//  word_be - read 16 bits of big-endian data
+//-------------------------------------------------
+
+u16 midiin_device::midi_parser::word_be()
+{
+	check_bounds(2);
+
+	u16 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 2, actual) || actual != 2)
+		throw error("Error reading data");
+	m_offset += 2;
+	return big_endianize_int16(result);
+}
+
+
+//-------------------------------------------------
+//  triple_be - read 24 bits of big-endian data
+//-------------------------------------------------
+
+u32 midiin_device::midi_parser::triple_be()
+{
+	check_bounds(3);
+
+	u32 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 3, actual) || actual != 3)
+		throw error("Error reading data");
+	m_offset += 3;
+	return big_endianize_int32(result) >> 8;
+}
+
+
+//-------------------------------------------------
+//  dword_be - read 32 bits of big-endian data
+//-------------------------------------------------
+
+u32 midiin_device::midi_parser::dword_be()
+{
+	check_bounds(4);
+
+	u32 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+		throw error("Error reading data");
+	m_offset += 4;
+	return big_endianize_int32(result);
+}
+
+
+//-------------------------------------------------
+//  dword_le - read 32 bits of little-endian data
+//-------------------------------------------------
+
+u32 midiin_device::midi_parser::dword_le()
+{
+	check_bounds(4);
+
+	u32 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+		throw error("Error reading data");
+	m_offset += 4;
+	return little_endianize_int32(result);
 }
 
 
@@ -364,13 +449,13 @@ midiin_device::midi_event &midiin_device::midi_sequence::event_at(u32 tick)
 //  parse - parse a MIDI sequence from a buffer
 //-------------------------------------------------
 
-bool midiin_device::midi_sequence::parse(u8 const *data, u32 length)
+bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 {
 	// start with an empty list of events
 	m_list.clear();
 
 	// by default parse the whole data
-	midi_parser buffer(data, length, 0);
+	midi_parser buffer(stream, length, 0);
 
 	// catch errors to make parsing easier
 	try
@@ -403,8 +488,9 @@ bool midiin_device::midi_sequence::parse(u8 const *data, u32 length)
 		m_iterator = m_list.begin();
 		return true;
 	}
-	catch (midi_parser::error &)
+	catch (midi_parser::error &err)
 	{
+		osd_printf_error("MIDI file error: %s\n", err.description());
 		m_list.clear();
 		m_iterator = m_list.begin();
 		return false;

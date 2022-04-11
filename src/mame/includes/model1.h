@@ -130,14 +130,14 @@ private:
 
 	void copro_reset();
 
-	u32 m_copro_sincos_base;
-	u32 m_copro_inv_base;
-	u32 m_copro_isqrt_base;
-	u32 m_copro_atan_base[4];
-	u32 m_copro_data_base;
-	u32 m_copro_ram_adr[4];
+	u32 m_copro_sincos_base = 0;
+	u32 m_copro_inv_base = 0;
+	u32 m_copro_isqrt_base = 0;
+	u32 m_copro_atan_base[4]{};
+	u32 m_copro_data_base = 0;
+	u32 m_copro_ram_adr[4]{};
 
-	uint16_t m_r360_state;
+	uint16_t m_r360_state = 0;
 	uint8_t r360_r();
 	void r360_w(uint8_t data);
 
@@ -209,8 +209,8 @@ private:
 	void irq_init();
 	void irq_control_w(u8 data);
 
-	uint8_t m_irq_status;
-	int m_last_irq;
+	uint8_t m_irq_status = 0;
+	int m_last_irq = 0;
 
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
@@ -232,7 +232,7 @@ private:
 	required_shared_ptr<uint16_t> m_color_xlat;
 
 	// Sound
-	int m_sound_irq;
+	int m_sound_irq = 0;
 
 	// TGP FIFO
 	void    fifoout_push(uint32_t data);
@@ -241,7 +241,7 @@ private:
 	float   fifoin_pop_f();
 	uint16_t  ram_get_i();
 	float   ram_get_f();
-	u32 m_v60_copro_fifo_r, m_v60_copro_fifo_w;
+	u32 m_v60_copro_fifo_r = 0, m_v60_copro_fifo_w = 0;
 
 	// TGP
 	void    tgp_reset();
@@ -271,12 +271,12 @@ private:
 	quad_t      *m_quadpt;
 	std::unique_ptr<quad_t *[]> m_quadind;
 
-	uint16_t  m_v60_copro_ram_adr;
-	uint16_t  m_v60_copro_ram_latch[2];
+	uint16_t  m_v60_copro_ram_adr = 0;
+	uint16_t  m_v60_copro_ram_latch[2]{};
 	std::unique_ptr<uint32_t[]> m_copro_ram_data;
-	uint16_t  m_listctl[2];
-	uint16_t  *m_glist;
-	bool    m_render_done;
+	uint16_t  m_listctl[2]{};
+	uint16_t  *m_glist = nullptr;
+	bool    m_render_done = false;
 
 	std::unique_ptr<uint16_t[]> m_tgp_ram;
 	std::unique_ptr<uint32_t[]> m_poly_ram;
@@ -331,7 +331,7 @@ private:
 	clipper_t m_clipfn[4];
 
 	// run-time rendering
-	uint16_t* m_display_list_current;
+	uint16_t* m_display_list_current = nullptr;
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;

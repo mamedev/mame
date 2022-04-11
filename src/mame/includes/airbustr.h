@@ -51,10 +51,10 @@ public:
 	required_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t    *m_tilemap[2];
-	int        m_scrollx[2];
-	int        m_scrolly[2];
-	int        m_highbits;
+	tilemap_t    *m_tilemap[2]{};
+	int        m_scrollx[2]{};
+	int        m_scrolly[2]{};
+	int        m_highbits = 0;
 
 	/* devices */
 	required_device<cpu_device> m_master;

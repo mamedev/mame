@@ -54,7 +54,7 @@ private:
 	required_ioport_array<10> m_keys;
 	required_ioport m_mode;
 
-	uint8_t m_reg[0x100];
+	uint8_t m_reg[0x100]{};
 
 	static const char *const s_def[5];
 	static const char *const s_shift[5];

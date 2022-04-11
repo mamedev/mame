@@ -62,17 +62,17 @@ protected:
 	void fromance_scroll_w(offs_t offset, uint8_t data);
 	void fromance_gga_data_w(offs_t offset, uint8_t data);
 
-	uint32_t   m_scrolly_ofs;
-	uint32_t   m_scrollx_ofs;
-	uint32_t   m_scrollx[2];
-	uint32_t   m_scrolly[2];
-	uint8_t    m_gfxreg;
-	uint8_t    m_flipscreen;
-	uint8_t    m_flipscreen_old;
-	uint8_t    m_selected_videoram;
-	uint8_t    m_selected_paletteram;
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
+	uint32_t   m_scrolly_ofs = 0;
+	uint32_t   m_scrollx_ofs = 0;
+	uint32_t   m_scrollx[2]{};
+	uint32_t   m_scrolly[2]{};
+	uint8_t    m_gfxreg = 0;
+	uint8_t    m_flipscreen = 0;
+	uint8_t    m_flipscreen_old = 0;
+	uint8_t    m_selected_videoram = 0;
+	uint8_t    m_selected_paletteram = 0;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
 
 	uint32_t screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -87,10 +87,10 @@ private:
 	emu_timer *m_crtc_timer;
 
 	/* misc */
-	uint8_t    m_portselect;
-	uint8_t    m_adpcm_reset;
-	uint8_t    m_adpcm_data;
-	uint8_t    m_vclk_left;
+	uint8_t    m_portselect = 0;
+	uint8_t    m_adpcm_reset = 0;
+	uint8_t    m_adpcm_data = 0;
+	uint8_t    m_vclk_left = 0;
 
 	/* devices */
 	uint8_t fromance_busycheck_main_r();

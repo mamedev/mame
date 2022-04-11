@@ -252,8 +252,8 @@ public:
 	template<int cpunum> uint8_t perr_r(offs_t offset);
 	template<int cpunum> void perr_w(offs_t offset, uint8_t data);
 
-	uint16_t m_aic_ad565_in[16];
-	uint8_t m_aic_mux_latch;
+	uint16_t m_aic_ad565_in[16]{};
+	uint8_t m_aic_mux_latch = 0;
 
 	uint8_t aic_ad574_r();
 	template<int Dac> void aic_dac_w(uint8_t data);
@@ -407,11 +407,11 @@ protected:
 	address_space *m_cpu2space;
 
 private:
-	emu_timer *m_map_switch_timer;
-	emu_timer *m_hblank_timer;
-	emu_timer *m_jam_timeout_timer;
+	emu_timer *m_map_switch_timer = nullptr;
+	emu_timer *m_hblank_timer = nullptr;
+	emu_timer *m_jam_timeout_timer = nullptr;
 
-	uint8_t m_video_data;
+	uint8_t m_video_data = 0;
 
 	// Memory
 	bool map_is_active(int cpunum, int map, uint8_t *map_info);

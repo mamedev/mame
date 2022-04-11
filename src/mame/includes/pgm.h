@@ -68,7 +68,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	/* hack */
-	int m_irq4_disabled;
+	int m_irq4_disabled = 0;
 
 	void pgm_base_mem(address_map &map);
 	void pgm_mem(address_map &map);
@@ -78,25 +78,25 @@ private:
 	required_shared_ptr<u16> m_videoregs;
 	required_shared_ptr<u16> m_videoram;
 	required_shared_ptr<u8>  m_z80_mainram;
-	u16 *                    m_bg_videoram;
-	u16 *                    m_tx_videoram;
-	u16 *                    m_rowscrollram;
+	u16 *                    m_bg_videoram = nullptr;
+	u16 *                    m_tx_videoram = nullptr;
+	u16 *                    m_rowscrollram = nullptr;
 
 	/* video-related */
 	struct sprite_t
 	{
-		int x,y;
-		bool xgrow, ygrow;
-		u32 xzoom, yzoom;
-		u32 color, offs;
-		u32 width, height;
-		u8 flip, pri;
+		int x = 0, y = 0;
+		bool xgrow = false, ygrow = false;
+		u32 xzoom = 0, yzoom = 0;
+		u32 color = 0, offs = 0;
+		u32 width = 0, height = 0;
+		u8 flip = 0, pri = 0;
 	};
 
 	std::unique_ptr<sprite_t[]> m_spritelist;
-	struct sprite_t *m_sprite_ptr_pre;
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_tx_tilemap;
+	struct sprite_t *m_sprite_ptr_pre = nullptr;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	tilemap_t     *m_tx_tilemap = nullptr;
 
 	/* devices */
 	required_device<cpu_device>             m_soundcpu;
@@ -109,9 +109,9 @@ private:
 	/* used by rendering */
 	required_region_ptr<u16> m_adata;
 	required_region_ptr<u16> m_bdata;
-	u32 m_aoffset;
-	u8 m_abit;
-	u32 m_boffset;
+	u32 m_aoffset = 0;
+	u8 m_abit = 0;
+	u32 m_boffset = 0;
 
 	u16 videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);

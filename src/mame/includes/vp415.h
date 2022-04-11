@@ -243,25 +243,25 @@ private:
 	required_shared_ptr<uint8_t> m_ctrlram;
 	required_ioport m_switches;
 
-	uint8_t m_sel34;
-	uint8_t m_sel37;
+	uint8_t m_sel34 = 0;
+	uint8_t m_sel37 = 0;
 
-	uint8_t m_int_lines[2];
+	uint8_t m_int_lines[2]{};
 
-	uint8_t m_refv;
+	uint8_t m_refv = 0;
 
-	uint8_t m_ctrl_cpu_p1;
-	uint8_t m_ctrl_cpu_p3;
-	uint8_t m_ctrl_mcu_p1;
-	uint8_t m_ctrl_mcu_p2;
+	uint8_t m_ctrl_cpu_p1 = 0;
+	uint8_t m_ctrl_cpu_p3 = 0;
+	uint8_t m_ctrl_mcu_p1 = 0;
+	uint8_t m_ctrl_mcu_p2 = 0;
 
-	uint8_t m_drive_p1;
-	uint8_t m_drive_pc_bits;
+	uint8_t m_drive_p1 = 0;
+	uint8_t m_drive_pc_bits = 0;
 
-	uint8_t m_drive_rad_mir_dac;
-	uint8_t m_drive_i8255_pb;
-	emu_timer *m_drive_2ppr_timer;
-	uint8_t m_drive_2ppr;
+	uint8_t m_drive_rad_mir_dac = 0;
+	uint8_t m_drive_i8255_pb = 0;
+	emu_timer *m_drive_2ppr_timer = nullptr;
+	uint8_t m_drive_2ppr = 0;
 
 	static const char *const DATARAM_TAG;
 	static const char *const SCSI_TAG;

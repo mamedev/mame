@@ -14,10 +14,10 @@ class srmp2_state : public driver_device
 public:
 	struct iox_t
 	{
-		int reset,ff_event,ff_1,protcheck[4],protlatch[4];
-		uint8_t data;
-		uint8_t mux;
-		uint8_t ff;
+		int reset = 0, ff_event,ff_1 = 0, protcheck[4]{}, protlatch[4]{};
+		uint8_t data = 0;
+		uint8_t mux = 0;
+		uint8_t ff = 0;
 	};
 
 	srmp2_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -41,12 +41,12 @@ private:
 	required_region_ptr<uint8_t> m_adpcm_rom;
 	optional_memory_bank m_mainbank;
 
-	uint8_t m_color_bank;
-	uint8_t m_gfx_bank;
-	uint8_t m_adpcm_bank;
-	int16_t m_adpcm_data;
-	uint32_t m_adpcm_sptr;
-	uint32_t m_adpcm_eptr;
+	uint8_t m_color_bank = 0;
+	uint8_t m_gfx_bank = 0;
+	uint8_t m_adpcm_bank = 0;
+	int16_t m_adpcm_data = 0;
+	uint32_t m_adpcm_sptr = 0;
+	uint32_t m_adpcm_eptr = 0;
 	iox_t m_iox;
 
 	// common

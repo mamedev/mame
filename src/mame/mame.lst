@@ -9957,6 +9957,7 @@ comg157                         // (c) 1983 Cal Omega Inc.
 comg159                         // (c) 1983 Cal Omega Inc.
 comg164                         // (c) 1983 Cal Omega Inc.
 comg168                         // (c) 1983 Cal Omega Inc.
+comg170                         // (c) 1983 Cal Omega Inc.
 comg172                         // (c) 1983 Cal Omega Inc.
 comg175                         // (c) 1984 Cal Omega / Casino Electronics Inc.
 comg176                         // (c) 1982 Cal Omega Inc.
@@ -16562,6 +16563,7 @@ rw10r                           // Rockwell
 rw12r                           // Rockwell
 rw18r                           // Rockwell
 rw24k                           // Rockwell
+rw30r                           // Rockwell
 rw31r                           // Rockwell
 
 @source:hh_sm510.cpp
@@ -20170,7 +20172,7 @@ wsf3                            // (c) 1990 Leland
 lemmings                        // prototype (c) 1991 Data East USA (US)
 
 @source:lependu.cpp
-lependu                         // 198? Voyageur de L'Espace Inc.
+lependu                         // 198? Avenir Amusement Inc.
 
 @source:lethal.cpp
 lethalen                        // GX191 (c) 1992
@@ -39341,6 +39343,9 @@ meteor                          // (c) 1981 Venture Line
 meteors                         // (c) 1981 Amusement World
 spcforc2                        // bootleg
 spcforce                        // (c) 1980 Venture Line
+
+@source:spdamjes.cpp
+spdamjes                        // (c) 19?? T-90 S.A.
 
 @source:spdheat.cpp
 spdheat                         // A55 (c) 1985 Taito Corporation (World)

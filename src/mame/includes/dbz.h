@@ -56,14 +56,14 @@ private:
 	required_shared_ptr<uint16_t> m_bg2_videoram;
 
 	/* video-related */
-	tilemap_t    *m_bg1_tilemap;
-	tilemap_t    *m_bg2_tilemap;
-	int          m_layer_colorbase[6];
-	int          m_layerpri[5];
-	int          m_sprite_colorbase;
+	tilemap_t    *m_bg1_tilemap = nullptr;
+	tilemap_t    *m_bg2_tilemap = nullptr;
+	int          m_layer_colorbase[6]{};
+	int          m_layerpri[5]{};
+	int          m_sprite_colorbase = 0;
 
 	/* misc */
-	int           m_control;
+	int           m_control = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

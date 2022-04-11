@@ -54,7 +54,7 @@ protected:
 	optional_memory_bank m_mainbank;
 
 	/* machine state */
-	uint8_t m_game_selected;  /* 0 = Ms. Pac-Man, 1 = Galaga */
+	uint8_t m_game_selected = 0;  /* 0 = Ms. Pac-Man, 1 = Galaga */
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -69,9 +69,9 @@ protected:
 	std::unique_ptr<uint8_t[]> m_ram_48000;
 
 	/* 25pacman and 20pacgal store the sprite palette at a different address, this is a hardware difference and confirmed NOT to be a register */
-	uint8_t m_sprite_pal_base;
+	uint8_t m_sprite_pal_base = 0;
 
-	uint8_t m_irq_mask;
+	uint8_t m_irq_mask = 0;
 	void irqack_w(uint8_t data);
 	void timer_pulse_w(uint8_t data);
 	void _20pacgal_coin_counter_w(uint8_t data);

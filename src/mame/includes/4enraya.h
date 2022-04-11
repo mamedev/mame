@@ -63,7 +63,7 @@ protected:
 	optional_region_ptr<uint8_t> m_rom;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	/* sound-related */
 	uint8_t m_soundlatch = 0U;

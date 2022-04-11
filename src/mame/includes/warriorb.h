@@ -54,7 +54,7 @@ private:
 	required_memory_bank m_z80bank;
 
 	/* misc */
-	int        m_pandata[4];
+	int        m_pandata[4]{};
 
 	void coin_control_w(u8 data);
 	void sound_bankswitch_w(u8 data);

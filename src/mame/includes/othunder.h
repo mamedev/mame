@@ -72,17 +72,17 @@ private:
 	/* video-related */
 	struct tempsprite
 	{
-		u32 code,color;
-		bool flipx,flipy;
-		int x,y;
-		int zoomx,zoomy;
-		u32 primask;
+		u32 code = 0, color = 0;
+		bool flipx = false, flipy = false;
+		int x = 0, y = 0;
+		int zoomx = 0, zoomy = 0;
+		u32 primask = 0;
 	};
 
 	std::unique_ptr<tempsprite[]> m_spritelist;
 
 	/* misc */
-	int        m_pan[4];
+	int        m_pan[4]{};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

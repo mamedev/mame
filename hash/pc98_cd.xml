@@ -4736,7 +4736,7 @@ license:CC0
 		<info name="serial" value="DWDC4023"/>
 		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.4　オルゴール" />
 		<info name="release" value="199412xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="psychic detective series vol. 4 - orgel (japan) (remake)" sha1="60b1d1a9085734c7d86d9d88c1590610b179567c" />
 			</diskarea>

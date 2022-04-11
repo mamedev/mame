@@ -85,6 +85,18 @@ private:
 	static const u8 b5000_opmap[0x100];
 };
 
+class b5500_disassembler : public rw5000_common_disassembler
+{
+public:
+	b5500_disassembler() = default;
+	virtual ~b5500_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 b5500_opmap[0x100];
+};
+
 class b6000_disassembler : public rw5000_common_disassembler
 {
 public:

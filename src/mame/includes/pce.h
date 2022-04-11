@@ -66,9 +66,9 @@ private:
 	required_device<pce_control_port_device> m_port_ctrl;
 	required_ioport m_a_card;
 
-	u8 m_io_port_options;
-	u8 m_sys3_card;
-	u8 m_acard;
+	u8 m_io_port_options = 0;
+	u8 m_sys3_card = 0;
+	u8 m_acard = 0;
 	void controller_w(u8 data);
 	u8 controller_r();
 	void cd_intf_w(offs_t offset, u8 data);

@@ -103,13 +103,13 @@ private:
 	int m_a8;
 
 	// video state
-	int m_llen;
+	int m_llen = 0;
 
 	// serial state
-	int m_intc;
-	int m_rx21;
-	int m_tx21;
-	int m_rcl;
+	int m_intc = 0;
+	int m_rx21 = 0;
+	int m_tx21 = 0;
+	int m_rcl = 0;
 
 	// floppy state
 	int m_recall;

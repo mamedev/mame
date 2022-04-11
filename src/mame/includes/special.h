@@ -110,16 +110,16 @@ private:
 	void specimx_mem(address_map &map);
 
 	std::unique_ptr<uint8_t[]> m_specimx_colorram;
-	uint8_t m_erik_color_1;
-	uint8_t m_erik_color_2;
-	uint8_t m_erik_background;
-	uint8_t m_specimx_color;
-	u8 m_porta;
-	u8 m_portb;
-	u8 m_portc;
-	uint8_t m_RR_register;
-	uint8_t m_RC_register;
-	u8 m_drive;
+	uint8_t m_erik_color_1 = 0;
+	uint8_t m_erik_color_2 = 0;
+	uint8_t m_erik_background = 0;
+	uint8_t m_specimx_color = 0;
+	u8 m_porta = 0;
+	u8 m_portb = 0;
+	u8 m_portc = 0;
+	uint8_t m_RR_register = 0;
+	uint8_t m_RC_register = 0;
+	u8 m_drive = 0;
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device> m_ppi;
 	optional_device<fd1793_device> m_fdc;

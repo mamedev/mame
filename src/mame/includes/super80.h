@@ -76,7 +76,7 @@ protected:
 	u8 m_cass_data[4]{};
 	u8 m_key_pressed = 0U;
 	u8 m_last_data = 0U;
-	bool m_boot_in_progress = 0;
+	bool m_boot_in_progress = false;
 	void super80m_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -117,9 +117,9 @@ private:
 	void super80e_io(address_map &map);
 	void super80m_map(address_map &map);
 
-	u8 m_int_sw;
-	u16 m_vidpg;
-	bool m_current_charset;
+	u8 m_int_sw = 0;
+	u16 m_vidpg = 0;
+	bool m_current_charset = false;
 };
 
 

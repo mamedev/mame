@@ -20,8 +20,8 @@
 
 struct pf_layer_info
 {
-	tilemap_t *     tmap;
-	uint16_t        vram_base;
+	tilemap_t *     tmap = nullptr;
+	uint16_t        vram_base = 0;
 };
 
 class m107_state : public driver_device
@@ -66,12 +66,12 @@ private:
 	optional_memory_bank m_mainbank;
 
 	// driver init
-	uint8_t m_spritesystem;
+	uint8_t m_spritesystem = 0;
 
-	uint8_t m_sprite_display;
-	uint16_t m_raster_irq_position;
+	uint8_t m_sprite_display = 0;
+	uint16_t m_raster_irq_position = 0;
 	pf_layer_info m_pf_layer[4];
-	uint16_t m_control[0x10];
+	uint16_t m_control[0x10]{};
 
 	void coincounter_w(uint8_t data);
 	void bankswitch_w(uint8_t data);

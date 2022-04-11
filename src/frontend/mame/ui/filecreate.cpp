@@ -290,9 +290,9 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_container &container, const std::vector<floppy_image_device::fs_info> &fs, int *result)
+menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_container &container, std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> &&fs, int *result)
 	: menu(mui, container),
-	  m_fs(fs),
+	  m_fs(std::move(fs)),
 	  m_result(result)
 
 {
@@ -316,7 +316,7 @@ void menu_select_floppy_init::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Select initial contents"), FLAG_DISABLE, nullptr);
 	int id = 0;
-	for (const auto &fmt : m_fs)
+	for (const floppy_image_device::fs_info &fmt : m_fs)
 		item_append(fmt.m_description, fmt.m_name, 0, (void *)(uintptr_t)(id++));
 }
 

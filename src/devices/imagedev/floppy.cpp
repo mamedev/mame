@@ -320,15 +320,12 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 
 void floppy_image_device::fs_enum::add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description)
 {
-	if(m_manager->can_format())
-		m_fid->m_create_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
-	if(m_manager->can_read())
-		m_fid->m_io_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
+	m_fid->m_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
 }
 
 void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char *description)
 {
-	m_fid->m_create_fs.emplace_back(fs_info(name, key, description));
+	m_fid->m_fs.emplace_back(fs_info(name, key, description));
 }
 
 void floppy_image_device::register_formats()

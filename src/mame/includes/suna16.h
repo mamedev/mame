@@ -103,6 +103,6 @@ private:
 	output_finder<4> m_leds;
 
 	std::unique_ptr<uint16_t[]> m_paletteram;
-	int m_color_bank;
-	uint8_t m_prot;
+	int m_color_bank = 0;
+	uint8_t m_prot = 0;
 };

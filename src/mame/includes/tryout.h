@@ -47,9 +47,9 @@ private:
 
 	required_memory_bank m_rombank;
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_vram_bank;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_vram_bank = 0;
 
 	void nmi_ack_w(uint8_t data);
 	void sound_irq_ack_w(uint8_t data);

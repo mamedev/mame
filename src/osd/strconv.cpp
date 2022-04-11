@@ -254,6 +254,11 @@ std::string from_wstring(const WCHAR *s)
 
 int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
+	// FIXME: Does not handle charsets that use variable lengths encodings such
+	// as example GB18030 or UTF-8.
+	// FIXME: Assumes all characters can be converted into a single wchar_t
+	// which may not always be the case such as with surrogate pairs.
+
 	WCHAR wch;
 	CPINFO cp;
 
@@ -261,7 +266,7 @@ int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 		goto error;
 
 	// The multibyte char can't be bigger than the max character size
-	count = std::min(count, size_t(cp.MaxCharSize));
+	count = std::min(count, size_t(IsDBCSLeadByte(*osdchar) ? cp.MaxCharSize : 1));
 
 	if (MultiByteToWideChar(CP_ACP, 0, osdchar, static_cast<DWORD>(count), &wch, 1) == 0)
 		goto error;

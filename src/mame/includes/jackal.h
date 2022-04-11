@@ -49,10 +49,10 @@ private:
 	required_memory_bank m_scrollbank;
 
 	// video-related
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	// misc
-	uint8_t m_irq_enable;
+	uint8_t m_irq_enable = 0;
 	optional_ioport_array<2> m_dials;
 
 	// devices
