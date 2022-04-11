@@ -55883,14 +55883,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- Micro Genius -->
 
-	<software name="qiwang" supported="partial">
-		<description>Qi Wang - Chinese Chess (Tw)</description>
-		<year>199?</year>
+	<software name="qiwang">
+		<description>Qíwáng - Chinese Chess (Taiwan)</description>
+		<year>1991</year>
 		<publisher>Micro Genius</publisher>
 		<info name="serial" value="MGC-001"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa72008" />
-			<feature name="pcb" value="UNL-SA-72008" />
+			<feature name="slot" value="txc_22211" />
+			<feature name="pcb" value="UNL-22211-A" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="qi wang - chinese chess (asia) (unl).chr" size="32768" crc="47fd920d" sha1="6dba34243e5fced22c2e33819a03e5153d33a362" offset="00000" status="baddump" />
 			</dataarea>
@@ -68133,15 +68134,15 @@ All musics were removed in this game.
 	</software>
 
 <!-- which game is this?!? pirating MGC-001?!? -->
-	<software name="qiwanga" cloneof="qiwang" supported="partial">
-		<description>Qi Wang - Chinese Chess (Chi, Alt)</description>
-		<year>19??</year>
+	<software name="qiwanga" cloneof="qiwang">
+		<description>Qíwáng - Chinese Chess (China, bootleg?)</description>
+		<year>199?</year>
 		<publisher>TXC Corp.</publisher>
 		<info name="alt_title" value="棋王"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa72008" />
-			<feature name="pcb" value="UNL-SA-72008" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="slot" value="txc_22211" />
+			<feature name="pcb" value="UNL-22211-A" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="qi wang - chinese chess (ch) [p1].chr" size="32768" crc="b8836420" sha1="bf8ef8486ee55560122e3605ad8cb00c4132c892" offset="00000" status="baddump" />
 			</dataarea>
