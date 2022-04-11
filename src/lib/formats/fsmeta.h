@@ -103,7 +103,15 @@ struct meta_description {
 
 	meta_description(meta_name name, meta_type type, int def, bool ro, std::function<void (meta_value)> validator, const char *tooltip) :
 		m_name(name), m_type(type), m_default(uint64_t(def)), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
-	{}
+	{
+		assert(type == meta_type::number);
+	}
+
+	meta_description(meta_name name, meta_type type, const char *def, bool ro, std::function<void(meta_value)> validator, const char *tooltip) :
+		m_name(name), m_type(type), m_default(std::string(def)), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
+	{
+		assert(type == meta_type::string);
+	}
 
 	template<typename T> meta_description(meta_name name, meta_type type, T def, bool ro, std::function<void (meta_value)> validator, const char *tooltip) :
 		m_name(name), m_type(type), m_default(def), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
