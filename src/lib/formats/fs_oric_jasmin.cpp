@@ -159,12 +159,12 @@ bool oric_jasmin_image::validate_filename(std::string name)
 std::vector<meta_description> oric_jasmin_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
-	res.emplace_back(meta_description(meta_name::name, meta_type::string, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
-	res.emplace_back(meta_description(meta_name::loading_address, meta_type::number, 0x501, false, [](const meta_value &m) { return m.as_number() < 0x10000; }, "Loading address of the file"));
-	res.emplace_back(meta_description(meta_name::length, meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
-	res.emplace_back(meta_description(meta_name::size_in_blocks, meta_type::number, 0, true, nullptr, "Number of blocks used by the file"));
-	res.emplace_back(meta_description(meta_name::locked, meta_type::flag, false, false, nullptr, "File locked"));
-	res.emplace_back(meta_description(meta_name::sequential, meta_type::flag, true, false, nullptr, "File sequential"));
+	res.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
+	res.emplace_back(meta_description(meta_name::loading_address, 0x501, false, [](const meta_value &m) { return m.as_number() < 0x10000; }, "Loading address of the file"));
+	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
+	res.emplace_back(meta_description(meta_name::size_in_blocks, 0, true, nullptr, "Number of blocks used by the file"));
+	res.emplace_back(meta_description(meta_name::locked, false, false, nullptr, "File locked"));
+	res.emplace_back(meta_description(meta_name::sequential, true, false, nullptr, "File sequential"));
 	return res;
 }
 
@@ -711,7 +711,7 @@ bool oric_jasmin_image::has_rsrc() const
 std::vector<meta_description> oric_jasmin_image::volume_meta_description() const
 {
 	std::vector<meta_description> res;
-	res.emplace_back(meta_description(meta_name::name, meta_type::string, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "Volume name, up to 8 characters"));
+	res.emplace_back(meta_description(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "Volume name, up to 8 characters"));
 
 	return res;
 }
