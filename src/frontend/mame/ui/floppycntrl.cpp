@@ -153,7 +153,6 @@ void menu_control_floppy_image::menu_activated()
 		// figure out which (if any) create file system was selected
 		create_fs = nullptr;
 		if(m_submenu_result.i >= 0) {
-			const auto &fs = fd.get_fs();
 			int i = 0;
 			for (const auto &this_fs : fd.get_fs()) {
 				if (can_format(this_fs)) {
