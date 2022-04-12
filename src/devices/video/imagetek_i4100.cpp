@@ -72,7 +72,7 @@
 #include <algorithm>
 
 #define LOG_INT (1 << 1U)
-//#define VERBOSE (LOG_INT)
+#define VERBOSE (LOG_INT)
 #include "logmacro.h"
 
 #define LOGINT(...) LOGMASKED(LOG_INT, __VA_ARGS__)
@@ -291,6 +291,9 @@ imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, devi
 	, m_tilemap_flip_scrolldx{0, 0, 0}
 	, m_tilemap_flip_scrolldy{0, 0, 0}
 	, m_spriteram_buffered(false)
+	, m_ext_ctrl_0_cb(*this)
+	, m_ext_ctrl_1_cb(*this)
+	, m_ext_ctrl_2_cb(*this)
 {
 }
 
@@ -385,6 +388,10 @@ void imagetek_i4100_device::device_start()
 
 	m_spritelist = std::make_unique<sprite_t []>(0x1000 / 8);
 	m_sprite_end = m_spritelist.get();
+
+	m_ext_ctrl_0_cb.resolve_safe();
+	m_ext_ctrl_1_cb.resolve_safe();
+	m_ext_ctrl_2_cb.resolve_safe();
 }
 
 void imagetek_i4300_device::device_start()
@@ -459,7 +466,11 @@ void imagetek_i4100_device::irq_cause_w(u8 data)
 		return;
 
 	LOGINT("%s: Interrupts acknowledged (%02X)\n", machine().describe_context(), data);
-	m_requested_int &= ~data;
+	// NB: at least i4100 device doesn't have control over bits 5-6-7
+	// it's cleared on top of irq services in karatour & ladykill with a 0xffea
+	// bit 5 seems more like an external irq service that is acknowledged separately,
+	// and is necessary for those + 3kokushi for updating scroll registers.
+	m_requested_int &= ~(data & 0x1f);
 	update_irq_state();
 }
 
@@ -670,31 +681,36 @@ void imagetek_i4100_device::window_w(offs_t offset, uint16_t data, uint16_t mem_
 uint16_t imagetek_i4100_device::scroll_r(offs_t offset) { return m_scroll[offset]; }
 void imagetek_i4100_device::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_scroll[offset]); }
 
-/****************************************************
+/*
  *
  * Screen Control Register:
  *
  * f--- ---- ---- ----     ?
  * -edc b--- ---- ----
- * ---- -a98 ---- ----     ? Leds (see gakusai attract)
+ * ---- -a98 ---- ----     external control pins
+ *                         \- gakusai attract (leds?);
+ *                         \- (bit 0) karatour/ladykill/3kokushi external irq level 5 enable;
+ *                         \- puzzli hblank control;
  * ---- ---- 765- ----     16x16 Tiles  (Layer 2-1-0)
  * ---- ---- ---4 32--
  * ---- ---- ---- --1-     Blank Screen
  * ---- ---- ---- ---0     Flip  Screen
  *
- ****************************************************/
+ */
 void imagetek_i4100_device::screen_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_layer_tile_select[2] = BIT(data,7);
-	m_layer_tile_select[1] = BIT(data,6);
-	m_layer_tile_select[0] = BIT(data,5);
+	m_ext_ctrl_2_cb(bool(BIT(data, 10)));
+	m_ext_ctrl_1_cb(bool(BIT(data, 9)));
+	m_ext_ctrl_0_cb(bool(BIT(data, 8)));
 
-	// TODO: some of these must be externalized
+	for (int i = 0; i < 3; i++)
+		m_layer_tile_select[i] = BIT(data, 5 + i);
+
 	m_screen_blank = BIT(data,1);
 	m_screen_flip = BIT(data,0);
 
 	if (data & 0xff1c)
-		logerror("%s warning: screen_ctrl_w write with %04x %04x\n",this->tag(),data,mem_mask);
+		logerror("%s warning: screen_ctrl_w write with %04x %04x\n", this->tag(), data, mem_mask);
 
 }
 
