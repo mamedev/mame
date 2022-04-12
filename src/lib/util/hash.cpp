@@ -44,19 +44,19 @@ public:
 		: m_hashes(hashes)
 	{
 		if (doing_crc32)
-			m_crc32_creator = std::make_optional<crc32_creator>();
+			m_crc32_creator.emplace();
 		if (doing_sha1)
-			m_sha1_creator = std::make_optional<sha1_creator>();
+			m_sha1_creator.emplace();
 	}
 
 	// add the given buffer to the hash
 	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		// append to each active hash
-		if (m_crc32_creator.has_value())
-			m_crc32_creator.value().append(buffer, length);
-		if (m_sha1_creator.has_value())
-			m_sha1_creator.value().append(buffer, length);
+		if (m_crc32_creator)
+			m_crc32_creator->append(buffer, length);
+		if (m_sha1_creator)
+			m_sha1_creator->append(buffer, length);
 
 		actual = length;
 		return std::error_condition();
@@ -72,12 +72,18 @@ public:
 	virtual std::error_condition finalize() noexcept override
 	{
 		// finish up the CRC32
-		if (m_crc32_creator.has_value())
-			m_hashes.add_crc(m_crc32_creator.value().finish());
+		if (m_crc32_creator)
+		{
+			m_hashes.add_crc(m_crc32_creator->finish());
+			m_crc32_creator.reset();
+		}
 
 		// finish up the SHA1
-		if (m_sha1_creator.has_value())
-			m_hashes.add_sha1(m_sha1_creator.value().finish());
+		if (m_sha1_creator)
+		{
+			m_hashes.add_sha1(m_sha1_creator->finish());
+			m_sha1_creator.reset();
+		}
 
 		return std::error_condition();
 	}
