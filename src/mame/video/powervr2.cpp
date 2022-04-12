@@ -1392,7 +1392,7 @@ uint32_t powervr2_device::spg_status_r()
 	uint32_t vsync = ((screen().vpos() >= spg_vbstart) || (screen().vpos() < spg_vbend)) ? 0 : 1;
 	uint32_t hsync = ((screen().hpos() >= spg_hbstart) || (screen().hpos() < spg_hbend)) ? 0 : 1;
 	// FIXME: following is just a wild guess
-	uint32_t blank = ((screen().vpos() >= spg_vbstart) || (screen().vpos() < spg_vbend) |
+	uint32_t blank = ((screen().vpos() >= spg_vbstart) || (screen().vpos() < spg_vbend) ||
 					(screen().hpos() >= spg_hbstart) || (screen().hpos() < spg_hbend)) ? 0 : 1;
 	if(vo_control & 4) { blank^=1; }
 	if(vo_control & 2) { vsync^=1; }
