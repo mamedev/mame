@@ -1639,7 +1639,7 @@ void lua_engine::initialize()
 		});
 	fs_meta_description_type["type"] = sol::property([](fs::meta_description const &desc)
 		{
-			switch (desc.m_type)
+			switch (desc.type())
 			{
 			case fs::meta_type::date:	return "date";
 			case fs::meta_type::flag:	return "flag";

@@ -7,6 +7,8 @@
 
 #include "strformat.h"
 
+#include <optional>
+
 namespace fs {
 
 const char *meta_data::entry_name(meta_name name)
@@ -32,33 +34,59 @@ const char *meta_data::entry_name(meta_name name)
 	return "";
 }
 
-std::string meta_value::to_string() const
+meta_type meta_value::type() const
 {
-	std::string result;
+	std::optional<meta_type> result;
 
-	std::visit([this, &result](auto &&arg)
+	std::visit([&result](auto &&arg)
 	{
 		using T = std::decay_t<decltype(arg)>;
 		if constexpr (std::is_same_v<T, std::string>)
 		{
-			result = as_string();
+			result = meta_type::string;
 		}
 		else if constexpr (std::is_same_v<T, uint64_t>)
 		{
-			result = util::string_format("0x%x", as_number());
+			result = meta_type::number;
 		}
 		else if constexpr (std::is_same_v<T, bool>)
 		{
-			result = as_flag() ? "t" : "f";
+			result = meta_type::flag;
 		}
 		else if constexpr (std::is_same_v<T, util::arbitrary_datetime>)
+		{
+			result = meta_type::date;
+		}
+	}, value);
+	return *result;
+}
+
+std::string meta_value::to_string() const
+{
+	std::string result;
+
+	switch (type())
+	{
+	case meta_type::string:
+		result = as_string();
+		break;
+	case meta_type::number:
+		result = util::string_format("0x%x", as_number());
+		break;
+	case meta_type::flag:
+		result = as_flag() ? "t" : "f";
+		break;
+	case meta_type::date:
 		{
 			auto dt = as_date();
 			result = util::string_format("%04d-%02d-%02d %02d:%02d:%02d",
 				dt.year, dt.month, dt.day_of_month,
 				dt.hour, dt.minute, dt.second);
 		}
-	}, value);
+		break;
+	default:
+		throw false;
+	}
 	return result;
 }
 

@@ -47,6 +47,7 @@ enum class meta_type {
 
 class meta_value {
 public:
+	meta_type type() const;
 	std::string to_string() const;
 	static meta_value from_string(meta_type type, std::string value);
 
@@ -107,6 +108,8 @@ struct meta_description {
 	template<typename T> meta_description(meta_name name, T def, bool ro, std::function<void(meta_value)> validator, const char *tooltip) :
 		meta_description(name, meta_value(def), ro, std::move(validator), tooltip)
 	{}
+
+	meta_type type() const { return m_default.type(); }
 
 private:
 	meta_description(meta_name name, meta_value &&def, bool ro, std::function<void(meta_value)> &&validator, const char *tooltip) :
