@@ -57,6 +57,23 @@ public:
 	///   be less than or equal to the requested length.
 	/// \return An error condition if reading stopped due to an error.
 	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
+
+	/// \brief Copy from the current position in the stream
+	///
+	/// Copies the specified number of bytes from the stream to the
+	/// supplied destination stream.  May read or write less than the
+	/// requested number of bytes if the end of the stream is reached or
+	/// an error occurs.  If the stream supports seeking, reading starts
+	/// at the current position in the stream, and the current position
+	/// is incremented by the number of bytes read.  Copied data is
+	/// written by invoking the stream's write method, either once or
+	/// iteratively.
+	/// \param [in] stream Destination stream to write to.
+	/// \param [in] length Maximum number of bytes to copy.
+	/// \param [out] actual Number of bytes actually written.  Will always
+	///   be less than or equal to the requested length.
+	/// \return An error condition if reading stopped due to an error.
+	virtual std::error_condition copy(write_stream &stream, std::size_t length, std::size_t &actual) noexcept;
 };
 
 

@@ -364,26 +364,14 @@ bool device_image_interface::run_hash(util::core_file &file, u32 skip_bytes, uti
 
 	// seek to the beginning
 	file.seek(skip_bytes, SEEK_SET); // TODO: check error return
-	u64 position = skip_bytes;
 
-	// keep on reading hashes
-	hashes.begin(types);
-	while (position < size)
-	{
-		uint8_t buffer[8192];
-
-		// read bytes
-		const size_t count = size_t(std::min<u64>(size - position, sizeof(buffer)));
-		size_t actual_count;
-		const std::error_condition filerr = file.read(buffer, count, actual_count);
-		if (filerr || !actual_count)
-			return false;
-		position += actual_count;
-
-		// and compute the hashes
-		hashes.buffer(buffer, actual_count);
-	}
-	hashes.end();
+	// and compute the hashes
+	util::write_stream::ptr creator = hashes.create(types);
+	size_t actual_count;
+	const std::error_condition filerr = file.copy(*creator, size - skip_bytes, actual_count);
+	if (filerr)
+		return false;
+	(void)creator->finalize();
 
 	// cleanup
 	file.seek(0, SEEK_SET); // TODO: check error return

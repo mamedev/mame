@@ -12,8 +12,11 @@
 
 #include "hash.h"
 
+#include "ioprocs.h"
+
 #include <cassert>
 #include <cctype>
+#include <optional>
 
 
 namespace util {
@@ -27,6 +30,67 @@ char const *const hash_collection::HASH_TYPES_CRC_SHA1 = "RS";
 char const *const hash_collection::HASH_TYPES_ALL = "RS";
 
 
+//**************************************************************************
+//  HASH CREATOR
+//**************************************************************************
+
+namespace {
+
+class hash_creator : public write_stream
+{
+public:
+	// constructor
+	hash_creator(hash_collection &hashes, bool doing_crc32, bool doing_sha1)
+		: m_hashes(hashes)
+	{
+		if (doing_crc32)
+			m_crc32_creator = std::make_optional<crc32_creator>();
+		if (doing_sha1)
+			m_sha1_creator = std::make_optional<sha1_creator>();
+	}
+
+	// add the given buffer to the hash
+	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		// append to each active hash
+		if (m_crc32_creator.has_value())
+			m_crc32_creator.value().append(buffer, length);
+		if (m_sha1_creator.has_value())
+			m_sha1_creator.value().append(buffer, length);
+
+		actual = length;
+		return std::error_condition();
+	}
+
+	// dummy override
+	virtual std::error_condition flush() noexcept override
+	{
+		return std::error_condition();
+	}
+
+	// stop hashing
+	virtual std::error_condition finalize() noexcept override
+	{
+		// finish up the CRC32
+		if (m_crc32_creator.has_value())
+			m_hashes.add_crc(m_crc32_creator.value().finish());
+
+		// finish up the SHA1
+		if (m_sha1_creator.has_value())
+			m_hashes.add_sha1(m_sha1_creator.value().finish());
+
+		return std::error_condition();
+	}
+
+private:
+	hash_collection &m_hashes;
+
+	std::optional<crc32_creator> m_crc32_creator;
+	std::optional<sha1_creator> m_sha1_creator;
+};
+
+} // anonymous namespace
+
 
 //**************************************************************************
 //  HASH COLLECTION
@@ -37,38 +101,9 @@ char const *const hash_collection::HASH_TYPES_ALL = "RS";
 //-------------------------------------------------
 
 hash_collection::hash_collection()
-	: m_has_crc32(false),
-		m_has_sha1(false),
-		m_creator(nullptr)
+	: m_has_crc32(false)
+	, m_has_sha1(false)
 {
-}
-
-
-hash_collection::hash_collection(std::string_view string)
-	: m_has_crc32(false),
-		m_has_sha1(false),
-		m_creator(nullptr)
-{
-	from_internal_string(string);
-}
-
-
-hash_collection::hash_collection(const hash_collection &src)
-	: m_has_crc32(false),
-		m_has_sha1(false),
-		m_creator(nullptr)
-{
-	copyfrom(src);
-}
-
-
-//-------------------------------------------------
-//  ~hash_collection - destructor
-//-------------------------------------------------
-
-hash_collection::~hash_collection()
-{
-	delete m_creator;
 }
 
 
@@ -138,8 +173,6 @@ void hash_collection::reset()
 {
 	m_flags.clear();
 	m_has_crc32 = m_has_sha1 = false;
-	delete m_creator;
-	m_creator = nullptr;
 }
 
 
@@ -336,69 +369,36 @@ bool hash_collection::from_internal_string(std::string_view string)
 
 
 //-------------------------------------------------
-//  begin - begin hashing
+//  create - begin hashing
 //-------------------------------------------------
 
-void hash_collection::begin(const char *types)
+write_stream::ptr hash_collection::create(const char *types)
 {
-	// nuke previous creator and make a new one
-	delete m_creator;
-	m_creator = new hash_creator;
-
 	// by default use all types
 	if (types == nullptr)
-		m_creator->m_doing_crc32 = m_creator->m_doing_sha1 = true;
+		return std::make_unique<hash_creator>(*this, true, true);
 
 	// otherwise, just allocate the ones that are specified
 	else
-	{
-		m_creator->m_doing_crc32 = (strchr(types, HASH_CRC) != nullptr);
-		m_creator->m_doing_sha1 = (strchr(types, HASH_SHA1) != nullptr);
-	}
+		return std::make_unique<hash_creator>(*this, strchr(types, HASH_CRC) != nullptr, strchr(types, HASH_SHA1) != nullptr);
 }
 
 
 //-------------------------------------------------
-//  buffer - add the given buffer to the hash
+//  compute - hash a block of data
 //-------------------------------------------------
 
-void hash_collection::buffer(const uint8_t *data, uint32_t length)
+void hash_collection::compute(const uint8_t *data, uint32_t length, const char *types)
 {
-	assert(m_creator != nullptr);
+	// begin
+	util::write_stream::ptr creator = create(types);
 
-	// append to each active hash
-	if (m_creator->m_doing_crc32)
-		m_creator->m_crc32_creator.append(data, length);
-	if (m_creator->m_doing_sha1)
-		m_creator->m_sha1_creator.append(data, length);
-}
+	// run the hashes
+	size_t actual;
+	(void)creator->write(data, length, actual);
 
-
-//-------------------------------------------------
-//  end - stop hashing
-//-------------------------------------------------
-
-void hash_collection::end()
-{
-	assert(m_creator != nullptr);
-
-	// finish up the CRC32
-	if (m_creator->m_doing_crc32)
-	{
-		m_has_crc32 = true;
-		m_crc32 = m_creator->m_crc32_creator.finish();
-	}
-
-	// finish up the SHA1
-	if (m_creator->m_doing_sha1)
-	{
-		m_has_sha1 = true;
-		m_sha1 = m_creator->m_sha1_creator.finish();
-	}
-
-	// nuke the creator
-	delete m_creator;
-	m_creator = nullptr;
+	// end
+	(void)creator->finalize();
 }
 
 
@@ -417,9 +417,6 @@ void hash_collection::copyfrom(const hash_collection &src)
 	m_crc32 = src.m_crc32;
 	m_has_sha1 = src.m_has_sha1;
 	m_sha1 = src.m_sha1;
-
-	// don't copy creators
-	m_creator = nullptr;
 }
 
 } // namespace util

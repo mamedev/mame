@@ -10,7 +10,6 @@
 
 #include "ioprocs.h"
 
-#include "corefile.h"
 #include "ioprocsfill.h"
 
 #include "osdfile.h"
@@ -25,6 +24,39 @@
 
 
 namespace util {
+
+// default buffered data copy routine (subclasses may override this)
+std::error_condition read_stream::copy(write_stream &stream, std::size_t length, std::size_t &actual) noexcept
+{
+	// local buffer of arbitrary size
+	uint8_t buffer[2048];
+
+	actual = 0U;
+	while (length)
+	{
+		// determine the size of the next chunk
+		unsigned const chunk_length = std::min(length, sizeof(buffer));
+
+		// read one chunk
+		std::size_t bytes_read;
+		std::error_condition err = read(buffer, chunk_length, bytes_read);
+		if (err)
+			return err;
+		if (!bytes_read)
+			return std::errc::io_error; // TODO: revisit this error code
+		length -= chunk_length;
+
+		// write the chunk
+		std::size_t bytes_written;
+		err = stream.write(buffer, bytes_read, bytes_written);
+		actual += bytes_written;
+		if (err)
+			return err;
+	}
+
+	return std::error_condition();
+}
+
 
 namespace {
 
@@ -132,6 +164,20 @@ public:
 	{
 		do_read(offset, buffer, length, actual);
 		return std::error_condition();
+	}
+
+	virtual std::error_condition copy(write_stream &stream, std::size_t length, std::size_t &actual) noexcept override
+	{
+		if ((this->m_pointer < this->m_size) && length)
+		{
+			std::size_t actual_read = std::min(std::size_t(this->m_size - this->m_pointer), length);
+			return stream.write(this->m_data + std::exchange(this->m_pointer, this->m_pointer + actual_read), actual_read, actual);
+		}
+		else
+		{
+			actual = 0U;
+			return std::error_condition();
+		}
 	}
 
 private:

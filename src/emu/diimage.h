@@ -113,7 +113,7 @@ public:
 	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
 
 	std::string_view error();
-	void seterror(std::error_condition err, const char *message);
+	void seterror(std::error_condition err, const char *message = nullptr);
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
 	bool exists() const noexcept { return !m_image_name.empty(); }
@@ -126,7 +126,7 @@ public:
 	bool is_filetype(std::string_view candidate_filetype) const;
 
 	bool is_open() const noexcept { return bool(m_file); }
-	util::core_file &image_core_file() const noexcept { return *m_file; }
+	util::core_file &image_core_file() const noexcept { assert(is_open()); return *m_file; }
 	bool is_readonly() const noexcept { return m_readonly; }
 
 	// image file I/O wrappers
@@ -165,27 +165,10 @@ public:
 		m_file->tell(result);
 		return result;
 	}
-	int fgetc()
-	{
-		char ch;
-		if (fread(&ch, 1) != 1)
-			ch = '\0';
-		return ch;
-	}
-	char *fgets(char *buffer, u32 length)
-	{
-		check_for_file();
-		return m_file->gets(buffer, length);
-	}
 	bool image_feof()
 	{
 		check_for_file();
 		return m_file->eof();
-	}
-	const void *ptr()
-	{
-		check_for_file();
-		return m_file->buffer();
 	}
 
 	// allocate and read into buffers
