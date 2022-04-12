@@ -3062,8 +3062,6 @@ files {
 createMAMEProjects(_target, _subtarget, "nasco")
 files {
 	MAME_DIR .. "src/mame/drivers/crgolf.cpp",
-	MAME_DIR .. "src/mame/includes/crgolf.h",
-	MAME_DIR .. "src/mame/video/crgolf.cpp",
 	MAME_DIR .. "src/mame/drivers/himesiki.cpp",
 	MAME_DIR .. "src/mame/drivers/suprgolf.cpp",
 }
@@ -3425,8 +3423,6 @@ files {
 createMAMEProjects(_target, _subtarget, "sega")
 files {
 	MAME_DIR .. "src/mame/drivers/angelkds.cpp",
-	MAME_DIR .. "src/mame/includes/angelkds.h",
-	MAME_DIR .. "src/mame/video/angelkds.cpp",
 	MAME_DIR .. "src/mame/drivers/bingoc.cpp",
 	MAME_DIR .. "src/mame/drivers/blockade.cpp",
 	MAME_DIR .. "src/mame/drivers/calorie.cpp",
