@@ -83,10 +83,10 @@ meta_data vtech_image::impl::metadata()
 std::vector<meta_description> vtech_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
-	res.emplace_back(meta_description(meta_name::name, meta_type::string, "", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "File name, 8 chars"));
-	res.emplace_back(meta_description(meta_name::loading_address, meta_type::number, 0x7ae9, false, [](const meta_value &m) { return m.as_number() < 0x10000; }, "Loading address of the file"));
-	res.emplace_back(meta_description(meta_name::length, meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
-	res.emplace_back(meta_description(meta_name::basic, meta_type::flag, true, true, nullptr, "Basic file"));
+	res.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "File name, 8 chars"));
+	res.emplace_back(meta_description(meta_name::loading_address, 0x7ae9, false, [](const meta_value &m) { return m.as_number() < 0x10000; }, "Loading address of the file"));
+	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
+	res.emplace_back(meta_description(meta_name::basic, true, true, nullptr, "Basic file"));
 	return res;
 }
 
