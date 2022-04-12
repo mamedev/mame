@@ -52,6 +52,9 @@ public:
 	}
 
 	auto irq_cb() { return m_irq_cb.bind(); }
+	auto ext_ctrl_0_cb() { return m_ext_ctrl_0_cb.bind(); }
+	auto ext_ctrl_1_cb() { return m_ext_ctrl_1_cb.bind(); }
+	auto ext_ctrl_2_cb() { return m_ext_ctrl_2_cb.bind(); }
 	void set_vblank_irq_level(int level) { m_vblank_irq_level = level; }
 	void set_blit_irq_level(int level) { m_blit_irq_level = level; }
 	void set_spriteram_buffered(bool buffer) { m_spriteram_buffered = buffer; }
@@ -59,9 +62,6 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_foreground(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_eof);
-	auto ext_ctrl_0_cb() { return m_ext_ctrl_0_cb.bind(); }
-	auto ext_ctrl_1_cb() { return m_ext_ctrl_1_cb.bind(); }
-	auto ext_ctrl_2_cb() { return m_ext_ctrl_2_cb.bind(); }
 
 	// TODO: privatize eventually
 	u8 irq_enable() const { return m_irq_enable; }

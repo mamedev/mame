@@ -2863,7 +2863,6 @@ void metro_state::i4220_config_304x224(machine_config &config)
 {
 	i4220_config(config);
 
-//	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 304-1, 0, 224-1);
 }
 
@@ -3398,8 +3397,12 @@ void metro_state::vmetal(machine_config &config)
 
 	m_vdp2->set_tmap_xoffsets(0,0,0);
 	m_vdp2->set_tmap_yoffsets(0,0,0);
-	m_vdp2->set_tmap_flip_xoffsets(16,16,16);
-	m_vdp2->set_tmap_flip_yoffsets(16,16,16);
+	// TODO: very fussy on screen geometry changes
+	// CRTC is set as 320x224, bottom 16 pixels are actually aligned properly when flip screen is on.
+	// Easiest alignment test is during story lore in attract, specifically at bomb explosion screen
+	// (latter being a sprite needs to be 1:1 aligned with underlying background layer)
+	m_vdp2->set_tmap_flip_xoffsets(88,88,88);
+	m_vdp2->set_tmap_flip_yoffsets(39,39,39);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3434,11 +3437,12 @@ void metro_state::blzntrnd(machine_config &config)
 	m_vdp2->set_vblank_irq_level(0);
 	m_vdp2->set_blit_irq_level(3);
 	m_vdp2->set_spriteram_buffered(true); // sprites are 1 frame delayed
+	m_vdp2->ext_ctrl_0_cb().set(FUNC(metro_state::ext_irq5_enable_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(320, 240);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
+	m_screen->set_size(392, 263);
 	m_screen->set_visarea(0, 304-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(metro_state::screen_update_psac_vdp2_mix));
 	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));

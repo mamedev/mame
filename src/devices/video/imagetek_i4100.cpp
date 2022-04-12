@@ -72,7 +72,7 @@
 #include <algorithm>
 
 #define LOG_INT (1 << 1U)
-#define VERBOSE (LOG_INT)
+//#define VERBOSE (LOG_INT)
 #include "logmacro.h"
 
 #define LOGINT(...) LOGMASKED(LOG_INT, __VA_ARGS__)
@@ -685,7 +685,7 @@ void imagetek_i4100_device::scroll_w(offs_t offset, uint16_t data, uint16_t mem_
  *
  * Screen Control Register:
  *
- * f--- ---- ---- ----     ?
+ * f--- ---- ---- ----     ? karatour during POST (CRTC i/f sync?)
  * -edc b--- ---- ----
  * ---- -a98 ---- ----     external control pins
  *                         \- gakusai attract, unknown purpose
@@ -695,6 +695,7 @@ void imagetek_i4100_device::scroll_w(offs_t offset, uint16_t data, uint16_t mem_
  *                         \- (bit 0) karatour/ladykill/3kokushi external irq level 5 enable, (bit 1-2) unknown;
  *                         \- puzzli [hblank] timer stop/start? 0 during transitions, 7 otherwise
  *                            (including individual printouts of ROM statuses during POST);
+ *                         \- mouja (1 during POST, 7 otherwise)
  * ---- ---- 765- ----     16x16 Tiles  (Layer 2-1-0)
  * ---- ---- ---4 32--
  * ---- ---- ---- --1-     Blank Screen
@@ -703,9 +704,9 @@ void imagetek_i4100_device::scroll_w(offs_t offset, uint16_t data, uint16_t mem_
  */
 void imagetek_i4100_device::screen_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_ext_ctrl_2_cb(bool(BIT(data, 10)));
-	m_ext_ctrl_1_cb(bool(BIT(data, 9)));
-	m_ext_ctrl_0_cb(bool(BIT(data, 8)));
+	m_ext_ctrl_2_cb(BIT(data, 10));
+	m_ext_ctrl_1_cb(BIT(data, 9));
+	m_ext_ctrl_0_cb(BIT(data, 8));
 
 	for (int i = 0; i < 3; i++)
 		m_layer_tile_select[i] = BIT(data, 5 + i);
@@ -715,7 +716,6 @@ void imagetek_i4100_device::screen_ctrl_w(offs_t offset, uint16_t data, uint16_t
 
 	if (data & 0xff1c)
 		logerror("%s warning: screen_ctrl_w write with %04x %04x\n", this->tag(), data, mem_mask);
-
 }
 
 
