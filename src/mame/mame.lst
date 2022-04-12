@@ -17540,10 +17540,11 @@ virtpool                        //
 
 @source:itech32.cpp
 bloodstm                        // (c) 1994 Strata/Incredible Technologies
-bloodstm10                      // (c) 1994 Strata/Incredible Technologies
-bloodstm11                      // (c) 1994 Strata/Incredible Technologies
-bloodstm21                      // (c) 1994 Strata/Incredible Technologies
-bloodstm22                      // (c) 1994 Strata/Incredible Technologies
+bloodstm104                     // (c) 1994 Strata/Incredible Technologies
+bloodstm110                     // (c) 1994 Strata/Incredible Technologies
+bloodstm210                     // (c) 1994 Strata/Incredible Technologies
+bloodstm220                     // (c) 1994 Strata/Incredible Technologies
+bloodstm221                     // (c) 1994 Strata/Incredible Technologies
 drivedge                        // (c) 1994 Strata/Incredible Technologies
 gt2k                            // (c) 2000 Incredible Technologies
 gt2kp100                        // (c) 2000 Incredible Technologies

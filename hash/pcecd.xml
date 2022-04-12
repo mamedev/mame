@@ -31,6 +31,10 @@ license:CC0
     various PC software and/or emulators handle them?  There are multiple second audio offset issues with
     several games in MESS/MAME which could be related.
 
+	TODO:
+	- Fix sharedfeat for Arcade Card (ACD) games, once that we split implementation from scdsys;
+	- What [Imperfect] means in some sets? Is it an alias for baddump?
+
 -->
 
 	<!-- JPN releases -->
@@ -359,7 +363,7 @@ license:CC0
 		<info name="release" value="19941125"/>
 		<info name="alt_title" value="バトルフィールド 新日本プロレスリング'94 BATTLEFIELD IN 闘強導夢"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="battlefield '94 in tokyo dome (acd)(jpn)" sha1="866e90f08cee3c5820b148f6c2c0791f5972ff51"/>
@@ -558,15 +562,15 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bunilla">
-		<description>Bunilla Syndrome Mahjong (CD, SCD)(Jpn)</description>
+	<software name="vanilla">
+		<description>Mahjong Vanilla Syndrome (CD, SCD)(Jpn)</description>
 		<year>1991</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="NBCD1001"/>
 		<info name="release" value="19911025"/>
-		<info name="alt_title" value="まーじゃん バニラシンドローム"/>
+		<info name="alt_title" value="まーじゃんバニラシンドローム"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="bunilla syndrome mahjong (cd, scd)(jpn)" sha1="fe373cbdcab0cd8e4f63b03c6c52b6d653a58f7a"/>
@@ -1617,7 +1621,7 @@ license:CC0
 		<info name="release" value="19950203"/>
 		<info name="alt_title" value="ファイプロ女子憧夢超女大戦 全女vsJWP"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fire pro joshi - dome choujo taisen (acd)(jpn)" sha1="a2a2e4108eed453e95f080b746b0797117b886e9"/>
@@ -1870,7 +1874,7 @@ license:CC0
 		<info name="release" value="19940212"/>
 		<info name="alt_title" value="餓狼伝説2 体験版"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu ii - aratanaru tatakai - sample disc (acd)(jpn)" sha1="978720b488736828bff3d7ecf2f738aec4aa3f36"/>
@@ -1886,7 +1890,7 @@ license:CC0
 		<info name="release" value="19940312"/>
 		<info name="alt_title" value="餓狼伝説2"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu ii - aratanaru tatakai [imperfect] (acd)(jpn)" sha1="b5d2dedf90a5b90c4d2b588e5f6985b8f38e18b5"/>
@@ -1902,7 +1906,7 @@ license:CC0
 		<info name="release" value="19941202"/>
 		<info name="alt_title" value="餓狼伝説スペシャル"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu special (acd)(jpn)" sha1="3d43a9d59e3a894580a4bbabc85ee0757b09d84a"/>
@@ -1966,7 +1970,7 @@ license:CC0
 		<info name="release" value="19951124"/>
 		<info name="alt_title" value="銀河婦警伝説サファイア"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ginga fukei densetsu sapphire (acd)(jpn)" sha1="5fe3b477286a60e47c367f8dd4d662557a62588b"/>
@@ -3054,7 +3058,7 @@ license:CC0
 		<info name="release" value="19920403"/>
 		<info name="alt_title" value="ロードオブウォーズ"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="macross 2036 (cd, scd)(jpn)" sha1="ac033b09b9585563d7300ea6b7cc53494f0633b5"/>
@@ -3086,7 +3090,7 @@ license:CC0
 		<info name="release" value="19940915"/>
 		<info name="alt_title" value="マッドストーカー フルメタルフォース"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad stalker - full metal force (acd)(jpn)" sha1="c2c1fdb935068405154eca2ab6a4ed68985353dd"/>
@@ -3099,7 +3103,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad stalker - full metal force - sample disc (acd)(jpn)" sha1="3ee9dd98aa62dac638dc20f22f67029120a1d6d6"/>
@@ -3115,7 +3119,7 @@ license:CC0
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="魔導物語I 炎の卒園児"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="madou monogatari i - honou no sotsuenji [imperfect] (acd)(jpn)" sha1="b0af74f366ca5284fb9447df1a456e7f624250f0"/>
@@ -4457,7 +4461,7 @@ license:CC0
 		<info name="release" value="19921002"/>
 		<info name="alt_title" value="らんま½ 打倒、元祖無差別格闘流!"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ranma datou, ganso musabetsu kakutou-ryuu (cd, scd)(jpn)" sha1="d37addaf2cc3a37c8430842570e1846ea6afe02a"/>
@@ -4777,7 +4781,7 @@ license:CC0
 		<info name="release" value="19940326"/>
 		<info name="alt_title" value="龍虎の拳"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ryuuko no ken (acd)(jpn)" sha1="50c2a68d3b1ab99802ec865af901e8454df62fc4"/>
@@ -4790,7 +4794,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ryuuko no ken - sample disc (acd)(jpn)" sha1="d1c5f36592565e3284bdc970b673fd7b577ad784"/>
@@ -5417,7 +5421,7 @@ license:CC0
 		<info name="serial" value="NAPR-1023?"/>
 		<info name="alt_title" value="スペースファンタジーゾーン"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="space fantasy zone [prototype][backup] (cd, scd)(jpn)" sha1="5d81cf1aba411801b3765510bf846dab74fc74c3"/>
@@ -5577,7 +5581,7 @@ license:CC0
 		<info name="release" value="19940922"/>
 		<info name="alt_title" value="ストライダー飛竜"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="strider hiryuu (acd)(jpn)" sha1="55730fca43667b79ca69a22092ddeb9e47f8eac4"/>
@@ -5817,7 +5821,7 @@ license:CC0
 		<info name="release" value="19911206"/>
 		<info name="alt_title" value="スーパーシュヴァルツシルト"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="super schwartzschild (cd, scd)(jpn)" sha1="05064b599ccfe5e86f3d25a46eabc01226c416ba"/>
@@ -6022,7 +6026,7 @@ license:CC0
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="カブキ一刀涼談"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tengai makyou - kabuki ittou ryoudan (acd)(jpn)" sha1="0ebc331c4d7d963f4a6553e6f2020fa5a1031753"/>
@@ -6118,7 +6122,7 @@ license:CC0
 		<info name="release" value="19920501"/>
 		<info name="alt_title" value="テラフォーミング"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="terraforming (cd, scd)(jpn)" sha1="a17977b33a87e37eb1e858d7785497fc4ad34d66"/>
@@ -6723,7 +6727,7 @@ license:CC0
 		<info name="release" value="19940604"/>
 		<info name="alt_title" value="ワールドヒーローズ2"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes ii (acd)(jpn)" sha1="67e7c559c1be2034502cb63efea6881fcc6b8e5a"/>
@@ -6737,7 +6741,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<info name="alt_title" value="ワールドヒーローズ2 体験版"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes ii - sample disc (acd)(jpn)" sha1="b3b8bcd66f58ee57f0e7473df1549f51e9096ade"/>
@@ -6762,7 +6766,8 @@ license:CC0
 	</software>
 
 	<software name="xak12">
-		<description>Xak I II (SCD)(Jpn)</description>
+		<!-- Has a dot separator on cover, canonically known with the ampersand -->
+		<description>Xak I &amp; II (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="TJCD2032"/>
@@ -7269,16 +7274,16 @@ license:CC0
 	</software>
 
 	<software name="implode">
-		<description>Implode (SCD)(USA)[bad toc]</description>
-		<!-- This disc has a copy protection scheme -->
+		<description>Implode (SCD)(USA)</description>
 		<year>2002</year>
 		<publisher>MindRec</publisher>
 		<info name="serial" value="BTCD0201"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
+		<!-- baddump: This disc has a copy protection scheme (also mentioned with [bad toc] moniker) -->
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="implode (scd)(usa)[bad toc]" sha1="e408fad0a69bb6c7329e218ef6bb26165de616b6"/>
+				<disk name="implode (scd)(usa)[bad toc]" sha1="e408fad0a69bb6c7329e218ef6bb26165de616b6" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7373,7 +7378,7 @@ license:CC0
 		<publisher>Hudson Soft / Red</publisher>
 		<info name="serial" value="TGXCD1033"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lords of thunder (scd)(usa)" sha1="ef889edba301b26f7b33294be79f63b60503b978"/>
@@ -7499,7 +7504,7 @@ license:CC0
 		<publisher>Sleuth Publications</publisher>
 		<info name="serial" value="TGXCD1039"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sherlock holmes consulting detective volume ii (cd, scd)(usa)" sha1="0c0206282e52ce25319abf2f71dea61d42f1366e"/>
@@ -7555,7 +7560,7 @@ license:CC0
 		<publisher>Syd Mead</publisher>
 		<info name="serial" value="TGXCD1040"/>
 		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="syd mead's terra forming [imperfect] (cd, scd)(usa)" sha1="86d8a356538f44f891ae985a6f5274025033bef5"/>
@@ -7652,16 +7657,16 @@ license:CC0
 	<!-- Unlicensed Discs -->
 
 	<software name="meteorbl">
-		<description>Meteor Blaster DX (SCD)(USA)[bad toc]</description>
-		<!-- This disc has a copy protection scheme -->
+		<description>Meteor Blaster DX (SCD)(USA)</description>
 		<year>2004</year>
 		<publisher>MindRec</publisher>
 		<info name="serial" value="BTCD0402"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
+		<!-- baddump: This disc has a copy protection scheme (also mentioned with [bad toc] moniker) -->
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="meteor blaster dx (scd)(usa)[bad toc]" sha1="d6a3d3a6c6305b7a7137ac330388fa327d9da066"/>
+				<disk name="meteor blaster dx (scd)(usa)[bad toc]" sha1="d6a3d3a6c6305b7a7137ac330388fa327d9da066" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7755,7 +7760,7 @@ license:CC0
 	</software>
 
 	<software name="pachinko" supported="no">
-		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai (GECD)(Jpn) [Imperfect]</description>
+		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai [Imperfect] (GECD)(Jpn)</description>
 		<year>1995</year>
 		<publisher>Game Express</publisher>
 		<info name="serial" value="GECD-1014"/>

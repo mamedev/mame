@@ -62,11 +62,11 @@ bool coco_rsdos_image::has_rsrc() const
 std::vector<meta_description> coco_rsdos_image::file_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, meta_type::string, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
-	results.emplace_back(meta_description(meta_name::file_type, meta_type::number, 0, true, nullptr, "Type of the file"));
-	results.emplace_back(meta_description(meta_name::ascii_flag, meta_type::string, 0, true, nullptr, "Ascii or binary flag"));
-	results.emplace_back(meta_description(meta_name::size_in_blocks, meta_type::number, 0, true, nullptr, "Number of granules used by the file"));
-	results.emplace_back(meta_description(meta_name::length, meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
+	results.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
+	results.emplace_back(meta_description(meta_name::file_type, 0, true, nullptr, "Type of the file"));
+	results.emplace_back(meta_description(meta_name::ascii_flag, "B", true, nullptr, "Ascii or binary flag"));
+	results.emplace_back(meta_description(meta_name::size_in_blocks, 0, true, nullptr, "Number of granules used by the file"));
+	results.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
 	return results;
 }
 

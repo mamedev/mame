@@ -23,6 +23,10 @@ void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_
 {
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
+		// TODO: this implies to read from the PSG inputs
+		// doesn't seem right at all, eventually causes extreme DC offset on BIOS main menu,
+		// possibly because adpcm_timer runs from a different thread,
+		// needs to be rechecked once we have better examples ...
 		s32 samp0 = inputs[0].get(i) * 32768.0;
 		s32 samp1 = inputs[1].get(i) * 32768.0;
 
@@ -33,8 +37,9 @@ void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			if (!channel->m_playing)
 				continue;
 
-			samp0 = std::clamp(samp0 + ((channel->m_output * channel->m_lvol) >> 3), -32768, 32767);
-			samp1 = std::clamp(samp1 + ((channel->m_output * channel->m_rvol) >> 3), -32768, 32767);
+			// TODO: wrong volume scales
+			samp0 = std::clamp(samp0 + ((channel->m_output * channel->m_lvol) >> 4), -32768, 32767);
+			samp1 = std::clamp(samp1 + ((channel->m_output * channel->m_rvol) >> 4), -32768, 32767);
 		}
 
 		outputs[0].put_int(i, samp0, 32768);
@@ -124,6 +129,8 @@ TIMER_CALLBACK_MEMBER(huc6230_device::adpcm_timer)
 		}
 
 		int32_t new_output;
+		// TODO: BIOS doesn't use interpolation
+		// which actually is linear interpolation off/on ...
 		if (!channel->m_interpolate)
 			new_output = channel->m_curr_sample;
 		else
