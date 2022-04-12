@@ -688,9 +688,13 @@ void imagetek_i4100_device::scroll_w(offs_t offset, uint16_t data, uint16_t mem_
  * f--- ---- ---- ----     ?
  * -edc b--- ---- ----
  * ---- -a98 ---- ----     external control pins
- *                         \- gakusai attract (leds?);
- *                         \- (bit 0) karatour/ladykill/3kokushi external irq level 5 enable;
- *                         \- puzzli hblank control;
+ *                         \- gakusai attract, unknown purpose
+ *                            (bit 2 enabled during title photo flashes,
+ *                             bit 1 always?,
+ *                             bit 0 periodically during gal sequences);
+ *                         \- (bit 0) karatour/ladykill/3kokushi external irq level 5 enable, (bit 1-2) unknown;
+ *                         \- puzzli [hblank] timer stop/start? 0 during transitions, 7 otherwise
+ *                            (including individual printouts of ROM statuses during POST);
  * ---- ---- 765- ----     16x16 Tiles  (Layer 2-1-0)
  * ---- ---- ---4 32--
  * ---- ---- ---- --1-     Blank Screen
