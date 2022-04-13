@@ -197,6 +197,7 @@
 #include "machine/pci.h"
 #include "machine/gt64xxx.h"
 #include "machine/pci-ide.h"
+#include "bus/ata/idehd.h"
 #include "video/voodoo_pci.h"
 #include "screen.h"
 
@@ -454,7 +455,7 @@ private:
 void seattle_state::machine_start()
 {
 	// set the fastest DRC options, but strict verification
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY);
 
 	// configure fast RAM regions
 //  m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
@@ -519,6 +520,10 @@ void seattle_state::machine_reset()
 
 	if (m_board_config == SEATTLE_WIDGET_CONFIG)
 		widget_reset();
+
+	// Set the disk dma transfer speed
+	auto* hdd = subdevice<ide_hdd_device>(PCI_ID_IDE":ide:0:hdd");
+	hdd->set_dma_transfer_time(attotime::from_usec(15));
 }
 
 /*************************************
@@ -905,7 +910,7 @@ uint32_t seattle_state::carnevil_gun_r(offs_t offset)
 
 void seattle_state::carnevil_gun_w(offs_t offset, uint32_t data)
 {
-	logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
+	//logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
 }
 
 /*************************************
@@ -1013,7 +1018,7 @@ void seattle_state::output_w(uint32_t data)
 	}
 	else if (!BIT(data, 9) || !BIT(data, 8))
 	{
-		logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
+		//logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
 	}
 }
 
