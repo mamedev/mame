@@ -46,6 +46,8 @@ public:
 	void set_cursor_enable(bool state) { m_cursor_enable = state; }
 	u32 get_cursor_size() { return (m_crtc_regs[CRTC_VCER] - m_crtc_regs[CRTC_VCSR]) * (32/4); }
 
+	virtual bool get_dac_mode() { return false; }
+
 protected:
 	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int dac_type);
 
@@ -81,7 +83,6 @@ protected:
 	u16 m_pal_4bpp_base;
 	u16 m_pal_cursor_base;
 	u16 m_pal_border_base;
-	const double m_sound_internal_divider = 8.0;
 
 	u8 m_bpp_mode, m_crtc_interlace;
 	u8       m_sound_frequency_latch;
@@ -90,9 +91,12 @@ protected:
 	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
 	int m_dac_type;
 
-private:
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
+
+	virtual void refresh_stereo_image(u8 channel);
+	const int m_sound_max_channels = 8;
+private:
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_sound_drq_cb;
 
@@ -124,9 +128,7 @@ private:
 	bool m_sound_frequency_test_bit;
 	u8       m_stereo_image[8];
 	const float m_sound_input_gain = 0.05f;
-	const int m_sound_max_channels = 8;
 	int16_t  m_ulaw_lookup[256];
-	inline void refresh_stereo_image(u8 channel);
 };
 
 class acorn_vidc1_device : public acorn_vidc10_device
@@ -154,7 +156,7 @@ public:
 	arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void write_dac32(u8 channel, u16 data);
-	bool get_dac_mode();
+	virtual bool get_dac_mode() override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -166,8 +168,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock() override;
-
-	const double m_sound_internal_divider = 1.0;
 
 private:
 	void vidc20_pal_data_display_w(offs_t offset, u32 data);
@@ -186,6 +186,10 @@ private:
 	u8 m_pixel_rate;
 	u8 m_vco_r_modulo;
 	u8 m_vco_v_modulo;
+
+	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac32;
+
+	virtual void refresh_stereo_image(u8 channel) override;
 };
 
 DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)
