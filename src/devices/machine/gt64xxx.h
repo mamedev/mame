@@ -104,6 +104,8 @@ private:
 	int m_irq_num;
 	int m_simm_size[4];
 
+	int m_irq_state;
+	uint32_t m_irq_pending;
 	int m_pci_stall_state;
 	int m_retry_count;
 	int m_pci_cpu_stalled;
