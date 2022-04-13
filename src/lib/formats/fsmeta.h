@@ -13,6 +13,7 @@
 #include <cassert>
 #include <functional>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <variant>
 
@@ -50,7 +51,8 @@ public:
 	static meta_value from_string(meta_type type, std::string value);
 
 	meta_value() { value = false; }
-	meta_value(std::string str) { value = str; }
+	meta_value(std::string &&str) { value = std::move(str); }
+	meta_value(std::string_view str) { value = std::string(str); }
 	meta_value(bool b) { value = b; }
 	meta_value(int32_t num) { value = uint64_t(num); }
 	meta_value(uint32_t num) { value = uint64_t(num); }
@@ -77,7 +79,9 @@ public:
 	bool empty() const { return meta.empty(); }
 
 	void set(meta_name name, const meta_value &val) { meta[name] = val; }
-	void set(meta_name name, std::string str) { set(name, meta_value(str)); }
+	void set(meta_name name, meta_value &&val) { meta[name] = std::move(val); }
+	void set(meta_name name, std::string &&str) { set(name, meta_value(std::move(str))); }
+	void set(meta_name name, std::string_view str) { set(name, meta_value(str)); }
 	void set(meta_name name, bool b) { set(name, meta_value(b)); }
 	void set(meta_name name, int32_t num) { set(name, meta_value(num)); }
 	void set(meta_name name, uint32_t num) { set(name, meta_value(num)); }
@@ -95,18 +99,18 @@ public:
 
 struct meta_description {
 	meta_name m_name;
-	meta_type m_type;
 	meta_value m_default;
 	bool m_ro;
-	std::function<void (const meta_value &)> m_validator;
+	std::function<void(const meta_value &)> m_validator;
 	const char *m_tooltip;
 
-	meta_description(meta_name name, meta_type type, int def, bool ro, std::function<void (meta_value)> validator, const char *tooltip) :
-		m_name(name), m_type(type), m_default(uint64_t(def)), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
+	template<typename T> meta_description(meta_name name, T def, bool ro, std::function<void(meta_value)> validator, const char *tooltip) :
+		meta_description(name, meta_value(def), ro, std::move(validator), tooltip)
 	{}
 
-	template<typename T> meta_description(meta_name name, meta_type type, T def, bool ro, std::function<void (meta_value)> validator, const char *tooltip) :
-		m_name(name), m_type(type), m_default(def), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
+private:
+	meta_description(meta_name name, meta_value &&def, bool ro, std::function<void(meta_value)> &&validator, const char *tooltip) :
+		m_name(name), m_default(std::move(def)), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
 	{}
 };
 

@@ -20,10 +20,10 @@
 
 struct midvunit_object_data
 {
-	uint16_t *    destbase;
-	uint8_t *     texbase;
-	uint16_t      pixdata;
-	uint8_t       dither;
+	uint16_t *    destbase = nullptr;
+	uint8_t *     texbase = 0;
+	uint16_t      pixdata = 0;
+	uint8_t       dither = 0;
 };
 
 class midvunit_state;
@@ -85,9 +85,9 @@ public:
 	void init_offroadc();
 	void init_crusnusa();
 
-	uint16_t m_page_control;
-	uint16_t m_dma_data[16];
-	uint8_t m_video_changed;
+	uint16_t m_page_control = 0;
+	uint16_t m_dma_data[16]{};
+	uint8_t m_video_changed = 0;
 
 	memory_share_creator<uint16_t> m_videoram;
 	required_shared_ptr<uint32_t> m_textureram;
@@ -107,29 +107,29 @@ private:
 	required_shared_ptr<uint32_t> m_tms32031_control;
 	optional_shared_ptr<uint32_t> m_midvplus_misc;
 
-	uint8_t m_cmos_protected;
-	uint16_t m_control_data;
-	uint8_t m_adc_shift;
-	uint16_t m_last_port0;
-	uint8_t m_shifter_state;
-	double m_timer_rate;
-	uint16_t m_bit_index;
-	int m_lastval;
-	uint32_t *m_generic_speedup;
-	uint16_t m_video_regs[16];
-	uint8_t m_dma_data_index;
-	emu_timer *m_scanline_timer;
+	uint8_t m_cmos_protected = 0;
+	uint16_t m_control_data = 0;
+	uint8_t m_adc_shift = 0;
+	uint16_t m_last_port0 = 0;
+	uint8_t m_shifter_state = 0;
+	double m_timer_rate = 0;
+	uint16_t m_bit_index = 0;
+	int m_lastval = 0;
+	uint32_t *m_generic_speedup = nullptr;
+	uint16_t m_video_regs[16]{};
+	uint8_t m_dma_data_index = 0;
+	emu_timer *m_scanline_timer = nullptr;
 	std::unique_ptr<midvunit_renderer> m_poly;
-	uint8_t m_galil_input_index;
-	uint8_t m_galil_input_length;
-	const char *m_galil_input;
-	uint8_t m_galil_output_index;
-	char m_galil_output[450];
-	uint8_t m_wheel_board_output;
-	uint32_t m_wheel_board_last;
-	uint32_t m_wheel_board_u8_latch;
-	uint8_t m_comm_flags;
-	uint16_t m_comm_data;
+	uint8_t m_galil_input_index = 0;
+	uint8_t m_galil_input_length = 0;
+	const char *m_galil_input = nullptr;
+	uint8_t m_galil_output_index = 0;
+	char m_galil_output[450]{};
+	uint8_t m_wheel_board_output = 0;
+	uint32_t m_wheel_board_last = 0;
+	uint32_t m_wheel_board_u8_latch = 0;
+	uint8_t m_comm_flags = 0;
+	uint16_t m_comm_data = 0;
 	void midvunit_dma_queue_w(uint32_t data);
 	uint32_t midvunit_dma_queue_entries_r();
 	uint32_t midvunit_dma_trigger_r(offs_t offset);

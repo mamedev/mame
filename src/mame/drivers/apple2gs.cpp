@@ -315,9 +315,9 @@ private:
 		ADBSTATE_INRESPONSE
 	};
 
-	bool m_adb_line;
+	bool m_adb_line = false;
 
-	address_space *m_maincpu_space;
+	address_space *m_maincpu_space = nullptr;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
@@ -335,9 +335,9 @@ private:
 	void devsel_w(uint8_t devsel);
 	void hdsel_w(int hdsel);
 
-	floppy_image_device *m_cur_floppy;
-	int m_devsel;
-	u8 m_diskreg;
+	floppy_image_device *m_cur_floppy = nullptr;
+	int m_devsel = 0;
+	u8 m_diskreg = 0;
 
 	u8 ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, u8 data);
@@ -435,91 +435,91 @@ private:
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 	void wdm_trampoline(offs_t offset, u8 data) { }; //m_a2host->wdm_w(space, offset, data); }
 
-	bool m_is_rom3;
-	int m_speaker_state;
+	bool m_is_rom3 = false;
+	int m_speaker_state = 0;
 
-	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time;
+	double m_joystick_x1_time = 0, m_joystick_y1_time = 0, m_joystick_x2_time = 0, m_joystick_y2_time = 0;
 
-	int m_inh_slot, m_cnxx_slot;
-	int m_motoroff_time;
+	int m_inh_slot = 0, m_cnxx_slot = 0;
+	int m_motoroff_time = 0;
 
-	bool m_romswitch;
+	bool m_romswitch = false;
 
-	bool m_page2;
-	bool m_an0, m_an1, m_an2, m_an3;
+	bool m_page2 = false;
+	bool m_an0 = false, m_an1 = false, m_an2 = false, m_an3 = false;
 
-	bool m_vbl;
+	bool m_vbl = false;
 
-	int m_irqmask;
+	int m_irqmask = 0;
 
-	bool m_intcxrom;
-	bool m_80store;
-	bool m_slotc3rom;
-	bool m_altzp;
-	bool m_ramrd, m_ramwrt;
-	bool m_lcram, m_lcram2, m_lcprewrite, m_lcwriteenable;
-	bool m_ioudis;
-	bool m_rombank;
+	bool m_intcxrom = false;
+	bool m_80store = false;
+	bool m_slotc3rom = false;
+	bool m_altzp = false;
+	bool m_ramrd = false, m_ramwrt = false;
+	bool m_lcram = false, m_lcram2 = false, m_lcprewrite = false, m_lcwriteenable = false;
+	bool m_ioudis = false;
+	bool m_rombank = false;
 
-	u8 m_shadow, m_speed, m_textcol;
-	u8 m_motors_active, m_slotromsel, m_intflag, m_vgcint, m_inten, m_newvideo;
+	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
+	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0, m_newvideo = 0;
 
-	bool m_last_speed;
+	bool m_last_speed = false;
 
 	// Sound GLU variables
-	u8 m_sndglu_ctrl;
-	int m_sndglu_addr;
-	int m_sndglu_dummy_read;
+	u8 m_sndglu_ctrl = 0;
+	int m_sndglu_addr = 0;
+	int m_sndglu_dummy_read = 0;
 
 	// Key GLU variables
-	u8 m_glu_regs[12], m_glu_bus;
-	bool m_glu_mcu_read_kgs, m_glu_816_read_dstat, m_glu_mouse_read_stat;
-	int m_glu_kbd_y;
+	u8 m_glu_regs[12]{}, m_glu_bus = 0;
+	bool m_glu_mcu_read_kgs = false, m_glu_816_read_dstat = false, m_glu_mouse_read_stat = false;
+	int m_glu_kbd_y = 0;
 
-	u8 *m_ram_ptr;
-	int m_ram_size;
-	u8 m_megaii_ram[0x20000];  // 128K of "slow RAM" at $E0/0000
+	u8 *m_ram_ptr = nullptr;
+	int m_ram_size = 0;
+	u8 m_megaii_ram[0x20000]{};  // 128K of "slow RAM" at $E0/0000
 
-	int m_inh_bank;
+	int m_inh_bank = 0;
 
-	bool m_slot_irq;
+	bool m_slot_irq = false;
 
-	double m_x_calibration, m_y_calibration;
+	double m_x_calibration = 0, m_y_calibration = 0;
 
-	device_a2bus_card_interface *m_slotdevice[8];
+	device_a2bus_card_interface *m_slotdevice[8]{};
 
-	u32 m_slow_counter;
+	u32 m_slow_counter = 0;
 
 	// clock/BRAM
-	u8 m_clkdata, m_clock_control, m_clock_read, m_clock_reg1;
+	u8 m_clkdata = 0, m_clock_control = 0, m_clock_read = 0, m_clock_reg1 = 0;
 	apple2gs_clock_mode m_clock_mode;
 	u32 m_clock_curtime;
 	seconds_t m_clock_curtime_interval;
-	u8 m_clock_bram[256];
-	int m_clock_frame;
+	u8 m_clock_bram[256]{};
+	int m_clock_frame = 0;
 
 	// ADB simulation
 	#if !RUN_ADB_MICRO
 	adbstate_t m_adb_state;
-	u8 m_adb_command;
-	u8 m_adb_mode;
-	u8 m_adb_kmstatus;
-	u8 m_adb_pending_status;
-	u8 m_adb_latent_result;
-	s32 m_adb_command_length;
-	s32 m_adb_command_pos;
-	u8 m_adb_response_length;
-	s32 m_adb_response_pos;
-	u8 m_adb_command_bytes[8];
-	u8 m_adb_response_bytes[8];
-	u8 m_adb_memory[0x100];
-	int m_adb_address_keyboard;
-	int m_adb_address_mouse;
+	u8 m_adb_command = 0;
+	u8 m_adb_mode = 0;
+	u8 m_adb_kmstatus = 0;
+	u8 m_adb_pending_status = 0;
+	u8 m_adb_latent_result = 0;
+	s32 m_adb_command_length = 0;
+	s32 m_adb_command_pos = 0;
+	u8 m_adb_response_length = 0;
+	s32 m_adb_response_pos = 0;
+	u8 m_adb_command_bytes[8]{};
+	u8 m_adb_response_bytes[8]{};
+	u8 m_adb_memory[0x100]{};
+	int m_adb_address_keyboard = 0;
+	int m_adb_address_mouse = 0;
 
-	u16 m_lastchar, m_strobe;
-	u8 m_transchar;
-	bool m_anykeydown;
-	int m_repeatdelay;
+	u16 m_lastchar = 0, m_strobe = 0;
+	u8 m_transchar = 0;
+	bool m_anykeydown = false;
+	int m_repeatdelay = 0;
 
 	u8 adb_read_datareg();
 	u8 adb_read_kmstatus();
@@ -559,13 +559,13 @@ private:
 	void process_clock();
 
 	// ZipGS stuff
-	bool m_accel_unlocked;
-	bool m_accel_fast;
-	bool m_accel_present;
-	bool m_accel_temp_slowdown;
-	int m_accel_stage;
-	u32 m_accel_speed;
-	u8 m_accel_slotspk, m_accel_gsxsettings, m_accel_percent;
+	bool m_accel_unlocked = false;
+	bool m_accel_fast = false;
+	bool m_accel_present = false;
+	bool m_accel_temp_slowdown = false;
+	int m_accel_stage = 0;
+	u32 m_accel_speed = 0;
+	u8 m_accel_slotspk = 0, m_accel_gsxsettings = 0, m_accel_percent = 0;
 
 	void accel_full_speed()
 	{
@@ -620,11 +620,13 @@ private:
 
 // FF6ACF is speed test routine in ROM 3
 
+// slow_cycle() - take a 1 MHz cycle.  Theory: a 2.8 MHz cycle is 14M / 5.
+// 1 MHz is 14M / 14.  14/5 = 2.8 * 65536 (16.16 fixed point) = 0x2cccd.
 #define slow_cycle() \
 {   \
 	if (!machine().side_effects_disabled() && m_last_speed) \
 	{\
-		m_slow_counter += 0x0001999a; \
+		m_slow_counter += 0x0002cccd; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
 		m_slow_counter &= 0xffff; \
 		m_maincpu->adjust_icount(-cycles); \

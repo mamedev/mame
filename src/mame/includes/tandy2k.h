@@ -205,7 +205,7 @@ private:
 
 	/* DMA state */
 	uint8_t m_dma_mux;
-	int m_busdmarq[4];
+	int m_busdmarq[4]{};
 
 	/* keyboard state */
 	int m_kbdclk;
@@ -235,7 +235,7 @@ private:
 	int m_sld;
 	uint8_t m_cgra;
 	uint8_t m_vidla;
-	uint8_t m_hires_en;
+	uint8_t m_hires_en = 0;
 
 	/* sound state */
 	int m_outspkr;
@@ -259,12 +259,12 @@ private:
 		MCU_DELAY
 	};
 
-	uint8_t m_clkmouse_cmd[8];
-	int m_clkmouse_cnt;
-	uint8_t m_clkmouse_irq;
-	uint16_t m_mouse_x, m_mouse_y;
-	emu_timer *m_mouse_timer;
-	emu_timer *m_mcu_delay;
+	uint8_t m_clkmouse_cmd[8]{};
+	int m_clkmouse_cnt = 0;
+	uint8_t m_clkmouse_irq = 0;
+	uint16_t m_mouse_x = 0, m_mouse_y = 0;
+	emu_timer *m_mouse_timer = nullptr;
+	emu_timer *m_mcu_delay = nullptr;
 
 	void tandy2k_hd_io(address_map &map);
 	void tandy2k_io(address_map &map);

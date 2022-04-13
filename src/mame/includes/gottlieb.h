@@ -157,7 +157,7 @@ private:
 	u8 m_laserdisc_select = 0U;
 	u8 m_laserdisc_status = 0U;
 	uint16_t m_laserdisc_philips_code = 0U;
-	std::unique_ptr<u8[]> m_laserdisc_audio_buffer{};
+	std::unique_ptr<u8[]> m_laserdisc_audio_buffer;
 	uint16_t m_laserdisc_audio_address = 0U;
 	int16_t m_laserdisc_last_samples[2]{};
 	attotime m_laserdisc_last_time;

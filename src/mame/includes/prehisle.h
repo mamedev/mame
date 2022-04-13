@@ -59,15 +59,15 @@ private:
 	required_region_ptr<uint8_t> m_tilemap_rom;
 
 	required_ioport m_io_p1;
-	uint8_t m_invert_controls;
-	uint16_t m_bg_scrollx;
-	uint16_t m_bg_scrolly;
-	uint16_t m_fg_scrollx;
-	uint16_t m_fg_scrolly;
+	uint8_t m_invert_controls = 0;
+	uint16_t m_bg_scrollx = 0;
+	uint16_t m_bg_scrolly = 0;
+	uint16_t m_fg_scrollx = 0;
+	uint16_t m_fg_scrolly = 0;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

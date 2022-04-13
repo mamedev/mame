@@ -188,32 +188,32 @@ private:
 	required_ioport m_touch;
 	required_ioport_array<8> m_kbd_cols;
 
-	emu_timer *m_timers[2];
+	emu_timer *m_timers[2]{};
 
-	uint32_t m_memcfg[2];
-	uint16_t m_dramcfg;
+	uint32_t m_memcfg[2]{};
+	uint16_t m_dramcfg = 0;
 
-	uint16_t m_timer_reload[2];
-	uint16_t m_timer_ctrl[2];
-	uint16_t m_timer_value[2];
+	uint16_t m_timer_reload[2]{};
+	uint16_t m_timer_ctrl[2]{};
+	uint16_t m_timer_value[2]{};
 
-	uint32_t m_pending_ints;
-	uint32_t m_int_mask;
+	uint32_t m_pending_ints = 0;
+	uint32_t m_int_mask = 0;
 
-	uint32_t m_lcd_display_base_addr;
+	uint32_t m_lcd_display_base_addr = 0;
 
-	uint32_t m_rtc;
-	uint32_t m_pwrsr;
-	uint32_t m_last_ssi_request;
-	uint32_t m_ssi_read_counter;
-	uint8_t m_buzzer_ctrl;
+	uint32_t m_rtc = 0;
+	uint32_t m_pwrsr = 0;
+	uint32_t m_last_ssi_request = 0;
+	uint32_t m_ssi_read_counter = 0;
+	uint8_t m_buzzer_ctrl = 0;
 
-	uint8_t m_kbd_scan;
+	uint8_t m_kbd_scan = 0;
 
-	uint8_t m_ports[5];
+	uint8_t m_ports[5]{};
 
-	emu_timer *m_periodic;
-	emu_timer *m_rtc_ticker;
+	emu_timer *m_periodic = nullptr;
+	emu_timer *m_rtc_ticker = nullptr;
 };
 
 #endif // MAME_INCLUDES_PSION5_H

@@ -112,8 +112,8 @@ private:
 	uint8_t port40_r();
 	void port40_w(uint8_t data);
 
-	int m_centronics_busy;
-	int m_centronics_ack;
+	int m_centronics_busy = 0;
+	int m_centronics_ack = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
@@ -161,7 +161,7 @@ private:
 	u8 port71_r();
 	void port71_w(u8 data);
 
-	u8 m_n80sr_bank;
+	u8 m_n80sr_bank = 0;
 };
 
 #endif

@@ -97,12 +97,12 @@ private:
 	std::unique_ptr<u8[]> m_ram;
 	std::unique_ptr<u8[]> m_vram; // video ram
 	std::unique_ptr<u8[]> m_dummy;  // black hole for write to rom
-	int m_centronics_busy;
-	bool m_is_motor_off = 0;
+	int m_centronics_busy = 0;
+	bool m_is_motor_off = false;
 	u8 m_fdc_rq = 0U;
 	u8 m_system_port = 0U;
 	u16 m_mc6845_video_address = 0U;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

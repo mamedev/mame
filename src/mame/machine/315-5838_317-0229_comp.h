@@ -57,7 +57,7 @@ private:
 			uint8_t len = 0;       /* in bits */
 			uint8_t idx = 0;       /* in the dictionary */
 			uint16_t pattern = 0;  /* of the first node */
-		} tree[12];
+		} tree[13];
 		int it2 = 0;
 		uint8_t dictionary[256]{};
 		int id = 0;

@@ -80,37 +80,37 @@ private:
 	/* video-related */
 	struct sprite_t
 	{
-		u8 gfx;
-		u32 code,color;
-		bool flipx,flipy;
-		s32 x,y;
-		u32 zoomx,zoomy;
-		u32 primask;
+		u8 gfx = 0;
+		u32 code = 0, color = 0;
+		bool flipx = false, flipy = false;
+		s32 x = 0, y = 0;
+		u32 zoomx = 0, zoomy = 0;
+		u32 primask = 0;
 	};
 
-	tilemap_t   *m_tilemap[2];
-	u8          m_tilemap_bank[2];
-	bool        m_ka302c_banking;
-	u32         m_old_linescroll[2];
-	u32         m_old_tmapsize[2];
-	u32         m_tmapsize[2];
+	tilemap_t   *m_tilemap[2]{};
+	u8          m_tilemap_bank[2]{};
+	bool        m_ka302c_banking = false;
+	u32         m_old_linescroll[2]{};
+	u32         m_old_tmapsize[2]{};
+	u32         m_tmapsize[2]{};
 	std::unique_ptr<sprite_t[]> m_spritelist;
 	struct sprite_t *m_sprite_ptr_pre;
-	u16         m_sprite_ctrl;
+	u16         m_sprite_ctrl = 0;
 
 	/* game-specific */
 	// 1945 MCU
-	int         m_mcu_status;
-	u8          m_s1945_mcu_direction;
-	u8          m_s1945_mcu_latch1;
-	u8          m_s1945_mcu_latch2;
-	u8          m_s1945_mcu_inlatch;
-	u8          m_s1945_mcu_index;
-	u8          m_s1945_mcu_latching;
-	u8          m_s1945_mcu_mode;
-	u8          m_s1945_mcu_control;
-	u8          m_s1945_mcu_bctrl;
-	const u8    *m_s1945_mcu_table;
+	int         m_mcu_status = 0;
+	u8          m_s1945_mcu_direction = 0;
+	u8          m_s1945_mcu_latch1 = 0;
+	u8          m_s1945_mcu_latch2 = 0;
+	u8          m_s1945_mcu_inlatch = 0;
+	u8          m_s1945_mcu_index = 0;
+	u8          m_s1945_mcu_latching = 0;
+	u8          m_s1945_mcu_mode = 0;
+	u8          m_s1945_mcu_control = 0;
+	u8          m_s1945_mcu_bctrl = 0;
+	const u8    *m_s1945_mcu_table = nullptr;
 
 	u32 sngkace_input_r(offs_t offset);
 	u32 gunbird_input_r(offs_t offset);

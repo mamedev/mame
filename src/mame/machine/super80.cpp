@@ -91,7 +91,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::kansas_r )
 TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 {
 	uint8_t go_fast = 0;
-	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    // bit 2 of port F0 is low, OR user turned on config switch
+	if ( (!BIT(m_portf0, 2)) || (!BIT(m_io_config->read(), 1)) )    // bit 2 of port F0 is low, OR user turned on config switch
 		go_fast++; // must be 1 at boot so banking works correctly
 
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */

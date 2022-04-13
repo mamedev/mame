@@ -34,7 +34,7 @@ public:
 
 protected:
 	/* misc */
-	uint8_t    m_nmi_enable;
+	uint8_t    m_nmi_enable = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -88,13 +88,13 @@ public:
 
 private:
 	/* misc */
-	int        m_old_x[2];
-	int        m_old_y[2];
-	int        m_old_f[2];
-	uint8_t    m_input_ret[2];
-	int        m_adpcm_playing[4];
-	int        m_adpcm_addr[2][4];
-	int        m_adpcm_nibble[4];
+	int        m_old_x[2]{};
+	int        m_old_y[2]{};
+	int        m_old_f[2]{};
+	uint8_t    m_input_ret[2]{};
+	int        m_adpcm_playing[4]{};
+	int        m_adpcm_addr[2][4]{};
+	int        m_adpcm_nibble[4]{};
 
 	/* devices */
 	required_device_array<msm5205_device, 4> m_msm;

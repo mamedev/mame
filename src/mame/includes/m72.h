@@ -129,28 +129,28 @@ private:
 	optional_ioport m_io_dsw;
 
 	std::unique_ptr<u16[]> m_protection_ram;
-	emu_timer *m_scanline_timer;
-	const u8 *m_protection_code;
-	const u8 *m_protection_crc;
-	u32 m_raster_irq_position;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg_tilemap_large;
-	s32 m_scrollx[2];
-	s32 m_scrolly[2];
-	s32 m_video_off;
+	emu_timer *m_scanline_timer = nullptr;
+	const u8 *m_protection_code = nullptr;
+	const u8 *m_protection_crc = nullptr;
+	u32 m_raster_irq_position = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap_large = nullptr;
+	s32 m_scrollx[2]{};
+	s32 m_scrolly[2]{};
+	s32 m_video_off = 0;
 
-	int m_fg_source;
-	int m_bg_source;
+	int m_fg_source = 0;
+	int m_bg_source = 0;
 	optional_ioport m_m81_b_b_j3;
 
 	// majtitle specific
-	int m_m82_rowscroll;
-	u16 m_m82_tmcontrol;
+	int m_m82_rowscroll = 0;
+	u16 m_m82_tmcontrol = 0;
 
 	// m72_i8751 specific
-	u8 m_mcu_sample_latch;
-	u32 m_mcu_sample_addr;
+	u8 m_mcu_sample_latch = 0;
+	u32 m_mcu_sample_addr = 0;
 
 	// common
 	template<unsigned N> u16 palette_r(offs_t offset);

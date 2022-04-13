@@ -67,15 +67,15 @@ private:
 	required_shared_ptr<uint16_t> m_spvideoram;
 
 	std::unique_ptr<uint16_t[]> m_spvideoram_old;
-	tilemap_t *m_fgtilemap;
-	tilemap_t *m_bg0tilemap;
-	tilemap_t *m_bg1tilemap;
-	int m_video_enable;
-	int m_irqs_enable;
-	int m_raster_scanline;
-	int m_raster_irq_enable;
-	int m_vblank;
-	int m_prev_value;
+	tilemap_t *m_fgtilemap = nullptr;
+	tilemap_t *m_bg0tilemap = nullptr;
+	tilemap_t *m_bg1tilemap = nullptr;
+	int m_video_enable = 0;
+	int m_irqs_enable = 0;
+	int m_raster_scanline = 0;
+	int m_raster_irq_enable = 0;
+	int m_vblank = 0;
+	int m_prev_value = 0;
 
 	void flip_screen(uint16_t data);
 	uint16_t input_ports_r(offs_t offset);

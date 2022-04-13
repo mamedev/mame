@@ -54310,7 +54310,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="侍魂"/>
 		<info name="alt_title" value="Shìhún"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_shero" />
+			<feature name="slot" value="sachen_shero" />
 			<feature name="pcb" value="UNL-SHERO" />
 			<feature name="mirroring" value="4screen" />
 			<dataarea name="chr" size="524288">
@@ -54399,23 +54399,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<!-- TC-031 is unknown. Possibly "Bridge", an unreleased proto -->
 
-	<software name="chuugokt" supported="partial">
-		<description>Chuugoku Taitei (Tw)</description>
-		<year>19??</year>
+	<software name="zgdaheng">
+		<description>Zhōngguó Dàhēng (Taiwan)</description>
+		<year>199?</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-032"/>
 		<info name="alt_title" value="中國大亨"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Original header was mapper 116, but it's not a SOMARI pcb... -->
+			<feature name="slot" value="sachen_zgdh" />
 			<dataarea name="chr" size="131072">
 				<rom name="chuugoku taitei (asia) (unl).chr" size="131072" crc="d9203c08" sha1="b32ef62e4583b216aea84f7d0da0269c01b61e26" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="chuugoku taitei (asia) (unl).prg" size="262144" crc="3acdcc64" sha1="32436a43d3c371ab7aa6bb5165f60ca5c006a60e" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -55880,14 +55883,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- Micro Genius -->
 
-	<software name="qiwang" supported="partial">
-		<description>Qi Wang - Chinese Chess (Tw)</description>
-		<year>199?</year>
+	<software name="qiwang">
+		<description>Qíwáng - Chinese Chess (Taiwan)</description>
+		<year>1991</year>
 		<publisher>Micro Genius</publisher>
 		<info name="serial" value="MGC-001"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa72008" />
-			<feature name="pcb" value="UNL-SA-72008" />
+			<feature name="slot" value="txc_22211" />
+			<feature name="pcb" value="UNL-22211-A" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="qi wang - chinese chess (asia) (unl).chr" size="32768" crc="47fd920d" sha1="6dba34243e5fced22c2e33819a03e5153d33a362" offset="00000" status="baddump" />
 			</dataarea>
@@ -68130,15 +68134,15 @@ All musics were removed in this game.
 	</software>
 
 <!-- which game is this?!? pirating MGC-001?!? -->
-	<software name="qiwanga" cloneof="qiwang" supported="partial">
-		<description>Qi Wang - Chinese Chess (Chi, Alt)</description>
-		<year>19??</year>
+	<software name="qiwanga" cloneof="qiwang">
+		<description>Qíwáng - Chinese Chess (China, bootleg?)</description>
+		<year>199?</year>
 		<publisher>TXC Corp.</publisher>
 		<info name="alt_title" value="棋王"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa72008" />
-			<feature name="pcb" value="UNL-SA-72008" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="slot" value="txc_22211" />
+			<feature name="pcb" value="UNL-22211-A" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="qi wang - chinese chess (ch) [p1].chr" size="32768" crc="b8836420" sha1="bf8ef8486ee55560122e3605ad8cb00c4132c892" offset="00000" status="baddump" />
 			</dataarea>

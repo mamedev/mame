@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-C-80
+C-80 Trainer (East Germany)
 
 Pasting:
     0-F : as is
@@ -133,6 +133,7 @@ void c80_state::c80_mem(address_map &map)
 void c80_state::c80_io(address_map &map)
 {
 	map.global_mask(0xff);
+	map.unmap_value_high();
 	map(0x7c, 0x7f).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0xbc, 0xbf).rw(m_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
@@ -344,7 +345,7 @@ void c80_state::c80(machine_config &config)
 /* ROMs */
 
 ROM_START( c80 )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x0800, Z80_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "c80.d3", 0x0000, 0x0400, CRC(ad2b3296) SHA1(14f72cb73a4068b7a5d763cc0e254639c251ce2e) )
 ROM_END
 

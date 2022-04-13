@@ -48,7 +48,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<atari_vad_device> m_vad;
 
-	int m_cur[2];
+	int m_cur[2]{};
 
 	static const atari_motion_objects_config s_mob_config;
 };

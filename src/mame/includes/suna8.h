@@ -195,29 +195,29 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_decrypt;
 
-	uint8_t m_rombank; // all
-	uint8_t m_rombank_latch; // sparkman and starfigh
-	uint8_t m_spritebank; // all
-	uint8_t m_palettebank; // all brickzn sets
-	uint8_t m_paletteram_enab; // only brickzn newer sets (no 1.1)
-	uint8_t m_prot2; // only brickzn newer sets (no 1.1)
-	uint8_t m_prot2_prev; // only brickzn newer sets (no 1.1)
+	uint8_t m_rombank = 0; // all
+	uint8_t m_rombank_latch = 0; // sparkman and starfigh
+	uint8_t m_spritebank = 0; // all
+	uint8_t m_palettebank = 0; // all brickzn sets
+	uint8_t m_paletteram_enab = 0; // only brickzn newer sets (no 1.1)
+	uint8_t m_prot2 = 0; // only brickzn newer sets (no 1.1)
+	uint8_t m_prot2_prev = 0; // only brickzn newer sets (no 1.1)
 
-	uint8_t m_protection_val; // hardhead and brickzn newer sets (no 1.1)
-	uint8_t m_nmi_enable; // hardhea2, sparkman and starfigh
-	uint8_t m_spritebank_latch; // sparkman and starfigh
-	uint8_t m_write_disable; // only sparkman
-	uint8_t m_prot_opcode_toggle; // only brickzn newer sets (no 1.1)
-	uint8_t m_remap_sound; // only brickzn newer sets (no 1.1)
+	uint8_t m_protection_val = 0; // hardhead and brickzn newer sets (no 1.1)
+	uint8_t m_nmi_enable = 0; // hardhea2, sparkman and starfigh
+	uint8_t m_spritebank_latch = 0; // sparkman and starfigh
+	uint8_t m_write_disable = 0; // only sparkman
+	uint8_t m_prot_opcode_toggle = 0; // only brickzn newer sets (no 1.1)
+	uint8_t m_remap_sound = 0; // only brickzn newer sets (no 1.1)
 
-	uint8_t m_gfxbank; // only starfigh
+	uint8_t m_gfxbank = 0; // only starfigh
 
-	bool m_has_text; // has text sprites (older games)
+	bool m_has_text = false; // has text sprites (older games)
 
 	// samples
 	std::unique_ptr<int16_t[]> m_samplebuf;
-	uint8_t m_sample, m_play;
-	int m_numsamples;
+	uint8_t m_sample = 0, m_play = 0;
+	int m_numsamples = 0;
 };
 
 #endif // MAME_INCLUDES_SUNA8_H

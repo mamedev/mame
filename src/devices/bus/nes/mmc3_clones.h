@@ -476,6 +476,30 @@ private:
 	u8 m_reg;
 };
 
+// ======================> nes_sachen_zgdh_device
+
+class nes_sachen_zgdh_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_sachen_zgdh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual u8 nt_r(offs_t offset) override;
+	virtual void nt_w(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
+
+private:
+	u8 m_reg;
+};
+
 // ======================> nes_a9746_device
 
 class nes_a9746_device : public nes_txrom_device
@@ -1229,6 +1253,7 @@ DECLARE_DEVICE_TYPE(NES_COCOMA,        nes_cocoma_device)
 DECLARE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device)
 DECLARE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device)
+DECLARE_DEVICE_TYPE(NES_SACHEN_ZGDH,   nes_sachen_zgdh_device)
 DECLARE_DEVICE_TYPE(NES_A9746,         nes_a9746_device)
 
 DECLARE_DEVICE_TYPE(NES_A88S1,         nes_a88s1_device)

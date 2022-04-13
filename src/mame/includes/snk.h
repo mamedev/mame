@@ -93,39 +93,39 @@ private:
 	optional_ioport m_joymode_io;
 	optional_ioport m_bonus_io;
 
-	int m_countryc_trackball;
-	int m_last_value[2];
-	int m_cp_count[2];
+	int m_countryc_trackball = 0;
+	int m_last_value[2]{};
+	int m_cp_count[2]{};
 
 	// FIXME this should be initialised on machine reset
-	int m_sound_status;
+	int m_sound_status = 0;
 
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	int m_fg_scrollx;
-	int m_fg_scrolly;
-	int m_bg_scrollx;
-	int m_bg_scrolly;
-	int m_sp16_scrollx;
-	int m_sp16_scrolly;
-	int m_sp32_scrollx;
-	int m_sp32_scrolly;
-	uint8_t m_sprite_split_point;
-	int m_num_sprites;
-	int m_yscroll_mask;
-	uint32_t m_bg_tile_offset;
-	uint32_t m_tx_tile_offset;
-	int m_is_psychos;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_fg_scrollx = 0;
+	int m_fg_scrolly = 0;
+	int m_bg_scrollx = 0;
+	int m_bg_scrolly = 0;
+	int m_sp16_scrollx = 0;
+	int m_sp16_scrolly = 0;
+	int m_sp32_scrollx = 0;
+	int m_sp32_scrolly = 0;
+	uint8_t m_sprite_split_point = 0;
+	int m_num_sprites = 0;
+	int m_yscroll_mask = 0;
+	uint32_t m_bg_tile_offset = 0;
+	uint32_t m_tx_tile_offset = 0;
+	int m_is_psychos = 0;
 
-	uint8_t m_drawmode_table[16];
-	uint8_t m_empty_tile[16*16];
-	int m_hf_posy;
-	int m_hf_posx;
-	int m_tc16_posy;
-	int m_tc16_posx;
-	int m_tc32_posy;
-	int m_tc32_posx;
+	uint8_t m_drawmode_table[16]{};
+	uint8_t m_empty_tile[16*16]{};
+	int m_hf_posy = 0;
+	int m_hf_posx = 0;
+	int m_tc16_posy = 0;
+	int m_tc16_posx = 0;
+	int m_tc32_posy = 0;
+	int m_tc32_posx = 0;
 	uint8_t snk_cpuA_nmi_trigger_r();
 	void snk_cpuA_nmi_ack_w(uint8_t data);
 	uint8_t snk_cpuB_nmi_trigger_r();

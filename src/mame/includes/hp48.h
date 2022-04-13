@@ -142,7 +142,7 @@ private:
 
 	uint8_t *m_videoram = nullptr;
 	uint8_t m_io[64]{};
-	hp48_models m_model{};
+	hp48_models m_model;
 
 	/* OUT register from SATURN (actually 12-bit) */
 	uint16_t m_out = 0U;

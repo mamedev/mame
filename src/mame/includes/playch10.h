@@ -121,8 +121,8 @@ private:
 
 	struct chr_bank
 	{
-		int writable;   // 1 for RAM, 0 for ROM
-		uint8_t* chr;     // direct access to the memory
+		int writable = 0;   // 1 for RAM, 0 for ROM
+		uint8_t* chr = nullptr;     // direct access to the memory
 	};
 
 	void playch10_palette(palette_device &palette) const;
@@ -159,39 +159,39 @@ private:
 	void prg8(int slot, int bank);
 	memory_bank_array_creator<4> m_prg_banks;
 	memory_view m_prg_view;
-	int m_prg_chunks;
+	int m_prg_chunks = 0;
 
 	optional_memory_region m_vrom_region;
 
 	output_finder<4> m_timedigits;
 
-	int m_up_8w;
-	int m_pc10_nmi_enable;
-	int m_pc10_dog_di;
-	int m_pc10_sdcs;
-	int m_pc10_dispmask;
-	int m_pc10_int_detect;
-	int m_pc10_game_mode;
-	int m_pc10_dispmask_old;
-	int m_pc10_gun_controller;
-	int m_cart_sel;
-	int m_cntrl_mask;
-	int m_input_latch[2];
-	int m_mirroring;
-	int m_MMC2_bank[4];
-	int m_MMC2_bank_latch[2];
-	uint8_t* m_vrom;
+	int m_up_8w = 0;
+	int m_pc10_nmi_enable = 0;
+	int m_pc10_dog_di = 0;
+	int m_pc10_sdcs = 0;
+	int m_pc10_dispmask = 0;
+	int m_pc10_int_detect = 0;
+	int m_pc10_game_mode = 0;
+	int m_pc10_dispmask_old = 0;
+	int m_pc10_gun_controller = 0;
+	int m_cart_sel = 0;
+	int m_cntrl_mask = 0;
+	int m_input_latch[2]{};
+	int m_mirroring = 0;
+	int m_MMC2_bank[4]{};
+	int m_MMC2_bank_latch[2]{};
+	uint8_t* m_vrom = nullptr;
 	std::unique_ptr<uint8_t[]> m_vram;
 	chr_bank m_chr_page[8];
-	int m_mmc1_shiftreg;
-	int m_mmc1_shiftcount;
-	int m_gboard_banks[2];
-	int m_gboard_command;
-	int m_IRQ_count;
-	uint8_t m_IRQ_count_latch;
-	int m_IRQ_enable;
-	int m_pc10_bios;
-	tilemap_t *m_bg_tilemap;
+	int m_mmc1_shiftreg = 0;
+	int m_mmc1_shiftcount = 0;
+	int m_gboard_banks[2]{};
+	int m_gboard_command = 0;
+	int m_IRQ_count = 0;
+	uint8_t m_IRQ_count_latch = 0;
+	int m_IRQ_enable = 0;
+	int m_pc10_bios = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 };
 
 #endif // MAME_INCLUDES_PLAYCH10_H

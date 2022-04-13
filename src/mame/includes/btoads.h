@@ -65,23 +65,23 @@ private:
 	required_shared_ptr<uint32_t> m_sprite_control;
 
 	// state
-	uint8_t m_main_to_sound_data;
-	uint8_t m_main_to_sound_ready;
-	uint8_t m_sound_to_main_data;
-	uint8_t m_sound_to_main_ready;
-	uint8_t m_sound_int_state;
-	uint8_t *m_vram_fg_draw;
-	uint8_t *m_vram_fg_display;
-	int32_t m_xscroll0;
-	int32_t m_yscroll0;
-	int32_t m_xscroll1;
-	int32_t m_yscroll1;
-	uint8_t m_screen_control;
-	uint16_t m_sprite_source_offs;
-	uint8_t *m_sprite_dest_base;
-	uint16_t m_sprite_dest_offs;
-	uint16_t m_misc_control;
-	int m_xcount;
+	uint8_t m_main_to_sound_data = 0;
+	uint8_t m_main_to_sound_ready = 0;
+	uint8_t m_sound_to_main_data = 0;
+	uint8_t m_sound_to_main_ready = 0;
+	uint8_t m_sound_int_state = 0;
+	uint8_t *m_vram_fg_draw = nullptr;
+	uint8_t *m_vram_fg_display = nullptr;
+	int32_t m_xscroll0 = 0;
+	int32_t m_yscroll0 = 0;
+	int32_t m_xscroll1 = 0;
+	int32_t m_yscroll1 = 0;
+	uint8_t m_screen_control = 0;
+	uint16_t m_sprite_source_offs = 0;
+	uint8_t *m_sprite_dest_base = nullptr;
+	uint16_t m_sprite_dest_offs = 0;
+	uint16_t m_misc_control = 0;
+	int m_xcount = 0;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
 
 	// in drivers/btoads

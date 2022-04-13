@@ -131,7 +131,7 @@ protected:
 	u16 alpha_II_trigger_r(offs_t offset);
 
 	/* video-related */
-	tilemap_t     *m_fix_tilemap = 0;
+	tilemap_t     *m_fix_tilemap = nullptr;
 	int           m_bank_base = 0;
 
 	void outlatch_w(offs_t offset, u8 data = 0);
@@ -268,7 +268,7 @@ protected:
 private:
 	u16 m_tile_transchar = 0U;
 	int m_tile_bankshift = 0;
-	bool m_is_super_stingray = 0;
+	bool m_is_super_stingray = false;
 };
 
 class sstingray_state : public alpha68k_N_state
