@@ -133,7 +133,23 @@
         P16 is a 6 pin marked "Aux in"
         P3 is a 6 pin marked "Bill in"
         P8 is a 14 pin marked "Aux Latched Outputs"
-        P22 is a 9 pin marked "serial port"
+        P22 is a 9 pin marked "serial port" used for bill acceptors (leads
+		    to the IOASIC's serial port)
+***************************************************************************
+
+    NFL Blitz '99 has an addon card reader board for saving custom stats and
+    plays through an N64 controller pak. One can save custom stats through
+    arcade Blitz '99 to use with N64 NFL Blitz or vice versa. NFL Blitz 2000
+    Gold does not support the card reader.
+    
+    5772-15870-03 Joyport
+        U1: ADM3202ARN
+        U2: ATMEL AT90S4414 AVR based MCU labeled 'U2 A22799.1 VER 2.0' (PLCC44)
+        U5: UCN5804LB
+        U6: MM74HC574WM
+        Y1: 4.000 XTAL
+
+    TODO: Not supported
 
 ***************************************************************************
 
@@ -2616,6 +2632,9 @@ ROM_START( blitz99 )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
 	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
+	
+	ROM_REGION( 0x1000, "cardcpu", 0 )   // Card reader AT90S4414 MCU code
+	ROM_LOAD( "a-22799-1.u2", 0x0000, 0x1000, NO_DUMP ) // 4KB internal flash rom :(
 ROM_END
 
 
@@ -2631,11 +2650,14 @@ ROM_START( blitz99a )
 	ROM_SYSTEM_BIOS( 1, "up130",       "Update to 1.30" )
 	ROMX_LOAD( "rev.-1.3.u33", 0x000000, 0x100000, CRC(0a0fde5a) SHA1(1edb671c66819f634a9f1daa35331a99b2bda01a), ROM_BIOS(1) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.30
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "blitz99a", 0, SHA1(43f834727ce01d7a63b482fc28cbf292477fc6f2) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
 	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
+
+	ROM_REGION( 0x1000, "cardcpu", 0 )   // Card reader AT90S4414 MCU code
+	ROM_LOAD( "a-22799-1.u2", 0x0000, 0x1000, NO_DUMP ) // 4KB internal flash rom :(
 ROM_END
 
 
