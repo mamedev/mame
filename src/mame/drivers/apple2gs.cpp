@@ -620,11 +620,13 @@ private:
 
 // FF6ACF is speed test routine in ROM 3
 
+// slow_cycle() - take a 1 MHz cycle.  Theory: a 2.8 MHz cycle is 14M / 5.
+// 1 MHz is 14M / 14.  14/5 = 2.8 * 65536 (16.16 fixed point) = 0x2cccd.
 #define slow_cycle() \
 {   \
 	if (!machine().side_effects_disabled() && m_last_speed) \
 	{\
-		m_slow_counter += 0x0001999a; \
+		m_slow_counter += 0x0002cccd; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
 		m_slow_counter &= 0xffff; \
 		m_maincpu->adjust_icount(-cycles); \
