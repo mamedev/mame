@@ -267,13 +267,13 @@ void alto2_cpu_device::f1_early_emu_block()
 	CPU_CLR_TASK_WAKEUP(m_task);
 	LOG((this,LOG_EMU,2, "   BLOCK %02o:%s\n", m_task, task_name(m_task)));
 #elif   0
-	fatal(1, "Emulator task want's to BLOCK.\n" \
-		"%s-%04o: r:%02o af:%02o bs:%02o f1:%02o f2:%02o" \
-		" t:%o l:%o next:%05o next2:%05o cycle:%lld\n",
-		task_name(m_task), m_mpc,
-		m_rsel, m_daluf, m_dbs, m_df1, mdf2,
-		m_dloadt, m_dloatl, m_next, m_next2,
-		ntime() / CPU_MICROCYCLE_TIME);
+	throw emu_fatalerror(1, "Emulator task want's to BLOCK.\n" \
+			"%s-%04o: r:%02o af:%02o bs:%02o f1:%02o f2:%02o" \
+			" t:%o l:%o next:%05o next2:%05o cycle:%lld\n",
+			task_name(m_task), m_mpc,
+			m_rsel, m_daluf, m_dbs, m_df1, mdf2,
+			m_dloadt, m_dloatl, m_next, m_next2,
+			ntime() / CPU_MICROCYCLE_TIME);
 #else
 	/* just ignore (?) */
 #endif

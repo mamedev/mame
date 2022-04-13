@@ -31,8 +31,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(firq_beam_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(firq_vblank_r);
+	DECLARE_READ_LINE_MEMBER(firq_beam_r);
+	DECLARE_READ_LINE_MEMBER(firq_vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_showdown();
@@ -42,23 +42,23 @@ public:
 	void exidy440(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(bankram_w);
-	DECLARE_READ8_MEMBER(exidy440_input_port_3_r);
-	DECLARE_READ8_MEMBER(sound_command_ack_r);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(exidy440_input_port_3_w);
-	DECLARE_WRITE8_MEMBER(exidy440_coin_counter_w);
-	DECLARE_READ8_MEMBER(showdown_bank0_r);
-	DECLARE_READ8_MEMBER(claypign_protection_r);
-	DECLARE_READ8_MEMBER(exidy440_videoram_r);
-	DECLARE_WRITE8_MEMBER(exidy440_videoram_w);
-	DECLARE_READ8_MEMBER(exidy440_paletteram_r);
-	DECLARE_WRITE8_MEMBER(exidy440_paletteram_w);
-	DECLARE_READ8_MEMBER(exidy440_horizontal_pos_r);
-	DECLARE_READ8_MEMBER(exidy440_vertical_pos_r);
-	DECLARE_WRITE8_MEMBER(exidy440_spriteram_w);
-	DECLARE_WRITE8_MEMBER(exidy440_control_w);
-	DECLARE_WRITE8_MEMBER(exidy440_interrupt_clear_w);
+	void bankram_w(offs_t offset, uint8_t data);
+	uint8_t exidy440_input_port_3_r();
+	uint8_t sound_command_ack_r();
+	void sound_command_w(uint8_t data);
+	void exidy440_input_port_3_w(uint8_t data);
+	void exidy440_coin_counter_w(uint8_t data);
+	uint8_t showdown_bank0_r(offs_t offset);
+	uint8_t claypign_protection_r();
+	uint8_t exidy440_videoram_r(offs_t offset);
+	void exidy440_videoram_w(offs_t offset, uint8_t data);
+	uint8_t exidy440_paletteram_r(offs_t offset);
+	void exidy440_paletteram_w(offs_t offset, uint8_t data);
+	uint8_t exidy440_horizontal_pos_r();
+	uint8_t exidy440_vertical_pos_r();
+	void exidy440_spriteram_w(offs_t offset, uint8_t data);
+	void exidy440_control_w(offs_t offset, uint8_t data);
+	void exidy440_interrupt_clear_w(uint8_t data);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int scroll_offset, int check_collision);
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision);
 	uint32_t screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -85,20 +85,22 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
-	uint8_t m_bank;
-	const uint8_t *m_showdown_bank_data[2];
-	int8_t m_showdown_bank_select;
-	uint8_t m_showdown_bank_offset;
-	uint8_t m_firq_vblank;
-	uint8_t m_firq_beam;
-	uint8_t m_latched_x;
-	std::unique_ptr<uint8_t[]> m_local_videoram;
-	std::unique_ptr<uint8_t[]> m_local_paletteram;
-	uint8_t m_firq_enable;
-	uint8_t m_firq_select;
-	uint8_t m_palettebank_io;
-	uint8_t m_palettebank_vis;
-	emu_timer *m_collide_firq_timer;
+	uint8_t m_bank = 0U;
+	const uint8_t *m_showdown_bank_data[2]{};
+	int8_t m_showdown_bank_select = 0;
+	uint8_t m_showdown_bank_offset = 0U;
+	uint8_t m_firq_vblank = 0U;
+	uint8_t m_firq_beam = 0U;
+	uint8_t m_latched_x = 0U;
+	std::unique_ptr<uint8_t[]> m_local_videoram{};
+	std::unique_ptr<uint8_t[]> m_local_paletteram{};
+	uint8_t m_firq_enable = 0U;
+	uint8_t m_firq_select = 0U;
+	uint8_t m_palettebank_io = 0U;
+	uint8_t m_palettebank_vis = 0U;
+	emu_timer *m_beam_firq_timer = nullptr;
+	emu_timer *m_collide_firq_timer = nullptr;
+	uint8_t m_beam_firq_count = 0U;
 };
 
 
@@ -111,14 +113,14 @@ public:
 
 protected:
 	void topsecex_video(machine_config &config);
-	DECLARE_READ8_MEMBER(topsecex_input_port_5_r);
-	DECLARE_WRITE8_MEMBER(topsecex_yscroll_w);
+	uint8_t topsecex_input_port_5_r();
+	void topsecex_yscroll_w(uint8_t data);
 	uint32_t screen_update_topsecex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override;
 
 private:
-	uint8_t m_topsecex_yscroll;
+	uint8_t m_topsecex_yscroll = 0U;
 };
 
 #endif // MAME_INCLUDES_EXIDY440_H

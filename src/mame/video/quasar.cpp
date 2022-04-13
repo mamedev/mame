@@ -108,7 +108,7 @@ uint32_t quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 
 
 		for (int ox = 0; ox < 8; ox++)
 			for (int oy = 0; oy < 8; oy++)
-				bitmap.pix16(y + oy, x + ox) = forecolor;
+				bitmap.pix(y + oy, x + ox) = forecolor;
 
 		// Main Screen
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
@@ -144,10 +144,10 @@ uint32_t quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 
 				int const bx = 255 - 9 - m_bullet_ram[offs] - ct;
 
 				// bullet/object Collision
-				if (s2636_0_bitmap.pix16(offs, bx) != 0) m_collision_register |= 0x04;
-				if (s2636_2_bitmap.pix16(offs, bx) != 0) m_collision_register |= 0x08;
+				if (s2636_0_bitmap.pix(offs, bx) != 0) m_collision_register |= 0x04;
+				if (s2636_2_bitmap.pix(offs, bx) != 0) m_collision_register |= 0x08;
 
-				bitmap.pix16(offs, bx) = 7;
+				bitmap.pix(offs, bx) = 7;
 			}
 		}
 	}
@@ -158,18 +158,18 @@ uint32_t quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 
 	{
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			int const pixel0 = s2636_0_bitmap.pix16(y, x);
-			int const pixel1 = s2636_1_bitmap.pix16(y, x);
-			int const pixel2 = s2636_2_bitmap.pix16(y, x);
+			int const pixel0 = s2636_0_bitmap.pix(y, x);
+			int const pixel1 = s2636_1_bitmap.pix(y, x);
+			int const pixel2 = s2636_2_bitmap.pix(y, x);
 
 			int const pixel = pixel0 | pixel1 | pixel2;
 
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
-				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
+				bitmap.pix(y, x) = S2636_PIXEL_COLOR(pixel);
 
 				/* S2636 vs. background collision detection */
-				if (m_palette->pen_indirect(m_collision_background.pix16(y, x)))
+				if (m_palette->pen_indirect(m_collision_background.pix(y, x)))
 				{
 					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x01;
 					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;

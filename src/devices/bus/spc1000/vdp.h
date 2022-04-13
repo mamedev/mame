@@ -27,8 +27,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 

@@ -134,24 +134,24 @@ inline void ramdac_device::reg_increment(uint8_t inc_type)
 	}
 }
 
-READ8_MEMBER( ramdac_device::index_r )
+uint8_t ramdac_device::index_r()
 {
 	return m_pal_index[0];
 }
 
-WRITE8_MEMBER( ramdac_device::index_w )
+void ramdac_device::index_w(uint8_t data)
 {
 	m_pal_index[0] = data;
 	m_int_index[0] = 0;
 }
 
-WRITE8_MEMBER( ramdac_device::index_r_w )
+void ramdac_device::index_r_w(uint8_t data)
 {
 	m_pal_index[1] = data;
 	m_int_index[1] = 0;
 }
 
-READ8_MEMBER( ramdac_device::pal_r )
+uint8_t ramdac_device::pal_r()
 {
 	uint8_t res;
 	res = readbyte(m_pal_index[m_split_read_reg] | (m_int_index[m_split_read_reg] << 8));
@@ -159,18 +159,18 @@ READ8_MEMBER( ramdac_device::pal_r )
 	return res;
 }
 
-WRITE8_MEMBER( ramdac_device::pal_w )
+void ramdac_device::pal_w(uint8_t data)
 {
-	writebyte(m_pal_index[0] | (m_int_index[0] << 8),data);
+	writebyte(m_pal_index[0] | (m_int_index[0] << 8), data);
 	reg_increment(0);
 }
 
-READ8_MEMBER( ramdac_device::mask_r )
+uint8_t ramdac_device::mask_r()
 {
 	return m_pal_mask;
 }
 
-WRITE8_MEMBER( ramdac_device::mask_w )
+void ramdac_device::mask_w(uint8_t data)
 {
 	m_pal_mask = data;
 }
@@ -180,12 +180,12 @@ WRITE8_MEMBER( ramdac_device::mask_w )
 //  Generic bank read/write handlers
 //**************************************************************************
 
-READ8_MEMBER( ramdac_device::ramdac_pal_r )
+uint8_t ramdac_device::ramdac_pal_r(offs_t offset)
 {
 	return m_palram[offset];
 }
 
-WRITE8_MEMBER( ramdac_device::ramdac_rgb666_w )
+void ramdac_device::ramdac_rgb666_w(offs_t offset, uint8_t data)
 {
 	uint16_t pal_offs;
 
@@ -196,7 +196,7 @@ WRITE8_MEMBER( ramdac_device::ramdac_rgb666_w )
 	m_palette->set_pen_color(pen, pal6bit(m_palram[pal_offs|0x000]), pal6bit(m_palram[pal_offs|0x100]), pal6bit(m_palram[pal_offs|0x200]));
 }
 
-WRITE8_MEMBER( ramdac_device::ramdac_rgb888_w )
+void ramdac_device::ramdac_rgb888_w(offs_t offset, uint8_t data)
 {
 	uint16_t pal_offs;
 

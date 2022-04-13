@@ -33,10 +33,10 @@ public:
 	// construction/destruction
 	newbrain_eim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( anout_r );
-	DECLARE_WRITE8_MEMBER( anout_w );
-	DECLARE_READ8_MEMBER( anin_r );
-	DECLARE_WRITE8_MEMBER( anio_w );
+	uint8_t anout_r();
+	void anout_w(uint8_t data);
+	uint8_t anin_r();
+	void anio_w(uint8_t data);
 
 protected:
 	// device-level overrides

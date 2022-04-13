@@ -17,25 +17,23 @@
 #define MAME_EMU_MAIN_H
 
 #include <thread>
-#include <time.h>
+#include <ctime>
 
 //**************************************************************************
 //    CONSTANTS
 //**************************************************************************
 
-enum
-{
-	EMU_ERR_NONE             = 0,    /* no error */
-	EMU_ERR_FAILED_VALIDITY  = 1,    /* failed validity checks */
-	EMU_ERR_MISSING_FILES    = 2,    /* missing files */
-	EMU_ERR_FATALERROR       = 3,    /* some other fatal error */
-	EMU_ERR_DEVICE           = 4,    /* device initialization error (MESS-specific) */
-	EMU_ERR_NO_SUCH_GAME     = 5,    /* game was specified but doesn't exist */
-	EMU_ERR_INVALID_CONFIG   = 6,    /* some sort of error in configuration */
-	EMU_ERR_IDENT_NONROMS    = 7,    /* identified all non-ROM files */
-	EMU_ERR_IDENT_PARTIAL    = 8,    /* identified some files but not all */
-	EMU_ERR_IDENT_NONE       = 9     /* identified no files */
-};
+constexpr int EMU_ERR_NONE             = 0;    // no error
+constexpr int EMU_ERR_FAILED_VALIDITY  = 1;    // failed validity checks
+constexpr int EMU_ERR_MISSING_FILES    = 2;    // missing files
+constexpr int EMU_ERR_FATALERROR       = 3;    // some other fatal error
+constexpr int EMU_ERR_DEVICE           = 4;    // device initialization error
+constexpr int EMU_ERR_NO_SUCH_SYSTEM   = 5;    // system was specified but doesn't exist
+constexpr int EMU_ERR_INVALID_CONFIG   = 6;    // some sort of error in configuration
+constexpr int EMU_ERR_IDENT_NONROMS    = 7;    // identified all non-ROM files
+constexpr int EMU_ERR_IDENT_PARTIAL    = 8;    // identified some files but not all
+constexpr int EMU_ERR_IDENT_NONE       = 9;    // identified no files
+
 
 //**************************************************************************
 //    TYPE DEFINITIONS
@@ -45,22 +43,23 @@ class emulator_info
 {
 public:
 	// construction/destruction
-	emulator_info() {};
+	emulator_info() = default;
 
-	static const char * get_appname();
-	static const char * get_appname_lower();
-	static const char * get_configname();
-	static const char * get_copyright();
-	static const char * get_copyright_info();
-	static const char * get_bare_build_version();
-	static const char * get_build_version();
-	static void display_ui_chooser(running_machine& machine);
+	static const char *get_appname();
+	static const char *get_appname_lower();
+	static const char *get_configname();
+	static const char *get_copyright();
+	static const char *get_copyright_info();
+	static const char *get_bare_build_version();
+	static const char *get_build_version();
+	static void display_ui_chooser(running_machine &machine);
 	static int start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args);
 	static int start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[]);
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
-	static void layout_file_cb(util::xml::data_node const &layout);
+	static void sound_hook();
+	static void layout_script_cb(layout_file &file, const char *script);
 	static bool standalone();
 };
 
@@ -72,7 +71,7 @@ protected:
 	// construction/destruction
 	machine_manager(emu_options& options, osd_interface& osd);
 public:
-	virtual ~machine_manager() { }
+	virtual ~machine_manager();
 
 	osd_interface &osd() const { return m_osd; }
 	emu_options &options() const { return m_options; }
@@ -85,10 +84,11 @@ public:
 	virtual void create_custom(running_machine& machine) { }
 	virtual void load_cheatfiles(running_machine& machine) { }
 	virtual void ui_initialize(running_machine& machine) { }
+	virtual void before_load_settings(running_machine &machine) { }
 
 	virtual void update_machine() { }
 
-	http_manager *http() { return m_http.get(); }
+	http_manager *http();
 	void start_http_server();
 
 protected:

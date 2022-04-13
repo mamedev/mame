@@ -19,7 +19,6 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 	int compl_in = rvv;         // reverse video
 	int hlt_in = hlgt;          // highlight;
 	int color;                  // 0 = black, 1 = dk green, 2 = lt green; on MikroMikko 1, "highlight" is actually the darker shade of green
-	int i, qh, video_in;
 
 	int d7 = BIT(romdata, 7);   // save MSB (1 indicates that this is a Visual Attribute or Special Code instead of a normal display character)
 	int d6 = BIT(romdata, 6);   // save also first and last char bitmap bits before shifting out the MSB
@@ -37,19 +36,19 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 			// Step 2: Make sure i8275_device::recompute_parameters() is called in i8275_device::device_start()
 			// Step 3: Fill in missing 2 pixels in the screen bitmap by repeating last column of the char bitmap
 			// (works better with MikroMikko 1 font than duplicating the first and the last column)
-			qh = d7 & d6; // extend pixels on the right side only if there were two adjacent ones before shifting out the MSB
-			video_in = ((((d7 & llen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
+			int qh = d7 & d6; // extend pixels on the right side only if there were two adjacent ones before shifting out the MSB
+			int video_in = ((((d7 & llen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
 			color = (hlt_in ? 1 : 2) * (video_in ^ compl_in);
-			bitmap.pix32(y, x + 8) = m_palette->pen(color);
-			bitmap.pix32(y, x + 9) = m_palette->pen(color);
+			bitmap.pix(y, x + 8) = m_palette->pen(color);
+			bitmap.pix(y, x + 9) = m_palette->pen(color);
 		}
 
-		for (i = 0; i < 8; ++i) // ...and now the actual character bitmap bits for this scanline
+		for (int i = 0; i < 8; ++i) // ...and now the actual character bitmap bits for this scanline
 		{
-			qh = BIT(data, i);
-			video_in = ((((d7 & llen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
+			int qh = BIT(data, i);
+			int video_in = ((((d7 & llen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
 			color = (hlt_in ? 1 : 2)*(video_in ^ compl_in);
-			bitmap.pix32(y, x + i) = m_palette->pen(color);
+			bitmap.pix(y, x + i) = m_palette->pen(color);
 		}
 	}
 }
@@ -72,10 +71,10 @@ void mm1_state::mm1_upd7220_map(address_map &map)
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 {
-	uint16_t data = m_video_ram[address >> 1];
+	uint16_t data = m_video_ram[address];
 	for (int i = 0; i < 16; i++)
 	{
-		if (BIT(data, i)) bitmap.pix32(y, x + i) = m_palette->pen(2);
+		if (BIT(data, i)) bitmap.pix(y, x + i) = m_palette->pen(2);
 	}
 }
 
@@ -143,7 +142,7 @@ void mm1_state::mm1m6_video(machine_config &config)
 
 	I8275(config, m_crtc, XTAL(18'720'000)/8);
 	m_crtc->set_character_width(HORIZONTAL_CHARACTER_PIXELS);
-	m_crtc->set_display_callback(FUNC(mm1_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(mm1_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	m_crtc->vrtc_wr_callback().set(m_hgdc, FUNC(upd7220_device::ext_sync_w));
 	m_crtc->set_screen("screen");

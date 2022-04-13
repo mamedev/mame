@@ -9,12 +9,13 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/gen_latch.h"
-#include "machine/segaic16.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
+#include "screen.h"
 
 
 // ======================> segahang_state
@@ -31,6 +32,8 @@ public:
 		, m_mcu(*this, "mcu")
 		, m_i8255_1(*this, "i8255_1")
 		, m_i8255_2(*this, "i8255_2")
+		, m_adc(*this, "adc")
+		, m_screen(*this, "screen")
 		, m_sprites(*this, "sprites")
 		, m_segaic16vid(*this, "segaic16vid")
 		, m_segaic16road(*this, "segaic16road")
@@ -38,7 +41,7 @@ public:
 		, m_workram(*this, "workram")
 		, m_sharrier_video(false)
 		, m_adc_select(0)
-		, m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"})
+		, m_adc_ports(*this, "ADC%u", 0U)
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -65,28 +68,32 @@ public:
 	// game-specific driver init
 	void init_generic();
 	void init_sharrier();
-	void init_enduror();
 	void init_endurobl();
 	void init_endurob2();
 
 private:
 	// PPI read/write callbacks
-	DECLARE_WRITE8_MEMBER( video_lamps_w );
-	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
-	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
-	DECLARE_READ8_MEMBER( adc_status_r );
+	void video_lamps_w(uint8_t data);
+	void tilemap_sound_w(uint8_t data);
+	void sub_control_adc_w(uint8_t data);
+	uint8_t adc_status_r();
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( hangon_io_r );
-	DECLARE_WRITE16_MEMBER( hangon_io_w );
-	DECLARE_READ16_MEMBER( sharrier_io_r );
-	DECLARE_WRITE16_MEMBER( sharrier_io_w );
+	uint8_t hangon_inputs_r(offs_t offset);
+	uint8_t sharrier_inputs_r(offs_t offset);
+	void sync_ppi_w(offs_t offset, uint8_t data);
+
+	// ADC0804 read handler
+	uint8_t analog_r();
 
 	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
+	uint8_t sound_data_r();
 
-	// I8751-related VBLANK interrupt handlers
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	// I8751
+	uint8_t i8751_r(offs_t offset);
+	void i8751_w(offs_t offset, uint8_t data);
+	void i8751_p1_w(uint8_t data);
+	uint8_t m_i8751_addr;
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -103,9 +110,6 @@ private:
 	void sound_portmap_2203x2(address_map &map);
 	void sub_map(address_map &map);
 
-	// internal types
-	typedef delegate<void ()> i8751_sim_delegate;
-
 	// timer IDs
 	enum
 	{
@@ -117,10 +121,7 @@ private:
 	virtual void video_start() override;
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// I8751 simulations
-	void sharrier_i8751_sim();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// devices
 	required_device<m68000_device> m_maincpu;
@@ -129,6 +130,8 @@ private:
 	optional_device<i8751_device> m_mcu;
 	required_device<i8255_device> m_i8255_1;
 	required_device<i8255_device> m_i8255_2;
+	required_device<adc0804_device> m_adc;
+	required_device<screen_device> m_screen;
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
@@ -138,13 +141,12 @@ private:
 	required_shared_ptr<uint16_t> m_workram;
 
 	// configuration
-	bool                    m_sharrier_video;
-	i8751_sim_delegate      m_i8751_vblank_hook;
+	bool                    m_sharrier_video = false;
 
 	// internal state
-	uint8_t                   m_adc_select;
+	uint8_t                   m_adc_select = 0;
 	optional_ioport_array<4> m_adc_ports;
-	bool                    m_shadow;
+	bool                    m_shadow = false;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	output_finder<2> m_lamps;
 };

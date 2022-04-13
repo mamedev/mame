@@ -96,7 +96,7 @@ void cgc7900_state::kbd_put(u8 data)
     keyboard_r - keyboard data read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::keyboard_r )
+u16 cgc7900_state::keyboard_r()
 {
 	u16 data;
 
@@ -146,7 +146,7 @@ READ16_MEMBER( cgc7900_state::keyboard_r )
     keyboard_w - keyboard data write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::keyboard_w )
+void cgc7900_state::keyboard_w(u16 data)
 {
 	/*
 
@@ -183,7 +183,7 @@ static const int int_vectors[16] = {
 	0x4b, 0x44, 0x4c, 0x43, 0x42, 0x4d, 0x45, 0x4a, 0x49, 0x46, 0x4e, 0x41, 0x40, 0x4f, 0x47, 0x48
 };
 
-WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
+void cgc7900_state::interrupt_mask_w(u16 data)
 {
 	/*
 
@@ -235,7 +235,7 @@ WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
 
 void cgc7900_state::cpu_space_map(address_map &map)
 {
-	map(0xfffff2, 0xffffff).lr16("interrupt", [] (offs_t offset) -> u16 { return int_vectors[offset+1]; });
+	map(0xfffff2, 0xffffff).lr16(NAME([] (offs_t offset) -> u16 { return int_vectors[offset + 1]; }));
 }
 
 void cgc7900_state::irq_encoder(int pin, int state)
@@ -255,7 +255,7 @@ void cgc7900_state::irq_encoder(int pin, int state)
     disk_data_r - disk data read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::disk_data_r )
+u16 cgc7900_state::disk_data_r()
 {
 	return 0;
 }
@@ -264,7 +264,7 @@ READ16_MEMBER( cgc7900_state::disk_data_r )
     disk_data_w - disk data write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::disk_data_w )
+void cgc7900_state::disk_data_w(u16 data)
 {
 }
 
@@ -272,7 +272,7 @@ WRITE16_MEMBER( cgc7900_state::disk_data_w )
     disk_status_r - disk status read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::disk_status_r )
+u16 cgc7900_state::disk_status_r()
 {
 	/*
 
@@ -304,11 +304,11 @@ READ16_MEMBER( cgc7900_state::disk_status_r )
     disk_command_w - disk command write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::disk_command_w )
+void cgc7900_state::disk_command_w(u16 data)
 {
 }
 
-READ16_MEMBER(cgc7900_state::unmapped_r)
+u16 cgc7900_state::unmapped_r()
 {
 	return rand();
 }
@@ -330,7 +330,7 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map(0xa00000, 0xbfffff).rw(FUNC(cgc7900_state::z_mode_r), FUNC(cgc7900_state::z_mode_w));
 	map(0xc00000, 0xdfffff).ram().share("plane_ram");
 	map(0xe00000, 0xe1ffff).w(FUNC(cgc7900_state::color_status_w));
-//  AM_RANGE(0xe20000, 0xe23fff) Raster Processor
+//  map(0xe20000, 0xe23fff) Raster Processor
 	map(0xe30000, 0xe303ff).ram().share("clut_ram");
 	map(0xe38000, 0xe3bfff).ram().share("overlay_ram");
 	map(0xe40000, 0xe40001).ram().share("roll_bitmap");
@@ -346,37 +346,37 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map(0xe40018, 0xe40019).ram().share("color_status_bg");
 	map(0xe4001a, 0xe4001b).ram().share("roll_overlay");
 	map(0xe4001c, 0xe40fff).ram();
-//  AM_RANGE(0xefc440, 0xefc441) HVG Load X
-//  AM_RANGE(0xefc442, 0xefc443) HVG Load Y
-//  AM_RANGE(0xefc444, 0xefc445) HVG Load dX
-//  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
-//  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
-//  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
+//  map(0xefc440, 0xefc441) HVG Load X
+//  map(0xefc442, 0xefc443) HVG Load Y
+//  map(0xefc444, 0xefc445) HVG Load dX
+//  map(0xefc446, 0xefc447) HVG Load dY
+//  map(0xefc448, 0xefc449) HVG Load Pixel Color
+//  map(0xefc44a, 0xefc44b) HVG Load Trip
 	map(0xff8000, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xff8040, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xff8080, 0xff8081).rw(FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
-//  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
-//  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
-//  AM_RANGE(0xff80cc, 0xff80cd) Joystick Z axis
+//  map(0xff80c6, 0xff80c7) Joystick X axis
+//  map(0xff80ca, 0xff80cb) Joystick Y axis
+//  map(0xff80cc, 0xff80cd) Joystick Z axis
 	map(0xff8100, 0xff8101).rw(FUNC(cgc7900_state::disk_data_r), FUNC(cgc7900_state::disk_data_w));
 	map(0xff8120, 0xff8121).rw(FUNC(cgc7900_state::disk_status_r), FUNC(cgc7900_state::disk_command_w));
 	map(0xff8140, 0xff8141).portr("BEZEL");
 	map(0xff8180, 0xff8180).w(K1135A_TAG, FUNC(com8116_device::stt_str_w));
 	map(0xff81c0, 0xff81ff).rw(MM58167_TAG, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0xff8200, 0xff8201).w(FUNC(cgc7900_state::interrupt_mask_w));
-//  AM_RANGE(0xff8240, 0xff8241) Light Pen enable
-//  AM_RANGE(0xff8242, 0xff8243) Light Pen X value
-//  AM_RANGE(0xff8244, 0xff8245) Light Pen Y value
-//  AM_RANGE(0xff8246, 0xff8247) Buffer memory parity check
-//  AM_RANGE(0xff8248, 0xff8249) Buffer memory parity set/reset
+//  map(0xff8240, 0xff8241) Light Pen enable
+//  map(0xff8242, 0xff8243) Light Pen X value
+//  map(0xff8244, 0xff8245) Light Pen Y value
+//  map(0xff8246, 0xff8247) Buffer memory parity check
+//  map(0xff8248, 0xff8249) Buffer memory parity set/reset
 	map(0xff824a, 0xff824b).r(FUNC(cgc7900_state::sync_r));
 	map(0xff83c0, 0xff83c0).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0xff83c2, 0xff83c2).r(AY8910_TAG, FUNC(ay8910_device::data_r));
 	map(0xff83c4, 0xff83c4).w(AY8910_TAG, FUNC(ay8910_device::data_w));
 	// DDMA option board
-//  AM_RANGE(0xff8500, 0xff8501) Disk DMA Command Register
-//  AM_RANGE(0xff8502, 0xff8503) Disk DMA Address Register
-//  AM_RANGE(0xff8507, 0xff8507) Disk DMA Control/Status Register
+//  map(0xff8500, 0xff8501) Disk DMA Command Register
+//  map(0xff8502, 0xff8503) Disk DMA Address Register
+//  map(0xff8507, 0xff8507) Disk DMA Control/Status Register
 }
 
 /*-------------------------------------------------
@@ -440,9 +440,9 @@ void cgc7900_state::machine_start()
 
 void cgc7900_state::machine_reset()
 {
-	uint8_t *user1 = memregion(M68000_TAG)->base();
+	u8 *user1 = memregion(M68000_TAG)->base();
 
-	memcpy((uint8_t *)m_chrom_ram.target(), user1, 8); // not really what happens but...
+	memcpy((u8 *)m_chrom_ram.target(), user1, 8); // not really what happens but...
 
 	kbd_mods = 0x300; // forces cold boot -- initializes SRAM contents
 	kbd_data = 0;

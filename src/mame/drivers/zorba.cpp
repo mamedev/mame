@@ -46,7 +46,6 @@ ToDo:
 - Dump Telcon and Gemini BIOSes
 - Emulate the Co-Power-88 expansion (allows PC-DOS, CP/M-86, etc. to be used)
 - Probably lots of other things
-- Press F3 and screen turns into garbage. This breakage started in the 0.198 to 0.199 cycle.
 
 
 *************************************************************************************************************/
@@ -67,14 +66,14 @@ ToDo:
 #include "machine/pit8253.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr(m_read_bank).bankw("bankw0");
-	map(0x4000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x3fff).bankr("bank1");
 }
 
 
@@ -89,7 +88,7 @@ void zorba_state::zorba_io(address_map &map)
 	map(0x22, 0x23).rw(m_uart1, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x24, 0x25).rw(m_uart2, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x26, 0x26).w(FUNC(zorba_state::intmask_w));
-	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x40, 0x43).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x50, 0x53).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x60, 0x63).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -166,20 +165,20 @@ void zorba_state::zorba(machine_config &config)
 	m_dma->in_iorq_callback().set(FUNC(zorba_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(zorba_state::io_write_byte));
 
-	I8251(config, m_uart0, 0); // U32 COM port J2
+	I8251(config, m_uart0, 24_MHz_XTAL / 12); // U32 COM port J2
 	m_uart0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd)); // TODO: this line has a LED attached
 	m_uart0->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart0->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_uart0->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<1>));
 	m_uart0->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<0>));
 
-	I8251(config, m_uart1, 0); // U31 printer port J3
+	I8251(config, m_uart1, 24_MHz_XTAL / 12); // U31 printer port J3
 	m_uart1->txd_handler().set("serprn", FUNC(rs232_port_device::write_txd));
 	m_uart1->rts_handler().set("serprn", FUNC(rs232_port_device::write_rts));
 	m_uart1->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<3>));
 	m_uart1->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<2>));
 
-	I8251(config, m_uart2, 0); // U30 serial keyboard J6
+	I8251(config, m_uart2, 24_MHz_XTAL / 12); // U30 serial keyboard J6
 	m_uart2->txd_handler().set("keyboard", FUNC(zorba_keyboard_device::txd_w));
 	m_uart2->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<5>));
 	m_uart2->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<4>));
@@ -188,7 +187,7 @@ void zorba_state::zorba(machine_config &config)
 	// port B - parallel interface
 	PIA6821(config, m_pia0, 0);
 	m_pia0->writepa_handler().set(FUNC(zorba_state::pia0_porta_w));
-	m_pia0->writepb_handler().set("parprndata", FUNC(output_latch_device::bus_w));
+	m_pia0->writepb_handler().set("parprndata", FUNC(output_latch_device::write));
 	m_pia0->cb2_handler().set("parprn", FUNC(centronics_device::write_strobe));
 
 	// IEEE488 interface
@@ -214,9 +213,10 @@ void zorba_state::zorba(machine_config &config)
 	pit.out_handler<2>().append(m_uart2, FUNC(i8251_device::write_rxc));
 
 	// CRTC
-	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 7);
+	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 8); // TODO: character clock divider is 9 during HRTC
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr), this);
+	m_crtc->set_refresh_hack(true);
+	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	m_crtc->irq_wr_callback().set("irq0", FUNC(input_merger_device::in_w<1>));
 	m_crtc->set_screen("screen");
@@ -225,8 +225,8 @@ void zorba_state::zorba(machine_config &config)
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<1>));
-	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// J1 IEEE-488
 	IEEE488(config, m_ieee);
@@ -266,12 +266,6 @@ void zorba_state::zorba(machine_config &config)
 
 void zorba_state::machine_start()
 {
-	uint8_t *main = memregion("maincpu")->base();
-
-	m_read_bank->configure_entry(0, &main[0x0000]);
-	m_read_bank->configure_entry(1, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
-
 	save_item(NAME(m_intmask));
 	save_item(NAME(m_tx_rx_rdy));
 	save_item(NAME(m_irq));
@@ -285,6 +279,8 @@ void zorba_state::machine_start()
 	m_printer_prowriter = false;
 	m_printer_fault = 0;
 	m_printer_select = 0;
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 }
 
 void zorba_state::machine_reset()
@@ -298,8 +294,7 @@ void zorba_state::machine_reset()
 	m_printer_prowriter = BIT(m_config_port->read(), 0);
 	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
-	m_read_bank->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to RAM
+	m_bank1->set_entry(1);
 
 	m_maincpu->reset();
 }
@@ -309,28 +304,28 @@ void zorba_state::machine_reset()
 // Memory banking control
 //-------------------------------------------------
 
-READ8_MEMBER( zorba_state::ram_r )
+uint8_t zorba_state::ram_r()
 {
 	if (!machine().side_effects_disabled())
-		m_read_bank->set_entry(0);
+		m_bank1->set_entry(0);
 	return 0;
 }
 
-WRITE8_MEMBER( zorba_state::ram_w )
+void zorba_state::ram_w(uint8_t data)
 {
-	m_read_bank->set_entry(0);
+	m_bank1->set_entry(0);
 }
 
-READ8_MEMBER( zorba_state::rom_r )
+uint8_t zorba_state::rom_r()
 {
 	if (!machine().side_effects_disabled())
-		m_read_bank->set_entry(1);
+		m_bank1->set_entry(1);
 	return 0;
 }
 
-WRITE8_MEMBER( zorba_state::rom_w )
+void zorba_state::rom_w(uint8_t data)
 {
-	m_read_bank->set_entry(1);
+	m_bank1->set_entry(1);
 }
 
 
@@ -338,7 +333,7 @@ WRITE8_MEMBER( zorba_state::rom_w )
 //  Interrupt vectoring glue
 //-------------------------------------------------
 
-WRITE8_MEMBER( zorba_state::intmask_w )
+void zorba_state::intmask_w(uint8_t data)
 {
 	m_intmask = data & 0x3f; // only six lines physically present
 	irq_w<3>(BIT(m_intmask & m_tx_rx_rdy, 0) | BIT(m_intmask & m_tx_rx_rdy, 1));
@@ -387,28 +382,28 @@ WRITE_LINE_MEMBER( zorba_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(zorba_state::memory_read_byte)
+uint8_t zorba_state::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(zorba_state::memory_write_byte)
+void zorba_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER(zorba_state::io_read_byte)
+uint8_t zorba_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(zorba_state::io_write_byte)
+void zorba_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 
 	if (offset == 0x10)
-		m_crtc->dack_w(space, 0, data);
+		m_crtc->dack_w(data);
 	else
 		prog_space.write_byte(offset, data);
 }
@@ -431,7 +426,7 @@ WRITE_LINE_MEMBER( zorba_state::br1_w )
 //  PIA handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER( zorba_state::pia0_porta_w )
+void zorba_state::pia0_porta_w(uint8_t data)
 {
 	m_beep->set_state(BIT(data, 7));
 	m_fdc->dden_w(BIT(data, 6));
@@ -449,7 +444,7 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 	m_floppy1->get_device()->mon_w(BIT(data, 4));
 }
 
-READ8_MEMBER( zorba_state::pia1_portb_r )
+uint8_t zorba_state::pia1_portb_r()
 {
 	// 0  (output only)
 	// 1  (output only)
@@ -470,7 +465,7 @@ READ8_MEMBER( zorba_state::pia1_portb_r )
 			(BIT(outputs, 2) ? 0x00 : 0x28);
 }
 
-WRITE8_MEMBER( zorba_state::pia1_portb_w )
+void zorba_state::pia1_portb_w(uint8_t data)
 {
 	// 0  DIO direction
 	// 1  NDAC/NRFD data direction, SRQ gate
@@ -495,22 +490,22 @@ WRITE8_MEMBER( zorba_state::pia1_portb_w )
 
 I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	uint8_t gfx = m_p_chargen[(linecount & 15) + (charcode << 4) + ((gpa & 1) << 11)];
 
+	if (rvv)
+		gfx ^= 0xff;
+
+	// VSP actually overrides reverse video here
 	if (vsp)
 		gfx = 0;
 
 	if (lten)
 		gfx = 0xff;
 
-	if (rvv)
-		gfx ^= 0xff;
-
-	for(i=0;i<8;i++)
-		bitmap.pix32(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
+	for (int i = 0; i < 8; i++)
+		bitmap.pix(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
 }
 
 
@@ -542,8 +537,8 @@ INPUT_CHANGED_MEMBER( zorba_state::printer_type )
 
 
 ROM_START( zorba )
-	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "780000.u47", 0x10000, 0x1000, CRC(6d58f2c5) SHA1(7763f08c801cd36e5a761c6dc9f30a50b3bc482d) )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "780000.u47", 0x0000, 0x1000, CRC(6d58f2c5) SHA1(7763f08c801cd36e5a761c6dc9f30a50b3bc482d) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "773000.u5", 0x0000, 0x1000, CRC(d0a2f8fc) SHA1(29aee7ee657778c46e9800abd4955e6d4b33ef68) )

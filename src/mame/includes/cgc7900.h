@@ -61,20 +61,20 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_region m_char_rom;
-	required_shared_ptr<uint16_t> m_chrom_ram;
-	required_shared_ptr<uint16_t> m_plane_ram;
-	required_shared_ptr<uint16_t> m_clut_ram;
-	required_shared_ptr<uint16_t> m_overlay_ram;
-	required_shared_ptr<uint16_t> m_roll_bitmap;
-	required_shared_ptr<uint16_t> m_pan_x;
-	required_shared_ptr<uint16_t> m_pan_y;
-	required_shared_ptr<uint16_t> m_zoom;
-	required_shared_ptr<uint16_t> m_blink_select;
-	required_shared_ptr<uint16_t> m_plane_select;
-	required_shared_ptr<uint16_t> m_plane_switch;
-	required_shared_ptr<uint16_t> m_color_status_fg;
-	required_shared_ptr<uint16_t> m_color_status_bg;
-	required_shared_ptr<uint16_t> m_roll_overlay;
+	required_shared_ptr<u16> m_chrom_ram;
+	required_shared_ptr<u16> m_plane_ram;
+	required_shared_ptr<u16> m_clut_ram;
+	required_shared_ptr<u16> m_overlay_ram;
+	required_shared_ptr<u16> m_roll_bitmap;
+	required_shared_ptr<u16> m_pan_x;
+	required_shared_ptr<u16> m_pan_y;
+	required_shared_ptr<u16> m_zoom;
+	required_shared_ptr<u16> m_blink_select;
+	required_shared_ptr<u16> m_plane_select;
+	required_shared_ptr<u16> m_plane_switch;
+	required_shared_ptr<u16> m_color_status_fg;
+	required_shared_ptr<u16> m_color_status_bg;
+	required_shared_ptr<u16> m_roll_overlay;
 	required_device<i8251_device> m_i8251_0;
 	required_device<i8251_device> m_i8251_1;
 
@@ -82,20 +82,20 @@ public:
 	virtual void machine_reset() override;
 
 	void cgc7900_palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER( keyboard_r );
-	DECLARE_WRITE16_MEMBER( keyboard_w );
-	DECLARE_WRITE16_MEMBER( interrupt_mask_w );
-	DECLARE_READ16_MEMBER( disk_data_r );
-	DECLARE_WRITE16_MEMBER( disk_data_w );
-	DECLARE_READ16_MEMBER( disk_status_r );
-	DECLARE_WRITE16_MEMBER( disk_command_w );
-	DECLARE_READ16_MEMBER( z_mode_r );
-	DECLARE_WRITE16_MEMBER( z_mode_w );
-	DECLARE_WRITE16_MEMBER( color_status_w );
-	DECLARE_READ16_MEMBER( sync_r );
-	DECLARE_READ16_MEMBER( unmapped_r );
+	u16 keyboard_r();
+	void keyboard_w(u16 data);
+	void interrupt_mask_w(u16 data);
+	u16 disk_data_r();
+	void disk_data_w(u16 data);
+	u16 disk_status_r();
+	void disk_command_w(u16 data);
+	u16 z_mode_r();
+	void z_mode_w(u16 data);
+	void color_status_w(u16 data);
+	u16 sync_r();
+	u16 unmapped_r();
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { irq_encoder(N, state); }
 
@@ -104,11 +104,11 @@ public:
 	void draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap);
 
 	/* interrupt state */
-	uint16_t m_int_mask, m_int_active;
+	u16 m_int_mask = 0U, m_int_active = 0U;
 
 	/* video state */
-	rgb_t m_clut[256];
-	int m_blink;
+	rgb_t m_clut[256]{};
+	int m_blink = 0;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 
@@ -120,9 +120,9 @@ public:
 	void keyboard_mem(address_map &map);
 	void cpu_space_map(address_map &map);
 private:
-	u16 kbd_mods;
-	u8 kbd_data;
-	bool kbd_ready;
+	u16 kbd_mods = 0U;
+	u8 kbd_data = 0U;
+	bool kbd_ready = false;
 
 	void irq_encoder(int pin, int state);
 };

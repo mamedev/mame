@@ -47,13 +47,13 @@ private:
 
 	uint16_t m_key_y;
 
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
-	DECLARE_READ8_MEMBER( p4_r );
-	DECLARE_WRITE8_MEMBER( p4_w );
+	uint8_t p1_r();
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
+	uint8_t p4_r();
+	void p4_w(uint8_t data);
 
 	void adam_kb_mem(address_map &map);
 };

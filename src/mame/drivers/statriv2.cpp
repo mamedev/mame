@@ -78,6 +78,7 @@ Issues:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class statriv2_state : public driver_device
@@ -106,25 +107,25 @@ public:
 	void init_addr_xhl();
 	void init_laserdisc();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
+	DECLARE_READ_LINE_MEMBER(latched_coin_r);
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;
 	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	optional_shared_ptr<uint8_t> m_question_offset;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	uint8_t m_question_offset_low;
-	uint8_t m_question_offset_mid;
-	uint8_t m_question_offset_high;
-	uint8_t m_latched_coin;
-	uint8_t m_last_coin;
+	uint8_t m_question_offset_low = 0;
+	uint8_t m_question_offset_mid = 0;
+	uint8_t m_question_offset_high = 0;
+	uint8_t m_latched_coin = 0;
+	uint8_t m_last_coin = 0;
 
-	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
-	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
+	void statriv2_videoram_w(offs_t offset, uint8_t data);
+	uint8_t question_data_r();
+	void ppi_portc_hi_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
@@ -156,7 +157,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 	int code = m_videoram[0x400 + tile_index];
 	int attr = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	tileinfo.set(0, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
@@ -164,7 +165,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 	int code = m_videoram[0x400 + tile_index];
 	int attr = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
+	tileinfo.set(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
 
 
@@ -186,12 +187,12 @@ void statriv2_state::statriv2_palette(palette_device &palette) const
 
 void statriv2_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info), this), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(statriv2_state::horizontal_tile_info)), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
 }
 
 VIDEO_START_MEMBER(statriv2_state,vertical)
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(statriv2_state::vertical_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -202,7 +203,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
  *
  *************************************/
 
-WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
+void statriv2_state::statriv2_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -265,7 +266,7 @@ INTERRUPT_GEN_MEMBER(statriv2_state::tripdraw_interrupt)
  *
  *************************************/
 
-READ8_MEMBER(statriv2_state::question_data_r)
+uint8_t statriv2_state::question_data_r()
 {
 	const uint8_t *qrom = memregion("questions")->base();
 	uint32_t qromsize = memregion("questions")->bytes();
@@ -290,13 +291,13 @@ READ8_MEMBER(statriv2_state::question_data_r)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(statriv2_state::latched_coin_r)
+READ_LINE_MEMBER(statriv2_state::latched_coin_r)
 {
 	return m_latched_coin;
 }
 
 
-WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
+void statriv2_state::ppi_portc_hi_w(uint8_t data)
 {
 	data >>= 4;
 	if (data != 0x0f)
@@ -353,7 +354,7 @@ static INPUT_PORTS_START( statusbj )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -374,9 +375,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( funcsino )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Draw")      PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("Deal")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Draw")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1 / Horse 1 / Point")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2 / Horse 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3 / Horse 3")
@@ -384,9 +385,9 @@ static INPUT_PORTS_START( funcsino )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5 / Horse 5 / No Point")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )                       PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -410,9 +411,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tripdraw )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Draw")      PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("Deal")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Draw")      PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1 / Lo")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3 / Double")
@@ -420,9 +421,9 @@ static INPUT_PORTS_START( tripdraw )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5 / Hi")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )                       PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -446,19 +447,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bigcsino ) // flyer shows 8 buttons on the cabinet
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_NAME("Play")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Stand")      PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Select Joker Poker / Discard 1 / Horse 1 / Point")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Select Blackjack / Discard 2 / Horse 2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Select Baccarat / Discard 3 / Horse 3")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Select Craps / Discard 4 / Horse 4")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Select Race Time / Discard 5 / Horse 5 / No Point")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )                         PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Select Joker Poker / Discard 1 / Horse 1 / Point")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Select Blackjack / Discard 2 / Horse 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Select Baccarat / Discard 3 / Horse 3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Select Craps / Discard 4 / Horse 4")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Select Race Time / Discard 5 / Horse 5 / No Point")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -498,14 +499,16 @@ static INPUT_PORTS_START( hangman )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Service_Mode ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Keep High Scores" )
+	PORT_DIPNAME( 0x80, 0x00, "Retain Backup Memory" )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
@@ -533,7 +536,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(statriv2_state, latched_coin_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
@@ -666,19 +669,8 @@ static GFXDECODE_START( gfx_horizontal )
 GFXDECODE_END
 
 
-static const gfx_layout vertical_tiles_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_vertical )
-	GFXDECODE_ENTRY( "tiles", 0, vertical_tiles_layout, 0, 64 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 64 )
 GFXDECODE_END
 
 
@@ -1697,18 +1689,18 @@ void statriv2_state::init_laserdisc()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_readwrite_handler(0x28, 0x2b,
-		read8_delegate([this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
+		read8_delegate(*this, NAME([this] (address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
 			uint8_t result = 0x00;
 			if (offset == 1)
 				result = 0x18;
 			logerror("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
 			return result;
-		},"write_lambda"),
-		write8_delegate([this](address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+		})),
+		write8_delegate(*this, NAME([this] (address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 		{
 			logerror("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
-		},"read_lambda")
+		}))
 	);
 }
 
@@ -1747,7 +1739,7 @@ GAME( 1985, cs5_ssp,   0,         statusbj,  funcsino, statriv2_state, init_lase
 GAME( 1988, cs6_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1985, cs6_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1986, cs8_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs8_spp,    0,        statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs8_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1988, cs8_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1992, cs9_qps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1985, cs9_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -15,9 +15,9 @@ int string_endswith(lua_State* L)
 
 	if (haystack && needle)
 	{
-		int hlen = strlen(haystack);
-		int nlen = strlen(needle);
-		if (hlen >= nlen) 
+		int hlen = (int)strlen(haystack);
+		int nlen = (int)strlen(needle);
+		if (hlen >= nlen)
 		{
 			lua_pushboolean(L, strcmp(haystack + hlen - nlen, needle) == 0);
 			return 1;

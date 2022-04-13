@@ -46,9 +46,8 @@ uint32_t segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
 
 	// draw background again, just to set the priorities on non-transparent pixels
-	bitmap_ind16 dummy_bitmap;
-	m_segaic16vid->tilemap_draw( screen, dummy_bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
-	m_segaic16vid->tilemap_draw( screen, dummy_bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
 
 	// draw foreground
 	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
@@ -78,7 +77,7 @@ uint32_t segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					{
 						// if color bits are all 1, this triggers shadow/hilight
 						if ((pix & 0x3f0) == 0x3f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else

@@ -39,7 +39,7 @@
     - h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
     - lambda/pow3000 joystick, connected in parallel with the 4,R,F,7,U keys, but the directions are unknown.
     - Many games don't work.
-    - sets z80, lambda. pc8300, pow3000 all fail to show text.
+    - sets zx80, lambda. pc8300, pow3000 all fail to show text.
 
 ****************************************************************************/
 
@@ -94,7 +94,7 @@ void zx_state::pow3000_io_map(address_map &map)
 
 static INPUT_PORTS_START( zx80 )
 /* PORT_NAME =  Key Mode (Press Key)    Shift Mode (Press Key+Shift)    BASIC Mode (Press Key at BASIC)  */
-/* Some keys (e.g. A,S,D,F,G etc.) produce glyphs when used in Shift Mode. MESS currently cannot show
+/* Some keys (e.g. A,S,D,F,G etc.) produce glyphs when used in Shift Mode. MAME currently cannot show
 these functions in Input (This System) menu, hence we live some empty space in the menu */
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -334,9 +334,12 @@ void zx_state::zx80(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(zx80_o_format);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("zx80_cass");
 
 	/* software lists */
@@ -367,9 +370,7 @@ void zx_state::zx81_spk(machine_config &config)
 	zx81(config);
 	/* sound hardware */
 	/* Used by pc8300/lambda/pow3000 */
-	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void zx_state::ts1000(machine_config &config)

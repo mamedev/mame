@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#include "emu.h"
+
 #define REALLY_SIMPLE 0
 /* Non-Flipped, Tinted, Non-Transparent */
 #define FLIPX 0
 #define TINT 1
 #define TRANSPARENT 0
 
-#include "emu.h"
 #include "epic12.h"
 
 /* Special Case */

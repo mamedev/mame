@@ -4,7 +4,7 @@
 #include "crsshair.h"
 #include "cpu/z80/z80.h"
 #include "video/315_5124.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "includes/sms.h"
 
 #define VERBOSE 0
@@ -18,11 +18,17 @@
 #define ENABLE_EXT_RAM   0x10
 
 
+TIMER_CALLBACK_MEMBER(sms_state::lphaser_th_generate)
+{
+	m_vdp->hcount_latch();
+}
+
+
 void sms_state::lphaser_hcount_latch()
 {
 	/* A delay seems to occur when the Light Phaser latches the
 	   VDP hcount, then an offset is added here to the hpos. */
-	m_vdp->hcount_latch_at_hpos(m_main_scr->hpos() + m_lphaser_x_offs);
+	m_lphaser_th_timer->adjust(m_main_scr->time_until_pos(m_main_scr->vpos(), m_main_scr->hpos() + m_lphaser_x_offs));
 }
 
 
@@ -66,7 +72,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 }
 
 
-WRITE_LINE_MEMBER(sms_state::gg_ext_th_input)
+WRITE_LINE_MEMBER(gamegear_state::gg_ext_th_input)
 {
 	if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 		return;
@@ -122,7 +128,7 @@ void sms_state::sms_get_inputs()
 }
 
 
-WRITE8_MEMBER(sms_state::sms_io_control_w)
+void sms_state::sms_io_control_w(uint8_t data)
 {
 	bool latch_hcount = false;
 	uint8_t ctrl1_port_data = 0xff;
@@ -200,7 +206,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 }
 
 
-READ8_MEMBER(sms_state::sms_count_r)
+uint8_t sms_state::sms_count_r(offs_t offset)
 {
 	if (offset & 0x01)
 		return m_vdp->hcount_read();
@@ -210,47 +216,39 @@ READ8_MEMBER(sms_state::sms_count_r)
 
 
 /*
- Check if the pause button is pressed.
- If the gamegear is in sms mode, check if the start button is pressed.
+ If the gamegear is in sms mode, the start button performs the pause function.
  */
-WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
+WRITE_LINE_MEMBER(gamegear_state::gg_pause_callback)
 {
-	bool pause_pressed = false;
-
-	if (!m_is_mark_iii)
+	if (!state)
 	{
-		// clear TH latch of the controller ports
-		m_ctrl1_th_latch = 0;
-		m_ctrl2_th_latch = 0;
-	}
+		bool pause_pressed = false;
 
-	if (m_is_gamegear)
-	{
-		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
-			return;
+		if (m_cartslot->exists() && m_cartslot->get_sms_mode())
+		{
+			if (!(m_port_start->read() & 0x80))
+				pause_pressed = true;
+		}
 
-		if (!(m_port_start->read() & 0x80))
-			pause_pressed = true;
-	}
-	else
-	{
-		if (!(m_port_pause->read() & 0x80))
-			pause_pressed = true;
-	}
+		if (pause_pressed)
+		{
+			if (!m_gg_paused)
+				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	if (pause_pressed)
-	{
-		if (!m_paused)
-			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_gg_paused = 1;
+		}
+		else
+		{
+			if (m_gg_paused)
+				m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-		m_paused = 1;
+			m_gg_paused = 0;
+		}
 	}
-	else
-		m_paused = 0;
 }
 
 
-WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
+WRITE_LINE_MEMBER(sms_state::rapid_n_csync_callback)
 {
 	if (m_port_rapid.found())
 	{
@@ -314,7 +312,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 }
 
 
-READ8_MEMBER(sms_state::sms_input_port_dc_r)
+uint8_t sms_state::sms_input_port_dc_r()
 {
 	if (m_is_mark_iii)
 	{
@@ -361,7 +359,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 }
 
 
-READ8_MEMBER(sms_state::sms_input_port_dd_r)
+uint8_t sms_state::sms_input_port_dd_r()
 {
 	if (m_is_mark_iii)
 	{
@@ -414,7 +412,9 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		if (m_ctrl1_th_latch)
 		{
-			m_port_dd_reg &= ~0x40;
+			if (m_vdp->hcount_latched())
+				m_port_dd_reg &= ~0x40;
+
 			m_ctrl1_th_latch = 0;
 		}
 	}
@@ -436,7 +436,9 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		if (m_ctrl2_th_latch)
 		{
-			m_port_dd_reg &= ~0x80;
+			if (m_vdp->hcount_latched())
+				m_port_dd_reg &= ~0x80;
+
 			m_ctrl2_th_latch = 0;
 		}
 	}
@@ -478,13 +480,13 @@ void sms_state::smsj_set_audio_control(uint8_t data)
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_audio_control_w)
+void sms_state::smsj_audio_control_w(uint8_t data)
 {
 	smsj_set_audio_control(data);
 }
 
 
-READ8_MEMBER(sms_state::smsj_audio_control_r)
+uint8_t sms_state::smsj_audio_control_r()
 {
 	uint8_t data;
 
@@ -513,20 +515,20 @@ READ8_MEMBER(sms_state::smsj_audio_control_r)
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_ym2413_register_port_w)
+void sms_state::smsj_ym2413_register_port_w(uint8_t data)
 {
 	m_ym->write(0, data & 0x3f);
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
+void sms_state::smsj_ym2413_data_port_w(uint8_t data)
 {
 	//logerror("data_port_w %x %x\n", offset, data);
 	m_ym->write(1, data);
 }
 
 
-WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
+void gamegear_state::gg_psg_stereo_w(uint8_t data)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
@@ -535,7 +537,7 @@ WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 }
 
 
-READ8_MEMBER(sms_state::gg_input_port_00_r)
+uint8_t gamegear_state::gg_input_port_00_r()
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return 0xff;
@@ -555,26 +557,19 @@ READ8_MEMBER(sms_state::gg_input_port_00_r)
 }
 
 
-READ8_MEMBER(sms_state::sms_sscope_r)
+uint8_t sms1_state::sscope_r(offs_t offset)
 {
-	int sscope = m_port_scope->read();
-
-	// On SMSJ, address $fffb also controls the built-in 3-D port, that works
-	// in parallel with the 3-D adapter that is inserted into the card slot.
-
-	if ( sscope )
-	{
-		// Scope is attached
-		return m_sscope_state;
-	}
-
-	return read_ram(space, 0x3ff8 + offset);
+	// SegaScope is write-only and writes are mirrored in RAM, from where the values read come from.
+	return read_ram(0x3ff8 + offset);
 }
 
 
-WRITE8_MEMBER(sms_state::sms_sscope_w)
+void sms1_state::sscope_w(offs_t offset, uint8_t data)
 {
-	write_ram(space, 0x3ff8 + offset, data);
+	write_ram(0x3ff8 + offset, data);
+
+	// On SMSJ, address $fffb also controls the built-in 3-D port, that can work
+	// in parallel with the 3-D adapter that is inserted into the card slot.
 
 	int sscope = m_port_scope->read();
 
@@ -597,18 +592,18 @@ WRITE8_MEMBER(sms_state::sms_sscope_w)
 }
 
 
-READ8_MEMBER(sms_state::read_ram)
+uint8_t sms_state::read_ram(offs_t offset)
 {
 	if (m_mem_device_enabled & ENABLE_EXT_RAM)
 	{
 		uint8_t data = 0xff;
 
 		if (m_mem_device_enabled & ENABLE_CART)
-			data &= m_cartslot->read_ram(space, offset);
+			data &= m_cartslot->read_ram(offset);
 		if (m_mem_device_enabled & ENABLE_CARD)
-			data &= m_cardslot->read_ram(space, offset);
+			data &= m_cardslot->read_ram(offset);
 		if (m_mem_device_enabled & ENABLE_EXPANSION)
-			data &= m_smsexpslot->read_ram(space, offset);
+			data &= m_smsexpslot->read_ram(offset);
 
 		return data;
 	}
@@ -619,16 +614,16 @@ READ8_MEMBER(sms_state::read_ram)
 }
 
 
-WRITE8_MEMBER(sms_state::write_ram)
+void sms_state::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_mem_device_enabled & ENABLE_EXT_RAM)
 	{
 		if (m_mem_device_enabled & ENABLE_CART)
-			m_cartslot->write_ram(space, offset, data);
+			m_cartslot->write_ram(offset, data);
 		if (m_mem_device_enabled & ENABLE_CARD)
-			m_cardslot->write_ram(space, offset, data);
+			m_cardslot->write_ram(offset, data);
 		if (m_mem_device_enabled & ENABLE_EXPANSION)
-			m_smsexpslot->write_ram(space, offset, data);
+			m_smsexpslot->write_ram(offset, data);
 	}
 	else
 	{
@@ -637,16 +632,16 @@ WRITE8_MEMBER(sms_state::write_ram)
 }
 
 
-READ8_MEMBER(sms_state::sms_mapper_r)
+uint8_t sms_state::sms_mapper_r(offs_t offset)
 {
-	return read_ram(space, 0x3ffc + offset);
+	return read_ram(0x3ffc + offset);
 }
 
 
-WRITE8_MEMBER(sms_state::sms_mapper_w)
+void sms_state::sms_mapper_w(offs_t offset, uint8_t data)
 {
 	m_mapper[offset] = data;
-	write_ram(space, 0x3ffc + offset, data);
+	write_ram(0x3ffc + offset, data);
 
 	switch (offset)
 	{
@@ -660,15 +655,15 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 			}
 			if (m_mem_device_enabled & ENABLE_CART)    // CART ROM/RAM
 			{
-				m_cartslot->write_mapper(space, offset, data);
+				m_cartslot->write_mapper(offset, data);
 			}
 			if (m_mem_device_enabled & ENABLE_CARD)    // CARD ROM/RAM
 			{
-				m_cardslot->write_mapper(space, offset, data);
+				m_cardslot->write_mapper(offset, data);
 			}
 			if (m_mem_device_enabled & ENABLE_EXPANSION)    // expansion slot
 			{
-				m_smsexpslot->write_mapper(space, offset, data);
+				m_smsexpslot->write_mapper(offset, data);
 			}
 			break;
 
@@ -684,22 +679,22 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 			}
 			if (m_mem_device_enabled & ENABLE_CART)
 			{
-				m_cartslot->write_mapper(space, offset, data);
+				m_cartslot->write_mapper(offset, data);
 			}
 			if (m_mem_device_enabled & ENABLE_CARD)
 			{
-				m_cardslot->write_mapper(space, offset, data);
+				m_cardslot->write_mapper(offset, data);
 			}
 			if (m_mem_device_enabled & ENABLE_EXPANSION)
 			{
-				m_smsexpslot->write_mapper(space, offset, data);
+				m_smsexpslot->write_mapper(offset, data);
 			}
 			break;
 	}
 }
 
 
-uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t base_addr, uint16_t offset)
+uint8_t sms_state::read_bus(unsigned int page, uint16_t base_addr, uint16_t offset)
 {
 	if (m_is_gamegear)
 	{
@@ -713,7 +708,7 @@ uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t ba
 		if ((m_mem_device_enabled & ENABLE_BIOS) && page == 3)
 			return m_BIOS[(m_bios_page[page] * 0x4000) + (offset & 0x3fff)];
 		if (m_mem_device_enabled & ENABLE_CART)
-			return m_cartslot->read_cart(space, base_addr + offset);
+			return m_cartslot->read_cart(base_addr + offset);
 	}
 	else if (m_mem_device_enabled != ENABLE_NONE)
 	{
@@ -726,11 +721,11 @@ uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t ba
 		if (m_mem_device_enabled & ENABLE_BIOS)
 			data &= m_BIOS[(m_bios_page[page] * 0x4000) + (offset & 0x3fff)];
 		if (m_mem_device_enabled & ENABLE_CART)
-			data &= m_cartslot->read_cart(space, base_addr + offset);
+			data &= m_cartslot->read_cart(base_addr + offset);
 		if (m_mem_device_enabled & ENABLE_CARD)
-			data &= m_cardslot->read_cart(space, base_addr + offset);
+			data &= m_cardslot->read_cart(base_addr + offset);
 		if (m_mem_device_enabled & ENABLE_EXPANSION)
-			data &= m_smsexpslot->read(space, base_addr + offset);
+			data &= m_smsexpslot->read(base_addr + offset);
 
 		return data;
 	}
@@ -738,47 +733,47 @@ uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t ba
 }
 
 
-READ8_MEMBER(sms_state::read_0000)
+uint8_t sms_state::read_0000(offs_t offset)
 {
 	if (offset < 0x400)
 	{
-		return read_bus(space, 3, 0x0000, offset);
+		return read_bus(3, 0x0000, offset);
 	}
 	else
 	{
-		return read_bus(space, 0, 0x0000, offset);
+		return read_bus(0, 0x0000, offset);
 	}
 }
 
-READ8_MEMBER(sms_state::read_4000)
+uint8_t sms_state::read_4000(offs_t offset)
 {
-	return read_bus(space, 1, 0x4000, offset);
+	return read_bus(1, 0x4000, offset);
 }
 
-READ8_MEMBER(sms_state::read_8000)
+uint8_t sms_state::read_8000(offs_t offset)
 {
-	return read_bus(space, 2, 0x8000, offset);
+	return read_bus(2, 0x8000, offset);
 }
 
-WRITE8_MEMBER(sms_state::write_cart)
+void sms_state::write_cart(offs_t offset, uint8_t data)
 {
 	if (m_mem_device_enabled & ENABLE_CART)
-		m_cartslot->write_cart(space, offset, data);
+		m_cartslot->write_cart(offset, data);
 	if (m_mem_device_enabled & ENABLE_CARD)
-		m_cardslot->write_cart(space, offset, data);
+		m_cardslot->write_cart(offset, data);
 	if (m_mem_device_enabled & ENABLE_EXPANSION)
-		m_smsexpslot->write(space, offset, data);
+		m_smsexpslot->write(offset, data);
 }
 
 
-READ8_MEMBER(smssdisp_state::store_cart_peek)
+uint8_t smssdisp_state::store_cart_peek(offs_t offset)
 {
 	if (m_mem_device_enabled != ENABLE_NONE)
 	{
 		uint8_t data = 0xff;
 
 		if (m_mem_device_enabled & ENABLE_CART)
-			data &= m_cartslot->read_cart(space, 0x6000 + (offset & 0x1fff));
+			data &= m_cartslot->read_cart(0x6000 + (offset & 0x1fff));
 
 		return data;
 	}
@@ -788,7 +783,7 @@ READ8_MEMBER(smssdisp_state::store_cart_peek)
 	}
 }
 
-WRITE8_MEMBER(sms_state::sms_mem_control_w)
+void sms_state::sms_mem_control_w(uint8_t data)
 {
 	m_mem_ctrl_reg = data;
 
@@ -798,36 +793,36 @@ WRITE8_MEMBER(sms_state::sms_mem_control_w)
 }
 
 
-READ8_MEMBER(sms_state::sg1000m3_peripheral_r)
+uint8_t sms_state::sg1000m3_peripheral_r(offs_t offset)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
 
 	if (joy_ports_disabled)
 	{
-		return m_sgexpslot->read(space, offset);
+		return m_sgexpslot->read(offset);
 	}
 	else
 	{
 		if (offset & 0x01)
-			return sms_input_port_dd_r(space, offset);
+			return sms_input_port_dd_r();
 		else
-			return sms_input_port_dc_r(space, offset);
+			return sms_input_port_dc_r();
 	}
 }
 
 
-WRITE8_MEMBER(sms_state::sg1000m3_peripheral_w)
+void sms_state::sg1000m3_peripheral_w(offs_t offset, uint8_t data)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
 
 	if (joy_ports_disabled)
 	{
-		m_sgexpslot->write(space, offset, data);
+		m_sgexpslot->write(offset, data);
 	}
 }
 
 
-WRITE8_MEMBER(sms_state::gg_sio_w)
+void gamegear_state::gg_sio_w(offs_t offset, uint8_t data)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
@@ -855,7 +850,7 @@ WRITE8_MEMBER(sms_state::gg_sio_w)
 }
 
 
-READ8_MEMBER(sms_state::gg_sio_r)
+uint8_t gamegear_state::gg_sio_r(offs_t offset)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return 0xff;
@@ -972,7 +967,7 @@ void sms_state::setup_media_slots()
 			m_lphaser_x_offs = m_smsexpslot->get_lphaser_xoffs();
 
 		if (m_lphaser_x_offs == -1)
-			m_lphaser_x_offs = 36;
+			m_lphaser_x_offs = 19;
 	}
 }
 
@@ -1022,7 +1017,6 @@ void sms_state::machine_start()
 	}
 
 	m_cartslot = m_slot.target();
-	m_space = &m_maincpu->space(AS_PROGRAM);
 
 	if (m_mainram == nullptr)
 	{
@@ -1047,7 +1041,8 @@ void sms_state::machine_start()
 		}
 	}
 
-	save_item(NAME(m_paused));
+	m_lphaser_th_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_th_generate),this));
+
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_port_dc_reg));
 	save_item(NAME(m_port_dd_reg));
@@ -1079,16 +1074,6 @@ void sms_state::machine_start()
 		save_item(NAME(m_lphaser_x_offs));
 	}
 
-	if (m_is_gamegear)
-	{
-		save_item(NAME(m_gg_sio));
-		// The game Ecco requires SP to be initialized, so, to run on a BIOS-less Game
-		// Gear, probably a custom chip like the 315-5378 does the initialization, as
-		// done by the 315-5342 chip on the Power Base Converter for Sega Genesis/MD.
-		// Reference: http://www.smspower.org/forums/14084-PowerBaseConverterInfo
-		m_maincpu->set_state_int(Z80_SP, 0xdff0);
-	}
-
 	if (m_cartslot)
 		m_cartslot->save_ram();
 }
@@ -1099,6 +1084,20 @@ void smssdisp_state::machine_start()
 
 	save_item(NAME(m_store_control));
 	save_item(NAME(m_store_cart_selection_data));
+}
+
+void gamegear_state::machine_start()
+{
+	sms_state::machine_start();
+
+	save_item(NAME(m_gg_paused));
+	save_item(NAME(m_gg_sio));
+
+	// The game Ecco requires SP to be initialized, so, to run on a BIOS-less Game
+	// Gear, probably a custom chip like the 315-5378 does the initialization, as
+	// done by the 315-5342 chip on the Power Base Converter for Sega Genesis/MD.
+	// Reference: http://www.smspower.org/forums/14084-PowerBaseConverterInfo
+	m_maincpu->set_state_int(Z80_SP, 0xdff0);
 }
 
 void sms_state::machine_reset()
@@ -1129,19 +1128,6 @@ void sms_state::machine_reset()
 		m_ctrl2_th_state = 1;
 	}
 
-	if (m_is_gamegear)
-	{
-		if (m_cartslot->exists() && m_cartslot->get_sms_mode())
-			m_vdp->set_sega315_5124_compatibility_mode(true);
-
-		/* Initialize SIO stuff for GG */
-		m_gg_sio[0] = 0x7f;
-		m_gg_sio[1] = 0xff;
-		m_gg_sio[2] = 0x00;
-		m_gg_sio[3] = 0xff;
-		m_gg_sio[4] = 0x00;
-	}
-
 	setup_bios();
 	setup_media_slots();
 }
@@ -1155,13 +1141,28 @@ void smssdisp_state::machine_reset()
 	sms_state::machine_reset();
 }
 
-READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
+void gamegear_state::machine_reset()
+{
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
+		m_vdp->set_sega315_5124_compatibility_mode(true);
+
+	/* Initialize SIO stuff for GG */
+	m_gg_sio[0] = 0x7f;
+	m_gg_sio[1] = 0xff;
+	m_gg_sio[2] = 0x00;
+	m_gg_sio[3] = 0xff;
+	m_gg_sio[4] = 0x00;
+
+	sms_state::machine_reset();
+}
+
+uint8_t smssdisp_state::sms_store_cart_select_r()
 {
 	return m_store_cart_selection_data;
 }
 
 
-WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
+void smssdisp_state::sms_store_cart_select_w(uint8_t data)
 {
 	store_select_cart(data);
 	m_store_cart_selection_data = data;
@@ -1199,7 +1200,7 @@ void smssdisp_state::store_select_cart(uint8_t data)
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }
 
-WRITE8_MEMBER(smssdisp_state::sms_store_control_w)
+void smssdisp_state::sms_store_control_w(uint8_t data)
 {
 	int led_number = data >> 4;
 	int led_column = led_number / 4;
@@ -1235,7 +1236,7 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 }
 
 
-VIDEO_START_MEMBER(sms_state,sms1)
+void sms1_state::video_start()
 {
 	m_main_scr->register_screen_bitmap(m_prevleft_bitmap);
 	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
@@ -1249,7 +1250,7 @@ VIDEO_START_MEMBER(sms_state,sms1)
 }
 
 
-VIDEO_RESET_MEMBER(sms_state,sms1)
+void sms1_state::video_reset()
 {
 	if (m_port_scope->read())
 	{
@@ -1266,7 +1267,7 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 }
 
 
-WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
+WRITE_LINE_MEMBER(sms1_state::sscope_vblank)
 {
 	// on falling edge
 	if (!state)
@@ -1281,13 +1282,7 @@ WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
 	}
 }
 
-uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_vdp->screen_update(screen, bitmap, cliprect);
-	return 0;
-}
-
-uint32_t sms_state::screen_update_sms1_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sms1_state::screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t sscope = m_port_scope->read();
 
@@ -1317,7 +1312,7 @@ uint32_t sms_state::screen_update_sms1_left(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-uint32_t sms_state::screen_update_sms1_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sms1_state::screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t sscope = m_port_scope->read();
 
@@ -1353,7 +1348,7 @@ uint32_t sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-VIDEO_START_MEMBER(sms_state,gamegear)
+void gamegear_state::video_start()
 {
 	m_prev_bitmap_copied = false;
 	m_main_scr->register_screen_bitmap(m_prev_bitmap);
@@ -1366,7 +1361,7 @@ VIDEO_START_MEMBER(sms_state,gamegear)
 	save_pointer(NAME(m_line_buffer), 160 * 4);
 }
 
-VIDEO_RESET_MEMBER(sms_state,gamegear)
+void gamegear_state::video_reset()
 {
 	if (m_prev_bitmap_copied)
 	{
@@ -1381,7 +1376,7 @@ VIDEO_RESET_MEMBER(sms_state,gamegear)
 }
 
 
-void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
 	const rectangle visarea = screen.visible_area();
@@ -1431,7 +1426,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 
 				if (sms_y2 >= vdp_bitmap.cliprect().min_y && sms_y2 <= vdp_bitmap.cliprect().max_y)
 				{
-					uint32_t *vdp_buffer =  &vdp_bitmap.pix32(sms_y2);
+					uint32_t *const vdp_buffer =  &vdp_bitmap.pix(sms_y2);
 
 					int sms_x = sms_min_x;
 					int x_min_i = plot_min_x - plot_x_first_group;
@@ -1494,7 +1489,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 				line3 = m_line_buffer.get() + ((sms_y + y_i + 1) & 0x03) * 160;
 				line4 = m_line_buffer.get() + ((sms_y + y_i + 2) & 0x03) * 160;
 
-				uint32_t *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y_group + y_i, visarea.min_x);
+				uint32_t *const p_bitmap = &bitmap.pix(visarea.min_y + plot_y_group + y_i, visarea.min_x);
 
 				for (int plot_x = plot_min_x; plot_x <= plot_max_x; plot_x++)
 				{
@@ -1518,7 +1513,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 }
 
 
-uint32_t sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gamegear_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 *source_bitmap;
 
@@ -1553,9 +1548,9 @@ uint32_t sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &
 		// (it would be better to generalize this in the core, to be used for all LCD systems)
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint32_t *linedst = &bitmap.pix32(y);
-			uint32_t *line0 = &source_bitmap->pix32(y);
-			uint32_t *line1 = &m_prev_bitmap.pix32(y);
+			uint32_t *const linedst = &bitmap.pix(y);
+			uint32_t const *const line0 = &source_bitmap->pix(y);
+			uint32_t const *const line1 = &m_prev_bitmap.pix(y);
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				uint32_t color0 = line0[x];
@@ -1566,9 +1561,9 @@ uint32_t sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &
 				uint16_t r1 = (color1 >> 16) & 0x000000ff;
 				uint16_t g1 = (color1 >>  8) & 0x000000ff;
 				uint16_t b1 = (color1 >>  0) & 0x000000ff;
-				uint8_t r = (uint8_t)((r0 + r1) >> 1);
-				uint8_t g = (uint8_t)((g0 + g1) >> 1);
-				uint8_t b = (uint8_t)((b0 + b1) >> 1);
+				uint8_t r = uint8_t((r0 + r1) >> 1);
+				uint8_t g = uint8_t((g0 + g1) >> 1);
+				uint8_t b = uint8_t((b0 + b1) >> 1);
 				linedst[x] = (r << 16) | (g << 8) | b;
 			}
 		}

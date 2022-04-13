@@ -108,11 +108,19 @@
     these special characters.
 
 *********************************************************************/
-#include <bitset>
-
 #include "imgtool.h"
-#include "formats/imageutl.h"
+#include "filter.h"
+
 #include "formats/hti_tape.h"
+#include "formats/imageutl.h"
+
+#include "corefile.h"
+#include "ioprocs.h"
+#include "opresolv.h"
+
+#include <bitset>
+#include <cstdio>
+
 
 // Constants
 #define SECTOR_LEN          256 // Bytes in a sector
@@ -148,10 +156,10 @@
 #define BYTES_AVAILABLE_MASK    0xff00  // Mask of "bytes available" field
 #define BYTES_USED          0x00ff  // "bytes used" field = 256
 #define BYTES_USED_MASK     0x00ff  // Mask of "bytes used" field
-#define FORMAT_SECT_SIZE    ((tape_pos_t)(2.85 * hti_format_t::ONE_INCH_POS)) // Size of sectors including padding: 2.85"
-#define PREAMBLE_WORD       0   // Value of preamble word
+#define FORMAT_SECT_SIZE    ((tape_pos_t)(2.67 * hti_format_t::ONE_INCH_POS)) // Size of sectors including padding: 2.67"
+#define PREAMBLE_WORD       0x0001  // Value of preamble word
 #define WORDS_PER_HEADER_N_SECTOR   (WORDS_PER_SECTOR + 5)
-#define MIN_IRG_SIZE        ((tape_pos_t)(0.066 * hti_format_t::ONE_INCH_POS))    // Minimum size of IRG gaps: 0.066"
+#define MIN_IRG_SIZE        ((tape_pos_t)(16 * 1024))   // Minimum size of IRG gaps: 0.017"
 
 // File types
 #define BKUP_FILETYPE       0
@@ -291,48 +299,16 @@ void tape_image_t::format_img(void)
 	dirty = true;
 }
 
-static int my_seekproc(void *file, int64_t offset, int whence)
-{
-	reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
-	return 0;
-}
-
-static size_t my_readproc(void *file, void *buffer, size_t length)
-{
-	return reinterpret_cast<imgtool::stream *>(file)->read(buffer, length);
-}
-
-static size_t my_writeproc(void *file, const void *buffer, size_t length)
-{
-	reinterpret_cast<imgtool::stream *>(file)->write(buffer, length);
-	return length;
-}
-
-static uint64_t my_filesizeproc(void *file)
-{
-	return reinterpret_cast<imgtool::stream *>(file)->size();
-}
-
-static const struct io_procs my_stream_procs = {
-	nullptr,
-	my_seekproc,
-	my_readproc,
-	my_writeproc,
-	my_filesizeproc
-};
-
 imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 {
 	hti_format_t inp_image;
+	inp_image.set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 
-	io_generic io;
-	io.file = (void *)stream;
-	io.procs = &my_stream_procs;
-	io.filler = 0;
-
-	if (!inp_image.load_tape(&io)) {
+	auto io = imgtool::stream_read(*stream, 0);
+	if (!io || !inp_image.load_tape(*io)) {
 		return IMGTOOLERR_READERROR;
 	}
+	io.reset();
 
 	unsigned exp_sector = 0;
 	unsigned last_sector_on_track = SECTORS_PER_TRACK;
@@ -357,16 +333,19 @@ imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 					}
 					if (state == 1) {
 						// Extract record data
-						if (it->second != PREAMBLE_WORD) {
+
+						// The top 8 bits are ignored by TACO when aligning with preamble
+						unsigned bit_idx = 7;
+						if (!inp_image.sync_with_record(track , it , bit_idx)) {
+							// Couldn't align
 							return IMGTOOLERR_CORRUPTIMAGE;
 						}
 						tape_word_t buffer[ WORDS_PER_HEADER_N_SECTOR ];
 						for (unsigned i = 0; i < WORDS_PER_HEADER_N_SECTOR; i++) {
-							auto res = inp_image.adv_it(track , true , it);
+							auto res = inp_image.next_word(track , it , bit_idx , buffer[ i ]);
 							if (res != hti_format_t::ADV_CONT_DATA) {
 								return IMGTOOLERR_CORRUPTIMAGE;
 							}
-							buffer[ i ] = it->second;
 						}
 						if (buffer[ 3 ] != checksum(&buffer[ 0 ], 3) ||
 							buffer[ 4 + WORDS_PER_SECTOR ] != checksum(&buffer[ 4 ], WORDS_PER_SECTOR)) {
@@ -519,12 +498,7 @@ imgtoolerr_t tape_image_t::save_to_file(imgtool::stream *stream)
 		}
 	}
 
-	io_generic io;
-	io.file = (void *)stream;
-	io.procs = &my_stream_procs;
-	io.filler = 0;
-
-	out_image.save_tape(&io);
+	out_image.save_tape(*imgtool::stream_read_write(*stream, 0));
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -981,7 +955,7 @@ static tape_state_t& get_tape_state(imgtool::image &img)
 static tape_image_t& get_tape_image(tape_state_t& ts)
 {
 	if (ts.img == nullptr) {
-		ts.img = global_alloc(tape_image_t);
+		ts.img = new tape_image_t;
 	}
 
 	return *(ts.img);
@@ -1030,7 +1004,7 @@ static void hp9845_tape_close(imgtool::image &image)
 	delete state.stream;
 
 	// Free tape_image
-	global_free(&tape_image);
+	delete &tape_image;
 }
 
 static imgtoolerr_t hp9845_tape_begin_enum (imgtool::directory &enumeration, const char *path)

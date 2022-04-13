@@ -29,7 +29,7 @@ void pcd_keyboard_device::pcd_keyboard_map(address_map &map)
 
 void pcd_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	i8035_device &mcu(I8035(config, "mcu", 5760000*2)); // FIXME: the mc2661 baud rate calculation
+	i8035_device &mcu(I8035(config, "mcu", 5760000));
 	mcu.set_addrmap(AS_PROGRAM, &pcd_keyboard_device::pcd_keyboard_map);
 	mcu.bus_in_cb().set(FUNC(pcd_keyboard_device::bus_r));
 	mcu.p1_in_cb().set(FUNC(pcd_keyboard_device::p1_r));
@@ -78,7 +78,7 @@ INPUT_PORTS_START( pcd_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(3)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x7C")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
@@ -206,9 +206,9 @@ INPUT_PORTS_START( pcd_keyboard )
 	PORT_START("ROW.16")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_PAUSE)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x3C")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x7E")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -234,19 +234,19 @@ void pcd_keyboard_device::device_start()
 	m_out_tx_handler(1);
 }
 
-READ8_MEMBER( pcd_keyboard_device::bus_r )
+uint8_t pcd_keyboard_device::bus_r()
 {
 	if(m_p1 & 0x10)
 		return m_rows[16]->read();
 	return m_rows[m_p1 & 0xf]->read();
 }
 
-READ8_MEMBER( pcd_keyboard_device::p1_r )
+uint8_t pcd_keyboard_device::p1_r()
 {
 	return m_p1;
 }
 
-WRITE8_MEMBER( pcd_keyboard_device::p1_w )
+void pcd_keyboard_device::p1_w(uint8_t data)
 {
 	m_p1 = data;
 	m_out_tx_handler(BIT(data, 5));

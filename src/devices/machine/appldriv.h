@@ -16,6 +16,11 @@
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 
+#define FLOPPY_0 "floppy0"
+#define FLOPPY_1 "floppy1"
+#define FLOPPY_2 "floppy2"
+#define FLOPPY_3 "floppy3"
+
 void apple525_set_lines(device_t *device, uint8_t lines);
 void apple525_set_enable_lines(device_t *device, int enable_mask);
 

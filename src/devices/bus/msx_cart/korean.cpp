@@ -117,7 +117,7 @@ void msx_cart_korean_90in1_device::device_start()
 	save_item(NAME(m_selected_bank));
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x77, 0x77, write8smo_delegate(FUNC(msx_cart_korean_90in1_device::banking), this));
+	io_space().install_write_handler(0x77, 0x77, write8smo_delegate(*this, FUNC(msx_cart_korean_90in1_device::banking)));
 }
 
 

@@ -16,6 +16,10 @@
 
 DEFINE_DEVICE_TYPE(A1BUS_SLOT, a1bus_slot_device, "a1bus_slot", "Apple I Slot")
 
+template class device_finder<device_a1bus_card_interface, false>;
+template class device_finder<device_a1bus_card_interface, true>;
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -30,7 +34,7 @@ a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *
 
 a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_a1bus_card_interface>(mconfig, *this)
 	, m_a1bus(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -38,13 +42,6 @@ a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-void a1bus_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_a1bus_card_interface *>(card))
-		osd_printf_error("Card device %s (%s) does not implement device_a1bus_card_interface\n", card->tag(), card->name());
-}
 
 void a1bus_slot_device::device_resolve_objects()
 {
@@ -55,9 +52,6 @@ void a1bus_slot_device::device_resolve_objects()
 
 void a1bus_slot_device::device_start()
 {
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_a1bus_card_interface *>(card))
-		throw emu_fatalerror("a1bus_slot_device: card device %s (%s) does not implement device_a1bus_card_interface\n", card->tag(), card->name());
 }
 
 
@@ -134,16 +128,15 @@ void a1bus_device::set_nmi_line(int state)
 	m_out_nmi_cb(state);
 }
 
-void a1bus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+void a1bus_device::install_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
 {
 	m_space->install_readwrite_handler(start, end, rhandler, whandler);
 }
 
-void a1bus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void a1bus_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
-	m_space->install_readwrite_bank(start, end, tag);
-	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
+	m_space->install_ram(start, end, data);
 }
 
 // interrupt request from a1bus card
@@ -164,7 +157,7 @@ WRITE_LINE_MEMBER( a1bus_device::nmi_w ) { m_out_nmi_cb(state); }
 //-------------------------------------------------
 
 device_a1bus_card_interface::device_a1bus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "a1bus")
 	, m_a1bus_finder(device, finder_base::DUMMY_TAG), m_a1bus(nullptr)
 	, m_a1bus_slottag(nullptr), m_next(nullptr)
 {
@@ -187,8 +180,6 @@ void device_a1bus_card_interface::interface_validity_check(validity_checker &val
 
 void device_a1bus_card_interface::interface_pre_start()
 {
-	device_slot_card_interface::interface_pre_start();
-
 	if (!m_a1bus)
 	{
 		m_a1bus = m_a1bus_finder;
@@ -202,12 +193,12 @@ void device_a1bus_card_interface::interface_pre_start()
 	m_a1bus->add_a1bus_card(this);
 }
 
-void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
 {
 	m_a1bus->install_device(start, end, rhandler, whandler);
 }
 
-void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
-	m_a1bus->install_bank(start, end, tag, data);
+	m_a1bus->install_bank(start, end, data);
 }

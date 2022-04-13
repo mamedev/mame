@@ -7,7 +7,6 @@
    Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
-
 #ifndef MAME_MACHINE_HP84_PORT_H
 #define MAME_MACHINE_HP84_PORT_H
 
@@ -36,16 +35,13 @@ public:
 	}
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "crd"; }
-	virtual const char *custom_instance_name() const override { return "port"; }
-	virtual const char *custom_brief_instance_name() const override { return "p"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "crd"; }
+	virtual const char *image_type_name() const noexcept override { return "port"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "p"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -58,12 +54,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
 private:
 	void fill_port();
 	void unfill_port();
 
-	int m_module;               /* memory module where the port is visible */
-	int m_max_size;             /* maximum size, in bytes 128 KB or 4 GB */
+	int m_module = 0;               /* memory module where the port is visible */
+	int m_max_size = 0;             /* maximum size, in bytes 128 KB or 4 GB */
 
 	uint32_t m_port_size;
 	bool m_port_write;

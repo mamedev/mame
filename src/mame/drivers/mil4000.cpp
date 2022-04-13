@@ -114,9 +114,12 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "mil4000.lh"
 
+
+namespace {
 
 #define MAIN_CLOCK    XTAL(12'000'000)
 #define SEC_CLOCK     XTAL(14'318'181)
@@ -154,25 +157,25 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;
 
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap;
-	uint16_t m_vblank;
-	uint16_t m_hblank;
-	uint8_t m_mcucomm;
-	uint8_t m_mcudata;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	tilemap_t *m_sc2_tilemap = nullptr;
+	tilemap_t *m_sc3_tilemap = nullptr;
+	uint16_t m_vblank = 0;
+	uint16_t m_hblank = 0;
+	uint8_t m_mcucomm = 0;
+	uint8_t m_mcudata = 0;
 
-	DECLARE_READ16_MEMBER(hvretrace_r);
-	DECLARE_READ16_MEMBER(unk_r);
-	DECLARE_READ16_MEMBER(chewheel_mcu_r);
-	DECLARE_WRITE16_MEMBER(unk_w);
-	DECLARE_WRITE16_MEMBER(chewheel_mcu_w);
-	DECLARE_WRITE16_MEMBER(sc0_vram_w);
-	DECLARE_WRITE16_MEMBER(sc1_vram_w);
-	DECLARE_WRITE16_MEMBER(sc2_vram_w);
-	DECLARE_WRITE16_MEMBER(sc3_vram_w);
-	DECLARE_WRITE16_MEMBER(output_w);
+	uint16_t hvretrace_r();
+	uint16_t unk_r();
+	uint16_t chewheel_mcu_r();
+	void unk_w(offs_t offset, uint16_t data);
+	void chewheel_mcu_w(uint16_t data);
+	void sc0_vram_w(offs_t offset, uint16_t data);
+	void sc1_vram_w(offs_t offset, uint16_t data);
+	void sc2_vram_w(offs_t offset, uint16_t data);
+	void sc3_vram_w(offs_t offset, uint16_t data);
+	void output_w(uint16_t data);
 
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
@@ -192,7 +195,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc0_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc0_vram[tile_index*2+1] & 0x1f)+0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -204,7 +207,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc1_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc1_vram[tile_index*2+1] & 0x1f)+0x10;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -216,7 +219,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc2_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc2_vram[tile_index*2+1] & 0x1f)+0x20;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -228,7 +231,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc3_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc3_vram[tile_index*2+1] & 0x1f)+0x30;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -244,10 +247,10 @@ void mil4000_state::machine_start()
 
 void mil4000_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mil4000_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mil4000_state::get_sc1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mil4000_state::get_sc2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mil4000_state::get_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mil4000_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mil4000_state::get_sc1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mil4000_state::get_sc2_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mil4000_state::get_sc3_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 
 	m_sc1_tilemap->set_transparent_pen(0);
 	m_sc2_tilemap->set_transparent_pen(0);
@@ -255,6 +258,9 @@ void mil4000_state::video_start()
 
 	save_item(NAME(m_vblank));
 	save_item(NAME(m_hblank));
+
+	m_vblank = 0;
+	m_hblank = 0;
 }
 
 uint32_t mil4000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -267,7 +273,7 @@ uint32_t mil4000_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 /*TODO*/
-READ16_MEMBER(mil4000_state::hvretrace_r)
+uint16_t mil4000_state::hvretrace_r()
 {
 	uint16_t res;
 
@@ -288,25 +294,25 @@ READ16_MEMBER(mil4000_state::hvretrace_r)
 }
 
 
-WRITE16_MEMBER(mil4000_state::sc0_vram_w)
+void mil4000_state::sc0_vram_w(offs_t offset, uint16_t data)
 {
 	m_sc0_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(mil4000_state::sc1_vram_w)
+void mil4000_state::sc1_vram_w(offs_t offset, uint16_t data)
 {
 	m_sc1_vram[offset] = data;
 	m_sc1_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(mil4000_state::sc2_vram_w)
+void mil4000_state::sc2_vram_w(offs_t offset, uint16_t data)
 {
 	m_sc2_vram[offset] = data;
 	m_sc2_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(mil4000_state::sc3_vram_w)
+void mil4000_state::sc3_vram_w(offs_t offset, uint16_t data)
 {
 	m_sc3_vram[offset] = data;
 	m_sc3_tilemap->mark_tile_dirty(offset/2);
@@ -324,7 +330,7 @@ WRITE16_MEMBER(mil4000_state::sc3_vram_w)
     ---- ---- ---- --x- Hold 2
     ---- ---- ---- ---x Hold 1
 */
-WRITE16_MEMBER(mil4000_state::output_w)
+void mil4000_state::output_w(uint16_t data)
 {
 	for(int i = 0; i < 3; i++)
 		machine().bookkeeping().coin_counter_w(i, data & 0x2000);
@@ -335,7 +341,7 @@ WRITE16_MEMBER(mil4000_state::output_w)
 //  popmessage("%04x\n",data);
 }
 
-READ16_MEMBER(mil4000_state::chewheel_mcu_r)
+uint16_t mil4000_state::chewheel_mcu_r()
 {
 /*  Damn thing!
     708010-708011 communicate with the MCU.
@@ -415,7 +421,7 @@ READ16_MEMBER(mil4000_state::chewheel_mcu_r)
 	return (machine().rand() & 0x0b);   // otherwise got corrupt gfx...
 }
 
-WRITE16_MEMBER(mil4000_state::chewheel_mcu_w)
+void mil4000_state::chewheel_mcu_w(uint16_t data)
 {
 	if ((data == 0x11)||(data == 0x1a)||(data == 0x1b)||(data == 0x1c)||(data == 0x1d)||(data == 0x1e))
 	{
@@ -430,13 +436,13 @@ WRITE16_MEMBER(mil4000_state::chewheel_mcu_w)
 }
 
 
-READ16_MEMBER(mil4000_state::unk_r)
+uint16_t mil4000_state::unk_r()
 {
 //  reads:  51000C-0E. touch screen?
 	return 0xff;
 }
 
-WRITE16_MEMBER(mil4000_state::unk_w)
+void mil4000_state::unk_w(offs_t offset, uint16_t data)
 {
 //  writes: 510000-02-04-06-08-0A-0C-0E
 //  logerror("unknown writes from address %04x\n", offset);
@@ -769,6 +775,8 @@ ROM_START( chewheel )
 	ROM_REGION( 0x4000, "nvram", 0 )   // default NVRAM (1x 6264 storing the odd bytes)
 	ROM_LOAD( "chewheel_nvram.bin", 0x0000, 0x4000, CRC(af73a270) SHA1(3e3e2c0a629bf506830b34d4c5a45ddbece618c3) )
 ROM_END
+
+} // Anonymous namespace
 
 
 //     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY              FULLNAME                               FLAGS                          LAYOUT

@@ -24,10 +24,12 @@
       #define MY_MACRO \
               "string that \
               continues"
-    * Will not produce expected output for a string continuation that
-      breaks an escape sequence, e.g. this:
-      "bad\\
-      tbehaviour"
+    * Numeric literals broken by line continuations are not recognised
+    * Will not recognise a comment delimiter broken by multiple line
+      continuations. e.g. this:
+      /\
+      \
+      / preprocessor abuse
 
     Known Lua limitations:
     * Whitespace normalisation is applied inside long string literals
@@ -35,6 +37,9 @@
     * Disabled code inside long comments gets no special treatment and
       may have spacing adjusted in a way that affects behaviour when
       uncommented
+
+    Known JSON limitations:
+    * Doesn't detect invalid numbers or literals
 
     Known XML limitations:
     * No special handling for CDATA
@@ -49,7 +54,6 @@
 
 #include "corefile.h"
 #include "corestr.h"
-#include "osdcore.h"
 #include "strformat.h"
 
 #include <algorithm>
@@ -101,14 +105,20 @@ protected:
 	static constexpr char32_t HORIZONTAL_TAB            = 0x0000'0009U;
 	static constexpr char32_t LINE_FEED                 = 0x0000'000aU;
 	static constexpr char32_t VERTICAL_TAB              = 0x0000'000bU;
+	static constexpr char32_t FORM_FEED                 = 0x0000'000cU;
+	static constexpr char32_t C0_CONTROL_LAST           = 0x0000'001fU;
 	static constexpr char32_t SPACE                     = 0x0000'0020U;
 	static constexpr char32_t DOUBLE_QUOTE              = 0x0000'0022U;
 	static constexpr char32_t SINGLE_QUOTE              = 0x0000'0027U;
+	static constexpr char32_t ASTERISK                  = 0x0000'002aU;
 	static constexpr char32_t HYPHEN_MINUS              = 0x0000'002dU;
+	static constexpr char32_t SLASH                     = 0x0000'002fU;
 	static constexpr char32_t QUESTION_MARK             = 0x0000'003fU;
 	static constexpr char32_t BACKSLASH                 = 0x0000'005cU;
 	static constexpr char32_t BASIC_LATIN_LAST          = 0x0000'007fU;
 	static constexpr char32_t CYRILLIC_SUPPLEMENT_LAST  = 0x0000'052fU;
+	static constexpr char32_t LINE_SEPARATOR            = 0x0000'2028U;
+	static constexpr char32_t PARAGRAPH_SEPARATOR       = 0x0000'2029U;
 
 	template <typename OutputIt>
 	cleaner_base(OutputIt &&output, newline newline_mode, unsigned tab_width);
@@ -176,7 +186,7 @@ private:
 
 	// output state management
 	unsigned                    m_output_column = 0U;
-	unsigned                    m_indent;
+	unsigned                    m_indent        = 0U;
 	unsigned                    m_tab_limit     = std::numeric_limits<unsigned>::max();
 	std::vector<char32_t>       m_whitespace;
 
@@ -595,7 +605,7 @@ void cleaner_base::output_utf8(char32_t ch)
 
 void cleaner_base::commit_character(char32_t ch)
 {
-	assert(ARRAY_LENGTH(m_buffer) > m_position);
+	assert(std::size(m_buffer) > m_position);
 	assert(1U <= m_code_length);
 	assert(6U >= m_code_length);
 
@@ -695,7 +705,7 @@ void cleaner_base::commit_character(char32_t ch)
 
 void cleaner_base::process_if_full()
 {
-	if (ARRAY_LENGTH(m_buffer) == m_position)
+	if (std::size(m_buffer) == m_position)
 	{
 		process_characters(m_buffer, m_buffer + m_position);
 		m_position = 0U;
@@ -824,8 +834,6 @@ protected:
 	void output_character(char32_t ch);
 
 private:
-	static constexpr char32_t ASTERISK              = 0x0000'002aU;
-	static constexpr char32_t SLASH                 = 0x0000'002fU;
 	static constexpr char32_t UPPERCASE_FIRST       = 0x0000'0041U;
 	static constexpr char32_t UPPERCASE_B           = 0x0000'0042U;
 	static constexpr char32_t UPPERCASE_X           = 0x0000'0058U;
@@ -868,19 +876,19 @@ private:
 
 	bool tail_is(char32_t ch) const
 	{
-		return !m_tail.empty() && (m_tail.front() == ch);
+		return !m_tail.empty() && (m_tail.back() == ch);
 	}
 
 	void pop_tail()
 	{
 		if (!m_tail.empty())
-			m_tail.pop_front();
+			m_tail.pop_back();
 	}
 
 	void replace_tail(char32_t ch)
 	{
 		assert(!m_tail.empty());
-		*m_tail.begin() = ch;
+		m_tail.back() = ch;
 	}
 
 	void flush_tail()
@@ -938,10 +946,12 @@ private:
 	bool                        m_escape        = false;
 	std::deque<char32_t>        m_tail;
 	std::uint64_t               m_comment_line  = 0U;
+	bool                        m_broken_escape = false;
 	char32_t                    m_lead_digit    = 0U;
 	unsigned                    m_radix         = 0U;
 
 	std::uint64_t   m_tabs_escaped                  = 0U;
+	std::uint64_t   m_broken_comment_delimiters     = 0U;
 	std::uint64_t   m_line_comment_continuations    = 0U;
 	std::uint64_t   m_string_continuations          = 0U;
 	std::uint64_t   m_uppercase_radix               = 0U;
@@ -965,6 +975,7 @@ bool cpp_cleaner::affected() const
 	return
 			cleaner_base::affected() ||
 			m_tabs_escaped ||
+			m_broken_comment_delimiters ||
 			m_line_comment_continuations ||
 			m_string_continuations ||
 			m_uppercase_radix ||
@@ -977,6 +988,8 @@ void cpp_cleaner::summarise(std::ostream &os) const
 	cleaner_base::summarise(os);
 	if (m_tabs_escaped)
 		util::stream_format(os, "%1$u tab(s) escaped\n", m_tabs_escaped);
+	if (m_broken_comment_delimiters)
+		util::stream_format(os, "%1$u broken comment delimiter(s) replaced\n", m_broken_comment_delimiters);
 	if (m_line_comment_continuations)
 		util::stream_format(os, "%1$u line comment continuation(s) replaced\n", m_line_comment_continuations);
 	if (m_string_continuations)
@@ -1016,16 +1029,17 @@ void cpp_cleaner::output_character(char32_t ch)
 
 	switch (ch)
 	{
+	case HORIZONTAL_TAB:
+	case SPACE:
+	case BACKSLASH:
+		m_tail.emplace_back(ch);
+		break;
 	default:
 		flush_tail();
 		if (LINE_FEED == ch)
-		{
 			cleaner_base::output_character(ch);
-			break;
-		}
-	case HORIZONTAL_TAB:
-	case SPACE:
-		m_tail.emplace_back(ch);
+		else
+			m_tail.emplace_back(ch);
 	}
 }
 
@@ -1085,6 +1099,13 @@ void cpp_cleaner::process_default(char32_t ch)
 {
 	switch (ch)
 	{
+	case LINE_FEED:
+		if (m_escape && tail_is(BACKSLASH))
+		{
+			m_broken_escape = true;
+			return;
+		}
+		break;
 	case DOUBLE_QUOTE:
 		m_parse_state = parse_state::STRING_CONSTANT;
 		break;
@@ -1097,11 +1118,35 @@ void cpp_cleaner::process_default(char32_t ch)
 			m_parse_state = parse_state::COMMENT;
 			m_comment_line = m_input_line;
 			set_tab_limit();
+			if (m_broken_escape)
+			{
+				++m_broken_comment_delimiters;
+				assert(tail_is(BACKSLASH));
+				pop_tail();
+				output_character(ch);
+				output_character(LINE_FEED);
+				m_escape = false;
+				m_broken_escape = false;
+				return;
+			}
 		}
 		break;
 	case SLASH:
 		if (m_escape)
+		{
 			m_parse_state = parse_state::LINE_COMMENT;
+			if (m_broken_escape)
+			{
+				++m_broken_comment_delimiters;
+				assert(tail_is(BACKSLASH));
+				pop_tail();
+				assert(tail_is(SLASH));
+				pop_tail();
+				output_character(LINE_FEED);
+				output_character(SLASH);
+				m_broken_escape = false;
+			}
+		}
 		break;
 	default:
 		if (is_token_lead(ch))
@@ -1112,11 +1157,15 @@ void cpp_cleaner::process_default(char32_t ch)
 		{
 			m_parse_state = parse_state::NUMERIC_CONSTANT;
 			m_escape = false;
+			m_broken_escape = false;
 			process_numeric(ch);
 			return;
 		}
 	}
-	m_escape = (SLASH == ch) ? !m_escape : false;
+	if (m_broken_escape)
+		output_character(LINE_FEED);
+	m_escape = m_escape ? ((BACKSLASH == ch) && tail_is(SLASH)) : (SLASH == ch);
+	m_broken_escape = false;
 	output_character(ch);
 }
 
@@ -1125,18 +1174,65 @@ void cpp_cleaner::process_comment(char32_t ch)
 {
 	switch (ch)
 	{
-	case SLASH:
-		if (m_escape)
+	case LINE_FEED:
+		if (m_escape && tail_is(BACKSLASH))
+		{
+			m_broken_escape = true;
+		}
+		else
 		{
 			m_escape = false;
+			m_broken_escape = false;
+			output_character(ch);
+		}
+		break;
+	case SLASH:
+		if (m_broken_escape)
+		{
+			m_parse_state = parse_state::DEFAULT;
+			m_comment_line = 0U;
+			++m_broken_comment_delimiters;
+			assert(tail_is(BACKSLASH));
+			pop_tail();
+			assert(tail_is(ASTERISK));
+			pop_tail();
+			output_character(LINE_FEED);
+			output_character(ASTERISK);
+			output_character(ch);
+			reset_tab_limit();
+		}
+		else if (m_escape)
+		{
 			m_parse_state = parse_state::DEFAULT;
 			m_comment_line = 0U;
 			output_character(ch);
 			reset_tab_limit();
-			break;
 		}
+		else
+		{
+			output_character(ch);
+		}
+		m_escape = false;
+		m_broken_escape = false;
+		break;
+	case BACKSLASH:
+		if (m_broken_escape)
+		{
+			m_escape = false;
+			m_broken_escape = false;
+			output_character(LINE_FEED);
+		}
+		else if (m_escape)
+		{
+			m_escape = tail_is(ASTERISK);
+		}
+		output_character(ch);
+		break;
 	default:
+		if (m_broken_escape)
+			output_character(LINE_FEED);
 		m_escape = ASTERISK == ch;
+		m_broken_escape = false;
 		output_character(ch);
 	}
 }
@@ -1157,6 +1253,7 @@ void cpp_cleaner::process_line_comment(char32_t ch)
 			break;
 		}
 		m_parse_state = parse_state::DEFAULT;
+		[[fallthrough]];
 	default:
 		output_character(ch);
 	}
@@ -1195,9 +1292,24 @@ void cpp_cleaner::process_text(char32_t ch)
 		else if (tail_is(BACKSLASH))
 		{
 			++m_string_continuations;
-			replace_tail(DOUBLE_QUOTE);
-			output_character(ch);
-			output_character(DOUBLE_QUOTE);
+			if (m_escape)
+			{
+				replace_tail(DOUBLE_QUOTE);
+				output_character(ch);
+				output_character(DOUBLE_QUOTE);
+			}
+			else
+			{
+				pop_tail();
+				assert(tail_is(BACKSLASH));
+				pop_tail();
+				output_character(DOUBLE_QUOTE);
+				output_character(ch);
+				output_character(DOUBLE_QUOTE);
+				output_character(BACKSLASH);
+				m_escape = true;
+				return;
+			}
 		}
 		else
 		{
@@ -1245,12 +1357,14 @@ void cpp_cleaner::process_numeric(char32_t ch)
 		case UPPERCASE_B:
 			++m_uppercase_radix;
 			ch = LOWERCASE_B;
+			[[fallthrough]];
 		case LOWERCASE_B:
 			m_radix = 2U;
 			break;
 		case UPPERCASE_X:
 			++m_uppercase_radix;
 			ch = LOWERCASE_X;
+			[[fallthrough]];
 		case LOWERCASE_X:
 			m_radix = 16U;
 			break;
@@ -1511,6 +1625,7 @@ void lua_cleaner::process_default(char32_t ch)
 			m_block_line = m_input_line;
 			m_block_level = m_long_bracket_level;
 			m_parse_state = parse_state::LONG_STRING_CONSTANT;
+			[[fallthrough]];
 		default:
 			m_long_bracket_level = -1;
 		}
@@ -1538,6 +1653,7 @@ void lua_cleaner::process_short_comment(char32_t ch)
 			m_block_level = m_long_bracket_level;
 			m_parse_state = parse_state::LONG_COMMENT;
 			set_tab_limit();
+			[[fallthrough]];
 		default:
 			m_long_bracket_level = -1;
 		}
@@ -1627,6 +1743,289 @@ void lua_cleaner::process_long_string_constant(char32_t ch)
 {
 	// this works because they're both closed by a matching long bracket
 	process_long_comment(ch);
+}
+
+
+
+/***************************************************************************
+    JSON DATA CLEANER CLASS
+***************************************************************************/
+
+class json_cleaner : public cleaner_base
+{
+public:
+	template <typename OutputIt>
+	json_cleaner(OutputIt &&output, newline newline_mode, unsigned tab_width);
+
+	virtual bool affected() const override;
+	virtual void summarise(std::ostream &os) const override;
+
+protected:
+	void output_character(char32_t ch);
+
+private:
+	enum class parse_state
+	{
+		DEFAULT,
+		COMMENT,
+		LINE_COMMENT,
+		STRING_CONSTANT
+	};
+
+	virtual void process_characters(char32_t const *begin, char32_t const *end) override;
+	virtual void input_complete() override;
+
+	void process_default(char32_t ch);
+	void process_comment(char32_t ch);
+	void process_line_comment(char32_t ch);
+	void process_text(char32_t ch);
+
+	parse_state     m_parse_state   = parse_state::DEFAULT;
+	std::uint64_t   m_input_line    = 1U;
+	bool            m_escape        = false;
+	std::uint64_t   m_comment_line  = 0U;
+
+	std::uint64_t   m_tabs_escaped                  = 0U;
+	std::uint64_t   m_newlines_escaped              = 0U;
+	std::uint64_t   m_form_feeds_escaped            = 0U;
+	std::uint64_t   m_line_separators_escaped       = 0U;
+	std::uint64_t   m_paragraph_separators_escaped  = 0U;
+	std::uint64_t   m_c0_control_escaped            = 0U;
+	std::uint64_t   m_non_ascii                     = 0U;
+};
+
+
+template <typename OutputIt>
+json_cleaner::json_cleaner(
+		OutputIt &&output,
+		newline newline_mode,
+		unsigned tab_width)
+	: cleaner_base(std::forward<OutputIt>(output), newline_mode, tab_width)
+{
+}
+
+
+bool json_cleaner::affected() const
+{
+	return
+			cleaner_base::affected() ||
+			m_tabs_escaped ||
+			m_newlines_escaped ||
+			m_form_feeds_escaped ||
+			m_line_separators_escaped ||
+			m_paragraph_separators_escaped ||
+			m_c0_control_escaped ||
+			m_non_ascii;
+}
+
+
+void json_cleaner::summarise(std::ostream &os) const
+{
+	cleaner_base::summarise(os);
+	if (m_tabs_escaped)
+		util::stream_format(os, "%1$u tab(s) escaped\n", m_tabs_escaped);
+	if (m_newlines_escaped)
+		util::stream_format(os, "%1$u line feed(s) escaped\n", m_newlines_escaped);
+	if (m_form_feeds_escaped)
+		util::stream_format(os, "%1$u form feed(s) escaped\n", m_form_feeds_escaped);
+	if (m_line_separators_escaped)
+		util::stream_format(os, "%1$u line separator(s) escaped\n", m_line_separators_escaped);
+	if (m_paragraph_separators_escaped)
+		util::stream_format(os, "%1$u paragraph separator(s) escaped\n", m_paragraph_separators_escaped);
+	if (m_c0_control_escaped)
+		util::stream_format(os, "%1$u C0 control character(s) escaped\n", m_c0_control_escaped);
+	if (m_non_ascii)
+		util::stream_format(os, "%1$u non-ASCII character(s) replaced\n", m_non_ascii);
+}
+
+
+void json_cleaner::output_character(char32_t ch)
+{
+	switch (m_parse_state)
+	{
+	case parse_state::DEFAULT:
+		if (BASIC_LATIN_LAST < ch)
+		{
+			++m_non_ascii;
+			ch = QUESTION_MARK;
+		}
+		break;
+	case parse_state::COMMENT:
+	case parse_state::LINE_COMMENT:
+	case parse_state::STRING_CONSTANT:
+		break;
+	}
+
+	cleaner_base::output_character(ch);
+}
+
+
+void json_cleaner::process_characters(char32_t const *begin, char32_t const *end)
+{
+	while (begin != end)
+	{
+		char32_t const ch(*begin++);
+		switch (m_parse_state)
+		{
+		case parse_state::DEFAULT:
+			process_default(ch);
+			break;
+		case parse_state::COMMENT:
+			process_comment(ch);
+			break;
+		case parse_state::LINE_COMMENT:
+			process_line_comment(ch);
+			break;
+		case parse_state::STRING_CONSTANT:
+			process_text(ch);
+			break;
+		}
+
+		if (LINE_FEED == ch)
+			++m_input_line;
+	}
+}
+
+
+void json_cleaner::input_complete()
+{
+	switch (m_parse_state)
+	{
+	case parse_state::COMMENT:
+		throw std::runtime_error(util::string_format("unterminated multi-line comment beginning on line %1$u", m_comment_line));
+	case parse_state::STRING_CONSTANT:
+		throw std::runtime_error(util::string_format("unterminated string literal on line %1$u", m_input_line));
+	default:
+		break;
+	}
+}
+
+
+void json_cleaner::process_default(char32_t ch)
+{
+	switch (ch)
+	{
+	case DOUBLE_QUOTE:
+		m_parse_state = parse_state::STRING_CONSTANT;
+		break;
+	case ASTERISK:
+		if (m_escape)
+		{
+			m_parse_state = parse_state::COMMENT;
+			m_comment_line = m_input_line;
+			set_tab_limit();
+		}
+		break;
+	case SLASH:
+		if (m_escape)
+			m_parse_state = parse_state::LINE_COMMENT;
+		break;
+	}
+	m_escape = (SLASH == ch) && !m_escape;
+	output_character(ch);
+}
+
+
+void json_cleaner::process_comment(char32_t ch)
+{
+	switch (ch)
+	{
+	case SLASH:
+		if (m_escape)
+		{
+			m_parse_state = parse_state::DEFAULT;
+			m_comment_line = 0U;
+			output_character(ch);
+			reset_tab_limit();
+		}
+		else
+		{
+			output_character(ch);
+		}
+		m_escape = false;
+		break;
+	default:
+		m_escape = ASTERISK == ch;
+		output_character(ch);
+	}
+}
+
+
+void json_cleaner::process_line_comment(char32_t ch)
+{
+	switch (ch)
+	{
+	case LINE_FEED:
+		m_parse_state = parse_state::DEFAULT;
+		[[fallthrough]];
+	default:
+		output_character(ch);
+	}
+}
+
+
+void json_cleaner::process_text(char32_t ch)
+{
+	switch (ch)
+	{
+	case HORIZONTAL_TAB:
+		++m_tabs_escaped;
+		if (!m_escape)
+			output_character(BACKSLASH);
+		output_character(char32_t(std::uint8_t('t')));
+		break;
+	case LINE_FEED:
+		++m_newlines_escaped;
+		if (!m_escape)
+			output_character(BACKSLASH);
+		output_character(char32_t(std::uint8_t('n')));
+		break;
+	case FORM_FEED:
+		++m_form_feeds_escaped;
+		if (!m_escape)
+			output_character(BACKSLASH);
+		output_character(char32_t(std::uint8_t('f')));
+		break;
+	case LINE_SEPARATOR:
+		++m_line_separators_escaped;
+		if (!m_escape)
+			output_character(BACKSLASH);
+		output_character(char32_t(std::uint8_t('u')));
+		output_character(char32_t(std::uint8_t('2')));
+		output_character(char32_t(std::uint8_t('0')));
+		output_character(char32_t(std::uint8_t('2')));
+		output_character(char32_t(std::uint8_t('8')));
+		break;
+	case PARAGRAPH_SEPARATOR:
+		++m_paragraph_separators_escaped;
+		if (!m_escape)
+			output_character(BACKSLASH);
+		output_character(char32_t(std::uint8_t('u')));
+		output_character(char32_t(std::uint8_t('2')));
+		output_character(char32_t(std::uint8_t('0')));
+		output_character(char32_t(std::uint8_t('2')));
+		output_character(char32_t(std::uint8_t('9')));
+		break;
+	default:
+		if (C0_CONTROL_LAST >= ch)
+		{
+			++m_c0_control_escaped;
+			if (!m_escape)
+				output_character(BACKSLASH);
+			output_character(char32_t(std::uint8_t('u')));
+			output_character(char32_t(std::uint8_t('0')));
+			output_character(char32_t(std::uint8_t('0')));
+			output_character(char32_t(std::uint8_t('0') + (ch / 0x10U)));
+			output_character(char32_t(std::uint8_t('0') + (ch % 0x10U)));
+		}
+		else
+		{
+			output_character(ch);
+			if (!m_escape && (DOUBLE_QUOTE == ch))
+				m_parse_state = parse_state::DEFAULT;
+		}
+	}
+	m_escape = (BACKSLASH == ch) && !m_escape;
 }
 
 
@@ -1785,6 +2184,13 @@ bool is_lua_source_extension(char const *ext)
 }
 
 
+bool is_json_extension(char const *ext)
+{
+	return
+			!core_stricmp(ext, ".json");
+}
+
+
 bool is_xml_extension(char const *ext)
 {
 	return
@@ -1806,7 +2212,7 @@ int main(int argc, char *argv[])
 {
 	bool                    keep_backup(false);
 	bool                    dry_run(false);
-#if defined(WIN32)
+#if defined(_WIN32)
 	cleaner_base::newline   newline_mode(cleaner_base::newline::DOS);
 #else
 	cleaner_base::newline   newline_mode(cleaner_base::newline::UNIX);
@@ -1848,13 +2254,13 @@ int main(int argc, char *argv[])
 	{
 		// open the file
 		util::core_file::ptr infile;
-		osd_file::error const err(util::core_file::open(argv[i], OPEN_FLAG_READ, infile));
-		if (osd_file::error::NONE != err)
+		std::error_condition const err(util::core_file::open(argv[i], OPEN_FLAG_READ, infile));
+		if (err)
 		{
 			if (affected)
 				std::cerr << std::endl;
 			affected = true;
-			util::stream_format(std::cerr, "Can't open %1$s\n", argv[i]);
+			util::stream_format(std::cerr, "Can't open %1$s (%2$s)\n", argv[i], err.message());
 			++failures;
 			continue;
 		}
@@ -1865,12 +2271,15 @@ int main(int argc, char *argv[])
 			char const *const ext(std::strrchr(argv[i], '.'));
 			bool const is_c_file(ext && is_c_source_extension(ext));
 			bool const is_lua_file(ext && is_lua_source_extension(ext));
+			bool const is_json_file(ext && is_json_extension(ext));
 			bool const is_xml_file(ext && is_xml_extension(ext));
 			std::unique_ptr<cleaner_base> cleaner;
 			if (is_c_file)
 				cleaner = std::make_unique<cpp_cleaner>(std::back_inserter(output), newline_mode, 4U);
 			else if (is_lua_file)
 				cleaner = std::make_unique<lua_cleaner>(std::back_inserter(output), newline_mode, 4U);
+			else if (is_json_file)
+				cleaner = std::make_unique<json_cleaner>(std::back_inserter(output), newline_mode, 4U);
 			else if (is_xml_file)
 				cleaner = std::make_unique<xml_cleaner>(std::back_inserter(output), newline_mode, 4U);
 			else
@@ -1878,9 +2287,15 @@ int main(int argc, char *argv[])
 
 			// read/process in chunks
 			output.clear();
-			std::uint64_t remaining(infile->size());
-			std::uint32_t block;
-			while (remaining && (0U != (block = infile->read(original, (std::min)(std::uint64_t(sizeof(original)), remaining)))))
+			std::uint64_t remaining;
+			if (infile->length(remaining))
+			{
+				util::stream_format(std::cerr, "Can't get length of %1$s\n", argv[i]);
+				++failures;
+				continue;
+			}
+			std::size_t block;
+			while (remaining && !infile->read(original, (std::min)(std::uint64_t(sizeof(original)), remaining), block) && block)
 			{
 				remaining -= block;
 				cleaner->process(original, original + block);

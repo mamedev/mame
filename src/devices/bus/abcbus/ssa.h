@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-	Luxor ABC-80 Owoco Super Smartaid cartridge emulation
+    Luxor ABC-80 Owoco Super Smartaid cartridge emulation
 
 *********************************************************************/
 
@@ -12,7 +12,6 @@
 #pragma once
 
 #include "abcbus.h"
-#include "machine/nvram.h"
 
 
 
@@ -20,15 +19,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> super_smartaid_t
+// ======================> abc_super_smartaid_device
 
-class super_smartaid_t : public device_t,
+class abc_super_smartaid_device : public device_t,
 						 public device_abcbus_card_interface,
 						 public device_nvram_interface
 {
 public:
 	// construction/destruction
-	super_smartaid_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc_super_smartaid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -41,8 +40,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override { }
-	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram, m_nvram.bytes()); } }
-	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.bytes()); } }
+	virtual bool nvram_read(util::read_stream &file) override { size_t actual; return !file.read(m_nvram, m_nvram.bytes(), actual) && actual == m_nvram.bytes(); }
+	virtual bool nvram_write(util::write_stream &file) override { size_t actual; return !file.write(m_nvram, m_nvram.bytes(), actual) && actual == m_nvram.bytes(); }
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override { m_bus->write_cs(data); }
@@ -61,13 +60,13 @@ private:
 	required_memory_region m_rom_1;
 	required_memory_region m_rom_2;
 	required_memory_region m_prom;
-	optional_shared_ptr<uint8_t> m_nvram;
+	memory_share_creator<uint8_t> m_nvram;
 	uint8_t m_rom_bank;
 	uint8_t m_prom_bank;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(SUPER_SMARTAID, super_smartaid_t)
+DECLARE_DEVICE_TYPE(ABC_SUPER_SMARTAID, abc_super_smartaid_device)
 
 #endif // MAME_BUS_ABCBUS_SSA_H

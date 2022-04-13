@@ -64,7 +64,7 @@
     BLACK SCREEN.
 
     In the real environment, the HSGPL has usually been set up on delivery.
-    In MESS we have to create a suitable HSGPL memory content. Best practice
+    In MAME we have to create a suitable HSGPL memory content. Best practice
     is to start the TI-99/4A console with EVPC support (driver ti99_4ev) with
     a plugged-in HSGPL and to go through the setup process there.
     Finally, the nvram files of the HSGPL must be copied into this driver's nvram
@@ -97,7 +97,7 @@
     Video and sound
     ---------------
     The SGCPU relies on the EVPC or EVPC2 card to provide video capabilities.
-    This card (rel.1) is emulated in MESS and is based on the v9938 video
+    This card (rel.1) is emulated in MAME and is based on the v9938 video
     display processor.
     In order to route the VDP interrupt to the SGCPU card, the previously
     unused LCP* line in the Peripheral Expansion Box is used.
@@ -116,7 +116,6 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/peb/peribox.h"
 #include "cpu/tms9900/tms9900.h"
@@ -125,21 +124,25 @@
 #include "machine/tms9901.h"
 #include "speaker.h"
 
-#define TI99_SGCPU_TAG "sgcpu"
-#define TI99_AMSRAM_TAG "amsram1meg"
+#define SGCPU_AMSRAM_TAG  "amsram1meg"
+#define SGCPU_PADRAM_TAG  "scratchpad"
+#define SGCPU_TMS9901_TAG     "tms9901"
 
 // Debugging
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_ILLWRITE    (1U<<2)
 #define LOG_READY       (1U<<3)
-#define LOG_INT         (1U<<4)
+#define LOG_INTERRUPTS  (1U<<4)
 #define LOG_ADDRESS     (1U<<5)
 #define LOG_MEM         (1U<<6)
 #define LOG_MUX         (1U<<7)
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
+
+
+namespace {
 
 class ti99_4p_state : public driver_device
 {
@@ -147,14 +150,15 @@ public:
 	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TI_TMS9901_TAG),
+		m_tms9901(*this, SGCPU_TMS9901_TAG),
 		m_cassette(*this, "cassette"),
 		m_peribox(*this, TI_PERIBOX_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
-		m_scratchpad(*this, TI99_PADRAM_TAG),
-		m_amsram(*this, TI99_AMSRAM_TAG),
+		m_scratchpad(*this, SGCPU_PADRAM_TAG),
+		m_amsram(*this, SGCPU_AMSRAM_TAG),
 		m_keyboard(*this, "COL%u", 0U),
-		m_alpha(*this, "ALPHA")
+		m_alpha(*this, "ALPHA"),
+		m_rom(*this, "maincpu")
 	{ }
 
 	void ti99_4p_60hz(machine_config &config);
@@ -177,7 +181,7 @@ private:
 	// CRU (Communication Register Unit) handling
 	uint8_t cruread(offs_t offset);
 	void cruwrite(offs_t offset, uint8_t data);
-	uint8_t read_by_9901(offs_t offset);
+	uint8_t psi_input(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
@@ -194,6 +198,10 @@ private:
 	void memmap_setaddress(address_map &map);
 
 	void    datamux_clock_in(int clock);
+
+	// Latch for 9901 INT1 and INT2 lines
+	int  m_int1;
+	int  m_int2;
 
 	// Devices
 	required_device<tms9900_device>        m_cpu;
@@ -214,10 +222,10 @@ private:
 	void set_keyboard_column(int number, int data);
 
 	// Pointer to EPROM
-	uint16_t *m_rom;
+	required_region_ptr<uint16_t> m_rom;
 
 	// First joystick. 6 for TI-99/4A
-	int     m_firstjoy;
+	static constexpr int FIRSTJOY=6;
 
 	int     m_keyboard_column;
 	int     m_check_alphalock;
@@ -274,10 +282,6 @@ private:
 	// Mapper registers
 	uint8_t m_mapper[16];
 
-	// Latch for 9901 INT2, INT1 lines
-	int     m_9901_int;
-	void    set_9901_int(int line, line_state state);
-
 	int     m_ready_prev;       // for debugging purposes only
 };
 
@@ -302,7 +306,6 @@ void ti99_4p_state::memmap_setaddress(address_map &map)
 void ti99_4p_state::crumap(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(ti99_4p_state::cruread), FUNC(ti99_4p_state::cruwrite));
-	map(0x0000, 0x03ff).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 /*
@@ -377,7 +380,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('-')
 
 	PORT_START("ALPHA") /* one more port for Alpha line */
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
 
 INPUT_PORTS_END
@@ -692,6 +695,12 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 */
 void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 {
+	// Internal 9901
+	// We cannot use the map because device in the Peribox may want to see the
+	// CRU address on the bus (see sidmaster)
+	if ((offset & 0xfc00)==0)
+		m_tms9901->write(offset & 0x3f, data);
+
 	int addroff = offset<<1;
 
 	if ((addroff & 0xff00)==MAP_CRU_BASE)
@@ -717,6 +726,13 @@ void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 uint8_t ti99_4p_state::cruread(offs_t offset)
 {
 	uint8_t value = 0;
+
+	// Internal 9901
+	// We cannot use the map because devices in the Peribox may want to see the
+	// CRU address on the bus (see sidmaster)
+	if ((offset & 0xfc00)==0)
+		value = m_tms9901->read(offset & 0x3f);
+
 	m_peribox->crureadz(offset<<1, &value);
 	return value;
 }
@@ -725,60 +741,102 @@ uint8_t ti99_4p_state::cruread(offs_t offset)
     Keyboard/tape control
 ****************************************************************************/
 
-uint8_t ti99_4p_state::read_by_9901(offs_t offset)
+uint8_t ti99_4p_state::psi_input(offs_t offset)
 {
-	int answer=0;
-
-	switch (offset & 0x03)
+	switch (offset)
 	{
-	case tms9901_device::CB_INT7:
-		// Read pins INT3*-INT7* of TI99's 9901.
-		// bit 1: INT1 status
-		// bit 2: INT2 status
-		// bit 3-7: keyboard status bits 0 to 4
-		//
-		// |K|K|K|K|K|I2|I1|C|
-		//
-		if (m_keyboard_column >= m_firstjoy) // joy 1 and 2
-		{
-			answer = m_joyport->read_port();
-		}
+	case tms9901_device::INT1:
+		return (m_int1==CLEAR_LINE)? 1 : 0;
+	case tms9901_device::INT2:
+		return (m_int2==CLEAR_LINE)? 1 : 0;
+	case tms9901_device::INT3:
+	case tms9901_device::INT4:
+	case tms9901_device::INT5:
+	case tms9901_device::INT6:
+		// Keyboard ACTIVE_LOW (s.o.)
+		// Joysticks ACTIVE_LOW (handset.cpp)
+		if (m_keyboard_column >= 6)
+			return BIT(m_joyport->read_port(), offset-tms9901_device::INT3);
+		else
+			return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
+
+	case tms9901_device::INT7_P15:
+		if (m_keyboard_column >= 6) // Joysticks
+			return BIT(m_joyport->read_port(), offset-tms9901_device::INT3);
 		else
 		{
-			answer = m_keyboard[m_keyboard_column]->read();
+			if (m_check_alphalock)
+			{
+				return BIT(m_alpha->read(), offset-tms9901_device::INT3);
+			}
+			else
+				return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
 		}
-		if (m_check_alphalock)
-		{
-			answer &= ~(m_alpha->read());
-		}
-		answer = (answer << 3) | m_9901_int;
-		break;
 
-	case tms9901_device::INT8_INT15:
-		// Read pins int8_t*-INT15* of TI99's 9901.
-		// bit 0-2: keyboard status bits 5 to 7
-		// bit 3: tape input mirror
-		// bit 5-7: weird, not emulated
-
-		// |1|1|1|1|0|K|K|K|
-		if (m_keyboard_column >= m_firstjoy) answer = 0x07;
-		else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
-		answer |= 0xf0;
-		break;
-
-	case tms9901_device::P0_P7:
-		break;
-
-	case tms9901_device::P8_P15:
-		// Read pins P8-P15 of TI99's 9901.
-		// bit 26: high
-		// bit 27: tape input
-		answer = 4;
-		if (m_cassette->input() > 0) answer |= 8;
-		break;
+	case tms9901_device::INT8_P14:
+	case tms9901_device::INT9_P13:
+	case tms9901_device::INT10_P12:
+		if (m_keyboard_column >= FIRSTJOY)  // no joystick lines after /INT7
+			return 1;
+		else
+			return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
+	case tms9901_device::INT11_P11:
+		// CS2 is write-only
+		return (m_cassette->input() > 0);
+	default:
+		return 1;
 	}
-	return answer;
 }
+
+/*  switch (offset & 0x03)
+    {
+    case tms9901_device::CB_INT7:
+        // Read pins INT3*-INT7* of TI99's 9901.
+        // bit 1: INT1 status
+        // bit 2: INT2 status
+        // bit 3-7: keyboard status bits 0 to 4
+        //
+        // |K|K|K|K|K|I2|I1|C|
+        //
+        if (m_keyboard_column >= FIRSTJOY) // joy 1 and 2
+        {
+            answer = m_joyport->read_port();
+        }
+        else
+        {
+            answer = m_keyboard[m_keyboard_column]->read();
+        }
+        if (m_check_alphalock)
+        {
+            answer &= ~(m_alpha->read());
+        }
+        answer = (answer << 3) | m_9901_int;
+        break;
+
+    case tms9901_device::INT8_INT15:
+        // Read pins int8_t*-INT15* of TI99's 9901.
+        // bit 0-2: keyboard status bits 5 to 7
+        // bit 3: tape input mirror
+        // bit 5-7: weird, not emulated
+
+        // |1|1|1|1|0|K|K|K|
+        if (m_keyboard_column >= FIRSTJOY) answer = 0x07;
+        else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
+        answer |= 0xf0;
+        break;
+
+    case tms9901_device::P0_P7:
+        break;
+
+    case tms9901_device::P8_P15:
+        // Read pins P8-P15 of TI99's 9901.
+        // bit 26: high
+        // bit 27: tape input
+        answer = 4;
+        if (m_cassette->input() > 0) answer |= 8;
+        break;
+    }
+    */
 
 /*
     WRITE key column select (P2-P4)
@@ -788,9 +846,9 @@ void ti99_4p_state::set_keyboard_column(int number, int data)
 	if (data!=0)    m_keyboard_column |= 1 << number;
 	else            m_keyboard_column &= ~(1 << number);
 
-	if (m_keyboard_column >= m_firstjoy)
+	if (m_keyboard_column >= FIRSTJOY)
 	{
-		m_joyport->write_port(m_keyboard_column - m_firstjoy + 1);
+		m_joyport->write_port(m_keyboard_column - FIRSTJOY + 1);
 	}
 }
 
@@ -874,23 +932,16 @@ WRITE_LINE_MEMBER( ti99_4p_state::ready_line )
 	ready_join();
 }
 
-void ti99_4p_state::set_9901_int( int line, line_state state)
-{
-	m_tms9901->set_single_int(line, state);
-	// We latch the value for the read operation. Mind the negative logic.
-	if (state==CLEAR_LINE) m_9901_int |= (1<<line);
-	else m_9901_int &= ~(1<<line);
-}
-
 WRITE_LINE_MEMBER( ti99_4p_state::extint )
 {
-	LOGMASKED(LOG_INT, "EXTINT level = %02x\n", state);
-	set_9901_int(1, (line_state)state);
+	LOGMASKED(LOG_INTERRUPTS, "EXTINT level = %02x\n", state);
+	m_int1 = (line_state)state;
+	m_tms9901->set_int_line(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 {
-	LOGMASKED(LOG_INT, "Setting a not connected line ... ignored\n");
+	LOGMASKED(LOG_INTERRUPTS, "Setting a not connected line ... ignored\n");
 }
 
 /*
@@ -931,14 +982,11 @@ void ti99_4p_state::driver_start()
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 
-	m_firstjoy = 6;
-
 	m_sysready = ASSERT_LINE;
 	m_muxready = true;
 
-	m_rom = (uint16_t*)(memregion("maincpu")->base());
-
-	save_item(NAME(m_firstjoy));
+	save_item(NAME(m_int1));
+	save_item(NAME(m_int2));
 	save_item(NAME(m_keyboard_column));
 	save_item(NAME(m_check_alphalock));
 	save_item(NAME(m_internal_dsr));
@@ -960,7 +1008,6 @@ void ti99_4p_state::driver_start()
 	save_item(NAME(m_highbyte));
 	save_item(NAME(m_latch));
 	save_pointer(NAME(m_mapper),16);
-	save_item(NAME(m_9901_int));
 }
 
 /*
@@ -968,7 +1015,9 @@ void ti99_4p_state::driver_start()
 */
 WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 {
-	set_9901_int(2, (line_state)state);
+	LOGMASKED(LOG_INTERRUPTS, "VDP INT2 from EVPC on tms9901, level=%d\n", state);
+	m_int2 = (line_state)state;
+	m_tms9901->set_int_line(2, state);
 }
 
 /*
@@ -976,11 +1025,11 @@ WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 */
 void ti99_4p_state::driver_reset()
 {
-	set_9901_int(12, CLEAR_LINE);
-
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
-	m_9901_int = 0x03; // INT2* and INT1* set to 1, i.e. inactive
+	m_int1 = m_int2 = CLEAR_LINE;
+	m_peribox->reset_in(ASSERT_LINE);
+	m_peribox->reset_in(CLEAR_LINE);
 }
 
 /*
@@ -1000,7 +1049,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 
 	// tms9901
 	TMS9901(config, m_tms9901, 0);
-	m_tms9901->read_cb().set(FUNC(ti99_4p_state::read_by_9901));
+	m_tms9901->read_cb().set(FUNC(ti99_4p_state::psi_input));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4p_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4p_state::keyC1));
 	m_tms9901->p_out_cb(4).set(FUNC(ti99_4p_state::keyC2));
@@ -1008,7 +1057,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_tms9901->p_out_cb(6).set(FUNC(ti99_4p_state::cs_motor));
 	m_tms9901->p_out_cb(8).set(FUNC(ti99_4p_state::audio_gate));
 	m_tms9901->p_out_cb(9).set(FUNC(ti99_4p_state::cassette_output));
-	m_tms9901->intlevel_cb().set(FUNC(ti99_4p_state::tms9901_interrupt));
+	m_tms9901->intreq_cb().set(FUNC(ti99_4p_state::tms9901_interrupt));
 
 	// Peripheral expansion box (SGCPU composition)
 	TI99_PERIBOX_SG(config, m_peribox, 0);
@@ -1020,10 +1069,10 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_peribox->lcp_cb().set(FUNC(ti99_4p_state::video_interrupt_in));
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
-	RAM(config, TI99_PADRAM_TAG).set_default_size("1K").set_default_value(0);
+	RAM(config, SGCPU_PADRAM_TAG).set_default_size("1K").set_default_value(0);
 
 	// AMS RAM 1 MiB
-	RAM(config, TI99_AMSRAM_TAG).set_default_size("1M").set_default_value(0);
+	RAM(config, SGCPU_AMSRAM_TAG).set_default_size("1M").set_default_value(0);
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();
@@ -1033,13 +1082,15 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
 }
 
-
 ROM_START(ti99_4p)
 	/*CPU memory space*/
 	ROM_REGION16_BE(0x10000, "maincpu", 0)
 	ROM_LOAD16_BYTE("sgcpu_hb.bin", 0x0000, 0x8000, CRC(aa100730) SHA1(35e585b2dcd3f2a0005bebb15ede6c5b8c787366) ) /* system ROMs */
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
 ROM_END
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT    CLASS          INIT        COMPANY                 FULLNAME                FLAGS
 COMP( 1996, ti99_4p, 0,      0,      ti99_4p_60hz, ti99_4p, ti99_4p_state, empty_init, "System-99 User Group", "SGCPU (aka TI-99/4P)", MACHINE_SUPPORTS_SAVE )

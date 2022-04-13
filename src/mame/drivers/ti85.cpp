@@ -2,7 +2,7 @@
 // copyright-holders:Krzysztof Strzecha,Jon Sturm
 /***************************************************************************
 TI-85 and TI-86 drivers by Krzysztof Strzecha
-TI-83 Plus, TI-84 Plus, and Siliver Edition support by Jon Sturm
+TI-83 Plus, TI-84 Plus, and Silver Edition support by Jon Sturm
 
 Notes:
 1. After start TI-85 waits for ON key interrupt, so press ON key to start
@@ -205,6 +205,7 @@ TI-86 ports:
 #include "includes/ti85.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/z80/ez80.h"
 #include "imagedev/snapquik.h"
 #include "machine/bankdev.h"
 #include "screen.h"
@@ -285,7 +286,7 @@ void ti85_state::ti83p_io(address_map &map)
 	map(0x0007, 0x0007).rw(FUNC(ti85_state::ti86_port_0006_r), FUNC(ti85_state::ti83p_port_0007_w));
 	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
 	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
-//  AM_RANGE(0x0014, 0x0014) AM_WRITE(ti83p_port_0014_w )
+//  map(0x0014, 0x0014).w(FUNC(ti85_state::ti83p_port_0014_w));
 }
 
 void ti85_state::ti83pse_io(address_map &map)
@@ -615,11 +616,12 @@ void ti85_state::ti85(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(ti85_state::ti85d)
+void ti85_state::ti85d(machine_config &config)
+{
 	ti85(config);
-	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(ti85_state::snapshot_cb));
 	//TI85SERIAL(config, "tiserial");
-MACHINE_CONFIG_END
+}
 
 
 void ti85_state::ti82(machine_config &config)
@@ -662,16 +664,17 @@ void ti85_state::ti83(machine_config &config)
 	T6A04(config, "t6a04", 0).set_size(96, 64);
 }
 
-MACHINE_CONFIG_START(ti85_state::ti86)
+void ti85_state::ti86(machine_config &config)
+{
 	ti85(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti86_mem);
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti86_io);
 
-	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
-	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86)
+	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85)
 
-	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav")
-MACHINE_CONFIG_END
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(ti85_state::snapshot_cb));
+}
 
 void ti85_state::ti83p(machine_config &config)
 {
@@ -714,7 +717,7 @@ void ti85_state::ti83pse(machine_config &config)
 	m_membank[3]->set_map(&ti85_state::ti83pse_banked_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83pse )
-	FUJITSU_29F160T(config.replace(), m_flash, 0);
+	FUJITSU_29F160TE(config.replace(), m_flash, 0);
 }
 
 void ti85_state::ti84p(machine_config &config)
@@ -736,6 +739,15 @@ void ti85_state::ti84pse(machine_config &config)
 {
 	ti83pse(config);
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
+}
+
+void ti85_state::ti84pce(machine_config &config)
+{
+	ti84pse(config);
+
+	EZ80(config.replace(), m_maincpu, 15000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti83p_asic_mem);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83pse_io);
 }
 
 void ti85_state::ti73(machine_config &config)
@@ -1091,62 +1103,62 @@ ROM_END
 ROM_START (ti84pce)
 	ROM_REGION (0x400000, "flash",0)
 	ROM_DEFAULT_BIOS("v530")
-	ROM_SYSTEM_BIOS( 0, "v500", "V 5.00" )
+	ROM_SYSTEM_BIOS( 0, "v500", "V 5.0.0.0089" )
 	ROMX_LOAD( "ti84pcev500.bin", 0x00000, 0x400000, CRC(e31ecdf9) SHA1(7f93a2e17b75debdeb5704e07092c48b3abfec9e), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v510", "V 5.10" )
+	ROM_SYSTEM_BIOS( 1, "v510", "V 5.1.0.0110" )
 	ROMX_LOAD( "ti84pcev510.bin", 0x00000, 0x400000, CRC(042f7031) SHA1(6754edc7aefc9f74247bf5ff60e7546f77cd2898), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "v515", "V 5.15" )
+	ROM_SYSTEM_BIOS( 2, "v515", "V 5.1.5.0019" )
 	ROMX_LOAD( "ti84pcev515.bin", 0x00000, 0x400000, CRC(2a958b6a) SHA1(6302ab3b4e3fca1ee6a05a3441b086ef7a57bee8), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "v520", "V 5.20" )
+	ROM_SYSTEM_BIOS( 3, "v520", "V 5.2.0.0035" )
 	ROMX_LOAD( "ti84pcev520.bin", 0x00000, 0x400000, CRC(a59c6633) SHA1(d02f20aa3c895254a0974db7e424dd91d075f859), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 4, "v521", "V 5.21" )
+	ROM_SYSTEM_BIOS( 4, "v521", "V 5.2.1.0042" )
 	ROMX_LOAD( "ti84pcev521.bin", 0x00000, 0x400000, CRC(89bc2ae1) SHA1(b0b83b2b0158e5b382fc12af95aa2a2e41f3ce6d), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 5, "v522", "V 5.22" )
+	ROM_SYSTEM_BIOS( 5, "v522", "V 5.2.2.0043" )
 	ROMX_LOAD( "ti84pcev522.bin", 0x00000, 0x400000, CRC(49ce1768) SHA1(f949c8f2832edd33a1b0dd4da0ab4c1f23e47b21), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS( 6, "v530", "V 5.30" )
+	ROM_SYSTEM_BIOS( 6, "v530", "V 5.3.0.0042" )
 	ROMX_LOAD( "ti84pcev530.bin", 0x00000, 0x400000, CRC(c72f36b8) SHA1(6856fb2a9d0a2e338a89b91bb7680180a69482d3), ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 7, "v531", "V 5.31" )
+	ROM_SYSTEM_BIOS( 7, "v531", "V 5.3.1.0058" )
 	ROMX_LOAD( "ti84pcev531.bin", 0x00000, 0x400000, CRC(6d269f68) SHA1(9f9321a0cff17c331c92be127ec67ef67317968b), ROM_BIOS(7) )
 ROM_END
 
 ROM_START (ti83pcev15)
 	ROM_REGION (0x400000, "flash",0)
-	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
-	ROM_SYSTEM_BIOS( 0, "v515", "V 5.15" )
+	ROM_DEFAULT_BIOS("v530") // 5.3.0.0042 is the default because 5.3.1.0058 disables some features
+	ROM_SYSTEM_BIOS( 0, "v515", "V 5.1.5.0019" )
 	ROMX_LOAD( "ti83pcev15v515.bin", 0x00000, 0x400000, CRC(f924d8e6) SHA1(ffb100c0d0478c414e7ba4dd9d73791d026b40ca), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v520", "V 5.20" )
+	ROM_SYSTEM_BIOS( 1, "v520", "V 5.2.0.0035" )
 	ROMX_LOAD( "ti83pcev15v520.bin", 0x00000, 0x400000, CRC(a403db1a) SHA1(a565d96e75bed354483c6904b9ee2b8054adc31e), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "v521", "V 5.21" )
+	ROM_SYSTEM_BIOS( 2, "v521", "V 5.2.1.0042" )
 	ROMX_LOAD( "ti83pcev15v521.bin", 0x00000, 0x400000, CRC(1dc2e3e3) SHA1(d8e44e1a8a6591b289766a881a81d33eca9a0ecc), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "v522", "V 5.22" )
+	ROM_SYSTEM_BIOS( 3, "v522", "V 5.2.2.0043" )
 	ROMX_LOAD( "ti83pcev15v522.bin", 0x00000, 0x400000, CRC(6971746d) SHA1(321c7aeda6af8b42742d080e802979188421e06a), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 4, "v530", "V 5.30" )
+	ROM_SYSTEM_BIOS( 4, "v530", "V 5.3.0.0042" )
 	ROMX_LOAD( "ti83pcev15v530.bin", 0x00000, 0x400000, CRC(08ae7388) SHA1(6d9d98d090ac1b250d1f8ba8ef7c26eb448e7f8c), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 5, "v531", "V 5.31" )
+	ROM_SYSTEM_BIOS( 5, "v531", "V 5.3.1.0058" )
 	ROMX_LOAD( "ti83pcev15v531.bin", 0x00000, 0x400000, CRC(6643adb3) SHA1(b380e15946c1749a56600d18fee7d9d3c658dee3), ROM_BIOS(5) )
 ROM_END
 
 ROM_START (ti84pcev15)
 	ROM_REGION (0x400000, "flash",0)
-	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
-	ROM_SYSTEM_BIOS( 0, "v515", "V 5.15" )
+	ROM_DEFAULT_BIOS("v530") // 5.3.0.0042 is the default because 5.3.1.0058 disables some features
+	ROM_SYSTEM_BIOS( 0, "v515", "V 5.1.5.0019" )
 	ROMX_LOAD( "ti84pcev15v515.bin", 0x00000, 0x400000, CRC(0318a913) SHA1(44256e23708c71b8f63660d3100e767d597c377f), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v520", "V 5.20" )
+	ROM_SYSTEM_BIOS( 1, "v520", "V 5.2.0.0035" )
 	ROMX_LOAD( "ti84pcev15v520.bin", 0x00000, 0x400000, CRC(c2029323) SHA1(827c1e7ead58f4eabe5b7b942d0f24abd46f1633), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "v521", "V 5.21" )
+	ROM_SYSTEM_BIOS( 2, "v521", "V 5.2.1.0042" )
 	ROMX_LOAD( "ti84pcev15v521.bin", 0x00000, 0x400000, CRC(880eefc9) SHA1(3449363553c093b6bb555306d91a4dd6dac8e891), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "v522", "V 5.22" )
+	ROM_SYSTEM_BIOS( 3, "v522", "V 5.2.2.0043" )
 	ROMX_LOAD( "ti84pcev15v522.bin", 0x00000, 0x400000, CRC(b95fefd9) SHA1(db1515b3bd4eebeb5ee3c29597991fc7f1e8b84e), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 4, "v530", "V 5.30" )
+	ROM_SYSTEM_BIOS( 4, "v530", "V 5.3.0.0042" )
 	ROMX_LOAD( "ti84pcev15v530.bin", 0x00000, 0x400000, CRC(0148cc26) SHA1(72a10379bbd9d427c6e73afa9fe316cbd502f53c), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 5, "v531", "V 5.31" )
+	ROM_SYSTEM_BIOS( 5, "v531", "V 5.3.1.0058" )
 	ROMX_LOAD( "ti84pcev15v531.bin", 0x00000, 0x400000, CRC(86511ea0) SHA1(ff14ec454fd1e0a2c436b4eed1eefca0d16aabfb), ROM_BIOS(5) )
 ROM_END
 
 ROM_START (ti84pcev30)
 	ROM_REGION (0x400000, "flash",0)
-	ROM_DEFAULT_BIOS("v530") // 5.30 is the default because 5.31 disables some features
-	ROM_SYSTEM_BIOS( 0, "v530", "V 5.30" )
+	ROM_DEFAULT_BIOS("v530") // 5.3.0.0042 is the default because 5.3.1.0058 disables some features
+	ROM_SYSTEM_BIOS( 0, "v530", "V 5.3.0.0042" )
 	ROMX_LOAD( "ti84pcev30v530.bin", 0x00000, 0x400000, CRC(cc7a7047) SHA1(0d348e60dc57276b1f8d5ff87935e47cdd27455c), ROM_BIOS(0) )
 ROM_END
 
@@ -1159,21 +1171,21 @@ COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state, empty_init,
 COMP( 1990, ti81,       0,       0,      ti81,    ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81",                                           MACHINE_NO_SOUND_HW )
 COMP( 1994, ti81v2,     ti81,    0,      ti81v2,  ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81 v2.0",                                      MACHINE_NO_SOUND_HW )
 COMP( 1993, ti82,       0,       0,      ti82,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-82",                                           MACHINE_NO_SOUND_HW )
-COMP( 1996, ti83,       0,       0,      ti83,    ti83,  ti85_state, empty_init, "Texas Instruments", "TI-83",                                           MACHINE_NO_SOUND_HW )
+COMP( 1996, ti83,       0,       0,      ti83,    ti83,  ti85_state, empty_init, "Texas Instruments", "TI-83",                                           MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 1999, ti83p,      0,       0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 20??, ti83pb,     ti83p,   0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2001, ti83pse,    0,       0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 20??, ti83pseb,   ti83pse, 0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 201?, ti83pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Premium CE (Boot Code 5.1.5.0014)",         MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2015, ti83pcev15, ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Premium CE (Boot Code 5.1.5.0014)",         MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84p,      0,       0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 200?, ti84pv2,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2011, ti84pv3,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.03)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.0)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pcsev2, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.2)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2015, ti84pce,    ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.0.0.0089)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.1.5.0014)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.0.0037)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2013, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.0)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 201?, ti84pcsev2, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.2)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2015, ti84pce,    ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.0.0.0089)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.1.5.0014)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.0.0037)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2004, ti84pse,    0,       0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2011, ti84psev3,  ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.03)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

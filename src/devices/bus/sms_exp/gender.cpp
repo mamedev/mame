@@ -56,14 +56,14 @@ void sms_gender_adapter_device::device_start()
 // read
 //-------------------------------------------------
 
-READ8_MEMBER(sms_gender_adapter_device::read)
+uint8_t sms_gender_adapter_device::read(offs_t offset)
 {
-	return m_subslot->read_cart(space, offset);
+	return m_subslot->read_cart(offset);
 }
 
-READ8_MEMBER(sms_gender_adapter_device::read_ram)
+uint8_t sms_gender_adapter_device::read_ram(offs_t offset)
 {
-	return m_subslot->read_ram(space, offset);
+	return m_subslot->read_ram(offset);
 }
 
 int sms_gender_adapter_device::get_lphaser_xoffs()
@@ -76,19 +76,19 @@ int sms_gender_adapter_device::get_lphaser_xoffs()
 // write
 //-------------------------------------------------
 
-WRITE8_MEMBER(sms_gender_adapter_device::write_mapper)
+void sms_gender_adapter_device::write_mapper(offs_t offset, uint8_t data)
 {
-	m_subslot->write_mapper(space, offset, data);
+	m_subslot->write_mapper(offset, data);
 }
 
-WRITE8_MEMBER(sms_gender_adapter_device::write)
+void sms_gender_adapter_device::write(offs_t offset, uint8_t data)
 {
-	m_subslot->write_cart(space, offset, data);
+	m_subslot->write_cart(offset, data);
 }
 
-WRITE8_MEMBER(sms_gender_adapter_device::write_ram)
+void sms_gender_adapter_device::write_ram(offs_t offset, uint8_t data)
 {
-	m_subslot->write_ram(space, offset, data);
+	m_subslot->write_ram(offset, data);
 }
 
 //-------------------------------------------------

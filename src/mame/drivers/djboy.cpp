@@ -142,27 +142,27 @@ Notes:
 #include "includes/djboy.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /* KANEKO BEAST state */
 
-READ8_MEMBER(djboy_state::beast_status_r)
+uint8_t djboy_state::beast_status_r()
 {
 	return (m_slavelatch->pending_r() ? 0x0 : 0x4) | (m_beastlatch->pending_r() ? 0x8 : 0x0);
 }
 
 /******************************************************************************/
 
-WRITE8_MEMBER(djboy_state::trigger_nmi_on_mastercpu)
+void djboy_state::trigger_nmi_on_mastercpu(uint8_t data)
 {
 	m_mastercpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(djboy_state::mastercpu_bankswitch_w)
+void djboy_state::mastercpu_bankswitch_w(uint8_t data)
 {
 	data ^= m_bankxor;
 	m_masterbank->set_entry(data);
@@ -177,7 +177,7 @@ WRITE8_MEMBER(djboy_state::mastercpu_bankswitch_w)
  * ---x---- screen flip
  * ----xxxx bank
  */
-WRITE8_MEMBER(djboy_state::slavecpu_bankswitch_w)
+void djboy_state::slavecpu_bankswitch_w(uint8_t data)
 {
 	m_videoreg = data;
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER(djboy_state::slavecpu_bankswitch_w)
 		m_slavebank->set_entry((data & 0xf));
 }
 
-WRITE8_MEMBER(djboy_state::coin_count_w)
+void djboy_state::coin_count_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -193,7 +193,7 @@ WRITE8_MEMBER(djboy_state::coin_count_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(djboy_state::soundcpu_bankswitch_w)
+void djboy_state::soundcpu_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data);  // shall we check data<0x07?
 }
@@ -206,9 +206,7 @@ void djboy_state::mastercpu_am(address_map &map)
 	map(0x8000, 0xafff).bankr("master_bank_l");
 	map(0xb000, 0xbfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
 	map(0xc000, 0xdfff).bankr("master_bank");
-	map(0xe000, 0xefff).ram().share("share1");
-	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xffff).ram();
+	map(0xe000, 0xffff).ram().share("share1");
 }
 
 void djboy_state::mastercpu_port_am(address_map &map)
@@ -263,13 +261,13 @@ void djboy_state::soundcpu_port_am(address_map &map)
 
 /******************************************************************************/
 
-READ8_MEMBER(djboy_state::beast_p0_r)
+uint8_t djboy_state::beast_p0_r()
 {
 	// ?
 	return 0;
 }
 
-WRITE8_MEMBER(djboy_state::beast_p0_w)
+void djboy_state::beast_p0_w(uint8_t data)
 {
 	if (!BIT(m_beast_p0, 1) && BIT(data, 1))
 	{
@@ -282,7 +280,7 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 	m_beast_p0 = data;
 }
 
-READ8_MEMBER(djboy_state::beast_p1_r)
+uint8_t djboy_state::beast_p1_r()
 {
 	if (BIT(m_beast_p0, 0) == 0)
 		return m_beastlatch->read();
@@ -290,12 +288,12 @@ READ8_MEMBER(djboy_state::beast_p1_r)
 		return 0; // ?
 }
 
-WRITE8_MEMBER(djboy_state::beast_p1_w)
+void djboy_state::beast_p1_w(uint8_t data)
 {
 	m_beast_p1 = data;
 }
 
-READ8_MEMBER(djboy_state::beast_p2_r)
+uint8_t djboy_state::beast_p2_r()
 {
 	switch ((m_beast_p0 >> 2) & 3)
 	{
@@ -306,12 +304,12 @@ READ8_MEMBER(djboy_state::beast_p2_r)
 	}
 }
 
-WRITE8_MEMBER(djboy_state::beast_p2_w)
+void djboy_state::beast_p2_w(uint8_t data)
 {
 	m_beast_p2 = data;
 }
 
-READ8_MEMBER(djboy_state::beast_p3_r)
+uint8_t djboy_state::beast_p3_r()
 {
 	uint8_t dsw = 0;
 	uint8_t dsw1 = ~m_port_dsw[0]->read();
@@ -327,7 +325,7 @@ READ8_MEMBER(djboy_state::beast_p3_r)
 	return (dsw << 4) | (m_beastlatch->pending_r() ? 0x0 : 0x4) | (m_slavelatch->pending_r() ? 0x8 : 0x0);
 }
 
-WRITE8_MEMBER(djboy_state::beast_p3_w)
+void djboy_state::beast_p3_w(uint8_t data)
 {
 	m_beast_p3 = data;
 	m_slavecpu->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
@@ -417,20 +415,9 @@ static INPUT_PORTS_START( djboy )
 INPUT_PORTS_END
 
 
-static const gfx_layout tile_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*8,4) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_djboy )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16 ) /* sprite bank */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -493,7 +480,6 @@ void djboy_state::djboy(machine_config &config)
 	Z80(config, m_soundcpu, 12_MHz_XTAL / 2); // 6.000MHz, verified
 	m_soundcpu->set_addrmap(AS_PROGRAM, &djboy_state::soundcpu_am);
 	m_soundcpu->set_addrmap(AS_IO, &djboy_state::soundcpu_port_am);
-	m_soundcpu->set_vblank_int("screen", FUNC(djboy_state::irq0_line_hold));
 
 	I80C51(config, m_beast, 12_MHz_XTAL / 2); // 6.000MHz, verified
 	m_beast->port_in_cb<0>().set(FUNC(djboy_state::beast_p0_r));
@@ -505,7 +491,7 @@ void djboy_state::djboy(machine_config &config)
 	m_beast->port_in_cb<3>().set(FUNC(djboy_state::beast_p3_r));
 	m_beast->port_out_cb<3>().set(FUNC(djboy_state::beast_p3_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	GENERIC_LATCH_8(config, m_slavelatch);
 
@@ -535,6 +521,7 @@ void djboy_state::djboy(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL / 4)); // 3.000MHz, verified
+	ymsnd.irq_handler().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 

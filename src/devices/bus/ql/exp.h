@@ -56,7 +56,7 @@
 
 class ql_expansion_slot_device;
 
-class device_ql_expansion_card_interface : public device_slot_card_interface
+class device_ql_expansion_card_interface : public device_interface
 {
 	friend class ql_expansion_slot_device;
 
@@ -79,7 +79,7 @@ protected:
 
 // ======================> ql_expansion_slot_device
 
-class ql_expansion_slot_device : public device_t, public device_slot_interface
+class ql_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_ql_expansion_card_interface>
 {
 public:
 	// construction/destruction
@@ -112,7 +112,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 

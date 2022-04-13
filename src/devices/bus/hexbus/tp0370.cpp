@@ -128,9 +128,9 @@ enum
 #include "logmacro.h"
 
 // Hexbus instance
-DEFINE_DEVICE_TYPE_NS(IBC, bus::hexbus, ibc_device,  "ibc",  "Intelligent Peripheral Bus Controller")
+DEFINE_DEVICE_TYPE(IBC, bus::hexbus::ibc_device,  "hexbus_ibc",  "Intelligent Peripheral Bus Controller")
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 ibc_device::ibc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, IBC, tag, owner, clock),
@@ -153,7 +153,7 @@ ibc_device::ibc_device(const machine_config &mconfig, const char *tag, device_t 
 /*
     Reading from host
 */
-READ8_MEMBER( ibc_device::read )
+uint8_t ibc_device::read(offs_t offset)
 {
 	uint8_t status = 0;
 	switch (offset)
@@ -177,7 +177,11 @@ READ8_MEMBER( ibc_device::read )
 		if (m_bav) status |= 0x20;
 		if (m_hsk) status |= 0x10;
 
-		LOGMASKED(LOG_STATUS, "Status -> %02x\n", status);
+		if (status != m_last_status)
+		{
+			LOGMASKED(LOG_STATUS, "Status -> %02x\n", status);
+			m_last_status = status;
+		}
 
 		// Reset flag
 		m_message_started = false;
@@ -193,7 +197,7 @@ READ8_MEMBER( ibc_device::read )
 /*
     Writing from host
 */
-WRITE8_MEMBER( ibc_device::write )
+void ibc_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -246,7 +250,7 @@ void ibc_device::set_lines(bool bav, bool hsk)
 	uint8_t val = (m_transmit & 0xc0)|((m_transmit & 0x30)>>4);
 	if (!bav) val |= 0x04;
 	if (!hsk) val |= 0x10;
-	if (m_transmit != 0xff) LOGMASKED(LOG_LINES, "Data = %01x\n", m_transmit>>4);
+	if (hsk) LOGMASKED(LOG_LINES, "Data = %01x\n", m_transmit>>4);
 
 	m_hexout(val);
 }
@@ -354,5 +358,5 @@ void ibc_device::device_reset()
 	m_disable = true;
 }
 
-}   }
+} // namespace bus::hexbus
 

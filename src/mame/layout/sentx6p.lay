@@ -1,0 +1,605 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<element name="SELECT">
+		<disk state ="0">
+			<color red="0.8" green="0.8" blue="0.0" />
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+		</disk>
+		<disk state ="1">
+			<color red="0.4" green="0.4" blue="0.0" />
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+		</disk>
+
+		<text string="SELECT" align="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds left="0.10" top="0.3" right="0.90" bottom="0.7" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OK">
+		<disk state ="0">
+			<color red="0.0" green="0.8" blue="0.0" />
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+		</disk>
+		<disk state ="1">
+			<color red="0.0" green="0.4" blue="0.0" />
+			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+		</disk>
+
+		<text string="OK" align="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds left="0.15" top="0.3" right="0.85" bottom="0.7" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="REVEAL">
+		<text string="REVEAL" align="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds left="0.10" top="0.3" right="0.90" bottom="0.7" />
+		</text>
+	</element>
+
+	<element name="DISPLAYBG">
+		<!-- white bg -->
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds left="0" top="0" right="1" bottom="1" />
+		</rect>
+		<!-- unit edge -->
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.02" top="0.0125" right="0.98" bottom="0.9875" />
+		</rect>
+		<!-- screen -->
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.05" top="0.025" right="0.95" bottom="0.975" />
+		</rect>
+		<!-- card 1 outline -->
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.07" top="0.035" right="0.48" bottom="0.4" />
+		</rect>
+		<!-- cart 1 inner fill -->
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.39" />
+		</rect>
+		<!-- card 2 outline -->
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.52" top="0.035" right="0.93" bottom="0.4" />
+		</rect>
+		<!-- card 2 inner fill -->
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.39" />
+		</rect>
+		<!-- cover bottom -->
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.02" top="0.635" right="0.98" bottom="0.9875" />
+		</rect>
+	</element>
+
+	<element name="LED">
+		<!--<rect>
+		    <color red="0.0" green="1.0" blue="1.0" />
+		    <bounds left="0.02" top="0.635" right="0.98" bottom="0.9875" />
+		</rect>-->
+
+		<disk>
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds left="0.46" top="0.64" right="0.54" bottom="0.68" />
+		</disk>
+
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds left="0.47" top="0.645" right="0.53" bottom="0.675" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+			<bounds left="0.47" top="0.645" right="0.53" bottom="0.675" />
+		</disk>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_SELECTS_FOLD">
+		<!-- FOLD -->
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.092" top="0.421" right="0.458" bottom="0.489" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
+		</rect>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_SELECTS_CHECK">
+		<!-- CHECK -->
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.542" top="0.421" right="0.908" bottom="0.489" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
+		</rect>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_SELECTS_BET">
+		<!-- BET -->
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.092" top="0.491" right="0.458" bottom="0.559" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
+		</rect>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_SELECTS_CALL">
+		<!-- CALL -->
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.542" top="0.491" right="0.908" bottom="0.559" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
+		</rect>
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_SELECTS_RAISE">
+		<!-- RAISE -->
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.092" top="0.561" right="0.458" bottom="0.629" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
+		</rect>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_SELECTS_ALLIN">
+		<!-- ALL IN -->
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.542" top="0.561" right="0.908" bottom="0.629" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
+		</rect>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_FOLD">
+		<text state="1" string="FOLD" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_CHECK">
+		<text state="1" string="CHECK" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_BET">
+		<text state="1" string="BET" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_CALL">
+		<text state="1" string="CALL" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_RAISE">
+		<text state="1" string="RAISE" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="OPTION_ALLIN">
+		<text state="1" string="ALL IN" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="NUMBER_LEFT">
+		<!--<rect state="0">
+		    <color alpha="0.5" red="0.2" green="0.1" blue="1.0" />
+		    <bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</rect>-->
+
+		<text state="1" string="A" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="2" string="2" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="3" string="3" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="4" string="4" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="5" string="5" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="6" string="6" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="7" string="7" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="8" string="8" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="9" string="9" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="10" string="10" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="11" string="J" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="12" string="Q" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="13" string="K" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="SUITE_LEFT">
+		<!--<rect state="0">
+		    <color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		    <bounds left="0.09" top="0.25" right="0.46" bottom="0.39" />
+		</rect>-->
+
+		<text state="1" string="&#x2666;" align="0"> <!-- DIAMOND -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.06" top="0.225" right="0.275" bottom="0.33" />
+		</text>
+		<text state="2" string="&#x2665;" align="0"> <!-- HEART -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.255" top="0.225" right="0.46" bottom="0.33" />
+		</text>
+		<text state="3" string="&#x2660;" align="0"> <!-- SPADE -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.06" top="0.295" right="0.275" bottom="0.40" />
+		</text>
+		<text state="4" string="&#x2663;" align="0"> <!-- CLUB -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.255" top="0.295" right="0.44" bottom="0.40" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="NUMBER_RIGHT">
+		<!--<rect state="0">
+		    <color alpha="0.5" red="0.2" green="0.1" blue="1.0" />
+		    <bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</rect>-->
+
+		<text state="1" string="A" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="2" string="2" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="3" string="3" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="4" string="4" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="5" string="5" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="6" string="6" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="7" string="7" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="8" string="8" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="9" string="9" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="10" string="10" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="11" string="J" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="12" string="Q" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+		<text state="13" string="K" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<element name="SUITE_RIGHT">
+		<!--<rect state="0">
+		    <color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+		    <bounds left="0.54" top="0.25" right="0.91" bottom="0.39" />
+		</rect>-->
+
+		<text state="1" string="&#x2666;" align="0"> <!-- DIAMOND -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.51" top="0.225" right="0.725" bottom="0.33" />
+		</text>
+		<text state="2" string="&#x2665;" align="0"> <!-- HEART -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.695" top="0.225" right="0.91" bottom="0.33" />
+		</text>
+		<text state="3" string="&#x2660;" align="0"> <!-- SPADE -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.51" top="0.295" right="0.725" bottom="0.40" />
+		</text>
+		<text state="4" string="&#x2663;" align="0"> <!-- CLUB -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.695" top="0.295" right="0.91" bottom="0.40" />
+		</text>
+
+		<rect>
+			<color alpha="0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+	</element>
+
+	<group name="controller">
+		<element name="BACKGROUND_BZ~player~" ref="DISPLAYBG">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="SUITE_LEFT_BZ~player~" ref="SUITE_LEFT">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="NUMBER_LEFT_BZ~player~" ref="NUMBER_LEFT">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="SUITE_RIGHT_BZ~player~" ref="SUITE_RIGHT">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="NUMBER_RIGHT_BZ~player~" ref="NUMBER_RIGHT">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="LED_BZ~player~" ref="LED">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="SELECT_FOLD_BZ~player~" ref="OPTION_SELECTS_FOLD">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="SELECT_CHECK_BZ~player~" ref="OPTION_SELECTS_CHECK">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="SELECT_BET_BZ~player~" ref="OPTION_SELECTS_BET">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="SELECT_CALL_BZ~player~" ref="OPTION_SELECTS_CALL">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="SELECT_RAISE_BZ~player~" ref="OPTION_SELECTS_RAISE">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="SELECT_ALLIN_BZ~player~" ref="OPTION_SELECTS_ALLIN">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="OPTION_FOLD_BZ~player~" ref="OPTION_FOLD">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="OPTION_CHECK_BZ~player~" ref="OPTION_CHECK">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="OPTION_BET_BZ~player~" ref="OPTION_BET">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="OPTION_CALL_BZ~player~" ref="OPTION_CALL">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="OPTION_RAISE_BZ~player~" ref="OPTION_RAISE">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element name="OPTION_ALLIN_BZ~player~" ref="OPTION_ALLIN">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</element>
+		<element ref="SELECT" inputtag="CTRL~port~" inputmask="0x1">
+			<bounds x="0.185" y="0.685" width="0.13" height="0.13" />
+		</element>
+		<element ref="OK" inputtag="CTRL~port~" inputmask="0x2">
+			<bounds x="0.185" y="0.81" width="0.13" height="0.13" />
+		</element>
+		<element name="REVEALTXT_BZ~player~" ref="REVEAL">
+			<bounds x="0.191" y="0.94" width="0.13" height="0.04" />
+		</element>
+	</group>
+
+	<view name="Screen and Controllers">
+		<screen index="0">
+			<bounds left="0.5" top="0" right="4.5" bottom="3" />
+		</screen>
+
+		<collection name="Player 1 Controller">
+			<param name="player" value="0" />
+			<param name="port" value="1" />
+			<group ref="controller">
+				<bounds x="4.5" y="0" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 2 Controller">
+			<param name="player" value="1" />
+			<param name="port" value="2" />
+			<group ref="controller">
+				<bounds x="4.5" y="1" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 3 Controller">
+			<param name="player" value="2" />
+			<param name="port" value="3" />
+			<group ref="controller">
+				<bounds x="4.5" y="2" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 4 Controller">
+			<param name="player" value="3" />
+			<param name="port" value="4" />
+			<group ref="controller">
+				<bounds x="0" y="2" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 5 Controller">
+			<param name="player" value="4" />
+			<param name="port" value="5" />
+			<group ref="controller">
+				<bounds x="0" y="1" width="0.5" height="1" />
+			</group>
+		</collection>
+
+		<collection name="Player 6 Controller">
+			<param name="player" value="5" />
+			<param name="port" value="6" />
+			<group ref="controller">
+				<bounds x="0" y="0" width="0.5" height="1" />
+			</group>
+		</collection>
+	</view>
+</mamelayout>

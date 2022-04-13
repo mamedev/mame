@@ -91,9 +91,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 3; }
-	virtual uint32_t execute_max_cycles() const override { return 6; }
-	virtual uint32_t execute_input_lines() const override { return 16; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 6; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 16; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -117,9 +117,9 @@ private:
 	uint8_t m_irq_line;
 	uint8_t m_irq_state;
 	uint8_t m_nmi_line;
-	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_io;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
 	uint32_t m_PPC;
 	int m_icount;
 

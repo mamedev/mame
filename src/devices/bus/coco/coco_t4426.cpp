@@ -95,15 +95,15 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_t4426_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_t4426_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 		// optional information overrides
 		virtual void device_add_mconfig(machine_config &config) override;
 		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual ioport_constructor device_input_ports() const override;
 
-		virtual uint8_t* get_cart_base() override;
-		DECLARE_WRITE8_MEMBER(pia_A_w);
+		virtual u8 *get_cart_base() override;
+		void pia_A_w(u8 data);
 
 		// Clocks
 		void write_acia_clocks(int id, int state);
@@ -117,7 +117,7 @@ namespace
 		DECLARE_WRITE_LINE_MEMBER (write_f13_clock){ write_acia_clocks(mc14411_device::TIMER_F13, state); }
 		DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 	protected:
-		coco_t4426_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+		coco_t4426_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 		// device-level overrides
 		virtual void device_start() override;
@@ -125,21 +125,22 @@ namespace
 
 		// internal state
 		device_image_interface *m_cart;
-		uint8_t m_select;
+		u8 m_select;
 
 		optional_ioport m_autostart;
 
-		virtual DECLARE_READ8_MEMBER(scs_read) override;
-		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+		virtual u8 cts_read(offs_t offset) override;
+		virtual u8 scs_read(offs_t offset) override;
+		virtual void scs_write(offs_t offset, u8 data) override;
 	private:
 		// internal state
+		required_memory_region m_eprom;
+		required_memory_region m_eprom_banked;
 		required_device<acia6850_device> m_uart;
 		required_device<pia6821_device> m_pia;
 		required_device<mc14411_device> m_brg;
 
 		required_ioport             m_serial_baud;
-
-		void set_bank();
 	};
 };
 
@@ -235,12 +236,14 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_T4426, device_cococart_interface, coco_t4426_dev
 //  coco_t4426_device - constructor
 //-------------------------------------------------
 
-coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_cart(nullptr)
 	, m_select(0)
 	, m_autostart(*this, CART_AUTOSTART_TAG)
+	, m_eprom(*this, CARTSLOT_TAG)
+	, m_eprom_banked(*this, CARTBANK_TAG)
 	, m_uart(*this, UART_TAG)
 	, m_pia(*this, PIA_TAG)
 	, m_brg(*this, BRG_TAG)
@@ -248,7 +251,7 @@ coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type 
 {
 }
 
-coco_t4426_device::coco_t4426_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_t4426_device::coco_t4426_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: coco_t4426_device(mconfig, COCO_T4426, tag, owner, clock)
 {
 }
@@ -261,6 +264,9 @@ void coco_t4426_device::device_start()
 {
 	LOG("%s()\n", FUNCNAME );
 	m_cart = dynamic_cast<device_image_interface *>(owner());
+
+	// save state support
+	save_item(NAME(m_select));
 }
 
 
@@ -293,7 +299,7 @@ void coco_t4426_device::device_reset()
 	LOG("%s()\n", FUNCNAME );
 	auto cart_line = line_value::Q;
 	set_line_value(line::CART, cart_line);
-	set_bank();
+	m_select = 0x00;
 
 	// Set up the BRG divider statically to X1
 	m_brg->rsa_w( ASSERT_LINE );
@@ -323,9 +329,9 @@ void coco_t4426_device::write_acia_clocks(int id, int state)
   ACIA is located at ff48-ff4F with A1 = 1
 -------------------------------------------------*/
 
-READ8_MEMBER(coco_t4426_device::scs_read)
+u8 coco_t4426_device::scs_read(offs_t offset)
 {
-	uint8_t result = 0x00;
+	u8 result = 0x00;
 
 	LOG("%s Offs:%d\n", FUNCNAME, offset);
 
@@ -355,7 +361,7 @@ READ8_MEMBER(coco_t4426_device::scs_read)
   ACIA is located at ff48-ff4F with A1 = 1
 -------------------------------------------------*/
 
-WRITE8_MEMBER(coco_t4426_device::scs_write)
+void coco_t4426_device::scs_write(offs_t offset, u8 data)
 {
 	LOG("%s Offs:%d Data:%02x\n", FUNCNAME, offset, data);
 	LOGSETUP(" * Offs:%02x <- %02x\n", offset, data);
@@ -394,37 +400,50 @@ WRITE8_MEMBER(coco_t4426_device::scs_write)
 #define ROM6 (~0x40 & 0xff)
 #define ROM7 (~0x80 & 0xff)
 
-WRITE8_MEMBER( coco_t4426_device::pia_A_w )
+void coco_t4426_device::pia_A_w(u8 data)
 {
 	LOGPIA("%s(%02x)\n", FUNCNAME, data);
 	m_select = data;
-	set_bank();
 }
 
-void coco_t4426_device::set_bank()
-{
-	uint8_t *cartbase = memregion(CARTSLOT_TAG)->base();
-	uint8_t *bankbase = memregion(CARTBANK_TAG)->base();
+/*-------------------------------------------------
+    cts_read
+-------------------------------------------------*/
 
-	switch (m_select)
+u8 coco_t4426_device::cts_read(offs_t offset)
+{
+	u8 result = 0x00;
+
+	switch (offset & 0x2000)
 	{
-	case 0:
-	case ROM0:memcpy(cartbase, bankbase + 0x0000, 0x2000); break;
-	case ROM1:memcpy(cartbase, bankbase + 0x2000, 0x2000); break;
-	case ROM2:memcpy(cartbase, bankbase + 0x4000, 0x2000); break;
-	case ROM3:memcpy(cartbase, bankbase + 0x6000, 0x2000); break;
-	case ROM4:memcpy(cartbase, bankbase + 0x8000, 0x2000); break;
-	case ROM5:memcpy(cartbase, bankbase + 0xa000, 0x2000); break;
-	case ROM6:memcpy(cartbase, bankbase + 0xc000, 0x2000); break;
-	case ROM7:memcpy(cartbase, bankbase + 0xe000, 0x2000); break;
+	case 0x0000:
+		switch (m_select)
+		{
+		case 0:
+		case ROM0:result = m_eprom_banked->base()[0x0000 | offset]; break;
+		case ROM1:result = m_eprom_banked->base()[0x2000 | offset]; break;
+		case ROM2:result = m_eprom_banked->base()[0x4000 | offset]; break;
+		case ROM3:result = m_eprom_banked->base()[0x6000 | offset]; break;
+		case ROM4:result = m_eprom_banked->base()[0x8000 | offset]; break;
+		case ROM5:result = m_eprom_banked->base()[0xa000 | offset]; break;
+		case ROM6:result = m_eprom_banked->base()[0xc000 | offset]; break;
+		case ROM7:result = m_eprom_banked->base()[0xe000 | offset]; break;
+		}
+		break;
+
+	case 0x2000:
+		result = m_eprom->base()[offset];
+		break;
 	}
+
+	return result;
 }
 
 /*-------------------------------------------------
     get_cart_base
 -------------------------------------------------*/
 
-uint8_t* coco_t4426_device::get_cart_base()
+u8 *coco_t4426_device::get_cart_base()
 {
 	LOG("%s - m_select %02x -> %02x\n", FUNCNAME, m_select, ~m_select & 0xff );
 	return memregion(CARTSLOT_TAG)->base();

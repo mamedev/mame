@@ -104,36 +104,36 @@ Bounty2:
 #include "speaker.h"
 
 
-WRITE8_MEMBER( zodiack_state::nmi_mask_w )
+void zodiack_state::nmi_mask_w(uint8_t data)
 {
 	m_main_nmi_enabled = (data & 1) ^ 1;
 }
 
-WRITE8_MEMBER( zodiack_state::sound_nmi_enable_w )
+void zodiack_state::sound_nmi_enable_w(uint8_t data)
 {
 	m_sound_nmi_enabled = data & 1;
 }
 
-INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_main_nmi_gen)
+WRITE_LINE_MEMBER(zodiack_state::vblank_main_nmi_w)
 {
-	if (m_main_nmi_enabled)
-		nmi_line_pulse(device);
+	if (state && m_main_nmi_enabled)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
 {
 	if (m_sound_nmi_enabled)
-		nmi_line_pulse(device);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-WRITE8_MEMBER( zodiack_state::master_soundlatch_w )
+void zodiack_state::master_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER( zodiack_state::control_w )
+void zodiack_state::control_w(uint8_t data)
 {
 	/* Bit 0-1 - coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
@@ -457,12 +457,11 @@ static INPUT_PORTS_START( bounty )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "20k 100k" )
+	PORT_DIPSETTING(    0x10, "40k 100k" )
+	PORT_DIPSETTING(    0x20, "20k 200k" )
+	PORT_DIPSETTING(    0x30, "40k 200k" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -510,7 +509,6 @@ void zodiack_state::zodiack(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zodiack_state::main_map);
-	m_maincpu->set_vblank_int("videopcb:screen", FUNC(zodiack_state::zodiack_main_nmi_gen));
 	m_maincpu->set_periodic_int(FUNC(zodiack_state::irq0_line_hold), attotime::from_hz(1*60)); // sound related - unknown source, timing is guessed
 
 	Z80(config, m_audiocpu, XTAL(18'432'000)/6);
@@ -520,8 +518,10 @@ void zodiack_state::zodiack(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(zodiack_state::vblank_main_nmi_w));
+
 	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb", 0));
-	videopcb.set_palette("videopcb:palette");
+	videopcb.set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

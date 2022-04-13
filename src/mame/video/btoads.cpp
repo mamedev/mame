@@ -24,7 +24,7 @@
 
 void btoads_state::video_start()
 {
-	/* initialize the swapped pointers */
+	// initialize the swapped pointers
 	m_vram_fg_draw = m_vram_fg0;
 	m_vram_fg_display = m_vram_fg1;
 
@@ -47,25 +47,25 @@ void btoads_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( btoads_state::misc_control_w )
+void btoads_state::misc_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_misc_control);
 
-	/* bit 3 controls sound reset line */
+	// bit 3 controls sound reset line
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (m_misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-WRITE16_MEMBER( btoads_state::display_control_w )
+void btoads_state::display_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		/* allow multiple changes during display */
+		// allow multiple changes during display
 		int scanline = m_screen->vpos();
 		if (scanline > 0)
 			m_screen->update_partial(scanline - 1);
 
-		/* bit 15 controls which page is rendered and which page is displayed */
+		// bit 15 controls which page is rendered and which page is displayed
 		if (data & 0x8000)
 		{
 			m_vram_fg_draw = m_vram_fg1;
@@ -77,7 +77,7 @@ WRITE16_MEMBER( btoads_state::display_control_w )
 			m_vram_fg_display = m_vram_fg1;
 		}
 
-		/* stash the remaining data for later */
+		// stash the remaining data for later
 		m_screen_control = data >> 8;
 	}
 }
@@ -90,13 +90,13 @@ WRITE16_MEMBER( btoads_state::display_control_w )
  *
  *************************************/
 
-WRITE16_MEMBER( btoads_state::scroll0_w )
+void btoads_state::scroll0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* allow multiple changes during display */
+	// allow multiple changes during display
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
-	/* upper bits are Y scroll, lower bits are X scroll */
+	// upper bits are Y scroll, lower bits are X scroll
 	if (ACCESSING_BITS_8_15)
 		m_yscroll0 = data >> 8;
 	if (ACCESSING_BITS_0_7)
@@ -104,13 +104,13 @@ WRITE16_MEMBER( btoads_state::scroll0_w )
 }
 
 
-WRITE16_MEMBER( btoads_state::scroll1_w )
+void btoads_state::scroll1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* allow multiple changes during display */
+	// allow multiple changes during display
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
-	/* upper bits are Y scroll, lower bits are X scroll */
+	// upper bits are Y scroll, lower bits are X scroll
 	if (ACCESSING_BITS_8_15)
 		m_yscroll1 = data >> 8;
 	if (ACCESSING_BITS_0_7)
@@ -121,48 +121,29 @@ WRITE16_MEMBER( btoads_state::scroll1_w )
 
 /*************************************
  *
- *  Palette RAM
- *
- *************************************/
-
-WRITE16_MEMBER( btoads_state::paletteram_w )
-{
-	m_tlc34076->write(offset/2, data);
-}
-
-
-READ16_MEMBER( btoads_state::paletteram_r )
-{
-	return m_tlc34076->read(offset/2);
-}
-
-
-
-/*************************************
- *
  *  Background video RAM
  *
  *************************************/
 
-WRITE16_MEMBER( btoads_state::vram_bg0_w )
+void btoads_state::vram_bg0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_bg0[offset & 0x3fcff]);
 }
 
 
-WRITE16_MEMBER( btoads_state::vram_bg1_w )
+void btoads_state::vram_bg1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_bg1[offset & 0x3fcff]);
 }
 
 
-READ16_MEMBER( btoads_state::vram_bg0_r )
+uint16_t btoads_state::vram_bg0_r(offs_t offset)
 {
 	return m_vram_bg0[offset & 0x3fcff];
 }
 
 
-READ16_MEMBER( btoads_state::vram_bg1_r )
+uint16_t btoads_state::vram_bg1_r(offs_t offset)
 {
 	return m_vram_bg1[offset & 0x3fcff];
 }
@@ -175,27 +156,27 @@ READ16_MEMBER( btoads_state::vram_bg1_r )
  *
  *************************************/
 
-WRITE16_MEMBER( btoads_state::vram_fg_display_w )
+void btoads_state::vram_fg_display_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_vram_fg_display[offset] = data;
 }
 
 
-WRITE16_MEMBER( btoads_state::vram_fg_draw_w )
+void btoads_state::vram_fg_draw_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_vram_fg_draw[offset] = data;
 }
 
 
-READ16_MEMBER( btoads_state::vram_fg_display_r )
+uint16_t btoads_state::vram_fg_display_r(offs_t offset)
 {
 	return m_vram_fg_display[offset];
 }
 
 
-READ16_MEMBER( btoads_state::vram_fg_draw_r )
+uint16_t btoads_state::vram_fg_draw_r(offs_t offset)
 {
 	return m_vram_fg_draw[offset];
 }
@@ -215,13 +196,13 @@ void btoads_state::render_sprite_row(uint16_t *sprite_source, uint32_t address)
 	int color = (~*m_sprite_control >> 8) & 0xf0;
 	int srcoffs = m_sprite_source_offs << 8;
 	int srcend = srcoffs + (width << 8);
-	int srcstep = 0x100 - m_sprite_scale[0];
-	int dststep = 0x100 - m_sprite_scale[8];
+	int srcstep = 0x100 - (m_sprite_scale[0] & 0xffff);
+	int dststep = 0x100 - (m_sprite_scale[4] & 0xffff);
 	int dstoffs = m_sprite_dest_offs << 8;
 
-	/* non-shadow case */
 	if (!(m_misc_control & 0x10))
 	{
+		// non-shadow case
 		for ( ; srcoffs < srcend; srcoffs += srcstep, dstoffs += dststep)
 		{
 			uint16_t src = sprite_source[(srcoffs >> 10) & 0x1ff];
@@ -233,10 +214,9 @@ void btoads_state::render_sprite_row(uint16_t *sprite_source, uint32_t address)
 			}
 		}
 	}
-
-	/* shadow case */
 	else
 	{
+		// shadow case
 		for ( ; srcoffs < srcend; srcoffs += srcstep, dstoffs += dststep)
 		{
 			uint16_t src = sprite_source[(srcoffs >> 10) & 0x1ff];
@@ -265,24 +245,30 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(btoads_state::to_shiftreg)
 {
 	address &= ~0x40000000;
 
-	/* reads from this first region are usual shift register reads */
 	if (address >= 0xa0000000 && address <= 0xa3ffffff)
+	{
+		// reads from this first region are usual shift register reads
 		memcpy(shiftreg, &m_vram_fg_display[(address & 0x3fffff) >> 4], 0x200);
-
-	/* reads from this region set the sprite destination address */
+	}
 	else if (address >= 0xa4000000 && address <= 0xa7ffffff)
 	{
+		// reads from this region set the sprite destination address
 		m_sprite_dest_base = &m_vram_fg_draw[(address & 0x3fc000) >> 4];
 		m_sprite_dest_offs = (address & 0x003fff) >> 5;
 	}
-
-	/* reads from this region set the sprite source address */
 	else if (address >= 0xa8000000 && address <= 0xabffffff)
 	{
-		memcpy(shiftreg, &m_vram_fg_data[(address & 0x7fc000) >> 4], 0x400);
+		// reads from this region set the sprite source address
+		const u32 *src = &m_vram_fg_data[(address & 0x7fc000) >> 5];
+		u16 *dest = shiftreg;
+		for (unsigned int i = 0; i != 0x100; i++)
+		{
+			*dest++ = *src;
+			*dest++ = *src >> 16;
+			src++;
+		}
 		m_sprite_source_offs = (address & 0x003fff) >> 3;
 	}
-
 	else
 		logerror("%s:btoads_to_shiftreg(%08X)\n", machine().describe_context(), address);
 }
@@ -292,22 +278,31 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(btoads_state::from_shiftreg)
 {
 	address &= ~0x40000000;
 
-	/* writes to this first region are usual shift register writes */
 	if (address >= 0xa0000000 && address <= 0xa3ffffff)
+	{
+		// writes to this first region are usual shift register writes
 		memcpy(&m_vram_fg_display[(address & 0x3fc000) >> 4], shiftreg, 0x200);
-
-	/* writes to this region are ignored for our purposes */
+	}
 	else if (address >= 0xa4000000 && address <= 0xa7ffffff)
-		;
-
-	/* writes to this region copy standard data */
+	{
+		// writes to this region are ignored for our purposes
+	}
 	else if (address >= 0xa8000000 && address <= 0xabffffff)
-		memcpy(&m_vram_fg_data[(address & 0x7fc000) >> 4], shiftreg, 0x400);
-
-	/* writes to this region render the current sprite data */
+	{
+		// writes to this region copy standard data
+		const u16 *src = shiftreg;
+		u32 *dest = &m_vram_fg_data[(address & 0x7fc000) >> 5];
+		for (unsigned int i = 0; i != 0x100; i++)
+		{
+			*dest++ = src[0] | (src[1] << 16);
+			src += 2;
+		}
+	}
 	else if (address >= 0xac000000 && address <= 0xafffffff)
+	{
+		// writes to this region render the current sprite data
 		render_sprite_row(shiftreg, address);
-
+	}
 	else
 		logerror("%s:btoads_from_shiftreg(%08X)\n", machine().describe_context(), address);
 }
@@ -326,10 +321,9 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 	uint16_t *bg0_base = &m_vram_bg0[(fulladdr + (m_yscroll0 << 10)) & 0x3fc00];
 	uint16_t *bg1_base = &m_vram_bg1[(fulladdr + (m_yscroll1 << 10)) & 0x3fc00];
 	uint8_t *spr_base = &m_vram_fg_display[fulladdr & 0x3fc00];
-	uint32_t *dst = &bitmap.pix32(scanline);
+	uint32_t *const dst = &bitmap.pix(scanline);
 	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = fulladdr & 0x3ff;
-	int x;
 
 	/* for each scanline, switch off the render mode */
 	switch (m_screen_control & 3)
@@ -343,7 +337,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 		    5. BG0
 		*/
 		case 0:
-			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+			for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
 				uint8_t sprpix = spr_base[coladdr & 0xff];
 
@@ -388,7 +382,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 		    5. BG1
 		*/
 		case 1:
-			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+			for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
 				uint8_t sprpix = spr_base[coladdr & 0xff];
 
@@ -430,7 +424,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 		    3. BG0
 		*/
 		case 2:
-			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+			for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
 				uint8_t sprpix = spr_base[coladdr & 0xff];
 
@@ -466,7 +460,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 		    5. BG0
 		*/
 		case 3:
-			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+			for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
 				uint16_t bg0pix = bg0_base[(coladdr + m_xscroll0) & 0xff];
 				uint16_t bg1pix = bg1_base[(coladdr + m_xscroll1) & 0xff];
@@ -505,25 +499,23 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(btoads_state::scanline_update)
 	{
 		char name[10];
 		FILE *f;
-		int i;
 
-		while (machine().input().code_pressed(KEYCODE_X)) ;
+		while (machine().input().code_pressed(KEYCODE_X)) { }
 
 		sprintf(name, "disp%d.log", m_xcount++);
 		f = fopen(name, "w");
 		fprintf(f, "screen_control = %04X\n\n", m_screen_control << 8);
 
-		for (i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			uint16_t *base = (i == 0) ? (uint16_t *)m_vram_fg_display : (i == 1) ? m_vram_bg0 : m_vram_bg1;
 			int xscr = (i == 0) ? 0 : (i == 1) ? m_xscroll0 : m_xscroll1;
 			int yscr = (i == 0) ? 0 : (i == 1) ? m_yscroll0 : m_yscroll1;
-			int y;
 
-			for (y = 0; y < 224; y++)
+			for (int y = 0; y < 224; y++)
 			{
 				uint32_t offs = ((y + yscr) & 0xff) * TOWORD(0x4000);
-				for (x = 0; x < 256; x++)
+				for (int x = 0; x < 256; x++)
 				{
 					uint16_t pix = base[offs + ((x + xscr) & 0xff)];
 					fprintf(f, "%02X%02X", pix & 0xff, pix >> 8);

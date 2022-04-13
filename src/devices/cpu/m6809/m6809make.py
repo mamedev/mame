@@ -2,8 +2,9 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert
 
-import sys
+import io
 import re
+import sys
 
 # Initial state
 state = 1
@@ -16,7 +17,7 @@ def load_file(fname, lines):
 	if path != "":
 		path += '/'
 	try:
-		f = open(fname, "rU")
+		f = io.open(fname, "r")
 	except Exception:
 		err = sys.exc_info()[1]
 		sys.stderr.write("Cannot read opcodes file %s [%s]\n" % (fname, err))

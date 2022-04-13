@@ -15,10 +15,9 @@ for which the system holds two at once.
 The "To Do" list:
 -----------------
 -Main CPU banks cartridges via ports $c0/$c1
--Consider moving the 3 cartridges of the slot 2 in a software list since they are interchangable
+-Consider moving the 3 cartridges of the slot 2 in a software list since they are interchangeable
  (that's bs, since that pss61 should always be there anyway ... -AS)
 -Hook the z180 clone, the DSP 1A/1B and the Super FX
--Add the missing GROM4-1
 -Add the possibly alternate revision of the attract ROM, with Kirby holding a coin
  (unless it is unlocked with some DIP switch)
 
@@ -59,7 +58,7 @@ S-ENC A (9504 BA)
 MB90082 001 (9351 M02)
 
 2. The BIOS board (PU 0871-101) must be inserted into the main board.
-BIOS ROM: KROM 1, 512Kibit
+BIOS ROM: KROM 1, 512Kibit or KROM 2.00, 1024Kibit
 SRAM: SRM20257LM12 F27K 256 (S-MOS Systems) - SRAM accounting and control circuits are
       self-diagnostic features that set time and operational status of the
       game(s) that are installed.
@@ -76,7 +75,7 @@ PSS-003 - SUPER FAMICOM BOX - Coin Box
 
 Software/Cartridge:
 The PSS-61 cartridge is required on the slot 1 for the machine to operate.
-The slot 2 may be free or contain PSS-62, PSS-63 or PSS-64 interchangably.
+The slot 2 may be free or contain PSS-62, PSS-63 or PSS-64 interchangeably.
 
 PSS-61  - SUPER FAMICOM BOX Commercial Regular Cart
 WARNING: This cartridge is required for the machine to operate.
@@ -95,7 +94,7 @@ Static RAM: 256 Kibit
 
 PSS-62  - SUPER FAMICOM BOX Commercial Optional Cart
 GameData ROM: GROM2-1, 256Kibit
-Lower ROM: New Super 3D Golf Simulation - Waialae No Kiseki (Waialae Golf) (T&E SOFT), SHVC-GC-0, 4Mibit
+Lower ROM: New Super 3D Golf Simulation - Waialae no Kiseki (Waialae Golf) (T&E SOFT), SHVC-GC-0, 4Mibit
 Lower ROM: Super Mahjong 2 (I'MAX), SHVC-2A-1, 8Mibit
 
 PSS-63  - SUPER FAMICOM BOX Commercial Optional Cart
@@ -104,7 +103,7 @@ Lower ROM: Super Donkey Kong (Nintendo), SHVC-8X-1, 32Mibit
 Lower ROM: Super Tetris 2 + Bombliss (BPS), SHVC-T2-1, 8Mibit
 
 PSS-64  - SUPER FAMICOM BOX Commercial Optional Cart
-GameData ROM: GROM4-1, undumped
+GameData ROM: GROM4-1, 256Kibit
 Lower ROM: Super Donkey Kong (Nintendo), SHVC-8X-1, 32Mibit
 Lower ROM: Super Bomberman 2 (Hudson Soft), SHVC-M4-0, 8Mibit
 
@@ -123,9 +122,12 @@ How does the Super Famicom Box operates
 #include "cpu/z180/z180.h"
 #include "machine/s3520cf.h"
 #include "video/mb90082.h"
-#include "rendlay.h"
+
+#include "layout/generic.h"
 #include "speaker.h"
 
+
+namespace {
 
 class sfcbox_state : public snes_state
 {
@@ -139,6 +141,10 @@ public:
 
 	void sfcbox(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_bios;
 	required_device<mb90082_device> m_mb90082;
@@ -146,21 +152,17 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( port_81_r );
-	DECLARE_READ8_MEMBER( port_83_r );
-	DECLARE_WRITE8_MEMBER( port_80_w );
-	DECLARE_WRITE8_MEMBER( port_81_w );
-	DECLARE_WRITE8_MEMBER( port_83_w );
-	DECLARE_WRITE8_MEMBER( snes_map_0_w );
-	DECLARE_WRITE8_MEMBER( snes_map_1_w );
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_READ8_MEMBER(spc_ram_100_r);
-	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	uint8_t port_81_r();
+	uint8_t port_83_r();
+	void port_80_w(uint8_t data);
+	void port_81_w(uint8_t data);
+	void port_83_w(uint8_t data);
+	void snes_map_0_w(uint8_t data);
+	void snes_map_1_w(uint8_t data);
 	void sfcbox_io(address_map &map);
 	void sfcbox_map(address_map &map);
 	void snes_map(address_map &map);
-	void spc_mem(address_map &map);
+	void spc_map(address_map &map);
 };
 
 uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -172,37 +174,25 @@ uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 void sfcbox_state::snes_map(address_map &map)
 {
 	map(0x000000, 0x7dffff).rw(FUNC(sfcbox_state::snes_r_bank1), FUNC(sfcbox_state::snes_w_bank1));
-	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	map(0x7e0000, 0x7fffff).ram().share("wram");                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
 	map(0x800000, 0xffffff).rw(FUNC(sfcbox_state::snes_r_bank2), FUNC(sfcbox_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
-READ8_MEMBER(sfcbox_state::spc_ram_100_r)
+void sfcbox_state::spc_map(address_map &map)
 {
-	return m_spc700->spc_ram_r(offset + 0x100);
-}
-
-WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
-{
-	m_spc700->spc_ram_w(offset + 0x100, data);
-}
-
-void sfcbox_state::spc_mem(address_map &map)
-{
-	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
-	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(FUNC(sfcbox_state::spc_ram_100_r), FUNC(sfcbox_state::spc_ram_100_w));
+	map(0x0000, 0xffff).ram().share("aram");
 }
 
 void sfcbox_state::sfcbox_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).rom().region("krom", 0);
+	map(0x00000, 0x1ffff).rom().region("krom", 0);
 	map(0x20000, 0x27fff).ram();
 	map(0x40000, 0x47fff).rom().region("grom1", 0);
 	map(0x60000, 0x67fff).rom().region("grom2", 0);
 }
 
 
-WRITE8_MEMBER( sfcbox_state::port_80_w )
+void sfcbox_state::port_80_w(uint8_t data)
 {
 /*
     x--- ----   (often same as bit5)
@@ -215,12 +205,12 @@ WRITE8_MEMBER( sfcbox_state::port_80_w )
     ---- ---x   SNES Transfer STAT to SNES  (Bit2 of WRIO/RDIO on SNES side)
 */
 	SNES_CPU_REG(WRIO) = ((data & 4) >> 1) | (SNES_CPU_REG(WRIO) & ~0x02); // DATA
-	SNES_CPU_REG(WRIO) = ((data & 2) << 4) | (SNES_CPU_REG(WRIO) & ~0x20); // CLOCK
-	SNES_CPU_REG(WRIO) = ((data & 1) << 2) | (SNES_CPU_REG(WRIO) & ~0x04); // STAT
+	SNES_CPU_REG(WRIO) |= (((data & 2) << 4) | (SNES_CPU_REG(WRIO) & ~0x20)); // CLOCK
+	SNES_CPU_REG(WRIO) |= (((data & 1) << 2) | (SNES_CPU_REG(WRIO) & ~0x04)); // STAT
 }
 
 
-READ8_MEMBER( sfcbox_state::port_81_r )
+uint8_t sfcbox_state::port_81_r()
 {
 /*
     x--- ----   Vblank, Vsync, or Whatever flag (must toggle on/off at whatever speed)
@@ -232,21 +222,20 @@ READ8_MEMBER( sfcbox_state::port_81_r )
     ---- --x-   SNES Transfer ACK from SNES  (Bit3 of WRIO/RDIO on SNES side)
     ---- ---x   Int0 Request (Coin-Input, Low for 44ms..80ms) (0=IRQ, 1=No)
 */
-	uint8_t res;
 
-	res = (m_screen->vblank() & 1) << 7;
-	res = 1 << 6;
-	res = 0 << 5;
-	res = 0 << 4;
-	res = 0 << 3;
+	u8 res = (m_screen->vblank() & 1) << 7;
+	res |= 1 << 6;
+	//res |= 0 << 5;
+	//res |= 0 << 4;
+	//res |= 0 << 3;
 	res |= ((SNES_CPU_REG(WRIO) & 0x10) >> 4) << 2; // DATA to main
 	res |= ((SNES_CPU_REG(WRIO) & 0x08) >> 3) << 1; // ACK to main
-	res = 1 << 0;
+	res |= 1 << 0;
 
 	return res;
 }
 
-WRITE8_MEMBER( sfcbox_state::port_81_w )
+void sfcbox_state::port_81_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
@@ -254,16 +243,16 @@ WRITE8_MEMBER( sfcbox_state::port_81_w )
 	ioport("OSD_CS")->write(data, 0xff);
 }
 
-READ8_MEMBER( sfcbox_state::port_83_r )
+uint8_t sfcbox_state::port_83_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( sfcbox_state::port_83_w )
+void sfcbox_state::port_83_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
+void sfcbox_state::snes_map_0_w(uint8_t data)
 {
 	const char *const rom_socket[4] = { "ROM5", "ROM1/7/12", "ROM3/9", "IC23" };
 
@@ -276,7 +265,7 @@ WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
 	printf("%s ROM / DSP / SRAM maps\n",(data & 0x80) ? "HiROM" : "LoROM");
 }
 
-WRITE8_MEMBER( sfcbox_state::snes_map_1_w )
+void sfcbox_state::snes_map_1_w(uint8_t data)
 {
 	/* Reserved for ROM DSP SRAM probably means bank ATROM */
 	const char *const rom_dsp_sram[4] = {   "Reserved?", "GSU", "LoROM", "HiROM" };
@@ -294,12 +283,12 @@ void sfcbox_state::sfcbox_io(address_map &map)
 	map(0x0b, 0x0b).w(m_mb90082, FUNC(mb90082_device::write));
 	map(0x80, 0x80).portr("KEY").w(FUNC(sfcbox_state::port_80_w)); // Keyswitch and Button Inputs / SNES Transfer and Misc Output
 	map(0x81, 0x81).rw(FUNC(sfcbox_state::port_81_r), FUNC(sfcbox_state::port_81_w)); // SNES Transfer and Misc Input / Misc Output
-//  AM_RANGE(0x82, 0x82) // Unknown/unused
+//  map(0x82, 0x82) // Unknown/unused
 	map(0x83, 0x83).rw(FUNC(sfcbox_state::port_83_r), FUNC(sfcbox_state::port_83_w)); // Joypad Input/Status / Joypad Output/Control
-//  AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
-//  AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
-//  AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
-//  AM_RANGE(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//  map(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  map(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//  map(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  map(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 	map(0xa0, 0xa0).portr("RTC_R").portw("RTC_W"); //  Real Time Clock
 	map(0xc0, 0xc0).w(FUNC(sfcbox_state::snes_map_0_w)); // SNES Mapping Register 0
 	map(0xc1, 0xc1).w(FUNC(sfcbox_state::snes_map_1_w)); // SNES Mapping Register 1
@@ -463,13 +452,15 @@ void sfcbox_state::sfcbox(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sfcbox_state::snes_map);
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &sfcbox_state::spc_mem);
+	S_SMP(config, m_soundcpu, XTAL(24'576'000) / 12);
+	m_soundcpu->set_addrmap(AS_DATA, &sfcbox_state::spc_map);
+	m_soundcpu->dsp_io_read_callback().set(m_s_dsp, FUNC(s_dsp_device::dsp_io_r));
+	m_soundcpu->dsp_io_write_callback().set(m_s_dsp, FUNC(s_dsp_device::dsp_io_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* sfcbox hardware */
-	Z180(config, m_bios, XTAL(12'000'000) / 2);  /* HD64180RF6X */
+	Z80180(config, m_bios, XTAL(12'000'000));  /* HD64180RF6X */
 	m_bios->set_addrmap(AS_PROGRAM, &sfcbox_state::sfcbox_map);
 	m_bios->set_addrmap(AS_IO, &sfcbox_state::sfcbox_io);
 
@@ -479,9 +470,11 @@ void sfcbox_state::sfcbox(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SNES_SOUND(config, m_spc700, XTAL(24'576'000) / 12);
-	m_spc700->add_route(0, "lspeaker", 1.00);
-	m_spc700->add_route(1, "rspeaker", 1.00);
+
+	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	m_s_dsp->set_addrmap(0, &sfcbox_state::spc_map);
+	m_s_dsp->add_route(0, "lspeaker", 1.00);
+	m_s_dsp->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
@@ -489,7 +482,8 @@ void sfcbox_state::sfcbox(machine_config &config)
 
 	// SNES PPU
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	screen.set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	screen.set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	screen.set_screen_update(FUNC(snes_state::screen_update));
 
 	SNES_PPU(config, m_ppu, MCLK_NTSC);
@@ -515,10 +509,11 @@ void sfcbox_state::sfcbox(machine_config &config)
 
 #define SFCBOX_BIOS \
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x100, "sound_ipl", 0 ) \
-	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
-	ROM_REGION( 0x10000, "krom", 0 ) \
-	ROM_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4) ) \
+	ROM_REGION( 0x20000, "krom", 0 ) \
+	ROM_SYSTEM_BIOS( 0, "2.00", "SFCBox Bios Version 2.00" ) \
+	ROMX_LOAD( "krom2.00.ic1", 0x00000, 0x20000, CRC(e31b5580) SHA1(4a6a34a9a94c8249c3b441c2516bdd03e198c458), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "1.00", "SFCBox Bios Version 1.00" ) \
+	ROMX_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4), ROM_BIOS(1) ) \
 	ROM_REGION( 0x100000, "user3", 0 ) \
 	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
 
@@ -573,8 +568,8 @@ ROM_END
 ROM_START( pss64 )
 	SFCBOX_BIOS
 
-	ROM_REGION( 0x8000, "grom1", ROMREGION_ERASEFF )
-	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x8000, "grom1", 0 )
+	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, CRC(fcdbcb7d) SHA1(f27e8a264a427c3b74c8a370c380a79b9363affa) )
 
 	ROM_REGION( 0x8000, "grom2", ROMREGION_ERASEFF )
 
@@ -586,9 +581,11 @@ ROM_START( pss64 )
 //  ROM_LOAD( "shvc-m4-0.rom3", 0x400000, 0x100000, CRC(fb259f4f) SHA1(8faeb56f80e82dd042bdc84d19c526a979c6de8f) )
 ROM_END
 
+} // Anonymous namespace
+
 
 GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
 GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae no Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
 GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
 GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )

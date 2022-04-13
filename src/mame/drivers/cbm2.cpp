@@ -11,10 +11,7 @@
 */
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
-#include "softlist.h"
-#include "speaker.h"
+
 #include "bus/cbm2/exp.h"
 #include "bus/cbm2/user.h"
 #include "bus/ieee488/ieee488.h"
@@ -37,7 +34,11 @@
 #include "video/mc6845.h"
 #include "video/mos6566.h"
 
-#define M6509_TAG       "u13"
+#include "emupal.h"
+#include "screen.h"
+#include "softlist_dev.h"
+#include "speaker.h"
+
 #define PLA1_TAG        "u78"
 #define PLA2_TAG        "u88"
 #define MOS6567_TAG     "u23"
@@ -67,7 +68,7 @@ class cbm2_state : public driver_device
 public:
 	cbm2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6509_TAG),
+		m_maincpu(*this, "u13"),
 		m_pla1(*this, PLA1_TAG),
 		m_crtc(*this, MC68B45_TAG),
 		m_palette(*this, "palette"),
@@ -80,7 +81,7 @@ public:
 		m_ieee2(*this, DS75161A_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
-		m_exp(*this, CBM2_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_user(*this, USER_PORT_TAG),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
@@ -92,9 +93,9 @@ public:
 		m_basic(*this, "basic"),
 		m_kernal(*this, "kernal"),
 		m_charom(*this, "charom"),
-		m_buffer_ram(*this, "buffer_ram"),
-		m_extbuf_ram(*this, "extbuf_ram"),
-		m_video_ram(*this, "video_ram"),
+		m_buffer_ram(*this, "buffer_ram", 0x800, ENDIANNESS_LITTLE),
+		m_extbuf_ram(*this, "extbuf_ram", 0x800, ENDIANNESS_LITTLE),
+		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
 		m_pa(*this, "PA%u", 0),
 		m_pb(*this, "PB%u", 0),
 		m_lock(*this, "LOCK"),
@@ -131,14 +132,14 @@ public:
 	required_memory_region m_basic;
 	required_memory_region m_kernal;
 	required_memory_region m_charom;
-	optional_shared_ptr<uint8_t> m_buffer_ram;
-	optional_shared_ptr<uint8_t> m_extbuf_ram;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_buffer_ram;
+	memory_share_creator<uint8_t> m_extbuf_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 	required_ioport_array<8> m_pa;
 	required_ioport_array<8> m_pb;
 	required_ioport m_lock;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	DECLARE_MACHINE_START( cbm2 );
 	DECLARE_MACHINE_START( cbm2_ntsc );
@@ -158,40 +159,40 @@ public:
 	uint8_t read_keyboard();
 	void set_busy2(int state);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( ext_read );
-	DECLARE_WRITE8_MEMBER( ext_write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t ext_read(offs_t offset);
+	void ext_write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( sid_potx_r );
-	DECLARE_READ8_MEMBER( sid_poty_r );
+	uint8_t sid_potx_r();
+	uint8_t sid_poty_r();
 
-	DECLARE_READ8_MEMBER( tpi1_pa_r );
-	DECLARE_WRITE8_MEMBER( tpi1_pa_w );
-	DECLARE_READ8_MEMBER( tpi1_pb_r );
-	DECLARE_WRITE8_MEMBER( tpi1_pb_w );
+	uint8_t tpi1_pa_r();
+	void tpi1_pa_w(uint8_t data);
+	uint8_t tpi1_pb_r();
+	void tpi1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
 	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
 
-	DECLARE_WRITE8_MEMBER( tpi2_pa_w );
-	DECLARE_WRITE8_MEMBER( tpi2_pb_w );
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	void tpi2_pa_w(uint8_t data);
+	void tpi2_pb_w(uint8_t data);
+	uint8_t tpi2_pc_r();
 
-	DECLARE_READ8_MEMBER( cia_pa_r );
-	DECLARE_WRITE8_MEMBER( cia_pa_w );
-	DECLARE_READ8_MEMBER( cia_pb_r );
+	uint8_t cia_pa_r();
+	void cia_pa_w(uint8_t data);
+	uint8_t cia_pb_r();
 
-	DECLARE_READ8_MEMBER( ext_tpi_pb_r );
-	DECLARE_WRITE8_MEMBER( ext_tpi_pb_w );
-	DECLARE_WRITE8_MEMBER( ext_tpi_pc_w );
+	uint8_t ext_tpi_pb_r();
+	void ext_tpi_pb_w(uint8_t data);
+	void ext_tpi_pc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ext_cia_irq_w );
-	DECLARE_READ8_MEMBER( ext_cia_pb_r );
-	DECLARE_WRITE8_MEMBER( ext_cia_pb_w );
+	uint8_t ext_cia_pb_r();
+	void ext_cia_pb_w(uint8_t data);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbmb );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cbmb);
 	// memory state
 	int m_dramon;
 	int m_busen1;
@@ -241,7 +242,7 @@ public:
 	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
 
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	uint8_t tpi2_pc_r();
 	void b256hp(machine_config &config);
 	void b128hp(machine_config &config);
 	void cbm710(machine_config &config);
@@ -258,7 +259,7 @@ public:
 		: cbm2_state(mconfig, type, tag),
 			m_pla2(*this, PLA2_TAG),
 			m_vic(*this, MOS6569_TAG),
-			m_color_ram(*this, "color_ram"),
+			m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 			m_statvid(1),
 			m_vicdotsel(1),
 			m_vicbnksel(0x03)
@@ -266,7 +267,7 @@ public:
 
 	required_device<pla_device> m_pla2;
 	required_device<mos6566_device> m_vic;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 
 	DECLARE_MACHINE_START( p500 );
 	DECLARE_MACHINE_START( p500_ntsc );
@@ -288,19 +289,19 @@ public:
 	uint8_t read_memory(offs_t offset, offs_t va, int ba, int ae);
 	void write_memory(offs_t offset, uint8_t data, int ba, int ae);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_colorram_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
 	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
 
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi2_pc_w );
+	uint8_t tpi2_pc_r();
+	void tpi2_pc_w(uint8_t data);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( p500 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_p500);
 	// video state
 	int m_statvid;
 	int m_vicdotsel;
@@ -339,14 +340,14 @@ static void cbmb_quick_sethiaddress(address_space &space, uint16_t hiaddress)
 	space.write_byte(0xf0047, hiaddress >> 8);
 }
 
-QUICKLOAD_LOAD_MEMBER( cbm2_state, cbmb )
+QUICKLOAD_LOAD_MEMBER(cbm2_state::quickload_cbmb)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0x10000, cbmb_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0x10000, cbmb_quick_sethiaddress);
 }
 
-QUICKLOAD_LOAD_MEMBER( p500_state, p500 )
+QUICKLOAD_LOAD_MEMBER(p500_state::quickload_p500)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbmb_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbmb_quick_sethiaddress);
 }
 
 //**************************************************************************
@@ -461,7 +462,7 @@ void cbm2_state::bankswitch(offs_t offset, int eras, int ecas, int refen, int ca
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::read )
+uint8_t cbm2_state::read(offs_t offset)
 {
 	int eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
@@ -564,7 +565,7 @@ READ8_MEMBER( cbm2_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cbm2_state::write )
+void cbm2_state::write(offs_t offset, uint8_t data)
 {
 	int eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
@@ -655,7 +656,7 @@ WRITE8_MEMBER( cbm2_state::write )
 //  ext_read -
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::ext_read )
+uint8_t cbm2_state::ext_read(offs_t offset)
 {
 #ifdef USE_PLA_DECODE
 	int ras = 1, cas = 1, refen = 0, eras = 1, ecas = 0;
@@ -694,7 +695,7 @@ READ8_MEMBER( cbm2_state::ext_read )
 //  ext_write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cbm2_state::ext_write )
+void cbm2_state::ext_write(offs_t offset, uint8_t data)
 {
 #ifdef USE_PLA_DECODE
 	int ras = 1, cas = 1, refen = 0, eras = 1, ecas = 0;
@@ -1037,7 +1038,7 @@ void p500_state::write_memory(offs_t offset, uint8_t data, int ba, int ae)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( p500_state::read )
+uint8_t p500_state::read(offs_t offset)
 {
 	int ba = 0, ae = 1;
 	offs_t va = 0xffff;
@@ -1050,7 +1051,7 @@ READ8_MEMBER( p500_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( p500_state::write )
+void p500_state::write(offs_t offset, uint8_t data)
 {
 	int ba = 0, ae = 1;
 
@@ -1062,7 +1063,7 @@ WRITE8_MEMBER( p500_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( p500_state::vic_videoram_r )
+uint8_t p500_state::vic_videoram_r(offs_t offset)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 	int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
@@ -1109,7 +1110,7 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( p500_state::vic_colorram_r )
+uint8_t p500_state::vic_colorram_r(offs_t offset)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 	int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
@@ -1414,7 +1415,7 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	int x = 0;
 
@@ -1430,7 +1431,7 @@ MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 			if (cursor_x == column) color ^= 1;
 			color &= de;
 
-			bitmap.pix32(vbp + y, hbp + x++) = pen[color];
+			bitmap.pix(vbp + y, hbp + x++) = pen[color];
 
 			if (bit < 8 || !m_graphics) data <<= 1;
 		}
@@ -1442,7 +1443,7 @@ MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 //  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::sid_potx_r )
+uint8_t cbm2_state::sid_potx_r()
 {
 	uint8_t data = 0xff;
 
@@ -1469,7 +1470,7 @@ READ8_MEMBER( cbm2_state::sid_potx_r )
 	return data;
 }
 
-READ8_MEMBER( cbm2_state::sid_poty_r )
+uint8_t cbm2_state::sid_poty_r()
 {
 	uint8_t data = 0xff;
 
@@ -1501,7 +1502,7 @@ READ8_MEMBER( cbm2_state::sid_poty_r )
 //  tpi6525_interface tpi1_intf
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::tpi1_pa_r )
+uint8_t cbm2_state::tpi1_pa_r()
 {
 	/*
 
@@ -1531,7 +1532,7 @@ READ8_MEMBER( cbm2_state::tpi1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
+void cbm2_state::tpi1_pa_w(uint8_t data)
 {
 	/*
 
@@ -1562,7 +1563,7 @@ WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
 	m_ieee2->nrfd_w(BIT(data, 7));
 }
 
-READ8_MEMBER( cbm2_state::tpi1_pb_r )
+uint8_t cbm2_state::tpi1_pb_r()
 {
 	/*
 
@@ -1595,7 +1596,7 @@ READ8_MEMBER( cbm2_state::tpi1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::tpi1_pb_w )
+void cbm2_state::tpi1_pb_w(uint8_t data)
 {
 	/*
 
@@ -1672,17 +1673,17 @@ uint8_t cbm2_state::read_keyboard()
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::tpi2_pa_w )
+void cbm2_state::tpi2_pa_w(uint8_t data)
 {
 	m_tpi2_pa = data;
 }
 
-WRITE8_MEMBER( cbm2_state::tpi2_pb_w )
+void cbm2_state::tpi2_pb_w(uint8_t data)
 {
 	m_tpi2_pb = data;
 }
 
-READ8_MEMBER( cbm2_state::tpi2_pc_r )
+uint8_t cbm2_state::tpi2_pc_r()
 {
 	/*
 
@@ -1702,7 +1703,7 @@ READ8_MEMBER( cbm2_state::tpi2_pc_r )
 	return (m_ntsc << 6) | (read_keyboard() & 0x3f);
 }
 
-READ8_MEMBER( cbm2hp_state::tpi2_pc_r )
+uint8_t cbm2hp_state::tpi2_pc_r()
 {
 	/*
 
@@ -1722,7 +1723,7 @@ READ8_MEMBER( cbm2hp_state::tpi2_pc_r )
 	return read_keyboard();
 }
 
-READ8_MEMBER( p500_state::tpi2_pc_r )
+uint8_t p500_state::tpi2_pc_r()
 {
 	/*
 
@@ -1742,7 +1743,7 @@ READ8_MEMBER( p500_state::tpi2_pc_r )
 	return read_keyboard();
 }
 
-WRITE8_MEMBER( p500_state::tpi2_pc_w )
+void p500_state::tpi2_pc_w(uint8_t data)
 {
 	/*
 
@@ -1766,7 +1767,7 @@ WRITE8_MEMBER( p500_state::tpi2_pc_w )
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::cia_pa_r )
+uint8_t cbm2_state::cia_pa_r()
 {
 	/*
 
@@ -1786,7 +1787,7 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	uint8_t data = 0;
 
 	// IEEE-488
-	data |= m_ieee1->read(space, 0);
+	data |= m_ieee1->read();
 
 	// user port
 	data &= m_user->d1_r();
@@ -1798,7 +1799,7 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::cia_pa_w )
+void cbm2_state::cia_pa_w(uint8_t data)
 {
 	/*
 
@@ -1816,7 +1817,7 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 	*/
 
 	// IEEE-488
-	m_ieee1->write(space, 0, data);
+	m_ieee1->write(data);
 
 	// user port
 	m_user->d1_w(data);
@@ -1825,7 +1826,7 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 	m_cia_pa = data;
 }
 
-READ8_MEMBER( cbm2_state::cia_pb_r )
+uint8_t cbm2_state::cia_pb_r()
 {
 	/*
 
@@ -1877,7 +1878,7 @@ void cbm2_state::set_busy2(int state)
 	}
 }
 
-READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
+uint8_t cbm2_state::ext_tpi_pb_r()
 {
 	/*
 
@@ -1908,7 +1909,7 @@ READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
+void cbm2_state::ext_tpi_pb_w(uint8_t data)
 {
 	/*
 
@@ -1937,7 +1938,7 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 	m_ext_cia->flag_w(BIT(data, 6));
 }
 
-WRITE8_MEMBER( cbm2_state::ext_tpi_pc_w )
+void cbm2_state::ext_tpi_pc_w(uint8_t data)
 {
 	/*
 
@@ -1970,7 +1971,7 @@ WRITE_LINE_MEMBER( cbm2_state::ext_cia_irq_w )
 	m_tpi1->i3_w(!state);
 }
 
-READ8_MEMBER( cbm2_state::ext_cia_pb_r )
+uint8_t cbm2_state::ext_cia_pb_r()
 {
 	/*
 
@@ -2001,7 +2002,7 @@ READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
+void cbm2_state::ext_cia_pb_w(uint8_t data)
 {
 	/*
 
@@ -2045,7 +2046,7 @@ WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_tpi1->i0_w(m_todclk);
 
@@ -2061,10 +2062,6 @@ void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 MACHINE_START_MEMBER( cbm2_state, cbm2 )
 {
-	// allocate memory
-	m_video_ram.allocate(m_video_ram_size);
-	m_buffer_ram.allocate(0x800);
-
 	// allocate timer
 	int todclk = (m_ntsc ? 60 : 50) * 2;
 
@@ -2114,9 +2111,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 
 MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 {
-	// allocate memory
-	m_extbuf_ram.allocate(0x800);
-
 	MACHINE_START_CALL_MEMBER(cbm2_ntsc);
 }
 
@@ -2127,9 +2121,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 
 MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
 {
-	// allocate memory
-	m_extbuf_ram.allocate(0x800);
-
 	MACHINE_START_CALL_MEMBER(cbm2_pal);
 }
 
@@ -2143,9 +2134,6 @@ MACHINE_START_MEMBER( p500_state, p500 )
 	m_video_ram_size = 0x400;
 
 	MACHINE_START_CALL_MEMBER(cbm2);
-
-	// allocate memory
-	m_color_ram.allocate(0x400);
 
 	// state saving
 	save_item(NAME(m_statvid));
@@ -2249,15 +2237,14 @@ void p500_state::p500_ntsc(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(14'318'181)/14);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &p500_state::p500_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
 	// video hardware
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
-	mos6567.set_cpu(M6509_TAG);
+	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &p500_state::vic_videoram_map);
@@ -2361,17 +2348,14 @@ void p500_state::p500_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(p500_state, p500), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500));
 
 	// internal ram
 	_128k(config);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop").set_filter("NTSC");
 }
 
 
@@ -2386,15 +2370,14 @@ void p500_state::p500_pal(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(17'734'472)/18);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &p500_state::p500_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
 	// video hardware
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos6569.set_cpu(M6509_TAG);
+	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &p500_state::vic_videoram_map);
@@ -2495,17 +2478,14 @@ void p500_state::p500_pal(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(p500_state, p500), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500));
 
 	// internal ram
 	_128k(config);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("PAL");
-	subdevice<software_list_device>("flop_list")->set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("PAL");
+	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop").set_filter("PAL");
 }
 
 
@@ -2520,9 +2500,8 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(18'000'000)/9);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm2_state::cbm2_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
@@ -2541,7 +2520,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(cbm2_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(cbm2_state::crtc_update_row));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2628,14 +2607,11 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cbm2_state, cbmb), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(cbm2_state::quickload_cbmb));
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("cbm2_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("cbm2_flop").set_filter("NTSC");
 }
 
 

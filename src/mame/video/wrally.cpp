@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(wrally_state::get_tile_info)
 
 	tileinfo.category = (data2 >> 5) & 0x01;
 
-	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
+	tileinfo.set(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
 }
 
 /***************************************************************************
@@ -56,8 +56,8 @@ TILE_GET_INFO_MEMBER(wrally_state::get_tile_info)
 
 void wrally_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
 
 	m_tilemap[0]->set_transmask(0,0xff01,0x00ff); /* this layer is split in two (pens 1..7, pens 8-15) */
 	m_tilemap[1]->set_transparent_pen(0);

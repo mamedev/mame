@@ -26,7 +26,6 @@ Todo:
 #include "machine/gen_latch.h"
 #include "machine/ldv1000.h"
 #include "emupal.h"
-#include "render.h"
 #include "speaker.h"
 
 
@@ -51,9 +50,9 @@ private:
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
-	DECLARE_READ8_MEMBER(z80_2_ldp_read);
-	DECLARE_READ8_MEMBER(z80_2_unknown_read);
-	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
+	uint8_t z80_2_ldp_read();
+	uint8_t z80_2_unknown_read();
+	void z80_2_ldp_write(uint8_t data);
 	virtual void machine_start() override;
 	uint32_t screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -77,23 +76,20 @@ private:
 /* VIDEO GOODS */
 uint32_t istellar_state::screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	/* clear */
 	bitmap.fill(0, cliprect);
 
 	/* Draw tiles */
-	for (y = 0; y < 32; y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 32; x++)
+		for (int x = 0; x < 32; x++)
 		{
-			int tile = m_tile_ram[x+y*32];
-			int attr = m_tile_control_ram[x+y*32];
+			int tile = m_tile_ram[x + y * 32];
+			int attr = m_tile_control_ram[x + y * 32];
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tile,attr & 0x0f,0, 0, x*8, y*8, 0);
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, attr & 0x0f, 0, 0, x * 8, y * 8, 0);
 		}
 	}
-
 
 	/* Draw sprites */
 
@@ -114,20 +110,20 @@ void istellar_state::machine_start()
 
 
 /* Z80 2 R/W */
-READ8_MEMBER(istellar_state::z80_2_ldp_read)
+uint8_t istellar_state::z80_2_ldp_read()
 {
 	uint8_t readResult = m_laserdisc->status_r();
 	logerror("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
 
-READ8_MEMBER(istellar_state::z80_2_unknown_read)
+uint8_t istellar_state::z80_2_unknown_read()
 {
 	logerror("CPU2 : c000!\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(istellar_state::z80_2_ldp_write)
+void istellar_state::z80_2_ldp_write(uint8_t data)
 {
 	logerror("CPU2 : writing LDP : 0x%x\n", data);
 	m_laserdisc->data_w(data);
@@ -166,16 +162,16 @@ void istellar_state::z80_0_io(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x02, 0x02).portr("DSW1");
 	map(0x03, 0x03).portr("DSW2");
-	/*AM_RANGE(0x04,0x04) AM_WRITE(volatile_palette_write)*/
+/*  map(0x04, 0x04).w(FUNC(istellar_state::volatile_palette_write));*/
 	map(0x05, 0x05).r("latch1", FUNC(generic_latch_8_device::read)).w("latch2", FUNC(generic_latch_8_device::write));
 }
 
 void istellar_state::z80_1_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).noprw(); /*AM_READWRITE(z80_1_slatch_read,z80_1_slatch_write)*/
-	map(0x01, 0x01).noprw(); /*AM_READWRITE(z80_1_nmienable,z80_1_soundwrite_front)*/
-	map(0x02, 0x02).noprw(); /*AM_WRITE(z80_1_soundwrite_rear)*/
+	map(0x00, 0x00).noprw(); /*.rw(FUNC(istellar_state::z80_1_slatch_read), FUNC(istellar_state::z80_1_slatch_write));*/
+	map(0x01, 0x01).noprw(); /*.rw(FUNC(istellar_state::z80_1_nmienable), FUNC(istellar_state::z80_1_soundwrite_front));*/
+	map(0x02, 0x02).noprw(); /*.w(FUNC(istellar_state::z80_1_soundwrite_rear));*/
 }
 
 void istellar_state::z80_2_io(address_map &map)
@@ -184,7 +180,7 @@ void istellar_state::z80_2_io(address_map &map)
 	map(0x00, 0x00).rw(FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
 	map(0x01, 0x01).r("latch2", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).r("latch2", FUNC(generic_latch_8_device::acknowledge_r));
-/*  AM_RANGE(0x03,0x03) AM_WRITE(z80_2_ldtrans_write)*/
+/*  map(0x03, 0x03).w(FUNC(istellar_state::z80_2_ldtrans_write));*/
 }
 
 
@@ -273,7 +269,8 @@ WRITE_LINE_MEMBER(istellar_state::vblank_irq)
 
 
 /* DRIVER */
-MACHINE_CONFIG_START(istellar_state::istellar)
+void istellar_state::istellar(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, GUESSED_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &istellar_state::z80_0_mem);
@@ -297,13 +294,12 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(istellar_state::screen_update_istellar));
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, istellar_state, vblank_irq))
+	m_laserdisc->add_ntsc_screen(config, "screen");
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(istellar_state::vblank_irq));
 
 	// Daphne says "TODO: get the real interstellar resistor values"
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -313,7 +309,7 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 /* There is a photo of the PCB with blurry IC locations and labels.  Comments reflect what I can (barely) see. */

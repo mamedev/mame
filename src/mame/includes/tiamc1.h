@@ -8,6 +8,7 @@
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tiamc1_state : public driver_device
 {
@@ -29,33 +30,33 @@ protected:
 
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
-	uint8_t *m_tileram;
-	uint8_t *m_charram;
-	uint8_t *m_spriteram_x;
-	uint8_t *m_spriteram_y;
-	uint8_t *m_spriteram_a;
-	uint8_t *m_spriteram_n;
-	uint8_t *m_paletteram;
-	uint8_t m_layers_ctrl;
-	uint8_t m_bg_vshift;
-	uint8_t m_bg_hshift;
-	uint8_t m_bg_bplctrl;
-	tilemap_t *m_bg_tilemap1;
-	tilemap_t *m_bg_tilemap2;
+	uint8_t *m_tileram = nullptr;
+	uint8_t *m_charram = nullptr;
+	uint8_t *m_spriteram_x = nullptr;
+	uint8_t *m_spriteram_y = nullptr;
+	uint8_t *m_spriteram_a = nullptr;
+	uint8_t *m_spriteram_n = nullptr;
+	uint8_t *m_paletteram = nullptr;
+	uint8_t m_layers_ctrl =0;
+	uint8_t m_bg_vshift = 0;
+	uint8_t m_bg_hshift = 0;
+	uint8_t m_bg_bplctrl = 0;
+	tilemap_t *m_bg_tilemap1 = nullptr;
+	tilemap_t *m_bg_tilemap2 = nullptr;
 	std::unique_ptr<rgb_t[]> m_palette_ptr;
-	DECLARE_WRITE8_MEMBER(tiamc1_control_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_videoram_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_sprite_x_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_sprite_y_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_sprite_a_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_sprite_n_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_bg_vshift_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_bg_hshift_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_bg_bplctrl_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
-	DECLARE_WRITE8_MEMBER(kot_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(kot_videoram_w);
+	void tiamc1_control_w(uint8_t data);
+	void tiamc1_videoram_w(offs_t offset, uint8_t data);
+	void tiamc1_bankswitch_w(uint8_t data);
+	void tiamc1_sprite_x_w(offs_t offset, uint8_t data);
+	void tiamc1_sprite_y_w(offs_t offset, uint8_t data);
+	void tiamc1_sprite_a_w(offs_t offset, uint8_t data);
+	void tiamc1_sprite_n_w(offs_t offset, uint8_t data);
+	void tiamc1_bg_vshift_w(uint8_t data);
+	void tiamc1_bg_hshift_w(uint8_t data);
+	void tiamc1_bg_bplctrl_w(uint8_t data);
+	void tiamc1_palette_w(offs_t offset, uint8_t data);
+	void kot_bankswitch_w(uint8_t data);
+	void kot_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_2_w);
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);

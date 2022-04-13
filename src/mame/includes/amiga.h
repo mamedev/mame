@@ -20,6 +20,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "bus/centronics/ctronics.h"
 #include "machine/mos6526.h"
 #include "machine/amigafdc.h"
+#include "machine/amiga_copper.h"
 #include "machine/msm6242.h"
 #include "machine/akiko.h"
 #include "machine/i2cmem.h"
@@ -94,7 +95,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BLTCDAT     (0x070/2)   /* W  A      Blitter source C data register */
 #define REG_BLTBDAT     (0x072/2)   /* W  A      Blitter source B data reglster */
 #define REG_BLTADAT     (0x074/2)   /* W  A      Blitter source A data register */
-#define REG_DENISEID    (0x07C/2)   /* R    D    Denise ID: OCS = 0xFF, ECS = 0xFC, AGA = 0xF8 */
+#define REG_DENISEID    (0x07C/2)   /* R    D    Denise ID: OCS = <open bus>, ECS = 0xFC, AGA = 0xF8 */
 #define REG_DSKSYNC     (0x07E/2)   /* W      P  Disk sync pattern register for disk read */
 #define REG_COP1LCH     (0x080/2)   /* W  A      Coprocessor first location register (high 3 bits) */
 #define REG_COP1LCL     (0x082/2)   /* W  A      Coprocessor first location register (low 15 bits) */
@@ -307,57 +308,67 @@ Ernesto Corvi & Mariusz Wojcieszek
 class amiga_state : public driver_device
 {
 public:
-	amiga_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_agnus_id(AGNUS_NTSC),
-		m_denise_id(DENISE),
-		m_maincpu(*this, "maincpu"),
-		m_cia_0(*this, "cia_0"),
-		m_cia_1(*this, "cia_1"),
-		m_rs232(*this, "rs232"),
-		m_centronics(*this, "centronics"),
-		m_paula(*this, "amiga"),
-		m_fdc(*this, "fdc"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_overlay(*this, "overlay"),
-		m_input_device(*this, "input"),
-		m_joy0dat_port(*this, "joy_0_dat"),
-		m_joy1dat_port(*this, "joy_1_dat"),
-		m_potgo_port(*this, "potgo"),
-		m_pot0dat_port(*this, "POT0DAT"),
-		m_pot1dat_port(*this, "POT1DAT"),
-		m_joy_ports(*this, "p%u_joy", 1),
-		m_p1_mouse_x(*this, "p1_mouse_x"),
-		m_p1_mouse_y(*this, "p1_mouse_y"),
-		m_p2_mouse_x(*this, "p2_mouse_x"),
-		m_p2_mouse_y(*this, "p2_mouse_y"),
-		m_hvpos(*this, "HVPOS"),
-		m_power_led(*this, "power_led"),
-		m_chip_ram_mask(0),
-		m_cia_0_irq(0),
-		m_cia_1_irq(0),
-		m_pot0x(0), m_pot1x(0), m_pot0y(0), m_pot1y(0),
-		m_pot0dat(0x0000),
-		m_pot1dat(0x0000),
-		m_centronics_busy(0),
-		m_centronics_perror(0),
-		m_centronics_select(0),
-		m_gayle_reset(false),
-		m_diw(),
-		m_diwhigh_valid(false),
-		m_previous_lof(true),
-		m_rx_shift(0),
-		m_tx_shift(0),
-		m_rx_state(0),
-		m_tx_state(0),
-		m_rx_previous(1)
-	{ }
+	amiga_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_agnus_id(AGNUS_NTSC)
+		, m_denise_id(DENISE)
+		, m_maincpu(*this, "maincpu")
+		, m_cia_0(*this, "cia_0")
+		, m_cia_1(*this, "cia_1")
+		, m_rs232(*this, "rs232")
+		, m_centronics(*this, "centronics")
+//      , m_agnus(*this, "agnus")
+//      , m_denise(*this, "denise")
+		, m_copper(*this, "copper")
+//      , m_blitter(*this, "blitter")
+		, m_paula(*this, "paula")
+		, m_fdc(*this, "fdc")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_overlay(*this, "overlay")
+		, m_chipset(*this, "chipset")
+		, m_input_device(*this, "input")
+		, m_joy0dat_port(*this, "joy_0_dat")
+		, m_joy1dat_port(*this, "joy_1_dat")
+		, m_potgo_port(*this, "potgo")
+		, m_pot0dat_port(*this, "POT0DAT")
+		, m_pot1dat_port(*this, "POT1DAT")
+		, m_joy_ports(*this, "p%u_joy", 1)
+		, m_p1_mouse_x(*this, "p1_mouse_x")
+		, m_p1_mouse_y(*this, "p1_mouse_y")
+		, m_p2_mouse_x(*this, "p2_mouse_x")
+		, m_p2_mouse_y(*this, "p2_mouse_y")
+		, m_hvpos(*this, "HVPOS")
+		, m_power_led(*this, "power_led")
+		, m_chip_ram_mask(0)
+		, m_cia_0_irq(0)
+		, m_cia_1_irq(0)
+		, m_pot0x(0), m_pot1x(0), m_pot0y(0), m_pot1y(0)
+		, m_pot0dat(0x0000)
+		, m_pot1dat(0x0000)
+		, m_centronics_busy(0)
+		, m_centronics_perror(0)
+		, m_centronics_select(0)
+		, m_gayle_reset(false)
+		, m_diw()
+		, m_diwhigh_valid(false)
+		, m_previous_lof(true)
+		, m_rx_shift(0)
+		, m_tx_shift(0)
+		, m_rx_state(0)
+		, m_tx_state(0)
+		, m_rx_previous(1)
+	{
+		std::fill(std::begin(m_custom_regs), std::end(m_custom_regs), 0);
+	}
 
 	/* chip RAM access */
 	uint16_t read_chip_ram(offs_t byteoffs)
 	{
-		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : 0xffff;
+		// We use rand() here so that an attempt to go beyond the allocated chip RAM
+		// (hopefully) doesn't go unnoticed.
+		// FIXME: most likely open bus instead.
+		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : machine().rand();
 	}
 
 	void write_chip_ram(offs_t byteoffs, uint16_t data)
@@ -366,59 +377,61 @@ public:
 			m_chip_ram.write(byteoffs >> 1, data);
 	}
 
-	DECLARE_READ16_MEMBER(chip_ram_r)
+	uint16_t chip_ram_r(offs_t offset, uint16_t mem_mask = ~0)
 	{
 		return read_chip_ram(offset & ~1) & mem_mask;
 	}
 
-	DECLARE_WRITE16_MEMBER(chip_ram_w)
+	void chip_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
 	{
 		uint16_t val = read_chip_ram(offset & ~1) & ~mem_mask;
 		write_chip_ram(offset & ~1, val | data);
 	}
 
 	/* sprite states */
-	uint8_t m_sprite_comparitor_enable_mask;
-	uint8_t m_sprite_dma_reload_mask;
-	uint8_t m_sprite_dma_live_mask;
-	uint8_t m_sprite_ctl_written;
-	uint32_t m_sprite_shiftreg[8];
-	uint8_t m_sprite_remain[8];
+	uint8_t m_sprite_comparitor_enable_mask = 0;
+	uint8_t m_sprite_dma_reload_mask = 0;
+	uint8_t m_sprite_dma_live_mask = 0;
+	uint8_t m_sprite_ctl_written = 0;
+	uint32_t m_sprite_shiftreg[8]{};
+	uint8_t m_sprite_remain[8]{};
 
 	/* copper states */
-	uint32_t m_copper_pc;
-	uint8_t m_copper_waiting;
-	uint8_t m_copper_waitblit;
-	uint16_t m_copper_waitval;
-	uint16_t m_copper_waitmask;
-	uint16_t m_copper_pending_offset;
-	uint16_t m_copper_pending_data;
-	int m_wait_offset;
+	uint32_t m_copper_pc = 0;
+	uint8_t m_copper_waiting = 0;
+	uint8_t m_copper_waitblit = 0;
+	uint16_t m_copper_waitval = 0;
+	uint16_t m_copper_waitmask = 0;
+	uint16_t m_copper_pending_offset = 0;
+	uint16_t m_copper_pending_data = 0;
+	int m_wait_offset = 0;
 
 	/* playfield states */
-	int m_last_scanline;
+	int m_last_scanline = 0;
 	rgb_t m_ham_color;
 
 	/* misc states */
-	uint16_t m_genlock_color;
+	uint16_t m_genlock_color = 0;
 
 	/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
-	uint8_t m_separate_bitplanes[2][64];
+	// FIXME: we instantiate 256 entries so that it pleases AGA
+	uint8_t m_separate_bitplanes[2][256];
 
 	/* aga */
-	int m_aga_diwhigh_written;
-	rgb_t m_aga_palette[256];
-	uint64_t m_aga_bpldat[8];
-	uint16_t m_aga_sprdata[8][4];
-	uint16_t m_aga_sprdatb[8][4];
-	int m_aga_sprite_fetched_words;
-	int m_aga_sprite_dma_used_words[8];
+	int m_aga_diwhigh_written = 0;
+	rgb_t m_aga_palette[256]{};
+	rgb_t m_aga_ehb_palette[32 + 32]{};
+	uint64_t m_aga_bpldat[8]{};
+	uint16_t m_aga_sprdata[8][4]{};
+	uint16_t m_aga_sprdatb[8][4]{};
+	int m_aga_sprite_fetched_words = 0;
+	int m_aga_sprite_dma_used_words[8]{};
 
 	DECLARE_VIDEO_START( amiga );
 	DECLARE_VIDEO_START( amiga_aga );
 	void amiga_palette(palette_device &palette) const;
 
-	uint32_t screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
 
@@ -427,19 +440,19 @@ public:
 	TIMER_CALLBACK_MEMBER( amiga_blitter_proc );
 	void update_irqs();
 
-	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
 	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
 
 	DECLARE_WRITE_LINE_MEMBER( m68k_reset );
 	DECLARE_WRITE_LINE_MEMBER( kbreset_w );
 
-	DECLARE_READ16_MEMBER( cia_r );
-	DECLARE_WRITE16_MEMBER( cia_w );
-	DECLARE_WRITE16_MEMBER( gayle_cia_w );
-	DECLARE_WRITE8_MEMBER( cia_0_port_a_write );
+	uint16_t cia_r(offs_t offset, uint16_t mem_mask = ~0);
+	void cia_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gayle_cia_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cia_0_port_a_write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cia_0_irq );
-	DECLARE_READ8_MEMBER( cia_1_port_a_read );
-	DECLARE_WRITE8_MEMBER( cia_1_port_a_write );
+	uint8_t cia_1_port_a_read();
+	void cia_1_port_a_write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cia_1_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
@@ -453,13 +466,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w );
 	DECLARE_WRITE_LINE_MEMBER( centronics_select_w );
 
-	DECLARE_READ16_MEMBER( custom_chip_r );
-	DECLARE_WRITE16_MEMBER( custom_chip_w );
+	uint16_t custom_chip_r(offs_t offset);
+	void custom_chip_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( paula_int_w );
+	void paula_int_w(offs_t channel, u8 state);
 
-	DECLARE_READ16_MEMBER( rom_mirror_r );
-	DECLARE_READ32_MEMBER( rom_mirror32_r );
+	uint16_t rom_mirror_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint32_t rom_mirror32_r(offs_t offset, uint32_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_dskblk_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_dsksyn_w);
@@ -486,15 +499,10 @@ public:
 		HBLANK = 186
 	};
 
-	emu_timer *m_blitter_timer;
+	emu_timer *m_blitter_timer = nullptr;
 
-	uint16_t m_agnus_id;
-	uint16_t m_denise_id;
-
-	void write_custom_chip(uint16_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
-	{
-		custom_chip_w(m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
-	}
+	uint16_t m_agnus_id = 0;
+	uint16_t m_denise_id = 0;
 
 	void blitter_setup();
 
@@ -539,7 +547,7 @@ protected:
 	};
 
 	// chipset
-	bool IS_OCS() const { return m_denise_id == 0xff; }
+	bool IS_OCS() const { return m_denise_id == 0xffff; }
 	bool IS_ECS() const { return m_denise_id == 0xfc; }
 	bool IS_AGA() const { return m_denise_id == 0xf8; }
 
@@ -548,7 +556,7 @@ protected:
 	virtual void machine_reset() override;
 
 	// device_t overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void custom_chip_reset();
 
@@ -561,7 +569,7 @@ protected:
 
 	virtual void vblank();
 
-	virtual void potgo_w(uint16_t data) {};
+	virtual void potgo_w(uint16_t data) {}
 
 	// joystick/mouse
 	virtual uint16_t joy0dat_r();
@@ -576,12 +584,13 @@ protected:
 	required_device<mos8520_device> m_cia_1;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
+	required_device<amiga_copper_device> m_copper;
 	required_device<paula_8364_device> m_paula;
 	optional_device<amiga_fdc_device> m_fdc;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;
-
+	required_device<address_map_bank_device> m_chipset;
 
 	// i/o ports
 	optional_ioport m_input_device;
@@ -601,11 +610,21 @@ protected:
 	memory_array m_chip_ram;
 	uint32_t m_chip_ram_mask;
 
-	int m_cia_0_irq;
-	int m_cia_1_irq;
+	int m_cia_0_irq = 0;
+	int m_cia_1_irq = 0;
 
-	uint16_t m_custom_regs[256];
+	uint16_t m_custom_regs[256]{};
 	static const char *const s_custom_reg_names[0x100];
+
+	void ocs_map(address_map &map);
+	void ecs_map(address_map &map);
+	void aga_map(address_map &map);
+
+	// TODO: move to Agnus/Alice
+	u16 vposr_r();
+	void vposw_w(u16 data);
+	void bplcon0_w(u16 data);
+	void aga_bplcon0_w(u16 data);
 
 private:
 	// blitter helpers
@@ -617,8 +636,6 @@ private:
 protected:
 	void set_genlock_color(uint16_t color);
 private:
-	void copper_setpc(uint32_t pc);
-	int copper_execute_next(int xpos);
 	void sprite_dma_reset(int which);
 	void sprite_enable_comparitor(int which, int enable);
 	void fetch_sprite_data(int scanline, int sprite);
@@ -630,7 +647,7 @@ private:
 	void fetch_bitplane_data(int plane);
 	int update_ham(int newpix);
 	void update_display_window();
-	void render_scanline(bitmap_ind16 &bitmap, int scanline);
+	void render_scanline(bitmap_rgb32 &bitmap, int scanline);
 
 	// AGA video helpers
 	void aga_palette_write(int color_reg, uint16_t data);
@@ -640,8 +657,8 @@ private:
 	int aga_get_sprite_pixel(int x);
 	uint8_t aga_assemble_odd_bitplanes(int planes, int obitoffs);
 	uint8_t aga_assemble_even_bitplanes(int planes, int ebitoffs);
-	void aga_fetch_bitplane_data(int plane);
-	rgb_t aga_update_ham(int newpix);
+	void aga_fetch_bitplane_data(int plane, u8 bitplane_fmode);
+	rgb_t aga_update_ham(int newpix, int plane);
 
 	enum
 	{
@@ -688,9 +705,9 @@ private:
 	int m_centronics_perror;
 	int m_centronics_select;
 
-	emu_timer *m_irq_timer;
-	emu_timer *m_serial_timer;
-	emu_timer *m_scanline_timer;
+	emu_timer *m_irq_timer = nullptr;
+	emu_timer *m_serial_timer = nullptr;
+	emu_timer *m_scanline_timer = nullptr;
 
 	bool m_gayle_reset;
 
@@ -699,8 +716,7 @@ private:
 	bool m_diwhigh_valid;
 
 	bool m_previous_lof;
-	bitmap_ind16 m_flickerfixer;
-	bitmap_ind32 m_flickerfixer32;
+	bitmap_rgb32 m_flickerfixer;
 
 	uint16_t m_rx_shift;
 	uint16_t m_tx_shift;
@@ -709,10 +725,10 @@ private:
 	int m_tx_state;
 	int m_rx_previous;
 
-	int m_rs232_dcd;
-	int m_rs232_dsr;
-	int m_rs232_ri;
-	int m_rs232_cts;
+	int m_rs232_dcd = 0;
+	int m_rs232_dsr = 0;
+	int m_rs232_ri = 0;
+	int m_rs232_cts = 0;
 
 	void serial_adjust();
 	void serial_shift();

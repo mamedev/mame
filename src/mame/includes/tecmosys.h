@@ -16,6 +16,7 @@
 #include "machine/watchdog.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class tecmosys_state : public driver_device
 {
@@ -64,52 +65,54 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<input_merger_device> m_soundnmi;
 
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_tilemap_paletteram16;
-	required_shared_ptr_array<uint16_t, 4> m_vram;
-	required_shared_ptr_array<uint16_t, 3> m_lineram;
-	required_shared_ptr_array<uint16_t, 4> m_scroll;
-	required_shared_ptr<uint16_t> m_880000regs;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_tilemap_paletteram16;
+	required_shared_ptr_array<u16, 4> m_vram;
+	required_shared_ptr_array<u16, 3> m_lineram;
+	required_shared_ptr_array<u16, 4> m_scroll;
+	required_shared_ptr<u16> m_880000regs;
 
-	required_region_ptr<uint8_t> m_sprite_region;
+	required_region_ptr<u8> m_sprite_region;
+	std::unique_ptr<u8[]>   m_sprite_gfx;
+	offs_t                  m_sprite_gfx_mask = 0;
 
 	required_memory_bank m_audiobank;
 	required_memory_bank_array<2> m_okibank;
 
-	int m_spritelist;
+	int m_spritelist = 0;
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tmp_tilemap_composebitmap;
 	bitmap_ind16 m_tmp_tilemap_renderbitmap;
-	tilemap_t *m_tilemap[4];
-	uint8_t m_device_read_ptr;
-	uint8_t m_device_status;
-	const struct prot_data* m_device_data;
-	uint8_t m_device_value;
+	tilemap_t *m_tilemap[4]{};
+	u8 m_device_read_ptr = 0;
+	u8 m_device_status = 0;
+	const struct prot_data* m_device_data = nullptr;
+	u8 m_device_value = 0;
 
-	DECLARE_READ8_MEMBER(sound_command_pending_r);
-	DECLARE_WRITE8_MEMBER(sound_nmi_disable_w);
-	DECLARE_WRITE16_MEMBER(unk880000_w);
-	DECLARE_READ16_MEMBER(unk880000_r);
-	DECLARE_WRITE8_MEMBER(z80_bank_w);
-	DECLARE_WRITE8_MEMBER(oki_bank_w);
-	DECLARE_READ16_MEMBER(prot_status_r);
-	DECLARE_WRITE16_MEMBER(prot_status_w);
-	DECLARE_READ16_MEMBER(prot_data_r);
-	DECLARE_WRITE16_MEMBER(prot_data_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(lineram_w);
-	DECLARE_READ16_MEMBER(eeprom_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
+	u8 sound_command_pending_r();
+	void sound_nmi_disable_w(u8 data);
+	void unk880000_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 unk880000_r(offs_t offset);
+	void z80_bank_w(u8 data);
+	void oki_bank_w(u8 data);
+	u16 prot_status_r(offs_t offset, u16 mem_mask = ~0);
+	void prot_status_w(u16 data);
+	u16 prot_data_r();
+	void prot_data_w(u16 data);
+	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template<int Layer> void lineram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 eeprom_r();
+	void eeprom_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void prot_init(int which);
 	void prot_reset();
-	inline void set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data);
-	void render_sprites_to_bitmap(bitmap_rgb32 &bitmap, uint16_t extrax, uint16_t extray);
-	void tilemap_copy_to_compose(uint16_t pri, const rectangle &cliprect);
+	inline void set_color_555(pen_t color, int rshift, int gshift, int bshift, u16 data);
+	void render_sprites_to_bitmap(const rectangle &cliprect, u16 extrax, u16 extray);
+	void tilemap_copy_to_compose(u16 pri, const rectangle &cliprect);
 	void do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void descramble();
 

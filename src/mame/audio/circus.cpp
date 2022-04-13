@@ -149,7 +149,7 @@ DISCRETE_SOUND_END
 /* and also is used to enable the amplifier and trigger the   */
 /* discrete circuitry that produces sound effects and music   */
 
-WRITE8_MEMBER(circus_state::circus_clown_z_w)
+void circus_state::circus_clown_z_w(uint8_t data)
 {
 	m_clown_z = (data & 0x0f);
 	*(memregion("maincpu")->base() + 0x8000) = data; logerror("Z:%02x\n",data); //DEBUG

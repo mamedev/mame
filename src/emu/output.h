@@ -6,22 +6,24 @@
 
     General purpose output routines.
 ***************************************************************************/
+#ifndef MAME_EMU_OUTPUT_H
+#define MAME_EMU_OUTPUT_H
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
-#ifndef MAME_EMU_OUTPUT_H
-#define MAME_EMU_OUTPUT_H
+#include <functional>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-typedef void (*output_notifier_func)(const char *outname, s32 value, void *param);
 
 // ======================> output_manager
 
@@ -30,10 +32,12 @@ class output_manager
 private:
 	template <typename Input, std::make_unsigned_t<Input> DefaultMask> friend class devcb_write;
 
+	typedef void (*notifier_func)(const char *outname, s32 value, void *param);
+
 	class output_notify
 	{
 	public:
-		output_notify(output_notifier_func callback, void *param)
+		output_notify(notifier_func callback, void *param)
 			: m_notifier(callback)
 			, m_param(param)
 		{
@@ -42,8 +46,8 @@ private:
 		void operator()(char const *outname, s32 value) const { m_notifier(outname, value, m_param); }
 
 	private:
-		output_notifier_func    m_notifier;       // callback to call
-		void *                  m_param;          // parameter to pass the callback
+		notifier_func   m_notifier;       // callback to call
+		void *          m_param;          // parameter to pass the callback
 	};
 	using notify_vector = std::vector<output_notify>;
 
@@ -67,7 +71,7 @@ private:
 		void set(s32 value) { if (m_value != value) { notify(value); } }
 		void notify(s32 value);
 
-		void set_notifier(output_notifier_func callback, void *param) { m_notifylist.emplace_back(callback, param); }
+		void set_notifier(notifier_func callback, void *param) { m_notifylist.emplace_back(callback, param); }
 
 	private:
 		output_manager      &m_manager;     // parent output manager
@@ -81,7 +85,7 @@ private:
 	{
 	public:
 		item_proxy() = default;
-		void resolve(device_t &device, std::string const &name);
+		void resolve(device_t &device, std::string_view name);
 		operator s32() const { return m_item->get(); }
 		s32 operator=(s32 value) { m_item->set(value); return m_item->get(); }
 	private:
@@ -105,6 +109,7 @@ public:
 		auto &operator[](unsigned n) { return m_proxies[n]; }
 		auto &operator[](unsigned n) const { return m_proxies[n]; }
 
+		auto size() const { return std::size(m_proxies); }
 		auto begin() { return std::begin(m_proxies); }
 		auto end() { return std::end(m_proxies); }
 		auto begin() const { return std::begin(m_proxies); }
@@ -158,45 +163,57 @@ public:
 	// construction/destruction
 	output_manager(running_machine &machine);
 
+	// register for save states
+	void register_save() ATTR_COLD;
+
 	// getters
 	running_machine &machine() const { return m_machine; }
 
 	// set the value for a given output
-	void set_value(const char *outname, s32 value);
+	void set_value(std::string_view outname, s32 value);
 
 	// return the current value for a given output
-	s32 get_value(const char *outname);
+	s32 get_value(std::string_view outname);
 
-	// set a notifier on a particular output, or globally if nullptr
-	void set_notifier(const char *outname, output_notifier_func callback, void *param);
+	// set a notifier on a particular output
+	void set_notifier(std::string_view outname, notifier_func callback, void *param);
 
-	// set a notifier on a particular output, or globally if nullptr
-	void notify_all(output_module *module);
+	// set a notifier globally
+	void set_global_notifier(notifier_func callback, void *param);
+
+	// immdediately call a notifier for all outputs
+	template <typename T> void notify_all(T &&notifier) const
+	{
+		for (auto const &item : m_itemtable)
+			notifier(item.second.name().c_str(), item.second.get());
+	}
 
 	// map a name to a unique ID
-	u32 name_to_id(const char *outname);
+	u32 name_to_id(std::string_view outname);
 
 	// map a unique ID back to a name
 	const char *id_to_name(u32 id);
 
+private:
+	output_item *find_item(std::string_view string);
+	output_item &create_new_item(std::string_view outname, s32 value);
+	output_item &find_or_create_item(std::string_view outname, s32 value);
+
+	// event handlers
 	void pause();
 	void resume();
-
-private:
-	// set an indexed value for an output (concatenates basename + index)
-	void set_indexed_value(const char *basename, int index, int value);
-
-	output_item *find_item(const char *string);
-	output_item &create_new_item(const char *outname, s32 value);
-	output_item &find_or_create_item(const char *outname, s32 value);
+	void presave() ATTR_COLD;
+	void postload() ATTR_COLD;
 
 	// internal state
 	running_machine &m_machine;                  // reference to our machine
 	std::unordered_map<std::string, output_item> m_itemtable;
 	notify_vector m_global_notifylist;
+	std::vector<std::reference_wrapper<output_item> > m_save_order;
+	std::unique_ptr<s32 []> m_save_data;
 	u32 m_uniqueid;
 };
 
 template <unsigned... N> using output_finder = output_manager::output_finder<void, N...>;
 
-#endif  // MAME_EMU_OUTPUT_H
+#endif // MAME_EMU_OUTPUT_H

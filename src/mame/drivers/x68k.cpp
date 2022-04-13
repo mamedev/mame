@@ -147,27 +147,24 @@
 static constexpr uint32_t adpcm_clock[2] = { 8000000, 4000000 };
 static constexpr uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
 
-void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_X68K_LED:
-		led_callback(ptr, param);
+		led_callback(param);
 		break;
 	case TIMER_X68K_SCC_ACK:
-		scc_ack(ptr, param);
+		scc_ack(param);
 		break;
 	case TIMER_MD_6BUTTON_PORT1_TIMEOUT:
-		md_6button_port1_timeout(ptr, param);
+		md_6button_port1_timeout(param);
 		break;
 	case TIMER_MD_6BUTTON_PORT2_TIMEOUT:
-		md_6button_port2_timeout(ptr, param);
+		md_6button_port2_timeout(param);
 		break;
 	case TIMER_X68K_BUS_ERROR:
-		bus_error(ptr, param);
-		break;
-	case TIMER_X68K_NET_IRQ:
-		net_irq(ptr, param);
+		bus_error(param);
 		break;
 	case TIMER_X68K_FDC_TC:
 		m_upd72065->tc_w(ASSERT_LINE);
@@ -178,7 +175,7 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_hd63450->drq3_w(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in x68k_state::device_timer");
+		throw emu_fatalerror("Unknown id in x68k_state::device_timer");
 	}
 }
 
@@ -246,32 +243,32 @@ int x68k_state::read_mouse()
     0xe98005 - Z8530 command port A
     0xe98007 - Z8530 data port A  (RS232)
 */
-READ16_MEMBER(x68k_state::scc_r )
+uint16_t x68k_state::scc_r(offs_t offset)
 {
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
-		return m_scc->reg_r(space, 0);
+		return m_scc->reg_r(0);
 	case 1:
 		return read_mouse();
 	case 2:
-		return m_scc->reg_r(space, 1);
+		return m_scc->reg_r(1);
 	case 3:
-		return m_scc->reg_r(space, 3);
+		return m_scc->reg_r(3);
 	default:
 		return 0xff;
 	}
 }
 
-WRITE16_MEMBER(x68k_state::scc_w )
+void x68k_state::scc_w(offs_t offset, uint16_t data)
 {
 	offset %= 4;
 
 	switch(offset)
 	{
 	case 0:
-		m_scc->reg_w(space, 0,(uint8_t)data);
+		m_scc->reg_w(0,(uint8_t)data);
 		if((m_scc->get_reg_b(5) & 0x02) != m_scc_prev)
 		{
 			if(m_scc->get_reg_b(5) & 0x02)  // Request to Send
@@ -284,13 +281,13 @@ WRITE16_MEMBER(x68k_state::scc_w )
 		}
 		break;
 	case 1:
-		m_scc->reg_w(space, 2,(uint8_t)data);
+		m_scc->reg_w(2,(uint8_t)data);
 		break;
 	case 2:
-		m_scc->reg_w(space, 1,(uint8_t)data);
+		m_scc->reg_w(1,(uint8_t)data);
 		break;
 	case 3:
-		m_scc->reg_w(space, 3,(uint8_t)data);
+		m_scc->reg_w(3,(uint8_t)data);
 		break;
 	}
 	m_scc_prev = m_scc->get_reg_b(5) & 0x02;
@@ -311,10 +308,9 @@ TIMER_CALLBACK_MEMBER(x68k_state::scc_ack)
 		{
 			if(m_scc->get_reg_b(5) & 0x02)  // RTS signal
 			{
-				m_mouse.irqactive = 1;
-				m_current_vector[5] = 0x54;
-				//m_current_irq_line = 5;
-				m_maincpu->set_input_line(5,ASSERT_LINE);
+				m_mouse.irqactive = true;
+				m_mouse.irqvector = 0x54;
+				update_ipl();
 			}
 		}
 	}
@@ -501,7 +497,7 @@ uint8_t x68k_state::xpd1lr_r(int port)
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
-READ8_MEMBER(x68k_state::ppi_port_a_r)
+uint8_t x68k_state::ppi_port_a_r()
 {
 	int ctrl = m_ctrltype->read() & 0x0f;
 
@@ -523,7 +519,7 @@ READ8_MEMBER(x68k_state::ppi_port_a_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_b_r)
+uint8_t x68k_state::ppi_port_b_r()
 {
 	int ctrl = m_ctrltype->read() & 0xf0;
 
@@ -545,7 +541,7 @@ READ8_MEMBER(x68k_state::ppi_port_b_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_c_r)
+uint8_t x68k_state::ppi_port_c_r()
 {
 	return m_ppi_port[2];
 }
@@ -558,7 +554,7 @@ READ8_MEMBER(x68k_state::ppi_port_c_r)
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan (00 = Both, 01 = Right only, 10 = Left only, 11 = Off)
 */
-WRITE8_MEMBER(x68k_state::ppi_port_c_w)
+void x68k_state::ppi_port_c_w(uint8_t data)
 {
 	// ADPCM / Joystick control
 	m_ppi_port[2] = data;
@@ -599,7 +595,7 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 
 
 // NEC uPD72065 at 0xe94000
-WRITE16_MEMBER(x68k_state::fdc_w)
+void x68k_state::fdc_w(offs_t offset, uint16_t data)
 {
 	unsigned int drive, x;
 	switch(offset)
@@ -643,7 +639,7 @@ WRITE16_MEMBER(x68k_state::fdc_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::fdc_r)
+uint16_t x68k_state::fdc_r(offs_t offset)
 {
 	unsigned int ret;
 	int x;
@@ -678,17 +674,18 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 {
 	if((m_ioc.irqstatus & 0x04) && state)
 	{
-		m_current_vector[1] = m_ioc.fdcvector;
 		m_ioc.irqstatus |= 0x80;
-		//m_current_irq_line = 1;
 		LOGMASKED(LOG_FDC, "FDC: IRQ triggered\n");
-		m_maincpu->set_input_line(1, ASSERT_LINE);
+		update_ipl();
 	}
 	else
-		m_maincpu->set_input_line(1, CLEAR_LINE);
+	{
+		m_ioc.irqstatus &= 0x7f;
+		update_ipl();
+	}
 }
 
-WRITE8_MEMBER(x68k_state::ct_w)
+void x68k_state::ct_w(uint8_t data)
 {
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -722,7 +719,7 @@ WRITE8_MEMBER(x68k_state::ct_w)
                 - bits 7-2 = vector
                 - bits 1,0 = device (00 = FDC, 01 = FDD, 10 = HDD, 11 = Printer)
 */
-WRITE16_MEMBER(x68k_state::ioc_w)
+void x68k_state::ioc_w(offs_t offset, uint16_t data)
 {
 	switch(offset)
 	{
@@ -754,7 +751,7 @@ WRITE16_MEMBER(x68k_state::ioc_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::ioc_r)
+uint16_t x68k_state::ioc_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -786,7 +783,7 @@ READ16_MEMBER(x68k_state::ioc_r)
                                          Any other value, then SRAM is read only.
  Port 8 (0xe8e00f) - Power off control - write 0x00, 0x0f, 0x0f sequentially to switch power off.
 */
-WRITE16_MEMBER(x68k_state::sysport_w)
+void x68k_state::sysport_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -809,7 +806,7 @@ WRITE16_MEMBER(x68k_state::sysport_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::sysport_r)
+uint16_t x68k_state::sysport_r(offs_t offset)
 {
 	int ret = 0;
 	switch(offset)
@@ -829,18 +826,18 @@ READ16_MEMBER(x68k_state::sysport_r)
 	}
 }
 
-WRITE16_MEMBER(x68k_state::ppi_w)
+void x68k_state::ppi_w(offs_t offset, uint16_t data)
 {
 	m_ppi->write(offset & 0x03,data);
 }
 
-READ16_MEMBER(x68k_state::ppi_r)
+uint16_t x68k_state::ppi_r(offs_t offset)
 {
 	return m_ppi->read(offset & 0x03);
 }
 
 
-WRITE16_MEMBER(x68k_state::sram_w)
+void x68k_state::sram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_sysport.sram_writeprotect == 0x31)
 	{
@@ -848,7 +845,7 @@ WRITE16_MEMBER(x68k_state::sram_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::sram_r)
+uint16_t x68k_state::sram_r(offs_t offset)
 {
 	// HACKS!
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
@@ -858,7 +855,7 @@ READ16_MEMBER(x68k_state::sram_r)
 	return m_nvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::vid_w)
+void x68k_state::vid_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -895,7 +892,7 @@ WRITE16_MEMBER(x68k_state::vid_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::vid_r)
+uint16_t x68k_state::vid_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -912,19 +909,19 @@ READ16_MEMBER(x68k_state::vid_r)
 	return 0xff;
 }
 
-READ16_MEMBER(x68k_state::areaset_r)
+uint16_t x68k_state::areaset_r()
 {
 	// register is write-only
 	return 0xffff;
 }
 
-WRITE16_MEMBER(x68k_state::areaset_w)
+void x68k_state::areaset_w(uint16_t data)
 {
 	// TODO
 	LOGMASKED(LOG_SYS, "SYS: Supervisor area set: 0x%02x\n",data & 0xff);
 }
 
-WRITE16_MEMBER(x68k_state::enh_areaset_w )
+void x68k_state::enh_areaset_w(offs_t offset, uint16_t data)
 {
 	// TODO
 	LOGMASKED(LOG_SYS, "SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
@@ -939,6 +936,11 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if(m_bus_error)
 		return;
+	else if(!m_maincpu->executing())
+	{
+		m_hd63450->bec_w(0, hd63450_device::ERR_BUS);
+		return;
+	}
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
@@ -949,7 +951,7 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
-READ16_MEMBER(x68k_state::rom0_r)
+uint16_t x68k_state::rom0_r(offs_t offset, uint16_t mem_mask)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
@@ -958,7 +960,7 @@ READ16_MEMBER(x68k_state::rom0_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::rom0_w)
+void x68k_state::rom0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
@@ -966,7 +968,7 @@ WRITE16_MEMBER(x68k_state::rom0_w)
 		set_bus_error((offset << 1) + 0xbffffc, false, mem_mask);
 }
 
-READ16_MEMBER(x68k_state::emptyram_r)
+uint16_t x68k_state::emptyram_r(offs_t offset, uint16_t mem_mask)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
@@ -975,7 +977,7 @@ READ16_MEMBER(x68k_state::emptyram_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::emptyram_w)
+void x68k_state::emptyram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
@@ -983,7 +985,7 @@ WRITE16_MEMBER(x68k_state::emptyram_w)
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
-READ16_MEMBER(x68k_state::exp_r)
+uint16_t x68k_state::exp_r(offs_t offset, uint16_t mem_mask)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
@@ -991,7 +993,7 @@ READ16_MEMBER(x68k_state::exp_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::exp_w)
+void x68k_state::exp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
@@ -1000,15 +1002,11 @@ WRITE16_MEMBER(x68k_state::exp_w)
 
 WRITE_LINE_MEMBER(x68k_state::dma_irq)
 {
-	if (state != CLEAR_LINE)
-	{
-		//m_current_irq_line = 3;
-		LOGMASKED(LOG_SYS, "DMA IRQ (vector 0x%02x)\n", m_hd63450->iack());
-	}
-	m_maincpu->set_input_line(3, state);
+	m_dmac_int = state != CLEAR_LINE;
+	update_ipl();
 }
 
-WRITE8_MEMBER(x68k_state::dma_end)
+void x68k_state::dma_end(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
@@ -1028,7 +1026,7 @@ WRITE_LINE_MEMBER(x68k_state::fm_irq)
 	}
 }
 
-WRITE8_MEMBER(x68k_state::adpcm_w)
+void x68k_state::adpcm_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -1043,69 +1041,163 @@ WRITE8_MEMBER(x68k_state::adpcm_w)
 
 WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 {
-	if(m_mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
-		return;
-	if(state != CLEAR_LINE)
-		state = HOLD_LINE;  // to get around erroneous spurious interrupt
-//  if((m_ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
-//      return;
-	m_maincpu->set_input_line(6, state);
-	m_current_vector[6] = 0;
-	m_mfp_prev = state;
+	m_mfp_int = state;
+	update_ipl();
 }
 
-template <int Line>
-uint8_t x68k_state::int_ack()
+void x68k_state::update_ipl()
+{
+	uint8_t new_ipl = 0;
+	if (m_exp_nmi[0] || m_exp_nmi[1])
+		new_ipl = 7;
+	else if (m_mfp_int)
+		new_ipl = 6;
+	else if (m_mouse.irqactive)
+		new_ipl = 5;
+	else if (m_exp_irq4[0] || m_exp_irq4[1])
+		new_ipl = 4;
+	else if (m_dmac_int)
+		new_ipl = 3;
+	else if (m_exp_irq2[0] || m_exp_irq2[1])
+		new_ipl = 2;
+	else if ((m_ioc.irqstatus & 0xf0) != 0)
+		new_ipl = 1;
+
+	if (m_current_ipl != new_ipl)
+	{
+		if (m_current_ipl != 0)
+			m_maincpu->set_input_line(m_current_ipl, CLEAR_LINE);
+		LOGMASKED(LOG_IRQ, "Changing interrupt level from %d to %d\n", m_current_ipl, new_ipl);
+		m_current_ipl = new_ipl;
+		if (m_current_ipl != 0)
+			m_maincpu->set_input_line(m_current_ipl, ASSERT_LINE);
+	}
+}
+
+uint8_t x68k_state::iack1()
+{
+	uint8_t vector = 0x18;
+	if (BIT(m_ioc.irqstatus, 7))
+	{
+		vector = m_ioc.fdcvector;
+		if (!machine().side_effects_disabled())
+		{
+			m_ioc.irqstatus &= 0x7f;
+			update_ipl();
+		}
+	}
+	else if (BIT(m_ioc.irqstatus, 6))
+	{
+		vector = 0x61 /*m_ioc.fddvector*/;
+		if (!machine().side_effects_disabled())
+		{
+			m_ioc.irqstatus &= 0xbf;
+			update_ipl();
+		}
+	}
+	else if (BIT(m_ioc.irqstatus, 5))
+	{
+		vector = m_ioc.prnvector;
+		if (!machine().side_effects_disabled())
+		{
+			m_ioc.irqstatus &= 0xdf;
+			update_ipl();
+		}
+	}
+	else if (BIT(m_ioc.irqstatus, 4))
+	{
+		vector = 0x6c /*m_ioc.hdcvector*/;
+		if (!machine().side_effects_disabled())
+		{
+			m_ioc.irqstatus &= 0xef;
+			update_ipl();
+		}
+	}
+
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_IRQ, "IOC: IRQ1 acknowledged with vector = %02X\n", vector);
+	return vector;
+}
+
+template <int N>
+WRITE_LINE_MEMBER(x68k_state::irq2_line)
+{
+	m_exp_irq2[N] = (state != CLEAR_LINE);
+	LOGMASKED(LOG_IRQ, "IRQ2-%d %s\n", N + 1, m_exp_irq2[N] ? "asserted" : "cleared");
+	update_ipl();
+}
+
+template <int N>
+WRITE_LINE_MEMBER(x68k_state::irq4_line)
+{
+	m_exp_irq4[N] = (state != CLEAR_LINE);
+	LOGMASKED(LOG_IRQ, "IRQ4-%d %s\n", N + 1, m_exp_irq4[N] ? "asserted" : "cleared");
+	update_ipl();
+}
+
+template <int N>
+WRITE_LINE_MEMBER(x68k_state::nmi_line)
+{
+	m_exp_nmi[N] = (state != CLEAR_LINE);
+	LOGMASKED(LOG_IRQ, "EXNMI %s on expansion %d\n", m_exp_nmi[N] ? "asserted" : "cleared", N + 1);
+	update_ipl();
+}
+
+uint8_t x68k_state::iack2()
+{
+	// Relative priority of IACK2-1 and IACK2-2 is unknown
+	if (m_exp_irq2[0])
+		return m_expansion[0]->iack2();
+	else if (m_exp_irq2[1])
+		return m_expansion[1]->iack2();
+	else
+		return 0x18; // spurious interrupt
+}
+
+uint8_t x68k_state::iack4()
+{
+	// Relative priority of IACK4-1 and IACK4-2 is unknown
+	if (m_exp_irq4[0])
+		return m_expansion[0]->iack4();
+	else if (m_exp_irq4[1])
+		return m_expansion[1]->iack4();
+	else
+		return 0x18; // spurious interrupt
+}
+
+uint8_t x68k_state::iack5()
 {
 	if (!machine().side_effects_disabled())
 	{
-		m_maincpu->set_input_line(Line, CLEAR_LINE);
-		if(Line == 1)  // IOSC
-		{
-			m_ioc.irqstatus &= ~0xf0;
-		}
-		if(Line == 5)  // SCC
-		{
-			m_mouse.irqactive = 0;
-		}
-
-		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[Line],Line);
+		m_mouse.irqactive = false;
+		update_ipl();
 	}
-	return m_current_vector[Line];
-}
 
-uint8_t x68k_state::mfp_ack()
-{
-	if (m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
-		m_current_vector[6] = m_mfpdev->get_vector();
-	else if (!machine().side_effects_disabled())
-	{
-		m_maincpu->set_input_line(6,CLEAR_LINE);
-		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],6);
-	}
-	return m_current_vector[6];
+	// TODO: use vector from SCC
+	return m_mouse.irqvector;
 }
 
 void x68k_state::cpu_space_map(address_map &map)
 {
 	map.global_mask(0xffffff);
-	map(0xfffff3, 0xfffff3).r(FUNC(x68k_state::int_ack<1>));
-	map(0xfffff5, 0xfffff5).r(FUNC(x68k_state::int_ack<2>));
+	map(0xfffff3, 0xfffff3).r(FUNC(x68k_state::iack1));
+	map(0xfffff5, 0xfffff5).r(FUNC(x68k_state::iack2));
 	map(0xfffff7, 0xfffff7).r(m_hd63450, FUNC(hd63450_device::iack));
-	map(0xfffff9, 0xfffff9).r(FUNC(x68k_state::int_ack<4>));
-	map(0xfffffb, 0xfffffb).r(FUNC(x68k_state::int_ack<5>));
-	map(0xfffffd, 0xfffffd).r(FUNC(x68k_state::mfp_ack));
-	map(0xffffff, 0xffffff).r(FUNC(x68k_state::int_ack<7>));
+	map(0xfffff9, 0xfffff9).r(FUNC(x68k_state::iack4));
+	map(0xfffffb, 0xfffffb).r(FUNC(x68k_state::iack5));
+	map(0xfffffd, 0xfffffd).r(m_mfpdev, FUNC(mc68901_device::get_vector));
+	map(0xffffff, 0xffffff).lr8(NAME([] () { return m68000_base_device::autovector(7); }));
 }
 
 WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
 {
+	LOGMASKED(LOG_IRQ, "SCSI IRQ %s\n", state ? "asserted" : "cleared");
+
 	// TODO : Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6, IRQs go through the IOSC (IRQ line 1)
 	if(state != 0)
 	{
-		m_current_vector[1] = 0x6c;
-		//m_current_irq_line = 1;
-		m_maincpu->set_input_line(1,ASSERT_LINE);
+		m_ioc.irqstatus |= 0x10;
+		update_ipl();
 	}
 }
 
@@ -1126,7 +1218,7 @@ void x68k_state::x68k_base_map(address_map &map)
 	map(0xe86000, 0xe87fff).rw(FUNC(x68k_state::areaset_r), FUNC(x68k_state::areaset_w));
 	map(0xe88000, 0xe89fff).rw(m_mfpdev, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xe8a000, 0xe8bfff).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
-//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
+//  map(0xe8c000, 0xe8dfff).rw(FUNC(x68k_state::x68k_printer_r), FUNC(x68k_state::x68k_printer_w));
 	map(0xe8e000, 0xe8ffff).rw(FUNC(x68k_state::sysport_r), FUNC(x68k_state::sysport_w));
 	map(0xe90000, 0xe91fff).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0xe94000, 0xe94003).m(m_upd72065, FUNC(upd72065_device::map)).umask16(0x00ff);
@@ -1177,11 +1269,11 @@ void x68030_state::x68030_map(address_map &map)
 	x68k_base_map(map);
 	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("gfxpalette");
 	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("pcgpalette");
-//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
+//  map(0xe8c000, 0xe8dfff).rw(FUNC(x68k_state::x68k_printer_r), FUNC(x68k_state::x68k_printer_w));
 	map(0xe92000, 0xe92003).r(m_okim6258, FUNC(okim6258_device::status_r)).umask32(0x00ff00ff).w(FUNC(x68030_state::adpcm_w)).umask32(0x00ff00ff);
 
 	map(0xe96020, 0xe9603f).rw(m_scsictrl, FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask32(0x00ff00ff);
-	map(0xea0000, 0xea1fff).noprw();//AM_READWRITE16(exp_r, exp_w,0xffffffff)  // external SCSI ROM and controller
+	map(0xea0000, 0xea1fff).noprw();//.rw(FUNC(x68030_state::exp_r), FUNC(x68030_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa8b).rw(FUNC(x68030_state::areaset_r), FUNC(x68030_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
 }
@@ -1368,11 +1460,9 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 	dev->mon_w(!(m_fdc.motor && load));
 	if(m_ioc.irqstatus & 0x02)
 	{
-		m_current_vector[1] = 0x61;
-		m_ioc.irqstatus |= 0x40;
-		//m_current_irq_line = 1;
-		m_maincpu->set_input_line(1,ASSERT_LINE);  // Disk insert/eject interrupt
+		m_ioc.irqstatus |= 0x40;  // Disk insert/eject interrupt
 		LOGMASKED(LOG_FDC, "IOC: Disk image inserted\n");
+		update_ipl();
 	}
 }
 
@@ -1385,32 +1475,6 @@ image_init_result x68k_state::floppy_load(floppy_image_device *dev)
 void x68k_state::floppy_unload(floppy_image_device *dev)
 {
 	floppy_load_unload(false, dev);
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::net_irq)
-{
-	m_current_vector[2] = 0xf9;
-	//m_current_irq_line = 2;
-	m_maincpu->set_input_line(2,ASSERT_LINE);
-}
-
-WRITE_LINE_MEMBER(x68k_state::irq2_line)
-{
-	if(state==ASSERT_LINE)
-	{
-		m_net_timer->adjust(attotime::from_usec(16));
-	}
-	else
-		m_maincpu->set_input_line(2,CLEAR_LINE);
-	LOGMASKED(LOG_IRQ, "EXP: IRQ2 set to %i\n",state);
-
-}
-
-WRITE_LINE_MEMBER(x68k_state::irq4_line)
-{
-	m_current_vector[4] = m_expansion->vector();
-	m_maincpu->set_input_line(4,state);
-	LOGMASKED(LOG_IRQ, "EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
 }
 
 static void x68000_exp_cards(device_slot_interface &device)
@@ -1442,17 +1506,13 @@ void x68k_state::machine_reset()
 	//m_mfpdev->i7_w(1); // h-sync
 
 	// reset output values
-	output().set_value("key_led_kana",1);
-	output().set_value("key_led_romaji",1);
-	output().set_value("key_led_code",1);
-	output().set_value("key_led_caps",1);
-	output().set_value("key_led_insert",1);
-	output().set_value("key_led_hiragana",1);
-	output().set_value("key_led_fullsize",1);
 	std::fill(std::begin(m_eject_drv_out), std::end(m_eject_drv_out), 1);
 	std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);
 	m_fdc.select_drive = 0;
+
+	m_ioc.irqstatus &= 0x0f;
+	update_ipl();
 }
 
 void x68k_state::machine_start()
@@ -1465,8 +1525,7 @@ void x68k_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
-	space.install_readwrite_bank(0x000000,m_ram->size()-1,"bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram(0x000000,m_ram->size()-1,m_ram->pointer());
 
 	// start mouse timer
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
@@ -1487,6 +1546,21 @@ void x68k_state::machine_start()
 		}
 	}
 	m_fdc.motor = 0;
+
+	m_dmac_int = false;
+	m_mfp_int = false;
+	m_exp_irq2[0] = m_exp_irq2[1] = false;
+	m_exp_irq4[0] = m_exp_irq4[1] = false;
+	m_exp_nmi[0] = m_exp_nmi[1] = false;
+	m_ioc.irqstatus = 0;
+	m_mouse.irqactive = false;
+	m_current_ipl = 0;
+	m_adpcm.rate = 0;
+	m_adpcm.clock = 0;
+	m_sysport.sram_writeprotect = 0;
+	m_sysport.monitor = 0;
+	m_bus_error = false;
+	m_led_state = 0;
 }
 
 void x68k_state::driver_init()
@@ -1508,7 +1582,6 @@ void x68k_state::driver_init()
 
 	m_mouse_timer = timer_alloc(TIMER_X68K_SCC_ACK);
 	m_led_timer = timer_alloc(TIMER_X68K_LED);
-	m_net_timer = timer_alloc(TIMER_X68K_NET_IRQ);
 	m_fdc_tc = timer_alloc(TIMER_X68K_FDC_TC);
 	m_adpcm_timer = timer_alloc(TIMER_X68K_ADPCM);
 	m_bus_error_timer = timer_alloc(TIMER_X68K_BUS_ERROR);
@@ -1538,10 +1611,12 @@ void x68030_state::driver_init()
 	m_is_32bit = true;
 }
 
-FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
-	FLOPPY_XDF_FORMAT,
-	FLOPPY_DIM_FORMAT
-FLOPPY_FORMATS_END
+void x68k_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_XDF_FORMAT);
+	fr.add(FLOPPY_DIM_FORMAT);
+}
 
 static void x68k_floppies(device_slot_interface &device)
 {
@@ -1555,19 +1630,18 @@ static void keyboard_devices(device_slot_interface &device)
 
 void x68k_state::x68000_base(machine_config &config)
 {
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* device hardware */
 	MC68901(config, m_mfpdev, 16_MHz_XTAL / 4);
 	m_mfpdev->set_timer_clock(16_MHz_XTAL / 4);
-	m_mfpdev->set_rx_clock(0);
-	m_mfpdev->set_tx_clock(0);
 	m_mfpdev->out_irq_cb().set(FUNC(x68k_state::mfp_irq_callback));
-	m_mfpdev->out_tbo_cb().set(m_mfpdev, FUNC(mc68901_device::clock_w));
+	m_mfpdev->out_tbo_cb().set(m_mfpdev, FUNC(mc68901_device::tc_w));
+	m_mfpdev->out_tbo_cb().append(m_mfpdev, FUNC(mc68901_device::rc_w));
 	m_mfpdev->out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", keyboard_devices, "x68k"));
-	keyboard.rxd_handler().set(m_mfpdev, FUNC(mc68901_device::write_rx));
+	keyboard.rxd_handler().set(m_mfpdev, FUNC(mc68901_device::si_w));
 
 	I8255A(config, m_ppi, 0);
 	m_ppi->in_pa_callback().set(FUNC(x68k_state::ppi_port_a_r));
@@ -1577,7 +1651,7 @@ void x68k_state::x68000_base(machine_config &config)
 
 	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu");
 	m_hd63450->set_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
-	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
+	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(450), attotime::from_nsec(50));
 	m_hd63450->irq_callback().set(FUNC(x68k_state::dma_irq));
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
 	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
@@ -1629,11 +1703,17 @@ void x68k_state::x68000_base(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("x68k_flop");
 
-	X68K_EXPANSION_SLOT(config, m_expansion, x68000_exp_cards, nullptr);
-	m_expansion->set_space(m_maincpu, AS_PROGRAM);
-	m_expansion->out_irq2_callback().set(FUNC(x68k_state::irq2_line));
-	m_expansion->out_irq4_callback().set(FUNC(x68k_state::irq4_line));
-	m_expansion->out_nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
+	X68K_EXPANSION_SLOT(config, m_expansion[0], x68000_exp_cards, nullptr);
+	m_expansion[0]->set_space(m_maincpu, AS_PROGRAM);
+	m_expansion[0]->out_irq2_callback().set(FUNC(x68k_state::irq2_line<0>));
+	m_expansion[0]->out_irq4_callback().set(FUNC(x68k_state::irq4_line<0>));
+	m_expansion[0]->out_nmi_callback().set(FUNC(x68k_state::nmi_line<0>));
+
+	X68K_EXPANSION_SLOT(config, m_expansion[1], x68000_exp_cards, nullptr);
+	m_expansion[1]->set_space(m_maincpu, AS_PROGRAM);
+	m_expansion[1]->out_irq2_callback().set(FUNC(x68k_state::irq2_line<1>));
+	m_expansion[1]->out_irq4_callback().set(FUNC(x68k_state::irq4_line<1>));
+	m_expansion[1]->out_nmi_callback().set(FUNC(x68k_state::nmi_line<1>));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M");

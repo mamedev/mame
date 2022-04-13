@@ -49,15 +49,15 @@ public:
 	auto out_dma_callback() { return m_out_dma_cb.bind(); }
 
 	/* port 0 */
-	DECLARE_READ32_MEMBER( program_control_r );
-	DECLARE_WRITE32_MEMBER( program_control_w );
+	uint32_t program_control_r();
+	void program_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	/* port 1 */
-	DECLARE_WRITE32_MEMBER( program_w );
+	void program_w(uint32_t data);
 	/* port 2 */
-	DECLARE_WRITE32_MEMBER( ram_address_control_w );
+	void ram_address_control_w(uint32_t data);
 	/* port 3 */
-	DECLARE_READ32_MEMBER( ram_address_r );
-	DECLARE_WRITE32_MEMBER( ram_address_w );
+	uint32_t ram_address_r();
+	void ram_address_w(uint32_t data);
 
 	void data_map(address_map &map);
 	void program_map(address_map &map);
@@ -67,9 +67,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 7; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 7; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

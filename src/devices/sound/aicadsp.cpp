@@ -214,9 +214,9 @@ void AICADSP::step()
 		//Shifter
 		s32 SHIFTED = 0;    //24 bit
 		if (SHIFT == 0)
-			SHIFTED = std::max<s32>(std::min<s32>(ACC, 0x007FFFFF), -0x00800000);
+			SHIFTED = std::clamp<s32>(ACC, -0x00800000, 0x007FFFFF);
 		else if (SHIFT == 1)
-			SHIFTED = std::max<s32>(std::min<s32>(ACC * 2, 0x007FFFFF), -0x00800000);
+			SHIFTED = std::clamp<s32>(ACC * 2, -0x00800000, 0x007FFFFF);
 		else if (SHIFT == 2)
 		{
 			SHIFTED = ACC * 2;
@@ -273,21 +273,21 @@ void AICADSP::step()
 				ADDR &= 0xFFFF;
 			//ADDR <<= 1;
 			//ADDR += RBP << 13;
-			//MEMVAL = space->read_word(ADDR >> 1);
+			//MEMVAL = space.read_word(ADDR >> 1);
 			ADDR += RBP << 10;
 			if (MRD && (step & 1)) //memory only allowed on odd? DoA inserts NOPs on even
 			{
 				if (NOFL)
-					MEMVAL = cache->read_word(ADDR) << 8;
+					MEMVAL = cache.read_word(ADDR) << 8;
 				else
-					MEMVAL = UNPACK(cache->read_word(ADDR));
+					MEMVAL = UNPACK(cache.read_word(ADDR));
 			}
 			if (MWT && (step&1))
 			{
 				if (NOFL)
-					space->write_word(ADDR, SHIFTED>>8);
+					space.write_word(ADDR, SHIFTED>>8);
 				else
-					space->write_word(ADDR, PACK(SHIFTED));
+					space.write_word(ADDR, PACK(SHIFTED));
 			}
 		}
 

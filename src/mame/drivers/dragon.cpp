@@ -2,9 +2,11 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    dragon.c
+    dragon.cpp
 
     Dragon
+
+    Bug? dragon200e hangs when single-quote is typed.
 
 ***************************************************************************/
 
@@ -19,25 +21,52 @@
 #include "formats/dmk_dsk.h"
 #include "formats/sdf_dsk.h"
 #include "imagedev/floppy.h"
+#include "bus/coco/cococart.h"
+#include "bus/rs232/rs232.h"
+#include "softlist_dev.h"
 
-#include "bus/coco/dragon_fdc.h"
-#include "bus/coco/dragon_jcbsnd.h"
-#include "bus/coco/coco_pak.h"
-#include "bus/coco/coco_ssc.h"
-#include "bus/coco/coco_orch90.h"
-#include "bus/coco/coco_gmc.h"
 
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
-//-------------------------------------------------
-//  ADDRESS_MAP( dragon_mem )
-//-------------------------------------------------
-
 void dragon_state::dragon_mem(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
+}
+
+
+void dragon64_state::d64_rom0(address_map &map)
+{
+	// $8000-$9FFF
+	map(0x0000, 0x1fff).bankr("rombank0");
+}
+
+void dragon64_state::d64_rom1(address_map &map)
+{
+	// $A000-$BFFF
+	map(0x0000, 0x1fff).bankr("rombank1");
+}
+
+void dragon64_state::d64_io0(address_map &map)
+{
+	// $FF00-$FF1F
+	map(0x00, 0x03).mirror(0x18).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x04, 0x07).mirror(0x18).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+}
+
+
+void dragon_alpha_state::dgnalpha_io1(address_map &map)
+{
+	// $FF20-$FF3F
+	map(0x00, 0x03).mirror(0x10).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
+	map(0x04, 0x07).mirror(0x10).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x08, 0x0b).mirror(0x10).rw(FUNC(dragon_alpha_state::modem_r), FUNC(dragon_alpha_state::modem_w));
+	map(0x0c, 0x0c).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::data_w));
+	map(0x0d, 0x0d).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::sector_r), FUNC(wd2797_device::sector_w));
+	map(0x0e, 0x0e).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::track_r), FUNC(wd2797_device::track_w));
+	map(0x0f, 0x0f).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::status_r), FUNC(wd2797_device::cmd_w));
 }
 
 
@@ -58,93 +87,94 @@ void dragon_state::dragon_mem(address_map &map)
  */
 static INPUT_PORTS_START( dragon_keyboard )
 	PORT_START("row0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
 	PORT_START("row1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("row2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 
 	PORT_START("row3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 
 	PORT_START("row4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 
 	PORT_START("row5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP), '^')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN), 10)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 9)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"\u2191") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP), '^')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"\u2193") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN), 10) PORT_CHAR('[')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 9) PORT_CHAR(']')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 
 	PORT_START("row6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("BREAK") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME("BREAK") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
 	PORT_BIT(0x78, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dragon200e_keyboard )
 	PORT_INCLUDE(dragon_keyboard)
 
 	PORT_MODIFY("row0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("0 \xC3\x87") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(0xC7)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"0 \u00c7") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(0xC7)
 
 	PORT_MODIFY("row1")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("\xC3\x91") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0xD1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"\u00d1") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0xD1)
 
 	PORT_MODIFY("row2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(';') PORT_CHAR('+')
 
 	PORT_MODIFY("row5")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("DOWN \xC2\xA1") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(10) PORT_CHAR(0xA1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("RIGHT \xC2\xBF") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(9) PORT_CHAR(0xBF)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR(0xA7)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"\u2191") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP), '^') PORT_CHAR('_')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"\u2193 \u00a1") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(10) PORT_CHAR(0xA1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"\u2192 \u00bf") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(9) PORT_CHAR(0xBF)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR(0xA7)
 
 	PORT_MODIFY("row6")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("CLEAR @") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12) PORT_CHAR('@')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("BREAK \xC3\xBC") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27) PORT_CHAR(0xFC)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME("CLEAR @") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12) PORT_CHAR('@')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, 0) PORT_NAME(u8"BREAK \u00fc") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27) PORT_CHAR(0xFC)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dragon )
@@ -157,35 +187,52 @@ static INPUT_PORTS_START( dragon200e )
 	PORT_INCLUDE(dragon200e_keyboard)
 	PORT_INCLUDE(coco_joystick)
 	PORT_INCLUDE(coco_analog_control)
-INPUT_PORTS_END
 
-MC6847_GET_CHARROM_MEMBER( dragon200e_state::char_rom_r )
-{
-	return m_char_rom->base()[(ch * 12 + line) & 0xfff];
-}
+	PORT_START("LK1")
+	PORT_CONFNAME(0x01, 0x01, "Inverse Video")
+	PORT_CONFSETTING(0x00, "Inverse")
+	PORT_CONFSETTING(0x01, "Normal")
+INPUT_PORTS_END
 
 void dragon_cart(device_slot_interface &device)
 {
-	device.option_add("dragon_fdc", DRAGON_FDC);
-	device.option_add("premier_fdc", PREMIER_FDC);
-	device.option_add("sdtandy_fdc", SDTANDY_FDC);
-	device.option_add("jcbsnd", DRAGON_JCBSND);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("gmc", COCO_PAK_GMC);
-	device.option_add("pak", COCO_PAK);
+	dragon_cart_add_basic_devices(device);
+	dragon_cart_add_fdcs(device);
+	dragon_cart_add_multi_pak(device);
 }
 
-FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
-	FLOPPY_VDK_FORMAT,
-	FLOPPY_DMK_FORMAT,
-	FLOPPY_SDF_FORMAT
-FLOPPY_FORMATS_END
+void dragon_alpha_state::dragon_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_VDK_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_SDF_FORMAT);
+}
 
 static void dragon_alpha_floppies(device_slot_interface &device)
 {
 	device.option_add("dd", FLOPPY_35_DD);
 }
+
+
+// F4 Character Displayer
+static const gfx_layout d64plus_charlayout =
+{
+	8, 12,                  // 8 x 12 characters
+	256,                    // 256 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	// y offsets
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	8 * 16                  // every char takes 16 bytes
+};
+
+static GFXDECODE_START(gfx_d64plus)
+	GFXDECODE_ENTRY("chargen", 0, d64plus_charlayout, 0, 1)
+GFXDECODE_END
+
 
 void dragon_state::dragon_base(machine_config &config)
 {
@@ -196,13 +243,17 @@ void dragon_state::dragon_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragon_state::dragon_mem);
 
 	// devices
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	pia0.tspb_handler().set_constant(0xff);
 	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
 	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
-	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
-	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
+	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
 	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
@@ -211,14 +262,22 @@ void dragon_state::dragon_base(machine_config &config)
 	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
 	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
 	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
-	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
-	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
+	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
+	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
-	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
+	m_sam->set_addrmap(0, &dragon_state::coco_ram);
+	m_sam->set_addrmap(1, &dragon_state::coco_rom0);
+	m_sam->set_addrmap(2, &dragon_state::coco_rom1);
+	m_sam->set_addrmap(3, &dragon_state::coco_rom2);
+	m_sam->set_addrmap(4, &dragon_state::coco_io0);
+	m_sam->set_addrmap(5, &dragon_state::coco_io1);
+	m_sam->set_addrmap(6, &dragon_state::coco_io2);
+	m_sam->set_addrmap(7, &dragon_state::coco_ff60);
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("dragon_cass");
 
 	PRINTER(config, m_printer, 0);
@@ -230,7 +289,7 @@ void dragon_state::dragon_base(machine_config &config)
 	m_vdg->set_screen(SCREEN_TAG);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
-	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
+	m_vdg->input_callback().set(FUNC(dragon_state::sam_read));
 
 	// sound hardware
 	coco_sound(config);
@@ -264,6 +323,10 @@ void dragon64_state::dragon64(machine_config &config)
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");
 
+	sam().set_addrmap(1, &dragon64_state::d64_rom0);
+	sam().set_addrmap(2, &dragon64_state::d64_rom1);
+	sam().set_addrmap(4, &dragon64_state::d64_io0);
+
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, "dragon_fdc"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
@@ -273,6 +336,14 @@ void dragon64_state::dragon64(machine_config &config)
 	// acia
 	mos6551_device &acia(MOS6551(config, "acia", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(acia, FUNC(mos6551_device::write_cts));
 
 	// software lists
 	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
@@ -293,6 +364,7 @@ void dragon200e_state::dragon200e(machine_config &config)
 	dragon64(config);
 	// video hardware
 	m_vdg->set_get_char_rom(FUNC(dragon200e_state::char_rom_r));
+	m_vdg->input_callback().set(FUNC(dragon200e_state::sam_read));
 }
 
 void d64plus_state::d64plus(machine_config &config)
@@ -300,19 +372,19 @@ void d64plus_state::d64plus(machine_config &config)
 	dragon64(config);
 	// video hardware
 	screen_device &plus_screen(SCREEN(config, "plus_screen", SCREEN_TYPE_RASTER));
-	plus_screen.set_refresh_hz(50);
-	plus_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	plus_screen.set_size(640, 264);
-	plus_screen.set_visarea_full();
-	plus_screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	plus_screen.set_raw(14.218_MHz_XTAL, 912, 0, 640, 316, 0, 264);
+	plus_screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_d64plus);
+
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// crtc
-	HD6845(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);
+	HD6845S(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);
 	m_crtc->set_screen("plus_screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(d64plus_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(d64plus_state::crtc_update_row));
 }
 
 void dragon_alpha_state::dgnalpha(machine_config &config)
@@ -321,10 +393,18 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
 
+	sam().set_addrmap(1, &dragon_alpha_state::d64_rom0);
+	sam().set_addrmap(2, &dragon_alpha_state::d64_rom1);
+	sam().set_addrmap(4, &dragon_alpha_state::d64_io0);
+	sam().set_addrmap(5, &dragon_alpha_state::dgnalpha_io1);
+
+	// input merger
+	INPUT_MERGER_ANY_HIGH(config, m_nmis).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, nullptr));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.nmi_callback().set(m_nmis, FUNC(input_merger_device::in_w<0>));
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
@@ -350,8 +430,8 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	// pia 2
 	pia6821_device &pia2(PIA6821(config, PIA2_TAG, 0));
 	pia2.writepa_handler().set(FUNC(dragon_alpha_state::pia2_pa_w));
-	pia2.irqa_handler().set(FUNC(dragon_alpha_state::pia2_firq_a));
-	pia2.irqb_handler().set(FUNC(dragon_alpha_state::pia2_firq_b));
+	pia2.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<2>));
+	pia2.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<3>));
 
 	// software lists
 	SOFTWARE_LIST(config, "dgnalpha_flop_list").set_original("dgnalpha_flop");
@@ -371,7 +451,7 @@ void dragon64_state::tanodr64(machine_config &config)
 	m_vdg->set_screen(SCREEN_TAG);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
-	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
+	m_vdg->input_callback().set(FUNC(dragon_state::sam_read));
 
 	// cartridge
 	subdevice<cococart_slot_device>(CARTRIDGE_TAG)->set_default_option("sdtandy_fdc");
@@ -446,12 +526,12 @@ ROM_END
 #define rom_dragon64h rom_dragon64
 #define rom_tanodr64h rom_tanodr64
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY                         FULLNAME                       FLAGS
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY                         FULLNAME                          FLAGS
 COMP( 1982, dragon32,   0,        0,      dragon32,   dragon,     dragon_state,       empty_init, "Dragon Data Ltd",              "Dragon 32",                      0 )
 COMP( 1983, dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64",                      0 )
 COMP( 19??, dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64 (HD6309E CPU)",        MACHINE_UNOFFICIAL )
 COMP( 1985, dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Eurohard S.A.",                "Dragon 200",                     0 )
-COMP( 1985, dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   empty_init, "Eurohard S.A.",                "Dragon 200-E",                   MACHINE_NOT_WORKING )
+COMP( 1985, dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   empty_init, "Eurohard S.A.",                "Dragon 200-E",                   0 )
 COMP( 1985, d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      empty_init, "Dragon Data Ltd / Compusense", "Dragon 64 Plus",                 0 )
 COMP( 1983, tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC)",          0 )
 COMP( 19??, tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC; HD6309E)", MACHINE_UNOFFICIAL )

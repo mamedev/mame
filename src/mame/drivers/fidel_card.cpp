@@ -2,27 +2,32 @@
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
 
-* fidel_card.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity electronic card games
-- *Bridge Challenger (BRC)
-- Advanced Bridge Challenger (UBC)
-- Voice Bridge Challenger (VBRC)
-- Bridge Challenger III (English,*French) (BV3)
+- Bridge Challenger (BRC)
+- Advanced Bridge Challenger (UBC/UB2)
+- Voice Bridge Challenger (VBRC/BV2)
+- Bridge Challenger III (BV3)
 - Gin & Cribbage Challenger (GIN)
 - *Skat Challenger (SKT)
 
 *: not dumped yet
 
+Card Challenger (model CDC) was announced but not released, it was supposed to be
+a card games console, with games on separate cartridges. Maybe some of the games
+were already finished, and used later for GIN and SKT.
+
 NOTE: The card scanner is simulated, but the player is kind of forced to cheat
 and has to peek at the card before it is scanned.
 
+BTANB:
+- on BRC, the 2 jokers are identified as Spade 1 and Spade 2
+
 TODO:
-- Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state
+- verify if BV2 is a newer program version than VBRC
 
 *******************************************************************************
 
-Voice Bridge Challenger (Model VBRC, later reissued as Model 7002)
+Voice Bridge Challenger (Model VBRC, later reissued as Model 7002/BV2)
 and Bridge Challenger 3 (Model 7014)
 (which both share the same* hardware)
 --------------------------------
@@ -157,20 +162,21 @@ cards:
 Playing cards have a 9-bit barcode on the face side near the edge. Swipe them downward
 against the card scanner and the game will detect the card.
 Barcode sync bits(msb and lsb) are the same for each card so that leaves 7 bits of data:
-2 for suit, 4 for value, and 1 for parity so the card can't be scanned backwards.
+2 for suit, 4 for value, and 1 for parity so the card can be scanned backwards.
 
 Two card decks exist (red and blue), each has the same set of barcodes.
 
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
 #include "machine/clock.h"
-#include "sound/volt_reg.h"
+#include "machine/timer.h"
+#include "sound/dac.h"
+#include "sound/s14001a.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -181,22 +187,27 @@ Two card decks exist (red and blue), each has the same set of barcodes.
 
 namespace {
 
-class card_state : public fidelbase_state
+class card_state : public driver_device
 {
 public:
 	card_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
-		m_i8243(*this, "i8243")
+		m_i8243(*this, "i8243"),
+		m_display(*this, "display"),
+		m_speech(*this, "speech"),
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
-	void ubc(machine_config &config);
+	// machine configs
+	void brc(machine_config &config);
 	void vbrc(machine_config &config);
 	void bv3(machine_config &config);
 	void gin(machine_config &config);
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button) override;
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_INPUT_CHANGED_MEMBER(start_scan);
 
 protected:
@@ -206,57 +217,98 @@ private:
 	void brc_base(machine_config &config);
 
 	// devices/pointers
-	required_device<i8041_device> m_mcu;
+	required_device<cpu_device> m_maincpu;
+	required_device<i8041a_device> m_mcu;
 	required_device<i8243_device> m_i8243;
+	required_device<pwm_display_device> m_display;
+	optional_device<s14001a_device> m_speech;
+	optional_device<dac_bit_interface> m_dac;
+	required_ioport_array<8> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(barcode_shift) { m_barcode >>= 1; }
-	u32 m_barcode;
+	u32 m_barcode = 0;
+	u16 m_vfd_data = 0;
+	u8 m_inp_mux = 0;
 
 	// I/O handlers
-	void prepare_display();
-	DECLARE_WRITE8_MEMBER(speech_w);
-	DECLARE_WRITE8_MEMBER(mcu_p1_w);
-	DECLARE_READ8_MEMBER(mcu_p2_r);
+	void update_display();
+	void speech_w(u8 data);
+	void mcu_p1_w(u8 data);
+	u8 mcu_p2_r();
 	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
 	template<int P> void ioexp_port_w(uint8_t data);
 };
 
 void card_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
-	// zerofill/register for savestates
-	m_barcode = 0;
+	// register for savestates
 	save_item(NAME(m_barcode));
+	save_item(NAME(m_vfd_data));
+	save_item(NAME(m_inp_mux));
+}
+
+INPUT_CHANGED_MEMBER(card_state::reset_button)
+{
+	// reset button is directly wired to maincpu/mcu RESET pins
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
+
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // misc handlers
 
-void card_state::prepare_display()
+void card_state::update_display()
 {
-	// 14seg led segments, d15(12) is extra led
-	u16 outdata = bitswap<16>(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
-	set_display_segmask(0xff, 0x3fff);
-	display_matrix(16, 8, outdata, m_led_select);
+	// 14seg VFD segments, d15(12) is extra LED
+	u16 outdata = bitswap<16>(m_vfd_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
+	m_display->matrix(m_inp_mux, outdata);
+
+	// I8243 P71 + I8041 P17 is tone (not on speech model)
+	if (m_dac != nullptr)
+		m_dac->write(BIT(~m_inp_mux, 7) & BIT(m_vfd_data, 13));
 }
 
-WRITE8_MEMBER(card_state::speech_w)
+void card_state::speech_w(u8 data)
 {
 	if (m_speech == nullptr)
 		return;
 
-	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->data_w(data & 0x3f);
 	m_speech->start_w(1);
 	m_speech->start_w(0);
+}
+
+
+// card scanner
+
+INPUT_CHANGED_MEMBER(card_state::start_scan)
+{
+	if (!newval)
+		return;
+
+	u32 code = (u32)param;
+	m_barcode = 0;
+
+	// convert bits to rising/falling edges
+	for (int i = 0; i < 9; i++)
+	{
+		m_barcode <<= 2;
+		m_barcode |= 1 << (code & 1);
+		code >>= 1;
+	}
+
+	// 6*white at msb for card edge
+	m_barcode <<= 8;
+	m_barcode = ~m_barcode;
 }
 
 
@@ -266,35 +318,37 @@ template<int P>
 void card_state::ioexp_port_w(uint8_t data)
 {
 	// P4x-P7x: digit segment data
-	m_7seg_data = (m_7seg_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
-	prepare_display();
-
-	// P71 is tone (not on speech model)
-	if (P == 3 && m_dac != nullptr)
-		m_dac->write(BIT(data, 1));
+	m_vfd_data = (m_vfd_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
+	update_display();
 }
 
 
 // I8041 MCU
 
-WRITE8_MEMBER(card_state::mcu_p1_w)
+void card_state::mcu_p1_w(u8 data)
 {
-	// P10-P17: select digits, input mux
-	m_inp_mux = m_led_select = data;
-	prepare_display();
+	// P10-P17: input mux, digit select
+	m_inp_mux = data;
+	update_display();
 }
 
-READ8_MEMBER(card_state::mcu_p2_r)
+u8 card_state::mcu_p2_r()
 {
 	// P20-P23: I8243 P2
+	u8 data = m_i8243->p2_r() & 0x0f;
+
 	// P24-P27: multiplexed inputs (active low)
-	return (m_i8243->p2_r() & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read() << 4;
+
+	return data ^ 0xf0;
 }
 
 READ_LINE_MEMBER(card_state::mcu_t0_r)
 {
-	// T0: card scanner light sensor (1=white/none, 0=black)
-	return ~m_barcode & 1;
+	// T0: card scanner light sensor (1=white, 0=black/none)
+	return m_barcode & 1;
 }
 
 
@@ -314,7 +368,7 @@ void card_state::main_map(address_map &map)
 void card_state::main_io(address_map &map)
 {
 	map.global_mask(0x01);
-	map(0x00, 0x01).rw(m_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x00, 0x01).rw(m_mcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 }
 
 
@@ -322,32 +376,6 @@ void card_state::main_io(address_map &map)
 /******************************************************************************
     Input Ports
 ******************************************************************************/
-
-INPUT_CHANGED_MEMBER(card_state::start_scan)
-{
-	if (!newval)
-		return;
-
-	u32 code = (u32)(uintptr_t)param;
-	m_barcode = 0;
-
-	// convert bits to rising/falling edges
-	for (int i = 0; i < 9; i++)
-	{
-		m_barcode <<= 2;
-		m_barcode |= 1 << (code & 1);
-		code >>= 1;
-	}
-
-	m_barcode <<= 1; // in case next barcode_shift timeout is soon
-}
-
-INPUT_CHANGED_MEMBER(card_state::reset_button)
-{
-	// reset button is directly wired to maincpu/mcu RESET pins
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-	m_mcu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static INPUT_PORTS_START( scanner )
 	PORT_START("CARDS.0") // spades + jokers
@@ -459,13 +487,13 @@ static INPUT_PORTS_START( brc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("Diamonds")
 
 	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("BR")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("DL")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Clubs")
 
 	PORT_START("RESET") // is not on matrix IN.7 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("RE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, 0) PORT_NAME("RE")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bv3 )
@@ -504,7 +532,7 @@ static INPUT_PORTS_START( bv3 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Dealer")
 
 	PORT_MODIFY("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, nullptr) PORT_NAME("Reset")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, card_state, reset_button, 0) PORT_NAME("Reset")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gin )
@@ -537,7 +565,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void card_state::brc_base(machine_config &config)
@@ -546,9 +574,9 @@ void card_state::brc_base(machine_config &config)
 	Z80(config, m_maincpu, 5_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &card_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &card_state::main_io);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
-	I8041(config, m_mcu, 5_MHz_XTAL);
+	I8041A(config, m_mcu, 5_MHz_XTAL);
 	m_mcu->p1_out_cb().set(FUNC(card_state::mcu_p1_w));
 	m_mcu->p2_in_cb().set(FUNC(card_state::mcu_p2_r));
 	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));
@@ -556,7 +584,7 @@ void card_state::brc_base(machine_config &config)
 	m_mcu->t0_in_cb().set(FUNC(card_state::mcu_t0_r));
 
 	// MCU T1 tied to master clock / 4
-	CLOCK(config, "t1_clock", 5_MHz_XTAL/4).signal_handler().set_nop();
+	CLOCK(config, "t1_clock", 5_MHz_XTAL/4);
 	m_mcu->t1_in_cb().set("t1_clock", FUNC(clock_device::signal_r)).invert();
 
 	I8243(config, m_i8243);
@@ -567,18 +595,19 @@ void card_state::brc_base(machine_config &config)
 
 	TIMER(config, "barcode_shift").configure_periodic(FUNC(card_state::barcode_shift), attotime::from_msec(2));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(card_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 16);
+	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_fidel_brc);
 }
 
-void card_state::ubc(machine_config &config)
+void card_state::brc(machine_config &config)
 {
 	brc_base(config);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void card_state::vbrc(machine_config &config)
@@ -594,13 +623,13 @@ void card_state::vbrc(machine_config &config)
 
 void card_state::bv3(machine_config &config)
 {
-	vbrc(config);
+	brc(config);
 	config.set_default_layout(layout_fidel_bv3);
 }
 
 void card_state::gin(machine_config &config)
 {
-	ubc(config);
+	brc(config);
 	config.set_default_layout(layout_fidel_gin);
 }
 
@@ -610,27 +639,38 @@ void card_state::gin(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( vbrc ) // model VBRC aka 7002
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(08472223) SHA1(859865b13c908dbb474333263dc60f6a32461141) ) // NEC 2364
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(320afa0f) SHA1(90edfe0ac19b108d232cda376b03a3a24befad4c) ) // NEC 2364
-	ROM_LOAD("101-64110", 0x4000, 0x2000, CRC(3040d0bd) SHA1(caa55fc8d9196e408fb41e7171a68e5099519813) ) // NEC 2364
+ROM_START( bridgec ) // model BRC, PCB label 510-4020-1C
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("bridge-1", 0x0000, 0x2000, CRC(83319c59) SHA1(db2dffb99320cbd60d33dcf9bb56a51266a041b2) ) // NEC 2364C 069
+	ROM_LOAD("bridge-2", 0x2000, 0x2000, CRC(7c54f9bc) SHA1(e57221ea3e22238192bb260ad5e385f5179bb34e) ) // NEC 2364C 070
+	ROM_LOAD("bridge-3", 0x4000, 0x1000, CRC(d3cda2e3) SHA1(69b62fa22b388a922abad4e89c78bdb01a5fb322) ) // NEC 2332C 188
 
 	ROM_REGION( 0x0400, "mcu", 0 )
-	ROM_LOAD("100-1009", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) )
+	ROM_LOAD("d8041c_531", 0x0000, 0x0400, CRC(b2baaaec) SHA1(bb0764d91dc1dcb143213faba204c2f2ff80aa33) ) // no custom label
+ROM_END
+
+
+ROM_START( vbrc ) // model VBRC aka 7002/BV2
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(08472223) SHA1(859865b13c908dbb474333263dc60f6a32461141) ) // NEC 2364C 210
+	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(320afa0f) SHA1(90edfe0ac19b108d232cda376b03a3a24befad4c) ) // NEC 2364C 211
+	ROM_LOAD("101-64110", 0x4000, 0x2000, CRC(3040d0bd) SHA1(caa55fc8d9196e408fb41e7171a68e5099519813) ) // NEC 2364C 212
+
+	ROM_REGION( 0x0400, "mcu", 0 )
+	ROM_LOAD("100-1009", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) ) // NEC D8041C 563
 
 	ROM_REGION( 0x1000, "speech", 0 )
 	ROM_LOAD("101-32118", 0x0000, 0x1000, CRC(a0b8bb8f) SHA1(f56852108928d5c6caccfc8166fa347d6760a740) )
 ROM_END
 
-ROM_START( bridgeca ) // model UBC
+ROM_START( bridgeca ) // model UBC, PCB label 510-4020-1C
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(08472223) SHA1(859865b13c908dbb474333263dc60f6a32461141) )
-	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(320afa0f) SHA1(90edfe0ac19b108d232cda376b03a3a24befad4c) )
-	ROM_LOAD("101-64110", 0x4000, 0x2000, CRC(3040d0bd) SHA1(caa55fc8d9196e408fb41e7171a68e5099519813) )
+	ROM_LOAD("101-64108", 0x0000, 0x2000, CRC(08472223) SHA1(859865b13c908dbb474333263dc60f6a32461141) ) // NEC 2364C 210
+	ROM_LOAD("101-64109", 0x2000, 0x2000, CRC(320afa0f) SHA1(90edfe0ac19b108d232cda376b03a3a24befad4c) ) // NEC 2364C 211
+	ROM_LOAD("101-64110", 0x4000, 0x2000, CRC(3040d0bd) SHA1(caa55fc8d9196e408fb41e7171a68e5099519813) ) // NEC 2364C 212
 
 	ROM_REGION( 0x0400, "mcu", 0 )
-	ROM_LOAD("100-1009", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) )
+	ROM_LOAD("100-1009", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) ) // NEC D8041C 563
 ROM_END
 
 
@@ -655,7 +695,7 @@ ROM_START( gincribc ) // model GIN, PCB label 510-4020-1C
 	ROM_LOAD("bridge-3",    0x4000, 0x1000, CRC(d3cda2e3) SHA1(69b62fa22b388a922abad4e89c78bdb01a5fb322) ) // NEC 2332C 188
 
 	ROM_REGION( 0x0400, "mcu", 0 )
-	ROM_LOAD("100-1009", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) )
+	ROM_LOAD("100-1009", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) ) // NEC D8041C 563
 ROM_END
 
 } // anonymous namespace
@@ -667,8 +707,10 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, vbrc,     0,      0, vbrc,    brc,   card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1980, bridgeca, vbrc,   0, ubc,     brc,   card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1979, bridgec,  0,      0, brc,     brc,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+
+CONS( 1979, vbrc,     0,      0, vbrc,    brc,   card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1979, bridgeca, vbrc,   0, brc,     brc,   card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1982, bridgec3, 0,      0, bv3,     bv3,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 

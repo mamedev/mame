@@ -2,7 +2,7 @@
 // detail/impl/dev_poll_reactor.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +21,7 @@
 
 #include "asio/detail/dev_poll_reactor.hpp"
 #include "asio/detail/assert.hpp"
+#include "asio/detail/scheduler.hpp"
 #include "asio/detail/throw_error.hpp"
 #include "asio/error.hpp"
 
@@ -67,7 +68,8 @@ void dev_poll_reactor::shutdown()
   scheduler_.abandon_operations(ops);
 } 
 
-void dev_poll_reactor::notify_fork(asio::io_context::fork_event fork_ev)
+void dev_poll_reactor::notify_fork(
+    asio::execution_context::fork_event fork_ev)
 {
   if (fork_ev == asio::execution_context::fork_child)
   {
@@ -200,6 +202,19 @@ void dev_poll_reactor::cancel_ops(socket_type descriptor,
   cancel_ops_unlocked(descriptor, asio::error::operation_aborted);
 }
 
+void dev_poll_reactor::cancel_ops_by_key(socket_type descriptor,
+    dev_poll_reactor::per_descriptor_data&,
+    int op_type, void* cancellation_key)
+{
+  asio::detail::mutex::scoped_lock lock(mutex_);
+  op_queue<operation> ops;
+  bool need_interrupt = op_queue_[op_type].cancel_operations_by_key(
+      descriptor, ops, cancellation_key, asio::error::operation_aborted);
+  scheduler_.post_deferred_completions(ops);
+  if (need_interrupt)
+    interrupter_.interrupt();
+}
+
 void dev_poll_reactor::deregister_descriptor(socket_type descriptor,
     dev_poll_reactor::per_descriptor_data&, bool)
 {
@@ -234,13 +249,18 @@ void dev_poll_reactor::deregister_internal_descriptor(
     op_queue_[i].cancel_operations(descriptor, ops, ec);
 }
 
+void dev_poll_reactor::cleanup_descriptor_data(
+    dev_poll_reactor::per_descriptor_data&)
+{
+}
+
 void dev_poll_reactor::run(long usec, op_queue<operation>& ops)
 {
   asio::detail::mutex::scoped_lock lock(mutex_);
 
   // We can return immediately if there's no work to do and the reactor is
   // not supposed to block.
-  if (!block && op_queue_[read_op].empty() && op_queue_[write_op].empty()
+  if (usec == 0 && op_queue_[read_op].empty() && op_queue_[write_op].empty()
       && op_queue_[except_op].empty() && timer_queues_.all_empty())
     return;
 

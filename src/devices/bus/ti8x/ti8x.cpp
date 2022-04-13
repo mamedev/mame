@@ -37,7 +37,7 @@ ti8x_link_port_device::ti8x_link_port_device(
 		device_t *owner,
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_ti8x_link_port_interface>(mconfig, *this)
 	, m_tip_handler(*this)
 	, m_ring_handler(*this)
 	, m_dev(nullptr)
@@ -88,7 +88,7 @@ void ti8x_link_port_device::device_start()
 
 void ti8x_link_port_device::device_config_complete()
 {
-	m_dev = dynamic_cast<device_ti8x_link_port_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
 
@@ -96,7 +96,7 @@ void ti8x_link_port_device::device_config_complete()
 device_ti8x_link_port_interface::device_ti8x_link_port_interface(
 		machine_config const &mconfig,
 		device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "ti8xlink")
 	, m_port(dynamic_cast<ti8x_link_port_device *>(device.owner()))
 {
 }
@@ -432,6 +432,7 @@ TIMER_CALLBACK_MEMBER(device_ti8x_link_port_bit_interface::bit_timeout)
 	// send timeout:
 	case WAIT_IDLE:
 		assert(EMPTY != m_tx_bit_buffer);
+		[[fallthrough]];
 	case WAIT_ACK_0:
 	case WAIT_ACK_1:
 	case WAIT_REL_0:
@@ -611,6 +612,12 @@ void device_ti8x_link_port_byte_interface::bit_received(bool data)
 #include "graphlinkhle.h"
 #include "teeconn.h"
 #include "tispeaker.h"
+
+
+// must come after including the headers that declare these extern
+template class device_finder<device_ti8x_link_port_interface, false>;
+template class device_finder<device_ti8x_link_port_interface, true>;
+
 
 void default_ti8x_link_devices(device_slot_interface &device)
 {

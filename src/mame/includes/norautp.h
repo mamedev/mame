@@ -44,6 +44,8 @@ public:
 	void dphla(machine_config &config);
 	void drhl(machine_config &config);
 	void norautxp(machine_config &config);
+	void cgidjp(machine_config &config);
+	void cdrawpkr(machine_config &config);
 
 	void init_ssa();
 	void init_enc();
@@ -56,12 +58,14 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(ppi2_obf_w);
 	TIMER_CALLBACK_MEMBER(ppi2_ack);
-	DECLARE_READ8_MEMBER(test2_r);
-	DECLARE_WRITE8_MEMBER(mainlamps_w);
-	DECLARE_WRITE8_MEMBER(soundlamps_w);
-	DECLARE_WRITE8_MEMBER(counterlamps_w);
+	uint8_t test2_r();
+	void mainlamps_w(uint8_t data);
+	void soundlamps_w(uint8_t data);
+	void counterlamps_w(uint8_t data);
 	void norautp_palette(palette_device &palette) const;
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cgidjp_map(address_map &map);
+	void cgidjp_opcodes_map(address_map &map);
 	void dphl_map(address_map &map);
 	void dphla_map(address_map &map);
 	void dphltest_map(address_map &map);

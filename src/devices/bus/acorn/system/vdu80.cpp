@@ -97,11 +97,11 @@ void acorn_vdu80_device::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_acorn_vdu80);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	H46505(config, m_crtc, 2_MHz_XTAL);
+	HD6845S(config, m_crtc, 2_MHz_XTAL); // "46505" on schematics (variant not verified)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(6);
-	m_crtc->set_update_row_callback(FUNC(acorn_vdu80_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(acorn_vdu80_device::crtc_update_row));
 }
 
 
@@ -152,15 +152,15 @@ void acorn_vdu80_device::device_reset()
 	{
 		space.install_ram(0xf000, 0x0f7ff, m_videoram.get());
 
-		space.install_readwrite_handler(0xe840, 0xe840, 0, 0x3f, 0, read8smo_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-		space.install_readwrite_handler(0xe841, 0xe841, 0, 0x3e, 0, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
+		space.install_readwrite_handler(0xe840, 0xe840, 0, 0x3f, 0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+		space.install_readwrite_handler(0xe841, 0xe841, 0, 0x3e, 0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 	}
 	else
 	{
 		space.install_ram(0x1000, 0x017ff, m_videoram.get());
 
-		space.install_readwrite_handler(0x1840, 0x1840, 0, 0x3f, 0, read8smo_delegate(FUNC(mc6845_device::status_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-		space.install_readwrite_handler(0x1841, 0x1841, 0, 0x3e, 0, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
+		space.install_readwrite_handler(0x1840, 0x1840, 0, 0x3f, 0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+		space.install_readwrite_handler(0x1841, 0x1841, 0, 0x3e, 0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 	}
 }
 
@@ -172,7 +172,7 @@ void acorn_vdu80_device::device_reset()
 MC6845_UPDATE_ROW(acorn_vdu80_device::crtc_update_row)
 {
 	uint8_t invert = BIT(m_links->read(), 1);
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	for (int column = 0; column < x_count; column++)
 	{

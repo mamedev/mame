@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh4.h"
 #include "sh4regs.h"
 #include "sh4comn.h"
@@ -147,7 +146,7 @@ static const int exception_codes[] =
 static const int sh3_intevt2_exception_codes[] =
 
 { 0x000, /* Power-on Reset */
-	-1, /* Manual Reset */
+	0x020, /* Manual Reset */
 	-1, /* H-UDI Reset */
 	-1, /* Inst TLB Multiple Hit */
 	-1, /* Data TLB Multiple Hit */
@@ -169,26 +168,26 @@ static const int sh3_intevt2_exception_codes[] =
 	-1, /* FPU Exception */
 	-1, /* Initial Page Write exception */
 
-	-1, /* Unconditional TRAP */
+	0x160, /* Unconditional TRAP */
 	-1, /* User break After Instruction */
 
-	-1, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
+	0x1C0, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
 
-	-1, /* EX Irq 0 */
-	-1, /*        1 */
-	-1, /*        2 */
-	-1, /*        3 */
-	-1, /*        4 */
-	-1, /*        5 */
-	-1, /*        6 */
-	-1, /*        7 */
-	-1, /*        8 */
-	-1, /*        9 */
-	-1, /*        A */
-	-1, /*        B */
-	-1, /*        C */
-	-1, /*        D */
-	-1, /*        E */
+	0x200, /* EX Irq 0 */
+	0x220, /*        1 */
+	0x240, /*        2 */
+	0x260, /*        3 */
+	0x280, /*        4 */
+	0x2A0, /*        5 */
+	0x2C0, /*        6 */
+	0x2E0, /*        7 */
+	0x300, /*        8 */
+	0x320, /*        9 */
+	0x340, /*        A */
+	0x360, /*        B */
+	0x380, /*        C */
+	0x3A0, /*        D */
+	0x3C0, /*        E */
 
 	0x600, /* SH4_INTC_IRL0 */
 	0x620, /* SH4_INTC_IRL1 */
@@ -198,10 +197,10 @@ static const int sh3_intevt2_exception_codes[] =
 
 	-1, /* HUDI */
 	-1, /* SH4_INTC_GPOI */
-	-1, /* SH4_INTC_DMTE0 */
-	-1, /* SH4_INTC_DMTE1 */
-	-1, /* SH4_INTC_DMTE2 */
-	-1, /* SH4_INTC_DMTE3 */
+	0x800, /* SH4_INTC_DMTE0 */
+	0x820, /* SH4_INTC_DMTE1 */
+	0x840, /* SH4_INTC_DMTE2 */
+	0x860, /* SH4_INTC_DMTE3 */
 
 	-1, /* SH4_INTC_DMTE4 */
 	-1, /* SH4_INTC_DMTE5 */
@@ -458,6 +457,10 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 
 			m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
 			m_sh3internal_upper[SH3_EXPEVT_ADDR] = exception_codes[exception];
+			if (sh3_intevt2_exception_codes[exception] >= 0x600)
+				m_sh3internal_upper[SH3_INTEVT_ADDR] = 0x3E0 - ((m_exception_priority[exception] >> 8) & 255) * 0x20;
+			else
+				m_sh3internal_upper[SH3_INTEVT_ADDR] = sh3_intevt2_exception_codes[exception];
 
 
 			LOG(("SH-3 '%s' interrupt exception #%d after [%s]\n", tag(), exception, message));
@@ -669,7 +672,7 @@ void sh34_base_device::sh4_handler_ipra_w(uint32_t data, uint32_t mem_mask)
 }
 
 
-WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
+void sh4_base_device::sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int a;
 	uint32_t addr = (offset << 2) + 0xfe000000;
@@ -727,44 +730,46 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 		logerror("TEA set to %08x\n", data);
 		break;
 
+	/*
+	    LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
 
+	    L = LRUI = Least recently used ITLB
+	    B = URB = UTLB replace boundary
+	    C = URC = UTLB replace counter
+	    Q = SQMD = Store Queue Mode Bit
+	    V = SV = Single Virtual Mode Bit
+	    T = TI = TLB invalidate
+	    A = AT = Address translation bit (enable)
+	*/
 	case MMUCR: // MMU Control
-		logerror("%s: MMUCR %08x\n", machine().describe_context(), data);
 		m_m[MMUCR] &= 0xffffffff;
-		/*
-		    LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
+		// MMUCR_AT
+		m_sh4_mmu_enabled = bool(BIT(data, 0));
+		logerror("%s: MMUCR %08x (enable: %d)\n", machine().describe_context(), data, m_sh4_mmu_enabled);
 
-		    L = LRUI = Least recently used ITLB
-		    B = URB = UTLB replace boundary
-		    C = URC = UTLB replace counter
-		    Q = SQMD = Store Queue Mode Bit
-		    V = SV = Single Virtual Mode Bit
-		    T = TI = TLB invaldiate
-		    A = AT = Address translation bit (enable)
-		*/
-
-
-
-		if (data & MMUCR_AT)
+		if (m_sh4_mmu_enabled)
 		{
-			m_sh4_mmu_enabled = 1;
-
-
+			// Newer versions of the Dreamcast Katana SDK use MMU to remap the SQ write-back space (cfr. ikaruga and several later NAOMI GD-ROM releases)
+			// Anything beyond that is bound to fail,
+			// i.e. DC WinCE games, DC Linux distros, v2 Sega checkers, aristmk6.cpp
+#if 0
 			if (m_mmuhack == 1)
 			{
 				printf("SH4 MMU Enabled\n");
 				printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
 				printf("The MMU emulation is a hack specific to that system\n");
 			}
-
+#endif
 
 			if (m_mmuhack == 2)
 			{
-				for (int i = 0;i < 64;i++)
+				for (int i = 0; i < 64; i++)
 				{
 					if (m_utlb[i].V)
 					{
-						printf("(entry %02x | ASID: %02x VPN: %08x V: %02x PPN: %08x SZ: %02x SH: %02x C: %02x PPR: %02x D: %02x WT %02x: SA: %02x TC: %02x)\n",
+						// FIXME: potentially verbose, move to logmacro.h pattern
+						// cfr. MMU Check_4 in v2.xx DC CHECKER
+						logerror("(entry %02x | ASID: %02x VPN: %08x V: %02x PPN: %08x SZ: %02x SH: %02x C: %02x PPR: %02x D: %02x WT %02x: SA: %02x TC: %02x)\n",
 							i,
 							m_utlb[i].ASID,
 							m_utlb[i].VPN << 10,
@@ -781,12 +786,6 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 					}
 				}
 			}
-
-
-		}
-		else
-		{
-			m_sh4_mmu_enabled = 0;
 		}
 
 		break;
@@ -976,7 +975,7 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 	}
 }
 
-READ32_MEMBER( sh4_base_device::sh4_internal_r )
+uint32_t sh4_base_device::sh4_internal_r(offs_t offset, uint32_t mem_mask)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_internal_r uses m_m[] with SH3\n");
@@ -1320,7 +1319,7 @@ uint32_t sh4_base_device::sh4_getsqremap(uint32_t address)
 }
 
 
-WRITE64_MEMBER( sh4_base_device::sh4_utlb_address_array_w )
+void sh4_base_device::sh4_utlb_address_array_w(offs_t offset, uint64_t data)
 {
 /*  uses bits 13:8 of address to select which UTLB entry we're addressing
     bit 7 of the address enables 'associative' mode, causing a search
@@ -1356,7 +1355,7 @@ WRITE64_MEMBER( sh4_base_device::sh4_utlb_address_array_w )
 	}
 }
 
-READ64_MEMBER( sh4_base_device::sh4_utlb_address_array_r )
+uint64_t sh4_base_device::sh4_utlb_address_array_r(offs_t offset)
 {
 	// associative bit is ignored for reads
 	int offs = offset*8;
@@ -1374,7 +1373,7 @@ READ64_MEMBER( sh4_base_device::sh4_utlb_address_array_r )
 }
 
 
-WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array1_w )
+void sh4_base_device::sh4_utlb_data_array1_w(offs_t offset, uint64_t data)
 {
 /*  uses bits 13:8 of address to select which UTLB entry we're addressing
 
@@ -1407,7 +1406,7 @@ WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array1_w )
 }
 
 
-READ64_MEMBER(sh4_base_device::sh4_utlb_data_array1_r)
+uint64_t sh4_base_device::sh4_utlb_data_array1_r(offs_t offset)
 {
 	uint32_t ret = 0;
 	int offs = offset*8;
@@ -1429,7 +1428,7 @@ READ64_MEMBER(sh4_base_device::sh4_utlb_data_array1_r)
 
 
 
-WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array2_w )
+void sh4_base_device::sh4_utlb_data_array2_w(offs_t offset, uint64_t data)
 {
 /*  uses bits 13:8 of address to select which UTLB entry we're addressing
 
@@ -1451,7 +1450,7 @@ WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array2_w )
 }
 
 
-READ64_MEMBER(sh4_base_device::sh4_utlb_data_array2_r)
+uint64_t sh4_base_device::sh4_utlb_data_array2_r(offs_t offset)
 {
 	uint32_t ret = 0;
 	int offs = offset*8;

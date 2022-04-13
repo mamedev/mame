@@ -24,7 +24,7 @@
 
 class device_gg_ext_port_interface;
 
-class gg_ext_port_device : public device_t, public device_slot_interface
+class gg_ext_port_device : public device_t, public device_single_card_slot_interface<device_gg_ext_port_interface>
 {
 public:
 	// construction/destruction
@@ -65,6 +65,11 @@ public:
 
 	void th_pin_w(int state);
 
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+
+	// for peripherals that interact with the machine's screen
+	required_device<screen_device> m_screen;
+
 //protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -79,7 +84,7 @@ private:
 // ======================> device_gg_ext_port_interface
 
 // class representing interface-specific live sms_expansion card
-class device_gg_ext_port_interface : public device_slot_card_interface
+class device_gg_ext_port_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -100,6 +105,5 @@ DECLARE_DEVICE_TYPE(GG_EXT_PORT, gg_ext_port_device)
 
 
 void gg_ext_port_devices(device_slot_interface &device);
-
 
 #endif // MAME_BUS_GAMEGEAR_GGEXT_H

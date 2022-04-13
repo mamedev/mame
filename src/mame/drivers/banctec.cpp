@@ -39,7 +39,7 @@ public:
 protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(u8 data);
 
 	virtual void machine_reset() override;
 	void banctec_mcu_mem(address_map &map);
@@ -61,7 +61,6 @@ void banctec_state::banctec_mem(address_map &map)
 
 void banctec_state::banctec_mcu_mem(address_map &map)
 {
-	map(0x0000, 0x00ff).ram(); /* Probably wrong. Must be verified on pcb! */
 	map(0x2000, 0x2000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2001, 0x2001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2003, 0x2003).w(FUNC(banctec_state::videoram_w));
@@ -78,7 +77,7 @@ void banctec_state::machine_reset()
 * Video/Character functions *
 ****************************/
 
-WRITE8_MEMBER( banctec_state::videoram_w )
+void banctec_state::videoram_w(u8 data)
 {
 	m_videoram[m_video_address] = data;
 	m_video_address++;
@@ -88,16 +87,14 @@ WRITE8_MEMBER( banctec_state::videoram_w )
 
 MC6845_UPDATE_ROW( banctec_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0xff;
-		chr = m_videoram[mem];
-		gfx = m_p_chargen[chr | (ra << 8)] ^ ((x == cursor_x) ? 0xff : 0);
+		u16 const mem = (ma + x) & 0xff;
+		u8 const chr = m_videoram[mem];
+		u8 const gfx = m_p_chargen[chr | (ra << 8)] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT(gfx, 7)];
@@ -162,8 +159,8 @@ void banctec_state::banctec(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(banctec_state::crtc_update_row), this);
-	crtc.set_on_update_addr_change_callback(FUNC(banctec_state::crtc_addr), this);
+	crtc.set_update_row_callback(FUNC(banctec_state::crtc_update_row));
+	crtc.set_on_update_addr_change_callback(FUNC(banctec_state::crtc_addr));
 }
 
 ROM_START(banctec)

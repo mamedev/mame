@@ -54,6 +54,7 @@ Dumped by Chackn
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class m14_state : public driver_device
@@ -85,14 +86,14 @@ private:
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_device<samples_device> m_samples;
 
-	DECLARE_WRITE8_MEMBER(m14_vram_w);
-	DECLARE_WRITE8_MEMBER(m14_cram_w);
-	DECLARE_READ8_MEMBER(m14_rng_r);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(ball_x_w);
-	DECLARE_WRITE8_MEMBER(ball_y_w);
-	DECLARE_WRITE8_MEMBER(paddle_x_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void m14_vram_w(offs_t offset, uint8_t data);
+	void m14_cram_w(offs_t offset, uint8_t data);
+	uint8_t m14_rng_r();
+	void output_w(uint8_t data);
+	void ball_x_w(uint8_t data);
+	void ball_y_w(uint8_t data);
+	void paddle_x_w(uint8_t data);
+	void sound_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(m14_get_tile_info);
 	void draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -107,12 +108,12 @@ private:
 	void m14_map(address_map &map);
 
 	/* video-related */
-	tilemap_t  *m_m14_tilemap;
+	tilemap_t  *m_m14_tilemap = nullptr;
 
 	/* input-related */
 	//uint8_t m_hop_mux;
-	uint8_t m_ballx,m_bally;
-	uint8_t m_paddlex;
+	uint8_t m_ballx = 0, m_bally = 0;
+	uint8_t m_paddlex = 0;
 };
 
 
@@ -145,7 +146,7 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 
 	/* colorram & 0xf0 used but unknown purpose*/
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			0);
@@ -153,40 +154,38 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 
 void m14_state::video_start()
 {
-	m_m14_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m14_state::m14_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_m14_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m14_state::m14_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 
 }
 
 void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int xi,yi;
 	//const rgb_t white_pen =  rgb_t::white();
 	const uint8_t white_pen = 0x1f;
 	const int xoffs = -8; // matches left-right wall bounces
 	const int p_ybase = 184; // matches ball bounce to paddle
-	int resx,resy;
 
 	// draw ball
-	for(xi=0;xi<4;xi++)
-		for(yi=0;yi<4;yi++)
+	for(int xi=0;xi<4;xi++)
+		for(int yi=0;yi<4;yi++)
 		{
-			resx = flip_screen() ?  32*8-(m_ballx+xi+xoffs) : m_ballx+xi+xoffs;
-			resy = flip_screen() ?  28*8-(m_bally+yi) :       m_bally+yi;
+			const int resx = flip_screen() ?  32*8-(m_ballx+xi+xoffs) : m_ballx+xi+xoffs;
+			const int resy = flip_screen() ?  28*8-(m_bally+yi) :       m_bally+yi;
 
 			if(cliprect.contains(resx,resy))
-				bitmap.pix16(resy, resx) = m_palette->pen(white_pen);
+				bitmap.pix(resy, resx) = m_palette->pen(white_pen);
 		}
 
 	// draw paddle
-	for(xi=0;xi<16;xi++)
-		for(yi=0;yi<4;yi++)
+	for(int xi=0;xi<16;xi++)
+		for(int yi=0;yi<4;yi++)
 		{
-			resx = flip_screen() ? 32*8-(m_paddlex+xi+xoffs) : (m_paddlex+xi+xoffs);
-			resy = flip_screen() ? 28*8-(p_ybase+yi) :         p_ybase+yi;
+			const int resx = flip_screen() ? 32*8-(m_paddlex+xi+xoffs) : (m_paddlex+xi+xoffs);
+			const int resy = flip_screen() ? 28*8-(p_ybase+yi) :         p_ybase+yi;
 
 			if(cliprect.contains(resx,resy))
-				bitmap.pix16(resy, resx) = m_palette->pen(white_pen);
+				bitmap.pix(resy, resx) = m_palette->pen(white_pen);
 		}
 
 
@@ -202,13 +201,13 @@ uint32_t m14_state::screen_update_m14(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE8_MEMBER(m14_state::m14_vram_w)
+void m14_state::m14_vram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m14_state::m14_cram_w)
+void m14_state::m14_cram_w(offs_t offset, uint8_t data)
 {
 	m_color_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
@@ -220,14 +219,14 @@ WRITE8_MEMBER(m14_state::m14_cram_w)
  *
  *************************************/
 
-READ8_MEMBER(m14_state::m14_rng_r)
+uint8_t m14_state::m14_rng_r()
 {
 	/* graphic artifacts happens if this doesn't return random values. */
 	/* guess directly tied to screen frame number */
 	return (m_screen->frame_number() & 0x7f) | (ioport("IN1")->read() & 0x80);
 }
 
-WRITE8_MEMBER(m14_state::output_w)
+void m14_state::output_w(uint8_t data)
 {
 	/* ---- x--- active after calling a winning hand */
 	/* ---- --x- lamp? */
@@ -237,17 +236,17 @@ WRITE8_MEMBER(m14_state::output_w)
 	//popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(m14_state::ball_x_w)
+void m14_state::ball_x_w(uint8_t data)
 {
 	m_ballx = data;
 }
 
-WRITE8_MEMBER(m14_state::ball_y_w)
+void m14_state::ball_y_w(uint8_t data)
 {
 	m_bally = data;
 }
 
-WRITE8_MEMBER(m14_state::paddle_x_w)
+void m14_state::paddle_x_w(uint8_t data)
 {
 	m_paddlex = data;
 }
@@ -269,7 +268,7 @@ static const char *const m14_sample_names[] =
 	nullptr
 };
 
-WRITE8_MEMBER(m14_state::sound_w)
+void m14_state::sound_w(uint8_t data)
 {
 	switch(data)
 	{
@@ -395,19 +394,8 @@ static INPUT_PORTS_START( m14 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,right_coin_inserted, 0) //coin x 1
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_m14 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,     0, 0x10 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(m14_state::m14_irq)

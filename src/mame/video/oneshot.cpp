@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_bg_tile_info)
 {
 	const u32 tileno = m_bg_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
 void oneshot_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_mid_tile_info)
 {
 	const u32 tileno = m_mid_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 2, 0);
+	tileinfo.set(0, tileno, 2, 0);
 }
 
 void oneshot_state::mid_videoram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_fg_tile_info)
 {
 	const u32 tileno = m_fg_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 3, 0);
+	tileinfo.set(0, tileno, 3, 0);
 }
 
 void oneshot_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -51,9 +51,9 @@ void oneshot_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void oneshot_state::video_start()
 {
-	m_bg_tilemap =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(oneshot_state::get_bg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(oneshot_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(oneshot_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(oneshot_state::get_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(oneshot_state::get_mid_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(oneshot_state::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_mid_tilemap->set_transparent_pen(0);

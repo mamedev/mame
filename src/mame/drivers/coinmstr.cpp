@@ -136,6 +136,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(14'000'000)
@@ -160,19 +161,19 @@ public:
 	required_shared_ptr<uint8_t> m_attr_ram1;
 	required_shared_ptr<uint8_t> m_attr_ram2;
 	required_shared_ptr<uint8_t> m_attr_ram3;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_question_adr[4];
-	DECLARE_WRITE8_MEMBER(quizmstr_bg_w);
-	DECLARE_WRITE8_MEMBER(quizmstr_attr1_w);
-	DECLARE_WRITE8_MEMBER(quizmstr_attr2_w);
-	DECLARE_WRITE8_MEMBER(quizmstr_attr3_w);
-	DECLARE_READ8_MEMBER(question_r);
-	DECLARE_WRITE8_MEMBER(question_w);
-	DECLARE_READ8_MEMBER(ff_r);
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_question_adr[4]{};
+	void quizmstr_bg_w(offs_t offset, uint8_t data);
+	void quizmstr_attr1_w(offs_t offset, uint8_t data);
+	void quizmstr_attr2_w(offs_t offset, uint8_t data);
+	void quizmstr_attr3_w(offs_t offset, uint8_t data);
+	uint8_t question_r();
+	void question_w(offs_t offset, uint8_t data);
+	uint8_t ff_r();
 	void init_coinmstr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	uint32_t screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_coinmstr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -192,10 +193,9 @@ public:
 };
 
 
-WRITE8_MEMBER(coinmstr_state::quizmstr_bg_w)
+void coinmstr_state::quizmstr_bg_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	if(offset >= 0x0240)
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
@@ -235,7 +235,7 @@ static void coinmstr_set_pal(palette_device &palette, uint32_t paldat, int col)
 }
 
 
-WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
+void coinmstr_state::quizmstr_attr1_w(offs_t offset, uint8_t data)
 {
 	m_attr_ram1[offset] = data;
 
@@ -250,7 +250,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 	}
 }
 
-WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
+void coinmstr_state::quizmstr_attr2_w(offs_t offset, uint8_t data)
 {
 	m_attr_ram2[offset] = data;
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 	}
 }
 
-WRITE8_MEMBER(coinmstr_state::quizmstr_attr3_w)
+void coinmstr_state::quizmstr_attr3_w(offs_t offset, uint8_t data)
 {
 	m_attr_ram3[offset] = data;
 
@@ -275,7 +275,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr3_w)
 }
 
 
-READ8_MEMBER(coinmstr_state::question_r)
+uint8_t coinmstr_state::question_r()
 {
 	int address;
 	uint8_t *questions = memregion("user1")->base();
@@ -323,7 +323,7 @@ READ8_MEMBER(coinmstr_state::question_r)
 	return questions[address];
 }
 
-WRITE8_MEMBER(coinmstr_state::question_w)
+void coinmstr_state::question_w(offs_t offset, uint8_t data)
 {
 	if(data != m_question_adr[offset])
 	{
@@ -333,7 +333,7 @@ WRITE8_MEMBER(coinmstr_state::question_w)
 	m_question_adr[offset] = data;
 }
 
-READ8_MEMBER(coinmstr_state::ff_r)
+uint8_t coinmstr_state::ff_r()
 {
 	return 0xff;
 }
@@ -500,7 +500,7 @@ E0-E1 CRTC
 	map(0xc8, 0xcb).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));    /* confirmed */
 	map(0xd0, 0xd3).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd8, 0xdb).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));    /* confirmed */
-//  AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
+//  map(0xc0, 0xc1).r(FUNC(coinmstr_state::ff_r));  /* needed to boot */
 	map(0xc4, 0xc4).r(FUNC(coinmstr_state::ff_r));  /* needed to boot */
 }
 
@@ -1240,20 +1240,19 @@ TILE_GET_INFO_MEMBER(coinmstr_state::get_bg_tile_info)
 
 	tile |= (m_attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 void coinmstr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(coinmstr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
 }
 
-uint32_t coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
-
 
 void coinmstr_state::coinmstr(machine_config &config)
 {
@@ -1267,6 +1266,7 @@ void coinmstr_state::coinmstr(machine_config &config)
 
 	pia6821_device &pia1(PIA6821(config, "pia1", 0));
 	pia1.readpa_handler().set_ioport("PIA1.A");
+	pia1.set_port_a_input_overrides_output_mask(0xff);
 	pia1.readpb_handler().set_ioport("PIA1.B");
 
 	pia6821_device &pia2(PIA6821(config, "pia2", 0));
@@ -1280,12 +1280,11 @@ void coinmstr_state::coinmstr(machine_config &config)
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8, 46*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(coinmstr_state::screen_update_coinmstr));
-	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmstr);
 	PALETTE(config, m_palette).set_entries(46*32*4);
 
-	h46505_device &crtc(H46505(config, "crtc", 14000000 / 16));
+	mc6845_device &crtc(MC6845(config, "crtc", 14000000 / 16));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

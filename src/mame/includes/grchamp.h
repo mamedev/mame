@@ -15,6 +15,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class grchamp_state : public driver_device
 {
@@ -47,29 +48,29 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(cpu0_outputs_w);
-	DECLARE_WRITE8_MEMBER(led_board_w);
-	DECLARE_WRITE8_MEMBER(cpu1_outputs_w);
-	DECLARE_READ8_MEMBER(pc3259_0_r);
-	DECLARE_READ8_MEMBER(pc3259_1_r);
-	DECLARE_READ8_MEMBER(pc3259_2_r);
-	DECLARE_READ8_MEMBER(pc3259_3_r);
-	DECLARE_READ8_MEMBER(sub_to_main_comm_r);
-	DECLARE_WRITE8_MEMBER(main_to_sub_comm_w);
-	DECLARE_READ8_MEMBER(main_to_sub_comm_r);
+	void cpu0_outputs_w(offs_t offset, uint8_t data);
+	void led_board_w(offs_t offset, uint8_t data);
+	void cpu1_outputs_w(offs_t offset, uint8_t data);
+	uint8_t pc3259_0_r();
+	uint8_t pc3259_1_r();
+	uint8_t pc3259_2_r();
+	uint8_t pc3259_3_r();
+	uint8_t sub_to_main_comm_r();
+	void main_to_sub_comm_w(offs_t offset, uint8_t data);
+	uint8_t main_to_sub_comm_r(offs_t offset);
 	uint8_t get_pc3259_bits(int offs);
-	DECLARE_WRITE8_MEMBER(left_w);
-	DECLARE_WRITE8_MEMBER(center_w);
-	DECLARE_WRITE8_MEMBER(right_w);
+	void left_w(offs_t offset, uint8_t data);
+	void center_w(offs_t offset, uint8_t data);
+	void right_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(soundlatch_w_cb);
 	TIMER_CALLBACK_MEMBER(soundlatch_clear7_w_cb);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(soundlatch_clear7_w);
-	DECLARE_READ8_MEMBER(soundlatch_flags_r);
-	DECLARE_WRITE8_MEMBER(portA_0_w);
-	DECLARE_WRITE8_MEMBER(portB_0_w);
-	DECLARE_WRITE8_MEMBER(portA_2_w);
-	DECLARE_WRITE8_MEMBER(portB_2_w);
+	uint8_t soundlatch_r();
+	void soundlatch_clear7_w(uint8_t data);
+	uint8_t soundlatch_flags_r();
+	void portA_0_w(uint8_t data);
+	void portB_0_w(uint8_t data);
+	void portA_2_w(uint8_t data);
+	void portB_2_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_left_tile_info);
@@ -90,27 +91,27 @@ private:
 	void sub_map(address_map &map);
 	void sub_portmap(address_map &map);
 
-	uint8_t       m_cpu0_out[16];
-	uint8_t       m_cpu1_out[16];
+	uint8_t       m_cpu0_out[16]{};
+	uint8_t       m_cpu1_out[16]{};
 
-	uint8_t       m_comm_latch;
-	uint8_t       m_comm_latch2[4];
+	uint8_t       m_comm_latch = 0U;
+	uint8_t       m_comm_latch2[4]{};
 
-	uint16_t      m_ledlatch;
-	uint8_t       m_ledaddr;
-	uint16_t      m_ledram[8];
+	uint16_t      m_ledlatch = 0U;
+	uint8_t       m_ledaddr = 0U;
+	uint16_t      m_ledram[8]{};
 
-	uint8_t       m_soundlatch_data;
-	bool          m_soundlatch_flag;
+	uint8_t       m_soundlatch_data = 0U;
+	bool          m_soundlatch_flag = false;
 
-	uint16_t      m_collide;
-	uint8_t       m_collmode;
+	uint16_t      m_collide = 0U;
+	uint8_t       m_collmode = 0U;
 
-	bitmap_ind16 m_work_bitmap;
-	tilemap_t *m_text_tilemap;
-	tilemap_t *m_left_tilemap;
-	tilemap_t *m_center_tilemap;
-	tilemap_t *m_right_tilemap;
+	bitmap_ind16 m_work_bitmap{};
+	tilemap_t *m_text_tilemap = nullptr;
+	tilemap_t *m_left_tilemap = nullptr;
+	tilemap_t *m_center_tilemap = nullptr;
+	tilemap_t *m_right_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

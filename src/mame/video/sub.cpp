@@ -36,22 +36,22 @@ TILE_GET_INFO_MEMBER(sub_state::get_tile_info)
 	int code = m_vram[tile_index] | ((m_attr[tile_index]&0xe0)<<3);
 	int color = (m_attr[tile_index]&0x1f)+0x40;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
-WRITE8_MEMBER(sub_state::vram_w)
+void sub_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(sub_state::attr_w)
+void sub_state::attr_w(offs_t offset, uint8_t data)
 {
 	m_attr[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(sub_state::scrolly_w)
+void sub_state::scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scrolly[offset] = data;
 	m_tilemap->set_scrolly(offset,m_scrolly[offset]);
@@ -59,7 +59,7 @@ WRITE8_MEMBER(sub_state::scrolly_w)
 
 void sub_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sub_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sub_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tilemap->set_scroll_cols(32);
 }

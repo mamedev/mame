@@ -51,8 +51,8 @@ private:
 
 	int m_reset;
 
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	uint8_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint8_t data);
 
 	void z80_io(address_map &map);
 	void z80_mem(address_map &map);

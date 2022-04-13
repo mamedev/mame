@@ -9,7 +9,6 @@
 #ifndef __WINDOWS_WINMAIN_H__
 #define __WINDOWS_WINMAIN_H__
 
-#include <winapifamily.h>
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
 
@@ -24,6 +23,7 @@
 
 // video options
 #define WINOPTION_MENU                  "menu"
+#define WINOPTION_ATTACH_WINDOW         "attach_window"
 
 // core post-processing options
 #define WINOPTION_HLSLPATH                  "hlslpath"
@@ -135,6 +135,7 @@ public:
 
 	// video options
 	bool menu() const { return bool_value(WINOPTION_MENU); }
+	const char *attach_window() const { return value(WINOPTION_ATTACH_WINDOW); }
 
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
@@ -242,6 +243,8 @@ enum input_event
 	INPUT_EVENT_KEYDOWN,
 	INPUT_EVENT_KEYUP,
 	INPUT_EVENT_RAWINPUT,
+	INPUT_EVENT_ARRIVAL,
+	INPUT_EVENT_REMOVAL,
 	INPUT_EVENT_MOUSE_BUTTON
 };
 
@@ -265,10 +268,8 @@ struct _EXCEPTION_POINTERS;
 
 class windows_osd_interface : public osd_common_t
 {
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// Access to exception filter static method
 	friend int main(int argc, char *argv[]);
-#endif
 
 public:
 	// construction/destruction
@@ -278,9 +279,10 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
+	virtual void input_update() override;
 
 	// input overrideables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
+	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
 	// video overridables
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
@@ -318,33 +320,6 @@ private:
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };
-
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-
-ref class MameMainApp sealed : public Windows::ApplicationModel::Core::IFrameworkView
-{
-private:
-	std::unique_ptr<windows_options>        m_options;
-	std::unique_ptr<windows_osd_interface>  m_osd;
-
-public:
-	MameMainApp();
-
-	// IFrameworkView Methods.
-	virtual void Initialize(Windows::ApplicationModel::Core::CoreApplicationView^ applicationView);
-	virtual void SetWindow(Windows::UI::Core::CoreWindow^ window);
-	virtual void Load(Platform::String^ entryPoint);
-	virtual void Run();
-	virtual void Uninitialize();
-};
-
-ref class MameViewSource sealed : Windows::ApplicationModel::Core::IFrameworkViewSource
-{
-public:
-	virtual Windows::ApplicationModel::Core::IFrameworkView^ CreateView();
-};
-
-#endif
 
 //============================================================
 //  GLOBAL VARIABLES

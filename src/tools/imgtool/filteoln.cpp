@@ -8,9 +8,10 @@
 
 *****************************************************************************/
 
-#include <string.h>
-
 #include "imgtool.h"
+#include "filter.h"
+
+#include <cstring>
 
 #define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))
 

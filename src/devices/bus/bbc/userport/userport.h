@@ -41,7 +41,7 @@
 
 class device_bbc_userport_interface;
 
-class bbc_userport_slot_device : public device_t, public device_slot_interface
+class bbc_userport_slot_device : public device_t, public device_single_card_slot_interface<device_bbc_userport_interface>
 {
 public:
 	// construction/destruction
@@ -61,16 +61,19 @@ public:
 	auto cb1_handler() { return m_cb1_handler.bind(); }
 	auto cb2_handler() { return m_cb2_handler.bind(); }
 
+	// from slot
 	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
 
+	// from host
 	uint8_t pb_r();
 	void pb_w(uint8_t data);
+	void write_cb1(int state);
+	void write_cb2(int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_bbc_userport_interface *m_device;
 
@@ -82,7 +85,7 @@ private:
 
 // ======================> device_bbc_userport_interface
 
-class device_bbc_userport_interface : public device_slot_card_interface
+class device_bbc_userport_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -90,6 +93,8 @@ public:
 
 	virtual uint8_t pb_r() { return 0xff; }
 	virtual void pb_w(uint8_t data) { }
+	virtual void write_cb1(int state) { }
+	virtual void write_cb2(int state) { }
 
 protected:
 	device_bbc_userport_interface(const machine_config &mconfig, device_t &device);

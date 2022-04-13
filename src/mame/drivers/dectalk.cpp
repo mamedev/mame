@@ -245,7 +245,6 @@ dgc (dg(no!spam)cx@mac.com)
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -271,53 +270,52 @@ private:
 	};
 
 	// input fifo, between m68k and tms32010
-	uint16_t m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
-	uint8_t m_infifo_count;
-	uint8_t m_infifo_tail_ptr;
-	uint8_t m_infifo_head_ptr;
+	uint16_t m_infifo[32]{}; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
+	uint8_t m_infifo_count = 0;
+	uint8_t m_infifo_tail_ptr = 0;
+	uint8_t m_infifo_head_ptr = 0;
 	// output fifo, between tms32010 and 10khz sample latch for dac
-	uint16_t m_outfifo[16]; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
-	uint8_t m_outfifo_count;
-	uint8_t m_outfifo_tail_ptr;
-	uint8_t m_outfifo_head_ptr;
-	bool m_infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
-	bool m_spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
-	uint8_t m_m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed! // TODO: Split this into two separate booleans!
-	uint8_t m_m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves' // TODO: Split this into three separate booleans!
-	bool m_simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
-	bool m_tlc_tonedetect;
-	bool m_tlc_ringdetect;
-	uint8_t m_tlc_dtmf; // dtmf holding reg
-	uint8_t m_duart_inport; // low 4 bits of duart input
-	uint8_t m_duart_outport; // most recent duart output
-	bool m_hack_self_test_is_second_read; // temp variable for hack below
+	uint16_t m_outfifo[16]{}; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
+	uint8_t m_outfifo_count = 0;
+	uint8_t m_outfifo_tail_ptr = 0;
+	uint8_t m_outfifo_head_ptr = 0;
+	bool m_infifo_semaphore = false; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
+	bool m_spc_error_latch = false; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
+	uint8_t m_m68k_spcflags_latch = 0; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed! // TODO: Split this into two separate booleans!
+	uint8_t m_m68k_tlcflags_latch = 0; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves' // TODO: Split this into three separate booleans!
+	bool m_simulate_outfifo_error = 0; // simulate an error on the outfifo, which does something unusual to the dsp latches
+	bool m_tlc_tonedetect = false;
+	bool m_tlc_ringdetect = false;
+	uint8_t m_tlc_dtmf = 0; // dtmf holding reg
+	uint8_t m_duart_inport = 0; // low 4 bits of duart input
+	uint8_t m_duart_outport = 0; // most recent duart output
+	bool m_hack_self_test_is_second_read = false; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<tms32010_device> m_dsp;
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
-	DECLARE_READ8_MEMBER(duart_input);
-	DECLARE_WRITE8_MEMBER(duart_output);
-	DECLARE_READ8_MEMBER(nvram_recall);
-	DECLARE_WRITE8_MEMBER(led_write);
-	DECLARE_WRITE8_MEMBER(nvram_store);
-	DECLARE_WRITE16_MEMBER(m68k_infifo_w);
-	DECLARE_READ16_MEMBER(m68k_spcflags_r);
-	DECLARE_WRITE16_MEMBER(m68k_spcflags_w);
-	DECLARE_READ16_MEMBER(m68k_tlcflags_r);
-	DECLARE_WRITE16_MEMBER(m68k_tlcflags_w);
-	DECLARE_READ16_MEMBER(m68k_tlc_dtmf_r);
-	DECLARE_WRITE16_MEMBER(spc_latch_outfifo_error_stats);
-	DECLARE_READ16_MEMBER(spc_infifo_data_r);
-	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
+	uint8_t duart_input();
+	void duart_output(uint8_t data);
+	uint8_t nvram_recall(offs_t offset);
+	void led_write(uint8_t data);
+	void nvram_store(offs_t offset, uint8_t data);
+	void m68k_infifo_w(uint16_t data);
+	uint16_t m68k_spcflags_r();
+	void m68k_spcflags_w(uint16_t data);
+	uint16_t m68k_tlcflags_r();
+	void m68k_tlcflags_w(uint16_t data);
+	uint16_t m68k_tlc_dtmf_r();
+	void spc_latch_outfifo_error_stats(uint16_t data);
+	uint16_t spc_infifo_data_r();
+	void spc_outfifo_data_w(uint16_t data);
 	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
-	emu_timer *m_outfifo_read_timer;
+	emu_timer *m_outfifo_read_timer = nullptr;
 	void outfifo_check();
 	void clear_all_fifos();
 	void dsp_semaphore_w(bool state);
@@ -328,17 +326,12 @@ private:
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
 /* 2681 DUART */
-WRITE_LINE_MEMBER(dectalk_state::duart_irq_handler)
-{
-	m_maincpu->set_input_line(M68K_IRQ_6, state);
-}
-
-READ8_MEMBER(dectalk_state::duart_input)
+uint8_t dectalk_state::duart_input()
 {
 	uint8_t data = 0;
 	data |= m_duart_inport&0xf;
@@ -348,7 +341,7 @@ READ8_MEMBER(dectalk_state::duart_input)
 	return data;
 }
 
-WRITE8_MEMBER(dectalk_state::duart_output)
+void dectalk_state::duart_output(uint8_t data)
 {
 	m_duart_outport = data;
 #ifdef SERIAL_TO_STDERR
@@ -484,12 +477,12 @@ void dectalk_state::machine_start()
 void dectalk_state::machine_reset()
 {
 	/* hook the RESET line, which resets a slew of other components */
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(dectalk_state::dectalk_reset),this));
+	m_maincpu->set_reset_callback(*this, FUNC(dectalk_state::dectalk_reset));
 }
 
 /* Begin 68k i/o handlers */
 
-READ8_MEMBER(dectalk_state::nvram_recall)// recall from x2212 nvram chip
+uint8_t dectalk_state::nvram_recall(offs_t offset)// recall from x2212 nvram chip
 {
 #ifdef NVRAM_LOG
 	fprintf(stderr,"NVRAM RECALL executed: offset %03x\n", offset);
@@ -500,7 +493,7 @@ READ8_MEMBER(dectalk_state::nvram_recall)// recall from x2212 nvram chip
 	return 0xff;
 }
 
-WRITE8_MEMBER(dectalk_state::led_write)
+void dectalk_state::led_write(uint8_t data)
 {
 	popmessage("LED status: %02X\n", data&0xff);
 #ifdef VERBOSE
@@ -509,7 +502,7 @@ WRITE8_MEMBER(dectalk_state::led_write)
 	//popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
-WRITE8_MEMBER(dectalk_state::nvram_store) // store to X2212 NVRAM chip
+void dectalk_state::nvram_store(offs_t offset, uint8_t data) // store to X2212 NVRAM chip
 {
 #ifdef NVRAM_LOG
 		fprintf(stderr,"NVRAM STORE executed: offset %03x, data written (and ignored) is %02x\n", offset, data);
@@ -519,7 +512,7 @@ WRITE8_MEMBER(dectalk_state::nvram_store) // store to X2212 NVRAM chip
 	m_nvram->store(0);
 }
 
-WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fifo
+void dectalk_state::m68k_infifo_w(uint16_t data)// 68k write to the speech input fifo
 {
 #ifdef USE_LOOSE_TIMING
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
@@ -541,7 +534,7 @@ WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fif
 	m_infifo_head_ptr&=0x1f;
 }
 
-READ16_MEMBER(dectalk_state::m68k_spcflags_r)// 68k read from the speech flags
+uint16_t dectalk_state::m68k_spcflags_r()// 68k read from the speech flags
 {
 	uint8_t data = 0;
 	data |= m_m68k_spcflags_latch; // bits 0 and 6
@@ -553,7 +546,7 @@ READ16_MEMBER(dectalk_state::m68k_spcflags_r)// 68k read from the speech flags
 	return data;
 }
 
-WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (only 3 bits do anything)
+void dectalk_state::m68k_spcflags_w(uint16_t data)// 68k write to the speech flags (only 3 bits do anything)
 {
 #ifdef USE_LOOSE_TIMING
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
@@ -612,7 +605,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 	}
 }
 
-READ16_MEMBER(dectalk_state::m68k_tlcflags_r)// dtmf flags read
+uint16_t dectalk_state::m68k_tlcflags_r()// dtmf flags read
 {
 	uint16_t data = 0;
 	data |= m_m68k_tlcflags_latch; // bits 6, 8, 14: tone detected int enable, answer phone relay enable, and ring int enable respectively
@@ -624,7 +617,7 @@ READ16_MEMBER(dectalk_state::m68k_tlcflags_r)// dtmf flags read
 	return data;
 }
 
-WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
+void dectalk_state::m68k_tlcflags_w(uint16_t data)// dtmf flags write
 {
 #ifdef TLC_LOG
 	logerror("m68k: TLC flags written with %04X, only storing %04X\n",data, data&0x4140);
@@ -686,7 +679,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 	}
 }
 
-READ16_MEMBER(dectalk_state::m68k_tlc_dtmf_r)// dtmf chip read
+uint16_t dectalk_state::m68k_tlc_dtmf_r()// dtmf chip read
 {
 #ifdef TLC_LOG
 	uint16_t data = 0xffff;
@@ -698,7 +691,7 @@ READ16_MEMBER(dectalk_state::m68k_tlc_dtmf_r)// dtmf chip read
 /* End 68k i/o handlers */
 
 /* Begin tms32010 i/o handlers */
-WRITE16_MEMBER(dectalk_state::spc_latch_outfifo_error_stats)// latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
+void dectalk_state::spc_latch_outfifo_error_stats(uint16_t data)// latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
 #ifdef USE_LOOSE_TIMING
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
@@ -710,7 +703,7 @@ WRITE16_MEMBER(dectalk_state::spc_latch_outfifo_error_stats)// latch 74ls74 @ E6
 	m_spc_error_latch = (data&1); // latch the dsp 'soft error' state aka "ERROR DETECTED D5 H" on schematics (different from the outfifo error state above!)
 }
 
-READ16_MEMBER(dectalk_state::spc_infifo_data_r)
+uint16_t dectalk_state::spc_infifo_data_r()
 {
 	uint16_t data = 0xffff;
 	data = m_infifo[m_infifo_tail_ptr];
@@ -727,7 +720,7 @@ READ16_MEMBER(dectalk_state::spc_infifo_data_r)
 	return data;
 }
 
-WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
+void dectalk_state::spc_outfifo_data_w(uint16_t data)
 {
 	// the low 4 data bits are thrown out on the real unit due to use of a 12 bit dac (and to save use of another 16x4 fifo chip), though technically they're probably valid, and with suitable hacking a dtc-01 could probably output full 16 bit samples at 10khz.
 #ifdef SPC_LOG_DSP
@@ -816,7 +809,7 @@ void dectalk_state::tms32010_io(address_map &map)
 {
 	map(0, 0).w(FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
 	map(1, 1).rw(FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
-	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
+	//map(8, 8) //the newer firmware seems to want something mapped here?
 }
 
 /******************************************************************************
@@ -846,15 +839,15 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_OUTFIFO_READ:
-		outfifo_read_cb(ptr, param);
+		outfifo_read_cb(param);
 		break;
 	default:
-		assert_always(false, "Unknown id in dectalk_state::device_timer");
+		throw emu_fatalerror("Unknown id in dectalk_state::device_timer");
 	}
 }
 
@@ -881,7 +874,7 @@ void dectalk_state::dectalk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
-	m_duart->irq_cb().set(FUNC(dectalk_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_duart->a_tx_cb().set(FUNC(dectalk_state::duart_txa));
 	m_duart->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_duart->inport_cb().set(FUNC(dectalk_state::duart_input));
@@ -893,7 +886,7 @@ void dectalk_state::dectalk(machine_config &config)
 	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
 
 #ifdef USE_LOOSE_TIMING
-	config.m_minimum_quantum = attotime::from_hz(100);
+	config.set_maximum_quantum(attotime::from_hz(100));
 #else
 	config.m_perfect_cpu_quantum = subtag("dsp");
 #endif
@@ -905,9 +898,6 @@ void dectalk_state::dectalk(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	AD7541(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.9); // ad7541.e107 (E88 10KHz OSC, handled by timer)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 

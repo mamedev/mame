@@ -93,7 +93,7 @@
  *
  *************************************/
 
-WRITE16_MEMBER(foodf_state::nvram_recall_w)
+void foodf_state::nvram_recall_w(uint16_t data)
 {
 	m_nvram->recall(0);
 	m_nvram->recall(1);
@@ -174,7 +174,7 @@ void foodf_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(foodf_state::digital_w)
+void foodf_state::digital_w(uint8_t data)
 {
 	foodf_set_flip(data & 0x01);
 
@@ -326,7 +326,7 @@ GFXDECODE_END
  *
  *************************************/
 
-READ8_MEMBER(foodf_state::pot_r)
+uint8_t foodf_state::pot_r(offs_t offset)
 {
 	return (ioport("DSW")->read() >> offset) << 7;
 }

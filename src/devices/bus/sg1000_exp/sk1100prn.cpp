@@ -30,8 +30,8 @@ DEFINE_DEVICE_TYPE(SK1100_PRINTER_PORT, sk1100_printer_port_device, "sk1100_prin
 //  device_sk1100_printer_port_interface - constructor
 //-------------------------------------------------
 
-device_sk1100_printer_port_interface::device_sk1100_printer_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_sk1100_printer_port_interface::device_sk1100_printer_port_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "sk1000prn")
 {
 }
 
@@ -56,7 +56,7 @@ device_sk1100_printer_port_interface::~device_sk1100_printer_port_interface()
 
 sk1100_printer_port_device::sk1100_printer_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, SK1100_PRINTER_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_sk1100_printer_port_interface>(mconfig, *this),
 	m_device(nullptr)
 {
 }
@@ -77,7 +77,7 @@ sk1100_printer_port_device::~sk1100_printer_port_device()
 
 void sk1100_printer_port_device::device_start()
 {
-	m_device = dynamic_cast<device_sk1100_printer_port_interface *>(get_card_device());
+	m_device = get_card_device();
 }
 
 WRITE_LINE_MEMBER(sk1100_printer_port_device::data_w)

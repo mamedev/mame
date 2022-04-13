@@ -125,7 +125,7 @@ static DISCRETE_SOUND_START(spiders_discrete)
 	DISCRETE_INPUT_LOGIC(SPIDERS_X_EN)
 
 	/* Web sound */
-	DISCRETE_NOTE(NODE_20, 1, SPIDERS_SOUND_CLK/8, SPIDERS_WEB_SOUND_DATA, 255, 15, DISC_CLK_IS_FREQ)
+	DISCRETE_NOTE(NODE_20, 1, SPIDERS_SOUND_CLK/21, SPIDERS_WEB_SOUND_DATA, 255, 15, DISC_CLK_IS_FREQ)
 	DISCRETE_TRANSFORM2(NODE_21, NODE_20, SPIDER_WEB_SOUND_MOD_DATA, "01&")
 	DISCRETE_DAC_R1(NODE_22, NODE_21, DEFAULT_TTL_V_LOGIC_1, &spiders_sound_dac)
 
@@ -176,25 +176,25 @@ DISCRETE_SOUND_END
 
 
 
-WRITE8_MEMBER(spiders_state::spiders_audio_command_w)
+void spiders_state::spiders_audio_command_w(uint8_t data)
 {
-	m_pia[3]->write_porta(data & 0xf8);
+	m_pia[3]->porta_w(data & 0xf8);
 	m_pia[3]->ca1_w(BIT(data, 7));
 }
 
 
-WRITE8_MEMBER(spiders_state::spiders_audio_a_w)
+void spiders_state::spiders_audio_a_w(uint8_t data)
 {
 	m_discrete->write(SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
 }
 
-WRITE8_MEMBER(spiders_state::spiders_audio_b_w)
+void spiders_state::spiders_audio_b_w(uint8_t data)
 {
 	m_discrete->write(SPIDERS_WEB_SOUND_DATA, data);
 }
 
 
-WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
+void spiders_state::spiders_audio_ctrl_w(uint8_t data)
 {
 	m_discrete->write(SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
 	m_discrete->write(SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);

@@ -158,27 +158,23 @@ Notes:
     U2C     - PROTO?
     U6A     - PROTO?
 
-*/
 
-/*
+TODO:
 
-    TODO:
-
-    - fix uk101 video to 64x16
     - floppy PIA is actually a 6820
     - break key
     - power on reset
     - Superboard II revisions A/C/D
     - uk101 medium resolution graphics
     - uk101 ay-3-8910 sound
-    - cassette
     - faster cassette
     - floppy
+    - need floppies to test with
+    - support for BAS files and other formats
     - wemon?
+    - rs232
 
-*/
-
-/* Notes added 2012-05-11 [Robbbert]
+Notes added 2012-05-11 [Robbbert]
     General
     - Added F1 key to toggle the sound on 'sb2m600b', to silence the awful screech.
     - Added F3 key to simulate the RESET / BREAK key on the real keyboard.
@@ -201,9 +197,7 @@ Notes:
       not normally fitted. It appears that it would work the same as in the other
       systems in this driver.
 
-*/
-
-/* Notes added 2013-01-20
+Notes added 2013-01-20
       Added a modified basic rom, which fixes the garbage collection problem.
       Try the following program with -bios 0 and -bios 1. It will work only
       with bios 1. You can copy/paste this code, but make sure you include the
@@ -213,8 +207,24 @@ Notes:
 RUN
 PRINT FRE(0)
 
-*/
 
+Keyboard notes and BTANBs:
+
+- Keyboards on all models are identical, except on UK101 where ^ replaces LINE FEED.
+
+- When run for the first time, the keyboard is in lowercase. Shift will correctly
+  select uppercase. Special keys do weird things, but come good when Shift pressed.
+  Since all input MUST be uppercase, the first thing to do is press Capslock (which
+  is SHIFT LOCK on the real machine). This is saved in your cfg file on exit.
+
+- After that, uppercase works correctly, as do the other keys. Pressing Shift will now
+  do odd things to the letters, and they become random symbols.
+
+- Natural keyboard is set up to take advantage of these oddities and get the maximum
+  symbols available, however lowercase is not available. Natural keyboard will only
+  work correctly when the SHIFT LOCK is engaged.
+
+*/
 
 #include "emu.h"
 #include "includes/osi.h"
@@ -269,7 +279,7 @@ DISCRETE_SOUND_END
 
 /* Keyboard */
 
-READ8_MEMBER( sb2m600_state::keyboard_r )
+uint8_t sb2m600_state::keyboard_r()
 {
 	if (m_io_reset->read())
 		m_maincpu->reset();
@@ -283,7 +293,7 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( sb2m600_state::keyboard_w )
+void sb2m600_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = data;
 
@@ -291,12 +301,12 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 		m_discrete->write(NODE_01, (data >> 2) & 0x0f);
 }
 
-WRITE8_MEMBER( uk101_state::keyboard_w )
+void uk101_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( sb2m600_state::ctrl_w )
+void sb2m600_state::ctrl_w(uint8_t data)
 {
 	/*
 
@@ -319,7 +329,7 @@ WRITE8_MEMBER( sb2m600_state::ctrl_w )
 	m_discrete->write(NODE_10, BIT(data, 4));
 }
 
-WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
+void c1p_state::osi630_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -339,7 +349,7 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 	m_beeper->set_state(BIT(data, 1));
 }
 
-WRITE8_MEMBER( c1p_state::osi630_sound_w )
+void c1p_state::osi630_sound_w(uint8_t data)
 {
 	if (data != 0)
 		m_beeper->set_clock(49152 / data);
@@ -386,7 +396,7 @@ void sb2m600_state::floppy_index_callback(floppy_image_device *floppy, int state
 	m_fdc_index = state;
 }
 
-READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
+uint8_t c1pmf_state::osi470_pia_pa_r()
 {
 	/*
 
@@ -406,7 +416,7 @@ READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
 	return (m_fdc_index << 7);
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
+void c1pmf_state::osi470_pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -424,7 +434,7 @@ WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
 	*/
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pb_w )
+void c1pmf_state::osi470_pia_pb_w(uint8_t data)
 {
 	/*
 
@@ -454,7 +464,7 @@ void sb2m600_state::osi600_mem(address_map &map)
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xdf00, 0xdf00).rw(FUNC(sb2m600_state::keyboard_r), FUNC(sb2m600_state::keyboard_w));
-	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf000, 0xf001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -465,7 +475,7 @@ void uk101_state::uk101_mem(address_map &map)
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xd400, 0xd7ff).noprw();  // bios sets this to spaces at boot
 	map(0xdc00, 0xdfff).r(FUNC(uk101_state::keyboard_r)).w(FUNC(uk101_state::keyboard_w));
-	map(0xf000, 0xf001).mirror(0x00fe).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf000, 0xf001).mirror(0x00fe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -480,7 +490,7 @@ void c1p_state::c1p_mem(address_map &map)
 	map(0xd400, 0xd7ff).ram().share("color_ram");
 	map(0xd800, 0xd800).w(FUNC(c1p_state::ctrl_w));
 	map(0xdf00, 0xdf00).rw(FUNC(c1p_state::keyboard_r), FUNC(c1p_state::keyboard_w));
-	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf000, 0xf001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf7c0, 0xf7c0).w(FUNC(c1p_state::osi630_sound_w));
 	map(0xf7e0, 0xf7e0).w(FUNC(c1p_state::osi630_ctrl_w));
 	map(0xf800, 0xffff).rom();
@@ -499,7 +509,7 @@ void c1pmf_state::c1pmf_mem(address_map &map)
 	map(0xd400, 0xd7ff).ram().share("color_ram");
 	map(0xd800, 0xd800).w(FUNC(c1pmf_state::ctrl_w));
 	map(0xdf00, 0xdf00).rw(FUNC(c1pmf_state::keyboard_r), FUNC(c1pmf_state::keyboard_w));
-	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf000, 0xf001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf7c0, 0xf7c0).w(FUNC(c1pmf_state::osi630_sound_w));
 	map(0xf7e0, 0xf7e0).w(FUNC(c1pmf_state::osi630_ctrl_w));
 	map(0xf800, 0xffff).rom();
@@ -510,17 +520,17 @@ void c1pmf_state::c1pmf_mem(address_map &map)
 static INPUT_PORTS_START( osi600 )
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_TAB) PORT_CHAR(27)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REPEAT") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REPEAT") PORT_CODE(KEYCODE_BACKSLASH)
 
 	PORT_START("ROW1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('@')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -531,8 +541,8 @@ static INPUT_PORTS_START( osi600 )
 	PORT_START("ROW2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR(']')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('^')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
@@ -540,7 +550,7 @@ static INPUT_PORTS_START( osi600 )
 
 	PORT_START("ROW3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('[')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
@@ -564,8 +574,8 @@ static INPUT_PORTS_START( osi600 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(10)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('_')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('\\')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 
 	PORT_START("ROW6")
@@ -597,29 +607,40 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( uk101 )
 	PORT_INCLUDE(osi600)
-
-	PORT_MODIFY("ROW0")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('~')
-
 	PORT_MODIFY("ROW5")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_BACKSLASH)
 INPUT_PORTS_END
 
 /* Machine Start */
 
-WRITE_LINE_MEMBER( sb2m600_state::write_cassette_clock )
+TIMER_DEVICE_CALLBACK_MEMBER( sb2m600_state::kansas_w )
 {
-	m_acia_0->write_rxd((m_cassette->input() > 0.0) ? 1 : 0);
+	m_cass_data[3]++;
 
-	m_acia_0->write_txc(state);
-	m_acia_0->write_rxc(state);
+	if (m_cassbit != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cassbit;
+	}
+
+	if (m_cassbit)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-WRITE_LINE_MEMBER( sb2m600_state::cassette_tx )
+TIMER_DEVICE_CALLBACK_MEMBER( sb2m600_state::kansas_r)
 {
-	m_cassette->output(state ? +1.0 : -1.0);
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_acia->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
+		m_cass_data[1] = 0;
+	}
 }
 
 void sb2m600_state::machine_start()
@@ -633,18 +654,24 @@ void sb2m600_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 4*1024:
-		program.install_readwrite_bank(0x0000, 0x0fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x0fff, membank("bank1"));
 		program.unmap_readwrite(0x1000, 0x1fff);
 		break;
 
 	case 8*1024:
-		program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x1fff, membank("bank1"));
 		break;
 	}
 
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 	save_pointer(NAME(m_video_ram.target()), OSI600_VIDEORAM_SIZE);
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_fdc_index));
+	save_item(NAME(m_32));
+	save_item(NAME(m_coloren));
 }
 
 void c1p_state::machine_start()
@@ -658,16 +685,20 @@ void c1p_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 8*1024:
-		program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x1fff, membank("bank1"));
 		program.unmap_readwrite(0x2000, 0x4fff);
 		break;
 
 	case 20*1024:
-		program.install_readwrite_bank(0x0000, 0x4fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x4fff, membank("bank1"));
 		break;
 	}
 
 	/* register for state saving */
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_fdc_index));
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_32));
 	save_item(NAME(m_coloren));
@@ -728,13 +759,18 @@ void sb2m600_state::osi600(machine_config &config)
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
-	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(sb2m600_state::write_cassette_clock));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 4'800)); // 300 baud x 16(divider) = 4800
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(sb2m600_state::kansas_w), attotime::from_hz(4800)); // cass write
+	TIMER(config, "kansas_r").configure_periodic(FUNC(sb2m600_state::kansas_r), attotime::from_hz(40000)); // cass read
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -752,14 +788,22 @@ void uk101_state::uk101(machine_config &config)
 	uk101_video(config);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_osi);
 
-	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(uk101_state::cassette_tx));
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
 
-	CLOCK(config, "cassette_clock", 500000).signal_handler().set(FUNC(uk101_state::write_cassette_clock));
+	/* cassette ACIA */
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 4'800)); // 300 baud x 16(divider) = 4800
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(uk101_state::kansas_w), attotime::from_hz(4800)); // cass write
+	TIMER(config, "kansas_r").configure_periodic(FUNC(uk101_state::kansas_r), attotime::from_hz(40000)); // cass read
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -783,19 +827,25 @@ void c1p_state::c1p(machine_config &config)
 	m_discrete->set_intf(osi600c_discrete_interface);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
 	BEEP(config, "beeper", 300).add_route(ALL_OUTPUTS, "mono", 0.50);
+	TIMER(config, m_beep_timer).configure_generic(FUNC(c1p_state::beep_timer));
 
 	PIA6821(config, "pia_1", 0);
 	PIA6821(config, "pia_2", 0);
 	PIA6821(config, "pia_3", 0);
 
 	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(c1p_state::cassette_tx));
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
-	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(c1p_state::write_cassette_clock));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 4'800)); // 300 baud x 16(divider) = 4800
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(c1p_state::kansas_w), attotime::from_hz(4800)); // cass write
+	TIMER(config, "kansas_r").configure_periodic(FUNC(c1p_state::kansas_r), attotime::from_hz(40000)); // cass read
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -819,8 +869,8 @@ void c1pmf_state::c1pmf(machine_config &config)
 
 	CLOCK(config, "floppy_clock", XTAL(4'000'000)/8).signal_handler().set("acia_1", FUNC(acia6850_device::write_txc)); // 250 kHz
 
-	FLOPPY_CONNECTOR(config, "floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "floppy0", osi_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "floppy1", osi_floppies, nullptr,   floppy_image_device::default_mfm_floppy_formats);
 
 	/* internal ram */
 	m_ram->set_default_size("20K");
@@ -873,30 +923,23 @@ ROM_END
 
 /* Driver Initialization */
 
-void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(c1p_state::beep_timer)
 {
-	switch (id)
-	{
-	case TIMER_SETUP_BEEP:
-		m_beeper->set_state(0);
-		m_beeper->set_clock(300);
-		break;
-	default:
-		assert_always(false, "Unknown id in sb2m600_state::device_timer");
-	}
+	m_beeper->set_state(0);
+	m_beeper->set_clock(300);
 }
 
 void c1p_state::init_c1p()
 {
-	timer_set(attotime::zero, TIMER_SETUP_BEEP);
+	m_beep_timer->adjust(attotime::zero);
 }
 
 
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY            FULLNAME                            FLAGS
-COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
-//COMP( 1980, sb2m600c, 0,        0,      osi600c, osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
-COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
-COMP( 1980, c1pmf,    sb2m600b, 0,      c1pmf,   osi600, c1pmf_state,   init_c1p,   "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
-COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_SUPPORTS_SAVE )
+//COMP( 1980, sb2m600c, 0,        0,      osi600c, osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_SUPPORTS_SAVE )
+COMP( 1980, c1pmf,    sb2m600b, 0,      c1pmf,   osi600, c1pmf_state,   init_c1p,   "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            MACHINE_SUPPORTS_SAVE )

@@ -42,15 +42,16 @@ public:
 	DECLARE_READ_LINE_MEMBER( io_r );
 
 protected:
+	ds1302_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t ram_size);
+
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
@@ -60,6 +61,8 @@ private:
 	void load_shift_register();
 	void input_bit();
 	void output_bit();
+
+	const uint8_t m_ram_size;
 
 	int m_ce;
 	int m_clk;
@@ -72,14 +75,24 @@ private:
 
 	uint8_t m_reg[9];
 	uint8_t m_user[9];
-	uint8_t m_ram[0x20];
+	uint8_t m_ram[31];
 
 	// timers
 	emu_timer *m_clock_timer;
 };
 
+// ======================> ds1202_device
 
-// device type definition
+class ds1202_device : public ds1302_device
+{
+public:
+	// construction/destruction
+	ds1202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// device type declarations
+DECLARE_DEVICE_TYPE(DS1202, ds1202_device)
 DECLARE_DEVICE_TYPE(DS1302, ds1302_device)
 
 #endif // MAME_MACHINE_DS1302_H

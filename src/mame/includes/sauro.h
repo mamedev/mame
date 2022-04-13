@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "sound/sp0256.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class sauro_state : public driver_device
 {
@@ -31,7 +32,7 @@ public:
 	void trckydoc(machine_config &config);
 	void tecfri(machine_config &config);
 	void sauro(machine_config &config);
-	void saurob(machine_config &config);
+	void saurobl(machine_config &config);
 
 	void init_tecfri();
 
@@ -49,11 +50,11 @@ private:
 	optional_shared_ptr<uint8_t> m_videoram2;
 	optional_shared_ptr<uint8_t> m_colorram2;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_palette_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_palette_bank = 0;
 
-	bool m_irq_enable;
+	bool m_irq_enable = 0;
 
 	virtual void machine_start() override;
 
@@ -63,19 +64,19 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(scroll_bg_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void scroll_bg_w(uint8_t data);
 
 	// sauro specific
-	DECLARE_WRITE8_MEMBER(sauro_sound_command_w);
-	DECLARE_READ8_MEMBER(sauro_sound_command_r);
+	void sauro_sound_command_w(uint8_t data);
+	uint8_t sauro_sound_command_r();
 	DECLARE_WRITE_LINE_MEMBER(sauro_palette_bank0_w);
 	DECLARE_WRITE_LINE_MEMBER(sauro_palette_bank1_w);
-	DECLARE_WRITE8_MEMBER(sauro_scroll_fg_w);
-	DECLARE_WRITE8_MEMBER(sauro_videoram2_w);
-	DECLARE_WRITE8_MEMBER(sauro_colorram2_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void sauro_scroll_fg_w(uint8_t data);
+	void sauro_videoram2_w(offs_t offset, uint8_t data);
+	void sauro_colorram2_w(offs_t offset, uint8_t data);
+	void adpcm_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
@@ -91,7 +92,7 @@ private:
 	void sauro_io_map(address_map &map);
 	void sauro_map(address_map &map);
 	void sauro_sound_map(address_map &map);
-	void saurob_sound_map(address_map &map);
+	void saurobl_sound_map(address_map &map);
 	void trckydoc_map(address_map &map);
 };
 

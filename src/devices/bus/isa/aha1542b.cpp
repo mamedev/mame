@@ -12,10 +12,11 @@
 #include "emu.h"
 #include "aha1542b.h"
 
+#include "bus/nscsi/devices.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/aic6250.h"
+#include "machine/aic580.h"
+#include "machine/gen_latch.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 
 DEFINE_DEVICE_TYPE(AHA1542A, aha1542a_device, "aha1542a", "AHA-1542A SCSI Controller")
@@ -25,6 +26,8 @@ DEFINE_DEVICE_TYPE(AHA1542B, aha1542b_device, "aha1542b", "AHA-1542B SCSI Contro
 aha154x_device::aha154x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
+	, m_localcpu(*this, "localcpu")
+	, m_scsic(*this, "scsi:7:scsic")
 	, m_fdc(*this, "fdc")
 	, m_bios(*this, "bios")
 {
@@ -37,6 +40,7 @@ aha1542a_device::aha1542a_device(const machine_config &mconfig, const char *tag,
 
 aha1542b_device::aha1542b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: aha154x_device(mconfig, AHA1542B, tag, owner, clock)
+	, m_busaic(*this, "busaic")
 {
 }
 
@@ -44,11 +48,62 @@ void aha154x_device::device_start()
 {
 }
 
-void aha154x_device::i8085_map(address_map &map)
+void aha154x_device::device_reset()
+{
+}
+
+void aha154x_device::i8085_base_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("mcode", 0);
-	map(0x8000, 0x800f).m("scsi:7:scsic", FUNC(aic6250_device::map));
+	map(0x8000, 0x800f).m(m_scsic, FUNC(aic6250_device::map));
+	map(0xc000, 0xc0ff).m("dmaaic", FUNC(aic580_device::mpu_map));
 	map(0xe000, 0xe7ff).ram();
+}
+
+void aha1542a_device::local_status_w(u8 data)
+{
+	logerror("Setting local status = %02X\n", data);
+}
+
+void aha1542a_device::int_status_w(u8 data)
+{
+	logerror("Setting interrupt status = %02X\n", data);
+}
+
+void aha1542a_device::srst_clear_w(u8 data)
+{
+	m_localcpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
+}
+
+void aha1542a_device::scsi_rstreq_clear_w(u8 data)
+{
+}
+
+READ_LINE_MEMBER(aha1542a_device::host_int_r)
+{
+	return 0;
+}
+
+READ_LINE_MEMBER(aha1542a_device::scsi_rstreq_r)
+{
+	return 0;
+}
+
+void aha1542a_device::i8085_map(address_map &map)
+{
+	i8085_base_map(map);
+	map(0xa000, 0xa000).w(FUNC(aha1542a_device::local_status_w));
+	map(0xa001, 0xa001).r("fromhost", FUNC(generic_latch_8_device::read));
+	map(0xa001, 0xa001).w("tohost", FUNC(generic_latch_8_device::write));
+	map(0xa002, 0xa002).w(FUNC(aha1542a_device::int_status_w));
+	map(0xa003, 0xa003).w(FUNC(aha1542a_device::srst_clear_w));
+	map(0xa004, 0xa004).w(FUNC(aha1542a_device::scsi_rstreq_clear_w));
+}
+
+void aha1542b_device::i8085_map(address_map &map)
+{
+	i8085_base_map(map);
+	map(0xa000, 0xa003).rw(m_busaic, FUNC(aic565_device::local_r), FUNC(aic565_device::local_w));
 }
 
 static INPUT_PORTS_START(aha1542a)
@@ -59,8 +114,8 @@ static INPUT_PORTS_START(aha1542a)
 	PORT_DIPNAME(0x02, 0x02, "Diagnostic Test Loop") PORT_DIPLOCATION("J1:2")
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) // Data accepted by host
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("tohost", generic_latch_8_device, pending_r)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, aha1542a_device, host_int_r)
 	PORT_DIPNAME(0x10, 0x10, "SCSI Parity Checking") PORT_DIPLOCATION("J1:3")
 	PORT_DIPSETTING(0x00, "Disabled")
 	PORT_DIPSETTING(0x10, "Enabled")
@@ -69,7 +124,7 @@ static INPUT_PORTS_START(aha1542a)
 	PORT_DIPSETTING(0x40, "5.7 MB/s")
 	PORT_DIPSETTING(0x20, "6.7 MB/s")
 	PORT_DIPSETTING(0x00, "8.0 MB/s")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) // SCSI reset
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, aha1542a_device, scsi_rstreq_r)
 
 	PORT_START("CONFIG")
 	PORT_DIPNAME(0x07, 0x07, "SCSI Address ID") PORT_DIPLOCATION("J1:4,5,6")
@@ -324,35 +379,59 @@ ioport_constructor aha1542b_device::device_input_ports() const
 	return INPUT_PORTS_NAME(aha1542b);
 }
 
-static void aha154x_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("scsic", AIC6250);
-}
-
 void aha154x_device::scsic_config(device_t *device)
 {
-	device->set_clock(20'000'000);
+	device->set_clock(20_MHz_XTAL);
 	downcast<aic6250_device &>(*device).int_cb().set_inputline("^^localcpu", I8085_RST65_LINE);
+	downcast<aic6250_device &>(*device).breq_cb().set("^^dmaaic", FUNC(aic580_device::breq_w));
 	downcast<aic6250_device &>(*device).port_a_r_cb().set_ioport("^^SETUP");
 	downcast<aic6250_device &>(*device).port_b_r_cb().set_ioport("^^CONFIG");
 }
 
-void aha154x_device::device_add_mconfig(machine_config &config)
+void aha154x_device::scsi_add(machine_config &config)
 {
-	i8085a_cpu_device &localcpu(I8085A(config, "localcpu", 10'000'000));
-	localcpu.set_addrmap(AS_PROGRAM, &aha154x_device::i8085_map);
-
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", aha154x_scsi_devices, "scsic", true)
-		.set_option_machine_config("scsic", [this] (device_t *device) { scsic_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", AIC6250)
+		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	aic580_device &dmaaic(AIC580(config, "dmaaic", 20_MHz_XTAL));
+	dmaaic.bdin_callback().set(m_scsic, FUNC(aic6250_device::dma_r));
+	dmaaic.bdout_callback().set(m_scsic, FUNC(aic6250_device::dma_w));
+	dmaaic.back_callback().set(m_scsic, FUNC(aic6250_device::back_w));
+}
+
+void aha1542a_device::device_add_mconfig(machine_config &config)
+{
+	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 20_MHz_XTAL / 2));
+	localcpu.set_addrmap(AS_PROGRAM, &aha1542a_device::i8085_map);
+
+	generic_latch_8_device &fromhost(GENERIC_LATCH_8(config, "fromhost"));
+	fromhost.data_pending_callback().set_inputline(m_localcpu, I8085_RST55_LINE);
+
+	GENERIC_LATCH_8(config, "tohost");
+
+	scsi_add(config);
+
+	DP8473(config, m_fdc, 24_MHz_XTAL);
+}
+
+void aha1542b_device::device_add_mconfig(machine_config &config)
+{
+	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 20_MHz_XTAL / 2));
+	localcpu.set_addrmap(AS_PROGRAM, &aha1542b_device::i8085_map);
+
+	AIC565(config, m_busaic);
+	m_busaic->hrst_callback().set_inputline(m_localcpu, INPUT_LINE_RESET);
+	// Soft reset interrupt is not used
+
+	scsi_add(config);
 
 	DP8473(config, m_fdc, 24_MHz_XTAL);
 }

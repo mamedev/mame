@@ -48,14 +48,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(jackpool_io_r);
+	uint8_t jackpool_io_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
 	void jackpool_mem(address_map &map);
 
 	required_shared_ptr<uint16_t> m_vram;
-	uint8_t m_map_vreg;
+	uint8_t m_map_vreg = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -111,7 +111,7 @@ uint32_t jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ8_MEMBER(jackpool_state::jackpool_io_r)
+uint8_t jackpool_state::jackpool_io_r(offs_t offset)
 {
 	switch(offset*2)
 	{

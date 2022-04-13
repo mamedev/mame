@@ -28,7 +28,6 @@ At the moment it simply outputs all the speech strings, one after the other, the
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 class instantm_state : public driver_device
@@ -42,29 +41,29 @@ public:
 	void instantm(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(port01_w);
+	u8 port01_r();
+	void port01_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 	void main_map(address_map &map);
 	void sub_io(address_map &map);
 	void sub_map(address_map &map);
 
-	u8 m_port01;
-	bool m_clock_en;
+	u8 m_port01 = 0;
+	bool m_clock_en = false;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
 // return instruction from main cpu
-READ8_MEMBER( instantm_state::port01_r )
+u8 instantm_state::port01_r()
 {
 	return m_port01;
 }
 
 // tell maincpu the speech is done
-WRITE8_MEMBER( instantm_state::port01_w )
+void instantm_state::port01_w(u8 data)
 {
 	// bump to next bit of speech for now
 	if ((m_port01 & 15) < 15)
@@ -86,15 +85,15 @@ void instantm_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8000); //AM_WRITE
-	map(0xc000, 0xc000); //AM_WRITE
-	map(0xc400, 0xc400); //AM_WRITE
-	map(0xc800, 0xc800); //AM_WRITE
-	map(0xcc00, 0xcc00); //AM_WRITE
-	map(0xec00, 0xec00); //AM_READ
-	map(0xf000, 0xf000); //AM_READ
-	map(0xf400, 0xf400); //AM_READ
-	map(0xfc00, 0xfc00); //AM_READ
+	map(0x8000, 0x8000); //.w(FUNC(instantm_state::));
+	map(0xc000, 0xc000); //.w(FUNC(instantm_state::));
+	map(0xc400, 0xc400); //.w(FUNC(instantm_state::));
+	map(0xc800, 0xc800); //.w(FUNC(instantm_state::));
+	map(0xcc00, 0xcc00); //.w(FUNC(instantm_state::));
+	map(0xec00, 0xec00); //.r(FUNC(instantm_state::));
+	map(0xf000, 0xf000); //.r(FUNC(instantm_state::));
+	map(0xf400, 0xf400); //.r(FUNC(instantm_state::));
+	map(0xfc00, 0xfc00); //.r(FUNC(instantm_state::));
 }
 
 // doesn't use ram
@@ -142,9 +141,6 @@ void instantm_state::instantm(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

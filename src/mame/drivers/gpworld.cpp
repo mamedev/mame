@@ -71,22 +71,22 @@ public:
 	void init_gpworld();
 
 private:
-	uint8_t m_nmi_enable;
-	uint8_t m_start_lamp;
-	uint8_t m_ldp_read_latch;
-	uint8_t m_ldp_write_latch;
-	uint8_t m_brake_gas;
-	emu_timer *m_irq_stop_timer;
+	uint8_t m_nmi_enable = 0;
+	uint8_t m_start_lamp = 0;
+	uint8_t m_ldp_read_latch = 0;
+	uint8_t m_ldp_write_latch = 0;
+	uint8_t m_brake_gas = 0;
+	emu_timer *m_irq_stop_timer = nullptr;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_palette_ram;
 	required_shared_ptr<uint8_t> m_tile_ram;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_READ8_MEMBER(pedal_in);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_WRITE8_MEMBER(misc_io_write);
-	DECLARE_WRITE8_MEMBER(brake_gas_write);
-	DECLARE_WRITE8_MEMBER(palette_write);
+	uint8_t ldp_read();
+	uint8_t pedal_in();
+	void ldp_write(uint8_t data);
+	void misc_io_write(uint8_t data);
+	void brake_gas_write(uint8_t data);
+	void palette_write(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback);
@@ -100,7 +100,7 @@ private:
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -138,7 +138,7 @@ void gpworld_state::draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,in
 	}
 
 	if (cliprect.contains(x, y))
-		bitmap.pix32(y, x) = m_palette->pen(color);
+		bitmap.pix(y, x) = m_palette->pen(color);
 }
 
 void gpworld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -270,12 +270,12 @@ void gpworld_state::machine_start()
 
 /* MEMORY HANDLERS */
 /* READS */
-READ8_MEMBER(gpworld_state::ldp_read)
+uint8_t gpworld_state::ldp_read()
 {
 	return m_ldp_read_latch;
 }
 
-READ8_MEMBER(gpworld_state::pedal_in)
+uint8_t gpworld_state::pedal_in()
 {
 	if (m_brake_gas)
 		return  ioport("INACCEL")->read();
@@ -285,12 +285,12 @@ READ8_MEMBER(gpworld_state::pedal_in)
 }
 
 /* WRITES */
-WRITE8_MEMBER(gpworld_state::ldp_write)
+void gpworld_state::ldp_write(uint8_t data)
 {
 	m_ldp_write_latch = data;
 }
 
-WRITE8_MEMBER(gpworld_state::misc_io_write)
+void gpworld_state::misc_io_write(uint8_t data)
 {
 	m_start_lamp = (data & 0x04) >> 1;
 	m_nmi_enable = (data & 0x40) >> 6;
@@ -299,12 +299,12 @@ WRITE8_MEMBER(gpworld_state::misc_io_write)
 	logerror("NMI : %x (0x%x)\n", m_nmi_enable, data);
 }
 
-WRITE8_MEMBER(gpworld_state::brake_gas_write)
+void gpworld_state::brake_gas_write(uint8_t data)
 {
 	m_brake_gas = data & 0x01;
 }
 
-WRITE8_MEMBER(gpworld_state::palette_write)
+void gpworld_state::palette_write(offs_t offset, uint8_t data)
 {
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b, a;
@@ -332,9 +332,9 @@ void gpworld_state::mainmem(address_map &map)
 	map(0xc800, 0xcfff).ram().w(FUNC(gpworld_state::palette_write)).share("palette_ram"); /* The memory test reads at 0xc800 */
 	map(0xd000, 0xd7ff).ram().share("tile_ram");
 	map(0xd800, 0xd800).rw(FUNC(gpworld_state::ldp_read), FUNC(gpworld_state::ldp_write));
-/*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
+/*  map(0xd801, 0xd801).r(FUNC(gpworld_state::???)); */
 	map(0xda00, 0xda00).portr("INWHEEL"); //8255 here....
-/*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
+/*  map(0xda01, 0xda01).w(FUNC(gpworld_state::???)); */                 /* These inputs are interesting - there are writes and reads all over these addr's */
 	map(0xda02, 0xda02).w(FUNC(gpworld_state::brake_gas_write));               /*bit 0 select gas/brake input */
 	map(0xda20, 0xda20).r(FUNC(gpworld_state::pedal_in));
 
@@ -454,7 +454,7 @@ static INPUT_PORTS_START( gpworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -462,7 +462,7 @@ void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in gpworld_state::device_timer");
+		throw emu_fatalerror("Unknown id in gpworld_state::device_timer");
 	}
 }
 
@@ -497,8 +497,8 @@ static GFXDECODE_START( gfx_gpworld )
 GFXDECODE_END
 
 /* DRIVER */
-MACHINE_CONFIG_START(gpworld_state::gpworld)
-
+void gpworld_state::gpworld(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, GUESSED_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gpworld_state::mainmem);
@@ -508,12 +508,11 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(512, 256, FUNC(gpworld_state::screen_update));
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gpworld);
 	PALETTE(config, m_palette).set_entries(1024);
@@ -521,7 +520,7 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( gpworld )

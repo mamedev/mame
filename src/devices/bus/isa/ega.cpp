@@ -448,21 +448,30 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 
 #include "screen.h"
 
+#define LOG_READ    (1U << 1)
+#define LOG_SETUP   (1U << 2)
+#define LOG_MODE    (1U << 3)
 
-#define VERBOSE_EGA     1
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_MODE)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGR(...)     LOGMASKED(LOG_READ,  __VA_ARGS__)
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGMODE(...)  LOGMASKED(LOG_MODE,  __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 #define EGA_SCREEN_NAME "ega_screen"
 #define EGA_CRTC_NAME   "crtc_ega_ega"
 
-
 #define EGA_MODE_GRAPHICS 1
 #define EGA_MODE_TEXT     2
-
-
-/*
-    Prototypes
-*/
-
 
 ROM_START( ega )
 	ROM_REGION(0x4000, "user1", 0)
@@ -540,7 +549,7 @@ void isa8_ega_device::device_add_mconfig(machine_config &config)
 	CRTC_EGA(config, m_crtc_ega, 16.257_MHz_XTAL/8);
 	m_crtc_ega->set_screen(EGA_SCREEN_NAME);
 	m_crtc_ega->config_set_hpixels_per_column(8);
-	m_crtc_ega->set_row_update_callback(FUNC(isa8_ega_device::ega_update_row), this);
+	m_crtc_ega->set_row_update_callback(FUNC(isa8_ega_device::ega_update_row));
 	m_crtc_ega->res_out_de_callback().set(FUNC(isa8_ega_device::de_changed));
 	m_crtc_ega->res_out_hsync_callback().set(FUNC(isa8_ega_device::hsync_changed));
 	m_crtc_ega->res_out_vsync_callback().set(FUNC(isa8_ega_device::vsync_changed));
@@ -627,10 +636,10 @@ void isa8_ega_device::device_start()
 	m_plane[2] = m_videoram + 0x20000;
 	m_plane[3] = m_videoram + 0x30000;
 
-	m_isa->install_rom(this, 0xc0000, 0xc3fff, "ega", "user2");
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_w), this));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));
+	m_isa->install_rom(this, 0xc0000, 0xc3fff, "user2");
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_w)));
 }
 
 //-------------------------------------------------
@@ -684,7 +693,7 @@ void isa8_ega_device::install_banks()
 	case 0x00:      /* 0xA0000, 128KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(isa8_ega_device::read)), write8sm_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -696,7 +705,7 @@ void isa8_ega_device::install_banks()
 	case 0x04:      /* 0xA0000, 64KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xa0000, 0xaffff, read8sm_delegate(*this, FUNC(isa8_ega_device::read)), write8sm_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -709,7 +718,7 @@ void isa8_ega_device::install_banks()
 	case 0x08:      /* 0xB0000, 32KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xb0000, 0xb7fff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xb0000, 0xb7fff, read8sm_delegate(*this, FUNC(isa8_ega_device::read)), write8sm_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -722,7 +731,7 @@ void isa8_ega_device::install_banks()
 	case 0x0c:      /* 0xB8000, 32KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xb8000, 0xbffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xb8000, 0xbffff, read8sm_delegate(*this, FUNC(isa8_ega_device::read)), write8sm_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -774,9 +783,9 @@ WRITE_LINE_MEMBER( isa8_ega_device::vblank_changed )
 
 CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 {
-	uint16_t  *p = &bitmap.pix16(y);
+	uint16_t  *p = &bitmap.pix(y);
 
-//  logerror( "pc_ega_graphics: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
+	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
 
 	if ( m_graphics_controller.data[5] & 0x10 )
 	{
@@ -835,12 +844,11 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 
 CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 {
-	uint16_t  *p = &bitmap.pix16(y);
-	int i;
+	uint16_t  *p = &bitmap.pix(y);
 
-//  logerror( "pc_ega_text: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
+	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t  offset = ma + i;
 		uint8_t   chr = m_plane[0][ offset ];
@@ -892,8 +900,6 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 
 void isa8_ega_device::change_mode()
 {
-	int clock, pixels;
-
 	m_video_mode = 0;
 
 	/* Check for graphics mode */
@@ -901,10 +907,7 @@ void isa8_ega_device::change_mode()
 			! ( m_sequencer.data[0x04] & 0x01 ) &&
 			( m_graphics_controller.data[0x06] & 0x01 ) )
 	{
-		if ( VERBOSE_EGA )
-		{
-			logerror("change_mode(): Switch to graphics mode\n");
-		}
+		LOGMODE("%s: Switch to graphics mode\n", FUNCNAME);
 
 		m_video_mode = EGA_MODE_GRAPHICS;
 	}
@@ -914,10 +917,7 @@ void isa8_ega_device::change_mode()
 			( m_sequencer.data[0x04] & 0x01 ) &&
 			! ( m_graphics_controller.data[0x06] & 0x01 ) )
 	{
-		if ( VERBOSE_EGA )
-		{
-			logerror("chnage_mode(): Switching to text mode\n");
-		}
+		LOGMODE("%s: Switching to text mode\n", FUNCNAME);
 
 		m_video_mode = EGA_MODE_TEXT;
 
@@ -935,8 +935,8 @@ void isa8_ega_device::change_mode()
 	}
 
 	/* Check for changes to the crtc input clock and number of pixels per clock */
-	clock = ( ( m_misc_output & 0x0c ) ? 16257000 : 14318181 );
-	pixels = ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
+	int clock = ( ( m_misc_output & 0x0c ) ? 16257000 : 14318181 );
+	int pixels = ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
 
 	if ( m_sequencer.data[0x01] & 0x08 )
 	{
@@ -950,7 +950,7 @@ void isa8_ega_device::change_mode()
 }
 
 
-READ8_MEMBER( isa8_ega_device::read )
+uint8_t isa8_ega_device::read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
@@ -1010,7 +1010,7 @@ uint8_t isa8_ega_device::alu_op( uint8_t data, uint8_t latch_data )
 }
 
 
-WRITE8_MEMBER( isa8_ega_device::write )
+void isa8_ega_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t d[4];
 	uint8_t alu[4];
@@ -1156,7 +1156,7 @@ WRITE8_MEMBER( isa8_ega_device::write )
 }
 
 
-READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
+uint8_t isa8_ega_device::pc_ega8_3X0_r(offs_t offset)
 {
 	int data = 0xff;
 
@@ -1193,12 +1193,9 @@ READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
 	return data;
 }
 
-WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
+void isa8_ega_device::pc_ega8_3X0_w(offs_t offset, uint8_t data)
 {
-	if ( VERBOSE_EGA )
-	{
-//      logerror("pc_ega_3X0_w: offset = %02x, data = %02x\n", offset, data );
-	}
+	LOGSETUP("%s: offset = %02x, data = %02x\n", FUNCNAME, offset, data );
 
 	switch ( offset )
 	{
@@ -1229,44 +1226,41 @@ WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3b0_r )
+uint8_t isa8_ega_device::pc_ega8_3b0_r(offs_t offset)
 {
-	return ( m_misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r(space, offset);
+	return ( m_misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r(offset);
 }
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3d0_r )
+uint8_t isa8_ega_device::pc_ega8_3d0_r(offs_t offset)
 {
-	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(space, offset) : 0xFF;
+	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(offset) : 0xFF;
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3b0_w )
+void isa8_ega_device::pc_ega8_3b0_w(offs_t offset, uint8_t data)
 {
 	if ( ! ( m_misc_output & 0x01 ) )
 	{
-		pc_ega8_3X0_w( space, offset, data );
+		pc_ega8_3X0_w( offset, data );
 	}
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3d0_w )
+void isa8_ega_device::pc_ega8_3d0_w(offs_t offset, uint8_t data)
 {
 	if ( m_misc_output & 0x01 )
 	{
-		pc_ega8_3X0_w( space, offset, data );
+		pc_ega8_3X0_w( offset, data );
 	}
 }
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
+uint8_t isa8_ega_device::pc_ega8_3c0_r(offs_t offset)
 {
 	int data = 0xff;
 
-	if ( VERBOSE_EGA )
-	{
-//      logerror("pc_ega_3c0_r: offset = %02x\n", offset );
-	}
+	LOGR("%s: offset = %02x\n", FUNCNAME, offset );
 
 	switch ( offset )
 	{
@@ -1302,7 +1296,7 @@ READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
+void isa8_ega_device::pc_ega8_3c0_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t ar_reg_mask[0x20] =
 		{
@@ -1322,10 +1316,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 		};
 	int index;
 
-	if ( VERBOSE_EGA )
-	{
-//      logerror("pc_ega_3c0_w: offset = %02x, data = %02x\n", offset, data );
-	}
+	LOGSETUP("%s: offset = %02x, data = %02x\n", FUNCNAME, offset, data );
 
 	switch ( offset )
 	{
@@ -1339,7 +1330,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 		{
 			index = m_attribute.index & 0x1F;
 
-			logerror("AR%02X = 0x%02x\n", index, data );
+			LOGSETUP(" - AR%02X = 0x%02x\n", index, data );
 
 			/* Clear unused bits */
 			m_attribute.data[ index ] = data & ar_reg_mask[ index ];
@@ -1354,7 +1345,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 		m_attribute.index_write ^= 0x01;
 		break;
 
-	/* Misccellaneous Output */
+	/* Miscellaneous Output */
 	case 2:
 		m_misc_output = data;
 		install_banks();
@@ -1368,7 +1359,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 	case 5:
 		index = m_sequencer.index & 0x07;
 
-		logerror("SR%02X = 0x%02x\n", index & 0x07, data );
+		LOGSETUP(" - SR%02X = 0x%02x\n", index & 0x07, data );
 
 		/* Clear unused bits */
 		m_sequencer.data[ index ] = data & sr_reg_mask[ index ];
@@ -1390,7 +1381,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 	case 15:
 		index = m_graphics_controller.index & 0x0F;
 
-		logerror("GR%02X = 0x%02x\n", index, data );
+		LOGSETUP(" - GR%02X = 0x%02x\n", index, data );
 
 		/* Clear unused bits */
 		m_graphics_controller.data[ index ] = data & gr_reg_mask[ index ];

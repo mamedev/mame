@@ -103,10 +103,10 @@ private:
 	private:
 		apollo_kbd_device *m_device; // pointer back to our device
 
-		int m_last_b;  // previous mouse button values
-		int m_last_x;  // previous mouse x-axis value
-		int m_last_y;  // previous mouse y-axis value
-		int m_tx_pending;  // mouse data packet is pending
+		int m_last_b = 0;  // previous mouse button values
+		int m_last_x = 0;  // previous mouse x-axis value
+		int m_last_y = 0;  // previous mouse y-axis value
+		int m_tx_pending = 0;  // mouse data packet is pending
 	};
 
 	static const int XMIT_RING_SIZE = 64;

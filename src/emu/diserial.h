@@ -201,8 +201,8 @@ protected:
 	virtual void tra_complete() override
 	{
 		assert(!m_empty || (m_head == m_tail));
-		assert(m_head < ARRAY_LENGTH(m_fifo));
-		assert(m_tail < ARRAY_LENGTH(m_fifo));
+		assert(m_head < std::size(m_fifo));
+		assert(m_tail < std::size(m_fifo));
 
 		if (!m_empty)
 		{
@@ -227,8 +227,8 @@ protected:
 	void transmit_byte(u8 byte)
 	{
 		assert(!m_empty || (m_head == m_tail));
-		assert(m_head < ARRAY_LENGTH(m_fifo));
-		assert(m_tail < ARRAY_LENGTH(m_fifo));
+		assert(m_head < std::size(m_fifo));
+		assert(m_tail < std::size(m_fifo));
 
 		if (m_empty && is_transmit_register_empty())
 		{

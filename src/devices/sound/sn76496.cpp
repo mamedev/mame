@@ -125,6 +125,10 @@
   * add PSSJ-3 support for the later Tandy 1000 series computers.
   * NCR8496's output is inverted, PSSJ-3's output is not.
 
+  10/12/2019: Michael Zapf
+  * READY line handling by own emu_timer, not depending on sound_stream_update
+
+
   TODO: * Implement the TMS9919 - any difference to sn94624?
         * Implement the T6W28; has registers in a weird order, needs writes
           to be 'sanitized' first. Also is stereo, similar to game gear.
@@ -171,11 +175,6 @@ sn76496_base_device::sn76496_base_device(
 
 sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
-{
-}
-
-u8106_device::u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, U8106, tag, 0x4000, 0x01, 0x02, true, false, 8, false, true, owner, clock)
 {
 }
 
@@ -234,7 +233,7 @@ void sn76496_base_device::device_start()
 
 	m_ready_handler.resolve_safe();
 
-	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate);
+	m_sound = stream_alloc(0, (m_stereo? 2:1), sample_rate);
 
 	for (i = 0; i < 4; i++) m_volume[i] = 0;
 
@@ -255,7 +254,6 @@ void sn76496_base_device::device_start()
 	m_RNG = m_feedback_mask;
 	m_output[3] = m_RNG & 1;
 
-	m_cycles_to_ready = 1;          // assume ready is not active immediately on init. is this correct?
 	m_stereo_mask = 0xFF;           // all channels enabled
 	m_current_clock = m_clock_divider-1;
 
@@ -282,6 +280,9 @@ void sn76496_base_device::device_start()
 
 	m_ready_state = true;
 
+	m_ready_timer = timer_alloc(0);
+	m_ready_handler(ASSERT_LINE);
+
 	register_for_save_states();
 }
 
@@ -297,16 +298,18 @@ void sn76496_base_device::stereo_w(u8 data)
 	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
 
+void sn76496_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+{
+	m_ready_state = true;
+	m_ready_handler(ASSERT_LINE);
+}
+
 void sn76496_base_device::write(u8 data)
 {
 	int n, r, c;
 
 	// update the output buffer before changing the registers
 	m_sound->update();
-
-	// set number of cycles until READY is active; this is always one
-	// 'sample', i.e. it equals the clock divider exactly
-	m_cycles_to_ready = 1;
 
 	if (data & 0x80)
 	{
@@ -355,6 +358,10 @@ void sn76496_base_device::write(u8 data)
 			}
 			break;
 	}
+
+	m_ready_state = false;
+	m_ready_handler(CLEAR_LINE);
+	m_ready_timer->adjust(attotime::from_hz(clock()/(4*m_clock_divider)));
 }
 
 inline bool sn76496_base_device::in_noise_mode()
@@ -362,31 +369,16 @@ inline bool sn76496_base_device::in_noise_mode()
 	return ((m_register[6] & 4)!=0);
 }
 
-void sn76496_base_device::countdown_cycles()
-{
-	if (m_cycles_to_ready > 0)
-	{
-		m_cycles_to_ready--;
-		if (m_ready_state==true) m_ready_handler(CLEAR_LINE);
-		m_ready_state = false;
-	}
-	else
-	{
-		if (m_ready_state==false) m_ready_handler(ASSERT_LINE);
-		m_ready_state = true;
-	}
-}
-
-void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i;
-	stream_sample_t *lbuffer = outputs[0];
-	stream_sample_t *rbuffer = (m_stereo)? outputs[1] : nullptr;
+	auto *lbuffer = &outputs[0];
+	auto *rbuffer = m_stereo ? &outputs[1] : nullptr;
 
 	int16_t out;
 	int16_t out2 = 0;
 
-	while (samples > 0)
+	for (int sampindex = 0; sampindex < lbuffer->samples(); sampindex++)
 	{
 		// clock chip once
 		if (m_current_clock > 0) // not ready for new divided clock
@@ -396,8 +388,6 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sampl
 		else // ready for new divided clock, make a new sample
 		{
 			m_current_clock = m_clock_divider-1;
-			// decrement Cycles to READY by one
-			countdown_cycles();
 
 			// handle channels 0,1,2
 			for (i = 0; i < 3; i++)
@@ -454,9 +444,9 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 		if (m_negate) { out = -out; out2 = -out2; }
 
-		*(lbuffer++) = out;
-		if (m_stereo) *(rbuffer++) = out2;
-		samples--;
+		lbuffer->put_int(sampindex, out, 32768);
+		if (m_stereo)
+			rbuffer->put_int(sampindex, out2, 32768);
 	}
 }
 
@@ -478,12 +468,10 @@ void sn76496_base_device::register_for_save_states()
 	save_item(NAME(m_period));
 	save_item(NAME(m_count));
 	save_item(NAME(m_output));
-	save_item(NAME(m_cycles_to_ready));
 //  save_item(NAME(m_sega_style_psg));
 }
 
 DEFINE_DEVICE_TYPE(SN76496,  sn76496_device,   "sn76496",      "SN76496")
-DEFINE_DEVICE_TYPE(U8106,    u8106_device,     "u8106",        "U8106")
 DEFINE_DEVICE_TYPE(Y2404,    y2404_device,     "y2404",        "Y2404")
 DEFINE_DEVICE_TYPE(SN76489,  sn76489_device,   "sn76489",      "SN76489")
 DEFINE_DEVICE_TYPE(SN76489A, sn76489a_device,  "sn76489a",     "SN76489A")

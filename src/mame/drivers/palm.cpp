@@ -16,7 +16,6 @@
 #include "machine/mc68328.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -50,11 +49,11 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(palm_port_f_out);
-	DECLARE_READ8_MEMBER(palm_port_c_in);
-	DECLARE_READ8_MEMBER(palm_port_f_in);
-	DECLARE_WRITE16_MEMBER(palm_spim_out);
-	DECLARE_READ16_MEMBER(palm_spim_in);
+	void palm_port_f_out(uint8_t data);
+	uint8_t palm_port_c_in();
+	uint8_t palm_port_f_in();
+	void palm_spim_out(uint16_t data);
+	uint16_t palm_spim_in();
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
 	void palm_palette(palette_device &palette) const;
 
@@ -89,30 +88,30 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 INPUT_CHANGED_MEMBER(palm_state::button_check)
 {
 	uint8_t button_state = m_io_portd->read();
-	m_maincpu->set_port_d_lines(button_state, (int)(uintptr_t)param);
+	m_maincpu->set_port_d_lines(button_state, (int)param);
 }
 
-WRITE8_MEMBER(palm_state::palm_port_f_out)
+void palm_state::palm_port_f_out(uint8_t data)
 {
 	m_port_f_latch = data;
 }
 
-READ8_MEMBER(palm_state::palm_port_c_in)
+uint8_t palm_state::palm_port_c_in()
 {
 	return 0x10;
 }
 
-READ8_MEMBER(palm_state::palm_port_f_in)
+uint8_t palm_state::palm_port_f_in()
 {
 	return m_port_f_latch;
 }
 
-WRITE16_MEMBER(palm_state::palm_spim_out)
+void palm_state::palm_spim_out(uint16_t data)
 {
 	m_spim_data = data;
 }
 
-READ16_MEMBER(palm_state::palm_spim_in)
+uint16_t palm_state::palm_spim_in()
 {
 	return m_spim_data;
 }
@@ -137,9 +136,7 @@ WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
 void palm_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank (0x000000, m_ram->size() - 1, "bank1");
-	space.install_write_bank(0x000000, m_ram->size() - 1, "bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram(0x000000, m_ram->size() - 1, m_ram->pointer());
 
 	save_item(NAME(m_port_f_latch));
 	save_item(NAME(m_spim_data));
@@ -189,7 +186,7 @@ void palm_state::palm(machine_config &config)
 	m_maincpu->in_spim().set(FUNC(palm_state::palm_spim_in));
 	m_maincpu->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -206,8 +203,6 @@ void palm_state::palm(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 static INPUT_PORTS_START( palm )
@@ -218,16 +213,16 @@ static INPUT_PORTS_START( palm )
 	PORT_BIT( 0xff, 0x50, IPT_LIGHTGUN_Y ) PORT_NAME("Pen Y") PORT_MINMAX(0, 0xa0) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, pen_check, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, pen_check, 0)
 
 	PORT_START( "PORTD" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)    PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Down") PORT_CODE(KEYCODE_H)    PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)3)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)4)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)5)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)6)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)    PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Down") PORT_CODE(KEYCODE_H)    PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 3)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 4)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 5)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 

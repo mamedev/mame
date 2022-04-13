@@ -5,9 +5,10 @@
 //  disasmbasewininfo.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_DISASMBASEWININFO_H
+#define MAME_DEBUGGER_WIN_DISASMBASEWININFO_H
 
-#ifndef __DEBUG_WIN_DISASM_BASE_WIN_INFO_H__
-#define __DEBUG_WIN_DISASM_BASE_WIN_INFO_H__
+#pragma once
 
 #include "debugwin.h"
 
@@ -27,4 +28,4 @@ protected:
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
 };
 
-#endif
+#endif // MAME_DEBUGGER_WIN_DISASMBASEWININFO_H

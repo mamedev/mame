@@ -82,7 +82,7 @@ public:
 	void register_write(u8 data);
 
 	/* update the screen */
-	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bitmap_rgb32 &get_bitmap() { return m_tmpbmp; }
 
 	/* RESET pin */
@@ -95,7 +95,7 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

@@ -19,7 +19,7 @@ function dat.check(set, softlist)
 		end
 	end
 	info = "#j2\n" .. table.concat(lines, "\n")
-	return _("Mamescore")
+	return _p("plugin-data", "Mamescore")
 end
 
 function dat.get()

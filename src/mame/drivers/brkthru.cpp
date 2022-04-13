@@ -145,8 +145,8 @@ buttons down after the game has started then pressing F3 to reset the game.
 #include "includes/brkthru.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/2203intf.h"
-#include "sound/3526intf.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -160,7 +160,7 @@ buttons down after the game has started then pressing F3 to reset the game.
  *
  *************************************/
 
-WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
+void brkthru_state::brkthru_1803_w(uint8_t data)
 {
 	/* bit 0 = NMI enable */
 	m_nmi_mask = ~data & 1;
@@ -171,7 +171,7 @@ WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
-WRITE8_MEMBER(brkthru_state::darwin_0803_w)
+void brkthru_state::darwin_0803_w(uint8_t data)
 {
 	/* bit 0 = NMI enable */
 	m_nmi_mask = data & 1;
@@ -208,7 +208,7 @@ void brkthru_state::brkthru_map(address_map &map)
 	map(0x1800, 0x1800).portr("P1");
 	map(0x1801, 0x1801).portr("P2");
 	map(0x1802, 0x1802).portr("DSW1");
-	map(0x1803, 0x1803).portr("DSW2/COIN");
+	map(0x1803, 0x1803).portr("DSW2_COIN");
 	map(0x1800, 0x1801).w(FUNC(brkthru_state::brkthru_1800_w));   /* bg scroll and color, ROM bank selection, flip screen */
 	map(0x1802, 0x1802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1803, 0x1803).w(FUNC(brkthru_state::brkthru_1803_w));   /* NMI enable, + ? */
@@ -227,7 +227,7 @@ void brkthru_state::darwin_map(address_map &map)
 	map(0x0800, 0x0800).portr("P1");
 	map(0x0801, 0x0801).portr("P2");
 	map(0x0802, 0x0802).portr("DSW1");
-	map(0x0803, 0x0803).portr("DSW2/COIN");
+	map(0x0803, 0x0803).portr("DSW2_COIN");
 	map(0x0800, 0x0801).w(FUNC(brkthru_state::brkthru_1800_w));     /* bg scroll and color, ROM bank selection, flip screen */
 	map(0x0802, 0x0802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0803, 0x0803).w(FUNC(brkthru_state::darwin_0803_w));     /* NMI enable, + ? */
@@ -297,7 +297,7 @@ static INPUT_PORTS_START( brkthru )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW2/COIN")
+	PORT_START("DSW2_COIN")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -324,7 +324,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( brkthruj )
 	PORT_INCLUDE( brkthru )
 
-	PORT_MODIFY("DSW2/COIN")
+	PORT_MODIFY("DSW2_COIN")
 	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
 INPUT_PORTS_END
 
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( darwin )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )   /* Manual says must be OFF */
 
-	PORT_MODIFY("DSW2/COIN")    /* modified by Shingo Suzuki 1999/11/02 */
+	PORT_MODIFY("DSW2_COIN")    /* modified by Shingo Suzuki 1999/11/02 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -691,6 +691,43 @@ ROM_START( brkthrut )
 	ROM_LOAD( "4_de-0230-2_27256.d6", 0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) ) // Same as parent
 ROM_END
 
+ROM_START( brkthrubl ) // 3002A + 3002B PCBs. Everything's the same as the original but the main CPU ROMs, which differ quite a lot (possibly bootlegged from a different revision?)
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "4",    0x04000, 0x4000, CRC(0f21b4c5) SHA1(e5ef67006394d475571196dcdc181d28a0831bdf) )
+	ROM_LOAD( "3",    0x08000, 0x8000, CRC(51c7c378) SHA1(b779df719b89bb41e342c472b38e20d8fc71ca6d) )
+	ROM_LOAD( "1",    0x10000, 0x8000, CRC(209484c2) SHA1(da7311768b675b833066a7403fd507969d74699e) )
+	ROM_LOAD( "2",    0x18000, 0x8000, CRC(2f2c40c2) SHA1(fcb78941453520a3a07f272127dae7c2cc1999ea) )
+
+	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_LOAD( "12",   0x00000, 0x2000, CRC(58c0b29b) SHA1(9dc075f8afae7e8fe164a9fe325e9948cdc7e4bb) )   // characters
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) // background
+	ROM_LOAD( "7",    0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) )   // bitplanes 1,2 for bank 1,2
+	ROM_CONTINUE(             0x08000, 0x4000 )             // bitplanes 1,2 for bank 3,4
+	ROM_LOAD( "6",    0x10000, 0x4000, CRC(fd3cee40) SHA1(3308b96bb69e0fa6dffbdff296273fafa16d5e70) )   // bitplanes 1,2 for bank 5,6
+	ROM_CONTINUE(             0x18000, 0x4000 )             // bitplanes 1,2 for bank 7,8
+	ROM_LOAD( "8",    0x04000, 0x1000, CRC(f67ee64e) SHA1(75634bd481ae44b8aa02acb4f9b4d7ff973a4c71) )   // bitplane 3 for bank 1,2
+	ROM_CONTINUE(             0x06000, 0x1000 )
+	ROM_CONTINUE(             0x0c000, 0x1000 )             // bitplane 3 for bank 3,4
+	ROM_CONTINUE(             0x0e000, 0x1000 )
+	ROM_CONTINUE(             0x14000, 0x1000 )             // bitplane 3 for bank 5,6
+	ROM_CONTINUE(             0x16000, 0x1000 )
+	ROM_CONTINUE(             0x1c000, 0x1000 )             // bitplane 3 for bank 7,8
+	ROM_CONTINUE(             0x1e000, 0x1000 )
+
+	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_LOAD( "9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )   // sprites
+	ROM_LOAD( "10",   0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) )
+	ROM_LOAD( "11",   0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "brkthru.13",   0x0000, 0x0100, CRC(aae44269) SHA1(7c66aeb93577104109d264ee8b848254256c81eb) ) // red and green component
+	ROM_LOAD( "brkthru.14",   0x0100, 0x0100, CRC(f2d4822a) SHA1(f535e91b87ff01f2a73662856fd3f72907ca62e9) ) // blue component
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "5",    0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) )
+ROM_END
+
 /* bootleg, changed prg rom fails test, probably just the japanese version modified to have english title */
 ROM_START( forcebrk )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for main CPU + 64k for banked ROMs */
@@ -798,8 +835,9 @@ void brkthru_state::init_brkthru()
  *
  *************************************/
 
-GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, init_brkthru, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation",                  "Kyohkoh-Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthrut, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, init_brkthru, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthru,   0,       brkthru, brkthru,  brkthru_state, init_brkthru, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruj,  brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation",                  "Kyohkoh-Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthrut,  brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, forcebrk,  brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthrubl, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",                                "Break Thru (bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darwin,    0,       darwin,  darwin,   brkthru_state, init_brkthru, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -195,6 +195,7 @@ namespace bimg
 		bool     m_cubeMap;
 		bool     m_ktx;
 		bool     m_ktxLE;
+		bool     m_pvr3;
 		bool     m_srgb;
 	};
 
@@ -425,6 +426,7 @@ namespace bimg
 		, uint32_t _height
 		, uint32_t _depth
 		, uint32_t _srcPitch
+		, uint32_t _dstPitch
 		);
 
 	///
@@ -540,6 +542,7 @@ namespace bimg
 		, uint32_t _depth
 		, uint8_t _numMips
 		, uint32_t _numLayers
+		, bool _srgb
 		, const void* _src
 		, bx::Error* _err = NULL
 		);

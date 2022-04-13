@@ -27,6 +27,9 @@
     Thus we assume that in the TI console (option 1) the sound chip has
     also been removed.
 
+    The EVPC has one configuration option:
+       VRAM may be set to 128K or 192K.
+
     Important note: The DSR (firmware) of the EVPC expects a memory expansion
     to be present; otherwise, the configuration (using CALL EVPC) will crash.
     There is no warning if the 32K expansion is not present.
@@ -37,6 +40,7 @@
 
 #include "emu.h"
 #include "evpc.h"
+
 #include "speaker.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
@@ -47,13 +51,15 @@
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
+#define EVPC_SCREEN_TAG      "screen"
 
-DEFINE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
+DEFINE_DEVICE_TYPE(TI99_EVPC, bus::ti99::peb::snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define NOVRAM_SIZE 256
 #define EVPC_CRU_BASE 0x1400
+#define SOUNDCHIP_TAG "soundchip"
 
 snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, TI99_EVPC, tag, owner, clock),
@@ -69,14 +75,14 @@ snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mco
 	m_intlevel(0),
 	m_dsrrom(nullptr),
 	m_novram(nullptr),
-	m_video(*this, TI_VDP_TAG),
-	m_sound(*this, TI_SOUNDCHIP_TAG),
+	m_video(*this, TIGEN_V9938_TAG),
+	m_sound(*this, SOUNDCHIP_TAG),
 	m_colorbus(*this, COLORBUS_TAG),
 	m_console_conn(*this, ":" TI99_EVPC_CONN_TAG)
 {
 }
 
-SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
+void snug_enhanced_video_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for the debugger. It will mess up the
 	// setaddress/memory access pairs when the CPU enters wait states.
@@ -86,10 +92,10 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 
 	m_address = offset;
 	bool reading = (state==ASSERT_LINE);
-	int offbase = (m_address & 0xfc01);
+	int offbase = (m_address & 0x7fc01); // The 7 represents the AMA/B/C lines
 
 	// Sound
-	m_sound_accessed = ((m_address & 0xff01)==0x8400) && !reading;
+	m_sound_accessed = ((m_address & 0x7ff01)==0x78400) && !reading;
 
 	// Video space
 	// 8800 / 8802 / 8804 / 8806
@@ -97,15 +103,15 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 	//
 	// Bits 1000 1w00 0000 0xx0
 	// Mask 1111 1000 0000 0001
-	m_video_accessed = ((offbase==0x8800) && reading) || ((offbase==0x8c00) && !reading);
+	m_video_accessed = ((offbase==0x78800) && reading) || ((offbase==0x78c00) && !reading);
 
 	// Read a byte in evpc DSR space
 	// 0x4000 - 0x5eff   DSR (paged)
 	// 0x5f00 - 0x5fef   NOVRAM
 	// 0x5ff0 - 0x5fff   Palette
-	m_inDsrArea = ((m_address & 0xe000)==0x4000);
-	m_novram_accessed = ((m_address & 0xff00)==0x5f00);
-	m_palette_accessed = ((m_address & 0xfff0)==0x5ff0);
+	m_inDsrArea = in_dsr_space(m_address, true);
+	m_novram_accessed = ((m_address & 0x7ff00)==0x75f00);
+	m_palette_accessed = ((m_address & 0x7fff0)==0x75ff0);
 
 	// Note that we check the selection in reverse order so that the overlap is avoided
 }
@@ -125,9 +131,10 @@ void snug_enhanced_video_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void snug_enhanced_video_device::nvram_read(emu_file &file)
+bool snug_enhanced_video_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_novram.get(), NOVRAM_SIZE);
+	size_t actual;
+	return !file.read(m_novram.get(), NOVRAM_SIZE, actual) && actual == NOVRAM_SIZE;
 }
 
 //-------------------------------------------------
@@ -135,9 +142,10 @@ void snug_enhanced_video_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void snug_enhanced_video_device::nvram_write(emu_file &file)
+bool snug_enhanced_video_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_novram.get(), NOVRAM_SIZE);
+	size_t actual;
+	return !file.write(m_novram.get(), NOVRAM_SIZE, actual) && actual == NOVRAM_SIZE;
 }
 
 /*
@@ -146,7 +154,7 @@ void snug_enhanced_video_device::nvram_write(emu_file &file)
     0x5f00 - 0x5fef   NOVRAM
     0x5ff0 - 0x5fff   Palette (5ff0, 5ff2, 5ff4, 5ff6)
 */
-READ8Z_MEMBER(snug_enhanced_video_device::readz)
+void snug_enhanced_video_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_selected && m_inDsrArea)
 	{
@@ -317,7 +325,7 @@ void snug_enhanced_video_device::write(offs_t offset, uint8_t data)
     7: DIP or NOVRAM
     Logic is inverted
 */
-READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
+void snug_enhanced_video_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
@@ -413,11 +421,10 @@ void snug_enhanced_video_device::device_start()
 
 void snug_enhanced_video_device::device_reset()
 {
-	m_select_mask = 0x7e000;
-	m_select_value = 0x74000;
 	m_dsr_page = 0;
 	m_RAMEN = false;
 	m_selected = false;
+	m_video->set_vram_size((ioport("EVPC-MEM")->read()==0)? 0x20000 : 0x30000);
 }
 
 void snug_enhanced_video_device::device_stop()
@@ -440,8 +447,6 @@ WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
 		m_intlevel = state;
 		if (m_console_conn != nullptr) m_console_conn->vclock_line(state);
 		else m_slot->lcp_line(state);
-
-		if (state!=0) m_colorbus->poll();
 	}
 }
 
@@ -473,6 +478,11 @@ INPUT_PORTS_START( ti99_evpc )
 	PORT_DIPNAME( 0x01, 0x00, "EVPC Configuration" )
 		PORT_DIPSETTING(    0x00, "DIP" )
 		PORT_DIPSETTING(    0x01, "NOVRAM" )
+
+	PORT_START( "EVPC-MEM" )
+	PORT_CONFNAME( 0x01, 0x00, "EVPC video memory" )
+		PORT_DIPSETTING(    0x00, "128K" )
+		PORT_DIPSETTING(    0x01, "192K" )
 INPUT_PORTS_END
 
 const tiny_rom_entry *snug_enhanced_video_device::device_rom_region() const
@@ -489,10 +499,11 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 {
 	// video hardware
 	V9938(config, m_video, XTAL(21'477'272)); // typical 9938 clock, not verified
-	m_video->set_vram_size(0x20000);
+
 	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
-	m_video->set_screen(TI_SCREEN_TAG);
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	m_video->set_screen(EVPC_SCREEN_TAG);
+	m_video->set_vram_size(0x20000); // gets changed at device_reset, but give it a default value to avoid assert
+	screen_device& screen(SCREEN(config, EVPC_SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(21'477'272),
 		v99x8_device::HTOTAL,
 		0,
@@ -500,18 +511,16 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 		v99x8_device::VTOTAL_NTSC * 2,
 		v99x8_device::VERTICAL_ADJUST * 2,
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
-	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
+	screen.set_screen_update(TIGEN_V9938_TAG, FUNC(v99x8_device::screen_update));
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
+	sn94624_device& soundgen(SN94624(config, SOUNDCHIP_TAG, 3579545/8));
 	soundgen.ready_cb().set(FUNC(snug_enhanced_video_device::ready_line));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
-	// Mouse connected to the color bus of the v9938
-	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
+	// Mouse connected to the color bus of the v9938; default: none
+	V9938_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, nullptr);
 }
 
-} } } // end namespace bus::ti99::peb
-
-
+} // end namespace bus::ti99::peb

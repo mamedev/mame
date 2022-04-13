@@ -39,24 +39,16 @@ public:
 
 	// configuration
 	template <unsigned P> void set_input_tag(const char *tag) { m_analog_ports[P].set_tag(tag); }
-	template <unsigned P> void set_input_cb(port_read_delegate callback) { m_analog_input_cb[P] = callback; }
-	template <unsigned P, class FunctionClass> void set_input_cb(const char *devname, ioport_value (FunctionClass::*callback)(), const char *name)
-	{
-		set_input_cb<P>(port_read_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <unsigned P, class FunctionClass> void set_input_cb(ioport_value (FunctionClass::*callback)(), const char *name)
-	{
-		set_input_cb<P>(port_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <unsigned P, typename... T> void set_input_cb(T &&... args) { m_analog_input_cb[P].set(std::forward<T>(args)...); }
 
 	// write handlers
-	WRITE8_MEMBER(address_w);
-	WRITE8_MEMBER(select_w);
+	void address_w(offs_t offset, u8 data);
+	void select_w(offs_t offset, u8 data);
 
 	// read handlers
 	bool shift_out();
-	READ8_MEMBER(d0_r);
-	READ8_MEMBER(d7_r);
+	u8 d0_r(address_space &space);
+	u8 d7_r(address_space &space);
 
 protected:
 	// device-level overrides
@@ -68,7 +60,7 @@ private:
 
 	// input configuration
 	optional_ioport_array<4> m_analog_ports;
-	port_read_delegate m_analog_input_cb[4];
+	port_read_delegate::array<4> m_analog_input_cb;
 
 	// private data
 	u8 m_shift_register;

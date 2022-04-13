@@ -12,7 +12,6 @@
 
 #define NORMAL_PLANE_ORDER 4
 
-typedef device_delegate<void (int *code, int *color, int *priority_mask)> k053247_cb_delegate;
 #define K053246_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
 #define K055673_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
 
@@ -41,7 +40,7 @@ Callback procedures for non-standard shadows:
 	#define GX_ZBUFSIZE  0x600000
 #else
 	#define GX_ZBUFW     576
-	#define GX_ZBUFH     224
+	#define GX_ZBUFH     256
 	#define GX_ZPAGESIZE (GX_ZBUFW*GX_ZBUFH)
 	#define GX_ZBUFSIZE  ((GX_ZBUFW*GX_ZBUFH)*2)
 #endif
@@ -52,11 +51,12 @@ class k053247_device : public device_t,
 						public device_gfx_interface
 {
 public:
+	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority_mask)>;
+
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	void set_k053247_callback(k053247_cb_delegate callback) { m_k053247_cb = callback; }
-	template <typename... T> void set_sprite_callback(T &&... args) { m_k053247_cb = k053247_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_sprite_callback(T &&... args) { m_k053247_cb.set(std::forward<T>(args)...); }
 	void set_config(int bpp, int dx, int dy)
 	{
 		m_bpp = bpp;
@@ -97,32 +97,32 @@ public:
 
 	u8    m_kx46_regs[8];
 	u16   m_kx47_regs[16];
-	int   m_dx, m_dy;
+	int   m_dx = 0, m_dy = 0;
 	u8    m_objcha_line;
 	int   m_z_rejection;
 
-	k053247_cb_delegate m_k053247_cb;
+	sprite_delegate m_k053247_cb;
 
 	required_region_ptr<u8> m_gfxrom;
 	int m_gfx_num;
-	int m_bpp;
+	int m_bpp = 0;
 
 	/* alt implementation - to be collapsed */
 	void zdrawgfxzoom32GP(
-		bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
+			bitmap_rgb32 &bitmap, const rectangle &cliprect,
+			u32 code, u32 color, int flipx, int flipy, int sx, int sy,
+			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
 	void zdrawgfxzoom32GP(
 			bitmap_ind16 &bitmap, const rectangle &cliprect,
 			u32 code, u32 color, int flipx, int flipy, int sx, int sy,
 			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
-	template<class _BitmapClass>
-	inline void k053247_draw_single_sprite_gxcore(_BitmapClass &bitmap , rectangle const &cliprect,
-		u8* gx_objzbuf, u8* gx_shdzbuf, int code, u16* gx_spriteram, int offs,
-		int color, int alpha, int drawmode, int zcode, int pri,
-		int primask, int shadow, u8* drawmode_table, u8* shadowmode_table, int shdmask)
+	template<class BitmapClass>
+	void k053247_draw_single_sprite_gxcore(BitmapClass &bitmap , rectangle const &cliprect,
+			u8* gx_objzbuf, u8* gx_shdzbuf, int code, u16* gx_spriteram, int offs,
+			int color, int alpha, int drawmode, int zcode, int pri,
+			int primask, int shadow, u8* drawmode_table, u8* shadowmode_table, int shdmask)
 	{
 		int xa,ya,ox,oy,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
 		int temp, temp4;
@@ -292,24 +292,23 @@ public:
 	}
 
 
-	template<class _BitmapClass>
-	void k053247_draw_yxloop_gx(_BitmapClass &bitmap, const rectangle &cliprect,
-		int code,
-		int color,
-		int height, int width,
-		int zoomx, int zoomy, int flipx, int flipy,
-		int ox, int oy,
-		int xa, int ya,
-		int mirrorx, int mirrory,
-		int nozoom,
-		/* gx specifics */
-		int pri,
-		int zcode, int alpha, int drawmode,
-		u8* gx_objzbuf, u8* gx_shdzbuf,
-		/* non-gx specifics */
-		int primask,
-		u8* whichtable
-		)
+	template<class BitmapClass>
+	void k053247_draw_yxloop_gx(BitmapClass &bitmap, const rectangle &cliprect,
+			int code,
+			int color,
+			int height, int width,
+			int zoomx, int zoomy, int flipx, int flipy,
+			int ox, int oy,
+			int xa, int ya,
+			int mirrorx, int mirrory,
+			int nozoom,
+			/* gx specifics */
+			int pri,
+			int zcode, int alpha, int drawmode,
+			u8* gx_objzbuf, u8* gx_shdzbuf,
+			/* non-gx specifics */
+			int primask,
+			u8* whichtable)
 	{
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
@@ -446,11 +445,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	template <class _BitmapClass> void k053247_sprites_draw_common(_BitmapClass &bitmap, const rectangle &cliprect);
+	template <class BitmapClass> void k053247_sprites_draw_common(BitmapClass &bitmap, const rectangle &cliprect);
 };
 
 DECLARE_DEVICE_TYPE(K053247, k053247_device)
-DECLARE_DEVICE_TYPE(K053246, k053247_device)
+static auto &K053246 = K053247;
 
 class k055673_device : public k053247_device
 {
@@ -463,7 +462,7 @@ protected:
 	virtual void device_start() override;
 //  virtual void device_reset();
 private:
-
+	std::unique_ptr<u16[]> m_combined_gfx;
 };
 
 DECLARE_DEVICE_TYPE(K055673, k055673_device)

@@ -1,20 +1,20 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert
 # r65c02 - rockwell variant, with the bitwise instructions and stp/wai
-brk_c_imp   ora_idx     nop_imm     nop_c_imp   tsb_zpg     ora_zpg     asl_zpg     rmb_bzp     php_imp     ora_imm     asl_acc     nop_c_imp   tsb_aba     ora_aba     asl_aba     bbr_zpb
-bpl_rel     ora_idy     ora_zpi     nop_c_imp   trb_zpg     ora_zpx     asl_zpx     rmb_bzp     clc_imp     ora_aby     inc_acc     nop_c_imp   trb_aba     ora_abx     asl_c_abx   bbr_zpb
-jsr_adr     and_idx     nop_imm     nop_c_imp   bit_zpg     and_zpg     rol_zpg     rmb_bzp     plp_imp     and_imm     rol_acc     nop_c_imp   bit_aba     and_aba     rol_aba     bbr_zpb
-bmi_rel     and_idy     and_zpi     nop_c_imp   bit_zpx     and_zpx     rol_zpx     rmb_bzp     sec_imp     and_aby     dec_acc     nop_c_imp   bit_abx     and_abx     rol_c_abx   bbr_zpb
-rti_imp     eor_idx     nop_imm     nop_c_imp   nop_zpg     eor_zpg     lsr_zpg     rmb_bzp     pha_imp     eor_imm     lsr_acc     nop_c_imp   jmp_adr     eor_aba     lsr_aba     bbr_zpb
-bvc_rel     eor_idy     eor_zpi     nop_c_imp   nop_zpx     eor_zpx     lsr_zpx     rmb_bzp     cli_imp     eor_aby     phy_imp     nop_c_imp   nop_c_aba   eor_abx     lsr_c_abx   bbr_zpb
-rts_imp     adc_c_idx   nop_imm     nop_c_imp   stz_zpg     adc_c_zpg   ror_zpg     rmb_bzp     pla_imp     adc_c_imm   ror_acc     nop_c_imp   jmp_c_ind   adc_c_aba   ror_aba     bbr_zpb
-bvs_rel     adc_c_idy   adc_c_zpi   nop_c_imp   stz_zpx     adc_c_zpx   ror_zpx     rmb_bzp     sei_imp     adc_c_aby   ply_imp     nop_c_imp   jmp_iax     adc_c_abx   ror_c_abx   bbr_zpb
+brk_c_imp   ora_idx     nop_imm     nop_c_imp   tsb_zpg     ora_zpg     asl_c_zpg   rmb_bzp     php_imp     ora_imm     asl_acc     nop_c_imp   tsb_aba     ora_aba     asl_c_aba   bbr_zpb
+bpl_rel     ora_idy     ora_zpi     nop_c_imp   trb_zpg     ora_zpx     asl_c_zpx   rmb_bzp     clc_imp     ora_aby     inc_acc     nop_c_imp   trb_aba     ora_abx     asl_c_abx   bbr_zpb
+jsr_adr     and_idx     nop_imm     nop_c_imp   bit_zpg     and_zpg     rol_c_zpg   rmb_bzp     plp_imp     and_imm     rol_acc     nop_c_imp   bit_aba     and_aba     rol_c_aba   bbr_zpb
+bmi_rel     and_idy     and_zpi     nop_c_imp   bit_zpx     and_zpx     rol_c_zpx   rmb_bzp     sec_imp     and_aby     dec_acc     nop_c_imp   bit_abx     and_abx     rol_c_abx   bbr_zpb
+rti_imp     eor_idx     nop_imm     nop_c_imp   nop_zpg     eor_zpg     lsr_c_zpg   rmb_bzp     pha_imp     eor_imm     lsr_acc     nop_c_imp   jmp_adr     eor_aba     lsr_c_aba   bbr_zpb
+bvc_rel     eor_idy     eor_zpi     nop_c_imp   nop_zpx     eor_zpx     lsr_c_zpx   rmb_bzp     cli_imp     eor_aby     phy_imp     nop_c_imp   nop_c_aba   eor_abx     lsr_c_abx   bbr_zpb
+rts_imp     adc_c_idx   nop_imm     nop_c_imp   stz_zpg     adc_c_zpg   ror_c_zpg   rmb_bzp     pla_imp     adc_c_imm   ror_acc     nop_c_imp   jmp_c_ind   adc_c_aba   ror_c_aba   bbr_zpb
+bvs_rel     adc_c_idy   adc_c_zpi   nop_c_imp   stz_zpx     adc_c_zpx   ror_c_zpx   rmb_bzp     sei_imp     adc_c_aby   ply_imp     nop_c_imp   jmp_iax     adc_c_abx   ror_c_abx   bbr_zpb
 bra_rel     sta_idx     nop_imm     nop_c_imp   sty_zpg     sta_zpg     stx_zpg     smb_bzp     dey_imp     bit_imm     txa_imp     nop_c_imp   sty_aba     sta_aba     stx_aba     bbs_zpb
 bcc_rel     sta_idy     sta_zpi     nop_c_imp   sty_zpx     sta_zpx     stx_zpy     smb_bzp     tya_imp     sta_aby     txs_imp     nop_c_imp   stz_aba     sta_abx     stz_abx     bbs_zpb
 ldy_imm     lda_idx     ldx_imm     nop_c_imp   ldy_zpg     lda_zpg     ldx_zpg     smb_bzp     tay_imp     lda_imm     tax_imp     nop_c_imp   ldy_aba     lda_aba     ldx_aba     bbs_zpb
 bcs_rel     lda_idy     lda_zpi     nop_c_imp   ldy_zpx     lda_zpx     ldx_zpy     smb_bzp     clv_imp     lda_aby     tsx_imp     nop_c_imp   ldy_abx     lda_abx     ldx_aby     bbs_zpb
-cpy_imm     cmp_idx     nop_imm     nop_c_imp   cpy_zpg     cmp_zpg     dec_zpg     smb_bzp     iny_imp     cmp_imm     dex_imp     wai_imp     cpy_aba     cmp_aba     dec_aba     bbs_zpb
-bne_rel     cmp_idy     cmp_zpi     nop_c_imp   nop_zpx     cmp_zpx     dec_zpx     smb_bzp     cld_imp     cmp_aby     phx_imp     stp_imp     nop_c_abx   cmp_abx     dec_abx     bbs_zpb
-cpx_imm     sbc_c_idx   nop_imm     nop_c_imp   cpx_zpg     sbc_c_zpg   inc_zpg     smb_bzp     inx_imp     sbc_c_imm   nop_imp     nop_c_imp   cpx_aba     sbc_c_aba   inc_aba     bbs_zpb
-beq_rel     sbc_c_idy   sbc_c_zpi   nop_c_imp   nop_zpx     sbc_c_zpx   inc_zpx     smb_bzp     sed_imp     sbc_c_aby   plx_imp     nop_c_imp   nop_c_abx   sbc_c_abx   inc_abx     bbs_zpb
-reset
+cpy_imm     cmp_idx     nop_imm     nop_c_imp   cpy_zpg     cmp_zpg     dec_c_zpg   smb_bzp     iny_imp     cmp_imm     dex_imp     wai_imp     cpy_aba     cmp_aba     dec_c_aba   bbs_zpb
+bne_rel     cmp_idy     cmp_zpi     nop_c_imp   nop_zpx     cmp_zpx     dec_c_zpx   smb_bzp     cld_imp     cmp_aby     phx_imp     stp_imp     nop_c_abx   cmp_abx     dec_c_abx   bbs_zpb
+cpx_imm     sbc_c_idx   nop_imm     nop_c_imp   cpx_zpg     sbc_c_zpg   inc_c_zpg   smb_bzp     inx_imp     sbc_c_imm   nop_imp     nop_c_imp   cpx_aba     sbc_c_aba   inc_c_aba   bbs_zpb
+beq_rel     sbc_c_idy   sbc_c_zpi   nop_c_imp   nop_zpx     sbc_c_zpx   inc_c_zpx   smb_bzp     sed_imp     sbc_c_aby   plx_imp     nop_c_imp   nop_c_abx   sbc_c_abx   inc_c_abx   bbs_zpb
+reset_c

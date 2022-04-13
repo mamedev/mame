@@ -2,44 +2,159 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Shisen
+Tamtex Shisensho / Match It
 
 driver by Nicola Salmoria
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/shisen.h"
+
+#include "audio/m72.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/rstbuf.h"
-#include "sound/ym2151.h"
-#include "sound/volt_reg.h"
+#include "sound/ymopm.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-READ8_MEMBER(shisen_state::dsw1_r)
+namespace {
+
+class shisen_state : public driver_device
 {
-	int ret = ioport("DSW1")->read();
+public:
+	shisen_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audio(*this, "m72"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_paletteram(*this, "paletteram"),
+		m_videoram(*this, "videoram"),
+		m_mainbank(*this, "mainbank"),
+		m_dsw2(*this, "DSW2")
+	{ }
 
-	/* Based on the coin mode fill in the upper bits */
-	if (ioport("DSW2")->read() & 0x04)
-	{
-		/* Mode 1 */
-		ret |= (ioport("DSW1")->read() << 4);
-	}
-	else
-	{
-		/* Mode 2 */
-		ret |= (ioport("DSW1")->read() & 0xf0);
-	}
+	void shisen(machine_config &config);
 
-	return ret;
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<m72_audio_device> m_audio;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_memory_bank m_mainbank;
+
+	required_ioport m_dsw2;
+
+	uint8_t m_gfxbank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	void coin_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_io_map(address_map &map);
+	void main_prg_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_prg_map(address_map &map);
+};
+
+
+// video
+
+void shisen_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(shisen_state::coin_w)
+void shisen_state::bankswitch_w(uint8_t data)
+{
+	if (data & 0xc0) logerror("bank switch %02x\n", data);
+
+	// bits 0-2 select ROM bank
+	m_mainbank->set_entry(data & 0x07);
+
+	// bits 3-5 select gfx bank
+	int bank = (data & 0x38) >> 3;
+
+	if (m_gfxbank != bank)
+	{
+		m_gfxbank = bank;
+		machine().tilemap().mark_all_dirty();
+	}
+
+	// bits 6-7 unknown
+}
+
+void shisen_state::paletteram_w(offs_t offset, uint8_t data)
+{
+	m_paletteram[offset] = data;
+
+	offset &= 0xff;
+
+	m_palette->set_pen_color(offset, pal5bit(m_paletteram[offset + 0x000]), pal5bit(m_paletteram[offset + 0x100]), pal5bit(m_paletteram[offset + 0x200]));
+}
+
+TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
+{
+	int offs = tile_index * 2;
+	int code = m_videoram[offs] + ((m_videoram[offs + 1] & 0x0f) << 8) + (m_gfxbank << 12);
+	int color = (m_videoram[offs + 1] & 0xf0) >> 4;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void shisen_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(shisen_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+
+	save_item(NAME(m_gfxbank));
+}
+
+uint32_t shisen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// on Irem boards, screen flip is handled in both hardware and software.
+	// this game doesn't have cocktail mode so if there's software control we don't know where it is mapped.
+	flip_screen_set(~m_dsw2->read() & 1);
+
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
+
+void shisen_state::main_prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc800, 0xcaff).ram().w(FUNC(shisen_state::paletteram_w)).share(m_paletteram);
+	map(0xd000, 0xdfff).ram().w(FUNC(shisen_state::videoram_w)).share(m_videoram);
+	map(0xe000, 0xffff).ram();
+}
+
+
+void shisen_state::coin_w(uint8_t data)
 {
 	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
 
@@ -47,34 +162,24 @@ WRITE8_MEMBER(shisen_state::coin_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x04);
 }
 
-
-
-void shisen_state::shisen_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc800, 0xcaff).ram().w(FUNC(shisen_state::paletteram_w)).share("paletteram");
-	map(0xd000, 0xdfff).ram().w(FUNC(shisen_state::videoram_w)).share("videoram");
-	map(0xe000, 0xffff).ram();
-}
-
-void shisen_state::shisen_io_map(address_map &map)
+void shisen_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(FUNC(shisen_state::dsw1_r), FUNC(shisen_state::coin_w));
+	map(0x00, 0x00).portr("DSW1").w(FUNC(shisen_state::coin_w));
 	map(0x01, 0x01).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).portr("P1").w(FUNC(shisen_state::bankswitch_w));
 	map(0x03, 0x03).portr("P2");
 	map(0x04, 0x04).portr("COIN");
 }
 
-void shisen_state::shisen_sound_map(address_map &map)
+
+void shisen_state::sound_prg_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0xfd00, 0xffff).ram();
 }
 
-void shisen_state::shisen_sound_io_map(address_map &map)
+void shisen_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -172,7 +277,7 @@ static INPUT_PORTS_START( shisen )
 	PORT_DIPNAME( 0x10, 0x10, "Women Select" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	/* In stop mode, press 2 to stop and 1 to restart */
+	// In stop mode, press 2 to stop and 1 to restart
 	PORT_DIPNAME( 0x20, 0x20, "Stop Mode (Cheat)") PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -208,27 +313,27 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( gfx_shisen )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0x00000, charlayout,  0, 16 )
 GFXDECODE_END
 
 
 
 void shisen_state::shisen(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);   /* 6 MHz ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &shisen_state::shisen_map);
-	m_maincpu->set_addrmap(AS_IO, &shisen_state::shisen_io_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL );   // Verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &shisen_state::main_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &shisen_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(shisen_state::irq0_line_hold));
 
-	z80_device &soundcpu(Z80(config, "soundcpu", 3579645));
-	soundcpu.set_addrmap(AS_PROGRAM, &shisen_state::shisen_sound_map);
-	soundcpu.set_addrmap(AS_IO, &shisen_state::shisen_sound_io_map);
-	soundcpu.set_periodic_int(FUNC(shisen_state::nmi_line_pulse), attotime::from_hz(128*55));  /* clocked by V1? (Vigilante) */
-								/* IRQs are generated by main Z80 and YM2151 */
+	z80_device &soundcpu(Z80(config, "soundcpu", 3.579545_MHz_XTAL ));   // Verified on PCB
+	soundcpu.set_addrmap(AS_PROGRAM, &shisen_state::sound_prg_map);
+	soundcpu.set_addrmap(AS_IO, &shisen_state::sound_io_map);
+	soundcpu.set_periodic_int(FUNC(shisen_state::nmi_line_pulse), attotime::from_hz(128*55));  // clocked by V1? (Vigilante)
+								// IRQs are generated by main Z80 and YM2151
 	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(55);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -240,7 +345,7 @@ void shisen_state::shisen(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shisen);
 	PALETTE(config, m_palette).set_entries(256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -253,15 +358,12 @@ void shisen_state::shisen(machine_config &config)
 	IREM_M72_AUDIO(config, m_audio);
 	m_audio->set_dac_tag("dac");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL ));   // Verified on PCB
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
 	ymsnd.add_route(0, "lspeaker", 0.5);
 	ymsnd.add_route(1, "rspeaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0x25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 }
 
 
@@ -273,49 +375,52 @@ void shisen_state::shisen(machine_config &config)
 ***************************************************************************/
 
 ROM_START( sichuan2 )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
-	ROM_LOAD( "ic06.06",      0x00000, 0x10000, CRC(98a2459b) SHA1(42102cf2921f80be7600b11aba63538e3b3858ec) )
-	ROM_RELOAD(               0x10000, 0x10000 )
-	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "6.11d",     0x00000, 0x10000, CRC(98a2459b) SHA1(42102cf2921f80be7600b11aba63538e3b3858ec) )
+	ROM_LOAD( "7.11c",     0x10000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
+	ROM_LOAD( "1.2c",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "ic08.04",      0x00000, 0x10000, CRC(1c0e221c) SHA1(87561f7dabf25309be784e797ac237aa3956ea1c) )
-	ROM_LOAD( "ic09.05",      0x10000, 0x10000, CRC(8a7d8284) SHA1(56b5d352b506c5bfab24102b11c877dd28c8ad36) )
-	ROM_LOAD( "ic12.08",      0x20000, 0x10000, CRC(48e1d043) SHA1(4fbd409aff593c0b27fc58c218a470adf48ee0b7) )
-	ROM_LOAD( "ic13.09",      0x30000, 0x10000, CRC(3feff3f2) SHA1(2e87e4fb158379486de5d13feff5bf1965690e14) )
-	ROM_LOAD( "ic14.10",      0x40000, 0x10000, CRC(b76a517d) SHA1(6dcab31ecc127c2fdc6912802cddfa62161d83a2) )
-	ROM_LOAD( "ic15.11",      0x50000, 0x10000, CRC(8ff5ee7a) SHA1(c8f4d374a43fcc818378c4e73af2c03238a93ad0) )
-	ROM_LOAD( "ic16.12",      0x60000, 0x10000, CRC(64e5d837) SHA1(030f9704dfdb06cd3ac583b857ce9239e1409f60) )
-	ROM_LOAD( "ic17.13",      0x70000, 0x10000, CRC(02c1b2c4) SHA1(6e4fe801189766559859eb0d628f3ae65c05ad16) )
-	ROM_LOAD( "ic18.14",      0x80000, 0x10000, CRC(f5a8370e) SHA1(b270af116ee15b5de048fc218215bf91a2ce6b46) )
-	ROM_LOAD( "ic19.15",      0x90000, 0x10000, CRC(7a9b7671) SHA1(ddb9b412b494f2f259c56a163e5511353cf4ebb5) )
-	ROM_LOAD( "ic20.16",      0xa0000, 0x10000, CRC(7fb396ad) SHA1(b245bb9a6a4c1ec518906c59c3a3da5e412369ab) )
-	ROM_LOAD( "ic21.17",      0xb0000, 0x10000, CRC(fb83c652) SHA1(3d124e5c751732e8055bbb7b6853b6e64435a85d) )
-	ROM_LOAD( "ic22.18",      0xc0000, 0x10000, CRC(d8b689e9) SHA1(14db7ba2246f12db9b6b5b4dcb4a648e4a65ace4) )
-	ROM_LOAD( "ic23.19",      0xd0000, 0x10000, CRC(e6611947) SHA1(9267dad097b318174706d51fb94d613208b04f60) )
-	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
-	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD( "8.3j",      0x00000, 0x10000, CRC(1c0e221c) SHA1(87561f7dabf25309be784e797ac237aa3956ea1c) )
+	ROM_LOAD( "9.4j",      0x10000, 0x10000, CRC(8a7d8284) SHA1(56b5d352b506c5bfab24102b11c877dd28c8ad36) )
+	ROM_LOAD( "12.1l",     0x20000, 0x10000, CRC(48e1d043) SHA1(4fbd409aff593c0b27fc58c218a470adf48ee0b7) )
+	ROM_LOAD( "13.2l",     0x30000, 0x10000, CRC(3feff3f2) SHA1(2e87e4fb158379486de5d13feff5bf1965690e14) )
+	ROM_LOAD( "14.3l",     0x40000, 0x10000, CRC(b76a517d) SHA1(6dcab31ecc127c2fdc6912802cddfa62161d83a2) )
+	ROM_LOAD( "15.5l",     0x50000, 0x10000, CRC(8ff5ee7a) SHA1(c8f4d374a43fcc818378c4e73af2c03238a93ad0) )
+	ROM_LOAD( "16.6l",     0x60000, 0x10000, CRC(64e5d837) SHA1(030f9704dfdb06cd3ac583b857ce9239e1409f60) )
+	ROM_LOAD( "17.7l",     0x70000, 0x10000, CRC(02c1b2c4) SHA1(6e4fe801189766559859eb0d628f3ae65c05ad16) )
+	ROM_LOAD( "18.8l",     0x80000, 0x10000, CRC(f5a8370e) SHA1(b270af116ee15b5de048fc218215bf91a2ce6b46) )
+	ROM_LOAD( "19.10l",    0x90000, 0x10000, CRC(7a9b7671) SHA1(ddb9b412b494f2f259c56a163e5511353cf4ebb5) )
+	ROM_LOAD( "20.11l",    0xa0000, 0x10000, CRC(7fb396ad) SHA1(b245bb9a6a4c1ec518906c59c3a3da5e412369ab) )
+	ROM_LOAD( "21.12l",    0xb0000, 0x10000, CRC(fb83c652) SHA1(3d124e5c751732e8055bbb7b6853b6e64435a85d) )
+	ROM_LOAD( "22.13l",    0xc0000, 0x10000, CRC(d8b689e9) SHA1(14db7ba2246f12db9b6b5b4dcb4a648e4a65ace4) )
+	ROM_LOAD( "23.14l",    0xd0000, 0x10000, CRC(e6611947) SHA1(9267dad097b318174706d51fb94d613208b04f60) )
+	ROM_LOAD( "11.6j",     0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
+	ROM_LOAD( "10.5j",     0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
-	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
-	ROM_LOAD( "ic02.02",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
-	ROM_LOAD( "ic03.03",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
-	ROM_LOAD( "ic04.04",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
-	ROM_LOAD( "ic05.05",      0x30000, 0x10000, CRC(92ffe22a) SHA1(19dcaf6e25bb7498d4ab19fa0a63f3326b9bff8f) )
+	ROM_REGION( 0x40000, "m72", 0 ) // samples
+	ROM_LOAD( "2.7b",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
+	ROM_LOAD( "3.6c",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
+	ROM_LOAD( "4.7c",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
+	ROM_LOAD( "5.9c",      0x30000, 0x10000, CRC(92ffe22a) SHA1(19dcaf6e25bb7498d4ab19fa0a63f3326b9bff8f) )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "1.1f",  0x000, 0x104, NO_DUMP ) // TIBPAL16R4
+	ROM_LOAD( "2.6e",  0x200, 0x104, NO_DUMP ) // TIBPAL16L8
+	ROM_LOAD( "3.14f", 0x400, 0x104, NO_DUMP ) // TIBPAL16L8
 ROM_END
 
 ROM_START( sichuan2a )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "sichuan.a6",   0x00000, 0x10000, CRC(f8ac05ef) SHA1(cd20e5239d73264f1323ba6b1e35934685852ba1) )
-	ROM_RELOAD(               0x10000, 0x10000 )
-	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
+	ROM_LOAD( "ic07.03",      0x10000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "ic08.04",      0x00000, 0x10000, CRC(1c0e221c) SHA1(87561f7dabf25309be784e797ac237aa3956ea1c) )
 	ROM_LOAD( "ic09.05",      0x10000, 0x10000, CRC(8a7d8284) SHA1(56b5d352b506c5bfab24102b11c877dd28c8ad36) )
 	ROM_LOAD( "ic12.08",      0x20000, 0x10000, CRC(48e1d043) SHA1(4fbd409aff593c0b27fc58c218a470adf48ee0b7) )
@@ -333,7 +438,7 @@ ROM_START( sichuan2a )
 	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
 	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
-	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
+	ROM_REGION( 0x40000, "m72", 0 ) // samples
 	ROM_LOAD( "ic02.02",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
 	ROM_LOAD( "ic03.03",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
 	ROM_LOAD( "ic04.04",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
@@ -341,14 +446,13 @@ ROM_START( sichuan2a )
 ROM_END
 
 ROM_START( shisen )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a-27-a.rom",   0x00000, 0x20000, CRC(de2ecf05) SHA1(7256c5587f92db10a52c43001e3236f3be3df5df) )
-	ROM_RELOAD(               0x10000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "ic08.04",      0x00000, 0x10000, CRC(1c0e221c) SHA1(87561f7dabf25309be784e797ac237aa3956ea1c) )
 	ROM_LOAD( "ic09.05",      0x10000, 0x10000, CRC(8a7d8284) SHA1(56b5d352b506c5bfab24102b11c877dd28c8ad36) )
 	ROM_LOAD( "ic12.08",      0x20000, 0x10000, CRC(48e1d043) SHA1(4fbd409aff593c0b27fc58c218a470adf48ee0b7) )
@@ -366,7 +470,7 @@ ROM_START( shisen )
 	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
 	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
-	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
+	ROM_REGION( 0x40000, "m72", 0 ) // samples
 	ROM_LOAD( "ic02.02",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
 	ROM_LOAD( "ic03.03",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
 	ROM_LOAD( "ic04.04",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
@@ -413,15 +517,14 @@ ROMs  : (All ROMs type 27C512)
 */
 
 ROM_START( matchit )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
-	ROM_LOAD( "2.11d",      0x00000, 0x10000, CRC(299815f7) SHA1(dd25f69d3c825e12e5c2e24b5bbfda9c39400345) )
-	ROM_RELOAD(               0x10000, 0x10000 )
-	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "2.11d",        0x00000, 0x10000, CRC(299815f7) SHA1(dd25f69d3c825e12e5c2e24b5bbfda9c39400345) )
+	ROM_LOAD( "ic07.03",      0x10000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "ic08.04",      0x00000, 0x10000, CRC(1c0e221c) SHA1(87561f7dabf25309be784e797ac237aa3956ea1c) )
 	ROM_LOAD( "ic09.05",      0x10000, 0x10000, CRC(8a7d8284) SHA1(56b5d352b506c5bfab24102b11c877dd28c8ad36) )
 	ROM_LOAD( "ic12.08",      0x20000, 0x10000, CRC(48e1d043) SHA1(4fbd409aff593c0b27fc58c218a470adf48ee0b7) )
@@ -439,9 +542,12 @@ ROM_START( matchit )
 	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
 	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
-	ROM_REGION( 0x40000, "m72", ROMREGION_ERASE00 ) /* samples */
-	/* no samples on this board */
+	ROM_REGION( 0x40000, "m72", ROMREGION_ERASE00 ) // samples
+	// no samples on this board
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1989, matchit,  0,         shisen,   matchit, shisen_state, empty_init, ROT0, "Tamtex",  "Match It",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1989, shisen,   matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", MACHINE_SUPPORTS_SAVE )

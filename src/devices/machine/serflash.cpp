@@ -98,24 +98,27 @@ void serflash_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void serflash_device::nvram_read(emu_file &file)
+bool serflash_device::nvram_read(util::read_stream &file)
 {
-	if (m_length % m_flash_page_size) return; // region size must be multiple of flash page size
+	if (m_length % m_flash_page_size) return false; // region size must be multiple of flash page size
 	int size = m_length / m_flash_page_size;
 
-
-	if (file.is_open())
 	{
 		uint32_t page;
-		file.read(&page, 4);
+		size_t actual;
+		if (file.read(&page, 4, actual) || actual != 4)
+			return false;
 		while (page < size)
 		{
 			m_flashwritemap[page] = 1;
-			file.read(m_region + page * m_flash_page_size, m_flash_page_size);
-			file.read(&page, 4);
+			if (file.read(m_region + page * m_flash_page_size, m_flash_page_size, actual) || actual != m_flash_page_size)
+				return false;
+			if (file.read(&page, 4, actual) || actual != 4)
+				return false;
 		}
 	}
 
+	return true;
 }
 
 
@@ -124,22 +127,28 @@ void serflash_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void serflash_device::nvram_write(emu_file &file)
+bool serflash_device::nvram_write(util::write_stream &file)
 {
-	if (m_length % m_flash_page_size) return; // region size must be multiple of flash page size
+	if (m_length % m_flash_page_size) return false; // region size must be multiple of flash page size
 	int size = m_length / m_flash_page_size;
 
 	uint32_t page = 0;
+	size_t actual;
 	while (page < size)
 	{
 		if (m_flashwritemap[page])
 		{
-			file.write(&page, 4);
-			file.write(m_region + page * m_flash_page_size, m_flash_page_size);
+			if (file.write(&page, 4, actual) || actual != 4)
+				return false;
+			if (file.write(m_region + page * m_flash_page_size, m_flash_page_size, actual) || actual != m_flash_page_size)
+				return false;
 		}
 		page++;
 	}
-	file.write(&page, 4);
+	if (file.write(&page, 4, actual) || actual != 4)
+		return false;
+
+	return true;
 }
 
 void serflash_device::flash_hard_reset()
@@ -162,7 +171,7 @@ void serflash_device::flash_hard_reset()
 	m_flash_page_index = 0;
 }
 
-WRITE8_MEMBER( serflash_device::flash_enab_w )
+void serflash_device::flash_enab_w(uint8_t data)
 {
 	//logerror("%08x FLASH: enab = %02X\n", m_maincpu->pc(), data);
 	m_flash_enab = data;
@@ -181,7 +190,7 @@ void serflash_device::flash_change_state(flash_state_t state)
 	//logerror("flash_change_state - FLASH: state = %s\n", m_flash_state_name[state]);
 }
 
-WRITE8_MEMBER( serflash_device::flash_cmd_w )
+void serflash_device::flash_cmd_w(uint8_t data)
 {
 	if (!m_flash_enab)
 		return;
@@ -287,7 +296,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 	}
 }
 
-WRITE8_MEMBER( serflash_device::flash_data_w )
+void serflash_device::flash_data_w(uint8_t data)
 {
 	if (!m_flash_enab)
 		return;
@@ -300,7 +309,7 @@ WRITE8_MEMBER( serflash_device::flash_data_w )
 	m_flash_page_addr++;
 }
 
-WRITE8_MEMBER( serflash_device::flash_addr_w )
+void serflash_device::flash_addr_w(uint8_t data)
 {
 	if (!m_flash_enab)
 		return;
@@ -336,7 +345,7 @@ WRITE8_MEMBER( serflash_device::flash_addr_w )
 	}
 }
 
-READ8_MEMBER( serflash_device::flash_io_r )
+uint8_t serflash_device::flash_io_r()
 {
 	uint8_t data = 0x00;
 //  uint32_t old;
@@ -395,14 +404,14 @@ READ8_MEMBER( serflash_device::flash_io_r )
 	return data;
 }
 
-READ8_MEMBER( serflash_device::flash_ready_r )
+uint8_t serflash_device::flash_ready_r()
 {
 	return 1;
 }
 
 
 
-READ8_MEMBER(serflash_device::n3d_flash_r)
+uint8_t serflash_device::n3d_flash_r(offs_t offset)
 {
 	if (m_last_flash_cmd==0x70) return 0xe0;
 
@@ -423,7 +432,7 @@ READ8_MEMBER(serflash_device::n3d_flash_r)
 }
 
 
-WRITE8_MEMBER(serflash_device::n3d_flash_cmd_w)
+void serflash_device::n3d_flash_cmd_w(offs_t offset, uint8_t data)
 {
 	logerror("n3d_flash_cmd_w %02x %02x\n", offset, data);
 	m_last_flash_cmd = data;
@@ -437,7 +446,7 @@ WRITE8_MEMBER(serflash_device::n3d_flash_cmd_w)
 	}
 }
 
-WRITE8_MEMBER(serflash_device::n3d_flash_addr_w)
+void serflash_device::n3d_flash_addr_w(offs_t offset, uint8_t data)
 {
 //  logerror("n3d_flash_addr_w %02x %02x\n", offset, data);
 

@@ -92,7 +92,7 @@ desired 300 Baud:
 6MHz / 15 / 32 / (0x100 - 0xfe) / 21 = 297.62 Baud
 
 This scheme allows only 64 machine cycles between interrupts, and more
-than half of thse are consumed by the timer service routine itself.
+than half of these are consumed by the timer service routine itself.
 
 The program ROM checksum routine is supposed to compute the sum of all
 program ROM bytes modulo 256 and the XOR of all program ROM bytes, but
@@ -209,7 +209,7 @@ INPUT_PORTS_START(kaypro_keyboard_typewriter)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)          PORT_CHAR('x')  PORT_CHAR('X')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('a')  PORT_CHAR('A')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)          PORT_CHAR('q')  PORT_CHAR('Q')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)          PORT_CHAR('1')  PORT_CHAR(';')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)          PORT_CHAR('1')  PORT_CHAR('!')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // 0xf0
 
 	PORT_START("ROW.9")
@@ -281,7 +281,7 @@ INPUT_PORTS_START(kaypro_keyboard_typewriter)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)           PORT_NAME("SHIFT")
 INPUT_PORTS_END
 
-INPUT_PORTS_START(kaypro_keyboard_bitshift)
+[[maybe_unused]] INPUT_PORTS_START(kaypro_keyboard_bitshift)
 	PORT_INCLUDE(kaypro_keyboard_typewriter)
 
 	PORT_MODIFY("ROW.2")
@@ -338,6 +338,7 @@ kaypro_10_keyboard_device::kaypro_10_keyboard_device(
 	, m_bell(*this, "bell")
 	, m_matrix(*this, "ROW.%X", 0)
 	, m_modifiers(*this, "MOD")
+	, m_led_caps_lock(*this, "led_caps_lock")
 	, m_rxd_cb(*this)
 	, m_txd(1U)
 	, m_bus(0U)
@@ -365,29 +366,29 @@ void kaypro_10_keyboard_device::device_add_mconfig(machine_config &config)
 
 ioport_constructor kaypro_10_keyboard_device::device_input_ports() const
 {
-	(void)&INPUT_PORTS_NAME(kaypro_keyboard_bitshift);
 	return INPUT_PORTS_NAME(kaypro_keyboard_typewriter);
 }
 
 void kaypro_10_keyboard_device::device_start()
 {
 	m_rxd_cb.resolve_safe();
+	m_led_caps_lock.resolve();
 
 	save_item(NAME(m_txd));
 	save_item(NAME(m_bus));
 }
 
-READ8_MEMBER(kaypro_10_keyboard_device::p1_r)
+uint8_t kaypro_10_keyboard_device::p1_r()
 {
 	return m_matrix[m_bus & 0x0f]->read();
 }
 
-READ8_MEMBER(kaypro_10_keyboard_device::p2_r)
+uint8_t kaypro_10_keyboard_device::p2_r()
 {
 	return m_modifiers->read() | 0xf8U;
 }
 
-WRITE8_MEMBER(kaypro_10_keyboard_device::p2_w)
+void kaypro_10_keyboard_device::p2_w(uint8_t data)
 {
 	if ((VERBOSE & LOG_TXD) && (0x0014U >= m_mcu->pc()))
 	{
@@ -416,14 +417,14 @@ READ_LINE_MEMBER(kaypro_10_keyboard_device::t1_r)
 	return m_txd ? 1 : 0;
 }
 
-READ8_MEMBER(kaypro_10_keyboard_device::bus_r)
+uint8_t kaypro_10_keyboard_device::bus_r()
 {
 	return m_bus;
 }
 
-WRITE8_MEMBER(kaypro_10_keyboard_device::bus_w)
+void kaypro_10_keyboard_device::bus_w(uint8_t data)
 {
 	if (BIT(m_bus ^ data, 4))
-		machine().output().set_value("led_caps_lock", BIT(data, 4));
+		m_led_caps_lock = BIT(data, 4);
 	m_bus = data;
 }

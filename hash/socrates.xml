@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="socrates" description="Video Technology Socrates cartridges">
 
 <!--
@@ -48,6 +51,7 @@ Undumped:
 		</part>
 	</software>
 
+	<!-- The dump of the French version of this cart is identical. "Fractions", Label: "(Vtech) 27-5001-00-0 // TC531000CP-L313 // (C)1988 VIDEO TECHNOLOGY // 9031EAI   JAPAN" -->
 	<software name="facts">
 		<description>Facts'N Fraction</description>
 		<year>1988</year>

@@ -10,10 +10,9 @@
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE_NS(HP_46060B_MOUSE, bus::hp_hil, hle_hp_46060b_device, "hp_46060b", "HP 46060B Mouse")
+DEFINE_DEVICE_TYPE(HP_46060B_MOUSE, bus::hp_hil::hle_hp_46060b_device, "hp_46060b", "HP 46060B Mouse")
 
-namespace bus {
-	namespace hp_hil {
+namespace bus::hp_hil {
 
 namespace {
 
@@ -23,24 +22,29 @@ namespace {
 
 INPUT_PORTS_START( hle_hp_46060b_device )
 	PORT_START("mouse_buttons")
-	PORT_BIT(hle_hp_46060b_device::MOUSE_LBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_button, nullptr)
-	PORT_BIT(hle_hp_46060b_device::MOUSE_MBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_button, nullptr)
-	PORT_BIT(hle_hp_46060b_device::MOUSE_RBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_button, nullptr)
+	PORT_BIT(hle_hp_46060b_device::MOUSE_LBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_button, 0)
+	PORT_BIT(hle_hp_46060b_device::MOUSE_MBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_button, 0)
+	PORT_BIT(hle_hp_46060b_device::MOUSE_RBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_button, 0)
 
 	PORT_START("mouse_x")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_x, nullptr)
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_x, 0)
 	PORT_START("mouse_y")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_y, nullptr)
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_hp_46060b_device, mouse_y, 0)
 INPUT_PORTS_END
 } // anonymous namespace
 
 hle_hp_46060b_device::hle_hp_46060b_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: hle_device_base(mconfig, HP_46060B_MOUSE, tag, owner, clock)
+	: hle_device_base(mconfig, HP_46060B_MOUSE, tag, owner, clock),
+	mouse_x_delta{0},
+	mouse_y_delta{0},
+	mouse_buttons{0}
 { }
 
 void hle_hp_46060b_device::device_reset()
 {
 	m_fifo.clear();
+
+	mouse_x_delta = mouse_y_delta = 0;
 }
 
 int hle_hp_46060b_device::hil_poll()
@@ -122,5 +126,4 @@ INPUT_CHANGED_MEMBER(hle_hp_46060b_device::mouse_button)
 	mouse_buttons = data;
 }
 
-} // namesapce bus::hp_hil
-} // namespace bus
+} // namespace bus::hp_hil

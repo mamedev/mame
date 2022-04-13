@@ -16,9 +16,10 @@ public:
 	auto mem_read_callback() { return m_mem_read_cb.bind(); }
 	auto mem_write_callback() { return m_mem_write_cb.bind(); }
 
-	DECLARE_WRITE16_MEMBER( dp8390_w );
-	DECLARE_READ16_MEMBER( dp8390_r );
-	DECLARE_WRITE_LINE_MEMBER( dp8390_cs );
+	void remote_write(uint16_t data);
+	void cs_write(offs_t offset, uint8_t data);
+	uint16_t remote_read();
+	uint8_t cs_read(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
 	void recv_cb(uint8_t *buf, int len) override;
 
@@ -52,7 +53,6 @@ private:
 	void recv(uint8_t *buf, int len);
 
 	int m_reset;
-	bool m_cs;
 	int m_rdma_active;
 
 	struct {

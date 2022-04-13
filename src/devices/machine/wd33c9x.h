@@ -11,7 +11,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class wd33c9x_base_device : public nscsi_device
+class wd33c9x_base_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	auto irq_cb() { return m_irq_cb.bind(); }
@@ -43,7 +43,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void scsi_ctrl_changed() override;
 

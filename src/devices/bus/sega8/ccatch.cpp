@@ -33,15 +33,15 @@ sega8_cardcatch_device::sega8_cardcatch_device(const machine_config &mconfig, co
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_cardcatch_device::read_cart)
+uint8_t sega8_cardcatch_device::read_cart(offs_t offset)
 {
 	if (offset < 0x8000)
-		return m_card->read_cart(space, offset);
+		return m_card->read_cart(offset);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(sega8_cardcatch_device::write_cart)
+void sega8_cardcatch_device::write_cart(offs_t offset, uint8_t data)
 {
 	// this should never happen, because there is no RAM on cards
 	if (offset < 0x8000)

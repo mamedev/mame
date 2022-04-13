@@ -26,7 +26,7 @@
 #include "emu.h"
 #include "includes/sage2.h"
 #include "bus/rs232/rs232.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -40,7 +40,7 @@ void sage2_state::sage2_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0xffc000, 0xffc007).rw(I8253_1_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xffc010, 0xffc01f).noprw(); //AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	map(0xffc010, 0xffc01f).noprw(); //rw(TMS9914_TAG, FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xffc020, 0xffc027).rw(I8255A_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255, DIPs + Floppy ctrl port
 	map(0xffc030, 0xffc033).rw(m_usart1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xffc040, 0xffc043).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
@@ -48,11 +48,11 @@ void sage2_state::sage2_mem(address_map &map)
 	map(0xffc060, 0xffc067).rw(I8255A_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255, Printer
 	map(0xffc070, 0xffc073).rw(m_usart0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xffc080, 0xffc087).mirror(0x78).rw(I8253_0_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-//  AM_RANGE(0xffc400, 0xffc407) AM_DEVREADWRITE8(S2651_0_TAG, s2651_device, read, write, 0x00ff)
-//  AM_RANGE(0xffc440, 0xffc447) AM_DEVREADWRITE8(S2651_1_TAG, s2651_device, read, write, 0x00ff)
-//  AM_RANGE(0xffc480, 0xffc487) AM_DEVREADWRITE8(S2651_2_TAG, s2651_device, read, write, 0x00ff)
-//  AM_RANGE(0xffc4c0, 0xffc4c7) AM_DEVREADWRITE8(S2651_3_TAG, s2651_device, read, write, 0x00ff)
-//  AM_RANGE(0xffc500, 0xffc7ff) // Winchester drive ports
+//  map(0xffc400, 0xffc407).rw(S2651_0_TAG, FUNC(s2651_device::read), FUNC(s2651_device::write)).umask16(0x00ff);
+//  map(0xffc440, 0xffc447).rw(S2651_1_TAG, FUNC(s2651_device::read), FUNC(s2651_device::write)).umask16(0x00ff);
+//  map(0xffc480, 0xffc487).rw(S2651_2_TAG, FUNC(s2651_device::read), FUNC(s2651_device::write)).umask16(0x00ff);
+//  map(0xffc4c0, 0xffc4c7).rw(S2651_3_TAG, FUNC(s2651_device::read), FUNC(s2651_device::write)).umask16(0x00ff);
+//  map(0xffc500, 0xffc7ff) // Winchester drive ports
 }
 
 
@@ -164,7 +164,7 @@ INPUT_PORTS_END
 //  I8255A INTERFACE( ppi0_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::ppi0_pc_w )
+void sage2_state::ppi0_pc_w(uint8_t data)
 {
 	/*
 
@@ -239,7 +239,7 @@ WRITE_LINE_MEMBER(sage2_state::write_centronics_fault)
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( sage2_state::ppi1_pb_r )
+uint8_t sage2_state::ppi1_pb_r()
 {
 	/*
 
@@ -277,7 +277,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( sage2_state::ppi1_pc_w )
+void sage2_state::ppi1_pc_w(uint8_t data)
 {
 	/*
 
@@ -359,7 +359,6 @@ WRITE_LINE_MEMBER( sage2_state::fdc_irq )
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -387,10 +386,10 @@ void sage2_state::machine_reset()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.unmap_readwrite(0x000000, 0x07ffff);
 	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base());
-	program.install_read_handler(0xfe0000, 0xfe3fff, read16_delegate(FUNC(sage2_state::rom_r), this));
+	program.install_read_handler(0xfe0000, 0xfe3fff, read16sm_delegate(*this, FUNC(sage2_state::rom_r)));
 }
 
-READ16_MEMBER(sage2_state::rom_r)
+uint16_t sage2_state::rom_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.unmap_readwrite(0x000000, 0x07ffff);
@@ -423,7 +422,7 @@ void sage2_state::sage2(machine_config &config)
 	ppi0.out_pc_callback().set(FUNC(sage2_state::ppi0_pc_w));
 
 	i8255_device &ppi1(I8255A(config, I8255A_1_TAG));
-	ppi1.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi1.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi1.in_pb_callback().set(FUNC(sage2_state::ppi1_pb_r));
 	ppi1.out_pc_callback().set(FUNC(sage2_state::ppi1_pc_w));
 
@@ -480,8 +479,8 @@ void sage2_state::sage2(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	IEEE488(config, m_ieee488);
 

@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders: Miodrag Milanovic, Robbbert
+// copyright-holders: Miodrag Milanovic
 /***************************************************************************
 
-        Systec Z80
+Systec Z80
 
-        More data :
-            http://www.hd64180-cpm.de/html/systecz80.html
+More info:
+ http://www.hd64180-cpm.de/html/systecz80.html
 
-        30/08/2010 Skeleton driver
+2010-08-30 Skeleton driver
+2011-12-22 connected to a terminal [Robbbert]
 
-        Systec Platine 1
-
+Systec Platine 1
         SYSTEC 155.1L
         EPROM 2764 CP/M LOADER 155 / 9600 Baud
         Z8400APS CPU
@@ -18,8 +18,7 @@
         Z8430APS CTC
         Z8470APS DART
 
-        Systec Platine 2
-
+Systec Platine 2
         SYSTEC 100.3B
         MB8877A FDC Controller
         FDC9229BT SMC 8608
@@ -27,9 +26,6 @@
         Z8420APS PIO
 
         MB8877A Compatible FD1793
-
-        2011-12-22 connected to a terminal [Robbbert]
-
 
 ****************************************************************************/
 
@@ -40,31 +36,37 @@
 #include "bus/rs232/rs232.h"
 
 
+namespace {
+
 class systec_state : public driver_device
 {
 public:
 	systec_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "mainram")
 	{ }
 
 	void systec(machine_config &config);
 
-private:
-	void systec_io(address_map &map);
-	void systec_mem(address_map &map);
-
+protected:
 	virtual void machine_reset() override;
+
+private:
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u8> m_ram;
 };
 
-void systec_state::systec_mem(address_map &map)
+void systec_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).ram().region("maincpu", 0);
+	map(0x0000, 0xffff).ram().share("mainram");
 }
 
-void systec_state::systec_io(address_map &map)
+void systec_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x68, 0x6b); // fdc?
@@ -78,9 +80,8 @@ INPUT_PORTS_END
 
 void systec_state::machine_reset()
 {
-	uint8_t *m_p_maincpu = memregion("maincpu")->base();
-	uint8_t *m_p_roms = memregion("roms")->base();
-	memcpy(m_p_maincpu, m_p_roms, 0x2000);
+	uint8_t *m = memregion("roms")->base();
+	memcpy(m_ram, m, 0x2000);
 }
 
 
@@ -88,8 +89,8 @@ void systec_state::systec(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &systec_state::systec_mem);
-	m_maincpu->set_addrmap(AS_IO, &systec_state::systec_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &systec_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &systec_state::io_map);
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
@@ -110,12 +111,14 @@ void systec_state::systec(machine_config &config)
 
 /* ROM definition */
 ROM_START( systec )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_REGION( 0x10000, "roms", 0 )
+	ROM_REGION( 0x2000, "roms", 0 )
 	ROM_LOAD( "systec.bin",   0x0000, 0x2000, CRC(967108ab) SHA1(a414db032ca7db0f9fdbe22aa68a099a93efb593))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY   FULLNAME      FLAGS
-COMP(19??, systec, 0,      0,      systec,  systec, systec_state, empty_init, "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(19??, systec, 0,      0,      systec,  systec, systec_state, empty_init, "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

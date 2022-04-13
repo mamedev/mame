@@ -36,6 +36,7 @@ bbc_ram_device::bbc_ram_device(const machine_config &mconfig, const char *tag, d
 
 void bbc_ram_device::device_start()
 {
+	ram_alloc(0x8000);
 }
 
 //-------------------------------------------------

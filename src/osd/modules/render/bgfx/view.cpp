@@ -13,7 +13,7 @@
 void bgfx_view::update() {
 	std::shared_ptr<osd_window> win = m_renderer->assert_window();
 
-	const uint32_t window_index = win->m_index;
+	const uint32_t window_index = win->index();
 	const uint32_t width = m_renderer->get_window_width(window_index);
 	const uint32_t height = m_renderer->get_window_height(window_index);
 
@@ -26,11 +26,14 @@ void bgfx_view::update() {
 }
 
 void bgfx_ortho_view::setup() {
-	if (m_window_index != 0)
+	if (m_window_index == 0)
+	{
+		bgfx::setViewFrameBuffer(m_index, BGFX_INVALID_HANDLE);
+	}
+	else
 	{
 		bgfx::setViewFrameBuffer(m_index, m_backbuffer->target());
 	}
-
 	bgfx::setViewRect(m_index, 0, 0, m_view_width, m_view_height);
 
 	while ((m_index + 1) > m_seen_views.size())

@@ -181,6 +181,26 @@ Notes:
 
     - NE555 discrete sound
 
+
+    Usage
+    - All variants: Boot up, then press F3, then press a letter (Q,W,E,A) to choose an inbuilt game.
+    - If using a cart, boot up, press F3, then follow the instructions that came with the cart (usually press Q).
+    - Visicom has no support for st2 files.
+    - Visicom always reserves buttons 1,2,3,4,7(Q,W,E,A,Z) for the internal games, which are always available.
+      The cartridges use 5(S) to start, except gambler1 which uses 9(C).
+
+    Memory organisation of the Studio II:
+    - RAM is mirrored everywhere except:
+      (a) when A9 is high;
+      (b) when a rom is active;
+      (c) when the cartridge wants to disable it;
+      so in effect, RAM exists at 0800-09FF then every 0x400 boundary onwards.
+    - The system ROM exists at 0000-03FF and cannot be deactivated.
+    - The inbuilt games exist at 0400-07FF and are always swapped out when a cart is used.
+    - The cart "grandpak" also uses 0C00-0FFF with a 2nd rom.
+    - Some homebrews make use of 0C00-0DFF (asteroids, berzerk, pacman, scramble). The
+      ST2 loader will enable the extra rombank as needed.
+
 */
 
 #include "emu.h"
@@ -195,9 +215,11 @@ Notes:
 #include "bus/generic/carts.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define CDP1802_TAG     "ic1"
 #define CDP1861_TAG     "ic2"
@@ -211,6 +233,7 @@ public:
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CDP1802_TAG)
+		, m_rom(*this, CDP1802_TAG)
 		, m_beeper(*this, "beeper")
 		, m_vdc(*this, CDP1861_TAG)
 		, m_cart(*this, "cartslot")
@@ -225,10 +248,14 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 
-	DECLARE_READ8_MEMBER( cart_400 );
+	uint8_t cart_400(offs_t offset);
+	uint8_t cart_c00(offs_t offset);
+	uint8_t rom_000(offs_t offset);
+	uint8_t rom_400(offs_t offset);
 
 protected:
 	required_device<cosmac_device> m_maincpu;
+	optional_region_ptr<u8> m_rom;
 	required_device<beep_device> m_beeper;
 	optional_device<cdp1861_device> m_vdc;
 	required_device<generic_slot_device> m_cart;
@@ -240,19 +267,17 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_a00 );
-	DECLARE_READ8_MEMBER( cart_e00 );
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( dispon_w );
+	uint8_t dispon_r();
+	void keylatch_w(uint8_t data);
+	void dispon_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( studio2_cart_load );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 
 	/* keyboard state */
-	uint8_t m_keylatch;
+	uint8_t m_keylatch = 0;
 
 	void studio2_io_map(address_map &map);
 	void studio2_map(address_map &map);
@@ -262,9 +287,9 @@ class visicom_state : public studio2_state
 {
 public:
 	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: studio2_state(mconfig, type, tag),
-			m_color0_ram(*this, "color0_ram"),
-			m_color1_ram(*this, "color1_ram")
+		: studio2_state(mconfig, type, tag)
+		, m_color0_ram(*this, "color0_ram")
+		, m_color1_ram(*this, "color1_ram")
 	{ }
 
 	void visicom(machine_config &config);
@@ -275,7 +300,9 @@ private:
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
-	DECLARE_WRITE8_MEMBER( dma_w );
+	virtual void machine_start() override;
+
+	void dma_w(offs_t offset, uint8_t data);
 	void visicom_io_map(address_map &map);
 	void visicom_map(address_map &map);
 };
@@ -284,9 +311,9 @@ class mpt02_state : public studio2_state
 {
 public:
 	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
-		: studio2_state(mconfig, type, tag),
-			m_cti(*this, CDP1864_TAG),
-			m_color_ram(*this, "color_ram")
+		: studio2_state(mconfig, type, tag)
+		, m_cti(*this, CDP1864_TAG)
+		, m_color_ram(*this, "color_ram")
 	{ }
 
 	void mpt02(machine_config &config);
@@ -297,15 +324,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_c00 );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
 
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
-	uint8_t m_color;
+	uint8_t m_color = 0;
 	void mpt02_io_map(address_map &map);
 	void mpt02_map(address_map &map);
 };
@@ -323,12 +349,12 @@ private:
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( studio2_state::keylatch_w )
+void studio2_state::keylatch_w(uint8_t data)
 {
 	m_keylatch = data & 0x0f;
 }
 
-READ8_MEMBER( studio2_state::dispon_r )
+uint8_t studio2_state::dispon_r()
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -336,7 +362,7 @@ READ8_MEMBER( studio2_state::dispon_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( studio2_state::dispon_w )
+void studio2_state::dispon_w(uint8_t data)
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -347,8 +373,7 @@ WRITE8_MEMBER( studio2_state::dispon_w )
 void studio2_state::studio2_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).rom();
-	map(0x0800, 0x09ff).mirror(0xf400).ram();
+	map(0x0000, 0x01ff).mirror(0xfc00).ram();
 }
 
 void studio2_state::studio2_io_map(address_map &map)
@@ -483,7 +508,7 @@ WRITE_LINE_MEMBER( studio2_state::q_w )
 	m_beeper->set_state(state);
 }
 
-WRITE8_MEMBER( visicom_state::dma_w )
+void visicom_state::dma_w(offs_t offset, uint8_t data)
 {
 	int sx = m_screen->hpos() + 4;
 	int y = m_screen->vpos();
@@ -495,39 +520,48 @@ WRITE8_MEMBER( visicom_state::dma_w )
 	for (int x = 0; x < 8; x++)
 	{
 		int color = (BIT(color1, 7) << 1) | BIT(color0, 7);
-		m_vdc->m_bitmap.pix32(y, sx + x) = VISICOM_PALETTE[color];
+		m_vdc->m_bitmap.pix(y, sx + x) = VISICOM_PALETTE[color];
 		color0 <<= 1;
 		color1 <<= 1;
 	}
 }
 
-WRITE8_MEMBER( mpt02_state::dma_w )
+void mpt02_state::dma_w(offs_t offset, uint8_t data)
 {
 	uint8_t addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 
 	m_color = m_color_ram[addr];
 
 	m_cti->con_w(0); // HACK
-	m_cti->dma_w(space, offset, data);
+	m_cti->dma_w(data);
 }
 
 /* Machine Initialization */
 
 // trampolines to cartridge
-READ8_MEMBER( studio2_state::cart_400 ) { return m_cart->read_rom(offset); }
-READ8_MEMBER( studio2_state::cart_a00 ) { return m_cart->read_rom(offset + 0x600); }
-READ8_MEMBER( studio2_state::cart_e00 ) { return m_cart->read_rom(offset + 0xa00); }
-READ8_MEMBER( mpt02_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
+uint8_t studio2_state::rom_000(offs_t offset) { return m_rom[offset]; }
+uint8_t studio2_state::rom_400(offs_t offset) { return m_rom[offset+0x400]; }
+uint8_t studio2_state::cart_400(offs_t offset) { return m_cart->read_rom(offset); }
+uint8_t studio2_state::cart_c00(offs_t offset) { return m_cart->read_rom(offset + 0x800); }
+
+void visicom_state::machine_start()
+{
+	// register for state saving
+	save_item(NAME(m_keylatch));
+}
 
 void studio2_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x07ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x03ff, read8sm_delegate(*this, FUNC(studio2_state::rom_000)));
+
 	if (m_cart->exists())
 	{
-		// these have to be installed only if a cart is present, because they partially overlap the built-in game
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(FUNC(studio2_state::cart_400), this));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0a00, 0x0bff, read8_delegate(FUNC(studio2_state::cart_a00), this));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e00, 0x0fff, read8_delegate(FUNC(studio2_state::cart_e00), this));
+		// cart always overlaps the inbuilt game roms
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8sm_delegate(*this, FUNC(studio2_state::cart_400)));
 	}
+	else
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8sm_delegate(*this, FUNC(studio2_state::rom_400)));
 
 	// register for state saving
 	save_item(NAME(m_keylatch));
@@ -537,9 +571,8 @@ void mpt02_state::machine_start()
 {
 	if (m_cart->exists())
 	{
-		// these have to be installed only if a cart is present, because they partially overlap the built-in game
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(FUNC(studio2_state::cart_400), this));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(FUNC(mpt02_state::cart_c00), this));
+		// cart always overlaps the inbuilt game roms
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8sm_delegate(*this, FUNC(studio2_state::cart_400)));
 	}
 
 	// register for state saving
@@ -556,7 +589,7 @@ void mpt02_state::machine_reset()
 	m_cti->reset();
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
+DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 {
 	uint32_t size;
 
@@ -567,13 +600,13 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 	{
 		if (image.is_filetype("st2"))
 		{
-			uint8_t header[0x100];
-			uint8_t catalogue[10], title[32], pages[64];
+			char header[0x100];
+			uint8_t pages[64];
 			uint8_t blocks;
 
-			if (image.length() <= 0x100)
+			if (image.length() < 0x200)
 			{
-				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file");
+				image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file");
 				return image_init_result::FAIL;
 			}
 
@@ -582,37 +615,48 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			// validate
 			if (strncmp((const char *)header, "RCA2", 4))
 			{
-				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not an .ST2 file");
+				image.seterror(image_error::INVALIDIMAGE, "Not an .ST2 file");
 				return image_init_result::FAIL;
 			}
 
 			blocks = header[4];
-			memcpy(&catalogue, &header[16], 10);
-			memcpy(&title, &header[32], 32);
+			if ((blocks < 2) || (blocks > 11))
+			{
+				image.seterror(image_error::INVALIDIMAGE, "Invalid .ST2 file");
+				return image_init_result::FAIL;
+			}
+
+			if (image.length() != (blocks << 8))
+				logerror("Wrong sized image: Expected 0x%04X; Found 0x%04X\n",blocks<<8,image.length());
+
+			char* catalogue = &header[16];
+			char* title = &header[32];
 			memcpy(&pages, &header[64], 64);
+
+			logerror("ST2 Catalogue: %s\n", catalogue);
+			logerror("ST2 Title: %s\n", title);
 
 			/* read ST2 cartridge into memory */
 			for (int block = 0; block < (blocks - 1); block++)
 			{
+				u16 offset = pages[block] << 8;
 				if (pages[block] < 4)
-					logerror("ST2 invalid block %u to %04x\n", block, pages[block] << 8);
+					logerror("ST2 invalid block %u to 0x%04x\n", block, offset);
 				else
 				{
-					uint16_t offset = (pages[block] << 8) - 0x400;
-					logerror("ST2 Reading block %u to %04x\n", block, offset);
-					image.fread(m_cart->get_rom_base() + offset, 0x100);
+					logerror("ST2 Reading block %u to 0x%04x\n", block, offset);
+					if (pages[block] == 0xC)
+						m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8sm_delegate(*this, FUNC(studio2_state::cart_c00)));
+					image.fread(m_cart->get_rom_base() + offset - 0x400, 0x100);
 				}
 			}
-
-			logerror("ST2 Catalogue: %s\n", catalogue);
-			logerror("ST2 Title: %s\n", title);
 		}
 		else
 		{
 			size = image.length();
 			if (size > 0x400)
 			{
-				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 			else
@@ -621,16 +665,14 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 	}
 	else
 	{
-		// Studio II carts might map their data at $400-$7ff, $a00-$bff and $e00-$fff
-		// MPT-2 carts might map their data at $400-$7ff and $c00-$fff
+		// Studio II and MPT-2 carts might map their data at $400-$7ff and $c00-$fff
 		if (image.get_software_region("rom_400"))
 			memcpy(m_cart->get_rom_base() + 0x000, image.get_software_region("rom_400"), image.get_software_region_length("rom_400"));
-		if (image.get_software_region("rom_a00"))
-			memcpy(m_cart->get_rom_base() + 0x600, image.get_software_region("rom_a00"), image.get_software_region_length("rom_a00"));
 		if (image.get_software_region("rom_c00"))
+		{
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8sm_delegate(*this, FUNC(studio2_state::cart_c00)));
 			memcpy(m_cart->get_rom_base() + 0x800, image.get_software_region("rom_c00"), image.get_software_region_length("rom_c00"));
-		if (image.get_software_region("rom_e00"))
-			memcpy(m_cart->get_rom_base() + 0xa00, image.get_software_region("rom_e00"), image.get_software_region_length("rom_e00"));
+		}
 	}
 
 	return image_init_result::PASS;
@@ -639,14 +681,13 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(studio2_state::studio2_cartslot)
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "studio2_cart")
-	MCFG_GENERIC_EXTENSIONS("st2,bin,rom")
-	MCFG_GENERIC_LOAD(studio2_state, studio2_cart_load)
+void studio2_state::studio2_cartslot(machine_config &config)
+{
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "studio2_cart", "st2,bin,rom").set_device_load(FUNC(studio2_state::cart_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("studio2");
-MACHINE_CONFIG_END
+}
 
 void studio2_state::studio2(machine_config &config)
 {
@@ -761,15 +802,17 @@ ROM_START( mpt02 )
 	ROM_LOAD( "87201.ic12",  0xc00, 0x400, CRC(8006a1e3) SHA1(b67612d98231485fce55d604915abd19b6d64eac) )
 ROM_END
 
-ROM_START( mpt02h )
-	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
-	ROM_LOAD( "86676.ic13",  0x000, 0x400, CRC(a7d0dd3b) SHA1(e1881ab4d67a5d735dd2c8d7e924e41df6f2aeec) )
-ROM_END
-
 #define rom_mtc9016 rom_mpt02
 #define rom_shmc1200 rom_mpt02
 #define rom_cm1200 rom_mpt02
 #define rom_apollo80 rom_mpt02
+
+ROM_START( mpt02h ) // doesn't have built-in games. It came with the pack-in cart 'Grand Pack'
+	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
+	ROM_LOAD( "86676.ic13",  0x000, 0x400, CRC(a7d0dd3b) SHA1(e1881ab4d67a5d735dd2c8d7e924e41df6f2aeec) )
+ROM_END
+
+} // Anonymous namespace
 
 
 /* Game Drivers */
@@ -777,7 +820,7 @@ ROM_END
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY     FULLNAME                                        FLAGS
 CONS( 1977, studio2,  0,       0,      studio2, studio2, studio2_state, empty_init, "RCA",      "Studio II",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 CONS( 1978, visicom,  studio2, 0,      visicom, studio2, visicom_state, empty_init, "Toshiba",  "Visicom COM-100 (Japan)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mpt02,    studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02,    studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE ) // It seems to have been sold in various countries, not only Austria
 CONS( 1978, mpt02h,   studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Hanimex",  "MPT-02 Jeu TV Programmable (France)",          MACHINE_SUPPORTS_SAVE )
 CONS( 1978, mtc9016,  studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Mustang",  "9016 Telespiel Computer (Germany)",            MACHINE_SUPPORTS_SAVE )
 CONS( 1978, shmc1200, studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Sheen",    "M1200 Micro Computer (Australia)",             MACHINE_SUPPORTS_SAVE )

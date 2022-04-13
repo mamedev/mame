@@ -1,0 +1,23 @@
+name: Compile UI translations
+
+on:
+  push:
+    paths:
+    - '.github/**'
+    - 'language/**'
+  pull_request:
+    paths:
+    - '.github/**'
+    - 'language/**'
+
+jobs:
+  build-language:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Compile message catalogs
+      run: for x in language/*/*.po ; do python scripts/build/msgfmt.py --output-file "`dirname "$x"`/`basename "$x" .po`.mo" "$x" ; done
+    - uses: actions/upload-artifact@master
+      with:
+        name: mame-language-${{ github.sha }}
+        path: language/*/*.mo

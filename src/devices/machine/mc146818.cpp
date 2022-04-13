@@ -12,8 +12,9 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "coreutil.h"
 #include "machine/mc146818.h"
+
+#include "coreutil.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -22,6 +23,7 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(MC146818, mc146818_device, "mc146818", "MC146818 RTC")
+DEFINE_DEVICE_TYPE(DS1287,   ds1287_device,   "ds1287",   "DS1287 RTC")
 
 //-------------------------------------------------
 //  mc146818_device - constructor
@@ -30,6 +32,21 @@ DEFINE_DEVICE_TYPE(MC146818, mc146818_device, "mc146818", "MC146818 RTC")
 mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc146818_device(mconfig, MC146818, tag, owner, clock)
 {
+	switch (clock)
+	{
+	case 4'194'304:
+	case 1'048'576:
+		m_tuc = 248;
+		break;
+	case 32'768:
+		m_tuc = 1984;
+		break;
+	}
+}
+
+ds1287_device::ds1287_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc146818_device(mconfig, DS1287, tag, owner, clock)
+{
 }
 
 mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -37,14 +54,17 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_index(0),
-		m_last_refresh(attotime::zero), m_clock_timer(nullptr), m_periodic_timer(nullptr),
+		m_clock_timer(nullptr), m_update_timer(nullptr), m_periodic_timer(nullptr),
 		m_write_irq(*this),
+		m_write_sqw(*this),
 		m_century_index(-1),
 		m_epoch(0),
 		m_use_utc(false),
 		m_binary(false),
 		m_hour(false),
-		m_binyear(false)
+		m_binyear(false),
+		m_sqw_state(false),
+		m_tuc(0)
 {
 }
 
@@ -54,12 +74,17 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 
 void mc146818_device::device_start()
 {
-	m_data.resize(data_size());
-	m_last_refresh = machine().time();
+	m_data = make_unique_clear<uint8_t[]>(data_size());
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
+	m_update_timer = timer_alloc(TIMER_UPDATE);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 
 	m_write_irq.resolve_safe();
+	m_write_sqw.resolve_safe();
+
+	save_pointer(NAME(m_data), data_size());
+	save_item(NAME(m_index));
+	save_item(NAME(m_sqw_state));
 }
 
 
@@ -72,6 +97,10 @@ void mc146818_device::device_reset()
 	m_data[REG_B] &= ~(REG_B_UIE | REG_B_AIE | REG_B_PIE | REG_B_SQWE);
 	m_data[REG_C] = 0;
 
+	// square wave output is disabled
+	if (m_sqw_state)
+		m_write_sqw(CLEAR_LINE);
+
 	update_irq();
 }
 
@@ -79,17 +108,35 @@ void mc146818_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_PERIODIC:
-		m_data[REG_C] |= REG_C_PF;
-		update_irq();
+		m_sqw_state = !m_sqw_state;
+
+		if (m_data[REG_B] & REG_B_SQWE)
+			m_write_sqw(m_sqw_state);
+
+		// periodic flag/interrupt on rising edge of periodic timer
+		if (m_sqw_state)
+		{
+			m_data[REG_C] |= REG_C_PF;
+			update_irq();
+		}
 		break;
 
 	case TIMER_CLOCK:
 		if (!(m_data[REG_B] & REG_B_SET))
+		{
+			m_data[REG_A] |= REG_A_UIP;
+
+			m_update_timer->adjust(attotime::from_usec(244));
+		}
+		break;
+
+	case TIMER_UPDATE:
+		if (!param)
 		{
 			/// TODO: find out how the real chip deals with updates when binary/bcd values are already outside the normal range
 			int seconds = get_seconds() + 1;
@@ -147,7 +194,20 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 							{
 								set_month(1);
 
-								set_year((get_year() + 1) % 100);
+								int year = get_year() + 1;
+								if (year <= 99)
+								{
+									set_year(year);
+								}
+								else
+								{
+									set_year(0);
+
+									if (century_count_enabled())
+									{
+										set_century((get_century() + 1) % 100);
+									}
+								}
 							}
 						}
 					}
@@ -162,12 +222,19 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				m_data[REG_C] |= REG_C_AF;
 			}
 
-			// set the update-ended interrupt Flag UF
-			m_data[REG_C] |=  REG_C_UF;
-			update_irq();
-
-			m_last_refresh = machine().time();
+			// defer the update end sequence if update cycle time is non-zero
+			if (m_tuc)
+			{
+				m_update_timer->adjust(attotime::from_usec(m_tuc), 1);
+				break;
+			}
 		}
+
+		// clear update in progress and set update ended
+		m_data[REG_A] &= ~REG_A_UIP;
+		m_data[REG_C] |= REG_C_UF;
+
+		update_irq();
 		break;
 	}
 }
@@ -181,15 +248,14 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 void mc146818_device::nvram_default()
 {
 	// populate from a memory region if present
-	memory_region *region = memregion(DEVICE_SELF);
-	if (region != nullptr)
+	if (m_region.found())
 	{
-		uint32_t bytes = region->bytes();
+		uint32_t bytes = m_region->bytes();
 
 		if (bytes > data_size())
 			bytes = data_size();
 
-		memcpy(&m_data[0], region->base(), bytes);
+		memcpy(&m_data[0], m_region->base(), bytes);
 	}
 	else
 	{
@@ -212,13 +278,18 @@ void mc146818_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void mc146818_device::nvram_read(emu_file &file)
+bool mc146818_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_data[0], data_size());
+	size_t size = data_size();
+	size_t actual;
+	if (file.read(&m_data[0], size, actual) || actual != size)
+		return false;
 
 	set_base_datetime();
 	update_timer();
 	update_irq();
+
+	return true;
 }
 
 
@@ -227,9 +298,11 @@ void mc146818_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void mc146818_device::nvram_write(emu_file &file)
+bool mc146818_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_data[0], data_size());
+	size_t size = data_size();
+	size_t actual;
+	return !file.write(&m_data[0], size, actual) && actual == size;
 }
 
 
@@ -237,7 +310,7 @@ void mc146818_device::nvram_write(emu_file &file)
 //  to_ram - convert value to current ram format
 //-------------------------------------------------
 
-int mc146818_device::to_ram(int a)
+int mc146818_device::to_ram(int a) const
 {
 	if (!(m_data[REG_B] & REG_B_DM))
 		return dec_2_bcd(a);
@@ -250,7 +323,7 @@ int mc146818_device::to_ram(int a)
 //  from_ram - convert value from current ram format
 //-------------------------------------------------
 
-int mc146818_device::from_ram(int a)
+int mc146818_device::from_ram(int a) const
 {
 	if (!(m_data[REG_B] & REG_B_DM))
 		return bcd_2_dec(a);
@@ -259,7 +332,7 @@ int mc146818_device::from_ram(int a)
 }
 
 
-int mc146818_device::get_seconds()
+int mc146818_device::get_seconds() const
 {
 	return from_ram(m_data[REG_SECONDS]);
 }
@@ -269,7 +342,7 @@ void mc146818_device::set_seconds(int seconds)
 	m_data[REG_SECONDS] = to_ram(seconds);
 }
 
-int mc146818_device::get_minutes()
+int mc146818_device::get_minutes() const
 {
 	return from_ram(m_data[REG_MINUTES]);
 }
@@ -279,7 +352,7 @@ void mc146818_device::set_minutes(int minutes)
 	m_data[REG_MINUTES] = to_ram(minutes);
 }
 
-int mc146818_device::get_hours()
+int mc146818_device::get_hours() const
 {
 	if (!(m_data[REG_B] & REG_B_24_12))
 	{
@@ -328,7 +401,7 @@ void mc146818_device::set_hours(int hours)
 	}
 }
 
-int mc146818_device::get_dayofweek()
+int mc146818_device::get_dayofweek() const
 {
 	return from_ram(m_data[REG_DAYOFWEEK]);
 }
@@ -338,7 +411,7 @@ void mc146818_device::set_dayofweek(int dayofweek)
 	m_data[REG_DAYOFWEEK] = to_ram(dayofweek);
 }
 
-int mc146818_device::get_dayofmonth()
+int mc146818_device::get_dayofmonth() const
 {
 	return from_ram(m_data[REG_DAYOFMONTH]);
 }
@@ -348,7 +421,7 @@ void mc146818_device::set_dayofmonth(int dayofmonth)
 	m_data[REG_DAYOFMONTH] = to_ram(dayofmonth);
 }
 
-int mc146818_device::get_month()
+int mc146818_device::get_month() const
 {
 	return from_ram(m_data[REG_MONTH]);
 }
@@ -358,7 +431,7 @@ void mc146818_device::set_month(int month)
 	m_data[REG_MONTH] = to_ram(month);
 }
 
-int mc146818_device::get_year()
+int mc146818_device::get_year() const
 {
 	return from_ram(m_data[REG_YEAR]);
 }
@@ -366,6 +439,18 @@ int mc146818_device::get_year()
 void mc146818_device::set_year(int year)
 {
 	m_data[REG_YEAR] = to_ram(year);
+}
+
+int mc146818_device::get_century() const
+{
+	assert(m_century_index != -1);
+	return from_ram(m_data[m_century_index]);
+}
+
+void mc146818_device::set_century(int century)
+{
+	assert(m_century_index != -1);
+	m_data[m_century_index] = to_ram(century);
 }
 
 
@@ -400,7 +485,7 @@ void mc146818_device::set_base_datetime()
 		set_year((current_time.year - m_epoch) % 100);
 
 	if (m_century_index >= 0)
-		m_data[m_century_index] = to_ram(current_time.year / 100);
+		set_century(current_time.year / 100);
 }
 
 
@@ -410,9 +495,7 @@ void mc146818_device::set_base_datetime()
 
 void mc146818_device::update_timer()
 {
-	int bypass;
-
-	bypass = get_timer_bypass();
+	int bypass = get_timer_bypass();
 
 	attotime update_period = attotime::never;
 	attotime update_interval = attotime::never;
@@ -439,8 +522,9 @@ void mc146818_device::update_timer()
 			double periodic_hz = (double) clock() / (1 << shift);
 
 			// TODO: take the time since last timer into account
-			periodic_period = attotime::from_hz(periodic_hz * 2);
-			periodic_interval = attotime::from_hz(periodic_hz);
+			// periodic frequency is doubled to produce square wave output
+			periodic_period = attotime::from_hz(periodic_hz * 4);
+			periodic_interval = attotime::from_hz(periodic_hz * 2);
 		}
 	}
 
@@ -452,7 +536,7 @@ void mc146818_device::update_timer()
 //  get_timer_bypass - get main clock divisor based on A register
 //---------------------------------------------------------------
 
-int mc146818_device::get_timer_bypass()
+int mc146818_device::get_timer_bypass() const
 {
 	int bypass;
 
@@ -520,7 +604,8 @@ uint8_t mc146818_device::read(offs_t offset)
 		break;
 
 	case 1:
-		data = read_direct(m_index);
+		data = internal_read(m_index);
+		LOG("mc146818_port_r(): offset=0x%02x data=0x%02x\n", m_index, data);
 		break;
 	}
 
@@ -529,36 +614,11 @@ uint8_t mc146818_device::read(offs_t offset)
 
 uint8_t mc146818_device::read_direct(offs_t offset)
 {
-	uint8_t data = 0;
+	offset %= data_logical_size();
+	if (!machine().side_effects_disabled())
+		internal_set_address(offset);
 
-	switch (offset)
-	{
-	case REG_A:
-		data = m_data[REG_A];
-		// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
-		/// TODO: support other dividers
-		/// TODO: don't set this if update is stopped
-		if ((machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
-			data |= REG_A_UIP;
-		break;
-
-	case REG_C:
-		// the unused bits b0 ... b3 are always read as 0
-		data = m_data[REG_C] & (REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
-		// read 0x0c will clear all IRQ flags in register 0x0c
-		m_data[REG_C] &= ~(REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
-		update_irq();
-		break;
-
-	case REG_D:
-		/* battery ok */
-		data = m_data[REG_D] | REG_D_VRT;
-		break;
-
-	default:
-		data = m_data[offset];
-		break;
-	}
+	uint8_t data = internal_read(offset);
 
 	LOG("mc146818_port_r(): offset=0x%02x data=0x%02x\n", offset, data);
 
@@ -574,19 +634,68 @@ void mc146818_device::write(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 0:
-		m_index = data % data_size();
+		internal_set_address(data % data_logical_size());
 		break;
 
 	case 1:
-		write_direct(m_index, data);
+		LOG("mc146818_port_w(): offset=0x%02x data=0x%02x\n", m_index, data);
+		internal_write(m_index, data);
 		break;
 	}
 }
 
 void mc146818_device::write_direct(offs_t offset, uint8_t data)
 {
+	offset %= data_logical_size();
+	if (!machine().side_effects_disabled())
+		internal_set_address(offset);
+
 	LOG("mc146818_port_w(): offset=0x%02x data=0x%02x\n", offset, data);
 
+	internal_write(offset, data);
+}
+
+void mc146818_device::internal_set_address(uint8_t address)
+{
+	m_index = address;
+}
+
+uint8_t mc146818_device::internal_read(offs_t offset)
+{
+	uint8_t data = 0;
+
+	switch (offset)
+	{
+	case REG_A:
+		data = m_data[REG_A];
+		break;
+
+	case REG_C:
+		// the unused bits b0 ... b3 are always read as 0
+		data = m_data[REG_C] & (REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
+		// read 0x0c will clear all IRQ flags in register 0x0c
+		if (!machine().side_effects_disabled())
+		{
+			m_data[REG_C] &= ~(REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
+			update_irq();
+		}
+		break;
+
+	case REG_D:
+		/* battery ok */
+		data = m_data[REG_D] | REG_D_VRT;
+		break;
+
+	default:
+		data = m_data[offset];
+		break;
+	}
+
+	return data;
+}
+
+void mc146818_device::internal_write(offs_t offset, uint8_t data)
+{
 	switch (offset)
 	{
 	case REG_SECONDS:
@@ -606,6 +715,9 @@ void mc146818_device::write_direct(offs_t offset, uint8_t data)
 	case REG_B:
 		if ((data & REG_B_SET) && !(m_data[REG_B] & REG_B_SET))
 			data &= ~REG_B_UIE;
+
+		if (!(data & REG_B_SQWE) && (m_data[REG_B] & REG_B_SQWE) && m_sqw_state)
+			m_write_sqw(CLEAR_LINE);
 
 		m_data[REG_B] = data;
 		update_irq();

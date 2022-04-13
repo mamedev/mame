@@ -13,8 +13,8 @@
 
 DEFINE_DEVICE_TYPE(CENTRONICS, centronics_device, "centronics", "Centronics")
 
-centronics_device::centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CENTRONICS, tag, owner, clock),
+centronics_device::centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CENTRONICS, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_strobe_handler(*this),
 	m_data0_handler(*this),
@@ -32,6 +32,7 @@ centronics_device::centronics_device(const machine_config &mconfig, const char *
 	m_autofd_handler(*this),
 	m_fault_handler(*this),
 	m_init_handler(*this),
+	m_sense_handler(*this),
 	m_select_in_handler(*this),
 	m_dev(nullptr)
 {
@@ -40,6 +41,12 @@ centronics_device::centronics_device(const machine_config &mconfig, const char *
 void centronics_device::device_config_complete()
 {
 	m_dev = dynamic_cast<device_centronics_peripheral_interface *>(get_card_device());
+}
+
+void centronics_device::device_reset()
+{
+	if (m_dev && m_dev->supports_pin35_5v())
+		m_sense_handler(1);
 }
 
 void centronics_device::device_start()
@@ -60,7 +67,10 @@ void centronics_device::device_start()
 	m_autofd_handler.resolve_safe();
 	m_fault_handler.resolve_safe();
 	m_init_handler.resolve_safe();
+	m_sense_handler.resolve_safe();
 	m_select_in_handler.resolve_safe();
+
+	m_sense_handler(0);
 
 	// pull up
 	m_strobe_handler(1);
@@ -116,7 +126,7 @@ WRITE_LINE_MEMBER( centronics_device::write_select_in ) { if (m_dev) m_dev->inpu
 // class device_centronics_peripheral_interface
 
 device_centronics_peripheral_interface::device_centronics_peripheral_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "centronics")
 {
 	m_slot = dynamic_cast<centronics_device *>(device.owner());
 }
@@ -133,6 +143,9 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "nec_p72.h"
 #include "printer.h"
 #include "covox.h"
+#include "samdac.h"
+#include "chessmec.h"
+#include "smartboard.h"
 
 void centronics_devices(device_slot_interface &device)
 {
@@ -145,4 +158,7 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("printer", CENTRONICS_PRINTER);
 	device.option_add("covox", CENTRONICS_COVOX);
 	device.option_add("covox_stereo", CENTRONICS_COVOX_STEREO);
+	device.option_add("samdac", CENTRONICS_SAMDAC);
+	device.option_add("chessmec", CENTRONICS_CHESSMEC);
+	device.option_add("smartboard", CENTRONICS_SMARTBOARD);
 }

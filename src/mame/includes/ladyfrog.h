@@ -13,6 +13,7 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class ladyfrog_state : public driver_device
 {
@@ -46,16 +47,16 @@ private:
 	std::vector<uint8_t> m_paletteram_ext;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	int        m_tilebank;
-	int        m_palette_bank;
-	int        m_spritetilebase;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int        m_tilebank = 0;
+	int        m_palette_bank = 0;
+	int        m_spritetilebase = 0;
 
 	/* misc */
-	int        m_sound_nmi_enable;
-	int        m_pending_nmi;
-	int        m_snd_flag;
-	uint8_t      m_snd_data;
+	int        m_sound_nmi_enable = 0;
+	int        m_pending_nmi = 0;
+	int        m_snd_flag = 0;
+	uint8_t      m_snd_data = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -65,24 +66,24 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_READ8_MEMBER(from_snd_r);
-	DECLARE_WRITE8_MEMBER(to_main_w);
-	DECLARE_WRITE8_MEMBER(sound_cpu_reset_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_READ8_MEMBER(snd_flag_r);
-	DECLARE_WRITE8_MEMBER(ladyfrog_spriteram_w);
-	DECLARE_READ8_MEMBER(ladyfrog_spriteram_r);
-	DECLARE_WRITE8_MEMBER(ladyfrog_videoram_w);
-	DECLARE_READ8_MEMBER(ladyfrog_videoram_r);
-	DECLARE_WRITE8_MEMBER(ladyfrog_palette_w);
-	DECLARE_READ8_MEMBER(ladyfrog_palette_r);
-	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl2_w);
-	DECLARE_READ8_MEMBER(ladyfrog_scrlram_r);
-	DECLARE_WRITE8_MEMBER(ladyfrog_scrlram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
+	uint8_t from_snd_r();
+	void to_main_w(uint8_t data);
+	void sound_cpu_reset_w(uint8_t data);
+	void sound_command_w(uint8_t data);
+	void nmi_disable_w(uint8_t data);
+	void nmi_enable_w(uint8_t data);
+	uint8_t snd_flag_r();
+	void ladyfrog_spriteram_w(offs_t offset, uint8_t data);
+	uint8_t ladyfrog_spriteram_r(offs_t offset);
+	void ladyfrog_videoram_w(offs_t offset, uint8_t data);
+	uint8_t ladyfrog_videoram_r(offs_t offset);
+	void ladyfrog_palette_w(offs_t offset, uint8_t data);
+	uint8_t ladyfrog_palette_r(offs_t offset);
+	void ladyfrog_gfxctrl_w(uint8_t data);
+	void ladyfrog_gfxctrl2_w(uint8_t data);
+	uint8_t ladyfrog_scrlram_r(offs_t offset);
+	void ladyfrog_scrlram_w(offs_t offset, uint8_t data);
+	void unk_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(toucheme);
 	DECLARE_VIDEO_START(ladyfrog_common);

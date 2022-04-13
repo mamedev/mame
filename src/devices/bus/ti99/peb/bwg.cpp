@@ -63,9 +63,9 @@
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
+DEFINE_DEVICE_TYPE(TI99_BWG, bus::ti99::peb::snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 
@@ -141,7 +141,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
 	operate_ready_line();
 }
 
-SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
+void snug_bwg_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for debugger
 	if (machine().side_effects_disabled()) return;
@@ -150,7 +150,7 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 
 	// Is the card being selected?
 	m_address = offset;
-	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+	m_inDsrArea = in_dsr_space(m_address, true);
 
 	if (!m_inDsrArea) return;
 
@@ -196,7 +196,7 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 */
 void snug_bwg_device::debug_read(offs_t offset, uint8_t* value)
 {
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if ((offset & 0x1c00)==0x1c00)
 		{
@@ -210,7 +210,7 @@ void snug_bwg_device::debug_read(offs_t offset, uint8_t* value)
 
 void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
 {
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if (((offset & 0x1c00)==0x1c00) && ((offset & 0x1fe0)!=0x1fe0))
 			m_buffer_ram->pointer()[(m_crulatch8_15->q5_r()<<10) | (m_address & 0x03ff)] = data;
@@ -221,7 +221,7 @@ void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
     Read a byte from ROM, RAM, FDC, or RTC. See setaddress_dbin for selection
     logic.
 */
-READ8Z_MEMBER(snug_bwg_device::readz)
+void snug_bwg_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -346,7 +346,7 @@ void snug_bwg_device::write(offs_t offset, uint8_t data)
     bit 6: Dip 3
     bit 7: Dip 4
 */
-READ8Z_MEMBER(snug_bwg_device::crureadz)
+void snug_bwg_device::crureadz(offs_t offset, uint8_t *value)
 {
 	uint8_t reply;
 
@@ -527,17 +527,6 @@ void snug_bwg_device::device_start()
 
 void snug_bwg_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
-
 	m_DRQ = CLEAR_LINE;
 	m_IRQ = CLEAR_LINE;
 	m_MOTOR_ON = CLEAR_LINE;
@@ -599,10 +588,12 @@ INPUT_PORTS_START( bwg_fdc )
 		PORT_DIPSETTING( 0x03, "DSK1-DSK4")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER(snug_bwg_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void snug_bwg_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void bwg_floppies(device_slot_interface &device)
 {
@@ -622,7 +613,7 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 	m_wd1773->intrq_wr_callback().set(FUNC(snug_bwg_device::fdc_irq_w));
 	m_wd1773->drq_wr_callback().set(FUNC(snug_bwg_device::fdc_drq_w));
 
-	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
+	MM58274C(config, CLOCK_TAG, 32.768_kHz_XTAL).set_mode_and_day(1, 0); // 24h, sunday
 
 	FLOPPY_CONNECTOR(config, "0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
@@ -631,7 +622,7 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 
 	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
 
-	LS259(config, m_crulatch0_7); // U13
+	HC259(config, m_crulatch0_7); // U13
 	m_crulatch0_7->q_out_cb<0>().set(FUNC(snug_bwg_device::den_w));
 	m_crulatch0_7->q_out_cb<1>().set(FUNC(snug_bwg_device::mop_w));
 	m_crulatch0_7->q_out_cb<2>().set(FUNC(snug_bwg_device::waiten_w));
@@ -641,7 +632,7 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 	m_crulatch0_7->q_out_cb<6>().set(FUNC(snug_bwg_device::dsel3_w));
 	m_crulatch0_7->q_out_cb<7>().set(FUNC(snug_bwg_device::sidsel_w));
 
-	LS259(config, m_crulatch8_15); // U12
+	HC259(config, m_crulatch8_15); // U12
 	m_crulatch8_15->q_out_cb<0>().set(FUNC(snug_bwg_device::dsel4_w));
 	m_crulatch8_15->q_out_cb<2>().set(FUNC(snug_bwg_device::dden_w));
 
@@ -664,4 +655,4 @@ const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 	return ROM_NAME( bwg_fdc );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

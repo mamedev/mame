@@ -109,7 +109,10 @@ Notes:
 #include "emupal.h"
 #include "machine/st0016.h"
 #include "cpu/mips/mips1.h"
+#include "speaker.h"
 #include <algorithm>
+
+namespace {
 
 class speglsht_state : public driver_device
 {
@@ -129,6 +132,11 @@ public:
 
 	void init_speglsht();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
@@ -143,19 +151,16 @@ private:
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	uint32_t m_videoreg;
 
-	DECLARE_READ32_MEMBER(shared_r);
-	DECLARE_WRITE32_MEMBER(shared_w);
-	DECLARE_WRITE32_MEMBER(videoreg_w);
-	DECLARE_WRITE32_MEMBER(cop_w);
-	DECLARE_READ32_MEMBER(cop_r);
-	DECLARE_READ32_MEMBER(irq_ack_clear);
+	uint32_t shared_r(offs_t offset);
+	void shared_w(offs_t offset, uint32_t data);
+	void videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void cop_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cop_r(offs_t offset);
+	uint32_t irq_ack_clear();
 
-	DECLARE_MACHINE_RESET(speglsht);
-	virtual void machine_start() override;
-	DECLARE_VIDEO_START(speglsht);
-	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void st0016_rom_bank_w(uint8_t data);
 	void speglsht_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_mem(address_map &map);
@@ -166,13 +171,13 @@ void speglsht_state::st0016_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("st0016_bank");
-	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
+	//map(0xc000, 0xcfff).rw(FUNC(speglsht_state::st0016_sprite_ram_r), FUNC(speglsht_state::st0016_sprite_ram_w));
+	//map(0xd000, 0xdfff).rw(FUNC(speglsht_state::st0016_sprite2_ram_r), FUNC(speglsht_state::st0016_sprite2_ram_w));
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xe87f).ram();
-	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	//AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
-	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//map(0xe900, 0xe9ff) // sound - internal
+	//map(0xea00, 0xebff).rw(FUNC(speglsht_state::st0016_palette_ram_r), FUNC(speglsht_state::st0016_palette_ram_w));
+	//map(0xec00, 0xec1f).rw(FUNC(speglsht_state::st0016_character_ram_r), FUNC(speglsht_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram().share("shared");
 }
 
@@ -182,7 +187,7 @@ void speglsht_state::machine_start()
 }
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
-WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
+void speglsht_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_st0016_bank->set_entry(data);
 }
@@ -191,33 +196,33 @@ WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
 void speglsht_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
+	//map(0x00, 0xbf).rw(FUNC(speglsht_state::st0016_vregs_r), FUNC(speglsht_state::st0016_vregs_w));
 	map(0xe1, 0xe1).w(FUNC(speglsht_state::st0016_rom_bank_w));
-	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
-	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
-	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
+	//map(0xe2, 0xe2).w(FUNC(speglsht_state::st0016_sprite_bank_w));
+	//map(0xe3, 0xe4).w(FUNC(speglsht_state::st0016_character_bank_w));
+	//map(0xe5, 0xe5).w(FUNC(speglsht_state::st0016_palette_bank_w));
 	map(0xe6, 0xe6).nopw();
 	map(0xe7, 0xe7).nopw();
-	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//map(0xf0, 0xf0).r(FUNC(speglsht_state::st0016_dma_r));
 }
 
-READ32_MEMBER(speglsht_state::shared_r)
+uint32_t speglsht_state::shared_r(offs_t offset)
 {
 	return m_shared[offset];
 }
 
-WRITE32_MEMBER(speglsht_state::shared_w)
+void speglsht_state::shared_w(offs_t offset, uint32_t data)
 {
 	m_shared[offset]=data&0xff;
 }
 
-WRITE32_MEMBER(speglsht_state::videoreg_w)
+void speglsht_state::videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_videoreg);
 }
 
 
-WRITE32_MEMBER(speglsht_state::cop_w)
+void speglsht_state::cop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_ram[offset]);
 
@@ -228,7 +233,7 @@ WRITE32_MEMBER(speglsht_state::cop_w)
 }
 
 //matrix * vector
-READ32_MEMBER(speglsht_state::cop_r)
+uint32_t speglsht_state::cop_r(offs_t offset)
 {
 	int32_t *cop=(int32_t*)&m_cop_ram[0];
 
@@ -262,7 +267,7 @@ READ32_MEMBER(speglsht_state::cop_r)
 	return 0;
 }
 
-READ32_MEMBER(speglsht_state::irq_ack_clear)
+uint32_t speglsht_state::irq_ack_clear()
 {
 	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
@@ -278,9 +283,9 @@ void speglsht_state::speglsht_mem(address_map &map)
 	map(0x01800400, 0x01800403).portr("IN1");
 	map(0x01a00000, 0x01afffff).ram().share("framebuffer");
 	map(0x01b00000, 0x01b07fff).ram(); //cleared ...  video related ?
-	map(0x01c00000, 0x01dfffff).rom().region("user2", 0);
+	map(0x01c00000, 0x01dfffff).rom().region("subdata", 0);
 	map(0x0a000000, 0x0a003fff).rw(FUNC(speglsht_state::shared_r), FUNC(speglsht_state::shared_w));
-	map(0x0fc00000, 0x0fdfffff).rom().mirror(0x10000000).region("user1", 0);
+	map(0x0fc00000, 0x0fdfffff).rom().mirror(0x10000000).region("subprog", 0);
 	map(0x1eff0000, 0x1eff001f).ram();
 	map(0x1eff003c, 0x1eff003f).r(FUNC(speglsht_state::irq_ack_clear));
 }
@@ -361,31 +366,28 @@ static GFXDECODE_START( gfx_speglsht )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(speglsht_state,speglsht)
+void speglsht_state::machine_reset()
 {
 	std::fill(&m_shared[0],&m_shared[m_shared.bytes()],0);
 }
 
-VIDEO_START_MEMBER(speglsht_state,speglsht)
+void speglsht_state::video_start()
 {
 	m_bitmap = std::make_unique<bitmap_ind16>(512, 512);
-//  VIDEO_START_CALL_MEMBER(st0016);
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \
 { \
-		bitmap.pix32(y, x) = (b) | ((g)<<8) | ((r)<<16); \
+		bitmap.pix(y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }
 
-uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,dy;
+	int dy=(m_videoreg&0x20)?(256*512):0; //visible frame
 
-	dy=(m_videoreg&0x20)?(256*512):0; //visible frame
-
-	for(y=0;y<256;y++)
+	for(int y=0;y<256;y++)
 	{
-		for(x=0;x<512;x++)
+		for(int x=0;x<512;x++)
 		{
 			int tmp=dy+y*512+x;
 			PLOT_PIXEL_RGB(x-67,y-5,(m_framebuffer[tmp]>>0)&0xff,(m_framebuffer[tmp]>>8)&0xff,(m_framebuffer[tmp]>>16)&0xff);
@@ -394,13 +396,13 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 
 	//draw st0016 gfx to temporary bitmap (indexed 16)
 	m_bitmap->fill(0);
-	m_maincpu->st0016_draw_screen(screen, *m_bitmap, cliprect);
+	m_maincpu->draw_screen(screen, *m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
-	for(y=cliprect.min_y; y<cliprect.max_y;y++)
+	for(int y=cliprect.min_y; y<=cliprect.max_y;y++)
 	{
-		uint16_t *srcline = &m_bitmap->pix16(y);
-		for(x=cliprect.min_x; x<cliprect.max_x;x++)
+		uint16_t const *const srcline = &m_bitmap->pix(y);
+		for(int x=cliprect.min_x; x<=cliprect.max_x;x++)
 		{
 			if(srcline[x])
 			{
@@ -416,18 +418,18 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 void speglsht_state::speglsht(machine_config &config)
 {
 	/* basic machine hardware */
-	ST0016_CPU(config, m_maincpu, 8000000); /* 8 MHz ? */
+	ST0016_CPU(config, m_maincpu, XTAL(42'954'545) / 6); // 7.159 MHz (42.9545 MHz / 6)
 	m_maincpu->set_addrmap(AS_PROGRAM, &speglsht_state::st0016_mem);
 	m_maincpu->set_addrmap(AS_IO, &speglsht_state::st0016_io);
 	m_maincpu->set_vblank_int("screen", FUNC(speglsht_state::irq0_line_hold));
+	m_maincpu->set_screen("screen");
 
-	R3051(config, m_subcpu, 25000000);
+	R3051(config, m_subcpu, XTAL(50'000'000) / 2); // 25 MHz (50 MHz / 2)
 	m_subcpu->set_endianness(ENDIANNESS_LITTLE);
 	m_subcpu->set_addrmap(AS_PROGRAM, &speglsht_state::speglsht_mem);
 	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
-	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -435,12 +437,17 @@ void speglsht_state::speglsht(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 319, 8, 239-8);
-	screen.set_screen_update(FUNC(speglsht_state::screen_update_speglsht));
+	screen.set_screen_update(FUNC(speglsht_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_speglsht);
 	PALETTE(config, m_palette).set_entries(16*16*4+1);
 
-	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
+	// TODO: Mono?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( speglsht )
@@ -448,13 +455,13 @@ ROM_START( speglsht )
 	ROM_LOAD( "sx004-07.u70", 0x000000, 0x200000, CRC(2d759cc4) SHA1(9fedd829190b2aab850b2f1088caaec91e8715dd) ) /* Noted as "ZPRO0" IE: Z80 (ST0016) Program 0 */
 	/* U71 unpopulated, Noted as ZPRO1 */
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 )
-	ROM_LOAD32_BYTE( "sx004-04.u33", 0x00000, 0x80000, CRC(e46d2e57) SHA1(b1fb836ab2ce547dc2e8d1046d7ef835b87bb04e) ) /* Noted as "RPRO3" IE: R3000 Program 3 */
-	ROM_LOAD32_BYTE( "sx004-03.u32", 0x00001, 0x80000, CRC(c6ffb00e) SHA1(f57ef45bb5c690c3e63101a36835d2687abfcdbd) ) /* Noted as "RPRO2" */
-	ROM_LOAD32_BYTE( "sx004-02.u31", 0x00002, 0x80000, CRC(21eb46e4) SHA1(0ab21ed012c9a76e01c83b60c6f4670836dfa718) ) /* Noted as "RPRO1" */
-	ROM_LOAD32_BYTE( "sx004-01.u30", 0x00003, 0x80000, CRC(65646949) SHA1(74931c230f4e4b1008fbc5fba169292e216aa23b) ) /* Noted as "RPRO0" */
+	ROM_REGION32_LE( 0x200000, "subprog", 0 )
+	ROM_LOAD32_BYTE( "sx004-04.u33", 0x00003, 0x80000, CRC(e46d2e57) SHA1(b1fb836ab2ce547dc2e8d1046d7ef835b87bb04e) ) /* Noted as "RPRO3" IE: R3000 Program 3 */
+	ROM_LOAD32_BYTE( "sx004-03.u32", 0x00002, 0x80000, CRC(c6ffb00e) SHA1(f57ef45bb5c690c3e63101a36835d2687abfcdbd) ) /* Noted as "RPRO2" */
+	ROM_LOAD32_BYTE( "sx004-02.u31", 0x00001, 0x80000, CRC(21eb46e4) SHA1(0ab21ed012c9a76e01c83b60c6f4670836dfa718) ) /* Noted as "RPRO1" */
+	ROM_LOAD32_BYTE( "sx004-01.u30", 0x00000, 0x80000, CRC(65646949) SHA1(74931c230f4e4b1008fbc5fba169292e216aa23b) ) /* Noted as "RPRO0" */
 
-	ROM_REGION( 0x200000, "user2",0)
+	ROM_REGION32_LE( 0x200000, "subdata", 0)
 	ROM_LOAD32_WORD( "sx004-05.u34", 0x000000, 0x100000, CRC(f3c69468) SHA1(81daef6d0596cb67bb6f87b39874aae1b1ffe6a6) ) /* Noted as "RD0" IE: R3000 Data 0 */
 	ROM_LOAD32_WORD( "sx004-06.u35", 0x000002, 0x100000, CRC(5af78e44) SHA1(0131d50348fef80c2b100d74b7c967c6a710d548) ) /* Noted as "RD1" */
 ROM_END
@@ -462,8 +469,10 @@ ROM_END
 
 void speglsht_state::init_speglsht()
 {
-	m_maincpu->set_st0016_game_flag(3);
+	m_maincpu->set_game_flag(3);
 }
+
+} // Anonymous namespace
 
 
 GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, init_speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )

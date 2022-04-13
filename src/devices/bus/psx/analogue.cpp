@@ -97,7 +97,7 @@ bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t id
 					case CONFIG_MODE: // 43
 						if(count == 3)
 							m_temp = idata;
-						/* no break */
+						[[fallthrough]];
 					case QUERY_PAD_STATE: // 42
 						*odata = pad_data(count, true);
 						break;
@@ -142,7 +142,7 @@ bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t id
 						{
 							case 3:
 								m_temp = idata;
-								/* no break */
+								[[fallthrough]];
 							default:
 								*odata = 0x00;
 								break;
@@ -181,7 +181,7 @@ bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t id
 			case 3:
 				if(m_cmd == CONFIG_MODE)
 					m_temp = idata;
-				/* no break */
+				[[fallthrough]];
 			default:
 				*odata = pad_data(count, true);
 				break;
@@ -207,7 +207,7 @@ bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t id
 			case 3:
 				if(m_cmd == CONFIG_MODE)
 					m_temp = idata;
-				/* no break */
+				[[fallthrough]];
 			default:
 				*odata = pad_data(count, false);
 				break;
@@ -254,7 +254,7 @@ static INPUT_PORTS_START( psx_analog_controller )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Left Analog Y") PORT_SENSITIVITY(100)
 
 	PORT_START("PSXMISC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Analog") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, psx_analog_controller_device, change_mode, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Analog") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, psx_analog_controller_device, change_mode, 0)
 INPUT_PORTS_END
 
 ioport_constructor psx_analog_controller_device::device_input_ports() const

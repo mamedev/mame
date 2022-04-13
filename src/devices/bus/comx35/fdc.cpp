@@ -81,9 +81,11 @@ const tiny_rom_entry *comx_fd_device::device_rom_region() const
 }
 
 
-FLOPPY_FORMATS_MEMBER( comx_fd_device::floppy_formats )
-	FLOPPY_COMX35_FORMAT
-FLOPPY_FORMATS_END
+void comx_fd_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_COMX35_FORMAT);
+}
 
 static void comx_fd_floppies(device_slot_interface &device)
 {

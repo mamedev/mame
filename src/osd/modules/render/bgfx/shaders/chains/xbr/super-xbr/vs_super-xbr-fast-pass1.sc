@@ -5,9 +5,9 @@ $output v_texcoord0, v_color0
 // copyright-holders:Hyllian
 
 /*
-   
+
   *******  Super XBR Shader - pass1 vertex shader *******
-   
+
   Copyright (c) 2016 Hyllian - sergiogdb@gmail.com
 
   Permission is hereby granted, free of charge, to any person obtaining a copy

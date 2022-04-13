@@ -8,9 +8,9 @@
  *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
  *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
- *  for his site http://www.geo255.redhotant.com
+ *  for his site http://www.geoff.org.uk/microtan/index.htm
  *  and to Fabrice Frances <frances@ensica.fr>
- *  for his site http://www.ifrance.com/oric/microtan.html
+ *  for his site http://oric.free.fr/microtan.html
  *
  ******************************************************************************/
 
@@ -19,99 +19,118 @@
 
 #pragma once
 
-#include "imagedev/snapquik.h"
-#include "machine/6522via.h"
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/input_merger.h"
-#include "sound/ay8910.h"
-#include "imagedev/cassette.h"
+#include "machine/timer.h"
+#include "bus/tanbus/tanbus.h"
+#include "imagedev/snapquik.h"
+#include "tilemap.h"
 
 class microtan_state : public driver_device
 {
 public:
-	microtan_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_irq_line(*this, "irq_line"),
-		m_cassette(*this, "cassette"),
-		m_via6522(*this, "via6522%u", 0),
-		m_ay8910(*this, "ay8910%u", 0),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_led(*this, "led1")
+	microtan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_irq_line(*this, "irq_line")
+		, m_config(*this, "CONFIG")
+		, m_io_keyboard(*this, "KBD%u", 0)
+		, m_io_keypad(*this, "KPAD%u", 0)
+		, m_keypad(*this, "KEYPAD")
+		, m_tanbus(*this, "tanbus")
+		, m_videoram(*this, "videoram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_gfx1(*this, "gfx1")
+		, m_led(*this, "led1")
 	{ }
 
-	void microtan(machine_config &config);
+	void mt65(machine_config &config);
+	void micron(machine_config &config);
+	void spinveti(machine_config &config);
 
+	void init_gfx2();
 	void init_microtan();
 
+	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
+	uint8_t bffx_r(offs_t offset);
+	void bffx_w(offs_t offset, uint8_t data);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+
 protected:
-	enum
-	{
-		TIMER_READ_CASSETTE,
-		TIMER_PULSE_NMI
-	};
+	enum { IRQ_KBD, IRQ_TANBUS };
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
-	enum { IRQ_VIA_0, IRQ_VIA_1, IRQ_KBD };
-
-	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_irq_line;
-	required_device<cassette_image_device> m_cassette;
-	required_device_array<via6522_device, 2> m_via6522;
-	required_device_array<ay8910_device, 2> m_ay8910;
-	required_device<gfxdecode_device> m_gfxdecode;
+	required_ioport m_config;
+	optional_ioport_array<9> m_io_keyboard;
+	optional_ioport_array<4> m_io_keypad;
+	optional_ioport m_keypad;
+	optional_device<tanbus_device> m_tanbus;
+
+	uint8_t m_keypad_column = 0;
+	uint8_t m_keyboard_ascii = 0;
+	emu_timer *m_pulse_nmi_timer = nullptr;
+	uint8_t m_keyrows[10]{};
+	int m_lastrow = 0;
+	int m_mask = 0;
+	int m_key = 0;
+	int m_repeat = 0;
+	int m_repeater = 0;
+
+	virtual void store_key(int key);
+
+private:
+	optional_shared_ptr<uint8_t> m_videoram;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	optional_memory_region m_gfx1;
 	output_finder<> m_led;
 
-	uint8_t m_chunky_graphics;
+	uint8_t m_chunky_graphics = 0;
 	std::unique_ptr<uint8_t[]> m_chunky_buffer;
-	uint8_t m_keypad_column;
-	uint8_t m_keyboard_ascii;
-	emu_timer *m_read_cassette_timer;
-	emu_timer *m_pulse_nmi_timer;
-	uint8_t m_keyrows[10];
-	int m_lastrow;
-	int m_mask;
-	int m_key;
-	int m_repeat;
-	int m_repeater;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(bffx_r);
-	DECLARE_WRITE8_MEMBER(bffx_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	uint8_t sound_r();
+	void sound_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void pgm_chargen_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(read_cassette);
 	TIMER_CALLBACK_MEMBER(pulse_nmi);
-	DECLARE_READ8_MEMBER(via_0_in_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_b);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
-	DECLARE_WRITE8_MEMBER(via_1_out_a);
-	DECLARE_WRITE8_MEMBER(via_1_out_b);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
-	uint8_t read_dsw();
-	void store_key(int key);
+
 	image_verify_result verify_snapshot(uint8_t *data, int size);
 	image_init_result parse_intel_hex(uint8_t *snapshot_buff, char *src);
 	image_init_result parse_zillion_hex(uint8_t *snapshot_buff, char *src);
 	void set_cpu_regs(const uint8_t *snapshot_buff, int base);
 	void snapshot_copy(uint8_t *snapshot_buff, int snapshot_size);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void main_map(address_map &map);
+	void mt65_map(address_map &map);
+	void spinv_map(address_map &map);
+};
+
+
+class mt6809_state : public microtan_state
+{
+public:
+	using microtan_state::microtan_state;
+
+	void mt6809(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+	virtual void store_key(int key) override;
+
+private:
+	uint8_t keyboard_r();
+
+	void mt6809_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MICROTAN_H

@@ -68,11 +68,6 @@ nes_h3001_device::nes_h3001_device(const machine_config &mconfig, const char *ta
 
 
 
-void nes_lrog017_device::device_start()
-{
-	common_start();
-}
-
 void nes_lrog017_device::pcb_reset()
 {
 	prg32(0);
@@ -82,22 +77,12 @@ void nes_lrog017_device::pcb_reset()
 	chr2_6(2, CHRRAM);
 }
 
-void nes_holydivr_device::device_start()
-{
-	common_start();
-}
-
 void nes_holydivr_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
-}
-
-void nes_tam_s1_device::device_start()
-{
-	common_start();
 }
 
 void nes_tam_s1_device::pcb_reset()
@@ -174,7 +159,7 @@ void nes_lrog017_device::write_h(offs_t offset, uint8_t data)
 	data = account_bus_conflict(offset, data);
 
 	prg32(data);
-	chr2_0((data >> 4), CHRROM);
+	chr2_0(data >> 4, CHRROM);
 }
 
 /*-------------------------------------------------
@@ -279,7 +264,7 @@ void nes_g101_device::write_h(offs_t offset, uint8_t data)
  -------------------------------------------------*/
 
 
-void nes_h3001_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_h3001_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

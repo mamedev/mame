@@ -14,7 +14,7 @@
 #pragma once
 
 #include "a2bus.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,6 +27,8 @@ class a2bus_hsscsi_device:
 public:
 	// construction/destruction
 	a2bus_hsscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
@@ -46,17 +48,18 @@ protected:
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
 
-	required_device<ncr5380n_device> m_ncr5380;
+	required_device<ncr53c80_device> m_ncr5380;
 	required_device<nscsi_bus_device> m_scsibus;
+	required_region_ptr<u8> m_rom;
 
 private:
-	uint8_t *m_rom;
 	uint8_t m_ram[8192];  // 8 banks of 1024 bytes
 	int m_rambank, m_rombank;
 	uint8_t m_drq;
 	uint8_t m_bank;
-	bool m_816block;
+	uint8_t m_dma_control;
 	uint8_t m_c0ne, m_c0nf;
+	uint16_t m_dma_addr, m_dma_size;
 };
 
 // device type definition

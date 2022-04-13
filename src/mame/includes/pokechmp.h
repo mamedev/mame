@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class pokechmp_state : public driver_device
 {
@@ -28,13 +29,13 @@ public:
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_shared_ptr<uint8_t> m_spriteram;
-	DECLARE_WRITE8_MEMBER(pokechmp_bank_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_sound_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_videoram_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_flipscreen_w);
+	void pokechmp_bank_w(uint8_t data);
+	void pokechmp_sound_bank_w(uint8_t data);
+	void pokechmp_sound_w(uint8_t data);
+	void pokechmp_videoram_w(offs_t offset, uint8_t data);
+	void pokechmp_flipscreen_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;

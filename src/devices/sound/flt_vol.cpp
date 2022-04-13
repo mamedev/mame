@@ -27,7 +27,7 @@ filter_volume_device::filter_volume_device(const machine_config &mconfig, const 
 void filter_volume_device::device_start()
 {
 	m_gain = 0x100;
-	m_stream = stream_alloc(1, 1, machine().sample_rate());
+	m_stream = stream_alloc(1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 }
 
 
@@ -35,13 +35,11 @@ void filter_volume_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void filter_volume_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void filter_volume_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *src = inputs[0];
-	stream_sample_t *dst = outputs[0];
-
-	while (samples--)
-		*dst++ = (*src++ * m_gain) >> 8;
+	// no need to work here; just copy input stream to output and apply gain
+	outputs[0] = inputs[0];
+	outputs[0].apply_gain(m_gain);
 }
 
 
@@ -49,5 +47,5 @@ void filter_volume_device::sound_stream_update(sound_stream &stream, stream_samp
 void filter_volume_device::flt_volume_set_volume(float volume)
 {
 	m_stream->update();
-	m_gain = int(volume * 256);
+	m_gain = volume;
 }

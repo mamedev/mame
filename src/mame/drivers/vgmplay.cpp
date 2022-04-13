@@ -14,15 +14,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/sh/sh2.h"
-#include "sound/2203intf.h"
-#include "sound/2608intf.h"
-#include "sound/2610intf.h"
-#include "sound/2612intf.h"
-#include "sound/262intf.h"
-#include "sound/3526intf.h"
-#include "sound/3812intf.h"
 #include "sound/ay8910.h"
-#include "sound/8950intf.h"
 #include "sound/c140.h"
 #include "sound/c352.h"
 #include "sound/c6280.h"
@@ -44,11 +36,12 @@
 #include "sound/segapcm.h"
 #include "sound/sn76496.h"
 #include "sound/upd7759.h"
+#include "sound/vgm_visualizer.h"
 #include "sound/x1_010.h"
-#include "sound/ym2151.h"
-#include "sound/ym2413.h"
 #include "sound/ymf271.h"
-#include "sound/ymf278b.h"
+#include "sound/ymopl.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "sound/ymz280b.h"
 #include "audio/vboy.h"
 #include "audio/wswan.h"
@@ -56,17 +49,21 @@
 
 #include "vgmplay.lh"
 #include "debugger.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include <zlib.h>
 
+#include <algorithm>
+#include <iterator>
 #include <list>
 #include <memory>
+#include <queue>
 #include <utility>
 #include <vector>
-#include <queue>
 
-#define AS_IO16             1
+#define AS_IO16LE           1
+#define AS_IO16BE           4
 
 class vgmplay_disassembler : public util::disasm_interface
 {
@@ -123,6 +120,14 @@ enum vgm_chip
 	CT_GA20,
 
 	CT_COUNT,
+};
+
+enum C140_TYPE
+{
+	C140_LINEAR = 0,
+	C140_SYSTEM2,
+	C140_SYSTEM21,
+	C140_ASIC219
 };
 
 class vgmplay_device : public cpu_device
@@ -223,9 +228,9 @@ public:
 
 	vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -237,34 +242,38 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	template<int Index> DECLARE_READ8_MEMBER(segapcm_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ym2608_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ym2610_adpcm_a_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ym2610_adpcm_b_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(y8950_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ymf278b_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ymf271_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ymz280b_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(multipcm_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(upd7759_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(okim6295_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(k054539_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(c140_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(k053260_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(qsound_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(es5505_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(x1_010_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(c352_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ga20_rom_r);
+	template<int Index> uint8_t segapcm_rom_r(offs_t offset);
+	template<int Index> uint8_t ym2608_rom_r(offs_t offset);
+	template<int Index> uint8_t ym2610_adpcm_a_rom_r(offs_t offset);
+	template<int Index> uint8_t ym2610_adpcm_b_rom_r(offs_t offset);
+	template<int Index> uint8_t y8950_rom_r(offs_t offset);
+	template<int Index> uint8_t ymf278b_rom_r(offs_t offset);
+	template<int Index> uint8_t ymf271_rom_r(offs_t offset);
+	template<int Index> uint8_t ymz280b_rom_r(offs_t offset);
+	template<int Index> uint8_t multipcm_rom_r(offs_t offset);
+	template<int Index> uint8_t upd7759_rom_r(offs_t offset);
+	template<int Index> uint8_t okim6295_rom_r(offs_t offset);
+	template<int Index> uint8_t k054539_rom_r(offs_t offset);
+	template<int Index> uint16_t c140_rom_r(offs_t offset);
+	template<int Index> uint16_t c219_rom_r(offs_t offset);
+	template<int Index> uint8_t k053260_rom_r(offs_t offset);
+	template<int Index> uint8_t qsound_rom_r(offs_t offset);
+	template<int Index> uint8_t es5505_rom_r(offs_t offset);
+	template<int Index> uint8_t x1_010_rom_r(offs_t offset);
+	template<int Index> uint8_t c352_rom_r(offs_t offset);
+	template<int Index> uint8_t ga20_rom_r(offs_t offset);
 
-	template<int Index> DECLARE_WRITE8_MEMBER(multipcm_bank_hi_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(multipcm_bank_lo_w);
+	template<int Index> void multipcm_bank_hi_w(offs_t offset, uint8_t data);
+	template<int Index> void multipcm_bank_lo_w(offs_t offset, uint8_t data);
 
-	template<int Index> DECLARE_WRITE8_MEMBER(upd7759_bank_w);
+	template<int Index> void upd7759_bank_w(uint8_t data);
 
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
+	template<int Index> void okim6295_nmk112_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6295_bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6295_nmk112_bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+
+	void set_c140_bank_type(int index, C140_TYPE type);
+	C140_TYPE c140_bank(int index) { return m_c140_bank[index]; }
 
 	void stop();
 	void pause();
@@ -297,24 +306,24 @@ private:
 
 	struct stream
 	{
-		uint8_t byte_depth;
-		uint32_t position;
-		emu_timer *timer;
+		uint8_t byte_depth = 0;
+		uint32_t position = 0;
+		emu_timer *timer = nullptr;
 		// stream control
 		vgm_chip chip_type;
-		uint8_t port;
-		uint8_t reg;
+		uint8_t port = 0;
+		uint8_t reg = 0;
 		// stream data
-		uint8_t bank;
-		uint8_t step_size;
-		uint8_t step_base;
+		uint8_t bank = 0;
+		uint8_t step_size = 0;
+		uint8_t step_base = 0;
 		// frequency
-		uint32_t frequency;
+		uint32_t frequency = 0;
 		// start stream
-		uint32_t offset;
-		uint32_t length;
-		bool loop;
-		bool reverse;
+		uint32_t offset = 0;
+		uint32_t length = 0;
+		bool loop = false;
+		bool reverse = false;
 	};
 
 	TIMER_CALLBACK_MEMBER(stream_timer_expired);
@@ -335,8 +344,8 @@ private:
 	led_expiry_iterator m_act_led_off;
 	emu_timer *m_act_led_timer = nullptr;
 
-	address_space_config m_file_config, m_io_config, m_io16_config;
-	address_space *m_file = nullptr, *m_io = nullptr, *m_io16 = nullptr;
+	address_space_config m_file_config, m_io_config, m_io16le_config, m_io16be_config;
+	address_space *m_file = nullptr, *m_io = nullptr, *m_io16le = nullptr, *m_io16be = nullptr;
 
 	int m_icount = 0;
 	int m_state = RESET;
@@ -378,9 +387,18 @@ private:
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
 
-	int m_sega32x_channel_hack;
+	C140_TYPE m_c140_bank[2]{};
+
+	int m_sega32x_channel_hack = 0;
 	int m_nes_apu_channel_hack[2];
 	uint8_t m_c6280_channel[2];
+
+	// newer YM cores require writes to be spaced out in order to play back
+	// correctly; simulate this by introducing some extra accounting
+	void space_out_write(uint32_t address);
+	void decrement_icount(int count);
+	int m_icount_ahead = 0;
+	int m_last_write_icount[256] = { 0 };
 };
 
 DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
@@ -392,6 +410,11 @@ enum vgmplay_inputs : uint8_t
 	VGMPLAY_PLAY,
 	VGMPLAY_RESTART,
 	VGMPLAY_LOOP,
+	VGMPLAY_VIZ,
+	VGMPLAY_RATE_DOWN,
+	VGMPLAY_RATE_UP,
+	VGMPLAY_RATE_RST,
+	VGMPLAY_HOLD,
 };
 
 class vgmplay_state : public driver_device
@@ -401,23 +424,25 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(load_file);
 
-	DECLARE_READ8_MEMBER(file_r);
-	DECLARE_READ8_MEMBER(file_size_r);
+	uint8_t file_r(offs_t offset);
+	uint8_t file_size_r(offs_t offset);
 	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
-	template<int Index> DECLARE_WRITE8_MEMBER(upd7759_reset_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(upd7759_data_w);
+	template<int Index> void upd7759_reset_w(uint8_t data);
+	template<int Index> void upd7759_data_w(uint8_t data);
 	template<int Index> DECLARE_WRITE_LINE_MEMBER(upd7759_drq_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6258_clock_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6258_divider_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(scc_w);
+	template<int Index> void okim6258_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6258_divider_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6295_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6295_pin7_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void scc_w(offs_t offset, uint8_t data);
+	template<int Index> void c140_c219_w(offs_t offset, uint8_t data);
 
 	void vgmplay(machine_config &config);
 	void file_map(address_map &map);
 	void soundchips_map(address_map &map);
-	void soundchips16_map(address_map &map);
+	void soundchips16le_map(address_map &map);
+	void soundchips16be_map(address_map &map);
 	template<int Index> void segapcm_map(address_map &map);
 	template<int Index> void rf5c68_map(address_map &map);
 	template<int Index> void ym2608_map(address_map &map);
@@ -434,6 +459,7 @@ public:
 	template<int Index> void okim6295_map(address_map &map);
 	template<int Index> void k054539_map(address_map &map);
 	template<int Index> void c140_map(address_map &map);
+	template<int Index> void c219_map(address_map &map);
 	template<int Index> void k053260_map(address_map &map);
 	template<int Index> void qsound_map(address_map &map);
 	template<int Index> void scsp_map(address_map &map);
@@ -445,8 +471,12 @@ public:
 	template<int Index> void ga20_map(address_map &map);
 
 private:
+	virtual void machine_start() override;
+
+	uint32_t m_held_clock = 0;
 	std::vector<uint8_t> m_file_data;
 	required_device<vgmplay_device> m_vgmplay;
+	required_device<vgmviz_device> m_mixer;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
 	required_device_array<sn76489_device, 2> m_sn76489;
@@ -478,6 +508,7 @@ private:
 	required_device_array<k054539_device, 2> m_k054539;
 	required_device_array<h6280_device, 2> m_huc6280;
 	required_device_array<c140_device, 2> m_c140;
+	required_device_array<c219_device, 2> m_c219;
 	required_device_array<k053260_device, 2> m_k053260;
 	required_device_array<pokey_device, 2> m_pokey;
 	required_device<qsound_device> m_qsound;
@@ -509,7 +540,8 @@ vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, d
 	m_act_leds(*this, "led_act_%u", 0U),
 	m_file_config("file", ENDIANNESS_LITTLE, 8, 32),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 32),
-	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 32)
+	m_io16le_config("io16le", ENDIANNESS_LITTLE, 16, 32),
+	m_io16be_config("io16be", ENDIANNESS_BIG, 16, 32)
 {
 }
 
@@ -518,7 +550,8 @@ void vgmplay_device::device_start()
 	set_icountptr(m_icount);
 	m_file = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
-	m_io16 = &space(AS_IO16);
+	m_io16le = &space(AS_IO16LE);
+	m_io16be = &space(AS_IO16BE);
 
 	m_act_leds.resolve();
 	m_act_led_index = std::make_unique<led_expiry_iterator[]>(CT_COUNT);
@@ -620,17 +653,17 @@ void vgmplay_device::play()
 		device_reset();
 }
 
-uint32_t vgmplay_device::execute_min_cycles() const
+uint32_t vgmplay_device::execute_min_cycles() const noexcept
 {
 	return 0;
 }
 
-uint32_t vgmplay_device::execute_max_cycles() const
+uint32_t vgmplay_device::execute_max_cycles() const noexcept
 {
 	return 65536;
 }
 
-uint32_t vgmplay_device::execute_input_lines() const
+uint32_t vgmplay_device::execute_input_lines() const noexcept
 {
 	return 0;
 }
@@ -803,7 +836,7 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 		uint32_t data_size = size - 4;
 		if (type == 0xe0)
 			for (int i = 0; i < data_size; i++)
-				m_io16->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + ((start + i) ^ 1), m_file->read_byte(m_pc + 0xb + i));
+				m_io16be->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + ((start + i) ^ 1), m_file->read_byte(m_pc + 0xb + i));
 		else if (type == 0xe1)
 			for (int i = 0; i < data_size; i++)
 				m_io->write_byte((second ? A_ES5503_RAM_1 : A_ES5503_RAM_0) + start + i, m_file->read_byte(m_pc + 0xb + i));
@@ -841,7 +874,7 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	else if (type == 0x06)
 	{
 		for (int i = 0; i < size; i++)
-			m_io16->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + ((dst + i) ^ 1), m_data_streams[type][src + i]);
+			m_io16be->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + ((dst + i) ^ 1), m_data_streams[type][src + i]);
 	}
 	else if (type == 0x07)
 	{
@@ -895,12 +928,12 @@ TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 		if (m_sega32x_channel_hack >= 0)
 		{
 			osd_printf_error("bad rip detected, enabling sega32x channels\n");
-			m_io16->write_word(A_32X_PWM, 5);
+			m_io16le->write_word(A_32X_PWM, 5);
 
 			m_sega32x_channel_hack = -2;
 		}
 
-		m_io16->write_word(A_32X_PWM + (s.reg << 1), ((m_data_streams[s.bank][offset + 1] & 0xf) << 8) | m_data_streams[s.bank][offset]);
+		m_io16le->write_word(A_32X_PWM + (s.reg << 1), ((m_data_streams[s.bank][offset + 1] & 0xf) << 8) | m_data_streams[s.bank][offset]);
 	}
 	else if (s.chip_type == CT_C6280)
 	{
@@ -933,6 +966,34 @@ TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 	}
 }
 
+void vgmplay_device::space_out_write(uint32_t address)
+{
+	// use the top address bits as an index
+	int index = address >> 24;
+	uint32_t cycles = uint32_t(total_cycles());
+
+	// if the last write happened at the current time, steal a cycle
+	if (m_last_write_icount[index] == cycles)
+	{
+		m_icount--;
+		m_icount_ahead++;
+		cycles++;
+	}
+	m_last_write_icount[index] = cycles;
+}
+
+void vgmplay_device::decrement_icount(int count)
+{
+	// take back any cycles we stole
+	if (count >= m_icount_ahead)
+	{
+		m_icount -= count - m_icount_ahead;
+		m_icount_ahead = 0;
+	}
+	else
+		m_icount_ahead -= count;
+}
+
 void vgmplay_device::execute_run()
 {
 	while (m_icount > 0)
@@ -954,14 +1015,15 @@ void vgmplay_device::execute_run()
 			uint32_t version = m_file->read_dword(8);
 			m_pc = 0x34 + m_file->read_dword(0x34);
 
-			if ((version < 0x150 && m_pc != 0x34) ||
-				(version >= 0x150 && m_pc == 0x34))
+			if ((version < 0x150 && m_pc != 0x34) || (version >= 0x150 && m_pc == 0x34))
 			{
 				osd_printf_error("bad rip detected, v%x invalid header size 0x%x\n", version, m_pc);
 				m_pc = 0x40;
 			}
 			else if (version < 0x150)
+			{
 				m_pc = 0x40;
+			}
 
 			m_state = RUN;
 			break;
@@ -971,7 +1033,7 @@ void vgmplay_device::execute_run()
 			if (m_paused)
 			{
 				machine().sound().system_mute(1);
-				m_icount = 0;
+				decrement_icount(m_icount);
 				return;
 			}
 			else
@@ -1011,6 +1073,7 @@ void vgmplay_device::execute_run()
 
 			case 0x51:
 				pulse_act_led(CT_YM2413);
+				space_out_write(A_YM2413_0);
 				m_io->write_byte(A_YM2413_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2413_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1019,6 +1082,7 @@ void vgmplay_device::execute_run()
 			case 0x52:
 			case 0x53:
 				pulse_act_led(CT_YM2612);
+				space_out_write(A_YM2612_0);
 				m_io->write_byte(A_YM2612_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2612_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1026,6 +1090,7 @@ void vgmplay_device::execute_run()
 
 			case 0x54:
 				pulse_act_led(CT_YM2151);
+				space_out_write(A_YM2151_0);
 				m_io->write_byte(A_YM2151_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2151_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1033,6 +1098,7 @@ void vgmplay_device::execute_run()
 
 			case 0x55:
 				pulse_act_led(CT_YM2203);
+				space_out_write(A_YM2203_0);
 				m_io->write_byte(A_YM2203_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2203_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1041,6 +1107,7 @@ void vgmplay_device::execute_run()
 			case 0x56:
 			case 0x57:
 				pulse_act_led(CT_YM2608);
+				space_out_write(A_YM2608_0);
 				m_io->write_byte(A_YM2608_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2608_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1049,6 +1116,7 @@ void vgmplay_device::execute_run()
 			case 0x58:
 			case 0x59:
 				pulse_act_led(CT_YM2610);
+				space_out_write(A_YM2610_0);
 				m_io->write_byte(A_YM2610_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2610_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1056,6 +1124,7 @@ void vgmplay_device::execute_run()
 
 			case 0x5a:
 				pulse_act_led(CT_YM3812);
+				space_out_write(A_YM3812_0);
 				m_io->write_byte(A_YM3812_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM3812_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1063,6 +1132,7 @@ void vgmplay_device::execute_run()
 
 			case 0x5b:
 				pulse_act_led(CT_YM3526);
+				space_out_write(A_YM3526_0);
 				m_io->write_byte(A_YM3526_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM3526_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1070,6 +1140,7 @@ void vgmplay_device::execute_run()
 
 			case 0x5c:
 				pulse_act_led(CT_Y8950);
+				space_out_write(A_Y8950_0);
 				m_io->write_byte(A_Y8950_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_Y8950_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1085,6 +1156,7 @@ void vgmplay_device::execute_run()
 			case 0x5e:
 			case 0x5f:
 				pulse_act_led(CT_YMF262);
+				space_out_write(A_YMF262_0);
 				m_io->write_byte(A_YMF262_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YMF262_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1093,18 +1165,18 @@ void vgmplay_device::execute_run()
 			case 0x61:
 			{
 				uint32_t duration = m_file->read_word(m_pc + 1);
-				m_icount -= duration;
+				decrement_icount(duration);
 				m_pc += 3;
 				break;
 			}
 
 			case 0x62:
-				m_icount -= 735;
+				decrement_icount(735);
 				m_pc++;
 				break;
 
 			case 0x63:
-				m_icount -= 882;
+				decrement_icount(882);
 				m_pc++;
 				break;
 
@@ -1137,7 +1209,7 @@ void vgmplay_device::execute_run()
 
 			case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-				m_icount -= 1 + (code & 0xf);
+				decrement_icount(1 + (code & 0xf));
 				m_pc += 1;
 				break;
 
@@ -1149,12 +1221,13 @@ void vgmplay_device::execute_run()
 					if (m_ym2612_stream_offset >= int(m_data_streams[0].size()))
 						m_ym2612_stream_offset = 0;
 
+					space_out_write(A_YM2612_0);
 					m_io->write_byte(A_YM2612_0 + 0, 0x2a);
 					m_io->write_byte(A_YM2612_0 + 1, m_data_streams[0][m_ym2612_stream_offset]);
 					m_ym2612_stream_offset++;
 				}
 				m_pc += 1;
-				m_icount -= code & 0xf;
+				decrement_icount(code & 0xf);
 				break;
 
 			case 0x90:
@@ -1295,7 +1368,7 @@ void vgmplay_device::execute_run()
 				uint8_t id = m_file->read_byte(m_pc + 1);
 				if (id == 0xff)
 					for (int i = 0; i < 0xff; i++)
-						m_streams[id].timer->enable(false);
+						m_streams[i].timer->enable(false);
 				else
 					m_streams[id].timer->enable(false);
 
@@ -1360,6 +1433,7 @@ void vgmplay_device::execute_run()
 
 			case 0xa1:
 				pulse_act_led(CT_YM2413);
+				space_out_write(A_YM2413_1);
 				m_io->write_byte(A_YM2413_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2413_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1368,6 +1442,7 @@ void vgmplay_device::execute_run()
 			case 0xa2:
 			case 0xa3:
 				pulse_act_led(CT_YM2612);
+				space_out_write(A_YM2612_1);
 				m_io->write_byte(A_YM2612_1 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2612_1 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1375,6 +1450,7 @@ void vgmplay_device::execute_run()
 
 			case 0xa4:
 				pulse_act_led(CT_YM2151);
+				space_out_write(A_YM2151_1);
 				m_io->write_byte(A_YM2151_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2151_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1382,6 +1458,7 @@ void vgmplay_device::execute_run()
 
 			case 0xa5:
 				pulse_act_led(CT_YM2203);
+				space_out_write(A_YM2203_1);
 				m_io->write_byte(A_YM2203_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2203_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1390,6 +1467,7 @@ void vgmplay_device::execute_run()
 			case 0xa6:
 			case 0xa7:
 				pulse_act_led(CT_YM2608);
+				space_out_write(A_YM2608_0);
 				m_io->write_byte(A_YM2608_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2608_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1398,6 +1476,7 @@ void vgmplay_device::execute_run()
 			case 0xa8:
 			case 0xa9:
 				pulse_act_led(CT_YM2610);
+				space_out_write(A_YM2610_0);
 				m_io->write_byte(A_YM2610_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2610_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1405,6 +1484,7 @@ void vgmplay_device::execute_run()
 
 			case 0xaa:
 				pulse_act_led(CT_YM3812);
+				space_out_write(A_YM3812_1);
 				m_io->write_byte(A_YM3812_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM3812_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1412,6 +1492,7 @@ void vgmplay_device::execute_run()
 
 			case 0xab:
 				pulse_act_led(CT_YM3526);
+				space_out_write(A_YM3526_1);
 				m_io->write_byte(A_YM3526_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM3526_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1419,6 +1500,7 @@ void vgmplay_device::execute_run()
 
 			case 0xac:
 				pulse_act_led(CT_Y8950);
+				space_out_write(A_Y8950_1);
 				m_io->write_byte(A_Y8950_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_Y8950_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1434,6 +1516,7 @@ void vgmplay_device::execute_run()
 			case 0xae:
 			case 0xaf:
 				pulse_act_led(CT_YMF262);
+				space_out_write(A_YMF262_1);
 				m_io->write_byte(A_YMF262_1 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YMF262_1 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1470,14 +1553,14 @@ void vgmplay_device::execute_run()
 						if (m_sega32x_channel_hack == 32)
 						{
 							osd_printf_error("bad rip detected, enabling sega32x channels\n");
-							m_io16->write_word(A_32X_PWM, 5);
+							m_io16le->write_word(A_32X_PWM, 5);
 
 							m_sega32x_channel_hack = -2;
 						}
 					}
 				}
 
-				m_io16->write_word(A_32X_PWM + ((offset & 0xf0) >> 3), ((offset & 0xf) << 8) | data);
+				m_io16le->write_word(A_32X_PWM + ((offset & 0xf0) >> 3), ((offset & 0xf) << 8) | data);
 				m_pc += 3;
 				break;
 			}
@@ -1727,9 +1810,9 @@ void vgmplay_device::execute_run()
 				pulse_act_led(CT_SCSP);
 				uint8_t offset = m_file->read_byte(m_pc + 1);
 				if (offset & 0x80)
-					m_io16->write_byte(A_SCSP_1 + ((offset & 0x7f) << 8) + (m_file->read_byte(m_pc + 2) ^ 1), m_file->read_byte(m_pc + 3));
+					m_io16be->write_byte(A_SCSP_1 + ((offset & 0x7f) << 8) + (m_file->read_byte(m_pc + 2) ^ 1), m_file->read_byte(m_pc + 3));
 				else
-					m_io16->write_byte(A_SCSP_0 + ((offset & 0x7f) << 8) + (m_file->read_byte(m_pc + 2) ^ 1), m_file->read_byte(m_pc + 3));
+					m_io16be->write_byte(A_SCSP_0 + ((offset & 0x7f) << 8) + (m_file->read_byte(m_pc + 2) ^ 1), m_file->read_byte(m_pc + 3));
 				m_pc += 4;
 				break;
 			}
@@ -1776,11 +1859,13 @@ void vgmplay_device::execute_run()
 				uint8_t offset = m_file->read_byte(m_pc + 1);
 				if (offset & 0x80)
 				{
+					space_out_write(A_YMF278B_1);
 					m_io->write_byte(A_YMF278B_1 + ((offset & 0x7f) << 1) + 0, m_file->read_byte(m_pc + 2));
 					m_io->write_byte(A_YMF278B_1 + ((offset & 0x7f) << 1) + 1, m_file->read_byte(m_pc + 3));
 				}
 				else
 				{
+					space_out_write(A_YMF278B_0);
 					m_io->write_byte(A_YMF278B_0 + ((offset & 0x7f) << 1) + 0, m_file->read_byte(m_pc + 2));
 					m_io->write_byte(A_YMF278B_0 + ((offset & 0x7f) << 1) + 1, m_file->read_byte(m_pc + 3));
 				}
@@ -1881,9 +1966,9 @@ void vgmplay_device::execute_run()
 				uint32_t addr = ((offset & 0x7f) << 8) + m_file->read_byte(m_pc + 2);
 				uint16_t data = (m_file->read_byte(m_pc + 3) << 8) + m_file->read_byte(m_pc + 4);
 				if (offset & 0x80)
-					m_io16->write_word(A_C352_1 + (addr << 1), data);
+					m_io16le->write_word(A_C352_1 + (addr << 1), data);
 				else
-					m_io16->write_word(A_C352_0 + (addr << 1), data);
+					m_io16le->write_word(A_C352_0 + (addr << 1), data);
 				m_pc += 5;
 				break;
 			}
@@ -1895,7 +1980,7 @@ void vgmplay_device::execute_run()
 					debugger_instruction_hook(m_pc);
 
 				m_state = DONE;
-				m_icount = 0;
+				decrement_icount(m_icount);
 				break;
 			}
 			break;
@@ -1903,7 +1988,7 @@ void vgmplay_device::execute_run()
 		case DONE:
 		{
 			machine().sound().system_mute(1);
-			m_icount = 0;
+			decrement_icount(m_icount);
 			break;
 		}
 		}
@@ -1920,7 +2005,8 @@ device_memory_interface::space_config_vector vgmplay_device::memory_space_config
 	{
 		std::make_pair(AS_PROGRAM, &m_file_config),
 		std::make_pair(AS_IO,      &m_io_config),
-		std::make_pair(AS_IO16,    &m_io16_config),
+		std::make_pair(AS_IO16LE,  &m_io16le_config),
+		std::make_pair(AS_IO16BE,  &m_io16be_config),
 	};
 }
 
@@ -2395,55 +2481,55 @@ uint8_t vgmplay_device::rom_r(int index, uint8_t type, offs_t offset)
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::segapcm_rom_r)
+uint8_t vgmplay_device::segapcm_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x80, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ym2608_rom_r)
+uint8_t vgmplay_device::ym2608_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x81, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ym2610_adpcm_a_rom_r)
+uint8_t vgmplay_device::ym2610_adpcm_a_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x82, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ym2610_adpcm_b_rom_r)
+uint8_t vgmplay_device::ym2610_adpcm_b_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x83, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ymf278b_rom_r)
+uint8_t vgmplay_device::ymf278b_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x84, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ymf271_rom_r)
+uint8_t vgmplay_device::ymf271_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x85, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
+uint8_t vgmplay_device::ymz280b_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x86, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::y8950_rom_r)
+uint8_t vgmplay_device::y8950_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x88, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::multipcm_rom_r)
+uint8_t vgmplay_device::multipcm_rom_r(offs_t offset)
 {
 	if (m_multipcm_banked[Index] == 1)
 	{
@@ -2471,13 +2557,13 @@ READ8_MEMBER(vgmplay_device::multipcm_rom_r)
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::upd7759_rom_r)
+uint8_t vgmplay_device::upd7759_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x8a, m_upd7759_bank[Index] | offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::okim6295_rom_r)
+uint8_t vgmplay_device::okim6295_rom_r(offs_t offset)
 {
 	if (m_okim6295_nmk112_enable[Index])
 	{
@@ -2498,49 +2584,71 @@ READ8_MEMBER(vgmplay_device::okim6295_rom_r)
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::k054539_rom_r)
+uint8_t vgmplay_device::k054539_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x8c, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::c140_rom_r)
+uint16_t vgmplay_device::c140_rom_r(offs_t offset)
 {
-	return rom_r(Index, 0x8d, offset);
+	switch (m_c140_bank[Index])
+	{
+	case C140_SYSTEM2:
+		offset = ((offset & 0x200000) >> 2) | (offset & 0x7ffff);
+		return rom_r(Index, 0x8d, offset) << 8; // high 8 bit only
+	case C140_SYSTEM21:
+		offset = ((offset & 0x300000) >> 1) | (offset & 0x7ffff);
+		return rom_r(Index, 0x8d, offset) << 8; // high 8 bit only
+	case C140_ASIC219:
+		return 0; // c140 not used in this mode
+	default:
+		return (rom_r(Index, 0x8d, offset * 2 + 1) << 8) | rom_r(Index, 0x8d, offset * 2); // 8 bit sample
+	}
+	return 0;
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::k053260_rom_r)
+uint16_t vgmplay_device::c219_rom_r(offs_t offset)
+{
+	if (m_c140_bank[Index] == C140_ASIC219)
+		return (rom_r(Index, 0x8d, offset * 2 + 1) << 8) | rom_r(Index, 0x8d, offset * 2); // 8 bit sample
+
+	return 0;
+}
+
+template<int Index>
+uint8_t vgmplay_device::k053260_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x8e, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::qsound_rom_r)
+uint8_t vgmplay_device::qsound_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x8f, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::es5505_rom_r)
+uint8_t vgmplay_device::es5505_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x90, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::x1_010_rom_r)
+uint8_t vgmplay_device::x1_010_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x91, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::c352_rom_r)
+uint8_t vgmplay_device::c352_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x92, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ga20_rom_r)
+uint8_t vgmplay_device::ga20_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x93, offset);
 }
@@ -2548,6 +2656,7 @@ READ8_MEMBER(vgmplay_device::ga20_rom_r)
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
 	, m_vgmplay(*this, "vgmplay")
+	, m_mixer(*this, "mixer")
 	, m_lspeaker(*this, "lspeaker")
 	, m_rspeaker(*this, "rspeaker")
 	, m_sn76489(*this, "sn76489.%d", 0)
@@ -2579,6 +2688,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_k054539(*this, "k054539.%d", 0)
 	, m_huc6280(*this, "huc6280.%d", 0)
 	, m_c140(*this, "c140.%d", 0)
+	, m_c219(*this, "c219.%d", 0)
 	, m_k053260(*this, "k053260.%d", 0)
 	, m_pokey(*this, "pokey.%d", 0)
 	, m_qsound(*this, "qsound")
@@ -2595,6 +2705,11 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	std::fill(std::begin(m_upd7759_md), std::end(m_upd7759_md), 0);
 	std::fill(std::begin(m_upd7759_reset), std::end(m_upd7759_drq), 0);
 	std::fill(std::begin(m_upd7759_drq), std::end(m_upd7759_drq), 0);
+}
+
+void vgmplay_state::machine_start()
+{
+	save_item(NAME(m_held_clock));
 }
 
 uint32_t vgmplay_state::r32(int off) const
@@ -2625,28 +2740,33 @@ static const uint8_t vgm_ay8910_flags(uint8_t vgm_flags)
 	return flags;
 }
 
-static const c140_device::C140_TYPE c140_bank_type(uint8_t vgm_type)
+static const C140_TYPE c140_bank_type(uint8_t vgm_type)
 {
 	switch (vgm_type)
 	{
 	case 0:
 	default:
-		return c140_device::C140_TYPE::SYSTEM2;
+		return C140_SYSTEM2;
 	case 1:
-		return c140_device::C140_TYPE::SYSTEM21;
+		return C140_SYSTEM21;
 	case 2:
-		return c140_device::C140_TYPE::ASIC219;
+		return C140_ASIC219;
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
+void vgmplay_device::set_c140_bank_type(int index, C140_TYPE type)
+{
+	m_c140_bank[index] = type;
+}
+
+QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 {
 	m_vgmplay->stop();
 
-	m_file_data.resize(quickload_size);
+	m_file_data.resize(image.length());
 
-	if (!quickload_size ||
-		image.fread(&m_file_data[0], quickload_size) != quickload_size)
+	if (image.length() == 0 ||
+		image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
 		return image_init_result::FAIL;
@@ -2713,8 +2833,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		else if (volbyte > 0xc1)
 			volbyte -= 0x100;
 
-		float volume = powf(2.0f, float(volbyte) / float(0x20));
-		uint32_t chip_count = 0;
+		float volume = version >= 0x160 && data_start >= 0x7d ? powf(2.0f, float(volbyte) / float(0x20)) : 1.0f;
 
 		uint32_t extra_header_start = version >= 0x170 && data_start >= 0xc0 && r32(0xbc) ? r32(0xbc) + 0xbc : 0;
 		uint32_t header_size = extra_header_start ? extra_header_start : data_start;
@@ -2729,10 +2848,13 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		const auto&& setup_device([&](device_t &device, int chip_num, vgm_chip chip_type, uint32_t offset, uint32_t min_version = 0)
 		{
 			uint32_t c = 0;
+			float chip_volume = volume;
+			bool has_2chip = false;
 
 			if (min_version <= version && offset + 4 <= header_size && (chip_num == 0 || (r32(offset) & 0x40000000) != 0))
 			{
 				c =  r32(offset);
+				has_2chip = (c & 0x40000000) != 0;
 
 				if (chip_clock_start && chip_num != 0)
 					for (auto i(0); i < r8(chip_clock_start); i++)
@@ -2743,11 +2865,17 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 							break;
 						}
 					}
-
-				chip_count++;
 			}
 
+			if (has_2chip)
+			{
+				chip_volume /= 2.0f;
+			}
 			device.set_unscaled_clock(c & ~0xc0000000);
+			if (device.unscaled_clock() != 0)
+				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, chip_volume);
+			else
+				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, 0);
 
 			return (c & 0x80000000) != 0;
 		});
@@ -2811,10 +2939,6 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_ay8910[1]->set_psg_type(vgm_ay8910_type(version >= 0x151 && header_size >= 0x7c ? r8(0x78) : 0));
 		m_ay8910[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7a ? r8(0x79) : 0));
 		m_ay8910[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7a ? r8(0x79) : 0));
-		m_ym2203[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7b ? r8(0x7a) : 0));
-		m_ym2203[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7b ? r8(0x7a) : 0));
-		m_ym2608[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7c ? r8(0x7b) : 0));
-		m_ym2608[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && header_size >= 0x7c ? r8(0x7b) : 0));
 
 		setup_device(*m_dmg[0], 0, CT_GAMEBOY, 0x80, 0x161);
 		setup_device(*m_dmg[1], 1, CT_GAMEBOY, 0x80, 0x161);
@@ -2849,17 +2973,21 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_k054539[0]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
 		m_k054539[1]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
 
-		m_c140[0]->set_bank_type(c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0));
-		m_c140[1]->set_bank_type(c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0));
+		C140_TYPE c140_type = c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0);
+		m_vgmplay->set_c140_bank_type(0, c140_type);
+		m_vgmplay->set_c140_bank_type(1, c140_type);
 
 		m_okim6295_pin7[0] = setup_device(*m_okim6295[0], 0, CT_OKIM6295, 0x98, 0x161);
 		m_okim6295_pin7[1] = setup_device(*m_okim6295[1], 1, CT_OKIM6295, 0x98, 0x161);
 		m_okim6295[0]->set_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 		m_okim6295[1]->set_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 
-		if (setup_device(*m_k051649[0], 0, CT_K051649, 0x9c, 0x161) ||
-			setup_device(*m_k051649[1], 1, CT_K051649, 0x9c, 0x161))
-			osd_printf_warning("Warning: file requests an unsupported Konami SCC\n");
+		setup_device(*m_k051649[0], 0, CT_K051649, 0x9c, 0x161);
+		setup_device(*m_k051649[1], 1, CT_K051649, 0x9c, 0x161);
+
+		// HACK: Some VGMs contain the halved clock speed of the sound core inside the SCC
+		m_k051649[0]->set_clock_scale(m_k051649[0]->unscaled_clock() < 2097152 ? 2.0 : 1.0);
+		m_k051649[1]->set_clock_scale(m_k051649[1]->unscaled_clock() < 2097152 ? 2.0 : 1.0);
 
 		setup_device(*m_k054539[0], 0, CT_K054539, 0xa0, 0x161);
 		setup_device(*m_k054539[1], 1, CT_K054539, 0xa0, 0x161);
@@ -2876,8 +3004,16 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 		setup_device(*m_huc6280[0], 0, CT_C6280, 0xa4, 0x161);
 		setup_device(*m_huc6280[1], 1, CT_C6280, 0xa4, 0x161);
-		setup_device(*m_c140[0], 0, CT_C140, 0xa8, 0x161);
-		setup_device(*m_c140[1], 1, CT_C140, 0xa8, 0x161);
+		if (c140_type == C140_ASIC219)
+		{
+			setup_device(*m_c219[0], 0, CT_C140, 0xa8, 0x161);
+			setup_device(*m_c219[1], 1, CT_C140, 0xa8, 0x161);
+		}
+		else
+		{
+			setup_device(*m_c140[0], 0, CT_C140, 0xa8, 0x161);
+			setup_device(*m_c140[1], 1, CT_C140, 0xa8, 0x161);
+		}
 		setup_device(*m_k053260[0], 0, CT_K053260, 0xac, 0x161);
 		setup_device(*m_k053260[1], 1, CT_K053260, 0xac, 0x161);
 		setup_device(*m_pokey[0], 0, CT_POKEY, 0xb0, 0x161);
@@ -2928,16 +3064,6 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 			if (child.clock() != 0)
 				logerror("%s %d\n", child.tag(), child.clock());
 
-		if (chip_count == 0)
-			volume = 0.0f;
-		else
-			volume /= (float)chip_count;
-
-		for (int i = 0; i < m_lspeaker->inputs(); i++)
-			m_lspeaker->set_input_gain(i, volume); // TODO : Volume is related to chip number
-		for (int i = 0; i < m_rspeaker->inputs(); i++)
-			m_rspeaker->set_input_gain(i, volume);
-
 		//for (auto &stream : machine().sound().streams())
 		//  if (stream->sample_rate() != 0)
 		//      logerror("%s %d\n", stream->device().tag(), stream->sample_rate());
@@ -2948,21 +3074,21 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 	}
 }
 
-READ8_MEMBER(vgmplay_state::file_r)
+uint8_t vgmplay_state::file_r(offs_t offset)
 {
 	if (offset < m_file_data.size())
 		return m_file_data[offset];
 	return 0;
 }
 
-READ8_MEMBER(vgmplay_state::file_size_r)
+uint8_t vgmplay_state::file_size_r(offs_t offset)
 {
 	uint32_t size = m_file_data.size();
 	return size >> (8 * offset);
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_w)
+void vgmplay_device::multipcm_bank_hi_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 		m_multipcm_bank_l[Index] = (m_multipcm_bank_l[Index] & 0xff) | (data << 16);
@@ -2971,7 +3097,7 @@ WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_w)
+void vgmplay_device::multipcm_bank_lo_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 		m_multipcm_bank_l[Index] = (m_multipcm_bank_l[Index] & 0xff00) | data;
@@ -2982,7 +3108,7 @@ WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::upd7759_reset_w)
+void vgmplay_state::upd7759_reset_w(uint8_t data)
 {
 	int reset = data != 0;
 
@@ -2998,7 +3124,7 @@ WRITE8_MEMBER(vgmplay_state::upd7759_reset_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::upd7759_data_w)
+void vgmplay_state::upd7759_data_w(uint8_t data)
 {
 	if (!m_upd7759_md[Index] && !m_upd7759_drq[Index])
 	{
@@ -3029,14 +3155,14 @@ WRITE_LINE_MEMBER(vgmplay_state::upd7759_drq_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::upd7759_bank_w)
+void vgmplay_device::upd7759_bank_w(uint8_t data)
 {
 	// TODO: upd7759 update stream
 	m_upd7759_bank[Index] = data * 0x20000;
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::okim6258_clock_w)
+void vgmplay_state::okim6258_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int shift = ((offset & 3) << 3);
 	uint32_t c = (m_okim6258[Index]->unscaled_clock() & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
@@ -3045,7 +3171,7 @@ WRITE8_MEMBER(vgmplay_state::okim6258_clock_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::okim6258_divider_w)
+void vgmplay_state::okim6258_divider_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & mem_mask) != (m_okim6258_divider[Index] & mem_mask))
 	{
@@ -3055,7 +3181,7 @@ WRITE8_MEMBER(vgmplay_state::okim6258_divider_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::okim6295_clock_w)
+void vgmplay_state::okim6295_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int shift = ((offset & 3) << 3);
 	uint32_t c = (m_okim6295[Index]->unscaled_clock() & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
@@ -3064,7 +3190,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_clock_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
+void vgmplay_state::okim6295_pin7_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & mem_mask) != (m_okim6295_pin7[Index] & mem_mask))
 	{
@@ -3074,13 +3200,13 @@ WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_enable_w)
+void vgmplay_device::okim6295_nmk112_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_okim6295_nmk112_enable[Index]);
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::okim6295_bank_w)
+void vgmplay_device::okim6295_bank_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & mem_mask) != (m_okim6295_bank[Index] & mem_mask))
 	{
@@ -3089,7 +3215,7 @@ WRITE8_MEMBER(vgmplay_device::okim6295_bank_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_bank_w)
+void vgmplay_device::okim6295_nmk112_bank_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 3;
 	if ((data & mem_mask) != (m_okim6295_nmk112_bank[Index][offset] & mem_mask))
@@ -3099,7 +3225,7 @@ WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_bank_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::scc_w)
+void vgmplay_state::scc_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 1)
 	{
@@ -3132,13 +3258,21 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 	}
 }
 
+template<int Index>
+void vgmplay_state::c140_c219_w(offs_t offset, uint8_t data)
+{
+	if (m_vgmplay->c140_bank(Index) == C140_ASIC219)
+		m_c219[Index]->c219_w(offset, data);
+	else
+		m_c140[Index]->c140_w(offset, data);
+}
+
 INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 {
-	if (!newval)
+	if (!newval && param != VGMPLAY_HOLD)
 		return;
 
-	int val = (uint8_t)(uintptr_t)param;
-	switch (val)
+	switch (param)
 	{
 	case VGMPLAY_STOP:
 		m_vgmplay->stop();
@@ -3155,16 +3289,43 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 	case VGMPLAY_LOOP:
 		m_vgmplay->toggle_loop();
 		break;
+	case VGMPLAY_VIZ:
+		m_mixer->cycle_viz_mode();
+		break;
+	case VGMPLAY_RATE_DOWN:
+		m_vgmplay->set_unscaled_clock((uint32_t)(m_vgmplay->clock() * 0.95f));
+		break;
+	case VGMPLAY_RATE_UP:
+		m_vgmplay->set_unscaled_clock((uint32_t)(m_vgmplay->clock() / 0.95f));
+		break;
+	case VGMPLAY_RATE_RST:
+		m_vgmplay->set_unscaled_clock(44100);
+		break;
+	case VGMPLAY_HOLD:
+		if (newval)
+		{
+			m_held_clock = m_vgmplay->clock();
+			m_vgmplay->set_unscaled_clock(0);
+		}
+		else
+		{
+			m_vgmplay->set_unscaled_clock(m_held_clock);
+		}
 	}
 }
 
 static INPUT_PORTS_START( vgmplay )
 	PORT_START("CONTROLS")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)        PORT_NAME("Stop")
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)       PORT_NAME("Pause")
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)        PORT_NAME("Play")
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)     PORT_NAME("Restart")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)        PORT_NAME("Loop")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)        PORT_NAME("Stop")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)       PORT_NAME("Pause")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)        PORT_NAME("Play")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)     PORT_NAME("Restart")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)        PORT_NAME("Loop")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_VIZ)         PORT_NAME("Visualization Mode")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_DOWN)   PORT_CODE(KEYCODE_R) PORT_NAME("Rate Down")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_UP)     PORT_CODE(KEYCODE_T) PORT_NAME("Rate Up")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_RST)    PORT_CODE(KEYCODE_Y) PORT_NAME("Rate Reset")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_HOLD)        PORT_CODE(KEYCODE_U) PORT_NAME("Rate Hold")
 INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)
@@ -3185,8 +3346,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_YM2612_1, vgmplay_device::A_YM2612_1 + 3).w(m_ym2612[1], FUNC(ym2612_device::write));
 	map(vgmplay_device::A_YM2151_0, vgmplay_device::A_YM2151_0 + 1).w(m_ym2151[0], FUNC(ym2151_device::write));
 	map(vgmplay_device::A_YM2151_1, vgmplay_device::A_YM2151_1 + 1).w(m_ym2151[1], FUNC(ym2151_device::write));
-	map(vgmplay_device::A_SEGAPCM_0, vgmplay_device::A_SEGAPCM_0 + 0x7ff).w(m_segapcm[0], FUNC(segapcm_device::sega_pcm_w));
-	map(vgmplay_device::A_SEGAPCM_1, vgmplay_device::A_SEGAPCM_1 + 0x7ff).w(m_segapcm[1], FUNC(segapcm_device::sega_pcm_w));
+	map(vgmplay_device::A_SEGAPCM_0, vgmplay_device::A_SEGAPCM_0 + 0x7ff).w(m_segapcm[0], FUNC(segapcm_device::write));
+	map(vgmplay_device::A_SEGAPCM_1, vgmplay_device::A_SEGAPCM_1 + 0x7ff).w(m_segapcm[1], FUNC(segapcm_device::write));
 	map(vgmplay_device::A_RF5C68, vgmplay_device::A_RF5C68 + 0xf).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_w));
 	map(vgmplay_device::A_RF5C68_RAM, vgmplay_device::A_RF5C68_RAM + 0xffff).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_mem_w));
 	map(vgmplay_device::A_YM2203_0, vgmplay_device::A_YM2203_0 + 1).w(m_ym2203[0], FUNC(ym2203_device::write));
@@ -3201,8 +3362,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_YM3526_1, vgmplay_device::A_YM3526_1 + 1).w(m_ym3526[1], FUNC(ym3526_device::write));
 	map(vgmplay_device::A_Y8950_0, vgmplay_device::A_Y8950_0 + 1).w(m_y8950[0], FUNC(y8950_device::write));
 	map(vgmplay_device::A_Y8950_1, vgmplay_device::A_Y8950_1 + 1).w(m_y8950[1], FUNC(y8950_device::write));
-	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 1).w(m_ymf262[0], FUNC(ymf262_device::write));
-	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 1).w(m_ymf262[1], FUNC(ymf262_device::write));
+	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 3).w(m_ymf262[0], FUNC(ymf262_device::write));
+	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 3).w(m_ymf262[1], FUNC(ymf262_device::write));
 	map(vgmplay_device::A_YMF278B_0, vgmplay_device::A_YMF278B_0 + 0xf).w(m_ymf278b[0], FUNC(ymf278b_device::write));
 	map(vgmplay_device::A_YMF278B_1, vgmplay_device::A_YMF278B_1 + 0xf).w(m_ymf278b[1], FUNC(ymf278b_device::write));
 	map(vgmplay_device::A_YMF271_0, vgmplay_device::A_YMF271_0 + 0xf).w(m_ymf271[0], FUNC(ymf271_device::write));
@@ -3230,11 +3391,11 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_MULTIPCM_1 + 4, vgmplay_device::A_MULTIPCM_1 + 7).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_hi_w<1>));
 	map(vgmplay_device::A_MULTIPCM_1 + 8, vgmplay_device::A_MULTIPCM_1 + 11).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_lo_w<1>));
 	map(vgmplay_device::A_UPD7759_0 + 0, vgmplay_device::A_UPD7759_0 + 0).w(FUNC(vgmplay_state::upd7759_reset_w<0>));
-	map(vgmplay_device::A_UPD7759_0 + 1, vgmplay_device::A_UPD7759_0 + 1).lw8("upd7759.0.start", [this](uint8_t data) {m_upd7759[0]->start_w(data != 0); });
+	map(vgmplay_device::A_UPD7759_0 + 1, vgmplay_device::A_UPD7759_0 + 1).lw8(NAME([this](uint8_t data) {m_upd7759[0]->start_w(data != 0); }));
 	map(vgmplay_device::A_UPD7759_0 + 2, vgmplay_device::A_UPD7759_0 + 2).w(FUNC(vgmplay_state::upd7759_data_w<0>));
 	map(vgmplay_device::A_UPD7759_0 + 3, vgmplay_device::A_UPD7759_0 + 3).w("vgmplay", FUNC(vgmplay_device::upd7759_bank_w<0>));
 	map(vgmplay_device::A_UPD7759_1 + 0, vgmplay_device::A_UPD7759_1 + 0).w(FUNC(vgmplay_state::upd7759_reset_w<1>));
-	map(vgmplay_device::A_UPD7759_1 + 1, vgmplay_device::A_UPD7759_1 + 1).lw8("upd7759.1.start", [this](uint8_t data) {m_upd7759[1]->start_w(data != 0); });
+	map(vgmplay_device::A_UPD7759_1 + 1, vgmplay_device::A_UPD7759_1 + 1).lw8(NAME([this](uint8_t data) {m_upd7759[1]->start_w(data != 0); }));
 	map(vgmplay_device::A_UPD7759_1 + 2, vgmplay_device::A_UPD7759_1 + 2).w(FUNC(vgmplay_state::upd7759_data_w<1>));
 	map(vgmplay_device::A_UPD7759_1 + 3, vgmplay_device::A_UPD7759_1 + 3).w("vgmplay", FUNC(vgmplay_device::upd7759_bank_w<1>));
 	map(vgmplay_device::A_OKIM6258_0 + 0x0, vgmplay_device::A_OKIM6258_0 + 0x0).w(m_okim6258[0], FUNC(okim6258_device::ctrl_w));
@@ -3265,17 +3426,13 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_K054539_1, vgmplay_device::A_K054539_1 + 0x22f).w(m_k054539[1], FUNC(k054539_device::write));
 	map(vgmplay_device::A_C6280_0, vgmplay_device::A_C6280_0 + 0xf).w("huc6280.0:psg", FUNC(c6280_device::c6280_w));
 	map(vgmplay_device::A_C6280_1, vgmplay_device::A_C6280_1 + 0xf).w("huc6280.1:psg", FUNC(c6280_device::c6280_w));
-	map(vgmplay_device::A_C140_0, vgmplay_device::A_C140_0 + 0x1ff).w(m_c140[0], FUNC(c140_device::c140_w));
-	map(vgmplay_device::A_C140_1, vgmplay_device::A_C140_1 + 0x1ff).w(m_c140[1], FUNC(c140_device::c140_w));
+	map(vgmplay_device::A_C140_0, vgmplay_device::A_C140_0 + 0x1ff).w(FUNC(vgmplay_state::c140_c219_w<0>));
+	map(vgmplay_device::A_C140_1, vgmplay_device::A_C140_1 + 0x1ff).w(FUNC(vgmplay_state::c140_c219_w<1>));
 	map(vgmplay_device::A_K053260_0, vgmplay_device::A_K053260_0 + 0x2f).w(m_k053260[0], FUNC(k053260_device::write));
 	map(vgmplay_device::A_K053260_1, vgmplay_device::A_K053260_1 + 0x2f).w(m_k053260[1], FUNC(k053260_device::write));
 	map(vgmplay_device::A_POKEY_0, vgmplay_device::A_POKEY_0 + 0xf).w(m_pokey[0], FUNC(pokey_device::write));
 	map(vgmplay_device::A_POKEY_1, vgmplay_device::A_POKEY_1 + 0xf).w(m_pokey[1], FUNC(pokey_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND + 0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
-	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
-	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
-	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
-	map(vgmplay_device::A_WSWAN_RAM_1, vgmplay_device::A_WSWAN_RAM_1 + 0x3fff).ram().share("wswan_ram.1");
 	map(vgmplay_device::A_VSU_VUE_0, vgmplay_device::A_VSU_VUE_0 + 0x5ff).w(m_vsu_vue[0], FUNC(vboysnd_device::write));
 	map(vgmplay_device::A_VSU_VUE_1, vgmplay_device::A_VSU_VUE_1 + 0x5ff).w(m_vsu_vue[1], FUNC(vboysnd_device::write));
 	map(vgmplay_device::A_SAA1099_0, vgmplay_device::A_SAA1099_0 + 1).w(m_saa1099[0], FUNC(saa1099_device::write));
@@ -3287,19 +3444,27 @@ void vgmplay_state::soundchips_map(address_map &map)
 	// TODO: es5505
 	map(vgmplay_device::A_X1_010_0, vgmplay_device::A_X1_010_0 + 0x1fff).w(m_x1_010[0], FUNC(x1_010_device::write));
 	map(vgmplay_device::A_X1_010_1, vgmplay_device::A_X1_010_1 + 0x1fff).w(m_x1_010[1], FUNC(x1_010_device::write));
-	map(vgmplay_device::A_GA20_0, vgmplay_device::A_GA20_0 + 0x1f).w(m_ga20[0], FUNC(iremga20_device::irem_ga20_w));
-	map(vgmplay_device::A_GA20_1, vgmplay_device::A_GA20_1 + 0x1f).w(m_ga20[1], FUNC(iremga20_device::irem_ga20_w));
+	map(vgmplay_device::A_GA20_0, vgmplay_device::A_GA20_0 + 0x1f).w(m_ga20[0], FUNC(iremga20_device::write));
+	map(vgmplay_device::A_GA20_1, vgmplay_device::A_GA20_1 + 0x1f).w(m_ga20[1], FUNC(iremga20_device::write));
 }
 
-void vgmplay_state::soundchips16_map(address_map &map)
+void vgmplay_state::soundchips16le_map(address_map &map)
 {
-	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::_32x_pwm_w));
+	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::pwm_w));
+	map(vgmplay_device::A_C352_0, vgmplay_device::A_C352_0 + 0x7fff).w(m_c352[0], FUNC(c352_device::write));
+	map(vgmplay_device::A_C352_1, vgmplay_device::A_C352_1 + 0x7fff).w(m_c352[1], FUNC(c352_device::write));
+	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
+	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
+	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
+	map(vgmplay_device::A_WSWAN_RAM_1, vgmplay_device::A_WSWAN_RAM_1 + 0x3fff).ram().share("wswan_ram.1");
+}
+
+void vgmplay_state::soundchips16be_map(address_map &map)
+{
 	map(vgmplay_device::A_SCSP_0, vgmplay_device::A_SCSP_0 + 0xfff).w(m_scsp[0], FUNC(scsp_device::write));
 	map(vgmplay_device::A_SCSP_1, vgmplay_device::A_SCSP_1 + 0xfff).w(m_scsp[1], FUNC(scsp_device::write));
 	map(vgmplay_device::A_SCSP_RAM_0, vgmplay_device::A_SCSP_RAM_0 + 0xfffff).ram().share("scsp_ram.0");
 	map(vgmplay_device::A_SCSP_RAM_1, vgmplay_device::A_SCSP_RAM_1 + 0xfffff).ram().share("scsp_ram.1");
-	map(vgmplay_device::A_C352_0, vgmplay_device::A_C352_0 + 0x7fff).w(m_c352[0], FUNC(c352_device::write));
-	map(vgmplay_device::A_C352_1, vgmplay_device::A_C352_1 + 0x7fff).w(m_c352[1], FUNC(c352_device::write));
 }
 
 template<int Index>
@@ -3389,7 +3554,13 @@ void vgmplay_state::k054539_map(address_map &map)
 template<int Index>
 void vgmplay_state::c140_map(address_map &map)
 {
-	map(0, 0x1fffff).r("vgmplay", FUNC(vgmplay_device::c140_rom_r<Index>));
+	map(0, 0x1ffffff).r("vgmplay", FUNC(vgmplay_device::c140_rom_r<Index>));
+}
+
+template<int Index>
+void vgmplay_state::c219_map(address_map &map)
+{
+	map(0, 0x07ffff).r("vgmplay", FUNC(vgmplay_device::c219_rom_r<Index>));
 }
 
 template<int Index>
@@ -3452,417 +3623,461 @@ void vgmplay_state::rf5c164_map(address_map &map)
 	map(0, 0xffff).ram().share("rf5c164_ram");
 }
 
-MACHINE_CONFIG_START(vgmplay_state::vgmplay)
+void vgmplay_state::vgmplay(machine_config &config)
+{
 	VGMPLAY(config, m_vgmplay, 44100);
 	m_vgmplay->set_addrmap(AS_PROGRAM, &vgmplay_state::file_map);
 	m_vgmplay->set_addrmap(AS_IO, &vgmplay_state::soundchips_map);
-	m_vgmplay->set_addrmap(AS_IO16, &vgmplay_state::soundchips16_map);
+	m_vgmplay->set_addrmap(AS_IO16LE, &vgmplay_state::soundchips16le_map);
+	m_vgmplay->set_addrmap(AS_IO16BE, &vgmplay_state::soundchips16be_map);
 
-	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz")
-	MCFG_QUICKLOAD_INTERFACE("vgm_quik")
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "vgm,vgz"));
+	quickload.set_load_callback(FUNC(vgmplay_state::load_file));
+	quickload.set_interface("vgm_quik");
 
 	SOFTWARE_LIST(config, "vgm_list").set_original("vgmplay");
 
 	config.set_default_layout(layout_vgmplay);
 
 	SN76489(config, m_sn76489[0], 0);
-	m_sn76489[0]->add_route(0, "lspeaker", 0.5);
-	m_sn76489[0]->add_route(0, "rspeaker", 0.5);
+	m_sn76489[0]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_sn76489[0]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	SN76489(config, m_sn76489[1], 0);
-	m_sn76489[1]->add_route(0, "lspeaker", 0.5);
-	m_sn76489[1]->add_route(0, "rspeaker", 0.5);
+	m_sn76489[1]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_sn76489[1]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	YM2413(config, m_ym2413[0], 0);
-	m_ym2413[0]->add_route(ALL_OUTPUTS, "lspeaker", 1);
-	m_ym2413[0]->add_route(ALL_OUTPUTS, "rspeaker", 1);
+	m_ym2413[0]->add_route(ALL_OUTPUTS, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_ym2413[0]->add_route(ALL_OUTPUTS, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	YM2413(config, m_ym2413[1], 0);
-	m_ym2413[1]->add_route(0, "lspeaker", 1);
-	m_ym2413[1]->add_route(1, "rspeaker", 1);
+	m_ym2413[1]->add_route(ALL_OUTPUTS, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_ym2413[1]->add_route(ALL_OUTPUTS, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	YM2612(config, m_ym2612[0], 0);
-	m_ym2612[0]->add_route(0, "lspeaker", 1);
-	m_ym2612[0]->add_route(1, "rspeaker", 1);
+	m_ym2612[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_ym2612[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	YM2612(config, m_ym2612[1], 0);
-	m_ym2612[1]->add_route(0, "lspeaker", 1);
-	m_ym2612[1]->add_route(1, "rspeaker", 1);
+	m_ym2612[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_ym2612[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	YM2151(config, m_ym2151[0], 0);
-	m_ym2151[0]->add_route(0, "lspeaker", 1);
-	m_ym2151[0]->add_route(1, "rspeaker", 1);
+	m_ym2151[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_ym2151[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	YM2151(config, m_ym2151[1], 0);
-	m_ym2151[1]->add_route(0, "lspeaker", 1);
-	m_ym2151[1]->add_route(1, "rspeaker", 1);
+	m_ym2151[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_ym2151[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	SEGAPCM(config, m_segapcm[0], 0);
 	m_segapcm[0]->set_addrmap(0, &vgmplay_state::segapcm_map<0>);
-	m_segapcm[0]->add_route(0, "lspeaker", 1);
-	m_segapcm[0]->add_route(1, "rspeaker", 1);
+	m_segapcm[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_segapcm[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	SEGAPCM(config, m_segapcm[1], 0);
 	m_segapcm[1]->set_addrmap(0, &vgmplay_state::segapcm_map<1>);
-	m_segapcm[1]->add_route(0, "lspeaker", 1);
-	m_segapcm[1]->add_route(1, "rspeaker", 1);
+	m_segapcm[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_segapcm[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	RF5C68(config, m_rf5c68, 0);
 	m_rf5c68->set_addrmap(0, &vgmplay_state::rf5c68_map<0>);
-	m_rf5c68->add_route(0, "lspeaker", 1);
-	m_rf5c68->add_route(1, "rspeaker", 1);
+	m_rf5c68->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_rf5c68->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	// TODO: prevent error.log spew
 	YM2203(config, m_ym2203[0], 0);
-	m_ym2203[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ym2203[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ym2203[0]->add_route(ALL_OUTPUTS, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ym2203[0]->add_route(ALL_OUTPUTS, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
 
 	YM2203(config, m_ym2203[1], 0);
-	m_ym2203[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ym2203[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ym2203[1]->add_route(ALL_OUTPUTS, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ym2203[1]->add_route(ALL_OUTPUTS, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
 
 	// TODO: prevent error.log spew
 	YM2608(config, m_ym2608[0], 0);
 	m_ym2608[0]->set_addrmap(0, &vgmplay_state::ym2608_map<0>);
-	m_ym2608[0]->add_route(ALL_OUTPUTS, "lspeaker", 1);
-	m_ym2608[0]->add_route(ALL_OUTPUTS, "rspeaker", 1);
+	m_ym2608[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ym2608[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ym2608[0]->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ym2608[0]->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	YM2608(config, m_ym2608[1], 0);
 	m_ym2608[1]->set_addrmap(0, &vgmplay_state::ym2608_map<1>);
-	m_ym2608[1]->add_route(ALL_OUTPUTS, "lspeaker", 1);
-	m_ym2608[1]->add_route(ALL_OUTPUTS, "rspeaker", 1);
+	m_ym2608[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ym2608[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ym2608[1]->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ym2608[1]->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	// TODO: prevent error.log spew
 	YM2610(config, m_ym2610[0], 0);
 	m_ym2610[0]->set_addrmap(0, &vgmplay_state::ym2610_adpcm_a_map<0>);
 	m_ym2610[0]->set_addrmap(1, &vgmplay_state::ym2610_adpcm_b_map<0>);
-	m_ym2610[0]->add_route(0, "lspeaker", 0.25);
-	m_ym2610[0]->add_route(0, "rspeaker", 0.25);
-	m_ym2610[0]->add_route(1, "lspeaker", 0.50);
-	m_ym2610[0]->add_route(2, "rspeaker", 0.50);
+	m_ym2610[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ym2610[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ym2610[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_ym2610[0]->add_route(2, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	YM2610(config, m_ym2610[1], 0);
 	m_ym2610[1]->set_addrmap(0, &vgmplay_state::ym2610_adpcm_a_map<1>);
 	m_ym2610[1]->set_addrmap(1, &vgmplay_state::ym2610_adpcm_b_map<1>);
-	m_ym2610[1]->add_route(0, "lspeaker", 0.25);
-	m_ym2610[1]->add_route(0, "rspeaker", 0.25);
-	m_ym2610[1]->add_route(1, "lspeaker", 0.50);
-	m_ym2610[1]->add_route(2, "rspeaker", 0.50);
+	m_ym2610[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ym2610[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ym2610[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_ym2610[1]->add_route(2, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	YM3812(config, m_ym3812[0], 0);
-	m_ym3812[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_ym3812[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_ym3812[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_ym3812[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	YM3812(config, m_ym3812[1], 0);
-	m_ym3812[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_ym3812[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_ym3812[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_ym3812[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	YM3526(config, m_ym3526[0], 0);
-	m_ym3526[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_ym3526[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_ym3526[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_ym3526[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	YM3526(config, m_ym3526[1], 0);
-	m_ym3526[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_ym3526[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_ym3526[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_ym3526[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	Y8950(config, m_y8950[0], 0);
 	m_y8950[0]->set_addrmap(0, &vgmplay_state::y8950_map<0>);
-	m_y8950[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	m_y8950[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	m_y8950[0]->add_route(ALL_OUTPUTS, m_mixer, 0.40, AUTO_ALLOC_INPUT, 0);
+	m_y8950[0]->add_route(ALL_OUTPUTS, m_mixer, 0.40, AUTO_ALLOC_INPUT, 1);
 
 	Y8950(config, m_y8950[1], 0);
 	m_y8950[1]->set_addrmap(0, &vgmplay_state::y8950_map<1>);
-	m_y8950[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	m_y8950[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	m_y8950[1]->add_route(ALL_OUTPUTS, m_mixer, 0.40, AUTO_ALLOC_INPUT, 0);
+	m_y8950[1]->add_route(ALL_OUTPUTS, m_mixer, 0.40, AUTO_ALLOC_INPUT, 1);
 
 	YMF262(config, m_ymf262[0], 0);
-	m_ymf262[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	m_ymf262[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	m_ymf262[0]->add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf262[0]->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_ymf262[0]->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf262[0]->add_route(3, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	YMF262(config, m_ymf262[1], 0);
-	m_ymf262[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	m_ymf262[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	m_ymf262[1]->add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf262[1]->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_ymf262[1]->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf262[1]->add_route(3, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	// TODO: prevent error.log spew
 	YMF278B(config, m_ymf278b[0], 0);
 	m_ymf278b[0]->set_addrmap(0, &vgmplay_state::ymf278b_map<0>);
-	m_ymf278b[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymf278b[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymf278b[0]->add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf278b[0]->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_ymf278b[0]->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf278b[0]->add_route(3, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_ymf278b[0]->add_route(4, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf278b[0]->add_route(5, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	YMF278B(config, m_ymf278b[1], 0);
 	m_ymf278b[1]->set_addrmap(0, &vgmplay_state::ymf278b_map<1>);
-	m_ymf278b[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymf278b[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymf278b[1]->add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf278b[1]->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_ymf278b[1]->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf278b[1]->add_route(3, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_ymf278b[1]->add_route(4, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_ymf278b[1]->add_route(5, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	YMF271(config, m_ymf271[0], 0);
 	m_ymf271[0]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);
-	m_ymf271[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymf271[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymf271[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ymf271[0]->add_route(1, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ymf271[0]->add_route(2, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ymf271[0]->add_route(3, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
 
 	YMF271(config, m_ymf271[1], 0);
 	m_ymf271[1]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);
-	m_ymf271[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymf271[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymf271[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ymf271[1]->add_route(1, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ymf271[1]->add_route(2, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_ymf271[1]->add_route(3, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
 
 	// TODO: prevent error.log spew
 	YMZ280B(config, m_ymz280b[0], 0);
 	m_ymz280b[0]->set_addrmap(0, &vgmplay_state::ymz280b_map<0>);
-	m_ymz280b[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymz280b[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymz280b[0]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_ymz280b[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	YMZ280B(config, m_ymz280b[1], 0);
 	m_ymz280b[1]->set_addrmap(0, &vgmplay_state::ymz280b_map<1>);
-	m_ymz280b[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymz280b[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymz280b[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_ymz280b[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	RF5C164(config, m_rf5c164, 0);
 	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map<0>);
-	m_rf5c164->add_route(0, "lspeaker", 1);
-	m_rf5c164->add_route(1, "rspeaker", 1);
+	m_rf5c164->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_rf5c164->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	/// TODO: rewrite to generate audio without using DAC devices
 	SEGA_32X_NTSC(config, m_sega32x, 0, "sega32x_maincpu", "sega32x_scanline_timer");
-	m_sega32x->set_palette_tag("sega32x_palette");
+	m_sega32x->add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_sega32x->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	auto& sega32x_maincpu(M68000(config, "sega32x_maincpu", 0));
 	sega32x_maincpu.set_disable();
 
 	TIMER(config, "sega32x_scanline_timer", 0);
 
-	PALETTE(config, "sega32x_palette").set_entries(0xc0 * 2);
-
 	m_sega32x->subdevice<cpu_device>("32x_master_sh2")->set_disable();
 	m_sega32x->subdevice<cpu_device>("32x_slave_sh2")->set_disable();
 
 	// TODO: prevent error.log spew
 	AY8910(config, m_ay8910[0], 0);
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, m_mixer, 0.33, AUTO_ALLOC_INPUT, 0);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, m_mixer, 0.33, AUTO_ALLOC_INPUT, 1);
 
 	AY8910(config, m_ay8910[1], 0);
-	m_ay8910[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
-	m_ay8910[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+	m_ay8910[1]->add_route(ALL_OUTPUTS, m_mixer, 0.33, AUTO_ALLOC_INPUT, 0);
+	m_ay8910[1]->add_route(ALL_OUTPUTS, m_mixer, 0.33, AUTO_ALLOC_INPUT, 1);
 
 	DMG_APU(config, m_dmg[0], 0);
-	m_dmg[0]->add_route(0, "lspeaker", 1);
-	m_dmg[0]->add_route(0, "rspeaker", 1);
+	m_dmg[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_dmg[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	DMG_APU(config, m_dmg[1], 0);
-	m_dmg[1]->add_route(0, "lspeaker", 1);
-	m_dmg[1]->add_route(0, "rspeaker", 1);
+	m_dmg[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_dmg[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	N2A03(config, m_nescpu[0], 0);
 	m_nescpu[0]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<0>);
 	m_nescpu[0]->set_disable();
-	m_nescpu[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_nescpu[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_nescpu[0]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_nescpu[0]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	N2A03(config, m_nescpu[1], 0);
 	m_nescpu[1]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<1>);
 	m_nescpu[1]->set_disable();
-	m_nescpu[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_nescpu[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_nescpu[1]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_nescpu[1]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	MULTIPCM(config, m_multipcm[0], 0);
 	m_multipcm[0]->set_addrmap(0, &vgmplay_state::multipcm_map<0>);
-	m_multipcm[0]->add_route(0, "lspeaker", 1);
-	m_multipcm[0]->add_route(1, "rspeaker", 1);
+	m_multipcm[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_multipcm[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	MULTIPCM(config, m_multipcm[1], 0);
 	m_multipcm[1]->set_addrmap(0, &vgmplay_state::multipcm_map<1>);
-	m_multipcm[1]->add_route(0, "lspeaker", 1);
-	m_multipcm[1]->add_route(1, "rspeaker", 1);
+	m_multipcm[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_multipcm[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	UPD7759(config, m_upd7759[0], 0);
 	m_upd7759[0]->drq().set(FUNC(vgmplay_state::upd7759_drq_w<0>));
 	m_upd7759[0]->set_addrmap(0, &vgmplay_state::upd7759_map<0>);
-	m_upd7759[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_upd7759[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_upd7759[0]->add_route(ALL_OUTPUTS, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_upd7759[0]->add_route(ALL_OUTPUTS, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	UPD7759(config, m_upd7759[1], 0);
 	m_upd7759[1]->drq().set(FUNC(vgmplay_state::upd7759_drq_w<1>));
 	m_upd7759[1]->set_addrmap(0, &vgmplay_state::upd7759_map<1>);
-	m_upd7759[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_upd7759[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_upd7759[1]->add_route(ALL_OUTPUTS, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_upd7759[1]->add_route(ALL_OUTPUTS, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	OKIM6258(config, m_okim6258[0], 0);
-	m_okim6258[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_okim6258[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_okim6258[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_okim6258[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	OKIM6258(config, m_okim6258[1], 0);
-	m_okim6258[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_okim6258[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_okim6258[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_okim6258[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	OKIM6295(config, m_okim6295[0], 0, okim6295_device::PIN7_HIGH);
 	m_okim6295[0]->set_addrmap(0, &vgmplay_state::okim6295_map<0>);
-	m_okim6295[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_okim6295[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_okim6295[0]->add_route(ALL_OUTPUTS, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_okim6295[0]->add_route(ALL_OUTPUTS, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
 
 	OKIM6295(config, m_okim6295[1], 0, okim6295_device::PIN7_HIGH);
 	m_okim6295[1]->set_addrmap(0, &vgmplay_state::okim6295_map<1>);
-	m_okim6295[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_okim6295[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_okim6295[1]->add_route(ALL_OUTPUTS, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
+	m_okim6295[1]->add_route(ALL_OUTPUTS, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
 
 	K051649(config, m_k051649[0], 0);
-	m_k051649[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
-	m_k051649[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+	m_k051649[0]->add_route(ALL_OUTPUTS, m_mixer, 0.33, AUTO_ALLOC_INPUT, 0);
+	m_k051649[0]->add_route(ALL_OUTPUTS, m_mixer, 0.33, AUTO_ALLOC_INPUT, 1);
 
 	K051649(config, m_k051649[1], 0);
-	m_k051649[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
-	m_k051649[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+	m_k051649[1]->add_route(ALL_OUTPUTS, m_mixer, 0.33, AUTO_ALLOC_INPUT, 0);
+	m_k051649[1]->add_route(ALL_OUTPUTS, m_mixer, 0.33, AUTO_ALLOC_INPUT, 1);
 
 	K054539(config, m_k054539[0], 0);
 	m_k054539[0]->set_addrmap(0, &vgmplay_state::k054539_map<0>);
-	m_k054539[0]->add_route(0, "lspeaker", 1);
-	m_k054539[0]->add_route(1, "rspeaker", 1);
+	m_k054539[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_k054539[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	K054539(config, m_k054539[1], 0);
 	m_k054539[1]->set_addrmap(0, &vgmplay_state::k054539_map<1>);
-	m_k054539[1]->add_route(0, "lspeaker", 1);
-	m_k054539[1]->add_route(1, "rspeaker", 1);
+	m_k054539[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_k054539[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	// TODO: prevent error.log spew
 	H6280(config, m_huc6280[0], 0);
 	m_huc6280[0]->set_disable();
-	m_huc6280[0]->add_route(0, "lspeaker", 1);
-	m_huc6280[0]->add_route(1, "rspeaker", 1);
+	m_huc6280[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_huc6280[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	H6280(config, m_huc6280[1], 0);
 	m_huc6280[1]->set_disable();
-	m_huc6280[1]->add_route(0, "lspeaker", 1);
-	m_huc6280[1]->add_route(1, "rspeaker", 1);
+	m_huc6280[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_huc6280[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	C140(config, m_c140[0], 0);
 	m_c140[0]->set_addrmap(0, &vgmplay_state::c140_map<0>);
-	m_c140[0]->add_route(0, "lspeaker", 0.50);
-	m_c140[0]->add_route(1, "rspeaker", 0.50);
+	m_c140[0]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_c140[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	C140(config, m_c140[1], 0);
 	m_c140[1]->set_addrmap(0, &vgmplay_state::c140_map<1>);
-	m_c140[1]->add_route(0, "lspeaker", 0.50);
-	m_c140[1]->add_route(1, "rspeaker", 0.50);
+	m_c140[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_c140[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
+
+	C219(config, m_c219[0], 0);
+	m_c219[0]->set_addrmap(0, &vgmplay_state::c219_map<0>);
+	m_c219[0]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_c219[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
+
+	C219(config, m_c219[1], 0);
+	m_c219[1]->set_addrmap(0, &vgmplay_state::c219_map<1>);
+	m_c219[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_c219[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	K053260(config, m_k053260[0], 0);
 	m_k053260[0]->set_addrmap(0, &vgmplay_state::k053260_map<0>);
-	m_k053260[0]->add_route(0, "lspeaker", 1);
-	m_k053260[0]->add_route(1, "rspeaker", 1);
+	m_k053260[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_k053260[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	K053260(config, m_k053260[1], 0);
 	m_k053260[1]->set_addrmap(0, &vgmplay_state::k053260_map<1>);
-	m_k053260[1]->add_route(0, "lspeaker", 1);
-	m_k053260[1]->add_route(1, "rspeaker", 1);
+	m_k053260[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_k053260[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	POKEY(config, m_pokey[0], 0);
-	m_pokey[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_pokey[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_pokey[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_pokey[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	POKEY(config, m_pokey[1], 0);
-	m_pokey[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_pokey[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_pokey[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_pokey[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	QSOUND(config, m_qsound, 0);
 	m_qsound->set_addrmap(0, &vgmplay_state::qsound_map<0>);
-	m_qsound->add_route(0, "lspeaker", 1);
-	m_qsound->add_route(1, "rspeaker", 1);
+	m_qsound->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_qsound->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	SCSP(config, m_scsp[0], 0);
 	m_scsp[0]->set_addrmap(0, &vgmplay_state::scsp_map<0>);
-	m_scsp[0]->add_route(0, "lspeaker", 1);
-	m_scsp[0]->add_route(1, "rspeaker", 1);
+	m_scsp[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_scsp[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	SCSP(config, m_scsp[1], 0);
 	m_scsp[1]->set_addrmap(0, &vgmplay_state::scsp_map<1>);
-	m_scsp[1]->add_route(0, "lspeaker", 1);
-	m_scsp[1]->add_route(1, "rspeaker", 1);
+	m_scsp[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_scsp[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	WSWAN_SND(config, m_wswan[0], 0);
 	m_wswan[0]->set_addrmap(0, &vgmplay_state::wswan_map<0>);
-	m_wswan[0]->add_route(0, "lspeaker", 0.50);
-	m_wswan[0]->add_route(1, "rspeaker", 0.50);
+	m_wswan[0]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_wswan[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	WSWAN_SND(config, m_wswan[1], 0);
 	m_wswan[1]->set_addrmap(0, &vgmplay_state::wswan_map<1>);
-	m_wswan[1]->add_route(0, "lspeaker", 0.50);
-	m_wswan[1]->add_route(1, "rspeaker", 0.50);
+	m_wswan[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_wswan[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	VBOYSND(config, m_vsu_vue[0], 0);
-	m_vsu_vue[0]->add_route(0, "lspeaker", 1.0);
-	m_vsu_vue[0]->add_route(1, "rspeaker", 1.0);
+	m_vsu_vue[0]->add_route(0, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_vsu_vue[0]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	VBOYSND(config, m_vsu_vue[1], 0);
-	m_vsu_vue[1]->add_route(0, "lspeaker", 1.0);
-	m_vsu_vue[1]->add_route(1, "rspeaker", 1.0);
+	m_vsu_vue[1]->add_route(0, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_vsu_vue[1]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	SAA1099(config, m_saa1099[0], 0);
-	m_saa1099[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_saa1099[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_saa1099[0]->add_route(0, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_saa1099[0]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	SAA1099(config, m_saa1099[1], 0);
-	m_saa1099[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_saa1099[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_saa1099[1]->add_route(0, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_saa1099[1]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	ES5503(config, m_es5503[0], 0);
 	m_es5503[0]->set_channels(2);
 	m_es5503[0]->set_addrmap(0, &vgmplay_state::es5503_map<0>);
-	m_es5503[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_es5503[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_es5503[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_es5503[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	ES5503(config, m_es5503[1], 0);
 	m_es5503[1]->set_channels(2);
 	m_es5503[1]->set_addrmap(0, &vgmplay_state::es5503_map<1>);
-	m_es5503[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_es5503[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_es5503[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_es5503[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	ES5505(config, m_es5505[0], 0);
 	// TODO m_es5505[0]->set_addrmap(0, &vgmplay_state::es5505_map<0>);
-	m_es5505[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_es5505[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	// TODO m_es5505[0]->set_addrmap(1, &vgmplay_state::es5505_map<0>);
+	m_es5505[0]->set_channels(1);
+	m_es5505[0]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_es5505[0]->add_route(1, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	ES5505(config, m_es5505[1], 0);
 	// TODO m_es5505[1]->set_addrmap(0, &vgmplay_state::es5505_map<1>);
-	m_es5505[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_es5505[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	// TODO m_es5505[1]->set_addrmap(1, &vgmplay_state::es5505_map<1>);
+	m_es5505[1]->set_channels(1);
+	m_es5505[1]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_es5505[1]->add_route(1, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	X1_010(config, m_x1_010[0], 0);
 	m_x1_010[0]->set_addrmap(0, &vgmplay_state::x1_010_map<0>);
-	m_x1_010[0]->add_route(0, "lspeaker", 1);
-	m_x1_010[0]->add_route(1, "rspeaker", 1);
+	m_x1_010[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_x1_010[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	X1_010(config, m_x1_010[1], 0);
 	m_x1_010[1]->set_addrmap(0, &vgmplay_state::x1_010_map<1>);
-	m_x1_010[1]->add_route(0, "lspeaker", 1);
-	m_x1_010[1]->add_route(1, "rspeaker", 1);
+	m_x1_010[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_x1_010[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	C352(config, m_c352[0], 0, 1);
 	m_c352[0]->set_addrmap(0, &vgmplay_state::c352_map<0>);
-	m_c352[0]->add_route(0, "lspeaker", 1);
-	m_c352[0]->add_route(1, "rspeaker", 1);
+	m_c352[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_c352[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
+	m_c352[0]->add_route(2, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_c352[0]->add_route(3, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	C352(config, m_c352[1], 0, 1);
 	m_c352[1]->set_addrmap(0, &vgmplay_state::c352_map<1>);
-	m_c352[1]->add_route(0, "lspeaker", 1);
-	m_c352[1]->add_route(1, "rspeaker", 1);
+	m_c352[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_c352[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
+	m_c352[1]->add_route(2, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_c352[1]->add_route(3, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	IREMGA20(config, m_ga20[0], 0);
 	m_ga20[0]->set_addrmap(0, &vgmplay_state::ga20_map<0>);
-	m_ga20[0]->add_route(0, "lspeaker", 1);
-	m_ga20[0]->add_route(1, "rspeaker", 1);
+	m_ga20[0]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_ga20[0]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	IREMGA20(config, m_ga20[1], 0);
 	m_ga20[1]->set_addrmap(0, &vgmplay_state::ga20_map<1>);
-	m_ga20[1]->add_route(0, "lspeaker", 1);
-	m_ga20[1]->add_route(1, "rspeaker", 1);
+	m_ga20[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
+	m_ga20[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
+
+	VGMVIZ(config, m_mixer, 0);
+	m_mixer->add_route(0, "lspeaker", 1);
+	m_mixer->add_route(1, "rspeaker", 1);
 
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
-MACHINE_CONFIG_END
+}
 
 ROM_START( vgmplay )
 	// TODO: split up 32x to remove dependencies
 	ROM_REGION( 0x4000, "master", ROMREGION_ERASE00 )
 	ROM_REGION( 0x4000, "slave", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400000, "gamecart", ROMREGION_ERASE00 )
-	ROM_REGION( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 )
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 )
 ROM_END
 
 CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", MACHINE_CLICKABLE_ARTWORK )

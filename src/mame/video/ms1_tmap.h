@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -41,9 +43,9 @@ public:
 	void set_colorbase(uint16_t colorbase) { m_colorbase = colorbase; }
 
 	// memory handlers
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(scroll_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t scroll_r(offs_t offset);
+	void scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// drawing and layer control
 	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority = 0, uint8_t priority_mask = 0xff);
@@ -71,12 +73,12 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	// internal state
-	uint16_t m_scrollx;
-	uint16_t m_scrolly;
-	uint16_t m_scroll_flag;
-	uint16_t m_tile_bank;
-	tilemap_t *m_tmap;
-	tilemap_t *m_tilemap[2][4];
+	uint16_t m_scrollx = 0;
+	uint16_t m_scrolly = 0;
+	uint16_t m_scroll_flag = 0;
+	uint16_t m_tile_bank = 0;
+	tilemap_t *m_tmap = nullptr;
+	tilemap_t *m_tilemap[2][4]{};
 
 	// helpers
 	TILEMAP_MAPPER_MEMBER(scan_8x8);

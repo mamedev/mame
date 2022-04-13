@@ -631,14 +631,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(count_leading_zeros(m_param[1].immediate()));
+					convert_to_mov_immediate(count_leading_zeros_32(m_param[1].immediate()));
 				else if (m_size == 8)
-				{
-					if ((m_param[1].immediate() >> 32) == 0)
-						convert_to_mov_immediate(32 + count_leading_zeros(m_param[1].immediate()));
-					else
-						convert_to_mov_immediate(count_leading_zeros(m_param[1].immediate() >> 32));
-				}
+					convert_to_mov_immediate(count_leading_zeros_64(m_param[1].immediate()));
 			}
 			break;
 
@@ -728,7 +723,7 @@ void uml::instruction::simplify()
 	    {
 	        std::string disasm1 = orig.disasm(block->drcuml);
 	        std::string disasm2 = inst->disasm(block->drcuml);
-	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.c_str(), disasm2.c_str());
+	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
 	    }
 	*/
 
@@ -766,7 +761,7 @@ void uml::instruction::validate()
 	}
 
 	// make sure we aren't missing any parameters
-	if (m_numparams < ARRAY_LENGTH(opinfo.param))
+	if (m_numparams < std::size(opinfo.param))
 		assert(opinfo.param[m_numparams].typemask == 0);
 #endif // MAME_DEBUG
 }

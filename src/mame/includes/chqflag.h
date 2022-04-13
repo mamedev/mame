@@ -34,21 +34,23 @@ public:
 	{
 	}
 
-	template<int Chip> DECLARE_READ8_MEMBER(k051316_ramrom_r);
-	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
-	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);
-	DECLARE_READ8_MEMBER(analog_read_r);
-	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
-	DECLARE_WRITE8_MEMBER(volume_callback0);
-	DECLARE_WRITE8_MEMBER(volume_callback1);
+	void chqflag(machine_config &config);
+
+private:
+	template<int Chip> uint8_t k051316_ramrom_r(offs_t offset);
+	void chqflag_bankswitch_w(uint8_t data);
+	void chqflag_vreg_w(uint8_t data);
+	void select_analog_ctrl_w(uint8_t data);
+	uint8_t analog_read_r();
+	void k007232_bankswitch_w(uint8_t data);
+	void k007232_extvolume_w(uint8_t data);
+	void volume_callback0(uint8_t data);
+	void volume_callback1(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(background_brt_w);
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);
 	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void chqflag(machine_config &config);
 	void bank1000_map(address_map &map);
 	void chqflag_map(address_map &map);
 	void chqflag_sound_map(address_map &map);
@@ -57,11 +59,11 @@ protected:
 	virtual void machine_reset() override;
 private:
 	/* misc */
-	int        m_k051316_readroms;
-	int        m_last_vreg;
-	int        m_analog_ctrl;
-	int        m_accel;
-	int        m_wheel;
+	int        m_k051316_readroms = 0;
+	int        m_last_vreg = 0;
+	int        m_analog_ctrl = 0;
+	int        m_accel = 0;
+	int        m_wheel = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

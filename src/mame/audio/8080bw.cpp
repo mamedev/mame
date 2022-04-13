@@ -4,9 +4,16 @@
 /* 8080bw.c *******************************************/
 
 #include "emu.h"
+#include "includes/8080bw.h"
+
 #include "sound/samples.h"
 #include "sound/discrete.h"
-#include "includes/8080bw.h"
+#include "speaker.h"
+
+#include <cmath>
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 /*******************************************************/
@@ -22,6 +29,74 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 	save_item(NAME(m_port_3_last_extra));
 }
 
+/*************************************
+ *
+ *  Device type globals
+ *
+ *************************************/
+
+DEFINE_DEVICE_TYPE(CANE_AUDIO,  cane_audio_device,  "cane_audio",  "Model Racing Cane Audio")
+
+
+/*************************************
+ *
+ *  Space Invaders
+ *
+ *  Author      : Tormod Tjaberg
+ *  Created     : 1997-04-09
+ *  Description : Sound routines for the 'invaders' games
+ *
+ *  Note:
+ *  The samples were taken from Michael Strutt's (mstrutt@pixie.co.za)
+ *  excellent space invader emulator and converted to signed samples so
+ *  they would work under SEAL. The port info was also gleaned from
+ *  his emulator. These sounds should also work on all the invader games.
+ *
+ *************************************/
+
+static const char *const invaders_sample_names[] =
+{
+	"*invaders",
+	"1",        /* shot/missle */
+	"2",        /* base hit/explosion */
+	"3",        /* invader hit */
+	"4",        /* fleet move 1 */
+	"5",        /* fleet move 2 */
+	"6",        /* fleet move 3 */
+	"7",        /* fleet move 4 */
+	"8",        /* UFO/saucer hit */
+	"9",        /* bonus base */
+	nullptr
+};
+
+
+/* left in for all games that hack into invaders samples for audio */
+void _8080bw_state::invaders_samples_audio(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, RES_K(100));
+	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_feedback_res(RES_K(10));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(invaders_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 
 /*******************************************************/
@@ -30,25 +105,25 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_1_w)
+void _8080bw_state::invadpt2_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	m_sn->enable_w(!(data & 0x01));         /* SAUCER SOUND */
+	m_sn->enable_w(!BIT(data, 0));                      // SAUCER SOUND
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);     /* MISSLE SOUND */
-	if (rising_bits & 0x04) m_samples->start(1, 1);     /* EXPLOSION */
-	if (rising_bits & 0x08) m_samples->start(2, 2);     /* INVADER HIT */
-	if (rising_bits & 0x10) m_samples->start(5, 8);     /* BONUS MISSILE BASE */
+	if (BIT(rising_bits, 1)) m_samples->start(0, 0);    // MISSLE SOUND
+	if (BIT(rising_bits, 2)) m_samples->start(1, 1);    // EXPLOSION
+	if (BIT(rising_bits, 3)) m_samples->start(2, 2);    // INVADER HIT
+	if (BIT(rising_bits, 4)) m_samples->start(5, 8);    // BONUS MISSILE BASE
 
 	m_screen_red = data & 0x04;
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
+void _8080bw_state::invadpt2_sh_port_2_w(uint8_t data)
 {
 	/* FLEET (movement)
 
@@ -59,11 +134,11 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 3);     /* FLEET */
-	if (rising_bits & 0x02) m_samples->start(4, 4);     /* FLEET */
-	if (rising_bits & 0x04) m_samples->start(4, 5);     /* FLEET */
-	if (rising_bits & 0x08) m_samples->start(4, 6);     /* FLEET */
-	if (rising_bits & 0x10) m_samples->start(3, 7);     /* SAUCER HIT */
+	if (BIT(rising_bits, 0)) m_samples->start(4, 3);    // FLEET
+	if (BIT(rising_bits, 1)) m_samples->start(4, 4);    // FLEET
+	if (BIT(rising_bits, 2)) m_samples->start(4, 5);    // FLEET
+	if (BIT(rising_bits, 3)) m_samples->start(4, 6);    // FLEET
+	if (BIT(rising_bits, 4)) m_samples->start(3, 7);    // SAUCER HIT
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 	m_color_map = BIT(data, 5);
@@ -79,15 +154,15 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::spacerng_sh_port_2_w)
+void _8080bw_state::spacerng_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 3);     /* FLEET */
-	if (rising_bits & 0x02) m_samples->start(4, 4);     /* FLEET */
-	if (rising_bits & 0x04) m_samples->start(4, 5);     /* FLEET */
-	if (rising_bits & 0x08) m_samples->start(4, 6);     /* FLEET */
-	if (rising_bits & 0x10) m_samples->start(3, 7);     /* SAUCER HIT */
+	if (BIT(rising_bits, 0)) m_samples->start(4, 3);    // FLEET
+	if (BIT(rising_bits, 1)) m_samples->start(4, 4);    // FLEET
+	if (BIT(rising_bits, 2)) m_samples->start(4, 5);    // FLEET
+	if (BIT(rising_bits, 3)) m_samples->start(4, 6);    // FLEET
+	if (BIT(rising_bits, 4)) m_samples->start(3, 7);    // SAUCER HIT
 
 	m_flip_screen = BIT(~data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -100,17 +175,17 @@ WRITE8_MEMBER(_8080bw_state::spacerng_sh_port_2_w)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::spcewars_sh_port_w)
+void _8080bw_state::spcewars_sh_port_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	m_sn->enable_w(!(data & 0x01));         /* Saucer Sound */
+	m_sn->enable_w(!BIT(data, 0));                      // Saucer Sound
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);     /* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(1, 1);     /* Base Hit */
-	if (rising_bits & 0x08) m_samples->start(2, 2);     /* Invader Hit */
+	if (BIT(rising_bits, 1)) m_samples->start(0, 0);    // Shot Sound
+	if (BIT(rising_bits, 2)) m_samples->start(1, 1);    // Base Hit
+	if (BIT(rising_bits, 3)) m_samples->start(2, 2);    // Invader Hit
 
-	m_speaker->level_w(BIT(data, 4));      /* Various bitstream tunes */
+	m_speaker->level_w(BIT(data, 4));                   // Various bitstream tunes
 
 	m_port_1_last_extra = data;
 }
@@ -138,35 +213,36 @@ const char *const lrescue_sample_names[] =
 	nullptr
 };
 
-WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
+void _8080bw_state::lrescue_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(0, 3);     /* Thrust */
-	if (rising_bits & 0x02) m_samples->start(1, 2);     /* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(0, 1);     /* Death */
-	if (rising_bits & 0x08) m_samples->start(1, 0);     /* Alien Hit */
-	if (rising_bits & 0x10) m_samples->start(2, 5);     /* Bonus Ship (not confirmed) */
+	if (BIT(rising_bits, 0)) m_samples->start(0, 3);    // Thrust
+	if (BIT(rising_bits, 1)) m_samples->start(1, 2);    // Shot Sound
+	if (BIT(rising_bits, 2)) m_samples->start(0, 1);    // Death
+	if (BIT(rising_bits, 3)) m_samples->start(1, 0);    // Alien Hit
+	if (BIT(rising_bits, 4)) m_samples->start(2, 5);    // Bonus Ship (not confirmed)
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_screen_red = data & 0x04;
 
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
+void _8080bw_state::lrescue_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
+	uint8_t falling_bits = ~data & m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 8);     /* Footstep high tone */
-	if (rising_bits & 0x02) m_samples->start(1, 7);     /* Footstep low tone */
-	if (rising_bits & 0x04) m_samples->start(1, 4);     /* Bonus when counting men saved */
+	if (BIT(rising_bits, 0)) m_samples->start(1, 8);    // Footstep high tone
+	if (BIT(rising_bits, 1)) m_samples->start(1, 7);    // Footstep low tone
+	if (BIT(rising_bits, 2)) m_samples->start(1, 4);    // Bonus when counting men saved
 
-	m_speaker->level_w(BIT(data, 3));                   /* Bitstream tunes - endlevel and bonus1 */
+	m_speaker->level_w(BIT(data, 3));                   // Bitstream tunes - endlevel and bonus1
 
-	if (rising_bits & 0x10) m_samples->start(3, 6);     /* Shooting Star and Rescue Ship sounds */
-	if ((~data & 0x10) && (m_port_2_last_extra & 0x10)) m_samples->stop(3); /* This makes the rescue ship sound beep on and off */
+	if (BIT(rising_bits, 4)) m_samples->start(3, 6);    // Shooting Star and Rescue Ship sounds
+	if (BIT(falling_bits, 4)) m_samples->stop(3);       // This makes the rescue ship sound beep on and off
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -181,10 +257,10 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::cosmo_sh_port_2_w)
+void _8080bw_state::cosmo_sh_port_2_w(uint8_t data)
 {
 	/* inverted flip screen bit */
-	invadpt2_sh_port_2_w(space, offset, data ^ 0x20);
+	invadpt2_sh_port_2_w(data ^ 0x20);
 }
 
 
@@ -240,35 +316,35 @@ DISCRETE_SOUND_START(ballbomb_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( _8080bw_state::ballbomb_01_w )
+void _8080bw_state::ballbomb_01_w(uint8_t data)
 {
 	m_discrete->write(BALLBOMB_MUSIC_DATA, data|0x80);
 }
 
-WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
+void _8080bw_state::ballbomb_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 2);     /* Hit a balloon */
-	if (rising_bits & 0x02) m_samples->start(2, 0);     /* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(2, 1);     /* Base Hit */
-	if (rising_bits & 0x08) m_samples->start(1, 7);     /* Hit a Bomb */
-	if (rising_bits & 0x10) m_samples->start(3, 8);     /* Bonus Base at 1500 points */
+	if (BIT(rising_bits, 0)) m_samples->start(1, 2);    // Hit a balloon
+	if (BIT(rising_bits, 1)) m_samples->start(2, 0);    // Shot Sound
+	if (BIT(rising_bits, 2)) m_samples->start(2, 1);    // Base Hit
+	if (BIT(rising_bits, 3)) m_samples->start(1, 7);    // Hit a Bomb
+	if (BIT(rising_bits, 4)) m_samples->start(3, 8);    // Bonus Base at 1500 points
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_screen_red = data & 0x04;
 
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_2_w)
+void _8080bw_state::ballbomb_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (data & 0x01) m_samples->start(0, 7);        /* Indicates plane will drop bombs */
-	if (data & 0x04) m_samples->start(0, 4);        /* Plane is dropping new balloons at start of level */
-	if (rising_bits & 0x10) m_samples->start(2, 2);     /* Balloon hit and bomb drops */
+	if (BIT(data, 0)) m_samples->start(0, 7);           // Indicates plane will drop bombs
+	if (BIT(data, 2)) m_samples->start(0, 4);           // Plane is dropping new balloons at start of level
+	if (BIT(rising_bits, 4)) m_samples->start(2, 2);    // Balloon hit and bomb drops
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -320,59 +396,59 @@ DISCRETE_SOUND_START(indianbt_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_1_w)
+void _8080bw_state::indianbt_sh_port_1_w(uint8_t data)
 {
 	/* bit 4 occurs every 5.25 seconds during gameplay */
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 7);     /* Death */
-	if (rising_bits & 0x02) m_samples->start(0, 1);     /* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(2, 3);     /* Move */
-	if (rising_bits & 0x08) m_samples->start(3, 2);     /* Hit */
+	if (BIT(rising_bits, 0)) m_samples->start(1, 7);    // Death
+	if (BIT(rising_bits, 1)) m_samples->start(0, 1);    // Shot Sound
+	if (BIT(rising_bits, 2)) m_samples->start(2, 3);    // Move
+	if (BIT(rising_bits, 3)) m_samples->start(3, 2);    // Hit
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
+void _8080bw_state::indianbt_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 0);     /* Bird dropped an egg, Lasso used */
-	if (rising_bits & 0x02) m_samples->start(4, 2);     /* Egg hatches, egg shot */
-	if (rising_bits & 0x08) m_samples->start(5, 0);     /* Grabber, Lasso caught something */
-	if (rising_bits & 0x10) m_samples->start(3, 7);     /* Lasso sound */
+	if (BIT(rising_bits, 0)) m_samples->start(4, 0);    // Bird dropped an egg, Lasso used
+	if (BIT(rising_bits, 1)) m_samples->start(4, 2);    // Egg hatches, egg shot
+	if (BIT(rising_bits, 3)) m_samples->start(5, 0);    // Grabber, Lasso caught something
+	if (BIT(rising_bits, 4)) m_samples->start(3, 7);    // Lasso sound
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
 	m_port_2_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
+void _8080bw_state::indianbt_sh_port_3_w(uint8_t data)
 {
 	m_discrete->write(INDIANBT_MUSIC_DATA, data);
 }
 
-WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
+void _8080bw_state::indianbtbr_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 7);     /* Lasso */
-	if (rising_bits & 0x04) m_samples->start(0, 1);     /* Shot Sound */
-	if (rising_bits & 0x08) m_samples->start(3, 2);     /* Hit */
+	if (BIT(rising_bits, 0)) m_samples->start(4, 7);    // Lasso
+	if (BIT(rising_bits, 2)) m_samples->start(0, 1);    // Shot Sound
+	if (BIT(rising_bits, 3)) m_samples->start(3, 2);    // Hit
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_2_w)
+void _8080bw_state::indianbtbr_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x08) m_samples->start(2, 3);     /* Move */
-	if (rising_bits & 0x10) m_samples->start(3, 7);     /* Death */
+	if (BIT(rising_bits, 3)) m_samples->start(2, 3);    // Move
+	if (BIT(rising_bits, 4)) m_samples->start(3, 7);    // Death
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -693,12 +769,12 @@ DISCRETE_SOUND_START(polaris_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(_8080bw_state::polaris_sh_port_1_w)
+void _8080bw_state::polaris_sh_port_1_w(uint8_t data)
 {
 	m_discrete->write(POLARIS_MUSIC_DATA, data);
 }
 
-WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
+void _8080bw_state::polaris_sh_port_2_w(uint8_t data)
 {
 	/* 0x01 - SX0 - Shot */
 	m_discrete->write(POLARIS_SX0_EN, data & 0x01);
@@ -718,7 +794,7 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
 	m_discrete->write(POLARIS_SX5_EN, data & 0x20);
 }
 
-WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
+void _8080bw_state::polaris_sh_port_3_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 0x04);  /* SX8 */
 
@@ -845,7 +921,7 @@ static const double schaser_effect_rc[8] =
 	(1.0/ (1.0/RES_K(15) + 1.0/RES_K(39) + 1.0/RES_K(82)) + RES_K(20)) * CAP_U(1)
 };
 
-WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
+void _8080bw_state::schaser_sh_port_1_w(uint8_t data)
 {
 	int effect;
 
@@ -912,7 +988,7 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 	m_sn->mixer_b_w(m_schaser_explosion);
 }
 
-WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
+void _8080bw_state::schaser_sh_port_2_w(uint8_t data)
 {
 	/* bit 0 - Music (DAC) (SX6)
 	   bit 1 - Sound Enable (SX7)
@@ -924,7 +1000,7 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 	m_discrete->write(SCHASER_MUSIC_BIT, BIT(data, 0));
 
 	m_discrete->write(SCHASER_SND_EN, BIT(data, 1));
-	machine().sound().system_enable(BIT(data, 1));
+	machine().sound().system_mute(!BIT(data, 1));
 
 	machine().bookkeeping().coin_lockout_global_w(BIT(data, 2));
 
@@ -964,9 +1040,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::schaser_effect_555_cb)
 
 void _8080bw_state::schaser_reinit_555_time_remain()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_schaser_effect_555_time_remain = attotime::from_double(m_schaser_effect_555_time_remain_savable);
-	schaser_sh_port_2_w(space, 0, m_port_2_last_extra);
+	schaser_sh_port_2_w(m_port_2_last_extra);
 }
 
 
@@ -982,12 +1057,10 @@ MACHINE_START_MEMBER(_8080bw_state,schaser_sh)
 
 MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	m_schaser_effect_555_is_low = 0;
 	m_schaser_effect_555_timer->adjust(attotime::never);
-	schaser_sh_port_1_w(space, 0, 0);
-	schaser_sh_port_2_w(space, 0, 0);
+	schaser_sh_port_1_w(0);
+	schaser_sh_port_2_w(0);
 	m_schaser_effect_555_time_remain = attotime::zero;
 	m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
 }
@@ -1000,12 +1073,12 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_port03_w)
+void _8080bw_state::invrvnge_port03_w(uint8_t data)
 {
 	m_sound_data = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_port05_w)
+void _8080bw_state::invrvnge_port05_w(uint8_t data)
 {
 	/*
 	    00 - normal play
@@ -1034,13 +1107,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
 /* - Press Left or Right to choose game to play     */
 /****************************************************/
 
-WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
+void _8080bw_state::rollingc_sh_port_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_3_last_extra;
 
-	if (rising_bits & 0x02) m_samples->start(4, 0); /* Steering */
-	if (rising_bits & 0x04) m_samples->start(0, 1); /* Collision */
-	if (rising_bits & 0x10) m_samples->start(1, 8); /* Computer car is starting to move */
+	if (BIT(rising_bits, 1)) m_samples->start(4, 0); // Steering
+	if (BIT(rising_bits, 2)) m_samples->start(0, 1); // Collision
+	if (BIT(rising_bits, 4)) m_samples->start(1, 8); // Computer car is starting to move
 
 	m_port_3_last_extra = data;
 }
@@ -1055,46 +1128,46 @@ WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
 const char *const lupin3_sample_names[] =
 {
 	"*lupin3",
-	"cap",      /* go to jail */
-	"bark",     /* dog barking */
-	"walk1",        /* walk, get money */
-	"walk2",        /* walk, get money */
-	"warp",     /* translocate, deposit money */
-	"extend",       /* bonus man */
-	"kick",     /* lands on top of building, wife kicks man */
+	"cap",      // go to jail
+	"bark",     // dog barking
+	"walk1",    // walk, get money
+	"walk2",    // walk, get money
+	"warp",     // translocate, deposit money
+	"extend",   // bonus man
+	"kick",     // lands on top of building, wife kicks man
 	nullptr
 };
 
-WRITE8_MEMBER( _8080bw_state::lupin3_00_w )
+void  _8080bw_state::lupin3_00_w (uint8_t data)
 {
 	m_discrete->write(INDIANBT_MUSIC_DATA, data);
 }
 
-WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
+void _8080bw_state::lupin3_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 	static uint8_t lupin3_step = 2;
 
-	if (rising_bits & 0x01)
+	if (BIT(rising_bits, 0))
 	{
-		m_samples->start(0, lupin3_step);           /* Walking, steal money */
+		m_samples->start(0, lupin3_step);               // Walking, steal money
 		lupin3_step ^= 1;
 	}
 
-	m_sn->enable_w(data & 0x02 ? 0:1);          /* Helicopter */
+	m_sn->enable_w(BIT(~data, 1));                      // Helicopter
 
-	if (rising_bits & 0x04) m_samples->start(1, 4);     /* Translocate */
-	if (rising_bits & 0x08) m_samples->start(0, 0);     /* Jail */
-	if (rising_bits & 0x10) m_samples->start(2, 5);     /* Bonus Man */
+	if (BIT(rising_bits, 2)) m_samples->start(1, 4);     // Translocate
+	if (BIT(rising_bits, 3)) m_samples->start(0, 0);     // Jail
+	if (BIT(rising_bits, 4)) m_samples->start(2, 5);     // Bonus Man
 
-	//machine().sound().system_enable(data & 0x20);
+	//machine().sound().system_mute(!BIT(data, 5));
 
-	//machine().bookkeeping().coin_lockout_global_w(data & 0x80);
+	//machine().bookkeeping().coin_lockout_global_w(BIT(data, 7));
 
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
+void _8080bw_state::lupin3_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
@@ -1118,7 +1191,7 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 /* Much more work needs to be done       */
 /*****************************************/
 
-WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
+void _8080bw_state::schasercv_sh_port_1_w(uint8_t data)
 {
 	/* bit 2 = 2nd speedup
 	   bit 3 = 1st speedup
@@ -1126,17 +1199,17 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
 
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x02) m_samples->start(1, 6);     /* Ran over a dot */
-	if (rising_bits & 0x10) m_samples->start(0, 1);     /* Death */
+	if (BIT(rising_bits, 1)) m_samples->start(1, 6);    // Ran over a dot
+	if (BIT(rising_bits, 4)) m_samples->start(0, 1);    // Death
 
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
+void _8080bw_state::schasercv_sh_port_2_w(uint8_t data)
 {
-	m_speaker->level_w(BIT(data, 0));      /* End-of-Level */
+	m_speaker->level_w(BIT(data, 0));      // End-of-Level
 
-	machine().sound().system_enable(data & 0x10);
+	machine().sound().system_mute(!BIT(data, 4));
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 }
@@ -1148,74 +1221,34 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 /* Much more work needs to be done       */
 /*****************************************/
 
-WRITE8_MEMBER(_8080bw_state::crashrd_port03_w)
+void _8080bw_state::crashrd_port03_w(uint8_t data)
 {
-	int effect;
-
 	/* bit 0 - Dot Sound Pitch (SX1)
 	   bit 2 - Explosion (SX5)
 	   bit 4 - Dot Sound Enable (SX0)
 	   bit 5 - Effect Sound C (SX4) */
 
-	m_discrete->write(SCHASER_SND_EN, BIT(data,5));
-	machine().sound().system_enable(BIT(data,5));
+	m_discrete->write(SCHASER_SND_EN, BIT(data, 5));
+	machine().sound().system_mute(!BIT(data, 5));
 	m_discrete->write(SCHASER_DOT_EN, BIT(data, 4));
 	m_discrete->write(SCHASER_DOT_SEL, BIT(data, 0));
-
-	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
-	 * select the frequency.  Because of the diode voltage drop, we can not use the
-	 * standard 555 time formulas.  Also, when effect=0, the charge resistor
-	 * is disconnected.  This causes the charge on the cap to slowly bleed off, but
-	 * but the bleed time is so long, that we can just cheat and put the time on hold
-	 * when effect = 0. */
-	effect = 0; //(data >> 2) & 0x07;
-	if (m_schaser_last_effect != effect)
-	{
-		if (effect)
-		{
-			if (m_schaser_effect_555_time_remain != attotime::zero)
-			{
-				/* timer re-enabled, use up remaining 555 high time */
-				m_schaser_effect_555_timer->adjust(m_schaser_effect_555_time_remain, effect);
-			}
-			else if (!m_schaser_effect_555_is_low)
-			{
-				/* set 555 high time */
-				attotime new_time = attotime(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
-				m_schaser_effect_555_timer->adjust(new_time, effect);
-			}
-		}
-		else
-		{
-			/* disable effect - stops at end of low cycle */
-			if (!m_schaser_effect_555_is_low)
-			{
-				m_schaser_effect_555_time_remain = m_schaser_effect_555_timer->time_left();
-				m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
-				m_schaser_effect_555_timer->adjust(attotime::never);
-			}
-		}
-		m_schaser_last_effect = effect;
-	}
-
 	m_schaser_explosion = BIT(data, 2);
+
 	if (m_schaser_explosion)
-	{
 		m_sn->amplitude_res_w(1.0 / (1.0/RES_K(200) + 1.0/RES_K(68)));
-	}
 	else
-	{
 		m_sn->amplitude_res_w(RES_K(200));
-	}
-	m_sn->enable_w(!(m_schaser_effect_555_is_low || m_schaser_explosion));
-	m_sn->one_shot_cap_voltage_w(!(m_schaser_effect_555_is_low || m_schaser_explosion) ? 0 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
+
+	m_sn->enable_w(!m_schaser_explosion);
+	m_sn->one_shot_cap_voltage_w(!m_schaser_explosion ? 0 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 	m_sn->mixer_b_w(m_schaser_explosion);
 }
 
-WRITE8_MEMBER(_8080bw_state::crashrd_port05_w)
+void _8080bw_state::crashrd_port05_w(uint8_t data)
 {
 	// bit 0 = bitstream audio
-	// bit 4 = not sure
+	// bit 4 = indicates when enemy goes faster toward end of level
+	// bit 5 = pulses once when flipscreen needed
 	m_discrete->write(SCHASER_MUSIC_BIT, BIT(data, 0));
 }
 
@@ -1226,31 +1259,31 @@ WRITE8_MEMBER(_8080bw_state::crashrd_port05_w)
 /* No information available as what the correct sounds are         */
 /*******************************************************************/
 
-WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_1_w)
+void _8080bw_state::yosakdon_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(0, 3);         /* Game Over */
-	if (rising_bits & 0x02) m_samples->start(2, 0);         /* Bird dead */
-	if (rising_bits & 0x04) m_samples->start(0, 1);         /* Rifle being fired */
-	if (rising_bits & 0x08) m_samples->start(1, 2);         /* Man dead */
-	if (rising_bits & 0x10) m_samples->start(5, 8);         /* Bonus Man? */
+	if (BIT(rising_bits, 0)) m_samples->start(0, 3);        //  Game Over
+	if (BIT(rising_bits, 1)) m_samples->start(2, 0);        //  Bird dead
+	if (BIT(rising_bits, 2)) m_samples->start(0, 1);        //  Rifle being fired
+	if (BIT(rising_bits, 3)) m_samples->start(1, 2);        //  Man dead
+	if (BIT(rising_bits, 4)) m_samples->start(5, 8);        //  Bonus Man?
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
+void _8080bw_state::yosakdon_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 6);         /* Ready? , Game Over */
-	if (rising_bits & 0x04) m_samples->start(3, 7);         /* Big bird dead */
+	if (BIT(rising_bits, 0)) m_samples->start(1, 6);        // Ready? , Game Over
+	if (BIT(rising_bits, 2)) m_samples->start(3, 7);        // Big bird dead
 
-	m_sn->enable_w(data & 0x08 ? 0:1);              /* Big bird */
+	m_sn->enable_w(BIT(~data, 3));                          // Big bird
 
-	if (rising_bits & 0x10) m_samples->start(2, 7);         /* Game Over */
+	if (BIT(rising_bits, 4)) m_samples->start(2, 7);        // Game Over
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -1264,7 +1297,7 @@ WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
 /* Proper samples are unavailable        */
 /*****************************************/
 
-WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_1_w)
+void _8080bw_state::shuttlei_sh_port_1_w(uint8_t data)
 {
 	/* bit 3 is high while you are alive and playing */
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
@@ -1277,7 +1310,7 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_1_w)
 	m_port_1_last_extra = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
+void _8080bw_state::shuttlei_sh_port_2_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -1305,32 +1338,306 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
 /* Proper samples are unavailable        */
 /*****************************************/
 
-WRITE8_MEMBER( _8080bw_state::darthvdr_00_w )
+void _8080bw_state::darthvdr_00_w(uint8_t data)
 {
 	m_flip_screen = BIT(data, 0) & ioport(CABINET_PORT_TAG)->read();
 }
 
-WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )
+void _8080bw_state::darthvdr_08_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	machine().sound().system_enable(data & 0x01);
+	machine().sound().system_mute(!BIT(data, 0));
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);     /* Shoot */
-	if (rising_bits & 0x04) m_samples->start(3, 7);     /* Hit UFO */
-	if (rising_bits & 0x10) m_samples->start(5, 8);     /* Bonus */
+	if (BIT(rising_bits, 1)) m_samples->start(0, 0);    // Shoot
+	if (BIT(rising_bits, 2)) m_samples->start(3, 7);    // Hit UFO
+	if (BIT(rising_bits, 4)) m_samples->start(5, 8);    // Bonus
 
-	m_sn->enable_w(data & 0x20 ? 0:1);          /* UFO */
+	m_sn->enable_w(BIT(~data, 5));                      // UFO
 
-	if (rising_bits & 0x40) m_samples->start(1, 1);     /* Death */
-	if (rising_bits & 0x80) m_samples->start(2, 2);     /* Hit */
+	if (BIT(rising_bits, 6)) m_samples->start(1, 1);    // Death
+	if (BIT(rising_bits, 7)) m_samples->start(2, 2);    // Hit
 
-	if (rising_bits & 0x08)
+	if (BIT(rising_bits, 3))
 	{
-		m_samples->start(4, m_fleet_step);          /* Fleet move in 4 steps */
+		m_samples->start(4, m_fleet_step);          // Fleet move in 4 steps
 		m_fleet_step++;
 		if (m_fleet_step > 6) m_fleet_step = 3;
 	}
 
 	m_port_1_last_extra = data;
+}
+
+
+/*********************************************************/
+/*                                                       */
+/* Model Racing "Cane" (Slightly based on Claybuster hw) */
+/*                                                       */
+/*********************************************************/
+#define CANE_CLOCK   (19968000.0)
+#define CANE_H64     CANE_CLOCK /2 /2 /4
+
+/* Nodes - Sound enable */
+#define CANE_SND_EN        NODE_05
+
+/* Nodes - Adjusters */
+#define CANE_VR1           NODE_07  // Gain for 76477
+#define CANE_VR2           NODE_08  // VR attached to the output of the TOS
+#define CANE_VR3           NODE_09  // VR for SFX generated by the 555
+
+/* Nodes - sn76477 Sounds */
+#define CANE_EXP_STREAM    NODE_03
+#define CANE_EXP_SND       NODE_11
+
+/* Nodes - BGM */
+#define CANE_MUSIC_DATA    NODE_06
+#define CANE_MUSIC_NOTE    NODE_40
+#define CANE_MUSIC_NOTE_PF NODE_01
+#define CANE_MUSIC_SND     NODE_12
+
+/* Nodes - 555 sfx */
+#define CANE_76477_PIN6    NODE_13
+#define CANE_555_CLAMPED   NODE_14
+#define CANE_555_ONESHOT   NODE_15
+#define CANE_555_EN        NODE_16
+#define CANE_TMP_SND       NODE_17
+#define CANE_SFX_SND       NODE_18
+
+/* Node output */
+#define CANE_SOUND_OUT     NODE_90
+
+static INPUT_PORTS_START( cane_audio )
+	PORT_START("VR1")
+	PORT_ADJUSTER( 80, "VR1 - SFX from 76477" )
+
+	PORT_START("VR2")
+	PORT_ADJUSTER( 90, "VR2 - TOS music" )
+
+	PORT_START("VR3")
+	PORT_ADJUSTER( 70, "VR3 - Shoot SFX from 555" )
+INPUT_PORTS_END
+
+cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, CANE_AUDIO, tag, owner, clock),
+	m_vco_timer(*this, "vco_timer"),
+	m_sn(*this, "snsnd"),
+	m_discrete(*this, "discrete"),
+	m_vco_rc_chargetime(attotime::never)
+{
+}
+
+void cane_audio_device::device_add_mconfig(machine_config &config)
+{
+	TIMER(config, m_vco_timer).configure_generic(FUNC(cane_audio_device::vco_voltage_timer));
+
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	// Amplitude res in the schematic is connected to a 470K potentiometer, so from the schematic is impossible to know the real res.
+	// This parameter drives the amp just before the audio output pin 13.
+	m_sn->set_amp_res(100+RES_K(20));
+	m_sn->set_noise_params(RES_K(39), RES_K(1), CAP_P(1000));
+	m_sn->set_decay_res(RES_M(1));
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(47));
+	m_sn->set_feedback_res(RES_K(4.7));
+	m_sn->set_vco_params(0, CAP_P(3300), RES_K(100));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(33));
+	m_sn->set_oneshot_params(CAP_U(10), RES_K(100));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(0);
+	m_sn->add_route(0, "discrete", 1.0, 0);
+
+	DISCRETE(config, m_discrete, cane_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+ioport_constructor cane_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(cane_audio);
+}
+
+void cane_audio_device::device_start()
+{
+	// provare a commentare
+	m_vco_rc_chargetime = attotime::never;
+
+	save_item(NAME(m_vco_rc_chargetime));
+}
+
+void cane_audio_device::sh_port_1_w(u8 data)
+{
+	/*
+	    bit 0 - SX0 - Sound enable on mixer
+	    bit 1 - SX1 - SN76477 - Mixer select C - pin 27
+	    bit 2 - SX2 - SN76477 - Mixer select A - pin 26
+	    bit 3 - SX3 - SN76477 - Mixer select B - pin 25
+	    bit 4 - SX4 - NE555 - Trigger (Step, high output level for 1.1*RC = 1.1*100K*0.47u = 51.7 ms)
+	*/
+
+	m_discrete->write(CANE_SND_EN, data & 0x01); // BIT(data, 0) - bit 0 - SX0 - Sound enable on mixer
+	m_discrete->write(CANE_555_EN, data & 0x10); // BIT(data, 4) - bit 4 - SX4 - NE555 - Trigger
+
+	// 76477 enable bit is connected to the select line of the out port 3 (inverted).
+	m_sn->enable_w(1);
+	m_sn->set_mixer_params(BIT(data, 2), BIT(data, 3), BIT(data, 1));
+
+	m_vco_timer->adjust(attotime::zero, m_vco_timer->param(), attotime::from_hz(1000));
+	m_vco_rc_chargetime = m_vco_timer->start_time();
+
+	// Little hack...
+	// To be precise I should enable the 76477 every time the CPU reads or write to a port different from port 3
+	// and disable it every time the CPU read/write from/to port 3.
+	// Actually this can not be done easily so I decided to enable it preemptively here after every port 3 access
+	m_sn->enable_w(0);
+}
+
+void cane_audio_device::music_w(u8 data)
+{
+	m_sn->enable_w(1);
+	m_discrete->write(CANE_MUSIC_DATA, data);
+}
+
+void cane_audio_device::sn76477_en_w(u8 data)
+{
+	m_sn->enable_w(0);
+}
+
+void cane_audio_device::sn76477_dis_w(u8 data)
+{
+	m_sn->enable_w(1);
+}
+
+/*******************************************************************************************************************************************************/
+/* Cane discrete implementation, slightly based on Claybuster hw.                                                                                      */
+/* This implementation doesn't pretend to be accurate thus trying to be at least functionally similar.                                                 */
+/*                                                                                                                                                     */
+/*                                                                       Port 1 - SX4              CANE_VR3                       Port 1 - SX0         */
+/*                                                                            |                        |                               |               */
+/*                                                                       CANE_555_EN                   |                               |               */
+/*                                                                            |                        |                               |               */
+/*                                                                  +------------------+               |                               |               */
+/*                                                                  | CANE_555_ONESHOT |               |                               |               */
+/*                                                                  +------------------+               |                               |               */
+/*                                                                            |                        |                               |               */
+/*                                                                            v                        v                               |               */
+/*                                    sn76477 pin 6   +------------------+  +---+  +--------------+  +---+  +--------------+           |               */
+/*                                     CLAMP(0, 5V) ->| CANE_555_CLAMPED |->| * |->| CANE_TMP_SND |->| * |->| CANE_SFX_SND |       CANE_SND_EN         */
+/*                                 (DISCRETE_NOISE)   +------------------+  +---+  +--------------+  +---+  +--------------+           |               */
+/*                                                                                                                       |             |               */
+/*                                                                                          CANE_VR1                     |             |               */
+/*                                                                                              |                        |             |               */
+/*                                                                                              v                        v             v               */
+/*                                                      sn76477 output   +-----------------+  +---+  +--------------+  +---+  +----------------+       */
+/*                                              DISCRETE_INPUTX_STREAM ->| CANE_EXP_STREAM |->| * |->| CANE_EXP_SND |->| + |->| CANE_SOUND_OUT |->OUT  */
+/*                                                                       +-----------------+  +---+  +--------------+  +---+  +----------------+       */
+/*                                                                                                                       ^                             */
+/*                                                                                                                       |                             */
+/*                   CANE_MUSIC_DATA   +--------------------+  +-----------+  +-----------------+  +---+  +----------------+                           */
+/* Port 5 data---DISCRETE_INPUT_DATA ->| CANE_MUSIC_NOTE_PF |->| CR_FILTER |->| CANE_MUSIC_NOTE |->| * |->| CANE_MUSIC_SND |                           */
+/*                     DISCRETE_NOTE   +--------------------+  +-----------+  +-----------------+  +---+  +----------------+                           */
+/*                                                                RES_K(10)                          ^                                                 */
+/*                                                               CAP_U(0.1)                          |                                                 */
+/*                                                                                               CANE_VR2                                              */
+/*                                                                                                                                                     */
+/*                                                                                                                                                     */
+/*******************************************************************************************************************************************************/
+DISCRETE_SOUND_START(cane_discrete)
+	/************************************************/
+	/* Input register mapping for cane           */
+	/************************************************/
+	DISCRETE_INPUT_DATA (CANE_MUSIC_DATA)
+
+	DISCRETE_INPUT_LOGIC  (CANE_555_EN)
+
+	// scale to 0-2.5V
+	DISCRETE_INPUTX_STREAM(CANE_EXP_STREAM, 0, 0.5, 0)
+
+	DISCRETE_INPUT_LOGIC  (CANE_SND_EN)
+
+	/************************************************/
+	/* Volume adjusters.                            */
+	/* We will set them to adjust the realitive     */
+	/* gains.                                       */
+	/************************************************/
+	DISCRETE_ADJUSTMENT(CANE_VR1, 0, 0.33*6, DISC_LINADJ, "VR1")      // Gain for 76477
+	DISCRETE_ADJUSTMENT(CANE_VR2, 0, 0.33*60000, DISC_LINADJ, "VR2")  // VR attached to the output of the TOS
+	DISCRETE_ADJUSTMENT(CANE_VR3, 0, 0.33*60000, DISC_LINADJ, "VR3")  // VR for SFX generated by the 555
+
+	/************************************************/
+	/* From 555                                     */
+	/************************************************/
+	/* TODO: find real noise freq and amplitude */
+	/* width was simulated with ltspice using Claybuster schematic as a source and it's value is about 51ms */
+	DISCRETE_NOISE(CANE_76477_PIN6,
+				1,                          /* ENAB */
+				1280,                       /* FREQ - Guessed */
+				1,                          /* AMP  */
+				0)                          /* BIAS - fake AC is fine*/
+	DISCRETE_CLAMP(CANE_555_CLAMPED,
+				CANE_76477_PIN6,            /* input node */
+				0.0,                        /* minimum */
+				5.0)                        /* maximum */
+	DISCRETE_ONESHOT(CANE_555_ONESHOT,
+					 CANE_555_EN,           /* trigger node */
+					 1,                     /* amplitude node or static value */
+					 0.05,                  /* width (in seconds) node or static value - 50 ms*/
+					 DISC_ONESHOT_FEDGE | DISC_ONESHOT_RETRIG)  /* type of oneshot static value */
+
+	DISCRETE_MULTIPLY(CANE_TMP_SND, CANE_555_CLAMPED, CANE_555_ONESHOT)
+	DISCRETE_MULTIPLY(CANE_SFX_SND, CANE_TMP_SND, CANE_VR3)
+
+/*****************************************************************************
+*
+* Music Generator (TOS)
+*
+* Values for this section of the sound hardware where derived from comments
+* in the source code and the analysis of TOS.ED sources.
+*
+* For further info look at the relevant comments reported into
+* drivers/8080bw.cpp
+*
+******************************************************************************/
+	DISCRETE_NOTE(CANE_MUSIC_NOTE_PF, 1, CANE_H64, CANE_MUSIC_DATA, 255, 1, DISC_CLK_IS_FREQ)
+	DISCRETE_CRFILTER(CANE_MUSIC_NOTE, CANE_MUSIC_NOTE_PF, RES_K(10), CAP_U(0.1))  // high pass filter
+	DISCRETE_MULTIPLY(CANE_MUSIC_SND, CANE_MUSIC_NOTE, CANE_VR2)
+
+/******************************************************************************
+*
+* From 76477 output
+*
+******************************************************************************/
+	DISCRETE_MULTIPLY(CANE_EXP_SND, CANE_EXP_STREAM, CANE_VR1)
+
+/******************************************************************************
+*
+* Final Mixing and Output
+*
+******************************************************************************/
+	DISCRETE_ADDER3(CANE_SOUND_OUT, CANE_SND_EN, CANE_SFX_SND, CANE_EXP_SND, CANE_MUSIC_SND)
+	DISCRETE_OUTPUT(CANE_SOUND_OUT, 1)
+
+//LOG
+/*
+    DISCRETE_WAVLOG1(CANE_EXP_STREAM, 1)
+    DISCRETE_WAVLOG1(CANE_EXP_SND, 1)
+    DISCRETE_WAVLOG1(CANE_TMP_SND, 1)
+    DISCRETE_WAVLOG1(CANE_SFX_SND, 1)
+    DISCRETE_WAVLOG1(CANE_MUSIC_NOTE, 1)
+    DISCRETE_WAVLOG1(CANE_MUSIC_SND, 1)
+    DISCRETE_WAVLOG1(CANE_SOUND_OUT, 1)
+*/
+DISCRETE_SOUND_END
+
+TIMER_DEVICE_CALLBACK_MEMBER(cane_audio_device::vco_voltage_timer)
+{
+	const double delta = (m_vco_timer->fire_time() - m_vco_rc_chargetime).as_double();
+	const double voltage = 5 * (1 - std::exp(-delta / 47));
+
+	LOG("t = %d\n", delta);
+	LOG("vco_voltage = %d\n", voltage);
+
+	m_sn->vco_voltage_w(voltage);
 }

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Procedure: Mount the floppy into the first drive.
+
+Select the TwinBoot software, and start the emulation.
+
+When the TwinBoot starts up, it will auto-detect CP/M or DOS, and boot it.
+
+Super-80 DOS is incredibly primitive. There is no directory as such. DIR lists the contents of each "track".
+You must load all the tracks needed into memory before running the program.
+More information will be added when I find it.
+
+-->
+<softwarelist name="super80_flop" description="Dick Smith Super-80 floppies">
+
+	<software name="cpm">
+		<description>CP/M boot disk</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="470469">
+				<rom name="cpm.imd" size="470469" crc="5f244055" sha1="1fd601efba719d2ee2fb58671f8584aca0e473b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dos">
+		<description>Super-80 DOS disk</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="69347">
+				<rom name="s80dos.imd" size="69347" crc="42b3b094" sha1="52ae93b07b9c6a8492bdcf56cbb13685fff47ec5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosgames">
+		<description>Super-80 DOS disk with games</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="558331">
+				<rom name="s80dosb0.imd" size="558331" crc="2a437bd3" sha1="be2125fee65d4b3f4da59f9ad76598e2bd7d95af"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

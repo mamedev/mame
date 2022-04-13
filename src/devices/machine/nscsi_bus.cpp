@@ -11,7 +11,7 @@
 #define LOG_DATA_SENT   (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
-#define VERBOSE (LOG_UNSUPPORTED | LOG_DATA_SENT)
+#define VERBOSE (LOG_UNSUPPORTED)
 
 #include "logmacro.h"
 
@@ -125,19 +125,15 @@ void nscsi_bus_device::ctrl_wait(int refid, uint32_t lines, uint32_t mask)
 	dev[refid].wait_ctrl = (w & ~mask) | (lines & mask);
 }
 
-void nscsi_bus_device::device_config_complete()
+void nscsi_bus_device::device_resolve_objects()
 {
-	char id[3];
 	for(int i=0; i<16; i++) {
-		sprintf(id, "%d", i);
-		nscsi_connector *conn = downcast<nscsi_connector *>(subdevice(id));
-		if(conn) {
-			nscsi_device *sdev = conn->get_device();
-			if(sdev) {
-				int rid = devcnt++;
-				dev[rid].dev = sdev;
-				sdev->connect_to_bus(this, rid, i);
-			}
+		device_t *subdev = subdevice(string_format("%d", i));
+		nscsi_device *sdev = subdev ? downcast<nscsi_connector &>(*subdev).get_device() : nullptr;
+		if(sdev) {
+			int rid = devcnt++;
+			dev[rid].dev = sdev;
+			sdev->connect_to_bus(this, rid, i);
 		}
 	}
 }
@@ -145,7 +141,7 @@ void nscsi_bus_device::device_config_complete()
 
 nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NSCSI_CONNECTOR, tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_single_card_slot_interface<nscsi_slot_card_interface>(mconfig, *this)
 {
 }
 
@@ -159,12 +155,21 @@ void nscsi_connector::device_start()
 
 nscsi_device *nscsi_connector::get_device()
 {
-	return dynamic_cast<nscsi_device *>(get_card_device());
+	nscsi_slot_card_interface *const connected = get_card_device();
+	if (connected)
+		return connected->device().subdevice<nscsi_device>(connected->m_nscsi.finder_tag());
+	else
+		return nullptr;
+}
+
+nscsi_slot_card_interface::nscsi_slot_card_interface(const machine_config &mconfig, device_t &device, const char *nscsi_tag) :
+	device_interface(device, "nscsi"),
+	m_nscsi(device, nscsi_tag)
+{
 }
 
 nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_slot_card_interface(mconfig, *this)
+	device_t(mconfig, type, tag, owner, clock)
 {
 	scsi_id = scsi_refid = -1;
 	scsi_bus = nullptr;
@@ -186,6 +191,12 @@ void nscsi_device::device_start()
 	save_item(NAME(scsi_id));
 }
 
+
+nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_device(mconfig, type, tag, owner, clock),
+	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
+{
+}
 
 const char *const nscsi_full_device::command_names[256] = {
 	/* 00 */ "TEST_UNIT_READY", "REZERO", "?", "REQUEST_SENSE", "FORMAT_UNIT", "?", "?", "REASSIGN_BLOCKS",
@@ -252,9 +263,10 @@ void nscsi_full_device::device_reset()
 	scsi_bus->data_w(scsi_refid, 0);
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+	sense(false, SK_NO_SENSE);
 }
 
-void nscsi_full_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nscsi_full_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(id != SCSI_TIMER)
 		return;
@@ -277,6 +289,11 @@ void nscsi_full_device::step(bool timeout)
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 		scsi_state = IDLE;
 		LOG("scsi bus reset\n");
+		scsi_state = scsi_substate = IDLE;
+		buf_control_rpos = buf_control_wpos = 0;
+		scsi_identify = 0;
+		data_buffer_size = 0;
+		data_buffer_pos = 0;
 		return;
 	}
 
@@ -528,7 +545,7 @@ bool nscsi_full_device::scsi_command_done(uint8_t command, uint8_t length)
 
 nscsi_full_device::control *nscsi_full_device::buf_control_push()
 {
-	if(buf_control_wpos == int(ARRAY_LENGTH(buf_control)))
+	if(buf_control_wpos == int(std::size(buf_control)))
 		throw emu_fatalerror("%s: buf_control overflow\n", tag());
 
 	control *c = buf_control + buf_control_wpos;
@@ -614,6 +631,10 @@ void nscsi_full_device::scsi_unknown_command()
 void nscsi_full_device::scsi_command()
 {
 	switch(scsi_cmdbuf[0]) {
+	case SC_REZERO:
+		LOG("command REZERO\n");
+		scsi_status_complete(SS_GOOD);
+		break;
 	case SC_REQUEST_SENSE:
 		LOG("command REQUEST SENSE alloc=%d\n", scsi_cmdbuf[4]);
 		scsi_data_in(SBUF_SENSE, scsi_cmdbuf[4] ? std::min(scsi_cmdbuf[4], u8(sizeof(scsi_sense_buffer))) : 4);

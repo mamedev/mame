@@ -109,7 +109,6 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -138,15 +137,15 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	DECLARE_WRITE8_MEMBER(outport_w);
+	void outport_w(uint8_t data);
 	void murogem_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void murogem_map(address_map &map);
 };
 
 
-WRITE8_MEMBER(murogem_state::outport_w)
+void murogem_state::outport_w(uint8_t data)
 {
 /*
    It's a Delta-Sigma DAC (1-bit/Bitstream)
@@ -161,7 +160,6 @@ WRITE8_MEMBER(murogem_state::outport_w)
 
 void murogem_state::murogem_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x4000, 0x4000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x4001, 0x4001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x5000, 0x5000).portr("IN0");
@@ -227,7 +225,7 @@ void murogem_state::murogem_palette(palette_device &palette) const
 {
 }
 
-uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t murogem_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -263,7 +261,6 @@ void murogem_state::murogem(machine_config &config)
 	screen.set_size((39+1)*8, (38+1)*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(murogem_state::screen_update));
-	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_murogem);
 	PALETTE(config, m_palette, FUNC(murogem_state::murogem_palette), 0x100);
@@ -276,8 +273,6 @@ void murogem_state::murogem(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.375);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

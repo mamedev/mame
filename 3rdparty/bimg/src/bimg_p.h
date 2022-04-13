@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -13,6 +13,8 @@
 #include <bx/endian.h>
 #include <bx/error.h>
 #include <bx/simd_t.h>
+
+#include "config.h"
 
 #define BIMG_CHUNK_MAGIC_TEX BX_MAKEFOURCC('T', 'E', 'X', 0x0)
 #define BIMG_CHUNK_MAGIC_GNF BX_MAKEFOURCC('G', 'N', 'F', ' ')
@@ -48,7 +50,7 @@ namespace bimg
 		if (_hasMips)
 		{
 			const uint32_t max = bx::max(_width, _height, _depth);
-			const uint32_t num = 1 + uint32_t(bx::log2(float(max) ) );
+			const uint32_t num = 1 + uint32_t(bx::log2((int32_t)max) );
 
 			return uint8_t(num);
 		}

@@ -17,8 +17,8 @@ class neogeo_sbp_cart_device : public neogeo_rom_device
 public:
 	neogeo_sbp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override;
-	virtual DECLARE_READ16_MEMBER(protection_r) override;
+	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual uint16_t protection_r(address_space &space, offs_t offset) override;
 
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 0; }

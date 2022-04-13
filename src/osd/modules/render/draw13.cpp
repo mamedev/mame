@@ -11,8 +11,8 @@
 //============================================================
 
 // standard C headers
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 // MAME headers
 #include "emu.h"
@@ -335,7 +335,7 @@ int renderer_sdl2::RendererSupportsFormat(Uint32 format, Uint32 access, const ch
 
 void renderer_sdl2::add_list(copy_info_t **head, const copy_info_t *element, Uint32 bm)
 {
-	copy_info_t *newci = global_alloc(copy_info_t);
+	copy_info_t *newci = new copy_info_t;
 	*newci = *element;
 
 	newci->bm_mask = bm;
@@ -705,9 +705,6 @@ texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsou
 		case TEXFORMAT_PALETTE16:
 			m_format = SDL_TEXFORMAT_PALETTE16;
 			break;
-		case TEXFORMAT_PALETTEA16:
-			m_format = SDL_TEXFORMAT_PALETTE16A;
-			break;
 		case TEXFORMAT_YUY16:
 			m_format = texsource.palette ? SDL_TEXFORMAT_YUY16_PALETTED : SDL_TEXFORMAT_YUY16;
 			break;
@@ -920,7 +917,7 @@ void renderer_sdl2::exit()
 							(int) bi->perf);
 				copy_info_t *freeme = bi;
 				bi = bi->next;
-				global_free(freeme);
+				delete freeme;
 			}
 			s_blit_info[i] = nullptr;
 		}
@@ -945,7 +942,7 @@ texture_info * renderer_sdl2::texture_update(const render_primitive &prim)
 	// if we didn't find one, create a new texture
 	if (texture == nullptr && prim.texture.base != nullptr)
 	{
-		texture = global_alloc(texture_info(this, prim.texture, setup, prim.flags));
+		texture = new texture_info(this, prim.texture, setup, prim.flags);
 		/* add us to the texture list */
 		m_texlist.prepend(*texture);
 	}

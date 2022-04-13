@@ -76,45 +76,45 @@ private:
 	optional_shared_ptr<uint16_t> m_intvkbd_dualport_ram;
 	optional_shared_ptr<uint8_t> m_videoram;
 
-	DECLARE_READ16_MEMBER(intv_stic_r);
-	DECLARE_WRITE16_MEMBER(intv_stic_w);
-	DECLARE_READ16_MEMBER(intv_gram_r);
-	DECLARE_WRITE16_MEMBER(intv_gram_w);
-	DECLARE_READ16_MEMBER(intv_ram8_r);
-	DECLARE_WRITE16_MEMBER(intv_ram8_w);
-	DECLARE_READ16_MEMBER(intv_ram16_r);
-	DECLARE_WRITE16_MEMBER(intv_ram16_w);
-	DECLARE_READ8_MEMBER(intvkb_iocart_r);
+	uint16_t intv_stic_r(offs_t offset);
+	void intv_stic_w(offs_t offset, uint16_t data);
+	uint16_t intv_gram_r(offs_t offset);
+	void intv_gram_w(offs_t offset, uint16_t data);
+	uint16_t intv_ram8_r(offs_t offset);
+	void intv_ram8_w(offs_t offset, uint16_t data);
+	uint16_t intv_ram16_r(offs_t offset);
+	void intv_ram16_w(offs_t offset, uint16_t data);
+	uint8_t intvkb_iocart_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(intv_right_control_r);
-	DECLARE_READ8_MEMBER(intv_left_control_r);
-
-	uint8_t m_bus_copy_mode;
-	uint8_t m_backtab_row;
-	uint16_t m_ram16[0x160];
-	int m_sr1_int_pending;
-	uint8_t m_ram8[256];
+	uint8_t m_bus_copy_mode = 0;
+	uint8_t m_backtab_row = 0;
+	uint16_t m_ram16[0x160]{};
+	int m_sr1_int_pending = 0;
+	uint8_t m_ram8[256]{};
+	bool m_maincpu_reset = false;
 
 	// Keyboard Component
-	DECLARE_WRITE16_MEMBER(intvkbd_dualport16_w);
-	DECLARE_READ8_MEMBER(intvkbd_dualport8_lsb_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_lsb_w);
-	DECLARE_READ8_MEMBER(intvkbd_dualport8_msb_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_msb_w);
-	DECLARE_READ8_MEMBER(intvkbd_io_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_io_w);
-	DECLARE_READ8_MEMBER(intvkbd_periph_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_periph_w);
+	void intvkbd_dualport16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t intvkbd_dualport8_lsb_r(offs_t offset);
+	void intvkbd_dualport8_lsb_w(offs_t offset, uint8_t data);
+	uint8_t intvkbd_dualport8_msb_r(offs_t offset);
+	void intvkbd_dualport8_msb_w(offs_t offset, uint8_t data);
+	uint8_t intvkbd_io_r(offs_t offset);
+	void intvkbd_io_w(offs_t offset, uint8_t data);
+	uint8_t intvkbd_periph_r(offs_t offset);
+	void intvkbd_periph_w(offs_t offset, uint8_t data);
 
-	bool m_printer_not_busy;        // printer state
-	bool m_printer_no_paper;        // printer state
-	bool m_printer_not_busy_enable; // printer interface state
+	uint16_t iab_r();
 
-	int m_intvkbd_text_blanked;
-	int m_intvkbd_keyboard_col;
-	int m_tape_int_pending;
-	int m_tape_interrupts_enabled;
-	int m_tape_motor_mode;
+	bool m_printer_not_busy = false;        // printer state
+	bool m_printer_no_paper = false;        // printer state
+	bool m_printer_not_busy_enable = false; // printer interface state
+
+	int m_intvkbd_text_blanked = 0;
+	int m_intvkbd_keyboard_col = 0;
+	int m_tape_int_pending = 0;
+	int m_tape_interrupts_enabled = 0;
+	int m_tape_motor_mode = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -135,7 +135,7 @@ private:
 	void intvkbd_mem(address_map &map);
 	void intvoice_mem(address_map &map);
 
-	int m_is_keybd;
+	int m_is_keybd = 0;
 
 	optional_device<cpu_device> m_keyboard;
 	optional_device<generic_slot_device> m_iocart1;
@@ -149,7 +149,7 @@ private:
 
 	ioport_port *m_intv_keyboard[10];
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_INTV_H

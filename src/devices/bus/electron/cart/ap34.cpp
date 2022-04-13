@@ -7,7 +7,6 @@
     http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/PRES_AP3A.html
 
     TODO:
-    - AP4 (DFS) is unreliable, maybe WD1770 reset issue to be investigated
     - add spare ROM slot in AP3 and AP4, not AP3/4
 
 **********************************************************************/
@@ -25,14 +24,16 @@ DEFINE_DEVICE_TYPE(ELECTRON_AP34, electron_ap34_device, "electron_ap34", "P.R.E.
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( ap34 )
+//  FLOPPY_FORMATS( ap34 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(electron_ap34_device::floppy_formats)
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT
-FLOPPY_FORMATS_END0
+void electron_ap34_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+}
 
 void ap34_floppies(device_slot_interface &device)
 {
@@ -48,8 +49,8 @@ void electron_ap34_device::device_add_mconfig(machine_config &config)
 {
 	/* fdc */
 	WD1770(config, m_fdc, DERIVED_CLOCK(1, 2));
-	FLOPPY_CONNECTOR(config, m_floppy0, ap34_floppies, "525qd", electron_ap34_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, ap34_floppies, nullptr, electron_ap34_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], ap34_floppies, "525qd", electron_ap34_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], ap34_floppies, nullptr, electron_ap34_device::floppy_formats).enable_sound(true);
 }
 
 //**************************************************************************
@@ -64,8 +65,7 @@ electron_ap34_device::electron_ap34_device(const machine_config &mconfig, const 
 	: device_t(mconfig, ELECTRON_AP34, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")
-	, m_floppy0(*this, "fdc:0")
-	, m_floppy1(*this, "fdc:1")
+	, m_floppy(*this, "fdc:%u", 0)
 {
 }
 
@@ -87,12 +87,9 @@ uint8_t electron_ap34_device::read(offs_t offset, int infc, int infd, int romqa,
 
 	if (infc)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0xfc)
 		{
 		case 0xc4:
-		case 0xc5:
-		case 0xc6:
-		case 0xc7:
 			data = m_fdc->read(offset & 0x03);
 			break;
 		}
@@ -120,15 +117,12 @@ void electron_ap34_device::write(offs_t offset, uint8_t data, int infc, int infd
 {
 	if (infc)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0xfc)
 		{
 		case 0xc0:
 			wd1770_control_w(data);
 			break;
 		case 0xc4:
-		case 0xc5:
-		case 0xc6:
-		case 0xc7:
 			m_fdc->write(offset & 0x03, data);
 			break;
 		}
@@ -152,8 +146,8 @@ void electron_ap34_device::wd1770_control_w(uint8_t data)
 	floppy_image_device *floppy = nullptr;
 
 	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 0)) floppy = m_floppy[0]->get_device();
+	if (BIT(data, 1)) floppy = m_floppy[1]->get_device();
 	m_fdc->set_floppy(floppy);
 
 	// bit 2: side select
@@ -167,5 +161,5 @@ void electron_ap34_device::wd1770_control_w(uint8_t data)
 	//m_slot->nmi_w(!BIT(data, 4));
 
 	// bit 5: reset
-	if (!BIT(data, 5)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 5));
 }

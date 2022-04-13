@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    a2hsscsi.c
+    a2hsscsi.cpp
 
     Implementation of the Apple II High Speed SCSI Card
 
@@ -40,8 +40,7 @@
 
 #include "emu.h"
 #include "a2hsscsi.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/devices.h"
 
 /***************************************************************************
     PARAMETERS
@@ -56,13 +55,6 @@ DEFINE_DEVICE_TYPE(A2BUS_HSSCSI, a2bus_hsscsi_device, "a2hsscsi", "Apple II High
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
-
-static void hsscsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5380", NCR5380N);
-}
 
 ROM_START( hsscsi )
 	ROM_REGION(0x8000, SCSI_ROM_REGION, 0)
@@ -80,16 +72,15 @@ ROM_END
 void a2bus_hsscsi_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsibus:0", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:1", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:2", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:3", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:4", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:5", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:6", hsscsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsibus:7", hsscsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this](device_t *device) {
-		device->set_clock(10000000);
-		downcast<ncr5380n_device &>(*device).drq_handler().set(*this, FUNC(a2bus_hsscsi_device::drq_w));
+	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
+		downcast<ncr53c80_device &>(*device).drq_handler().set(*this, FUNC(a2bus_hsscsi_device::drq_w));
 	});
 }
 
@@ -110,7 +101,8 @@ a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, device_t
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),
-	m_scsibus(*this, SCSI_BUS_TAG), m_rom(nullptr), m_rambank(0), m_rombank(0), m_drq(0), m_bank(0), m_816block(false), m_c0ne(0), m_c0nf(0)
+	m_scsibus(*this, SCSI_BUS_TAG), m_rom(*this, SCSI_ROM_REGION), m_rambank(0), m_rombank(0), m_drq(0), m_bank(0), m_c0ne(0), m_c0nf(0),
+	m_dma_addr(0), m_dma_size(0)
 {
 }
 
@@ -125,8 +117,6 @@ a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, const ch
 
 void a2bus_hsscsi_device::device_start()
 {
-	m_rom = machine().root_device().memregion(this->subtag(SCSI_ROM_REGION).c_str())->base();
-
 	memset(m_ram, 0, 8192);
 
 	save_item(NAME(m_ram));
@@ -134,15 +124,16 @@ void a2bus_hsscsi_device::device_start()
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_bank));
 	save_item(NAME(m_drq));
-	save_item(NAME(m_816block));
+	save_item(NAME(m_dma_addr));
+	save_item(NAME(m_dma_size));
 }
 
 void a2bus_hsscsi_device::device_reset()
 {
 	m_rambank = 0;
 	m_rombank = 0;
+	m_dma_addr = m_dma_size = 0;
 	m_c0ne = m_c0nf = 0;
-	m_816block = false;
 }
 
 
@@ -160,13 +151,35 @@ uint8_t a2bus_hsscsi_device::read_c0nx(uint8_t offset)
 		case 3:
 		case 4:
 		case 5:
-		case 6:
 		case 7:
 //          logerror("Read 5380 @ %x\n", offset);
 			return m_ncr5380->read(offset);
 
-		case 0xc:
-			return 0x00;    // indicate watchdog?
+		case 6:
+			if (m_dma_control & 1)  // pseudo-DMA?
+			{
+				return m_ncr5380->dma_r();
+			}
+			else
+			{
+				//printf("Read 5380 PIO data (%s)\n", machine().describe_context().c_str());
+				return m_ncr5380->read(offset);
+			}
+
+		case 8: // DMA address low
+			return m_dma_addr & 0xff;
+
+		case 9: // DMA address high
+			return (m_dma_addr >> 8) & 0xff;
+
+		case 0xa:   // DMA size low
+			return m_dma_size & 0xff;
+
+		case 0xb:   // DMA size high
+			return (m_dma_size >> 8) & 0xff;
+
+		case 0xc:   // DMA control
+			return m_dma_control;
 
 		case 0xe:   // code at cf32 wants to RMW this without killing the ROM bank
 			return m_c0ne;
@@ -175,7 +188,7 @@ uint8_t a2bus_hsscsi_device::read_c0nx(uint8_t offset)
 			return m_c0nf;
 
 		default:
-			logerror("Read c0n%x (%s)\n", offset, machine().describe_context());
+			logerror("Read c0n%x (%s)\n", offset, machine().describe_context().c_str());
 			break;
 	}
 
@@ -191,7 +204,17 @@ void a2bus_hsscsi_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0:
+		case 0: // data out register; in PDMA mode, it's assumed this goes to DMA as reads do
+			if (m_dma_control & 1)
+			{
+				m_ncr5380->dma_w(data);
+			}
+			else
+			{
+				m_ncr5380->write(offset, data);
+			}
+			break;
+
 		case 1:
 		case 2:
 		case 3:
@@ -202,25 +225,39 @@ void a2bus_hsscsi_device::write_c0nx(uint8_t offset, uint8_t data)
 //          logerror("%02x to 5380 reg %x\n", data, offset);
 			m_ncr5380->write(offset, data);
 			break;
-#if 0
+
 		case 8: // DMA address low
+			//printf("%02x to DMA adr low\n", data);
+			m_dma_addr &= 0xff00;
+			m_dma_addr |= data;
 			break;
 
 		case 9: // DMA address high
+			//printf("%02x to DMA adr high\n", data);
+			m_dma_addr &= 0x00ff;
+			m_dma_addr |= (data << 8);
 			break;
 
 		case 0xa: // DMA count low
+			//printf("%02x to DMA count low\n", data);
+			m_dma_size &= 0xff00;
+			m_dma_size |= data;
 			break;
 
 		case 0xb: // DMA count high
+			//printf("%02x to DMA count high\n", data);
+			m_dma_size &= 0x00ff;
+			m_dma_size |= (data << 8);
 			break;
 
 		case 0xc:   // DMA control
+			//printf("%02x to DMA control\n", data);
+			m_dma_control &= ~0x2b; // clear the read/write bits
+			m_dma_control |= (data & 0x2b);
 			break;
-#endif
 
 		case 0xd:   // DMA enable / reset
-			logerror("%02x to DMA enable/reset\n", data);
+			//printf("%02x to DMA enable/reset\n", data);
 			if (data & 0x2)
 			{
 	//          logerror("Resetting SCSI: %02x at %s\n", data, machine().describe_context());
@@ -231,17 +268,17 @@ void a2bus_hsscsi_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0xe:
 			m_c0ne = data;
 			m_rombank = (data & 0x1f) * 0x400;
-			logerror("c0ne to %x (ROM bank %x)\n", data & 0x1f, m_rombank);
+			//logerror("c0ne to %x (ROM bank %x)\n", data & 0x1f, m_rombank);
 			break;
 
 		case 0xf:
 			m_c0nf = data;
 			m_rambank = (data & 0x7) * 0x400;
-			logerror("c0nf to %x (RAM bank %x)\n", data & 0x7, m_rambank);
+			//logerror("c0nf to %x (RAM bank %x)\n", data & 0x7, m_rambank);
 			break;
 
 		default:
-			logerror("Write %02x to c0n%x (%s)\n", data, offset, machine().describe_context());
+			logerror("Write %02x to c0n%x (%s)\n", data, offset, machine().describe_context().c_str());
 			break;
 	}
 }
@@ -272,11 +309,6 @@ uint8_t a2bus_hsscsi_device::read_c800(uint16_t offset)
 	if (offset < 0x400)
 	{
 //      logerror("Read RAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
-		if (m_816block)
-		{
-			return m_ncr5380->dma_r();
-		}
-
 		return m_ram[offset + m_rambank];
 	}
 	else
@@ -293,18 +325,12 @@ void a2bus_hsscsi_device::write_c800(uint16_t offset, uint8_t data)
 	if (offset < 0x400)
 	{
 //      logerror("%02x to RAM at %x\n", data, offset+m_rambank);
-		if (m_816block)
-		{
-			m_ncr5380->dma_w(data);
-		}
-		else
-		{
-			m_ram[offset + m_rambank] = data;
-		}
+		m_ram[offset + m_rambank] = data;
 	}
 }
 
 WRITE_LINE_MEMBER( a2bus_hsscsi_device::drq_w )
 {
 	m_drq = (state ? 0x80 : 0x00);
+//  printf("DRQ to %d\n", state);
 }

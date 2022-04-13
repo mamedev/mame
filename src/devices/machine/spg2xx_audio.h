@@ -22,17 +22,18 @@ public:
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto write_irq_callback() { return m_irq_cb.bind(); }
+	auto channel_irq_callback() { return m_ch_irq_cb.bind(); }
 
-	DECLARE_READ16_MEMBER(audio_r);
-	virtual DECLARE_WRITE16_MEMBER(audio_w);
-	DECLARE_READ16_MEMBER(audio_ctrl_r);
-	DECLARE_WRITE16_MEMBER(audio_ctrl_w);
-	DECLARE_READ16_MEMBER(audio_phase_r);
-	DECLARE_WRITE16_MEMBER(audio_phase_w);
+	uint16_t audio_r(offs_t offset);
+	virtual void audio_w(offs_t offset, uint16_t data);
+	uint16_t audio_ctrl_r(offs_t offset);
+	void audio_ctrl_w(offs_t offset, uint16_t data);
+	uint16_t audio_phase_r(offs_t offset);
+	void audio_phase_w(offs_t offset, uint16_t data);
 
 protected:
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void audio_beat_tick();
 	void audio_rampdown_tick(const uint32_t channel);
@@ -321,12 +322,22 @@ protected:
 		AUDIO_EQ_GAIN32_MASK            = 0x7f7f
 	};
 
+	struct adpcm36_state
+	{
+		uint16_t m_remaining;
+		uint16_t m_header;
+		int16_t m_prevsamp[2];
+	};
+
 	static const device_timer_id TIMER_BEAT = 3;
+	static const device_timer_id TIMER_IRQ = 4;
+
 	void check_irqs(const uint16_t changed);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_stop() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint16_t read_space(offs_t offset);
 
@@ -334,7 +345,8 @@ protected:
 	bool advance_channel(const uint32_t channel);
 	bool fetch_sample(const uint32_t channel);
 	void loop_channel(const uint32_t channel);
-
+	uint16_t decode_adpcm36_nybble(const uint32_t channel, const uint8_t data);
+	void read_adpcm36_header(const uint32_t channel);
 
 	bool m_debug_samples;
 	bool m_debug_rates;
@@ -354,9 +366,11 @@ protected:
 	uint16_t m_audio_curr_beat_base_count;
 
 	emu_timer *m_audio_beat;
+	emu_timer *m_channel_irq[16];
 
 	sound_stream *m_stream;
 	oki_adpcm_state m_adpcm[16];
+	adpcm36_state m_adpcm36_state[16];
 
 	static const uint32_t s_rampdown_frame_counts[8];
 	static const uint32_t s_envclk_frame_counts[16];
@@ -364,7 +378,7 @@ protected:
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write_line m_irq_cb;
-
+	devcb_write_line m_ch_irq_cb;
 };
 
 class spg110_audio_device : public spg2xx_audio_device
@@ -372,7 +386,7 @@ class spg110_audio_device : public spg2xx_audio_device
 public:
 	spg110_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE16_MEMBER(audio_w) override;
+	virtual void audio_w(offs_t offset, uint16_t data) override;
 
 	// these either come from somewhere else on spg110 or are hardcoded
 	virtual uint16_t get_16bit_bit(const offs_t channel) const override { return 1; }
@@ -381,7 +395,25 @@ public:
 	virtual uint32_t get_phase(const offs_t channel) const override { return m_audio_regs[(channel << 4) | 0xe]; }
 };
 
+class sunplus_gcm394_audio_device : public spg2xx_audio_device
+{
+public:
+	sunplus_gcm394_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint16_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data);
+
+	virtual void device_start() override;
+
+private:
+	uint16_t control_group16_r(uint8_t group, uint8_t offset);
+	void control_group16_w(uint8_t group, uint8_t offset, uint16_t data);
+
+	uint16_t m_control[2][0x20];
+};
+
 DECLARE_DEVICE_TYPE(SPG2XX_AUDIO, spg2xx_audio_device)
 DECLARE_DEVICE_TYPE(SPG110_AUDIO, spg110_audio_device)
+DECLARE_DEVICE_TYPE(SUNPLUS_GCM394_AUDIO, sunplus_gcm394_audio_device)
 
 #endif // MAME_MACHINE_SPG2XX_AUDIO_H

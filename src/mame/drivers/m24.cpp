@@ -11,6 +11,12 @@
     The AT&T PC6300, the Xerox 6060 and the Logabax Persona 1600 were
     badge-engineered Olivetti M24s.
 
+    The Olivetti M21 was a portable version of the M24 that sported a 9"
+    monochrome monitor.
+
+    http://www.computinghistory.org.uk/det/43175/Olivetti-M21/
+    https://www.nightfallcrew.com/23/02/2014/repairing-a-defective-olivetti-m21/
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -24,7 +30,7 @@
 #include "machine/i8087.h"
 #include "machine/m24_kbd.h"
 #include "machine/m24_z8000.h"
-#include "machine/mm58274c.h"
+#include "machine/mm58174.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
@@ -35,7 +41,10 @@
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
+
+
+namespace {
 
 class m24_state : public driver_device
 {
@@ -52,7 +61,8 @@ public:
 		m_kbc(*this, "kbc"),
 		m_keyboard(*this, "keyboard"),
 		m_z8000_apb(*this, "z8000_apb"),
-		m_dsw0(*this, "DSW0")
+		m_dsw0(*this, "DSW0"),
+		m_nmi_enable(false)
 	{ }
 
 	void olivetti(machine_config &config);
@@ -115,14 +125,14 @@ private:
 	u8 m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 
-	DECLARE_READ8_MEMBER(pa_r);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_READ8_MEMBER(kbcdata_r);
-	DECLARE_WRITE8_MEMBER(kbcdata_w);
+	u8 pa_r();
+	void pb_w(u8 data);
+	u8 kbcdata_r();
+	void kbcdata_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	static void cfg_m20_format(device_t *device);
 	void kbc_map(address_map &map);
@@ -389,26 +399,26 @@ void m24_state::update_nmi()
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(m24_state::pa_r)
+u8 m24_state::pa_r()
 {
 	return m_pa & (m_kbdata ? 0xff : 0xfd);
 }
 
-WRITE8_MEMBER(m24_state::pb_w)
+void m24_state::pb_w(u8 data)
 {
 	m_keyboard->clock_w(!BIT(data, 0));
 	m_keyboard->data_w(!BIT(data, 1));
 	m_pa = (m_pa & ~3) | (~data & 3);
 }
 
-READ8_MEMBER(m24_state::kbcdata_r)
+u8 m24_state::kbcdata_r()
 {
 	m_kbc->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
 	m_kbcibf = false;
 	return m_kbcin;
 }
 
-WRITE8_MEMBER(m24_state::kbcdata_w)
+void m24_state::kbcdata_w(u8 data)
 {
 	m_pa &= ~0x40;
 	m_pic->ir1_w(1);
@@ -454,7 +464,7 @@ void m24_state::m24_io(address_map &map)
 	map(0x0064, 0x0064).r(FUNC(m24_state::keyboard_status_r));
 	map(0x0065, 0x0065).w(FUNC(m24_state::alt_w));
 	map(0x0066, 0x0067).portr("DSW0");
-	map(0x0070, 0x007f).rw("mm58174an", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
+	map(0x0070, 0x007f).rw("mm58174an", FUNC(mm58174_device::read), FUNC(mm58174_device::write));
 	map(0x0080, 0x0083).mirror(0xc).w(FUNC(m24_state::dma_segment_w));
 	map(0x00a0, 0x00a1).mirror(0xe).w(FUNC(m24_state::nmi_enable_w));
 	map(0x80c1, 0x80c1).rw(m_z8000_apb, FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
@@ -509,11 +519,12 @@ static INPUT_PORTS_START( m24 )
 	PORT_DIPSETTING(    0xc000, "4" )
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( m24_state::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT,
-	FLOPPY_M20_FORMAT
-FLOPPY_FORMATS_END
+void m24_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+	fr.add(FLOPPY_M20_FORMAT);
+}
 
 void m24_state::cfg_m20_format(device_t *device)
 {
@@ -601,17 +612,24 @@ void m24_state::olivetti(machine_config &config)
 	M24_KEYBOARD(config, m_keyboard, 0);
 	m_keyboard->out_data_handler().set(FUNC(m24_state::kbcin_w));
 
-	mm58274c_device &mm58174an(MM58274C(config, "mm58174an", 32.768_kHz_XTAL));
-	// this is all guess
-	mm58174an.set_mode24(1); // ?
-	mm58174an.set_day1(1);   // ?
+	MM58174(config, "mm58174an", 32.768_kHz_XTAL);
 
 	M24_Z8000(config, m_z8000_apb, 0); // TODO: make this a slot device (uses custom bus connector)
 	m_z8000_apb->halt_callback().set(FUNC(m24_state::halt_i86_w));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "m24_disk_list").set_original("m24");
 }
+
+ROM_START( m21 )
+	ROM_REGION16_LE(0x8000,"bios", 0)
+	ROMX_LOAD( "bios_m24_144_even.bin", 0x4000, 0x2000, CRC(5f3d7084) SHA1(d55c0d8472b45e4c4ca9cb0066cd5c122056ba8e), ROM_SKIP(1))
+	ROMX_LOAD( "bios_m24_144_odd.bin", 0x4001, 0x2000, CRC(18fd8db8) SHA1(f2c9d189f7ded88946a99432abd7106d509a7411), ROM_SKIP(1))
+
+	ROM_REGION(0x800, "kbc", 0)
+	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
+ROM_END
 
 ROM_START( m24 )
 	ROM_REGION16_LE(0x8000,"bios", 0)
@@ -645,5 +663,9 @@ ROM_START( m240 )
 	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
+} // Anonymous namespace
+
+
+COMP( 1984, m21,  ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M21",  MACHINE_NOT_WORKING )
 COMP( 1983, m24,  ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M24",  MACHINE_NOT_WORKING )
 COMP( 1987, m240, ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M240", MACHINE_NOT_WORKING )

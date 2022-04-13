@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #ifndef MAME_MACHINE_I82355_H
-#define MAME_MACHINE_I82355_H 1
+#define MAME_MACHINE_I82355_H
 
 #pragma once
 

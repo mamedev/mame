@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pasogo" description="Koei PasoGo cartridges">
 
 <!--
@@ -22,8 +25,8 @@
 		<info name="serial" value="KS-1001"/>
 		<info name="alt_title" value="対局くん I"/>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" width="16" endianness="little" size="1048576">
-				<rom name="ks-1001.ic4" size="1048576" crc="b6a3f97c" sha1="2de63b05ec93a4ba3ea55ba131c0706927a5bf39" offset="00000000" />
+			<dataarea name="rom" width="16" size="1048576">
+				<rom name="ks-1001.ic4" size="1048576" crc="2753bb6c" sha1="3603e9ab6d4861a26343f03129eec58f7b5a34f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36,8 +39,8 @@
 		<info name="serial" value="KS-1002"/>
 		<info name="alt_title" value="楽しい詰碁・第1巻"/>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" width="16" endianness="little" size="524288">
-				<rom name="ks-1002.ic4" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
+			<dataarea name="rom" width="16" size="524288">
+				<rom name="ks-1002.ic4" size="524288" crc="2d78a2b8" sha1="929d12c7b8607e11e5bc579e498f221ffcc84bdf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,8 +53,8 @@
 		<info name="serial" value="KS-1003"/>
 		<info name="alt_title" value="楽しい詰碁・第2巻"/>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" width="16" endianness="little" size="524288">
-				<rom name="ks-1003.ic4" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
+			<dataarea name="rom" width="16" size="524288">
+				<rom name="ks-1003.ic4" size="524288" crc="4796155b" sha1="75014e71de8f10e10fc06d0c21145b9679135352"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,8 +67,8 @@
 		<info name="serial" value="KS-1004"/>
 		<info name="alt_title" value="囲碁名局集・第1巻"/>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" width="16" endianness="little" size="524288">
-				<rom name="ks-1004.ic4" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
+			<dataarea name="rom" width="16" size="524288">
+				<rom name="ks-1004.ic4" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -78,8 +81,8 @@
 		<info name="serial" value="KS-1009"/>
 		<info name="alt_title" value="電子碁盤"/>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" width="16" endianness="little" size="1048576">
-				<rom name="ks-1009.ic4" size="1048576" crc="b6a3f97c" sha1="2de63b05ec93a4ba3ea55ba131c0706927a5bf39" offset="00000000" />
+			<dataarea name="rom" width="16" size="1048576">
+				<rom name="ks-1009.ic4" size="1048576" crc="b6a3f97c" sha1="2de63b05ec93a4ba3ea55ba131c0706927a5bf39"/>
 			</dataarea>
 		</part>
 	</software>
@@ -92,8 +95,8 @@
 		<info name="serial" value="KS-1010"/>
 		<info name="alt_title" value="強くなる手筋・第1巻"/>
 		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" width="16" endianness="little" size="524288">
-				<rom name="ks-1010.ic4" size="524288" crc="3e70fca6" sha1="c46cdc9e01f2f5c66b2523e1d30355e51c839f27" offset="00000000" />
+			<dataarea name="rom" width="16" size="524288">
+				<rom name="ks-1010.ic4" size="524288" crc="3e70fca6" sha1="c46cdc9e01f2f5c66b2523e1d30355e51c839f27"/>
 			</dataarea>
 		</part>
 	</software>

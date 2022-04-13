@@ -56,30 +56,30 @@ private:
 	optional_device_array<buffered_spriteram16_device, 2> m_spriteram;
 
 	/* memory pointers */
-	optional_shared_ptr_array<uint16_t, 4> m_pf_rowscroll;
+	optional_shared_ptr_array<u16, 4> m_pf_rowscroll;
 
 	optional_device_array<decospr_device, 2> m_sprgen;
 
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
-	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	u16 irq_ack_r();
+	void irq_ack_w(u16 data);
+	void rohga_buffer_spriteram16_w(u16 data);
+	void sound_bankswitch_w(u8 data);
 
 	DECLARE_VIDEO_START(wizdfire);
-	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask);
+	u32 screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri, u16 primask);
 	void mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(rohga_pri_callback);
 	DECOSPR_COLOUR_CB_MEMBER(rohga_col_callback);
 	DECOSPR_COLOUR_CB_MEMBER(schmeisr_col_callback);
 
-	READ16_MEMBER( ioprot_r );
-	WRITE16_MEMBER( ioprot_w );
+	u16 ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void hangzo_map(address_map &map);
 	void hotb_base_map(address_map &map);
 	void nitrobal_map(address_map &map);

@@ -8,12 +8,14 @@
 
 ***************************************************************************/
 
+#include "aviio.h"
+#include "osdcomm.h"
+#include "osdfile.h"
+
 #include <array>
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-
-#include "aviio.h"
 
 
 /***************************************************************************
@@ -39,7 +41,7 @@
 /** @brief  Size of the maximum riff. */
 #define MAX_RIFF_SIZE           (2UL * 1024 * 1024 * 1024 - 1024)   /* just under 2GB */
 /** @brief  The maximum avi size in gigabytes. */
-#define MAX_AVI_SIZE_IN_GB      (256)
+#define MAX_AVI_SIZE_IN_GB      (1024)
 
 /**
  * @def FOUR_GB
@@ -298,7 +300,7 @@ public:
 		std::uint32_t width = info.video_width;
 		std::uint32_t height = info.video_height;
 
-		std::uint32_t integal_multiple = std::uint32_t(AVI_INTEGRAL_MULTIPLE);
+		auto integal_multiple = std::uint32_t(AVI_INTEGRAL_MULTIPLE);
 		if (integal_multiple > 1)
 		{
 			width = width - (width % integal_multiple);
@@ -364,6 +366,10 @@ public:
 
 	// HuffYUV helpers
 	avi_file::error huffyuv_decompress_to_yuy16(const std::uint8_t *data, std::uint32_t numbytes, bitmap_yuy16 &bitmap) const;
+
+	// Uncompressed helpers
+	avi_file::error uncompressed_rgb24_to_argb32(const std::uint8_t *data, std::uint32_t numbytes, bitmap_argb32 &bitmap) const;
+	avi_file::error uncompressed_yuv420p_to_argb32(const std::uint8_t *data, std::uint32_t numbytes, bitmap_argb32 &bitmap) const;
 
 private:
 	struct huffyuv_table
@@ -456,6 +462,7 @@ public:
 	virtual movie_info const &get_movie_info() const override;
 	virtual std::uint32_t first_sample_in_frame(std::uint32_t framenum) const override;
 
+	virtual error read_uncompressed_video_frame(std::uint32_t framenum, bitmap_argb32 &bitmap) override;
 	virtual error read_video_frame(std::uint32_t framenum, bitmap_yuy16 &bitmap) override;
 	virtual error read_sound_samples(int channel, std::uint32_t firstsample, std::uint32_t numsamples, std::int16_t *output) override;
 
@@ -715,8 +722,8 @@ inline void put_64bits(std::uint8_t *data, std::uint64_t value)
 
 inline void u64toa(std::uint64_t val, char *output)
 {
-	std::uint32_t lo = std::uint32_t(val & 0xffffffff);
-	std::uint32_t hi = std::uint32_t(val >> 32);
+	auto lo = std::uint32_t(val & 0xffffffff);
+	auto hi = std::uint32_t(val >> 32);
 	if (hi != 0)
 		sprintf(output, "%X%08X", hi, lo);
 	else
@@ -994,7 +1001,7 @@ avi_file::error avi_stream::rgb32_compress_to_rgb(const bitmap_rgb32 &bitmap, st
 	/* compressed video */
 	for (y = 0; y < height; y++)
 	{
-		const std::uint32_t *source = &bitmap.pix32(y);
+		const std::uint32_t *source = &bitmap.pix(y);
 		std::uint8_t *dest = data + (m_height - 1 - y) * m_width * 3;
 
 		for (x = 0; x < width && dest < dataend; x++)
@@ -1050,14 +1057,14 @@ avi_file::error avi_stream::rgb32_compress_to_rgb(const bitmap_rgb32 &bitmap, st
 
 avi_file::error avi_stream::yuv_decompress_to_yuy16(const std::uint8_t *data, std::uint32_t numbytes, bitmap_yuy16 &bitmap) const
 {
-	std::uint16_t const *const dataend = reinterpret_cast<const std::uint16_t *>(data + numbytes);
+	auto const *const dataend = reinterpret_cast<const std::uint16_t *>(data + numbytes);
 	int x, y;
 
 	/* compressed video */
 	for (y = 0; y < m_height; y++)
 	{
 		const std::uint16_t *source = reinterpret_cast<const std::uint16_t *>(data) + y * m_width;
-		std::uint16_t *dest = &bitmap.pix16(y);
+		std::uint16_t *dest = &bitmap.pix(y);
 
 		/* switch off the compression */
 		switch (m_format)
@@ -1102,13 +1109,13 @@ avi_file::error avi_stream::yuv_decompress_to_yuy16(const std::uint8_t *data, st
 
 avi_file::error avi_stream::yuy16_compress_to_yuy(const bitmap_yuy16 &bitmap, std::uint8_t *data, std::uint32_t numbytes) const
 {
-	std::uint16_t *const dataend = reinterpret_cast<std::uint16_t *>(data + numbytes);
+	auto *const dataend = reinterpret_cast<std::uint16_t *>(data + numbytes);
 	int x, y;
 
 	/* compressed video */
 	for (y = 0; y < m_height; y++)
 	{
-		const std::uint16_t *source = &bitmap.pix16(y);
+		const std::uint16_t *source = &bitmap.pix(y);
 		std::uint16_t *dest = reinterpret_cast<std::uint16_t *>(data) + y * m_width;
 
 		/* switch off the compression */
@@ -1293,7 +1300,7 @@ avi_file::error avi_stream::huffyuv_decompress_to_yuy16(const std::uint8_t *data
 	/* compressed video */
 	for (y = 0; y < m_height; y++)
 	{
-		std::uint16_t *dest = &bitmap.pix16(y);
+		std::uint16_t *dest = &bitmap.pix(y);
 
 		/* handle the first four bytes independently */
 		x = 0;
@@ -1381,8 +1388,8 @@ avi_file::error avi_stream::huffyuv_decompress_to_yuy16(const std::uint8_t *data
 	lastprevy = lastprevcb = lastprevcr = 0;
 	for (y = 0; y < m_height; y++)
 	{
-		std::uint16_t *prevrow = &bitmap.pix16(y - prevlines);
-		std::uint16_t *dest = &bitmap.pix16(y);
+		std::uint16_t *prevrow = &bitmap.pix(y - prevlines);
+		std::uint16_t *dest = &bitmap.pix(y);
 
 		/* handle the first four bytes independently */
 		x = 0;
@@ -1476,6 +1483,73 @@ avi_file::error avi_stream::huffyuv_decompress_to_yuy16(const std::uint8_t *data
 				lastcr = (pixel1 & 0xff) + b;
 				dest[x + 1] = (lasty << 8) | lastcr;
 			}
+		}
+	}
+
+	return avi_file::error::NONE;
+}
+
+
+/*-------------------------------------------------
+    uncompressed_rgb24_to_argb32 - convert a raw
+    RGB24-encoded frame to an ARGB32 bitmap
+-------------------------------------------------*/
+
+avi_file::error avi_stream::uncompressed_rgb24_to_argb32(const std::uint8_t *data, std::uint32_t numbytes, bitmap_argb32 &bitmap) const
+{
+	std::uint32_t dataoffs = 0;
+
+	/* uncompressed video */
+	for (int y = 0; y < m_height; y++)
+	{
+		std::uint32_t *dest = &bitmap.pix(y);
+
+		/* loop over pixels */
+		for (int x = 0; x < m_width; x++)
+		{
+			const uint8_t b = data[dataoffs++];
+			const uint8_t g = data[dataoffs++];
+			const uint8_t r = data[dataoffs++];
+			*dest++ = 0xff << 24 | r << 16 | g << 8 | b;
+		}
+	}
+
+	return avi_file::error::NONE;
+}
+
+
+/*-------------------------------------------------
+    uncompressed_yuv420p_to_argb32 - convert a
+    YUV420p-encoded frame to an ARGB32 bitmap
+-------------------------------------------------*/
+
+avi_file::error avi_stream::uncompressed_yuv420p_to_argb32(const std::uint8_t *data, std::uint32_t numbytes, bitmap_argb32 &bitmap) const
+{
+	const int width = bitmap.width();
+	const int height = bitmap.height();
+	const int size_total = width * height;
+
+	/* uncompressed video */
+	for (int y = 0; y < m_height; y++)
+	{
+		std::uint32_t *dest = &bitmap.pix(y);
+
+		/* loop over pixels */
+		for (int x = 0; x < m_width; x++)
+		{
+			const uint8_t luma = data[y * width + x];
+			const uint8_t u = data[(y / 2) * (width / 2) + x / 2 + size_total];
+			const uint8_t v = data[(y / 2) * (width / 2) + x / 2 + size_total + size_total / 4];
+
+			int r = luma + (1.370705f * (v - 0x80));
+			int g = luma - (0.698001f * (v - 0x80)) - (0.337633f * (u - 0x80));
+			int b = luma + (1.732446f * (u - 0x80));
+
+			r = (r < 0) ? 0 : ((r > 255) ? 255 : r);
+			g = (g < 0) ? 0 : ((g > 255) ? 255 : g);
+			b = (b < 0) ? 0 : ((b > 255) ? 255 : b);
+
+			*dest++ = 0xff << 24 | r << 16 | g << 8 | b;
 		}
 	}
 
@@ -1602,22 +1676,67 @@ std::uint32_t avi_file_impl::first_sample_in_frame(std::uint32_t framenum) const
 
 
 /*-------------------------------------------------
-    avi_read_video_frame - read video data
-    for a particular frame from the AVI file,
-    converting to YUY16 format
+    read_uncompressed_video_frame - read raw video
+    data for a particular frame from the AVI file,
+    converting to ARGB32 format
 -------------------------------------------------*/
 
-/**
- * @fn  avi_error avi_read_video_frame(avi_file *file, std::uint32_t framenum, bitmap_yuy16 &bitmap)
- *
- * @brief   Avi read video frame.
- *
- * @param [in,out]  file    If non-null, the file.
- * @param   framenum        The framenum.
- * @param [in,out]  bitmap  The bitmap.
- *
- * @return  An avi_error.
- */
+avi_file::error avi_file_impl::read_uncompressed_video_frame(std::uint32_t framenum, bitmap_argb32 &bitmap)
+{
+	/* get the video stream */
+	avi_stream *const stream = get_video_stream();
+	if (!stream)
+		return error::INVALID_STREAM;
+
+	if (stream->format() != FORMAT_UNCOMPRESSED && stream->format() != FORMAT_DIB && stream->format() != FORMAT_RGB && stream->format() != FORMAT_RAW && stream->format() != FORMAT_I420)
+		return error::UNSUPPORTED_VIDEO_FORMAT;
+
+	if (bitmap.width() < stream->width() || bitmap.height() < stream->height())
+		bitmap.resize(stream->width(), stream->height());
+
+	/* assume one chunk == one frame */
+	if (framenum >= stream->chunks())
+		return error::INVALID_FRAME;
+
+	/* we only support YUY-style bitmaps (16bpp) */
+	if (bitmap.width() < stream->width() || bitmap.height() < stream->height())
+		return error::INVALID_BITMAP;
+
+	/* expand the tempbuffer to hold the data if necessary */
+	error avierr = error::NONE;
+	avierr = expand_tempbuffer(stream->chunk(framenum).length);
+	if (avierr != error::NONE)
+		return avierr;
+
+	/* read in the data */
+	std::uint32_t bytes_read;
+	std::error_condition const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(framenum).offset, stream->chunk(framenum).length, bytes_read);
+	if (filerr || bytes_read != stream->chunk(framenum).length)
+		return error::READ_ERROR;
+
+	/* validate this is good data */
+	std::uint32_t const chunkid = fetch_32bits(&m_tempbuffer[0]);
+	if (chunkid == get_chunkid_for_stream(stream))
+	{
+		/* uncompressed YUV420p */
+		if (stream->format() == FORMAT_I420)
+			avierr = stream->uncompressed_yuv420p_to_argb32(&m_tempbuffer[8], stream->chunk(framenum).length - 8, bitmap);
+		else
+			avierr = stream->uncompressed_rgb24_to_argb32(&m_tempbuffer[8], stream->chunk(framenum).length - 8, bitmap);
+	}
+	else
+	{
+		avierr = error::INVALID_DATA;
+	}
+
+	return avierr;
+}
+
+/*-------------------------------------------------
+    read_video_frame - read video data for a
+    particular frame from the AVI file, converting
+    to YUY16 format
+-------------------------------------------------*/
 
 avi_file::error avi_file_impl::read_video_frame(std::uint32_t framenum, bitmap_yuy16 &bitmap)
 {
@@ -1646,8 +1765,8 @@ avi_file::error avi_file_impl::read_video_frame(std::uint32_t framenum, bitmap_y
 
 	/* read in the data */
 	std::uint32_t bytes_read;
-	osd_file::error const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(framenum).offset, stream->chunk(framenum).length, bytes_read);
-	if (filerr != osd_file::error::NONE || bytes_read != stream->chunk(framenum).length)
+	std::error_condition const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(framenum).offset, stream->chunk(framenum).length, bytes_read);
+	if (filerr || bytes_read != stream->chunk(framenum).length)
 		return error::READ_ERROR;
 
 	/* validate this is good data */
@@ -1738,8 +1857,8 @@ avi_file::error avi_file_impl::read_sound_samples(int channel, std::uint32_t fir
 			return avierr;
 
 		/* read in the data */
-		auto const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(chunknum).offset, stream->chunk(chunknum).length, bytes_read);
-		if (filerr != osd_file::error::NONE || bytes_read != stream->chunk(chunknum).length)
+		std::error_condition const filerr = m_file->read(&m_tempbuffer[0], stream->chunk(chunknum).offset, stream->chunk(chunknum).length, bytes_read);
+		if (filerr || bytes_read != stream->chunk(chunknum).length)
 			return error::READ_ERROR;
 
 		/* validate this is good data */
@@ -1754,7 +1873,7 @@ avi_file::error avi_file_impl::read_sound_samples(int channel, std::uint32_t fir
 		/* extract 16-bit samples from the chunk */
 		if (stream->samplebits() == 16)
 		{
-			const std::int16_t *base = reinterpret_cast<const std::int16_t *>(&m_tempbuffer[8]);
+			const auto *base = reinterpret_cast<const std::int16_t *>(&m_tempbuffer[8]);
 			base += stream->channels() * (firstsample - chunkbase) + offset;
 			for (sampnum = 0; sampnum < samples_this_chunk; sampnum++)
 			{
@@ -1966,14 +2085,15 @@ avi_file::error avi_file_impl::append_sound_samples(int channel, const std::int1
 
 avi_file::error avi_file_impl::read_chunk_data(avi_chunk const &chunk, std::unique_ptr<std::uint8_t []> &buffer)
 {
-	/* allocate memory for the data */
-	try { buffer.reset(new std::uint8_t[chunk.size]); }
-	catch (...) { return error::NO_MEMORY; }
+	// allocate memory for the data
+	buffer.reset(new (std::nothrow) std::uint8_t[chunk.size]);
+	if (!buffer)
+		return error::NO_MEMORY;
 
-	/* read from the file */
+	// read from the file
 	std::uint32_t bytes_read;
-	osd_file::error const filerr = m_file->read(&buffer[0], chunk.offset + 8, chunk.size, bytes_read);
-	if (filerr != osd_file::error::NONE || bytes_read != chunk.size)
+	std::error_condition const filerr = m_file->read(&buffer[0], chunk.offset + 8, chunk.size, bytes_read);
+	if (filerr || bytes_read != chunk.size)
 	{
 		buffer.reset();
 		return error::READ_ERROR;
@@ -2173,35 +2293,33 @@ avi_file::error avi_file_impl::find_next_list(std::uint32_t findme, const avi_ch
 
 avi_file::error avi_file_impl::get_next_chunk_internal(const avi_chunk *parent, avi_chunk &newchunk, std::uint64_t offset)
 {
-	osd_file::error filerr;
-	std::uint8_t buffer[12];
-	std::uint32_t bytesread;
-
-	/* nullptr parent implies the root */
-	if (parent == nullptr)
+	// nullptr parent implies the root
+	if (!parent)
 		parent = &m_rootchunk;
 
-	/* start at the current offset */
+	// start at the current offset
 	newchunk.offset = offset;
 
-	/* if we're past the bounds of the parent, bail */
+	// if we're past the bounds of the parent, bail
 	if (newchunk.offset + 8 >= parent->offset + 8 + parent->size)
 		return error::END;
 
-	/* read the header */
-	filerr = m_file->read(buffer, newchunk.offset, 8, bytesread);
-	if (filerr != osd_file::error::NONE || bytesread != 8)
+	// read the header
+	std::uint8_t buffer[12];
+	std::uint32_t bytesread;
+	std::error_condition filerr = m_file->read(buffer, newchunk.offset, 8, bytesread);
+	if (filerr || bytesread != 8)
 		return error::INVALID_DATA;
 
-	/* fill in the new chunk */
+	// fill in the new chunk
 	newchunk.type = fetch_32bits(&buffer[0]);
 	newchunk.size = fetch_32bits(&buffer[4]);
 
-	/* if we are a list, fetch the list type */
+	// if we are a list, fetch the list type
 	if (newchunk.type == CHUNKTYPE_LIST || newchunk.type == CHUNKTYPE_RIFF)
 	{
 		filerr = m_file->read(&buffer[8], newchunk.offset + 8, 4, bytesread);
-		if (filerr != osd_file::error::NONE || bytesread != 4)
+		if (filerr || bytesread != 4)
 			return error::INVALID_DATA;
 		newchunk.listtype = fetch_32bits(&buffer[8]);
 	}
@@ -2524,16 +2642,15 @@ avi_file::error avi_file_impl::parse_indx_chunk(avi_stream &stream, avi_chunk co
 		/* loop over entries and create subchunks for each */
 		for (std::uint32_t entry = 0; entry < entries; entry++)
 		{
-			const std::uint8_t *base = &chunkdata[24 + entry * 16];
-			osd_file::error filerr;
+			std::uint8_t const *const base = &chunkdata[24 + entry * 16];
 			avi_chunk subchunk;
-			std::uint32_t bytes_read;
-			std::uint8_t buffer[8];
 
 			/* go read the subchunk */
 			subchunk.offset = fetch_64bits(&base[0]);
-			filerr = m_file->read(buffer, subchunk.offset, sizeof(buffer), bytes_read);
-			if (filerr != osd_file::error::NONE || bytes_read != sizeof(buffer))
+			std::uint32_t bytes_read;
+			std::uint8_t buffer[8];
+			std::error_condition const filerr = m_file->read(buffer, subchunk.offset, sizeof(buffer), bytes_read);
+			if (filerr || bytes_read != sizeof(buffer))
 			{
 				avierr = error::READ_ERROR;
 				break;
@@ -2669,8 +2786,8 @@ avi_file::error avi_file_impl::chunk_open(std::uint32_t type, std::uint32_t list
 
 		/* write the header */
 		std::uint32_t written;
-		osd_file::error const filerr = m_file->write(buffer, m_writeoffs, sizeof(buffer), written);
-		if (filerr != osd_file::error::NONE || written != sizeof(buffer))
+		std::error_condition const filerr = m_file->write(buffer, m_writeoffs, sizeof(buffer), written);
+		if (filerr || written != sizeof(buffer))
 			return error::WRITE_ERROR;
 		m_writeoffs += written;
 	}
@@ -2687,8 +2804,8 @@ avi_file::error avi_file_impl::chunk_open(std::uint32_t type, std::uint32_t list
 
 		/* write the header */
 		std::uint32_t written;
-		osd_file::error const filerr = m_file->write(buffer, m_writeoffs, sizeof(buffer), written);
-		if (filerr != osd_file::error::NONE || written != sizeof(buffer))
+		std::error_condition const filerr = m_file->write(buffer, m_writeoffs, sizeof(buffer), written);
+		if (filerr || written != sizeof(buffer))
 			return error::WRITE_ERROR;
 		m_writeoffs += written;
 	}
@@ -2727,8 +2844,8 @@ avi_file::error avi_file_impl::chunk_close()
 
 		put_32bits(&buffer[0], std::uint32_t(chunksize));
 		std::uint32_t written;
-		osd_file::error const filerr = m_file->write(buffer, chunk.offset + 4, sizeof(buffer), written);
-		if (filerr != osd_file::error::NONE || written != sizeof(buffer))
+		std::error_condition const filerr = m_file->write(buffer, chunk.offset + 4, sizeof(buffer), written);
+		if (filerr || written != sizeof(buffer))
 			return error::WRITE_ERROR;
 	}
 
@@ -2806,8 +2923,8 @@ avi_file::error avi_file_impl::chunk_write(std::uint32_t type, const void *data,
 
 	/* write the data */
 	std::uint32_t written;
-	osd_file::error const filerr = m_file->write(data, m_writeoffs, length, written);
-	if (filerr != osd_file::error::NONE || written != length)
+	std::error_condition const filerr = m_file->write(data, m_writeoffs, length, written);
+	if (filerr || written != length)
 		return error::WRITE_ERROR;
 	m_writeoffs += written;
 
@@ -3147,6 +3264,9 @@ avi_file::error avi_file_impl::write_indx_chunk(avi_stream &stream, bool initial
 			if (chunks_this_index == 0)
 				continue;
 
+			if (master_entries >= MAX_AVI_SIZE_IN_GB / 4)
+				return error::WRITE_ERROR;
+
 			/* allocate memory */
 			std::unique_ptr<std::uint8_t []> tempbuf;
 			try { tempbuf.reset(new std::uint8_t[24 + 8 * chunks_this_index]); }
@@ -3430,7 +3550,8 @@ avi_file::error avi_file_impl::soundbuf_flush(bool only_flush_full)
 	if (processedsamples > 0)
 	{
 		/* first account for the samples we processed */
-		std::memmove(&m_soundbuf[0], &m_soundbuf[processedsamples * stream->channels()], (m_soundbuf_samples - processedsamples) * bytes_per_sample);
+		if (m_soundbuf_samples > processedsamples)
+			std::memmove(&m_soundbuf[0], &m_soundbuf[processedsamples * stream->channels()], (m_soundbuf_samples - processedsamples) * bytes_per_sample);
 		for (int channel = 0; channel < stream->channels(); channel++)
 			m_soundbuf_chansamples[channel] -= processedsamples;
 	}
@@ -3555,7 +3676,7 @@ avi_file::error avi_file::open(std::string const &filename, ptr &file)
 	/* open the file */
 	osd_file::ptr f;
 	std::uint64_t length;
-	if (osd_file::open(filename, OPEN_FLAG_READ, f, length) != osd_file::error::NONE)
+	if (osd_file::open(filename, OPEN_FLAG_READ, f, length))
 		return error::CANT_OPEN_FILE;
 
 	/* allocate the file */
@@ -3608,8 +3729,8 @@ avi_file::error avi_file::create(std::string const &filename, movie_info const &
 	/* open the file */
 	osd_file::ptr f;
 	std::uint64_t length;
-	osd_file::error const filerr = osd_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, f, length);
-	if (filerr != osd_file::error::NONE)
+	std::error_condition const filerr = osd_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, f, length);
+	if (filerr)
 		return error::CANT_OPEN_FILE;
 
 	/* allocate the file */

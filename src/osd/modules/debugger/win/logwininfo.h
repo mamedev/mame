@@ -5,9 +5,10 @@
 //  logwininfo.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_LOGWININFO_H
+#define MAME_DEBUGGER_WIN_LOGWININFO_H
 
-#ifndef __DEBUG_WIN_LOG_WIN_INFO_H__
-#define __DEBUG_WIN_LOG_WIN_INFO_H__
+#pragma once
 
 #include "debugwin.h"
 
@@ -21,10 +22,6 @@ public:
 	virtual ~logwin_info();
 
 protected:
-	enum
-	{
-		ID_CLEAR_LOG = 1
-	};
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
 };
 

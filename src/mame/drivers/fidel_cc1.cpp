@@ -3,16 +3,24 @@
 // thanks-to:Berger, Sean Riddle
 /******************************************************************************
 
-* fidel_cc1.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity's 1st generation chess computers:
-- *Chess Challenger
-- Chess Challenger 3
-- *Chess Challenger 10 (UCC10)
+- Chess Challenger
+- Chess Challenger (upgraded version) - more commonly known as CC3
+- Chess Challenger (model UCC10) - more commonly known as CC10 ver. C
 
-* denotes not dumped (actually CC1 is dumped, but with half of the contents missing)
+The first generation of chesscomputers didn't have an electronic chessboard.
+Some of them required a separate chessboard, others had a small chessboard
+attached to it (the latter applies to Fidelity).
 
-*******************************************************************************
+For those familiar with MAME's sensorboard interface and really want to use it
+for the old keypad-input machines, there is an awkward workaround: Start a 2nd
+instance of MAME with -sound none and load mephisto3 or mephisto2e, turn off
+the ESB 6000 board in the machine configuration, and set the video options to
+"Internal Layout (Board)". The same thing can be done with ccmk6.
+
+That being said, it's probably a better idea to use a real chessboard.
+
+===============================================================================
 
 Chess Challenger (1)
 --------------------
@@ -30,98 +38,129 @@ CC1 hardware overview:
 - NEC 8080AF @ 2MHz(18MHz XTAL through a 8224)
 - Everything goes via a NEC B8228, its special features are unused.
 - NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
-- 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad
+- 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad, no sound
 
-Chess Challenger 3 is on the same hardware, but with double ROM size, and they
-corrected the reversed chess notation. It was also offered as an upgrade to CC1.
-PCB label P179 C-3 9.77.
+Chess Challenger (upgraded version) released a few months later is on the same
+hardware, but with double the ROM size, and they corrected the reversed chess
+notation. It was also offered as an upgrade to CC1. PCB label P179 C-3 9.77.
 
-Chess Challenger 10 version 'C'(model UCC10) is on (nearly) the same PCB too,
-same label as CC3, with a small daughterboard for 8KB ROM. Again, it was also
+Chess Challenger (model UCC10) is on nearly the same PCB too, same label as CC3,
+with an 8KB ROM on a small daughterboard(P-410A 4 12 79). Again, it was also
 offered as an upgrade to CC1, or CC3.
+
+Note that although these 2 newer versions are known as "Chess Challenger 3" and
+"Chess Challeger 10 C" nowadays, those are not the official titles. CC3 simply
+says "upgraded version" on the 1st page of the manual (even the newly sold ones,
+not just the literal CC1 upgrades). UCC10 mentions "10 levels of play". Consumenta
+Computer(reseller of Fidelity chesscomputers) did name it Chess-Challenger 10 C.
+Officially, Fidelity started adding level numbers to their chesscomputer titles
+with CCX and CC7.
 
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
+#include "video/pwm.h"
 
 // internal artwork
 #include "fidel_cc1.lh" // clickable
 #include "fidel_cc3.lh" // clickable
+#include "fidel_cc10c.lh" // clickable
 
 
 namespace {
 
-class cc1_state : public fidelbase_state
+class cc1_state : public driver_device
 {
 public:
 	cc1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
-		m_delay(*this, "delay")
+		m_display(*this, "display"),
+		m_delay(*this, "delay"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// RE button is tied to 8224 RESIN pin
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+
+	// machine configs
 	void cc1(machine_config &config);
 	void cc3(machine_config &config);
+	void cc10c(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
+	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_delay;
+	required_ioport_array<2> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
+	void cc10c_map(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
-	DECLARE_READ8_MEMBER(ppi_porta_r);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	void update_display();
+	u8 ppi_porta_r();
+	void ppi_portb_w(u8 data);
+	void ppi_portc_w(u8 data);
+
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
 };
 
-
-/******************************************************************************
-    Devices, I/O
-******************************************************************************/
-
-// misc handlers
-
-void cc1_state::prepare_display()
+void cc1_state::machine_start()
 {
-	// 4 7segs + 2 leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 6, m_7seg_data, m_led_select);
+	// register for savestates
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_7seg_data));
 }
 
 
+
+/******************************************************************************
+    I/O
+******************************************************************************/
+
 // I8255 PPI
 
-READ8_MEMBER(cc1_state::ppi_porta_r)
+void cc1_state::update_display()
+{
+	// 4 7segs + 2 leds
+	m_display->matrix(m_led_select, m_7seg_data);
+}
+
+u8 cc1_state::ppi_porta_r()
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
-	u8 data = count_leading_zeros(m_inp_matrix[0]->read()) - 24;
+	u8 data = count_leading_zeros_32(m_inputs[0]->read()) - 24;
+	if (data == 8) data = 0xf;
 
 	// d5-d7: more inputs (direct)
-	data |= ~m_inp_matrix[1]->read() << 5 & 0xe0;
+	data |= ~m_inputs[1]->read() << 5 & 0xe0;
 
 	// d4: 555 Q
 	return data | ((m_delay->enabled()) ? 0x10 : 0);
 }
 
-WRITE8_MEMBER(cc1_state::ppi_portb_w)
+void cc1_state::ppi_portb_w(u8 data)
 {
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 }
 
-WRITE8_MEMBER(cc1_state::ppi_portc_w)
+void cc1_state::ppi_portc_w(u8 data)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
 	if (~data & m_led_select & 0x40 && !m_delay->enabled())
@@ -130,7 +169,7 @@ WRITE8_MEMBER(cc1_state::ppi_portc_w)
 	// d0-d3: digit select
 	// d4: check led, d5: lose led
 	m_led_select = data;
-	prepare_display();
+	update_display();
 }
 
 
@@ -150,6 +189,14 @@ void cc1_state::main_io(address_map &map)
 {
 	map.global_mask(0x0f);
 	map(0x00, 0x03).mirror(0x04).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+void cc1_state::cc10c_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x11ff).mirror(0x2e00).ram();
+	map(0x2000, 0x2fff).rom();
 }
 
 
@@ -175,7 +222,7 @@ static INPUT_PORTS_START( cc1 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, cc1_state, reset_button, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, cc1_state, reset_button, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cc3 )
@@ -192,10 +239,17 @@ static INPUT_PORTS_START( cc3 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cc10c )
+	PORT_INCLUDE( cc3 )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM / PB") PORT_CODE(KEYCODE_M)
+INPUT_PORTS_END
+
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void cc1_state::cc1(machine_config &config)
@@ -212,9 +266,11 @@ void cc1_state::cc1(machine_config &config)
 	m_ppi8255->out_pc_callback().set(FUNC(cc1_state::ppi_portc_w));
 	m_ppi8255->tri_pc_callback().set_constant(0);
 
-	TIMER(config, "delay").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "delay").configure_generic(nullptr);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(cc1_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_cc1);
 }
 
@@ -224,6 +280,16 @@ void cc1_state::cc3(machine_config &config)
 	config.set_default_layout(layout_fidel_cc3);
 }
 
+void cc1_state::cc10c(machine_config &config)
+{
+	cc1(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cc1_state::cc10c_map);
+
+	config.set_default_layout(layout_fidel_cc10c);
+}
+
 
 
 /******************************************************************************
@@ -231,14 +297,19 @@ void cc1_state::cc3(machine_config &config)
 ******************************************************************************/
 
 ROM_START( cc1 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "d2316ac_011", 0x0000, 0x0800, BAD_DUMP CRC(e27f9816) SHA1(ad9881b3bf8341829a27e86de27805fc2ccb5f7d) ) // A4 line was broken
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("d2316ac_011", 0x0000, 0x0800, CRC(4af38ed6) SHA1(3f07691266196f3aa5c440a40bfe4802303e7c07) )
 ROM_END
 
-
 ROM_START( cc3 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d2332c_011", 0x0000, 0x1000, CRC(51cf4682) SHA1(197374c633a0bf1a9b7ea51a72dc2b89a6c9c508) )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("d2332c_011", 0x0000, 0x1000, CRC(51cf4682) SHA1(197374c633a0bf1a9b7ea51a72dc2b89a6c9c508) )
+ROM_END
+
+ROM_START( cc10c )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("k95069-922_ucc_10", 0x0000, 0x1000, CRC(2232c1c4) SHA1(fd282ba7ce7ac28834c860cec2cca398aec1b3f3) )
+	ROM_CONTINUE(                 0x2000, 0x1000 )
 ROM_END
 
 } // anonymous namespace
@@ -249,7 +320,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1977, cc1,  0,      0, cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-
-CONS( 1977, cc3,  0,      0, cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger 3", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1977, cc1,   0,      0, cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1977, cc3,   0,      0, cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3
+CONS( 1979, cc10c, 0,      0, cc10c,   cc10c, cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C

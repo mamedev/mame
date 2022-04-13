@@ -7,62 +7,63 @@
     OSD module management
 
 *******************************************************************c********/
-
-//#pragma once
-
 #ifndef MAME_OSD_MODULES_OSDMODULE_H
 #define MAME_OSD_MODULES_OSDMODULE_H
 
+#pragma once
+
 #include "osdcore.h"
 #include "osdepend.h"
+
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
+
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
 class osd_options;
-class osd_module;
 
 // ======================> osd_module
 
 class osd_module
 {
 public:
-
-	osd_module(const char *type, const char *name)
-	: m_name(name), m_type(type)
-	{}
 	virtual ~osd_module() { }
 
-	const char * name() const { return m_name.c_str(); }
-	const char * type() const { return m_type.c_str(); }
+	std::string const &name() const { return m_name; }
+	std::string const &type() const { return m_type; }
 
 	virtual bool probe() { return true; }
 
 	virtual int init(const osd_options &options) = 0;
 	virtual void exit() { }
 
+protected:
+	osd_module(const char *type, const char *name) : m_name(name), m_type(type) { }
+	osd_module(osd_module const &) = delete;
+
 private:
-	std::string     m_name;
-	std::string     m_type;
+	std::string const m_name;
+	std::string const m_type;
 };
 
 // a module_type is simply a pointer to its alloc function
-typedef osd_module *(*module_type)();
+typedef std::unique_ptr<osd_module> (*module_type)();
 
 // this template function creates a stub which constructs a module
-template<class ModuleClass>
-osd_module *module_creator()
+template <class ModuleClass>
+std::unique_ptr<osd_module> module_creator()
 {
-	return global_alloc(ModuleClass());
+	return std::unique_ptr<osd_module>(new ModuleClass);
 }
 
 class osd_module_manager
 {
 public:
-
-	static const int MAX_MODULES = 64;
-
 	osd_module_manager();
 	~osd_module_manager();
 
@@ -79,7 +80,7 @@ public:
 
 	osd_module *select_module(const char *type, const char *name = "");
 
-	void get_module_names(const char *type, const int max, int *num, const char *names[]) const;
+	void get_module_names(const char *type, const int max, int &num, const char *names[]) const;
 
 	void init(const osd_options &options);
 
@@ -88,8 +89,8 @@ public:
 private:
 	int get_module_index(const char *type, const char *name) const;
 
-	osd_module *m_modules[MAX_MODULES];
-	osd_module *m_selected[MAX_MODULES];
+	std::vector<std::unique_ptr<osd_module> > m_modules;
+	std::vector<std::reference_wrapper<osd_module> > m_selected;
 };
 
 #define MODULE_DEFINITION(mod_id, mod_class) \

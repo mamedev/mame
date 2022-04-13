@@ -14,8 +14,8 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
 #include "machine/adc0844.h"
-#include "machine/mc2661.h"
 #include "machine/mc68681.h"
+#include "machine/scn_pci.h"
 #include "emupal.h"
 
 
@@ -58,7 +58,7 @@ public:
 	void init_micro3d();
 	void init_botss();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
+	DECLARE_READ_LINE_MEMBER(botss_hwchk_r);
 
 protected:
 	enum
@@ -70,7 +70,7 @@ protected:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum planes
@@ -85,7 +85,7 @@ private:
 
 	struct micro3d_vtx
 	{
-		int32_t x, y, z;
+		int32_t x = 0, y = 0, z = 0;
 
 		constexpr int64_t dot_product(micro3d_vtx const &that) const;
 	};
@@ -108,85 +108,85 @@ private:
 	optional_ioport m_joystick_y;
 
 	required_shared_ptr<uint16_t> m_shared_ram;
-	uint8_t               m_m68681_tx0;
+	uint8_t               m_m68681_tx0 = 0;
 
 	/* Sound */
-	uint8_t               m_sound_port_latch[4];
+	uint8_t               m_sound_port_latch[4]{};
 
 	/* Hardware version-check latch for BOTSS 1.1a */
-	uint8_t               m_botss_latch;
+	uint8_t               m_botss_latch = 0;
 
 	/* MAC */
 	required_shared_ptr<uint32_t> m_mac_sram;
-	uint32_t              m_sram_r_addr;
-	uint32_t              m_sram_w_addr;
-	uint32_t              m_vtx_addr;
-	uint32_t              m_mrab11;
-	uint32_t              m_mac_stat;
-	uint32_t              m_mac_inst;
+	uint32_t              m_sram_r_addr = 0;
+	uint32_t              m_sram_w_addr = 0;
+	uint32_t              m_vtx_addr = 0;
+	uint32_t              m_mrab11 = 0;
+	uint32_t              m_mac_stat = 0;
+	uint32_t              m_mac_inst = 0;
 
 	/* 2D video */
 	required_shared_ptr<uint16_t> m_sprite_vram;
-	uint16_t              m_creg;
-	uint16_t              m_xfer3dk;
+	uint16_t              m_creg = 0;
+	uint16_t              m_xfer3dk = 0;
 
 	/* 3D pipeline */
-	uint32_t              m_pipe_data;
-	uint32_t              m_pipeline_state;
-	int32_t               m_vtx_fifo[512];
-	uint32_t              m_fifo_idx;
-	uint32_t              m_draw_cmd;
-	int                 m_draw_state;
-	int32_t               m_x_min;
-	int32_t               m_x_max;
-	int32_t               m_y_min;
-	int32_t               m_y_max;
-	int32_t               m_z_min;
-	int32_t               m_z_max;
-	int32_t               m_x_mid;
-	int32_t               m_y_mid;
-	int                 m_dpram_bank;
-	uint32_t              m_draw_dpram[1024];
+	uint32_t              m_pipe_data = 0;
+	uint32_t              m_pipeline_state = 0;
+	int32_t               m_vtx_fifo[512]{};
+	uint32_t              m_fifo_idx = 0;
+	uint32_t              m_draw_cmd = 0;
+	int                 m_draw_state = 0;
+	int32_t               m_x_min = 0;
+	int32_t               m_x_max = 0;
+	int32_t               m_y_min = 0;
+	int32_t               m_y_max = 0;
+	int32_t               m_z_min = 0;
+	int32_t               m_z_max = 0;
+	int32_t               m_x_mid = 0;
+	int32_t               m_y_mid = 0;
+	int                 m_dpram_bank = 0;
+	uint32_t              m_draw_dpram[1024]{};
 	std::unique_ptr<uint16_t[]>              m_frame_buffers[2];
 	std::unique_ptr<uint16_t[]>              m_tmp_buffer;
-	int                 m_drawing_buffer;
-	int                 m_display_buffer;
+	int                 m_drawing_buffer = 0;
+	int                 m_display_buffer = 0;
 
-	DECLARE_WRITE8_MEMBER(vgb_uart_w);
-	DECLARE_READ8_MEMBER(vgb_uart_r);
-	DECLARE_WRITE32_MEMBER(micro3d_mac1_w);
-	DECLARE_READ32_MEMBER(micro3d_mac2_r);
-	DECLARE_WRITE32_MEMBER(micro3d_mac2_w);
-	DECLARE_READ16_MEMBER(micro3d_encoder_h_r);
-	DECLARE_READ16_MEMBER(micro3d_encoder_l_r);
-	DECLARE_READ8_MEMBER(adc_volume_r);
-	DECLARE_READ16_MEMBER(botss_140000_r);
-	DECLARE_READ16_MEMBER(botss_180000_r);
-	DECLARE_WRITE16_MEMBER(micro3d_reset_w);
-	DECLARE_WRITE16_MEMBER(host_drmath_int_w);
-	DECLARE_WRITE32_MEMBER(micro3d_shared_w);
-	DECLARE_READ32_MEMBER(micro3d_shared_r);
-	DECLARE_WRITE32_MEMBER(drmath_int_w);
-	DECLARE_WRITE32_MEMBER(drmath_intr2_ack);
-	DECLARE_WRITE16_MEMBER(micro3d_creg_w);
-	DECLARE_WRITE16_MEMBER(micro3d_xfer3dk_w);
-	DECLARE_WRITE32_MEMBER(micro3d_fifo_w);
-	DECLARE_WRITE32_MEMBER(micro3d_alt_fifo_w);
-	DECLARE_READ32_MEMBER(micro3d_pipe_r);
-	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
-	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
-	DECLARE_WRITE8_MEMBER(micro3d_sound_p1_w);
-	DECLARE_WRITE8_MEMBER(micro3d_sound_p3_w);
-	DECLARE_READ8_MEMBER(micro3d_sound_p1_r);
-	DECLARE_READ8_MEMBER(micro3d_sound_p3_r);
+	void vgb_uart_w(offs_t offset, uint8_t data);
+	uint8_t vgb_uart_r(offs_t offset);
+	void micro3d_mac1_w(uint32_t data);
+	uint32_t micro3d_mac2_r();
+	void micro3d_mac2_w(uint32_t data);
+	uint16_t micro3d_encoder_h_r();
+	uint16_t micro3d_encoder_l_r();
+	uint8_t adc_volume_r();
+	uint16_t botss_140000_r();
+	uint16_t botss_180000_r();
+	void micro3d_reset_w(uint16_t data);
+	void host_drmath_int_w(uint16_t data);
+	void micro3d_shared_w(offs_t offset, uint32_t data);
+	uint32_t micro3d_shared_r(offs_t offset);
+	void drmath_int_w(uint32_t data);
+	void drmath_intr2_ack(uint32_t data);
+	void micro3d_creg_w(uint16_t data);
+	void micro3d_xfer3dk_w(uint16_t data);
+	void micro3d_fifo_w(uint32_t data);
+	void micro3d_alt_fifo_w(uint32_t data);
+	uint32_t micro3d_pipe_r();
+	void micro3d_snd_dac_a(uint8_t data);
+	void micro3d_snd_dac_b(uint8_t data);
+	void micro3d_sound_p1_w(uint8_t data);
+	void micro3d_sound_p3_w(uint8_t data);
+	uint8_t micro3d_sound_p1_r();
+	uint8_t micro3d_sound_p3_r();
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
-	DECLARE_WRITE8_MEMBER(micro3d_upd7759_w);
-	DECLARE_WRITE8_MEMBER(data_from_i8031);
-	DECLARE_READ8_MEMBER(data_to_i8031);
+	void micro3d_upd7759_w(uint8_t data);
+	void data_from_i8031(uint8_t data);
+	uint8_t data_to_i8031();
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_READ8_MEMBER(duart_input_r);
-	DECLARE_WRITE8_MEMBER(duart_output_w);
+	uint8_t duart_input_r();
+	void duart_output_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(duart_txb);
 	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
@@ -208,7 +208,7 @@ private:
 	void soundmem_prg(address_map &map);
 	void vgbmem(address_map &map);
 
-	required_device<mc2661_device> m_vgb_uart;
+	required_device<scn2651_device> m_vgb_uart;
 };
 
 #endif // MAME_INCLUDES_MICRO3D_H

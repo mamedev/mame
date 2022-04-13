@@ -1504,7 +1504,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				case 0x13:
 					imm = opcodes.r8( pos++ );
 					imm = imm | (opcodes.r8( pos++ ) << 8);
-					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
+					buf = string_format("0x%06x", pos + (int16_t)imm);
 					break;
 				}
 				break;
@@ -1597,7 +1597,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				case 0x13:
 					imm = opcodes.r8( pos++ );
 					imm = imm | (opcodes.r8( pos++ ) << 8);
-					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
+					buf = string_format("0x%06x", pos + (int16_t)imm);
 					break;
 				}
 				break;
@@ -1691,7 +1691,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				case 0x13:
 					imm = opcodes.r8( pos++ );
 					imm = imm | (opcodes.r8( pos++ ) << 8);
-					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
+					buf = string_format("0x%06x", pos + (int16_t)imm);
 					break;
 				}
 				break;
@@ -1784,7 +1784,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				case 0x13:
 					imm = opcodes.r8( pos++ );
 					imm = imm | (opcodes.r8( pos++ ) << 8);
-					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
+					buf = string_format("0x%06x", pos + (int16_t)imm);
 					break;
 				}
 				break;
@@ -1822,6 +1822,9 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case M_RETI:
 		flags = STEP_OUT;
 		break;
+	case M_DJNZ:
+		flags = STEP_COND;
+		break;
 	}
 
 	switch( dasm->operand1 )
@@ -1851,6 +1854,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CC:
 		util::stream_format(stream, " %s", s_cond[op & 0x0F]);
+		if ((op & 0x07) != 0 && dasm->mnemonic != M_SCC)
+			flags |= STEP_COND;
 		break;
 
 	case O_CR8:
@@ -1933,13 +1938,13 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_D8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, " 0x%06x", ( pc + pos + (int8_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, " 0x%06x", ( pos + (int8_t)imm ) & 0xFFFFFF);
 		break;
 
 	case O_D16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, " 0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, " 0x%06x", ( pos + (int16_t)imm ) & 0xFFFFFF);
 		break;
 
 	case O_F:
@@ -2037,6 +2042,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CC:
 		util::stream_format(stream, ",%s", s_cond[op & 0x0F]);
+		if ((op & 0x07) != 0 && dasm->mnemonic != M_SCC)
+			flags |= STEP_COND;
 		break;
 
 	case O_CR8:
@@ -2119,13 +2126,13 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_D8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, ",0x%06x", ( pc + pos + (int8_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, ",0x%06x", ( pos + (int8_t)imm ) & 0xFFFFFF);
 		break;
 
 	case O_D16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, ",0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, ",0x%06x", ( pos + (int16_t)imm ) & 0xFFFFFF);
 		break;
 
 	case O_F:

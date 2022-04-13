@@ -27,16 +27,16 @@ public:
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write_vregs );
-	DECLARE_READ8_MEMBER( read_ram );
-	DECLARE_WRITE8_MEMBER( write_ram );
-	DECLARE_READ8_MEMBER( load_params );
-	DECLARE_READ8_MEMBER( load_gfx );
-	DECLARE_READ8_MEMBER( load_set_clr );
-	DECLARE_WRITE8_MEMBER( background_color_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( vbank_w );
-	DECLARE_WRITE8_MEMBER( vbank_clear_w );
+	void write_vregs(offs_t offset, uint8_t data);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
+	uint8_t load_params(offs_t offset);
+	uint8_t load_gfx(offs_t offset);
+	uint8_t load_set_clr(offs_t offset);
+	void background_color_w(uint8_t data);
+	uint8_t status_r();
+	void vbank_w(uint8_t data);
+	void vbank_clear_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(void);
@@ -54,8 +54,8 @@ private:
 	inline uint8_t read_io(offs_t address);
 	inline void write_io(offs_t address, uint8_t data);
 
-	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
-	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
+	uint8_t mb_vcu_paletteram_r(offs_t offset);
+	void mb_vcu_paletteram_w(offs_t offset, uint8_t data);
 
 	void mb_vcu_pal_ram(address_map &map);
 	void mb_vcu_vram(address_map &map);

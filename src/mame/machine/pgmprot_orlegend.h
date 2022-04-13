@@ -9,18 +9,20 @@ public:
 		: pgm_state(mconfig, type, tag) {
 	}
 
-	// ASIC 3 (oriental legends protection)
-	uint8_t         m_asic3_reg;
-	uint8_t         m_asic3_latch[3];
-	uint8_t         m_asic3_x;
-	uint16_t        m_asic3_hilo;
-	uint16_t        m_asic3_hold;
-
 	void init_orlegend();
-	void asic3_compute_hold(int,int);
-	DECLARE_READ16_MEMBER( pgm_asic3_r );
-	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
 	void pgm_asic3(machine_config &config);
+
+private:
+	// ASIC 3 (oriental legends protection)
+	u8         m_asic3_reg = 0;
+	u8         m_asic3_latch[3]{};
+	u8         m_asic3_x = 0;
+	u16        m_asic3_hilo = 0;
+	u16        m_asic3_hold = 0;
+
+	void asic3_compute_hold(int,int);
+	u16 pgm_asic3_r();
+	void pgm_asic3_w(offs_t offset, u16 data);
 };
 
 INPUT_PORTS_EXTERN( orlegend );

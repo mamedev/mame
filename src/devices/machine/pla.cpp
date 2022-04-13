@@ -11,6 +11,10 @@
 #include "jedparse.h"
 #include "plaparse.h"
 
+#define LOG_TERMS (1 << 0U)
+//#define VERBOSE (LOG_TERMS)
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(PLA, pla_device, "pla", "PLA")
 DEFINE_DEVICE_TYPE(PLS100, pls100_device, "pls100", "82S100-series PLA")
@@ -68,21 +72,29 @@ void pla_device::device_start()
 		m_input_mask = ((uint64_t)1 << m_inputs) - 1;
 	m_input_mask = ((uint64_t)m_input_mask << 32) | m_input_mask;
 
-	// parse fusemap
-	parse_fusemap();
+	m_cache_size = 1 << ((m_inputs > MAX_CACHE_BITS) ? MAX_CACHE_BITS : m_inputs);
+	m_cache.resize(m_cache_size);
+
+	reinit();
+}
+
+bool pla_device::reinit()
+{
+	int result = parse_fusemap();
 
 	// initialize cache
 	m_cache2_ptr = 0;
 	for (auto & elem : m_cache2)
 		elem = 0x80000000;
 
+	int csize = m_cache_size;
 	m_cache_size = 0;
-	int csize = 1 << ((m_inputs > MAX_CACHE_BITS) ? MAX_CACHE_BITS : m_inputs);
-	m_cache.resize(csize);
 	for (int i = 0; i < csize; i++)
 		m_cache[i] = read(i);
 
 	m_cache_size = csize;
+
+	return result == JEDERR_NONE;
 }
 
 
@@ -90,24 +102,28 @@ void pla_device::device_start()
 //  parse_fusemap -
 //-------------------------------------------------
 
-void pla_device::parse_fusemap()
+int pla_device::parse_fusemap()
 {
 	jed_data jed;
 	int result = JEDERR_NONE;
 
 	// read pla file
-	switch (m_format)
+	auto file = util::ram_read(m_region->base(), m_region->bytes());
+	if (file)
 	{
+		switch (m_format)
+		{
 		case FMT::JEDBIN:
-			result = jedbin_parse(m_region->base(), m_region->bytes(), &jed);
+			result = jedbin_parse(*file, &jed);
 			break;
 
 		case FMT::BERKELEY:
-			result = pla_parse(m_region->base(), m_region->bytes(), &jed);
+			result = pla_parse(*file, &jed);
 			break;
+		}
 	}
 
-	if (result != JEDERR_NONE)
+	if (!file || result != JEDERR_NONE)
 	{
 		for (int p = 0; p < m_terms; p++)
 		{
@@ -116,7 +132,7 @@ void pla_device::parse_fusemap()
 		}
 
 		logerror("%s PLA parse error %d!\n", tag(), result);
-		return;
+		return result;
 	}
 
 	// parse it
@@ -147,6 +163,16 @@ void pla_device::parse_fusemap()
 		}
 
 		term->or_mask <<= 32;
+
+		LOGMASKED(LOG_TERMS, "F |= %0*X if (I & %0*X) == zeroes and (I & %0*X) == ones [term %d%s]\n",
+			(m_outputs + 3) / 4,
+			term->or_mask >> 32,
+			(m_inputs + 3) / 4,
+			(term->and_mask ^ m_input_mask) >> 32,
+			(m_inputs + 3) / 4,
+			uint32_t(term->and_mask ^ m_input_mask),
+			p,
+			(~term->and_mask & (~term->and_mask >> 32) & m_input_mask) == 0 ? "" : ", ignored");
 	}
 
 	// XOR mask
@@ -158,6 +184,9 @@ void pla_device::parse_fusemap()
 	}
 
 	m_xor <<= 32;
+
+	LOGMASKED(LOG_TERMS, "F ^= %0*X\n", (m_outputs + 3) / 4, m_xor >> 32);
+	return result;
 }
 
 

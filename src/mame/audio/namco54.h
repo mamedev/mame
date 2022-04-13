@@ -15,20 +15,16 @@ public:
 	template <typename T> void set_discrete(T &&tag) { m_discrete.set_tag(std::forward<T>(tag)); }
 	void set_basenote(int node) { m_basenode = node; }
 
-	DECLARE_READ8_MEMBER( K_r );
-	DECLARE_READ8_MEMBER( R0_r );
-	DECLARE_WRITE8_MEMBER( O_w );
-	DECLARE_WRITE8_MEMBER( R1_w );
+	DECLARE_WRITE_LINE_MEMBER( reset );
+	WRITE_LINE_MEMBER( chip_select );
+	void write(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( write );
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	TIMER_CALLBACK_MEMBER( latch_callback );
-	TIMER_CALLBACK_MEMBER( irq_clear );
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
@@ -36,6 +32,12 @@ private:
 
 	int m_basenode;
 	uint8_t m_latched_cmd;
+
+	uint8_t K_r();
+	uint8_t R0_r();
+	void O_w(uint8_t data);
+	void R1_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER( write_sync );
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device)

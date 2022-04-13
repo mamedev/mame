@@ -16,27 +16,28 @@ Custom  :   IGS011 (blitter, protection)
 NVRAM   :   Battery for main RAM
 
 ---------------------------------------------------------------------------
-Year + Game                PCB        Sound         Chips
+Year + Game                   PCB        Sound         Chips
 ---------------------------------------------------------------------------
-95 Da Ban Cheng            NO-T0084-1 M6295         IGS011 8255
-95 Long Hu Bang V033C      NO-T0093   M6295         IGS011 8255
-95 Long Hu Bang V035C      ?
-95 Mj Ryukobou             NO-T0094   M6295         IGS011 8255
-95 Dragon World V010C      NO-0105-4  M6295 YM3812  IGS011 IGS003
-95 Dragon World V011H      ?
-95 Dragon World V020J      ?          M6295 YM3812  IGS011 IGS003  IGS012
-95 Dragon World V021J      ?
-95 Dragon World V021O      NO-0105-1  M6295 YM3812  IGS011 IGS003  IGS012
-95 Dragon World V030O      NO-0105-1  M6295 YM3812  IGS011 IGS003
-97 Dragon World V040O      NO-0105-5  M6295 YM3812  IGS011 IGS003c
-97 Dragon World V040K      NO-0105-5  M6295 YM3812  IGS011 IGS003c IGS012
-96 Virtua Bowling V100JCM  NO-0101-?  ICS2115       IGS011 IGS003e IGS012
-96 Virtua Bowling V101XCM  NO-0101-1  ICS2115       IGS011 IGS003e IGS012
-96 Virtua Bowling V101HJS  NO-0101-?  ICS2115       IGS011 IGS003e?IGS012
-96 Long Hu Bang II V185H   NO-0115    M6295 YM2413  IGS011 8255
-96 Wanli Changcheng        ?
-96 Xingyun Man Guan        ?
-98 Mj Nenrikishu SP V250J  NO-0115-5  M6295 YM2413  IGS011 8255
+95 Da Ban Cheng               NO-T0084-1 M6295         IGS011 8255
+95 Long Hu Bang V033C         NO-T0093   M6295         IGS011 8255
+95 Long Hu Bang V035C         ?
+95 Mj Ryukobou                NO-T0094   M6295         IGS011 8255
+95 Dragon World V010C         NO-0105-4  M6295 YM3812  IGS011 IGS003
+95 Dragon World V011H (set 1) ?
+95 Dragon World V011H (set 2) NO-T0105   M6295 YM3812  IGS011 IGS003  IGS012
+95 Dragon World V020J         ?          M6295 YM3812  IGS011 IGS003  IGS012
+95 Dragon World V021J         ?
+95 Dragon World V021O         NO-0105-1  M6295 YM3812  IGS011 IGS003  IGS012
+95 Dragon World V030O         NO-0105-1  M6295 YM3812  IGS011 IGS003
+97 Dragon World V040O         NO-0105-5  M6295 YM3812  IGS011 IGS003c
+97 Dragon World V040K         NO-0105-5  M6295 YM3812  IGS011 IGS003c IGS012
+96 Virtua Bowling V100JCM     NO-0101-?  ICS2115       IGS011 IGS003e IGS012
+96 Virtua Bowling V101XCM     NO-0101-1  ICS2115       IGS011 IGS003e IGS012
+96 Virtua Bowling V101HJS     NO-0101-?  ICS2115       IGS011 IGS003e?IGS012
+96 Long Hu Bang II V185H      NO-0115    M6295 YM2413  IGS011 8255
+96 Wanli Changcheng           ?
+96 Xingyun Man Guan           ?
+98 Mj Nenrikishu SP V250J     NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
 To do:
@@ -66,16 +67,17 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "sound/ym2413.h"
-#include "sound/3812intf.h"
 #include "sound/ics2115.h"
+#include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class igs011_state : public driver_device
 {
@@ -100,7 +102,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(igs_hopper_r);
+	DECLARE_READ_LINE_MEMBER(igs_hopper_r);
 
 	void init_lhbv33c();
 	void init_drgnwrldv21j();
@@ -394,10 +396,10 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap.pix16(y, x) = m_palette->black_pen();
+				bitmap.pix(y, x) = m_palette->black_pen();
 			else
 #endif
-				bitmap.pix16(y, x) = m_layer[l][scr_addr] | (l << 8);
+				bitmap.pix(y, x) = m_layer[l][scr_addr] | (l << 8);
 		}
 	}
 	return 0;
@@ -618,6 +620,9 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 
 void igs011_state::machine_start()
 {
+	m_prot1_addr = 0;
+	m_lhb_irq_enable = 0;
+
 	save_item(NAME(m_igs_dips_sel));
 	save_item(NAME(m_igs_input_sel));
 	save_item(NAME(m_igs_hopper));
@@ -641,7 +646,7 @@ void igs011_state::machine_start()
 // Inputs
 
 
-CUSTOM_INPUT_MEMBER(igs011_state::igs_hopper_r)
+READ_LINE_MEMBER(igs011_state::igs_hopper_r)
 {
 	return (m_igs_hopper && ((m_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
@@ -1211,11 +1216,11 @@ void igs011_state::prot_mem_range_set()
 	address_space &sp = m_maincpu->space(AS_PROGRAM);
 
 	// Add protection memory range
-	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write8sm_delegate(FUNC(igs011_state::igs011_prot1_w), this), 0xff00);
-	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16smo_delegate(FUNC(igs011_state::igs011_prot1_r), this));
+	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write8sm_delegate(*this, FUNC(igs011_state::igs011_prot1_w)), 0xff00);
+	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16smo_delegate(*this, FUNC(igs011_state::igs011_prot1_r)));
 }
 /*
-READ16_MEMBER(igs011_state::igs011_prot_fake_r)
+u16 igs011_state::igs011_prot_fake_r(offs_t offset)
 {
     switch (offset)
     {
@@ -1429,7 +1434,7 @@ void igs011_state::igs012_prot_reset_w(u16 data)
 	m_igs012_prot_mode = 0;
 }
 /*
-READ16_MEMBER(igs011_state::igs012_prot_fake_r)
+u16 igs011_state::igs012_prot_fake_r(offs_t offset)
 {
     switch (offset)
     {
@@ -1743,7 +1748,7 @@ u16 igs011_state::lhb2_igs003_r()
 			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
 			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
 			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
-			/* fall through */
+			[[fallthrough]];
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg);
 			break;
@@ -1878,7 +1883,7 @@ u16 igs011_state::xymg_igs003_r()
 			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
 			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
 			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
-			/* fall through */
+			[[fallthrough]];
 
 		case 0x20:  return 0x49;
 		case 0x21:  return 0x47;
@@ -2179,7 +2184,7 @@ void igs011_state::init_drgnwrldv21()
 
 	drgnwrld_type2_decrypt();
 	drgnwrld_gfx_decrypt();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(*this, FUNC(igs011_state::drgnwrldv21_igs011_prot2_r)));
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -2263,7 +2268,7 @@ void igs011_state::init_drgnwrldv40k()
 	drgnwrldv40k_decrypt();
 	drgnwrld_gfx_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(FUNC(igs011_state::drgnwrldv40k_igs011_prot2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(*this, FUNC(igs011_state::drgnwrldv40k_igs011_prot2_r)));
 }
 
 void igs011_state::init_drgnwrldv11h()
@@ -2327,7 +2332,7 @@ void igs011_state::init_dbc()
 
 	dbc_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(FUNC(igs011_state::dbc_igs011_prot2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(*this, FUNC(igs011_state::dbc_igs011_prot2_r)));
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -2357,7 +2362,7 @@ void igs011_state::init_ryukobou()
 
 	ryukobou_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(FUNC(igs011_state::ryukobou_igs011_prot2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(*this, FUNC(igs011_state::ryukobou_igs011_prot2_r)));
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
@@ -3275,7 +3280,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state, igs_hopper_r, nullptr) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3405,7 +3410,7 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3534,7 +3539,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  ) // shown in test mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)   // clear coin
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr)   // hopper switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r)   // hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -3663,7 +3668,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   // system reset
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -3727,7 +3732,7 @@ INPUT_PORTS_END
 // vbowlhk: joystick only, no cabinet linking
 static INPUT_PORTS_START( vbowlhk )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -3736,60 +3741,60 @@ static INPUT_PORTS_START( vbowlhk )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Sexy Interlude" )
+	PORT_DIPNAME( 0x10, 0x10, "Sexy Interlude" )      PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Open Picture" )
+	PORT_DIPNAME( 0x20, 0x20, "Open Picture" )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy   ) )   // 5
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )   // 7
 	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )   // 9
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard   ) )   // 11
-	PORT_DIPNAME( 0x04, 0x04, "Spares To Win (Frames 1-5)" )
+	PORT_DIPNAME( 0x04, 0x04, "Spares To Win (Frames 1-5)" )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x18, 0x18, "Points To Win (Frames 6-10)" )
+	PORT_DIPNAME( 0x18, 0x18, "Points To Win (Frames 6-10)" )      PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "160" )
 	PORT_DIPSETTING(    0x10, "170" )
 	PORT_DIPSETTING(    0x08, "180" )
 	PORT_DIPSETTING(    0x00, "190" )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPUNKNOWN_DIPLOC(0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC(0x40, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START("DSW3")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNKNOWN_DIPLOC(0x01, IP_ACTIVE_LOW, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC(0x02, IP_ACTIVE_LOW, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC(0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC(0x08, IP_ACTIVE_LOW, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC(0x10, IP_ACTIVE_LOW, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC(0x20, IP_ACTIVE_LOW, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC(0x40, IP_ACTIVE_LOW, "SW3:7" )
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW3:8" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x81, 0x81, "Protection & Comm Test" ) // includes IGS011 and IGS012 protection tests
+	PORT_DIPNAME( 0x81, 0x81, "Protection & Comm Test" )      PORT_DIPLOCATION("SW4:1,8") // includes IGS011 and IGS012 protection tests
 	PORT_DIPSETTING(    0x81, "No (0)" )
 	PORT_DIPSETTING(    0x80, "No (1)" )
 	PORT_DIPSETTING(    0x01, "No (2)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN_DIPLOC(0x02, IP_ACTIVE_LOW, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC(0x04, IP_ACTIVE_LOW, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC(0x08, IP_ACTIVE_LOW, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC(0x10, IP_ACTIVE_LOW, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC(0x20, IP_ACTIVE_LOW, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC(0x40, IP_ACTIVE_LOW, "SW4:7" )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3834,45 +3839,19 @@ static INPUT_PORTS_START( vbowl )
 	PORT_INCLUDE(vbowlhk)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Sexy Interlude" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Open Picture" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Controls ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Trackball ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Cabinet ID" )
+	PORT_DIPNAME( 0x03, 0x03, "Cabinet ID" )      PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x04, 0x04, "Linked Cabinets" )
+	PORT_DIPNAME( 0x04, 0x04, "Linked Cabinets" )      PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_MODIFY("AN0")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
@@ -3887,28 +3866,9 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_INCLUDE(vbowl)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Sexy Interlude" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Controls ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Trackball ) )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3964,7 +3924,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -4034,16 +3994,6 @@ INPUT_PORTS_END
 // for debugging
 
 #if 0
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4, 0, 12,  8, 20,16, 28,24 },
-	{ STEP8(0,8*4) },
-	8*8*4
-};
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -4087,17 +4037,17 @@ static const gfx_layout layout_16x16x1 =
 };
 
 static GFXDECODE_START( gfx_igs011 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, gfx_8x8x4_packed_lsb, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4,       0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,         0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8,       0, 0x08 )
 GFXDECODE_END
 static GFXDECODE_START( gfx_igs011_hi )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
-	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
-	GFXDECODE_ENTRY( "blitter_hi", 0, layout_16x16x1, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, gfx_8x8x4_packed_lsb, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4,       0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,         0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8,       0, 0x08 )
+	GFXDECODE_ENTRY( "blitter_hi", 0, layout_16x16x1,    0, 0x80 )
 GFXDECODE_END
 #endif
 
@@ -4243,7 +4193,7 @@ void igs011_state::vbowl(machine_config &config)
 //  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	config.device_remove("oki");
-	ICS2115(config, m_ics, 0);
+	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set(FUNC(igs011_state::sound_irq));
 	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
 }
@@ -4425,7 +4375,7 @@ ROM_END
 
 /***************************************************************************
 
-  東方之珠/Dōngfāng Zhī Zhū
+  東方之珠/Dung1 Fong1 Zi1 Zyu1
   (Hong Kong version of 中國龍/Zhōngguó Lóng, V011H)
 
 ***************************************************************************/
@@ -4439,6 +4389,17 @@ ROM_START( drgnwrldv11h )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+ROM_END
+
+ROM_START( drgnwrldv11ha )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "u3", 0x00000, 0x80000, CRC(b68113c4) SHA1(618fbf8ef71fcab5cd887e2d06f08169aec9e59f) ) // label not readable
+
+	ROM_REGION( 0x400000, "blitter", 0 )
+	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "china-dr-sp.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
 
 /***************************************************************************
@@ -4543,7 +4504,7 @@ ROM_END
 
 /***************************************************************************
 
-    Long Hu Bang (V035C)
+    龙虎榜/Lóng hǔ bǎng (V035C)
 
     Other files in the zip:
 
@@ -4570,7 +4531,7 @@ ROM_END
 
 /***************************************************************************
 
-Long Hu Bang (V033C)
+龙虎榜/Lóng hǔ bǎng (V033C)
 
 PCB Layout
 ----------
@@ -4632,7 +4593,7 @@ ROM_END
 
 /***************************************************************************
 
-Da Ban Cheng
+大阪城/Daai6 Baan2 Sing4
 
 PCB Layout
 ----------
@@ -4739,7 +4700,7 @@ ROM_END
 
 /***************************************************************************
 
-Long Hu Bang II
+龍虎榜/Lung4 Fu2 Bong2 II
 IGS, 1996
 
 PCB Layout
@@ -4950,6 +4911,8 @@ ROM_START( xymg )
 	ROM_CONTINUE(          0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 ROM_END
 
+} // Anonymous namespace
+
 
 /***************************************************************************
 
@@ -4957,22 +4920,23 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dongfang Zhi Zhu (Hong Kong, V011H)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhb,          0,        lhb,             lhb,       igs011_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhbv33c,      lhb,      lhb,             lhb,       igs011_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dbc,          lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ryukobou,     lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2,         0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Long Hu Bang II (Hong Kong, V185H)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, vbowl,        0,        vbowl,           vbowl,     igs011_state, init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    igs011_state, init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlhk,      vbowl,    vbowlhk,         vbowl,     igs011_state, init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp,  igs011_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgnwrld,      0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv40k,  drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv30,   drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21,   drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11h,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 2)",  MACHINE_SUPPORTS_SAVE ) // different encryption and with IGS012
+GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhb,           0,        lhb,             lhb,       igs011_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, vbowl,         0,        vbowl,           vbowl,     igs011_state, init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    igs011_state, init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   igs011_state, init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",        MACHINE_SUPPORTS_SAVE )

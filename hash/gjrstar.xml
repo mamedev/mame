@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="gjrstar" description="VTech Genius Junior Redstar cartridges">
+
+	<!-- According to the boxart, this is compatible with: Junior Redstar/Redstar 2/Redstar 3 -->
+	<software name="wortspie">
+		<description>Wortspiele</description>
+		<year>200?</year>
+		<publisher>Video Technology</publisher>
+		<info name="serial" value="80-10171" />
+
+		<part name="rom" interface="genius_rom">
+			<dataarea name="rom" size="0x40000">
+				<rom name="27-5883-00" size="0x40000" crc="99214bce" sha1="75294fbc411b0b39b3db4727824faf29127675af"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

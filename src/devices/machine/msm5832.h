@@ -40,8 +40,8 @@ public:
 	// construction/destruction
 	msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 	void address_w(uint8_t data);
 
@@ -56,7 +56,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;

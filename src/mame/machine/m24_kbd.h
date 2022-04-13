@@ -19,9 +19,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(data_w);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -35,10 +35,10 @@ private:
 	required_device<i8049_device> m_mcu;
 	emu_timer *m_reset_timer;
 
-	DECLARE_WRITE8_MEMBER(bus_w);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p2_r);
+	void bus_w(uint8_t data);
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
 };

@@ -1,5 +1,5 @@
-// license: GPL-2.0+
-// copyright-holders: Dirk Best
+// license:BSD-3-Clause
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     PMI DAC-76 COMDAC
@@ -37,18 +37,18 @@ public:
 	dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// chord
-	DECLARE_WRITE_LINE_MEMBER(b1_w) { m_chord &= ~(1 << 2); m_chord |= (state << 2); };
-	DECLARE_WRITE_LINE_MEMBER(b2_w) { m_chord &= ~(1 << 1); m_chord |= (state << 1); };
-	DECLARE_WRITE_LINE_MEMBER(b3_w) { m_chord &= ~(1 << 0); m_chord |= (state << 0); };
+	DECLARE_WRITE_LINE_MEMBER(b1_w) { m_chord &= ~(1 << 2); m_chord |= (state << 2); }
+	DECLARE_WRITE_LINE_MEMBER(b2_w) { m_chord &= ~(1 << 1); m_chord |= (state << 1); }
+	DECLARE_WRITE_LINE_MEMBER(b3_w) { m_chord &= ~(1 << 0); m_chord |= (state << 0); }
 
 	// step
-	DECLARE_WRITE_LINE_MEMBER(b4_w) { m_step &= ~(1 << 3); m_step |= (state << 3); };
-	DECLARE_WRITE_LINE_MEMBER(b5_w) { m_step &= ~(1 << 2); m_step |= (state << 2); };
-	DECLARE_WRITE_LINE_MEMBER(b6_w) { m_step &= ~(1 << 1); m_step |= (state << 1); };
-	DECLARE_WRITE_LINE_MEMBER(b7_w) { m_step &= ~(1 << 0); m_step |= (state << 0); };
+	DECLARE_WRITE_LINE_MEMBER(b4_w) { m_step &= ~(1 << 3); m_step |= (state << 3); }
+	DECLARE_WRITE_LINE_MEMBER(b5_w) { m_step &= ~(1 << 2); m_step |= (state << 2); }
+	DECLARE_WRITE_LINE_MEMBER(b6_w) { m_step &= ~(1 << 1); m_step |= (state << 1); }
+	DECLARE_WRITE_LINE_MEMBER(b7_w) { m_step &= ~(1 << 0); m_step |= (state << 0); }
 
 	// sign bit
-	DECLARE_WRITE_LINE_MEMBER(sb_w) { m_sb = bool(state); };
+	DECLARE_WRITE_LINE_MEMBER(sb_w) { m_sb = bool(state); }
 
 	void update() { m_stream->update(); }
 
@@ -57,7 +57,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	static constexpr int m_level[8] = { 0, 33, 99, 231, 495, 1023, 2079, 4191 };

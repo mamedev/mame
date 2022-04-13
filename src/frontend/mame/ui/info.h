@@ -13,7 +13,10 @@
 
 #pragma once
 
-#include "ui/menu.h"
+#include "ui/textbox.h"
+
+#include <string>
+
 
 namespace ui {
 
@@ -21,7 +24,7 @@ class machine_static_info
 {
 public:
 	// construction
-	machine_static_info(machine_config const &config);
+	machine_static_info(const ui_options &options, machine_config const &config);
 
 	// overall emulation status
 	::machine_flags::type machine_flags() const { return m_flags; }
@@ -38,15 +41,19 @@ public:
 	bool has_test_switch() const { return m_has_test_switch; }
 	bool has_analog() const { return m_has_analog; }
 
-	// message colour
+	// warning severity indications
+	bool has_warnings() const;
+	bool has_severe_warnings() const;
 	rgb_t status_color() const;
 	rgb_t warnings_color() const;
 
 protected:
-	machine_static_info(machine_config const &config, ioport_list const &ports);
+	machine_static_info(const ui_options &options, machine_config const &config, ioport_list const &ports);
 
 private:
-	machine_static_info(machine_config const &config, ioport_list const *ports);
+	machine_static_info(const ui_options &options, machine_config const &config, ioport_list const *ports);
+
+	const ui_options &      m_options;
 
 	// overall feature status
 	::machine_flags::type   m_flags;
@@ -74,7 +81,6 @@ public:
 	// text generators
 	std::string warnings_string() const;
 	std::string game_info_string() const;
-	std::string mandatory_images() const;
 	std::string get_screen_desc(screen_device &screen) const;
 
 private:
@@ -83,15 +89,33 @@ private:
 };
 
 
-class menu_game_info : public menu
+class menu_game_info : public menu_textbox
 {
 public:
 	menu_game_info(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_game_info() override;
 
+protected:
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
+
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
+};
+
+
+class menu_warn_info : public menu_textbox
+{
+public:
+	menu_warn_info(mame_ui_manager &mui, render_container &container);
+	virtual ~menu_warn_info() override;
+
+protected:
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
+
+private:
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle(event const *ev) override;
 };
 
 
@@ -101,9 +125,12 @@ public:
 	menu_image_info(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_image_info() override;
 
+protected:
+	virtual void menu_activated() override;
+
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 	void image_info(device_image_interface *image);
 };
 

@@ -19,6 +19,7 @@
 #include <ostream>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "libspirv.hpp"
@@ -27,7 +28,8 @@ namespace spvtools {
 
 namespace opt {
 class Pass;
-}
+struct DescriptorSetAndBinding;
+}  // namespace opt
 
 // C++ interface for SPIR-V optimization functionalities. It wraps the context
 // (including target environment and the corresponding SPIR-V grammar) and
@@ -65,9 +67,9 @@ class Optimizer {
   // Constructs an instance with the given target |env|, which is used to decode
   // the binaries to be optimized later.
   //
-  // The constructed instance will have an empty message consumer, which just
-  // ignores all messages from the library. Use SetMessageConsumer() to supply
-  // one if messages are of concern.
+  // The instance will have an empty message consumer, which ignores all
+  // messages from the library. Use SetMessageConsumer() to supply a consumer
+  // if messages are of concern.
   explicit Optimizer(spv_target_env env);
 
   // Disables copy/move constructor/assignment operations.
@@ -148,25 +150,53 @@ class Optimizer {
   // returns false.
   bool FlagHasValidForm(const std::string& flag) const;
 
+  // Allows changing, after creation time, the target environment to be
+  // optimized for and validated.  Should be called before calling Run().
+  void SetTargetEnv(const spv_target_env env);
+
   // Optimizes the given SPIR-V module |original_binary| and writes the
-  // optimized binary into |optimized_binary|.
+  // optimized binary into |optimized_binary|. The optimized binary uses
+  // the same SPIR-V version as the original binary.
+  //
   // Returns true on successful optimization, whether or not the module is
   // modified. Returns false if |original_binary| fails to validate or if errors
   // occur when processing |original_binary| using any of the registered passes.
   // In that case, no further passes are executed and the contents in
   // |optimized_binary| may be invalid.
   //
+  // By default, the binary is validated before any transforms are performed,
+  // and optionally after each transform.  Validation uses SPIR-V spec rules
+  // for the SPIR-V version named in the binary's header (at word offset 1).
+  // Additionally, if the target environment is a client API (such as
+  // Vulkan 1.1), then validate for that client API version, to the extent
+  // that it is verifiable from data in the binary itself.
+  //
   // It's allowed to alias |original_binary| to the start of |optimized_binary|.
   bool Run(const uint32_t* original_binary, size_t original_binary_size,
            std::vector<uint32_t>* optimized_binary) const;
 
-  // Same as above, except passes |options| to the validator when trying to
-  // validate the binary.  If |skip_validation| is true, then the caller is
-  // guaranteeing that |original_binary| is valid, and the validator will not
-  // be run.
+  // DEPRECATED: Same as above, except passes |options| to the validator when
+  // trying to validate the binary.  If |skip_validation| is true, then the
+  // caller is guaranteeing that |original_binary| is valid, and the validator
+  // will not be run.  The |max_id_bound| is the limit on the max id in the
+  // module.
   bool Run(const uint32_t* original_binary, const size_t original_binary_size,
            std::vector<uint32_t>* optimized_binary,
-           const ValidatorOptions& options, bool skip_validation = false) const;
+           const ValidatorOptions& options, bool skip_validation) const;
+
+  // Same as above, except it takes an options object.  See the documentation
+  // for |OptimizerOptions| to see which options can be set.
+  //
+  // By default, the binary is validated before any transforms are performed,
+  // and optionally after each transform.  Validation uses SPIR-V spec rules
+  // for the SPIR-V version named in the binary's header (at word offset 1).
+  // Additionally, if the target environment is a client API (such as
+  // Vulkan 1.1), then validate for that client API version, to the extent
+  // that it is verifiable from data in the binary itself, or from the
+  // validator options set on the optimizer options.
+  bool Run(const uint32_t* original_binary, const size_t original_binary_size,
+           std::vector<uint32_t>* optimized_binary,
+           const spv_optimizer_options opt_options) const;
 
   // Returns a vector of strings with all the pass names added to this
   // optimizer's pass manager. These strings are valid until the associated
@@ -182,6 +212,9 @@ class Optimizer {
   // is null, then no output is generated. Otherwise, output is sent to the
   // |out| output stream.
   Optimizer& SetTimeReport(std::ostream* out);
+
+  // Sets the option to validate the module after each pass.
+  Optimizer& SetValidateAfterAll(bool validate);
 
  private:
   struct Impl;                  // Opaque struct for holding internal data.
@@ -209,6 +242,11 @@ Optimizer::PassToken CreateStripReflectInfoPass();
 // the call trees rooted at entry points and exported functions.  These
 // functions are not needed because they will never be called.
 Optimizer::PassToken CreateEliminateDeadFunctionsPass();
+
+// Creates an eliminate-dead-members pass.
+// An eliminate-dead-members pass will remove all unused members of structures.
+// This will not affect the data layout of the remaining members.
+Optimizer::PassToken CreateEliminateDeadMembersPass();
 
 // Creates a set-spec-constant-default-value pass from a mapping from spec-ids
 // to the default values in the form of string.
@@ -456,20 +494,6 @@ Optimizer::PassToken CreateInsertExtractElimPass();
 // inserts created by that pass.
 Optimizer::PassToken CreateDeadInsertElimPass();
 
-// Creates a pass to consolidate uniform references.
-// For each entry point function in the module, first change all constant index
-// access chain loads into equivalent composite extracts. Then consolidate
-// identical uniform loads into one uniform load. Finally, consolidate
-// identical uniform extracts into one uniform extract. This may require
-// moving a load or extract to a point which dominates all uses.
-//
-// This pass requires a module to have structured control flow ie shader
-// capability. It also requires logical addressing ie Addresses capability
-// is not enabled. It also currently does not support any extensions.
-//
-// This pass currently only optimizes loads with a single index.
-Optimizer::PassToken CreateCommonUniformElimPass();
-
 // Create aggressive dead code elimination pass
 // This pass eliminates unused code from the module. In addition,
 // it detects and eliminates code which may have spurious uses but which do
@@ -490,7 +514,31 @@ Optimizer::PassToken CreateCommonUniformElimPass();
 // Conversion, which tends to cause cycles of dead code to be left after
 // Store/Load elimination passes are completed. These cycles cannot be
 // eliminated with standard dead code elimination.
-Optimizer::PassToken CreateAggressiveDCEPass();
+//
+// If |preserve_interface| is true, all non-io variables in the entry point
+// interface are considered live and are not eliminated. This mode is needed
+// by GPU-Assisted validation instrumentation, where a change in the interface
+// is not allowed.
+Optimizer::PassToken CreateAggressiveDCEPass(bool preserve_interface = false);
+
+// Creates a remove-unused-interface-variables pass.
+// Removes variables referenced on the |OpEntryPoint| instruction that are not
+// referenced in the entry point function or any function in its call tree. Note
+// that this could cause the shader interface to no longer match other shader
+// stages.
+Optimizer::PassToken CreateRemoveUnusedInterfaceVariablesPass();
+
+// Creates an empty pass.
+// This is deprecated and will be removed.
+// TODO(jaebaek): remove this pass after handling glslang's broken unit tests.
+//                https://github.com/KhronosGroup/glslang/pull/2440
+Optimizer::PassToken CreatePropagateLineInfoPass();
+
+// Creates an empty pass.
+// This is deprecated and will be removed.
+// TODO(jaebaek): remove this pass after handling glslang's broken unit tests.
+//                https://github.com/KhronosGroup/glslang/pull/2440
+Optimizer::PassToken CreateRedundantLineInfoElimPass();
 
 // Creates a compact ids pass.
 // The pass remaps result ids to a compact and gapless range starting from %1.
@@ -628,6 +676,22 @@ Optimizer::PassToken CreateLoopUnrollPass(bool fully_unroll, int factor = 0);
 // processed (see IsSSATargetVar for details).
 Optimizer::PassToken CreateSSARewritePass();
 
+// Create pass to convert relaxed precision instructions to half precision.
+// This pass converts as many relaxed float32 arithmetic operations to half as
+// possible. It converts any float32 operands to half if needed. It converts
+// any resulting half precision values back to float32 as needed. No variables
+// are changed. No image operations are changed.
+//
+// Best if run after function scope store/load and composite operation
+// eliminations are run. Also best if followed by instruction simplification,
+// redundancy elimination and DCE.
+Optimizer::PassToken CreateConvertRelaxedToHalfPass();
+
+// Create relax float ops pass.
+// This pass decorates all float32 result instructions with RelaxedPrecision
+// if not already so decorated.
+Optimizer::PassToken CreateRelaxFloatOpsPass();
+
 // Create copy propagate arrays pass.
 // This pass looks to copy propagate memory references for arrays.  It looks
 // for specific code patterns to recognize array copies.
@@ -642,13 +706,173 @@ Optimizer::PassToken CreateVectorDCEPass();
 // Create a pass to reduce the size of loads.
 // This pass looks for loads of structures where only a few of its members are
 // used.  It replaces the loads feeding an OpExtract with an OpAccessChain and
-// a load of the specific elements.
-Optimizer::PassToken CreateReduceLoadSizePass();
+// a load of the specific elements.  The parameter is a threshold to determine
+// whether we have to replace the load or not.  If the ratio of the used
+// components of the load is less than the threshold, we replace the load.
+Optimizer::PassToken CreateReduceLoadSizePass(
+    double load_replacement_threshold = 0.9);
 
 // Create a pass to combine chained access chains.
 // This pass looks for access chains fed by other access chains and combines
 // them into a single instruction where possible.
 Optimizer::PassToken CreateCombineAccessChainsPass();
+
+// Create a pass to instrument bindless descriptor checking
+// This pass instruments all bindless references to check that descriptor
+// array indices are inbounds, and if the descriptor indexing extension is
+// enabled, that the descriptor has been initialized. If the reference is
+// invalid, a record is written to the debug output buffer (if space allows)
+// and a null value is returned. This pass is designed to support bindless
+// validation in the Vulkan validation layers.
+//
+// TODO(greg-lunarg): Add support for buffer references. Currently only does
+// checking for image references.
+//
+// Dead code elimination should be run after this pass as the original,
+// potentially invalid code is not removed and could cause undefined behavior,
+// including crashes. It may also be beneficial to run Simplification
+// (ie Constant Propagation), DeadBranchElim and BlockMerge after this pass to
+// optimize instrument code involving the testing of compile-time constants.
+// It is also generally recommended that this pass (and all
+// instrumentation passes) be run after any legalization and optimization
+// passes. This will give better analysis for the instrumentation and avoid
+// potentially de-optimizing the instrument code, for example, inlining
+// the debug record output function throughout the module.
+//
+// The instrumentation will read and write buffers in debug
+// descriptor set |desc_set|. It will write |shader_id| in each output record
+// to identify the shader module which generated the record.
+// |desc_length_enable| controls instrumentation of runtime descriptor array
+// references, |desc_init_enable| controls instrumentation of descriptor
+// initialization checking, and |buff_oob_enable| controls instrumentation
+// of storage and uniform buffer bounds checking, all of which require input
+// buffer support. |texbuff_oob_enable| controls instrumentation of texel
+// buffers, which does not require input buffer support.
+Optimizer::PassToken CreateInstBindlessCheckPass(
+    uint32_t desc_set, uint32_t shader_id, bool desc_length_enable = false,
+    bool desc_init_enable = false, bool buff_oob_enable = false,
+    bool texbuff_oob_enable = false);
+
+// Create a pass to instrument physical buffer address checking
+// This pass instruments all physical buffer address references to check that
+// all referenced bytes fall in a valid buffer. If the reference is
+// invalid, a record is written to the debug output buffer (if space allows)
+// and a null value is returned. This pass is designed to support buffer
+// address validation in the Vulkan validation layers.
+//
+// Dead code elimination should be run after this pass as the original,
+// potentially invalid code is not removed and could cause undefined behavior,
+// including crashes. Instruction simplification would likely also be
+// beneficial. It is also generally recommended that this pass (and all
+// instrumentation passes) be run after any legalization and optimization
+// passes. This will give better analysis for the instrumentation and avoid
+// potentially de-optimizing the instrument code, for example, inlining
+// the debug record output function throughout the module.
+//
+// The instrumentation will read and write buffers in debug
+// descriptor set |desc_set|. It will write |shader_id| in each output record
+// to identify the shader module which generated the record.
+Optimizer::PassToken CreateInstBuffAddrCheckPass(uint32_t desc_set,
+                                                 uint32_t shader_id);
+
+// Create a pass to instrument OpDebugPrintf instructions.
+// This pass replaces all OpDebugPrintf instructions with instructions to write
+// a record containing the string id and the all specified values into a special
+// printf output buffer (if space allows). This pass is designed to support
+// the printf validation in the Vulkan validation layers.
+//
+// The instrumentation will write buffers in debug descriptor set |desc_set|.
+// It will write |shader_id| in each output record to identify the shader
+// module which generated the record.
+Optimizer::PassToken CreateInstDebugPrintfPass(uint32_t desc_set,
+                                               uint32_t shader_id);
+
+// Create a pass to upgrade to the VulkanKHR memory model.
+// This pass upgrades the Logical GLSL450 memory model to Logical VulkanKHR.
+// Additionally, it modifies memory, image, atomic and barrier operations to
+// conform to that model's requirements.
+Optimizer::PassToken CreateUpgradeMemoryModelPass();
+
+// Create a pass to do code sinking.  Code sinking is a transformation
+// where an instruction is moved into a more deeply nested construct.
+Optimizer::PassToken CreateCodeSinkingPass();
+
+// Create a pass to fix incorrect storage classes.  In order to make code
+// generation simpler, DXC may generate code where the storage classes do not
+// match up correctly.  This pass will fix the errors that it can.
+Optimizer::PassToken CreateFixStorageClassPass();
+
+// Creates a graphics robust access pass.
+//
+// This pass injects code to clamp indexed accesses to buffers and internal
+// arrays, providing guarantees satisfying Vulkan's robustBufferAccess rules.
+//
+// TODO(dneto): Clamps coordinates and sample index for pointer calculations
+// into storage images (OpImageTexelPointer).  For an cube array image, it
+// assumes the maximum layer count times 6 is at most 0xffffffff.
+//
+// NOTE: This pass will fail with a message if:
+// - The module is not a Shader module.
+// - The module declares VariablePointers, VariablePointersStorageBuffer, or
+//   RuntimeDescriptorArrayEXT capabilities.
+// - The module uses an addressing model other than Logical
+// - Access chain indices are wider than 64 bits.
+// - Access chain index for a struct is not an OpConstant integer or is out
+//   of range. (The module is already invalid if that is the case.)
+// - TODO(dneto): The OpImageTexelPointer coordinate component is not 32-bits
+// wide.
+//
+// NOTE: Access chain indices are always treated as signed integers.  So
+//   if an array has a fixed size of more than 2^31 elements, then elements
+//   from 2^31 and above are never accessible with a 32-bit index,
+//   signed or unsigned.  For this case, this pass will clamp the index
+//   between 0 and at 2^31-1, inclusive.
+//   Similarly, if an array has more then 2^15 element and is accessed with
+//   a 16-bit index, then elements from 2^15 and above are not accessible.
+//   In this case, the pass will clamp the index between 0 and 2^15-1
+//   inclusive.
+Optimizer::PassToken CreateGraphicsRobustAccessPass();
+
+// Create descriptor scalar replacement pass.
+// This pass replaces every array variable |desc| that has a DescriptorSet and
+// Binding decorations with a new variable for each element of the array.
+// Suppose |desc| was bound at binding |b|.  Then the variable corresponding to
+// |desc[i]| will have binding |b+i|.  The descriptor set will be the same.  It
+// is assumed that no other variable already has a binding that will used by one
+// of the new variables.  If not, the pass will generate invalid Spir-V.  All
+// accesses to |desc| must be OpAccessChain instructions with a literal index
+// for the first index.
+Optimizer::PassToken CreateDescriptorScalarReplacementPass();
+
+// Create a pass to replace each OpKill instruction with a function call to a
+// function that has a single OpKill.  Also replace each OpTerminateInvocation
+// instruction  with a function call to a function that has a single
+// OpTerminateInvocation.  This allows more code to be inlined.
+Optimizer::PassToken CreateWrapOpKillPass();
+
+// Replaces the extensions VK_AMD_shader_ballot,VK_AMD_gcn_shader, and
+// VK_AMD_shader_trinary_minmax with equivalent code using core instructions and
+// capabilities.
+Optimizer::PassToken CreateAmdExtToKhrPass();
+
+// Replaces the internal version of GLSLstd450 InterpolateAt* extended
+// instructions with the externally valid version. The internal version allows
+// an OpLoad of the interpolant for the first argument. This pass removes the
+// OpLoad and replaces it with its pointer. glslang and possibly other
+// frontends will create the internal version for HLSL. This pass will be part
+// of HLSL legalization and should be called after interpolants have been
+// propagated into their final positions.
+Optimizer::PassToken CreateInterpolateFixupPass();
+
+// Creates a convert-to-sampled-image pass to convert images and/or
+// samplers with given pairs of descriptor set and binding to sampled image.
+// If a pair of an image and a sampler have the same pair of descriptor set and
+// binding that is one of the given pairs, they will be converted to a sampled
+// image. In addition, if only an image has the descriptor set and binding that
+// is one of the given pairs, it will be converted to a sampled image as well.
+Optimizer::PassToken CreateConvertToSampledImagePass(
+    const std::vector<opt::DescriptorSetAndBinding>&
+        descriptor_set_binding_pairs);
 
 }  // namespace spvtools
 

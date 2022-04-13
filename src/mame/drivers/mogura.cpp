@@ -7,10 +7,10 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class mogura_state : public driver_device
@@ -36,10 +36,10 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	tilemap_t *m_tilemap;
-	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
-	DECLARE_WRITE8_MEMBER(mogura_dac_w);
-	DECLARE_WRITE8_MEMBER(mogura_gfxram_w);
+	tilemap_t *m_tilemap = nullptr;
+	void mogura_tileram_w(offs_t offset, uint8_t data);
+	void mogura_dac_w(uint8_t data);
+	void mogura_gfxram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_mogura_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 	int code = m_tileram[tile_index];
 	int attr = m_tileram[tile_index + 0x800];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr >> 1) & 7,
 			0);
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 void mogura_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_source(m_gfxram);
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mogura_state::get_mogura_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mogura_state::get_mogura_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 uint32_t mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -117,20 +117,20 @@ uint32_t mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(mogura_state::mogura_tileram_w)
+void mogura_state::mogura_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(mogura_state::mogura_dac_w)
+void mogura_state::mogura_dac_w(uint8_t data)
 {
 	m_ldac->write(data >> 4);
 	m_rdac->write(data & 15);
 }
 
 
-WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
+void mogura_state::mogura_gfxram_w(offs_t offset, uint8_t data)
 {
 	m_gfxram[offset] = data ;
 
@@ -233,9 +233,6 @@ void mogura_state::mogura(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_4BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_4BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

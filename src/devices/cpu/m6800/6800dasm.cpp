@@ -7,16 +7,6 @@
  *
  *   I'm afraid to put my name on it, but I feel obligated:
  *   This code written by Aaron Giles (agiles@sirius.com) for the MAME project
- *
- * History:
- * 990314 HJB
- * The disassembler knows about valid opcodes for M6800/1/2/3/8 and HD63701.
- * 990302 HJB
- * Changed the string array into a table of opcode names (or tokens) and
- * argument types. This second try should give somewhat better results.
- * Named the undocumented HD63701YO opcodes $12 and $13 'asx1' and 'asx2',
- * since 'add contents of stack to x register' is what they do.
- *
  */
 
 #include "emu.h"
@@ -39,13 +29,13 @@ const char *const m680x_disassembler::op_name_str[] = {
 	"std",   "sei",   "sts",   "stx",   "suba",  "subb",  "subd",  "swi",
 	"wai",   "tab",   "tap",   "tba",   "tim",   "tpa",   "tst",   "tsta",
 	"tstb",  "tsx",   "txs",   "asx1",  "asx2",  "xgdx",  "addx",  "adcx",
-	"bitx"
+	"bitx",  "slp"
 };
 
 /*
  * This table defines the opcodes:
  * byte meaning
- * 0    token (menmonic)
+ * 0    token (mnemonic)
  * 1    addressing mode
  * 2    invalid opcode for 1:6800/6802/6808, 2:6801/6803, 4:HD63701
  */
@@ -55,9 +45,9 @@ const uint8_t m680x_disassembler::table[0x104][3] = {
 	{lsrd,inh,1},{asld,inh,1},{tap, inh,0},{tpa, inh,0},
 	{inx, inh,0},{dex, inh,0},{clv, inh,0},{sev, inh,0},
 	{clc, inh,0},{sec, inh,0},{cli, inh,0},{sei, inh,0},
-	{sba, inh,0},{cba, inh,0},{asx1,sx1,0},{asx2,sx1,0},/* 10 */
+	{sba, inh,0},{cba, inh,0},{asx1,sx1,3},{asx2,sx1,3},/* 10 */
 	{ill, inh,7},{ill, inh,7},{tab, inh,0},{tba, inh,0},
-	{xgdx,inh,3},{daa, inh,0},{ill, inh,7},{aba, inh,0},
+	{xgdx,inh,3},{daa, inh,0},{slp, inh,3},{aba, inh,0},
 	{ill, inh,7},{ill, inh,7},{ill, inh,7},{ill, inh,7},
 	{bra, rel,0},{brn, rel,0},{bhi, rel,0},{bls, rel,0},/* 20 */
 	{bcc, rel,0},{bcs, rel,0},{bne, rel,0},{beq, rel,0},
@@ -175,6 +165,8 @@ offs_t m680x_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		flags = STEP_OVER;
 	else if (opcode == rti || opcode == rts)
 		flags = STEP_OUT;
+	else if (args == rel && opcode != bra && opcode != brn && opcode != bsr)
+		flags = STEP_COND;
 
 	if ( invalid & invalid_mask )   /* invalid for this cpu type ? */
 	{

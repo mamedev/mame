@@ -27,7 +27,7 @@ public:
 	// construction/destruction
 	cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(dac_w);
+	void dac_w(uint8_t data);
 
 protected:
 	// device-level overrides

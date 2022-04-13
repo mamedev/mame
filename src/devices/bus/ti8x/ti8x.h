@@ -45,7 +45,7 @@ DECLARE_DEVICE_TYPE(TI8X_LINK_PORT, ti8x_link_port_device)
 class device_ti8x_link_port_interface;
 
 
-class ti8x_link_port_device : public device_t, public device_slot_interface
+class ti8x_link_port_device : public device_t, public device_single_card_slot_interface<device_ti8x_link_port_interface>
 {
 public:
 	template <typename T>
@@ -92,7 +92,7 @@ private:
 };
 
 
-class device_ti8x_link_port_interface : public device_slot_card_interface
+class device_ti8x_link_port_interface : public device_interface
 {
 public:
 	DECLARE_WRITE_LINE_MEMBER(output_tip)

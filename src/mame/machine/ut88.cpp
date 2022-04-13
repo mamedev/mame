@@ -25,105 +25,103 @@ static const uint8_t hex_to_7seg[16] =
 
 
 /* Driver initialization */
-void ut88_state::init_ut88()
+TIMER_DEVICE_CALLBACK_MEMBER(ut88mini_state::display_timer)
 {
-	/* set initially ROM to be visible on first bank */
-	uint8_t *RAM = m_region_maincpu->base();
-	memset(RAM,0x0000,0x0800); // make first page empty by default
-	m_bank1->configure_entries(1, 2, RAM, 0x0000);
-	m_bank1->configure_entries(0, 2, RAM, 0xf800);
+	for (u8 i = 0; i < 6; i++)
+		m_digits[i] = hex_to_7seg[m_lcd_digit[i]];
 }
 
-
-void ut88_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_RESET:
-		m_bank1->set_entry(0);
-		break;
-	case TIMER_UPDATE_DISPLAY:
-		for (int i=0;i<6;i++)
-			m_digits[i] = hex_to_7seg[m_lcd_digit[i]];
-		timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
-		break;
-	default:
-		assert_always(false, "Unknown id in ut88_state::device_timer");
-	}
-}
-
-
-READ8_MEMBER( ut88_state::ut88_8255_portb_r )
+uint8_t ut88_state::ppi_portb_r()
 {
 	uint8_t data = 0xff;
 
-	if ( m_keyboard_mask & 0x01 )
+	if (BIT(m_keyboard_mask, 0))
 		data &= m_io_line0->read();
-	if ( m_keyboard_mask & 0x02 )
+	if (BIT(m_keyboard_mask, 1))
 		data &= m_io_line1->read();
-	if ( m_keyboard_mask & 0x04 )
+	if (BIT(m_keyboard_mask, 2))
 		data &= m_io_line2->read();
-	if ( m_keyboard_mask & 0x08 )
+	if (BIT(m_keyboard_mask, 3))
 		data &= m_io_line3->read();
-	if ( m_keyboard_mask & 0x10 )
+	if (BIT(m_keyboard_mask, 4))
 		data &= m_io_line4->read();
-	if ( m_keyboard_mask & 0x20 )
+	if (BIT(m_keyboard_mask, 5))
 		data &= m_io_line5->read();
-	if ( m_keyboard_mask & 0x40 )
+	if (BIT(m_keyboard_mask, 6))
 		data &= m_io_line6->read();
-	if ( m_keyboard_mask & 0x80 )
+	if (BIT(m_keyboard_mask, 7))
 		data &= m_io_line7->read();
 
 	return data;
 }
 
-READ8_MEMBER( ut88_state::ut88_8255_portc_r )
+uint8_t ut88_state::ppi_portc_r()
 {
 	return m_io_line8->read();
 }
 
-WRITE8_MEMBER( ut88_state::ut88_8255_porta_w )
+void ut88_state::ppi_porta_w(uint8_t data)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
 
-MACHINE_RESET_MEMBER(ut88_state,ut88)
+void ut88_state::machine_reset()
 {
-	timer_set(attotime::from_usec(10), TIMER_RESET);
-	m_bank1->set_entry(1);
 	m_keyboard_mask = 0;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf800, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
+
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
-
-READ8_MEMBER( ut88_state::ut88_keyboard_r )
+void ut88_state::machine_start()
 {
-	return m_ppi->read(offset^0x03);
+	save_item(NAME(m_keyboard_mask));
 }
 
-
-WRITE8_MEMBER( ut88_state::ut88_keyboard_w )
+uint8_t ut88_state::keyboard_r(offs_t offset)
 {
-	m_ppi->write(offset^0x03, data);
+	return m_ppi->read(offset ^ 0x03);
 }
 
-WRITE8_MEMBER( ut88_state::ut88_sound_w )
+
+void ut88_state::keyboard_w(offs_t offset, uint8_t data)
+{
+	m_ppi->write(offset ^ 0x03, data);
+}
+
+void ut88_state::sound_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 0));
 	m_cassette->output(BIT(data, 0) ? 1 : -1);
 }
 
 
-READ8_MEMBER( ut88_state::ut88_tape_r )
+uint8_t ut88_common::tape_r()
 {
 	double level = m_cassette->input();
 	return (level <  0) ? 0 : 0xff;
 }
 
-READ8_MEMBER( ut88_state::ut88mini_keyboard_r )
+uint8_t ut88mini_state::keyboard_r()
 {
 	// This is real keyboard implementation
-	uint8_t *keyrom1 = m_region_proms->base();
-	uint8_t *keyrom2 = m_region_proms->base()+100;
+	uint8_t *keyrom1 = m_proms->base();
+	uint8_t *keyrom2 = m_proms->base()+0x100;
 
 	uint8_t key = keyrom2[m_io_line1->read()];
 
@@ -145,7 +143,7 @@ READ8_MEMBER( ut88_state::ut88mini_keyboard_r )
 }
 
 
-WRITE8_MEMBER( ut88_state::ut88mini_write_led )
+void ut88mini_state::led_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -161,17 +159,13 @@ WRITE8_MEMBER( ut88_state::ut88mini_write_led )
 		}
 }
 
-void ut88_state::init_ut88mini()
-{
-}
-
-MACHINE_START_MEMBER(ut88_state,ut88mini)
+void ut88mini_state::machine_start()
 {
 	m_digits.resolve();
-	timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
+	save_item(NAME(m_lcd_digit));
 }
 
-MACHINE_RESET_MEMBER(ut88_state,ut88mini)
+void ut88mini_state::machine_reset()
 {
 	m_lcd_digit[0] = m_lcd_digit[1] = m_lcd_digit[2] = 0;
 	m_lcd_digit[3] = m_lcd_digit[4] = m_lcd_digit[5] = 0;

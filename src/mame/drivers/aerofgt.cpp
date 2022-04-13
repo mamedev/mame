@@ -67,41 +67,42 @@ Verification still needed for the other PCBs.
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
 #include "machine/vs9209.h"
-#include "sound/2610intf.h"
-#include "sound/3812intf.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "video/vsystem_gga.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(aerofgt_state::karatblzbl_soundlatch_w)
+void aerofgt_state::karatblzbl_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ8_MEMBER(aerofgt_state::pending_command_r)
+uint8_t aerofgt_state::pending_command_r()
 {
 	return m_soundlatch->pending_r();
 }
 
-WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
+void aerofgt_state::aerofgt_sh_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(aerofgt_state::spinlbrk_sh_bankswitch_w)
+void aerofgt_state::spinlbrk_sh_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x01);
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikesb_oki_banking_w)
+void aerofgt_state::pspikesb_oki_banking_w(uint16_t data)
 {
 	m_oki->set_rom_bank(data & 3);
 }
 
 /*TODO: sound banking. */
-WRITE16_MEMBER(aerofgt_state::aerfboo2_okim6295_banking_w)
+void aerofgt_state::aerfboo2_okim6295_banking_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  if(ACCESSING_BITS_8_15)
 //  {
@@ -109,40 +110,40 @@ WRITE16_MEMBER(aerofgt_state::aerfboo2_okim6295_banking_w)
 //  }
 }
 
-WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
+void aerofgt_state::aerfboot_okim6295_banking_w(uint8_t data)
 {
 	/*bit 2 (0x4) set too?*/
 	if (data & 0x4)
 		m_okibank->set_entry(data & 0x3);
 }
 
-WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_write_port_0_w)
+void aerofgt_state::karatblzbl_d7759_write_port_0_w(uint8_t data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
-WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_reset_w)
+void aerofgt_state::karatblzbl_d7759_reset_w(uint8_t data)
 {
 	m_upd7759->reset_w(BIT(data, 7));
 }
 
 template<int Layer>
-WRITE16_MEMBER(aerofgt_state::vram_w)
+void aerofgt_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
 template<int Layer>
-WRITE16_MEMBER(aerofgt_state::scrollx_w)
+void aerofgt_state::scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollx[Layer]);
 }
 
 template<int Layer>
-WRITE16_MEMBER(aerofgt_state::scrolly_w)
+void aerofgt_state::scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrolly[Layer]);
 }
@@ -202,7 +203,7 @@ void aerofgt_state::spikes91_map(address_map &map)
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
 	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff006, 0xfff007).noprw();
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff008, 0xfff009).w(FUNC(aerofgt_state::spikes91_lookup_w));
 }
 
@@ -524,8 +525,8 @@ void aerofgt_state::karatblzbl_sound_map(address_map &map)
 void aerofgt_state::karatblzbl_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::data_w));
 	map(0x40, 0x40).w(FUNC(aerofgt_state::karatblzbl_d7759_write_port_0_w));
 	map(0x80, 0x80).w(FUNC(aerofgt_state::karatblzbl_d7759_reset_w));
 }
@@ -540,12 +541,21 @@ void aerofgt_state::kickball_sound_map(address_map &map)
 void aerofgt_state::kickball_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::data_w));
 	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc0, 0xc0).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
+void aerofgt_state::spikes91_sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	//map(0xf000, 0xf000) // OKI M5205?
+	//map(0xf400, 0xf400) // OKI M5205?
+	map(0xf800, 0xffff).ram();
+}
 
 void aerofgt_state::oki_map(address_map &map)
 { //only for aerfboot for now
@@ -1219,17 +1229,6 @@ static INPUT_PORTS_START( wbbc97 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
-static const gfx_layout pspikes_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout aerofgt_charlayout =
 {
 	8,8,
@@ -1312,18 +1311,6 @@ static const gfx_layout aerofgt_spritelayout =
 	128*8
 };
 
-static const gfx_layout spikes91_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
 
 
 static const gfx_layout aerfboot_spritelayout =
@@ -1380,7 +1367,7 @@ static const gfx_layout kickball_spritelayout =
 };
 
 static GFXDECODE_START( gfx_pspikes )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,    0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, pspikes_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
@@ -1391,17 +1378,17 @@ GFXDECODE_END
 
 static GFXDECODE_START( gfx_spikes91 )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikesb_charlayout,      0, 64 )   /* colors    0-1023 in 8 banks */
-	GFXDECODE_ENTRY( "gfx2", 0, spikes91_spritelayout, 1024, 64 )   /* colors 1024-2047 in 4 banks */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_planar,    1024, 64 )   /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_kickball )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,     0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, kickball_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_turbofrc )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, pspikes_charlayout,   256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb, 256, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0, pspikes_spritelayout, 512, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, pspikes_spritelayout, 768, 16 )
 GFXDECODE_END
@@ -1427,7 +1414,7 @@ static GFXDECODE_START( gfx_aerfboo2 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_wbbc97 )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, wbbc97_spritelayout, 1024, 64 ) /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
@@ -1489,7 +1476,7 @@ void aerofgt_state::pspikes(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1520,10 +1507,14 @@ void aerofgt_state::spikes91(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::spikes91_map);
 	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
 
-	/* + Z80 for sound */
+	Z80(config, m_audiocpu, 24000000/8); // ?
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::spikes91_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1541,12 +1532,12 @@ void aerofgt_state::spikes91(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
-	/* sound hardware */
-	/* the sound hardware is completely different on this:
-	    1x YM2151 (sound)(ic150)
-	    1x OKI M5205 (sound)(ic145)
-	    2x LM324N (sound)(ic152, ic153)
-	*/
+	SPEAKER(config, "mono").front_center();
+
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 24000000/8));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	// TODO: OKI M5205
 }
 
 void aerofgt_state::pspikesb(machine_config &config)
@@ -1616,7 +1607,7 @@ void aerofgt_state::kickball(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1664,7 +1655,7 @@ void aerofgt_state::pspikesc(machine_config &config)
 	//VSYSTEM_GGA(config, "gga", 0);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1706,12 +1697,12 @@ void aerofgt_state::karatblz(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1760,12 +1751,12 @@ void aerofgt_state::karatblzbl(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1822,8 +1813,8 @@ void aerofgt_state::spinlbrk(machine_config &config)
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::spinbrk_tile_callback), this); // rom lookup
-	m_spr_old[0]->set_pritype(1);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::spinbrk_tile_callback)); // rom lookup
+	m_spr_old[1]->set_pritype(1);
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1874,12 +1865,12 @@ void aerofgt_state::turbofrc(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1930,12 +1921,12 @@ void aerofgt_state::aerofgtb(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1965,7 +1956,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, XTAL(20'000'000)/4); /* 5 MHz verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);;
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::aerofgt_sound_portmap); /* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
@@ -1996,7 +1987,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_tile_callback), this);
+	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_tile_callback));
 	m_spr->set_gfx_region(2);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
@@ -2117,7 +2108,7 @@ void aerofgt_state::wbbc97(machine_config &config)
 	//VSYSTEM_GGA(config, "gga", 0);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -2159,10 +2150,10 @@ ROM_START( pspikes )
 	ROM_LOAD( "g7j",          0x000000, 0x80000, CRC(0b9e4739) SHA1(64b440a5026735aafe1a7cc2806fe0d78f4a6fba) )
 	ROM_LOAD( "g7l",          0x080000, 0x80000, CRC(943139ff) SHA1(59065f9c3b3a47159c5968df199bdcb1b4f51f29) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
@@ -2183,10 +2174,10 @@ ROM_START( pspikesk )
 	ROM_LOAD( "g7j",          0x000000, 0x80000, CRC(0b9e4739) SHA1(64b440a5026735aafe1a7cc2806fe0d78f4a6fba) )
 	ROM_LOAD( "g7l",          0x080000, 0x80000, CRC(943139ff) SHA1(59065f9c3b3a47159c5968df199bdcb1b4f51f29) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -2208,10 +2199,10 @@ ROM_START( pspikesu )
 	ROM_LOAD( "g7j",          0x000000, 0x80000, CRC(0b9e4739) SHA1(64b440a5026735aafe1a7cc2806fe0d78f4a6fba) )
 	ROM_LOAD( "g7l",          0x080000, 0x80000, CRC(943139ff) SHA1(59065f9c3b3a47159c5968df199bdcb1b4f51f29) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
 ROM_END
 
@@ -2229,10 +2220,10 @@ ROM_START( svolly91 )
 	ROM_LOAD( "g7j",          0x000000, 0x80000, CRC(0b9e4739) SHA1(64b440a5026735aafe1a7cc2806fe0d78f4a6fba) )
 	ROM_LOAD( "g7l",          0x080000, 0x80000, CRC(943139ff) SHA1(59065f9c3b3a47159c5968df199bdcb1b4f51f29) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
 ROM_END
 
@@ -2374,9 +2365,9 @@ ROM_START( spikes91 )
 	ROM_LOAD16_BYTE( "10.ic104",   0x00000, 0x10000, CRC(769ade77) SHA1(9cb581d02592c69f37d4b5a902d3515f40915ec4) )
 	ROM_LOAD16_BYTE( "9.ic103",    0x00001, 0x10000, CRC(201cb748) SHA1(f78d384e4e9c5996a278f76fb4d5f28812a27de5) )
 
-	ROM_REGION( 0x20000, "cpu1", 0 ) /* Z80 Sound CPU + M5205 Samples */
-	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) )
-	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 Sound CPU + M5205 Samples */
+	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) ) // matches svolleybl in rpunch.cpp
+	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) ) // 1ST AND 2ND HALF IDENTICAL, matches svolleybl in rpunch.cpp when halved
 
 	ROM_REGION( 0x1000, "user2", 0 ) /* ? */
 	ROM_LOAD( "ep910pc.ic7",   0x00000, 0x884, CRC(e7a3913a) SHA1(6f18f55ecdc94a416baecd16fe7c6698b1ec9d87) )
@@ -2403,9 +2394,9 @@ ROM_START( spikes91b ) // todo, check how this differs, only 1 of the 68k pair a
 	ROM_LOAD16_BYTE( "10.ic104",    0x00000, 0x8000, CRC(b6fe4e57) SHA1(6b62936ff9d0f39fd02c3db488d53bc035c2272d) ) // sldh
 	ROM_LOAD16_BYTE( "9.ic103",     0x00001, 0x8000, CRC(5479ed35) SHA1(ca26289318352901841fcdf26d9b43e797ac39b6) ) // sldh
 
-	ROM_REGION( 0x20000, "cpu1", 0 ) /* Z80 Sound CPU + M5205 Samples */
-	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) )
-	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 Sound CPU + M5205 Samples */
+	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) ) // matches svolleybl in rpunch.cpp
+	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) ) // 1ST AND 2ND HALF IDENTICAL, matches svolleybl in rpunch.cpp when halved
 
 	ROM_REGION( 0x1000, "user2", 0 ) /* ? */
 	ROM_LOAD( "ep910pc.ic7",   0x00000, 0x884, CRC(e7a3913a) SHA1(6f18f55ecdc94a416baecd16fe7c6698b1ec9d87) )
@@ -2477,9 +2468,9 @@ ROM_START( spinlbrk )
 	ROM_LOAD16_BYTE( "ic13",    0x00001, 0x10000, CRC(97025bf4) SHA1(0519f0c94f3d417bf8ff0124a3a137035a4013dc) )
 	/* 20000-23fff empty space, filled in vh_startup */
 
-	/* no "ymsnd.deltat" */
+	/* no "ymsnd:adpcmb" */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
 	ROM_LOAD( "ic163",        0x080000, 0x80000, CRC(e6621dfb) SHA1(85ee77c4720b7eb20ecf293c16b3105c8dcb1114) ) //FIRST AND SECOND HALF IDENTICAL
 
@@ -2527,9 +2518,9 @@ ROM_START( spinlbrku )
 	ROM_LOAD16_BYTE( "ic13",    0x00001, 0x10000, CRC(97025bf4) SHA1(0519f0c94f3d417bf8ff0124a3a137035a4013dc) )
 	/* 20000-23fff empty space, filled in vh_startup */
 
-	/* no "ymsnd.deltat" */
+	/* no "ymsnd:adpcmb" */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
 	ROM_LOAD( "ic163",        0x080000, 0x80000, CRC(e6621dfb) SHA1(85ee77c4720b7eb20ecf293c16b3105c8dcb1114) ) //FIRST AND SECOND HALF IDENTICAL
 
@@ -2577,9 +2568,9 @@ ROM_START( spinlbrkj )
 	ROM_LOAD16_BYTE( "ic13",    0x00001, 0x10000, CRC(97025bf4) SHA1(0519f0c94f3d417bf8ff0124a3a137035a4013dc) )
 	/* 20000-23fff empty space, filled in vh_startup */
 
-	/* no "ymsnd.deltat" */
+	/* no "ymsnd:adpcmb" */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
 	ROM_LOAD( "ic163",        0x080000, 0x80000, CRC(e6621dfb) SHA1(85ee77c4720b7eb20ecf293c16b3105c8dcb1114) ) //FIRST AND SECOND HALF IDENTICAL
 
@@ -2593,6 +2584,65 @@ ROM_START( spinlbrkj )
 ROM_END
 
 /*
+Dumper's notes:
+-board has sockets and jumpers for ROMS not fitted on the final board.
+-early version has game crashing bugs and other glitches.
+-the mask ROMs match the regular version.
+-RAM & ROM check is not shown.
+-region warning seems much slower to pass.
+-attract mode starts in the jungle, old dumps all start with a building with fences
+*/
+
+ROM_START( spinlbrkup ) // the labels are official Video System without numbering and handwritten on top
+	ROM_REGION( 0x60000, "maincpu", 0 ) // these differ quite a lot
+	ROM_LOAD16_BYTE( "spb0-e.ic98",  0x00000, 0x10000, CRC(421eaff2) SHA1(e0ffd37fa8361a544cd7a66da0b802367adccd7d) )
+	ROM_LOAD16_BYTE( "spb0-o.ic104", 0x00001, 0x10000, CRC(9576d508) SHA1(426a630a7a5bdaa0316391582b25274a6d923c79) )
+	ROM_LOAD16_BYTE( "sbp1-e.ic93",  0x20000, 0x10000, CRC(d6444d1e) SHA1(2aa80b8cf3c44e4a583b57f4a6cc673d984f3a05) )
+	ROM_LOAD16_BYTE( "sbp1-o.ic94",  0x20001, 0x10000, CRC(a3f7bd8e) SHA1(dc393b4911c6acadb97b0380db15ae5c972a3505) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "11-14-15.00.music.ic117", 0x00000, 0x08000, CRC(6b8c8f09) SHA1(d57699ea82f5e48ed8c9909a040c2fa6f988f8b3) ) // this differs quite a lot
+	ROM_LOAD( "11-14.m.bank.ic118",      0x08000, 0x10000, CRC(a1ed270b) SHA1(f513baed1f7efda3d843982e1fa4857f058e8595) ) // relatively minor differences
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
+	ROM_LOAD( "ic9",          0x080000, 0x80000, CRC(e071f674) SHA1(b6d98d7fcc28516d937d8c655d07305515be8a20) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "ic17",         0x000000, 0x80000, CRC(a63d5a55) SHA1(a942651a206a2abe4f60f0717e1d5d8e89b993d4) )
+	ROM_LOAD( "ic11",         0x080000, 0x80000, CRC(7dcc913d) SHA1(527bae5020581d1ac322ea25c8e0994d54bbc051) )
+	ROM_LOAD( "ic16",         0x100000, 0x80000, CRC(0d84af7f) SHA1(07356ee61c84c4c4ccb49c8dfe8c468990580041) ) //FIRST AND SECOND HALF IDENTICAL
+
+	ROM_REGION( 0x100000, "spritegfx", 0 )
+	ROM_LOAD( "ic12",         0x000000, 0x80000, CRC(d63fac4e) SHA1(bb96d2e41334d136b9208dbe7e88a45e3bbc6542) )
+	ROM_LOAD( "ic18",         0x080000, 0x80000, CRC(5a60444b) SHA1(62c418aedd1087dac82dcb44830cce00278103dd) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 )
+	ROM_LOAD( "ic14",         0x000000, 0x80000, CRC(1befd0f3) SHA1(7ab6fb5bf814ef3ae9a306a0d32d1078ee594461) )
+	ROM_LOAD( "ic20",         0x080000, 0x80000, CRC(c2f84a61) SHA1(1dce538ced54a61c43ed25e1d71b5ac1c8935cc5) )
+	ROM_LOAD( "ic35",         0x100000, 0x80000, CRC(eba8e1a3) SHA1(976ef30437df9aba6fa6d5cd11728476f34eb05b) )
+	ROM_LOAD( "ic40",         0x180000, 0x80000, CRC(5ef5aa7e) SHA1(8d4b0f2348c536c6781c8ba25722301673aca289) )
+
+	ROM_REGION16_BE( 0x24000, "sprlookuprom", 0 ) // very minor differences
+	ROM_LOAD16_BYTE( "sbm-1-18.ic19",    0x00000, 0x10000, CRC(e155357f) SHA1(05864c5d281df52adce4e959c65260ee3f585988) )
+	ROM_LOAD16_BYTE( "sbm-0-18.ic13",    0x00001, 0x10000, CRC(16b79e45) SHA1(9f89381bc3949adf1317836fc35608c0982a4b46) )
+
+	// no "ymsnd:adpcmb"
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
+	ROM_LOAD( "ic163",        0x080000, 0x80000, CRC(e6621dfb) SHA1(85ee77c4720b7eb20ecf293c16b3105c8dcb1114) ) //FIRST AND SECOND HALF IDENTICAL
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "epl16p8bp.ic133", 0x0000, 0x0107, NO_DUMP ) // read protected
+	ROM_LOAD( "epl16p8bp.ic127", 0x0200, 0x0107, NO_DUMP ) // read protected
+	ROM_LOAD( "epl16p8bp.ic99",  0x0400, 0x0107, NO_DUMP ) // read protected
+	ROM_LOAD( "epl16p8bp.ic100", 0x0600, 0x0107, NO_DUMP ) // read protected
+	ROM_LOAD( "gal16v8a.ic95",   0x0800, 0x0117, NO_DUMP ) // read protected
+	ROM_LOAD( "gal16v8a.ic114",  0x0a00, 0x0117, NO_DUMP ) // read protected
+ROM_END
+
+/*
 
 Karate Blazers regions known to exist but not dumped or not verified:
 
@@ -2601,7 +2651,6 @@ Toushin Blazers title:
    V2 with 1V1   "original" non Tecmo verions??
 
 Karate Blazers title
-  1V2 with V1   US??
   3V2 with 1V1  Euro, current parent??
 
 Note: It's unknown what if any difference there is between V1 and 1V1 ROMs
@@ -2631,10 +2680,10 @@ ROM_START( karatblz )
 	ROM_LOAD( "u59.ghb", 0x000000, 0x80000, CRC(158c9cde) SHA1(a2c1b404d40e6c2627691f5c7a3f63484bd5d2de) )
 	ROM_LOAD( "ghd.u60", 0x080000, 0x80000, CRC(73180ae3) SHA1(e4eaf6693826d9e72032d0a0e25938a23ab7d792) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8", 0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(5795e884) SHA1(a4178497ad0a1e60ceb87612b218d77b36d2a11b) )
 ROM_END
 
@@ -2662,10 +2711,10 @@ ROM_START( karatblzt ) // Karate Blazers, Tecmo license
 	ROM_LOAD( "u59.ghb", 0x000000, 0x80000, CRC(158c9cde) SHA1(a2c1b404d40e6c2627691f5c7a3f63484bd5d2de) )
 	ROM_LOAD( "ghd.u60", 0x080000, 0x80000, CRC(73180ae3) SHA1(e4eaf6693826d9e72032d0a0e25938a23ab7d792) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8", 0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(5795e884) SHA1(a4178497ad0a1e60ceb87612b218d77b36d2a11b) )
 ROM_END
 
@@ -2693,16 +2742,16 @@ ROM_START( karatblza )
 	ROM_LOAD( "u59.ghb", 0x000000, 0x80000, CRC(158c9cde) SHA1(a2c1b404d40e6c2627691f5c7a3f63484bd5d2de) )
 	ROM_LOAD( "ghd.u60", 0x080000, 0x80000, CRC(73180ae3) SHA1(e4eaf6693826d9e72032d0a0e25938a23ab7d792) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8", 0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(5795e884) SHA1(a4178497ad0a1e60ceb87612b218d77b36d2a11b) )
 ROM_END
 
 ROM_START( karatblzu )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "v2.u14",  0x00000, 0x40000, CRC(202e6220) SHA1(2605511a0574cbc39fdf3d8ae27a0aa9b43345fb) ) // need to verify correct "region" stamped number
+	ROM_LOAD16_WORD_SWAP( "1v2.u14", 0x00000, 0x40000, CRC(202e6220) SHA1(2605511a0574cbc39fdf3d8ae27a0aa9b43345fb) ) // 1 stamped on chip with VideoSystem logo V and 2
 	ROM_LOAD16_WORD_SWAP( "v1.u15",  0x40000, 0x40000, CRC(d16ee21b) SHA1(d454cdf22b72a537b9d7ae73deb8136a4f09da47) ) // chip with VideoSystem logo V and 1
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
@@ -2724,10 +2773,10 @@ ROM_START( karatblzu )
 	ROM_LOAD( "u59.ghb", 0x000000, 0x80000, CRC(158c9cde) SHA1(a2c1b404d40e6c2627691f5c7a3f63484bd5d2de) )
 	ROM_LOAD( "ghd.u60", 0x080000, 0x80000, CRC(73180ae3) SHA1(e4eaf6693826d9e72032d0a0e25938a23ab7d792) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8", 0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(5795e884) SHA1(a4178497ad0a1e60ceb87612b218d77b36d2a11b) )
 ROM_END
 
@@ -2755,10 +2804,10 @@ ROM_START( karatblzj ) // Toushin Blazers, Tecmo license
 	ROM_LOAD( "u59.ghb", 0x000000, 0x80000, CRC(158c9cde) SHA1(a2c1b404d40e6c2627691f5c7a3f63484bd5d2de) )
 	ROM_LOAD( "ghd.u60", 0x080000, 0x80000, CRC(73180ae3) SHA1(e4eaf6693826d9e72032d0a0e25938a23ab7d792) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8", 0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(5795e884) SHA1(a4178497ad0a1e60ceb87612b218d77b36d2a11b) )
 ROM_END
 
@@ -2845,10 +2894,10 @@ ROM_START( turbofrc ) // World version with no copyright notice
 	ROM_LOAD( "lh532a52.u134", 0x000000, 0x40000, CRC(3c725a48) SHA1(120e62b2ef911bfa0f8a1468966ff70fab2d7582) ) // mask rom
 	ROM_LOAD( "lh532a51.u135", 0x040000, 0x40000, CRC(95c63559) SHA1(5f77bd22dce1ac4aa7291e5c3c3c358e2f066e8c) ) // mask rom
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "lh532h74.u180", 0x00000, 0x40000, CRC(a3d43254) SHA1(d0225d6cf9299ecc39d8e3f64f48cf80d554a67f) ) // mask rom
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "lh538o7j.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
 ROM_END
 
@@ -2879,10 +2928,10 @@ ROM_START( turbofrco ) // World version with no copyright notice
 	ROM_LOAD( "lh532a52.u134", 0x000000, 0x40000, CRC(3c725a48) SHA1(120e62b2ef911bfa0f8a1468966ff70fab2d7582) ) // mask rom
 	ROM_LOAD( "lh532a51.u135", 0x040000, 0x40000, CRC(95c63559) SHA1(5f77bd22dce1ac4aa7291e5c3c3c358e2f066e8c) ) // mask rom
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "lh532h74.u180", 0x00000, 0x40000, CRC(a3d43254) SHA1(d0225d6cf9299ecc39d8e3f64f48cf80d554a67f) ) // mask rom
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "lh538o7j.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
 ROM_END
 
@@ -2913,10 +2962,10 @@ ROM_START( turbofrcu ) // US version
 	ROM_LOAD( "lh532a52.u134", 0x000000, 0x40000, CRC(3c725a48) SHA1(120e62b2ef911bfa0f8a1468966ff70fab2d7582) ) // mask rom
 	ROM_LOAD( "lh532a51.u135", 0x040000, 0x40000, CRC(95c63559) SHA1(5f77bd22dce1ac4aa7291e5c3c3c358e2f066e8c) ) // mask rom
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "lh532h74.u180", 0x00000, 0x40000, CRC(a3d43254) SHA1(d0225d6cf9299ecc39d8e3f64f48cf80d554a67f) ) // mask rom
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "lh538o7j.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
 ROM_END
 
@@ -2935,10 +2984,10 @@ ROM_START( aerofgt )
 	ROM_LOAD( "538a53.u9",    0x000000, 0x100000, CRC(630d8e0b) SHA1(5a0c252ccd53c5199a695909d25ecb4e53dc15b9) )
 	ROM_LOAD( "534g8f.u18",   0x200000, 0x080000, CRC(76ce0926) SHA1(5ef4cec215d4dd600d8fcd1bd9a4c09081d59e33) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-06",     0x000000, 0x100000, CRC(cdbbdb1d) SHA1(067c816545f246ff1fd4c821d70df1e7eb47938c) )
 ROM_END
 
@@ -2964,10 +3013,10 @@ ROM_START( aerofgtb )
 	ROM_LOAD16_WORD_SWAP( "g27",          0x000000, 0x40000, CRC(4d89cbc8) SHA1(93f248f3dc1a15c32d14a147b37d5d660d0e4337) )
 	ROM_LOAD16_WORD_SWAP( "g26",          0x040000, 0x40000, CRC(8072c1d2) SHA1(c14634f5f2686cf616f415d9ea4a0c6490054beb) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-06",     0x000000, 0x100000, CRC(cdbbdb1d) SHA1(067c816545f246ff1fd4c821d70df1e7eb47938c) )
 ROM_END
 
@@ -2994,10 +3043,10 @@ ROM_START( aerofgtc )
 	ROM_LOAD16_WORD_SWAP( "g27",          0x000000, 0x40000, CRC(4d89cbc8) SHA1(93f248f3dc1a15c32d14a147b37d5d660d0e4337) )
 	ROM_LOAD16_WORD_SWAP( "g26",          0x040000, 0x40000, CRC(8072c1d2) SHA1(c14634f5f2686cf616f415d9ea4a0c6490054beb) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-06",     0x000000, 0x100000, CRC(cdbbdb1d) SHA1(067c816545f246ff1fd4c821d70df1e7eb47938c) )
 ROM_END
 
@@ -3024,10 +3073,10 @@ ROM_START( sonicwi )
 	ROM_LOAD16_WORD_SWAP( "g27",          0x000000, 0x40000, CRC(4d89cbc8) SHA1(93f248f3dc1a15c32d14a147b37d5d660d0e4337) )
 	ROM_LOAD16_WORD_SWAP( "g26",          0x040000, 0x40000, CRC(8072c1d2) SHA1(c14634f5f2686cf616f415d9ea4a0c6490054beb) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-06",     0x000000, 0x100000, CRC(cdbbdb1d) SHA1(067c816545f246ff1fd4c821d70df1e7eb47938c) )
 ROM_END
 
@@ -3150,9 +3199,10 @@ void aerofgt_state::init_kickball()
 	}
 }
 
-GAME( 1990, spinlbrk,  0,         spinlbrk,   spinlbrk,  aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrku, spinlbrk,  spinlbrk,   spinlbrku, aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrkj, spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrk,   0,         spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrku,  spinlbrk,  spinlbrk,   spinlbrku, aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrkj,  spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrkup, spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // build date 11/15 15:00
 
 GAME( 1991, pspikes,   0,         pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, pspikesk,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
@@ -3160,8 +3210,8 @@ GAME( 1991, pspikesu,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_in
 GAME( 1991, svolly91,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Super Volley '91 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, pspikesb,  pspikes,   pspikesb,   pspikesb,  aerofgt_state, empty_init,      ROT0,   "bootleg",             "Power Spikes (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, pspikesba, pspikes,   pspikesb,   pspikesb,  aerofgt_state, empty_init,      ROT0,   "bootleg (Playmark?)", "Power Spikes (Italian bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91,  pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91b, pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
+GAME( 1991, spikes91,  pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // OKI M5205 not hooked up yet
+GAME( 1991, spikes91b, pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // OKI M5205 not hooked up yet
 GAME( 1991, pspikesc,  pspikes,   pspikesc,   pspikesc,  aerofgt_state, empty_init,      ROT0,   "bootleg",             "Power Spikes (China)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, wbbc97,    0,         wbbc97,     wbbc97,    aerofgt_state, empty_init,      ROT0,   "Comad",               "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
 GAME( 1998, kickball,  0,         kickball,   pspikes,   aerofgt_state, init_kickball,   ROT0,   "Seoung Youn",    "Kick Ball", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // based on power spikes codebase, wrong priorities

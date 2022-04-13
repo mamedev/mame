@@ -199,6 +199,7 @@
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */
 #define CPU_CLOCK       MASTER_CLOCK           /* guess */
@@ -220,12 +221,12 @@ public:
 	void jubileep(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
-	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
+	void jubileep_videoram_w(offs_t offset, uint8_t data);
+	void jubileep_colorram_w(offs_t offset, uint8_t data);
+	void unk_w(offs_t offset, uint8_t data);
+	uint8_t mux_port_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	void jubileep_cru_map(address_map &map);
 	void jubileep_map(address_map &map);
@@ -233,12 +234,12 @@ private:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-	uint8_t mux_sel;
-	uint8_t muxlamps;
+	uint8_t mux_sel = 0;
+	uint8_t muxlamps = 0;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<9> m_lamps;
@@ -249,13 +250,13 @@ private:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(jubilee_state::jubileep_videoram_w)
+void jubilee_state::jubileep_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jubilee_state::jubileep_colorram_w)
+void jubilee_state::jubileep_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -274,17 +275,17 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 	int bank = (attr & 0x03);
 	int color = 0;  /* fixed colors: one rom for each R, G and B. */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 
 void jubilee_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jubilee_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scrolldx(8, 0); /* guess */
 }
 
-uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -332,7 +333,7 @@ void jubilee_state::jubileep_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(jubilee_state::unk_w)
+void jubilee_state::unk_w(offs_t offset, uint8_t data)
 {
 /*  In particular, the interrupt from above must be cleared. We assume that
     this is done by one of the output lines, and from the 32 lines that are
@@ -565,7 +566,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	logerror("CRU write to address %04x: %d\n", offset<<1, data & 1);
 }
 
-READ8_MEMBER(jubilee_state::mux_port_r)
+uint8_t jubilee_state::mux_port_r(offs_t offset)
 {
 	switch( mux_sel )
 	{
@@ -687,7 +688,6 @@ void jubilee_state::jubileep(machine_config &config)
 	screen.set_size(32*8, 32*8);                         /* (47+1*8, 38+1*8) from CRTC settings */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);   /* (32*8, 32*8) from CRTC settings */
 	screen.set_screen_update(FUNC(jubilee_state::screen_update_jubileep));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_jubileep);
 	PALETTE(config, "palette").set_entries(8);

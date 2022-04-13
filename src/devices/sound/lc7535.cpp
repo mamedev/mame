@@ -41,6 +41,7 @@ DEFINE_DEVICE_TYPE(LC7535, lc7535_device, "lc7535", "Sanyo LC7535")
 lc7535_device::lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, LC7535, tag, owner, clock),
 	m_select_cb(*this),
+	m_volume_cb(*this),
 	m_addr(0), m_data(0),
 	m_count(0),
 	m_ce(0), m_di(0), m_clk(0)
@@ -55,7 +56,7 @@ void lc7535_device::device_start()
 {
 	// resolve callbacks
 	m_select_cb.resolve();
-	m_volume_cb.bind_relative_to(*owner());
+	m_volume_cb.resolve();
 
 	// register for save states
 	save_item(NAME(m_addr));

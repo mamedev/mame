@@ -13,6 +13,7 @@
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
 
@@ -37,15 +38,15 @@ public:
 	void init_poolshrk();
 
 private:
-	DECLARE_WRITE8_MEMBER(da_latch_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(irq_reset_r);
-	DECLARE_WRITE8_MEMBER(scratch_sound_w);
-	DECLARE_WRITE8_MEMBER(score_sound_w);
-	DECLARE_WRITE8_MEMBER(click_sound_w);
-	DECLARE_WRITE8_MEMBER(bump_sound_w);
+	void da_latch_w(uint8_t data);
+	void led_w(offs_t offset, uint8_t data);
+	void watchdog_w(offs_t offset, uint8_t data);
+	uint8_t input_r(offs_t offset);
+	uint8_t irq_reset_r();
+	void scratch_sound_w(offs_t offset, uint8_t data);
+	void score_sound_w(uint8_t data);
+	void click_sound_w(uint8_t data);
+	void bump_sound_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -67,8 +68,8 @@ private:
 	required_shared_ptr<uint8_t> m_vpos_ram;
 	output_finder<2> m_leds;
 
-	tilemap_t* m_bg_tilemap;
-	int m_da_latch;
+	tilemap_t* m_bg_tilemap = nullptr;
+	int m_da_latch = 0;
 };
 
 

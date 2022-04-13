@@ -1,0 +1,795 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="c64_flop_orig" description="Commodore 64 original disks">
+
+	<!-- Games -->
+
+	<software name="aztecchl">
+		<description>Aztec Challenge</description>
+		<year>1983</year>
+		<publisher>Cosmi</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="aztec_challenge[cosmi_1983].g64" size="333744" crc="2268d7ae" sha1="b63aa4f59b7d43e37c3633199457b511d394f19c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barbaria">
+		<description>Barbarian: The Ultimate Warrior</description>
+		<year>1988</year>
+		<publisher>Melbourne House</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="barbarian[melbourne_house_1988].g64" size="333744" crc="db28e401" sha1="c8d6027dee3ddfab8adc5e352f201afb0c59d518"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basil" supported="no">
+		<description>Basil: The Great Mouse Detective</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="protection" value="cyan" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="basil_the_great_mouse_detective[gremlin_1987](cyan-early).g64" size="333744" crc="bbf79c1f" sha1="984df9a8d9ed08408bc93de1265771309b5f1367"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bionicco">
+		<description>Bionic Commando</description>
+		<year>1988</year>
+		<publisher>Capcom</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="bionic_commando[capcom_1988].g64" size="333744" crc="b216989d" sha1="f1feb2dcb2af5af56051187ffda495c92e967302"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bldrdash">
+		<description>Boulder Dash</description>
+		<year>1984</year>
+		<publisher>First Star</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="boulder_dash[first_star_1984](pal).g64" size="333744" crc="659ad749" sha1="1529cfb26ce01e36869219c874e81b5f7e6cdc49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbsb">
+		<description>Bounty Bob Strikes Back! (v1.2)</description>
+		<year>1985</year>
+		<publisher>Big Five</publisher>
+		<info name="protection" value="halftrack" />
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<!-- will not load if disk is not write protected -->
+			<feature name="read_only" value="true"/>
+			<dataarea name="flop" size="208212">
+				<rom name="bbsb.g64" size="208212" crc="69456d8c" sha1="26801eda258f748aa6f6c45df8af7f7cbb2857d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buddy64">
+		<description>Buddy System 64 v10</description>
+		<year>1992</year>
+		<publisher>Chris Miller</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="buddy64.g64" size="333744" crc="986d5e3d" sha1="3aeedd8e4e9c7a9412144fa5f7930e3492b79d33" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commando">
+		<description>Commando</description>
+		<year>1985</year>
+		<publisher>Elite</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="commando[elite_1985](pal).g64" size="333744" crc="e5679217" sha1="05be404ba9d6b1685935a44291420014f1c3959f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dotc" supported="no">
+		<description>Defender of the Crown</description>
+		<year>1987</year>
+		<publisher>Cinemaware</publisher>
+		<info name="protection" value="vmaxv2" />
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="defenderofthecrown_s0.g64" size="279582" crc="5a6dc7c0" sha1="495674468ad6277aa586eb46b6291f4a49b9e020"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="324752">
+				<rom name="defenderofthecrown_s1.g64" size="324752" crc="0104c012" sha1="070c34ee59e44cdd2dda9fd6166d66373ca1bdc2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grnberet">
+		<description>Green Beret</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="green_beret[ocean_1986].g64" size="333744" crc="d5795cde" sha1="889393ba8d3238e8cb53640c85eb7153570a0be0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmiss">
+		<description>Impossible Mission</description>
+		<year>1984</year>
+		<publisher>Epyx</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="impossible_mission[epyx_1984](pal).g64" size="333744" crc="d6cad3cd" sha1="23796cca5d5bbe4f90751aa52085cb69ce67f29f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_22">
+		<description>INPUT 64 10/86</description>
+		<year>1986</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="286164">
+				<rom name="input64-8610.g64" size="286164" crc="52043960" sha1="5c260d975237c6aad87d3629b277f59044f620ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_23">
+		<description>INPUT 64 11/86</description>
+		<year>1986</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8611.g64" size="278234" crc="6edbc714" sha1="aa2f3672d3bf1d09b650f194f5760fdbfe8ced43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_24">
+		<description>INPUT 64 12/86</description>
+		<year>1986</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8612.g64" size="278234" crc="5fe6a642" sha1="b70829b2df402ff6f3c0632d4532eaf1314300d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_25">
+		<description>INPUT 64 1/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8701.g64" size="278234" crc="062cb4c1" sha1="9b06a7d9f934e06574392e9f1b15435ba3a29bbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_26">
+		<description>INPUT 64 2/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8702.g64" size="278234" crc="619587c5" sha1="3f685030f76e9b23658d055d853f33741d46e289"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_27">
+		<description>INPUT 64 3/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8703.g64" size="278234" crc="39c40893" sha1="22f30dbb1e4b554a6348865a6fea15f99454d067"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_28">
+		<description>INPUT 64 4/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8704.g64" size="278234" crc="dfcb814a" sha1="dcad7168be21651c91138c825f00b8b55de67f59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_29">
+		<description>INPUT 64 5/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8705.g64" size="278234" crc="94cc9dd3" sha1="0220b14fa8641c18a81129c944e06ba95c35d944"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_30">
+		<description>INPUT 64 6/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8706.g64" size="278234" crc="3d0408dc" sha1="e16288ce00593e14ae345a28bb18593b56e80a8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_31">
+		<description>INPUT 64 7/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8707.g64" size="278234" crc="ce9dfa34" sha1="cd87c56d27b6525a1c4cdf1ac5620652758e9da9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_32">
+		<description>INPUT 64 8/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="309954">
+				<rom name="input64-8708.g64" size="309954" crc="a7c91709" sha1="793ef78e2a883f133c7fe8356adf8ab3d41317e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_33">
+		<description>INPUT 64 9/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8709.g64" size="278234" crc="53e02004" sha1="91ac02ea88af2b1b9ef4384a7a5b717bc0fa317e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_34">
+		<description>INPUT 64 10/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8710.g64" size="278234" crc="b58a1b2f" sha1="79894cb1eb1ec9e436888526d8cb46ccfa51a64d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_35">
+		<description>INPUT 64 11/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8711.g64" size="278234" crc="3c74fccd" sha1="66ade471b5cce456f22d8cda27a0fe519066460e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_36">
+		<description>INPUT 64 12/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8712.g64" size="278234" crc="0d6b298e" sha1="a828ef7ec17a2a5b88edd6887287b6656c4a8357"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_37">
+		<description>INPUT 64 1/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8801.g64" size="278234" crc="baa0e5c2" sha1="618a477d5815544cf4b8200c0530fd9b23eb5e8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_38">
+		<description>INPUT 64 2/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8802.g64" size="278234" crc="1fc4034a" sha1="ac1e5d3f8eeca92cce1d1a3c5c9ef8c42878e7a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_39">
+		<description>INPUT 64 3/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8803.g64" size="278234" crc="aea916ea" sha1="74abb9e94943a66480a973887aa361a1ee5d16c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_40">
+		<description>INPUT 64 4/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8804.g64" size="278234" crc="c9c23646" sha1="57e9f8da108e826e16d6c0ab05378c242bd32295"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_41">
+		<description>INPUT 64 5/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8805.g64" size="278234" crc="834972e9" sha1="83e03773b5bbc1ab30c6f3c1bbe36aee4601835f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_42">
+		<description>INPUT 64 6/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8806.g64" size="278234" crc="4f2307fb" sha1="8df019bb6c958174a5925747911eb9d4d4ed9f5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_43">
+		<description>INPUT 64 7/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8807.g64" size="278234" crc="4e3e15d0" sha1="58c1b92a2c4cba660652d78eb07f7fec279c9acf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_44">
+		<description>INPUT 64 8/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8808.g64" size="278234" crc="c5c6d47b" sha1="9767a58084eb610f56ebab98f7dce619bdba3c4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_45">
+		<description>INPUT 64 9/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8809a.g64" size="278234" crc="350212d1" sha1="7a65b37f96e0f81cff8dd0c366a1c58e8b588fff"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="input64-8809b.d64" size="174848" crc="7df0066f" sha1="4d88288f8fda66231793349cdf6950c581c15dfc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_46">
+		<description>INPUT 64 10/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8810.g64" size="278234" crc="6d872aea" sha1="718afd2e5db020696344c3301bc8980c703839cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_47">
+		<description>INPUT 64 11/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8811.g64" size="278234" crc="7a674053" sha1="bdfee677d32061b8bf62fa31fdfcb9b10cfa12a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_48">
+		<description>INPUT 64 12/88</description>
+		<year>1988</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8812a.g64" size="278234" crc="400f9ebe" sha1="ec6465bc4b26238a45ed7fcd0180017210a6bf45"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="input64-8812b.d64" size="174848" crc="e12e79b9" sha1="25cbb824437ade1c981434577c281542a7198835"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jacknpr" supported="no">
+		<description>Jack the Nipper</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="video" value="PAL" />
+		<info name="protection" value="cyan" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miamivic" supported="no">
+		<description>Miami Vice</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<info name="video" value="PAL" />
+		<info name="protection" value="cyan" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="miami_vice[ocean_1986](cyan1)(pal).g64" size="333744" crc="b3556e0c" sha1="ed1d290baf83f0ad31424a4e11f4f2aef8515dbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mule">
+		<description>M.U.L.E.</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="protection" value="fat" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="mule[ea_1983].g64" size="333744" crc="9c5adfdd" sha1="8b894a5be8ef2e0cfded4e20cf0c7e6c9c68e369"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo2" supported="no">
+		<description>Rambo: First Blood Part II</description>
+		<year>1985</year>
+		<publisher>Ocean</publisher>
+		<info name="video" value="PAL" />
+		<info name="protection" value="xrom" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rambo[ocean_1985](pal).g64" size="333744" crc="e9e186dd" sha1="ce2c06cf341c629e75ae6e47887f2aab635f9340"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo2n" cloneof="rambo2" supported="no">
+		<description>Rambo: First Blood Part II (NTSC)</description>
+		<year>1985</year>
+		<publisher>Thunder Mountain</publisher>
+		<info name="video" value="NTSC" />
+		<info name="protection" value="signature" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_first_blood_part_ii[thunder_mtn_1985](ntsc).g64" size="333744" crc="f1e99142" sha1="8263d6eecd017468d505891b3546b80f7cc4989f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo3" supported="no">
+		<description>Rambo III</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+		<info name="video" value="PAL" />
+		<info name="protection" value="ocean" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_iii_s1[ocean_1988](pal).g64" size="333744" crc="6f2ea02d" sha1="69ff02b03e4e4b5957b12fba4ea0a4e06172727e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_iii_s2[ocean_1988](pal).g64" size="333744" crc="82f55d97" sha1="e55bfb001feb2f09c33ec57a1400c659bf1e2e7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo3n" cloneof="rambo3" supported="no">
+		<description>Rambo III (NTSC)</description>
+		<year>1989</year>
+		<publisher>Taito</publisher>
+		<info name="video" value="NTSC" />
+		<info name="protection" value="vmax3" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_iii[taito_1989](vmax3).g64" size="333744" crc="8e34cbc7" sha1="a83030d9a46a5a7a33b9cfedf6adf0b778f7262b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sthassle">
+		<description>Street Hassle</description>
+		<year>1987</year>
+		<publisher>Melbourne House</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="street_hassle[melbourne_house_1987](pal).g64" size="333744" crc="92c15c93" sha1="a1bc536294ae1d36ffde644798dc25cd1d514c93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spoker">
+		<description>Strip Poker</description>
+		<year>1984</year>
+		<publisher>Artworx</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="strip_poker[artworx_1984](pal).g64" size="333744" crc="4a66bc83" sha1="68d66ee9f357c3964303e94c625ff9587f5df7c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="terramex" supported="no">
+		<description>Terramex</description>
+		<year>1988</year>
+		<publisher>Grand Slam</publisher>
+		<info name="video" value="PAL" />
+		<info name="protection" value="custom_dos" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="333744">
+				<rom name="terramex_s1[grandslam_1988].g64" size="333744" crc="cc38f968" sha1="985eb00dcda7cb2499120b1801ca18df5cf2827e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="333744">
+				<rom name="terramex_s2[grandslam_1988].g64" size="333744" crc="78408a59" sha1="f23fdea7292a95b076cc0a23c81e2e214e42129a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toutrun" supported="no">
+		<description>Turbo Out Run</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="video" value="PAL" />
+		<info name="protection" value="sload" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="333744">
+				<rom name="turbo_out_run_s1[us_gold_1989](pal).g64" size="333744" crc="3ab79f79" sha1="47ac893f0c53f10c455fb10b4221fc1c51b0f3c5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="333744">
+				<rom name="turbo_out_run_s2[us_gold_1989](pal).g64" size="333744" crc="fda9e331" sha1="56da1a1a2d88bf63fda41096fc9d839e0cc5877b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Compilations -->
+
+	<software name="gameset">
+		<description>Game Set and Match</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s1[ocean_1987].g64" size="333744" crc="ca84a09e" sha1="fdd4246db837d74ef136d2c72895c04915384146"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s2[ocean_1987].g64" size="333744" crc="85ba1688" sha1="b41e55eca81067d4499e0201454ccbaaec70b672"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s3[ocean_1987].g64" size="333744" crc="c8053e01" sha1="7ae5d1225a8613ea70e8dd2c8d5a3008e3ea4c13"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s4[ocean_1987].g64" size="333744" crc="d775e8bb" sha1="6df6c56ff5202544a1075d7966e52b046da2dcaf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Applications -->
+
+	<software name="basickaa">
+		<description>BASIC-kääntäjä (Fin)</description>
+		<year>1984</year>
+		<publisher>Amersoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="basic-kaantaja[amersoft_1984].g64" size="333744" crc="68ffade3" sha1="951e63d05c0911abcc247ff8327b7239fc0c9e86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprbas64">
+		<description>SuperBase 64 (Fin)</description>
+		<year>1983</year>
+		<publisher>Precision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="superbase_64[precision_1983](finnish).g64" size="333744" crc="83eb8f50" sha1="2cff03d08f15f8d66fad9d20233fc4d87f71395c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="elktrgld">
+		<!-- Flippy disk, a800 version on side B -->
+		<description>Elektra Glide</description>
+		<year>1986</year>
+		<publisher>Mastertronic</publisher>
+		<info name="serial" value="64712" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="elektraglide.g64" size="287512" crc="ccb7b7c1" sha1="699bc6111a0f3c26d61c63f7b23eeb7462649461"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koalapnt">
+		<!-- Flippy disk, a800 version on side B -->
+		<description>KoalaPainter (Light Pen)</description>
+		<year>1984</year>
+		<publisher>Koala Technologies</publisher>
+		<info name="serial" value="00626-001" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="koalapainter.g64" size="287512" crc="56f06305" sha1="a4bb43f8f46c3e733e4a2ab7f6cdfa8483159df5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Test/Demo disks -->
+
+	<!-- MIDI -->
+
+	<software name="midi8p">
+		<description>MIDI 8+</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:midipp"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="midi8+.g64" size="333744" crc="294921f7" sha1="376f7b91feb7709f9169aa1a9f297d3678e2d97a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cagedart">
+		<description>Caged Artist's FB and DX Editor/Librarian</description>
+		<year>198?</year>
+		<publisher>Dr T</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="caged artist_1.g64" size="333744" crc="a2e05594" sha1="4950d59682683af49098e7665f81341e4c7843d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lxp1edit">
+		<description>Lexicon LXP-1 Visual Editor/Librarian</description>
+		<year>1988</year>
+		<publisher>Leaping Lizards</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="lexedit.g64" size="333744" crc="b6468192" sha1="15ef75d08111fb1a992f866313b346186f0a77cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superseq">
+		<description>Super Sequencer</description>
+		<year>1984</year>
+		<publisher>Sonus</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="sonusseq.g64" size="333744" crc="4b2d949a" sha1="824c0058c567e25fb4bc19b1f7a75352c4e19459"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

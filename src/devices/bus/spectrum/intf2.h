@@ -40,7 +40,7 @@ protected:
 
 private:
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(spectrum_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_exp_line3;

@@ -101,14 +101,14 @@ private:
 	uint32_t m_port[8];
 
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
-	DECLARE_WRITE8_MEMBER( s3c2410_nand_command_w );
-	DECLARE_WRITE8_MEMBER( s3c2410_nand_address_w );
-	DECLARE_READ8_MEMBER( s3c2410_nand_data_r );
-	DECLARE_WRITE8_MEMBER( s3c2410_nand_data_w );
-	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
-	DECLARE_READ32_MEMBER(s3c2410_core_pin_r);
-	DECLARE_READ32_MEMBER(s3c2410_adc_data_r );
+	void s3c2410_nand_command_w(uint8_t data);
+	void s3c2410_nand_address_w(uint8_t data);
+	uint8_t s3c2410_nand_data_r();
+	void s3c2410_nand_data_w(uint8_t data);
+	uint32_t s3c2410_gpio_port_r(offs_t offset);
+	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
+	uint32_t s3c2410_core_pin_r(offs_t offset);
+	uint32_t s3c2410_adc_data_r(offs_t offset);
 
 	void map(address_map &map);
 };
@@ -133,33 +133,33 @@ inline void palmz22_state::verboselog(int n_level, const char *s_fmt, ...)
 
 // NAND
 
-WRITE8_MEMBER( palmz22_state::s3c2410_nand_command_w )
+void palmz22_state::s3c2410_nand_command_w(uint8_t data)
 {
 	verboselog(9, "s3c2410_nand_command_w %02X\n", data);
 	m_nand->command_w(data);
 }
 
-WRITE8_MEMBER( palmz22_state::s3c2410_nand_address_w )
+void palmz22_state::s3c2410_nand_address_w(uint8_t data)
 {
 	verboselog(9, "s3c2410_nand_address_w %02X\n", data);
 	m_nand->address_w(data);
 }
 
-READ8_MEMBER( palmz22_state::s3c2410_nand_data_r )
+uint8_t palmz22_state::s3c2410_nand_data_r()
 {
 	uint8_t data = m_nand->data_r();
 	verboselog(9, "s3c2410_nand_data_r %02X\n", data);
 	return data;
 }
 
-WRITE8_MEMBER( palmz22_state::s3c2410_nand_data_w )
+void palmz22_state::s3c2410_nand_data_w(uint8_t data)
 {
 	verboselog(9, "s3c2410_nand_data_w %02X\n", data);
 	m_nand->data_w(data);
 }
 
 /*
-READ8_MEMBER( palmz22_state::s3c2410_nand_busy_r )
+uint8_t palmz22_state::s3c2410_nand_busy_r()
 {
     uint8_t data = m_nand->is_busy();
     verboselog(9, "s3c2410_nand_busy_r %02X\n", data);
@@ -169,7 +169,7 @@ READ8_MEMBER( palmz22_state::s3c2410_nand_busy_r )
 
 // GPIO
 
-READ32_MEMBER(palmz22_state::s3c2410_gpio_port_r)
+uint32_t palmz22_state::s3c2410_gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_port[offset];
 	switch (offset)
@@ -195,7 +195,7 @@ READ32_MEMBER(palmz22_state::s3c2410_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(palmz22_state::s3c2410_gpio_port_w)
+void palmz22_state::s3c2410_gpio_port_w(offs_t offset, uint32_t data)
 {
 	m_port[offset] = data;
 }
@@ -214,7 +214,7 @@ NCON : NAND flash memory address step selection
 
 */
 
-READ32_MEMBER(palmz22_state::s3c2410_core_pin_r)
+uint32_t palmz22_state::s3c2410_core_pin_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
@@ -228,7 +228,7 @@ READ32_MEMBER(palmz22_state::s3c2410_core_pin_r)
 
 // ADC
 
-READ32_MEMBER(palmz22_state::s3c2410_adc_data_r )
+uint32_t palmz22_state::s3c2410_adc_data_r(offs_t offset)
 {
 	uint32_t data = 0;
 	switch (offset)
@@ -246,13 +246,13 @@ READ32_MEMBER(palmz22_state::s3c2410_adc_data_r )
 
 INPUT_CHANGED_MEMBER(palmz22_state::input_changed)
 {
-	if (((int)(uintptr_t)param) == 0)
+	if (param == 0)
 	{
 		m_s3c2410->s3c2410_touch_screen( (newval & 0x01) ? 1 : 0);
 	}
 	else
 	{
-		m_s3c2410->s3c2410_request_eint( (uintptr_t)param - 1);
+		m_s3c2410->s3c2410_request_eint( param - 1);
 	}
 }
 
@@ -321,20 +321,20 @@ void palmz22_state::palmz22(machine_config &config)
 
 static INPUT_PORTS_START( palmz22 )
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)0) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 0) PORT_PLAYER(2)
 	PORT_START( "PENX" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_NAME("Pen X") PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1, 0, 0) PORT_KEYDELTA(30) PORT_PLAYER(2)
 	PORT_START( "PENY" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_NAME("Pen Y") PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_KEYDELTA(30) PORT_PLAYER(2)
 	PORT_START( "PORT-F" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)1) PORT_NAME("Power")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)1) PORT_NAME("Contacts")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)1) PORT_NAME("Calendar")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)1) PORT_NAME("Center")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, (void *)1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1) PORT_NAME("Power")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1) PORT_NAME("Contacts")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1) PORT_NAME("Calendar")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1) PORT_NAME("Center")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, input_changed, 1)
 INPUT_PORTS_END
 
 /***************************************************************************

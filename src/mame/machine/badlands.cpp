@@ -13,7 +13,7 @@
 ***************************************************************/
 
 #include "emu.h"
-#include "machine/atarigen.h"
+#include "machine/gen_latch.h"
 #include "video/atarimo.h"
 #include "screen.h"
 
@@ -24,8 +24,7 @@
  *************************************/
 
 // TODO: doesn't link?
-#ifdef UNUSED_FUNCTION
-const gfx_layout badlands_molayout =
+[[maybe_unused]] static const gfx_layout badlands_molayout =
 {
 	16,8,
 	RGN_FRAC(1,1),
@@ -35,7 +34,6 @@ const gfx_layout badlands_molayout =
 	{ 0*8, 8*8, 16*8, 24*8, 32*8, 40*8, 48*8, 56*8 },
 	64*8
 };
-#endif
 
 /*************************************
  *
@@ -69,8 +67,8 @@ INPUT_PORTS_START( badlands )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")   /* response buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")    /* command buffer full */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r)   /* response buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)    /* command buffer full */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
 
 	PORT_START("PEDALS")    /* fake for pedals */

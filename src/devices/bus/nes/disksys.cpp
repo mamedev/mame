@@ -13,8 +13,6 @@
 
  TODO:
    - convert floppy drive + fds format to modern code!
-   - add sound bits
-   - stop IRQ from using HOLD_LINE
 
  ***********************************************************************************************************/
 
@@ -23,6 +21,7 @@
 #include "disksys.h"
 #include "imagedev/flopdrv.h"
 #include "formats/nes_dsk.h"
+#include "speaker.h"
 
 #ifdef NES_PCB_DEBUG
 	#define VERBOSE 1
@@ -53,7 +52,12 @@ static const floppy_interface nes_floppy_interface =
 
 void nes_disksys_device::device_add_mconfig(machine_config &config)
 {
-	LEGACY_FLOPPY(config, FLOPPY_0, 0, &nes_floppy_interface);
+	LEGACY_FLOPPY(config, m_disk, 0, &nes_floppy_interface);
+
+	SPEAKER(config, "addon").front_center(); // connected to motherboard
+
+	RP2C33_SOUND(config, m_sound, XTAL(21'477'272)/12); // clock driven from motherboard?
+	m_sound->add_route(0, "addon", 0.2);
 }
 
 
@@ -101,9 +105,10 @@ nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char
 	: nes_nrom_device(mconfig, NES_DISKSYS, tag, owner, clock)
 	, m_2c33_rom(*this, "drive")
 	, m_fds_data(nullptr)
-	, m_disk(*this, FLOPPY_0)
+	, m_disk(*this, "floppy0")
+	, m_sound(*this, "rp2c33snd")
 	, irq_timer(nullptr)
-	, m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_transfer(0), m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0)
+	, m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_repeat(0), m_irq_transfer(0), m_disk_reg_enable(0), m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0)
 	, m_fds_sides(0), m_fds_last_side(0), m_fds_count(0)
 {
 }
@@ -127,9 +132,11 @@ void nes_disksys_device::device_start()
 	save_item(NAME(m_read_mode));
 	save_item(NAME(m_drive_ready));
 	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_repeat));
 	save_item(NAME(m_irq_transfer));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
+	save_item(NAME(m_disk_reg_enable));
 
 	save_item(NAME(m_fds_last_side));
 	save_item(NAME(m_fds_count));
@@ -152,7 +159,9 @@ void nes_disksys_device::pcb_reset()
 	m_irq_count = 0;
 	m_irq_count_latch = 0;
 	m_irq_enable = 0;
+	m_irq_repeat = 0;
 	m_irq_transfer = 0;
+	m_disk_reg_enable = 0;
 
 	m_fds_count = 0;
 	m_fds_last_side = 0;
@@ -205,8 +214,12 @@ uint8_t nes_disksys_device::read_m(offs_t offset)
 
 void nes_disksys_device::hblank_irq(int scanline, int vblank, int blanked)
 {
+	// FIXME: This looks like a gross hack that ties the disk byte transfer IRQ to the PPU. Seriously?
 	if (m_irq_transfer)
-		hold_irq_line();
+	{
+		set_irq_line(ASSERT_LINE);
+		m_fds_status0 |= 0x02;
+	}
 }
 
 void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
@@ -216,6 +229,8 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 	if (offset >= 0x20 && offset < 0x60)
 	{
 		// wavetable
+		if (m_sound_en)
+			m_sound->wave_w(offset - 0x20, data);
 	}
 
 	switch (offset)
@@ -227,18 +242,35 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 			m_irq_count_latch = (m_irq_count_latch & 0x00ff) | (data << 8);
 			break;
 		case 0x02:
-			m_irq_count = m_irq_count_latch;
-			m_irq_enable = BIT(data, 1);
+			if (m_disk_reg_enable)
+			{
+				m_irq_repeat = BIT(data, 0);
+				m_irq_enable = BIT(data, 1);
+				if (m_irq_enable)
+					m_irq_count = m_irq_count_latch;
+				else
+					set_irq_line(CLEAR_LINE);
+			}
 			break;
 		case 0x03:
 			// bit0 - Enable disk I/O registers
 			// bit1 - Enable sound I/O registers
+			m_disk_reg_enable = BIT(data, 0);
+			if (!m_disk_reg_enable)
+			{
+				m_irq_enable = 0;
+				set_irq_line(CLEAR_LINE);
+			}
+			m_sound_en = BIT(data, 1);
 			break;
 		case 0x04:
 			// write data out to disk
 			// TEST!
 			if (m_fds_data && m_fds_current_side && !m_read_mode)
 				m_fds_data[(m_fds_current_side - 1) * 65500 + m_fds_head_position++] = data;
+			// clear the byte transfer flag
+			m_fds_status0 &= ~0x02;
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x05:
 			// $4025 - FDS Control
@@ -277,6 +309,8 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 		case 0x68:  // $4088 - Mod table write
 		case 0x69:  // $4089 - Wave write / master volume
 		case 0x6a:  // $408a - Envelope speed
+			if (m_sound_en)
+				m_sound->write(offset - 0x60, data);
 			break;
 	}
 }
@@ -284,11 +318,13 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 uint8_t nes_disksys_device::read_ex(offs_t offset)
 {
 	LOG_MMC(("Famicom Disk System read_ex, offset: %04x\n", offset));
-	uint8_t ret;
+	uint8_t ret = 0x00;
 
 	if (offset >= 0x20 && offset < 0x60)
 	{
 		// wavetable
+		if (m_sound_en)
+			ret = m_sound->wave_r(offset - 0x20);
 	}
 
 	switch (offset)
@@ -303,8 +339,9 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 			// bit6 - End of Head (1 when disk head is on the most inner track)
 			// bit7 - Disk Data Read/Write Enable (1 when disk is readable/writable)
 			ret = m_fds_status0 | 0x80;
-			// clear the disk IRQ detect flag
-			m_fds_status0 &= ~0x01;
+			// clear the disk IRQ detect and byte transfer flags
+			m_fds_status0 &= ~0x03;
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x11:
 			// $4031 - data latch
@@ -323,6 +360,9 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 			}
 			else
 				ret = 0;
+			// clear the byte transfer flag
+			m_fds_status0 &= ~0x02;
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x12:
 			// $4032 - disk status 1:
@@ -351,6 +391,9 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 			break;
 		case 0x70:  // $4090 - Volume gain - write through $4080
 		case 0x72:  // $4092 - Mod gain - read through $4084
+			if (m_sound_en)
+				ret = m_sound->read(offset - 0x60);
+			break;
 		default:
 			ret = 0x00;
 			break;
@@ -363,19 +406,21 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nes_disksys_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_disksys_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
-		if (m_irq_enable && m_irq_count)
+		if (m_irq_enable)
 		{
-			m_irq_count--;
-			if (!m_irq_count)
+			if (m_irq_count)
+				m_irq_count--;
+			else
 			{
-				hold_irq_line();
-				m_irq_enable = 0;
+				set_irq_line(ASSERT_LINE);
+				m_irq_count = m_irq_count_latch;
+				if (!m_irq_repeat)
+					m_irq_enable = 0;
 				m_fds_status0 |= 0x01;
-				m_irq_count_latch = 0;  // used in Kaettekita Mario Bros
 			}
 		}
 	}
@@ -393,7 +438,7 @@ void nes_disksys_device::disk_flip_side()
 	if (m_fds_current_side == 0)
 		popmessage("No disk inserted.");
 	else
-		popmessage("Disk set to side %d", m_fds_current_side);
+		popmessage("Disk set to side %c", m_fds_current_side+0x40);
 }
 
 

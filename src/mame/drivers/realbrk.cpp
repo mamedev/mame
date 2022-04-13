@@ -36,7 +36,7 @@ Notes:
 
 To Do:
 
-- Priorities (e.g during the intro, there are two black bands in the backround
+- Priorities (e.g during the intro, there are two black bands in the background
   that should obscure sprites).
 - Sometimes sprites are shrunk to end up overlapping the background image
   in the tilemaps, but they are a few pixels off
@@ -47,15 +47,15 @@ To Do:
 #include "includes/realbrk.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 
 
 /* Read 4 ten bit dip switches */
-READ16_MEMBER(realbrk_state::realbrk_dsw_r)
+u16 realbrk_state::realbrk_dsw_r()
 {
-	uint16_t sel = ~m_dsw_select[0];
+	const u16 sel = ~m_dsw_select[0];
 	if (sel & 0x01) return  (m_dsw_io[0]->read() & 0x00ff) << 8;      // DSW1 low bits
 	if (sel & 0x02) return  (m_dsw_io[1]->read() & 0x00ff) << 8;      // DSW2 low bits
 	if (sel & 0x04) return  (m_dsw_io[2]->read() & 0x00ff) << 8;      // DSW3 low bits
@@ -70,7 +70,7 @@ READ16_MEMBER(realbrk_state::realbrk_dsw_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(realbrk_state::pkgnsh_input_r)
+u16 realbrk_state::pkgnsh_input_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -88,9 +88,9 @@ READ16_MEMBER(realbrk_state::pkgnsh_input_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(realbrk_state::pkgnshdx_input_r)
+u16 realbrk_state::pkgnshdx_input_r(offs_t offset)
 {
-	uint16_t sel = ~m_dsw_select[0];
+	const u16 sel = ~m_dsw_select[0];
 
 	switch(offset)
 	{
@@ -122,7 +122,7 @@ READ16_MEMBER(realbrk_state::pkgnshdx_input_r)
 }
 
 
-READ16_MEMBER(realbrk_state::backup_ram_r)
+u16 realbrk_state::backup_ram_r(offs_t offset)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
@@ -133,7 +133,7 @@ READ16_MEMBER(realbrk_state::backup_ram_r)
 }
 
 
-READ16_MEMBER(realbrk_state::backup_ram_dx_r)
+u16 realbrk_state::backup_ram_dx_r(offs_t offset)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
@@ -143,13 +143,13 @@ READ16_MEMBER(realbrk_state::backup_ram_dx_r)
 		return m_backup_ram[offset];
 }
 
-WRITE16_MEMBER(realbrk_state::backup_ram_w)
+void realbrk_state::backup_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_backup_ram[offset]);
 }
 
 template<int Layer>
-WRITE16_MEMBER(realbrk_state::vram_w)
+void realbrk_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset/2);
@@ -170,8 +170,9 @@ void realbrk_state::base_mem(address_map &map)
 	map(0x600000, 0x601fff).ram().w(FUNC(realbrk_state::vram_w<0>)).share("vram_0");  // Background   (0)
 	map(0x602000, 0x603fff).ram().w(FUNC(realbrk_state::vram_w<1>)).share("vram_1");  // Background   (1)
 	map(0x604000, 0x604fff).ram().w(FUNC(realbrk_state::vram_2_w)).share("vram_2");  // Text         (2)
-	map(0x605000, 0x61ffff).ram();                                         //
+	map(0x605000, 0x605fff).ram();                                         //
 	map(0x606000, 0x60600f).ram().w(FUNC(realbrk_state::vregs_w)).share("vregs");    // Scroll + Video Regs
+	map(0x606010, 0x61ffff).ram();                                         //
 	map(0x800000, 0x800003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);   // YMZ280
 	map(0xfe0000, 0xfeffff).ram();                                         // RAM
 }
@@ -712,17 +713,6 @@ static const gfx_layout layout_8x8x4 =
 	8*8*4
 };
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{   STEP4(0,1)      },
-	{   1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4,9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4 },
-	{   STEP16(0,16*4)  },
-	16*16*4
-};
-
 static const gfx_layout layout_16x16x8 =
 {
 	16,16,
@@ -735,10 +725,10 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_realbrk )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
-	GFXDECODE_ENTRY( "gfx4", 0, layout_16x16x4,     0, 0x800    )   // [3] Sprites (16 colors)
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,         0, 0x80     )   // [0] Backgrounds
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,           0, 0x800    )   // [1] Text
+	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,         0, 0x80     )   // [2] Sprites (256 colors)
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x4_packed_lsb, 0, 0x800    )   // [3] Sprites (16 colors)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_dai2kaku )
@@ -794,8 +784,8 @@ void realbrk_state::realbrk(machine_config &config)
 	ymz.add_route(1, "rspeaker", 0.50);
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
 
 void realbrk_state::pkgnsh(machine_config &config)

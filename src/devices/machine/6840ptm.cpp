@@ -38,8 +38,15 @@
 #include "emu.h"
 #include "6840ptm.h"
 
-//#define VERBOSE 1
-//#define LOG_OUTPUT_STREAM std::cout
+#define LOG_COUNTERS    (1 << 1)
+#define LOG_STATUS      (1 << 2)
+#define LOG_CONTROL     (1 << 3)
+#define LOG_RESETS      (1 << 4)
+#define LOG_TIMEOUTS    (1 << 5)
+#define LOG_IRQS        (1 << 6)
+#define LOG_ALL         (LOG_COUNTERS | LOG_STATUS | LOG_CONTROL | LOG_RESETS | LOG_TIMEOUTS | LOG_IRQS)
+
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 
@@ -73,7 +80,7 @@ DEFINE_DEVICE_TYPE(PTM6840, ptm6840_device, "ptm6840", "MC6840 PTM")
 ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PTM6840, tag, owner, clock)
 	, m_external_clock{ 0.0, 0.0, 0.0 }
-	, m_out_cb{*this, *this, *this}
+	, m_out_cb(*this)
 	, m_irq_cb(*this)
 {
 }
@@ -85,9 +92,7 @@ ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, d
 void ptm6840_device::device_start()
 {
 	// resolve callbacks
-	m_out_cb[0].resolve_safe();
-	m_out_cb[1].resolve_safe();
-	m_out_cb[2].resolve_safe();
+	m_out_cb.resolve_all_safe();
 	m_irq_cb.resolve_safe();
 
 	m_timer[0] = timer_alloc(0);
@@ -151,12 +156,17 @@ void ptm6840_device::device_reset()
 	}
 }
 
+void ptm6840_device::device_resolve_objects()
+{
+	for (int i = 0; i < 3; i++)
+		m_gate[i]  = 0;
+}
 
 //-------------------------------------------------
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void ptm6840_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ptm6840_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	timeout(id);
 }
@@ -276,6 +286,11 @@ void ptm6840_device::update_interrupts()
 					((m_status_reg & TIMER2_IRQ) && (m_control_reg[1] & INTERRUPT_EN)) ||
 					((m_status_reg & TIMER3_IRQ) && (m_control_reg[2] & INTERRUPT_EN));
 
+	LOGMASKED(LOG_IRQS, "%s: IRQ state update: %d, T1:%d, T1E:%d, T2:%d, T2E:%d, T3:%d, T3E:%d\n", machine().describe_context(), new_state,
+		(m_status_reg & TIMER1_IRQ) ? 1 : 0, (m_control_reg[0] & INTERRUPT_EN) ? 1 : 0,
+		(m_status_reg & TIMER2_IRQ) ? 1 : 0, (m_control_reg[1] & INTERRUPT_EN) ? 1 : 0,
+		(m_status_reg & TIMER3_IRQ) ? 1 : 0, (m_control_reg[2] & INTERRUPT_EN) ? 1 : 0);
+
 	if (new_state != m_irq)
 	{
 		m_irq = new_state;
@@ -306,7 +321,7 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 	// If there's no timer, return the count
 	if (!m_enabled[counter])
 	{
-		LOG("Timer #%d read counter: %d\n", counter + 1, m_counter[counter]);
+		LOGMASKED(LOG_COUNTERS, "Timer #%d read counter: %d\n", counter + 1, m_counter[counter]);
 		return m_counter[counter];
 	}
 
@@ -314,17 +329,18 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 	if (m_control_reg[counter] & INTERNAL_CLK_EN)
 	{
 		clk = static_cast<double>(clock());
-		LOG("Timer #%d internal clock freq %f \n", counter + 1, clk);
 	}
 	else
 	{
 		clk = m_external_clock[counter];
-		if (counter == 2)
-		{
-			clk /= m_t3_divisor;
-		}
-		LOG("Timer #%d external clock freq %f \n", counter + 1, clk);
 	}
+
+	if (counter == 2)
+	{
+		clk /= m_t3_divisor;
+	}
+	LOGMASKED(LOG_COUNTERS, "Timer #%d %s clock freq %f \n", counter + 1, (m_control_reg[counter] & INTERNAL_CLK_EN) ? "internal" : "external", clk);
+
 	// See how many are left
 	int remaining = (m_timer[counter]->remaining() * clk).as_double();
 
@@ -336,7 +352,8 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 		int lsb = remaining % divisor;
 		remaining = (msb << 8) | lsb;
 	}
-	LOG("Timer #%d read counter: %d\n", counter + 1, remaining);
+
+	LOGMASKED(LOG_COUNTERS, "Timer #%d read counter: %d\n", counter + 1, remaining);
 	return remaining;
 }
 
@@ -361,12 +378,12 @@ void ptm6840_device::reload_count(int idx)
 	if (m_control_reg[idx] & INTERNAL_CLK_EN)
 	{
 		clk = static_cast<double> (clock());
-		LOG("Timer #%d internal clock freq %f \n", idx + 1, clk);
+		LOGMASKED(LOG_COUNTERS, "Timer #%d internal clock freq %f \n", idx + 1, clk);
 	}
 	else
 	{
 		clk = m_external_clock[idx];
-		LOG("Timer #%d external clock freq %f \n", idx + 1, clk);
+		LOGMASKED(LOG_COUNTERS, "Timer #%d external clock freq %f \n", idx + 1, clk);
 	}
 
 	// Determine the number of clock periods before we expire
@@ -393,7 +410,7 @@ void ptm6840_device::reload_count(int idx)
 	}
 
 	// Set the timer
-	LOG("Timer #%d reload_count: clock = %f  count = %d\n", idx + 1, clk, count);
+	LOGMASKED(LOG_COUNTERS, "Timer #%d reload_count: clock = %f  count = %d\n", idx + 1, clk, count);
 
 	if (clk == 0.0)
 	{
@@ -409,7 +426,7 @@ void ptm6840_device::reload_count(int idx)
 			duration *= m_t3_divisor;
 		}
 
-		LOG("Timer #%d reload_count: output = %f\n", idx + 1, duration.as_double());
+		LOGMASKED(LOG_COUNTERS, "Timer #%d reload_count: output = %f\n", idx + 1, duration.as_double());
 
 		m_enabled[idx] = 1;
 		m_timer[idx]->adjust(duration);
@@ -437,7 +454,7 @@ uint8_t ptm6840_device::read(offs_t offset)
 
 		case PTM_6840_STATUS:
 		{
-			LOG("%s: Status read = %04X\n", machine().describe_context(), m_status_reg);
+			LOGMASKED(LOG_STATUS, "%s: Status read = %04X\n", machine().describe_context(), m_status_reg);
 			m_status_read_since_int |= m_status_reg & 0x07;
 			val = m_status_reg;
 			break;
@@ -459,7 +476,7 @@ uint8_t ptm6840_device::read(offs_t offset)
 
 			m_lsb_buffer = result & 0xff;
 
-			LOG("%s: Counter %d read = %04X\n", machine().describe_context(), idx + 1, result >> 8);
+			LOGMASKED(LOG_COUNTERS, "%s: Counter %d read = %04X\n", machine().describe_context(), idx + 1, result >> 8);
 			val = result >> 8;
 			break;
 		}
@@ -496,14 +513,14 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 		{
 			int idx = (offset == 1) ? 1 : (m_control_reg[1] & CR1_SELECT) ? 0 : 2;
 			uint8_t diffs = data ^ m_control_reg[idx];
-			m_t3_divisor = (m_control_reg[2] & T3_PRESCALE_EN) ? 8 : 1;
 			m_mode[idx] = (data >> 3) & 0x07;
 			m_control_reg[idx] = data;
+			m_t3_divisor = (m_control_reg[2] & T3_PRESCALE_EN) ? 8 : 1;
 
-			LOG("Control register #%d selected\n", idx + 1);
-			LOG("operation mode   = %s\n", opmode[m_mode[idx]]);
-			LOG("value            = %04X\n", m_control_reg[idx]);
-			LOG("t3divisor        = %d\n", m_t3_divisor);
+			LOGMASKED(LOG_CONTROL, "Control register #%d selected\n", idx + 1);
+			LOGMASKED(LOG_CONTROL, "operation mode   = %s\n", opmode[m_mode[idx]]);
+			LOGMASKED(LOG_CONTROL, "value            = %04X\n", m_control_reg[idx]);
+			LOGMASKED(LOG_CONTROL, "t3divisor        = %d\n", m_t3_divisor);
 
 			if (diffs & INTERRUPT_EN)
 				update_interrupts();
@@ -520,7 +537,7 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 				// Holding reset down
 				if (data & RESET_TIMERS)
 				{
-					LOG("Timer reset\n");
+					LOGMASKED(LOG_RESETS, "Timer reset\n");
 					for (int i = 0; i < 3; i++)
 					{
 						m_timer[i]->enable(false);
@@ -555,7 +572,7 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 		case PTM_6840_MSBBUF2:
 		case PTM_6840_MSBBUF3:
 		{
-			LOG("msbbuf%d = %02X\n", offset / 2, data);
+			LOGMASKED(LOG_COUNTERS, "msbbuf%d = %02X\n", offset / 2, data);
 			m_msb_buffer = data;
 			break;
 		}
@@ -578,7 +595,7 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 				reload_count(idx);
 			}
 
-			LOG("%s: Counter #%d latch = %04X\n", machine().describe_context(), idx + 1, m_latch[idx]);
+			LOGMASKED(LOG_COUNTERS, "%s: Counter #%d latch = %04X\n", machine().describe_context(), idx + 1, m_latch[idx]);
 			break;
 		}
 	}
@@ -591,7 +608,7 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 
 void ptm6840_device::timeout(int idx)
 {
-	LOG("**ptm6840 t%d timeout**\n", idx + 1);
+	LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d timeout**\n", idx + 1);
 
 	// Set the interrupt flag
 	m_status_reg |= (1 << idx);
@@ -616,7 +633,7 @@ void ptm6840_device::timeout(int idx)
 					m_output[idx] = m_output[idx] ^ 1;
 					m_out_cb[idx](m_output[idx]);
 				}
-				LOG("%6.6f: **ptm6840 t%d output %d **\n", machine().time().as_double(), idx + 1, m_output[idx]);
+				LOGMASKED(LOG_TIMEOUTS, "%6.6f: **ptm6840 t%d output %d **\n", machine().time().as_double(), idx + 1, m_output[idx]);
 				break;
 
 			case 4:
@@ -624,7 +641,7 @@ void ptm6840_device::timeout(int idx)
 				if (!m_fired[idx])
 				{
 					m_output[idx] = 1;
-					LOG("**ptm6840 t%d output %d **\n", idx + 1, m_output[idx]);
+					LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d output %d **\n", idx + 1, m_output[idx]);
 
 					m_out_cb[idx](m_output[idx]);
 

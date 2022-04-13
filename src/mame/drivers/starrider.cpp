@@ -20,7 +20,7 @@
  * D-9926 Image ROM board (ROM)
  * D-9930 Video Expander board (EXP)
  * D-9941 Sound System board (Sound)
- 
+
  C-9928 PIF:
  -----------
  Handles communication with the LaserDisc player.  Uses a 68029E CPU
@@ -138,6 +138,9 @@
  Q      ______------------____________------------____________------------______
  LATCH  ______________--------________________--------________________--------__
         __----__----__----__----__----__----__----__----__----__----__----__----
+ /SRL   --------____--------------------____--------------------____------------
+ 4MHz   ___---___---___---___---___---___---___---___---___---___---___---___---
+ 2MHz   ______------______------______------______------______------______------
 
  Video RAM consists of 6 4416 16k*4 DRAMs at U25, U26, U41, U42, U55 and
  U56.  The CPU and DMA chips have their addressing mangled by the 6349
@@ -170,10 +173,13 @@
 
  U14.6 (active low)        1111x xxxx xxxxxxxx xxxxxxxx
 
+ U15.13 (active high)      xxxxx xx11 xxxxxxxx xxxxxxxx (W)
+
  U18.8 (active low)        xxxxx xx10 xxxxxxxx xxxxxxxx (CPU access)
 
  U46.3   /1E               11110 xxxx xxxxxxxx xxxxxxxx
  U46.8   /1F               11111 xxxx xxxxxxxx xxxxxxxx
+ U46.11 (active low)       11110 xx01 xxxxxxxx xxxxxxxx
 
  U33.8 (active low)        11001011 xxxxxxxx      0xcb00-0xcbff
 
@@ -257,6 +263,7 @@
 #include "emupal.h"
 
 #include <algorithm>
+#include <iterator>
 #include <memory>
 
 
@@ -391,7 +398,7 @@ void sr_state::starrider(machine_config &config)
 	m_main_pia1->readpa_handler().set_ioport("IN2");
 	// CA1 is the /END SCREEN signal
 	// CA2 is the 4MS signal
-	m_main_pia1->writepb_handler().set(m_sound_pia1, FUNC(pia6821_device::write_portb));
+	m_main_pia1->writepb_handler().set(m_sound_pia1, FUNC(pia6821_device::portb_w));
 	m_main_pia1->cb2_handler().set(m_sound_pia1, FUNC(pia6821_device::ca1_w));
 	m_main_pia1->irqa_handler().set("main.irq", FUNC(input_merger_device::in_w<0>));
 	m_main_pia1->irqb_handler().set("main.irq", FUNC(input_merger_device::in_w<1>));
@@ -561,7 +568,9 @@ void sr_state::cpu_wd_w(u8 data)
 {
 	// U22 (74LS161) parallel load zero
 	if ((data & 0x3e) == 0x14)
-		/* TODO: watchdog reset */;
+	{
+		/* TODO: watchdog reset */
+	}
 }
 
 u8 sr_state::cpu_nvram_r(address_space &space, offs_t offset)
@@ -613,6 +622,8 @@ u16 sr_state::vgg_drams_map(u16 a) const
 
 void sr_state::vgg_drams_w(offs_t offset, u8 data)
 {
+	if (((m_main_page & 0x03) == 0x03) || (((m_main_page & 0x03) == 0x01) && ((m_vgg_image_page & 0x1f) == 0x1e)))
+		offset ^= 0x8000;
 	u16 const addr(vgg_drams_map(offset));
 	if ((offset & 0xc000) != 0xc000)
 		m_vgg_drams[addr] = data;
@@ -621,7 +632,7 @@ void sr_state::vgg_drams_w(offs_t offset, u8 data)
 void sr_state::vgg_impg_w(u8 data)
 {
 	// 6 bits latched by U13 (74LS173) but only 5 bits used
-	m_vgg_image_page = data & 0x1f;
+	m_vgg_image_page = data & 0x3f;
 }
 
 void sr_state::vgg_xlate_w(u8 data)
@@ -640,7 +651,7 @@ void sr_state::vgg_disable_w(u8 data)
 void sr_state::vgg_color_palet_w(u8 data)
 {
 	// all 8 bits latched by U94 (74LS374) but only 6 bits used
-	m_vgg_color_palet = data & 0x3f;
+	m_vgg_color_palet = data;
 }
 
 
@@ -745,7 +756,7 @@ void sr_state::sound_pia2_pa(u8 data)
 	m_sound_pia2_pa_out = data;
 	if (diff & ~m_sound_pia2_pb_in & 0x77U)
 	{
-		m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+		m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 		m_sound_pia2->ca1_w((0x07U == ((m_sound_pia2_pb_in | m_sound_pia2_pa_out) & 0x07U)) ? 1 : 0);
 		m_sound_pia2->ca2_w((0x70U == ((m_sound_pia2_pb_in | m_sound_pia2_pa_out) & 0x70U)) ? 1 : 0);
 	}
@@ -757,7 +768,7 @@ DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo0_ir)
 		m_sound_pia2_pb_in |= 0x08U;
 	else
 		m_sound_pia2_pb_in &= 0xf7U;
-	m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 }
 
 DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo1_ir)
@@ -766,7 +777,7 @@ DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo1_ir)
 		m_sound_pia2_pb_in |= 0x80U;
 	else
 		m_sound_pia2_pb_in &= 0x7fU;
-	m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 }
 
 template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_or)
@@ -777,7 +788,7 @@ template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_or)
 		m_sound_pia2_pb_in &= ~(u8(1) << (N + 4));
 	if (!BIT(m_sound_pia2_pa_out, N + 4))
 	{
-		m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+		m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 		m_sound_pia2->ca2_w((0x70U == ((m_sound_pia2_pb_in | m_sound_pia2_pa_out) & 0x70U)) ? 1 : 0);
 	}
 }
@@ -790,7 +801,7 @@ template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_flag)
 		m_sound_pia2_pb_in &= ~(u8(1) << N);
 	if (!BIT(m_sound_pia2_pa_out, N))
 	{
-		m_sound_pia2->write_portb(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+		m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 		m_sound_pia2->ca1_w((0x07U == ((m_sound_pia2_pb_in | m_sound_pia2_pa_out) & 0x07U)) ? 1 : 0);
 	}
 }
@@ -996,6 +1007,9 @@ ROM_START(starridr)
 
 	ROM_REGION(0x200, "horz", 0)
 	ROM_LOAD("u74.6349", 0x000, 0x200, CRC(362ec0f9) SHA1(0304a36d038436e9f5e817dfc2c40b6421953cad))
+
+	DISK_REGION( "ld_pr8210a" )
+	DISK_IMAGE_READONLY( "starrider", 0, NO_DUMP )
 ROM_END
 
 } // anonymous namespace

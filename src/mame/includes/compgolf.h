@@ -11,6 +11,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class compgolf_state : public driver_device
 {
@@ -25,27 +26,30 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void init_compgolf();
+	void compgolf(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_bg_ram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t        *m_text_tilemap;
-	tilemap_t        *m_bg_tilemap;
-	int            m_scrollx_lo;
-	int            m_scrollx_hi;
-	int            m_scrolly_lo;
-	int            m_scrolly_hi;
+	tilemap_t        *m_text_tilemap = nullptr;
+	tilemap_t        *m_bg_tilemap = nullptr;
+	int            m_scrollx_lo = 0;
+	int            m_scrollx_hi = 0;
+	int            m_scrolly_lo = 0;
+	int            m_scrolly_hi = 0;
 
 	/* misc */
-	int            m_bank;
-	DECLARE_WRITE8_MEMBER(compgolf_ctrl_w);
-	DECLARE_WRITE8_MEMBER(compgolf_video_w);
-	DECLARE_WRITE8_MEMBER(compgolf_back_w);
-	DECLARE_WRITE8_MEMBER(compgolf_scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(compgolf_scrolly_lo_w);
-	void init_compgolf();
+	int            m_bank = 0;
+	void compgolf_ctrl_w(uint8_t data);
+	void compgolf_video_w(offs_t offset, uint8_t data);
+	void compgolf_back_w(offs_t offset, uint8_t data);
+	void compgolf_scrollx_lo_w(uint8_t data);
+	void compgolf_scrolly_lo_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_text_info);
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILE_GET_INFO_MEMBER(get_back_info);
@@ -59,7 +63,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void compgolf(machine_config &config);
 	void compgolf_map(address_map &map);
 };
 

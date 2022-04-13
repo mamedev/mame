@@ -47,11 +47,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
 
 private:
-	DECLARE_WRITE16_MEMBER(ripribit_control_w);
-	DECLARE_WRITE16_MEMBER(cfarm_control_w);
-	DECLARE_WRITE16_MEMBER(cclownz_control_w);
-	DECLARE_READ16_MEMBER(lethalj_gun_r);
-	DECLARE_WRITE16_MEMBER(blitter_w);
+	void ripribit_control_w(uint16_t data);
+	void cfarm_control_w(uint16_t data);
+	void cclownz_control_w(uint16_t data);
+	uint16_t lethalj_gun_r(offs_t offset);
+	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void do_blit();
 	inline void get_crosshair_xy(int player, int *x, int *y);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
@@ -59,7 +59,7 @@ private:
 	void lethalj_map(address_map &map);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void video_start() override;
 
 	required_device<tms34010_device> m_maincpu;
@@ -75,14 +75,14 @@ private:
 	optional_ioport m_light1_y;
 	output_finder<3> m_lamps;
 
-	emu_timer *m_gen_ext1_int_timer;
-	uint16_t m_blitter_data[8];
+	emu_timer *m_gen_ext1_int_timer = nullptr;
+	uint16_t m_blitter_data[8]{};
 	std::unique_ptr<uint16_t[]> m_screenram;
-	uint8_t m_vispage;
-	int m_blitter_rows;
-	uint16_t m_gunx;
-	uint16_t m_guny;
-	uint8_t m_blank_palette;
+	uint8_t m_vispage = 0;
+	int m_blitter_rows = 0;
+	uint16_t m_gunx = 0;
+	uint16_t m_guny = 0;
+	uint8_t m_blank_palette = 0;
 };
 
 #endif // MAME_INCLUDES_LETHALJ_H

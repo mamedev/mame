@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="ekara_japan_s" description="Takara e-kara (Japan) S-xx / SCxxxx- series cartridges">
 	<!-- cartridges contain ROM only, the XaviX CPU and BIOS are in the base unit
 
@@ -10,7 +13,7 @@
 
 	SAI seems to be used for multiple different series here, need to look at the subtitles too
 
-	S-1   SC0001-     Hello Kitty Special
+	S-1  *SC0001-KTY  Hello Kitty Special
 	S-2   SC0002-SAI  SAI (series 3) Volume 1
 	S-3  *SC0003-     Kids' Challenge Volume 1
 	S-4  *SC0004-SAI  SAI (series 1) Volume 1
@@ -40,13 +43,25 @@
 	<!-- Japanese e-kara cartridges SC (Special?) series -->
 	<!-- these have unique presentation -->
 
+	<software name="sc0001">
+		<description>Hello Kitty Special (Japan) (SC0001-KTY)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="01.bin" size="0x100000" crc="0635e39f" sha1="bfe33b0de01e8618abfdd190abf752cee53a6403"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="sc0003">
 		<description>Kids' Challenge Volume 1 (Japan) (SC0003-xxx)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0003-.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0" offset="0" />
+				<rom name="sc0003-.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +72,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0004-sai.u1" size="0x100000" crc="c2a080da" sha1="6eb803bc8587308002f7f8a15b1928c8f726c192" offset="0" />
+				<rom name="sc0004-sai.u1" size="0x100000" crc="c2a080da" sha1="6eb803bc8587308002f7f8a15b1928c8f726c192"/>
 			</dataarea>
 		</part>
 	</software>
@@ -68,7 +83,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0005-sai.u1" size="0x100000" crc="f919b155" sha1="60fc9985d277422d4d64fb4f0cebf2732e2958aa" offset="0" />
+				<rom name="sc0005-sai.u1" size="0x100000" crc="f919b155" sha1="60fc9985d277422d4d64fb4f0cebf2732e2958aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +94,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0006-sai.u1" size="0x100000" crc="4bd8669e" sha1="e77d16ecead2a6c660fedcbca3a1e0e719648be4" offset="0" />
+				<rom name="sc0006-sai.u1" size="0x100000" crc="4bd8669e" sha1="e77d16ecead2a6c660fedcbca3a1e0e719648be4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -90,7 +105,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0009-sai.u1" size="0x100000" crc="61413fd5" sha1="47dad178faa99301009ae74554a39b15c01e0db2" offset="0" />
+				<rom name="sc0009-sai.u1" size="0x100000" crc="61413fd5" sha1="47dad178faa99301009ae74554a39b15c01e0db2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -101,7 +116,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="sc0010-hkw.u1" size="0x200000" crc="fd6dc588" sha1="fece06706399eb36f3e69f7693116c944fe890e7" offset="0" />
+				<rom name="sc0010-hkw.u1" size="0x200000" crc="fd6dc588" sha1="fece06706399eb36f3e69f7693116c944fe890e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +127,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0012-sai.u1" size="0x100000" crc="8b971664" sha1="5f748d3406dbe74ce06c68aa07bafa9e288d5b51" offset="0" />
+				<rom name="sc0012-sai.u1" size="0x100000" crc="8b971664" sha1="5f748d3406dbe74ce06c68aa07bafa9e288d5b51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -123,7 +138,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0018-sai.u1" size="0x100000" crc="23545417" sha1="64b84de483c6c5d1129826324b30580a189077ea" offset="0" />
+				<rom name="sc0018-sai.u1" size="0x100000" crc="23545417" sha1="64b84de483c6c5d1129826324b30580a189077ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -134,7 +149,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929" offset="0" />
+				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929"/>
 			</dataarea>
 		</part>
 	</software>
@@ -145,7 +160,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="sc0021-sai.u1" size="0x100000" crc="fbc77e6c" sha1="eee3c8a68807dbac62c8021f9c755d08076925e2" offset="0" />
+				<rom name="sc0021-sai.u1" size="0x100000" crc="fbc77e6c" sha1="eee3c8a68807dbac62c8021f9c755d08076925e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +171,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="sc0022-sai.u1" size="0x100000" crc="d631d890" sha1="a0953aa347c9ec152e64bc455fc360056c5c0807" offset="0" />
+				<rom name="sc0022-sai.u1" size="0x100000" crc="d631d890" sha1="a0953aa347c9ec152e64bc455fc360056c5c0807"/>
 			</dataarea>
 		</part>
 	</software>

@@ -7,6 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "smsctrl.h"
 
 // slot devices
@@ -38,7 +39,7 @@ DEFINE_DEVICE_TYPE(SMS_CONTROL_PORT, sms_control_port_device, "sms_control_port"
 //-------------------------------------------------
 
 device_sms_control_port_interface::device_sms_control_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+	: device_interface(device, "smsctrl")
 {
 	m_port = dynamic_cast<sms_control_port_device *>(device.owner());
 }
@@ -65,6 +66,7 @@ device_sms_control_port_interface::~device_sms_control_port_interface()
 sms_control_port_device::sms_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_CONTROL_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
+	m_screen(*this, finder_base::DUMMY_TAG),
 	m_device(nullptr),
 	m_th_pin_handler(*this)
 {

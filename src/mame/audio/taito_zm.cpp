@@ -85,23 +85,23 @@ void taito_zoom_device::device_reset()
 
 ***************************************************************************/
 
-READ8_MEMBER(taito_zoom_device::shared_ram_r)
+uint8_t taito_zoom_device::shared_ram_r(offs_t offset)
 {
 	return m_snd_shared_ram[offset];
 }
 
-WRITE8_MEMBER(taito_zoom_device::shared_ram_w)
+void taito_zoom_device::shared_ram_w(offs_t offset, uint8_t data)
 {
 	m_snd_shared_ram[offset] = data;
 }
 
 
-READ8_MEMBER(taito_zoom_device::tms_ctrl_r)
+uint8_t taito_zoom_device::tms_ctrl_r()
 {
 	return m_tms_ctrl;
 }
 
-WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
+void taito_zoom_device::tms_ctrl_w(uint8_t data)
 {
 	// According to the TMS57002 manual, reset should NOT be set low during the data transfer.
 	//m_tms57002->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
@@ -136,19 +136,19 @@ void taito_zoom_device::tms57002_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(taito_zoom_device::sound_irq_w)
+void taito_zoom_device::sound_irq_w(uint16_t data)
 {
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ16_MEMBER(taito_zoom_device::sound_irq_r)
+uint16_t taito_zoom_device::sound_irq_r()
 {
 	// reads this before writing irq, bit 0 = busy?
 	return 0;
 }
 
-WRITE16_MEMBER(taito_zoom_device::reg_data_w)
+void taito_zoom_device::reg_data_w(uint16_t data)
 {
 	switch (m_reg_address)
 	{
@@ -171,7 +171,7 @@ WRITE16_MEMBER(taito_zoom_device::reg_data_w)
 	}
 }
 
-WRITE16_MEMBER(taito_zoom_device::reg_address_w)
+void taito_zoom_device::reg_address_w(uint16_t data)
 {
 	m_reg_address = data & 0xff;
 }
@@ -191,7 +191,7 @@ void taito_zoom_device::device_add_mconfig(machine_config &config)
 	m_soundcpu->write_port<1>().set(FUNC(taito_zoom_device::tms_ctrl_w));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &taito_zoom_device::taitozoom_mn_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	TMS57002(config, m_tms57002, XTAL(25'000'000)/2);
 	//m_tms57002->empty_callback().set_inputline(m_soundcpu, MN10200_IRQ1, m_tms57002->empty_r()); /*.invert();*/

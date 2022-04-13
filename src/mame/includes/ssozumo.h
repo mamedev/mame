@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class ssozumo_state : public driver_device
 {
@@ -33,14 +34,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(colorram2_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void sound_nmi_mask_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void colorram2_w(offs_t offset, uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void scroll_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
@@ -65,10 +66,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_colorram2;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_sound_nmi_mask;
-	uint8_t m_color_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_sound_nmi_mask = 0;
+	uint8_t m_color_bank = 0;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

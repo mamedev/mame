@@ -32,7 +32,7 @@ void msx_slot_music_device::device_start()
 	}
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(FUNC(msx_slot_music_device::write_ym2413), this));
+	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(*this, FUNC(msx_slot_music_device::write_ym2413)));
 }
 
 

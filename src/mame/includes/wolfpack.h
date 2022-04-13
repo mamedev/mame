@@ -30,7 +30,7 @@ public:
 
 	void wolfpack(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	template <int Bit> DECLARE_READ_LINE_MEMBER(dial_r);
 
 private:
 	enum
@@ -38,39 +38,39 @@ private:
 		TIMER_PERIODIC
 	};
 
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(high_explo_w);
-	DECLARE_WRITE8_MEMBER(sonar_ping_w);
-	DECLARE_WRITE8_MEMBER(sirlat_w);
-	DECLARE_WRITE8_MEMBER(pt_sound_w);
-	DECLARE_WRITE8_MEMBER(launch_torpedo_w);
-	DECLARE_WRITE8_MEMBER(low_explo_w);
-	DECLARE_WRITE8_MEMBER(screw_cont_w);
-	DECLARE_WRITE8_MEMBER(lamp_flash_w);
-	DECLARE_WRITE8_MEMBER(warning_light_w);
-	DECLARE_WRITE8_MEMBER(audamp_w);
-	DECLARE_WRITE8_MEMBER(attract_w);
-	DECLARE_WRITE8_MEMBER(credit_w);
-	DECLARE_WRITE8_MEMBER(coldetres_w);
-	DECLARE_WRITE8_MEMBER(ship_size_w);
-	DECLARE_WRITE8_MEMBER(video_invert_w);
-	DECLARE_WRITE8_MEMBER(ship_reflect_w);
-	DECLARE_WRITE8_MEMBER(pt_pos_select_w);
-	DECLARE_WRITE8_MEMBER(pt_horz_w);
-	DECLARE_WRITE8_MEMBER(pt_pic_w);
-	DECLARE_WRITE8_MEMBER(ship_h_w);
-	DECLARE_WRITE8_MEMBER(torpedo_pic_w);
-	DECLARE_WRITE8_MEMBER(ship_h_precess_w);
-	DECLARE_WRITE8_MEMBER(ship_pic_w);
-	DECLARE_WRITE8_MEMBER(torpedo_h_w);
-	DECLARE_WRITE8_MEMBER(torpedo_v_w);
-	DECLARE_WRITE8_MEMBER(word_w);
-	DECLARE_WRITE8_MEMBER(start_speech_w);
+	uint8_t misc_r();
+	void high_explo_w(uint8_t data);
+	void sonar_ping_w(uint8_t data);
+	void sirlat_w(uint8_t data);
+	void pt_sound_w(uint8_t data);
+	void launch_torpedo_w(uint8_t data);
+	void low_explo_w(uint8_t data);
+	void screw_cont_w(uint8_t data);
+	void lamp_flash_w(uint8_t data);
+	void warning_light_w(uint8_t data);
+	void audamp_w(uint8_t data);
+	void attract_w(uint8_t data);
+	void credit_w(uint8_t data);
+	void coldetres_w(uint8_t data);
+	void ship_size_w(uint8_t data);
+	void video_invert_w(uint8_t data);
+	void ship_reflect_w(uint8_t data);
+	void pt_pos_select_w(uint8_t data);
+	void pt_horz_w(uint8_t data);
+	void pt_pic_w(uint8_t data);
+	void ship_h_w(uint8_t data);
+	void torpedo_pic_w(uint8_t data);
+	void ship_h_precess_w(uint8_t data);
+	void ship_pic_w(uint8_t data);
+	void torpedo_h_w(uint8_t data);
+	void torpedo_v_w(uint8_t data);
+	void word_w(uint8_t data);
+	void start_speech_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void wolfpack_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -92,23 +92,23 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<> m_led;
 
-	bool m_collision;
-	unsigned m_current_index;
-	uint8_t m_video_invert;
-	uint8_t m_ship_reflect;
-	uint8_t m_pt_pos_select;
-	uint8_t m_pt_horz;
-	uint8_t m_pt_pic;
-	uint8_t m_ship_h;
-	uint8_t m_torpedo_pic;
-	uint8_t m_ship_size;
-	uint8_t m_ship_h_precess;
-	uint8_t m_ship_pic;
-	uint8_t m_torpedo_h;
-	uint8_t m_torpedo_v;
+	bool m_collision = false;
+	unsigned m_current_index = 0;
+	uint8_t m_video_invert = 0;
+	uint8_t m_ship_reflect = 0;
+	uint8_t m_pt_pos_select = 0;
+	uint8_t m_pt_horz = 0;
+	uint8_t m_pt_pic = 0;
+	uint8_t m_ship_h = 0;
+	uint8_t m_torpedo_pic = 0;
+	uint8_t m_ship_size = 0;
+	uint8_t m_ship_h_precess = 0;
+	uint8_t m_ship_pic = 0;
+	uint8_t m_torpedo_h = 0;
+	uint8_t m_torpedo_v = 0;
 	std::unique_ptr<uint8_t[]> m_LFSR;
 	bitmap_ind16 m_helper;
-	emu_timer *m_periodic_timer;
+	emu_timer *m_periodic_timer = nullptr;
 };
 
 #endif // MAME_INCLUDES_WOLFPACK_H

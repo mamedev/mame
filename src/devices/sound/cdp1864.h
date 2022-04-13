@@ -93,17 +93,17 @@ public:
 
 	void set_chrominance(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }
 
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_READ8_MEMBER( dispoff_r );
+	uint8_t dispon_r();
+	uint8_t dispoff_r();
 
-	DECLARE_WRITE8_MEMBER( step_bgcolor_w );
-	DECLARE_WRITE8_MEMBER( tone_latch_w );
+	void step_bgcolor_w(uint8_t data);
+	void tone_latch_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( con_w );
-	DECLARE_WRITE_LINE_MEMBER( aoe_w );
-	DECLARE_WRITE_LINE_MEMBER( evs_w );
+	void con_w(int state);
+	void aoe_w(int state);
+	void evs_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -112,10 +112,10 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	enum
@@ -152,12 +152,12 @@ private:
 	int m_disp;                     // display on
 	int m_dmaout;                   // DMA request active
 	int m_bgcolor;                  // background color
-	int m_con;                      // color on
+	bool m_con;                     // color on
 
 	// sound state
 	int m_aoe;                      // audio on
 	int m_latch;                    // sound latch
-	int16_t m_signal;                 // current signal
+	stream_buffer::sample_t m_signal; // current signal
 	int m_incr;                     // initial wave state
 
 	// timers

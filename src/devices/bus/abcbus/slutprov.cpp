@@ -9,7 +9,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ABC_SLUTPROV, abc_slutprov_device, "slutprov", "Slutprov")
+DEFINE_DEVICE_TYPE(ABC_SLUTPROV, abc_slutprov_device, "abc_slutprov", "Slutprov")
 
 
 //-------------------------------------------------

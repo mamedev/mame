@@ -15,7 +15,6 @@
 
     TODO:
     - Understand what the 0x400000c reads on SH-2 really do.
-    - Remove SH-2 watchdog hack, if we ever bother about it ...
     - improve sound emulation
     - i8237 purpose is unknown (missing ROM for comms?).
     - verify zooming etc. our current algorithm is a bit ugly for text
@@ -101,6 +100,7 @@ SYSTEM-H1 CPU BD
 171-6651A
 837-10389
 837-11481 (sticker)
+833-11483 COOL RIDERS (sticker)
 |--------------------------------------------------------------|
 |                                                EPR-17662.IC12|
 |                                                              |
@@ -289,7 +289,7 @@ to the same bank as defined through A20.
 #include "machine/315_5649.h"
 #include "sound/scsp.h"
 #include "emupal.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -321,7 +321,7 @@ public:
 		m_workram_h(*this, "workrah"),
 		m_sound_dma(*this, "sound_dma"),
 		m_soundram(*this, "soundram%u", 1U),
-		m_rom(*this, "share1"),
+		m_rom(*this, "maincpu"),
 		m_compressedgfx(*this, "compressedgfx"),
 		m_io_config(*this, "CONFIG"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -359,7 +359,7 @@ public:
 	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint32_t> m_sound_dma;
 	required_shared_ptr_array<uint16_t, 2> m_soundram;
-	required_shared_ptr<uint32_t> m_rom;
+	required_region_ptr<uint32_t> m_rom;
 	required_region_ptr<uint8_t> m_compressedgfx;
 	required_ioport m_io_config;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -379,24 +379,22 @@ public:
 	uint32_t get_20bit_data(uint32_t romoffset, int _20bitwordnum);
 	uint16_t get_10bit_data(uint32_t romoffset, int _10bitwordnum);
 
-	DECLARE_READ32_MEMBER(sound_dma_r);
-	DECLARE_WRITE32_MEMBER(sound_dma_w);
-	DECLARE_READ32_MEMBER(unk_blit_r);
-	DECLARE_WRITE32_MEMBER(unk_blit_w);
-	DECLARE_WRITE32_MEMBER(blit_mode_w);
-	DECLARE_WRITE32_MEMBER(blit_data_w);
-	DECLARE_WRITE32_MEMBER(fb_mode_w);
-	DECLARE_WRITE32_MEMBER(fb_data_w);
+	uint32_t sound_dma_r(offs_t offset);
+	void sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t unk_blit_r(offs_t offset);
+	void unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void blit_mode_w(uint32_t data);
+	void blit_data_w(address_space &space, uint32_t data);
+	void fb_mode_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void fb_data_w(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE32_MEMBER(dma_w);
-	DECLARE_READ32_MEMBER(coolridr_hack2_r);
-	DECLARE_READ32_MEMBER(aquastge_hack_r);
-	template<int Chip> DECLARE_READ16_MEMBER(soundram_r);
-	template<int Chip> DECLARE_WRITE16_MEMBER(soundram_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Chip> uint16_t soundram_r(offs_t offset);
+	template<int Chip> void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lamps_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
-	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
+	void sound_to_sh1_w(uint8_t data);
 	void init_coolridr();
 	void init_aquastge();
 	virtual void machine_start() override;
@@ -417,7 +415,7 @@ public:
 	void blit_current_sprite(address_space &space);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_sub);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 
 	void dma_transfer( address_space &space, uint16_t dma_index );
 
@@ -509,10 +507,12 @@ public:
 	objcachemanager m_decode[2];
 	void aquastge(machine_config &config);
 	void coolridr(machine_config &config);
+	void coolridr_h1_map(address_map &map);
 	void aquastge_h1_map(address_map &map);
 	void aquastge_submap(address_map &map);
 	void coolridr_submap(address_map &map);
 	void system_h1_map(address_map &map);
+	void system_h1_submap(address_map &map);
 	void system_h1_sound_map(address_map &map);
 	template<int Chip> void scsp_map(address_map &map);
 };
@@ -664,17 +664,17 @@ do {                                                                            
 			/* iterate over pixels in Y */                                          \
 			for (cury = desty; cury <= destendy; cury++)                            \
 			{                                                                       \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const uint8_t *srcptr = srcdata;                                      \
+				PIXEL_TYPE *destptr = &dest.pix(cury, destx);                       \
+				const uint8_t *srcptr = srcdata;                                    \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
 				for (curx = 0; curx < numblocks; curx++)                            \
 				{                                                                   \
-					COOL_PIXEL_OP(destptr[0], srcptr[0]);                     \
-					COOL_PIXEL_OP(destptr[1], srcptr[1]);                     \
-					COOL_PIXEL_OP(destptr[2], srcptr[2]);                     \
-					COOL_PIXEL_OP(destptr[3], srcptr[3]);                     \
+					COOL_PIXEL_OP(destptr[0], srcptr[0]);                           \
+					COOL_PIXEL_OP(destptr[1], srcptr[1]);                           \
+					COOL_PIXEL_OP(destptr[2], srcptr[2]);                           \
+					COOL_PIXEL_OP(destptr[3], srcptr[3]);                           \
 																					\
 					srcptr += 4;                                                    \
 					destptr += 4;                                                   \
@@ -683,7 +683,7 @@ do {                                                                            
 				/* iterate over leftover pixels */                                  \
 				for (curx = 0; curx < leftovers; curx++)                            \
 				{                                                                   \
-					COOL_PIXEL_OP(destptr[0], srcptr[0]);                     \
+					COOL_PIXEL_OP(destptr[0], srcptr[0]);                           \
 					srcptr++;                                                       \
 					destptr++;                                                      \
 				}                                                                   \
@@ -696,8 +696,8 @@ do {                                                                            
 			/* iterate over pixels in Y */                                          \
 			for (cury = desty; cury <= destendy; cury++)                            \
 			{                                                                       \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const uint8_t *srcptr = srcdata;                                      \
+				PIXEL_TYPE *destptr = &dest.pix(cury, destx);                       \
+				const uint8_t *srcptr = srcdata;                                    \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -911,8 +911,8 @@ uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t* linesrc = &m_screen_bitmap[Screen].pix16(y);
-		uint16_t* linedest = &bitmap.pix16(y);
+		uint16_t const *const linesrc = &m_screen_bitmap[Screen].pix(y);
+		uint16_t *const linedest = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x<= cliprect.right(); x++)
 		{
@@ -1130,8 +1130,8 @@ uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		const int pixelOffsetnextX = ((hPositionTable) + ((h+1)* 16 * hZoomHere)) / 0x40; \
 		if (drawy>clipmaxY) { break; }; \
 		if (drawy<clipminY) { drawy++; continue; }; \
-		line = &drawbitmap->pix16(drawy); \
-		/* zline = &object->zbitmap->pix16(drawy); */ \
+		uint16_t *const line = &drawbitmap->pix(drawy); \
+		/* uint16_t *const zline = &object->zbitmap->pix(drawy); */ \
 		int blockwide = pixelOffsetnextX-pixelOffsetX; \
 		if (pixelOffsetX+blockwide <clipminX) { drawy++; continue; } \
 		if (pixelOffsetX>clipmaxX)  { drawy++; continue; } \
@@ -1168,8 +1168,8 @@ uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int realy = ((y*incy)>>21); \
 		const int drawy = pixelOffsetY+y; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix16(drawy); \
-		/* zline = &object->zbitmap->pix16(drawy); */ \
+		uint16_t *const line = &drawbitmap->pix(drawy); \
+		/* uint16_t *const zline = &object->zbitmap->pix(drawy); */ \
 		int drawx = pixelOffsetX; \
 		for (int x = 0; x < blockwide; x++) \
 		{ \
@@ -1186,8 +1186,8 @@ uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{ \
 		const int drawy = pixelOffsetY+realy; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix16(drawy); \
-		/* zline = &object->zbitmap->pix16(drawy); */ \
+		uint16_t *const line = &drawbitmap->pix(drawy); \
+		/* uint16_t *const zline = &object->zbitmap->pix(drawy); */ \
 		int drawx = pixelOffsetX; \
 		for (int realx = 0; realx < 16; realx++) \
 		{ \
@@ -1938,9 +1938,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			uint32_t incy = 0x8000000 / vZoom;
 
 			// DEBUG: Draw 16x16 block
-			uint16_t* line;
-			//uint16_t* zline;
-
 
 			if (indirect_zoom_enable)
 			{
@@ -2301,7 +2298,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 }
 
 
-WRITE32_MEMBER(coolridr_state::blit_mode_w)
+void coolridr_state::blit_mode_w(uint32_t data)
 {
 	m_blitterMode = (data & 0x00ff0000) >> 16;
 
@@ -2367,7 +2364,7 @@ WRITE32_MEMBER(coolridr_state::blit_mode_w)
 	{
 		// Could be a full clear of VRAM?
 		for(uint32_t vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
-			space.write_dword(vramAddr, 0x00000000);
+			m_maincpu->space(AS_PROGRAM).write_dword(vramAddr, 0x00000000);
 
 		m_blitterSerialCount = 0;
 	}
@@ -2387,7 +2384,7 @@ WRITE32_MEMBER(coolridr_state::blit_mode_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::blit_data_w)
+void coolridr_state::blit_data_w(address_space &space, uint32_t data)
 {
 	if (m_blitterMode == 0xf4)
 	{
@@ -2450,7 +2447,7 @@ WRITE32_MEMBER(coolridr_state::blit_data_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::fb_mode_w)
+void coolridr_state::fb_mode_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	This does the fb display/clear phases of blitter data processed in the previous frame.
@@ -2482,7 +2479,7 @@ WRITE32_MEMBER(coolridr_state::fb_mode_w)
 
 
 
-WRITE32_MEMBER(coolridr_state::fb_data_w)
+void coolridr_state::fb_data_w(offs_t offset, uint32_t data)
 {
 	if(m_blitterClearCount == 0)
 	{
@@ -2616,7 +2613,7 @@ WRITE32_MEMBER(coolridr_state::fb_data_w)
 	m_blitterClearCount++;
 }
 
-READ32_MEMBER(coolridr_state::unk_blit_r)
+uint32_t coolridr_state::unk_blit_r(offs_t offset)
 {
 //  if(offset == 0x0c/4) // TODO
 
@@ -2624,7 +2621,7 @@ READ32_MEMBER(coolridr_state::unk_blit_r)
 }
 
 
-WRITE32_MEMBER(coolridr_state::unk_blit_w)
+void coolridr_state::unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_txt_blit[offset]);
 
@@ -2768,7 +2765,7 @@ void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 	}while(!end_dma_mark );
 }
 
-WRITE32_MEMBER(coolridr_state::dma_w)
+void coolridr_state::dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
@@ -2783,12 +2780,9 @@ WRITE32_MEMBER(coolridr_state::dma_w)
 
 void coolridr_state::system_h1_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rom().share("share1").nopw();
+	map(0x00000000, 0x001fffff).rom().nopw();
 	map(0x01000000, 0x01ffffff).rom().region("gfx_data", 0x0000000);
 
-	map(0x03c00000, 0x03c1ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
-
-	map(0x03f00000, 0x03f0ffff).ram().share("share3"); /*Communication area RAM*/
 	map(0x03f40000, 0x03f4ffff).ram().share("txt_vram");//text tilemap + "lineram"
 	map(0x04000000, 0x0400000f).rw(FUNC(coolridr_state::unk_blit_r), FUNC(coolridr_state::unk_blit_w)).share("txt_blit");
 	map(0x04000010, 0x04000013).w(FUNC(coolridr_state::blit_mode_w));
@@ -2797,9 +2791,17 @@ void coolridr_state::system_h1_map(address_map &map)
 	map(0x0400001c, 0x0400001f).w(FUNC(coolridr_state::fb_data_w));
 
 	map(0x06000000, 0x060fffff).ram().share("workrah");
-	map(0x20000000, 0x201fffff).rom().share("share1");
+	map(0x20000000, 0x201fffff).rom().region("maincpu", 0);
 
 	map(0x60000000, 0x600003ff).nopw();
+}
+
+void coolridr_state::coolridr_h1_map(address_map &map)
+{
+	system_h1_map(map);
+	map(0x03c00000, 0x03c1ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
+
+	map(0x03f00000, 0x03f0ffff).ram().share("share3"); /*Communication area RAM*/
 }
 
 void coolridr_state::aquastge_h1_map(address_map &map)
@@ -2812,19 +2814,19 @@ void coolridr_state::aquastge_h1_map(address_map &map)
 }
 
 template<int Chip>
-READ16_MEMBER( coolridr_state::soundram_r)
+uint16_t coolridr_state::soundram_r(offs_t offset)
 {
 	return m_soundram[Chip][offset];
 }
 
 template<int Chip>
-WRITE16_MEMBER( coolridr_state::soundram_w)
+void coolridr_state::soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_soundram[Chip][offset]);
 }
 
 
-WRITE8_MEMBER( coolridr_state::lamps_w )
+void coolridr_state::lamps_w(uint8_t data)
 {
 	/*
 	x--- ---- P2 Music select Lamp
@@ -2838,7 +2840,7 @@ WRITE8_MEMBER( coolridr_state::lamps_w )
 }
 
 
-READ32_MEMBER(coolridr_state::sound_dma_r)
+uint32_t coolridr_state::sound_dma_r(offs_t offset)
 {
 	if(offset == 8)
 	{
@@ -2859,7 +2861,7 @@ READ32_MEMBER(coolridr_state::sound_dma_r)
 	return m_sound_dma[offset];
 }
 
-WRITE32_MEMBER(coolridr_state::sound_dma_w)
+void coolridr_state::sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	address_space &main_space = m_maincpu->space(AS_PROGRAM);
 	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
@@ -2916,7 +2918,7 @@ WRITE32_MEMBER(coolridr_state::sound_dma_w)
 
 
 
-void coolridr_state::coolridr_submap(address_map &map)
+void coolridr_state::system_h1_submap(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom(); // note: SH7032 only supports 64KB
 
@@ -2931,8 +2933,6 @@ void coolridr_state::coolridr_submap(address_map &map)
 //  map(0x04200000, 0x0420003f).ram(); /* unknown */
 
 	map(0x05000000, 0x05000fff).ram();
-	map(0x05200000, 0x052001ff).ram();
-	map(0x05300000, 0x0530ffff).ram().share("share3"); /*Communication area RAM*/
 //  map(0x05fffe00, 0x05ffffff).rw(FUNC(coolridr_state::sh7032_r), FUNC(coolridr_state::sh7032_w)); // SH-7032H internal i/o
 	map(0x06000000, 0x060001ff).ram().share("nvram"); // backup RAM
 	map(0x06100000, 0x0610001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
@@ -2940,16 +2940,24 @@ void coolridr_state::coolridr_submap(address_map &map)
 	map(0x07ffe000, 0x07ffffff).ram(); // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
 }
 
+void coolridr_state::coolridr_submap(address_map &map)
+{
+	system_h1_submap(map);
+	map(0x05200000, 0x052001ff).ram();
+	map(0x05300000, 0x0530ffff).ram().share("share3"); /*Communication area RAM*/
+}
+
 void coolridr_state::aquastge_submap(address_map &map)
 {
-	coolridr_submap(map);
-	map(0x05200000, 0x0537ffff).ram();
+	system_h1_submap(map);
+	map(0x05200000, 0x0520ffff).ram();
 	map(0x05210000, 0x0521ffff).ram().share("share3"); /*Communication area RAM*/
+	map(0x05220000, 0x0537ffff).ram();
 	map(0x06000200, 0x06000207).nopw(); // program bug?
 }
 
 /* TODO: what is this for, volume mixing? MIDI? */
-WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
+void coolridr_state::sound_to_sh1_w(uint8_t data)
 {
 	m_sound_fifo = data;
 }
@@ -3194,7 +3202,7 @@ void coolridr_state::machine_reset()
 	m_usethreads = m_io_config->read()&1;
 }
 
-WRITE8_MEMBER(coolridr_state::scsp_irq)
+void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
 {
 	m_soundcpu->set_input_line(offset, data);
 }
@@ -3217,18 +3225,17 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 		m_sound_data &= ~0x20;
 }
 
-#define MAIN_CLOCK XTAL(28'636'363)
 
 void coolridr_state::coolridr(machine_config &config)
 {
-	SH2(config, m_maincpu, MAIN_CLOCK);  // 28 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_map);
+	SH2(config, m_maincpu, XTAL(28'000'000)); // 28 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_h1_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
-	M68000(config, m_soundcpu, 22579000/2); // 22.579 MHz XTAL / 2 = 11.2895 MHz
+	M68000(config, m_soundcpu, XTAL(32'000'000)/2); // 16 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	SH1(config, m_subcpu, 16000000);  // SH7032 HD6417032F20!! 16 MHz
+	SH1(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 
@@ -3249,14 +3256,14 @@ void coolridr_state::coolridr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coolridr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(57); // measured at 57.0426Hz
 	m_screen->set_size(640, 512);
 	m_screen->set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
 	m_screen->set_screen_update(FUNC(coolridr_state::screen_update<0>));
 	m_screen->set_palette(m_palette);
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
-	screen2.set_refresh_hz(60);
+	screen2.set_refresh_hz(57); // measured at 57.0426Hz
 	screen2.set_size(640, 512);
 	screen2.set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
 	screen2.set_screen_update(FUNC(coolridr_state::screen_update<1>));
@@ -3269,14 +3276,14 @@ void coolridr_state::coolridr(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	scsp_device &scsp1(SCSP(config, "scsp1", 22579000)); // 22.579 MHz XTAL
+	scsp_device &scsp1(SCSP(config, "scsp1", XTAL(22'579'000))); // 22.579 MHz
 	scsp1.set_addrmap(0, &coolridr_state::scsp_map<0>);
 	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
 	scsp1.main_irq_cb().set(FUNC(coolridr_state::scsp1_to_sh1_irq));
 	scsp1.add_route(0, "lspeaker", 1.0);
 	scsp1.add_route(1, "rspeaker", 1.0);
 
-	scsp_device &scsp2(SCSP(config, "scsp2", 22579000)); // 22.579 MHz XTAL
+	scsp_device &scsp2(SCSP(config, "scsp2", XTAL(22'579'000))); // 22.579 MHz
 	scsp2.set_addrmap(0, &coolridr_state::scsp_map<1>);
 	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
 	scsp2.add_route(0, "lspeaker", 1.0);
@@ -3367,85 +3374,26 @@ ROM_START( aquastge )
 ROM_END
 
 
-/*
-TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then expect that this buffer goes low IN the irq routines.
-      The Watchdog Timer is setted up with these params:
-      0xee for wtcnt
-      0x39 for wtcsr (enable irq (bit 5), enable timer (bit 4), clock select divider / 64 (bits 2-0))
-      vector is 0x7f (so VBR+0x1fc)
-      level is 0xf
-... and indeed the Watchdog irq routine effectively clears this RAM buffer. What the manual doesn't say is that the Watchdog timer irq
-    presumably is treated as an NMI by the SH-2 CPU and not really a "normal" irq exception.
-    For the record, here's the ITI code snippet:
-    06002DE4: 2F36   MOV.L   R3,@-SP
-    06002DE6: E300   MOV     #$00,R3
-    06002DE8: 2F26   MOV.L   R2,@-SP
-    06002DEA: D20B   MOV.L   @($2C,PC),R2
-    06002DEC: 2230   MOV.B   R3,@R2 ;writes 0 to the RAM buffer 0x60d8896
-    06002DEE: 9305   MOV.W   @($000A,PC),R3
-    06002DF0: 9205   MOV.W   @($000A,PC),R2
-    06002DF2: 2231   MOV.W   R3,@R2 ;writes 0x19, disables the watchdog timer
-    06002DF4: 62F6   MOV.L   @SP+,R2
-    06002DF6: 63F6   MOV.L   @SP+,R3
-    06002DF8: 002B   RTE
-    06002DFA: 0009   NOP
-
-*/
-READ32_MEMBER(coolridr_state::coolridr_hack2_r)
-{
-	offs_t pc = m_maincpu->pc();
-
-	if(pc == 0x6002cba || pc == 0x6002d42)
-		return 0;
-
-	// with the non-recompiler pc returns +2
-	if(pc == 0x06002cbc || pc == 0x06002d44)
-		return 0;
-
-	return m_workram_h[0xd8894/4];
-}
-
-
-READ32_MEMBER(coolridr_state::aquastge_hack_r)
-{
-	offs_t pc = m_maincpu->pc();
-
-	if ((pc == 0x6009e76) || (pc == 0x6009e78))
-		return 0;
-	else
-	{
-//      printf("pc %08x\n", pc);
-	}
-
-	return m_workram_h[0xc3fd8/4];
-}
-
-
 void coolridr_state::init_coolridr()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
-
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 
 	m_colbase = 0x7b20;
 
 	// work around the hack when mapping the workram directly
-	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060d7fff, 0, &m_workram_h[0]);
-	m_maincpu->sh2drc_add_fastram(0x060d9000, 0x060fffff, 0, &m_workram_h[0xd9000/4]);
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, 1, &m_rom[0]);
 	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]);
 }
 
 void coolridr_state::init_aquastge()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
-
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 
 	m_colbase = 0;
 }
 
-GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
 GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)

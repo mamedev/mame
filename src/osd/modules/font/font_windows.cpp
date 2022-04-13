@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 /*
- * font_windows.c
+ * font_windows.cpp
  *
  */
 
@@ -15,8 +15,8 @@
 #include "modules/osdmodule.h"
 
 #include "strconv.h"
+#include "unicode.h"
 #include "corestr.h"
-#include "corealloc.h"
 
 #include <cstring>
 
@@ -28,6 +28,7 @@
 
 
 namespace {
+
 class osd_font_windows : public osd_font
 {
 public:
@@ -85,7 +86,7 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 
 	// copy in the face name
 	osd::text::tstring face = osd::text::to_tstring(name);
-	_tcsncpy(logfont.lfFaceName, face.c_str(), ARRAY_LENGTH(logfont.lfFaceName));
+	_tcsncpy(logfont.lfFaceName, face.c_str(), std::size(logfont.lfFaceName));
 	logfont.lfFaceName[sizeof(logfont.lfFaceName) / sizeof(TCHAR)-1] = 0;
 
 	// create the font
@@ -200,7 +201,7 @@ bool osd_font_windows::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, int32_t
 
 		// now draw the character
 		char16_t tempchar[UTF16_CHAR_MAX];
-		UINT const count = INT(utf16_from_uchar(tempchar, ARRAY_LENGTH(tempchar), chnum));
+		UINT const count = INT(utf16_from_uchar(tempchar, std::size(tempchar), chnum));
 		SetTextColor(dummyDC, RGB(0xff, 0xff, 0xff));
 		SetBkColor(dummyDC, RGB(0x00, 0x00, 0x00));
 		ExtTextOutW(dummyDC, 50 + abc.abcA, 50, ETO_OPAQUE, nullptr, reinterpret_cast<LPCWSTR>(tempchar), count, nullptr);
@@ -260,7 +261,7 @@ bool osd_font_windows::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, int32_t
 			// copy the bits into it
 			for (int y = 0; y < bitmap.height(); y++)
 			{
-				uint32_t *dstrow = &bitmap.pix32(y);
+				uint32_t *dstrow = &bitmap.pix(y);
 				uint8_t *srcrow = &bits[(y + actbounds.min_y) * rowbytes];
 				for (int x = 0; x < bitmap.width(); x++)
 				{

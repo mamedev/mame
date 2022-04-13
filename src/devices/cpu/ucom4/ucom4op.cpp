@@ -41,7 +41,7 @@ void ucom4_cpu_device::push_stack()
 
 void ucom4_cpu_device::op_illegal()
 {
-	logerror("%s unknown opcode $%02X at $%03X\n", tag(), m_op, m_prev_pc);
+	logerror("unknown opcode $%02X at $%03X\n", m_op, m_prev_pc);
 }
 
 
@@ -261,14 +261,14 @@ void ucom4_cpu_device::op_reb()
 {
 	// REB B: Reset a single bit of output port E
 	m_icount--;
-	output_w(NEC_UCOM4_PORTE, m_port_out[NEC_UCOM4_PORTE] & ~m_bitmask);
+	output_w(PORTE, m_port_out[PORTE] & ~m_bitmask);
 }
 
 void ucom4_cpu_device::op_seb()
 {
 	// SEB B: Set a single bit of output port E
 	m_icount--;
-	output_w(NEC_UCOM4_PORTE, m_port_out[NEC_UCOM4_PORTE] | m_bitmask);
+	output_w(PORTE, m_port_out[PORTE] | m_bitmask);
 }
 
 void ucom4_cpu_device::op_rpb()
@@ -337,7 +337,7 @@ void ucom4_cpu_device::op_ci()
 	m_skip = (m_acc == (m_arg & 0x0f));
 
 	if ((m_arg & 0xf0) != 0xc0)
-		logerror("%s CI opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xf0, m_prev_pc);
+		logerror("CI opcode unexpected upper arg $%02X at $%03X\n", m_arg & 0xf0, m_prev_pc);
 }
 
 void ucom4_cpu_device::op_cm()
@@ -364,7 +364,7 @@ void ucom4_cpu_device::op_cli()
 	m_skip = (m_dpl == (m_arg & 0x0f));
 
 	if ((m_arg & 0xf0) != 0xe0)
-		logerror("%s CLI opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xf0, m_prev_pc);
+		logerror("CLI opcode unexpected upper arg $%02X at $%03X\n", m_arg & 0xf0, m_prev_pc);
 }
 
 void ucom4_cpu_device::op_tmb()
@@ -376,7 +376,7 @@ void ucom4_cpu_device::op_tmb()
 void ucom4_cpu_device::op_tpa()
 {
 	// TPA B: skip next on bit(input port A)
-	m_skip = ((input_r(NEC_UCOM4_PORTA) & m_bitmask) != 0);
+	m_skip = ((input_r(PORTA) & m_bitmask) != 0);
 }
 
 void ucom4_cpu_device::op_tpb()
@@ -402,7 +402,7 @@ void ucom4_cpu_device::op_ia()
 {
 	// IA: Input port A to ACC
 	m_icount--;
-	m_acc = input_r(NEC_UCOM4_PORTA);
+	m_acc = input_r(PORTA);
 }
 
 void ucom4_cpu_device::op_ip()
@@ -415,7 +415,7 @@ void ucom4_cpu_device::op_oe()
 {
 	// OE: Output ACC to port E
 	m_icount--;
-	output_w(NEC_UCOM4_PORTE, m_acc);
+	output_w(PORTE, m_acc);
 }
 
 void ucom4_cpu_device::op_op()
@@ -427,8 +427,8 @@ void ucom4_cpu_device::op_op()
 void ucom4_cpu_device::op_ocd()
 {
 	// OCD X: Output X to ports C and D
-	output_w(NEC_UCOM4_PORTD, m_arg >> 4);
-	output_w(NEC_UCOM4_PORTC, m_arg & 0xf);
+	output_w(PORTD, m_arg >> 4);
+	output_w(PORTC, m_arg & 0xf);
 }
 
 
@@ -447,7 +447,7 @@ inline bool ucom4_cpu_device::check_op_43()
 {
 	// these opcodes are officially only supported on uCOM-43
 	if (m_family != NEC_UCOM43)
-		logerror("%s using uCOM-43 opcode $%02X at $%03X\n", tag(), m_op, m_prev_pc);
+		logerror("using uCOM-43 opcode $%02X at $%03X\n", m_op, m_prev_pc);
 
 	return (m_family == NEC_UCOM43);
 }
@@ -689,7 +689,7 @@ void ucom4_cpu_device::op_stm()
 	m_timer->adjust(base * ((m_arg & 0x3f) + 1));
 
 	if ((m_arg & 0xc0) != 0x80)
-		logerror("%s STM opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xc0, m_prev_pc);
+		logerror("STM opcode unexpected upper arg $%02X at $%03X\n", m_arg & 0xc0, m_prev_pc);
 }
 
 void ucom4_cpu_device::op_ttm()

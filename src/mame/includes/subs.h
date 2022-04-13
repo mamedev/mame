@@ -47,20 +47,20 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	int m_steering_buf1;
-	int m_steering_buf2;
-	int m_steering_val1;
-	int m_steering_val2;
-	int m_last_val_1;
-	int m_last_val_2;
+	int m_steering_buf1 = 0;
+	int m_steering_buf2 = 0;
+	int m_steering_val1 = 0;
+	int m_steering_val2 = 0;
+	int m_last_val_1 = 0;
+	int m_last_val_2 = 0;
 
-	DECLARE_WRITE8_MEMBER(steer_reset_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_READ8_MEMBER(coin_r);
-	DECLARE_READ8_MEMBER(options_r);
+	void steer_reset_w(uint8_t data);
+	uint8_t control_r(offs_t offset);
+	uint8_t coin_r(offs_t offset);
+	uint8_t options_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(invert1_w);
 	DECLARE_WRITE_LINE_MEMBER(invert2_w);
-	DECLARE_WRITE8_MEMBER(noise_reset_w);
+	void noise_reset_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

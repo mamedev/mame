@@ -20,23 +20,23 @@
 #include "includes/vaportra.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /******************************************************************************/
 
-READ8_MEMBER(vaportra_state::irq6_ack_r)
+uint8_t vaportra_state::irq6_ack_r()
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
 	return (0);
 }
 
-WRITE8_MEMBER(vaportra_state::irq6_ack_w)
+void vaportra_state::irq6_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 }
@@ -217,6 +217,7 @@ void vaportra_state::vaportra(machine_config &config)
 	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vaportra_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	m_audiocpu->set_timer_scale(2);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -229,42 +230,37 @@ void vaportra_state::vaportra(machine_config &config)
 	screen.set_screen_update(FUNC(vaportra_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_vaportra);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vaportra);
 	PALETTE(config, m_palette).set_entries(1280);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(vaportra_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(vaportra_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(4);
-	m_spritegen->set_gfxdecode_tag("gfxdecode");
+	m_spritegen->set_colpri_callback(FUNC(vaportra_state::vaportra_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -79,7 +79,7 @@ void vp595_device::vip_io_w(offs_t offset, uint8_t data)
 	{
 		if (!data) data = 0x80;
 
-		m_pfg->write_str(data);
+		m_pfg->str_w(data);
 	}
 }
 

@@ -130,6 +130,8 @@ Unresolved Issues:
 - Elaine's end-game graphics has wrong masking effect (known non-zoomed pdrawgfx issue)
 - intro screen at wrong alpha effect; it has K054157 flag-per-tile for alpha blending?
 - Tilemap scroll is wrong at cocktail mode
+- Music fadeout isn't working
+reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 
 ***************************************************************************/
 
@@ -143,7 +145,7 @@ Unresolved Issues:
 #include "machine/k053252.h"
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -156,7 +158,7 @@ Unresolved Issues:
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x8000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053247. */
-READ16_MEMBER(xexex_state::k053247_scattered_word_r)
+uint16_t xexex_state::k053247_scattered_word_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x0031)
 		return m_spriteram[offset];
@@ -167,7 +169,7 @@ READ16_MEMBER(xexex_state::k053247_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(xexex_state::k053247_scattered_word_w)
+void xexex_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0031)
 		COMBINE_DATA(m_spriteram + offset);
@@ -214,17 +216,17 @@ void xexex_state::xexex_objdma( int limiter )
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-READ16_MEMBER(xexex_state::spriteram_mirror_r)
+uint16_t xexex_state::spriteram_mirror_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(xexex_state::spriteram_mirror_w)
+void xexex_state::spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_spriteram + offset);
 }
 
-READ16_MEMBER(xexex_state::xexex_waitskip_r)
+uint16_t xexex_state::xexex_waitskip_r()
 {
 	if (m_maincpu->pc() == 0x1158)
 	{
@@ -253,23 +255,23 @@ void xexex_state::parse_control2(  )
 	m_cur_alpha = !(m_cur_control2 & 0x200);
 }
 
-READ16_MEMBER(xexex_state::control2_r)
+uint16_t xexex_state::control2_r()
 {
 	return m_cur_control2;
 }
 
-WRITE16_MEMBER(xexex_state::control2_w)
+void xexex_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cur_control2);
 	parse_control2();
 }
 
-WRITE16_MEMBER(xexex_state::sound_irq_w)
+void xexex_state::sound_irq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
+void xexex_state::sound_bankswitch_w(uint8_t data)
 {
 	m_z80bank->set_entry(data & 0x07);
 }
@@ -355,7 +357,7 @@ void xexex_state::main_map(address_map &map)
 	map(0x0c8000, 0x0c800f).rw(m_k053250, FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));              // CLTC
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);               // priority encoder
-//  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                // CCU
+//  map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                // CCU
 	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));                // VSCCS regs
@@ -479,7 +481,7 @@ void xexex_state::xexex(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // Z80E 8Mhz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &xexex_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1920);
+	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
@@ -498,12 +500,12 @@ void xexex_state::xexex(machine_config &config)
 	m_palette->enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(xexex_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(xexex_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(xexex_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(xexex_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48, 32);
 	m_k053246->set_palette(m_palette);
 
@@ -522,17 +524,17 @@ void xexex_state::xexex(machine_config &config)
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'000'000)/8)); // 4MHz
-	ymsnd.add_route(0, "filter1_l", 0.50);
-	ymsnd.add_route(0, "filter1_r", 0.50);
-	ymsnd.add_route(1, "filter2_l", 0.50);
-	ymsnd.add_route(1, "filter2_r", 0.50);
+	ymsnd.add_route(0, "filter1_l", 0.2);
+	ymsnd.add_route(0, "filter1_r", 0.2);
+	ymsnd.add_route(1, "filter2_l", 0.2);
+	ymsnd.add_route(1, "filter2_r", 0.2);
 
 	K054539(config, m_k054539, XTAL(18'432'000));
 	m_k054539->set_analog_callback(FUNC(xexex_state::ym_set_mixing));
-	m_k054539->add_route(0, "lspeaker", 1.0);
-	m_k054539->add_route(0, "rspeaker", 1.0);
-	m_k054539->add_route(1, "lspeaker", 1.0);
-	m_k054539->add_route(1, "rspeaker", 1.0);
+	m_k054539->add_route(0, "lspeaker", 0.4);
+	m_k054539->add_route(0, "rspeaker", 0.4);
+	m_k054539->add_route(1, "lspeaker", 0.4);
+	m_k054539->add_route(1, "rspeaker", 0.4);
 
 	FILTER_VOLUME(config, "filter1_l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "filter1_r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);

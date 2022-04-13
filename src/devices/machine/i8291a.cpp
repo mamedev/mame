@@ -48,7 +48,63 @@ i8291a_device::i8291a_device(const machine_config &mconfig, const char *tag,
 		m_ndac_write_func{*this},
 		m_srq_write_func{*this},
 		m_dio_write_func{*this},
-		m_dio_read_func{*this}
+		m_dio_read_func{*this},
+		m_din{0},
+		m_dout{0},
+		m_ints1{0},
+		m_ints2{0},
+		m_ie1{0},
+		m_ie2{0},
+		m_address0{0},
+		m_address1{0},
+		m_eos{0},
+		m_spoll_mode{0},
+		m_address_mode{0},
+		m_address_status{0},
+		m_cpt{0},
+		m_auxa{0},
+		m_auxb{0},
+		m_atn{false},
+		m_ren{false},
+		m_nrfd{false},
+		m_ndac{false},
+		m_dav{false},
+		m_srq{false},
+		m_ifc{false},
+		m_eoi{false},
+		m_dio{0},
+		m_nrfd_out{false},
+		m_ndac_out{false},
+		m_dav_out{false},
+		m_srq_out{false},
+		m_eoi_out{false},
+		m_pon{false},
+		m_rdy{false},
+		m_lpe{false},
+		m_ist{false},
+		m_rtl{false},
+		m_apt_flag{false},
+		m_cpt_flag{false},
+		m_din_flag{false},
+		m_nba{false},
+		m_pp_sense{false},
+		m_pp_line{0},
+		m_send_eoi{false},
+		m_sh_state{source_handshake_state::SIDS},
+		m_ah_state{acceptor_handshake_state::AIDS},
+		m_t_state{talker_state::TIDS},
+		m_tp_state{talker_primary_state::TPIS},
+		m_tsp_state{talker_serial_poll_state::SPIS},
+		m_l_state{listener_state::LIDS},
+		m_lp_state{listener_primary_state::LPIS},
+		m_rl_state{remote_local_state::LOCS},
+		m_pp_state{parallel_poll_state::PPIS},
+		m_dc_state{device_clear_state::DCIS},
+		m_dt_state{device_trigger_state::DTIS},
+		m_state_changed(false),
+		m_ignore_ext_signals(false),
+		m_intr_out(false),
+		m_dreq_out(false)
 {
 }
 
@@ -155,7 +211,7 @@ void i8291a_device::device_start()
 	save_item(NAME(m_dt_state));
 }
 
-READ8_MEMBER(i8291a_device::din_r)
+uint8_t i8291a_device::din_r()
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, m_din);
 	if (!machine().side_effects_disabled()) {
@@ -201,7 +257,7 @@ void i8291a_device::update_int()
 	}
 }
 
-READ8_MEMBER(i8291a_device::ints1_r)
+uint8_t i8291a_device::ints1_r()
 {
 	uint8_t ret = m_ints1;
 
@@ -213,7 +269,7 @@ READ8_MEMBER(i8291a_device::ints1_r)
 	return ret;
 }
 
-READ8_MEMBER(i8291a_device::ints2_r)
+uint8_t i8291a_device::ints2_r()
 {
 	uint8_t ret = m_ints2;
 
@@ -225,13 +281,13 @@ READ8_MEMBER(i8291a_device::ints2_r)
 	return ret;
 }
 
-READ8_MEMBER(i8291a_device::spoll_stat_r)
+uint8_t i8291a_device::spoll_stat_r()
 {
 	LOGMASKED(LOG_REG, "%s\n", __FUNCTION__);
 	return 0;
 }
 
-READ8_MEMBER(i8291a_device::addr_stat_r)
+uint8_t i8291a_device::addr_stat_r()
 {
 	if (!(m_address_status & 0xfe))
 			m_address_status = 0;
@@ -240,25 +296,25 @@ READ8_MEMBER(i8291a_device::addr_stat_r)
 	return m_address_status;
 }
 
-READ8_MEMBER(i8291a_device::cpt_r)
+uint8_t i8291a_device::cpt_r()
 {
 	LOGMASKED(LOG_REG, "%s\n", __FUNCTION__);
 	return m_cpt;
 }
 
-READ8_MEMBER(i8291a_device::addr0_r)
+uint8_t i8291a_device::addr0_r()
 {
 	//LOGMASKED(LOG_REG, "%s = %02X\n", __FUNCTION__, m_address0);
 	return m_address0;
 }
 
-READ8_MEMBER(i8291a_device::addr1_r)
+uint8_t i8291a_device::addr1_r()
 {
 	LOGMASKED(LOG_REG, "%s = %02X\n", __FUNCTION__, m_address1);
 	return m_address1;
 }
 
-WRITE8_MEMBER(i8291a_device::dout_w)
+void i8291a_device::dout_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	if (m_nba)
@@ -268,35 +324,35 @@ WRITE8_MEMBER(i8291a_device::dout_w)
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::ie1_w)
+void i8291a_device::ie1_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_ie1 = data;
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::ie2_w)
+void i8291a_device::ie2_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_ie2 = data;
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::spoll_mode_w)
+void i8291a_device::spoll_mode_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_spoll_mode = data;
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::addr_mode_w)
+void i8291a_device::addr_mode_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_address_mode = data & 3;
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::aux_mode_w)
+void i8291a_device::aux_mode_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	switch (data >> 5) {
@@ -376,32 +432,32 @@ WRITE8_MEMBER(i8291a_device::aux_mode_w)
 			device_reset();
 			break;
 		}
-		case 1:
-			/* preset internal clock counter */
-			break;
-		case 4:
-			LOGMASKED(LOG_REG, "AUXA = %02X\n", data & 0x1f);
-			/* AUXA write */
-			m_auxa = data;
-			break;
-		case 5:
-			LOGMASKED(LOG_REG, "AUXB = %02X\n", data & 0x1f);
-			m_auxb = data;
-			break;
-		case 3:
-			LOGMASKED(LOG_REG, "PPOLL %s (line %d)\n", (data & 0x10) ? "disable" : "enable", data & 7);
-			m_lpe = !!!(data & 0x10);
-			m_pp_sense = data & 0x08;
-			m_pp_line = data & 7;
-			break;
-		default:
-			break;
-
+		break;
+	case 1:
+		/* preset internal clock counter */
+		break;
+	case 4:
+		LOGMASKED(LOG_REG, "AUXA = %02X\n", data & 0x1f);
+		/* AUXA write */
+		m_auxa = data;
+		break;
+	case 5:
+		LOGMASKED(LOG_REG, "AUXB = %02X\n", data & 0x1f);
+		m_auxb = data;
+		break;
+	case 3:
+		LOGMASKED(LOG_REG, "PPOLL %s (line %d)\n", (data & 0x10) ? "disable" : "enable", data & 7);
+		m_lpe = !!!(data & 0x10);
+		m_pp_sense = data & 0x08;
+		m_pp_line = data & 7;
+		break;
+	default:
+		break;
 	}
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::addr01_w)
+void i8291a_device::addr01_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	if (data & REG_ADDRESS01_ARS)
@@ -411,56 +467,56 @@ WRITE8_MEMBER(i8291a_device::addr01_w)
 	run_fsm();
 }
 
-WRITE8_MEMBER(i8291a_device::eos_w)
+void i8291a_device::eos_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	m_eos = data;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::nrfd_w)
+void i8291a_device::nrfd_w(int state)
 {
 	m_nrfd = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::ndac_w)
+void i8291a_device::ndac_w(int state)
 {
 	m_ndac = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::dav_w)
+void i8291a_device::dav_w(int state)
 {
 	m_dav = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::eoi_w)
+void i8291a_device::eoi_w(int state)
 {
 	m_eoi = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::srq_w)
+void i8291a_device::srq_w(int state)
 {
 	m_srq = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::ifc_w)
+void i8291a_device::ifc_w(int state)
 {
 	m_ifc = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::atn_w)
+void i8291a_device::atn_w(int state)
 {
 	m_atn = !state;
 	run_fsm();
 }
 
-WRITE_LINE_MEMBER(i8291a_device::ren_w)
+void i8291a_device::ren_w(int state)
 {
 	m_ren = !state;
 	run_fsm();

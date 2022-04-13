@@ -162,7 +162,7 @@ int ti990_hdc_device::get_id_from_device( device_t *device )
 /*
     Initialize hard disk unit and open a hard disk image
 */
-DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
+DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
 {
 	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
@@ -175,18 +175,16 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 
 	if ( hd_file )
 	{
-		const hard_disk_info *standard_header;
-
 		d->format = format_mame;
 		d->hd_handle = hd_file;
 
 		/* use standard hard disk image header. */
-		standard_header = hard_disk_get_info(d->hd_handle);
+		const auto &standard_header = d->hd_handle->get_info();
 
-		d->cylinders = standard_header->cylinders;
-		d->heads = standard_header->heads;
-		d->sectors_per_track = standard_header->sectors;
-		d->bytes_per_sector = standard_header->sectorbytes;
+		d->cylinders = standard_header.cylinders;
+		d->heads = standard_header.heads;
+		d->sectors_per_track = standard_header.sectors;
+		d->bytes_per_sector = standard_header.sectorbytes;
 	}
 	else
 	{
@@ -239,7 +237,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 /*
     close a hard disk image
 */
-DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device, ti990_hd )
+DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device::unload_hd )
 {
 	int id = get_id_from_device(&image.device());
 	hd_unit_t *d;
@@ -365,7 +363,7 @@ int ti990_hdc_device::read_sector(int unit, unsigned int lba, void *buffer, unsi
 	switch (m_d[unit].format)
 	{
 	case format_mame:
-		bytes_read = m_d[unit].bytes_per_sector * hard_disk_read(m_d[unit].hd_handle, lba, buffer);
+		bytes_read = m_d[unit].bytes_per_sector * m_d[unit].hd_handle->read(lba, buffer);
 		if (bytes_read > bytes_to_read)
 			bytes_read = bytes_to_read;
 		break;
@@ -395,7 +393,7 @@ int ti990_hdc_device::write_sector(int unit, unsigned int lba, const void *buffe
 	switch (m_d[unit].format)
 	{
 	case format_mame:
-		bytes_written = m_d[unit].bytes_per_sector * hard_disk_write(m_d[unit].hd_handle, lba, buffer);
+		bytes_written = m_d[unit].bytes_per_sector * m_d[unit].hd_handle->write(lba, buffer);
 		if (bytes_written > bytes_to_write)
 			bytes_written = bytes_to_write;
 		break;
@@ -924,7 +922,7 @@ void ti990_hdc_device::execute_command()
 /*
     Read one register in TPCS space
 */
-READ16_MEMBER(ti990_hdc_device::read)
+uint16_t ti990_hdc_device::read(offs_t offset)
 {
 	if (offset < 8)
 		return m_w[offset];
@@ -935,7 +933,7 @@ READ16_MEMBER(ti990_hdc_device::read)
 /*
     Write one register in TPCS space.  Execute command if w7_idle is cleared.
 */
-WRITE16_MEMBER(ti990_hdc_device::write)
+void ti990_hdc_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 8)
 	{
@@ -977,7 +975,7 @@ void ti990_hdc_device::device_start()
 	int i;
 
 	/* initialize harddisk information */
-	/* attention lines will be set by DEVICE_IMAGE_LOD */
+	/* attention lines will be set by DEVICE_IMAGE_LOAD */
 	for (i=0; i<MAX_DISK_UNIT; i++)
 	{
 		m_d[i].format = format_mame;
@@ -1004,17 +1002,21 @@ void ti990_hdc_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ti990_hdc_device::device_add_mconfig)
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_ADD( "harddisk2" )
-	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_ADD( "harddisk3" )
-	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_ADD( "harddisk4" )
-	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
-	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
-MACHINE_CONFIG_END
+void ti990_hdc_device::device_add_mconfig(machine_config &config)
+{
+	harddisk_image_device &harddisk1(HARDDISK(config, "harddisk1"));
+	harddisk1.set_device_load(FUNC(ti990_hdc_device::load_hd));
+	harddisk1.set_device_unload(FUNC(ti990_hdc_device::unload_hd));
+
+	harddisk_image_device &harddisk2(HARDDISK(config, "harddisk2"));
+	harddisk2.set_device_load(FUNC(ti990_hdc_device::load_hd));
+	harddisk2.set_device_unload(FUNC(ti990_hdc_device::unload_hd));
+
+	harddisk_image_device &harddisk3(HARDDISK(config, "harddisk3"));
+	harddisk3.set_device_load(FUNC(ti990_hdc_device::load_hd));
+	harddisk3.set_device_unload(FUNC(ti990_hdc_device::unload_hd));
+
+	harddisk_image_device &harddisk4(HARDDISK(config, "harddisk4"));
+	harddisk4.set_device_load(FUNC(ti990_hdc_device::load_hd));
+	harddisk4.set_device_unload(FUNC(ti990_hdc_device::unload_hd));
+}

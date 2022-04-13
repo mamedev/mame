@@ -1,5 +1,5 @@
-// license: GPL-2.0+
-// copyright-holders: Dirk Best
+// license:BSD-3-Clause
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Amiga Keyboard Interface
@@ -27,7 +27,7 @@ class device_amiga_keyboard_interface;
 
 // ======================> amiga_keyboard_bus_device
 
-class amiga_keyboard_bus_device : public device_t, public device_slot_interface
+class amiga_keyboard_bus_device : public device_t, public device_single_card_slot_interface<device_amiga_keyboard_interface>
 {
 public:
 	// construction/destruction
@@ -71,7 +71,7 @@ private:
 
 // ======================> device_amiga_keyboard_interface
 
-class device_amiga_keyboard_interface : public device_slot_card_interface
+class device_amiga_keyboard_interface : public device_interface
 {
 public:
 	// construction/destruction

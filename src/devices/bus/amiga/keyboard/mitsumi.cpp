@@ -109,10 +109,10 @@ public:
 	virtual WRITE_LINE_MEMBER(kdat_w) override
 	{
 		m_kdat_in = state ? 0x01U : 0x00U;
-		m_mcu->pa_w(machine().dummy_space(), 0, m_meta->read());
+		m_mcu->pa_w(m_meta->read());
 	}
 
-	CUSTOM_INPUT_MEMBER(kdat_r)
+	READ_LINE_MEMBER(kdat_r)
 	{
 		return m_kdat_in ^ 0x01U;
 	}
@@ -128,7 +128,7 @@ public:
 		return (result >> 2) ^ 0x3fU;
 	}
 
-	CUSTOM_INPUT_MEMBER(reset_r)
+	READ_LINE_MEMBER(reset_r)
 	{
 		return m_ctrl_a_a;
 	}
@@ -414,27 +414,27 @@ protected:
 
 INPUT_PORTS_START(fullsize_cols)
 	PORT_START("COLS")
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, cols_r, nullptr)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mitsumi_keyboard_base, cols_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, kdat_r, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, kdat_r)
 INPUT_PORTS_END
 
 INPUT_PORTS_START(compact_cols)
 	PORT_START("COLS")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, reset_r, nullptr)
-	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, cols_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, reset_r)
+	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mitsumi_keyboard_base, cols_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, kdat_r, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, kdat_r)
 INPUT_PORTS_END
 
 INPUT_PORTS_START(mitsumi_meta)
 	PORT_START("META")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)        PORT_CHAR(UCHAR_MAMEKEY(LWIN))       PORT_NAME("Left Amiga")   PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, nullptr)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)        PORT_CHAR(UCHAR_MAMEKEY(LWIN))       PORT_NAME("Left Amiga")   PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, 0)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)        PORT_CHAR(UCHAR_MAMEKEY(LALT))       PORT_NAME("Left Alt")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)      PORT_CHAR(UCHAR_SHIFT_1)             PORT_NAME("Left Shift")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)    PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))   PORT_NAME("Ctrl")         PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, nullptr)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)        PORT_CHAR(UCHAR_MAMEKEY(RWIN))       PORT_NAME("Right Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, nullptr)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)    PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))   PORT_NAME("Ctrl")         PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, 0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)        PORT_CHAR(UCHAR_MAMEKEY(RWIN))       PORT_NAME("Right Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, 0)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)        PORT_CHAR(UCHAR_SHIFT_2)             PORT_NAME("Right Alt")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))     PORT_NAME("Right Shift")
 INPUT_PORTS_END
@@ -665,6 +665,8 @@ public:
 		: a500_keyboard_base(mconfig, A500_KBD_US, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_us); }
 };
@@ -675,6 +677,8 @@ public:
 	a500_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a500_keyboard_base(mconfig, A500_KBD_DE, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_de); }
@@ -687,6 +691,8 @@ public:
 		: a500_keyboard_base(mconfig, A500_KBD_FR, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_fr); }
 };
@@ -697,6 +703,8 @@ public:
 	a500_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a500_keyboard_base(mconfig, A500_KBD_IT, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_it); }
@@ -709,6 +717,8 @@ public:
 		: a500_keyboard_base(mconfig, A500_KBD_SE, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_se); }
 };
@@ -719,6 +729,8 @@ public:
 	a500_keyboard_es(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a500_keyboard_base(mconfig, A500_KBD_ES, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_es); }
@@ -731,6 +743,8 @@ public:
 		: a500_keyboard_base(mconfig, A500_KBD_DK, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_dk); }
 };
@@ -741,6 +755,8 @@ public:
 	a500_keyboard_ch(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a500_keyboard_base(mconfig, A500_KBD_CH, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_ch); }
@@ -753,6 +769,8 @@ public:
 		: a500_keyboard_base(mconfig, A500_KBD_NO, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_no); }
 };
@@ -763,6 +781,8 @@ public:
 	a500_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a500_keyboard_base(mconfig, A500_KBD_GB, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_gb); }
@@ -780,6 +800,8 @@ public:
 		: a600_keyboard_base(mconfig, A600_KBD_US, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_us); }
 };
@@ -790,6 +812,8 @@ public:
 	a600_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a600_keyboard_base(mconfig, A600_KBD_DE, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_de); }
@@ -802,6 +826,8 @@ public:
 		: a600_keyboard_base(mconfig, A600_KBD_FR, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_fr); }
 };
@@ -812,6 +838,8 @@ public:
 	a600_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a600_keyboard_base(mconfig, A600_KBD_IT, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_it); }
@@ -824,6 +852,8 @@ public:
 		: a600_keyboard_base(mconfig, A600_KBD_SE, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_se); }
 };
@@ -834,6 +864,8 @@ public:
 	a600_keyboard_es(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a600_keyboard_base(mconfig, A600_KBD_ES, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_es); }
@@ -846,6 +878,8 @@ public:
 		: a600_keyboard_base(mconfig, A600_KBD_DK, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_dk); }
 };
@@ -856,6 +890,8 @@ public:
 	a600_keyboard_ch(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a600_keyboard_base(mconfig, A600_KBD_CH, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_ch); }
@@ -868,6 +904,8 @@ public:
 		: a600_keyboard_base(mconfig, A600_KBD_NO, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_no); }
 };
@@ -878,6 +916,8 @@ public:
 	a600_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a600_keyboard_base(mconfig, A600_KBD_GB, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(compact_gb); }
@@ -906,6 +946,8 @@ public:
 		: a1000_keyboard_base(mconfig, A1000_KBD_DE, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A1000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_de); }
 };
@@ -916,6 +958,8 @@ public:
 	a1000_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_FR, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A1000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_fr); }
@@ -928,6 +972,8 @@ public:
 		: a1000_keyboard_base(mconfig, A1000_KBD_IT, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A1000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_it); }
 };
@@ -938,6 +984,8 @@ public:
 	a1000_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_SE, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A1000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_se); }
@@ -950,6 +998,8 @@ public:
 		: a1000_keyboard_base(mconfig, A1000_KBD_DK, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A1000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_dk); }
 };
@@ -960,6 +1010,8 @@ public:
 	a1000_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_GB, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A1000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_gb); }
@@ -988,6 +1040,8 @@ public:
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_DE, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_de); }
 };
@@ -998,6 +1052,8 @@ public:
 	a2000_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_FR, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_fr); }
@@ -1010,6 +1066,8 @@ public:
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_IT, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_it); }
 };
@@ -1020,6 +1078,8 @@ public:
 	a2000_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_SE, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_se); }
@@ -1032,6 +1092,8 @@ public:
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_ES, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_es); }
 };
@@ -1042,6 +1104,8 @@ public:
 	a2000_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_DK, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_dk); }
@@ -1054,6 +1118,8 @@ public:
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_CH, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_ch); }
 };
@@ -1065,6 +1131,8 @@ public:
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_NO, tag, owner, clock)
 	{ }
 
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_no); }
 };
@@ -1075,6 +1143,8 @@ public:
 	a2000_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_GB, tag, owner, clock)
 	{ }
+
+	static auto parent_rom_device_type() { return &A2000_KBD_US; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(fullsize_gb); }

@@ -1,0 +1,159 @@
+Inputs:
+
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+
+Outputs:
+
+14 (Combinatorial, Output feedback output, Active high)
+15 (Combinatorial, Output feedback output, Active low)
+16 (Combinatorial, Output feedback output, Active low)
+17 (Combinatorial, Output feedback output, Active high)
+18 (Combinatorial, Output feedback output, Active high)
+19 (Combinatorial, Output feedback output, Active low)
+20 (Combinatorial, Output feedback output, Active low)
+21 (Combinatorial, Output feedback output, Active low)
+22 (Combinatorial, Output feedback output, Active low)
+23 (Combinatorial, Output feedback output, Active high)
+
+Equations:
+
+o14 = /i9 +
+      /i8 +
+      /i7 +
+      /i6 +
+      /i5 +
+      /i4 +
+      /i3 +
+      /i2
+o14.oe = vcc
+
+/o15 = i3 +
+       i7 & i8 +
+       i9 & i10 +
+       i11 & i13 +
+       i8 +
+       i4 & i6 +
+       i2 & i5 +
+       /i13 +
+       /i11 +
+       /i10
+o15.oe = vcc
+
+/o16 = /i4 & /i5 & /i6 +
+       i2 & i3 & i11 & i13 +
+       i2 & i3 +
+       /i2 & i3 & /i4 +
+       /i3 & /i4 & /i13 +
+       /i5 & /i11 & /i13 +
+       i11 & i13 +
+       i9 & i10 +
+       i7 & i8 +
+       i5 & i6 +
+       i3 & i4 +
+       i1 & i2
+o16.oe = o14
+
+o17 = /i6 & /i7 & /i8 & /i9 & /i10 +
+      /i1 & /i2 & /i3 & /i4 & /i5 +
+      i1 +
+      i2 +
+      i3 +
+      i4 +
+      i5 +
+      i6 +
+      i7 +
+      i8 +
+      i9 +
+      i10 +
+      i11 +
+      i13
+o17.oe = /o15
+
+o18 = /i7 & /i8 +
+      i1 & i2 & /i5 & /i6 +
+      i13 & /o20 +
+      /i9 & /i10 & /i11 +
+      /i5 & /i6 & o20 +
+      o17 & /o20 +
+      i1 & i3 & /o17 +
+      i9 & i11 +
+      /i7 & /i9 & /i13 +
+      i5 & i6 & /i10 +
+      /i3 & i4 +
+      /i3 & /o17 +
+      i1 & i2 & i4 +
+      /i3 & /i4 & o17 +
+      /i1 & /i2 & o17 +
+      /o17
+o18.oe = /i11 & /i13
+
+/o19 = i4 +
+       i3 +
+       i2 +
+       /i13 +
+       /i11 +
+       /i10 +
+       /i9 +
+       /i8 +
+       /i7 +
+       /i6 +
+       /i5 +
+       /i4 +
+       /i3 +
+       /i2 +
+       /o14 +
+       i1 & o14
+o19.oe = vcc
+
+/o20 = /i8 +
+       /i9 +
+       /i10 +
+       /i11 +
+       /i13 +
+       i13 +
+       i11 +
+       i10 +
+       i9 +
+       i8 +
+       i7 +
+       i6 +
+       i5 +
+       i1 & /i2
+o20.oe = i3 & /i9 & /i10 & i11
+
+/o21 = i5 & /i6 +
+       i4 & /i5 +
+       i3 & /i4 +
+       i2 & /i3 +
+       /i11 & /i13 +
+       /i9 & /i10 +
+       /i7 & /i8 +
+       /i5 & /i6 +
+       /i3 & /i4 +
+       /i2 & /i3 +
+       /o17 & /o23 +
+       i1 & i10
+o21.oe = vcc
+
+/o22 = i9 & i10 & i11 & i13 +
+       i5 & i6 & i7 & i8 +
+       i1 & i2 & i3 & i4 +
+       i11 & /i13 +
+       i10 & /i11 +
+       i9 & /i10 +
+       i8 & /i9 +
+       i7 & /i8 +
+       i6 & /i7 +
+       o23
+o22.oe = /i13
+
+o23 = /i1 & /i2 & /i3 & /i4 & /i5 & /i6 & /i7 & /i8 & /i9 & /i10 & /i11 & /i13 +
+      /i1 & i2 & /i3 & i4 & /i5 & i6 & /i7 & i8 & /i9 & i10 & /i11 & i13 +
+      i1 & /i2 & i3 & /i4 & i5 & /i6 & i7 & /i8 & i9 & /i10 & i11 & /i13 +
+      /i1 & /i13 +
+      /i1 & /i2 & /i3 & /i4 & /i5 & /i6 & /i7 & /i8 & /i9 & /i10 & /i11 & /i13 +
+      /i3 & i4 +
+      i1 & i2 & i3 & i4 & i5 & i6 & i7 & i8 & i9 & i10 & i11 & i13 +
+      i3 & /i4
+o23.oe = /o15 & o21
+

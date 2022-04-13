@@ -50,9 +50,6 @@ public:
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-	// to access io ports
-	DECLARE_READ8_MEMBER(read_fdc37c93x);
-	DECLARE_WRITE8_MEMBER(write_fdc37c93x);
 	// for the internal floppy controller
 	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_floppy_w);
@@ -82,6 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_rtc_w);
 	// keyboard
 	DECLARE_WRITE_LINE_MEMBER(irq_keyboard_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mouse_w);
 	DECLARE_WRITE_LINE_MEMBER(kbdp21_gp25_gatea20_w);
 	DECLARE_WRITE_LINE_MEMBER(kbdp20_gp20_reset_w);
 
@@ -93,22 +91,17 @@ public:
 	void map_keyboard(address_map &map);
 	void unmap_keyboard(address_map &map);
 
-	DECLARE_READ8_MEMBER(disabled_read);
-	DECLARE_WRITE8_MEMBER(disabled_write);
-	DECLARE_READ8_MEMBER(lpt_read);
-	DECLARE_WRITE8_MEMBER(lpt_write);
-	DECLARE_READ8_MEMBER(serial1_read);
-	DECLARE_WRITE8_MEMBER(serial1_write);
-	DECLARE_READ8_MEMBER(serial2_read);
-	DECLARE_WRITE8_MEMBER(serial2_write);
-	DECLARE_READ8_MEMBER(rtc_read);
-	DECLARE_WRITE8_MEMBER(rtc_write);
-	DECLARE_READ8_MEMBER(at_keybc_r);
-	DECLARE_WRITE8_MEMBER(at_keybc_w);
-	DECLARE_READ8_MEMBER(keybc_status_r);
-	DECLARE_WRITE8_MEMBER(keybc_command_w);
+	// to access io ports
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t disabled_read();
+	void disabled_write(uint8_t data);
+	uint8_t at_keybc_r(offs_t offset);
+	void at_keybc_w(offs_t offset, uint8_t data);
+	uint8_t keybc_status_r();
+	void keybc_command_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 protected:
 	// device-level overrides
@@ -155,10 +148,10 @@ private:
 	devcb_write_line m_txd2_callback;
 	devcb_write_line m_ndtr2_callback;
 	devcb_write_line m_nrts2_callback;
-	required_device<pc_fdc_interface> floppy_controller_fdcdev;
+	required_device<smc37c78_device> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
-	required_device<ns16450_device> pc_serial1_comdev;
-	required_device<ns16450_device> pc_serial2_comdev;
+	required_device<ns16550_device> pc_serial1_comdev;
+	required_device<ns16550_device> pc_serial2_comdev;
 	required_device<ds12885_device> ds12885_rtcdev;
 	required_device<kbdc8042_device> m_kbdc;
 	int sysopt_pin;
@@ -193,12 +186,12 @@ private:
 	void write_auxio_configuration_register(int index, int data);
 	uint16_t read_global_configuration_register(int index);
 	uint16_t read_logical_configuration_register(int index);
-	uint16_t read_fdd_configuration_register(int index) { return 0; }
-	uint16_t read_ide1_configuration_register(int index) { return 0; }
-	uint16_t read_ide2_configuration_register(int index) { return 0; }
-	uint16_t read_parallel_configuration_register(int index) { return 0; }
-	uint16_t read_serial1_configuration_register(int index) { return 0; }
-	uint16_t read_serial2_configuration_register(int index) { return 0; }
+	uint16_t read_fdd_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_ide1_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_ide2_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_parallel_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_serial1_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_serial2_configuration_register(int index) { return configuration_registers[logical_device][index]; }
 	uint16_t read_rtc_configuration_register(int index);
 	uint16_t read_keyboard_configuration_register(int index);
 	uint16_t read_auxio_configuration_register(int index);

@@ -18,7 +18,7 @@
 
 class abc_keyboard_interface;
 
-class abc_keyboard_port_device : public device_t, public device_slot_interface
+class abc_keyboard_port_device : public device_t, public device_single_card_slot_interface<abc_keyboard_interface>
 {
 public:
 	// construction/destruction
@@ -48,9 +48,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	devcb_write_line m_out_rx_handler;
 	devcb_write_line m_out_trxc_handler;
@@ -60,7 +58,7 @@ protected:
 };
 
 
-class abc_keyboard_interface : public device_slot_card_interface
+class abc_keyboard_interface : public device_interface
 {
 public:
 	virtual void txd_w(int state) { }

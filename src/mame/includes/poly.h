@@ -64,13 +64,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_bankdev(*this, "bankdev")
 		, m_ram(*this, RAM_TAG)
-		, m_trom(*this, "saa5050_%u", 1)
-		, m_pia(*this, "pia%u", 0)
+		, m_trom(*this, "saa5050_%u", 1U)
+		, m_pia(*this, "pia%u", 0U)
 		, m_adlc(*this, "mc6854")
 		, m_ptm(*this, "ptm")
 		, m_irqs(*this, "irqs")
 //      , m_kr2376(*this, "kr2376")
-		, m_kbd(*this, "X%u", 0)
+		, m_kbd(*this, "X%u", 0U)
 		, m_modifiers(*this, "MODIFIERS")
 		, m_speaker(*this, "speaker")
 		, m_user(*this, "user")
@@ -92,27 +92,27 @@ public:
 	virtual void poly_bank(address_map &map);
 
 private:
-	DECLARE_READ8_MEMBER( logical_mem_r );
-	DECLARE_WRITE8_MEMBER( logical_mem_w );
-	DECLARE_READ8_MEMBER( vector_r );
+	uint8_t logical_mem_r(offs_t offset);
+	void logical_mem_w(offs_t offset, uint8_t data);
+	uint8_t vector_r(offs_t offset);
 	void kbd_put(u8 data); // remove when KR2376 is implemented
 	DECLARE_READ_LINE_MEMBER( kbd_shift_r );
 	DECLARE_READ_LINE_MEMBER( kbd_control_r );
-	DECLARE_WRITE8_MEMBER( pia0_pa_w );
-	DECLARE_WRITE8_MEMBER( pia0_pb_w );
-	DECLARE_READ8_MEMBER( pia1_b_in );
-	DECLARE_READ8_MEMBER( videoram_1_r );
-	DECLARE_READ8_MEMBER( videoram_2_r );
+	void pia0_pa_w(uint8_t data);
+	void pia0_pb_w(uint8_t data);
+	uint8_t pia1_b_in();
+	uint8_t videoram_1_r(offs_t offset);
+	uint8_t videoram_2_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
 	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
-	DECLARE_WRITE8_MEMBER( baud_rate_w );
+	void baud_rate_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER( set_protect );
-	DECLARE_WRITE8_MEMBER( set_protect_w );
-	DECLARE_READ8_MEMBER( select_map_r );
-	DECLARE_WRITE8_MEMBER( select_map1_w );
-	DECLARE_WRITE8_MEMBER( select_map2_w );
-	DECLARE_READ8_MEMBER( network_r );
-	DECLARE_WRITE8_MEMBER( network_w );
+	void set_protect_w(uint8_t data);
+	uint8_t select_map_r();
+	void select_map1_w(uint8_t data);
+	void select_map2_w(uint8_t data);
+	uint8_t network_r(offs_t offset);
+	void network_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( network_clk_w );
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -140,12 +140,12 @@ private:
 	required_shared_ptr<uint8_t> m_dat;
 	optional_device<acia6850_device> m_acia;
 	optional_device<clock_device> m_acia_clock;
-	uint8_t m_video_pa, m_video_pb;
-	uint8_t m_term_data;
+	uint8_t m_video_pa = 0U, m_video_pb = 0U;
+	uint8_t m_term_data = 0U;
 
 	inline offs_t physical(offs_t offset);
 
-	int m_dat_bank;
+	int m_dat_bank = 0;
 };
 
 
@@ -155,7 +155,7 @@ public:
 	polydev_state(const machine_config &mconfig, device_type type, const char *tag)
 		: poly_state(mconfig, type, tag)
 		, m_fdc(*this, "fdc")
-		, m_floppy(*this, "fdc:%u", 0)
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_current_floppy(nullptr)
 	{
 	}
@@ -165,16 +165,16 @@ public:
 	void polydev(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(drive_register_w);
-	DECLARE_READ8_MEMBER(drive_register_r);
+	void drive_register_w(uint8_t data);
+	uint8_t drive_register_r();
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_READ8_MEMBER(fdc_inv_r);
-	DECLARE_WRITE8_MEMBER(fdc_inv_w);
+	uint8_t fdc_inv_r(offs_t offset);
+	void fdc_inv_w(offs_t offset, uint8_t data);
 
 
 	virtual void poly_bank(address_map &map) override;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<fd1771_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

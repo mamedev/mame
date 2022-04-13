@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class scotrsht_state : public driver_device
 {
@@ -38,18 +39,18 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	int m_irq_enable;
-	int m_charbank;
-	int m_palette_bank;
+	int m_irq_enable = 0;
+	int m_charbank = 0;
+	int m_palette_bank = 0;
 
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(palettebank_w);
+	void ctrl_w(uint8_t data);
+	void soundlatch_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void charbank_w(uint8_t data);
+	void palettebank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

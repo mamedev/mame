@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "necdasm.h"
 
 #define NEC_INPUT_LINE_INTP0 10
 #define NEC_INPUT_LINE_INTP1 11
@@ -15,30 +16,25 @@
 enum
 {
 	V25_PC=0,
-	V25_IP, V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
-	V25_FLAGS, V25_ES, V25_CS, V25_SS, V25_DS,
+	V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
+	V25_DS1, V25_PS, V25_SS, V25_DS0,
+	V25_AL, V25_AH, V25_CL, V25_CH, V25_DL, V25_DH, V25_BL, V25_BH,
+	V25_PSW,
 	V25_IDB,
 	V25_PENDING
 };
 
-class v25_common_device : public cpu_device
+class v25_common_device : public cpu_device, public nec_disassembler::config
 {
 public:
 	// configuration helpers
 	void set_decryption_table(const uint8_t *decryption_table) { m_v25v35_decryptiontable = decryption_table; }
 
-	template <class Object> devcb_base &set_pt_in_cb(Object &&cb) { return m_pt_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p0_in_cb(Object &&cb) { return m_p0_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p1_in_cb(Object &&cb) { return m_p1_in.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p2_in_cb(Object &&cb) { return m_p2_in.set_callback(std::forward<Object>(cb)); }
 	auto pt_in_cb() { return m_pt_in.bind(); }
 	auto p0_in_cb() { return m_p0_in.bind(); }
 	auto p1_in_cb() { return m_p1_in.bind(); }
 	auto p2_in_cb() { return m_p2_in.bind(); }
 
-	template <class Object> devcb_base &set_p0_out_cb(Object &&cb) { return m_p0_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p1_out_cb(Object &&cb) { return m_p1_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_p2_out_cb(Object &&cb) { return m_p2_out.set_callback(std::forward<Object>(cb)); }
 	auto p0_out_cb() { return m_p0_out.bind(); }
 	auto p1_out_cb() { return m_p1_out.bind(); }
 	auto p2_out_cb() { return m_p2_out.bind(); }
@@ -55,13 +51,13 @@ protected:
 	virtual void device_post_load() override { notify_clock_changed(); }
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return clocks / m_PCK; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * m_PCK; }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 80; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || (inputnum >= NEC_INPUT_LINE_INTP0 && inputnum <= NEC_INPUT_LINE_INTP2); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks / m_PCK; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles * m_PCK; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 80; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI || (inputnum >= NEC_INPUT_LINE_INTP0 && inputnum <= NEC_INPUT_LINE_INTP2); }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -75,16 +71,21 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual int get_mode() const override { return 1; }
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::cache m_cache16;
+
 	/* internal RAM and register banks */
 	required_shared_ptr<uint16_t> m_internal_ram;
 
 	uint16_t  m_ip;
+	uint16_t  m_prev_ip;
 
 	/* PSW flags */
 	int32_t   m_SignVal;
@@ -95,14 +96,20 @@ private:
 	/* interrupt related */
 	uint32_t  m_pending_irq;
 	uint32_t  m_unmasked_irq;
+	uint32_t  m_macro_service;
 	uint32_t  m_bankswitch_irq;
 	uint8_t   m_priority_inttu, m_priority_intd, m_priority_intp, m_priority_ints0, m_priority_ints1;
+	uint8_t   m_ems[3];
+	uint8_t   m_srms[2];
+	uint8_t   m_stms[2];
+	uint8_t   m_tmms[3];
 	uint8_t   m_IRQS, m_ISPR;
 	uint32_t  m_nmi_state;
 	uint32_t  m_irq_state;
 	uint32_t  m_poll_state;
 	uint32_t  m_mode_state;
 	uint32_t  m_intp_state[3];
+	uint8_t   m_intm;
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
 
@@ -182,12 +189,36 @@ private:
 	void pmc2_w(uint8_t d);
 	uint8_t pt_r();
 	void pmt_w(uint8_t d);
+	uint8_t intm_r();
+	void intm_w(uint8_t d);
+	uint8_t ems_r(offs_t a);
+	void ems_w(offs_t a, uint8_t d);
 	uint8_t exic0_r();
 	void exic0_w(uint8_t d);
 	uint8_t exic1_r();
 	void exic1_w(uint8_t d);
 	uint8_t exic2_r();
 	void exic2_w(uint8_t d);
+	uint8_t srms0_r();
+	void srms0_w(uint8_t d);
+	uint8_t stms0_r();
+	void stms0_w(uint8_t d);
+	uint8_t seic0_r();
+	void seic0_w(uint8_t d);
+	uint8_t sric0_r();
+	void sric0_w(uint8_t d);
+	uint8_t stic0_r();
+	void stic0_w(uint8_t d);
+	uint8_t srms1_r();
+	void srms1_w(uint8_t d);
+	uint8_t stms1_r();
+	void stms1_w(uint8_t d);
+	uint8_t seic1_r();
+	void seic1_w(uint8_t d);
+	uint8_t sric1_r();
+	void sric1_w(uint8_t d);
+	uint8_t stic1_r();
+	void stic1_w(uint8_t d);
 	uint16_t tm0_r();
 	void tm0_w(uint16_t d);
 	uint16_t md0_r();
@@ -198,6 +229,8 @@ private:
 	void md1_w(uint16_t d);
 	void tmc0_w(uint8_t d);
 	void tmc1_w(uint8_t d);
+	uint8_t tmms_r(offs_t a);
+	void tmms_w(offs_t a, uint8_t d);
 	uint8_t tmic0_r();
 	void tmic0_w(uint8_t d);
 	uint8_t tmic1_r();

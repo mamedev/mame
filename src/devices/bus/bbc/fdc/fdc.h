@@ -21,7 +21,7 @@
 
 class device_bbc_fdc_interface;
 
-class bbc_fdc_slot_device : public device_t, public device_slot_interface
+class bbc_fdc_slot_device : public device_t, public device_single_card_slot_interface<device_bbc_fdc_interface>
 {
 public:
 	// construction/destruction
@@ -33,9 +33,13 @@ public:
 		slot_options(*this);
 		set_default_option(default_option);
 		set_fixed(false);
+		set_insert_rom(true);
 	}
 
 	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+
+	void set_insert_rom(bool insert_rom) { m_insert_rom = insert_rom; }
+	bool insert_rom() { return m_insert_rom; }
 
 	// callbacks
 	auto intrq_wr_callback() { return m_intrq_cb.bind(); }
@@ -49,21 +53,21 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_bbc_fdc_interface *m_card;
 
 private:
 	devcb_write_line m_intrq_cb;
 	devcb_write_line m_drq_cb;
+
+	bool m_insert_rom;
 };
 
 
 // ======================> device_bbc_fdc_interface
 
-class device_bbc_fdc_interface : public device_slot_card_interface
+class device_bbc_fdc_interface : public device_interface
 {
 public:
 	virtual uint8_t read(offs_t offset) { return 0xff; }

@@ -68,6 +68,9 @@ ToDo: verify QS1000 hook-up
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define NAND_LOG 0
 
 enum nand_mode_t
@@ -78,10 +81,10 @@ enum nand_mode_t
 
 struct nand_t
 {
-	nand_mode_t mode;
-	int page_addr;
-	int byte_addr;
-	int addr_load_ptr;
+	nand_mode_t mode{};
+	int page_addr = 0;
+	int byte_addr = 0;
+	int addr_load_ptr = 0;
 };
 
 
@@ -97,6 +100,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_system_memory(*this, "systememory")
 		, m_flash(*this, "flash")
+		, m_qs1000_bank(*this, "qs1000_bank")
 	{
 	}
 
@@ -107,6 +111,10 @@ public:
 	void init_touryuu();
 	void init_bballoon();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
@@ -115,27 +123,26 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint32_t> m_system_memory;
 	required_region_ptr<uint8_t> m_flash;
+	memory_bank_creator m_qs1000_bank;
 
-	int m_security_count;
-	uint32_t m_bballoon_port[20];
+	int m_security_count = 0;
+	uint32_t m_bballoon_port[20]{};
 	struct nand_t m_nand;
-	DECLARE_READ32_MEMBER(bballoon_speedup_r);
-	DECLARE_READ32_MEMBER(touryuu_port_10000000_r);
+	uint32_t bballoon_speedup_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t touryuu_port_10000000_r();
 
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	void qs1000_p1_w(uint8_t data);
+	void qs1000_p2_w(uint8_t data);
+	void qs1000_p3_w(uint8_t data);
 
-	int m_rom_pagesize;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
-	DECLARE_READ32_MEMBER(s3c2410_core_pin_r);
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_command_w );
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_address_w );
-	DECLARE_READ8_MEMBER(s3c2410_nand_data_r );
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_data_w );
+	int m_rom_pagesize = 0;
+	uint32_t s3c2410_gpio_port_r(offs_t offset);
+	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
+	uint32_t s3c2410_core_pin_r(offs_t offset);
+	void s3c2410_nand_command_w(uint8_t data);
+	void s3c2410_nand_address_w(uint8_t data);
+	uint8_t s3c2410_nand_data_r();
+	void s3c2410_nand_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_scl_w );
 	DECLARE_READ_LINE_MEMBER(s3c2410_i2c_sda_r );
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_sda_w );
@@ -168,21 +175,21 @@ NAND Flash Controller (4KB internal buffer)
 24-ch external interrupts Controller (Wake-up source 16-ch)
 */
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p1_w )
+void ghosteo_state::qs1000_p1_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p2_w )
+void ghosteo_state::qs1000_p2_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
+void ghosteo_state::qs1000_p3_w(uint8_t data)
 {
 	// .... .xxx - Data ROM bank (64kB)
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	membank("qs1000:bank")->set_entry(data & 0x07);
+	m_qs1000_bank->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
 		m_soundlatch->acknowledge_w();
@@ -193,7 +200,7 @@ WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
 
 static const uint8_t security_data[] = { 0x01, 0xC4, 0xFF, 0x22, 0xFF, 0xFF, 0xFF, 0xFF };
 
-READ32_MEMBER(ghosteo_state::s3c2410_gpio_port_r)
+uint32_t ghosteo_state::s3c2410_gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_bballoon_port[offset];
 	switch (offset)
@@ -213,7 +220,7 @@ READ32_MEMBER(ghosteo_state::s3c2410_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(ghosteo_state::s3c2410_gpio_port_w)
+void ghosteo_state::s3c2410_gpio_port_w(offs_t offset, uint32_t data)
 {
 	uint32_t old_value = m_bballoon_port[offset];
 	m_bballoon_port[offset] = data;
@@ -258,7 +265,7 @@ NCON : NAND flash memory address step selection
 
 */
 
-READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
+uint32_t ghosteo_state::s3c2410_core_pin_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
@@ -272,7 +279,7 @@ READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
 
 // NAND
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
+void ghosteo_state::s3c2410_nand_command_w(uint8_t data)
 {
 	struct nand_t &nand = m_nand;
 	#if NAND_LOG
@@ -296,7 +303,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 	}
 }
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
+void ghosteo_state::s3c2410_nand_address_w(uint8_t data)
 {
 	struct nand_t &nand = m_nand;
 	#if NAND_LOG
@@ -330,7 +337,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 	}
 }
 
-READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
+uint8_t ghosteo_state::s3c2410_nand_data_r()
 {
 	struct nand_t &nand = m_nand;
 	uint8_t data = 0;
@@ -376,7 +383,7 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 	return data;
 }
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
+void ghosteo_state::s3c2410_nand_data_w(uint8_t data)
 {
 	#if NAND_LOG
 	logerror( "s3c2410_nand_data_w %02X\n", data);
@@ -405,7 +412,7 @@ WRITE_LINE_MEMBER(ghosteo_state::s3c2410_i2c_sda_w )
 	m_i2cmem->write_sda(state);
 }
 
-READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
+uint32_t ghosteo_state::touryuu_port_10000000_r()
 {
 	uint32_t port_g = m_bballoon_port[S3C2410_GPIO_PORT_G];
 	uint32_t data = 0xFFFFFFFF;
@@ -567,9 +574,9 @@ static INPUT_PORTS_START( touryuu )
 	PORT_BIT( 0xFFFFFF50, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
+uint32_t ghosteo_state::bballoon_speedup_r(offs_t offset, uint32_t mem_mask)
 {
-	uint32_t ret = m_s3c2410->s3c24xx_lcd_r(space, offset+0x10/4, mem_mask);
+	uint32_t ret = m_s3c2410->s3c24xx_lcd_r(offset+0x10/4, mem_mask);
 
 
 	int pc = m_maincpu->pc();
@@ -594,13 +601,15 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 void ghosteo_state::machine_start()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
-	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
+
+	m_security_count = 0;
 }
 
 void ghosteo_state::machine_reset()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32s_delegate(*this, FUNC(ghosteo_state::bballoon_speedup_r)));
 }
 
 void ghosteo_state::ghosteo(machine_config &config)
@@ -635,7 +644,7 @@ void ghosteo_state::ghosteo(machine_config &config)
 //  nand.set_nand_type(nand_device::chip::K9F5608U0D);    // or another variant with ID 0xEC 0x75 ?
 //  nand.rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::s3c24xx_pin_frnb_w));
 
-//  I2CMEM(config, "i2cmem", 0, 0xA0, 0, 0x100, nullptr);
+	I2C_24C16(config, "i2cmem", 0); // M24CL16-S
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -659,14 +668,12 @@ void ghosteo_state::bballoon(machine_config &config)
 {
 	ghosteo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ghosteo_state::bballoon_map);
-	I2CMEM(config, "i2cmem", 0).set_data_size(256);
 }
 
 void ghosteo_state::touryuu(machine_config &config)
 {
 	ghosteo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ghosteo_state::touryuu_map);
-	I2CMEM(config, "i2cmem", 0).set_data_size(1024);
 }
 
 
@@ -711,7 +718,7 @@ Notes:
       QS1001A    - QDSP QS1001A 512k x8 MaskROM (SOP32)
 
       qs1001a.u17 was not dumped from this PCB, but is a standard sample rom found on many Eolith games
-                  see eolith.c and vegaeo.c drivers
+                  see eolith.cpp and vegaeo.cpp drivers
 */
 
 // The NAND dumps are missing the ECC data.  We calculate it on the fly, because the games require it, but really it should be dumped hence the 'BAD DUMP' flags
@@ -764,6 +771,9 @@ void ghosteo_state::init_touryuu()
 {
 	m_rom_pagesize = 0x210;
 }
+
+} // Anonymous namespace
+
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
 GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )

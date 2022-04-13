@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="iq128" description="VTech Genius IQ 128 cartridges">
 
 	<!-- According to the boxart, this is compatible with: IQ 128 -->

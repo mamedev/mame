@@ -86,11 +86,11 @@ void dlair2_state::dlair2_map(address_map &map)
 
 void dlair2_state::dlair2_io(address_map &map)
 {
-//  AM_RANGE(0x020, 0x020) ICR
-//  AM_RANGE(0x042, 0x043) sound related
-//  AM_RANGE(0x061, 0x061) sound related
-//  AM_RANGE(0x200, 0x203) i/o, coin, eeprom
-//  AM_RANGE(0x2f8, 0x2ff) COM2
+//  map(0x020, 0x020) ICR
+//  map(0x042, 0x043) sound related
+//  map(0x061, 0x061) sound related
+//  map(0x200, 0x203) i/o, coin, eeprom
+//  map(0x2f8, 0x2ff) COM2
 }
 
 static INPUT_PORTS_START( dlair2 )

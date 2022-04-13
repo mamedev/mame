@@ -64,13 +64,13 @@ void espial_state::machine_start()
 }
 
 
-WRITE8_MEMBER(espial_state::espial_master_interrupt_mask_w)
+void espial_state::espial_master_interrupt_mask_w(uint8_t data)
 {
 	m_main_nmi_enabled = ~(data & 1);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_sound_nmi_mask_w)
+void espial_state::espial_sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_enabled = data & 1;
 }
@@ -90,11 +90,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(espial_state::espial_scanline)
 INTERRUPT_GEN_MEMBER(espial_state::espial_sound_nmi_gen)
 {
 	if (m_sound_nmi_enabled)
-		nmi_line_pulse(device);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_master_soundlatch_w)
+void espial_state::espial_master_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);

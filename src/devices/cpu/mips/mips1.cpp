@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "mips1.h"
 #include "mips1dsm.h"
-#include "debugger.h"
 #include "softfloat3/source/include/softfloat.h"
 
 #define LOG_GENERAL (1U << 0)
@@ -54,9 +53,9 @@ DEFINE_DEVICE_TYPE(R3071,       r3071_device,     "r3071",   "IDT R3071")
 DEFINE_DEVICE_TYPE(R3081,       r3081_device,     "r3081",   "IDT R3081")
 DEFINE_DEVICE_TYPE(SONYPS2_IOP, iop_device,       "sonyiop", "Sony Playstation 2 IOP")
 
-ALLOW_SAVE_TYPE(mips1core_device_base::branch_state_t);
+ALLOW_SAVE_TYPE(mips1core_device_base::branch_state);
 
-mips1core_device_base::mips1core_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size)
+mips1core_device_base::mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_be("program", ENDIANNESS_BIG, 32, 32)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 32, 32)
@@ -67,68 +66,68 @@ mips1core_device_base::mips1core_device_base(const machine_config &mconfig, devi
 	, m_icount(0)
 	, m_icache_size(icache_size)
 	, m_dcache_size(dcache_size)
-	, m_in_brcond{ *this, *this, *this, *this }
+	, m_in_brcond(*this)
 {
 }
 
-mips1_device_base::mips1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size)
+mips1_device_base::mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size)
 	: mips1core_device_base(mconfig, type, tag, owner, clock, cpurev, icache_size, dcache_size)
 	, m_fcr0(0)
 {
 }
 
-r2000_device::r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
+r2000_device::r2000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
 	: mips1_device_base(mconfig, R2000, tag, owner, clock, 0x0100, icache_size, dcache_size)
 {
 }
 
-r2000a_device::r2000a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
+r2000a_device::r2000a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
 	: mips1_device_base(mconfig, R2000A, tag, owner, clock, 0x0210, icache_size, dcache_size)
 {
 }
 
-r3000_device::r3000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
+r3000_device::r3000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
 	: mips1_device_base(mconfig, R3000, tag, owner, clock, 0x0220, icache_size, dcache_size)
 {
 }
 
-r3000a_device::r3000a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
+r3000a_device::r3000a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
 	: mips1_device_base(mconfig, R3000A, tag, owner, clock, 0x0230, icache_size, dcache_size)
 {
 }
 
-r3041_device::r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+r3041_device::r3041_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: mips1core_device_base(mconfig, R3041, tag, owner, clock, 0x0700, 2048, 512)
 {
 }
 
-r3051_device::r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+r3051_device::r3051_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: mips1core_device_base(mconfig, R3051, tag, owner, clock, 0x0200, 4096, 2048)
 {
 }
 
-r3052_device::r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+r3052_device::r3052_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: mips1core_device_base(mconfig, R3052, tag, owner, clock, 0x0200, 8192, 2048)
 {
 }
 
-r3052e_device::r3052e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+r3052e_device::r3052e_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: mips1_device_base(mconfig, R3052E, tag, owner, clock, 0x0200, 8192, 2048)
 {
 }
 
-r3071_device::r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
+r3071_device::r3071_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
 	: mips1_device_base(mconfig, R3071, tag, owner, clock, 0x0200, icache_size, dcache_size)
 {
 }
 
-r3081_device::r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
+r3081_device::r3081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
 	: mips1_device_base(mconfig, R3081, tag, owner, clock, 0x0200, icache_size, dcache_size)
 {
 	set_fpu(0x0300);
 }
 
-iop_device::iop_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+iop_device::iop_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: mips1core_device_base(mconfig, SONYPS2_IOP, tag, owner, clock, 0x001f, 4096, 1024)
 {
 	m_endianness = ENDIANNESS_LITTLE;
@@ -151,8 +150,7 @@ void mips1core_device_base::device_start()
 	set_icountptr(m_icount);
 
 	// resolve conditional branch input handlers
-	for (devcb_read_line &cb : m_in_brcond)
-		cb.resolve_safe(0);
+	m_in_brcond.resolve_all_safe(0);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
@@ -161,7 +159,7 @@ void mips1core_device_base::device_start()
 	state_add(MIPS1_PC,                   "PC",        m_pc);
 	state_add(MIPS1_COP0 + COP0_Status,   "SR",        m_cop0[COP0_Status]);
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_r); i++)
+	for (unsigned i = 0; i < std::size(m_r); i++)
 		state_add(MIPS1_R0 + i, util::string_format("R%d", i).c_str(), m_r[i]);
 
 	state_add(MIPS1_HI, "HI", m_hi);
@@ -183,6 +181,10 @@ void mips1core_device_base::device_start()
 
 	// initialise cpu id register
 	m_cop0[COP0_PRId] = m_cpurev;
+
+	m_cop0[COP0_Cause] = 0;
+
+	m_r[0] = 0;
 }
 
 void r3041_device::device_start()
@@ -195,6 +197,10 @@ void r3041_device::device_start()
 	state_add(MIPS1_COP0 + COP0_Count,    "Count", m_cop0[COP0_Count]);
 	state_add(MIPS1_COP0 + COP0_PortSize, "PortSize", m_cop0[COP0_PortSize]);
 	state_add(MIPS1_COP0 + COP0_Compare,  "Compare", m_cop0[COP0_Compare]);
+
+	m_cop0[COP0_BusCtrl] = 0x20130b00U;
+	m_cop0[COP0_Config] = 0x40000000U;
+	m_cop0[COP0_PortSize] = 0;
 }
 
 void mips1core_device_base::device_reset()
@@ -207,13 +213,19 @@ void mips1core_device_base::device_reset()
 	m_cop0[COP0_Status] = SR_BEV | SR_TS;
 
 	m_data_spacenum = 0;
+	m_bus_error = false;
+}
+
+void r3041_device::device_reset()
+{
+	mips1core_device_base::device_reset();
+
+	m_cop0[COP0_Count] = 0;
+	m_cop0[COP0_Compare] = 0x00ffffffU;
 }
 
 void mips1core_device_base::execute_run()
 {
-	// check for interrupts
-	check_irqs();
-
 	// core execution loop
 	while (m_icount-- > 0)
 	{
@@ -238,10 +250,17 @@ void mips1core_device_base::execute_run()
 			}
 		}
 
-		// fetch and execute instruction
+		// fetch instruction
 		fetch(m_pc, [this](u32 const op)
 		{
-			// parse the instruction
+			// check for interrupts
+			if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
+			{
+				generate_exception(EXCEPTION_INTERRUPT);
+				return;
+			}
+
+			// decode and execute instruction
 			switch (op >> 26)
 			{
 			case 0x00: // SPECIAL
@@ -378,7 +397,18 @@ void mips1core_device_base::execute_run()
 				}
 				break;
 			case 0x01: // REGIMM
-				switch (RTREG)
+				/*
+				 * Hardware testing has established that MIPS-1 processors do
+				 * not decode bit 17 of REGIMM format instructions. This bit is
+				 * used to add the "branch likely" instructions for MIPS-2 and
+				 * later architectures.
+				 *
+				 * IRIX 5.3 inst(1M) uses this behaviour to distinguish MIPS-1
+				 * from MIPS-2 processors; the latter nullify the delay slot
+				 * instruction if the branch is not taken, whereas the former
+				 * execute the delay slot instruction regardless.
+				 */
+				switch (RTREG & 0x1d)
 				{
 				case 0x00: // BLTZ
 					if (s32(m_r[RSREG]) < 0)
@@ -558,31 +588,31 @@ void mips1core_device_base::execute_run()
 				break;
 			}
 
-			// update pc and branch state
-			switch (m_branch_state)
-			{
-			case NONE:
-				m_pc += 4;
-				break;
-
-			case DELAY:
-				m_branch_state = NONE;
-				m_pc = m_branch_target;
-				break;
-
-			case BRANCH:
-				m_branch_state = DELAY;
-				m_pc += 4;
-				break;
-
-			case EXCEPTION:
-				m_branch_state = NONE;
-				break;
-			}
-
 			// clear register 0
 			m_r[0] = 0;
 		});
+
+		// update pc and branch state
+		switch (m_branch_state)
+		{
+		case NONE:
+			m_pc += 4;
+			break;
+
+		case DELAY:
+			m_branch_state = NONE;
+			m_pc = m_branch_target;
+			break;
+
+		case BRANCH:
+			m_branch_state = DELAY;
+			m_pc += 4;
+			break;
+
+		case EXCEPTION:
+			m_branch_state = NONE;
+			break;
+		}
 	}
 }
 
@@ -598,8 +628,6 @@ void mips1core_device_base::execute_set_input(int irqline, int state)
 	}
 	else
 		CAUSE &= ~(CAUSE_IPEX0 << irqline);
-
-	check_irqs();
 }
 
 device_memory_interface::space_config_vector mips1core_device_base::memory_space_config() const
@@ -633,13 +661,8 @@ bool mips1core_device_base::memory_translate(int spacenum, int intention, offs_t
 		}
 		else if (SR & SR_KUc)
 		{
-			if (!machine().side_effects_disabled())
-			{
-				// exception
-				m_cop0[COP0_BadVAddr] = address;
+			address_error(intention, address);
 
-				generate_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
-			}
 			return false;
 		}
 	}
@@ -727,17 +750,17 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 			{
 			case 1049: // msgsys
 				LOGMASKED(LOG_RISCOS, "asid %d syscall msgsys:%s() (%s)\n",
-					asid, (m_r[5] < ARRAY_LENGTH(msg_syscalls)) ? msg_syscalls[m_r[5]] : "unknown", machine().describe_context());
+					asid, (m_r[5] < std::size(msg_syscalls)) ? msg_syscalls[m_r[5]] : "unknown", machine().describe_context());
 				break;
 
 			case 1052: // shmsys
 				LOGMASKED(LOG_RISCOS, "asid %d syscall shmsys:%s() (%s)\n",
-					asid, (m_r[5] < ARRAY_LENGTH(shm_syscalls)) ? shm_syscalls[m_r[5]] : "unknown", machine().describe_context());
+					asid, (m_r[5] < std::size(shm_syscalls)) ? shm_syscalls[m_r[5]] : "unknown", machine().describe_context());
 				break;
 
 			case 1053: // semsys
 				LOGMASKED(LOG_RISCOS, "asid %d syscall semsys:%s() (%s)\n",
-					asid, (m_r[5] < ARRAY_LENGTH(sem_syscalls)) ? sem_syscalls[m_r[5]] : "unknown", machine().describe_context());
+					asid, (m_r[5] < std::size(sem_syscalls)) ? sem_syscalls[m_r[5]] : "unknown", machine().describe_context());
 				break;
 
 			case 2151: // bsd_sysmips
@@ -749,7 +772,7 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 					break;
 
 				default:
-					if ((m_r[5] > 0x100) && (m_r[5] - 0x100) < ARRAY_LENGTH(mips_syscalls))
+					if ((m_r[5] > 0x100) && (m_r[5] - 0x100) < std::size(mips_syscalls))
 						LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:%s() (%s)\n",
 							asid, mips_syscalls[m_r[5] - 0x100], machine().describe_context());
 					else
@@ -760,7 +783,7 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 				break;
 
 			default:
-				if ((m_r[4] > 2000) && (m_r[4] - 2000 < ARRAY_LENGTH(bsd_syscalls)) && bsd_syscalls[m_r[4] - 2000])
+				if ((m_r[4] > 2000) && (m_r[4] - 2000 < std::size(bsd_syscalls)) && bsd_syscalls[m_r[4] - 2000])
 					LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_%s() (%s)\n",
 						asid, bsd_syscalls[m_r[4] - 2000], machine().describe_context());
 				else
@@ -809,7 +832,7 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 			break;
 
 		default:
-			if ((m_r[2] > 1000) && (m_r[2] - 1000 < ARRAY_LENGTH(sysv_syscalls)) && sysv_syscalls[m_r[2] - 1000])
+			if ((m_r[2] > 1000) && (m_r[2] - 1000 < std::size(sysv_syscalls)) && sysv_syscalls[m_r[2] - 1000])
 				LOGMASKED(LOG_RISCOS, "asid %d syscall %s() (%s)\n", asid, sysv_syscalls[m_r[2] - 1000], machine().describe_context());
 			else
 				LOGMASKED(LOG_RISCOS, "asid %d syscall unknown %d (%s)\n", asid, m_r[2], machine().describe_context());
@@ -845,10 +868,19 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 		debugger_privilege_hook();
 }
 
-void mips1core_device_base::check_irqs()
+void mips1core_device_base::address_error(int intention, u32 const address)
 {
-	if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
-		generate_exception(EXCEPTION_INTERRUPT);
+	if (!machine().side_effects_disabled() && !(intention & TRANSLATE_DEBUG_MASK))
+	{
+		logerror("address_error 0x%08x (%s)\n", address, machine().describe_context());
+
+		m_cop0[COP0_BadVAddr] = address;
+
+		generate_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
+
+		// address errors shouldn't typically occur, so a breakpoint is handy
+		machine().debug_break();
+	}
 }
 
 void mips1core_device_base::handle_cop0(u32 const op)
@@ -887,7 +919,7 @@ void mips1core_device_base::handle_cop0(u32 const op)
 		switch (op & 31)
 		{
 			case 0x10: // RFE
-				SR = (SR & ~SR_KUIEpc) | ((SR >> 2) & SR_KUIEpc);
+				SR = (SR & ~SR_KUIE) | ((SR >> 2) & SR_KUIEpc);
 				if (bool(SR & SR_KUc) ^ bool(SR & SR_KUp))
 					debugger_privilege_hook();
 				break;
@@ -911,32 +943,24 @@ void mips1core_device_base::set_cop0_reg(unsigned const reg, u32 const data)
 {
 	switch (reg)
 	{
-	case COP0_Context:
-		m_cop0[COP0_Context] = (m_cop0[COP0_Context] & ~PTE_BASE) | (data & PTE_BASE);
-		break;
 	case COP0_Status:
-	{
-		u32 const delta = SR ^ data;
+		{
+			u32 const delta = SR ^ data;
 
-		m_cop0[COP0_Status] = data;
+			m_cop0[COP0_Status] = data;
 
-		// handle cache isolation and swap
-		m_data_spacenum = (data & SR_IsC) ? ((data & SR_SwC) ? 1 : 2) : 0;
+			// handle cache isolation and swap
+			m_data_spacenum = (data & SR_IsC) ? ((data & SR_SwC) ? 1 : 2) : 0;
 
-		// update interrupts
-		if (delta & (SR_IEc | SR_IM))
-			check_irqs();
+			if ((delta & SR_KUc) && (m_branch_state != EXCEPTION))
+				debugger_privilege_hook();
+		}
+		break;
 
-		if ((delta & SR_KUc) && (m_branch_state != EXCEPTION))
-			debugger_privilege_hook();
-	}
-	break;
 	case COP0_Cause:
 		CAUSE = (CAUSE & CAUSE_IPEX) | (data & ~CAUSE_IPEX);
-
-		// update interrupts -- software ints can occur this way
-		check_irqs();
 		break;
+
 	case COP0_PRId:
 		// read-only register
 		break;
@@ -1030,9 +1054,9 @@ void mips1core_device_base::handle_cop3(u32 const op)
 void mips1core_device_base::lwl(u32 const op)
 {
 	offs_t const offset = SIMMVAL + m_r[RSREG];
-	load<u32>(offset & ~3, [this, op, offset](u32 temp)
+	load<u32, false>(offset, [this, op, offset](u32 temp)
 	{
-		unsigned const shift = ((offset & 3) ^ ENDIAN_VALUE_LE_BE(m_endianness, 3, 0)) << 3;
+		unsigned const shift = ((offset & 3) ^ (m_endianness == ENDIANNESS_LITTLE ? 3 : 0)) << 3;
 
 		m_r[RTREG] = (m_r[RTREG] & ~u32(0xffffffffU << shift)) | (temp << shift);
 	});
@@ -1041,9 +1065,9 @@ void mips1core_device_base::lwl(u32 const op)
 void mips1core_device_base::lwr(u32 const op)
 {
 	offs_t const offset = SIMMVAL + m_r[RSREG];
-	load<u32>(offset & ~3, [this, op, offset](u32 temp)
+	load<u32, false>(offset, [this, op, offset](u32 temp)
 	{
-		unsigned const shift = ((offset & 0x3) ^ ENDIAN_VALUE_LE_BE(m_endianness, 0, 3)) << 3;
+		unsigned const shift = ((offset & 0x3) ^ (m_endianness == ENDIANNESS_LITTLE ? 0 : 3)) << 3;
 
 		m_r[RTREG] = (m_r[RTREG] & ~u32(0xffffffffU >> shift)) | (temp >> shift);
 	});
@@ -1052,36 +1076,64 @@ void mips1core_device_base::lwr(u32 const op)
 void mips1core_device_base::swl(u32 const op)
 {
 	offs_t const offset = SIMMVAL + m_r[RSREG];
-	unsigned const shift = ((offset & 3) ^ ENDIAN_VALUE_LE_BE(m_endianness, 3, 0)) << 3;
+	unsigned const shift = ((offset & 3) ^ (m_endianness == ENDIANNESS_LITTLE ? 3 : 0)) << 3;
 
-	store<u32>(offset & ~3, m_r[RTREG] >> shift, 0xffffffffU >> shift);
+	store<u32, false>(offset, m_r[RTREG] >> shift, 0xffffffffU >> shift);
 }
 
 void mips1core_device_base::swr(u32 const op)
 {
 	offs_t const offset = SIMMVAL + m_r[RSREG];
-	unsigned const shift = ((offset & 3) ^ ENDIAN_VALUE_LE_BE(m_endianness, 0, 3)) << 3;
+	unsigned const shift = ((offset & 3) ^ (m_endianness == ENDIANNESS_LITTLE ? 0 : 3)) << 3;
 
-	store<u32>(offset & ~3, m_r[RTREG] << shift, 0xffffffffU << shift);
+	store<u32, false>(offset, m_r[RTREG] << shift, 0xffffffffU << shift);
 }
 
-template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> mips1core_device_base::load(u32 address, U &&apply)
+template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> mips1core_device_base::load(u32 address, U &&apply)
 {
+	// alignment error
+	if (Aligned && (address & (sizeof(T) - 1)))
+	{
+		address_error(TRANSLATE_READ, address);
+		return;
+	}
+
 	if (memory_translate(m_data_spacenum, TRANSLATE_READ, address))
 	{
-		switch (sizeof(T))
+		// align address for ld[lr] instructions
+		if (!Aligned)
+			address &= ~(sizeof(T) - 1);
+
+		T const data
+			= (sizeof(T) == 1) ? space(m_data_spacenum).read_byte(address)
+			: (sizeof(T) == 2) ? space(m_data_spacenum).read_word(address)
+			: space(m_data_spacenum).read_dword(address);
+
+		if (m_bus_error)
 		{
-		case 1: apply(T(space(m_data_spacenum).read_byte(address))); break;
-		case 2: apply(T(space(m_data_spacenum).read_word(address))); break;
-		case 4: apply(T(space(m_data_spacenum).read_dword(address))); break;
+			m_bus_error = false;
+			generate_exception(EXCEPTION_BUSDATA);
 		}
+		else
+			apply(data);
 	}
 }
 
-template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> mips1core_device_base::store(u32 address, U data, T mem_mask)
+template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> mips1core_device_base::store(u32 address, U data, T mem_mask)
 {
+	// alignment error
+	if (Aligned && (address & (sizeof(T) - 1)))
+	{
+		address_error(TRANSLATE_WRITE, address);
+		return;
+	}
+
 	if (memory_translate(m_data_spacenum, TRANSLATE_WRITE, address))
 	{
+		// align address for sd[lr] instructions
+		if (!Aligned)
+			address &= ~(sizeof(T) - 1);
+
 		switch (sizeof(T))
 		{
 		case 1: space(m_data_spacenum).write_byte(address, T(data)); break;
@@ -1093,10 +1145,26 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::va
 
 bool mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
 {
+	// alignment error
+	if (address & 3)
+	{
+		address_error(TRANSLATE_FETCH, address);
+		return false;
+	}
+
 	if (memory_translate(0, TRANSLATE_FETCH, address))
 	{
-		apply(space(0).read_dword(address));
+		u32 const data = space(0).read_dword(address);
 
+		if (m_bus_error)
+		{
+			m_bus_error = false;
+			generate_exception(EXCEPTION_BUSINST);
+
+			return false;
+		}
+
+		apply(data);
 		return true;
 	}
 	else
@@ -1176,8 +1244,8 @@ void mips1_device_base::device_start()
 	if (m_fcr0)
 	{
 		state_add(MIPS1_FCR31, "FCSR", m_fcr31);
-		for (unsigned i = 0; i < ARRAY_LENGTH(m_f); i++)
-			state_add(MIPS1_F0 + i, util::string_format("F%d", i).c_str(), m_f[i]);
+		for (unsigned i = 0; i < std::size(m_f); i++)
+			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2).c_str(), m_f[i]);
 	}
 
 	save_item(NAME(m_reset_time));
@@ -1198,7 +1266,7 @@ void mips1_device_base::device_reset()
 	m_reset_time = total_cycles();
 
 	// initialize tlb mru index with identity mapping
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
+	for (unsigned i = 0; i < std::size(m_tlb); i++)
 	{
 		m_tlb_mru[TRANSLATE_READ][i] = i;
 		m_tlb_mru[TRANSLATE_WRITE][i] = i;
@@ -1226,8 +1294,8 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[index][0] = m_cop0[COP0_EntryHi];
 			m_tlb[index][1] = m_cop0[COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlb write index %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
-				index, (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
+			LOGMASKED(LOG_TLB, "asid %2d tlb write index %2d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, index, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
 				m_cop0[COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cop0[COP0_EntryLo] & EL_D ? 'D' : '-',
 				m_cop0[COP0_EntryLo] & EL_V ? 'V' : '-',
@@ -1243,8 +1311,8 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[random][0] = m_cop0[COP0_EntryHi];
 			m_tlb[random][1] = m_cop0[COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlb write random %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
-				random, (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
+			LOGMASKED(LOG_TLB, "asid %2d tlb write random %2d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, random, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
 				m_cop0[COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cop0[COP0_EntryLo] & EL_D ? 'D' : '-',
 				m_cop0[COP0_EntryLo] & EL_V ? 'V' : '-',
@@ -1261,15 +1329,15 @@ void mips1_device_base::handle_cop0(u32 const op)
 			u32 const mask = (m_tlb[index][1] & EL_G) ? EH_VPN : EH_VPN | EH_ASID;
 			if ((m_tlb[index][0] & mask) == (m_cop0[COP0_EntryHi] & mask))
 			{
-				LOGMASKED(LOG_TLB, "tlb probe hit vpn 0x%08x index %d (%s)\n",
-					m_cop0[COP0_EntryHi] & mask, index, machine().describe_context());
+				LOGMASKED(LOG_TLB, "asid %2d tlb probe index %2d vpn 0x%08x (%s)\n",
+					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, index, m_cop0[COP0_EntryHi] & mask, machine().describe_context());
 
 				m_cop0[COP0_Index] = index << 8;
 				break;
 			}
 		}
 		if ((VERBOSE & LOG_TLB) && BIT(m_cop0[COP0_Index], 31))
-			LOGMASKED(LOG_TLB, "tlb probe miss asid %d vpn 0x%08x(%s)\n",
+			LOGMASKED(LOG_TLB, "asid %2d tlb probe miss vpn 0x%08x(%s)\n",
 				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, machine().describe_context());
 		break;
 
@@ -1287,6 +1355,28 @@ u32 mips1_device_base::get_cop0_reg(unsigned const reg)
 	return m_cop0[reg];
 }
 
+void mips1_device_base::set_cop0_reg(unsigned const reg, u32 const data)
+{
+	switch (reg)
+	{
+	case COP0_EntryHi:
+		m_cop0[COP0_EntryHi] = data & EH_WM;
+		break;
+
+	case COP0_EntryLo:
+		m_cop0[COP0_EntryLo] = data & EL_WM;
+		break;
+
+	case COP0_Context:
+		m_cop0[COP0_Context] = (m_cop0[COP0_Context] & ~PTE_BASE) | (data & PTE_BASE);
+		break;
+
+	default:
+		mips1core_device_base::set_cop0_reg(reg, data);
+		break;
+	}
+}
+
 void mips1_device_base::handle_cop1(u32 const op)
 {
 	if (!(SR & SR_COP1))
@@ -1297,6 +1387,8 @@ void mips1_device_base::handle_cop1(u32 const op)
 
 	if (!m_fcr0)
 		return;
+
+	softfloat_exceptionFlags = 0;
 
 	switch (op >> 26)
 	{
@@ -1355,8 +1447,10 @@ void mips1_device_base::handle_cop1(u32 const op)
 				}
 
 				// exception check
-				if ((m_fcr31 & FCR31_CE) || ((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM))
-					execute_set_input(m_fpu_irq, ASSERT_LINE);
+				{
+					bool const exception = (m_fcr31 & FCR31_CE) || (((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM));
+					execute_set_input(m_fpu_irq, exception ? ASSERT_LINE : CLEAR_LINE);
+				}
 				break;
 
 			default:
@@ -1831,15 +1925,15 @@ template <typename T> void mips1_device_base::set_cop1_reg(unsigned const reg, T
 		if (softfloat_exceptionFlags & softfloat_flag_invalid)
 			m_fcr31 |= FCR31_CV;
 
-		// check if exception is enabled
-		if (((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM))
-		{
-			execute_set_input(m_fpu_irq, ASSERT_LINE);
-			return;
-		}
-
 		// set flags
 		m_fcr31 |= ((m_fcr31 & FCR31_CM) >> 10);
+
+		// update exception state
+		bool const exception = (m_fcr31 & FCR31_CE) || ((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM);
+		execute_set_input(m_fpu_irq, exception ? ASSERT_LINE : CLEAR_LINE);
+
+		if (exception)
+			return;
 	}
 
 	if (sizeof(T) == 4)
@@ -1870,13 +1964,8 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 		}
 		else if (SR & SR_KUc)
 		{
-			if (!machine().side_effects_disabled())
-			{
-				// exception
-				m_cop0[COP0_BadVAddr] = address;
+			address_error(intention, address);
 
-				generate_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
-			}
 			return false;
 		}
 	}
@@ -1889,7 +1978,7 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 	bool refill = !BIT(address, 31);
 	bool modify = false;
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
+	for (unsigned i = 0; i < std::size(m_tlb); i++)
 	{
 		unsigned const index = mru[i];
 		u32 const *const entry = m_tlb[index];
@@ -1930,11 +2019,11 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 		if (VERBOSE & LOG_TLB)
 		{
 			if (modify)
-				LOGMASKED(LOG_TLB, "tlb modify asid %d address 0x%08x (%s)\n",
+				LOGMASKED(LOG_TLB, "asid %2d tlb modify address 0x%08x (%s)\n",
 					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
 			else
-				LOGMASKED(LOG_TLB, "tlb miss %c asid %d address 0x%08x (%s)\n",
-					(intention & TRANSLATE_WRITE) ? 'w' : 'r', (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
+				LOGMASKED(LOG_TLB, "asid %2d tlb miss %c address 0x%08x (%s)\n",
+					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, (intention & TRANSLATE_WRITE) ? 'w' : 'r', address, machine().describe_context());
 		}
 
 		// load tlb exception registers

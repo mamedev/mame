@@ -26,7 +26,7 @@ void deco_cpu7_device::device_reset()
 
 uint8_t deco_cpu7_device::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = cache->read_byte(adr);
+	uint8_t res = cprogram.read_byte(adr);
 	if(had_written) {
 		had_written = false;
 		if((adr & 0x0104) == 0x0104)
@@ -37,7 +37,7 @@ uint8_t deco_cpu7_device::mi_decrypt::read_sync(uint16_t adr)
 
 void deco_cpu7_device::mi_decrypt::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 	had_written = true;
 }
 

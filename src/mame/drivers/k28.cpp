@@ -22,13 +22,16 @@ TODO:
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/timer.h"
-#include "machine/tms6100.h"
-#include "sound/votrax.h"
 #include "video/mm5445.h"
+#include "video/pwm.h"
+#include "machine/tms6100.h"
+#include "machine/timer.h"
+#include "sound/votrax.h"
 #include "speaker.h"
 
+// internal artwork
 #include "k28.lh"
+
 
 namespace {
 
@@ -38,14 +41,12 @@ public:
 	k28_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_vfd(*this, "vfd"),
+		m_display(*this, "display"),
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
-		m_vfd(*this, "vfd"),
-		m_vfd_delay(*this, "led_delay_%u", 0),
 		m_onbutton_timer(*this, "on_button"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u", 0U, 0U),
-		m_out_digit(*this, "digit%u", 0U)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void k28(machine_config &config);
@@ -59,28 +60,24 @@ protected:
 private:
 	// devices/pointers
 	required_device<i8021_device> m_maincpu;
+	required_device<mm5445_device> m_vfd;
+	required_device<pwm_display_device> m_display;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
-	required_device<mm5445_device> m_vfd;
-	required_device_array<timer_device, 9> m_vfd_delay;
 	required_device<timer_device> m_onbutton_timer;
-	required_ioport_array<7> m_inp_matrix;
-	output_finder<9, 16> m_out_x;
-	output_finder<9> m_out_digit;
+	required_ioport_array<7> m_inputs;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(vfd_delay_off);
+	bool m_power_on = false;
+	u8 m_inp_mux = 0;
+	u8 m_phoneme = 0x3f;
+	int m_speech_strobe = 0;
+	u64 m_vfd_data = 0;
 
-	bool m_power_on;
-	u8 m_inp_mux;
-	u8 m_phoneme;
-	int m_speech_strobe;
-	u64 m_vfd_data;
-
-	DECLARE_WRITE64_MEMBER(vfd_output_w);
-	DECLARE_WRITE8_MEMBER(mcu_p0_w);
-	DECLARE_READ8_MEMBER(mcu_p1_r);
-	DECLARE_READ8_MEMBER(mcu_p2_r);
-	DECLARE_WRITE8_MEMBER(mcu_p2_w);
+	void vfd_output_w(u64 data);
+	void mcu_p0_w(u8 data);
+	u8 mcu_p1_r();
+	u8 mcu_p2_r();
+	void mcu_p2_w(u8 data);
 
 	void power_off();
 };
@@ -90,10 +87,6 @@ private:
 
 void k28_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-	m_out_digit.resolve();
-
 	// zerofill
 	m_power_on = false;
 	m_inp_mux = 0;
@@ -133,44 +126,17 @@ void k28_state::power_off()
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
-// VFD handling
+// MM5445 VFD
 
-TIMER_DEVICE_CALLBACK_MEMBER(k28_state::vfd_delay_off)
-{
-	// clear VFD outputs
-	if (!BIT(m_vfd_data, param+16))
-	{
-		m_out_digit[param] = 0;
-
-		for (int i = 0; i < 16; i++)
-			m_out_x[param][i] = 0;
-	}
-}
-
-WRITE64_MEMBER(k28_state::vfd_output_w)
+void k28_state::vfd_output_w(u64 data)
 {
 	// O1-O16: digit segment data
-	u16 seg_data = bitswap<16>(data,15,14,2,6,5,3,1,7,12,11,10,13,0,4,9,8);
-
 	// O17-O25: digit select
-	for (int i = 0; i < 9; i++)
-	{
-		if (BIT(data, i+16))
-		{
-			m_out_digit[i] = seg_data & 0x3fff;
-
-			// output individual segments (2 of them are not in MAME's 16seg)
-			for (int j = 0; j < 16; j++)
-				m_out_x[i][j] = seg_data >> j & 1;
-		}
-
-		// they're strobed, so on falling edge, delay them going off to prevent flicker
-		else if (BIT(m_vfd_data, i+16))
-			m_vfd_delay[i]->adjust(attotime::from_msec(50), i);
-	}
+	u16 seg_data = bitswap<16>(data,15,14,2,6,5,3,1,7,12,11,10,13,0,4,9,8);
+	m_display->matrix(data >> 16, seg_data);
 
 	// O26: power-off request on falling edge
 	if (~data & m_vfd_data & 0x2000000)
@@ -181,7 +147,7 @@ WRITE64_MEMBER(k28_state::vfd_output_w)
 
 // I8021 ports
 
-WRITE8_MEMBER(k28_state::mcu_p0_w)
+void k28_state::mcu_p0_w(u8 data)
 {
 	// d0,d1: phoneme high bits
 	// d0-d2: input mux high bits
@@ -207,7 +173,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	m_tms6100->clk_w(0);
 }
 
-READ8_MEMBER(k28_state::mcu_p1_r)
+u8 k28_state::mcu_p1_r()
 {
 	u8 data = 0;
 
@@ -215,7 +181,7 @@ READ8_MEMBER(k28_state::mcu_p1_r)
 	for (int i = 0; i < 7; i++)
 		if (m_inp_mux >> i & 1)
 		{
-			data |= m_inp_matrix[i]->read();
+			data |= m_inputs[i]->read();
 
 			// force press on-button at boot
 			if (i == 5 && m_onbutton_timer->enabled())
@@ -225,19 +191,19 @@ READ8_MEMBER(k28_state::mcu_p1_r)
 	return data ^ 0xff;
 }
 
-READ8_MEMBER(k28_state::mcu_p2_r)
+u8 k28_state::mcu_p2_r()
 {
 	// d3: VSM data
 	return (m_tms6100->data_line_r()) ? 8 : 0;
 }
 
-WRITE8_MEMBER(k28_state::mcu_p2_w)
+void k28_state::mcu_p2_w(u8 data)
 {
 	// d0: VFD driver serial data
 	m_vfd->data_w(data & 1);
 
 	// d0-d3: VSM data, input mux and SC-01 phoneme lower nibble
-	m_tms6100->add_w(space, 0, data);
+	m_tms6100->add_w(data);
 	m_inp_mux = (m_inp_mux & ~0xf) | (~data & 0xf);
 	m_phoneme = (m_phoneme & ~0xf) | (data & 0xf);
 }
@@ -300,7 +266,7 @@ static INPUT_PORTS_START( k28 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 
 	PORT_START("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, k28_state, power_on, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, k28_state, power_on, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
@@ -314,8 +280,8 @@ static INPUT_PORTS_START( k28 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
@@ -339,14 +305,13 @@ void k28_state::k28(machine_config &config)
 
 	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL / 15); // CLK tied to 8021 ALE pin
 
-	TIMER(config, "on_button").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "on_button").configure_generic(nullptr);
 
 	/* video hardware */
 	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	m_display->set_segmask(0x1ff, 0x3fff);
 	config.set_default_layout(layout_k28);
-
-	for (int i = 0; i < 9; i++)
-		TIMER(config, m_vfd_delay[i]).configure_generic(FUNC(k28_state::vfd_delay_off));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -376,5 +341,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY              FULLNAME                                        FLAGS
+//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
 COMP( 1981, k28,  0,      0, k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )

@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Acrobatic Dog-Fight / Batten O'hara no Sucha-Raka Kuuchuu Sen
+Acrobatic Dog-Fight / 『バッテン・オハラのスチャラカ空中戦』
 (c) 1984 Technos Japan
 
 driver by Nicola Salmoria
@@ -16,30 +16,30 @@ driver by Nicola Salmoria
 #include "speaker.h"
 
 
-WRITE8_MEMBER(dogfgt_state::subirqtrigger_w)
+void dogfgt_state::subirqtrigger_w(uint8_t data)
 {
 	/* bit 0 used but unknown */
 	if (data & 0x04)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::sub_irqack_w)
+void dogfgt_state::sub_irqack_w(uint8_t data)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::soundlatch_w)
+void dogfgt_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch = data;
 }
 
-WRITE8_MEMBER(dogfgt_state::soundcontrol_w)
+void dogfgt_state::soundcontrol_w(uint8_t data)
 {
-	/* bit 5 goes to 8910 #0 BDIR pin  */
+	/* bit 5 goes to YM2149 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
 		m_ay[0]->data_address_w(m_last_snd_ctrl >> 4, m_soundlatch);
 
-	/* bit 7 goes to 8910 #1 BDIR pin  */
+	/* bit 7 goes to YM2149 #1 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
 		m_ay[1]->data_address_w(m_last_snd_ctrl >> 6, m_soundlatch);
 
@@ -237,7 +237,7 @@ void dogfgt_state::dogfgt(machine_config &config)
 	M6502(config, m_subcpu, 1500000); /* 1.5 MHz ???? */
 	m_subcpu->set_addrmap(AS_PROGRAM, &dogfgt_state::sub_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -254,8 +254,8 @@ void dogfgt_state::dogfgt(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
-	AY8910(config, m_ay[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	YM2149(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	YM2149(config, m_ay[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 
@@ -366,4 +366,4 @@ ROM_END
 
 GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Acrobatic Dog-Fight",       MACHINE_SUPPORTS_SAVE )
 GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Dog-Fight (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "But-ten Ohara's Suit-Cha Luck-a Dog-Fight (Japan)", MACHINE_SUPPORTS_SAVE )

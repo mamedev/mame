@@ -23,6 +23,10 @@ namespace spvtools {
 namespace opt {
 
 Pass::Status IfConversion::Process() {
+  if (!context()->get_feature_mgr()->HasCapability(SpvCapabilityShader)) {
+    return Status::SuccessWithoutChange;
+  }
+
   const ValueNumberTable& vn_table = *context()->GetValueNumberTable();
   bool modified = false;
   std::vector<Instruction*> to_kill;
@@ -125,6 +129,8 @@ Pass::Status IfConversion::Process() {
         Instruction* select = builder.AddSelect(phi->type_id(), condition,
                                                 true_value->result_id(),
                                                 false_value->result_id());
+        context()->get_def_use_mgr()->AnalyzeInstDefUse(select);
+        select->UpdateDebugInfoFrom(phi);
         context()->ReplaceAllUsesWith(phi->result_id(), select->result_id());
         to_kill.push_back(phi);
         modified = true;
@@ -161,6 +167,9 @@ bool IfConversion::CheckBlock(BasicBlock* block, DominatorAnalysis* dominators,
   if (!*common || cfg()->IsPseudoEntryBlock(*common)) return false;
   Instruction* branch = (*common)->terminator();
   if (branch->opcode() != SpvOpBranchConditional) return false;
+  auto merge = (*common)->GetMergeInst();
+  if (!merge || merge->opcode() != SpvOpSelectionMerge) return false;
+  if ((*common)->MergeBlockIdIfAny() != block->id()) return false;
 
   return true;
 }

@@ -47,10 +47,10 @@
 class mquake_state : public amiga_state
 {
 public:
-	mquake_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_es5503(*this, "es5503"),
-		m_es5503_rom(*this, "es5503")
+	mquake_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_es5503(*this, "es5503")
+		, m_es5503_rom(*this, "es5503")
 	{ }
 
 	void mquake(machine_config &config);
@@ -58,10 +58,10 @@ public:
 	void init_mquake();
 
 private:
-	DECLARE_READ8_MEMBER( es5503_sample_r );
-	DECLARE_WRITE16_MEMBER( output_w );
-	DECLARE_READ16_MEMBER( coin_chip_r );
-	DECLARE_WRITE16_MEMBER( coin_chip_w );
+	uint8_t es5503_sample_r(offs_t offset);
+	void output_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t coin_chip_r(offs_t offset, uint16_t mem_mask = ~0);
+	void coin_chip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void a500_mem(address_map &map);
 	void main_map(address_map &map);
@@ -81,7 +81,7 @@ private:
  *
  *************************************/
 
-READ8_MEMBER( mquake_state::es5503_sample_r )
+uint8_t mquake_state::es5503_sample_r(offs_t offset)
 {
 	return m_es5503_rom[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
@@ -91,14 +91,14 @@ void mquake_state::mquake_es5503_map(address_map &map)
 	map(0x000000, 0x1ffff).r(FUNC(mquake_state::es5503_sample_r));
 }
 
-WRITE16_MEMBER( mquake_state::output_w )
+void mquake_state::output_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x:output_w(%x) = %02x\n", m_maincpu->pc(), offset, data);
 }
 
 
-READ16_MEMBER( mquake_state::coin_chip_r )
+uint16_t mquake_state::coin_chip_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ioport("COINCHIP")->read();
@@ -106,7 +106,7 @@ READ16_MEMBER( mquake_state::coin_chip_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( mquake_state::coin_chip_w )
+void mquake_state::coin_chip_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", m_maincpu->pc(), offset, data, mem_mask);
 }
@@ -137,10 +137,10 @@ void mquake_state::a500_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
 	map(0xa00000, 0xbfffff).rw(FUNC(mquake_state::cia_r), FUNC(mquake_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
+	map(0xc00000, 0xd7ffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
+	map(0xde0000, 0xdeffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
+	map(0xdf0000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xe00000, 0xe7ffff).nopw().r(FUNC(mquake_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -174,11 +174,11 @@ static INPUT_PORTS_START( mquake )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)         /* JS1SW */
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mquake_state,amiga_joystick_convert, (void *)0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mquake_state, amiga_joystick_convert<0>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mquake_state,amiga_joystick_convert, (void *)1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mquake_state, amiga_joystick_convert<1>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("p1_joy")
@@ -319,7 +319,13 @@ void mquake_state::mquake(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mquake_state::main_map);
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&mquake_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&mquake_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+
+	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
+	m_copper->set_host_cpu_tag(m_maincpu);
+	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->set_ecs_mode(false);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -334,13 +340,13 @@ void mquake_state::mquake(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
-	paula.add_route(0, "lspeaker", 0.50);
-	paula.add_route(1, "rspeaker", 0.50);
-	paula.add_route(2, "rspeaker", 0.50);
-	paula.add_route(3, "lspeaker", 0.50);
-	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
-	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
+	PAULA_8364(config, m_paula, amiga_state::CLK_C1_NTSC);
+	m_paula->add_route(0, "lspeaker", 0.50);
+	m_paula->add_route(1, "rspeaker", 0.50);
+	m_paula->add_route(2, "rspeaker", 0.50);
+	m_paula->add_route(3, "lspeaker", 0.50);
+	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	ES5503(config, m_es5503, amiga_state::CLK_7M_NTSC); /* ES5503 is likely mono due to channel strobe used as bank select */
 	m_es5503->set_channels(1);
@@ -374,23 +380,23 @@ void mquake_state::mquake(machine_config &config)
  *************************************/
 
 ROM_START( mquake )
-	ROM_REGION(0x80000, "kickstart", 0)
-	ROM_LOAD16_WORD_SWAP("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
+	ROM_REGION16_BE(0x80000, "kickstart", 0)
+	ROM_LOAD16_WORD("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
 	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
 
-	ROM_REGION(0xc0000, "user2", 0)
-	ROM_LOAD16_BYTE( "rom0l.bin",    0x00000, 0x10000, CRC(60c35ec3) SHA1(84fe88af54903cbd46044ef52bb50e8f94a94dcd) )
-	ROM_LOAD16_BYTE( "rom0h.bin",    0x00001, 0x10000, CRC(11551a68) SHA1(bc17e748cc7a4a547de230431ea08f0355c0eec8) )
-	ROM_LOAD16_BYTE( "rom1l.bin",    0x20000, 0x10000, CRC(0128c423) SHA1(b0465069452bd11b67c9a2f2b9021c91788bedbb) )
-	ROM_LOAD16_BYTE( "rom1h.bin",    0x20001, 0x10000, CRC(95119e65) SHA1(29f3c32ca110c9687f38fd03ccb979c1e7c7a87e) )
-	ROM_LOAD16_BYTE( "rom2l.bin",    0x40000, 0x10000, CRC(f8b8624a) SHA1(cb769581f78882a950be418dd4b35bbb6fd78a34) )
-	ROM_LOAD16_BYTE( "rom2h.bin",    0x40001, 0x10000, CRC(46e36e0d) SHA1(0813430137a31d5af2cadbd712a418e9ff339a21) )
-	ROM_LOAD16_BYTE( "rom3l.bin",    0x60000, 0x10000, CRC(c00411a2) SHA1(960d3539914f587c2186ec6eefb81b3cdd9325a0) )
-	ROM_LOAD16_BYTE( "rom3h.bin",    0x60001, 0x10000, CRC(4540c681) SHA1(cb0bc6dc506ed0c9561687964e57299a472c5cd8) )
-	ROM_LOAD16_BYTE( "rom4l.bin",    0x80000, 0x10000, CRC(f48d0730) SHA1(703a8ed47f64b3824bc6e5a4c5bdb2895f8c3d37) )
-	ROM_LOAD16_BYTE( "rom4h.bin",    0x80001, 0x10000, CRC(eee39fec) SHA1(713e24fa5f4ba0a8bc7bf67ed2d9e079fd3aa5d6) )
-	ROM_LOAD16_BYTE( "rom5l.bin",    0xa0000, 0x10000, CRC(7b6ec532) SHA1(e19005269673134431eb55053d650f747f614b89) )
-	ROM_LOAD16_BYTE( "rom5h.bin",    0xa0001, 0x10000, CRC(ed8ec9b7) SHA1(510416bc88382e7a548635dcba53a2b615272e0f) )
+	ROM_REGION16_BE(0xc0000, "user2", 0)
+	ROM_LOAD16_BYTE( "rom0l.bin",    0x00001, 0x10000, CRC(60c35ec3) SHA1(84fe88af54903cbd46044ef52bb50e8f94a94dcd) )
+	ROM_LOAD16_BYTE( "rom0h.bin",    0x00000, 0x10000, CRC(11551a68) SHA1(bc17e748cc7a4a547de230431ea08f0355c0eec8) )
+	ROM_LOAD16_BYTE( "rom1l.bin",    0x20001, 0x10000, CRC(0128c423) SHA1(b0465069452bd11b67c9a2f2b9021c91788bedbb) )
+	ROM_LOAD16_BYTE( "rom1h.bin",    0x20000, 0x10000, CRC(95119e65) SHA1(29f3c32ca110c9687f38fd03ccb979c1e7c7a87e) )
+	ROM_LOAD16_BYTE( "rom2l.bin",    0x40001, 0x10000, CRC(f8b8624a) SHA1(cb769581f78882a950be418dd4b35bbb6fd78a34) )
+	ROM_LOAD16_BYTE( "rom2h.bin",    0x40000, 0x10000, CRC(46e36e0d) SHA1(0813430137a31d5af2cadbd712a418e9ff339a21) )
+	ROM_LOAD16_BYTE( "rom3l.bin",    0x60001, 0x10000, CRC(c00411a2) SHA1(960d3539914f587c2186ec6eefb81b3cdd9325a0) )
+	ROM_LOAD16_BYTE( "rom3h.bin",    0x60000, 0x10000, CRC(4540c681) SHA1(cb0bc6dc506ed0c9561687964e57299a472c5cd8) )
+	ROM_LOAD16_BYTE( "rom4l.bin",    0x80001, 0x10000, CRC(f48d0730) SHA1(703a8ed47f64b3824bc6e5a4c5bdb2895f8c3d37) )
+	ROM_LOAD16_BYTE( "rom4h.bin",    0x80000, 0x10000, CRC(eee39fec) SHA1(713e24fa5f4ba0a8bc7bf67ed2d9e079fd3aa5d6) )
+	ROM_LOAD16_BYTE( "rom5l.bin",    0xa0001, 0x10000, CRC(7b6ec532) SHA1(e19005269673134431eb55053d650f747f614b89) )
+	ROM_LOAD16_BYTE( "rom5h.bin",    0xa0000, 0x10000, CRC(ed8ec9b7) SHA1(510416bc88382e7a548635dcba53a2b615272e0f) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "68705.bin", 0x0000, 0x0800, NO_DUMP )

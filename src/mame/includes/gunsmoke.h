@@ -11,6 +11,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class gunsmoke_state : public driver_device
 {
@@ -38,17 +39,17 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
-	uint8_t      m_chon;
-	uint8_t      m_objon;
-	uint8_t      m_bgon;
-	uint8_t      m_sprite3bank;
-	DECLARE_READ8_MEMBER(gunsmoke_protection_r);
-	DECLARE_WRITE8_MEMBER(gunsmoke_videoram_w);
-	DECLARE_WRITE8_MEMBER(gunsmoke_colorram_w);
-	DECLARE_WRITE8_MEMBER(gunsmoke_c804_w);
-	DECLARE_WRITE8_MEMBER(gunsmoke_d806_w);
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	uint8_t      m_chon = 0U;
+	uint8_t      m_objon = 0U;
+	uint8_t      m_bgon = 0U;
+	uint8_t      m_sprite3bank = 0U;
+	uint8_t gunsmoke_protection_r(offs_t offset);
+	void gunsmoke_videoram_w(offs_t offset, uint8_t data);
+	void gunsmoke_colorram_w(offs_t offset, uint8_t data);
+	void gunsmoke_c804_w(uint8_t data);
+	void gunsmoke_d806_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

@@ -285,7 +285,7 @@ void edge1_device_base::map(address_map &map)
 	 */
 	map(0x000, 0x003).rw(FUNC(edge1_device_base::reg0_r), FUNC(edge1_device_base::reg0_w));
 
-	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
+	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask32(0x000000ff);
 
 	map(0x100, 0x103).rw(FUNC(edge1_device_base::control_r), FUNC(edge1_device_base::control_w));
 	map(0x104, 0x107).rw(FUNC(edge1_device_base::status_r), FUNC(edge1_device_base::status_w));
@@ -301,14 +301,14 @@ void edge1_device_base::map(address_map &map)
 void edge1_device_base::map_dynamic(address_map &map)
 {
 	// TODO: map using lambdas until mixed-size submaps work
-	map(0x00000000, 0x0001ffff).lrw8("sram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
+	map(0x00000000, 0x0001ffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); }));
 
 
-	map(0x01000000, 0x013fffff).lrw8("vram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read((offset >> 2) | (offset & 0x3)); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write((offset >> 2) | (offset & 0x3), data); });
+	map(0x01000000, 0x013fffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read((offset >> 2) | (offset & 0x3)); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write((offset >> 2) | (offset & 0x3), data); }));
 
 	//map(0x02028200, 0x0202827f).lr32("idprom",
 	//  [this](address_space &space, offs_t offset, u8 mem_mask) { return memregion("idprom")->as_u32(offset); });
@@ -350,10 +350,10 @@ void edge2plus_processor_device_base::map(address_map &map)
 {
 	map(0x000, 0x003).rw(FUNC(edge2plus_processor_device_base::reg0_r), FUNC(edge2plus_processor_device_base::reg0_w));
 
-	map(0x008, 0x008).lr8("mouse_x", []() { return 0; });
-	map(0x00c, 0x00c).lr8("mouse_y", []() { return 0; });
+	map(0x008, 0x008).lr8([]() { return 0; }, "mouse_x");
+	map(0x00c, 0x00c).lr8([]() { return 0; }, "mouse_y");
 
-	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
+	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask32(0x000000ff);
 
 	map(0x100, 0x103).rw(FUNC(edge2plus_processor_device_base::control_r), FUNC(edge2plus_processor_device_base::control_w));
 	map(0x104, 0x107).rw(FUNC(edge2plus_processor_device_base::status_r), FUNC(edge2plus_processor_device_base::status_w));
@@ -377,18 +377,18 @@ void edge2plus_framebuffer_device_base::map_dynamic(address_map &map)
 {
 	// TODO: map using lambdas until mixed-size submaps work
 
-	map(0x00000000, 0x0003ffff).lrw8("sram",
-	[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
+	map(0x00000000, 0x0003ffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); }));
 
-	map(0x01000000, 0x01ffffff).lrw8("vram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write(offset, data); });
+	map(0x01000000, 0x01ffffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read(offset); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write(offset, data); }));
 
 	map(0x02028088, 0x0202808b).w(FUNC(edge2plus_framebuffer_device_base::select_w));
 
-	map(0x02028200, 0x0202827f).lr32("idprom",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_select == 0 ? memregion("idprom")->as_u32(offset) : space.unmap(); });
+	map(0x02028200, 0x0202827f).lr32(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_select == 0 ? memregion("idprom")->as_u32(offset) : space.unmap(); }));
 
 	map(0x02028290, 0x02028293).w(FUNC(edge2plus_framebuffer_device_base::lut_select_w));
 	map(0x02028300, 0x02028303).w(FUNC(edge2plus_framebuffer_device_base::unk_300_w));
@@ -607,6 +607,7 @@ edge2plus_processor_device_base::edge2plus_processor_device_base(const machine_c
 	, device_srx_card_interface(mconfig, *this)
 	, m_dsp1(*this, "dsp1")
 	, m_screen(nullptr)
+	, m_sram(nullptr)
 {
 }
 
@@ -702,12 +703,11 @@ void edge2plus_framebuffer_device_base::device_start()
 		LOG("found processor device %s\n", processor->tag());
 
 		processor->register_screen(m_screen, m_sram);
+		processor->m_dsp1->set_addrmap(0, address_map_constructor(&edge2plus_framebuffer_device_base::map_dynamic, processor->m_dsp1->tag(), this));
 	}
 
 	// FIXME: dynamically allocate SR region 4
 	m_bus->install_map(*this, 0x90000000, 0x93ffffff, &edge2plus_framebuffer_device_base::map_dynamic);
-
-	processor->m_dsp1->set_addrmap(0, address_map_constructor(&edge2plus_framebuffer_device_base::map_dynamic, processor->m_dsp1->tag(), this));
 }
 
 u32 mpcb849_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -755,15 +755,15 @@ u32 edge2plus_framebuffer_device_base::screen_update(screen_device &screen, bitm
 			const u8 index = *pixel_data++;
 
 			bitmap.pix(y, x) = rgb_t(
-				m_ramdac[0]->palette_lookup(index),
-				m_ramdac[1]->palette_lookup(index),
-				m_ramdac[2]->palette_lookup(index));
+				m_ramdac[0]->lookup(index),
+				m_ramdac[1]->lookup(index),
+				m_ramdac[2]->lookup(index));
 		}
 
 	return 0;
 }
 
-WRITE32_MEMBER(edge1_device_base::control_w)
+void edge1_device_base::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// clear interrupt
 	if (m_control & HOLDA_INT_H && !(data & HOLDA_INT_H))
@@ -799,7 +799,7 @@ WRITE_LINE_MEMBER(edge1_device_base::holda)
 		m_status &= ~DSP_1_HOLDA_H;
 }
 
-WRITE32_MEMBER(edge2plus_processor_device_base::control_w)
+void edge2plus_processor_device_base::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_control);
 
@@ -832,16 +832,16 @@ WRITE_LINE_MEMBER(edge2plus_processor_device_base::holda)
 
 void edge2plus_processor_device_base::dsp1_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).lrw8("sram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
+	map(0x00000, 0x3ffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram ? m_sram->read(offset) : 0; }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { if (m_sram) m_sram->write(offset, data); }));
 
-	map(0x40000, 0x7ffff).lr32("prg1",
-		[this](address_space &space, offs_t offset, u32 mem_mask) { return memregion("prg1")->as_u32(offset); });
+	map(0x40000, 0x7ffff).lr32(
+			NAME([this](address_space &space, offs_t offset, u32 mem_mask) { return memregion("prg1")->as_u32(offset); }));
 }
 
 
-WRITE32_MEMBER(edge2plus_framebuffer_device_base::lut_select_w)
+void edge2plus_framebuffer_device_base::lut_select_w(u32 data)
 {
 	LOG("select ramdac %d\n", data);
 
@@ -865,12 +865,12 @@ WRITE_LINE_MEMBER(edge1_device_base::scc_irq)
 	irq0(state);
 }
 
-READ32_MEMBER(edge1_device_base::reg0_r)
+u32 edge1_device_base::reg0_r()
 {
 	return ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0));
 }
 
-WRITE32_MEMBER(edge1_device_base::kernel_w)
+void edge1_device_base::kernel_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_kernel);
 
@@ -887,16 +887,17 @@ WRITE_LINE_MEMBER(edge2plus_processor_device_base::scc_irq)
 	irq0(state);
 }
 
-WRITE32_MEMBER(edge2plus_processor_device_base::kernel_w)
+void edge2plus_processor_device_base::kernel_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_kernel);
 
 	m_status |= KREG_IN_FULL;  // FIXME: what clears this?
 }
 
-READ32_MEMBER(edge2plus_processor_device_base::reg0_r)
+u32 edge2plus_processor_device_base::reg0_r()
 {
-	LOG("reg0_r vblank %d\n", m_screen->vblank());
+	if (m_screen)
+		LOG("reg0_r vblank %d\n", m_screen->vblank());
 
 	return (m_screen == nullptr) ? (m_reg0 & ~VBLANK) : ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0));
 }

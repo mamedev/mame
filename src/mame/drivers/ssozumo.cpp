@@ -17,7 +17,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -42,13 +41,13 @@ void ssozumo_state::ssozumo_map(address_map &map)
 	map(0x4010, 0x4010).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x4020, 0x4020).portr("DSW2").w(FUNC(ssozumo_state::scroll_w));
 	map(0x4030, 0x4030).portr("DSW1");
-//  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
+//  map(0x4030, 0x4030).writeonly();
 	map(0x4050, 0x407f).ram().w(FUNC(ssozumo_state::paletteram_w)).share("paletteram");
 	map(0x6000, 0xffff).rom();
 }
 
 
-WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
+void ssozumo_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }
@@ -228,9 +227,6 @@ void ssozumo_state::ssozumo(machine_config &config)
 	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

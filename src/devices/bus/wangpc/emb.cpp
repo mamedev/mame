@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(WANGPC_EMB, wangpc_emb_device, "wangpc_emb", "Wang PC-PM031-B
 wangpc_emb_device::wangpc_emb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WANGPC_EMB, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE),
 	m_option(0), m_parity_error(0), m_parity_odd(0)
 {
 }
@@ -59,9 +59,6 @@ wangpc_emb_device::wangpc_emb_device(const machine_config &mconfig, const char *
 
 void wangpc_emb_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(RAM_SIZE);
-
 	// state saving
 	save_item(NAME(m_option));
 	save_item(NAME(m_parity_error));

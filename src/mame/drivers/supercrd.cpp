@@ -169,6 +169,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(16'000'000)
@@ -193,15 +194,15 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(supercrd_videoram_w);
-	DECLARE_WRITE8_MEMBER(supercrd_colorram_w);
+	void supercrd_videoram_w(offs_t offset, uint8_t data);
+	void supercrd_colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void supercrd_palette(palette_device &palette) const;
-	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_supercrd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void supercrd_map(address_map &map);
 };
 
@@ -248,13 +249,13 @@ void supercrd_state::supercrd_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(supercrd_state::supercrd_videoram_w)
+void supercrd_state::supercrd_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(supercrd_state::supercrd_colorram_w)
+void supercrd_state::supercrd_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -273,17 +274,17 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 	int code = attr & 0xfff;
 	int color = m_colorram[offs] >> 4;  // 4 bits for color.
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
 void supercrd_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supercrd_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supercrd_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
 
 
-uint32_t supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -299,9 +300,9 @@ void supercrd_state::supercrd_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram().w(FUNC(supercrd_state::supercrd_videoram_w)).share("videoram"); // wrong
 	map(0xd000, 0xdfff).ram().w(FUNC(supercrd_state::supercrd_colorram_w)).share("colorram"); // wrong
-//  AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("nvram")
-//  AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-//  AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+//  map(0x0000, 0x0000).ram().share("nvram");
+//  map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+//  map(0xe001, 0xe001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 
@@ -441,7 +442,6 @@ void supercrd_state::supercrd(machine_config &config)
 	screen.set_size((124+1)*4, (30+1)*8);               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06 */
 	screen.set_screen_update(FUNC(supercrd_state::screen_update_supercrd));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_supercrd);
 	PALETTE(config, "palette", FUNC(supercrd_state::supercrd_palette), 0x200);

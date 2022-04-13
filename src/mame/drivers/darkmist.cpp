@@ -38,7 +38,7 @@ void darkmist_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-WRITE8_MEMBER(darkmist_state::hw_w)
+void darkmist_state::hw_w(uint8_t data)
 {
 	m_hw=data;
 	membank("bank1")->set_entry((data&0x80)?1:0);
@@ -231,10 +231,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* Z80 - RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* Z80 - RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
 }
 
 

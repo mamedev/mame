@@ -21,7 +21,6 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(HD61830, hd61830_device, "hd61830", "Hitachi HD61830B LCD Controller")
-decltype(HD61830) HD61830B = HD61830;
 
 
 // default address map
@@ -138,7 +137,7 @@ void hd61830_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void hd61830_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hd61830_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// clear busy flag
 	m_bf = false;
@@ -177,7 +176,7 @@ void hd61830_device::set_busy_flag()
 //  status_r - status register read
 //-------------------------------------------------
 
-READ8_MEMBER( hd61830_device::status_r )
+uint8_t hd61830_device::status_r()
 {
 	LOG("HD61830 Status Read: %s\n", m_bf ? "busy" : "ready");
 
@@ -189,7 +188,7 @@ READ8_MEMBER( hd61830_device::status_r )
 //  control_w - instruction register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd61830_device::control_w )
+void hd61830_device::control_w(uint8_t data)
 {
 	m_ir = data;
 }
@@ -199,7 +198,7 @@ WRITE8_MEMBER( hd61830_device::control_w )
 //  data_r - data register read
 //-------------------------------------------------
 
-READ8_MEMBER( hd61830_device::data_r )
+uint8_t hd61830_device::data_r()
 {
 	uint8_t data = m_dor;
 
@@ -217,7 +216,7 @@ READ8_MEMBER( hd61830_device::data_r )
 //  data_w - data register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd61830_device::data_w )
+void hd61830_device::data_w(uint8_t data)
 {
 	if (m_bf)
 	{
@@ -248,6 +247,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 
 	case INSTRUCTION_NUMBER_OF_CHARACTERS:
 		m_hn = (data & 0x7f) + 1;
+		m_hn = (m_hn % 2 == 0) ? m_hn : (m_hn + 1);
 
 		LOG("HD61830 Number of Characters: %u\n", m_hn);
 		break;
@@ -259,7 +259,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 		break;
 
 	case INSTRUCTION_CURSOR_POSITION:
-		m_cp = (data & 0x7f) + 1;
+		m_cp = (data & 0x0f) + 1;
 
 		LOG("HD61830 Cursor Position: %u\n", m_cp);
 		break;
@@ -359,9 +359,9 @@ uint16_t hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cl
 			if(y >= 0 && y < bitmap.height())
 			{
 				if(((sx * m_hp) + x) >= 0 && ((sx * m_hp) + x) < bitmap.width())
-					bitmap.pix16(y, (sx * m_hp) + x) = BIT(data1, x);
+					bitmap.pix(y, (sx * m_hp) + x) = BIT(data1, x);
 				if(((sx * m_hp) + x + m_hp) >= 0 && ((sx * m_hp) + x + m_hp) < bitmap.width())
-					bitmap.pix16(y, (sx * m_hp) + x + m_hp) = BIT(data2, x);
+					bitmap.pix(y, (sx * m_hp) + x + m_hp) = BIT(data2, x);
 			}
 		}
 	}
@@ -439,7 +439,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			{
 				// cursor off, character blink
 				if (!cursor)
-					pixel = m_cursor ? pixel : 0;
+					pixel = m_cursor ? 1 : pixel;
 
 				// cursor blink
 				if (cursor && (cl == m_cp))
@@ -453,7 +453,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			}
 
 			if (sy < screen().height() && sx < screen().width())
-				bitmap.pix16(sy, sx) = pixel;
+				bitmap.pix(sy, sx) = pixel;
 		}
 	}
 }
@@ -482,8 +482,8 @@ void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 			md1 = readbyte(rac2);
 			md2 = readbyte(rac2+1);
 
-			draw_char(bitmap, cliprect, ma, x, y + rows, md1);
-			draw_char(bitmap, cliprect, ma+1, x+1, y + rows, md2);
+			draw_char(bitmap, cliprect, ma + (rows * m_hn), x, y + rows, md1);
+			draw_char(bitmap, cliprect, ma+1 + (rows * m_hn), x+1, y + rows, md2);
 
 			ma+=2;
 			rac1+=2;

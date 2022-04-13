@@ -28,11 +28,11 @@ public:
 	// construction/destruction
 	sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( command_w );
+	uint8_t status_r();
+	void command_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -94,12 +94,13 @@ private:
 
 	// address space configurations
 	const address_space_config      m_space_config;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
 
 	inline uint8_t readbyte(offs_t address);
 	inline void writebyte(offs_t address, uint8_t m_data);
 	inline void increment_csr();
 
-	void draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va);
+	void draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int r, uint16_t va, bool cursor);
 	void draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va);
 	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);

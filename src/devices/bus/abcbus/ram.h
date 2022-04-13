@@ -32,12 +32,12 @@ protected:
 	virtual void device_start() override;
 
 	// device_abcbus_interface overrides
-	virtual void abcbus_cs(uint8_t data) override { };
+	virtual void abcbus_cs(uint8_t data) override { }
 	virtual uint8_t abcbus_xmemfl(offs_t offset) override;
 	virtual void abcbus_xmemw(offs_t offset, uint8_t data) override;
 
 private:
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 };
 
 

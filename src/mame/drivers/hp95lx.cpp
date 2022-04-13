@@ -25,6 +25,9 @@
     - native keyboard
     - 1MB model
     - identify RTC core
+    - variable refresh rate?
+      When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
+      When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
     - everything else
 
     Technical info:
@@ -55,34 +58,34 @@
 
 #include "emu.h"
 
-#include "machine/nvram.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/nec/nec.h"
 #include "machine/bankdev.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "sound/dac.h"
 
 #include "screen.h"
 #include "emupal.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
 
-#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
-
-#define KBDC_TAG "pc_kbdc"
 
 
 class hp95lx_state : public driver_device
@@ -103,19 +106,21 @@ public:
 		, m_isabus(*this, "isa")
 		, m_pic8259(*this, "pic8259")
 		, m_pit8254(*this, "pit8254")
+		, m_dac(*this, "dac")
 		, m_screen(*this, "screen")
 		, m_p_videoram(*this, "video")
 		, m_p_chargen(*this, "gfx1")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(d300_w);
-	DECLARE_READ8_MEMBER(d300_r);
-	DECLARE_WRITE8_MEMBER(e300_w);
-	DECLARE_READ8_MEMBER(e300_r);
-	DECLARE_WRITE8_MEMBER(f300_w);
-	DECLARE_READ8_MEMBER(f300_r);
+	void d300_w(offs_t offset, uint8_t data);
+	uint8_t d300_r(offs_t offset);
+	void e300_w(offs_t offset, uint8_t data);
+	uint8_t e300_r(offs_t offset);
+	void f300_w(offs_t offset, uint8_t data);
+	uint8_t f300_r(offs_t offset);
 
 	void hp95lx(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -133,6 +138,7 @@ protected:
 	required_device<isa8_device> m_isabus;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8254_device> m_pit8254;
+	required_device<dac_8bit_r2r_device> m_dac;
 	required_device<screen_device> m_screen;
 
 private:
@@ -140,14 +146,14 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_WRITE8_MEMBER(video_address_w);
-	DECLARE_READ8_MEMBER(video_register_r);
-	DECLARE_WRITE8_MEMBER(video_register_w);
-	DECLARE_WRITE8_MEMBER(debug_w);
+	uint8_t keyboard_r(offs_t offset);
+	void keyboard_w(offs_t offset, uint8_t data);
+	uint8_t video_r(offs_t offset);
+	void video_w(offs_t offset, uint8_t data);
+	void video_address_w(uint8_t data);
+	uint8_t video_register_r();
+	void video_register_w(uint8_t data);
+	void debug_w(offs_t offset, uint8_t data);
 
 	void hp95lx_io(address_map &map);
 	void hp95lx_map(address_map &map);
@@ -158,20 +164,20 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	u8 m_mapper[32], m_rtcram[2];
+	u8 m_mapper[32]{}, m_rtcram[2]{};
 
 	// crtc
-	u8 m_crtc[64], m_cursor_start_ras;
-	u16 m_disp_start_addr, m_cursor_addr, m_window_start_addr;
-	int m_register_address_latch;
-	bool m_graphics_mode;
+	u8 m_crtc[64]{}, m_cursor_start_ras = 0;
+	u16 m_disp_start_addr = 0, m_cursor_addr = 0, m_window_start_addr = 0;
+	int m_register_address_latch = 0;
+	bool m_graphics_mode = false;
 
 	// from pt68k4.cpp
-	bool m_kclk;
-	uint8_t m_kdata;
-	uint8_t m_scancode;
-	uint8_t m_kbdflag;
-	int m_kbit;
+	bool m_kclk = false;
+	uint8_t m_kdata = 0;
+	uint8_t m_scancode = 0;
+	uint8_t m_kbdflag = 0;
+	int m_kbit = 0;
 };
 
 
@@ -183,20 +189,16 @@ void hp95lx_state::hp95lx_palette(palette_device &palette) const
 
 uint32_t hp95lx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, offset;
-	uint16_t gfx, *p;
-	uint8_t chr, attr;
-
 	if (m_graphics_mode)
 	{
-		for (y = 0; y < 128; y++)
+		for (int y = 0; y < 128; y++)
 		{
-			p = &bitmap.pix16(y);
-			offset = y * (240 / 8);
+			uint16_t *p = &bitmap.pix(y);
+			int const offset = y * (240 / 8);
 
-			for (x = offset; x < offset + (240 / 8); x++)
+			for (int x = offset; x < offset + (240 / 8); x++)
 			{
-				gfx = m_p_videoram[x];
+				uint16_t const gfx = m_p_videoram[x];
 
 				for (int i = 7; i >= 0; i--)
 				{
@@ -210,17 +212,17 @@ uint32_t hp95lx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		bool blink((m_screen->frame_number() % 10) > 4);
 
 		// screen memory is normal MDA 80x25, but only a scrollable 40x16 window is displayed
-		for (y = 0; y < 128; y++)
+		for (int y = 0; y < 128; y++)
 		{
-			p = &bitmap.pix16(y);
-			offset = (y / 8) * 160 + m_window_start_addr;
+			uint16_t *p = &bitmap.pix(y);
+			int const offset = (y / 8) * 160 + m_window_start_addr;
 
-			for (x = offset; x < offset + 80; x += 2)
+			for (int x = offset; x < offset + 80; x += 2)
 			{
-				chr = m_p_videoram[x];
-				attr = m_p_videoram[x + 1];
+				uint8_t const chr = m_p_videoram[x];
+				uint8_t const attr = m_p_videoram[x + 1];
 
-				gfx = m_p_chargen[(chr)*8 + (y % 8)];
+				uint16_t gfx = m_p_chargen[(chr)*8 + (y % 8)];
 
 				if ((x >> 1) == m_cursor_addr && blink && (y % 8) >= m_cursor_start_ras)
 				{
@@ -287,10 +289,12 @@ void hp95lx_state::machine_reset()
 	m_kbit = 0;
 	m_scancode = 0;
 	m_kbdflag = 0;
+
+	m_dac->write(0x7f);
 }
 
 
-WRITE8_MEMBER(hp95lx_state::d300_w)
+void hp95lx_state::d300_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: IO %04x <- %02x\n", machine().describe_context(), 0xd300 + offset, data);
 
@@ -314,7 +318,7 @@ WRITE8_MEMBER(hp95lx_state::d300_w)
 	}
 }
 
-READ8_MEMBER(hp95lx_state::d300_r)
+uint8_t hp95lx_state::d300_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -343,7 +347,7 @@ READ8_MEMBER(hp95lx_state::d300_r)
 	return data;
 }
 
-WRITE8_MEMBER(hp95lx_state::e300_w)
+void hp95lx_state::e300_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: IO %04x <- %02x\n", machine().describe_context(), 0xe300 + offset, data);
 
@@ -356,6 +360,7 @@ WRITE8_MEMBER(hp95lx_state::e300_w)
 		break;
 
 	case 5: // DAC out (per snd.c)
+		m_dac->write(data);
 		break;
 
 	case 9: // b1 = 'a2d power' (per snd.c)
@@ -376,7 +381,7 @@ WRITE8_MEMBER(hp95lx_state::e300_w)
 	}
 }
 
-READ8_MEMBER(hp95lx_state::e300_r)
+uint8_t hp95lx_state::e300_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -413,7 +418,7 @@ READ8_MEMBER(hp95lx_state::e300_r)
 	return data;
 }
 
-WRITE8_MEMBER(hp95lx_state::f300_w)
+void hp95lx_state::f300_w(offs_t offset, uint8_t data)
 {
 	address_map_bank_device *mapper;
 	const char *mapname;
@@ -512,7 +517,7 @@ WRITE8_MEMBER(hp95lx_state::f300_w)
 	}
 }
 
-READ8_MEMBER(hp95lx_state::f300_r)
+uint8_t hp95lx_state::f300_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -523,7 +528,7 @@ READ8_MEMBER(hp95lx_state::f300_r)
 
 /* keyboard HLE -- adapted from pt68k4.cpp */
 
-READ8_MEMBER(hp95lx_state::keyboard_r)
+uint8_t hp95lx_state::keyboard_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -535,7 +540,7 @@ READ8_MEMBER(hp95lx_state::keyboard_r)
 		return 0;
 }
 
-WRITE8_MEMBER(hp95lx_state::keyboard_w)
+void hp95lx_state::keyboard_w(offs_t offset, uint8_t data)
 {
 	LOGKBD("kbd: write %02X <= %02X\n", offset + 0x60, data);
 	m_pic8259->ir1_w(CLEAR_LINE);
@@ -558,7 +563,7 @@ WRITE_LINE_MEMBER(hp95lx_state::keyboard_clock_w)
 		{
 			m_scancode >>= 1;
 			m_scancode |= m_kdata;
-			// XXX map F2..F10 to blue function keys
+			// FIXME: workaround, map F2..F10 to blue function keys
 			if (m_scancode > 0x3B && m_scancode < 0x45) m_scancode += 0x36;
 			LOGKBD("kbd: scancode %02x\n", m_scancode);
 			m_kbit = 0;
@@ -581,7 +586,7 @@ WRITE_LINE_MEMBER(hp95lx_state::keyboard_data_w)
 
 /* video HLE */
 
-READ8_MEMBER(hp95lx_state::video_register_r)
+uint8_t hp95lx_state::video_register_r()
 {
 	uint8_t ret = 0;
 
@@ -603,7 +608,7 @@ READ8_MEMBER(hp95lx_state::video_register_r)
 	return ret;
 }
 
-WRITE8_MEMBER(hp95lx_state::video_register_w)
+void hp95lx_state::video_register_w(uint8_t data)
 {
 	switch (m_register_address_latch)
 	{
@@ -630,19 +635,19 @@ WRITE8_MEMBER(hp95lx_state::video_register_w)
 	}
 }
 
-WRITE8_MEMBER(hp95lx_state::video_address_w)
+void hp95lx_state::video_address_w(uint8_t data)
 {
 	m_register_address_latch = data & 0x3f;
 }
 
-READ8_MEMBER(hp95lx_state::video_r)
+uint8_t hp95lx_state::video_r(offs_t offset)
 {
 	int data = 0xff;
 
 	switch (offset)
 	{
 	case 1: case 3: case 5: case 7:
-		data = video_register_r(space, offset);
+		data = video_register_r();
 		break;
 
 	case 10:
@@ -653,21 +658,21 @@ READ8_MEMBER(hp95lx_state::video_r)
 	return data;
 }
 
-WRITE8_MEMBER(hp95lx_state::video_w)
+void hp95lx_state::video_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0: case 2: case 4: case 6:
-		video_address_w(space, offset, data);
+		video_address_w(data);
 		break;
 
 	case 1: case 3: case 5: case 7:
-		video_register_w(space, offset, data);
+		video_register_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(hp95lx_state::debug_w)
+void hp95lx_state::debug_w(offs_t offset, uint8_t data)
 {
 	LOGDBG("%11.6f %s debug: port %02X <= %02X\n", machine().time().as_double(), machine().describe_context(), offset + 0x90, data);
 }
@@ -724,9 +729,9 @@ void hp95lx_state::hp95lx(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankdev_ec00").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	PIT8254(config, m_pit8254, 0);
-	m_pit8254->set_clk<0>(XTAL(14'318'181)/12); /* heartbeat IRQ */
+	m_pit8254->set_clk<0>(XTAL(14'318'181) / 12); /* heartbeat IRQ */
 	m_pit8254->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
-	m_pit8254->set_clk<1>(XTAL(14'318'181)/12); /* misc IRQ */
+	m_pit8254->set_clk<1>(XTAL(14'318'181) / 12); /* misc IRQ */
 	m_pit8254->out_handler<1>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 
 	PIC8259(config, m_pic8259, 0);
@@ -738,16 +743,16 @@ void hp95lx_state::hp95lx(machine_config &config)
 
 	ISA8_SLOT(config, "board0", 0, "isa", pc_isa8_cards, "com", true);
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, KBDC_TAG, 0));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
 	pc_kbdc.out_clock_cb().set(FUNC(hp95lx_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(hp95lx_state::keyboard_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(&pc_kbdc);
 
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
 
-	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
-	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
 	m_screen->set_screen_update(FUNC(hp95lx_state::screen_update));
 	m_screen->set_raw(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128);
@@ -760,7 +765,7 @@ void hp95lx_state::hp95lx(machine_config &config)
 
 
 ROM_START( hp95lx )
-	ROM_REGION16_LE(0x100000, "romdos", 0)
+	ROM_REGION(0x100000, "romdos", 0)
 	// Version A ... ROM BIOS Ver 2.14 ... 04/02/91
 	ROM_LOAD("18-5301.abd.bin", 0, 0x100000, CRC(18121c48) SHA1(c3bfb45cbbf4f57ae67fb5659da40f371d8e5c54))
 

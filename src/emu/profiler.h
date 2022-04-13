@@ -48,9 +48,10 @@ enum profile_type
 	PROFILER_BLIT,
 	PROFILER_SOUND,
 	PROFILER_TIMER_CALLBACK,
-	PROFILER_INPUT,             // input.c and inptport.c
+	PROFILER_INPUT,             // input.cpp and inptport.cpp
 	PROFILER_MOVIE_REC,         // movie recording
 	PROFILER_LOGERROR,          // logerror
+	PROFILER_LUA,               // LUA
 	PROFILER_EXTRA,             // everything else
 
 	// the USER types are available to driver writers to profile
@@ -116,7 +117,7 @@ private:
 	ATTR_FORCE_INLINE void real_start(profile_type type)
 	{
 		// fail if we overflow
-		if (m_filoptr >= &m_filo[ARRAY_LENGTH(m_filo) - 1])
+		if (m_filoptr >= &m_filo[std::size(m_filo) - 1])
 			throw emu_fatalerror("Profiler FILO overflow (type = %d)\n", type);
 
 		// get current tick count

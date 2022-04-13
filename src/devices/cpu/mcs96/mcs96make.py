@@ -4,12 +4,13 @@
 
 from __future__ import print_function
 
+import io
+import sys
+
 USAGE = """
 Usage:
 %s mcs96ops.lst mcs96.inc
 """
-import sys
-
 def save_full_one(f, t, name, source):
     print("void %s_device::%s_full()" % (t, name), file=f)
     print("{", file=f)
@@ -73,7 +74,7 @@ class OpcodeList:
         self.ea = {}
         self.macros = {}
         try:
-            f = open(fname, "rU")
+            f = io.open(fname, "r")
         except Exception:
             err = sys.exc_info()[1]
             sys.stderr.write("Cannot read opcodes file %s [%s]\n" % (fname, err))
@@ -128,6 +129,8 @@ class OpcodeList:
                     flags = "STEP_OVER"
                 elif opc.name == "rts":
                     flags = "STEP_OUT"
+                elif opc.amode == "rel8" or opc.amode == "rrel8" or opc.amode == "brrel8" or opc.amode == "wrrel8":
+                    flags = "STEP_COND"
                 else:
                     flags = "0"
                 print("\t{ \"%s\", %s, DASM_%s, %s }," % (opc.name, alt, opc.amode, flags), file=f)

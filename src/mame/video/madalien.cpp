@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 {
 	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
 
-	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	tileinfo.set(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
@@ -100,16 +100,16 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
 {
 	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
 
-	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	tileinfo.set(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_FG)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
-WRITE8_MEMBER(madalien_state::madalien_videoram_w)
+void madalien_state::madalien_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap_fg->mark_tile_dirty(offset);
@@ -118,27 +118,24 @@ WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 
 void madalien_state::video_start()
 {
-	static const tilemap_mapper_delegate scan_functions[4] =
+	// can't make this static or it will keep stale pointers after a hard reset
+	const tilemap_mapper_delegate scan_functions[4] =
 	{
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode1),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode2),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode3),this)
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode0)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode1)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode2)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode3))
 	};
 
-	static const int tilemap_cols[4] =
-	{
-		16, 16, 32, 32
-	};
+	static constexpr int tilemap_cols[4] = { 16, 16, 32, 32 };
 
-	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_FG)), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_tilemap_fg->set_transparent_pen(0);
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
-
-		m_tilemap_edge2[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_BG_1)), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge2[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_BG_2)), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 	}
 
 	m_headlight_bitmap = std::make_unique<bitmap_ind16>(128, 128);
@@ -212,8 +209,8 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 				if ((hx < cliprect.left()) || (hx > cliprect.right()))
 					continue;
 
-				if (m_headlight_bitmap->pix16(y, x) != 0)
-					bitmap.pix16(hy, hx) |= 8;
+				if (m_headlight_bitmap->pix(y, x) != 0)
+					bitmap.pix(hy, hx) |= 8;
 			}
 		}
 	}
@@ -227,7 +224,7 @@ void madalien_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-WRITE8_MEMBER(madalien_state::madalien_charram_w)
+void madalien_state::madalien_charram_w(offs_t offset, uint8_t data)
 {
 	m_charram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty((offset/8) & 0xff);
@@ -280,7 +277,7 @@ uint32_t madalien_state::screen_update_madalien(screen_device &screen, bitmap_in
 		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 			for (x = min_x; x <= max_x; x++)
 				if ((x >= cliprect.left()) && (x <= cliprect.right()))
-					bitmap.pix16(y, x) |= 8;
+					bitmap.pix(y, x) |= 8;
 	}
 
 	draw_headlight(bitmap, cliprect, flip);

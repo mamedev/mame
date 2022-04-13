@@ -21,11 +21,11 @@ public:
 
 	m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(z8000_io_r);
-	DECLARE_WRITE16_MEMBER(z8000_io_w);
+	uint16_t z8000_io_r(offs_t offset, uint16_t mem_mask = ~0);
+	void z8000_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vi_w);
 	DECLARE_WRITE_LINE_MEMBER(nvi_w);
-	DECLARE_WRITE16_MEMBER(handshake_w);
+	void handshake_w(offs_t offset, uint16_t data);
 
 	void halt() { m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); }
 	bool halted() const { return m_8086_halt; }
@@ -44,7 +44,7 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<ram_device> m_ram;
 	bool m_8086_halt;
-	int m_nvi, m_vi;
+	int m_nvi = 0, m_vi = 0;
 
 	IRQ_CALLBACK_MEMBER(int_cb);
 };

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "device.h"
-
 
 class r10788_device : public device_t
 {
@@ -36,8 +34,8 @@ public:
 		KER = 0x6   //!< Reset Keyboard Error
 	};
 
-	DECLARE_READ8_MEMBER ( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
 	auto update_cb() { return m_display.bind(); } /* Set the writer used to update a display digit */
 
@@ -45,7 +43,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	static const device_timer_id TIMER_DISPLAY = 0;

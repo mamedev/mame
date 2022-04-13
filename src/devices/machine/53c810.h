@@ -17,19 +17,19 @@ public:
 	// construction/destruction
 	lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class FunctionClass> void set_irq_callback(void (FunctionClass::*callback)(int), const char *name)
+	template <typename... T> void set_irq_callback(T &&... args)
 	{
-		m_irq_cb = irq_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr));
+		m_irq_cb.set(std::forward<T>(args)...);
 	}
 
-	template <class FunctionClass> void set_dma_callback(void (FunctionClass::*callback)(uint32_t, uint32_t, int, int), const char *name)
+	template <typename... T> void set_dma_callback(T &&... args)
 	{
-		m_dma_cb = dma_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr));
+		m_dma_cb.set(std::forward<T>(args)...);
 	}
 
-	template <class FunctionClass> void set_fetch_callback(uint32_t (FunctionClass::*callback)(uint32_t), const char *name)
+	template <typename... T> void set_fetch_callback(T &&... args)
 	{
-		m_fetch_cb = fetch_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr));
+		m_fetch_cb.set(std::forward<T>(args)...);
 	}
 
 	uint8_t reg_r(int offset);
@@ -40,7 +40,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	typedef delegate<void (void)> opcode_handler_delegate;
+	typedef delegate<void ()> opcode_handler_delegate;
 	opcode_handler_delegate dma_opcode[256];
 
 	irq_delegate m_irq_cb;

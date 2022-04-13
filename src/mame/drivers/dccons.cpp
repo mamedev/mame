@@ -20,6 +20,15 @@
 
     TODO:
     - RTC error always pops up at start-up, no flash plus bug with ticks (needs rewrite)
+    - cfr. naomi.cpp header for general DC notes;
+    - https://github.com/flyinghead/flycast/blob/master/docs/Notable%20game%20bugs.md
+      For a comprehensive list of issues to be verified;
+    - Fix Check-GD disk usability, cfr. notes in dc.xml;
+    - G1 i/f for GD-ROM needs to be converted in device class and hunted for unsupported features;
+    - VMU;
+    - Modem;
+
+    Old TODO (to be rechecked and moved in XML notes):
     - Inputs doesn't work most of the time;
     - Candy Stripe: fills the log with "ATAPI_FEATURES_FLAG_OVL not supported", black screen
     - Carrier: Jaleco logo uses YUV, but y size is halved?
@@ -32,230 +41,8 @@
     - Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
 
     Notes:
-    - DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
     - 0x1a002 of flash ROM returns the region type (0x30=Japan, 0x31=USA, 0x32=Europe). Amusingly, if the value
       on a non-jp console is different than these ones, the system shows a black swirl (and nothing boots).
-    - gdi file for DCLP (a Dreamcast tester) doesn't have first two tracks info, they are:
-      1 0 4 2048 FILE0001.DUP 0
-      2 1798 0 2352 FILE0002.DUP 0
-      serial i/o also fails on that, work ram addresses that needs to be patched with 0x0009 (nop) are:
-      0xc0196da
-      0xc0196ec
-    SH4 TEST:
-        UBC test (0101):
-            ok
-        FPU test (0201):
-            NG
-        0xc03fe24 work ram flag check (1=error, 0=ok)
-        Cache test (03xx):
-            Cache Read/Write test (0301)
-            NG
-            Cache RAM mode Check (0305)
-            NG
-        MMU test (04xx):
-            asserts
-        TMU test (0501):
-            *_reg check -> ok
-            TCNT* reload -> NG
-            TCNT* underflow irq -> NG
-        MULT test (0601)
-            ok
-        DIVU test (0701)
-            ok
-        Store Queue test (0801):
-            ok
-        SCIF test (0901)
-            NG
-        Private Instruction test (0a01)
-            NG
-        Critical test (0dxx)
-            Critical (Store Queue) test (0d01):
-                ok
-            Critical (Write back) test (0d02):
-                ok
-            Critical (ADD,CMP/EQ) test (0d03):
-                ok
-            Critical (OC_OIX) test (0d04):
-                NG
-            Critical (MAX current) test (0d05):
-                ok (very slow!)
-            Critical (IC Cross Talk) test (0d06):
-                NG
-            Critical (Cache D-array) test (0d07):
-                NG
-        SH-4 BUG (0exx)
-            SH4_BUG 64bit FMOV
-                ok
-            SH4 BUG FIX (64bitFMOV)
-                ok
-    MEM TEST:
-        AICA (0102)
-            ok
-        Work RAM (0204):
-            ok
-        PV64 area (0303):
-            ok
-        PV32 area (0403):
-            ok
-    CLX TEST:
-        CLX internal RAM (0101):
-            ok
-        <Torus> check (0401):
-            (sets up RGB888 mode 2, assuming it's critically failed)
-    TA TEST:
-        TA_YUVINT (0101):
-            ok -> IST_EOXFER_YUV
-        TA_OENDINT (0102):
-            ok -> IST_EOXFER_OPLST
-        TA_OMENDINT (0103):
-            ok -> IST_EOXFER_OPMV
-        TA_TENDINT (0104):
-            ok -> IST_EOXFER_TRLST
-        TA_TMENDINT (0105):
-            ok -> IST_EOXFER_TRMV
-        TA_PTENDINT (0106):
-            ok -> IST_EOXFER_PTLST
-        TA_ISPINT (0107):
-            NG -> ISP/TSP Parameter Overflow (error)
-        TA_OBJINT (0108):
-            NG -> OBJect list pointer Overflow (error)
-        TA_IPINT (0109):
-            NG -> TA: Illegal parameter (error)
-        YUV Converter (0201):
-            ok
-    DDT i/f TEST:
-        Sort, Normal DMA (1) (0101)
-            hangs (wants Sort DMA irq, of course)
-        Sort, Normal DMA (2)
-            ...
-        Through
-            NG, hangs again
-        DC_DEINT (0201)
-            ok
-        DC_SDTEINT (0202)
-            ok
-        DC_SDTERINT (0203)
-            ok (but returns error count ++, think it's a bug in the SW)
-    G2 TEST
-        DMA (0101):
-            G2 EXT AREA DETECT:
-            "!!!! ch00 ERROR DETECT !!!!"
-        Interrupt (0301):
-            G2 EXT AREA DETECT
-            DMA END INT
-                hangs
-        Ext Interrupt (06xx)
-            AICA INT  (0601)
-                error detect
-            Modem INT (0602)
-                error detect
-    AICA TEST
-        Sound RAM (01xx)
-            Pattern R/W check (0101)
-                ok
-        Register (02xx)
-            CH Data (0201)
-                ok
-            EXT Input (0202)
-                ok
-            DSP Data (0203)
-                ok
-        S_Clock (03xx)
-            50MSEC (0301)
-                NG -> ~0xa58 in 0x702814, must be > 0x889 and < 0x8b0
-            25MSEC (0302)
-                NG -> ~0x372 in 0x702814, must be > 0x443 and < 0x45a
-        Timer (04xx)
-            Timer A (0401)
-                NG
-            Timer B (0402)
-                NG
-            Timer C (0403)
-                NG
-        DMA (05xx)
-            SRAM -> CH Reg (0501)
-                ok
-            SRAM -> Comm Reg (0502)
-                ok
-            SRAM -> DSP Reg (0503)
-                ok
-            CH Reg -> SRAM (0504)
-                ok
-            Comm Reg -> SRAM (0505)
-                ok
-            DSP Reg -> SRAM (0506)
-                ok
-            Clear SRAM (0507)
-                ok
-            Clear CH Reg (0508)
-                ok
-            Clear Comm Reg (0509)
-                ok
-            Clear DSP Reg (050a)
-                ok
-        Interrupt (06xx)
-            Sampling clock (0601)
-                NG (irq 0x400)
-            Timer A (0602)
-                randomly NG/ok
-            Timer B (0603)
-                ok
-            Timer C (0604)
-                ok
-            DMA End (0605)
-                ok
-            Midi Out (0606)
-                NG
-            Main CPU (0607)
-                ok
-        RTC (07xx)
-            Write Protect (0701)
-                ok
-            RW Comp (0702)
-                ok
-            Clock (0703)
-                NG
-        ARM7 (08xx)
-            Load & Start (0801)
-                NG
-            Timer & Intr (0802)
-                NG
-            DMA (0803)
-                NG
-            Ch-Reg R/W (0804)
-                ok
-            SRAM incr (0805)
-                NG
-            SRAM pattern (0806)
-                ok
-        EG (09xx)
-            LSA-Reg Left (0901)
-                ok/NG
-            LSA-Reg Right (0902)
-                ok/NG
-            LSA-Reg Left & Right (0903)
-                ok/NG
-        MIDI (0axx)
-            OEMP bit (0a01)
-                NG
-            OFLL bit (0a02)
-                NG
-    PVRi/f test
-        DMA (01xx)
-            CPU trig (0101)
-                ok
-            INT trig
-                ok
-        Interrupt (02xx)
-            PVR DMA end Int (0201)
-                ok
-            PVR DMA IA Int (0202)
-                NG
-            PVR DMA end (0203)
-                NG
-    Flash test:
-        (SH-4 jumps to la la land as soon as this is started)
-
 
 */
 
@@ -270,30 +57,14 @@
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
 
-#include "emupal.h"
+//#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
 
 #define CPU_CLOCK (200000000)
-
-READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
-{
-	//if (m_maincpu->pc()==0xc0ba52a)
-	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(m_maincpu);
-
-	return dc_ram[0x2303b0/8];
-}
-
-READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
-{
-	//if (m_maincpu->pc()==0xc0bac62)
-	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(m_maincpu);
-
-	return dc_ram[0x2302f8/8];
-}
+// cfr. sh4.cpp m_mmuhack
+#define DC_MMU_HACK_MODE (1)
 
 void dc_cons_state::init_dc()
 {
@@ -301,20 +72,6 @@ void dc_cons_state::init_dc()
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, memregion("maincpu")->base());
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 	dreamcast_atapi_init();
-}
-
-void dc_cons_state::init_dcus()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(FUNC(dc_cons_state::dcus_idle_skip_r),this));
-
-	init_dc();
-}
-
-void dc_cons_state::init_dcjp()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(FUNC(dc_cons_state::dcjp_idle_skip_r),this));
-
-	init_dc();
 }
 
 void dc_cons_state::init_tream()
@@ -326,10 +83,10 @@ void dc_cons_state::init_tream()
 	rom[0x523] |= 0x40;
 	rom[0x531] |= 0x40;
 
-	init_dcus();
+	init_dc();
 }
 
-READ64_MEMBER(dc_cons_state::dc_pdtra_r )
+uint64_t dc_cons_state::dc_pdtra_r()
 {
 	uint64_t out = PCTRA<<32;
 
@@ -350,54 +107,54 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 		}
 	}
 
-	/*
-	cable setting, (0) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
-	Note: several games doesn't like VGA setting (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta), default to composite.
-	*/
+
+	// cable setting, (0) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
+	// Note: several games doesn't like VGA setting,
+	// default to composite for max possible compatibility
+	// (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta)
+	// TODO: identify via script
 	out |= ioport("SCREEN_TYPE")->read() << 8;
 
 	return out;
 }
 
-WRITE64_MEMBER(dc_cons_state::dc_pdtra_w )
+void dc_cons_state::dc_pdtra_w(uint64_t data)
 {
 	PCTRA = (data>>16) & 0xffff;
 	PDTRA = (data & 0xffff);
 }
 
-#if 0
-READ8_MEMBER(dc_cons_state::dc_flash_r)
+uint8_t dc_cons_state::dc_flash_r(offs_t offset)
 {
-	return m_dcflash->read(offset);
+	return m_dcflash->read(offset+0x20000);
 }
 
-WRITE8_MEMBER(dc_cons_state::dc_flash_w)
+void dc_cons_state::dc_flash_w(offs_t offset, uint8_t data)
 {
-	m_dcflash->write(offset,data);
+	m_dcflash->write(offset+0x20000,data);
 }
-#endif
 
 void dc_cons_state::dc_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().nopw();             // BIOS
-	map(0x00200000, 0x0021ffff).rom().region("dcflash", 0);//AM_READWRITE8(dc_flash_r,dc_flash_w, 0xffffffffffffffffU)
+	map(0x00200000, 0x0021ffff).rw(FUNC(dc_cons_state::dc_flash_r), FUNC(dc_cons_state::dc_flash_w));
 	map(0x005f6800, 0x005f69ff).rw(FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask64(0x0000ffff0000ffff);
 	map(0x005f7080, 0x005f709f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).rw(FUNC(dc_cons_state::dc_mess_g1_ctrl_r), FUNC(dc_cons_state::dc_mess_g1_ctrl_w));
-	map(0x005f7800, 0x005f78ff).rw(FUNC(dc_cons_state::dc_g2_ctrl_r), FUNC(dc_cons_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).m(m_g2if, FUNC(dc_g2if_device::amap));
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).rw(FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
 	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
-//  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
-//  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
-//  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
+	map(0x00800000, 0x009fffff).mirror(0x02000000).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
+//  map(0x01000000, 0x01ffffff) G2 Ext Device #1
+//  map(0x02700000, 0x02707fff) AICA reg mirror
+//  map(0x02800000, 0x02ffffff) AICA wave mem mirror (loopchk g2 bus DMA test)
 
-//  AM_RANGE(0x03000000, 0x03ffffff) G2 Ext Device #2
+//  map(0x03000000, 0x03ffffff) G2 Ext Device #2
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).ram().share("dc_texture_ram");      // texture memory 64 bit access
@@ -418,11 +175,13 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x12800000, 0x12ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
 	map(0x13000000, 0x137fffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)).mirror(0x00800000); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
-//  AM_RANGE(0x14000000, 0x17ffffff) G2 Ext Device #3
+//  map(0x14000000, 0x17ffffff) G2 Ext Device #3
 
 	map(0x8c000000, 0x8cffffff).ram().share("dc_ram");  // another RAM mirror
 
 	map(0xa0000000, 0xa01fffff).rom().region("maincpu", 0);
+
+	map(0xf4000000, 0xf4003fff).noprw(); // SH-4 operand cache address array
 }
 
 void dc_cons_state::dc_port(address_map &map)
@@ -580,10 +339,23 @@ static INPUT_PORTS_START( dc )
 
 	//A4 - A5, second analog stick, unused on DC
 
-	PORT_START("MAMEDEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_START("SCREEN_TYPE")
+	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
+	PORT_CONFSETTING(    0x00, "VGA" )
+	PORT_CONFSETTING(    0x02, "Composite" )
+	PORT_CONFSETTING(    0x03, "S-Video" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dcfish )
+	PORT_START("P1:0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("CONFIG")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SCREEN_TYPE")
 	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
@@ -594,12 +366,12 @@ INPUT_PORTS_END
 
 void dc_cons_state::gdrom_config(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^aica", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^aica", 1.0)
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^aica", 0.4);
+	cdda->add_route(1, "^^aica", 0.4);
 }
 
-void dc_cons_state::dc(machine_config &config)
+void dc_cons_state::dc_base(machine_config &config)
 {
 	/* basic machine hardware */
 	SH4LE(config, m_maincpu, CPU_CLOCK);
@@ -615,60 +387,28 @@ void dc_cons_state::dc(machine_config &config)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
 	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
+	m_maincpu->set_mmu_hacktype(DC_MMU_HACK_MODE);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
+
+	system_bus_config(config, "maincpu");
 
 	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_audio_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
-//  MACRONIX_29LV160TMC(config, "dcflash");
+	FUJITSU_29LV002TC(config, "dcflash");
 
 	MAPLE_DC(config, m_maple, 0, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1:0");
-	dcctrl0.set_port_tag<1>("P1:1");
-	dcctrl0.set_port_tag<2>("P1:A0");
-	dcctrl0.set_port_tag<3>("P1:A1");
-	dcctrl0.set_port_tag<4>("P1:A2");
-	dcctrl0.set_port_tag<5>("P1:A3");
-	dcctrl0.set_port_tag<6>("P1:A4");
-	dcctrl0.set_port_tag<7>("P1:A5");
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2:0");
-	dcctrl1.set_port_tag<1>("P2:1");
-	dcctrl1.set_port_tag<2>("P2:A0");
-	dcctrl1.set_port_tag<3>("P2:A1");
-	dcctrl1.set_port_tag<4>("P2:A2");
-	dcctrl1.set_port_tag<5>("P2:A3");
-	dcctrl1.set_port_tag<6>("P2:A4");
-	dcctrl1.set_port_tag<7>("P2:A5");
-	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
-	dcctrl2.set_port_tag<0>("P3:0");
-	dcctrl2.set_port_tag<1>("P3:1");
-	dcctrl2.set_port_tag<2>("P3:A0");
-	dcctrl2.set_port_tag<3>("P3:A1");
-	dcctrl2.set_port_tag<4>("P3:A2");
-	dcctrl2.set_port_tag<5>("P3:A3");
-	dcctrl2.set_port_tag<6>("P3:A4");
-	dcctrl2.set_port_tag<7>("P3:A5");
-	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
-	dcctrl3.set_port_tag<0>("P4:0");
-	dcctrl3.set_port_tag<1>("P4:1");
-	dcctrl3.set_port_tag<2>("P4:A0");
-	dcctrl3.set_port_tag<3>("P4:A1");
-	dcctrl3.set_port_tag<4>("P4:A2");
-	dcctrl3.set_port_tag<5>("P4:A3");
-	dcctrl3.set_port_tag<6>("P4:A4");
-	dcctrl3.set_port_tag<7>("P4:A5");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480); /* TODO: where pclk actually comes? */
+	// TODO: find exact pclk source
+	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
-	PALETTE(config, "palette").set_entries(0x1000);
+
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
@@ -679,8 +419,8 @@ void dc_cons_state::dc(machine_config &config)
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
 	m_aica->set_addrmap(0, &dc_cons_state::aica_map);
-	m_aica->add_route(0, "lspeaker", 1.0);
-	m_aica->add_route(1, "rspeaker", 1.0);
+	m_aica->add_route(0, "lspeaker", 0.4);
+	m_aica->add_route(1, "rspeaker", 0.4);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 
@@ -691,10 +431,31 @@ void dc_cons_state::dc(machine_config &config)
 	ata_0.option_add("gdrom", GDROM);
 	ata_0.set_option_machine_config("gdrom", gdrom_config);
 	ata_0.set_default_option("gdrom");
+}
+
+void dc_cons_state::dc(machine_config &config)
+{
+	dc_base(config);
+
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tags("P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5");
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tags("P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5");
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dcctrl2.set_port_tags("P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5");
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("dc");
 }
 
+void dc_cons_state::dc_fish(machine_config &config)
+{
+	dc_base(config);
+
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1:0");
+}
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
@@ -703,9 +464,8 @@ void dc_cons_state::dc(machine_config &config)
 // "MPR-21068 SEGA JAPAN / 9850 D" from VA0 837-13392-02 (171-7782B) NTSC-J unit
 // KABUTO Ver.1.011 CRC 34DA5C88 from pre-release US unit (private)
 
-// MPR-21933-X2 confirmed match MPR-21931 (v1.01d)
-
-// actual mask rom labels can have -X1 or -X2 added, presumable depending on mobo revision and/or type of rom used (5v or 3.3v), contents is the same
+// MPR-21933 (5v/VA0) confirmed match MPR-21931 (3.3v/VA1) - v1.01d
+// actual mask rom labels may have -X1 or -X2 added depending on chip manufacturer, contents is the same
 
 #define DREAMCAST_COMMON_BIOS \
 	ROM_REGION(0x200000, "maincpu", 0) \
@@ -717,9 +477,9 @@ void dc_cons_state::dc(machine_config &config)
 	ROM_LOAD_BIOS(2, "mpr-21871.ic501", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434) ) \
 	ROM_SYSTEM_BIOS(3, "101dch", "v1.01d (Chinese hack)") \
 	ROM_LOAD_BIOS(3, "dc101d_ch.bin",   0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )
-// ^^^ dc101d_eu.bin ^^^ is selfmade chinese translation, doesn't work on real hardware, does it must be here at all ?
+// ^^^ dc101d_ch.bin ^^^ is selfmade Chinese translation, doesn't work on real hardware, does it must be here at all ?
 
-/* note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (VA0) or MBM29LV002TC (VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
+/* note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (5v/VA0) or MBM29LV002TC (3.3v/VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
    sector SA5 (1A000 - 1BFFF) is read-only, contain information written during manufacture or repair, fully generated by software tool (except predefined list of creators)
 struct factory_sector
 {
@@ -743,7 +503,11 @@ struct factory_sector
         char factory_code[4];
         char total_number[16];
         uint8_t sum;        // byte sum of above
-        uint8_t machine_id[8];  // 64bit UID
+        struct {
+            uint8_t sum_inv;    // ~(UID byte sum)
+            uint8_t sum;        // UID byte sum
+            uint8_t id[6];      // UID
+        } machine_id;
         uint8_t machine_type;   // FF - Dreamcast
         uint8_t machine_version;// FF - VA0, FE - VA1, FD - VA2, NOTE: present in 1st factory record only, in 2nd always FF
         uint8_t unused[0x40]    // FF filled
@@ -776,16 +540,16 @@ struct cid_record
 ROM_START(dc)
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dcus_ntsc.bin", 0x020000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
 ROM_END
 
 ROM_START( dceu )
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dceu_pal.bin",  0x000000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
-	ROM_LOAD( "dceu_pala.bin", 0x000000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dceu_pal.bin",  0x020000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
+	ROM_LOAD( "dceu_pala.bin", 0x020000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
 ROM_END
 
 ROM_START( dcjp )
@@ -793,8 +557,8 @@ ROM_START( dcjp )
 	ROM_SYSTEM_BIOS(4, "1004", "v1.004 (Japan)")    // oldest known mass production version, supports Japan region only
 	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dcjp_ntsc.bin", 0x020000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
 ROM_END
 
 // unauthorised portable modification
@@ -803,8 +567,8 @@ ROM_START( dctream )
 	// uses regular mpr-21931 BIOS chip, have region-free mod-chip installed, see driver init.
 	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dc_flash.bin", 0x020000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
 ROM_END
 
 // normally, with DIP switch 4 off, HKT-0100/0110/0120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
@@ -813,26 +577,90 @@ ROM_START( dcdev )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "1011", "Katana Set5 v1.011 (World)")    // BOOT flash rom update from Katana SDK R9-R11, WinCE SDK v2.1
 	ROM_LOAD_BIOS(0, "set5v1.011.ic507", 0x000000, 0x200000, CRC(2186e0e5) SHA1(6bd18fb83f8fdb56f1941e079580e5dd672a6dad) )
-	ROM_SYSTEM_BIOS(1, "1001", "Katana Set5 v1.001 (Japan)")    // BOOT flash rom update from WinCE SDK v1.0
+	ROM_SYSTEM_BIOS(1, "1001", "Katana Set5 v1.001 (Japan)")    // BOOT flash rom update from Katana SDK 1.42J and WinCE SDK v1.0
 	ROM_LOAD_BIOS(1, "set5v1.001.ic507", 0x000000, 0x200000, CRC(5702d38f) SHA1(ea7a3ae1de73683008dd795c252941a4fc81b42e) )
+	ROM_SYSTEM_BIOS(2, "0976", "Katana Set5 v0.976 (Japan)")    // BOOT flash rom update from Katana SDK 1.20J
+	ROM_LOAD_BIOS(2, "set5v0.976.ic507", 0x000000, 0x200000, CRC(dcb2e86f) SHA1(c88b4b6704811e3a428ee225727e4f7df467a3b5) )
 
 	// 27C160 EPROM (DIP42) IC??? labeled
 	// SET5 7676
 	// V0.71 98/11/13
-	ROM_SYSTEM_BIOS(2, "071", "Katana Set5 Checker v0.71")
-	ROM_LOAD_BIOS(2, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
+	ROM_SYSTEM_BIOS(3, "071", "Katana Set5 Checker v0.71")
+	ROM_LOAD_BIOS(3, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
 	// SET5 FC52
 	// V0.41 98/08/27
-	ROM_SYSTEM_BIOS(3, "041", "Katana Set5 Checker v0.41")
-	ROM_LOAD_BIOS(3, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
+	ROM_SYSTEM_BIOS(4, "041", "Katana Set5 Checker v0.41")
+	ROM_LOAD_BIOS(4, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) ) // Dev.Boxes have empty (FF filled) flash ROM
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	// Dev.Boxes have empty (FF filled) flash ROM
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT       COMPANY FULLNAME */
-CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dcjp, "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
 CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
+
+/*
+Fish Life - interactive aquarium simulator
+Consists of HKS-0300 main unit and HKS-0100 LCD with touch screen
+
+  HKS-0300
+  Fish Life
+  670-14239A
+  (c) 2000 Sega
+  components:
+    Dreamcast VA1 motherboard
+    GD-ROM drive
+    PSU
+    173-8100B / 837-14049 IC BD SW FL
+      backplate with up/down/left/right/A/B/Start buttons
+    171-8097B / 837-14046 IC BD FL
+      main components:
+        315-6211-AB - Dreamcast game controller IC
+        315-6182    - Dreamcast microphone controller IC
+        connectors
+
+ HKS-0100 touch screen wired to SH-4's SCIF serial port. Communication is one-way, touch packet format is:
+ 0100000T 00xxxxxx 00XXXXXX 00yyyyyy 00YYYYYY 00--zzzz 00------
+  T: 1 - touch, 0 - release
+  x: X value low bits
+  X: X value high bits
+  y: Y value low bits
+  Y: Y value high bits
+  z: unused
+ X/Y values range seems 3000x2294
+
+ HKS-0200 software GD-ROMs:
+  HDR-0093 673-01613 Fish Life Red Sea Playful Edition
+ *HDR-0094 673-01672 Fish Life Amazon Playful Edition
+  HDR-0095 673-01??? Fish Life Episode 1 Basic Edition
+  HDR-0096 673-01??? Fish Life Episode 2 Basic Edition
+  HDR-0097 673-01??? Fish Life Episode 3 Basic Edition
+  MSD-0001 ???-????? Fish Life Red Sea & Amazon PDP Ver.
+ * denotes these games are archived.
+
+ Machines high likely based on Fish Life:
+  タッチであそぼ！ / Play with a touch! (2001) - touch screen cabinet for McDonald's Japan https://www.famitsu.com/game/news/2001/09/13/103,1000362656,1276,0,0.html
+  タッチでポン！ / Pong by touch! (2001) - sushi ordering system https://web.archive.org/web/20180421214402/sega.jp/fb/creators/vol_13/1.html
+
+ notes:
+  Some sources claims Playful and Basic editions hardware is not the same, has to be verified.
+  Press down+B for Test Mode
+*/
+ROM_START( dcfish )
+	ROM_REGION64_LE(0x200000, "maincpu", 0)
+	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) ) // regular v1.0d 3.3v BIOS
+
+	// similar Dreamcast flashes, machine_name was changed to "Fish Life", machine_code2 is 0xff (verified  by software)
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "fish_flash.bin", 0x020000, 0x020000, CRC(f7f36b7b) SHA1(f49d18de85c519c16d5447ca8ae39b62d1b8e483) ) // VA1 NTSC-JP
+
+	DISK_REGION( "ata:0:gdrom" )
+	DISK_IMAGE_READONLY( "fish_life_amazon", 0, SHA1(2cbba727b219bbbeddf551d0f3e80c5f8ecbe21f) ) // HDR-0094
+ROM_END
+
+/*    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS          INIT       ROT   COMPANY FULLNAME */
+GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dc, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )

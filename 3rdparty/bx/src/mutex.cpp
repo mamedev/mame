@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -12,6 +12,8 @@
 #	include <bx/cpu.h>
 #	include "crt0.h"
 #elif  BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_BSD     \
+	|| BX_PLATFORM_HAIKU   \
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
@@ -156,4 +158,26 @@ namespace bx
 
 } // namespace bx
 
-#endif // BX_MUTEX_H_HEADER_GUARD
+#else
+
+namespace bx
+{
+	Mutex::Mutex()
+	{
+	}
+
+	Mutex::~Mutex()
+	{
+	}
+
+	void Mutex::lock()
+	{
+	}
+
+	void Mutex::unlock()
+	{
+	}
+
+} // namespace bx
+
+#endif // BX_CONFIG_SUPPORTS_THREADING

@@ -127,7 +127,7 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 					int x = hbp + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
 					int color = (BIT(data, 7) ^ ri) && de;
 
-					bitmap.pix32(y, x) = pen[color];
+					bitmap.pix(y, x) = pen[color];
 
 					data <<= 1;
 				}
@@ -139,8 +139,8 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 					int x = hbp + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
 					int color = (BIT(data, 7) ^ ri) && de;
 
-					bitmap.pix32(y, x) = pen[color];
-					bitmap.pix32(y, x + 1) = pen[color];
+					bitmap.pix(y, x) = pen[color];
+					bitmap.pix(y, x + 1) = pen[color];
 
 					data <<= 1;
 				}
@@ -174,6 +174,15 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 }
 
 
+void abc802_state::video_start()
+{
+	// register for state saving
+	save_item(NAME(m_flshclk_ctr));
+	save_item(NAME(m_flshclk));
+	save_item(NAME(m_80_40_mux));
+}
+
+
 //-------------------------------------------------
 //  machine_config( abc802_video )
 //-------------------------------------------------
@@ -184,7 +193,7 @@ void abc802_state::abc802_video(machine_config &config)
 	mc6845.set_screen(SCREEN_TAG);
 	mc6845.set_show_border_area(true);
 	mc6845.set_char_width(ABC800_CHAR_WIDTH);
-	mc6845.set_update_row_callback(FUNC(abc802_state::abc802_update_row), this);
+	mc6845.set_update_row_callback(FUNC(abc802_state::abc802_update_row));
 	mc6845.out_vsync_callback().set(FUNC(abc802_state::vs_w));
 	mc6845.out_vsync_callback().append(m_dart, FUNC(z80dart_device::rib_w)).invert();
 

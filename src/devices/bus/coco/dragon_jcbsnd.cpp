@@ -40,9 +40,10 @@ DEFINE_DEVICE_TYPE(DRAGON_JCBSND, dragon_jcbsnd_device, "dragon_jcbsnd", "Dragon
 //  dragon_jcbsnd_device - constructor
 //-------------------------------------------------
 
-dragon_jcbsnd_device::dragon_jcbsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dragon_jcbsnd_device::dragon_jcbsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DRAGON_JCBSND, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
+	, m_eprom(*this, "eprom")
 	, m_ay8910(*this, "ay8910")
 {
 }
@@ -53,9 +54,6 @@ dragon_jcbsnd_device::dragon_jcbsnd_device(const machine_config &mconfig, const 
 
 void dragon_jcbsnd_device::device_start()
 {
-	install_write_handler(0xfefe, 0xfefe, write8smo_delegate(FUNC(ay8910_device::address_w), (ay8910_device *)m_ay8910));
-	install_readwrite_handler(0xfeff, 0xfeff, read8smo_delegate(FUNC(ay8910_device::data_r), (ay8910_device *)m_ay8910), write8smo_delegate(FUNC(ay8910_device::data_w), (ay8910_device *)m_ay8910));
-
 	set_line_value(line::CART, line_value::Q);
 }
 
@@ -63,18 +61,18 @@ void dragon_jcbsnd_device::device_start()
 //  dragon_jcbsnd_device::get_cart_base
 //-------------------------------------------------
 
-uint8_t* dragon_jcbsnd_device::get_cart_base()
+u8 *dragon_jcbsnd_device::get_cart_base()
 {
-	return memregion("eprom")->base();
+	return m_eprom->base();
 }
 
 //-------------------------------------------------
 //  dragon_jcbsnd_device::get_cart_memregion
 //-------------------------------------------------
 
-memory_region* dragon_jcbsnd_device::get_cart_memregion()
+memory_region *dragon_jcbsnd_device::get_cart_memregion()
 {
-	return memregion("eprom");
+	return m_eprom;
 }
 
 //-------------------------------------------------
@@ -95,4 +93,26 @@ void dragon_jcbsnd_device::device_add_mconfig(machine_config &config)
 const tiny_rom_entry *dragon_jcbsnd_device::device_rom_region() const
 {
 	return ROM_NAME( dragon_jcbsnd );
+}
+
+//-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+u8 dragon_jcbsnd_device::cts_read(offs_t offset)
+{
+	if (offset == 0x3eff)
+		return m_ay8910->data_r();
+	else
+		return m_eprom->base()[offset & 0x1fff];
+}
+
+//-------------------------------------------------
+//  cts_write
+//-------------------------------------------------
+
+void dragon_jcbsnd_device::cts_write(offs_t offset, u8 data)
+{
+	if ((offset & ~1) == 0x3efe)
+		m_ay8910->address_data_w(offset & 1, data);
 }

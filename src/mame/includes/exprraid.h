@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class exprraid_state : public driver_device
 {
@@ -51,30 +52,29 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* protection */
-	uint8_t           m_prot_value;
+	uint8_t           m_prot_value = 0U;
 
 	/* video-related */
-	tilemap_t       *m_bg_tilemap;
-	tilemap_t       *m_fg_tilemap;
-	int             m_bg_index[4];
+	tilemap_t       *m_bg_tilemap = nullptr;
+	tilemap_t       *m_fg_tilemap = nullptr;
+	int             m_bg_index[4]{};
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(exprraid_int_clear_w);
-	DECLARE_READ8_MEMBER(exprraid_prot_status_r);
-	DECLARE_READ8_MEMBER(exprraid_prot_data_r);
-	DECLARE_WRITE8_MEMBER(exprraid_prot_data_w);
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(exprraid_videoram_w);
-	DECLARE_WRITE8_MEMBER(exprraid_colorram_w);
-	DECLARE_WRITE8_MEMBER(exprraid_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(exprraid_bgselect_w);
-	DECLARE_WRITE8_MEMBER(exprraid_scrollx_w);
-	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
+	void exprraid_int_clear_w(uint8_t data);
+	uint8_t exprraid_prot_status_r();
+	uint8_t exprraid_prot_data_r();
+	void exprraid_prot_data_w(uint8_t data);
+	uint8_t vblank_r();
+	void exprraid_videoram_w(offs_t offset, uint8_t data);
+	void exprraid_colorram_w(offs_t offset, uint8_t data);
+	void exprraid_flipscreen_w(uint8_t data);
+	void exprraid_bgselect_w(offs_t offset, uint8_t data);
+	void exprraid_scrollx_w(offs_t offset, uint8_t data);
+	void exprraid_scrolly_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 

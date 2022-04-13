@@ -21,7 +21,7 @@
 		#ifdef _MSC_VER
 			#include <windows.h>
 			#include "GL/GL.h"
-			#include "bgfx/3rdparty/khronos/gl/glext.h "
+			#include "bgfx/3rdparty/khronos/gl/glext.h"
 			#ifndef USE_DISPATCH_GL
 			#include "bgfx/3rdparty/khronos/wgl/wglext.h"
 			#endif
@@ -32,6 +32,9 @@
 			#include "GL/wglext.h"
 			#endif
 		#endif
+	#elif defined(OSD_MAC)
+		#include <OpenGL/gl.h>
+		#include <OpenGL/glext.h>
 	#else
 	#include <SDL2/SDL_version.h>
 

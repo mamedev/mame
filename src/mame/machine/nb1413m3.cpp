@@ -8,7 +8,7 @@
 
 ******************************************************************************/
 /******************************************************************************
-Memo:
+Memo: The NB1413M3 is a Fujitsu ULA
 
 ******************************************************************************/
 
@@ -31,9 +31,9 @@ nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag,
 	m_sndrombank1(0),
 	m_sndrombank2(0),
 	m_busyctr(0),
-	m_busyflag(1),
 	m_outcoin_flag(1),
 	m_inputport(0xff),
+	m_busyflag(1),
 	m_74ls193_counter(0),
 	m_nmi_count(0),
 	m_nmi_clock(0),
@@ -103,15 +103,15 @@ void nb1413m3_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void nb1413m3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nb1413m3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 		case TIMER_CB:
-			timer_callback(ptr, param);
+			timer_callback(param);
 			break;
 		default:
-			assert_always(false, "Unknown id in nb1413m3_device::device_timer");
+			throw emu_fatalerror("Unknown id in nb1413m3_device::device_timer");
 	}
 }
 
@@ -151,7 +151,7 @@ TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
 }
 
 
-WRITE8_MEMBER( nb1413m3_device::nmi_clock_w )
+void nb1413m3_device::nmi_clock_w(uint8_t data)
 {
 	m_nmi_clock = data;
 
@@ -198,12 +198,12 @@ WRITE8_MEMBER( nb1413m3_device::nmi_clock_w )
 
 }
 
-READ8_MEMBER( nb1413m3_device::sndrom_r )
+uint8_t nb1413m3_device::sndrom_r(address_space &space, offs_t offset)
 {
 	int rombank;
 
-	/* get top 8 bits of the I/O port address */
-	offset = (offset << 8) | (space.device().state().state_int(Z80_BC) >> 8);
+	// get top 8 bits of the I/O port address (FIXME: do this the correct way with 16-bit addressing)
+	offset = (offset << 8) | (downcast<z80_device &>(space.device()).state_int(Z80_BC) >> 8);
 
 	switch (m_nb1413m3_type)
 	{
@@ -301,52 +301,83 @@ READ8_MEMBER( nb1413m3_device::sndrom_r )
 	}
 }
 
-WRITE8_MEMBER( nb1413m3_device::sndrombank1_w )
+void nb1413m3_device::sndrombank1_w(uint8_t data)
 {
 	// if (data & 0x02) coin counter ?
-	outcoin_w(space, 0, data);             // (data & 0x04) >> 2;
+	outcoin_w(data);             // (data & 0x04) >> 2;
 	m_nmi_enable = ((data & 0x20) >> 5);
 	m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
 }
 
-WRITE8_MEMBER( nb1413m3_device::sndrombank2_w )
+// bikkuri, to be exposed in driver
+void nb1413m3_device::sndrombank1_alt_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
+	//outcoin_w(data);             // (data & 0x04) >> 2;
+	m_outcoin_enable = (data & 0x04) >> 2;
+
+	if (m_outcoin_enable)
+	{
+		if (m_counter++ == 2)
+		{
+			m_outcoin_flag ^= 1;
+			m_counter = 0;
+		}
+	}
+
+	m_nmi_enable = ((data & 0x80) >> 7);
+	//m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
+}
+
+void nb1413m3_device::sndrombank2_w(uint8_t data)
 {
 	m_sndrombank2 = (data & 0x03);
 }
 
-READ8_MEMBER( nb1413m3_device::gfxrom_r )
+uint8_t nb1413m3_device::gfxrom_r(offs_t offset)
 {
 	uint8_t *GFXROM = machine().root_device().memregion("gfx1")->base();
 
 	return GFXROM[(0x20000 * (m_gfxrombank | ((m_sndrombank1 & 0x02) << 3))) + ((0x0200 * m_gfxradr_h) + (0x0002 * m_gfxradr_l)) + (offset & 0x01)];
 }
 
-WRITE8_MEMBER( nb1413m3_device::gfxrombank_w )
+void nb1413m3_device::gfxrombank_w(uint8_t data)
 {
 	m_gfxrombank = (((data & 0xc0) >> 4) + (data & 0x03));
 }
 
-WRITE8_MEMBER( nb1413m3_device::gfxradr_l_w )
+void nb1413m3_device::gfxradr_l_w(uint8_t data)
 {
 	m_gfxradr_l = data;
 }
 
-WRITE8_MEMBER( nb1413m3_device::gfxradr_h_w )
+void nb1413m3_device::gfxradr_h_w (uint8_t data)
 {
 	m_gfxradr_h = data;
 }
 
-WRITE8_MEMBER( nb1413m3_device::inputportsel_w )
+void nb1413m3_device::inputportsel_w(uint8_t data)
 {
 	m_inputport = data;
 }
 
-READ8_MEMBER( nb1413m3_device::inputport0_r )
+READ_LINE_MEMBER( nb1413m3_device::busyflag_r )
+{
+	return m_busyflag & 0x01;
+}
+
+WRITE_LINE_MEMBER( nb1413m3_device::busyflag_w )
+{
+	m_busyflag = state;
+}
+
+uint8_t nb1413m3_device::inputport0_r()
 {
 	return ((machine().root_device().ioport("SYSTEM")->read() & 0xfd) | ((m_outcoin_flag & 0x01) << 1));
 }
 
-READ8_MEMBER( nb1413m3_device::inputport1_r )
+uint8_t nb1413m3_device::inputport1_r()
 {
 	device_t &root = machine().root_device();
 	switch (m_nb1413m3_type)
@@ -395,7 +426,7 @@ READ8_MEMBER( nb1413m3_device::inputport1_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::inputport2_r )
+uint8_t nb1413m3_device::inputport2_r()
 {
 	device_t &root = machine().root_device();
 	switch (m_nb1413m3_type)
@@ -444,7 +475,7 @@ READ8_MEMBER( nb1413m3_device::inputport2_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::inputport3_r )
+uint8_t nb1413m3_device::inputport3_r()
 {
 	switch (m_nb1413m3_type)
 	{
@@ -467,7 +498,7 @@ READ8_MEMBER( nb1413m3_device::inputport3_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw1_r )
+uint8_t nb1413m3_device::dipsw1_r()
 {
 	device_t &root = machine().root_device();
 	switch (m_nb1413m3_type)
@@ -511,7 +542,7 @@ READ8_MEMBER( nb1413m3_device::dipsw1_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw2_r )
+uint8_t nb1413m3_device::dipsw2_r()
 {
 	device_t &root = machine().root_device();
 	switch (m_nb1413m3_type)
@@ -555,17 +586,17 @@ READ8_MEMBER( nb1413m3_device::dipsw2_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw3_l_r )
+uint8_t nb1413m3_device::dipsw3_l_r()
 {
 	return ((machine().root_device().ioport("DSWC")->read() & 0xf0) >> 4);
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw3_h_r )
+uint8_t nb1413m3_device::dipsw3_h_r()
 {
 	return ((machine().root_device().ioport("DSWC")->read() & 0x0f) >> 0);
 }
 
-WRITE8_MEMBER( nb1413m3_device::outcoin_w )
+void nb1413m3_device::outcoin_w(uint8_t data)
 {
 	m_outcoin_enable = (data & 0x04) >> 2;
 
@@ -604,7 +635,7 @@ WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 	m_led = m_outcoin_flag;      // out coin
 }
 
-WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
+void nb1413m3_device::vcrctrl_w(uint8_t data)
 {
 	if (data & 0x08)
 	{

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "machine/atapicdr.h"
+#include "bus/ata/atapicdr.h"
 
 class gdrom_device : public atapi_cdrom_device
 {
@@ -26,6 +26,8 @@ public:
 
 protected:
 	virtual void process_buffer() override;
+	virtual void signature() override;
+	virtual void SetDevice(void *device) override;
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -33,9 +35,10 @@ protected:
 
 private:
 	uint8_t GDROM_Cmd11_Reply[32];
-	uint32_t read_type;   // for command 0x30 only
-	uint32_t data_select; // for command 0x30 only
-	uint32_t transferOffset;
+	uint32_t read_type = 0;   // for command 0x30 only
+	uint32_t data_select = 0; // for command 0x30 only
+	uint32_t transferOffset = 0;
+	bool is_real_gdrom_disc;
 };
 
 DECLARE_DEVICE_TYPE(GDROM, gdrom_device)

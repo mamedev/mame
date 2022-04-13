@@ -27,7 +27,7 @@ public:
 	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	// inline configuration helpers
-	void set_ds2401_tag( const char *ds2401_tag ) { m_ds2401_tag = ds2401_tag; }
+	template <typename T> void set_ds2401_tag( T &&tag ) { m_ds2401.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_cs );
 	DECLARE_WRITE_LINE_MEMBER( write_rst );
@@ -38,11 +38,12 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read( emu_file &file ) override;
-	virtual void nvram_write( emu_file &file ) override;
+	virtual bool nvram_read( util::read_stream &file ) override;
+	virtual bool nvram_write( util::write_stream &file ) override;
 
 private:
 	inline void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, const char *s_fmt, ... );
@@ -72,8 +73,20 @@ private:
 		STATE_READ_DATA
 	};
 
+	enum status_t
+	{
+		STATUS_OK,
+		STATUS_ERROR = 2,
+	};
+
+	enum configuration_registers_t
+	{
+		CONFIG_RR = 4, // Retry Register
+		CONFIG_RC = 5  // Reset Counter
+	};
+
 	// internal state
-	const char *m_ds2401_tag;
+	optional_device<ds2401_device> m_ds2401;
 	optional_memory_region m_region;
 
 	int m_cs;
@@ -85,14 +98,15 @@ private:
 	int m_shift;
 	int m_bit;
 	int m_byte;
+	int m_previous_byte;
 	uint8_t m_write_buffer[ 12 ];
 	uint8_t m_read_buffer[ 12 ];
 	uint8_t m_response_key[ 8 ];
 	uint8_t m_response_to_reset[ 4 ];
 	uint8_t m_command_key[ 8 ];
 	uint8_t m_data_key[ 8 ];
-	uint8_t m_data[ 4096 ];
-	ds2401_device *m_ds2401;
+	uint8_t m_configuration_registers[ 8 ];
+	uint8_t m_data[ 112 ];
 };
 
 

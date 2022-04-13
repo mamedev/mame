@@ -30,7 +30,6 @@ Memo:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -43,7 +42,7 @@ void hyhoo_state::hyhoo_map(address_map &map)
 void hyhoo_state::hyhoo_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
+//  map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
 	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
@@ -56,13 +55,8 @@ void hyhoo_state::hyhoo_io_map(address_map &map)
 	map(0xe0, 0xe0).w(FUNC(hyhoo_state::hyhoo_romsel_w));
 	map(0xe0, 0xe1).r(m_nb1413m3, FUNC(nb1413m3_device::gfxrom_r));
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
-//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
+//  map(0xf0, 0xf0).nopw();
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
-}
-
-CUSTOM_INPUT_MEMBER( hyhoo_state::nb1413m3_busyflag_r )
-{
-	return m_nb1413m3->m_busyflag & 0x01;
 }
 
 static INPUT_PORTS_START( hyhoo )
@@ -111,7 +105,7 @@ static INPUT_PORTS_START( hyhoo )
 	PORT_DIPSETTING(    0x00, "95%" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
@@ -186,7 +180,7 @@ static INPUT_PORTS_START( hyhoo2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
@@ -255,9 +249,6 @@ void hyhoo_state::hyhoo(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

@@ -9,12 +9,13 @@
 #include "emu.h"
 #include "diagnostics_module.h"
 
+#include "corestr.h"
+
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // standard windows headers
 #include <windows.h>
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #include <debugger.h>
 
 #include <psapi.h>
@@ -99,7 +100,7 @@ private:
 	void scan_cache_for_address(uintptr_t address);
 	void format_symbol(const char *name, uint32_t displacement, const char *filename = nullptr, int linenumber = 0);
 
-	static uintptr_t get_text_section_base();
+	static uintptr_t get_text_section_base(ULONG &size);
 
 	struct cache_entry
 	{
@@ -115,8 +116,9 @@ private:
 	std::string     m_symfile;
 	std::string     m_buffer;
 	HANDLE          m_process;
-	uintptr_t            m_last_base;
-	uintptr_t            m_text_base;
+	uintptr_t       m_last_base;
+	uintptr_t       m_text_base;
+	ULONG           m_text_size;
 
 	osd::dynamic_module::ptr m_dbghelp_dll;
 
@@ -308,7 +310,7 @@ symbol_manager::symbol_manager(const char *argv0)
 	m_symfile.append(".sym");
 
 	// figure out the base of the .text section
-	m_text_base = get_text_section_base();
+	m_text_base = get_text_section_base(m_text_size);
 #endif
 
 	// expand the buffer to be decently large up front
@@ -377,6 +379,10 @@ bool symbol_manager::query_system_for_address(uintptr_t address)
 	info.MaxNameLen = sizeof(info_buffer) - sizeof(info);
 	if ((*m_sym_from_addr)(m_process, address, &displacement, &info))
 	{
+		// if the address is within our image, but the symbol is at or below the text base, it's useless (lld produces these)
+		if (info.Address <= m_text_base && address > m_text_base && address < m_text_base + m_text_size)
+			return false;
+
 		// try to get source info as well; again we are returned an ANSI string
 		IMAGEHLP_LINE64 lineinfo = { sizeof(lineinfo) };
 		DWORD linedisp;
@@ -529,7 +535,7 @@ bool symbol_manager::parse_sym_line(const char *line, uintptr_t &address, std::s
 				chptr++;
 
 			// extract the symbol name
-			strtrimspace(symbol.assign(chptr));
+			symbol.assign(strtrimspace(chptr));
 			return (symbol.length() > 0);
 		}
 	}
@@ -569,7 +575,7 @@ bool symbol_manager::parse_map_line(const char *line, uintptr_t &address, std::s
 			chptr++;
 
 		// extract the symbol name
-		strtrimspace(symbol.assign(chptr));
+		symbol.assign(strtrimspace(chptr));
 		return (symbol.length() > 0);
 	}
 #endif
@@ -602,7 +608,7 @@ void symbol_manager::format_symbol(const char *name, uint32_t displacement, cons
 //  of the .text section
 //-------------------------------------------------
 
-uintptr_t symbol_manager::get_text_section_base()
+uintptr_t symbol_manager::get_text_section_base(ULONG &size)
 {
 	osd::dynamic_module::ptr m_dbghelp_dll = osd::dynamic_module::open({ "dbghelp.dll" });
 
@@ -610,7 +616,7 @@ uintptr_t symbol_manager::get_text_section_base()
 	ImageNtHeader_fn image_nt_header = m_dbghelp_dll->bind<ImageNtHeader_fn>("ImageNtHeader");
 
 	// start with the image base
-	PVOID base = reinterpret_cast<PVOID>(GetModuleHandleUni());
+	auto base = reinterpret_cast<PVOID>(GetModuleHandleUni());
 	assert(base != nullptr);
 
 	// make sure we have the functions we need
@@ -623,10 +629,14 @@ uintptr_t symbol_manager::get_text_section_base()
 		// look ourself up (assuming we are in the .text section)
 		PIMAGE_SECTION_HEADER section = (*image_rva_to_section)(headers, base, reinterpret_cast<uintptr_t>(get_text_section_base) - reinterpret_cast<uintptr_t>(base));
 		if (section != nullptr)
+		{
+			size = section->SizeOfRawData;
 			return reinterpret_cast<uintptr_t>(base) + section->VirtualAddress;
+		}
 	}
 
 	// fallback to returning the image base (wrong)
+	size = 0;
 	return reinterpret_cast<uintptr_t>(base);
 }
 
@@ -663,23 +673,27 @@ sampling_profiler::~sampling_profiler()
 }
 
 
-//-------------------------------------------------
+////-------------------------------------------------
 //  start - begin gathering profiling information
 //-------------------------------------------------
 
 void sampling_profiler::start()
 {
 	// do the dance to get a handle to ourself
-	BOOL result = DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &m_target_thread,
-		THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
-	assert_always(result, "Failed to get thread handle for main thread");
+	BOOL const result = DuplicateHandle(
+			GetCurrentProcess(), GetCurrentThread(),
+			GetCurrentProcess(), &m_target_thread,
+			THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
+	if (!result)
+		throw emu_fatalerror("sampling_profiler::start: Failed to get thread handle for main thread");
 
 	// reset the exit flag
 	m_thread_exit = false;
 
 	// start the thread
 	m_thread = CreateThread(nullptr, 0, thread_entry, (LPVOID)this, 0, &m_thread_id);
-	assert_always(m_thread != nullptr, "Failed to create profiler thread\n");
+	if (!m_thread)
+		throw emu_fatalerror("sampling_profiler::start: Failed to create profiler thread");
 
 	// max out the priority
 	SetThreadPriority(m_thread, THREAD_PRIORITY_TIME_CRITICAL);
@@ -708,8 +722,8 @@ void sampling_profiler::stop()
 
 int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *item2)
 {
-	const uintptr_t *entry1 = reinterpret_cast<const uintptr_t *>(item1);
-	const uintptr_t *entry2 = reinterpret_cast<const uintptr_t *>(item2);
+	const auto *entry1 = reinterpret_cast<const uintptr_t *>(item1);
+	const auto *entry2 = reinterpret_cast<const uintptr_t *>(item2);
 	int mincount = std::min(entry1[0], entry2[0]);
 
 	// sort in order of: bucket, caller, caller's caller, etc.
@@ -729,8 +743,8 @@ int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *
 
 int CLIB_DECL sampling_profiler::compare_frequency(const void *item1, const void *item2)
 {
-	const uintptr_t *entry1 = reinterpret_cast<const uintptr_t *>(item1);
-	const uintptr_t *entry2 = reinterpret_cast<const uintptr_t *>(item2);
+	const auto *entry1 = reinterpret_cast<const uintptr_t *>(item1);
+	const auto *entry2 = reinterpret_cast<const uintptr_t *>(item2);
 
 	// sort by frequency, then by address
 	if (entry1[0] != entry2[0])
@@ -1082,7 +1096,5 @@ diagnostics_module * diagnostics_module::get_instance()
 	static diagnostics_win32 s_instance;
 	return &s_instance;
 }
-
-#endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 #endif

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, Bartman/Abyss (HD6345)
+// copyright-holders:Wilbert Pol,Nigel Barnes
 /**********************************************************************
 
     Motorola MC6845 and compatible CRT controller emulation
@@ -7,15 +7,17 @@
     The following variations exist that are different in
     functionality and not just in speed rating(1):
         * Motorola 6845, 6845-1
-        * Hitachi 46505
+        * Hitachi 6845 (= 46505R), 6845S (= 46505S), 6345/6445
         * Rockwell 6545, 6545-1 (= Synertek SY6545-1)
         * MOS Technology 6545-1
 
     (1) as per the document at
     http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
 
-    The various speed rated devices are identified by a letter,
-    for example M68A45, M68B45, etc.
+    The various speed rated devices are usually identified by a
+    letter, e.g. MC68A45, MC68B45. Hitachi's older HD46505 numbering
+    identifies speed by numerical suffixes (-1, -2), which other
+    manufacturers use to identify functional variants instead.
 
     The chip is originally designed by Hitachi, not by Motorola.
 
@@ -30,11 +32,15 @@
     - Support 'interlace and video' mode
 
     - mos8563
-
         - horizontal scroll
         - vertical scroll
         - bitmap modes
         - display enable begin/end
+
+    - hd6345
+        - smooth scrolling
+        - second cursor
+        - interrupt request
 
 */
 
@@ -43,23 +49,27 @@
 
 #include "screen.h"
 
-#define LOG_REGS    (1 << 0U)
-#define LOG_CONFIG  (1 << 1U)
-#define VERBOSE     (0)
+#define LOG_SETUP   (1 << 1U)
+#define LOG_REGS    (1 << 2U)
+#define LOG_CONF    (1 << 3U)
+
+//#define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,  __VA_ARGS__)
+#define LOGREGS(...)    LOGMASKED(LOG_REGS,  __VA_ARGS__)
+#define LOGCONF(...)    LOGMASKED(LOG_CONF,  __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MC6845,   mc6845_device,   "mc6845",   "Motorola MC6845 CRTC")
 DEFINE_DEVICE_TYPE(MC6845_1, mc6845_1_device, "mc6845_1", "Motorola MC6845-1 CRTC")
 DEFINE_DEVICE_TYPE(R6545_1,  r6545_1_device,  "r6545_1",  "Rockwell R6545-1 CRTC")
 DEFINE_DEVICE_TYPE(C6545_1,  c6545_1_device,  "c6545_1",  "C6545-1 CRTC")
-DEFINE_DEVICE_TYPE(H46505,   h46505_device,   "h46505",   "Hitachi HD46505 CRTC")
-DEFINE_DEVICE_TYPE(HD6845,   hd6845_device,   "hd6845",   "Hitachi HD6845 CRTC")
+DEFINE_DEVICE_TYPE(HD6845S,  hd6845s_device,  "hd6845s",  "Hitachi HD6845S CRTC") // same as HD46505S
 DEFINE_DEVICE_TYPE(SY6545_1, sy6545_1_device, "sy6545_1", "Synertek SY6545-1 CRTC")
 DEFINE_DEVICE_TYPE(SY6845E,  sy6845e_device,  "sy6845e",  "Synertek SY6845E CRTC")
-DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC")
-DEFINE_DEVICE_TYPE(AMS40041, ams40041_device, "ams40041", "AMS40041 CRTC")
+DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC-II")
 DEFINE_DEVICE_TYPE(AMS40489, ams40489_device, "ams40489", "AMS40489 ASIC (CRTC)")
 DEFINE_DEVICE_TYPE(MOS8563,  mos8563_device,  "mos8563",  "MOS 8563 VDC")
 DEFINE_DEVICE_TYPE(MOS8568,  mos8568_device,  "mos8568",  "MOS 8568 VDC")
@@ -95,20 +105,26 @@ DEFINE_DEVICE_TYPE(MOS8568,  mos8568_device,  "mos8568",  "MOS 8568 VDC")
 
 
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_video_interface(mconfig, *this, false),
-		m_show_border_area(true),
-		m_interlace_adjust(0),
-		m_clk_scale(1),
-		m_visarea_adjust_min_x(0),
-		m_visarea_adjust_max_x(0),
-		m_visarea_adjust_min_y(0),
-		m_visarea_adjust_max_y(0),
-		m_hpixels_per_column(0),
-		m_out_de_cb(*this),
-		m_out_cur_cb(*this),
-		m_out_hsync_cb(*this),
-		m_out_vsync_cb(*this)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this, false)
+	, m_show_border_area(true)
+	, m_noninterlace_adjust(0)
+	, m_interlace_adjust(0)
+	, m_clk_scale(1)
+	, m_visarea_adjust_min_x(0)
+	, m_visarea_adjust_max_x(0)
+	, m_visarea_adjust_min_y(0)
+	, m_visarea_adjust_max_y(0)
+	, m_hpixels_per_column(0)
+	, m_reconfigure_cb(*this)
+	, m_begin_update_cb(*this)
+	, m_update_row_cb(*this)
+	, m_end_update_cb(*this)
+	, m_on_update_addr_changed_cb(*this)
+	, m_out_de_cb(*this)
+	, m_out_cur_cb(*this)
+	, m_out_hsync_cb(*this)
+	, m_out_vsync_cb(*this)
 {
 }
 
@@ -173,7 +189,7 @@ void mc6845_device::transparent_update()
 		{
 			m_update_addr++;
 			m_update_addr &= 0x3fff;
-			call_on_update_address(0);
+			call_on_update_address(MODE_UPDATE_STROBE);
 		}
 		else
 		{
@@ -198,6 +214,7 @@ uint8_t mc6845_device::register_r()
 		case 0x0d:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 0) & 0xff : 0; break;
 		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
 		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
+		// FIXME: status flag should not be reset if LPEN input is held high
 		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
 		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
 		case 0x1f:  transparent_update(); break;
@@ -212,7 +229,19 @@ uint8_t mc6845_device::register_r()
 
 void mc6845_device::register_w(uint8_t data)
 {
-	LOGMASKED(LOG_REGS, "%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+	LOGREGS("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+
+	/* Omits LOGSETUP logs of cursor registers as they tend to be spammy */
+	if (m_register_address_latch < 0x0e &&
+		m_register_address_latch != 0x0a &&
+		m_register_address_latch != 0x0b) LOGSETUP(" * %02x <= %3u [%02x] %s\n", m_register_address_latch,
+							  data, data, std::array<char const *, 16>
+		 {{ "R0 - Horizontal Total",       "R1 - Horizontal Displayed",   "R2 - Horizontal Sync Position",
+			"R3 - Sync Width",             "R4 - Vertical Total",         "R5 - Vertical Total Adjust",
+			"R6 - Vertical Displayed",     "R7 - Vertical Sync Position", "R8 - Interlace & Skew",
+			"R9 - Maximum Raster Address", "R10 - Cursor Start Raster",   "R11 - Cursor End Raster",
+			"R12 - Start Address (H)",     "R13 - Start Address (L)",     "R14 - Cursor (H)",
+			"R15 - Cursor (L)" }}[(m_register_address_latch & 0x0f)]);
 
 	switch (m_register_address_latch)
 	{
@@ -239,7 +268,7 @@ void mc6845_device::register_w(uint8_t data)
 			{
 				m_update_addr = ((data & 0x3f) << 8) | (m_update_addr & 0x00ff);
 				if(MODE_TRANSPARENT_PHI2)
-					call_on_update_address(0);
+					call_on_update_address(MODE_UPDATE_STROBE);
 			}
 			break;
 		case 0x13:
@@ -247,7 +276,7 @@ void mc6845_device::register_w(uint8_t data)
 			{
 				m_update_addr = ((data & 0xff) << 0) | (m_update_addr & 0xff00);
 				if(MODE_TRANSPARENT_PHI2)
-					call_on_update_address(0);
+					call_on_update_address(MODE_UPDATE_STROBE);
 			}
 			break;
 		case 0x1f:  transparent_update(); break;
@@ -341,7 +370,7 @@ uint8_t mos8563_device::register_r()
 
 void mos8563_device::register_w(uint8_t data)
 {
-	LOGMASKED(LOG_REGS, "%s:MOS8563 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+	LOGREGS("%s:MOS8563 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
 	switch (m_register_address_latch)
 	{
@@ -410,17 +439,34 @@ void hd6345_device::address_w(uint8_t data)
 
 uint8_t hd6345_device::register_r()
 {
-	uint8_t ret = 0xff;
+	uint8_t ret = 0;
 
 	switch (m_register_address_latch)
 	{
-		case 0x0c:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 8) & 0xff : 0; break;
-		case 0x0d:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 0) & 0xff : 0; break;
-		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
-		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
-		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
-		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
-		// TODO: REST
+		case 0x0c:  ret = (m_disp_start_addr  >> 8) & 0xff; break;
+		case 0x0d:  ret = (m_disp_start_addr  >> 0) & 0xff; break;
+		case 0x0e:  ret = (m_cursor_addr      >> 8) & 0xff; break;
+		case 0x0f:  ret = (m_cursor_addr      >> 0) & 0xff; break;
+		case 0x10:  ret = (m_light_pen_addr   >> 8) & 0xff; m_light_pen_latched = false; break;
+		case 0x11:  ret = (m_light_pen_addr   >> 0) & 0xff; m_light_pen_latched = false; break;
+		case 0x12:  ret = m_disp2_pos; break;
+		case 0x13:  ret = (m_disp2_start_addr >> 8) & 0xff; break;
+		case 0x14:  ret = (m_disp2_start_addr >> 0) & 0xff; break;
+		case 0x15:  ret = m_disp3_pos; break;
+		case 0x16:  ret = (m_disp3_start_addr >> 8) & 0xff; break;
+		case 0x17:  ret = (m_disp3_start_addr >> 0) & 0xff; break;
+		case 0x18:  ret = m_disp4_pos; break;
+		case 0x19:  ret = (m_disp4_start_addr >> 8) & 0xff; break;
+		case 0x1a:  ret = (m_disp4_start_addr >> 0) & 0xff; break;
+		case 0x1b:  ret = m_vert_sync_pos_adj; break;
+		case 0x1c: /* TODO: light pen raster */ break;
+		case 0x1d:  ret = m_smooth_scroll_ras; break;
+		case 0x1f: /* TODO: status */ break;
+		case 0x21:  ret = m_mem_width_offs; break;
+		case 0x24:  ret = (m_cursor2_addr     >> 8) & 0xff; break;
+		case 0x25:  ret = (m_cursor2_addr     >> 0) & 0xff; break;
+		case 0x26:  ret = m_cursor_width; break;
+		case 0x27:  ret = m_cursor2_width; break;
 	}
 
 	return ret;
@@ -428,7 +474,27 @@ uint8_t hd6345_device::register_r()
 
 void hd6345_device::register_w(uint8_t data)
 {
-	LOGMASKED(LOG_REGS, "%s:HD6345 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+	LOGREGS("%s:HD6345 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+
+	/* Omits LOGSETUP logs of cursor registers as they tend to be spammy */
+	if (m_register_address_latch < 0x28 &&
+		m_register_address_latch != 0x0a && m_register_address_latch != 0x0a &&
+		m_register_address_latch != 0x0e && m_register_address_latch != 0x0f)
+		LOGSETUP(" * %02x <= %3u [%02x] %s\n", m_register_address_latch, data, data, std::array<char const *, 40>
+		 {{ "R0 - Horizontal Total",            "R1 - Horizontal Displayed",        "R2 - Horizontal Sync Position",
+			"R3 - Sync Width",                  "R4 - Vertical Total",              "R5 - Vertical Total Adjust",
+			"R6 - Vertical Displayed",          "R7 - Vertical Sync Position",      "R8 - Interlace Mode & Skew",
+			"R9 - Maximum Raster Address",      "R10 - Cursor 1 Start",             "R11 - Cursor 1 End",
+			"R12 - Screen 1 Start Address (H)", "R13 - Screen 1 Start Address (L)", "R14 - Cursor 1 Address (H)",
+			"R15 - Cursor 1 Address (L)",       "R16 - Light Pen (H)",              "R17 - Light Pen (L)",
+			"R18 - Screen 2 Start Position",    "R19 - Screen 2 Start Address (H)", "R20 - Screen 2 Start Address (L)",
+			"R21 - Screen 3 Start Position",    "R22 - Screen 3 Start Address (H)", "R23 - Screen 3 Start Address (L)",
+			"R24 - Screen 4 Start Position",    "R25 - Screen 4 Start Address (H)", "R26 - Screen 4 Start Address (L)",
+			"R27 - Vertical Sync Position Adj", "R28 - Light Pen Raster",           "R29 - Smooth Scrolling",
+			"R30 - Control 1",                  "R31 - Control 2",                  "R32 - Control 3",
+			"R33 - Memory Width Offset",        "R34 - Cursor 2 Start",             "R35 - Cursor 2 End",
+			"R36 - Cursor 2 Address (H)",       "R37 - Cursor 2 Address (L)",       "R38 - Cursor 1 Width",
+			"R39 - Cursor 2 Width" }}[(m_register_address_latch & 0x3f)]);
 
 	switch (m_register_address_latch)
 	{
@@ -440,7 +506,7 @@ void hd6345_device::register_w(uint8_t data)
 		case 0x05:  m_vert_total_adj   =   data & 0x1f; break;
 		case 0x06:  m_vert_disp        =   data & 0xff; break;
 		case 0x07:  m_vert_sync_pos    =   data & 0xff; break;
-		case 0x08:  m_mode_control     =   data & 0xff; break;
+		case 0x08:  m_mode_control     =   data & 0xf3; break;
 		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
 		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
 		case 0x0b:  m_cursor_end_ras   =   data & 0x1f; break;
@@ -450,7 +516,28 @@ void hd6345_device::register_w(uint8_t data)
 		case 0x0f:  m_cursor_addr      = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
 		case 0x10: /* read-only */ break;
 		case 0x11: /* read-only */ break;
-		// TODO: rest
+		case 0x12:  m_disp2_pos         =   data & 0xff; break;
+		case 0x13:  m_disp2_start_addr  = ((data & 0x3f) << 8) | (m_disp2_start_addr & 0x00ff); break;
+		case 0x14:  m_disp2_start_addr  = ((data & 0xff) << 0) | (m_disp2_start_addr & 0xff00); break;
+		case 0x15:  m_disp3_pos         =   data & 0xff; break;
+		case 0x16:  m_disp3_start_addr  = ((data & 0x3f) << 8) | (m_disp3_start_addr & 0x00ff); break;
+		case 0x17:  m_disp3_start_addr  = ((data & 0xff) << 0) | (m_disp3_start_addr & 0xff00); break;
+		case 0x18:  m_disp4_pos         =   data & 0xff; break;
+		case 0x19:  m_disp4_start_addr  = ((data & 0x3f) << 8) | (m_disp4_start_addr & 0x00ff); break;
+		case 0x1a:  m_disp4_start_addr  = ((data & 0xff) << 0) | (m_disp4_start_addr & 0xff00); break;
+		case 0x1b:  m_vert_sync_pos_adj =   data & 0x1f; break;
+		case 0x1c: /* read-only */ break;
+		case 0x1d:  m_smooth_scroll_ras =   data & 0x1f; break;
+		case 0x1e:  m_control1          =   data & 0xff; break;
+		case 0x1f:  m_control2          =   data & 0xf8; break;
+		case 0x20:  m_control3          =   data & 0xfe; break;
+		case 0x21:  m_mem_width_offs    =   data & 0xff; break;
+		case 0x22:  m_cursor2_start_ras =   data & 0x7f; break;
+		case 0x23:  m_cursor2_end_ras   =   data & 0x1f; break;
+		case 0x24:  m_cursor2_addr      = ((data & 0x3f) << 8) | (m_cursor2_addr & 0x00ff); break;
+		case 0x25:  m_cursor2_addr      = ((data & 0xff) << 0) | (m_cursor2_addr & 0xff00); break;
+		case 0x26:  m_cursor_width      =   data & 0xff; break;
+		case 0x27:  m_cursor2_width     =   data & 0xff; break;
 	}
 
 	recompute_parameters(false);
@@ -570,8 +657,8 @@ void mc6845_device::recompute_parameters(bool postload)
 			else
 				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
 
-			LOGMASKED(LOG_CONFIG, "M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
-								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
+			LOGCONF("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
+				 horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 
 			if (has_screen())
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
@@ -691,6 +778,71 @@ bool mc6845_device::match_line()
 }
 
 
+bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
+{
+	if (!m_cursor_state)
+		return false;
+
+	if ((m_cursor_addr < line_addr) ||
+		(m_cursor_addr >= (line_addr + m_horiz_disp)))
+	{
+		// Not a cursor character line.
+		return false;
+	}
+
+	uint16_t cursor_start_ras = m_cursor_start_ras & 0x1f;
+	uint16_t max_ras_addr = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1;
+
+	if (cursor_start_ras > max_ras_addr)
+	{
+		// No cursor.
+		return false;
+	}
+
+	// TODO explore the edge cases in the 'interlace and video' mode.
+
+	if (cursor_start_ras <= m_cursor_end_ras)
+	{
+		if (m_cursor_end_ras > max_ras_addr)
+		{
+			// Wraps to produce a full cursor.
+			return true;
+		}
+		// Cursor from start to end inclusive.
+		return (ra >= cursor_start_ras) && (ra <= m_cursor_end_ras);
+	}
+
+	// Otherwise cursor_start_ras > m_cursor_end_ras giving a split cursor.
+	return (ra <= m_cursor_end_ras) || (ra >= cursor_start_ras);
+}
+
+// The HD6845 cursor does not wrap as it does for the MC6845.
+bool hd6845s_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
+{
+	if (!m_cursor_state)
+		return false;
+
+	if ((m_cursor_addr < line_addr) ||
+		(m_cursor_addr >= (line_addr + m_horiz_disp)))
+	{
+		// Not a cursor character line.
+		return false;
+	}
+
+	uint16_t cursor_start_ras = m_cursor_start_ras & 0x1f;
+	uint16_t max_ras_addr = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1;
+
+	if (cursor_start_ras > max_ras_addr || cursor_start_ras > m_cursor_end_ras)
+	{
+		// No cursor.
+		return false;
+	}
+
+	// Cursor from start to end inclusive.
+	return (ra >= cursor_start_ras) && (ra <= m_cursor_end_ras);
+}
+
+
 void mc6845_device::handle_line_timer()
 {
 	bool new_vsync = m_vsync;
@@ -775,11 +927,7 @@ void mc6845_device::handle_line_timer()
 		m_de_off_timer->adjust(cclks_to_attotime(m_horiz_disp));
 
 		/* Is cursor visible on this line? */
-		if ( m_cursor_state &&
-			(m_raster_counter >= (m_cursor_start_ras & 0x1f)) &&
-			(m_raster_counter <= m_cursor_end_ras) &&
-			(m_cursor_addr >= m_line_address) &&
-			(m_cursor_addr < (m_line_address + m_horiz_disp)) )
+		if (check_cursor_visible(m_raster_counter, m_line_address))
 		{
 			m_cursor_x = m_cursor_addr - m_line_address;
 
@@ -800,7 +948,7 @@ void mc6845_device::handle_line_timer()
 }
 
 
-void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -846,7 +994,7 @@ void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	case TIMER_UPD_ADR:
 		/* fire a update address strobe */
-		call_on_update_address(0);
+		call_on_update_address(MODE_UPDATE_STROBE);
 		break;
 
 	case TIMER_UPD_TRANS:
@@ -870,7 +1018,7 @@ void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-void mos8563_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mos8563_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -891,7 +1039,7 @@ void mos8563_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		break;
 	}
 	default:
-		mc6845_device::device_timer(timer, id, param, ptr);
+		mc6845_device::device_timer(timer, id, param);
 		break;
 	}
 }
@@ -968,16 +1116,14 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 	/* compute the current raster line */
 	uint8_t ra = y % (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 
-	/* check if the cursor is visible and is on this scanline */
-	int cursor_visible = m_cursor_state &&
-						(ra >= (m_cursor_start_ras & 0x1f)) &&
-						(ra <= m_cursor_end_ras) &&
-						(m_cursor_addr >= m_current_disp_addr) &&
-						(m_cursor_addr < (m_current_disp_addr + m_horiz_disp));
+	// Check if the cursor is visible and is on this scanline.
+	int cursor_visible = check_cursor_visible(ra, m_current_disp_addr);
 
-	/* compute the cursor X position, or -1 if not visible */
+	// Compute the cursor X position, or -1 if not visible. This position
+	// is in units of characters and is relative to the start of the
+	// displayable area, not relative to the screen bitmap origin.
 	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
-	int de = (y < m_max_visible_y) ? 1 : 0;
+	int de = (y <= m_max_visible_y) ? 1 : 0;
 	int vbp = m_vert_pix_total - m_vsync_off_pos;
 	if (vbp < 0) vbp = 0;
 	int hbp = m_horiz_pix_total - m_hsync_off_pos;
@@ -1005,6 +1151,26 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 }
 
 
+uint8_t hd6345_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t ra = hd6845s_device::draw_scanline(y, bitmap, cliprect);
+
+	/* update MA for screen split */
+	if (ra == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1)
+	{
+		int y_pos = y / (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
+		if ((m_control1 & 0x03) > 0 && y_pos == m_disp2_pos && m_disp2_pos != m_disp3_pos && m_disp2_pos != m_disp4_pos)
+			m_current_disp_addr = m_disp2_start_addr;
+		if ((m_control1 & 0x03) > 1 && y_pos == m_disp3_pos && m_disp3_pos != m_disp2_pos && m_disp3_pos != m_disp4_pos)
+			m_current_disp_addr = m_disp3_start_addr;
+		if ((m_control1 & 0x03) > 2 && y_pos == m_disp4_pos && m_disp4_pos != m_disp2_pos && m_disp4_pos != m_disp3_pos)
+			m_current_disp_addr = m_disp4_start_addr;
+	}
+
+	return ra;
+}
+
+
 uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	assert(bitmap.valid());
@@ -1012,6 +1178,12 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	if (m_has_valid_parameters)
 	{
 		assert(!m_update_row_cb.isnull());
+
+		if (m_display_disabled_msg_shown == true)
+		{
+			logerror("M6845: Valid screen parameters - display reenabled!!!\n");
+			m_display_disabled_msg_shown = false;
+		}
 
 		/* call the set up function if any */
 		if (!m_begin_update_cb.isnull())
@@ -1024,7 +1196,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y && y <= m_max_visible_y; y++)
+		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}
@@ -1035,7 +1207,11 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 	else
 	{
-		LOGMASKED(LOG_CONFIG, "M6845: Invalid screen parameters - display disabled!!!\n");
+		if (m_display_disabled_msg_shown == false)
+		{
+			logerror("M6845: Invalid screen parameters - display disabled!!!\n");
+			m_display_disabled_msg_shown = true;
+		}
 	}
 
 	return 0;
@@ -1047,18 +1223,18 @@ void mc6845_device::device_start()
 	assert(clock() > 0);
 	assert(m_hpixels_per_column > 0);
 
+	/* bind delegates */
+	m_reconfigure_cb.resolve();
+	m_begin_update_cb.resolve();
+	m_update_row_cb.resolve();
+	m_end_update_cb.resolve();
+	m_on_update_addr_changed_cb.resolve();
+
 	/* resolve callbacks */
 	m_out_de_cb.resolve_safe();
 	m_out_cur_cb.resolve_safe();
 	m_out_hsync_cb.resolve_safe();
 	m_out_vsync_cb.resolve_safe();
-
-	/* bind delegates */
-	m_reconfigure_cb.bind_relative_to(*owner());
-	m_begin_update_cb.bind_relative_to(*owner());
-	m_update_row_cb.bind_relative_to(*owner());
-	m_end_update_cb.bind_relative_to(*owner());
-	m_on_update_addr_changed_cb.bind_relative_to(*owner());
 
 	/* create the timers */
 	m_line_timer = timer_alloc(TIMER_LINE);
@@ -1075,6 +1251,7 @@ void mc6845_device::device_start()
 	m_horiz_char_total = 0xff;
 	m_max_ras_addr = 0x1f;
 	m_vert_char_total = 0x7f;
+	m_mode_control = 0x00;
 
 	m_supports_disp_start_addr_r = false;  // MC6845 can not read Display Start (double checked on datasheet)
 	m_supports_vert_sync_width = false;
@@ -1083,6 +1260,7 @@ void mc6845_device::device_start()
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
 	m_has_valid_parameters = false;
+	m_display_disabled_msg_shown = false;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
 	m_raster_counter = 0;
@@ -1196,20 +1374,7 @@ void r6545_1_device::device_start()
 }
 
 
-void h46505_device::device_start()
-{
-	mc6845_device::device_start();
-
-	m_supports_disp_start_addr_r = false;
-	m_supports_vert_sync_width = false;
-	m_supports_status_reg_d5 = false;
-	m_supports_status_reg_d6 = false;
-	m_supports_status_reg_d7 = false;
-	m_supports_transparent = false;
-}
-
-
-void hd6845_device::device_start()
+void hd6845s_device::device_start()
 {
 	mc6845_device::device_start();
 
@@ -1255,38 +1420,42 @@ void sy6845e_device::device_start()
 
 void hd6345_device::device_start()
 {
-	mc6845_device::device_start();
+	hd6845s_device::device_start();
 
-	m_supports_disp_start_addr_r = true;
-	m_supports_vert_sync_width = true;
-	m_supports_status_reg_d5 = true;
-	m_supports_status_reg_d6 = true;
-	m_supports_status_reg_d7 = true;
-	//m_supports_transparent = true;
+	m_disp2_pos = 0;
+	m_disp3_pos = 0;
+	m_disp4_pos = 0;
+	m_disp2_start_addr = 0;
+	m_disp3_start_addr = 0;
+	m_disp4_start_addr = 0;
+	m_vert_sync_pos_adj = 0;
+	m_smooth_scroll_ras = 0;
+	m_mem_width_offs = 0;
+	m_cursor2_start_ras = 0;
+	m_cursor2_end_ras = 0;
+	m_cursor2_addr = 0;
+	m_cursor_width = 0;
+	m_cursor2_width = 0;
+
+	save_item(NAME(m_disp2_pos));
+	save_item(NAME(m_disp2_start_addr));
+	save_item(NAME(m_disp3_pos));
+	save_item(NAME(m_disp3_start_addr));
+	save_item(NAME(m_disp4_pos));
+	save_item(NAME(m_disp4_start_addr));
+	save_item(NAME(m_vert_sync_pos_adj));
+	save_item(NAME(m_smooth_scroll_ras));
+	save_item(NAME(m_control1));
+	save_item(NAME(m_control2));
+	save_item(NAME(m_control3));
+	save_item(NAME(m_mem_width_offs));
+	save_item(NAME(m_cursor2_start_ras));
+	save_item(NAME(m_cursor2_end_ras));
+	save_item(NAME(m_cursor2_addr));
+	save_item(NAME(m_cursor_width));
+	save_item(NAME(m_cursor2_width));
 }
 
-
-void ams40041_device::device_start()
-{
-	mc6845_device::device_start();
-
-	m_horiz_char_total =  113;
-	m_horiz_disp       =  80;
-	m_horiz_sync_pos   =  90;
-	m_sync_width       =  10;
-	m_vert_char_total  =  127;
-	m_vert_total_adj   =  6;
-	m_vert_disp        =  100;
-	m_vert_sync_pos    =  112;
-	m_mode_control     =  2;
-
-	m_supports_disp_start_addr_r = false;
-	m_supports_vert_sync_width = false;
-	m_supports_status_reg_d5 = false;
-	m_supports_status_reg_d6 = false;
-	m_supports_status_reg_d7 = false;
-	m_supports_transparent = false;
-}
 
 void ams40489_device::device_start()
 {
@@ -1314,7 +1483,7 @@ void mos8563_device::device_start()
 	m_update_ready_bit = 1;
 
 	// default update_row delegate
-	m_update_row_cb =  update_row_delegate(FUNC(mos8563_device::vdc_update_row), this);
+	m_update_row_cb.set(*this, FUNC(mos8563_device::vdc_update_row));
 
 	m_char_blink_state = false;
 	m_char_blink_count = 0;
@@ -1417,14 +1586,21 @@ void mc6845_device::device_reset()
 
 
 void r6545_1_device::device_reset() { mc6845_device::device_reset(); }
-void h46505_device::device_reset() { mc6845_device::device_reset(); }
 void mc6845_1_device::device_reset() { mc6845_device::device_reset(); }
-void hd6845_device::device_reset() { mc6845_device::device_reset(); }
+void hd6845s_device::device_reset() { mc6845_device::device_reset(); }
 void c6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
-void hd6345_device::device_reset() { mc6845_device::device_reset(); }
-void ams40041_device::device_reset() { mc6845_device::device_reset(); }
+
+void hd6345_device::device_reset()
+{
+	hd6845s_device::device_reset();
+
+	m_control1 = 0;
+	m_control2 = 0;
+	m_control3 = 0;
+}
+
 void ams40489_device::device_reset() { mc6845_device::device_reset(); }
 
 void mos8563_device::device_reset()
@@ -1463,20 +1639,20 @@ r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-h46505_device::h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, H46505, tag, owner, clock)
-{
-}
-
-
 mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, MC6845_1, tag, owner, clock)
 {
 }
 
 
-hd6845_device::hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, HD6845, tag, owner, clock)
+hd6845s_device::hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
+hd6845s_device::hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, HD6845S, tag, owner, clock)
 {
 }
 
@@ -1500,15 +1676,10 @@ sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, d
 
 
 hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, HD6345, tag, owner, clock)
+	: hd6845s_device(mconfig, HD6345, tag, owner, clock)
 {
 }
 
-
-ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, AMS40041, tag, owner, clock)
-{
-}
 
 ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, AMS40489, tag, owner, clock)
@@ -1517,10 +1688,10 @@ ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag,
 
 
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, type, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		device_palette_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this))
+	: mc6845_device(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
+	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this))
 {
 	m_clk_scale = 8;
 }
@@ -1610,7 +1781,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
+				bitmap.pix(vbp + y, hbp + x) = pen(de ? color : 0);
 			}
 		}
 		else
@@ -1646,7 +1817,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
+				bitmap.pix(vbp + y, hbp + x) = pen(de ? color : 0);
 
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}

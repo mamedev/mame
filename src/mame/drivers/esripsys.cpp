@@ -33,7 +33,6 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -55,13 +54,13 @@ WRITE_LINE_MEMBER(esripsys_state::ptm_irq)
  *************************************/
 
 /* Note: Game CPU /FIRQ is connected to RXRDY */
-WRITE8_MEMBER(esripsys_state::uart_w)
+void esripsys_state::uart_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 1) == 0)
 		osd_printf_debug("%c",data);
 }
 
-READ8_MEMBER(esripsys_state::uart_r)
+uint8_t esripsys_state::uart_r()
 {
 	return 0;
 }
@@ -86,7 +85,7 @@ READ8_MEMBER(esripsys_state::uart_r)
     7: Frame CPU /NMI       7: /VBLANK
 */
 
-READ8_MEMBER(esripsys_state::g_status_r)
+uint8_t esripsys_state::g_status_r()
 {
 	int bank4 = BIT(m_videocpu->get_rip_status(), 2);
 	int vblank = m_screen->vblank();
@@ -94,7 +93,7 @@ READ8_MEMBER(esripsys_state::g_status_r)
 	return (!vblank << 7) | (bank4 << 6) | (m_f_status & 0x2f);
 }
 
-WRITE8_MEMBER(esripsys_state::g_status_w)
+void esripsys_state::g_status_w(uint8_t data)
 {
 	int bankaddress;
 	uint8_t *rom = memregion("game_cpu")->base();
@@ -134,7 +133,7 @@ WRITE8_MEMBER(esripsys_state::g_status_w)
     7: /FRDONE                  7: /VBLANK
 */
 
-READ8_MEMBER(esripsys_state::f_status_r)
+uint8_t esripsys_state::f_status_r()
 {
 	int vblank = m_screen->vblank();
 	uint8_t rip_status = m_videocpu->get_rip_status();
@@ -144,7 +143,7 @@ READ8_MEMBER(esripsys_state::f_status_r)
 	return (!vblank << 7) | (m_fbsel << 6) | (m_frame_vbl << 5) | rip_status;
 }
 
-WRITE8_MEMBER(esripsys_state::f_status_w)
+void esripsys_state::f_status_w(uint8_t data)
 {
 	m_f_status = data;
 }
@@ -162,13 +161,13 @@ TIMER_CALLBACK_MEMBER(esripsys_state::delayed_bank_swap)
 	m_fbsel ^= 1;
 }
 
-WRITE8_MEMBER(esripsys_state::frame_w)
+void esripsys_state::frame_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(esripsys_state::delayed_bank_swap),this));
 	m_frame_vbl = 1;
 }
 
-READ8_MEMBER(esripsys_state::fdt_r)
+uint8_t esripsys_state::fdt_r(offs_t offset)
 {
 	if (!m_fasel)
 		return m_fdt_b[offset];
@@ -176,7 +175,7 @@ READ8_MEMBER(esripsys_state::fdt_r)
 		return m_fdt_a[offset];
 }
 
-WRITE8_MEMBER(esripsys_state::fdt_w)
+void esripsys_state::fdt_w(offs_t offset, uint8_t data)
 {
 	if (!m_fasel)
 		m_fdt_b[offset] = data;
@@ -191,7 +190,7 @@ WRITE8_MEMBER(esripsys_state::fdt_w)
  *
  *************************************/
 
-READ16_MEMBER( esripsys_state::fdt_rip_r )
+uint16_t esripsys_state::fdt_rip_r(offs_t offset)
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -201,7 +200,7 @@ READ16_MEMBER( esripsys_state::fdt_rip_r )
 		return (m_fdt_b[offset] << 8) | m_fdt_b[offset + 1];
 }
 
-WRITE16_MEMBER( esripsys_state::fdt_rip_w )
+void esripsys_state::fdt_rip_w(offs_t offset, uint16_t data)
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -228,7 +227,7 @@ WRITE16_MEMBER( esripsys_state::fdt_rip_w )
    D7 = /FDONE
 */
 
-READ8_MEMBER(esripsys_state::rip_status_in)
+uint8_t esripsys_state::rip_status_in()
 {
 	int vpos =  m_screen->vpos();
 	uint8_t _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
@@ -248,12 +247,12 @@ READ8_MEMBER(esripsys_state::rip_status_in)
  *
  *************************************/
 
-WRITE8_MEMBER(esripsys_state::g_iobus_w)
+void esripsys_state::g_iobus_w(uint8_t data)
 {
 	m_g_iodata = data;
 }
 
-READ8_MEMBER(esripsys_state::g_iobus_r)
+uint8_t esripsys_state::g_iobus_r()
 {
 	switch (m_g_ioaddr & 0x7f)
 	{
@@ -284,9 +283,9 @@ READ8_MEMBER(esripsys_state::g_iobus_r)
 		case 0x10:
 			return ioport("IO_1")->read();
 		case 0x11:
-			return ioport("JOYSTICK_X")->read();
+			return ioport("STICKX")->read();
 		case 0x12:
-			return ioport("JOYSTICK_Y")->read();
+			return ioport("STICKY")->read();
 		case 0x16:
 			return m_io_firq_status;
 		case 0x18:
@@ -320,7 +319,7 @@ READ8_MEMBER(esripsys_state::g_iobus_r)
 	}
 }
 
-WRITE8_MEMBER(esripsys_state::g_ioadd_w)
+void esripsys_state::g_ioadd_w(uint8_t data)
 {
 	m_g_ioaddr = data;
 
@@ -453,11 +452,11 @@ static INPUT_PORTS_START( turbosub )
 	PORT_START("IO_2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("JOYSTICK_X")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+	PORT_START("STICKX")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 
-	PORT_START("JOYSTICK_Y")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+	PORT_START("STICKY")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
 
@@ -468,17 +467,17 @@ INPUT_PORTS_END
  *************************************/
 
 /* Game/Sound CPU communications */
-READ8_MEMBER(esripsys_state::s_200e_r)
+uint8_t esripsys_state::s_200e_r()
 {
 	return m_g_to_s_latch1;
 }
 
-WRITE8_MEMBER(esripsys_state::s_200e_w)
+void esripsys_state::s_200e_w(uint8_t data)
 {
 	m_s_to_g_latch1 = data;
 }
 
-WRITE8_MEMBER(esripsys_state::s_200f_w)
+void esripsys_state::s_200f_w(uint8_t data)
 {
 	uint8_t *rom = memregion("sound_data")->base();
 	int rombank = data & 0x20 ? 0x2000 : 0;
@@ -502,12 +501,12 @@ WRITE8_MEMBER(esripsys_state::s_200f_w)
 	m_s_to_g_latch2 = data;
 }
 
-READ8_MEMBER(esripsys_state::s_200f_r)
+uint8_t esripsys_state::s_200f_r()
 {
 	return (m_g_to_s_latch2 & 0xfc) | (m_u56b << 1) | m_u56a;
 }
 
-READ8_MEMBER(esripsys_state::tms5220_r)
+uint8_t esripsys_state::tms5220_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -522,7 +521,7 @@ READ8_MEMBER(esripsys_state::tms5220_r)
 }
 
 /* TODO: Implement correctly using the state PROM */
-WRITE8_MEMBER(esripsys_state::tms5220_w)
+void esripsys_state::tms5220_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -532,20 +531,20 @@ WRITE8_MEMBER(esripsys_state::tms5220_w)
 #if 0
 	if (offset == 1)
 	{
-		m_tms->data_w(space, 0, m_tms_data);
+		m_tms->data_w(m_tms_data);
 	}
 #endif
 }
 
 /* Not used in later revisions */
-WRITE8_MEMBER(esripsys_state::control_w)
+void esripsys_state::control_w(uint8_t data)
 {
 	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, m_soundcpu->pcbase());
 }
 
 
 /* 10-bit MC3410CL DAC */
-WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
+void esripsys_state::esripsys_dac_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -630,6 +629,9 @@ void esripsys_state::init_esripsys()
 
 	subdevice<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 
+	// FIXME: arbitrarily initialize bank1 to avoid debugger crash
+	membank("bank1")->set_base(&memregion("game_cpu")->base()[0x10000]);
+
 	membank("bank2")->set_base(&rom[0x0000]);
 	membank("bank3")->set_base(&rom[0x4000]);
 	membank("bank4")->set_base(&rom[0x8000]);
@@ -670,7 +672,7 @@ void esripsys_state::esripsys(machine_config &config)
 	m_gamecpu->set_addrmap(AS_PROGRAM, &esripsys_state::game_cpu_map);
 	m_gamecpu->set_vblank_int("screen", FUNC(esripsys_state::esripsys_vblank_irq));
 
-	config.m_perfect_cpu_quantum = subtag("game_cpu");
+	config.set_perfect_quantum(m_gamecpu);
 
 	MC6809E(config, m_framecpu, XTAL(8'000'000) / 4);
 	m_framecpu->set_addrmap(AS_PROGRAM, &esripsys_state::frame_cpu_map);
@@ -700,11 +702,8 @@ void esripsys_state::esripsys(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	MC3410(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	mc3408_device &dacvol(MC3408(config, "dacvol", 0)); // unknown DAC
-	dacvol.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	dacvol.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
+	mc3408_device &dacvol(MC3408(config, "dacvol", 0));
+	dacvol.set_output_range(0, 1).add_route(0, m_dac, 1.0, DAC_INPUT_RANGE_HI).add_route(0, m_dac, -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 
 	TMS5220(config, m_tms, 640000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 

@@ -1,11 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
 /*
-    machine/apexc.c : APEXC machine
+    machine/apexc.cpp : APEXC machine
 
     By Raphael Nabet
 
-    see cpu/apexc.c for background and tech info
+    see cpu/apexc.cpp for background and tech info
 */
 
 #include "emu.h"
@@ -66,8 +66,7 @@ void apexc_cylinder_image_device::call_unload()
 
 
 apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APEXC_TAPE_PUNCHER, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_punch_device(mconfig, APEXC_TAPE_PUNCHER, tag, owner, clock)
 {
 }
 
@@ -75,7 +74,7 @@ apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_c
     Punch a tape character
 */
 
-WRITE8_MEMBER(apexc_tape_puncher_image_device::write)
+void apexc_tape_puncher_image_device::write(uint8_t data)
 {
 	if (exists())
 	{
@@ -85,8 +84,7 @@ WRITE8_MEMBER(apexc_tape_puncher_image_device::write)
 }
 
 apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APEXC_TAPE_READER, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_reader_device(mconfig, APEXC_TAPE_READER, tag, owner, clock)
 {
 }
 
@@ -94,7 +92,7 @@ apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_con
     Read a tape image
 */
 
-READ8_MEMBER(apexc_tape_reader_image_device::read)
+uint8_t apexc_tape_reader_image_device::read()
 {
 	uint8_t reply;
 	if (exists() && (fread(&reply, 1) == 1))

@@ -45,7 +45,7 @@ private:
 
 	int          m_reg_set; // 1 = access reg / 0 = access ram
 
-	required_device<voodoo_device> m_voodoo;
+	required_device<generic_voodoo_device> m_voodoo;
 
 	std::unique_ptr<u32[]> m_reg;
 	std::unique_ptr<u32[]> m_ram;

@@ -10,7 +10,9 @@
 
 #ifndef MAME_CPU_LH5801_5801DASM_H
 #define MAME_CPU_LH5801_5801DASM_H
-
+#ifdef __sun
+#undef SEC
+#endif
 #pragma once
 
 class lh5801_disassembler : public util::disasm_interface

@@ -41,18 +41,16 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(stateparam_w);
-	DECLARE_READ8_MEMBER(stateparam_r);
-	DECLARE_WRITE8_MEMBER(lut_w);
-	DECLARE_READ8_MEMBER(init_r);
-	DECLARE_WRITE8_MEMBER(accel_w);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void stateparam_w(offs_t offset, uint8_t data);
+	uint8_t stateparam_r(offs_t offset);
+	void lut_w(offs_t offset, uint8_t data);
+	uint8_t init_r();
+	void accel_w(offs_t offset, uint8_t data);
 
 	void reset_common();
 
@@ -62,13 +60,12 @@ private:
 	required_device<i8088_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_commarea;
 
-	uint8_t *m_commarea;
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_eram;
 	uint8_t m_stateparam[16];
 	uint8_t m_lut[256 * 3];
-	std::unique_ptr<bitmap_ind16> m_bitmap;
 	int m_accel;
 };
 

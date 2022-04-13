@@ -12,11 +12,10 @@
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
-READ8_MEMBER(spacefb_state::audio_p2_r)
+uint8_t spacefb_state::audio_p2_r()
 {
 	return (m_sound_latch & 0x18) << 1;
 }
@@ -34,7 +33,7 @@ READ_LINE_MEMBER(spacefb_state::audio_t1_r)
 }
 
 
-WRITE8_MEMBER(spacefb_state::port_1_w)
+void spacefb_state::port_1_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -81,9 +80,6 @@ void spacefb_state::spacefb_audio(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(3);

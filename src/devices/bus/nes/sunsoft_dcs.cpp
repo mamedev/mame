@@ -35,7 +35,7 @@
 //-------------------------------------------------
 
 ntb_cart_interface::ntb_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "ntbcart")
 	, m_rom(nullptr)
 {
 }
@@ -52,8 +52,8 @@ DEFINE_DEVICE_TYPE(NES_NTB_SLOT, nes_ntb_slot_device, "nes_ntb_slot", "NES NTB C
 
 nes_ntb_slot_device::nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_NTB_SLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
+	, device_single_card_slot_interface<ntb_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
 }
@@ -65,15 +65,15 @@ nes_ntb_slot_device::~nes_ntb_slot_device()
 
 void nes_ntb_slot_device::device_start()
 {
-	m_cart = dynamic_cast<ntb_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 uint8_t nes_ntb_slot_device::read(offs_t offset)
 {
 	if (m_cart)
 		return m_cart->read(offset);
-
-	return 0xff;
+	else
+		return 0xff;
 }
 
 
@@ -269,7 +269,7 @@ uint8_t nes_sunsoft_dcs_device::read_m(offs_t offset)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 
@@ -295,7 +295,7 @@ void nes_sunsoft_dcs_device::device_add_mconfig(machine_config &config)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nes_sunsoft_dcs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_dcs_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_PROTECT)
 	{

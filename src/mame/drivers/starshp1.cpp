@@ -42,7 +42,7 @@ WRITE_LINE_MEMBER(starshp1_state::phasor_w)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_collision_reset_w)
+void starshp1_state::starshp1_collision_reset_w(uint8_t data)
 {
 	m_collision_latch = 0;
 }
@@ -78,13 +78,13 @@ CUSTOM_INPUT_MEMBER(starshp1_state::collision_latch_r)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_analog_in_w)
+void starshp1_state::starshp1_analog_in_w(offs_t offset, uint8_t data)
 {
 	m_analog_in_select = offset & 3;
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
+void starshp1_state::starshp1_analog_out_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{
@@ -164,7 +164,7 @@ void starshp1_state::starshp1_map(address_map &map)
 	map(0xc300, 0xc3ff).w(FUNC(starshp1_state::starshp1_sspic_w)); /* spaceship picture */
 	map(0xc400, 0xc400).portr("COINAGE");
 	map(0xc400, 0xc4ff).w(FUNC(starshp1_state::starshp1_ssadd_w)); /* spaceship address */
-	map(0xc800, 0xc9ff).ram().w(FUNC(starshp1_state::starshp1_playfield_w)).share("playfield_ram");
+	map(0xc800, 0xc8ff).ram().w(FUNC(starshp1_state::starshp1_playfield_w)).share("playfield_ram");
 	map(0xcc00, 0xcc0f).writeonly().share("hpos_ram");
 	map(0xd000, 0xd00f).writeonly().share("vpos_ram");
 	map(0xd400, 0xd40f).writeonly().share("obj_ram");
@@ -201,12 +201,12 @@ static INPUT_PORTS_START( starshp1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,starshp1_analog_r, nullptr)   /* analog in */
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(starshp1_state, starshp1_analog_r)   // analog in
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("COINAGE")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,collision_latch_r, nullptr)   /* collision latch */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(starshp1_state, collision_latch_r)   // collision latch
 	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )

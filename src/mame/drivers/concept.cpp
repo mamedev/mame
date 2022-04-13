@@ -29,6 +29,12 @@
 
     Raphael Nabet, Brett Wyer, 2003-2005
     Major reworking by R. Belmont 2012-2013 resulting in bootable floppies
+
+    ACIA baud rates are 1.36% slower than normal by design. The clock division
+    used as the BRG input for all three is about 1.818 MHz, not the standard
+    1.8432 MHz. The schematics indicate a PCB option to leave the 74LS161 at
+    U212 unpopulated and use a secondary XTAL as the baud rate clock. This
+    XTAL is also specified as 1.818 MHz.
 */
 
 #include "emu.h"
@@ -52,7 +58,7 @@ void concept_state::concept_memmap(address_map &map)
 	map(0x020000, 0x021fff).rom().region("macsbug", 0x0);       /* macsbugs ROM (optional) */
 	map(0x030000, 0x03ffff).rw(FUNC(concept_state::io_r), FUNC(concept_state::io_w)).umask16(0x00ff);    /* I/O space */
 
-	map(0x080000, 0x0fffff).ram().share("videoram");/* AM_RAMBANK(2) */ /* DRAM */
+	map(0x080000, 0x0fffff).ram().share("videoram"); /* .bankrw(2); */ /* DRAM */
 }
 
 
@@ -213,15 +219,13 @@ void concept_state::concept(machine_config &config)
 	M68000(config, m_maincpu, 16.364_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &concept_state::concept_memmap);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);            /* 50 or 60, jumper-selectable */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(720, 560);
-	screen.set_visarea(0, 720-1, 0, 560-1);
+	screen.set_raw(16.364_MHz_XTAL * 2, 944, 0, 720, 578, 0, 560);
+	// Horizontal sync is 34.669 kHz; refresh rate is ~50 or ~60 Hz, jumper-selectable
 	screen.set_screen_update(FUNC(concept_state::screen_update));
 	screen.set_palette("palette");
 
@@ -233,12 +237,10 @@ void concept_state::concept(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc */
-	MM58274C(config, m_mm58274, 32.768_kHz_XTAL);
-	m_mm58274->set_mode24(0); // 12 hour
-	m_mm58274->set_day1(1);   // monday
+	MM58174(config, m_mm58174, 32.768_kHz_XTAL);
 
 	/* via */
-	VIA6522(config, m_via0, 16.364_MHz_XTAL / 16);
+	MOS6522(config, m_via0, 16.364_MHz_XTAL / 16);
 	m_via0->readpa_handler().set(FUNC(concept_state::via_in_a));
 	m_via0->readpb_handler().set(FUNC(concept_state::via_in_b));
 	m_via0->writepa_handler().set(FUNC(concept_state::via_out_a));
@@ -306,7 +308,7 @@ ROM_START( concept )
 #if 0
 	// version 1 lvl 7 release
 	ROM_LOAD16_BYTE("bootl17h", 0x010000, 0x1000, CRC(6dd9718f))    // where does this come from?
-	ROM_LOAD16_BYTE("bootl17l", 0x010001, 0x1000, CRC(107a3830))
+	ROM_LOAD16_BYTE("bootl17l", 0x010001, 0x1000, CRC(107a3830) SHA1(0ea12ef13b0d11fcd83b306b3a1bb8014ba910c0))
 #elif 0
 	// version $F lvl 8 (development version found on a floppy disk along with
 	// the source code)

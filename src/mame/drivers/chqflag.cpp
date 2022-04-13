@@ -27,7 +27,7 @@
 #include "cpu/m6809/konami.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "chqflag.lh"
@@ -35,7 +35,7 @@
 
 /* these trampolines are less confusing than nested address_map_bank_devices */
 template<int Chip>
-READ8_MEMBER(chqflag_state::k051316_ramrom_r)
+uint8_t chqflag_state::k051316_ramrom_r(offs_t offset)
 {
 	if (m_k051316_readroms)
 		return m_k051316[Chip]->rom_r(offset);
@@ -43,7 +43,7 @@ READ8_MEMBER(chqflag_state::k051316_ramrom_r)
 		return m_k051316[Chip]->read(offset);
 }
 
-WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
+void chqflag_state::chqflag_bankswitch_w(uint8_t data)
 {
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	int bankaddress = data & 0x1f;
@@ -56,7 +56,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	/* other bits unknown/unused */
 }
 
-WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
+void chqflag_state::chqflag_vreg_w(uint8_t data)
 {
 	/* bits 0 & 1 = coin counters */
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
@@ -105,12 +105,12 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	/* other bits unknown. bit 5 is used. */
 }
 
-WRITE8_MEMBER(chqflag_state::select_analog_ctrl_w)
+void chqflag_state::select_analog_ctrl_w(uint8_t data)
 {
 	m_analog_ctrl = data;
 }
 
-READ8_MEMBER(chqflag_state::analog_read_r)
+uint8_t chqflag_state::analog_read_r()
 {
 	switch (m_analog_ctrl & 0x03)
 	{
@@ -160,7 +160,7 @@ void chqflag_state::bank1000_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(chqflag_state::k007232_bankswitch_w)
+void chqflag_state::k007232_bankswitch_w(uint8_t data)
 {
 	int bank_A, bank_B;
 
@@ -255,21 +255,21 @@ INPUT_PORTS_END
 
 
 
-WRITE8_MEMBER(chqflag_state::volume_callback0)
+void chqflag_state::volume_callback0(uint8_t data)
 {
 	// volume/pan for one of the channels on this chip
 	// which channel and which bits are left/right is a guess
 	m_k007232[0]->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
+void chqflag_state::k007232_extvolume_w(uint8_t data)
 {
 	// volume/pan for one of the channels on this chip
 	// which channel and which bits are left/right is a guess
 	m_k007232[0]->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-WRITE8_MEMBER(chqflag_state::volume_callback1)
+void chqflag_state::volume_callback1(uint8_t data)
 {
 	m_k007232[1]->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232[1]->set_volume(1, 0, (data & 0x0f) * 0x11);
@@ -327,7 +327,7 @@ void chqflag_state::chqflag(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_bank1000).set_map(&chqflag_state::bank1000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -344,8 +344,8 @@ void chqflag_state::chqflag(machine_config &config)
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback), this);
+	m_k051960->set_screen("screen");
+	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k051960->vreg_contrast_handler().set(FUNC(chqflag_state::background_brt_w));
@@ -353,14 +353,14 @@ void chqflag_state::chqflag(machine_config &config)
 	K051316(config, m_k051316[0], 0);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(7, 0);
-	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1), this);
+	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_layermask(0xc0);
 	m_k051316[1]->set_wrap(1);
-	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2), this);
+	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2));
 
 	K051733(config, "k051733", 0);
 

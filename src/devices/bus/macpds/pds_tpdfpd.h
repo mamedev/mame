@@ -28,17 +28,17 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_READ16_MEMBER(sedisplay_r);
-	DECLARE_WRITE16_MEMBER(sedisplay_w);
-	DECLARE_READ16_MEMBER(ramdac_r);
-	DECLARE_WRITE16_MEMBER(ramdac_w);
+	uint16_t sedisplay_r(offs_t offset);
+	void sedisplay_w(offs_t offset, uint16_t data);
+	uint16_t ramdac_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ramdac_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

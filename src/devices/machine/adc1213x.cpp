@@ -57,6 +57,7 @@ adc12138_device::adc12138_device(const machine_config &mconfig, const char *tag,
 }
 adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_ipt_read_cb(*this)
 {
 }
 
@@ -76,7 +77,7 @@ void adc12138_device::device_start()
 	m_end_conv = 0;
 
 	/* resolve callbacks */
-	m_ipt_read_cb.bind_relative_to(*owner());
+	m_ipt_read_cb.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_cycle));

@@ -11,6 +11,8 @@
 #include "imagedev/snapquik.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
+#include <sstream>
 
 
 class ssem_state : public driver_device
@@ -32,9 +34,9 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(ssem_store);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	inline uint32_t reverse(uint32_t v);
-	void strlower(char *buf);
+	std::string read_line(device_image_interface &image);
 
 	void ssem_map(address_map &map);
 
@@ -45,7 +47,7 @@ private:
 	required_shared_ptr<uint8_t> m_store;
 	required_device<screen_device> m_screen;
 
-	uint8_t m_store_line;
+	uint8_t m_store_line = 0;
 
 	util::ovectorstream m_glyph_print_buf;
 };
@@ -116,7 +118,7 @@ INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 	uint8_t edit3_state = ioport("EDIT3")->read();
 	uint8_t misc_state = ioport("MISC")->read();
 
-	switch( (int)(uintptr_t)param )
+	switch( (int)param )
 	{
 		case PANEL_BIT0:
 			if(edit0_state & 0x01) m_store[(m_store_line << 2) | 0] ^= 0x80;
@@ -237,49 +239,49 @@ INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 
 static INPUT_PORTS_START( ssem )
 	PORT_START("EDIT0")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 0")  PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT0)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 1")  PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT1)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 2")  PORT_CODE(KEYCODE_3) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT2)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 3")  PORT_CODE(KEYCODE_4) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT3)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 4")  PORT_CODE(KEYCODE_5) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT4)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 5")  PORT_CODE(KEYCODE_6) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT5)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 6")  PORT_CODE(KEYCODE_7) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT6)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 7")  PORT_CODE(KEYCODE_8) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT7)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 0")  PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT0)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 1")  PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT1)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 2")  PORT_CODE(KEYCODE_3) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT2)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 3")  PORT_CODE(KEYCODE_4) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT3)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 4")  PORT_CODE(KEYCODE_5) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT4)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 5")  PORT_CODE(KEYCODE_6) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT5)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 6")  PORT_CODE(KEYCODE_7) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT6)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 7")  PORT_CODE(KEYCODE_8) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT7)
 
 	PORT_START("EDIT1")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 8")  PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT8)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 9")  PORT_CODE(KEYCODE_W) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT9)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 10")    PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT10)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 11")    PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT11)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 12")    PORT_CODE(KEYCODE_T) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT12)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 13")    PORT_CODE(KEYCODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT13)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 14")    PORT_CODE(KEYCODE_U) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT14)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 15")    PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT15)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 8")  PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT8)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 9")  PORT_CODE(KEYCODE_W) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT9)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 10")    PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT10)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 11")    PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT11)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 12")    PORT_CODE(KEYCODE_T) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT12)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 13")    PORT_CODE(KEYCODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT13)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 14")    PORT_CODE(KEYCODE_U) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT14)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 15")    PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT15)
 
 	PORT_START("EDIT2")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 16")    PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT16)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 17")    PORT_CODE(KEYCODE_S) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT17)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 18")    PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT18)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 19")    PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT19)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 20")    PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT20)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 21")    PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT21)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 22")    PORT_CODE(KEYCODE_J) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT22)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 23")    PORT_CODE(KEYCODE_K) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT23)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 16")    PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT16)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 17")    PORT_CODE(KEYCODE_S) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT17)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 18")    PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT18)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 19")    PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT19)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 20")    PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT20)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 21")    PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT21)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 22")    PORT_CODE(KEYCODE_J) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT22)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 23")    PORT_CODE(KEYCODE_K) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT23)
 
 	PORT_START("EDIT3")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 24")    PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT24)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 25")    PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT25)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 26")    PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT26)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 27")    PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT27)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 28")    PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT28)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 29")    PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT29)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 30")    PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT30)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 31")    PORT_CODE(KEYCODE_COMMA) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT31)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 24")    PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT24)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 25")    PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT25)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 26")    PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT26)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 27")    PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT27)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 28")    PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT28)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 29")    PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT29)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 30")    PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT30)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 31")    PORT_CODE(KEYCODE_COMMA) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_BIT31)
 
 	PORT_START("MISC")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Up")   PORT_CODE(KEYCODE_UP)   PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_LNUP)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Down") PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_LNDN)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_HALT)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Up")   PORT_CODE(KEYCODE_UP)   PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_LNUP)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Down") PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_LNDN)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, PANEL_HALT)
 		PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -437,9 +439,8 @@ void ssem_state::glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format 
 			int32_t line = 0;
 			for(line = 0; line < 8; line++)
 			{
-				uint32_t *d = &bitmap.pix32(y + line);
-				int32_t bit = 0;
-				for(bit = 0; bit < 8; bit++)
+				uint32_t *const d = &bitmap.pix(y + line);
+				for(uint32_t bit = 0; bit < 8; bit++)
 				{
 					if(char_glyphs[cur][line] & (1 << (7 - bit)))
 					{
@@ -516,102 +517,131 @@ uint32_t ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bit
 * Image helper functions                             *
 \****************************************************/
 
-void ssem_state::strlower(char *buf)
+std::string ssem_state::read_line(device_image_interface &image)
 {
-	if(buf)
+	std::ostringstream stream;
+	for (u8 i = 0; i < 100; i++)
 	{
-		int i = 0;
-		for(i = 0; i < strlen(buf); i++)
+		char c = 0;
+		if (image.fread(&c, 1) != 1)
+			break;
+		// convert opcode to lower case
+		if (c >= 'A' && c <= 'Z')
+			c += 32;
+		if (c >= 32)
+			stream << c;
+		else
 		{
-			if(buf[i] >= 'A' && buf[i] <= 'Z')
-			{
-				buf[i] |= 0x20;
-			}
+			image.fread(&c, 1); // skip LF
+			break;
 		}
 	}
+	return std::move(stream).str();
 }
+
 
 /****************************************************\
 * Image loading                                      *
 \****************************************************/
 
-QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
+QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	char image_line[100] = { 0 };
-	char token_buf[100] = { 0 };
-	int num_lines = 0;
+	std::string buffer;
+	u32 num_lines = 0;
 
-	image.fgets(image_line, 99);
-	sscanf(image_line, "%d", &num_lines);
-
-	if (num_lines)
+	std::string image_line = read_line(image);
+	if (image_line.empty())
 	{
-		for (int i = 0; i < num_lines; i++)
+		image.message("No data in line 1");
+		return image_init_result::FAIL;
+	}
+
+	sscanf(image_line.c_str(), "%d", &num_lines);  //num_lines = std::stoul(image_line);
+
+	if (num_lines < 1)
+	{
+		image.message("No data to process");
+		return image_init_result::FAIL;
+	}
+
+	for (u32 i = 0; i < num_lines; i++)
+	{
+		u32 line = 0, word = 0;
+		image_line = read_line(image);
+		u32 length = image_line.length();
+
+		if (length < 8)
 		{
-			uint32_t line = 0;
-			image.fgets(image_line, 99);
-
-			// Isolate and convert 4-digit decimal address
-			memcpy(token_buf, image_line, 4);
-			token_buf[4] = '\0';
-			sscanf(token_buf, "%04u", &line);
-
-			if (image.is_filetype("snp"))
-			{
-				uint32_t word = 0;
-
-				// Parse a line such as: 0000:00000110101001000100000100000100
-				for (int b = 0; b < 32; b++)
-				{
-					if (image_line[5 + b] == '1')
-						word |= 1 << (31 - b);
-				}
-
-				space.write_byte((line << 2) + 0, (word >> 24) & 0x000000ff);
-				space.write_byte((line << 2) + 1, (word >> 16) & 0x000000ff);
-				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
-				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
-			}
-			else if (image.is_filetype("asm"))
-			{
-				char op_buf[4] = { 0 };
-				int32_t value = 0;
-				uint32_t unsigned_value = 0;
-				uint32_t word = 0;
-
-				// Isolate the opcode and convert to lower-case
-				memcpy(op_buf, image_line + 5, 3);
-				op_buf[3] = '\0';
-				strlower(op_buf);
-
-				// Isolate the value
-				sscanf(image_line + 9, "%d", &value);
-				unsigned_value = reverse((uint32_t)value);
-
-				if (!core_stricmp(op_buf, "num"))
-					word = unsigned_value;
-				else if (!core_stricmp(op_buf, "jmp"))
-					word = 0x00000000 | unsigned_value ;
-				else if (!core_stricmp(op_buf, "jrp"))
-					word = 0x00040000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "ldn"))
-					word = 0x00020000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "sto"))
-					word = 0x00060000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "sub"))
-					word = 0x00010000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "cmp"))
-					word = 0x00030000 | unsigned_value;
-				else if (!core_stricmp(op_buf, "stp"))
-					word = 0x00070000 | unsigned_value;
-
-				space.write_byte((line << 2) + 0, (word >> 24) & 0x000000ff);
-				space.write_byte((line << 2) + 1, (word >> 16) & 0x000000ff);
-				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
-				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
-			}
+			image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
+			return image_init_result::FAIL;
 		}
+
+		// Isolate and convert 4-digit decimal address
+		buffer = image_line.substr(0, 4);
+		sscanf(buffer.c_str(), "%04u", &line);
+
+		if (image.is_filetype("snp"))
+		{
+			if (length < 37)
+			{
+				image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
+				return image_init_result::FAIL;
+			}
+
+			// Parse a line such as: 0000:00000110101001000100000100000100
+			for (u8 b = 0; b < 32; b++)
+				if (image_line[5 + b] == '1')
+					word |= 1 << (31 - b);
+		}
+		else
+		if (image.is_filetype("asm"))
+		{
+			int32_t value = 0;
+			uint32_t unsigned_value = 0;
+
+			// Isolate the value
+			if (length > 8)
+			{
+				buffer = image_line.substr(9);
+				sscanf(buffer.c_str(), "%d", &value);
+				unsigned_value = reverse((uint32_t)value);
+			}
+
+			// Isolate the opcode
+			buffer = image_line.substr(5, 3);
+
+			if (buffer == "num")
+				word = unsigned_value;
+			else
+			if (buffer == "jmp")
+				word = 0x00000000 | unsigned_value ;
+			else
+			if (buffer == "jrp")
+				word = 0x00040000 | unsigned_value;
+			else
+			if (buffer == "ldn")
+				word = 0x00020000 | unsigned_value;
+			else
+			if (buffer == "sto")
+				word = 0x00060000 | unsigned_value;
+			else
+			if (buffer == "sub")
+				word = 0x00010000 | unsigned_value;
+			else
+			if (buffer == "cmp")
+				word = 0x00030000 | unsigned_value;
+			else
+			if (buffer == "stp")
+				word = 0x00070000 | unsigned_value;
+			else
+				logerror("Unknown opcode (%s) in line %d\n",buffer,i+2);
+		}
+
+		space.write_byte((line << 2) + 0, BIT(word, 24, 8));
+		space.write_byte((line << 2) + 1, BIT(word, 16, 8));
+		space.write_byte((line << 2) + 2, BIT(word, 8,  8));
+		space.write_byte((line << 2) + 3, BIT(word, 0,  8));
 	}
 
 	return image_init_result::PASS;
@@ -632,7 +662,8 @@ void ssem_state::machine_reset()
 	m_store_line = 0;
 }
 
-MACHINE_CONFIG_START(ssem_state::ssem)
+void ssem_state::ssem(machine_config &config)
+{
 	/* basic machine hardware */
 	SSEMCPU(config, m_maincpu, 700);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssem_state::ssem_map);
@@ -647,8 +678,11 @@ MACHINE_CONFIG_START(ssem_state::ssem)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", ssem_state, ssem_store, "snp,asm", attotime::from_seconds(1))
-MACHINE_CONFIG_END
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "snp,asm", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(ssem_state::quickload_cb));
+	quickload.set_interface("ssemquik");
+	SOFTWARE_LIST(config, "quik_list").set_original("ssem_quik");
+}
 
 
 ROM_START( ssem )

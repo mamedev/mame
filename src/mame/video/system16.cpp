@@ -36,9 +36,8 @@ void segas1x_bootleg_state::setup_system16_bootleg_spritebanking(  )
 {
 	if (m_spritebank_type == 0)
 	{
-		static const uint8_t alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
-		int i;
-		for (i = 0; i < 16; i++)
+		static constexpr uint8_t alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
+		for (int i = 0; i < 16; i++)
 			m_sprites->set_bank(i, alternate_banklist[i]);
 
 	}
@@ -103,7 +102,7 @@ static const int resistances_normal[6] = {3900, 2000, 1000, 1000/2, 1000/4, 0};
 static const int resistances_sh[6] = {3900, 2000, 1000, 1000/2, 1000/4, 470};
 
 #ifdef UNUSED_CODE
-WRITE16_MEMBER(segas1x_bootleg_state::sys16_paletteram_w)
+void segas1x_bootleg_state::sys16_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword;
 
@@ -229,11 +228,11 @@ void segas1x_bootleg_state::update_page(  )
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 {
-	const uint16_t *source = (m_bg_page[0][tile_index >> 11] << 11) + m_tileram;
+	const uint16_t *source = &m_tileram[m_bg_page[0][tile_index >> 11] << 11];
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -241,11 +240,11 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 {
-	const uint16_t *source = (m_fg_page[0][tile_index >> 11] << 11) + m_tileram;
+	const uint16_t *source = &m_tileram[m_fg_page[0][tile_index >> 11] << 11];
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -253,11 +252,11 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 {
-	const uint16_t *source = (m_bg_page[1][tile_index >> 11] << 11) + m_tileram;
+	const uint16_t *source = &m_tileram[m_bg_page[1][tile_index >> 11] << 11];
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -265,17 +264,17 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 {
-	const uint16_t *source = (m_fg_page[1][tile_index >> 11] << 11) + m_tileram;
+	const uint16_t *source = &m_tileram[m_fg_page[1][tile_index >> 11] << 11];
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::sys16_tileram_w)
+void segas1x_bootleg_state::sys16_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldword = m_tileram[offset];
 
@@ -321,14 +320,14 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 
 	if (!m_shinobl_kludge)
 	{
-		SET_TILE_INFO_MEMBER(0,
+		tileinfo.set(0,
 				(tile_number & 0x1ff) | (m_tile_bank[0] << 12),
 				(tile_number >> 9) % 8,
 				0);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(0,
+		tileinfo.set(0,
 				(tile_number & 0xff) | (m_tile_bank[0] << 12),
 				(tile_number >> 8) % 8,
 				0);
@@ -340,7 +339,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 		tileinfo.category = 0;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::sys16_textram_w)
+void segas1x_bootleg_state::sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
@@ -366,24 +365,24 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 
 	if (!m_bg1_trans)
 		m_background[0] = &machine().tilemap().create(
-				*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+				*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 				8,8,
-				64*2,32*2 );
+				64*2,32*2);
 	else
 		m_background[0] = &machine().tilemap().create(
-				*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+				*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 				8,8,
-				64*2,32*2 );
+				64*2,32*2);
 
 	m_foreground[0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 			8,8,
-			64*2,32*2 );
+			64*2,32*2);
 
 	m_text_layer = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_text_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_text_map),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_text_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_text_map)),
 			8,8,
-			40,28 );
+			40,28);
 
 	if (m_bg1_trans) m_background[0]->set_transparent_pen(0);
 	m_foreground[0]->set_transparent_pen(0);
@@ -399,6 +398,12 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 	m_bg_scrolly = 0;
 
 	m_refreshenable = 1;
+
+	for (int i = 0; i < 2; i++)
+	{
+		std::fill(std::begin(m_bg_page[i]), std::end(m_bg_page[i]), 0);
+		std::fill(std::begin(m_fg_page[i]), std::end(m_fg_page[i]), 0);
+	}
 
 	/* common defaults */
 	m_tilebank_switch = 0x1000;
@@ -422,14 +427,14 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
 	m_bg1_trans = 1;
 
 	m_background[1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 			8,8,
-			64*2,32*2 );
+			64*2,32*2);
 
 	m_foreground[1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_fg2_tile_info),this), tilemap_mapper_delegate(FUNC(segas1x_bootleg_state::sys16_bg_map),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_fg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(segas1x_bootleg_state::sys16_bg_map)),
 			8,8,
-			64*2,32*2 );
+			64*2,32*2);
 
 	m_foreground[1]->set_transparent_pen(0);
 
@@ -479,7 +484,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt)
 	data = m_textram[tile_index];
 	tile_number = data & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			((data >> 9) & 0x7),
 			0);
@@ -493,7 +498,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info0)
 	tile_number = data & 0x1fff;
 
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
@@ -506,33 +511,33 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info1)
 	data = m_bg1_tileram[tile_index];
 	tile_number = data & 0x1fff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			(data >> 6) & 0x7f,
 			0);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w)
+void segas1x_bootleg_state::s16a_bootleg_bgscrolly_w(uint16_t data)
 {
 	m_bg_scrolly = data;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w)
+void segas1x_bootleg_state::s16a_bootleg_bgscrollx_w(uint16_t data)
 {
 	m_bg_scrollx = data;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w)
+void segas1x_bootleg_state::s16a_bootleg_fgscrolly_w(uint16_t data)
 {
 	m_fg_scrolly = data;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w)
+void segas1x_bootleg_state::s16a_bootleg_fgscrollx_w(uint16_t data)
 {
 	m_fg_scrollx = data;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w)
+void segas1x_bootleg_state::s16a_bootleg_tilemapselect_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapselect);
 	//printf("system16 bootleg tilemapselect %04x\n", m_tilemapselect);
@@ -557,11 +562,11 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg)
 
 
 
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	// the system16a bootlegs have simple tilemaps instead of the paged system
-	m_bg_tilemaps[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info0),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
-	m_bg_tilemaps[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info1),this), TILEMAP_SCAN_ROWS, 8,8, 64,32 );
+	m_bg_tilemaps[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info0)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_bg_tilemaps[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas1x_bootleg_state::get_s16a_bootleg_tile_info1)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	m_text_tilemap->set_transparent_pen(0);
 	m_bg_tilemaps[0]->set_transparent_pen(0);
@@ -659,7 +664,7 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -729,7 +734,7 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_devic
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -811,7 +816,7 @@ uint32_t segas1x_bootleg_state::screen_update_system16(screen_device &screen, bi
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -874,7 +879,7 @@ uint32_t segas1x_bootleg_state::screen_update_system18old(screen_device &screen,
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else

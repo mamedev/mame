@@ -66,16 +66,16 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
+	, m_palette_scramble_cb(*this, FUNC(igs017_igs031_device::palette_callback_straight))
 	, m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this))
-	, m_spriteram(*this, "spriteram", 0)
-	, m_fg_videoram(*this, "fg_videoram", 0)
-	, m_bg_videoram(*this, "bg_videoram", 0)
-	, m_palram(*this, "palram", 0)
+	, m_spriteram(*this, "spriteram")
+	, m_fg_videoram(*this, "fg_videoram")
+	, m_bg_videoram(*this, "bg_videoram")
+	, m_palram(*this, "palram")
 	, m_i8255(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "palette")
+	, m_revbits(false)
 {
-	m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(FUNC(igs017_igs031_device::palette_callback_straight), this);
-	m_revbits = false;
 }
 
 device_memory_interface::space_config_vector igs017_igs031_device::memory_space_config() const
@@ -97,10 +97,10 @@ void igs017_igs031_device::device_add_mconfig(machine_config &config)
 
 void igs017_igs031_device::device_start()
 {
-	m_palette_scramble_cb.bind_relative_to(*owner());
+	m_palette_scramble_cb.resolve();
 
-	m_fg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(igs017_igs031_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_bg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(igs017_igs031_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_fg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(igs017_igs031_device::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(igs017_igs031_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	m_fg_tilemap->set_transparent_pen(0xf);
 	m_bg_tilemap->set_transparent_pen(0xf);
@@ -179,13 +179,13 @@ TILE_GET_INFO_MEMBER(igs017_igs031_device::get_fg_tile_info)
 {
 	const u16 code = m_fg_videoram[tile_index * 4 + 0] + (m_fg_videoram[tile_index * 4 + 1] << 8);
 	const u16 attr = m_fg_videoram[tile_index * 4 + 2] + (m_fg_videoram[tile_index * 4 + 3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY(attr >> 5));
+	tileinfo.set(0, code, COLOR(attr), TILE_FLIPXY(attr >> 5));
 }
 TILE_GET_INFO_MEMBER(igs017_igs031_device::get_bg_tile_info)
 {
 	const u16 code = m_bg_videoram[tile_index * 4 + 0] + (m_bg_videoram[tile_index * 4 + 1] << 8);
 	const u16 attr = m_bg_videoram[tile_index * 4 + 2] + (m_bg_videoram[tile_index * 4 + 3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY(attr >> 5));
+	tileinfo.set(0, code, COLOR(attr)+8, TILE_FLIPXY(attr >> 5));
 }
 
 void igs017_igs031_device::fg_w(offs_t offset, u8 data)
@@ -254,26 +254,77 @@ void igs017_igs031_device::expand_sprites()
 
 ***************************************************************************/
 
-void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr)
+void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int offsx, int offsy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr)
 {
-	// prepare GfxElement on the fly
-
 	// Bounds checking
 	if (addr + dimx * dimy >= m_sprites_gfx_size)
 		return;
 
-	gfx_element gfx(m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
+	/* Start drawing */
+	const u16 pal = 0x100 + (color << 5);
+	const u8 *source_base = &m_sprites_gfx[addr];
+	const u8 transparent_color = 0x1f;
 
-	gfx.transpen(bitmap, cliprect,
-				0, color,
-				flipx, flipy,
-				sx, sy, 0x1f);
+	int xinc = flipx ? -1 : 1;
+	int yinc = flipy ? -1 : 1;
+
+	int x_index_base = flipx ? dimx - 1 : 0;
+	int y_index = flipy ? dimy - 1 : 0;
+
+	// start coordinates
+	int sx = offsx;
+	int sy = offsy;
+
+	// end coordinates
+	int ex = sx + dimx;
+	int ey = sy + dimy;
+
+	if (sx < cliprect.min_x)
+	{ // clip left
+		int pixels = cliprect.min_x - sx;
+		sx += pixels;
+		x_index_base += xinc * pixels;
+	}
+	if (sy < cliprect.min_y)
+	{ // clip top
+		int pixels = cliprect.min_y - sy;
+		sy += pixels;
+		y_index += yinc * pixels;
+	}
+	// NS 980211 - fixed incorrect clipping
+	if (ex > cliprect.max_x + 1)
+	{ // clip right
+		ex = cliprect.max_x + 1;
+	}
+	if (ey > cliprect.max_y + 1)
+	{ // clip bottom
+		ey = cliprect.max_y + 1;
+	}
+
+	if (ex > sx)
+	{ // skip if inner loop doesn't draw anything
+		for (int y = sy; y < ey; y++)
+		{
+			u8 const *const source = source_base + y_index * dimx;
+			u16 *const dest = &bitmap.pix(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
+			{
+				const u8 c = source[x_index];
+				if (c != transparent_color)
+					dest[x] = pal + c;
+
+				x_index += xinc;
+			}
+			y_index += yinc;
+		}
+	}
 }
 
 void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	u8 *s    =   m_spriteram;
-	u8 *end  =   m_spriteram + 0x800;
+	const u8 *s    =   m_spriteram;
+	const u8 *end  =   m_spriteram + 0x800;
 
 	for (; s < end; s += 8)
 	{
@@ -296,7 +347,7 @@ void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cl
 		if (sy == -0x200)
 			break;
 
-		u32 color = (s[7] & 0xe0) >> 5;
+		const u32 color = (s[7] & 0xe0) >> 5;
 
 		draw_sprite(bitmap, cliprect, sx, sy, dimx, dimy, flipx, flipy, color, addr);
 	}

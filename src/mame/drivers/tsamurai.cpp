@@ -45,33 +45,33 @@ the "America" release.
 #include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 void tsamurai_state::machine_start()
 {
+	m_textbank1 = 0;
+	m_nmi_enabled = 0;
+
+	m_sound_command1 = 0;
+	m_sound_command2 = 0;
+
+	save_item(NAME(m_sound_command1));
+	save_item(NAME(m_sound_command2));
 	save_item(NAME(m_nmi_enabled));
 }
 
-MACHINE_START_MEMBER(tsamurai_state, tsamurai)
+void m660_state::machine_start()
 {
-	save_item(NAME(m_sound_command1));
-	save_item(NAME(m_sound_command2));
-	machine_start();
-}
-
-MACHINE_START_MEMBER(tsamurai_state, m660)
-{
-	MACHINE_START_CALL_MEMBER(tsamurai);
+	tsamurai_state::machine_start();
 	save_item(NAME(m_sound_command3));
 }
 
-MACHINE_START_MEMBER(tsamurai_state, vsgongf)
+void vsgongf_state::machine_start()
 {
+	tsamurai_state::machine_start();
 	save_item(NAME(m_vsgongf_sound_nmi_enabled));
-	machine_start();
 }
 
 WRITE_LINE_MEMBER(tsamurai_state::nmi_enable_w)
@@ -85,44 +85,44 @@ WRITE_LINE_MEMBER(tsamurai_state::vblank_irq)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ8_MEMBER(tsamurai_state::tsamurai_unknown_d803_r)
+uint8_t tsamurai_state::tsamurai_unknown_d803_r()
 {
 	return 0x6b;
 }
 
-READ8_MEMBER(tsamurai_state::m660_unknown_d803_r)
+uint8_t m660_state::m660_unknown_d803_r()
 {
 	return 0x53;     // this is what the bootleg patches in.
 }
 
-READ8_MEMBER(tsamurai_state::unknown_d806_r)
+uint8_t tsamurai_state::unknown_d806_r()
 {
 	return 0x40;
 }
 
-READ8_MEMBER(tsamurai_state::unknown_d900_r)
+uint8_t tsamurai_state::unknown_d900_r()
 {
 	return 0x6a;
 }
 
-READ8_MEMBER(tsamurai_state::unknown_d938_r)
+uint8_t tsamurai_state::unknown_d938_r()
 {
 	return 0xfb;
 }
 
-WRITE8_MEMBER(tsamurai_state::sound_command1_w)
+void tsamurai_state::sound_command1_w(uint8_t data)
 {
 	m_sound_command1 = data;
 	m_audiocpu->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(tsamurai_state::sound_command2_w)
+void tsamurai_state::sound_command2_w(uint8_t data)
 {
 	m_sound_command2 = data;
 	m_audio2->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(tsamurai_state::m660_sound_command3_w)
+void m660_state::m660_sound_command3_w(uint8_t data)
 {
 	m_sound_command3 = data;
 	m_audio3->set_input_line(0, HOLD_LINE );
@@ -175,32 +175,32 @@ void tsamurai_state::main_map(address_map &map)
 	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
-void tsamurai_state::m660_map(address_map &map)
+void m660_state::m660_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 
 	/* protection? - there are writes as well...*/
-	map(0xd803, 0xd803).r(FUNC(tsamurai_state::m660_unknown_d803_r));
-	map(0xd806, 0xd806).r(FUNC(tsamurai_state::unknown_d806_r));
-	map(0xd900, 0xd900).r(FUNC(tsamurai_state::unknown_d900_r));
-	map(0xd938, 0xd938).r(FUNC(tsamurai_state::unknown_d938_r));
+	map(0xd803, 0xd803).r(FUNC(m660_state::m660_unknown_d803_r));
+	map(0xd806, 0xd806).r(FUNC(m660_state::unknown_d806_r));
+	map(0xd900, 0xd900).r(FUNC(m660_state::unknown_d900_r));
+	map(0xd938, 0xd938).r(FUNC(m660_state::unknown_d938_r));
 
-	map(0xe000, 0xe3ff).ram().w(FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
-	map(0xe400, 0xe43f).ram().w(FUNC(tsamurai_state::fg_colorram_w)).share("colorram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(m660_state::fg_videoram_w)).share("videoram");
+	map(0xe400, 0xe43f).ram().w(FUNC(m660_state::fg_colorram_w)).share("colorram");
 	map(0xe440, 0xe7ff).ram();
-	map(0xe800, 0xefff).ram().w(FUNC(tsamurai_state::bg_videoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(m660_state::bg_videoram_w)).share("bg_videoram");
 	map(0xf000, 0xf3ff).ram().share("spriteram");
 
 	map(0xf400, 0xf400).nopw();/* This is always written with F401, F402 & F403 data */
-	map(0xf401, 0xf401).w(FUNC(tsamurai_state::m660_sound_command3_w));
-	map(0xf402, 0xf402).w(FUNC(tsamurai_state::sound_command2_w));
-	map(0xf403, 0xf403).w(FUNC(tsamurai_state::sound_command1_w));
+	map(0xf401, 0xf401).w(FUNC(m660_state::m660_sound_command3_w));
+	map(0xf402, 0xf402).w(FUNC(m660_state::sound_command2_w));
+	map(0xf403, 0xf403).w(FUNC(m660_state::sound_command1_w));
 
 	map(0xf800, 0xf800).portr("P1");
-	map(0xf801, 0xf801).portr("P2").w(FUNC(tsamurai_state::bgcolor_w));
-	map(0xf802, 0xf802).portr("SYSTEM").w(FUNC(tsamurai_state::scrolly_w));
-	map(0xf803, 0xf803).w(FUNC(tsamurai_state::scrollx_w));
+	map(0xf801, 0xf801).portr("P2").w(FUNC(m660_state::bgcolor_w));
+	map(0xf802, 0xf802).portr("SYSTEM").w(FUNC(m660_state::scrolly_w));
+	map(0xf803, 0xf803).w(FUNC(m660_state::scrollx_w));
 	map(0xf804, 0xf804).portr("DSW1");
 	map(0xf805, 0xf805).portr("DSW2");
 
@@ -213,7 +213,7 @@ void tsamurai_state::z80_io_map(address_map &map)
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
-void tsamurai_state::z80_m660_io_map(address_map &map)
+void m660_state::z80_m660_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).nopw();        /* ? */
@@ -221,23 +221,23 @@ void tsamurai_state::z80_m660_io_map(address_map &map)
 	map(0x02, 0x02).nopw();        /* Always follows above with 0x01 data */
 }
 
-void tsamurai_state::vsgongf_audio_io_map(address_map &map)
+void vsgongf_state::vsgongf_audio_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
-READ8_MEMBER(tsamurai_state::sound_command1_r)
+uint8_t tsamurai_state::sound_command1_r()
 {
 	return m_sound_command1;
 }
 
-READ8_MEMBER(tsamurai_state::sound_command2_r)
+uint8_t tsamurai_state::sound_command2_r()
 {
 	return m_sound_command2;
 }
 
-READ8_MEMBER(tsamurai_state::m660_sound_command3_r)
+uint8_t m660_state::m660_sound_command3_r()
 {
 	return m_sound_command3;
 }
@@ -265,10 +265,10 @@ void tsamurai_state::sound2_map(address_map &map)
 
 /*******************************************************************************/
 
-void tsamurai_state::sound1_m660_map(address_map &map)
+void m660_state::sound1_m660_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0xc000, 0xc000).r(FUNC(tsamurai_state::sound_command1_r));
+	map(0xc000, 0xc000).r(FUNC(m660_state::sound_command1_r));
 	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
 	map(0xc002, 0xc002).w("dac1", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0x87ff).ram();
@@ -276,10 +276,10 @@ void tsamurai_state::sound1_m660_map(address_map &map)
 
 /*******************************************************************************/
 
-void tsamurai_state::sound2_m660_map(address_map &map)
+void m660_state::sound2_m660_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0xc000, 0xc000).r(FUNC(tsamurai_state::sound_command2_r));
+	map(0xc000, 0xc000).r(FUNC(m660_state::sound_command2_r));
 	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
 	map(0xc002, 0xc002).w("dac2", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0x87ff).ram();
@@ -287,16 +287,16 @@ void tsamurai_state::sound2_m660_map(address_map &map)
 
 /*******************************************************************************/
 
-void tsamurai_state::sound3_m660_map(address_map &map)
+void m660_state::sound3_m660_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc000).r(FUNC(tsamurai_state::m660_sound_command3_r));
+	map(0xc000, 0xc000).r(FUNC(m660_state::m660_sound_command3_r));
 	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
 	map(0x8000, 0x87ff).ram();
 	map(0xfffc, 0xffff).ram(); /* CPU writes here - music data */
 }
 
-void tsamurai_state::sound3_m660_io_map(address_map &map)
+void m660_state::sound3_m660_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
@@ -304,12 +304,12 @@ void tsamurai_state::sound3_m660_io_map(address_map &map)
 
 /*******************************************************************************/
 
-WRITE8_MEMBER(tsamurai_state::vsgongf_sound_nmi_enable_w)
+void vsgongf_state::vsgongf_sound_nmi_enable_w(uint8_t data)
 {
 	m_vsgongf_sound_nmi_enabled = data;
 }
 
-INTERRUPT_GEN_MEMBER(tsamurai_state::vsgongf_sound_interrupt)
+INTERRUPT_GEN_MEMBER(vsgongf_state::vsgongf_sound_interrupt)
 {
 	if (m_vsgongf_sound_nmi_enabled)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -317,7 +317,7 @@ INTERRUPT_GEN_MEMBER(tsamurai_state::vsgongf_sound_interrupt)
 
 /* what are these, protection of some kind? */
 
-READ8_MEMBER(tsamurai_state::vsgongf_a006_r)
+uint8_t vsgongf_state::vsgongf_a006_r()
 {
 	/* sound CPU busy? */
 	if (!strcmp(machine().system().name,"vsgongf"))  return 0x80;
@@ -328,7 +328,7 @@ READ8_MEMBER(tsamurai_state::vsgongf_a006_r)
 	return 0x00;
 }
 
-READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
+uint8_t vsgongf_state::vsgongf_a100_r()
 {
 	/* protection? */
 	if (!strcmp(machine().system().name,"vsgongf"))  return 0xaa;
@@ -339,26 +339,26 @@ READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
+void vsgongf_state::vsgongf_sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void tsamurai_state::vsgongf_map(address_map &map)
+void vsgongf_state::vsgongf_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa003, 0xa003).readonly();
-	map(0xa006, 0xa006).r(FUNC(tsamurai_state::vsgongf_a006_r)); /* protection */
-	map(0xa100, 0xa100).r(FUNC(tsamurai_state::vsgongf_a100_r)); /* protection */
+	map(0xa006, 0xa006).r(FUNC(vsgongf_state::vsgongf_a006_r)); /* protection */
+	map(0xa100, 0xa100).r(FUNC(vsgongf_state::vsgongf_a100_r)); /* protection */
 	map(0xc000, 0xc7ff).ram();                  /* work ram */
-	map(0xe000, 0xe3ff).ram().w(FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(vsgongf_state::fg_videoram_w)).share("videoram");
 	map(0xe400, 0xe43f).ram().share("spriteram");
 	map(0xe440, 0xe47b).ram();
-	map(0xe800, 0xe800).w(FUNC(tsamurai_state::vsgongf_sound_command_w));
-	map(0xec00, 0xec06).writeonly();
-	map(0xf000, 0xf000).w(FUNC(tsamurai_state::vsgongf_color_w));
-	map(0xf400, 0xf400).writeonly(); /* vreg? always 0 */
+	map(0xe800, 0xe800).w(FUNC(vsgongf_state::vsgongf_sound_command_w));
+	map(0xec00, 0xec06).nopw();
+	map(0xf000, 0xf000).w(FUNC(vsgongf_state::vsgongf_color_w));
+	map(0xf400, 0xf400).nopw(); /* vreg? always 0 */
 	map(0xf800, 0xf800).portr("P1");
 	map(0xf801, 0xf801).portr("P2");
 	map(0xf802, 0xf802).portr("SYSTEM");
@@ -370,11 +370,11 @@ void tsamurai_state::vsgongf_map(address_map &map)
 	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
-void tsamurai_state::sound_vsgongf_map(address_map &map)
+void vsgongf_state::sound_vsgongf_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6000, 0x63ff).ram(); /* work RAM */
-	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(tsamurai_state::vsgongf_sound_nmi_enable_w)); /* NMI enable */
+	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(vsgongf_state::vsgongf_sound_nmi_enable_w)); /* NMI enable */
 	map(0xa000, 0xa000).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
@@ -412,7 +412,7 @@ static INPUT_PORTS_START( tsamurai )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("DSW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -421,7 +421,7 @@ static INPUT_PORTS_START( tsamurai )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )        PORT_DIPLOCATION("DSW1:!4,!5,!6")
 	PORT_DIPSETTING(    0x38, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
@@ -430,33 +430,33 @@ static INPUT_PORTS_START( tsamurai )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x40, 0x00, "Freeze" )
+	PORT_DIPNAME( 0x40, 0x00, "Freeze" )                 PORT_DIPLOCATION("DSW1:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )       PORT_DIPLOCATION("DSW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )         PORT_DIPLOCATION("DSW2:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "7" )
 	PORT_DIPSETTING(    0x03, "254 (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, "DSW2 Unknown 1" )
+	PORT_DIPNAME( 0x0c, 0x0c, "DSW2 Unknown 1" )         PORT_DIPLOCATION("DSW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x04, "30" )
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x0c, "70" )
-	PORT_DIPNAME( 0x30, 0x30, "DSW2 Unknown 2" )
+	PORT_DIPNAME( 0x30, 0x30, "DSW2 Unknown 2" )         PORT_DIPLOCATION("DSW2:!5,!6")
 	PORT_DIPSETTING(    0x00, "0x00" )
 	PORT_DIPSETTING(    0x10, "0x01" )
 	PORT_DIPSETTING(    0x20, "0x02" )
 	PORT_DIPSETTING(    0x30, "0x03" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )   PORT_DIPLOCATION("DSW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW2 Unknown 3" )
+	PORT_DIPNAME( 0x80, 0x80, "DSW2 Unknown 3" )         PORT_DIPLOCATION("DSW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -465,7 +465,7 @@ static INPUT_PORTS_START( tsamuraih )
 	PORT_INCLUDE( tsamurai )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )         PORT_DIPLOCATION("DSW2:!1,!2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -492,25 +492,25 @@ static INPUT_PORTS_START( nunchaku )
 	PORT_INCLUDE( ladymstr )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )         PORT_DIPLOCATION("DSW2:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "7" )
 	PORT_DIPSETTING(    0x03, "255 (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, "DSW2 Unknown 1" )
+	PORT_DIPNAME( 0x0c, 0x0c, "DSW2 Unknown 1" )         PORT_DIPLOCATION("DSW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x04, "30" )
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x0c, "70" )
-	PORT_DIPNAME( 0x30, 0x30, "DSW2 Unknown 2" )
+	PORT_DIPNAME( 0x30, 0x30, "DSW2 Unknown 2" )         PORT_DIPLOCATION("DSW2:!5,!6")
 	PORT_DIPSETTING(    0x00, "0x00" )
 	PORT_DIPSETTING(    0x10, "0x01" )
 	PORT_DIPSETTING(    0x20, "0x02" )
 	PORT_DIPSETTING(    0x30, "0x03" )
-	PORT_DIPNAME( 0x40, 0x40, "DSW2 Unknown 3" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW2 Unknown 3" )         PORT_DIPLOCATION("DSW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW2 Unknown 4" )
+	PORT_DIPNAME( 0x80, 0x80, "DSW2 Unknown 4" )         PORT_DIPLOCATION("DSW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -532,28 +532,28 @@ static INPUT_PORTS_START( vsgongf )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:!1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -583,26 +583,26 @@ static INPUT_PORTS_START( yamagchi )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )         PORT_DIPLOCATION("DSW2:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "7" )
 	PORT_DIPSETTING(    0x03, "255 (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, "DSW2 Unknown 1" )
+	PORT_DIPNAME( 0x0c, 0x0c, "DSW2 Unknown 1" )         PORT_DIPLOCATION("DSW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x04, "30" )
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x0c, "70" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Language ) )      PORT_DIPLOCATION("DSW2:!5")
 	PORT_DIPSETTING(    0x10, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW2 Unknown 2" )
+	PORT_DIPNAME( 0x20, 0x20, "DSW2 Unknown 2" )         PORT_DIPLOCATION("DSW2:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )   PORT_DIPLOCATION("DSW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW2 Unknown 3" )
+	PORT_DIPNAME( 0x80, 0x80, "DSW2 Unknown 3" )         PORT_DIPLOCATION("DSW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -624,7 +624,7 @@ static INPUT_PORTS_START( m660 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("DSW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -633,7 +633,7 @@ static INPUT_PORTS_START( m660 )
 	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )        PORT_DIPLOCATION("DSW1:!4,!5,!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
@@ -642,49 +642,38 @@ static INPUT_PORTS_START( m660 )
 	PORT_DIPSETTING(    0x38, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x40, 0x00, "Freeze" )
+	PORT_DIPNAME( 0x40, 0x00, "Freeze" )                 PORT_DIPLOCATION("DSW1:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Continues ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Continues ) )     PORT_DIPLOCATION("DSW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )         PORT_DIPLOCATION("DSW2:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" )                  PORT_DIPLOCATION("DSW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "10,30,50" )
 	PORT_DIPSETTING(    0x04, "20,50,80" )
 	PORT_DIPSETTING(    0x08, "30,70,110" )
 	PORT_DIPSETTING(    0x0c, "50,100,150" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("DSW2:!5,!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )       PORT_DIPLOCATION("DSW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) /* listed as screen flip (hardware) */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )        PORT_DIPLOCATION("DSW2:!8") // listed as screen flip (hardware)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
-
-static const gfx_layout char_layout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0,1,2,3, 4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	8*8
-};
 
 static const gfx_layout sprite_layout =
 {
@@ -707,21 +696,10 @@ static const gfx_layout sprite_layout =
 	4*256
 };
 
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_tsamurai )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, char_layout,   0, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar, 0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout,    0, 32 )
 GFXDECODE_END
 
 
@@ -740,7 +718,6 @@ void tsamurai_state::tsamurai(machine_config &config)
 	Z80(config, m_audio2, XTAL(24'000'000)/8);
 	m_audio2->set_addrmap(AS_PROGRAM, &tsamurai_state::sound2_map);
 
-	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(tsamurai_state::flip_screen_w));
@@ -761,7 +738,6 @@ void tsamurai_state::tsamurai(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tsamurai);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
-	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -770,31 +746,26 @@ void tsamurai_state::tsamurai(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
-void tsamurai_state::vsgongf(machine_config &config)
+void vsgongf_state::vsgongf(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(24'000'000)/8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tsamurai_state::vsgongf_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsgongf_state::vsgongf_map);
 
 	Z80(config, m_audiocpu, XTAL(24'000'000)/8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tsamurai_state::sound_vsgongf_map);
-	m_audiocpu->set_addrmap(AS_IO, &tsamurai_state::vsgongf_audio_io_map);
-	m_audiocpu->set_periodic_int(FUNC(tsamurai_state::vsgongf_sound_interrupt), attotime::from_hz(3*60));
-
-	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,vsgongf)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &vsgongf_state::sound_vsgongf_map);
+	m_audiocpu->set_addrmap(AS_IO, &vsgongf_state::vsgongf_audio_io_map);
+	m_audiocpu->set_periodic_int(FUNC(vsgongf_state::vsgongf_sound_interrupt), attotime::from_hz(3*60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 4L
 	mainlatch.q_out_cb<0>().set_nop(); // vreg? always 0
-	mainlatch.q_out_cb<1>().set(FUNC(tsamurai_state::nmi_enable_w));
-	mainlatch.q_out_cb<2>().set(FUNC(tsamurai_state::coin1_counter_w));
-	mainlatch.q_out_cb<3>().set(FUNC(tsamurai_state::coin2_counter_w));
-	mainlatch.q_out_cb<4>().set(FUNC(tsamurai_state::textbank1_w));
+	mainlatch.q_out_cb<1>().set(FUNC(vsgongf_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(vsgongf_state::coin1_counter_w));
+	mainlatch.q_out_cb<3>().set(FUNC(vsgongf_state::coin2_counter_w));
+	mainlatch.q_out_cb<4>().set(FUNC(vsgongf_state::textbank1_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -802,13 +773,12 @@ void tsamurai_state::vsgongf(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0, 255, 16, 255-16);
-	screen.set_screen_update(FUNC(tsamurai_state::screen_update_vsgongf));
+	screen.set_screen_update(FUNC(vsgongf_state::screen_update_vsgongf));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(tsamurai_state::vblank_irq));
+	screen.screen_vblank().set(FUNC(vsgongf_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tsamurai);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
-	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -818,38 +788,34 @@ void tsamurai_state::vsgongf(machine_config &config)
 	AY8910(config,"aysnd", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
-void tsamurai_state::m660(machine_config &config)
+void m660_state::m660(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(24'000'000)/8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tsamurai_state::m660_map);
-	m_maincpu->set_addrmap(AS_IO, &tsamurai_state::z80_m660_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m660_state::m660_map);
+	m_maincpu->set_addrmap(AS_IO, &m660_state::z80_m660_io_map);
 
 	Z80(config, m_audiocpu, XTAL(24'000'000)/8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tsamurai_state::sound1_m660_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &m660_state::sound1_m660_map);
 
 	Z80(config, m_audio2, XTAL(24'000'000)/8);
-	m_audio2->set_addrmap(AS_PROGRAM, &tsamurai_state::sound2_m660_map);
+	m_audio2->set_addrmap(AS_PROGRAM, &m660_state::sound2_m660_map);
 
 	Z80(config, m_audio3, XTAL(24'000'000)/8);
-	m_audio3->set_addrmap(AS_PROGRAM, &tsamurai_state::sound3_m660_map);
-	m_audio3->set_addrmap(AS_IO, &tsamurai_state::sound3_m660_io_map);
+	m_audio3->set_addrmap(AS_PROGRAM, &m660_state::sound3_m660_map);
+	m_audio3->set_addrmap(AS_IO, &m660_state::sound3_m660_io_map);
 
-	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,m660)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(tsamurai_state::flip_screen_w));
-	mainlatch.q_out_cb<1>().set(FUNC(tsamurai_state::nmi_enable_w));
-	mainlatch.q_out_cb<2>().set(FUNC(tsamurai_state::textbank1_w));
-	mainlatch.q_out_cb<3>().set(FUNC(tsamurai_state::coin1_counter_w));
-	mainlatch.q_out_cb<4>().set(FUNC(tsamurai_state::coin2_counter_w));
-	mainlatch.q_out_cb<7>().set(FUNC(tsamurai_state::textbank2_w));
+	mainlatch.q_out_cb<0>().set(FUNC(m660_state::flip_screen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(m660_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(m660_state::textbank1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(m660_state::coin1_counter_w));
+	mainlatch.q_out_cb<4>().set(FUNC(m660_state::coin2_counter_w));
+	mainlatch.q_out_cb<7>().set(FUNC(m660_state::textbank2_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -857,14 +823,13 @@ void tsamurai_state::m660(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0, 255, 16, 255-16);
-	screen.set_screen_update(FUNC(tsamurai_state::screen_update));
+	screen.set_screen_update(FUNC(m660_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(tsamurai_state::vblank_irq));
+	screen.screen_vblank().set(FUNC(m660_state::vblank_irq));
 	screen.screen_vblank().append_inputline(m_audio3, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tsamurai);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
-	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -873,9 +838,6 @@ void tsamurai_state::m660(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -1012,10 +974,10 @@ ROM_START( nunchaku )
 	ROM_LOAD( "nunchack.c2", 0x4000, 0x4000, CRC(701a0cc3) SHA1(323ee1cba3da0ccb2c4d542c497de0e1c047f532) )
 	ROM_LOAD( "nunchack.c3", 0x8000, 0x4000, CRC(ffb841fc) SHA1(c1285cf093360923307bc86f6a5473d689b16a2c) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "nunchack.016", 0x000, 0x100, CRC(a7b077d4) SHA1(48c3e68d67de067c0ead0dbd34769b755fb5952f) )
-	ROM_LOAD( "nunchack.017", 0x100, 0x100, CRC(1c04c087) SHA1(7179edf96f59a469353d9652900b99fef25f4054) )
-	ROM_LOAD( "nunchack.018", 0x200, 0x100, CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
+	ROM_REGION( 0x0300, "proms", 0 ) // no way these PROMs can give the colours seen in reference videos
+	ROM_LOAD( "nunchack.016", 0x000, 0x100, BAD_DUMP CRC(a7b077d4) SHA1(48c3e68d67de067c0ead0dbd34769b755fb5952f) )
+	ROM_LOAD( "nunchack.017", 0x100, 0x100, BAD_DUMP CRC(1c04c087) SHA1(7179edf96f59a469353d9652900b99fef25f4054) )
+	ROM_LOAD( "nunchack.018", 0x200, 0x100, BAD_DUMP CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
 ROM_END
 
 ROM_START( yamagchi )
@@ -1340,67 +1302,67 @@ ROM_END
 
 ROM_START( ringfgt )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
-	ROM_LOAD( "rft04-1",    0x0000, 0x2000, CRC(11030866) SHA1(b95b231c241e5bdc002de3f6a732cd627c7dc145) )
-	ROM_LOAD( "rft03-1",    0x2000, 0x2000, CRC(357a2085) SHA1(0534f6c1a876dacfcff09a547290354eeddb3126) )
+	ROM_LOAD( "rft_04-1.5a", 0x0000, 0x2000, CRC(11030866) SHA1(b95b231c241e5bdc002de3f6a732cd627c7dc145) )
+	ROM_LOAD( "rft_03-1.5c", 0x2000, 0x2000, CRC(357a2085) SHA1(0534f6c1a876dacfcff09a547290354eeddb3126) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sound CPU */
-	ROM_LOAD( "6.5n",   0x0000, 0x2000, CRC(785b9000) SHA1(9eb32724b0611a93959485a7f9c806eb6d7ab013) )
-	ROM_LOAD( "5.5l",   0x2000, 0x2000, CRC(76dbfde9) SHA1(fe6e02f4b5a0a5baa59506636226c8ea7b551ef6) )
+	ROM_LOAD( "rft_01.5n", 0x0000, 0x2000, CRC(785b9000) SHA1(9eb32724b0611a93959485a7f9c806eb6d7ab013) )
+	ROM_LOAD( "rft_02.5l", 0x2000, 0x2000, CRC(76dbfde9) SHA1(fe6e02f4b5a0a5baa59506636226c8ea7b551ef6) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_ERASEFF ) /* tiles (N/A) */
 
 	ROM_REGION( 0x6000, "gfx2", 0 ) /* characters */
-	ROM_LOAD( "rft05",  0x0000, 0x1000, CRC(a7b732fd) SHA1(2abe4b422a7cd32cd12c6d6acba1872afe4a2ecc) )
-	ROM_LOAD( "rft06",  0x2000, 0x1000, CRC(ff2721f7) SHA1(ae75103a7663a190da36e0bb2d46a333f830eba5) )
-	ROM_LOAD( "rft07",  0x4000, 0x1000, CRC(ec1d7ba4) SHA1(047aa3c6c92126ac623fddbe0adc50a450910d6e) )
+	ROM_LOAD( "rft_05.6f", 0x0000, 0x1000, CRC(a7b732fd) SHA1(2abe4b422a7cd32cd12c6d6acba1872afe4a2ecc) )
+	ROM_LOAD( "rft_06.7f", 0x2000, 0x1000, CRC(ff2721f7) SHA1(ae75103a7663a190da36e0bb2d46a333f830eba5) )
+	ROM_LOAD( "rft_07.8f", 0x4000, 0x1000, CRC(ec1d7ba4) SHA1(047aa3c6c92126ac623fddbe0adc50a450910d6e) )
 
 	ROM_REGION( 0xc000, "gfx3", 0 ) /* sprites */
-	ROM_LOAD( "rft08",  0x0000, 0x2000, CRC(80d67d28) SHA1(f4016159201abdfe0c0441f78ed6a1a12b7ba34b) )
-	ROM_LOAD( "rft09",  0x4000, 0x2000, CRC(ea8f0656) SHA1(c4d2302d046c41bae9946a5ddc0087349a421b35) )
-	ROM_LOAD( "rft10",  0x8000, 0x2000, CRC(833ca89f) SHA1(b43416e783e6109d19de81a124fae84f1afb8440) )
+	ROM_LOAD( "rft_08.15j", 0x0000, 0x2000, CRC(80d67d28) SHA1(f4016159201abdfe0c0441f78ed6a1a12b7ba34b) )
+	ROM_LOAD( "rft_09.15h", 0x4000, 0x2000, CRC(ea8f0656) SHA1(c4d2302d046c41bae9946a5ddc0087349a421b35) )
+	ROM_LOAD( "rft_10.15f", 0x8000, 0x2000, CRC(833ca89f) SHA1(b43416e783e6109d19de81a124fae84f1afb8440) )
 
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "clr.6s",  0x000, 0x0100, CRC(578bfbea) SHA1(12a97de0f8012ccce75e14abf743bcec6857684c) )
-	ROM_LOAD( "clr.6r",  0x100, 0x0100, CRC(3ec00739) SHA1(614d1799fe197df389f6155f86fe113e1b0b018a) )
-	ROM_LOAD( "clr.6p",  0x200, 0x0100, CRC(0e4fd17a) SHA1(d4e32bd9dd903177af61f77976a25c5db1467bba) )
+	ROM_LOAD( "rft-11.6s", 0x000, 0x0100, CRC(578bfbea) SHA1(12a97de0f8012ccce75e14abf743bcec6857684c) )
+	ROM_LOAD( "rft-12.6r", 0x100, 0x0100, CRC(3ec00739) SHA1(614d1799fe197df389f6155f86fe113e1b0b018a) )
+	ROM_LOAD( "rft-13.6p", 0x200, 0x0100, CRC(0e4fd17a) SHA1(d4e32bd9dd903177af61f77976a25c5db1467bba) )
 ROM_END
 
 ROM_START( ringfgt2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
-	ROM_LOAD( "rft.04", 0x0000, 0x2000, CRC(6b9b3f3d) SHA1(ea75e77e0e3379a22381b1d0aae7f96b53cd7562) )
-	ROM_LOAD( "rft.03", 0x2000, 0x2000, CRC(1821974b) SHA1(1ce52f20bf49c111000f870bbe3416d27673b91d) )
+	ROM_LOAD( "rft_04.5a", 0x0000, 0x2000, CRC(6b9b3f3d) SHA1(ea75e77e0e3379a22381b1d0aae7f96b53cd7562) )
+	ROM_LOAD( "rft_03.5c", 0x2000, 0x2000, CRC(1821974b) SHA1(1ce52f20bf49c111000f870bbe3416d27673b91d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sound CPU */
-	ROM_LOAD( "6.5n",   0x0000, 0x2000, CRC(785b9000) SHA1(9eb32724b0611a93959485a7f9c806eb6d7ab013) )
-	ROM_LOAD( "5.5l",   0x2000, 0x2000, CRC(76dbfde9) SHA1(fe6e02f4b5a0a5baa59506636226c8ea7b551ef6) )
+	ROM_LOAD( "rft_01.5n", 0x0000, 0x2000, CRC(785b9000) SHA1(9eb32724b0611a93959485a7f9c806eb6d7ab013) )
+	ROM_LOAD( "rft_02.5l", 0x2000, 0x2000, CRC(76dbfde9) SHA1(fe6e02f4b5a0a5baa59506636226c8ea7b551ef6) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_ERASEFF ) /* tiles (N/A) */
 
 	ROM_REGION( 0x6000, "gfx2", 0 ) /* characters */
-	ROM_LOAD( "rft05",  0x0000, 0x1000, CRC(a7b732fd) SHA1(2abe4b422a7cd32cd12c6d6acba1872afe4a2ecc) )
-	ROM_LOAD( "rft06",  0x2000, 0x1000, CRC(ff2721f7) SHA1(ae75103a7663a190da36e0bb2d46a333f830eba5) )
-	ROM_LOAD( "rft07",  0x4000, 0x1000, CRC(ec1d7ba4) SHA1(047aa3c6c92126ac623fddbe0adc50a450910d6e) )
+	ROM_LOAD( "rft_05.6f", 0x0000, 0x1000, CRC(a7b732fd) SHA1(2abe4b422a7cd32cd12c6d6acba1872afe4a2ecc) )
+	ROM_LOAD( "rft_06.7f", 0x2000, 0x1000, CRC(ff2721f7) SHA1(ae75103a7663a190da36e0bb2d46a333f830eba5) )
+	ROM_LOAD( "rft_07.8f", 0x4000, 0x1000, CRC(ec1d7ba4) SHA1(047aa3c6c92126ac623fddbe0adc50a450910d6e) )
 
 	ROM_REGION( 0xc000, "gfx3", 0 ) /* sprites */
-	ROM_LOAD( "rft08",  0x0000, 0x2000, CRC(80d67d28) SHA1(f4016159201abdfe0c0441f78ed6a1a12b7ba34b) )
-	ROM_LOAD( "rft09",  0x4000, 0x2000, CRC(ea8f0656) SHA1(c4d2302d046c41bae9946a5ddc0087349a421b35) )
-	ROM_LOAD( "rft10",  0x8000, 0x2000, CRC(833ca89f) SHA1(b43416e783e6109d19de81a124fae84f1afb8440) )
+	ROM_LOAD( "rft_08.15j", 0x0000, 0x2000, CRC(80d67d28) SHA1(f4016159201abdfe0c0441f78ed6a1a12b7ba34b) )
+	ROM_LOAD( "rft_09.15h", 0x4000, 0x2000, CRC(ea8f0656) SHA1(c4d2302d046c41bae9946a5ddc0087349a421b35) )
+	ROM_LOAD( "rft_10.15f", 0x8000, 0x2000, CRC(833ca89f) SHA1(b43416e783e6109d19de81a124fae84f1afb8440) )
 
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "clr.6s",  0x000, 0x0100, CRC(578bfbea) SHA1(12a97de0f8012ccce75e14abf743bcec6857684c) )
-	ROM_LOAD( "clr.6r",  0x100, 0x0100, CRC(3ec00739) SHA1(614d1799fe197df389f6155f86fe113e1b0b018a) )
-	ROM_LOAD( "clr.6p",  0x200, 0x0100, CRC(0e4fd17a) SHA1(d4e32bd9dd903177af61f77976a25c5db1467bba) )
+	ROM_LOAD( "rft-11.6s", 0x000, 0x0100, CRC(578bfbea) SHA1(12a97de0f8012ccce75e14abf743bcec6857684c) )
+	ROM_LOAD( "rft-12.6r", 0x100, 0x0100, CRC(3ec00739) SHA1(614d1799fe197df389f6155f86fe113e1b0b018a) )
+	ROM_LOAD( "rft-13.6p", 0x200, 0x0100, CRC(0e4fd17a) SHA1(d4e32bd9dd903177af61f77976a25c5db1467bba) )
 ROM_END
 
-void tsamurai_state::init_the26thz()
+void m660_state::init_the26thz()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_read(0xd803, 0xd803);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd803, 0xd803, read8_delegate(FUNC(tsamurai_state::tsamurai_unknown_d803_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd803, 0xd803, read8smo_delegate(*this, FUNC(m660_state::tsamurai_unknown_d803_r)));
 }
 
-GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,   tsamurai_state, empty_init,    ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1984, ringfgt,   vsgongf,  vsgongf,  vsgongf,   tsamurai_state, empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ringfgt2,  vsgongf,  vsgongf,  vsgongf,   tsamurai_state, empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,   vsgongf_state, empty_init,    ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, ringfgt,   vsgongf,  vsgongf,  vsgongf,   vsgongf_state, empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ringfgt2,  vsgongf,  vsgongf,  vsgongf,   vsgongf_state, empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, tsamurai,  0,        tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tsamurai2, tsamurai, tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -1412,8 +1374,8 @@ GAME( 1985, nunchaku,  ladymstr, tsamurai, nunchaku,  tsamurai_state, empty_init
 
 GAME( 1985, yamagchi,  0,        tsamurai, yamagchi,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, m660,      0,        m660,     m660,      tsamurai_state, empty_init,    ROT90, "Wood Place Inc. (Taito America Corporation license)", "Mission 660 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, m660j,     m660,     m660,     m660,      tsamurai_state, empty_init,    ROT90, "Wood Place Inc. (Taito Corporation license)", "Mission 660 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, m660b,     m660,     m660,     m660,      tsamurai_state, empty_init,    ROT90, "bootleg", "Mission 660 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, alphaxz,   m660,     m660,     m660,      tsamurai_state, empty_init,    ROT90, "Ed Co. Ltd. (Wood Place Inc. license)", "The Alphax Z (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, the26thz,  m660,     m660,     m660,      tsamurai_state, init_the26thz, ROT90, "Ed Co. Ltd. (Taito license)", "The 26th Z (Japan, location test)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660,      0,        m660,     m660,      m660_state, empty_init,    ROT90, "Wood Place Co. Ltd. (Taito America Corporation license)", "Mission 660 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660j,     m660,     m660,     m660,      m660_state, empty_init,    ROT90, "Wood Place Co. Ltd. (Taito Corporation license)", "Mission 660 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660b,     m660,     m660,     m660,      m660_state, empty_init,    ROT90, "bootleg", "Mission 660 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, alphaxz,   m660,     m660,     m660,      m660_state, empty_init,    ROT90, "Ed Co., Ltd. (Wood Place Co., Ltd. license)", "The Alphax Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, the26thz,  m660,     m660,     m660,      m660_state, init_the26thz, ROT90, "Ed Co., Ltd. (Taito license)", "The 26th Z (Japan, location test)", MACHINE_SUPPORTS_SAVE )

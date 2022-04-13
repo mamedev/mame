@@ -533,8 +533,8 @@ void msx_slot_disk5_device::device_start()
 	save_item(NAME(m_control));
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xd0, 0xd4, write8sm_delegate(FUNC(msx_slot_disk5_device::io_write), this));
-	io_space().install_read_handler(0xd0, 0xd4, read8sm_delegate(FUNC(msx_slot_disk5_device::io_read), this));
+	io_space().install_write_handler(0xd0, 0xd4, write8sm_delegate(*this, FUNC(msx_slot_disk5_device::io_write)));
+	io_space().install_read_handler(0xd0, 0xd4, read8sm_delegate(*this, FUNC(msx_slot_disk5_device::io_read)));
 }
 
 

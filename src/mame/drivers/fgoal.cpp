@@ -64,15 +64,15 @@ void fgoal_state::fgoal_palette(palette_device &palette) const
 }
 
 
-void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(param);
 		break;
 	default:
-		assert_always(false, "Unknown id in fgoal_state::device_timer");
+		throw emu_fatalerror("Unknown id in fgoal_state::device_timer");
 	}
 }
 
@@ -104,20 +104,20 @@ unsigned fgoal_state::video_ram_address( )
 }
 
 
-READ8_MEMBER(fgoal_state::analog_r)
+uint8_t fgoal_state::analog_r()
 {
 	return ioport(m_player ? "PADDLE1" : "PADDLE0")->read(); /* PCB can be jumpered to use a single dial */
 }
 
 
-CUSTOM_INPUT_MEMBER(fgoal_state::_80_r)
+READ_LINE_MEMBER(fgoal_state::_80_r)
 {
 	uint8_t ret = (m_screen->vpos() & 0x80) ? 1 : 0;
 
 	return ret;
 }
 
-READ8_MEMBER(fgoal_state::nmi_reset_r)
+uint8_t fgoal_state::nmi_reset_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
@@ -125,7 +125,7 @@ READ8_MEMBER(fgoal_state::nmi_reset_r)
 }
 
 
-READ8_MEMBER(fgoal_state::irq_reset_r)
+uint8_t fgoal_state::irq_reset_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -133,50 +133,50 @@ READ8_MEMBER(fgoal_state::irq_reset_r)
 }
 
 
-READ8_MEMBER(fgoal_state::row_r)
+uint8_t fgoal_state::row_r()
 {
 	return m_row;
 }
 
 
-WRITE8_MEMBER(fgoal_state::row_w)
+void fgoal_state::row_w(uint8_t data)
 {
 	m_row = data;
-	m_mb14241->shift_data_w(space, 0, 0);
+	m_mb14241->shift_data_w(0);
 }
 
-WRITE8_MEMBER(fgoal_state::col_w)
+void fgoal_state::col_w(uint8_t data)
 {
 	m_col = data;
-	m_mb14241->shift_count_w(space, 0, data);
+	m_mb14241->shift_count_w(data);
 }
 
-READ8_MEMBER(fgoal_state::address_hi_r)
+uint8_t fgoal_state::address_hi_r()
 {
 	return video_ram_address() >> 8;
 }
 
-READ8_MEMBER(fgoal_state::address_lo_r)
+uint8_t fgoal_state::address_lo_r()
 {
 	return video_ram_address() & 0xff;
 }
 
-READ8_MEMBER(fgoal_state::shifter_r)
+uint8_t fgoal_state::shifter_r()
 {
-	uint8_t v = m_mb14241->shift_result_r(space, 0);
+	uint8_t v = m_mb14241->shift_result_r();
 
 	return bitswap<8>(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-READ8_MEMBER(fgoal_state::shifter_reverse_r)
+uint8_t fgoal_state::shifter_reverse_r()
 {
-	uint8_t v = m_mb14241->shift_result_r(space, 0);
+	uint8_t v = m_mb14241->shift_result_r();
 
 	return bitswap<8>(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 
-WRITE8_MEMBER(fgoal_state::sound1_w)
+void fgoal_state::sound1_w(uint8_t data)
 {
 	/* BIT0 => SX2 */
 	/* BIT1 => SX1 */
@@ -189,7 +189,7 @@ WRITE8_MEMBER(fgoal_state::sound1_w)
 }
 
 
-WRITE8_MEMBER(fgoal_state::sound2_w)
+void fgoal_state::sound2_w(uint8_t data)
 {
 	/* BIT0 => CX0 */
 	/* BIT1 => SX6 */
@@ -263,7 +263,7 @@ static INPUT_PORTS_START( fgoal )
 	/* extra credit score changes depending on player's performance */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fgoal_state, _80_r, nullptr) /* 128V */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fgoal_state, _80_r) /* 128V */
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))

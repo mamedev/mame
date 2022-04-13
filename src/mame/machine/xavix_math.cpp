@@ -32,7 +32,7 @@ void xavix_math_device::device_reset()
 
 
 // epo_guru uses this for ground movement in 3d stages (and other places)
-READ8_MEMBER(xavix_math_device::barrel_r)
+uint8_t xavix_math_device::barrel_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -50,7 +50,7 @@ READ8_MEMBER(xavix_math_device::barrel_r)
 
 // epo_guru 3d stages still flicker a lot with this, but it seems unrelated to the calculations here, possibly a raster timing issue
 // the pickup animations however don't seem to play, which indicates this could still be wrong.
-WRITE8_MEMBER(xavix_math_device::barrel_w)
+void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: barrel_w %02x\n", machine().describe_context(), data);
 
@@ -104,23 +104,23 @@ WRITE8_MEMBER(xavix_math_device::barrel_w)
 
 
 
-READ8_MEMBER(xavix_math_device::mult_r)
+uint8_t xavix_math_device::mult_r(offs_t offset)
 {
 	return m_multresults[offset];
 }
 
-WRITE8_MEMBER(xavix_math_device::mult_w)
+void xavix_math_device::mult_w(offs_t offset, uint8_t data)
 {
 	// rad_madf writes here to set the base value which the multiplication result gets added to
 	m_multresults[offset] = data;
 }
 
-READ8_MEMBER(xavix_math_device::mult_param_r)
+uint8_t xavix_math_device::mult_param_r(offs_t offset)
 {
 	return m_multparams[offset];
 }
 
-WRITE8_MEMBER(xavix_math_device::mult_param_w)
+void xavix_math_device::mult_param_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_multparams[offset]);
 	// there are NOPs after one of the writes, so presumably the operation is write triggerd and not intstant

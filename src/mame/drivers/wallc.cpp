@@ -51,11 +51,13 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class wallc_state : public driver_device
@@ -90,15 +92,15 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	bool m_bookkeeping_mode;
+	bool m_bookkeeping_mode = false;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out0_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void wallc_coin_counter_w(uint8_t data);
+	void unkitpkr_out0_w(uint8_t data);
+	void unkitpkr_out1_w(uint8_t data);
+	void unkitpkr_out2_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
@@ -212,7 +214,7 @@ void wallc_state::unkitpkr_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(wallc_state::videoram_w)
+void wallc_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -220,7 +222,7 @@ WRITE8_MEMBER(wallc_state::videoram_w)
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] | 0x100, 1, 0);
+	tileinfo.set(0, m_videoram[tile_index] | 0x100, 1, 0);
 }
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
@@ -231,27 +233,27 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
 	if (m_bookkeeping_mode || (tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
 		code |= 0x100;
 
-	SET_TILE_INFO_MEMBER(0, code, 1, 0);
+	tileinfo.set(0, code, 1, 0);
 }
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_sidampkr)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] | 0x100, 0, 0);
+	tileinfo.set(0, m_videoram[tile_index] | 0x100, 0, 0);
 }
 
 void wallc_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(wallc_state, unkitpkr)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_unkitpkr), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info_unkitpkr)), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(wallc_state, sidampkr)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_sidampkr), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info_sidampkr)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -261,22 +263,22 @@ uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
+void wallc_state::wallc_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 2);
 }
 
 
-WRITE8_MEMBER(wallc_state::unkitpkr_out0_w)
+void wallc_state::unkitpkr_out0_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(wallc_state::unkitpkr_out1_w)
+void wallc_state::unkitpkr_out1_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 }
 
-WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
+void wallc_state::unkitpkr_out2_w(uint8_t data)
 {
 	if (m_bookkeeping_mode != BIT(data, 0))
 	{
@@ -293,14 +295,13 @@ void wallc_state::wallc_map(address_map &map)
 
 	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb200, 0xb200).portr("SYSTEM");
-	map(0xb400, 0xb400).portr("DIAL");
-	map(0xb600, 0xb600).portr("DSW2");
+	map(0xb400, 0xb400).r("adc", FUNC(adc0804_device::read_and_write));
 
 	map(0xb000, 0xb000).nopw();
 	map(0xb100, 0xb100).w(FUNC(wallc_state::wallc_coin_counter_w));
 	map(0xb200, 0xb200).nopw();
 	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
-	map(0xb600, 0xb600).w("aysnd", FUNC(ay8912_device::data_w));
+	map(0xb600, 0xb600).rw("aysnd", FUNC(ay8912_device::data_r), FUNC(ay8912_device::data_w));
 }
 
 void wallc_state::unkitpkr_map(address_map &map)
@@ -521,6 +522,8 @@ void wallc_state::wallc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::wallc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wallc_state::irq0_line_hold));
 
+	ADC0804(config, "adc", 640000).vin_callback().set_ioport("DIAL"); // clock not verified
+
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -535,7 +538,9 @@ void wallc_state::wallc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, "aysnd", 12288000 / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
+	ay8912_device &aysnd(AY8912(config, "aysnd", 12288000 / 8));
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 void wallc_state::wallca(machine_config &config)
@@ -547,6 +552,7 @@ void wallc_state::wallca(machine_config &config)
 void wallc_state::unkitpkr(machine_config &config)
 {
 	wallc(config);
+	config.device_remove("adc");
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::unkitpkr_map);
 
@@ -554,9 +560,7 @@ void wallc_state::unkitpkr(machine_config &config)
 	subdevice<palette_device>("palette")->set_init(FUNC(wallc_state::unkitpkr_palette));
 
 	/* sound hardware */
-	subdevice<ay8912_device>("aysnd")->port_a_read_callback().set_ioport("DSW2");
-	subdevice<ay8912_device>("aysnd")->reset_routes();
-	subdevice<ay8912_device>("aysnd")->add_route(ALL_OUTPUTS, "mono", 0.50);
+	subdevice<ay8912_device>("aysnd")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void wallc_state::sidampkr(machine_config &config)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -14,7 +14,7 @@
 #if __IPHONE_8_0 && !TARGET_IPHONE_SIMULATOR  // check if sdk/target supports metal
 #   import <Metal/Metal.h>
 #   import <QuartzCore/CAMetalLayer.h>
-//#   define HAS_METAL_SDK
+#   define HAS_METAL_SDK
 #endif
 
 #include <bgfx/platform.h>
@@ -38,8 +38,8 @@ namespace entry
 	{
 		Context(uint32_t _width, uint32_t _height)
 		{
-			const char* const argv[1] = { "ios" };
-			m_mte.m_argc = 1;
+			static const char* const argv[] = { "ios" };
+			m_mte.m_argc = BX_COUNTOF(argv);
 			m_mte.m_argv = argv;
 
 			m_eventQueue.postSizeEvent(s_defaultWindow, _width, _height);

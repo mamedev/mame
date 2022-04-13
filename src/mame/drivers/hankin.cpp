@@ -2,16 +2,18 @@
 // copyright-holders:Robbbert
 /**********************************************************************************
 
-  PINBALL
-  Hankin
-  Based on Bally BY35
-  Sound based on Atari System 1
+PINBALL
+Hankin
+Based on Bally BY35
+Sound based on Atari System 1
 
+
+Status:
+- All games are working
 
 ToDo:
-- High score isn't saved or remembered
-- Sound needs to be verified with original
-- Mechanical
+- Lamp outputs
+
 
 ***********************************************************************************/
 
@@ -20,12 +22,16 @@ ToDo:
 
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/clock.h"
+#include "machine/input_merger.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "hankin.lh"
+
+
+namespace {
 
 class hankin_state : public genpin_class
 {
@@ -40,12 +46,18 @@ public:
 		, m_ic2(*this, "ic2")
 		, m_dac(*this, "dac")
 		, m_io_test(*this, "TEST")
-		, m_io_x(*this, { "X0", "X1", "X2", "X3", "X4", "DSW0", "DSW1", "DSW2" })
-		, m_display(*this, "digit%u%u", 0U, 0U)
+		, m_io_keyboard(*this, { "X0", "X1", "X2", "X3", "X4", "DSW0", "DSW1", "DSW2" })
+		, m_digits(*this, "digit%d%d", 0U, 0U)
+		, m_io_leds(*this, "led%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	void hankin(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
@@ -54,40 +66,37 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ic11_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
-	DECLARE_WRITE8_MEMBER(ic10_a_w);
-	DECLARE_WRITE8_MEMBER(ic10_b_w);
-	DECLARE_WRITE8_MEMBER(ic11_a_w);
-	DECLARE_WRITE8_MEMBER(ic2_b_w);
-	DECLARE_WRITE8_MEMBER(ic2_a_w);
-	DECLARE_READ8_MEMBER(ic11_b_r);
-	DECLARE_READ8_MEMBER(ic2_a_r);
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void ic10_a_w(u8 data);
+	void ic10_b_w(u8 data);
+	void ic11_a_w(u8 data);
+	void ic2_b_w(u8 data);
+	void ic2_a_w(u8 data);
+	u8 ic11_b_r();
+	u8 ic2_a_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void main_map(address_map &map);
+	void audio_map(address_map &map);
 
-	void hankin_map(address_map &map);
-	void hankin_sub_map(address_map &map);
+	bool m_timer_sb = false;
+	u8 m_timer_s[3]{};
+	u8 m_vol = 0U;
+	u8 m_ic2a = 0U;
+	u8 m_ic2b = 0U;
+	u8 m_ic10a = 0U;
+	u8 m_ic10b = 0U;
+	u8 m_ic11a = 0U;
+	bool m_ic11_ca2 = false;
+	bool m_ic11_cb2 = false;
+	bool m_ic10_cb2 = false;
+	bool m_ic2_ca2 = false;
+	bool m_ic2_cb2 = false;
+	u8 m_counter = 0U;
+	u8 m_digit = 0U;
+	u8 m_segment[5]{};
 
-	bool m_timer_x;
-	bool m_timer_sb;
-	uint8_t m_timer_s[3];
-	uint8_t m_vol;
-	uint8_t m_ic2a;
-	uint8_t m_ic2b;
-	uint8_t m_ic10a;
-	uint8_t m_ic10b;
-	uint8_t m_ic11a;
-	bool m_ic11_ca2;
-	bool m_ic10_cb2;
-	bool m_ic2_ca2;
-	bool m_ic2_cb2;
-	uint8_t m_counter;
-	uint8_t m_digit;
-	uint8_t m_segment[5];
-
-	required_region_ptr<uint8_t> m_p_prom;
+	required_region_ptr<u8> m_p_prom;
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<m6802_cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_ic10;
@@ -95,32 +104,32 @@ private:
 	required_device<pia6821_device> m_ic2;
 	required_device<dac_4bit_r2r_device> m_dac;
 	required_ioport m_io_test;
-	required_ioport_array<8> m_io_x;
-	output_finder<5, 6> m_display;
+	required_ioport_array<8> m_io_keyboard;
+	output_finder<5, 6> m_digits;
+	output_finder<1> m_io_leds;
+	output_finder<96> m_io_outputs;   // 32 solenoids + 64 lamps
 };
 
 
-void hankin_state::hankin_map(address_map &map)
+void hankin_state::main_map(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0088, 0x008b).rw(m_ic11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_ic10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0200, 0x02ff).ram().share("nvram"); // 5101L 4-bit static ram
 	map(0x1000, 0x1fff).rom().region("maincpu", 0);
 }
 
-void hankin_state::hankin_sub_map(address_map &map)
+void hankin_state::audio_map(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0080, 0x0083).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x17ff).rom().mirror(0x800).region("audiocpu", 0);
 }
 
 static INPUT_PORTS_START( hankin )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hankin_state, self_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hankin_state, self_test, 0)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR(Coinage))
@@ -138,7 +147,7 @@ static INPUT_PORTS_START( hankin )
 	PORT_DIPNAME( 0x10, 0x10, "Match")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x10, DEF_STR( On ))
-	PORT_DIPNAME( 0x60, 0x40, "Credits for exceeding high score")
+	PORT_DIPNAME( 0x60, 0x00, "Credits for exceeding high score")
 	PORT_DIPSETTING(    0x00, "0")
 	PORT_DIPSETTING(    0x20, "1")
 	PORT_DIPSETTING(    0x40, "2")
@@ -200,54 +209,54 @@ static INPUT_PORTS_START( hankin )
 
 	// Switches are numbered 8-1,16-9,24-17
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP08")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP07")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP06")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP05")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP04")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP01")
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Coin Door")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP15")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP14")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP13")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP12")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP11")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Coin Door")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP24")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP23")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP22")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP21")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP20")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP19")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP18")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP17")
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP32")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP31")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP30")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP29")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP28")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP27")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP26")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP25")
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP39")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP38")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP37")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP36")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP35")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP34")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP33")
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( hankin_state::self_test )
@@ -255,7 +264,7 @@ INPUT_CHANGED_MEMBER( hankin_state::self_test )
 	m_ic11->ca1_w(newval);
 }
 
-WRITE8_MEMBER( hankin_state::ic10_a_w )
+void hankin_state::ic10_a_w(u8 data)
 {
 	m_ic10a = data;
 
@@ -278,17 +287,18 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 		// use is to place the '1' digit in the centre segments.
 		if (BIT(data, 0) && (m_counter > 8))
 		{
-			static constexpr uint8_t patterns[16] = { 0x3f,0x80,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 with '1' adjusted
-			for (unsigned i = 0U; i < 5U; ++i)
-				m_display[i][m_digit] = bitswap<10>(uint16_t(patterns[m_segment[i]]), 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+			static constexpr u8 patterns[16] = { 0x3f,0x80,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 with '1' adjusted
+			for (u8 i = 0U; i < 5U; ++i)
+				m_digits[i][m_digit] = bitswap<10>(uint16_t(patterns[m_segment[i]]), 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 		}
 	}
 }
 
-WRITE8_MEMBER( hankin_state::ic10_b_w )
+void hankin_state::ic10_b_w(u8 data)
 {
 	m_ic10b = data;
 
+	// Solenoids
 	if (!m_ic10_cb2)
 	{
 		switch (data & 15)
@@ -309,13 +319,15 @@ WRITE8_MEMBER( hankin_state::ic10_b_w )
 				m_samples->start(0, 7);
 				break;
 		}
+		for (u8 i = 0; i < 8; i++)
+			m_io_outputs[i] = (data == i) ? 1 : 0;
 	}
 	// also sound data
 }
 
 WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
 {
-	output().set_value("led0", !state);
+	m_io_leds[0] = state ? 0 : 1;
 	// also sound strobe
 	m_ic2->ca1_w(state);
 }
@@ -326,7 +338,7 @@ WRITE_LINE_MEMBER( hankin_state::ic10_cb2_w )
 	m_ic10_cb2 = state;
 }
 
-WRITE8_MEMBER( hankin_state::ic11_a_w )
+void hankin_state::ic11_a_w(u8 data)
 {
 	m_ic11a = data;
 
@@ -351,14 +363,14 @@ WRITE8_MEMBER( hankin_state::ic11_a_w )
 	}
 }
 
-READ8_MEMBER( hankin_state::ic11_b_r )
+u8 hankin_state::ic11_b_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	for (unsigned i = 0U; i < 8U; ++i)
 	{
 		if (BIT(m_ic11a, i))
-			data |= m_io_x[i]->read();
+			data |= m_io_keyboard[i]->read();
 	}
 
 	return data;
@@ -374,13 +386,21 @@ WRITE_LINE_MEMBER( hankin_state::ic11_ca2_w )
 // lamp strobe
 WRITE_LINE_MEMBER( hankin_state::ic11_cb2_w )
 {
+	m_ic11_cb2 = state;
+	// Todo: no lamps are ever activated at this moment, to fix
+	if (state)
+	{
+		u8 addr = m_ic11a & 15;
+		u8 data = m_ic11a >> 4;
+		for (u8 i = 0; i < 4; i++)
+			m_io_outputs[32+addr*4+i] = BIT(data, i);
+	}
 }
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_x )
+WRITE_LINE_MEMBER( hankin_state::clock_w )
 {
-	m_timer_x ^= 1;
-	m_ic11->cb1_w(m_timer_x);
+	m_ic11->cb1_w(state);
 }
 
 // Sound
@@ -421,23 +441,47 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
 
 void hankin_state::machine_start()
 {
-	m_display.resolve();
+	m_digits.resolve();
+	m_io_leds.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_timer_sb));
+	save_item(NAME(m_timer_s));
+	save_item(NAME(m_vol));
+	save_item(NAME(m_ic2a));
+	save_item(NAME(m_ic2b));
+	save_item(NAME(m_ic10a));
+	save_item(NAME(m_ic10b));
+	save_item(NAME(m_ic11a));
+	save_item(NAME(m_ic11_ca2));
+	save_item(NAME(m_ic10_cb2));
+	save_item(NAME(m_ic2_ca2));
+	save_item(NAME(m_ic2_cb2));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_segment));
+
 }
 
 void hankin_state::machine_reset()
 {
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
+	m_timer_sb = false;
+	m_ic10b = 0;
 	m_vol = 0;
 	m_dac->set_output_gain(0, 0);
 }
 
 // PA0-3 = sound data from main cpu
-READ8_MEMBER( hankin_state::ic2_a_r )
+u8 hankin_state::ic2_a_r()
 {
 	return m_ic10b;
 }
 
 // PA4-7 = sound data to prom
-WRITE8_MEMBER( hankin_state::ic2_a_w )
+void hankin_state::ic2_a_w(u8 data)
 {
 	m_ic2a = data >> 4;
 	offs_t offs = (m_timer_s[2] & 31) | (m_ic2a << 5);
@@ -446,7 +490,7 @@ WRITE8_MEMBER( hankin_state::ic2_a_w )
 
 // PB0-3 = preset on 74LS161
 // PB4-7 = volume
-WRITE8_MEMBER( hankin_state::ic2_b_w )
+void hankin_state::ic2_b_w(u8 data)
 {
 	m_ic2b = data;
 
@@ -476,10 +520,10 @@ void hankin_state::hankin(machine_config &config)
 {
 	/* basic machine hardware */
 	M6802(config, m_maincpu, 3276800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hankin_state::hankin_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hankin_state::main_map);
 
 	M6802(config, m_audiocpu, 3276800); // guess, xtal value not shown
-	m_audiocpu->set_addrmap(AS_PROGRAM, &hankin_state::hankin_sub_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hankin_state::audio_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -491,9 +535,6 @@ void hankin_state::hankin(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Devices */
 	PIA6821(config, m_ic10, 0);
@@ -503,8 +544,8 @@ void hankin_state::hankin(machine_config &config)
 	m_ic10->writepb_handler().set(FUNC(hankin_state::ic10_b_w));
 	m_ic10->ca2_handler().set(FUNC(hankin_state::ic10_ca2_w));
 	m_ic10->cb2_handler().set(FUNC(hankin_state::ic10_cb2_w));
-	m_ic10->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
-	m_ic10->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	m_ic10->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_ic10->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	PIA6821(config, m_ic11, 0);
 	//m_ic11->readpa_handler().set(FUNC(hankin_state::ic11_a_r));
@@ -513,8 +554,8 @@ void hankin_state::hankin(machine_config &config)
 	//m_ic11->writepb_handler().set(FUNC(hankin_state::ic11_b_w));
 	m_ic11->ca2_handler().set(FUNC(hankin_state::ic11_ca2_w));
 	m_ic11->cb2_handler().set(FUNC(hankin_state::ic11_cb2_w));
-	m_ic11->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
-	m_ic11->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	m_ic11->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
+	m_ic11->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 
 	PIA6821(config, m_ic2, 0);
 	m_ic2->readpa_handler().set(FUNC(hankin_state::ic2_a_r));
@@ -523,11 +564,16 @@ void hankin_state::hankin(machine_config &config)
 	m_ic2->writepb_handler().set(FUNC(hankin_state::ic2_b_w));
 	m_ic2->ca2_handler().set(FUNC(hankin_state::ic2_ca2_w));
 	m_ic2->cb2_handler().set(FUNC(hankin_state::ic2_cb2_w));
-	m_ic2->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
-	m_ic2->irqb_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
+	m_ic2->irqa_handler().set("audioirq", FUNC(input_merger_device::in_w<0>));
+	m_ic2->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
 
-	TIMER(config, "timer_x").configure_periodic(FUNC(hankin_state::timer_x), attotime::from_hz(120)); // mains freq*2
+	clock_device &irqclock(CLOCK(config, "irqclock", 100));
+	irqclock.signal_handler().set(FUNC(hankin_state::clock_w));
+
 	TIMER(config, "timer_s").configure_periodic(FUNC(hankin_state::timer_s), attotime::from_hz(94000)); // 555 on sound board*2
+
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 }
 
 /*--------------------------------
@@ -605,9 +651,11 @@ ROM_START(empsback)
 	ROM_LOAD("sw_ic3.snd",   0x0000, 0x0200, CRC(db214f65) SHA1(1a499cf2059a5c0d860d5a4251a89a5735937ef8))
 ROM_END
 
+} // Anonymous namespace
 
-GAME(1978,  fjholden, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "FJ Holden",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  orbit1,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Orbit 1",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  shark,    0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Shark",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  howzat,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Howzat!",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1981,  empsback, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "The Empire Strike Back", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+
+GAME(1978,  fjholden, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "FJ Holden",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  orbit1,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Orbit 1",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  shark,    0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Shark",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  howzat,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Howzat!",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  empsback, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "The Empire Strikes Back (Hankin Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -41,17 +41,17 @@ public:
 	void alinvade(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(irqmask_r);
-	DECLARE_WRITE8_MEMBER(irqmask_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sounden_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	uint8_t irqmask_r();
+	void irqmask_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void sounden_w(uint8_t data);
+	void vblank_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void alinvade_map(address_map &map);
 
-	uint8_t m_irqmask;
-	uint8_t m_irqff;
+	uint8_t m_irqmask = 0;
+	uint8_t m_irqff = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -80,23 +80,23 @@ DISCRETE_SOUND_START(alinvade_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( alinvade_state::sound_w )
+void  alinvade_state::sound_w(uint8_t data)
 {
 	m_discrete->write(NODE_01, (data^0x3f)<<2);
 }
 
-WRITE8_MEMBER( alinvade_state::sounden_w )
+void alinvade_state::sounden_w(uint8_t data)
 {
-	machine().sound().system_enable(data == 4);
+	machine().sound().system_mute(data != 4);
 }
 
-READ8_MEMBER(alinvade_state::irqmask_r)
+uint8_t alinvade_state::irqmask_r()
 {
 	return 0; // TODO: might be anything
 }
 
 
-WRITE8_MEMBER(alinvade_state::irqmask_w)
+void alinvade_state::irqmask_w(uint8_t data)
 {
 	if((!(m_irqff & 1)) && (data & 1)) // f/f, active high? If the above actually returns 0xff this could be active low ...
 		m_irqmask^= 1;
@@ -152,14 +152,14 @@ static INPUT_PORTS_START( alinvade )
 	PORT_BIT(0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR ( Unknown ) )   // read, but not tested afterwards?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR ( Bonus_Life ) )
+	PORT_DIPSETTING(    0x04, "10k" )
+	PORT_DIPSETTING(    0x00, "13k" )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -177,23 +177,19 @@ void alinvade_state::machine_reset()
 
 uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t x = (offs << 3)&0x7f;
 		int y = (offs >> 4)&0x7f;
 		uint8_t data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x01) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
-			data = data >> 1;
-			x = x + 1;
+			data >>= 1;
+			x++;
 		}
 	}
 
@@ -201,7 +197,7 @@ uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(alinvade_state::vblank_irq)
+void alinvade_state::vblank_irq(int state)
 {
 	if (state && BIT(m_irqmask, 0))
 		m_maincpu->set_input_line(0,HOLD_LINE);

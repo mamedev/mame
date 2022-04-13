@@ -51,13 +51,13 @@ protected:
 	virtual void eop_w(int state) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
-	DECLARE_READ8_MEMBER( fdc_input_r );
+	uint8_t fdc_input_r();
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	required_device<pc_fdc_interface> m_fdc;
+	required_device<mcs3201_device> m_fdc;
 	required_ioport m_config;
 };
 

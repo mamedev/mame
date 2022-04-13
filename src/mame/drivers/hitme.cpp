@@ -39,11 +39,11 @@ TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 {
 	/* the code is the low 6 bits */
 	uint8_t code = m_videoram[tile_index] & 0x3f;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 
-WRITE8_MEMBER(hitme_state::hitme_vidram_w)
+void hitme_state::hitme_vidram_w(offs_t offset, uint8_t data)
 {
 	/* mark this tile dirty */
 	m_videoram[offset] = data;
@@ -60,13 +60,13 @@ WRITE8_MEMBER(hitme_state::hitme_vidram_w)
 
 void hitme_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hitme_state::get_hitme_tile_info)), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
 }
 
 
 VIDEO_START_MEMBER(hitme_state,barricad)
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hitme_state::get_hitme_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
 }
 
 
@@ -80,26 +80,26 @@ uint32_t hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &b
 	double dot_freq = 15750 * 336;
 	/* the number of pixels is the duration times the frequency */
 	int width_pixels = width_duration * dot_freq;
-	int x, y, xx, inv;
 	offs_t offs = 0;
 
 	/* start by drawing the tilemap */
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now loop over and invert anything */
-	for (y = 0; y < 19; y++)
+	for (int y = 0; y < 19; y++)
 	{
 		int dy = bitmap.rowpixels();
-		for (inv = x = 0; x < 40; x++, offs++)
+		int inv = 0;
+		for (int x = 0; x < 40; x++, offs++)
 		{
 			/* if the high bit is set, reset the oneshot */
 			if (m_videoram[y * 40 + x] & 0x80)
 				inv = width_pixels;
 
 			/* invert pixels until we run out */
-			for (xx = 0; xx < 8 && inv; xx++, inv--)
+			for (int xx = 0; xx < 8 && inv; xx++, inv--)
 			{
-				uint16_t *dest = &bitmap.pix16(y * 10, x * 8 + xx);
+				uint16_t *const dest = &bitmap.pix(y * 10, x * 8 + xx);
 				dest[0 * dy] ^= 1;
 				dest[1 * dy] ^= 1;
 				dest[2 * dy] ^= 1;
@@ -151,25 +151,25 @@ uint8_t hitme_state::read_port_and_t0_and_hblank( int port )
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_0_r)
+uint8_t hitme_state::hitme_port_0_r()
 {
 	return read_port_and_t0_and_hblank(0);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_1_r)
+uint8_t hitme_state::hitme_port_1_r()
 {
 	return read_port_and_t0(1);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_2_r)
+uint8_t hitme_state::hitme_port_2_r()
 {
 	return read_port_and_t0_and_hblank(2);
 }
 
 
-READ8_MEMBER(hitme_state::hitme_port_3_r)
+uint8_t hitme_state::hitme_port_3_r()
 {
 	return read_port_and_t0(3);
 }
@@ -182,7 +182,7 @@ READ8_MEMBER(hitme_state::hitme_port_3_r)
  *
  *************************************/
 
-WRITE8_MEMBER(hitme_state::output_port_0_w)
+void hitme_state::output_port_0_w(uint8_t data)
 {
 	/*
 	    Note: We compute the timeout time on a write here. Unfortunately, the situation is
@@ -200,7 +200,7 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 }
 
 
-WRITE8_MEMBER(hitme_state::output_port_1_w)
+void hitme_state::output_port_1_w(uint8_t data)
 {
 	m_discrete->write(HITME_ENABLE_VAL, data);
 	m_discrete->write(HITME_OUT1, 1);
@@ -280,19 +280,8 @@ static GFXDECODE_START( gfx_hitme )
 GFXDECODE_END
 
 
-static const gfx_layout barricad_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_barricad )
-	GFXDECODE_ENTRY( "gfx1", 0, barricad_charlayout,   0, 1  )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,   0, 1  )
 GFXDECODE_END
 
 
@@ -638,7 +627,7 @@ ROM_START( hitme1 )
 	ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
 ROM_END
 
-ROM_START( m21 )
+ROM_START( mirco21 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
 	ROM_LOAD( "mirco1.bin", 0x0000, 0x0200, CRC(aa796ad7) SHA1(2908bdb4ab17a2f5bc4da2f957906bf2b57afa50) )
 	ROM_LOAD( "hm2.c7", 0x0200, 0x0200, CRC(25d47ba4) SHA1(6f3bb4ca6918dc07f37d0c0c7fe5ec53aa7171a5) )
@@ -693,7 +682,7 @@ ROM_END
 
 GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
 GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
+GAME( 1976, mirco21,  hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
 GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, empty_init, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
 GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
 GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )

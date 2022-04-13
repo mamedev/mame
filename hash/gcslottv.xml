@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="gcslottv" description="Gachinko Contest! Slot machine TV cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	-->
+
+	<software name="aladdin" supported="no">
+		<description>Aladdin TV</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="slotslc01black.bin" size="0x400000" crc="d18ff203" sha1="8d62051565bfb1cc9eb14e4161ed892014e97c9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ginginma" supported="no">
+		<description>Ginginmaru TV</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<info name="alt_title" value="ギンギン丸TV"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="slotslc01orange.bin" size="0x400000" crc="f3e9c746" sha1="e242587406e9e4fa76ddb5120211e2eb996e36f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="salarymn" supported="no">
+		<description>Salaryman Kintaro</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<info name="alt_title" value="サラリーマン金太郎"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="slotslc05red.bin" size="0x400000" crc="b30e908e" sha1="f9ad6b93bcf626ba1d5222af13088565a5d4a729"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mojuotv" supported="no">
+		<description>Moju-o TV</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<info name="alt_title" value="猛獣王TV"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="slotslc07yellow.bin" size="0x800000" crc="461a9ede" sha1="e41b97409e17ce16fe522a3a45c4577c6dbed522"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

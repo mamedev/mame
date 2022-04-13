@@ -51,6 +51,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 //**************************************************************************
@@ -92,7 +93,7 @@ private:
 	TILE_GET_INFO_MEMBER(dkong3abl_char_tile_info);
 
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(scroll_ram_w);
+	void scroll_ram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(color_bank_1_w);
 	DECLARE_WRITE_LINE_MEMBER(color_bank_2_w);
 
@@ -102,7 +103,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(output_latches_w);
+	void output_latches_w(offs_t offset, uint8_t data);
 
 	void bootleg_map(address_map &map);
 	void main_map(address_map &map);
@@ -154,11 +155,12 @@ void ambush_state::bootleg_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x7000, 0x77ff).ram();
-	map(0x7000, 0x71ff).share("sprite_ram");
-	map(0x7200, 0x72ff).share("attribute_ram");
-	map(0x7380, 0x739f).share("scroll_ram");  // not used on bootlegs?
-	map(0x7400, 0x77ff).share("video_ram");
+	map(0x7000, 0x71ff).ram().share("sprite_ram");
+	map(0x7200, 0x72ff).ram().share("attribute_ram");
+	map(0x7300, 0x737f).ram();
+	map(0x7380, 0x739f).ram().share("scroll_ram");  // not used on bootlegs?
+	map(0x73a0, 0x73ff).ram();
+	map(0x7400, 0x77ff).ram().share("video_ram");
 	map(0x8000, 0x9fff).rom();
 	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xa100, 0xa100).portr("sw1");
@@ -560,7 +562,7 @@ WRITE_LINE_MEMBER(ambush_state::flip_screen_w)
 	flip_screen_set(state);
 }
 
-WRITE8_MEMBER( ambush_state::scroll_ram_w )
+void ambush_state::scroll_ram_w(offs_t offset, uint8_t data)
 {
 	m_scroll_ram[offset] = data;
 	m_char_tilemap->set_scrolly(offset, data + 1);
@@ -636,7 +638,7 @@ TILE_GET_INFO_MEMBER( ambush_state::ambush_char_tile_info )
 	int color = (m_color_bank << 4) | (attr & 0x0f);
 	tileinfo.category = BIT(attr, 4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( ambush_state::mariobl_char_tile_info )
@@ -648,7 +650,7 @@ TILE_GET_INFO_MEMBER( ambush_state::mariobl_char_tile_info )
 	int code = ((attr & 0x40) << 2) | m_video_ram[tile_index];
 	int color = ((attr & 0x40) >> 2) | 8 | (m_video_ram[tile_index] >> 5);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( ambush_state::dkong3abl_char_tile_info )
@@ -661,7 +663,7 @@ TILE_GET_INFO_MEMBER( ambush_state::dkong3abl_char_tile_info )
 	int code = ((attr & 0x40) << 2) | m_video_ram[tile_index];
 	int color = (BIT(attr, 6) << 5) | (BIT(attr, 6) << 4) | (attr & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -679,7 +681,7 @@ MACHINE_START_MEMBER( ambush_state, ambush )
 	register_save_states();
 
 	// create character tilemap
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ambush_state::ambush_char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ambush_state::ambush_char_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_char_tilemap->set_transparent_pen(0);
 	m_char_tilemap->set_scroll_cols(32);
 }
@@ -689,7 +691,7 @@ MACHINE_START_MEMBER( ambush_state, mariobl )
 	register_save_states();
 
 	// create character tilemap
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ambush_state::mariobl_char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ambush_state::mariobl_char_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_char_tilemap->set_transparent_pen(0);
 	m_gfxdecode->gfx(0)->set_granularity(8);
 }
@@ -699,7 +701,7 @@ MACHINE_START_MEMBER( ambush_state, dkong3abl )
 	register_save_states();
 
 	// create character tilemap
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ambush_state::dkong3abl_char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ambush_state::dkong3abl_char_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_char_tilemap->set_transparent_pen(0);
 }
 
@@ -713,7 +715,7 @@ WRITE_LINE_MEMBER(ambush_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(ambush_state::output_latches_w)
+void ambush_state::output_latches_w(offs_t offset, uint8_t data)
 {
 	m_outlatch[0]->write_bit(offset, BIT(data, 0));
 	m_outlatch[1]->write_bit(offset, BIT(data, 1));

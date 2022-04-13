@@ -4,31 +4,31 @@
 
     Mitsubishi MULTI-16 series
 
-	MULTI-16 (1982, 1983 for S models)
-	- 8088, 4 MHz
-	- 8041 (MCU), 8253 (PIT), 8259A (PIC), MB8866 (FDC)
-	- MP-1601 (128 KB RAM, 32 KB VRAM, monochrome, 1x 5.25")
-	- MP-1602 (192 KB RAM, 32 KB VRAM, monochrome, 2x 5.25")
-	- MP-1605 (256 KB RAM, 96 KB VRAM, 8 colors, 2x 5.25")
-	- MP-1601S (8087, 128 KB RAM, 32 KB VRAM, monochrome, 1x 5.25")
-	- MP-1602S (8087, 192 KB RAM, 32 KB VRAM, monochrome, 2x 5.25")
-	- MP-1605S (8087, 256 KB RAM, 96 KB VRAM, 8 colors, 2x 5.25")
-	- MP-1622 (8087, 192 KB RAM, 32 KB VRAM, monochrome, 2x 8")
-	- MP-1625 (8087, 256 KB RAM, 96 KB VRAM, 8 colors, 2x 8")
+    MULTI-16 (1982, 1983 for S models)
+    - 8088, 4 MHz
+    - 8041 (MCU), 8253 (PIT), 8259A (PIC), MB8866 (FDC)
+    - MP-1601 (128 KB RAM, 32 KB VRAM, monochrome, 1x 5.25")
+    - MP-1602 (192 KB RAM, 32 KB VRAM, monochrome, 2x 5.25")
+    - MP-1605 (256 KB RAM, 96 KB VRAM, 8 colors, 2x 5.25")
+    - MP-1601S (8087, 128 KB RAM, 32 KB VRAM, monochrome, 1x 5.25")
+    - MP-1602S (8087, 192 KB RAM, 32 KB VRAM, monochrome, 2x 5.25")
+    - MP-1605S (8087, 256 KB RAM, 96 KB VRAM, 8 colors, 2x 5.25")
+    - MP-1622 (8087, 192 KB RAM, 32 KB VRAM, monochrome, 2x 8")
+    - MP-1625 (8087, 256 KB RAM, 96 KB VRAM, 8 colors, 2x 8")
 
-	MULTI-16 II (1984)
-	- 8086, 8 MHz
-	- MP-1642 (256 KB RAM, 64 KB VRAM, monochrome, 2x 5.25")
-	- MP-1645 (256 KB RAM, 192 KB VRAM, 8 colors, 2x 5.25")
+    MULTI-16 II (1984)
+    - 8086, 8 MHz
+    - MP-1642 (256 KB RAM, 64 KB VRAM, monochrome, 2x 5.25")
+    - MP-1645 (256 KB RAM, 192 KB VRAM, 8 colors, 2x 5.25")
 
-	MULTI-16 IV (1986)
-	- 80286, 8 MHz
-	- MP-1652-A20 (512 KB RAM, 128 KB VRAM, monochrome, 2x 5.25")
-	- MP-1652-A22 (512 KB RAM, 128 KB VRAM, monochrome, 2x 5.25", 20 MB HDD)
-	- MP-1655-A20 (512 KB RAM, 384 KB VRAM, 8 colors, 2x 5.25")
-	- MP-1655-A22 (512 KB RAM, 384 KB VRAM, 8 colors, 2x 5.25", 20 MB HDD)
+    MULTI-16 IV (1986)
+    - 80286, 8 MHz
+    - MP-1652-A20 (512 KB RAM, 128 KB VRAM, monochrome, 2x 5.25")
+    - MP-1652-A22 (512 KB RAM, 128 KB VRAM, monochrome, 2x 5.25", 20 MB HDD)
+    - MP-1655-A20 (512 KB RAM, 384 KB VRAM, 8 colors, 2x 5.25")
+    - MP-1655-A22 (512 KB RAM, 384 KB VRAM, 8 colors, 2x 5.25", 20 MB HDD)
 
-	The IPL dump we currently have seems to be from the MP-1645.
+    The IPL dump we currently have seems to be from the MP-1645.
 
 ****************************************************************************/
 
@@ -68,7 +68,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
-	required_device<hd6845_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<mb8866_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -82,7 +82,7 @@ private:
 
 MC6845_UPDATE_ROW(multi16_state::crtc_update_row)
 {
-	uint8_t *vram = reinterpret_cast<uint8_t *>(m_vram.target());
+	uint8_t const *const vram = reinterpret_cast<uint8_t *>(m_vram.target());
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -101,7 +101,7 @@ MC6845_UPDATE_ROW(multi16_state::crtc_update_row)
 			color |= BIT(data_g, 7 - x) << 1;
 			color |= BIT(data_b, 7 - x) << 2;
 
-			bitmap.pix32(y, x + i * 8) = m_palette->pens()[color];
+			bitmap.pix(y, x + i * 8) = m_palette->pens()[color];
 		}
 	}
 }
@@ -118,18 +118,18 @@ void multi16_state::multi16_map(address_map &map)
 void multi16_state::multi16_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x02, 0x03) // ?
-//	map(0x06, 0x06) // ?
-//	map(0x07, 0x07) // ?
-//	map(0x08, 0x0b) // ?
+//  map(0x02, 0x03) // ?
+//  map(0x06, 0x06) // ?
+//  map(0x07, 0x07) // ?
+//  map(0x08, 0x0b) // ?
 	map(0x0c, 0x0f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x40, 0x40).w(m_crtc, FUNC(hd6845_device::address_w));
-	map(0x41, 0x41).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-//	map(0x42, 0x44) // ?
-//	map(0x48, 0x48) // ?
-//	map(0x4e, 0x4e) // ?
-//	map(0x82, 0x82) // ?
-//	map(0x92, 0x92) // ?
+	map(0x40, 0x40).w(m_crtc, FUNC(hd6845s_device::address_w));
+	map(0x41, 0x41).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+//  map(0x42, 0x44) // ?
+//  map(0x48, 0x48) // ?
+//  map(0x4e, 0x4e) // ?
+//  map(0x82, 0x82) // ?
+//  map(0x92, 0x92) // ?
 }
 
 /* Input ports */
@@ -165,28 +165,28 @@ void multi16_state::multi16(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16000000, 848, 0, 640, 518, 0, 400); // unknown clock
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	HD6845(config, m_crtc, 2000000); // unknown clock
+	HD6845S(config, m_crtc, 2000000); // unknown clock
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(multi16_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(multi16_state::crtc_update_row));
 
 	// floppy
 	MB8866(config, m_fdc, 2000000);
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], multi16_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], multi16_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], multi16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], multi16_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 }
 
 /* ROM definition */
 
 // MULTI16MODEL2-24
 ROM_START( multi16 )
-	ROM_REGION( 0x4000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD("ipl.rom", 0x0000, 0x4000, CRC(5beb5e94) SHA1(d3b9dc9a08995a0f26af9671893417e795370306))
 
 	ROM_REGION(0x20000, "kanji", 0)

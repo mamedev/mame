@@ -71,7 +71,7 @@ enum
 };
 
 
-WRITE8_MEMBER( vicdual_state::pulsar_audio_1_w )
+void vicdual_state::pulsar_audio_1_w(uint8_t data)
 {
 	int bitsChanged;
 	//int bitsGoneHigh;
@@ -120,7 +120,7 @@ WRITE8_MEMBER( vicdual_state::pulsar_audio_1_w )
 }
 
 
-WRITE8_MEMBER( vicdual_state::pulsar_audio_2_w )
+void vicdual_state::pulsar_audio_2_w(uint8_t data)
 {
 	int bitsChanged;
 	int bitsGoneHigh;

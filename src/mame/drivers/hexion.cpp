@@ -90,7 +90,7 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(hexion_state::coincntr_w)
+void hexion_state::coincntr_w(uint8_t data)
 {
 //logerror("%04x: coincntr_w %02x\n",m_maincpu->pc(),data);
 
@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER(hexion_state::nmi_ack_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(hexion_state::ccu_int_time_w)
+void hexion_state::ccu_int_time_w(uint8_t data)
 {
 	logerror("ccu_int_time rewritten with value of %02x\n", data);
 	m_ccu_int_time = data;
@@ -283,7 +283,7 @@ void hexion_state::hexion(machine_config &config)
 	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	/* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
-	K051649(config, "k051649", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.5);
+	K051649(config, "k051649", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void hexion_state::hexionb(machine_config &config)

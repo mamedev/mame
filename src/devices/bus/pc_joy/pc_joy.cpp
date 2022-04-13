@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(PC_JOY, pc_joy_device, "pc_joy", "PC joystick port")
 
 pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_JOY, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_pc_joy_interface>(mconfig, *this),
 	m_dev(nullptr)
 {
 	option_reset();
@@ -25,7 +25,7 @@ pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, dev
 	set_fixed(false);
 }
 
-READ8_MEMBER ( pc_joy_device::joy_port_r )
+uint8_t pc_joy_device::joy_port_r()
 {
 	int delta = ((machine().time() - m_stime) * 256 * 2325).seconds();
 
@@ -35,7 +35,7 @@ READ8_MEMBER ( pc_joy_device::joy_port_r )
 	return (m_dev->btn() << 4) | (m_dev->y2(delta) << 3) | (m_dev->x2(delta) << 2) | (m_dev->y1(delta) << 1) | m_dev->x1(delta);
 }
 
-WRITE8_MEMBER ( pc_joy_device::joy_port_w )
+void pc_joy_device::joy_port_w(uint8_t data)
 {
 	m_stime = machine().time();
 	if(!m_dev)
@@ -45,11 +45,11 @@ WRITE8_MEMBER ( pc_joy_device::joy_port_w )
 
 void pc_joy_device::device_config_complete()
 {
-	m_dev = dynamic_cast<device_pc_joy_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
 device_pc_joy_interface::device_pc_joy_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "pcjoy")
 {
 }
 

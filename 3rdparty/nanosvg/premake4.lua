@@ -14,7 +14,7 @@ solution "nanosvg"
 		targetdir("build")
 	 
 		configuration { "linux" }
-			 links { "X11","Xrandr", "rt", "GL", "GLU", "pthread" }
+			 links { "X11","Xrandr", "rt", "GL", "GLU", "pthread", "glfw" }
 
 		configuration { "windows" }
 			 links { "glu32","opengl32", "gdi32", "winmm", "user32" }

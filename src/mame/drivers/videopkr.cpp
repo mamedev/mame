@@ -264,7 +264,7 @@
 
   * Add Tech. Notes for Baby board, a reworked and improved version on Video Poker hardware.
   * Fix some missing pulses on mechanical counters.
-  * Fix the bug on bookeeping mode (videodad & videocba).
+  * Fix the bug on bookkeeping mode (videodad & videocba).
   * Figure out the undocumented jumper.
   * Hopper simulation.
   * Switch to resnet system.
@@ -282,11 +282,11 @@
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "babydad.lh"
 #include "babypkr.lh"
@@ -295,6 +295,8 @@
 #include "videodad.lh"
 #include "videopkr.lh"
 
+
+namespace {
 
 #define CPU_CLOCK       (XTAL(6'000'000))         /* main cpu clock */
 #define CPU_CLOCK_ALT   (XTAL(8'000'000))         /* alternative main cpu clock for newer games */
@@ -307,42 +309,41 @@ class videopkr_state : public driver_device
 public:
 	videopkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_data_ram(*this, "data_ram", 0x100, ENDIANNESS_LITTLE)
+		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_LITTLE)
+		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE)
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_aysnd(*this, "aysnd")
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void babypkr(machine_config &config);
-	void videodad(machine_config &config);
 	void videopkr(machine_config &config);
-	void fortune1(machine_config &config);
 	void blckjack(machine_config &config);
-	void bpoker(machine_config &config);
+	void videodad(machine_config &config);
+	void fortune1(machine_config &config);
 
-private:
-	DECLARE_READ8_MEMBER(videopkr_io_r);
-	DECLARE_WRITE8_MEMBER(videopkr_io_w);
-	DECLARE_READ8_MEMBER(videopkr_p1_data_r);
-	DECLARE_READ8_MEMBER(videopkr_p2_data_r);
-	DECLARE_WRITE8_MEMBER(videopkr_p1_data_w);
-	DECLARE_WRITE8_MEMBER(videopkr_p2_data_w);
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+//private:
+	uint8_t videopkr_io_r(offs_t offset);
+	void videopkr_io_w(offs_t offset, uint8_t data);
+	uint8_t videopkr_p1_data_r();
+	uint8_t videopkr_p2_data_r();
+	void videopkr_p1_data_w(uint8_t data);
+	void videopkr_p2_data_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
 	DECLARE_WRITE_LINE_MEMBER(prog_w);
-	DECLARE_READ8_MEMBER(sound_io_r);
-	DECLARE_WRITE8_MEMBER(sound_io_w);
-	DECLARE_READ8_MEMBER(sound_p2_r);
-	DECLARE_WRITE8_MEMBER(sound_p2_w);
-	DECLARE_READ8_MEMBER(baby_sound_p0_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p0_w);
-	DECLARE_READ8_MEMBER(baby_sound_p1_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
+	uint8_t sound_io_r();
+	void sound_io_w(uint8_t data);
+	uint8_t sound_p2_r();
+	void sound_p2_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void videopkr_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(vidadcba);
-	void babypkr_palette(palette_device &palette) const;
 	void fortune1_palette(palette_device &palette) const;
 	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
@@ -352,17 +353,10 @@ private:
 	void i8039_map(address_map &map);
 	void i8039_sound_mem(address_map &map);
 	void i8039_sound_port(address_map &map);
-	void i8051_sound_mem(address_map &map);
-	void i8051_sound_port(address_map &map);
-	void i8751_io_port(address_map &map);
-	void i8751_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
-	uint8_t m_data_ram[0x100];
-	uint8_t m_video_ram[0x0400];
-	uint8_t m_color_ram[0x0400];
+	memory_share_creator<uint8_t> m_data_ram;
+	memory_share_creator<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	uint16_t m_p1;
 	uint16_t m_p2;
 	uint8_t m_t0_latch;
@@ -389,14 +383,47 @@ private:
 	unsigned long m_count2;
 	unsigned long m_count3;
 	unsigned long m_count4;
-	uint8_t m_sbp0;
 	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	optional_device<ay8910_device> m_aysnd;
 	output_finder<28> m_digits;
 	output_finder<14> m_lamps;
+};
+
+
+class babypkr_state : public videopkr_state
+{
+public:
+	babypkr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: videopkr_state(mconfig, type, tag)
+		, m_aysnd(*this, "aysnd")
+		, m_top_lamps(*this, "TOP_%u", 1U)
+	{
+	}
+
+	void babypkr(machine_config &config);
+	void bpoker(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	uint8_t baby_sound_p0_r();
+	void baby_sound_p0_w(uint8_t data);
+	uint8_t baby_sound_p1_r();
+	void baby_sound_p3_w(uint8_t data);
+	void babypkr_palette(palette_device &palette) const;
+
+	void i8751_map(address_map &map);
+	void i8751_io_port(address_map &map);
+	void i8051_sound_mem(address_map &map);
+	void i8051_sound_port(address_map &map);
+
+	required_device<ay8910_device> m_aysnd;
+	output_finder<3> m_top_lamps;
+
+	uint8_t m_sbp0 = 0U;
 };
 
 
@@ -462,7 +489,7 @@ void videopkr_state::videopkr_palette(palette_device &palette) const
 	}
 }
 
-void videopkr_state::babypkr_palette(palette_device &palette) const
+void babypkr_state::babypkr_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 	for (int j = 0; j < palette.entries(); j++)
@@ -521,18 +548,18 @@ TILE_GET_INFO_MEMBER(videopkr_state::get_bg_tile_info)
 	int attr = m_color_ram[offs] + ioport("IN2")->read(); /* Color Switch Action */
 	int code = m_video_ram[offs];
 	int color = attr;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
 void videopkr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(videopkr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(videopkr_state,vidadcba)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(videopkr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
 
 
@@ -548,7 +575,7 @@ uint32_t videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_in
 *      R/W Handlers      *
 *************************/
 
-READ8_MEMBER(videopkr_state::videopkr_io_r)
+uint8_t videopkr_state::videopkr_io_r(offs_t offset)
 {
 	uint8_t valor = 0, hf, co;
 
@@ -628,7 +655,7 @@ READ8_MEMBER(videopkr_state::videopkr_io_r)
 	return valor;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_io_w)
+void videopkr_state::videopkr_io_w(offs_t offset, uint8_t data)
 {
 	switch (m_p2)
 	{
@@ -697,17 +724,17 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 	}
 }
 
-READ8_MEMBER(videopkr_state::videopkr_p1_data_r)
+uint8_t videopkr_state::videopkr_p1_data_r()
 {
 	return m_p1;
 }
 
-READ8_MEMBER(videopkr_state::videopkr_p2_data_r)
+uint8_t videopkr_state::videopkr_p2_data_r()
 {
 	return m_p2;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
+void videopkr_state::videopkr_p1_data_w(uint8_t data)
 {
 	m_p1 = data;
 
@@ -749,7 +776,7 @@ WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
 	m_ant_jckp = m_jckp;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_p2_data_w)
+void videopkr_state::videopkr_p2_data_w(uint8_t data)
 {
 	m_p2 = data;
 }
@@ -801,7 +828,7 @@ WRITE_LINE_MEMBER(videopkr_state::prog_w)
 
 */
 
-READ8_MEMBER(videopkr_state::sound_io_r)
+uint8_t videopkr_state::sound_io_r()
 {
 	switch (m_vp_sound_p2)
 	{
@@ -823,7 +850,7 @@ READ8_MEMBER(videopkr_state::sound_io_r)
 	return m_sound_latch;
 }
 
-WRITE8_MEMBER(videopkr_state::sound_io_w)
+void videopkr_state::sound_io_w(uint8_t data)
 {
 	if (m_vp_sound_p2 == 0x5f || m_vp_sound_p2 == 0xdf)
 	{
@@ -832,12 +859,12 @@ WRITE8_MEMBER(videopkr_state::sound_io_w)
 	}
 }
 
-READ8_MEMBER(videopkr_state::sound_p2_r)
+uint8_t videopkr_state::sound_p2_r()
 {
 	return m_vp_sound_p2;
 }
 
-WRITE8_MEMBER(videopkr_state::sound_p2_w)
+void videopkr_state::sound_p2_w(uint8_t data)
 {
 	m_vp_sound_p2 = data;
 
@@ -869,17 +896,17 @@ WRITE8_MEMBER(videopkr_state::sound_p2_w)
 
 /* Baby Sound Handlers */
 
-READ8_MEMBER(videopkr_state::baby_sound_p0_r)
+uint8_t babypkr_state::baby_sound_p0_r()
 {
 	return m_sbp0;
 }
 
-WRITE8_MEMBER(videopkr_state::baby_sound_p0_w)
+void babypkr_state::baby_sound_p0_w(uint8_t data)
 {
 	m_sbp0 = data;
 }
 
-READ8_MEMBER(videopkr_state::baby_sound_p1_r)
+uint8_t babypkr_state::baby_sound_p1_r()
 {
 	m_c_io = (m_p1 >> 5) & 1;
 	m_hp_1 = (~m_p24_data >> 6) & 1;
@@ -889,14 +916,11 @@ READ8_MEMBER(videopkr_state::baby_sound_p1_r)
 	return m_c_io | (m_hp_1 << 1) | (m_hp_2 << 2) | (m_bell << 3) | (m_aux3 << 4) | 0xe0;
 }
 
-WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
+void babypkr_state::baby_sound_p3_w(uint8_t data)
 {
-	uint8_t lmp_ports, ay_intf;
-	lmp_ports = data >> 1 & 0x07;
-
-	output().set_value("TOP_1", (lmp_ports >> 0) & 1);
-	output().set_value("TOP_2", (lmp_ports >> 1) & 1);
-	output().set_value("TOP_3", (lmp_ports >> 2) & 1);
+	m_top_lamps[0] = BIT(data, 1);
+	m_top_lamps[1] = BIT(data, 2);
+	m_top_lamps[2] = BIT(data, 3);
 
 	if (!(data & 0x10))
 	{
@@ -904,8 +928,7 @@ WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 		logerror("AY3-8910: Reset\n");
 	}
 
-	ay_intf = (data >> 5) & 0x07;
-
+	uint8_t ay_intf = (data >> 5) & 0x07;
 	switch (ay_intf)
 	{
 		case 0x00:  break;
@@ -947,19 +970,19 @@ void videopkr_state::i8039_io_port(address_map &map)
 	map(0x00, 0xff).rw(FUNC(videopkr_state::videopkr_io_r), FUNC(videopkr_state::videopkr_io_w));
 }
 
-void videopkr_state::i8751_map(address_map &map)
+void babypkr_state::i8751_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 }
 
-void videopkr_state::i8751_io_port(address_map &map)
+void babypkr_state::i8751_io_port(address_map &map)
 {
 	map(0x0000, 0x0fff).ram(); // NVRAM?
 	map(0x8000, 0x8000).noprw(); // ???
-	map(0x9000, 0x9000).writeonly(); // ???
+	map(0x9000, 0x9000).nopw(); // ???
 	map(0xa000, 0xbfff).ram(); // video RAM?
 	map(0xc000, 0xc003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf000, 0xf000).writeonly(); // ???
+	map(0xf000, 0xf000).nopw(); // ???
 }
 
 void videopkr_state::i8039_sound_mem(address_map &map)
@@ -973,12 +996,12 @@ void videopkr_state::i8039_sound_port(address_map &map)
 }
 
 
-void videopkr_state::i8051_sound_mem(address_map &map)
+void babypkr_state::i8051_sound_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 }
 
-void videopkr_state::i8051_sound_port(address_map &map)
+void babypkr_state::i8051_sound_port(address_map &map)
 {
 	map(0x0000, 0x1ff).ram();
 }
@@ -994,7 +1017,7 @@ static INPUT_PORTS_START( videopkr )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) PORT_NAME("Books")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Discard") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) PORT_NAME("Discard")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )
@@ -1103,7 +1126,7 @@ static INPUT_PORTS_START( babypkr )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) PORT_NAME("Books")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP ) PORT_NAME("Double / Discard") PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) PORT_NAME("Double / Discard")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel / Take")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )
@@ -1206,14 +1229,27 @@ void videopkr_state::machine_start()
 {
 	m_digits.resolve();
 	m_lamps.resolve();
+
 	m_vp_sound_p2 = 0xff;   /* default P2 latch value */
 	m_sound_latch = 0xff;   /* default sound data latch value */
 	m_p24_data = 0xff;
 	m_p1 = 0xff;
 	m_ant_cio = 0;
 	m_count0 = 0;
+	m_count1 = 0;
+	m_count2 = 0;
+	m_count3 = 0;
+	m_count4 = 0;
+	m_ant_jckp = 0;
 
 	subdevice<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
+}
+
+void babypkr_state::machine_start()
+{
+	videopkr_state::machine_start();
+
+	m_top_lamps.resolve();
 }
 
 /************************
@@ -1260,9 +1296,6 @@ void videopkr_state::videopkr(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.275);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -1295,8 +1328,19 @@ void videopkr_state::videodad(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 }
 
+void videopkr_state::fortune1(machine_config &config)
+{
+	videopkr(config);
 
-void videopkr_state::babypkr(machine_config &config)
+	/* basic machine hardware */
+	m_maincpu->set_clock(CPU_CLOCK_ALT);
+
+	/* video hardware */
+	subdevice<palette_device>("palette")->set_init(FUNC(videopkr_state::fortune1_palette));
+}
+
+
+void babypkr_state::babypkr(machine_config &config)
 {
 	videopkr(config);
 
@@ -1305,42 +1349,34 @@ void videopkr_state::babypkr(machine_config &config)
 
 	/* most likely romless or eprom */
 	i8031_device &soundcpu(I8031(config.replace(), m_soundcpu, CPU_CLOCK));
-	soundcpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8051_sound_mem);
-	soundcpu.set_addrmap(AS_IO, &videopkr_state::i8051_sound_port);
-	soundcpu.port_in_cb<0>().set(FUNC(videopkr_state::baby_sound_p0_r));
-	soundcpu.port_out_cb<0>().set(FUNC(videopkr_state::baby_sound_p0_w));
-	soundcpu.port_in_cb<1>().set(FUNC(videopkr_state::baby_sound_p1_r));
+	soundcpu.set_addrmap(AS_PROGRAM, &babypkr_state::i8051_sound_mem);
+	soundcpu.set_addrmap(AS_IO, &babypkr_state::i8051_sound_port);
+	soundcpu.port_in_cb<0>().set(FUNC(babypkr_state::baby_sound_p0_r));
+	soundcpu.port_out_cb<0>().set(FUNC(babypkr_state::baby_sound_p0_w));
+	soundcpu.port_in_cb<1>().set(FUNC(babypkr_state::baby_sound_p1_r));
 	soundcpu.port_out_cb<2>().set("dac", FUNC(dac_byte_interface::data_w));
-	soundcpu.port_out_cb<3>().set(FUNC(videopkr_state::baby_sound_p3_w));
+	soundcpu.port_out_cb<3>().set(FUNC(babypkr_state::baby_sound_p3_w));
 
 	/* video hardware */
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.set_size(32*16, 32*8);
 	screen.set_visarea(5*16, 31*16-1, 3*8, 29*8-1);
 
-	subdevice<palette_device>("palette")->set_init(FUNC(videopkr_state::babypkr_palette));
+	subdevice<palette_device>("palette")->set_init(FUNC(babypkr_state::babypkr_palette));
 	m_gfxdecode->set_info(gfx_videodad);
-	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
+	MCFG_VIDEO_START_OVERRIDE(babypkr_state,vidadcba)
 
-	AY8910(config, m_aysnd, CPU_CLOCK / 6).add_route(ALL_OUTPUTS, "speaker", 0.3); /* no ports used */
+	AY8910(config, m_aysnd, CPU_CLOCK / 6); // no ports used
+	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.3);
 }
 
-void videopkr_state::fortune1(machine_config &config)
-{
-	videopkr(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_clock(CPU_CLOCK_ALT);
-
-	subdevice<palette_device>("palette")->set_init(FUNC(videopkr_state::fortune1_palette));
-}
-
-void videopkr_state::bpoker(machine_config &config)
+void babypkr_state::bpoker(machine_config &config)
 {
 	babypkr(config);
+
 	i8751_device &maincpu(I8751(config.replace(), m_maincpu, XTAL(6'000'000)));
-	maincpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8751_map);
-	maincpu.set_addrmap(AS_IO, &videopkr_state::i8751_io_port);
+	maincpu.set_addrmap(AS_PROGRAM, &babypkr_state::i8751_map);
+	maincpu.set_addrmap(AS_IO, &babypkr_state::i8751_io_port);
 	maincpu.port_in_cb<0>().set_constant(0); // ???
 	maincpu.port_in_cb<1>().set_constant(0); // ???
 	maincpu.port_out_cb<1>().set_nop(); // ???
@@ -1569,6 +1605,9 @@ ROM_START( fortune1 )
 	ROM_LOAD( "3140-cap8.b8", 0x0000, 0x0100, CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
 ROM_END
 
+} // Anonymous namespace
+
+
 /*************************
 *      Game Drivers      *
 *************************/
@@ -1578,6 +1617,6 @@ GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, videopkr_state, empty_init,
 GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, empty_init, ROT0, "InterFlip",                           "Black Jack",                     0,                   layout_blckjack )
 GAMEL( 1987, videodad, videopkr, videodad, videodad, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Dado",                     0,                   layout_videodad )
 GAMEL( 1987, videocba, videopkr, videodad, videocba, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Cordoba",                  0,                   layout_videocba )
-GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  videopkr_state, empty_init, ROT0, "Recreativos Franco",                  "Baby Poker",                     0,                   layout_babypkr  )
-GAMEL( 1987, babydad,  videopkr, babypkr,  babydad,  videopkr_state, empty_init, ROT0, "Recreativos Franco",                  "Baby Dado",                      0,                   layout_babydad  )
-GAMEL( 198?, bpoker,   videopkr, bpoker,   babypkr,  videopkr_state, empty_init, ROT0, "Recreativos Franco",                  "Video Poker (v1403)",            MACHINE_NOT_WORKING, layout_babypkr  )
+GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  babypkr_state,  empty_init, ROT0, "Recreativos Franco",                  "Baby Poker",                     0,                   layout_babypkr  )
+GAMEL( 1987, babydad,  videopkr, babypkr,  babydad,  babypkr_state,  empty_init, ROT0, "Recreativos Franco",                  "Baby Dado",                      0,                   layout_babydad  )
+GAMEL( 198?, bpoker,   videopkr, bpoker,   babypkr,  babypkr_state,  empty_init, ROT0, "Recreativos Franco",                  "Video Poker (v1403)",            MACHINE_NOT_WORKING, layout_babypkr  )

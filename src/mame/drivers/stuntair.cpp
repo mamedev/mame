@@ -89,6 +89,7 @@ Bprom dump by f205v
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class stuntair_state : public driver_device
@@ -125,26 +126,26 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_bg_xscroll;
-	uint8_t m_nmi_enable;
-	uint8_t m_spritebank0;
-	uint8_t m_spritebank1;
+	uint8_t m_bg_xscroll = 0;
+	uint8_t m_nmi_enable = 0;
+	uint8_t m_spritebank0 = 0;
+	uint8_t m_spritebank1 = 0;
 
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
-	DECLARE_WRITE8_MEMBER(stuntair_bgram_w);
-	DECLARE_WRITE8_MEMBER(stuntair_bgattrram_w);
-	DECLARE_WRITE8_MEMBER(stuntair_bgxscroll_w);
+	void stuntair_fgram_w(offs_t offset, uint8_t data);
+	void stuntair_bgram_w(offs_t offset, uint8_t data);
+	void stuntair_bgattrram_w(offs_t offset, uint8_t data);
+	void stuntair_bgxscroll_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(spritebank0_w);
 	DECLARE_WRITE_LINE_MEMBER(spritebank1_w);
-	DECLARE_WRITE8_MEMBER(stuntair_coin_w);
-	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	void stuntair_coin_w(uint8_t data);
+	void stuntair_sound_w(uint8_t data);
+	void ay8910_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(stuntair_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -165,7 +166,7 @@ private:
 void stuntair_state::stuntair_palette(palette_device &palette) const
 {
 	// need resistor weights etc
-	uint8_t const *const color_prom = machine().root_device().memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{
@@ -191,7 +192,7 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 
 	// where does the FG palette come from? it's a 1bpp layer..
 
-	SET_TILE_INFO_MEMBER(0, tileno & 0x7f, 0, opaque ? TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
+	tileinfo.set(0, tileno & 0x7f, 0, opaque ? TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
 
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
@@ -200,16 +201,16 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
 	tileno |= (m_bgattrram[tile_index] & 0x08)<<5;
 	int colour = (m_bgattrram[tile_index] & 0x07);
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
+	tileinfo.set(1, tileno, colour, 0);
 }
 
 
 void stuntair_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stuntair_state::get_stuntair_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stuntair_state::get_stuntair_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -261,26 +262,26 @@ uint32_t stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-WRITE8_MEMBER(stuntair_state::stuntair_bgattrram_w)
+void stuntair_state::stuntair_bgattrram_w(offs_t offset, uint8_t data)
 {
 	m_bgattrram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_bgram_w)
+void stuntair_state::stuntair_bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_fgram_w)
+void stuntair_state::stuntair_fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER( stuntair_state::stuntair_bgxscroll_w )
+void stuntair_state::stuntair_bgxscroll_w(uint8_t data)
 {
 	m_bg_xscroll = data;
 }
@@ -304,7 +305,7 @@ WRITE_LINE_MEMBER(stuntair_state::nmi_enable_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
+void stuntair_state::stuntair_coin_w(uint8_t data)
 {
 	// lower 2 bits are coin counters, excluding 1st coin(?)
 	machine().bookkeeping().coin_counter_w(0, data >> 0 & 1);
@@ -316,7 +317,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
 }
 
 
-WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
+void stuntair_state::stuntair_sound_w(uint8_t data)
 {
 	// each command is written three times: with bit 7 set, then with bit 7 clear, then with bit 7 set again
 	// the 3 highest bits are ignored by the sound program
@@ -434,17 +435,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout tiles8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	8*8
-};
-
 static const gfx_layout tiles8x8x2_layout =
 {
 	8,8,
@@ -469,8 +459,8 @@ static const gfx_layout tiles16x8x2_layout =
 
 
 static GFXDECODE_START( gfx_stuntair )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout, 0xe0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,         0x100, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout,  0xe0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x8x2_layout, 0xe0, 8 )
 GFXDECODE_END
 
@@ -482,7 +472,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(stuntair_state::ay8910_portb_w)
+void stuntair_state::ay8910_portb_w(uint8_t data)
 {
 	// it writes $e8 and $f0 for music drums?
 	// possibly to discrete sound circuitry?

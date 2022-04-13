@@ -22,11 +22,11 @@
 ****************************************************************************
 
     Known bugs:
-        * still seems to be some glitchiness in the games in general
+        * pdriftl's comms don't work
 
 ****************************************************************************
 
-Network Board (used for Power Drift)
+Network Board (used for Power Drift: Link Version)
 -------------
 
 Board: 834-6740
@@ -64,9 +64,10 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 #include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
+#include "machine/segaic16.h"
 #include "machine/315_5296.h"
 #include "sound/segapcm.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "pdrift.lh"
@@ -103,7 +104,7 @@ ioport_value segaybd_state::analog_mux()
 //  output1_w - handle writes to I/O port D
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::output1_w)
+void segaybd_state::output1_w(uint8_t data)
 {
 	if (!m_output_cb1.isnull())
 		m_output_cb1(data);
@@ -114,7 +115,7 @@ WRITE8_MEMBER(segaybd_state::output1_w)
 //  misc_output_w - handle writes to I/O port E
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::misc_output_w)
+void segaybd_state::misc_output_w(uint8_t data)
 {
 	//
 	//  D7 = /KILL
@@ -139,14 +140,14 @@ WRITE8_MEMBER(segaybd_state::misc_output_w)
 //  output2_w - handle writes to I/O port H
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaybd_state::output2_w)
+void segaybd_state::output2_w(uint8_t data)
 {
 	if (!m_output_cb2.isnull())
 		m_output_cb2(data);
 
 	// D7 = /MUTE
 	// D6-D0 = FLT31-25
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 }
 
 
@@ -170,7 +171,7 @@ void segaybd_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -591,7 +592,7 @@ void segaybd_state::main_map(address_map &map)
 	map(0x080000, 0x080007).mirror(0x001ff8).rw("multiplier_main", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
 	map(0x082001, 0x082001).mirror(0x001ffe).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x084000, 0x08401f).mirror(0x001fe0).rw("divider_main", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
-//  AM_RANGE(0x086000, 0x087fff) /DEA0
+//  map(0x086000, 0x087fff) /DEA0
 	map(0x0c0000, 0x0cffff).ram().share("shareram");
 	map(0x100000, 0x10001f).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0x100040, 0x100047).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask16(0x00ff);
@@ -640,7 +641,7 @@ void segaybd_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -670,17 +671,17 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 }
 
 
-READ16_MEMBER(segaybd_state::link_r)
+uint16_t segaybd_state::link_r()
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(segaybd_state::link2_r)
+uint16_t segaybd_state::link2_r()
 {
 	return 0x0000;
 }
 
-WRITE16_MEMBER(segaybd_state::link2_w)
+void segaybd_state::link2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 	logerror("link2_w %04x\n", data);
@@ -704,7 +705,7 @@ void segaybd_state::link_map(address_map &map)
 }
 
 #if 0
-READ8_MEMBER(segaybd_state::link_portc0_r)
+uint8_t segaybd_state::link_portc0_r()
 {
 	return 0xf8;
 }
@@ -956,7 +957,7 @@ static INPUT_PORTS_START( pdrift )
 	PORT_INCLUDE( yboard_generic )
 
 	PORT_MODIFY("GENERAL")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
 
 	PORT_MODIFY("LIMITSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Safety Sensor Left")
@@ -1180,7 +1181,7 @@ static INPUT_PORTS_START( rchase )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_MODIFY("COINAGE")
+	PORT_MODIFY("COINAGE") // like with the other games, set all switches to 0x00 for Free Play
 	PORT_DIPNAME( 0x03, 0x03, "Coin to Credit" ) PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -1288,7 +1289,7 @@ void segaybd_state::yboard(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segaybd_state::sound_portmap);
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MB3773(config, "watchdog"); // IC95
 
@@ -1330,7 +1331,7 @@ void segaybd_state::yboard(machine_config &config)
 	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
-	PALETTE(config, m_palette).set_entries(8192*3);
+	PALETTE(config, m_palette).set_entries(8192*2);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -1398,8 +1399,9 @@ void segaybd_state::yboard_deluxe(machine_config &config)
 //*************************************************************************************************************************
 //  Galaxy Force 2 (World), Sega Y-board
 //  CPU: 68000 (317-????)
-//  GAME BD: 834-6614-02 GALAXY FORCE 2
-//
+//  GAME BD:  834-6614-02 GALAXY FORCE 2
+//  DRIVE BD: 839-0161
+
 ROM_START( gforce2 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
 	ROM_LOAD16_BYTE( "epr-11688.25",   0x000000, 0x20000, CRC(c845f2df) SHA1(17586a5f83170e99f28cd35b28e85e503e7bbe75) )
@@ -1412,6 +1414,10 @@ ROM_START( gforce2 )
 	ROM_REGION( 0x040000, "suby", 0 ) // Y
 	ROM_LOAD16_BYTE( "epr-11816b.54",   0x000000, 0x20000, CRC(317dd0c2) SHA1(7f1c7dcfb111385e2a94912975c2f9bfe78445ac) )
 	ROM_LOAD16_BYTE( "epr-11815b.53",   0x000001, 0x20000, CRC(f1fb22f1) SHA1(da3ce521b0a19b391913c35af34084d29edceca7) )
+
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11707.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11707a.ic37", 0x00000, 0x08000, NO_DUMP )
 
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "mpr-11467.16",   0x000000, 0x20000, CRC(6e60e736) SHA1(73086744cb2fe1ce162f851cb879755c21819b33) )
@@ -1486,6 +1492,10 @@ ROM_START( gforce2sd )
 	ROM_REGION( 0x040000, "suby", 0 ) // Y
 	ROM_LOAD16_BYTE( "epr-11816b.54",   0x000000, 0x20000, CRC(317dd0c2) SHA1(7f1c7dcfb111385e2a94912975c2f9bfe78445ac) )
 	ROM_LOAD16_BYTE( "epr-11815b.53",   0x000001, 0x20000, CRC(f1fb22f1) SHA1(da3ce521b0a19b391913c35af34084d29edceca7) )
+
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11707.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11707a.ic37", 0x00000, 0x08000, NO_DUMP )
 
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "mpr-11467.16",   0x000000, 0x20000, CRC(6e60e736) SHA1(73086744cb2fe1ce162f851cb879755c21819b33) )
@@ -1565,6 +1575,10 @@ ROM_START( gforce2ja )
 	ROM_LOAD16_BYTE( "epr-11690a.54",  0x000000, 0x20000, CRC(e18bc177) SHA1(3fb179c9074954fc9b64da1463f542d60a99ec84) )
 	ROM_LOAD16_BYTE( "epr-11689a.53",  0x000001, 0x20000, CRC(6010e63e) SHA1(00aa5e8516f094409a407744b84ef183393b8b19) )
 
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11707.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11707a.ic37", 0x00000, 0x08000, NO_DUMP )
+
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "mpr-11467.16",   0x000000, 0x20000, CRC(6e60e736) SHA1(73086744cb2fe1ce162f851cb879755c21819b33) )
 	ROM_LOAD16_BYTE( "mpr-11468.14",   0x000001, 0x20000, CRC(74ca9ca5) SHA1(c6f27ce43ef270088e6155c8240fd15afa5729fd) )
@@ -1640,6 +1654,10 @@ ROM_START( gforce2j )
 	ROM_LOAD16_BYTE( "epr-11513.54",   0x000000, 0x20000, CRC(e18bc177) SHA1(3fb179c9074954fc9b64da1463f542d60a99ec84) )
 	ROM_LOAD16_BYTE( "epr-11512.53",   0x000001, 0x20000, CRC(6010e63e) SHA1(00aa5e8516f094409a407744b84ef183393b8b19) )
 
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11707.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11707a.ic37", 0x00000, 0x08000, NO_DUMP )
+
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "mpr-11467.16",   0x000000, 0x20000, CRC(6e60e736) SHA1(73086744cb2fe1ce162f851cb879755c21819b33) )
 	ROM_LOAD16_BYTE( "mpr-11468.14",   0x000001, 0x20000, CRC(74ca9ca5) SHA1(c6f27ce43ef270088e6155c8240fd15afa5729fd) )
@@ -1707,7 +1725,8 @@ ROM_END
 //  CPU BD      837-7403
 //  VIDEO BD    837-7301-02
 //  GAME BD     834-7300-07 G-LOC
-//
+//  DRIVE BD:   839-0341
+
 ROM_START( gloc )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
 	ROM_LOAD16_BYTE( "epr-13172.25",  0x000000, 0x20000, CRC(75e7174c) SHA1(ef052a6973cf49267463a0c14e8c392a083c62fb) )
@@ -1722,6 +1741,9 @@ ROM_START( gloc )
 	ROM_REGION( 0x040000, "suby", 0 ) // Y
 	ROM_LOAD16_BYTE( "epr-13030.54",  0x000000, 0x20000, CRC(81abcabf) SHA1(cb4e817d66a7f384aa9757758c51cd1bf7347dd0) )
 	ROM_LOAD16_BYTE( "epr-13029.53",  0x000001, 0x20000, CRC(f3638efb) SHA1(f82a46fc8616cbe0235746161c587e54adecfe50) )
+
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11830.ic37",  0x00000, 0x8000, CRC(c1201c02) SHA1(3fc854f33631a65e499d581712c46b60b6f5b4c7) )
 
 	ROM_REGION16_BE( 0x200000, "bsprites", 0)
 	ROM_LOAD16_BYTE( "epr-13039.16",  0x000000, 0x80000, CRC(d7e1266d) SHA1(b0fc4cc60a7e876ae2af343bba6da3fb926ea9c5) )
@@ -1797,6 +1819,9 @@ ROM_START( glocu )
 	ROM_REGION( 0x040000, "suby", 0 ) // Y
 	ROM_LOAD16_BYTE( "epr-13030.54",  0x000000, 0x20000, CRC(81abcabf) SHA1(cb4e817d66a7f384aa9757758c51cd1bf7347dd0) )
 	ROM_LOAD16_BYTE( "epr-13029.53",  0x000001, 0x20000, CRC(f3638efb) SHA1(f82a46fc8616cbe0235746161c587e54adecfe50) )
+
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11830.ic37",  0x00000, 0x8000, CRC(c1201c02) SHA1(3fc854f33631a65e499d581712c46b60b6f5b4c7) )
 
 	ROM_REGION16_BE( 0x200000, "bsprites", 0)
 	ROM_LOAD16_BYTE( "epr-13039.16",  0x000000, 0x80000, CRC(d7e1266d) SHA1(b0fc4cc60a7e876ae2af343bba6da3fb926ea9c5) )
@@ -2007,7 +2032,8 @@ ROM_END
 //  CPU: 68000 (317-????)
 //   CPU BD POWER DRIFT   837-6695-08 (or 837-6695-09)
 //   VIDEO BD POWER DRIFT 837-6696-01 (or 837-6696-02)
-//
+//   DRIVE BD:            839-0213
+
 ROM_START( pdrift )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
 	ROM_LOAD16_BYTE( "epr-12017.25",  0x000000, 0x20000, CRC(31190322) SHA1(18df4bd6078b1c76c7061c05a476a7cbf7d0b37b) )
@@ -2022,6 +2048,9 @@ ROM_START( pdrift )
 	ROM_REGION( 0x040000, "suby", 0 ) // Y
 	ROM_LOAD16_BYTE( "epr-12019a.54", 0x000000, 0x20000, CRC(11188a30) SHA1(42dd0344d92529848b53a8cec4c145237ccd5b51) )
 	ROM_LOAD16_BYTE( "epr-12018a.53", 0x000001, 0x20000, CRC(1c582e1f) SHA1(c32d2f921554bddd7dedcb81e231aa91f50fa27b) )
+
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
 
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "epr-11789.16",  0x000000, 0x20000, CRC(b86f8d2b) SHA1(a053f2021841fd0ef89fd3f28050a698b36c435e) )
@@ -2071,11 +2100,11 @@ ROM_START( pdrift )
 
 	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASEFF )    // SegaPCM samples
 	ROM_LOAD( "mpr-11754.107",  0x000000, 0x80000, CRC(ebeb8484) SHA1(269f33cb1a9be126bada858e25291385d48686a2) )
-	ROM_LOAD( "epr-11756.105",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
+	ROM_LOAD( "epr-11756.106",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
 	ROM_RELOAD(                 0x0a0000, 0x20000 )
 	ROM_RELOAD(                 0x0c0000, 0x20000 )
 	ROM_RELOAD(                 0x0e0000, 0x20000 )
-	ROM_LOAD( "epr-11755.106",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
+	ROM_LOAD( "epr-11755.105",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
 	ROM_RELOAD(                 0x120000, 0x20000 )
 	ROM_RELOAD(                 0x140000, 0x20000 )
 	ROM_RELOAD(                 0x160000, 0x20000 )
@@ -2106,6 +2135,9 @@ ROM_START( pdrifta )
 	ROM_LOAD16_BYTE( "epr-12019.54", 0x000000, 0x20000, CRC(e514d7b6) SHA1(27ae99f5f3e8d2f248916f7a252e2c0686638df5) )
 	ROM_LOAD16_BYTE( "epr-12018.53", 0x000001, 0x20000, CRC(0a3f7faf) SHA1(fe20a164a7a2c9e9bf0e7aade75b0488bdc93d79) )
 
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
+
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "epr-11789.16",  0x000000, 0x20000, CRC(b86f8d2b) SHA1(a053f2021841fd0ef89fd3f28050a698b36c435e) )
 	ROM_LOAD16_BYTE( "epr-11791.14",  0x000001, 0x20000, CRC(36b2910a) SHA1(9948b91837f944a7a606542fa685525e74bbe398) )
@@ -2154,11 +2186,11 @@ ROM_START( pdrifta )
 
 	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASEFF )    // SegaPCM samples
 	ROM_LOAD( "mpr-11754.107",  0x000000, 0x80000, CRC(ebeb8484) SHA1(269f33cb1a9be126bada858e25291385d48686a2) )
-	ROM_LOAD( "epr-11756.105",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
+	ROM_LOAD( "epr-11756.106",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
 	ROM_RELOAD(                 0x0a0000, 0x20000 )
 	ROM_RELOAD(                 0x0c0000, 0x20000 )
 	ROM_RELOAD(                 0x0e0000, 0x20000 )
-	ROM_LOAD( "epr-11755.106",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
+	ROM_LOAD( "epr-11755.105",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
 	ROM_RELOAD(                 0x120000, 0x20000 )
 	ROM_RELOAD(                 0x140000, 0x20000 )
 	ROM_RELOAD(                 0x160000, 0x20000 )
@@ -2190,6 +2222,9 @@ ROM_START( pdrifte )
 	ROM_LOAD16_BYTE( "epr-11903.54",  0x000000, 0x20000, CRC(d004f411) SHA1(212a985275647fae24b580ebaffc1230c06318ac) )
 	ROM_LOAD16_BYTE( "epr-11902.53",  0x000001, 0x20000, CRC(e8028e08) SHA1(de4ee5011e9552e624b6223e0e1ef00bc271a811) )
 
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
+
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "epr-11789.16",  0x000000, 0x20000, CRC(b86f8d2b) SHA1(a053f2021841fd0ef89fd3f28050a698b36c435e) )
 	ROM_LOAD16_BYTE( "epr-11791.14",  0x000001, 0x20000, CRC(36b2910a) SHA1(9948b91837f944a7a606542fa685525e74bbe398) )
@@ -2238,11 +2273,11 @@ ROM_START( pdrifte )
 
 	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASEFF )    // SegaPCM samples
 	ROM_LOAD( "mpr-11754.107",  0x000000, 0x80000, CRC(ebeb8484) SHA1(269f33cb1a9be126bada858e25291385d48686a2) )
-	ROM_LOAD( "epr-11756.105",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
+	ROM_LOAD( "epr-11756.106",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
 	ROM_RELOAD(                 0x0a0000, 0x20000 )
 	ROM_RELOAD(                 0x0c0000, 0x20000 )
 	ROM_RELOAD(                 0x0e0000, 0x20000 )
-	ROM_LOAD( "epr-11755.106",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
+	ROM_LOAD( "epr-11755.105",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
 	ROM_RELOAD(                 0x120000, 0x20000 )
 	ROM_RELOAD(                 0x140000, 0x20000 )
 	ROM_RELOAD(                 0x160000, 0x20000 )
@@ -2260,6 +2295,7 @@ ROM_END
 //  CPU: 68000 (317-????)
 //   CPU BD POWER DRIFT   837-6695-08 (or 837-6695-09)
 //   VIDEO BD POWER DRIFT 837-6696-01 (or 837-6696-02)
+//                GAME BD 834-6697-02 POWER DRIFT
 //
 ROM_START( pdriftj )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
@@ -2275,6 +2311,9 @@ ROM_START( pdriftj )
 	ROM_REGION( 0x040000, "suby", 0 ) // Y
 	ROM_LOAD16_BYTE( "epr-11750b.54", 0x000000, 0x20000, CRC(bc14ce30) SHA1(9bbadee0946e0abaac4f0d2625ba5550f11fa8a9) )
 	ROM_LOAD16_BYTE( "epr-11749b.53", 0x000001, 0x20000, CRC(9e385568) SHA1(74e22eaed645cc80b1eb0c52912186066e58b9d2) )
+
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
 
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "epr-11789.16",  0x000000, 0x20000, CRC(b86f8d2b) SHA1(a053f2021841fd0ef89fd3f28050a698b36c435e) )
@@ -2324,11 +2363,11 @@ ROM_START( pdriftj )
 
 	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASEFF )    // SegaPCM samples
 	ROM_LOAD( "mpr-11754.107",  0x000000, 0x80000, CRC(ebeb8484) SHA1(269f33cb1a9be126bada858e25291385d48686a2) )
-	ROM_LOAD( "epr-11756.105",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
+	ROM_LOAD( "epr-11756.106",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
 	ROM_RELOAD(                 0x0a0000, 0x20000 )
 	ROM_RELOAD(                 0x0c0000, 0x20000 )
 	ROM_RELOAD(                 0x0e0000, 0x20000 )
-	ROM_LOAD( "epr-11755.106",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
+	ROM_LOAD( "epr-11755.105",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
 	ROM_RELOAD(                 0x120000, 0x20000 )
 	ROM_RELOAD(                 0x140000, 0x20000 )
 	ROM_RELOAD(                 0x160000, 0x20000 )
@@ -2360,6 +2399,9 @@ ROM_START(pdriftl)
 	ROM_REGION(0x040000, "suby", 0) // Y
 	ROM_LOAD16_BYTE("epr-12109.54", 0x000000, 0x20000, CRC(256350b8) SHA1(72b05d3583d63766690fed4827ec586e832168d1) )
 	ROM_LOAD16_BYTE("epr-12108.53", 0x000001, 0x20000, CRC(a3a56771) SHA1(f41d466f31a1b833d21a7011314c48d5056409eb) )
+
+	ROM_REGION( 0x08000, "drive_board", 0 )
+	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
 
 	ROM_REGION16_BE(0x080000, "bsprites", 0)
 	ROM_LOAD16_BYTE("epr-12114.16", 0x000000, 0x20000, CRC(8b07e8eb) SHA1(22a4aff968d6de52372b7b2b5322d353f7b835ef) )
@@ -2409,11 +2451,11 @@ ROM_START(pdriftl)
 
 	ROM_REGION(0x200000, "pcm", ROMREGION_ERASEFF)    // SegaPCM samples
 	ROM_LOAD("mpr-11754.107", 0x000000, 0x80000, CRC(ebeb8484) SHA1(269f33cb1a9be126bada858e25291385d48686a2) )
-	ROM_LOAD("epr-11756.105", 0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
+	ROM_LOAD("epr-11756.106", 0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
 	ROM_RELOAD(               0x0a0000, 0x20000)
 	ROM_RELOAD(               0x0c0000, 0x20000)
 	ROM_RELOAD(               0x0e0000, 0x20000)
-	ROM_LOAD("epr-11755.106", 0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
+	ROM_LOAD("epr-11755.105", 0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
 	ROM_RELOAD(               0x120000, 0x20000)
 	ROM_RELOAD(               0x140000, 0x20000)
 	ROM_RELOAD(               0x160000, 0x20000)
@@ -2790,7 +2832,7 @@ GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, init_pd
 GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_pdrift)
 
 GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )

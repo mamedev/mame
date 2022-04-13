@@ -16,6 +16,11 @@ All rights reserved.
 
 */
 
+#ifdef __sun
+#undef SEC
+#undef op
+#endif
+
 class g65816_disassembler : public util::disasm_interface
 {
 public:
@@ -71,6 +76,7 @@ private:
 		const char *name() const;
 		bool is_call() const;
 		bool is_return() const;
+		bool is_cond() const;
 	};
 
 	static const char *const s_opnames[];

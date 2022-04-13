@@ -60,17 +60,17 @@ private:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 
-	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
-	DECLARE_READ16_MEMBER(pckgaldx_protection_r);
-	DECLARE_WRITE16_MEMBER(pktgaldx_oki_bank_w);
+	uint16_t pckgaldx_unknown_r();
+	uint16_t pckgaldx_protection_r();
+	void pktgaldx_oki_bank_w(uint16_t data);
 	virtual void machine_start() override;
 	uint32_t screen_update_pktgaldx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pktgaldb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	READ16_MEMBER( pktgaldx_protection_region_f_104_r );
-	WRITE16_MEMBER( pktgaldx_protection_region_f_104_w );
+	uint16_t pktgaldx_protection_region_f_104_r(offs_t offset);
+	void pktgaldx_protection_region_f_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER( vblank_w );
-	DECLARE_WRITE16_MEMBER( vblank_ack_w );
+	void vblank_ack_w(uint16_t data);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	void decrypted_opcodes_map(address_map &map);

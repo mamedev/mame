@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -17,7 +18,7 @@
 
 // ======================> dynax_blitter_rev2_device
 
-class dynax_blitter_rev2_device : public device_t, public device_rom_interface
+class dynax_blitter_rev2_device : public device_t, public device_rom_interface<20>
 {
 public:
 	// construction/destruction
@@ -30,8 +31,8 @@ public:
 	auto ready_cb() { return m_ready_cb.bind(); }
 
 	// write handlers
-	DECLARE_WRITE8_MEMBER(pen_w);
-	virtual DECLARE_WRITE8_MEMBER(regs_w);
+	void pen_w(uint8_t data);
+	virtual void regs_w(offs_t offset, uint8_t data);
 
 	// getter
 	u8 blit_pen() const { return m_blit_pen; }
@@ -60,12 +61,12 @@ protected:
 	devcb_write_line m_ready_cb;
 
 	// internal registers
-	u8 m_blit_pen;
-	u8 m_blit_wrap_enable;
-	u8 m_blit_x;
-	u8 m_blit_y;
-	u8 m_blit_flags;
-	u32 m_blit_src;
+	u8 m_blit_pen = 0;
+	u8 m_blit_wrap_enable = 0;
+	u8 m_blit_x = 0;
+	u8 m_blit_y = 0;
+	u8 m_blit_flags = 0;
+	u32 m_blit_src = 0;
 };
 
 // ======================> cdracula_blitter_device
@@ -79,8 +80,8 @@ public:
 	auto blit_dest_cb() { return m_blit_dest_cb.bind(); }
 
 	// write handlers
-	DECLARE_WRITE8_MEMBER(flags_w);
-	virtual DECLARE_WRITE8_MEMBER(regs_w) override;
+	void flags_w(uint8_t data);
+	virtual void regs_w(offs_t offset, uint8_t data) override;
 
 private:
 	// device-level overrides

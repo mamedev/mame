@@ -13,45 +13,51 @@ Guru Readme for Namco System 10 Hardware
 Note! This document is a Work-In-Progress and will be updated from time to time when more dumps are available.
 
 This document covers all the known Namco System 10 games, including....
-*Drum Master                                       (C) Namco, 2001
-*Drum Master 2                                     (C) Namco, 2001
-*Drum Master 3                                     (C) Namco, 2002
-*Drum Master 4                                     (C) Namco, 2003
-*Drum Master 5                                     (C) Namco, 2003
-*Drum Master 6                                     (C) Namco, 2004
-*Drum Master 7                                     (C) Namco, 2005
-GAHAHA Ippatsu-dou (GID2 Ver.A)                    (C) Namco/Metro, 2000
-GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                  (C) Namco/Metro, 2001
-Gamshara (10021 Ver.A)                             (C) Mitchell, 2003
-Gekitoride-Jong Space (10011 Ver.A)                (C) Namco/Metro, 2001
-Golgo 13 Juusei no Chinkonka (GLT1 Ver.A)          (C) Namco/8ing/Raizing, 2001
-Gunbalina (GNN1 Ver. A)                            (C) Namco, 2000
-*Hard Puncher Hajime no Ippo 2 Ouja e no Chousen   (C) Namco/Taito, 2002
-*Honne Hakkenki                                    (C) Namco, 2001
-Kotoba no Puzzle Mojipittan (KPM1 Ver.A)           (C) Namco, 2001
-*Kurukuru Food                                     (C) Namco, 2002
-Mr Driller 2 (DR21 Ver.A)                          (C) Namco, 2000
-Mr Driller 2 (DR22 Ver.A)                          (C) Namco, 2000
-Mr Driller G (DRG1 Ver.A)                          (C) Namco, 2001
-NFL Classic Football (NCF3 Ver.A)                  (C) Namco, 2003
-Panicuru Panekuru (PPA1 Ver.A)                     (C) Namco, 2001
-*Photo Battle                                      (C) Namco, 2001
-Point Blank 3 (GNN2 Ver. A)                        (C) Namco, 2000
-*Ren-ai Quiz High School Angel                     (C) Namco, 2002
-Seishun Quiz Colorful High School (CHS1 Ver.A)     (C) Namco, 2002
-Sekai Kaseki Hakken (Japan, SKH1 Ver.A)            (C) Namco, 2004
-Shamisen Brothers                                  (C) Kato/Konami, 2003
-Star Trigon (STT1 Ver.A)                           (C) Namco, 2002
-*Taiko No Tatsujin                                 (C) Namco, 2001
-Taiko No Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
-Taiko No Tatsujin 3 (TK31 Ver.A)                   (C) Namco, 2002
-Taiko No Tatsujin 4 (TK41 Ver.A)                   (C) Namco, 2003
-Taiko No Tatsujin 5 (TK51 Ver.A)                   (C) Namco, 2003
-Taiko No Tatsujin 6 (TK61 Ver.A)                   (C) Namco, 2004
-Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)    (C) Namco/Metro, 2002
-Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
+*Drum Master                                                     (C) Namco, 2001
+*Drum Master 2                                                   (C) Namco, 2001
+*Drum Master 3                                                   (C) Namco, 2002
+*Drum Master 4                                                   (C) Namco, 2003
+*Drum Master 5                                                   (C) Namco, 2003
+*Drum Master 6                                                   (C) Namco, 2004
+*Drum Master 7                                                   (C) Namco, 2005
+GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro, 2000
+GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
+Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
+Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja (GYM1 Ver.A) (C) Namco, 2007
+Gekitoride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
+Golgo 13 Juusei no Chinkonka (GLT1 Ver.A)                        (C) Namco/8ing/Raizing, 2001
+Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
+*Hard Puncher Hajime no Ippo 2 Ouja e no Chousen                 (C) Namco/Taito, 2002
+*Honne Hakkenki                                                  (C) Namco, 2001
+Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu! (KRG1 Ver.A)     (C) Namco, 2006
+**Knock Down 2001                                                (C) Namco, 2001
+Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                         (C) Namco, 2001
+*Kurukuru Food                                                   (C) Namco, 2002
+Mr Driller 2 (DR21 Ver.A)                                        (C) Namco, 2000
+Mr Driller 2 (DR22 Ver.A)                                        (C) Namco, 2000
+Mr Driller G (DRG1 Ver.A)                                        (C) Namco, 2001
+NFL Classic Football (NCF3 Ver.A)                                (C) Namco, 2003
+Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
+Panicuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
+*Photo Battle                                                    (C) Namco, 2001
+Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
+*Ren-ai Quiz High School Angel                                   (C) Namco, 2002
+Seishun Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
+Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
+Shamisen Brothers                                                (C) Kato/Konami, 2003
+Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
+*Taiko no Tatsujin                                               (C) Namco, 2001
+Taiko no Tatsujin 2 (TK21 Ver.C)                                 (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A)                                 (C) Namco, 2002
+Taiko no Tatsujin 4 (TK41 Ver.A)                                 (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A)                                 (C) Namco, 2003
+Taiko no Tatsujin 6 (TK61 Ver.A)                                 (C) Namco, 2004
+Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
+Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
+Unknown medal (?) game (MTL1 SPR0B)                              (C) ?,     200?
 
 * - denotes not dumped yet.
+** - denotes incomplete dump.
 
 The Namco System 10 system comprises 2 or 3 PCB's....
 MAIN PCB - This is the mother board PCB. It holds the main CPU/GPU & SPU and all sound circuitry, program & video RAM,
@@ -259,26 +265,31 @@ Notes:
 
 This PCB is used on:
 
-                                      MEM PCB
-Game                                  Sticker       KEYCUS   ROMs Populated       CD            Notes
-----------------------------------------------------------------------------------------------------------------------------------------------
-Gamshara                              10021 Ver.A   KC020A   8E, 8D               N/A
-Gekitoride-Jong Space                 10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
-Gunbalina                             GNN1  Ver.A   KC002A   8E, 8D               N/A           see note 3
-Kono Tako                             10021 Ver.A   KC034A   8E, 8D               N/A
-Kotoba no Puzzle Mojipittan           KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
-Mr Driller G                          DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
-NFL Classic Football                  NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A
-Panicuru Panekuru                     PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
-Point Blank 3                         GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
-Sekai Kaseki Hakken                   SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
-Star Trigon                           STT1  Ver.A   KC019A   8E, 8D               N/A
-Taiko No Tatsujin 2                   TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
-Taiko No Tatsujin 3                   TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
-Taiko No Tatsujin 4                   TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
-Taiko No Tatsujin 5                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
-Taiko No Tatsujin 6                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
-Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
+                                                    MEM PCB
+Game                                                Sticker       KEYCUS   ROMs Populated       CD            Notes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Gamshara                                            10021 Ver.A   KC020A   8E, 8D               N/A
+Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja GYM1  Ver.A   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
+Gekitoride-Jong Space                               10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
+Gunbalina                                           GNN1  Ver.A   KC002A   8E, 8D               N/A           see note 3
+Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu!     KRG1  Ver.A   KC047A1  8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
+Knock Down 2001                                     KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
+Kono Tako                                           10021 Ver.A   KC034A   8E, 8D               N/A
+Kotoba no Puzzle Mojipittan                         KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
+Mr Driller G                                        DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
+NFL Classic Football                                NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A
+Pacman Ball                                         PMB2  Ver.A   KC026A   8E, 8D               N/A
+Panicuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
+Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
+Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A
+Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
+Taiko no Tatsujin 3                                 TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
+Taiko no Tatsujin 4                                 TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
+Taiko no Tatsujin 5                                 TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
+Taiko no Tatsujin 6                                 TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
+Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
+unknown medal (?) game                              MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
 
       Notes:
       1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
@@ -388,7 +399,7 @@ Notes:
 
 This PCB is required by Point Blank 3 since it controls the gun opto signal. Only the CPLD and J8 and some minor
 logic and other small support parts are populated.
-This PCB has been found almost fully populated (minus J6) on some Taiko no Tatsujin games (TK51/TK61) but not
+This PCB has been found almost fully populated (minus J6) on some Taiko no Tatsujin games (TK51/TK61) (and on Knock Down 2001) but not
 earlier TK games, so it appears to be optional or is only used by the later TK51 and TK61 games.
 */
 
@@ -396,22 +407,32 @@ earlier TK games, so it appears to be optional or is only used by the later TK51
 #include "machine/ns10crypt.h"
 
 #include "cpu/psx/psx.h"
+#include "cpu/tlcs900/tmp95c061.h"
 #include "machine/ram.h"
+//#include "sound/spu.h"
 #include "video/psx.h"
 #include "screen.h"
 #include "speaker.h"
 
 
+namespace {
+
 class namcos10_state : public driver_device
 {
 public:
 	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_exio_mcu(*this, "exio_mcu")
+		, m_memp3_mcu(*this, "memp3_mcu")
+		, decrypter(*this, "decrypter")
+	{ }
 
 	void namcos10_base(machine_config &config);
 	void namcos10_memm(machine_config &config);
 	void namcos10_memn(machine_config &config);
+	void namcos10_memn_exio(machine_config &config);
+	void namcos10_memp3(machine_config &config);
 	void ns10_konotako(machine_config &config);
 	void ns10_mrdrilr2(machine_config &config);
 	void ns10_knpuzzle(machine_config &config);
@@ -433,34 +454,38 @@ public:
 	void init_chocovdr();
 	void init_konotako();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	// memm variant interface
-	DECLARE_WRITE16_MEMBER(crypto_switch_w);
-	DECLARE_READ16_MEMBER(range_r);
-	DECLARE_WRITE16_MEMBER(bank_w);
+	void crypto_switch_w(uint16_t data);
+	uint16_t range_r(offs_t offset);
+	void bank_w(offs_t offset, uint16_t data);
 
 	// memn variant interface
-	DECLARE_READ16_MEMBER(nand_status_r);
-	DECLARE_WRITE8_MEMBER(nand_address1_w);
-	DECLARE_WRITE8_MEMBER(nand_address2_w);
-	DECLARE_WRITE8_MEMBER(nand_address3_w);
-	DECLARE_WRITE8_MEMBER(nand_address4_w);
-	DECLARE_READ16_MEMBER(nand_data_r);
-	DECLARE_WRITE16_MEMBER(nand_block_w);
-	DECLARE_READ16_MEMBER(nand_block_r);
+	uint16_t nand_status_r();
+	void nand_address1_w(uint8_t data);
+	void nand_address2_w(uint8_t data);
+	void nand_address3_w(uint8_t data);
+	void nand_address4_w(uint8_t data);
+	uint16_t nand_data_r();
+	void nand_block_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t nand_block_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER (control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
+	uint16_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER (i2c_clock_r);
-	DECLARE_WRITE16_MEMBER(i2c_clock_w);
-	DECLARE_READ16_MEMBER (i2c_data_r);
-	DECLARE_WRITE16_MEMBER(i2c_data_w);
+	uint16_t i2c_clock_r();
+	void i2c_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t i2c_data_r();
+	void i2c_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER (sprot_r);
-	DECLARE_WRITE16_MEMBER(sprot_w);
+	uint16_t sprot_r();
+	void sprot_w(uint16_t data);
 
-	uint8_t *nand_base;
+	uint8_t *nand_base = nullptr;
 	void nand_copy( uint32_t *dst, uint32_t address, int len );
 
 	void namcos10_map(address_map &map);
@@ -474,26 +499,33 @@ private:
 		I2CP_RECIEVE_ACK_0
 	};
 
-	uint32_t bank_base;
-	uint32_t nand_address;
-	uint16_t block[0x1ff];
-	ns10_decrypter_device* decrypter;
+	uint32_t bank_base = 0;
+	uint32_t nand_address = 0;
+	uint16_t block[0x1ff]{};
 
-	uint16_t i2c_host_clock, i2c_host_data, i2c_dev_clock, i2c_dev_data, i2c_prev_clock, i2c_prev_data;
-	int i2cp_mode;
-	uint8_t i2c_byte;
-	int i2c_bit;
+	uint16_t i2c_host_clock = 0, i2c_host_data = 0, i2c_dev_clock = 0, i2c_dev_data = 0, i2c_prev_clock = 0, i2c_prev_data = 0;
+	int i2cp_mode = 0;
+	uint8_t i2c_byte = 0;
+	int i2c_bit = 0;
 
-	int sprot_bit, sprot_byte;
+	int sprot_bit = 0, sprot_byte = 0;
 	uint16_t nand_read( uint32_t address );
 	uint16_t nand_read2( uint32_t address );
 
 	void i2c_update();
 
-	DECLARE_MACHINE_RESET(namcos10);
 	void memn_driver_init(  );
 	required_device<psxcpu_device> m_maincpu;
+	optional_device<tmp95c061_device> m_exio_mcu;
+	optional_device<tmp95c061_device> m_memp3_mcu;
+	optional_device<ns10_decrypter_device> decrypter;
 };
+
+
+void namcos10_state::machine_start()
+{
+	nand_address = 0;
+}
 
 
 void namcos10_state::namcos10_map(address_map &map)
@@ -518,10 +550,10 @@ void namcos10_state::namcos10_map(address_map &map)
 // bios copies 62000-37ffff from the flash to 80012000 in ram through the
 // decryption in range_r then jumps there
 
-WRITE16_MEMBER(namcos10_state::crypto_switch_w)
+void namcos10_state::crypto_switch_w(uint16_t data)
 {
 	printf("crypto_switch_w: %04x\n", data);
-	if (decrypter == nullptr)
+	if (!decrypter.found())
 		return;
 
 	if (BIT(data, 15) != 0)
@@ -530,16 +562,16 @@ WRITE16_MEMBER(namcos10_state::crypto_switch_w)
 		decrypter->deactivate();
 }
 
-WRITE16_MEMBER(namcos10_state::bank_w)
+void namcos10_state::bank_w(offs_t offset, uint16_t data)
 {
 	bank_base = 0x100000 * offset;
 }
 
-READ16_MEMBER(namcos10_state::range_r)
+uint16_t namcos10_state::range_r(offs_t offset)
 {
 	uint16_t data = ((const uint16_t *)(memregion("maincpu:rom")->base()))[bank_base+offset];
 
-	if (decrypter == nullptr)
+	if (!decrypter.found())
 		return data;
 
 	if (decrypter->is_active())
@@ -548,7 +580,7 @@ READ16_MEMBER(namcos10_state::range_r)
 		return data;
 }
 
-READ16_MEMBER(namcos10_state::control_r)
+uint16_t namcos10_state::control_r(offs_t offset)
 {
 	logerror("%s: control_r %d (%x)\n", machine().describe_context(), offset);
 	if(offset == 2)
@@ -556,12 +588,12 @@ READ16_MEMBER(namcos10_state::control_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos10_state::control_w)
+void namcos10_state::control_w(offs_t offset, uint16_t data)
 {
 	logerror("%s: control_w %d, %04x (%x)\n", machine().describe_context(), offset, data);
 }
 
-WRITE16_MEMBER(namcos10_state::sprot_w)
+void namcos10_state::sprot_w(uint16_t data)
 {
 	logerror("%s: sprot_w %04x (%x)\n", machine().describe_context(), data);
 	sprot_bit = 7;
@@ -576,7 +608,7 @@ WRITE16_MEMBER(namcos10_state::sprot_w)
 // 800128e0: jal 1649c
 // 800128e8: jal 2c47c
 
-READ16_MEMBER(namcos10_state::sprot_r)
+uint16_t namcos10_state::sprot_r()
 {
 	// If line 3 has 0x30/0x31 in it, something happens.  That
 	// something currently kills the system though.
@@ -599,7 +631,7 @@ READ16_MEMBER(namcos10_state::sprot_r)
 	return res;
 }
 
-READ16_MEMBER(namcos10_state::i2c_clock_r)
+uint16_t namcos10_state::i2c_clock_r()
 {
 	uint16_t res = i2c_dev_clock & i2c_host_clock & 1;
 	//  logerror("i2c_clock_r %d (%x)\n", res, m_maincpu->pc());
@@ -607,14 +639,14 @@ READ16_MEMBER(namcos10_state::i2c_clock_r)
 }
 
 
-WRITE16_MEMBER(namcos10_state::i2c_clock_w)
+void namcos10_state::i2c_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&i2c_host_clock);
 	//  logerror("i2c_clock_w %d (%x)\n", data, m_maincpu->pc());
 	i2c_update();
 }
 
-READ16_MEMBER(namcos10_state::i2c_data_r)
+uint16_t namcos10_state::i2c_data_r()
 {
 	uint16_t res = i2c_dev_data & i2c_host_data & 1;
 	//  logerror("i2c_data_r %d (%x)\n", res, m_maincpu->pc());
@@ -622,7 +654,7 @@ READ16_MEMBER(namcos10_state::i2c_data_r)
 }
 
 
-WRITE16_MEMBER(namcos10_state::i2c_data_w)
+void namcos10_state::i2c_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&i2c_host_data);
 	//  logerror("i2c_data_w %d (%x)\n", data, m_maincpu->pc());
@@ -698,30 +730,30 @@ void namcos10_state::namcos10_memm_map(address_map &map)
 // Block access to the nand.  Something strange is going on with the
 // status port.  Interaction with the decryption is unclear at best.
 
-READ16_MEMBER(namcos10_state::nand_status_r )
+uint16_t namcos10_state::nand_status_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(namcos10_state::nand_address1_w )
+void namcos10_state::nand_address1_w(uint8_t data)
 {
 	logerror("%s: nand_a1_w %08x (%08x)\n", machine().describe_context(), data);
 	//  nand_address = ( nand_address & 0x00ffffff ) | ( data << 24 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address2_w )
+void namcos10_state::nand_address2_w(uint8_t data)
 {
 	logerror("%s: nand_a2_w %08x (%08x)\n", machine().describe_context(), data);
 	nand_address = ( nand_address & 0xffffff00 ) | ( data << 0 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address3_w )
+void namcos10_state::nand_address3_w(uint8_t data)
 {
 	logerror("%s: nand_a3_w %08x (%08x)\n", machine().describe_context(), data);
 	nand_address = ( nand_address & 0xffff00ff ) | ( data <<  8 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address4_w )
+void namcos10_state::nand_address4_w(uint8_t data)
 {
 	nand_address = ( nand_address & 0xff00ffff ) | ( data << 16 );
 	logerror("%s: nand_a4_w %08x (%08x) -> %08x\n", machine().describe_context(), data, nand_address*2);
@@ -739,7 +771,7 @@ uint16_t namcos10_state::nand_read2( uint32_t address )
 	return nand_base[ index + 1 ] | ( nand_base[ index ] << 8 );
 }
 
-READ16_MEMBER( namcos10_state::nand_data_r )
+uint16_t namcos10_state::nand_data_r()
 {
 	uint16_t data = nand_read2( nand_address * 2 );
 
@@ -750,7 +782,7 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 /*  printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;
 
-	if (decrypter == nullptr)
+	if (!decrypter.found())
 		return data;
 
 	if (decrypter->is_active())
@@ -769,12 +801,12 @@ void namcos10_state::nand_copy( uint32_t *dst, uint32_t address, int len )
 	}
 }
 
-WRITE16_MEMBER(namcos10_state::nand_block_w)
+void namcos10_state::nand_block_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &block[offset] );
 }
 
-READ16_MEMBER(namcos10_state::nand_block_r)
+uint16_t namcos10_state::nand_block_r(offs_t offset)
 {
 	return block[ offset ];
 }
@@ -798,7 +830,6 @@ void namcos10_state::memn_driver_init(  )
 {
 	uint8_t *BIOS = (uint8_t *)memregion( "maincpu:rom" )->base();
 	nand_base = (uint8_t *)memregion( "user2" )->base();
-	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 
 	nand_copy( (uint32_t *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
 	nand_copy( (uint32_t *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
@@ -820,16 +851,15 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 
 void namcos10_state::init_mrdrilr2()
 {
-	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
+	int regSize = memregion("maincpu:rom")->bytes();
 
 	decrypt_bios(machine(), "maincpu:rom", 0, 0x62000, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
 	decrypt_bios(machine(), "maincpu:rom", 0x380000, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
-	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 }
 
 void namcos10_state::init_gjspace()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb);
 	decrypt_bios(machine(), "user2", 0x0210000, 0x104e800, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb);
 	decrypt_bios(machine(), "user2", 0x1077c00, regSize, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb);
@@ -838,14 +868,14 @@ void namcos10_state::init_gjspace()
 
 void namcos10_state::init_mrdrilrg()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x2, 0x1, 0x0, 0x3, 0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xb, 0xa);
 	memn_driver_init();
 }
 
 void namcos10_state::init_knpuzzle()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
 	decrypt_bios(machine(), "user2", 0x047ac00, 0x1042200, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
 	decrypt_bios(machine(), "user2", 0x104a600, regSize  , 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
@@ -854,7 +884,7 @@ void namcos10_state::init_knpuzzle()
 
 void namcos10_state::init_startrgn()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
 	decrypt_bios(machine(), "user2", 0x00b9a00, 0x105ae00, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
 	decrypt_bios(machine(), "user2", 0x1080000, regSize  , 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
@@ -863,7 +893,7 @@ void namcos10_state::init_startrgn()
 
 void namcos10_state::init_gamshara()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb);
 	decrypt_bios(machine(), "user2", 0x014e200, 0x105ae00, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb);
 	decrypt_bios(machine(), "user2", 0x1080000, regSize  , 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb);
@@ -872,14 +902,14 @@ void namcos10_state::init_gamshara()
 
 void namcos10_state::init_gunbalna()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xa, 0xb);
 	memn_driver_init();
 }
 
 void namcos10_state::init_chocovdr()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9);
 	decrypt_bios(machine(), "user2", 0x01eae00, 0x105ae00, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9);
 	decrypt_bios(machine(), "user2", 0x1080000, regSize  , 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9);
@@ -888,14 +918,14 @@ void namcos10_state::init_chocovdr()
 
 void namcos10_state::init_panikuru()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa);
 	memn_driver_init();
 }
 
 void namcos10_state::init_nflclsfb()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
 	decrypt_bios(machine(), "user2", 0x0214200, 0x105ae00, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
 	decrypt_bios(machine(), "user2", 0x1080000, regSize  , 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
@@ -904,7 +934,7 @@ void namcos10_state::init_nflclsfb()
 
 void namcos10_state::init_konotako()
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
 	decrypt_bios(machine(), "user2", 0x00b9a00, 0x105ae00, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
 	decrypt_bios(machine(), "user2", 0x1080000, regSize  , 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
@@ -912,7 +942,7 @@ void namcos10_state::init_konotako()
 }
 
 
-MACHINE_RESET_MEMBER(namcos10_state,namcos10)
+void namcos10_state::machine_reset()
 {
 	i2c_dev_clock = i2c_dev_data = 1;
 	i2c_host_clock = i2c_host_data = 1;
@@ -927,22 +957,22 @@ void namcos10_state::namcos10_base(machine_config &config)
 	/* basic machine hardware */
 	CXD8606BQ(config, m_maincpu, XTAL(101'491'200));
 	m_maincpu->set_disable_rom_berr(true);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("16M");
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("16M"); // ->set_default_size("4M"); 2 IS41LV16100s
 	// The bios first configures the ROM window as 80000-big, then
 	// switches to 400000.  If berr is active, the first configuration
 	// wipes all handlers after 1fc80000, which kills the system
 	// afterwards
 
-	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10)
-
 	/* video hardware */
-	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen"); // 2 54V25632s
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
+	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 3?
 }
 
 void namcos10_state::namcos10_memm(machine_config &config)
@@ -955,6 +985,19 @@ void namcos10_state::namcos10_memn(machine_config &config)
 {
 	namcos10_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_state::namcos10_memn_map);
+}
+
+void namcos10_state::namcos10_memn_exio(machine_config &config)
+{
+	namcos10_memn(config);
+	TMP95C061(config, m_exio_mcu, XTAL(22'118'400)).set_disable(); // not hooked up
+}
+
+void namcos10_state::namcos10_memp3(machine_config &config)
+{
+	namcos10_memn(config);
+	TMP95C061(config, m_memp3_mcu, XTAL(16'934'400)).set_disable(); // not hooked up
+	// LC82310 16.9344MHz
 }
 
 void namcos10_state::ns10_mrdrilr2(machine_config &config)
@@ -1240,21 +1283,93 @@ ROM_START( sekaikh )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
+ROM_START( taiko6 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2001, gjspace,   0,        ns10_gjspace , namcos10, namcos10_state, init_gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2001, g13jnc,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, namcos10_state, init_mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, namcos10_state, init_mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2001, knpuzzle,  0,        ns10_knpuzzle, namcos10, namcos10_state, init_knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, chocovdr,  0,        ns10_chocovdr, namcos10, namcos10_state, init_chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, startrgn,  0,        ns10_startrgn, namcos10, namcos10_state, init_startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, init_panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, gamshara,  0,        ns10_gamshara, namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver. 20020912A ETC
-GAME( 2002, gamsharaj, gamshara, ns10_gamshara, namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, init_nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",         0x0000000, 0x1080000, CRC(a87352c9) SHA1(1816fabecfaa140da2cd46334701c3e2fb93258e) )
+	ROM_LOAD( "k9f2808u0c.8d",         0x1080000, 0x1080000, CRC(e89aa7a3) SHA1(c34d693f4715ce930dbd105eda1ffc8379991c22) )
+	ROM_LOAD( "k9f2808u0c.7e",         0x2100000, 0x1080000, CRC(098920ef) SHA1(06a689d8abb8454ed62dda92d93a8f5d756a6166) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
+ROM_END
+
+ROM_START( unks10md )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",  0x0000000, 0x1080000, CRC(b8ce45c6) SHA1(cfc85e796e32f5f3cc16e12ce902f0ae088eea31) )
+	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(49a2a732) SHA1(1a473177827a6d0e58c289d9af064665b941519b) )
+ROM_END
+
+ROM_START( kd2001 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "0.8e",  0x0000000, 0x1080000, NO_DUMP ) // broken flash ROM, couldn't be dumped
+	ROM_LOAD( "1.8d",  0x1080000, 0x1080000, CRC(2b0d0e8c) SHA1(d679e7044e1f93bb7bd449e6d8fcb7737d154025) )
+
+	ROM_REGION( 0x20000, "pdrivecpu", 0 )
+	ROM_LOAD( "kd11-dr0-ic10.bin", 0x00000, 0x20000, CRC(59649293) SHA1(71c3a0e73d077398e7f3d95acedc47814e99fbc6) )
+ROM_END
+
+ROM_START( keroro )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x4200000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "krg1.8e",  0x0000000, 0x2100000, CRC(12e78c66) SHA1(83573f68f27ace345a3be16f29f874f14e593233) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "krg1.8d",  0x2100000, 0x2100000, CRC(879a87b7) SHA1(fcef8eb9423b4825bf27fbfe8cae6d4018cb534f) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+ROM_END
+
+ROM_START( gegemdb )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x4200000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "gym1.8e",  0x0000000, 0x2100000, CRC(ea740351) SHA1(4dc7ce256a2d60be512d04a992b2103602bcfaa9) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "gym1.8d",  0x2100000, 0x2100000, CRC(0145a8c1) SHA1(a32dd944d022df14450bbcb01b4d1712683c0680) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+
+	ROM_REGION( 0x8000, "nvram", 0 )
+	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) )
+ROM_END
+
+ROM_START( pacmball )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",  0x0000000, 0x1080000, CRC(7b6f814d) SHA1(728167866d9350150b5fd9ebcf8fe7280efedb91) )
+	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(f79d7199) SHA1(4ef9b758ee778e12f7fef717e063597299fb8219) )
+ROM_END
+
+} // Anonymous namespace
+
+
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,      namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2,      namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, ptblank3,  0,        namcos10_memn_exio, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs to hookup gun IO
+GAME( 2000, gunbalina, ptblank3, namcos10_memn_exio, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // ""
+GAME( 2001, gjspace,   0,        ns10_gjspace,       namcos10, namcos10_state, init_gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, g13jnc,    0,        namcos10_memp3,     namcos10, namcos10_state, empty_init,    ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, mrdrilrg,  0,        namcos10_memn,      namcos10, namcos10_state, init_mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn,      namcos10, namcos10_state, init_mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,      namcos10, namcos10_state, init_knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, kd2001,    0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2002, chocovdr,  0,        ns10_chocovdr,      namcos10, namcos10_state, init_chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, startrgn,  0,        ns10_startrgn,      namcos10, namcos10_state, init_startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2002, panikuru,  0,        namcos10_memn,      namcos10, namcos10_state, init_panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, gamshara,  0,        ns10_gamshara,      namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver. 20020912A ETC
+GAME( 2002, gamsharaj, gamshara, ns10_gamshara,      namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,      namcos10, namcos10_state, init_nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, pacmball,  0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, konotako,  0,        ns10_konotako,      namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2004, sekaikh,   0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2004, taiko6,    0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2006, keroro,    0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // ケロロ軍曹　地球侵略指令…であります！
+GAME( 2007, gegemdb,   0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 200?, unks10md,  0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

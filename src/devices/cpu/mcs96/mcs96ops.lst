@@ -1703,7 +1703,7 @@ d0    jnst  rel8
 	}
 
 d1    jnh   rel8
-	if((PSW & (F_C|F_N)) != F_C) {
+	if((PSW & (F_C|F_Z)) != F_C) {
 		PC += OP1;
 		next(8);
 	} else {
@@ -1769,7 +1769,7 @@ d8    jst   rel8
 	}
 
 d9    jh    rel8
-	if((PSW & (F_C|F_N)) == F_C) {
+	if((PSW & (F_C|F_Z)) == F_C) {
 		PC += OP1;
 		next(8);
 	} else {

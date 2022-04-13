@@ -6,12 +6,12 @@
 #include <chrono>
 
 #if defined(SDLMAME_ANDROID)
-#include <SDL2/SDL.h>
+#include <android/log.h>
 #endif
 
 #ifdef _WIN32
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 #include <shellapi.h>
 #include "strconv.h"
 #endif
@@ -26,7 +26,7 @@ static int m_ptr = -1;
 
 void osd_output::push(osd_output *delegate)
 {
-	if (m_ptr < MAXSTACK)
+	if (m_ptr < MAXSTACK - 1)
 	{
 		delegate->m_chain = (m_ptr >= 0 ? m_stack[m_ptr] : nullptr);
 		m_ptr++;
@@ -37,7 +37,7 @@ void osd_output::push(osd_output *delegate)
 void osd_output::pop(osd_output *delegate)
 {
 	int f = -1;
-	for (int i=0; i<=m_ptr; i++)
+	for (int i = 0; i <= m_ptr; i++)
 		if (m_stack[i] == delegate)
 		{
 			f = i;
@@ -59,129 +59,93 @@ void osd_output::pop(osd_output *delegate)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    osd_printf_error - output an error to the
+    osd_vprintf_error - output an error to the
     appropriate callback
 -------------------------------------------------*/
 
-void CLIB_DECL osd_printf_error(const char *format, ...)
+void osd_vprintf_error(util::format_argument_pack<std::ostream> const &args)
 {
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
 #if defined(SDLMAME_ANDROID)
-	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, format, argptr);
+	__android_log_write(ANDROID_LOG_ERROR, "%s", util::string_format(args).c_str());
 #else
-	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_ERROR, format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_ERROR, args);
 #endif
-	va_end(argptr);
 }
 
 
 /*-------------------------------------------------
-    osd_printf_warning - output a warning to the
+    osd_vprintf_warning - output a warning to the
     appropriate callback
 -------------------------------------------------*/
 
-void CLIB_DECL osd_printf_warning(const char *format, ...)
+void osd_vprintf_warning(util::format_argument_pack<std::ostream> const &args)
 {
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
 #if defined(SDLMAME_ANDROID)
-	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, format, argptr);
+	__android_log_write(ANDROID_LOG_WARN, "%s", util::string_format(args).c_str());
 #else
-	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_WARNING, format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_WARNING, args);
 #endif
-	va_end(argptr);
 }
 
 
 /*-------------------------------------------------
-    osd_printf_info - output info text to the
+    osd_vprintf_info - output info text to the
     appropriate callback
 -------------------------------------------------*/
 
-void CLIB_DECL osd_printf_info(const char *format, ...)
+void osd_vprintf_info(util::format_argument_pack<std::ostream> const &args)
 {
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
 #if defined(SDLMAME_ANDROID)
-	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, format, argptr);
+	__android_log_write(ANDROID_LOG_INFO, "%s", util::string_format(args).c_str());
 #else
-	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_INFO, format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_INFO, args);
 #endif
-	va_end(argptr);
 }
 
 
 /*-------------------------------------------------
-    osd_printf_verbose - output verbose text to
+    osd_vprintf_verbose - output verbose text to
     the appropriate callback
 -------------------------------------------------*/
 
-void CLIB_DECL osd_printf_verbose(const char *format, ...)
+void osd_vprintf_verbose(util::format_argument_pack<std::ostream> const &args)
 {
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
 #if defined(SDLMAME_ANDROID)
-	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE, format, argptr);
+	__android_log_write( ANDROID_LOG_VERBOSE, "%s", util::string_format(args).c_str());
 #else
-	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_VERBOSE, format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_VERBOSE, args);
 #endif
-	va_end(argptr);
 }
 
 
 /*-------------------------------------------------
-    osd_printf_debug - output debug text to the
+    osd_vprintf_debug - output debug text to the
     appropriate callback
 -------------------------------------------------*/
 
-void CLIB_DECL osd_printf_debug(const char *format, ...)
+void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args)
 {
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
 #if defined(SDLMAME_ANDROID)
-	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, format, argptr);
+	__android_log_write(ANDROID_LOG_DEBUG, "%s", util::string_format(args).c_str());
 #else
-	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_DEBUG, format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_DEBUG, args);
 #endif
-	va_end(argptr);
 }
 
-
-/*-------------------------------------------------
-    osd_printf_log - output log text to the
-    appropriate callback
--------------------------------------------------*/
-
-#ifdef UNUSED_FUNCTION
-void CLIB_DECL osd_printf_log(const char *format, ...)
-{
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
-	output_cb[OSD_OUTPUT_CHANNEL_LOG])(format, argptr);
-	va_end(argptr);
-}
-#endif
 
 //============================================================
 //  osd_ticks
 //============================================================
 
-osd_ticks_t osd_ticks(void)
+osd_ticks_t osd_ticks()
 {
+#ifdef _WIN32
+	LARGE_INTEGER val;
+	QueryPerformanceCounter(&val);
+	return val.QuadPart;
+#else
 	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+#endif
 }
 
 
@@ -189,9 +153,15 @@ osd_ticks_t osd_ticks(void)
 //  osd_ticks_per_second
 //============================================================
 
-osd_ticks_t osd_ticks_per_second(void)
+osd_ticks_t osd_ticks_per_second()
 {
+#ifdef _WIN32
+	LARGE_INTEGER val;
+	QueryPerformanceFrequency(&val);
+	return val.QuadPart;
+#else
 	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
+#endif
 }
 
 //============================================================
@@ -200,7 +170,7 @@ osd_ticks_t osd_ticks_per_second(void)
 
 void osd_sleep(osd_ticks_t duration)
 {
-#ifdef WIN32
+#ifdef _WIN32
 // sleep_for appears to oversleep on Windows with gcc 8
 	Sleep(duration / (osd_ticks_per_second() / 1000));
 #else
@@ -220,7 +190,7 @@ void osd_sleep(osd_ticks_t duration)
 std::vector<std::string> osd_get_command_line(int argc, char *argv[])
 {
 	std::vector<std::string> results;
-#ifdef WIN32
+#ifdef _WIN32
 	{
 		// Get the command line from Windows
 		int count;
@@ -236,7 +206,7 @@ std::vector<std::string> osd_get_command_line(int argc, char *argv[])
 
 		LocalFree(wide_args);
 	}
-#else // !WIN32
+#else // !_WIN32
 	{
 		// for non Windows platforms, we are assuming that arguments are
 		// already UTF-8; we just need to convert to std::vector<std::string>
@@ -244,6 +214,6 @@ std::vector<std::string> osd_get_command_line(int argc, char *argv[])
 		for (int i = 0; i < argc; i++)
 			results.emplace_back(argv[i]);
 	}
-#endif // WIN32
+#endif // _WIN32
 	return results;
 }

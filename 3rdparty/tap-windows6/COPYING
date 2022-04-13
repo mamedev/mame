@@ -1,0 +1,24 @@
+tap-windows6 license
+--------------------
+
+The source and object code of the tap-windows6 project
+is Copyright (C) 2002-2014 OpenVPN Technologies, Inc. The
+NSIS installer is Copyright (C) 2014 OpenVPN Technologies,
+Inc. and (C) 2012 Alon Bar-Lev. Both are released under the
+GPL version 2. See COPYRIGHT.GPL for the full GPL license.
+The licensors also make the following statement borrowed
+from the SPICE project:
+
+With respect to binaries built using the Microsoft(R)
+Windows Driver Kit (WDK), GPLv2 does not extend to any code
+contained in or derived from the WDK ("WDK Code").  As to
+WDK Code, by using or distributing such binaries you agree
+to be bound by the Microsoft Software License Terms for the
+WDK.  All WDK Code is considered by the GPLv2 licensors to
+qualify for the special exception stated in section 3 of
+GPLv2 (commonly known as the system library exception).
+
+The tap-windows.h file has been released under the MIT
+license (see COPYRIGHT.MIT) as well as under GPLv2 (see
+COPYRIGHT.GPL). This has been done to allow the use of the
+header file in non-GPLv2 compatible projects.

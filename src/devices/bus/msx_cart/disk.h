@@ -29,7 +29,7 @@ protected:
 	optional_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 };
 
 

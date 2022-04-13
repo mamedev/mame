@@ -25,13 +25,17 @@ public:
 
 	mace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto rtc_read_callback() { return m_rtc_read_callback.bind(); }
+	auto rtc_write_callback() { return m_rtc_write_callback.bind(); }
+
 	void map(address_map &map);
 
 protected:
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_MSC = 0;
 	static const device_timer_id TIMER_UST = 1;
@@ -40,32 +44,35 @@ protected:
 	void check_ust_msc_compare();
 
 	// Read/Write Handlers
-	DECLARE_READ64_MEMBER(pci_r);
-	DECLARE_WRITE64_MEMBER(pci_w);
-	DECLARE_READ64_MEMBER(vin1_r);
-	DECLARE_WRITE64_MEMBER(vin1_w);
-	DECLARE_READ64_MEMBER(vin2_r);
-	DECLARE_WRITE64_MEMBER(vin2_w);
-	DECLARE_READ64_MEMBER(vout_r);
-	DECLARE_WRITE64_MEMBER(vout_w);
-	DECLARE_READ64_MEMBER(enet_r);
-	DECLARE_WRITE64_MEMBER(enet_w);
-	DECLARE_READ64_MEMBER(audio_r);
-	DECLARE_WRITE64_MEMBER(audio_w);
-	DECLARE_READ64_MEMBER(isa_r);
-	DECLARE_WRITE64_MEMBER(isa_w);
-	DECLARE_READ64_MEMBER(kbdms_r);
-	DECLARE_WRITE64_MEMBER(kbdms_w);
-	DECLARE_READ64_MEMBER(i2c_r);
-	DECLARE_WRITE64_MEMBER(i2c_w);
-	DECLARE_READ64_MEMBER(ust_msc_r);
-	DECLARE_WRITE64_MEMBER(ust_msc_w);
-	DECLARE_READ64_MEMBER(isa_ext_r);
-	DECLARE_WRITE64_MEMBER(isa_ext_w);
-	DECLARE_READ64_MEMBER(rtc_r);
-	DECLARE_WRITE64_MEMBER(rtc_w);
+	uint64_t pci_r(offs_t offset, uint64_t mem_mask = ~0);
+	void pci_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t vin1_r(offs_t offset, uint64_t mem_mask = ~0);
+	void vin1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t vin2_r(offs_t offset, uint64_t mem_mask = ~0);
+	void vin2_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t vout_r(offs_t offset, uint64_t mem_mask = ~0);
+	void vout_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t enet_r(offs_t offset, uint64_t mem_mask = ~0);
+	void enet_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t audio_r(offs_t offset, uint64_t mem_mask = ~0);
+	void audio_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t isa_r(offs_t offset, uint64_t mem_mask = ~0);
+	void isa_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t kbdms_r(offs_t offset, uint64_t mem_mask = ~0);
+	void kbdms_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t i2c_r(offs_t offset, uint64_t mem_mask = ~0);
+	void i2c_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t ust_msc_r(offs_t offset, uint64_t mem_mask = ~0);
+	void ust_msc_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t isa_ext_r(offs_t offset, uint64_t mem_mask = ~0);
+	void isa_ext_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t rtc_r(offs_t offset, uint64_t mem_mask = ~0);
+	void rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	required_device<mips3_device> m_maincpu;
+
+	devcb_read8 m_rtc_read_callback;
+	devcb_write8 m_rtc_write_callback;
 
 	enum
 	{
@@ -98,19 +105,11 @@ protected:
 		uint64_t m_vout_msc_ust;
 	};
 
-	// DS17287 RTC; proper hookup is unknown
-	struct rtc_t
-	{
-		uint64_t m_unknown;
-	};
-
 	isa_t m_isa;
 
 	ust_msc_t m_ust_msc;
 	emu_timer *m_timer_ust;
 	emu_timer *m_timer_msc;
-
-	rtc_t m_rtc;
 };
 
 DECLARE_DEVICE_TYPE(SGI_MACE, mace_device)

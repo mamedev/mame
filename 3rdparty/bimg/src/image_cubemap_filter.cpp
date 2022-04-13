@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -259,22 +259,46 @@ namespace bimg
 						const float* src2 = (const float*)&srcData[y1*srcPitch + x0*16];
 						const float* src3 = (const float*)&srcData[y1*srcPitch + x1*16];
 
-						const float tx   = srcU - float(int32_t(x0) );
-						const float ty   = srcV - float(int32_t(y0) );
-						const float omtx = 1.0f - tx;
-						const float omty = 1.0f - ty;
+						const float tx    = srcU - float(int32_t(x0) );
+						const float ty    = srcV - float(int32_t(y0) );
+						const float omtx  = 1.0f - tx;
+						const float omty  = 1.0f - ty;
 
-						float p0[4];
-						bx::vec4Mul(p0, src0, omtx*omty);
+						const float p0x = omtx*omty;
+						const float p0[4] =
+						{
+							src0[0] * p0x,
+							src0[1] * p0x,
+							src0[2] * p0x,
+							src0[3] * p0x,
+						};
 
-						float p1[4];
-						bx::vec4Mul(p1, src1, tx*omty);
+						const float p1x = tx*omty;
+						const float p1[4] =
+						{
+							src1[0] * p1x,
+							src1[1] * p1x,
+							src1[2] * p1x,
+							src1[3] * p1x,
+						};
 
-						float p2[4];
-						bx::vec4Mul(p2, src2, omtx*ty);
+						const float p2x = omtx*ty;
+						const float p2[4] =
+						{
+							src2[0] * p2x,
+							src2[1] * p2x,
+							src2[2] * p2x,
+							src2[3] * p2x,
+						};
 
-						float p3[4];
-						bx::vec4Mul(p3, src3, tx*ty);
+						const float p3x = tx*ty;
+						const float p3[4] =
+						{
+							src3[0] * p3x,
+							src3[1] * p3x,
+							src3[2] * p3x,
+							src3[3] * p3x,
+						};
 
 						const float rr = p0[0] + p1[0] + p2[0] + p3[0];
 						const float gg = p0[1] + p1[1] + p2[1] + p3[1];
@@ -312,15 +336,17 @@ namespace bimg
 		if (_input.m_depth     != 1
 		&&  _input.m_numLayers != 1
 		&&  _input.m_format    != TextureFormat::RGBA32F
-		&&  _input.m_width/6   != _input.m_height)
+		&& ( (_input.m_width   != _input.m_height*6) || (_input.m_width*6 != _input.m_height) ) )
 		{
 			BX_ERROR_SET(_err, BIMG_ERROR, "Input image format is not strip projection.");
 			return NULL;
 		}
 
+		const bool   horizontal = _input.m_width == _input.m_height*6;
 		const uint32_t srcPitch = _input.m_width*16;
-		const uint32_t dstWidth = _input.m_height;
+		const uint32_t dstWidth = horizontal ? _input.m_height : _input.m_width;
 		const uint32_t dstPitch = dstWidth*16;
+		const uint32_t step     = horizontal ? dstPitch : dstPitch*dstWidth;
 
 		ImageContainer* output = imageAlloc(_allocator
 			, _input.m_format
@@ -334,12 +360,12 @@ namespace bimg
 
 		const uint8_t* srcData = (const uint8_t*)_input.m_data;
 
-		for (uint8_t side = 0; side < 6 && _err->isOk(); ++side, srcData += dstPitch)
+		for (uint8_t side = 0; side < 6 && _err->isOk(); ++side, srcData += step)
 		{
 			ImageMip dstMip;
 			imageGetRawData(*output, side, 0, output->m_data, output->m_size, dstMip);
 
-			bx::memCopy(const_cast<uint8_t*>(dstMip.m_data), srcData, dstPitch, dstWidth, srcPitch, dstPitch);
+			bx::memCopy(const_cast<uint8_t*>(dstMip.m_data), dstPitch, srcData, srcPitch, dstPitch, dstWidth);
 		}
 
 		return output;
@@ -823,8 +849,8 @@ namespace bimg
 		const float kGoldenSection = 0.61803398875f;
 		float offset = kGoldenSection;
 
-		bx::Vec3 tangentX;
-		bx::Vec3 tangentY;
+		bx::Vec3 tangentX(bx::init::None);
+		bx::Vec3 tangentY(bx::init::None);
 		bx::calcTangentFrame(tangentX, tangentY, _dir);
 
 		for (uint32_t ii = 0; ii < kNumSamples; ++ii)
@@ -954,7 +980,7 @@ namespace bimg
 					{
 						const float* normal = (const float*)&nsaMip.m_data[(yy*nsaMip.m_width+xx)*(nsaMip.m_bpp/8)];
 						const float solidAngle = normal[3];
-						const float ndotl = bx::clamp(bx::dot(bx::load(normal), _dir), 0.0f, 1.0f);
+						const float ndotl = bx::clamp(bx::dot(bx::load<bx::Vec3>(normal), _dir), 0.0f, 1.0f);
 
 						if (ndotl >= _specularAngle)
 						{

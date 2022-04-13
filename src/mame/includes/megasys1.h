@@ -14,6 +14,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "video/ms1_tmap.h"
 #include "emupal.h"
@@ -31,6 +32,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki%u", 1U),
+		m_ymsnd(*this, "ymsnd"),
+		m_p47b_adpcm(*this, "msm%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
@@ -51,6 +54,7 @@ public:
 	void system_A_iganinju(machine_config &config);
 	void system_A_hachoo(machine_config &config);
 	void kickoffb(machine_config &config);
+	void p47b(machine_config &config);
 	void system_D(machine_config &config);
 	void system_C(machine_config &config);
 	void system_Bbl(machine_config &config);
@@ -85,6 +89,7 @@ public:
 	void init_stdragona();
 	void init_stdragonb();
 	void init_systemz();
+	void init_lordofkbp();
 
 private:
 	required_shared_ptr<u16> m_objectram;
@@ -93,6 +98,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<okim6295_device, 2> m_oki;
+	optional_device<device_t> m_ymsnd;
+	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -108,65 +115,66 @@ private:
 	optional_ioport m_io_dsw2;
 
 	// configuration
-	u16 m_ip_select_values[7]; // System B and C
-	int m_hardware_type_z; // System Z
-	int m_layers_order[16];
-	u8 m_ignore_oki_status;
+	u16 m_ip_select_values[7]{}; // System B and C
+	int m_hardware_type_z = 0; // System Z
+	int m_layers_order[16]{};
+	u8 m_ignore_oki_status = 0;
 
 	// all
 	bitmap_ind16 m_sprite_buffer_bitmap;
-	u16 m_screen_flag;
+	u16 m_screen_flag = 0;
 	std::unique_ptr<u16[]> m_buffer_objectram;
 	std::unique_ptr<u16[]> m_buffer2_objectram;
 	std::unique_ptr<u16[]> m_buffer_spriteram16;
 	std::unique_ptr<u16[]> m_buffer2_spriteram16;
 
 	// all but System Z
-	u16 m_active_layers;
-	u16 m_sprite_flag;
+	u16 m_active_layers = 0;
+	u16 m_sprite_flag = 0;
 
 	// System B and C
-	u16 m_ip_latched;
+	u16 m_ip_latched = 0;
 
 	 // System C
-	u16 m_sprite_bank;
+	u16 m_sprite_bank = 0;
 
 	// System A only
-	int m_mcu_hs;
-	u16 m_mcu_hs_ram[0x10];
+	int m_mcu_hs = 0;
+	u16 m_mcu_hs_ram[0x10]{};
 
 	// peekaboo
-	u16 m_protection_val;
+	u16 m_protection_val = 0;
 
 	// soldam
-	u16 *m_spriteram;
+	u16 *m_spriteram = nullptr;
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_READ16_MEMBER(ip_select_r);
-	DECLARE_WRITE16_MEMBER(ip_select_w);
-	DECLARE_READ16_MEMBER(protection_peekaboo_r);
-	DECLARE_WRITE16_MEMBER(protection_peekaboo_w);
-	DECLARE_READ16_MEMBER(megasys1A_mcu_hs_r);
-	DECLARE_WRITE16_MEMBER(megasys1A_mcu_hs_w);
-	DECLARE_READ16_MEMBER(iganinju_mcu_hs_r);
-	DECLARE_WRITE16_MEMBER(iganinju_mcu_hs_w);
-	DECLARE_READ16_MEMBER(soldamj_spriteram16_r);
-	DECLARE_WRITE16_MEMBER(soldamj_spriteram16_w);
-	DECLARE_READ16_MEMBER(stdragon_mcu_hs_r);
-	DECLARE_WRITE16_MEMBER(stdragon_mcu_hs_w);
-	DECLARE_WRITE16_MEMBER(active_layers_w);
-	DECLARE_WRITE16_MEMBER(sprite_bank_w);
-	DECLARE_READ16_MEMBER(sprite_flag_r);
-	DECLARE_WRITE16_MEMBER(sprite_flag_w);
-	DECLARE_WRITE16_MEMBER(screen_flag_w);
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
-	DECLARE_WRITE16_MEMBER(soundlatch_z_w);
-	DECLARE_WRITE16_MEMBER(soundlatch_c_w);
-	DECLARE_WRITE16_MEMBER(monkelf_scroll0_w);
-	DECLARE_WRITE16_MEMBER(monkelf_scroll1_w);
+	u16 ip_select_r();
+	void ip_select_w(u16 data);
+	u16 protection_peekaboo_r();
+	void protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 megasys1A_mcu_hs_r(offs_t offset, u16 mem_mask = ~0);
+	void megasys1A_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 iganinju_mcu_hs_r(offs_t offset, u16 mem_mask = ~0);
+	void iganinju_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 soldamj_spriteram16_r(offs_t offset);
+	void soldamj_spriteram16_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 stdragon_mcu_hs_r(offs_t offset, u16 mem_mask = ~0);
+	void stdragon_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void active_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprite_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 sprite_flag_r();
+	void sprite_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void screen_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void soundlatch_w(u16 data);
+	void soundlatch_z_w(u16 data);
+	void soundlatch_c_w(u16 data);
+	void monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void megasys1_set_vreg_flag(int which, int data);
-	template<int Chip> DECLARE_READ8_MEMBER(oki_status_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
+	template<int Chip> u8 oki_status_r();
+	void ram_w(offs_t offset, u16 data);
+	void p47b_adpcm_w(offs_t offset, u8 data);
 
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);
@@ -190,6 +198,9 @@ private:
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
 	void kickoffb_sound_map(address_map &map);
+	void p47b_sound_map(address_map &map);
+	void p47b_extracpu_prg_map(address_map &map);
+	void p47b_extracpu_io_map(address_map &map);
 	void megasys1A_map(address_map &map);
 	void megasys1A_sound_map(address_map &map);
 	void megasys1A_jitsupro_sound_map(address_map &map);

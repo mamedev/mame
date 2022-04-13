@@ -29,6 +29,12 @@ function maintargetosdoptions(_target,_subtarget)
 			"X11",
 			"Xinerama",
 		}
+	else
+		if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+			links {
+				"EGL",
+			}
+		end
 	end
 
 	if _OPTIONS["NO_USE_XINPUT"]~="1" then
@@ -38,7 +44,7 @@ function maintargetosdoptions(_target,_subtarget)
 		}
 	end
 
-	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" then
+	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" and _OPTIONS["targetos"]~="asmjs" then
 		links {
 			"SDL2_ttf",
 		}
@@ -178,6 +184,19 @@ if not _OPTIONS["NO_USE_XINPUT"] then
 end
 
 newoption {
+	trigger = "NO_USE_XINPUT_WII_LIGHTGUN_HACK",
+	description = "Disable use of Xinput Wii Lightgun Hack",
+	allowed = {
+		{ "0",  "Enable Xinput Wii Lightgun Hack"  },
+		{ "1",  "Disable Xinput Wii Lightgun Hack" },
+	},
+}
+
+if not _OPTIONS["NO_USE_XINPUT_WII_LIGHTGUN_HACK"] then
+	_OPTIONS["NO_USE_XINPUT_WII_LIGHTGUN_HACK"] = "1"
+end
+
+newoption {
 	trigger = "SDL2_MULTIAPI",
 	description = "Use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)",
 	allowed = {
@@ -220,21 +239,16 @@ end
 
 BASE_TARGETOS       = "unix"
 SDLOS_TARGETOS      = "unix"
-SDL_NETWORK         = ""
 if _OPTIONS["targetos"]=="linux" then
-	SDL_NETWORK         = "taptun"
 elseif _OPTIONS["targetos"]=="openbsd" then
 elseif _OPTIONS["targetos"]=="netbsd" then
-	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
 elseif _OPTIONS["targetos"]=="asmjs" then
 elseif _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
 	SDLOS_TARGETOS      = "win32"
-	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="macosx" then
 	SDLOS_TARGETOS      = "macosx"
-	SDL_NETWORK         = "pcap"
 end
 
 if _OPTIONS["with-bundled-sdl2"]~=nil then
@@ -262,6 +276,7 @@ if BASE_TARGETOS=="unix" then
 		end
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			linkoptions {
+				"-framework AudioToolbox",
 				"-framework AudioUnit",
 				"-framework CoreAudio",
 				"-framework Carbon",
@@ -315,7 +330,7 @@ if BASE_TARGETOS=="unix" then
 					"socket",
 					"nsl",
 				}
-			else
+			elseif _OPTIONS["targetos"]~="asmjs" then
 				links {
 					"util",
 				}
@@ -366,12 +381,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl",
 	}
 
-	if _OPTIONS["targetos"]=="windows" then
-		files {
-			MAME_DIR .. "src/osd/windows/main.cpp",
-		}
-	end
-
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "src/osd/modules/debugger/debugosx.mm",
@@ -405,6 +414,8 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/debugger/osx/memoryviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.h",
+			MAME_DIR .. "src/osd/modules/debugger/osx/registerpointsview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/registerpointsview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.mm",
@@ -453,6 +464,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	files {
 		MAME_DIR .. "src/osd/osdcore.cpp",
 		MAME_DIR .. "src/osd/osdcore.h",
+		MAME_DIR .. "src/osd/osdfile.h",
 		MAME_DIR .. "src/osd/strconv.cpp",
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/osdsync.cpp",
@@ -466,7 +478,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 	if BASE_TARGETOS=="unix" then
 		files {
 			MAME_DIR .. "src/osd/modules/file/posixdir.cpp",
-			MAME_DIR .. "src/osd/modules/file/posixdomain.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.h",
 			MAME_DIR .. "src/osd/modules/file/posixptty.cpp",

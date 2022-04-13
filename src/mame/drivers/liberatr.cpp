@@ -138,6 +138,7 @@
 
 #include "emu.h"
 #include "includes/liberatr.h"
+#include "machine/rescap.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
@@ -169,7 +170,7 @@ void liberatr_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(liberatr_state::output_latch_w)
+void liberatr_state::output_latch_w(offs_t offset, uint8_t data)
 {
 	m_outlatch->write_bit(offset, BIT(data, 4));
 }
@@ -208,7 +209,7 @@ WRITE_LINE_MEMBER(liberatr_state::trackball_reset_w)
 }
 
 
-READ8_MEMBER( liberatr_state::port0_r )
+uint8_t liberatr_state::port0_r()
 {
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
 	if (m_ctrld)
@@ -230,14 +231,14 @@ READ8_MEMBER( liberatr_state::port0_r )
  *
  *************************************/
 
-READ8_MEMBER( liberatr_state::earom_r )
+uint8_t liberatr_state::earom_r()
 {
 	// return data latched from previous clock
 	return m_earom->data();
 }
 
 
-WRITE8_MEMBER( liberatr_state::earom_w )
+void liberatr_state::earom_w(offs_t offset, uint8_t data)
 {
 	// remember the value written
 	m_earom_data = data;
@@ -251,7 +252,7 @@ WRITE8_MEMBER( liberatr_state::earom_w )
 }
 
 
-WRITE8_MEMBER( liberatr_state::earom_control_w )
+void liberatr_state::earom_control_w(uint8_t data)
 {
 	// remember the control state
 	m_earom_control = data;
@@ -275,10 +276,10 @@ WRITE8_MEMBER( liberatr_state::earom_control_w )
 
 void liberatr_state::liberatr_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");   /* overlapping for my convenience */
 	map(0x0000, 0x0000).ram().share("xcoord");
 	map(0x0001, 0x0001).ram().share("ycoord");
 	map(0x0002, 0x0002).rw(FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
+	map(0x0003, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");
 	map(0x4000, 0x403f).r(FUNC(liberatr_state::earom_r));
 	map(0x5000, 0x5000).r(FUNC(liberatr_state::port0_r));
 	map(0x5001, 0x5001).portr("IN1");
@@ -306,10 +307,10 @@ void liberatr_state::liberatr_map(address_map &map)
 
 void liberatr_state::liberat2_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");   /* overlapping for my convenience */
 	map(0x0000, 0x0000).ram().share("xcoord");
 	map(0x0001, 0x0001).ram().share("ycoord");
 	map(0x0002, 0x0002).rw(FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
+	map(0x0003, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");
 	map(0x4000, 0x4000).r(FUNC(liberatr_state::port0_r));
 	map(0x4001, 0x4001).portr("IN1");
 	map(0x4002, 0x400f).nopr();
@@ -324,7 +325,7 @@ void liberatr_state::liberat2_map(address_map &map)
 	map(0x4e00, 0x4e3f).nopr().w(FUNC(liberatr_state::earom_w));
 	map(0x5000, 0x501f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x5800, 0x581f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
+	//map(0x6000, 0x601f).w(FUNC(liberatr_state::pokey1_w)); /* bug ??? */
 	map(0x6000, 0xbfff).rom();
 	map(0xfffa, 0xffff).rom();
 }

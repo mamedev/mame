@@ -67,7 +67,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
@@ -101,7 +101,7 @@ private:
 	int m_sector;                           //!< current sector number in track
 	int m_page;                             //!< current page (derived from cylinder, head and sector)
 	std::unique_ptr<uint8_t[]> m_cache[2 * DIABLO_PAGES];                        //!< pages raw bytes
-	uint32_t** m_bits;                        //!< pages expanded to bits
+	std::unique_ptr<std::unique_ptr<uint32_t[]>[]> m_bits;                       //!< pages expanded to bits
 	int m_rdfirst;                          //!< set to first bit of a sector that is read from
 	int m_rdlast;                           //!< set to last bit of a sector that was read from
 	int m_wrfirst;                          //!< set to non-zero if a sector is written to
@@ -110,7 +110,6 @@ private:
 	void (*m_sector_callback)(void*,int);   //!< callback to call at the start of each sector
 	emu_timer* m_timer;                     //!< sector timer
 	diablo_image_device* m_image;           //!< diablo_image_device interfacing the CHD
-	chd_file* m_handle;                     //!< underlying CHD handle
 	hard_disk_file* m_disk;                 //!< underlying hard disk file
 
 	//! translate C/H/S to a page and read the sector

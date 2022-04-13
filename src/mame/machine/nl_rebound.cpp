@@ -64,21 +64,10 @@
  *
  */
 
-#ifndef __PLIB_PREPROCESSOR__
-	#define NL_PROHIBIT_BASEH_INCLUDE   1
-	#include "netlist/devices/net_lib.h"
-#endif
+#define NL_PROHIBIT_BASEH_INCLUDE   1
+#include "netlist/devices/net_lib.h"
 
-NETLIST_START(rebound_schematics)
-	 SOLVER(Solver, 48000)
-	 PARAM(Solver.DYNAMIC_TS, 1)
-	 PARAM(Solver.DYNAMIC_LTE, 1e-3)
-	 PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 5e-7)
-
-	 PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
-	 PARAM(Solver.ACCURACY, 1e-9)
-	 PARAM(NETLIST.USE_DEACTIVATE, 1)
-	 HINT(F9.B, NO_DEACTIVATE)
+static NETLIST_START(rebound_schematics)
 
 	 ANALOG_INPUT(V5, 5)
 
@@ -90,6 +79,8 @@ NETLIST_START(rebound_schematics)
 	SWITCH2(START_SW)
 
 	TTL_INPUT(antenna, 0)
+	NET_C(V5,  antenna.VCC)
+	NET_C(GND, antenna.GND)
 
 	// DSW1a/b are actually only a 1 contact switches.
 	// The logic is needed to force high level on
@@ -124,6 +115,12 @@ NETLIST_START(rebound_schematics)
 	NET_C(COIN1_SW.Q, GND)
 
 	NET_C(CON15, antenna)
+
+	// Coin Counter is connected to CON10 as well. Simulate using resistor
+
+	RES(RCOINCOUNTER, 10)
+	NET_C(RCOINCOUNTER.1, CON10)
+	NET_C(RCOINCOUNTER.2, V5)
 
 	/* -----------------------------------------------------------------------
 	 * Real netlist start
@@ -1292,4 +1289,19 @@ NETLIST_START(rebound_schematics)
 			   H1.7,  H2.7,  H3.10, H4.7,  H5.10, H6.7,  H7.7,  H8.7,  H9.7,
 			   J1.7,  J2.7,  J3.10, J4.7,  J5.7,  J6.7,  J7.7,  J8.8,  J9.10,
 					  K2.10, K3.8,  K4.7,  K5.7,  K6.7,  K7.8,  K8.8,  K9.10)
+NETLIST_END()
+
+NETLIST_START(rebound)
+
+	LOCAL_SOURCE(rebound_schematics)
+	SOLVER(Solver, 480)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_LTE, 1e-6)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 5e-7)
+
+	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
+	PARAM(NETLIST.USE_DEACTIVATE, 1)
+	HINT(F9.B, NO_DEACTIVATE)
+	INCLUDE(rebound_schematics)
+
 NETLIST_END()

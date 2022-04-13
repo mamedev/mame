@@ -60,12 +60,12 @@ const tiny_rom_entry *cmd_hd_device::device_rom_region() const
 void cmd_hd_device::mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
-	map(0x8000, 0x800f).mirror(0x1f0).w(M6522_1_TAG, FUNC(via6522_device::write));
-	map(0x8400, 0x840f).mirror(0x1f0).w(M6522_2_TAG, FUNC(via6522_device::write));
+	map(0x8000, 0x800f).mirror(0x1f0).m(M6522_1_TAG, FUNC(via6522_device::map));
+	map(0x8400, 0x840f).mirror(0x1f0).m(M6522_2_TAG, FUNC(via6522_device::map));
 	map(0x8800, 0x8803).mirror(0x1fc).w(I8255A_TAG, FUNC(i8255_device::write));
 	map(0x8c00, 0x8c0f).mirror(0x1f0).w(RTC72421A_TAG, FUNC(rtc72421_device::write));
 	map(0x8f00, 0x8f00).mirror(0xff).w(FUNC(cmd_hd_device::led_w));
+	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
 }
 
 
@@ -78,8 +78,8 @@ void cmd_hd_device::device_add_mconfig(machine_config &config)
 	M6502(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmd_hd_device::mem_map);
 
-	VIA6522(config, M6522_1_TAG, 2000000);
-	VIA6522(config, M6522_2_TAG, 2000000);
+	MOS6522(config, M6522_1_TAG, 2000000);
+	MOS6522(config, M6522_2_TAG, 2000000);
 	I8255A(config, I8255A_TAG, 0);
 	RTC72421(config, RTC72421A_TAG, XTAL(32'768));
 
@@ -168,7 +168,7 @@ void cmd_hd_device::cbm_iec_reset(int state)
 //  led_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cmd_hd_device::led_w )
+void cmd_hd_device::led_w(uint8_t data)
 {
 	/*
 

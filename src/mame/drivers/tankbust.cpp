@@ -46,18 +46,18 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundlatch_callback)
 	m_latch = param;
 }
 
-WRITE8_MEMBER(tankbust_state::soundlatch_w)
+void tankbust_state::soundlatch_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundlatch_callback),this), data);
 }
 
-READ8_MEMBER(tankbust_state::soundlatch_r)
+uint8_t tankbust_state::soundlatch_r()
 {
 	return m_latch;
 }
 
 //port B of ay8910#0
-READ8_MEMBER(tankbust_state::soundtimer_r)
+uint8_t tankbust_state::soundtimer_r()
 {
 	int ret;
 
@@ -76,7 +76,7 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundirqline_callback)
 
 
 
-WRITE8_MEMBER(tankbust_state::e0xx_w)
+void tankbust_state::e0xx_w(offs_t offset, uint8_t data)
 {
 	m_e0xx_data[offset] = data;
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER(tankbust_state::e0xx_w)
 	}
 }
 
-READ8_MEMBER(tankbust_state::debug_output_area_r)
+uint8_t tankbust_state::debug_output_area_r(offs_t offset)
 {
 	return m_e0xx_data[offset];
 }
@@ -175,13 +175,13 @@ void tankbust_state::tankbust_palette(palette_device &palette) const
 }
 
 #if 0
-READ8_MEMBER(tankbust_state::read_from_unmapped_memory)
+uint8_t tankbust_state::read_from_unmapped_memory()
 {
 	return 0xff;
 }
 #endif
 
-READ8_MEMBER(tankbust_state::some_changing_input)
+uint8_t tankbust_state::some_changing_input()
 {
 	m_variable_data += 8;
 	return m_variable_data;
@@ -204,7 +204,7 @@ void tankbust_state::main_map(address_map &map)
 	map(0xe803, 0xe803).rw(FUNC(tankbust_state::some_changing_input), FUNC(tankbust_state::soundlatch_w));   /*unknown. Game expects this to change so this is not player input */
 	map(0xe804, 0xe804).nopw();    /* watchdog ? ; written in long-lasting loops */
 	map(0xf000, 0xf7ff).ram();
-	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
+	//map(0xf800, 0xffff).r(FUNC(tankbust_state::read_from_unmapped_memory));   /* a bug in game code ? */
 }
 
 void tankbust_state::port_map_cpu2(address_map &map)
@@ -223,8 +223,7 @@ void tankbust_state::map_cpu2(address_map &map)
 	map(0x2000, 0x3fff).nopw();    /* garbage, written in initialization loop */
 	//0x4000 and 0x4040-0x4045 seem to be used (referenced in the code)
 	map(0x4000, 0x7fff).nopw();    /* garbage, written in initialization loop */
-	map(0x8000, 0x87ff).readonly();
-	map(0x8000, 0x87ff).writeonly();
+	map(0x8000, 0x87ff).ram();
 }
 
 
@@ -342,7 +341,7 @@ void tankbust_state::tankbust(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &tankbust_state::map_cpu2);
 	m_subcpu->set_addrmap(AS_IO, &tankbust_state::port_map_cpu2);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 
 	/* video hardware */

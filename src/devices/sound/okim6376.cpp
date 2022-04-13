@@ -19,8 +19,8 @@
 #define MAX_SAMPLE_CHUNK    10000
 //#define MAX_WORDS           111
 
-#define OKIVERBOSE 0
-#define MSM6376LOG(...) do { if (OKIVERBOSE) logerror(__VA_ARGS__); } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 /* step size index shift table */
 static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
@@ -111,11 +111,12 @@ void okim6376_device::ADPCMVoice::reset()
 
 
 DEFINE_DEVICE_TYPE(OKIM6376, okim6376_device, "okim6376", "OKI MSM6376 ADPCM")
+DEFINE_DEVICE_TYPE(OKIM6650, okim6650_device, "okim6650", "OKI MSM6650 ADPCM")
 
-okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, OKIM6376, tag, owner, clock),
+okim6376_device::okim6376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		m_region_base(*this, DEVICE_SELF),
+		device_rom_interface(mconfig, *this),
 		//m_command[OKIM6376_VOICES],
 		m_latch(0),
 		//m_stage[OKIM6376_VOICES],
@@ -130,6 +131,17 @@ okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag,
 		m_st_pulses(0),
 		m_ch2_update(0),
 		m_st_update(0)
+{
+	override_address_width(addrbits);
+}
+
+okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: okim6376_device(mconfig, OKIM6376, tag, owner, clock, 21)
+{
+}
+
+okim6650_device::okim6650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: okim6376_device(mconfig, OKIM6650, tag, owner, clock, 23)
 {
 }
 
@@ -157,7 +169,7 @@ void okim6376_device::device_start()
 	m_ch2_update = 0;
 	m_st_pulses = 0;
 	/* generate the name and create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / m_divisor);
+	m_stream = stream_alloc(0, 1, get_sample_rate());
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6376_VOICES; voice++)
@@ -181,6 +193,11 @@ void okim6376_device::device_reset()
 	m_stream->update();
 	for (i = 0; i < OKIM6376_VOICES; i++)
 		m_voice[i].playing = 0;
+}
+
+
+void okim6376_device::rom_bank_updated()
+{
 }
 
 
@@ -212,13 +229,46 @@ int16_t okim6376_device::ADPCMVoice::clock(uint8_t nibble)
 }
 
 
+offs_t okim6376_device::get_start_position(int channel)
+{
+	offs_t base = m_command[channel] * 4;
+
+	// max address space is 16Mbit
+	return (read_byte(base+0) << 16 | read_byte(base+1) << 8 | read_byte(base+2)) & 0x1fffff;
+}
+
+
+offs_t okim6650_device::get_start_position(int channel)
+{
+	offs_t base = 0x000800 + m_command[channel] * 4;
+
+	// determine sampling frequency for phrase
+	uint8_t data = read_byte(base);
+	m_divisor = ((data & 3) == 2 ? 5 : 8 - (data & 3) * 2) * (BIT(data, 2) ? 2 : 1);
+	notify_clock_changed();
+
+	// max address space is 64Mbit
+	return (read_byte(base+1) << 16 | read_byte(base+2) << 8 | read_byte(base+3)) & 0x7fffff;
+}
+
+
+u32 okim6376_device::get_sample_rate()
+{
+	return clock() / m_divisor;
+}
+
+u32 okim6650_device::get_sample_rate()
+{
+	return clock() / 64 / m_divisor;
+}
+
+
+
 void okim6376_device::oki_process(int channel, int command)
 {
 	/* if a command is pending, process the second half */
 	if ((command != -1) && (command != 0)) //process silence separately
 	{
-		int start;
-		unsigned char *base/*, *base_end*/;
 		/* update the stream */
 		m_stream->update();
 
@@ -226,10 +276,8 @@ void okim6376_device::oki_process(int channel, int command)
 		{
 			struct ADPCMVoice *voice = &m_voice[channel];
 
-			/* determine the start position, max address space is 16Mbit */
-			base = &m_region_base[m_command[channel] * 4];
-			//base_end = &m_region_base[(MAX_WORDS+1) * 4];
-			start = ((base[0] << 16) + (base[1] << 8) + base[2]) & 0x1fffff;
+			// determine the start position
+			offs_t start = get_start_position(channel);
 
 				if (start == 0)
 				{
@@ -293,7 +341,7 @@ void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, 
 	/* if this voice is active */
 	if (voice->playing)
 	{
-		uint8_t *base = m_region_base + voice->base_offset;
+		offs_t base = voice->base_offset;
 		int sample = voice->sample;
 		int count = voice->count;
 
@@ -305,7 +353,7 @@ void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, 
 			if (count == 0)
 			{
 				/* get the number of samples to play */
-				count = (base[sample / 2] & 0x7f) << 1;
+				count = (read_byte(base + sample / 2) & 0x7f) << 1;
 
 				/* end of voice marker */
 				if (count == 0)
@@ -321,7 +369,7 @@ void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, 
 			}
 
 			/* compute the new amplitude and update the current step */
-			nibble = base[sample / 2] >> (((sample & 1) << 2) ^ 4);
+			nibble = read_byte(base + sample / 2) >> (((sample & 1) << 2) ^ 4);
 
 			/* output to the buffer, scaling by the volume */
 			/* signal in range -4096..4095, volume in range 2..16 => signal * volume / 2 in range -32768..32767 */
@@ -397,7 +445,7 @@ void okim6376_device::okim6376_state_save_register()
 
 void okim6376_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / m_divisor);
+	m_stream->set_sample_rate(get_sample_rate());
 }
 
 
@@ -425,14 +473,14 @@ READ_LINE_MEMBER( okim6376_device::busy_r )
 
 READ_LINE_MEMBER( okim6376_device::nar_r )
 {
-	MSM6376LOG("OKIM6376: NAR %x\n",m_nar);
+	LOG("OKIM6376: NAR %x\n",m_nar);
 	return m_nar;
 }
 
 WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 {
 	m_ch2_update = 0;//Clear flag
-	MSM6376LOG("OKIM6376: CH2 %x\n",state);
+	LOG("OKIM6376: CH2 %x\n",state);
 
 	if (m_ch2 != state)
 	{
@@ -445,7 +493,7 @@ WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 		struct ADPCMVoice *voice0 = &m_voice[0];
 		struct ADPCMVoice *voice1 = &m_voice[1];
 		// We set to channel 2
-		MSM6376LOG("OKIM6376: Channel 1\n");
+		LOG("OKIM6376: Channel 1\n");
 		m_channel = 1;
 
 		if ((voice0->playing)&&(m_st))
@@ -460,7 +508,7 @@ WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 	{
 		m_stage[1]=0;
 		oki_process(1, m_command[1]);
-		MSM6376LOG("OKIM6376: Channel 0\n");
+		LOG("OKIM6376: Channel 0\n");
 		m_channel = 0;
 	}
 }
@@ -471,7 +519,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 	//As in STart, presumably, this triggers everything
 
 	m_st_update = 0;//Clear flag
-	MSM6376LOG("OKIM6376: ST %x\n",state);
+	LOG("OKIM6376: ST %x\n",state);
 
 	if (m_st != state)
 	{
@@ -483,7 +531,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 			struct ADPCMVoice *voice = &m_voice[m_channel];
 			{
 				m_st_pulses ++;
-				MSM6376LOG("OKIM6376: ST pulses %x\n",m_st_pulses);
+				LOG("OKIM6376: ST pulses %x\n",m_st_pulses);
 				if (m_st_pulses > 3)
 				{
 					m_st_pulses = 3; //undocumented behaviour beyond 3 pulses
@@ -507,6 +555,12 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 	}
 }
 
+
+WRITE_LINE_MEMBER( okim6650_device::cmd_w )
+{
+	// TODO
+}
+
 /**********************************************************************************************
 
      okim6376_data_w -- write to the data port of an OKIM6376-compatible chip
@@ -527,18 +581,15 @@ void okim6376_device::write(uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void okim6376_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void okim6376_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int i;
+	outputs[0].fill(0);
 
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-
-	for (i = 0; i < OKIM6376_VOICES; i++)
+	for (int i = 0; i < OKIM6376_VOICES; i++)
 	{
 		struct ADPCMVoice *voice = &m_voice[i];
-		stream_sample_t *buffer = outputs[0];
+		auto &buffer = outputs[0];
 		int16_t sample_data[MAX_SAMPLE_CHUNK];
-		int remaining = samples;
 		if (i == 0) //channel 1 is the only channel to affect NAR
 		{
 			if (m_nartimer > 0)
@@ -552,16 +603,19 @@ void okim6376_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		}
 
 		/* loop while we have samples remaining */
-		while (remaining)
+		for (int sampindex = 0; sampindex < buffer.samples(); )
 		{
+			int remaining = buffer.samples() - sampindex;
 			int samples = (remaining > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : remaining;
-			int samp;
 
 			generate_adpcm(voice, sample_data, samples,i);
-			for (samp = 0; samp < samples; samp++)
-				*buffer++ += sample_data[samp];
+			for (int samp = 0; samp < samples; samp++)
+				buffer.add_int(sampindex + samp, sample_data[samp], 32768);
 
-			remaining -= samples;
+			sampindex += samples;
 		}
 	}
+
+	for (int i = 0; i < outputs[0].samples(); i++)
+		outputs[0].put(i, std::clamp(outputs[0].getraw(i), -1.0f, 1.0f));
 }

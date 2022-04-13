@@ -26,7 +26,7 @@ void maple_device::maple_reset()
 	device_reset();
 }
 
-void maple_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void maple_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(id != TIMER_ID)
 		return;

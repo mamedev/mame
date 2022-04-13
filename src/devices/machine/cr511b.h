@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -45,12 +45,6 @@ public:
 	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_stch_handler(Object &&cb) { return m_stch_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sten_handler(Object &&cb) { return m_sten_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dten_handler(Object &&cb) { return m_dten_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_scor_handler(Object &&cb) { return m_scor_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xaen_handler(Object &&cb) { return m_xaen_handler.set_callback(std::forward<Object>(cb)); }
 	auto stch_handler() { return m_stch_handler.bind(); }
 	auto sten_handler() { return m_sten_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
@@ -58,8 +52,8 @@ public:
 	auto scor_handler() { return m_scor_handler.bind(); }
 	auto xaen_handler() { return m_xaen_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER ( write );
+	uint8_t read();
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
 	DECLARE_WRITE_LINE_MEMBER( cmd_w );
@@ -69,7 +63,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum

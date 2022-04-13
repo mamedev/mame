@@ -20,13 +20,6 @@
   else on ZSNES Technical for probing the darker corners of the SNES
   with test programs so we have a chance at getting things accurate.
 
-  MESS Bugzilla bugs:
-  - 804 ADC sets carry too late (FIXED)
-  - 805 ADDW/SUBW set V wrongly (FIXED)
-  - 806 BRK should modify PSW (FIXED)
-  - 807 DAA/DAS problem (FIXED)
-
-
 */
 /* ======================================================================== */
 /* ================================= NOTES ================================ */
@@ -65,26 +58,14 @@ Address  Function Register  R/W  When Reset          Remarks
 #include "emu.h"
 #include "spc700.h"
 
-#include "debugger.h"
-
-#include <limits.h>
+#include <climits>
 
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
 /* ======================================================================== */
 
-#undef int8
-
-/* Allow for architectures that don't have 8-bit sizes */
-#if UCHAR_MAX == 0xff
-#define int8 char
-#define MAKE_INT_8(A) (int8)((A)&0xff)
-#else
-#define int8   int
-static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
-#endif /* UCHAR_MAX == 0xff */
-
+#define MAKE_INT_8(A) (int8_t)((A)&0xff)
 #define MAKE_UINT_8(A) ((A)&0xff)
 #define MAKE_UINT_16(A) ((A)&0xffff)
 
@@ -222,8 +203,13 @@ DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "Sony SPC700")
 
 
 spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SPC700, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+	: spc700_device(mconfig, SPC700, tag, owner, clock)
+{
+}
+
+spc700_device::spc700_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
 	, m_a(0)
 	, m_x(0)
 	, m_y(0)
@@ -247,7 +233,8 @@ device_memory_interface::space_config_vector spc700_device::memory_space_config(
 /* ======================================================================== */
 
 /* Use up clock cycles */
-#define CLK(A) CLOCKS -= (A)
+#define CLK_DIVIDER 2
+#define CLK(A) CLOCKS -= ((A)*(CLK_DIVIDER))
 #define CLK_ALL() CLOCKS = 0
 
 
@@ -414,11 +401,11 @@ uint32_t spc700_device::EA_ABS()   {return OPER_16_IMM();}
 uint32_t spc700_device::EA_ABX()   {return EA_ABS() + REG_X;}
 uint32_t spc700_device::EA_ABY()   {return EA_ABS() + REG_Y;}
 uint32_t spc700_device::EA_AXI()   {return OPER_16_ABX();}
-uint32_t spc700_device::EA_DP()   {return OPER_8_IMM();}
+uint32_t spc700_device::EA_DP()    {return OPER_8_IMM();}
 uint32_t spc700_device::EA_DPX()   {return (EA_DP() + REG_X)&0xff;}
 uint32_t spc700_device::EA_DPY()   {return (EA_DP() + REG_Y)&0xff;}
 uint32_t spc700_device::EA_DXI()   {return OPER_16_DPX();}
-uint32_t spc700_device::EA_DIY()   {uint32_t addr = OPER_16_DP(); if((addr&0xff00) != ((addr+REG_Y)&0xff00)) CLK(1); return addr + REG_Y;}
+uint32_t spc700_device::EA_DIY()   {uint32_t addr = OPER_16_DP(); return addr + REG_Y;}
 uint32_t spc700_device::EA_XI()    {return REG_X;}
 uint32_t spc700_device::EA_XII()   {uint32_t val = REG_X;REG_X = MAKE_UINT_8(REG_X+1);return val;}
 uint32_t spc700_device::EA_YI()    {return REG_Y;}
@@ -1180,16 +1167,18 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			write_8_##MODE(DST, FLAG_N & ~REG_A);                           \
-			FLAG_NZ &= REG_A
+			m_spc_int16 = (short)REG_A - (short)(read_8_##MODE(DST)); \
+			write_8_##MODE(DST, FLAG_NZ & ~REG_A); \
+			FLAG_NZ = MAKE_UINT_8(m_spc_int16);
 
 /* Test and Set Bits */
 #define OP_TSET1(BCLK, MODE)                                                \
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			write_8_##MODE(DST, FLAG_N | REG_A);                            \
-			FLAG_NZ &= REG_A
+		m_spc_int16 = (short)REG_A - (short)(read_8_##MODE(DST)); \
+		write_8_##MODE(DST, FLAG_NZ | REG_A); \
+		FLAG_NZ = MAKE_UINT_8(m_spc_int16);
 
 /* Exchange high and low nybbles of accumulator */
 #define OP_XCN(BCLK)                                                        \
@@ -1246,7 +1235,6 @@ void spc700_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc).formatstr("%04X").noshow();
-	state_add(STATE_GENSP, "GENSP", m_debugger_temp).mask(0x1ff).callexport().formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_debugger_temp).formatstr("%8s").noshow();
 
 	set_icountptr(m_ICount);
@@ -1297,10 +1285,6 @@ void spc700_device::state_export(const device_state_entry &entry)
 					FLAG_I                    |
 					((!FLAG_Z) << 1)      |
 					((FLAG_C >> 8)&1));
-			break;
-
-		case STATE_GENSP:
-			m_debugger_temp = m_s + STACK_PAGE;
 			break;
 	}
 }

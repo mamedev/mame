@@ -172,7 +172,7 @@ void vme_fcisio1_card_device::fcisio1_mem(address_map &map)
 	map(0xe60000, 0xe601ff).rw("duscc3", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);
 	map(0xe80000, 0xe80dff).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 	map(0xf00000, 0xf7ffff).rom(); /* System EPROM Area 32Kb DEBUGGER supplied */
-//  AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
+//  map(0xc40000, 0xc800ff).rw(FUNC(vme_fcisio1_card_device::not_implemented_r), FUNC(vme_fcisio1_card_device::not_implemented_w));  /* Dummy mapping af address area to display message */
 }
 
 /* ROM definitions */
@@ -405,7 +405,6 @@ vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, 
 void vme_fcisio1_card_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-	set_vme_device();
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0xf00000);
@@ -426,11 +425,11 @@ void vme_fcisio1_card_device::device_reset()
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (vme_fcisio1_card_device::bootvect_r){
+uint16_t vme_fcisio1_card_device::bootvect_r(offs_t offset){
 	return m_sysrom [offset];
 }
 
-READ8_MEMBER (vme_fcisio1_card_device::not_implemented_r){
+uint8_t vme_fcisio1_card_device::not_implemented_r(){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -439,7 +438,7 @@ READ8_MEMBER (vme_fcisio1_card_device::not_implemented_r){
 	return (uint8_t) 0;
 }
 
-WRITE8_MEMBER (vme_fcisio1_card_device::not_implemented_w){
+void vme_fcisio1_card_device::not_implemented_w(uint8_t data){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -449,7 +448,7 @@ WRITE8_MEMBER (vme_fcisio1_card_device::not_implemented_w){
 }
 
 // TODO: Get a manual to understand the config options for real
-READ8_MEMBER (vme_fcisio1_card_device::config_rd){
+uint8_t vme_fcisio1_card_device::config_rd(){
 	uint8_t ret = 0;
 	LOG("%s\n", FUNCNAME);
 

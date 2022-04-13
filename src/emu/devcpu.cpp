@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    devcpu.c
+    devcpu.cpp
 
     CPU device definitions.
 
@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include <ctype.h>
+#include <cctype>
 
 
 //**************************************************************************

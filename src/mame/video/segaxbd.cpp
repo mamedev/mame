@@ -26,7 +26,7 @@ void segaxbd_state::video_start()
 	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_16B, 0x1c00, 0, 2);
 
 	// initialize the road
-	m_segaic16road->segaic16_road_init(machine(), 0, segaic16_road_device::ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
+	m_segaic16road->segaic16_road_init(0, segaic16_road_device::ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
 }
 
 
@@ -91,7 +91,7 @@ uint32_t segaxbd_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					{
 						// if the shadow flag is set, this triggers shadow/hilight for pen 0xa
 						if ((pix & 0x400f) == 0x400a)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else

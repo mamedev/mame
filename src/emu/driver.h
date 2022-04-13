@@ -32,13 +32,6 @@
 #define MCFG_MACHINE_RESET_REMOVE() \
 	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate());
 
-// core sound callbacks
-#define MCFG_SOUND_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::SOUND_START_NAME(_func), this));
-
-#define MCFG_SOUND_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::SOUND_RESET_NAME(_func), this));
-
 
 // core video callbacks
 #define MCFG_VIDEO_START_OVERRIDE(_class, _func) \
@@ -63,15 +56,6 @@
 #define DECLARE_MACHINE_RESET(name) void MACHINE_RESET_NAME(name)()
 #define MACHINE_RESET_MEMBER(cls,name) void cls::MACHINE_RESET_NAME(name)()
 
-#define SOUND_START_NAME(name)      sound_start_##name
-#define DECLARE_SOUND_START(name)   void SOUND_START_NAME(name)() ATTR_COLD
-#define SOUND_START_MEMBER(cls,name) void cls::SOUND_START_NAME(name)()
-
-#define SOUND_RESET_NAME(name)      sound_reset_##name
-#define SOUND_RESET_CALL_MEMBER(name) SOUND_RESET_NAME(name)()
-#define DECLARE_SOUND_RESET(name)   void SOUND_RESET_NAME(name)()
-#define SOUND_RESET_MEMBER(cls,name) void cls::SOUND_RESET_NAME(name)()
-
 #define VIDEO_START_NAME(name)      video_start_##name
 #define VIDEO_START_CALL_MEMBER(name)       VIDEO_START_NAME(name)()
 #define DECLARE_VIDEO_START(name)   void VIDEO_START_NAME(name)() ATTR_COLD
@@ -92,9 +76,14 @@
 typedef delegate<void ()> driver_callback_delegate;
 
 
-// ======================> driver_device
-
-// base class for machine driver-specific devices
+/// \brief Base class for system device classes
+///
+/// System devices can be used as the root device of a system.
+/// Indirection for metadata, input port definitons, initialisation
+/// functions, ROM definitions, internal artwork and emulation status
+/// flags is provided via the #game_driver structure.  This allows
+/// multiple systems to be be implemented using a single
+/// system device class.
 class driver_device : public device_t
 {
 public:
@@ -103,29 +92,26 @@ public:
 	virtual ~driver_device();
 
 	// getters
-	const game_driver &system() const { assert(m_system != nullptr); return *m_system; }
+	const game_driver &system() const { return m_system; }
 
 	// indexes into our generic callbacks
 	enum callback_type
 	{
 		CB_MACHINE_START,
 		CB_MACHINE_RESET,
-		CB_SOUND_START,
-		CB_SOUND_RESET,
 		CB_VIDEO_START,
 		CB_VIDEO_RESET,
 		CB_COUNT
 	};
 
 	// inline configuration helpers
-	void set_game_driver(const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
-	// dummy driver_init callback
+	/// \brief Empty system initialisation function
+	///
+	/// Provided as a convenience for systems that have no additional
+	/// initialisation tasks.
 	void empty_init();
-
-	// memory helpers
-	address_space &generic_space() const { return machine().dummy_space(); }
 
 	// output heler
 	output_manager &output() const { return machine().output(); }
@@ -156,6 +142,8 @@ public:
 
 	void irq7_line_hold(device_t &device);
 	void irq7_line_assert(device_t &device);
+
+	virtual std::vector<std::string> searchpath() const override;
 
 	virtual void driver_init();
 
@@ -192,7 +180,8 @@ private:
 	void updateflip();
 
 	// internal state
-	const game_driver        *m_system;               // pointer to the game driver
+	const game_driver        &m_system;               // reference to the system description
+	std::vector<std::string>  m_searchpath;           // media search path following parent/clone links
 	driver_callback_delegate  m_callbacks[CB_COUNT];  // start/reset callbacks
 
 	// generic video

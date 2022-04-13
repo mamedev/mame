@@ -59,7 +59,7 @@ bool m6502_vtscr::mi_decrypt::toggle_scramble(uint8_t op) {
 
 uint8_t m6502_vtscr::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = cache->read_byte(adr);
+	uint8_t res = cprogram.read_byte(adr);
 	if(m_scramble_en)
 	{
 		res = descramble(res);

@@ -17,8 +17,8 @@ public:
 protected:
 	ds12885_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual int data_size() override { return 128; }
-	virtual int get_timer_bypass() override;
+	virtual int data_size() const override { return 128; }
+	virtual int get_timer_bypass() const override;
 };
 
 // device type definition
@@ -37,7 +37,7 @@ public:
 	void write_extended(offs_t offset, uint8_t data);
 
 protected:
-	virtual int data_size() override { return 256; }
+	virtual int data_size() const override { return 256; }
 };
 
 // device type definition

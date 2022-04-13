@@ -1,0 +1,3293 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="pc8001_flop" description="NEC PC-8001 (N-BASIC) disk images">
+<!--
+PC-8001 / PC-8801 N-BASIC compatible SW list
+
+Generic troubleshooting:
+- For PC-8801 you need to flip in N-BASIC mode;
+- Commands are case insensitive but files are!
+- Issue a FILES command to get the contents of the disk.
+  If OS punts with a "Disk BASIC Feature" then you are on resident ROM OS
+    (and most likely the floppy didn't read in the first place);
+  If OS throws a "Disk not mounted" just issue a MOUNT command then FILES again
+    (cfr. games with "Two surface disk version" BIOS like Dragon'N Spirit);
+- LOAD "<filename>.<ext>" then RUN
+  Notice that if file doesn't have any extension then you can omit the ending dot.
+  Alternatively you can directly RUN "<filename>" but this depends on the loaded OS
+- If attempting to load any of those fails and returns with "<gibberish 7 chars katakana>NEC PC-8001 BASIC"
+  then SW needs either N80 or N80SR BASIC (hence works only in PC-8001mkII/PC-8001mkIISR);
+
+TODO:
+- Identify which SWs are officially been released on disk and what instead are
+  ported from tape format (hence bootlegs);
+- Fill unknown years and manufacturers;
+- Pinpoint if there are further games that needs to be moved from pc8801_flop to here
+  (1982, 1983 and 1984 releases may really work on N-BASIC only);
+- Checkout the collection disks, printout what they contains and eventually extract a
+  list of games released for the system;
+- verify minimum RAM & minimum N Basic version requirements
+
+References:
+- http://w01.tp1.jp/~a571632211/micon/game0.htm (石津氏)
+
+-->
+
+	<software name="15puzzle" supported="yes">
+		<description>15 Puzzle</description>
+		<!-- 1999.11.23 -->
+		<year>1999</year>
+		<!-- hal_8999@geocities.co.jp (doujinshi) -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424"> <!-- Data CRC16: 57187 -->
+				<rom name="15 puzzle(8001).d88" size="31424" crc="594fad81" sha1="8fb5c66b31b2d245bb72718b9d3fd70ed8e71215"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="15puzzlea" cloneof="15puzzle" supported="yes">
+		<description>15 Puzzle (alt)</description>
+		<!-- 1999.11.23 -->
+		<year>1999</year>
+		<!-- hal_8999@geocities.co.jp (doujinshi) -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="15 puzzle.d88" size="31424" crc="e598f88f" sha1="efd1172901756b2abd2e2551e8fbbd60570ca7be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2001spc" supported="yes">
+		<description>2001 A Space Odyssey (v1.2)</description>
+		<!-- basic list prints '81, later release? -->
+		<year>1980</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<info name="alt_title" value="2001年宇宙の旅"/>
+		<info name="usage" value="Requires 32K RAM"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="2001 a space odyssey.d88" size="31424" crc="c98945b1" sha1="1f3bd896104d50af32d0d1bca85b1766e5689b8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- "I-SCORE" on title screen is a typo (btanb) -->
+	<software name="3by4" supported="yes">
+		<description>3 by 4</description>
+		<!-- 1982.8 -->
+		<year>1982</year>
+		<!-- Published on I/O 1982.08 -->
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- Ｅ．Ｈ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 9706 -->
+				<rom name="3by4.d88" size="348832" crc="1c75d055" sha1="026cdfec0557c203b1b119194832b1bdca4dbaca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3by4a" cloneof="3by4" supported="yes">
+		<description>3 by 4 (alt)</description>
+		<!-- 1982.8 -->
+		<year>1982</year>
+		<!-- Published on I/O 1982.08 -->
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- Ｅ．Ｈ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="3 by 4.d88" size="348848" crc="46ff04e7" sha1="6dffb648c27a47cb5f69296bf9fecfa60554a340"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Locks up at "BASIC LODGE" screen, blinks player after too much time, never start gameplay -->
+	<!-- [Does extensive reads of the RTC, keeps looping at 340-350 basic lines] -->
+	<software name="300m" supported="no">
+		<description>300m</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- I.O -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 64846 -->
+				<rom name="300m.d88" size="348832" crc="eebfbcd8" sha1="d85d2cbbe83fe37129aa03b090cd85e8f878a5cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Locks up at "BASIC LODGE" screen, blinks player after too much time, never start gameplay -->
+	<!-- [Does extensive reads of the RTC, keeps looping at 340-350 basic lines] -->
+	<software name="300ma" cloneof="300m" supported="no">
+		<description>300m (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- I.O -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="300m [alt].d88" size="348848" crc="b435686a" sha1="d0cd5f3df1078a9cfb1ecc158c6608bdffb57e91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4dimensi" supported="yes">
+		<description>Yojigen no Ie - 4 Dimension House</description>
+		<year>1983</year>
+		<publisher>プロシューマー (Prosumer)</publisher>
+		<info name="alt_title" value="四次元の家"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="4 dimension house.d88" size="348848" crc="cfa34b59" sha1="5a3ff204fcbae21d097736867c3fb0f7c5b4e7ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4dhouse" cloneof="4dimensi">
+		<description>Yojigen no Ie - 4 Dimension House (alt)</description>
+		<year>1983</year>
+		<publisher>プロシューマー (Prosumer)</publisher>
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="四次元の家"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34880 -->
+				<rom name="4 dimension house [alt].d88" size="348848" crc="90e85539" sha1="450867c78915238f9de40bb98cd9d03f63eb01b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="7narabe" supported="yes">
+		<description>7 Narabe</description>
+		<year>19??</year>
+		<!-- "Programed (sic) by Koji Kawamoto" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="7 narabe.d88" size="348848" crc="cfe325eb" sha1="4f2770cf7a8cbe4f47a9e69dbc5a535892d07017"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="8colorsg" supported="yes">
+		<description>RGB Colors Game</description>
+		<!-- 1986,9,21 -->
+		<year>1986</year>
+		<!-- 1st-base -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="8-colors game.d88" size="31424" crc="48fcaa5b" sha1="2d38a422c0dcae486ef3ec9e14dab4295f759a0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienbom" supported="yes">
+		<!-- Misspelled as "Ailen Bomb" in BASIC LIST -->
+		<description>Alien Bomb</description>
+		<!-- 1982;1;25 -->
+		<year>1982</year>
+		<!-- yoshikazu -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="alien bomb.d88" size="348848" crc="6bfa32c0" sha1="d7d2dfcfce734f080e4fcc24230be4492cf053e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienfal" supported="yes">
+		<!-- uses Dash-80 1.0b loader -->
+		<description>Alien Fall</description>
+		<!-- Published on I/O 1980.10 -->
+		<year>1980</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="エイリアン　フォール"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="alien fall.d88" size="348848" crc="8b7761a2" sha1="616e0327be1f0be6c2f9b014137e0a5a31d9174b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienfala" cloneof="alienfal" supported="yes">
+		<!-- uses anonymous "LOADING" -->
+		<description>Alien Fall (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="alien fall [set 1].d88" size="31424" crc="0cc4dd5f" sha1="af98cfd5baa92a6a84f4d63699df2e24f8fbddc7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alien2" supported="yes">
+		<!-- uses Dash-80 1.0b loader -->
+		<description>Alien Part 2</description>
+		<!-- no in-game year, published on I/O 1981.05 -->
+		<year>1981</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="エイリアン　パート2"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="alien part 2.d88" size="348848" crc="b5486cdd" sha1="c91a07da3c4e1df36bbfb35347b9c65a5cdc82ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alien2a" cloneof="alien2" supported="yes">
+		<!-- uses anonymous "LOADING" -->
+		<description>Alien Part 2 (alt)</description>
+		<!-- no in-game year, published on I/O 1981.05 -->
+		<year>1981</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="エイリアン　パート２"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="alien part 2 [set 1].d88" size="31424" crc="142bf95b" sha1="cdaf6e7268de0a0fcfb53a54e2787e19c28406c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astoria" supported="yes">
+		<description>Astoria</description>
+		<year>1982</year>
+		<!-- ishizu YO -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="astoria.d88" size="348848" crc="1a5569a1" sha1="b0cc2da79032f07e8e63e474dc597583032b143b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ay1h" supported="yes">
+		<description>AY-1 Fortress Solomon (bootleg)</description>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ay-1 (hack) {pass=123}.d88" size="348848" crc="b6d490f0" sha1="0c6619a4cc01b843a43f7e0695602a09e8560cf4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="80ay1d88" cloneof="ay1h" supported="yes">
+		<description>AY-1 Fortress Solomon (bootleg, alt)</description>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="80ay1.d88" size="348848" crc="fd62ea35" sha1="77a4c69588a8b3b0fb0c2e0a7ccaeb37890cdf62"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ay2" supported="yes">
+		<description>AY-2 Orion80</description>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="AY-2 オリオン80"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="ay-2 - orion80 (1983)(ascii).d88" size="31424" crc="c6d64b3a" sha1="852bc22c80056f3dfbcce55cef29e6461191f427"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ay2a" cloneof="ay2" supported="yes">
+		<description>AY-2 Orion80 (alt)</description>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="AY-2 オリオン80"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="ay-2 - olion 80 [set 1].d88" size="31424" crc="65ee725d" sha1="1e0bb1991bf6b5bc19e2d8e4fa46e62babb05c4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamn" supported="yes">
+		<description>Backgammon</description>
+		<year>1982</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="backgammon.d88" size="31424" crc="1efa203a" sha1="7e2c85b7eea73ef6ec1e548229e0b434896e178f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bastille" supported="yes">
+		<description>Bastille Rougoku</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="バスチーユロウゴク"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="bastille rougoku.d88" size="348848" crc="2b7d45d2" sha1="063ccc4b0572369aa660bd7e903ed0fb5d9a09a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Has lots of sound aliasing -->
+	<software name="beepmusi" supported="partial">
+		<!-- TODO: fix naming (cfr. BASIC LIST 10-90) -->
+		<description>Beep Music Test</description>
+		<year>2002</year>
+		<!-- Y.Mino 1991.5.6 / HAL8999 2002.10.27 -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="beep music menu.d88" size="31424" crc="d73399e2" sha1="1d996045200f6d30942eefeb7c191e7e36fa0f2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Has lots of sound aliasing -->
+	<software name="beeptest" supported="partial">
+		<!-- TODO: fix naming (cfr. BASIC LIST 10-90) -->
+		<description>Beep Music Test 2</description>
+		<year>2002</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Y.Mino 1991.5.6 / HAL8999 2002.10.27 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="beep music test.d88" size="348848" crc="e51ed1de" sha1="f27218b9405e1518754548e1299393632808b2a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="block" supported="yes">
+		<description>Block</description>
+		<!-- 1982/3 -->
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- "Yoshikazu Ishizu" according to Neo Kobe-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="block (yoshikazu ishizu).d88" size="348848" crc="ab905843" sha1="f56636ac6b553b57f5177f8854da2559250fd12a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockten" supported="yes">
+		<!-- Tennis Game "Tennis" -->
+		<description>Tennis (Kiyoshi Kawamura)</description>
+		<year>19??</year>
+		<!-- Kiyoshi Kawamura -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Inputs: -->
+		<!-- p1 Shift and Right CTRL -->
+		<!-- p2 Page Up and + (Numpad) -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="block tennis.d88" size="31424" crc="25fa6b41" sha1="dbb7f33bff050c442e09518b4769de27335f4d9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomberga" supported="yes">
+		<!-- Bombar (sic) ゲーム -->
+		<description>Bomber Game</description>
+		<!-- 1982:2:16 -->
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Bombarゲーム"/>
+		<!-- Isizu Yoshikazu -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="bomber game.d88" size="348848" crc="f07c544a" sha1="2eb02414659eac46e3d3680ce5e7a8890b27cf0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Timer never start, -->
+	<!-- Hi-Score doesn't initialize properly (sometimes 0, other times 0xFFFFFF) -->
+	<!-- TODO: both smells as btanb, verify on real HW -->
+	<!-- TODO: is the I/O 81.03 release based off later code? -->
+	<software name="bugfire" supported="partial">
+		<!-- uses Dash-80 1.0b loader -->
+		<description>Bug Fire!</description>
+		<!-- 1980.12.13 -->
+		<year>1980</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Y.OGI / Ｋ．Ｏ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="bug fire.d88" size="348848" crc="20f3ff11" sha1="599d74babd6227683289d0f270637a6b61a6395e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Timer never start, -->
+	<!-- Hi-Score doesn't initialize properly (sometimes 0, other times 0xFFFFFF) -->
+	<!-- TODO: both smells as btanb, verify on real HW -->
+	<software name="bugfirea" cloneof="bugfire" supported="partial">
+		<!-- uses anonymous "LOADING" -->
+		<description>Bug Fire! (alt)</description>
+		<!-- 1980.12.13 -->
+		<year>1980</year>
+		<!-- Y.OGI / Ｋ．Ｏ氏 -->
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="bug fire [set 1].d88" size="31424" crc="663eae6a" sha1="2b525f6d3c201e0636e86ccec3215f148aa6374e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chikyuso">
+		<!-- Terra S.O.S. -->
+		<description>Chikyu SOS!</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="chikyu sos.d88" size="348832" crc="bb349e36" sha1="dc2c7758659632723e43687fc9796af8fbd8d613"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cityline" supported="yes">
+		<description>City Line</description>
+		<!-- 1982:2:1 -->
+		<year>1982</year>
+		<!-- isisu yoshikasu -->
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="city line.d88" size="348848" crc="0f5085e2" sha1="22e060e190e1aead3323cd0e47ba6a4ad003fc39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combat" supported="yes">
+		<description>Combat (v1.2)</description>
+		<!-- 1982,4,25 -->
+		<year>1982</year>
+		<publisher>光栄 (Koei)</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="combat.d88" size="31424" crc="5f3d8c23" sha1="917cd7ba383ca9749f9d327d6354d09c53a1aeaf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combata" cloneof="combat" supported="yes">
+		<description>Combat (v1.2, alt)</description>
+		<!-- 1982,4,25 -->
+		<year>1982</year>
+		<publisher>光栄 (Koei)</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="combat [alt].d88" size="31424" crc="e3ead92d" sha1="db62e573c17bc4bc4e5c8fd8f903a7074fcee38b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmicin" supported="yes">
+		<!-- "Vol. 3" on gameplay (?) -->
+		<description>Cosmic Ineiger (v1.0)</description>
+		<!-- 1982,6,28 No. 7 (?) -->
+		<year>1982</year>
+		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<info name="alt_title" value="コスミック　イネジャー"/>
+		<!-- Ｍ．Ｎ(ＳＹＯＨ)氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="cosmic ineiger.d88" size="31424" crc="4782f36e" sha1="fdb5be253aba51eaf89fbf8b4a9af3ab91161a70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmomis">
+		<description>Cosmo Missile</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="cosmo missile.d88" size="348848" crc="404cc821" sha1="4f3ed65cd3ffca3e00920a9e7b3ac332fdd98d07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmomisa" cloneof="cosmomis">
+		<description>Cosmo Missile (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="cosmo missile [set 1].d88" size="348848" crc="f3477abe" sha1="fbc760e8a99cffa6db5e7fb7041fd49494606ef9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmotra" supported="yes">
+		<description>Cosmo Traveler (v1.1)</description>
+		<year>1982</year>
+		<!-- J&P -->
+		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<!-- M,Nakajima Ｍ．Ｎ（ＴＯＴＯ）氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="cosmo traveler.d88" size="31424" crc="c04c4679" sha1="5b371499a5b77cbceedaa6bb7c48b3065e544a1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dasshuts">
+		<description>Dasshutsu! Shi no Aokigahara</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="dasshutsu shi no aokigahara.d88" size="31424" crc="3bb3fa40" sha1="67dcbca00c7e5c14c288c07975744531bf111bed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="destheli">
+		<description>Destroy Helicopter</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="destroy helicopter.d88" size="348848" crc="6297b886" sha1="7cd299a5e5fcfa2a818e3e1982b046cc6291af8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desthelia" cloneof="destheli">
+		<description>Destroy Helicopter (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="destroy helicopter [set 1].d88" size="348848" crc="d7e8534c" sha1="124ce059e1c89a6733e22a62a186682c68c759a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: Neo Kobe claims as "prototype" for some reason, verify -->
+	<software name="dinosaurn">
+		<description>Dinosaur N</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dinosaur n (prototype).d88" size="348848" crc="cb58c3e8" sha1="72b70cbd475b621e6da39e972f64ea4b213e4b86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dockingt">
+		<description>Docking Three</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="docking three.d88" size="348848" crc="09726393" sha1="1358012075c835d1748c4c2fd9865fe11f87c02d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonsp">
+		<description>Dragon 'N' Spirit</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dragon 'n' spirit.d88" size="348848" crc="4c83c46a" sha1="4e76ec192eb1fdb74137a1cf4b109a40004a3d1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnlair">
+		<description>Dragon Lair</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="dragon lair.d88" size="31424" crc="cd5042ce" sha1="4c6514bb8a971bb89496c708c65db73c72f77157"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: both versions returns a title screen year 1982 and manufacturer "TANAC 2" -->
+	<software name="dualaln">
+		<description>Dual Alien</description>
+		<year>1984</year>
+		<publisher>セントラル教育 (Central Kyoku)</publisher>
+		<!-- PC8001 -->
+		<info name="release" value="198404xx"/>
+		<info name="alt_title" value="デュアルエイリアン"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="dual alien.d88" size="31424" crc="5a54e237" sha1="044021325c1019718c00bed5614e124684170ba8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dualalna" cloneof="dualaln">
+		<description>Dual Alien (alt)</description>
+		<year>1984</year>
+		<publisher>セントラル教育 (Central Kyoku)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="dual alien [alt].d88" size="31424" crc="e683b739" sha1="85473ccbbe41a756231c510bed2356be2714eee7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: Later release with fancy GFX title known to exist (mkII?), is this based off the tape version instead? -->
+	<software name="dungeon">
+		<description>Dungeon</description>
+		<!-- Dec 1983 -->
+		<year>1983</year>
+		<!-- misspelled as Koey on title screen -->
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="ダンジョン"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="166064">
+				<rom name="dungeon.d88" size="166064" crc="99e6c8c0" sha1="3ae5a0d014f0e8f019c237fd3d1afc920b34c5ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emmyn" supported="yes">
+		<description>Emmy</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="emmy.d88" size="348848" crc="ad5c4831" sha1="2b726b866fcbc4a130d52e44aeba88826af7f8c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emmyna" cloneof="emmyn" supported="yes">
+		<description>Emmy (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="emmy [alt 1].d88" size="348848" crc="313592c8" sha1="71c4d03ee52206ed377c16fa77fd0c6e2e6b16e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emmynb" cloneof="emmyn" supported="yes">
+		<description>Emmy (alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="emmy [alt 2].d88" size="348848" crc="65bf0aec" sha1="1d98eb060a52cab0075a47b375f18a10910f24b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emmync" cloneof="emmyn" supported="yes">
+		<description>Emmy (alt 3)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="emmy [alt 3].d88" size="348848" crc="be83167b" sha1="a77b1e0db564b1632a640ad904a36d7e73231919"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emmynd" cloneof="emmyn" supported="yes">
+		<description>Emmy (alt 4)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="emmy [alt 4].d88" size="348848" crc="2c1f9f36" sha1="99651eea15ebdc3d46724e284a60d7fba113356f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="europeta">
+		<description>Europe Taisen</description>
+		<year>19??</year>
+		<publisher>アスキー (ASCII)</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="europe taisen.d88" size="31424" crc="f0894ea7" sha1="539522b23d598a09c91b1c5b94dee806b6c478ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- box says it's also for pc8001 (32k) and pc8001mkII -->
+	<software name="fanfun" supported="yes">
+		<description>Fan Fun</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="ファンファン"/>
+		<!-- Miyata -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="fanfun.d88" size="31424" crc="4d31b443" sha1="65c0e564c99f57eb4551dadb28b8a1ee387386cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fanfuna" cloneof="fanfun" supported="yes">
+		<description>Fan Fun (alt)</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="ファンファン"/>
+		<!-- Miyata -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="fan fun.d88" size="31424" crc="72bac1b7" sha1="7cc591ef225ffe629d39d98b082be20cd605b7a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fejobust" supported="yes">
+		<description>Fejone Buster</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Tanico -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="fejone buster.d88" size="31424" crc="bedd3272" sha1="3a1c460108550d80426314100b9131c1566578cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fenix2">
+		<description>Fenix Part 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="fenix part 2.d88" size="348848" crc="634f548c" sha1="3939b7d80e51dc51a23b2f59ef98582e7e9854f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fenix2a" cloneof="fenix2">
+		<description>Fenix Part 2 (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="fenix part 2 [set 1].d88" size="348848" crc="b80e968c" sha1="79f75211f5a8d1585d21c74458e608c4737c0ac0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Has left column text attribute GFX glitches -->
+	<software name="flgworld" supported="partial">
+		<description>Flag World</description>
+		<!-- published on PiO 1984.06 -->
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="フラグワールド"/>
+		<!-- ＵＳＵＡＬ　ＳＩＴＵＡＴＩＯＮ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="flag world.d88" size="348848" crc="ed6969ba" sha1="0b44f1e5c2c65a6fa02de32a7dad5bc5ec4f0517"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Has left column text attribute GFX glitches -->
+	<software name="flgworlda" cloneof="flgworld" supported="partial">
+		<description>Flag World (alt)</description>
+		<!-- published on PiO 1984.06 -->
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="フラグワールド"/>
+		<!-- ＵＳＵＡＬ　ＳＩＴＵＡＴＩＯＮ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="flag world [set 1].d88" size="348848" crc="1de65e33" sha1="1bb911f71d4d2963ffbf9580bd5017ecfb099588"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foresigh01">
+		<description>Foresight #01</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="foresight #01.d88" size="31424" crc="d5360c56" sha1="82ba56e64f481a277a3e1aa772a53d360f691553"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foresigh16d">
+		<description>Foresight #16 (Demo)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="foresight #16 (demo).d88" size="31424" crc="8fc9af3e" sha1="fd3cc13436fe912289d84bfe48d5e324a30bb7d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foresig18">
+		<description>Foresight #18 (Inu)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="foresight #18 (inu).d88" size="31424" crc="fcc1c5c4" sha1="0ed2a09bc454d8108bbc0f41653f7e0466817b49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foresigh19">
+		<description>Foresight #19 (Drive)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="foresight #19 (drive).d88" size="31424" crc="fabb4d9c" sha1="5b7737af5346f1aa9f85bb57d9b7638fa8cc528d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foresigh21">
+		<description>Foresight #21 (Man)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="foresight #21 (man).d88" size="31424" crc="3c0f8d47" sha1="93c9537d9c3ee2da525f4c84f2f9299327681d9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foresigh22">
+		<description>Foresight #22 (Back)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="foresight #22 (back).d88" size="31424" crc="88e77b40" sha1="e8df2aaf5f28a438afbe062045b8b059fb4c0c5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foresigh39d">
+		<description>Foresight #39 (Demo)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="foresight #39 (demo).d88" size="348848" crc="bd8bd8b6" sha1="3e16284653fc608a494b63ce7c404446126bceb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal">
+		<!-- Collection of Demos -->
+		<!-- "vogue" are nsfw -->
+		<description>&lt;Unknown&gt; Foresight (Demo)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="pascal.d88" size="348848" crc="52040866" sha1="ba4f0ceac598eb57d482140c8d39d787b5f3c9e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitfld">
+		<description>Fruits Fields (N-BASIC version)</description>
+		<!-- Compaq like N88 version? -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="fruits fields.d88" size="31424" crc="bf320b73" sha1="d19033d520b221aa9976512f2061857337bcb9f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitflda" cloneof="fruitfld">
+		<!-- TODO: doesn't really boot in N80 BASIC? -->
+		<description>Fruits Fields (N80-BASIC version)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="fruits fields(n80).d88" size="31424" crc="cff5e18e" sha1="8fcdac58e3dff1c348031b62581d81079ae47301"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fulltime">
+		<description>Full Time 'N'</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="full time 'n'.d88" size="348848" crc="db712a0c" sha1="079cbd497f4ed477941e8d58f30d148f2235a90f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxiangk" supported="yes">
+		<description>Galaxian (Geimu Kyoujin)</description>
+		<!-- Published on I/O 1980.09 -->
+		<year>1980</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="ギャラクシアン"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="galaxian (geimu kyoujin).d88" size="348848" crc="cfb467bf" sha1="244f13ac49e1a527f7bcb2b2a5b659e698ce251f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxiangka" cloneof="galaxiangk" supported="yes">
+		<description>Galaxian (alt Geimu Kyoujin)</description>
+		<year>19??</year>
+		<publisher>Geimu Kyoujin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="galaxian (geimu kyoujin) [alt 1].d88" size="31424" crc="df5490af" sha1="2115dc0a72a61d75a9e9982b38dfec25e1632ad2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxbat" supported="yes">
+		<description>Galaxy Bats</description>
+		<!-- Published on I/O 1982.11 -->
+		<year>1982</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="ギャラクシーバット"/>
+		<!-- Ｋ．Ｙ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="galaxy bats.d88" size="31424" crc="1b04110e" sha1="27716bbce6f937f2be413987fcdfc93e1f069335"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxyfi">
+		<description>Galaxy Fighter</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="galaxy fighter.d88" size="31424" crc="efdd7cc9" sha1="967592f9c0757cb5905ce0676934c5732724f67c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gekisenm" supported="yes">
+		<!-- uses Micro Disk Basic loader -->
+		<description>Gekisen! Minami Taihei-yo</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="激戦!南太平洋"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gekisen minami taihei-yo.d88" size="348848" crc="e84c77e2" sha1="49230a4bd91f05906df8250786eb69ce94c22638"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gekisenma" cloneof="gekisenm">
+		<!-- uses Micro Disk Basic loader -->
+		<description>Gekisen! Minami Taihei-yo (alt)</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="激戦!南太平洋"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gekise minami taiheiyou (tank submarine).d88" size="348848" crc="decdc011" sha1="d13c8473a6b03c82998073ea672ff308403b2c6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gekisenmb" cloneof="gekisenm">
+		<!-- uses anonymous "LOADING" -->
+		<description>Gekisen! Minami Taihei-yo (alt 2)</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="激戦!南太平洋"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="gekisen minami taiheiyou (tank submarine) [set 1].d88" size="31424" crc="829f535b" sha1="05ec3f3d93e82b5feade3439ac66465c85458e13"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genmatai" supported="yes">
+		<description>Genma Taisen</description>
+		<year>1983</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<info name="alt_title" value="幻魔大戦"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="genma taisen.d88" size="31424" crc="abdebaa5" sha1="e86083628b0693aa873c01f6c62a177a7253c5cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golgo13m" supported="yes">
+		<description>Golgo 13 - Moretti Ikka Zansatsu Jiken</description>
+		<year>1983</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<info name="alt_title" value="ゴルゴ13 モレッティー一族惨殺事件"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="golgo 13 - moretti ikka zansatsu jiken.d88" size="31424" crc="8b4d6786" sha1="610d4f48c5d43d8195c12e4a9b2f55a65d56b52b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: both the Dash-80 loader defaults hi-score to 99990 (dump issue?) -->
+	<software name="hammerbr" supported="yes">
+		<!-- uses Dash-80 1.0b loader -->
+		<description>Hammer Break</description>
+		<!-- 1982/8 -->
+		<year>1982</year>
+		<!-- J&P -->
+		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<!-- 石津氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hammer break.d88" size="348848" crc="9ee2444c" sha1="801dd61fe0bb818af635ed25378d50529d833b8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hammerbra" cloneof="hammerbr" supported="yes">
+		<!-- uses Dash-80 1.0b loader -->
+		<description>Hammer Break (alt)</description>
+		<!-- 1982/8 -->
+		<year>1982</year>
+		<!-- J&P -->
+		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<info name="alt_title" value="ハンマーブレーク"/>
+		<!-- 石津氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hammer break [alt 1].d88" size="348848" crc="31919104" sha1="090de956699f7a133e6684f18976802dcfdc7e56"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: default hi-score is 16160 (dump issue?) -->
+	<software name="hammerbrb" cloneof="hammerbr" supported="yes">
+		<!-- uses anonymous "LOADING" -->
+		<description>Hammer Break (alt 2)</description>
+		<!-- earlier rev or erased copyright -->
+		<year>1982</year>
+		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<info name="alt_title" value="ハンマーブレーク"/>
+		<!-- 石津氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="hammer break [set 1].d88" size="31424" crc="1224d9f1" sha1="32ff2dc1958de6118de06afffd7e5c538de3089c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Engine sound is output to optional PCG-8100 -->
+	<software name="hashires" supported="partial">
+		<description>Hashire! Skyline</description>
+		<year>1985</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="release" value="198512xx"/>
+		<info name="alt_title" value="走れ!スカイライン"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="hashire skyline.d88" size="31424" crc="d3ad2cb6" sha1="3dac58996b33dab2714d59f4fe27557ee931614f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Engine sound is output to optional PCG-8100 -->
+	<software name="hashiresb" cloneof="hashires" supported="partial">
+		<description>Hashire! Skyline (alt 2)</description>
+		<year>1985</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="release" value="198512xx"/>
+		<info name="alt_title" value="走れ!スカイライン"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="hashire skyline (b).d88" size="31424" crc="a732bfdb" sha1="672762966770ac7c24ed6d5711d4b35f6eb1609e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Engine sound is output to optional PCG-8100 -->
+	<software name="hashiresc" cloneof="hashires" supported="partial">
+		<description>Hashire! Skyline (alt 3)</description>
+		<year>1985</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="release" value="198512xx"/>
+		<info name="alt_title" value="走れ!スカイライン"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="hashire skyline [alt 1].d88" size="31424" crc="a57810af" sha1="f6720927d2035621ea139575caa31f1afed0fd96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heartcat">
+		<description>Heart Catch Harumi-chan</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="heart catch harumi-chan.d88" size="348848" crc="a21a9516" sha1="4fba05adf793f09e1eb1f63606b7a5e3d6601005"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heiankyo" supported="yes">
+		<description>Heiankyo Alien (Arrange ver.)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="平安京エイリアン" />
+		<!-- TSG / arranged by "areaarea" -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="heiankyo alien.d88" size="31424" crc="9ca086c8" sha1="d442450b5b1279b841a35fe2f92ce9ac7dfb1208"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heiankyoa" cloneof="heiankyo" supported="yes">
+		<!-- this should be the "original" version that the other set mentions -->
+		<description>Heiankyo Alien (Original ver.)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="平安京エイリアン" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="heiankyo alien [set 1].d88" size="348848" crc="4ff4ce07" sha1="64b532812bfb5123a9c5bfa1219c710c59dc86df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hokkaido">
+		<description>Hokkaido Bouei Sakusen</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="hokkaido bouei sakusen.d88" size="31424" crc="fdc578a1" sha1="6e72b155492355eaccf1d28e17dc4b831965ad8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="honshogi" supported="yes">
+		<description>Hon Shogi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="hon shogi.d88" size="31424" crc="2bc76508" sha1="ea1912b8229819028878bef2e13c4af9f266ab81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="husmind">
+		<description>Hu's Mind</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="hu's mind.d88" size="31424" crc="6045b989" sha1="ec3b4c32b8f528caf9b3e421c3e52c1a930ee5e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwasanju">
+		<description>I wa Sanjutsu Nari</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="iwasanjutsunari.d88" size="348832" crc="0c882033" sha1="363e3064cc4330f52d8c591cd27411a54505553c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwasanjua" cloneof="iwasanju">
+		<description>I wa Sanjutsu Nari (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="i wa sanjutsu nari.d88" size="348848" crc="5602f481" sha1="8df1b562a49f292be7aa58835af740a8bbab9db4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceworld2">
+		<description>Ice World II</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ice world ii (pengo).d88" size="348848" crc="9b961f3a" sha1="3072ccbaa7c60551d56b60911eecc465085dace1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceworld2a" cloneof="iceworld2">
+		<description>Ice World II (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="ice world ii (pengo) [alt 1].d88" size="31424" crc="37d59346" sha1="5c395a1b3ccba1c531d9d6165b6b1de9a517a6e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jankyu" supported="yes">
+		<description>Jankyu</description>
+		<!-- 1982.NOVEMBER -->
+		<year>1982</year>
+		<publisher>システムソフト (System Soft)</publisher>
+		<!-- T. Yoshino -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="jankyu.d88" size="31424" crc="616ab5f9" sha1="a26741e99177d2c41eb9419a977f29102b710441"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kawanaka">
+		<description>Kawanakajima no Kassen</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="kawanakajima no kassen.d88" size="31424" crc="35dcc68b" sha1="0e84baf53e0b4e5766aa0a686e72a0bf372b12d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kentomah">
+		<description>Ken to Mahou</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ken to mahou.d88" size="348848" crc="dc52e105" sha1="6fd9e46092029841b3a7c15f594b18c9fb8289c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kentomaha" cloneof="kentomah">
+		<description>Ken to Mahou (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="ken to mahou [alt 1].d88" size="31424" crc="c16a1fef" sha1="e8b70ee1ba99be7bebf927ec045252b09227ce73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manbikig" supported="yes">
+		<description>Manbiki Game</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="マンビキゲーム"/>
+		<!-- S.Morinaka / KOBE -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="manbiki game(not ascii's listing).d88" size="348832" crc="88747428" sha1="15a357aa339638b92e6f9b36f349554b5f1f89d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manbikiga" cloneof="manbikig" supported="yes">
+		<description>Manbiki Game (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="マンビキゲーム"/>
+		<!-- S.Morinaka / KOBE -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="manbiki game.d88" size="348848" crc="d2fea09a" sha1="323718ec97f5a35759a57b01cd2bd28235b4df4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misscmd">
+		<description>Missile Commander</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="missile commander.d88" size="31424" crc="30b6b394" sha1="358ce45ba3776bb98b35c6e445dc2977cc98b4d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misscmda" cloneof="misscmd">
+		<description>Missile Commander (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="missile commander [set 1].d88" size="348848" crc="5f7713e6" sha1="e5bbeb447a492d2f63cb3a2d8c88f2c34d9ec07a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misscmdb" cloneof="misscmd">
+		<description>Missile Commander (alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="missile commander [set 2].d88" size="348848" crc="3828140e" sha1="4fa4531419a24299addf3cdd499b1987f04de6a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missilec" cloneof="misscmd">
+		<description>Missile Commander (alt 3)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="missile commander [set 3].d88" size="348832" crc="05fdc754" sha1="4519345cad8c60383508e9b6b444ab4909462990"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstbal">
+		<description>Monster and Ball</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="monster and ball.d88" size="31424" crc="05abc530" sha1="915a06a25e09be6a2bb1b61195d04320a485eb08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- black screen after pressing ENTER (btanb) -->
+	<software name="moonbeam" supported="yes">
+		<description>Moon Beam</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- isizu yo -->
+		<!-- (follow OSD title instructions: two players game that draws only if you actually move) -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="moon beam.d88" size="348848" crc="9a3e07c4" sha1="ce496cdcd046986e2c48f460ab78accbce35377f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moritaot">
+		<description>Morita Othello (v2.7)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="morita othello (v2.7).d88" size="348848" crc="34d3de9e" sha1="0aa10a62a5e1b7ec2a88c8b69753833b52a8ea4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moritaota" cloneof="moritaot">
+		<description>Morita Othello (v2.7, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="morita othello (v2.7) [alt 1].d88" size="348848" crc="0127e6b2" sha1="25dc1f3d66788cfa003d1daffc5bf73e177ccedc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moritaotb" cloneof="moritaot">
+		<description>Morita Othello (v2.7, alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="morita othello (v2.7) [set 1].d88" size="31424" crc="fd6d4926" sha1="9602870ca0324986de082eb56c24cc22610e1910"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newrally" supported="yes">
+		<description>New Rally-X (Komaj)</description>
+		<!-- Published on I/O 1982.05 -->
+		<year>1982</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- Ｙ．Ｋ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="new rally-x.d88" size="31424" crc="7a619338" sha1="cda51808ba71490a1a5b8960d9027498a22cdf8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjayas" supported="yes">
+		<description>Ninja Yashiki</description>
+		<year>1983</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="ninja yashiki.d88" size="31424" crc="86c1b86d" sha1="285b1695a1aecb46ad4bdb361bf7379012e54a47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nipponre">
+		<description>Nippon Rettou Kaishime Game</description>
+		<!-- 81 12 -->
+		<year>1981</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<!-- TODO: verify -->
+		<!-- <info name="alt_title" value="日本列島会姫ゲーム"/> -->
+		<!-- conversion from MZ by K.S -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="nippon rettou kaishime game.d88" size="348848" crc="78111ff0" sha1="09d2996c7f28333b146c4627fa7d383aaaea4e81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobunagan">
+		<description>Nobunaga no Yabou (N Basic)</description>
+		<year>19??</year>
+		<publisher>光栄 (Koei)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="nobunaga no yabou.d88" size="31424" crc="64ac424e" sha1="31be8884d2ca929e69a57468683e1d9d14d36e23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="normandy">
+		<description>Normandy Joriku Sakusen</description>
+		<year>19??</year>
+		<publisher>光栄 (Koei)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="normandy joriku sakusen(normandy landings).d88" size="348848" crc="ccf1b638" sha1="735bb5e47713eee3bc6763f4b92cf39aca505a0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="normandya" cloneof="normandy">
+		<description>Normandy Jouriku Sakusen (alt)</description>
+		<year>19??</year>
+		<publisher>光栄 (Koei)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="normandy jouriku sakusen.d88" size="31424" crc="f3cdf540" sha1="f76776ca7271166cac303caec64ac73fab4807d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="normandyb" cloneof="normandy">
+		<description>Normandy Jouriku Sakusen (alt 2)</description>
+		<year>19??</year>
+		<publisher>光栄 (Koei)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="normandy jouriku sakusen [set 1].d88" size="348848" crc="fc2f7a0e" sha1="379181a0d47219bdb9f99a30d82b8debd1ead93e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omotesan">
+		<description>Omotesando Adventure</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="omotesando adventure.d88" size="31424" crc="1e7badc8" sha1="dee558102a80b5ba869df71096bb279b9f26f96b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othello">
+		<!-- not to be confused with the Compaq "Othello" release -->
+		<description>Computer Othello</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="コンピューターオセロ"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="othello (bugfire) (touch panel).d88" size="348848" crc="d7ae6afd" sha1="597aa62996a92ac073ebfb2a187f141c8c695bf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othelloa" cloneof="othello">
+		<description>Computer Othello (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="コンピューターオセロ"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="othello (bugfire).d88" size="348848" crc="f7f3e00a" sha1="d6d29cc7babfef116301f69fb3647454589f99b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacworld">
+		<description>Pac-World</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="pac-world.d88" size="31424" crc="f133ed2e" sha1="fba222d80ce51bcdbe50de51c7f8dbcea921d9d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacworlda" cloneof="pacworld">
+		<description>Pac-World (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="pac-world [alt 1].d88" size="348848" crc="3d7a0e51" sha1="298888cddce82f8ff4a194293f66850212465390"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pachinko">
+		<description>Pachinko</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="pachinko.d88" size="348848" crc="99c21bdc" sha1="26121753118c03da42b2e3ccddd56d22b71e8ceb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="packmanm">
+		<description>Pack Man Modoki</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="pack man modoki.d88" size="348848" crc="80e7107c" sha1="ceec56c1713c7f90d3e65069982ac67eda9ee0e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires PCG-8100 -->
+	<software name="pcgdigdug" supported="no">
+		<description>Dig Dug (PCG)</description>
+		<year>19??</year>
+		<!-- Dempa? -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires PCG-8100"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="pcg dig dug.d88" size="31424" crc="3333c07a" sha1="7b06e5302afadc9df48cdbcae3f3cdc928deed2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires PCG-8100, uses Color Magical even/odd frame trick -->
+	<software name="pcgdusty" supported="no">
+		<description>The Dusty World (PCG)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires PCG-8100"/>
+		<!-- N.H -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="pcg the dusty world.d88" size="31424" crc="e9fc16ed" sha1="6dc095dc5b54136633a0d6b6bd5be0c4bd2518db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires PCG-8100 -->
+	<software name="planetta" supported="no">
+		<description>Planet Taizer</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires PCG-8100"/>
+		<!-- S. Nakamura / Amico / Koichi -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="planet taizer.d88" size="348832" crc="bfdfbff7" sha1="927c23f6f6dfd13feeb880cc7c73a322807887b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires PCG-8100 -->
+	<software name="planettaa" cloneof="planetta" supported="no">
+		<description>Planet Taizer (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires PCG-8100"/>
+		<!-- S. Nakamura / Amico / Koichi -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="planet taizer (pcg).d88" size="348848" crc="e5556b45" sha1="ca8a3b034db2dec4fd9633f7fde777d20f313b8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poppingp" supported="yes">
+		<description>Popping Panic</description>
+		<year>1983</year>
+		<publisher>アンプルソフトウェア (Ample Software)</publisher>
+		<info name="alt_title" value="ポッピングパニック"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="popping panic.d88" size="31424" crc="55ff80f7" sha1="dde43eef8648fabe279c433e79b27689f15ae22c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puckman" supported="yes">
+		<!-- uses Dash-80 1.0b loader -->
+		<description>Puck Man</description>
+		<!-- Published on I/O Apr 1981 -->
+		<year>1981</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="パックマン"/>
+		<!-- TOM group -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="puck man.d88" size="348848" crc="fe83fe48" sha1="20f74197060027a9a37e61b179a9eac0ca9918e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puckmana" cloneof="puckman">
+		<!-- uses anonymous "LOADING" -->
+		<description>Puck Man (alt)</description>
+		<!-- Published on I/O Apr 1981 -->
+		<year>1981</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="パックマン"/>
+		<!-- TOM group -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="puck man [alt 1].d88" size="31424" crc="b55d1271" sha1="485122cb11c7d4eb49ff4c399c296a7299bd6a17"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="remlum">
+		<description>Rem &amp; Lum</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="rem and lum.d88" size="31424" crc="744cc09b" sha1="fe5a918c127a7235cb72c6fafe68d805642deb78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riverres" supported="yes">
+		<description>River Rescue</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Koichi -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="river rescue.d88" size="31424" crc="46c85f30" sha1="5234e88f37e963eb336392cdda3de5e437c84b01"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riverresa" cloneof="riverres" supported="yes">
+		<description>River Rescue (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Koichi -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="river rescue [alt].d88" size="31424" crc="5cd28dff" sha1="1cd582ed0b333880f42b7c5864df164d4051d1e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramble" supported="yes">
+		<!-- uses anonymous "LOADING" -->
+		<description>Scramble</description>
+		<!-- Sports title screen of 1981, published on I/O 1982.01 -->
+		<year>1982</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="コムパック"/>
+		<!-- K.N "Koichi" -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="scramble.d88" size="31424" crc="40e7439f" sha1="4c03c72a0e0bc112aa45b0928748e0dffd113bc2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramblea" cloneof="scramble" supported="yes">
+		<!-- uses Micro Disk Basic loader -->
+		<description>Scramble (alt)</description>
+		<!-- Sports title screen of 1981, published on I/O 1982.01 -->
+		<year>1982</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="コムパック"/>
+		<!-- K.N "Koichi" -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="scramble [alt].d88" size="348848" crc="ccc60815" sha1="dc6823e6d6cde73c171e8858c18e079f9cf91d65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrambleb" cloneof="scramble">
+		<!-- uses anonymous "LOADING" -->
+		<description>Scramble (alt 2)</description>
+		<!-- Sports title screen of 1981, published on I/O 1982.01 -->
+		<year>1982</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="alt_title" value="コムパック"/>
+		<!-- K.N "Koichi" -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="scramble [set 1].d88" size="31424" crc="293360ba" sha1="1e90b03b78980018e9f363800d5ff0b96aca31e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Asks to "read tape" to load a character -->
+	<software name="seikende" supported="no">
+		<description>Seiken Densetsu</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="seiken densetsu.d88" size="31424" crc="d79a5978" sha1="77bfad91dee5b37c6bf6d54b5053a966a7b126c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- gameplay is decidedly too fast -->
+	<software name="select5" supported="partial">
+		<description>Select 5</description>
+		<!-- published on 別冊ＰＯＰＣＯＭプログラムマガジンＰＣシリーズ用 -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="セレクト５"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="select 5.d88" size="348848" crc="c1381a83" sha1="aad61739ccb6ca6101eebdffc5ce65e24280d05c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shogitra">
+		<description>Shogi Trainer</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="shogi trainer.d88" size="31424" crc="323b4bbf" sha1="ca1536bf00ce6f92ca6dd572b62d1c6a71384d3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Locks up after game over -->
+	<software name="snake" supported="no">
+		<description>Snake</description>
+		<!-- 2002.03.29 -->
+		<year>2002</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- HAL8999 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="snake.d88" size="31424" crc="d9f7966b" sha1="6bd10fe4fbab0308be000d60d74ccc3e4e84d84f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcameba">
+		<description>Space Amoeba (N Basic)</description>
+		<year>19??</year>
+		<publisher>ツクモ (Tsukumo)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="space ameoba.d88" size="31424" crc="6348333a" sha1="fb41143c4a7809dd71eee2218d63accd66e21c76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcbase" supported="yes">
+		<!-- misspelled as Space Bace on title -->
+		<description>Space Base</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="スペース　ベース"/>
+		<!-- 石津氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="space base.d88" size="348848" crc="f89f07c1" sha1="99a601395eef5865ecb4bc5f189388d5ac8fb9a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcflaper" supported="yes">
+		<description>Space Flaper (v1.0)</description>
+		<!-- Printed in BASIC LIST -->
+		<year>1983</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="space flaper.d88" size="31424" crc="f8c75bfe" sha1="efc1e6f8a59bae4fdbd695af80af9c88674a6019"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcfollow">
+		<description>Space Follow</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="space follow.d88" size="348848" crc="59b696d6" sha1="8dd9b4a17566f794f966fad37314f9fcb2403fbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacepat" supported="yes">
+		<description>Space Pattern</description>
+		<year>19??</year>
+		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<info name="alt_title" value="スペース　パターン"/>
+		<!-- 石津氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="space pattern.d88" size="348848" crc="687152ac" sha1="0d71eb426764e4e2b38f3058e867691cb654c3cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcpulsar">
+		<description>Space Pulsar</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="space pulsar.d88" size="348848" crc="7caa2942" sha1="75158893eb92a806906ee1bd459e799682b17a58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spctravel">
+		<description>Space Travel</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="space travel.d88" size="348848" crc="8fc38bf8" sha1="20f9d6a9abfedb09275f306fd4d5f25184454b30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spctrip2" supported="yes">
+		<description>Space Trip 2 "Melyos" (v1.1)</description>
+		<year>19??</year>
+		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<info name="alt_title" value="スペーストリップ2 メリオス"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="space trip 2 melyos.d88" size="31424" crc="ebb05b70" sha1="a9bfea0bcc4feb796867981ff2f502a11bb3053c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spydaisn" supported="yes">
+		<description>Spy Daisakusen (N Basic)</description>
+		<!-- 1982.10.28. -->
+		<year>1982</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<info name="alt_title" value="スパイ大作戦"/>
+		<!-- Ｙ．Ｔ氏 / Yoshinobu Takahashi -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="spy daisakusen(8001 version).d88" size="31424" crc="19460d73" sha1="7e329c06760ae939f18f7f742ef039a71718d8b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spydaisna" cloneof="spydaisn" supported="yes">
+		<description>Spy Daisakusen (N Basic, alt)</description>
+		<!-- 1982.10.28. -->
+		<year>1982</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<info name="alt_title" value="スパイ大作戦"/>
+		<!-- Ｙ．Ｔ氏 / Yoshinobu Takahashi -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="spy daisakusen.d88" size="31424" crc="a591587d" sha1="e1ee57e33ee99d536c4359f2655d450030bbad70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfire" supported="yes">
+		<description>Star Fire!!! (v1.0)</description>
+		<year>1980</year>
+		<!-- Definitely unrelated with the SystemSoft release -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="スターファイアー!!!"/>
+		<!-- Y.OGI -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="star fire.d88" size="31424" crc="0e55de39" sha1="adb35d4c1a21264492d1758c11de64e59e68cb3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stopharu">
+		<description>Stop! Harumi-chan</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="stop harumi-chan.d88" size="348848" crc="f62fad05" sha1="fcd671d13c995d9422ef59cd52c294626ab6b3ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="submari2" supported="yes">
+		<!-- "S U B M L I N part2" -->
+		<description>Submarine Part 2</description>
+		<!-- 1982:2:2 -->
+		<year>1982</year>
+		<!-- isisu yoshikasu -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="サブマリン パート2"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="submarine 2.d88" size="348848" crc="f9085f4c" sha1="4fec68ca5850fbfd4739204fe7c68d538772fa8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="submari3" supported="yes">
+		<!-- "SUBMLINE part 3" -->
+		<description>Submarine Part 3</description>
+		<!-- 1982:2:18 -->
+		<year>1982</year>
+		<!-- isisu Yo -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="サブマリン パート3"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="submarine 3.d88" size="348848" crc="8ee3594b" sha1="0c7be5aad64080b3876739735f5d9b9c92b15f2b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superbal">
+		<description>Super Balloon</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="super balloon.d88" size="348832" crc="d51ce50d" sha1="f9d0d4f859ea86a94bd759c8deafaac689b40368"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superbala" cloneof="superbal">
+		<description>Super Balloon (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="super balloon [alt].d88" size="348848" crc="8f9631bf" sha1="f37d6f9e9da233024d663ddea3d4beb43452d8c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spinball">
+		<description>Super Pinball</description>
+		<year>1984</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="release" value="198401xx"/>
+		<info name="alt_title" value="スーパーピンボール"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="super pinball.d88" size="31424" crc="132ef0f0" sha1="348e07022c4df9aa41aaf7204b79f91b715ba761" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Black screen on title until it completes the underlying animation -->
+	<!-- [PC=0xea00/BASIC line 20010, explicit reset command issued to CRTC, may be btanb?] -->
+	<software name="surabaya" supported="partial">
+		<!-- LIST 20500-20550 -->
+		<!-- Epoch's World War Game -->
+		<description>Surabaya-oki Kaisen</description>
+		<year>1983</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<!-- M.D.S. Takuya Kojima -->
+		<!-- Produced and Arranged by PonyCa Masaichiro Hirano -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="surabaya-oki kaisen.d88" size="31424" crc="b69ab788" sha1="78f7307200ab1bd6a5775101041cf8fb5c2ec0fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takahash">
+		<description>Takahashi Harumi programs</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="takahashi harumi programs.d88" size="348848" crc="b4cf0d18" sha1="2613ffbd229a124a067001e84eb13fd00713e429"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankbata">
+		<description>Tank Batabata</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="tank batabata.d88" size="31424" crc="5ce14e6d" sha1="2c5ff0416c413ef0b15090998d3a9db86da95fb4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tengokut">
+		<description>Tengoku to Jigoku</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="tengoku to jigoku.d88" size="31424" crc="0b800bad" sha1="f1841ceeb779ed9fc2843cb91010bd7c29d88410"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tengokuta" cloneof="tengokut">
+		<description>Tengoku to Jigoku (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="tengoku to jigoku [alt].d88" size="31424" crc="764bbcbb" sha1="0781eb93a468c9a1262c5dc0f792824e9cc05023"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="terrasos">
+		<description>Terra SOS</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="terra sos.d88" size="348848" crc="e1be4a84" sha1="15f4f6cb6acd849ad67df4cb8b79c3fc91a5f384"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris80" supported="yes">
+		<!-- uses Micro Disk Basic loader -->
+		<description>Tetris-8001</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="tetris(8001 ver).d88" size="348832" crc="e8a1dbf5" sha1="82c91997de820af2c19275f43067d8fce671aba3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris80a" cloneof="tetris80" supported="yes">
+		<!-- uses Micro Disk Basic loader -->
+		<description>Tetris-8001 (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="tetris-8001.d88" size="348848" crc="b22b0f47" sha1="ec46d9f17fa4ef3e869bd4f4636618744c4c9fd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris80b" cloneof="tetris80" supported="yes">
+		<!-- uses anonymous "LOADING" -->
+		<description>Tetris-8001 (alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="tetris-8001 [set 1].d88" size="31424" crc="5b6576b6" sha1="037bd90dcbea220b8068aa83ce9973d5a0533bd2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunin2">
+		<description>The Akunin 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="the akunin 2.d88" size="31424" crc="f4d3e09b" sha1="c6fef95b86311bdb5b7d5cda570be75c2153e8d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunin2a" cloneof="akunin2">
+		<description>The Akunin 2 (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="the akunin 2 [alt 1].d88" size="348848" crc="770dfefc" sha1="7f91e262110443ed13d0eea48ec06b1fa1b0b1b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunin3">
+		<description>The Akunin 3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="the akunin 3.d88" size="31424" crc="95c5dd4b" sha1="d5b08853141a77663bf0f138613d0060240bd977"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunin3a" cloneof="akunin3">
+		<description>The Akunin 3 (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="the akunin 3 [alt 1].d88" size="348848" crc="a2396b73" sha1="afe76201331c4ad1fb643fa18ca100c4a8d724b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunin">
+		<description>The Akunin</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="the akunin.d88" size="31424" crc="5124c616" sha1="9bc4ec135363972ea8c254edaad70f118d35e192"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunina" cloneof="akunin">
+		<description>The Akunin (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="the akunin [alt 1].d88" size="348848" crc="f3d31bdd" sha1="32d5b96455db408eb744aa69d966f1b4c07f9342"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienisl">
+		<description>The Alien Island 3D-Version</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="the alien island 3d-version.d88" size="348848" crc="6f5c0d31" sha1="fda73aa3ba76e0972a3e70c77fb4e6074c3bdce8"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Was this from tape? was it for PC8001? -->
+<!-- According to http://www.onon.jp/~onon/game/PC8001/ it comes from ASCII 1985/2 -->
+	<software name="thealien" cloneof="alienisl">
+		<description>The Alien Island 3D-Version (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 4401 -->
+				<rom name="the alien island 3d ver.d88" size="348832" crc="35d6d983" sha1="ae5619d8d5d9e192dbe02edcc3aa3cb33acefc16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farway">
+		<description>The Farway</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35776">
+				<rom name="the farway.d88" size="35776" crc="4711cf95" sha1="88450414a878eee8e71dc703905ae4a69a6c78f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guardian" supported="yes">
+		<description>The Guardian</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="the guardian.d88" size="31424" crc="ceefc08c" sha1="cb5d06b27b751c1b9a323d7ef7f06bfe9254abe2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oilfield">
+		<description>The Oil Field</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="the oil field.d88" size="348576" crc="eaa6ddd6" sha1="014e44e648bbe3731e2764d2b1538404e2fb5b22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetmi">
+		<description>The Planet Miners</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="the planet miners.d88" size="31424" crc="4223ac04" sha1="e44ffbfc0a8ee6ed8bb57e061d6af5006aed249d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theracer" supported="yes">
+		<description>The Racer</description>
+		<!-- 1983/7/5 -->
+		<year>1983</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<!-- Yasugi Kenta (ESC) -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="the racer.d88" size="31424" crc="c5a21f00" sha1="b950839fd4adefb8d64486aabcc3ca03a845f62a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tlix">
+		<description>Tlix</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="tlix.d88" size="31424" crc="49e8512e" sha1="b4c661e76541e864f561a3eebdb409cb57b9e4e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toriaezu">
+		<description>Toriaezu Tinyan da yo!</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="toriaezu tinyan da yo.d88" size="31424" crc="57776daf" sha1="2e8a9dfbee0c75ac424dcbb5907b2b1161567771"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toriaezua" cloneof="toriaezu">
+		<description>Toriaezu Tinyan da yo! (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="toriaezu tinyan da yo [alt 1].d88" size="348848" crc="d2158d3d" sha1="2b198bc2598c7515db3305bce7e11d1c7860463c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toshigam">
+		<description>Toushi Game</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="toushi game.d88" size="31424" crc="8f357be8" sha1="1805f0b36de0a1e5e28ea1174feee018b5bd212e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsumesho">
+		<description>Tsume Shogi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="tsume shogi.d88" size="31424" crc="e8ee6a52" sha1="744e6ad91097a328db1c117a4f2e4f3467eeca6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uchuuei">
+		<description>Uchuu Ei</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="uchuu ei.d88" size="348848" crc="d4878af1" sha1="48c49e3979644c503eff42a1bf99b4d8b9cef982"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufo">
+		<description>UFO</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="ufo.d88" size="31424" crc="4d824aff" sha1="616847d5ea9819a08241b788e41c568ae5fedd72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="undermon">
+		<!-- Misspelled as Undergrand on title/gameplay -->
+		<description>Underground Monster</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="alt_title" value="地底のモンスター"/>
+		<!-- Osamu Hasegawa -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="166064">
+				<rom name="underground monster.d88" size="166064" crc="6d40589b" sha1="0ac90c7406557e1c864183f48d015c9358221800"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="various2">
+		<description>Various 2</description>
+		<!-- Feb 1988 according to gameplay status bar -->
+		<year>1988</year>
+		<!-- Isis (doujin? official?) -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="various 2.d88" size="348848" crc="f4091030" sha1="83f853378be66bc98b82fb177bb7a27c83396318"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="various2a" cloneof="various2">
+		<description>Various 2 (alt)</description>
+		<!-- Feb 1988 according to gameplay status bar -->
+		<year>1988</year>
+		<!-- Isis (doujin? official?) -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="various 2 [alt 1].d88" size="348848" crc="d71b56b4" sha1="7bd2cd6335a605225b57a08f006405df0722fa38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="various" supported="yes">
+		<description>Various</description>
+		<!-- published on I/O 1984.03 -->
+		<year>1984</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- ＵＳＵＡＬ　ＳＩＴＵＡＴＩＯＮ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="various.d88" size="348848" crc="460346d9" sha1="1fdd478f3809d639cca380e3c43e400f1178fa07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="variousa" cloneof="various" supported="yes">
+		<description>Various (alt)</description>
+		<!-- published on I/O 1984.03 -->
+		<year>1984</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- ＵＳＵＡＬ　ＳＩＴＵＡＴＩＯＮ氏 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="various [alt 1].d88" size="348848" crc="f36449f5" sha1="448885ca1372caf583c34ba4ec00f0d0fe6d358b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wa">
+		<description>Mojidoori Wa o Tsukurou</description>
+		<!-- 2001/12/20 -->
+		<year>2001</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="もじどおり わをつくろう"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="wa.d88" size="31424" crc="93ed5b52" sha1="abad582b6d91ca2b1835acf2ccc462b54102e6fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdalien">
+		<description>World Alien</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="world alien.d88" size="348848" crc="1b19d0e7" sha1="00a923b66a0fcff31e12bf87bc1360b8316accf1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yuureise">
+		<description>Yuureisen</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="yuureisen.d88" size="31424" crc="5e918665" sha1="41e4a529711a92ac4229f2049adf4361b4ccb81a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxus" supported="yes">
+		<description>Zaxus</description>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198503xx"/>
+		<info name="alt_title" value="ザクサス"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="40128">
+				<rom name="zaxus.d88" size="40128" crc="a5fed0de" sha1="8d7a2df8eb5b0934c6abad75af962c6a979d121d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxusa" cloneof="zaxus">
+		<description>Zaxus (alt)</description>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+
+		<info name="release" value="198503xx"/>
+		<info name="alt_title" value="ザクサス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="40128">
+				<rom name="zaxus [alt].d88" size="40128" crc="e4c70eaa" sha1="9889a3ec48e2722446e3a59bafa1ffe547ebff92"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Compilations -->
+
+	<software name="nbasicga">
+		<description>N-BASIC Game Shu</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="n-basic game shu.d88" size="348848" crc="9eec8b75" sha1="0229b1e62264647baf93b126674ca7ab304859ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbasicgp">
+		<description>N-Basic Game Pack (compilation, NS-DOS CATS EYE)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="n-basic game pack (dungeon etc).d88" size="348848" crc="d3dcd2ec" sha1="72ba2282b532036dbfdc5f511d7fb82d331a55f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- seems based off above -->
+	<software name="nbasicgaa" cloneof="nbasicga">
+		<description>N-BASIC Games (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] n-basic games.d88" size="348848" crc="fccb3ca6" sha1="006826a311eb8972bd640320b4168f37d2c1084a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndisk">
+		<description>Ndisk (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press Up arrow or LSHIFT to break from the initial listing"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] ndisk (disk 1).d88" size="348848" crc="a3f69ff2" sha1="b825c97afa84db047b261be676de2f0f8e7c71d2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] ndisk (disk 2).d88" size="348848" crc="7eb31e11" sha1="3d0f1c0305aeb3cbf1af11568264990084eec662"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndisk5d8">
+		<description>NDisk5 (Collection)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Issue a rbyte to load any file"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="350720">
+				<rom name="ndisk5.d88" size="350720" crc="be55acf4" sha1="5bc1679d56ca2dc3651178ca8b8a8269d06cfe54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newpc">
+		<description>Newpc (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] newpc (disk 1).d88" size="348848" crc="3b3b6f80" sha1="69eacfde4a97e7ece03f934adb60baabe3c95f90"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] newpc (disk 2).d88" size="348848" crc="b0f37e15" sha1="2d50c442d70c64a7d57be9654abbe34dc2c8598d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] newpc (disk 3).d88" size="348848" crc="567495db" sha1="7c676f2c2072e07704ba0d7927eb6d9d15a36088"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newpcdos">
+		<description>New PC-DOS1 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="new pc-dos1.d88" size="348848" crc="b2650f8e" sha1="8bb8828433c0bbaf902ac739586e0d2604d24c0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newpcdo1">
+		<description>New PC-DOS2 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="new pc-dos2.d88" size="348848" crc="051e6412" sha1="07d144d301dc2d6a01d9b48f0877b0e3482aa138"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newpcdo2">
+		<description>New PC-DOS3 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="new pc-dos3.d88" size="348848" crc="a3a9fdbb" sha1="a0b84d2ec02219709115ca73320c020e7584be1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newpcdo3">
+		<description>New PC-DOS4 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="new pc-dos4.d88" size="348848" crc="920b40b0" sha1="b94064a04278d3dbfc11939a9998538e368b5e4e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsdospac">
+		<description>NS-DOS Pack (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] ns-dos pack (disk 1).d88" size="348848" crc="772ce895" sha1="ad0c2d6fb2136227216683fed7b7dae8be17a833"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="350720">
+				<rom name="[compilation] ns-dos pack (disk 2).d88" size="350720" crc="117d59ff" sha1="2cc7613d42f5023edff4de880e64ff2d5f2b349c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc8001ba">
+		<description>PC-8001 BASIC Game Book (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001 basic game book.d88" size="348848" crc="6238a6b6" sha1="9b21ead30e34ee08eecd342929aa87177b127bf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc8001gp">
+		<description>PC-8001 Game Pack (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001 game pack (disk 1).d88" size="348848" crc="3dba6090" sha1="e9752637948908716655043e6f654a3620adaf17"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001 game pack (disk 2).d88" size="348848" crc="a28ddcce" sha1="c51a9516e1d4fcc5da4105e2b4548539360a3cfa"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001 game pack (disk 3).d88" size="348848" crc="41898d11" sha1="08bd993ceae63d97450d09331c9dfcc5847e0610"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001 game pack (disk 4).d88" size="348848" crc="811f11f6" sha1="7f729c27add3a0f8d7a9de353895db69b431a283"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001 game pack (disk 5).d88" size="348848" crc="6047ed0d" sha1="75f661c0ddd31a45b063fd61a2c8d162ab56dde7"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001 game pack (disk 6).d88" size="348848" crc="d7643c02" sha1="8035445834c29c61c36e9568daaa2700dae33f3c"/>
+			</dataarea>
+		</part>
+		<!-- alt disk 1 (contains exact same files structure) -->
+		<!-- <rom name="[compilation] pc-8001 game pack (disk 1) [alt 1].d88" size="348848" crc="528c6f5f" sha1="127d9659612c6c9a73411b589bba89b12523d6e1"/> -->
+	</software>
+
+	<software name="pc8001ga">
+		<description>PC-8001 Games (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001 games (disk 1) {pass=123}.d88" size="348848" crc="7bc90758" sha1="b8be7490027e076a735863a12ad19c694627eef2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="[compilation] pc-8001 games (disk 2) {pass=123}.d88" size="348576" crc="dba4c616" sha1="a00a3c97615b08ad94f56575603caff5aa8af569"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc801pac">
+		<description>PC80 1 (collection)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="pc80 1(pack password 123).d88" size="348832" crc="c2425df4" sha1="18cd05e45bd01e521cdae51da58c7486fdb4b81a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc802pac">
+		<description>PC80 2 (collection)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Insert 123 then ENTER when prompted for password"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="pc80 2(pack password 123).d88" size="348576" crc="6fd841ce" sha1="cacde068c7db176ec273c844afdbe4318b56523a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+ExtractDisk  [01]"S-DOS A        " -> "s-dos_01.d88"
+ExtractDisk  [02]"S-DOS B        " -> "s-dos_02.d88"
+-->
+	<software name="sdosgame">
+		<description>S-DOS Game Pack (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!--combined image-->
+		<!--rom name="s-dos.d88" size="697696" crc="6cb5a1b1" sha1="55734c599fd672e31ae45aed50edc8213b5a1a73"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="s-dos_01.d88" size="348848" crc="b4699d03" sha1="475707fb01bc354693010ec1a822694809318eb6"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="s-dos_02.d88" size="348848" crc="c5d0bcd5" sha1="5b70340250426a6be761a8470b50cbd283bfd320"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdosgamea" cloneof="sdosgame">
+		<description>S-DOS Game Pack (compilation, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] s-dos (system disk).d88" size="348848" crc="da3019e0" sha1="dd7cb6d25c8ce31db754154f050ff7ed6bb336db"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] s-dos (user disk).d88" size="348848" crc="3d93b40a" sha1="db7f902232084a2539f76542aeb2512570efd2d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdosgameb" cloneof="sdosgame">
+		<description>S-DOS Game Pack (compilation, alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] s-dos game pack (disk 1).d88" size="348848" crc="ccd93eb4" sha1="0fda834a97151afec8572d7ff88afdf863979524"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] s-dos game pack (disk 2).d88" size="348848" crc="eb424a60" sha1="63796c7d77ee36fdb59c86b111d71bdd398827b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finalwp">
+		<description>The Final Weapon V-001 (compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] the final weapon v-001.d88" size="348848" crc="b63cb922" sha1="721a97c558aa4c866db22c0295d9be9709857a39"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Operating Systems -->
+
+	<!-- Hangs on PC8001, boot on PC8801 in N Basic compatible mode -->
+	<!-- (does it need the PC-8011 expansion board?) -->
+	<software name="cpm22n" supported="partial">
+		<description>CP/M for PC-8001 (v2.2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] cp-m for the pc-8001 (v2.2).d88" size="348848" crc="4d2e0daa" sha1="00fd21f5c933c0b7b0a7ede5e138d1df61332821"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Hangs on PC8001, boot on PC8801 in N Basic compatible mode -->
+	<software name="cpm22na" cloneof="cpm22n" supported="partial">
+		<description>CP/M for PC-8001 (v2.2, alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 58491 -->
+				<rom name="cpm2.2 for pc-8001.d88" size="348848" crc="21e2663f" sha1="824fcfdfa07caa4ce91cc4faad436dbdcc9bfde1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Hangs on PC8001, boot on PC8801 in N Basic compatible mode -->
+	<software name="cpm22nb" cloneof="cpm22n" supported="partial">
+		<description>CP/M for PC-8001 (v2.2, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="[os] cp-m for the pc-8001 (v2.2) [set 1].d88" size="348576" crc="42e8b22f" sha1="61d92b55af2b28baec3cc0dbf780a43213791ad3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Hangs on PC8001, boot on PC8801 in N Basic compatible mode -->
+	<software name="cpm22nc" cloneof="cpm22n" supported="partial">
+		<description>CP/M for PC-8001 (v2.2B)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] cp-m for the pc-8001 (v2.2b).d88" size="348848" crc="368097d2" sha1="35e8906d108d4e724f19e039b08166e580b94ffa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbasicsy">
+		<description>N BASIC system disk (PC-8034-2W)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] n basic system disk (pc-8034-2w) (pc-8001).d88" size="348848" crc="e0f930c1" sha1="6b1254de56605cdbb3d0abea291849fe85314de8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbasicsya" cloneof="nbasicsy">
+		<description>N BASIC system disk (PC-8034-2W, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] n basic system disk (pc-8034-2w) (pc-8001) [alt 1].d88" size="348848" crc="00b2a439" sha1="ce234142ec31e8ec2e862042b2c6889650ed59d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbasicsyb" cloneof="nbasicsy">
+		<description>N BASIC system disk (PC-8034-2W, alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] n basic system disk (pc-8034-2w) (pc-8001) [alt 2].d88" size="348848" crc="7f722a16" sha1="b707b1cdec531d23e31a26c25645bae49a6de633"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndiskb">
+		<description>N Disk BASIC</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 60189 -->
+				<rom name="n80-basic.d88" size="348848" crc="93746147" sha1="24d8b5b74d8a340d9afbbdc532395a3ded888fc5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc8001mi">
+		<description>PC-8001 Micro Disk Basic 2W</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] pc-8001 micro disk basic 2w.d88" size="348848" crc="b8d73f39" sha1="025112d7eec8e9c35a19ab9bc0bf8a3d1e15a1c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc8034d8">
+		<description>PC-8034</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="pc-8034.d88" size="348848" crc="0a4dab65" sha1="cd6a093643fa9f162a5be94ba830ba4b8d90099a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+ExtractDisk  [01]"sdos system    " -> "sdos_01.d88"
+ExtractDisk  [02]"users 1        " -> "sdos_02.d88"
+-->
+	<software name="sdos">
+		<description>S-DOS</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!--combined image-->
+		<!--rom name="sdos.d88" size="697664" crc="f0d99ea2" sha1="7b42f090b7213d16655173fc473b72eee739c2c9"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="sdos_01.d88" size="348832" crc="3ebf6dae" sha1="5dd50bc55a7a2db748cf8edcd88dfd62c310aaa9"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="sdos_02.d88" size="348832" crc="5c88c5e4" sha1="660fbca52e2ee9fdb9b278fcd17de621df6fbe87"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Utilities -->
+
+<!--
+ExtractDisk  [01]"MagicCopy2.8  " -> "magic copy 2 ver2.8-3.7_01.d88"   7107161b
+ExtractDisk  [02]"MagicCopy2.9  " -> "magic copy 2 ver2.8-3.7_02.d88"   291c31c8
+ExtractDisk  [03]"MagicCopy3.0  " -> "magic copy 2 ver2.8-3.7_03.d88"   58cc307c
+ExtractDisk  [04]"MagicCopy3.1  " -> "magic copy 2 ver2.8-3.7_04.d88"   2c426feb
+ExtractDisk  [05]"MagicCopy3.2  " -> "magic copy 2 ver2.8-3.7_05.d88"   a3d865b6
+ExtractDisk  [06]"MagicCopy3.2_08 " -> "magic copy 2 ver2.8-3.7_06.d88" c1af57f2
+ExtractDisk  [07]"MagicCopy3.3  " -> "magic copy 2 ver2.8-3.7_07.d88"   351b34a5
+ExtractDisk  [08]"MagicCopy3.4  " -> "magic copy 2 ver2.8-3.7_08.d88"   08d61d54
+ExtractDisk  [09]"MagicCopy3.5  " -> "magic copy 2 ver2.8-3.7_09.d88"   ad2a8493
+ExtractDisk  [10]"MagicCopy3.6  " -> "magic copy 2 ver2.8-3.7_10.d88"   785646af
+ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
+-->
+<!--combined image-->
+<!--rom name="magic copy 2 ver2.8-3.7.d88" size="3837328" crc="0340eba4" sha1="d5854b4001f716849b5bb78b220bf2420dee2704"/-->
+
+	<software name="magicopy26" cloneof="magicopy">
+		<description>Magic Copy II ver 2.6</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 65296 -->
+				<rom name="magic copy 2 ver2.6.d88" size="348848" crc="d7057780" sha1="56bc07856ae99a0eedbe89271f3f2bb3b1f4a273"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy27" cloneof="magicopy">
+		<description>Magic Copy II ver 2.7</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 49084 -->
+				<rom name="magic copy 2 ver2.7.d88" size="348848" crc="8f1d66e8" sha1="fe54f5f1f5650a4bf5bfe798820e9cf9de86ee73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy28" cloneof="magicopy">
+		<description>Magic Copy II ver 2.8</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 30010 -->
+				<rom name="magic copy v28.d88" size="348848" crc="7107161b" sha1="36b74f278d9262097e4cc337542d6b8598c1c727"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy29" cloneof="magicopy">
+		<description>Magic Copy II ver 2.9</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 68 -->
+				<rom name="magic copy v29.d88" size="348848" crc="291c31c8" sha1="4e6cee799eafa15665ab5b1dab187ad564a4693f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy29a" cloneof="magicopy">
+		<description>Magic Copy II ver 2.9 (alt)</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<!--combined image-->
+		<!--rom name="magic copy v2.9.d88" size="697696" crc="fe0c4db3" sha1="3b278e82ff1b434b6c22219a17c7d952f87969c4"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 40440 -->
+				<rom name="magic copy v2.9 (v29).d88" size="348848" crc="186221c1" sha1="b90096d683eba6ca7473c1d9d53a0afc55dbc066"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 28431 -->
+				<rom name="magic copy v2.9 (filer).d88" size="348848" crc="df137903" sha1="fc0a892e40e0218475ebde15023b7d8932538d82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy30" cloneof="magicopy">
+		<description>Magic Copy II ver 3.0</description>
+		<year>1984</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 8469 -->
+				<rom name="magic copy v30.d88" size="348848" crc="58cc307c" sha1="577fd14b187050a02a75923feacd22c58ca32f43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy31" cloneof="magicopy">
+		<description>Magic Copy II ver 3.1</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 31791 -->
+				<rom name="magic copy v31.d88" size="348848" crc="2c426feb" sha1="ca84ae8b6d9a803b48f141ec4f52ba5a00174557"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy31a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.1 (alt)</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 48935 -->
+				<rom name="magic copy v3.1.d88" size="348848" crc="caa19e11" sha1="fc0e6b577956b598f46719f750750e93ef8baaba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy32" cloneof="magicopy">
+		<description>Magic Copy II ver 3.2</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 42591 -->
+				<rom name="magic copy v32.d88" size="348848" crc="a3d865b6" sha1="b60b88ffde821f35872c1be565fcec1b56b3828a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy32a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.2 (alt)</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 49300 -->
+				<rom name="magic copy v32-8.d88" size="348848" crc="c1af57f2" sha1="b1efce9b9bb1c7a1d8438182e0a3689658562ccd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy33" cloneof="magicopy">
+		<description>Magic Copy II ver 3.3</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 33634 -->
+				<rom name="magic copy v33.d88" size="348848" crc="351b34a5" sha1="7434089206aaea56b200883e337df3ed97b72bd8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy33a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.3 (alt)</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="magic copy2 ver.3.3.d88" size="348848" crc="94034787" sha1="3f489a6d311ad1aab9fb9399136f2f0d1d6cff24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy34" cloneof="magicopy">
+		<description>Magic Copy II ver 3.4</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 55536 -->
+				<rom name="magic copy v34.d88" size="348848" crc="08d61d54" sha1="5ec7f8430f0e9ecb56dcd7575bec7d1e802224af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy34a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.4 (alt)</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="magic copy2 ver.3.4.d88" size="348848" crc="a9ce6e76" sha1="72aa6ad87f3ff211208004ee602175a0bcc18fae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy35" cloneof="magicopy">
+		<description>Magic Copy II ver 3.5</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 23206 -->
+				<rom name="magic copy v35.d88" size="348848" crc="ad2a8493" sha1="752c868b99da1420bd757f3477aa4dd746b8a49a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy35a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.5 (alt)</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 12497 -->
+				<rom name="magic copy v3.5.d88" size="348848" crc="357c895c" sha1="06e5bfa417a582ade8541bd9e01141e8e6701f8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy36" cloneof="magicopy">
+		<description>Magic Copy II ver 3.6</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 39768 -->
+				<rom name="magic copy v36.d88" size="348848" crc="785646af" sha1="98ed9e8f73102562402823fc18782c403f83e114"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy">
+		<description>Magic Copy II ver 3.7</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 22644 -->
+				<rom name="magic copy v37.d88" size="348848" crc="79b4c6af" sha1="c72e9761e3f13af6bbe6295a87298873d76a5b15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdsc">
+		<description>BDS C (v1.50)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[utility] bds c (v1.50) (disk 1).d88" size="348848" crc="d3a1da16" sha1="a5c45cfcb82d6ae1ace56b5834f5aa5a17e4286b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[utility] bds c (v1.50) (disk 2).d88" size="348848" crc="494242d6" sha1="fe9df8a8195ec28b8cece3b388dad44c08664a17"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jrtpasca">
+		<description>JRT Pascal</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[utility] jrt pascal.d88" size="348848" crc="0bb3ce9e" sha1="7661df9f5d6d6b5ef465a7d1f8d87469795fc6d3"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

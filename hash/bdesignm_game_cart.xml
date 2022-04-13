@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+    Game cartridges for Bandai Design Master
+
+    Game carts, these plug into the system
+
+    G.01 - Dragon Ball Z Taisen-gata Search Battle
+    G.02 - Dungeon Diver
+    G.03 - Bishoujo Senshi Sailor Moon SS Illustration Club
+    G.04 - Rockman X3 Buster Battle
+
+    Cart info:
+
+    G-Cartridge (GAME):
+
+            FRONT                        BACK
+     ____________________        ____________________
+    |  2x18 EDGE-SOCKET  |      |  2x18 EDGE-SOCKET  |
+    |____________________|      |____________________|
+     |                  |        |                  |
+     |                  |        |                  |
+     |                  |        |                  |
+     |  ________   HC74 |        |                  |
+     | |1MbitROM|  |‾‾| |        |                  |
+     |  ‾‾‾‾‾‾‾‾    ‾‾  |        |                  |
+     |                  |        |                  |
+     |__________________|        |__________________|
+     ||||||||||||||||||||        ||||||||||||||||||||
+     1‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾18      19‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾36
+
+    PINOUT:
+
+     1|CE_G-Cart  19|NC
+     2|GND        20|HC74_3&11 -> Clock Signal (CLK)
+     3|GND        21|A2
+     4|VCC        22|A3
+     5|CE_M-Cart  23|A4
+     6|NC         24|A5
+     7|OE         25|A6
+     8|D0         26|A7
+     9|D1         27|A8
+    10|D2         28|A9
+    11|D3         29|A10
+    12|D4         30|A11
+    13|D5         31|A12
+    14|D6         32|A13
+    15|D7         33|A14
+    16|A0         34|CLK_M-Cart
+    17|A1         35|VCC
+    18|HC74_1&13  36|GND
+
+    HC74:
+          ________
+     C18-|        |-VCC
+      D0-|        |-C18
+     CLK-|        |-D1
+     VCC-|        |-CLK
+     A15-|        |-VCC
+      NC-|        |-A16
+     GND-|        |-NC
+          ‾‾‾‾‾‾‾‾
+-->
+
+<softwarelist name="bdesignm_game_cart" description="Bandai Design Master 'Game' cartridges">
+
+	<software name="dbzg" supported="no">
+		<description>Dragon Ball Z Taisen-gata Search Battle (game)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="g01_dragonballz.bin" size="0x20000" crc="94107404" sha1="c86d48e9f0262da36ac9bbcffd9cea8e9bb672b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddiver" supported="no">
+		<description>Dungeon Diver (game)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="g02_dungeondiver.bin" size="0x20000" crc="877781b7" sha1="3a1ec0bd594b31e9ea4e5b28471ff709c89989f0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sailormng" supported="no">
+		<description>Bishoujo Senshi Sailor Moon SS Illustration Club (game)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="g03_sailormoon.bin" size="0x20000" crc="641f20e6" sha1="b9f3a37385eeaf2e66b28ad5bac24a8a9cd46bdd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockmang" supported="no">
+		<description>Rockman X3 Buster Battle (game)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="g04_rockman.bin" size="0x20000" crc="bbca31a7" sha1="5606c8ee6b893cd529499581d8227505a736d14d" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

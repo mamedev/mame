@@ -181,15 +181,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 	if(m) {
 		switch(mod>>5) {
 		case 0: // Double displacement (8 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r8(pc+1), opcodes.r8(pc+2), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, int8_t(opcodes.r8(pc+1)), int8_t(opcodes.r8(pc+2)), opsize, stream);
 			return 3;
 
 		case 1: // Double displacement (16 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r16(pc+1), opcodes.r16(pc+3), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, int16_t(opcodes.r16(pc+1)), int16_t(opcodes.r16(pc+3)), opsize, stream);
 			return 5;
 
 		case 2: // Double displacement (32 bit)
-			out_AM_DoubleDisplacement(mod&0x1F, opcodes.r32(pc+1), opcodes.r32(pc+5), opsize, stream);
+			out_AM_DoubleDisplacement(mod&0x1F, int32_t(opcodes.r32(pc+1)), int32_t(opcodes.r32(pc+5)), opsize, stream);
 			return 9;
 
 		case 3: // Register
@@ -208,15 +208,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 			switch (opcodes.r8(pc+1)>>5)
 				{
 				case 0: // Displacement indexed (8 bit)
-					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r8(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int8_t(opcodes.r8(pc+2)), opsize, stream);
 					return 3;
 
 				case 1: // Displacement indexed (16 bit)
-					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r16(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int16_t(opcodes.r16(pc+2)), opsize, stream);
 					return 4;
 
 				case 2: // Displacement indexed (32 bit)
-					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r32(pc+2), opsize, stream);
+					out_AM_DisplacementIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int32_t(opcodes.r32(pc+2)), opsize, stream);
 					return 6;
 
 				case 3: // Register indirect indexed
@@ -224,30 +224,30 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 					return 2;
 
 				case 4: // Displacement indirect indexed (8 bit)
-					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r8(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int8_t(opcodes.r8(pc+2)), opsize, stream);
 					return 3;
 
 				case 5: // Displacement indirect indexed (16 bit)
-					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r16(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int16_t(opcodes.r16(pc+2)), opsize, stream);
 					return 4;
 
 				case 6: // Displacement indirect indexed (32 bit)
-					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, opcodes.r32(pc+2), opsize, stream);
+					out_AM_DisplacementIndirectIndexed(opcodes.r8(pc+1)&0x1F, mod&0x1F, int32_t(opcodes.r32(pc+2)), opsize, stream);
 					return 6;
 
 				case 7:
 					switch (opcodes.r8(pc+1)&0x1F)
 						{
 						case 16: // PC Displacement Indexed (8 bit)
-							out_AM_PCDisplacementIndexed(ipc, opcodes.r8(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, int8_t(opcodes.r8(pc+2)), mod&0x1F, opsize, stream);
 							return 3;
 
 						case 17: // PC Displacement Indexed (16 bit)
-							out_AM_PCDisplacementIndexed(ipc, opcodes.r16(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, int16_t(opcodes.r16(pc+2)), mod&0x1F, opsize, stream);
 							return 4;
 
 						case 18: // PC Displacement Indexed (32 bit)
-							out_AM_PCDisplacementIndexed(ipc, opcodes.r32(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndexed(ipc, int32_t(opcodes.r32(pc+2)), mod&0x1F, opsize, stream);
 							return 6;
 
 						case 19: // Direct Address Indexed
@@ -255,15 +255,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 							return 6;
 
 						case 24: // PC Displacement Indirect Indexed(8 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r8(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, int8_t(opcodes.r8(pc+2)), mod&0x1F, opsize, stream);
 							return 3;
 
 						case 25: // PC Displacement Indirect Indexed (16 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r16(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, int16_t(opcodes.r16(pc+2)), mod&0x1F, opsize, stream);
 							return 4;
 
 						case 26: // PC Displacement Indirect Indexed (32 bit)
-							out_AM_PCDisplacementIndirectIndexed(ipc, opcodes.r32(pc+2), mod&0x1F, opsize, stream);
+							out_AM_PCDisplacementIndirectIndexed(ipc, int32_t(opcodes.r32(pc+2)), mod&0x1F, opsize, stream);
 							return 6;
 
 						case 27: // Direct Address Deferred Indexed
@@ -287,15 +287,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 	} else {
 		switch(mod>>5) {
 		case 0: // Displacement (8 bit)
-			out_AM_Displacement(mod&0x1F, opcodes.r8(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, int8_t(opcodes.r8(pc+1)), opsize, stream);
 			return 2;
 
 		case 1: // Displacement (16 bit)
-			out_AM_Displacement(mod&0x1F, opcodes.r16(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, int16_t(opcodes.r16(pc+1)), opsize, stream);
 			return 3;
 
 		case 2: // Displacement (32 bit)
-			out_AM_Displacement(mod&0x1F, opcodes.r32(pc+1), opsize, stream);
+			out_AM_Displacement(mod&0x1F, int32_t(opcodes.r32(pc+1)), opsize, stream);
 			return 5;
 
 		case 3: // Register indirect
@@ -303,15 +303,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 			return 1;
 
 		case 4: // Displacement indirect (8 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r8(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, int8_t(opcodes.r8(pc+1)), opsize, stream);
 			return 2;
 
 		case 5: // Displacement indirect (16 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r16(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, int16_t(opcodes.r16(pc+1)), opsize, stream);
 			return 3;
 
 		case 6: // Displacement indirect (32 bit)
-			out_AM_DisplacementIndirect(mod&0x1F, opcodes.r32(pc+1), opsize, stream);
+			out_AM_DisplacementIndirect(mod&0x1F, int32_t(opcodes.r32(pc+1)), opsize, stream);
 			return 5;
 
 		case 7:
@@ -336,15 +336,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 				return 1;
 
 			case 16: // PC Displacement (8 bit)
-				out_AM_PCDisplacement(ipc, opcodes.r8(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, int8_t(opcodes.r8(pc+1)), opsize, stream);
 				return 2;
 
 			case 17: // PC Displacement (16 bit)
-				out_AM_PCDisplacement(ipc, opcodes.r16(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, int16_t(opcodes.r16(pc+1)), opsize, stream);
 				return 3;
 
 			case 18: // PC Displacement (32 bit)
-				out_AM_PCDisplacement(ipc, opcodes.r32(pc+1), opsize, stream);
+				out_AM_PCDisplacement(ipc, int32_t(opcodes.r32(pc+1)), opsize, stream);
 				return 5;
 
 			case 19: // Direct Address
@@ -372,15 +372,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 				}
 
 			case 24: // PC Displacement Indirect (8 bit)
-				out_AM_PCDisplacementIndirect(ipc, opcodes.r8(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, int8_t(opcodes.r8(pc+1)), opsize, stream);
 				return 2;
 
 			case 25: // PC Displacement Indirect (16 bit)
-				out_AM_PCDisplacementIndirect(ipc, opcodes.r16(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, int16_t(opcodes.r16(pc+1)), opsize, stream);
 				return 3;
 
 			case 26: // PC Displacement Indirect (32 bit)
-				out_AM_PCDisplacementIndirect(ipc, opcodes.r32(pc+1), opsize, stream);
+				out_AM_PCDisplacementIndirect(ipc, int32_t(opcodes.r32(pc+1)), opsize, stream);
 				return 5;
 
 			case 27: // Direct Address Deferred
@@ -388,15 +388,15 @@ u32 v60_disassembler::decode_AM(unsigned ipc, offs_t pc, int m, int opsize, cons
 				return 5;
 
 			case 28: // PC Double Displacement (8 bit)
-				out_AM_PCDoubleDisplacement(ipc, opcodes.r8(pc+1), opcodes.r8(pc+2), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, int8_t(opcodes.r8(pc+1)), int8_t(opcodes.r8(pc+2)), opsize, stream);
 				return 3;
 
 			case 29: // PC Double Displacement (16 bit)
-				out_AM_PCDoubleDisplacement(ipc, opcodes.r16(pc+1), opcodes.r16(pc+3), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, int16_t(opcodes.r16(pc+1)), int16_t(opcodes.r16(pc+3)), opsize, stream);
 				return 5;
 
 			case 30: // PC Double Displacement (32 bit)
-				out_AM_PCDoubleDisplacement(ipc, opcodes.r32(pc+1), opcodes.r32(pc+5), opsize, stream);
+				out_AM_PCDoubleDisplacement(ipc, int32_t(opcodes.r32(pc+1)), int32_t(opcodes.r32(pc+5)), opsize, stream);
 				return 9;
 
 			default:
@@ -455,13 +455,13 @@ u32 v60_disassembler::decode_F3(const char *opnm, int opsize1, int opsize2, unsi
 
 u32 v60_disassembler::decode_F4a(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%X", opnm, ipc + static_cast<int8_t>(opcodes.r8(pc)));
+	util::stream_format(stream, "%-8s%X", opnm, ipc + int8_t(opcodes.r8(pc)));
 	return 2;
 }
 
 u32 v60_disassembler::decode_F4b(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%X", opnm, ipc + static_cast<int16_t>(opcodes.r16(pc)));
+	util::stream_format(stream, "%-8s%X", opnm, ipc + int16_t(opcodes.r16(pc)));
 	return 3;
 }
 
@@ -473,7 +473,7 @@ u32 v60_disassembler::decode_F5(const char *opnm, int opsize1, int opsize2, unsi
 
 u32 v60_disassembler::decode_F6(const char *opnm, int opsize1, int opsize2, unsigned ipc, offs_t pc, const data_buffer &opcodes, std::ostream &stream)
 {
-	util::stream_format(stream, "%-8s%s, %X[PC]", opnm, v60_reg_names[opcodes.r8(pc) & 0x1f], ipc+opcodes.r16(pc+1));
+	util::stream_format(stream, "%-8s%s, %X[PC]", opnm, v60_reg_names[opcodes.r8(pc) & 0x1f], ipc + int16_t(opcodes.r16(pc+1)));
 	return 4;
 }
 
@@ -640,38 +640,38 @@ DEFINE_EASY_OPCODE(ANDBSU, "andbsu", F7b, 0x80, 0x80)
 DEFINE_EASY_OPCODE(ANDBSD, "andbsd", F7b, 0x80, 0x80)
 DEFINE_EASY_OPCODE(ANDNBSU, "andnbsu", F7b, 0x80, 0x80)
 DEFINE_EASY_OPCODE(ANDNBSD, "andnbsd", F7b, 0x80, 0x80)
-DEFINE_EASY_OPCODE(BGT8, "bgt", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BGT16, "bgt", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BGE8, "bge", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BGE16, "bge", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BLT8, "blt", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BLT16, "blt", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BLE8, "ble", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BLE16, "ble", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BH8, "bh", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BH16, "bh", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BNL8, "bnl", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BNL16, "bnl", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BL8, "bl", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BL16, "bl", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BNH8, "bnh", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BNH16, "bnh", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BE8, "be", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BE16, "be", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BNE8, "bne", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BNE16, "bne", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BV8, "bv", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BV16, "bv", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BNV8, "bnv", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BNV16, "bnv", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BN8, "bn", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BN16, "bn", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BP8, "bp", F4a, 0, 0)
-DEFINE_EASY_OPCODE(BP16, "bp", F4b, 0, 0)
+DEFINE_EASY_OPCODE_EX(BGT8, "bgt", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BGT16, "bgt", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BGE8, "bge", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BGE16, "bge", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BLT8, "blt", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BLT16, "blt", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BLE8, "ble", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BLE16, "ble", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BH8, "bh", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BH16, "bh", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BNL8, "bnl", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BNL16, "bnl", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BL8, "bl", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BL16, "bl", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BNH8, "bnh", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BNH16, "bnh", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BE8, "be", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BE16, "be", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BNE8, "bne", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BNE16, "bne", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BV8, "bv", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BV16, "bv", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BNV8, "bnv", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BNV16, "bnv", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BN8, "bn", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BN16, "bn", F4b, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BP8, "bp", F4a, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(BP16, "bp", F4b, 0, 0, STEP_COND)
 DEFINE_EASY_OPCODE(BR8, "br", F4a, 0, 0)
 DEFINE_EASY_OPCODE(BR16, "br", F4b, 0, 0)
-DEFINE_EASY_OPCODE(BRK, "brk", F5, 0, 0)
-DEFINE_EASY_OPCODE(BRKV, "brkv", F5, 0, 0)
+DEFINE_EASY_OPCODE_EX(BRK, "brk", F5, 0, 0, STEP_OVER)
+DEFINE_EASY_OPCODE_EX(BRKV, "brkv", F5, 0, 0, STEP_OVER | STEP_COND)
 DEFINE_EASY_OPCODE_EX(BSR, "bsr", F4b, 0, 0, STEP_OVER)
 DEFINE_EASY_OPCODE_EX(CALL, "call", F1F2, 0, 2, STEP_OVER)
 DEFINE_EASY_OPCODE(CAXI, "caxi", F1, 2, 2)
@@ -698,21 +698,21 @@ DEFINE_EASY_OPCODE(CVTSW, "cvt.sw", F2, 0, 2)
 DEFINE_EASY_OPCODE(CVTLW, "cvt.lw", F2, 1, 2)
 DEFINE_EASY_OPCODE(CVTDPZ, "cvtd.pz", F7c, 0, 1)
 DEFINE_EASY_OPCODE(CVTDZP, "cvtd.zp", F7c, 1, 0)
-DEFINE_EASY_OPCODE_EX(DBGT, "dbgt", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBGE, "dbge", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBLT, "dbgt", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBLE, "dbge", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBH, "dbh", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBNL, "dbnl", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBL, "dbl", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBNH, "dbnh", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBE, "dbe", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBNE, "dbne", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBV, "dbe", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBNV, "dbne", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBN, "dbn", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBP, "dbp", F6, 0, 0, STEP_OVER)
-DEFINE_EASY_OPCODE_EX(DBR, "dbr", F6, 0, 0, STEP_OVER)
+DEFINE_EASY_OPCODE_EX(DBGT, "dbgt", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBGE, "dbge", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBLT, "dbgt", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBLE, "dbge", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBH, "dbh", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBNL, "dbnl", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBL, "dbl", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBNH, "dbnh", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBE, "dbe", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBNE, "dbne", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBV, "dbe", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBNV, "dbne", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBN, "dbn", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBP, "dbp", F6, 0, 0, STEP_COND)
+DEFINE_EASY_OPCODE_EX(DBR, "dbr", F6, 0, 0, STEP_COND)
 DEFINE_TRIPLE_OPCODE(DEC, "dec", F3)
 DEFINE_EASY_OPCODE(DISPOSE, "dispose", F5, 0, 0)
 DEFINE_TRIPLE_OPCODE(DIV, "div", F1F2)
@@ -825,7 +825,7 @@ DEFINE_EASY_OPCODE(SUBDC, "subdc", F7c, 0, 0)
 DEFINE_EASY_OPCODE(SUBRDC, "subrdc", F7c, 0, 0)
 DEFINE_FPU_OPCODE(SUBF, "subf", F2)
 DEFINE_EASY_OPCODE(TASI, "tasi", F3, 0, 0)
-DEFINE_EASY_OPCODE(TB, "tb", F6, 0, 0)
+DEFINE_EASY_OPCODE_EX(TB, "tb", F6, 0, 0, STEP_COND)
 DEFINE_TRIPLE_OPCODE(TEST, "test", F3)
 DEFINE_EASY_OPCODE(TEST1, "test1", F1F2, 2, 2)
 DEFINE_EASY_OPCODE_EX(TRAP, "trap", F3, 0, 0, STEP_OVER)

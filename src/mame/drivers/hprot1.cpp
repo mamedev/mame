@@ -83,8 +83,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(henry_p1_w);
-	DECLARE_WRITE8_MEMBER(henry_p3_w);
+	void henry_p1_w(uint8_t data);
+	void henry_p3_w(uint8_t data);
 	void hprot1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void i80c31_io(address_map &map);
@@ -135,10 +135,10 @@ void hprot1_state::i80c31_io(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 /*TODO: verify the mirror mask value for the HD44780 device */
-	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_write));
-	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_write));
-	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_read));
-	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_read));
+	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_w));
+	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_w));
+	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_r));
+	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_r));
 /*TODO: attach the watchdog/brownout reset device:
     map(0xe000,0xe0??).mirror(?).r("adm965an", FUNC(adm965an_device::data_read)); */
 }
@@ -199,13 +199,13 @@ void hprot1_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER(hprot1_state::henry_p1_w)
+void hprot1_state::henry_p1_w(uint8_t data)
 {
 	if (LOG_IO_PORTS && data != 0xFF && data != 0xEF)
 		logerror("Write to P1: %02X\n", data);
 }
 
-WRITE8_MEMBER(hprot1_state::henry_p3_w)
+void hprot1_state::henry_p3_w(uint8_t data)
 {
 	if (LOG_IO_PORTS)
 		logerror("Write to P3: %02X\n", data);
@@ -236,12 +236,12 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 {
 	if ( pos < 16 && line==0 )
 	{
-		bitmap.pix16(y, pos*6 + x) = state;
+		bitmap.pix(y, pos*6 + x) = state;
 	}
 
 	if ( pos >= 64 && pos < 80 && line==0 )
 	{
-		bitmap.pix16(y+9,(pos-64)*6 + x) = state;
+		bitmap.pix(y+9,(pos-64)*6 + x) = state;
 	}
 }
 
@@ -269,7 +269,7 @@ void hprot1_state::hprot1(machine_config &config)
 
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update));
 
 	/* TODO: figure out which RTC chip is in use. */
 

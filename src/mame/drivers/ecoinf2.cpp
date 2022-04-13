@@ -40,7 +40,7 @@ public:
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
-	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
+	void ox_port5c_out_w(uint8_t data);
 
 	void update_lamps()
 	{
@@ -59,7 +59,7 @@ private:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_a_strobedat0)
+	void ppi8255_ic10_write_a_strobedat0(uint8_t data)
 	{
 		if (strobe_amount)
 		{
@@ -67,7 +67,7 @@ private:
 			strobe_amount--;
 		}
 	}
-	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_b_strobedat1)
+	void ppi8255_ic10_write_b_strobedat1(uint8_t data)
 	{
 		if (strobe_amount)
 		{
@@ -75,7 +75,7 @@ private:
 			strobe_amount--;
 		}
 	}
-	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_c_strobe)
+	void ppi8255_ic10_write_c_strobe(uint8_t data)
 	{
 //      if (data>=0xf0)
 		{
@@ -92,14 +92,14 @@ private:
 	}
 
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic13_write_a_strobedat0)
+	void ppi8255_ic13_write_a_strobedat0(uint8_t data)
 	{
 		if (strobe_amount)
 		{
 			m_leds[strobe_addr] = (m_leds[strobe_addr] &0xff00) | (data & 0x00ff);
 		}
 	}
-	DECLARE_WRITE8_MEMBER(ppi8255_ic13_write_b_strobedat1)
+	void ppi8255_ic13_write_b_strobedat1(uint8_t data)
 	{
 		if (strobe_amount)
 		{
@@ -107,21 +107,21 @@ private:
 		}
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_ic13_read_c_panel)
+	uint8_t ppi8255_ic13_read_c_panel()
 	{
 		return m_panel->read();
 	}
 
 
-	DECLARE_READ8_MEMBER(ppi8255_ic22_read_a_levels)
+	uint8_t ppi8255_ic22_read_a_levels()
 	{
 		return 0;//m_levels->read();
 	}
-	DECLARE_READ8_MEMBER(ppi8255_ic22_read_b_coins)
+	uint8_t ppi8255_ic22_read_b_coins()
 	{
 		return m_coins->read();
 	}
-	DECLARE_READ8_MEMBER(ppi8255_ic22_read_c_misc)
+	uint8_t ppi8255_ic22_read_c_misc()
 	{
 		int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
 							m_meters->GetActivity(2) | m_meters->GetActivity(3) |
@@ -142,7 +142,7 @@ private:
 
 
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_a_meters)
+	void ppi8255_ic24_write_a_meters(uint8_t data)
 	{
 		for (int meter = 0; meter < 8; meter ++)
 		{
@@ -150,14 +150,14 @@ private:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_b_payouts)
+	void ppi8255_ic24_write_b_payouts(uint8_t data)
 	{
 		//TODO: Fix up payout enables - all available bits enable one slide each
 		m_coinlamp_outputs[0] = BIT(data, 6);
 		m_coinlamp_outputs[1] = BIT(data, 7);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_c_inhibits)
+	void ppi8255_ic24_write_c_inhibits(uint8_t data)
 	{
 		machine().bookkeeping().coin_lockout_w(0, (data & 0x01) );
 		machine().bookkeeping().coin_lockout_w(1, (data & 0x02) );
@@ -169,7 +169,7 @@ private:
 	}
 
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_a_reel01)
+	void ppi8255_ic23_write_a_reel01(uint8_t data)
 	{
 		m_reels[0]->update( data    &0x0f);
 		m_reels[1]->update((data>>4)&0x0f);
@@ -178,7 +178,7 @@ private:
 		awp_draw_reel(machine(),"reel2", *m_reels[1]);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
+	void ppi8255_ic23_write_b_reel23(uint8_t data)
 	{
 		m_reels[2]->update( data    &0x0f);
 		m_reels[3]->update((data>>4)&0x0f);
@@ -187,7 +187,7 @@ private:
 		awp_draw_reel(machine(),"reel4", *m_reels[3]);
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)
+	uint8_t ppi8255_ic23_read_c_key()
 	{
 		int data = m_optic_pattern;
 		data |= m_key->read();
@@ -224,7 +224,7 @@ private:
 };
 
 
-WRITE8_MEMBER(ecoinf2_state::ox_port5c_out_w)
+void ecoinf2_state::ox_port5c_out_w(uint8_t data)
 {
 	// Watchdog?
 }
@@ -245,10 +245,10 @@ void ecoinf2_state::oxo_portmap(address_map &map)
 	map(0x48, 0x4b).rw("ic22_inpt", FUNC(i8255_device::read), FUNC(i8255_device::write)); //*
 	map(0x4c, 0x4f).rw("ic23_reel", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x50, 0x53).rw("ic13_leds", FUNC(i8255_device::read), FUNC(i8255_device::write)); //*
-//  AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ic25_dips", i8255_device, read, write) // is this an 8255, or a mirrored byte read?
+//  map(0x54, 0x57).rw("ic25_dips", FUNC(i8255_device::read), FUNC(i8255_device::write)); // is this an 8255, or a mirrored byte read?
 
 
-//  AM_RANGE(0x5c, 0x5c) AM_WRITE(ox_port5c_out_w)
+//  map(0x5c, 0x5c).w(FUNC(ecoinf2_state::ox_port5c_out_w));
 }
 
 
@@ -500,7 +500,7 @@ INPUT_PORTS_END
 void ecoinf2_state::ecoinf2_oxo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, 4000000); // some of these hit invalid opcodes with a plain z80, some don't?
+	Z80180(config, m_maincpu, 4000000); // some of these hit invalid opcodes with a plain z80, some don't?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf2_state::oxo_memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinf2_state::oxo_portmap);
 

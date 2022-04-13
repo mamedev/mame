@@ -143,7 +143,8 @@ static const uint8_t dec_2_seven_segs[] = {
 };
 
 hp98035_io_card_device::hp98035_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp9845_io_card_device(mconfig , HP98035_IO_CARD , tag , owner , clock),
+	: device_t(mconfig , HP98035_IO_CARD , tag , owner , clock),
+	  device_hp9845_io_interface(mconfig, *this),
 	  device_rtc_interface(mconfig , *this),
 	  m_cpu(*this , "np")
 {
@@ -154,7 +155,7 @@ hp98035_io_card_device::~hp98035_io_card_device()
 }
 
 static INPUT_PORTS_START(hp98035_port)
-	MCFG_HP9845_IO_SC(9)
+	PORT_HP9845_IO_SC(9)
 INPUT_PORTS_END
 
 ioport_constructor hp98035_io_card_device::device_input_ports() const
@@ -191,8 +192,6 @@ void hp98035_io_card_device::device_start()
 
 void hp98035_io_card_device::device_reset()
 {
-	hp9845_io_card_device::device_reset();
-
 	m_idr_full = false;
 	m_idr = 0;
 	m_odr = 0;
@@ -208,7 +207,7 @@ void hp98035_io_card_device::device_reset()
 	half_init();
 }
 
-void hp98035_io_card_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp98035_io_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == MSEC_TMR_ID) {
 		// On real hw there's a full 4-bit decimal counter, but only the LSB is used to
@@ -255,7 +254,7 @@ void hp98035_io_card_device::device_timer(emu_timer &timer, device_timer_id id, 
 	}
 }
 
-READ16_MEMBER(hp98035_io_card_device::reg_r)
+uint16_t hp98035_io_card_device::reg_r(address_space &space, offs_t offset)
 {
 	uint16_t res;
 
@@ -288,7 +287,7 @@ READ16_MEMBER(hp98035_io_card_device::reg_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp98035_io_card_device::reg_w)
+void hp98035_io_card_device::reg_w(address_space &space, offs_t offset, uint16_t data)
 {
 	bool new_inten;
 
@@ -318,33 +317,33 @@ WRITE16_MEMBER(hp98035_io_card_device::reg_w)
 	LOG(("write R%u=%04x\n" , offset + 4 , data));
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::ram_addr_w)
+void hp98035_io_card_device::ram_addr_w(uint8_t data)
 {
 	m_ram_addr = data;
 }
 
-READ8_MEMBER(hp98035_io_card_device::ram_data_r)
+uint8_t hp98035_io_card_device::ram_data_r()
 {
 	return m_np_ram[ m_ram_addr ];
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::ram_addr_data_w)
+void hp98035_io_card_device::ram_addr_data_w(uint8_t data)
 {
 	m_ram_addr = data;
 	m_np_ram[ m_ram_addr ] = m_ram_data_in;
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::ram_data_w)
+void hp98035_io_card_device::ram_data_w(uint8_t data)
 {
 	m_ram_data_in = data;
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::clock_key_w)
+void hp98035_io_card_device::clock_key_w(uint8_t data)
 {
 	m_clock_keys = data & 7;
 }
 
-READ8_MEMBER(hp98035_io_card_device::clock_digit_r)
+uint8_t hp98035_io_card_device::clock_digit_r()
 {
 	switch (m_clock_mux) {
 	case 1:
@@ -361,20 +360,20 @@ READ8_MEMBER(hp98035_io_card_device::clock_digit_r)
 	}
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::odr_w)
+void hp98035_io_card_device::odr_w(uint8_t data)
 {
 	m_odr = data;
 	set_flg(true);
 }
 
-READ8_MEMBER(hp98035_io_card_device::idr_r)
+uint8_t hp98035_io_card_device::idr_r()
 {
 	set_flg(true);
 	m_idr_full = false;
 	return m_idr;
 }
 
-READ8_MEMBER(hp98035_io_card_device::np_status_r)
+uint8_t hp98035_io_card_device::np_status_r()
 {
 	// Bit 2 = 0: use US date format
 	uint8_t res = 0x03;
@@ -397,13 +396,13 @@ READ8_MEMBER(hp98035_io_card_device::np_status_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::clear_np_irq_w)
+void hp98035_io_card_device::clear_np_irq_w(uint8_t data)
 {
 	m_np_irq = false;
 	update_dc();
 }
 
-READ8_MEMBER(hp98035_io_card_device::clock_mux_r)
+uint8_t hp98035_io_card_device::clock_mux_r()
 {
 	// External input lines are always active (bits 7-4)
 	uint8_t res = 0xf0 | m_clock_mux;
@@ -414,13 +413,13 @@ READ8_MEMBER(hp98035_io_card_device::clock_mux_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::set_irq_w)
+void hp98035_io_card_device::set_irq_w(uint8_t data)
 {
 	m_irq = true;
 	update_irq();
 }
 
-READ8_MEMBER(hp98035_io_card_device::clr_inten_r)
+uint8_t hp98035_io_card_device::clr_inten_r()
 {
 	m_intflag = false;
 	m_inten = false;
@@ -429,14 +428,14 @@ READ8_MEMBER(hp98035_io_card_device::clr_inten_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::clr_inten_w)
+void hp98035_io_card_device::clr_inten_w(uint8_t data)
 {
 	m_intflag = false;
 	m_inten = false;
 	update_irq();
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::dc_w)
+void hp98035_io_card_device::dc_w(uint8_t data)
 {
 	if (data != m_dc) {
 		//LOG(("DC=%02x\n" , data));

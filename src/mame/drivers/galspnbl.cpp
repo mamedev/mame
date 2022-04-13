@@ -35,6 +35,13 @@ Manuals for both games define the controls as 4 push buttons:
 | Left   |    Left      |             |  Right  |    Right     |
 |--------+--------------+-------------+---------+--------------|
 
+
+  CPU: MC68000P10, Z80B
+  OSC: 22.1184MHz by 68K CPU, 4MHz? OSC by Z80 & OKI 6295
+Sound: Oki 6295, K-665 (rebadged YM3812)
+Other: Actel A1020B 84pin PLCC, Cypress CY7384A 84pin PLCC
+       2 8-switch dipswitches
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -43,11 +50,11 @@ Manuals for both games define the controls as 4 push buttons:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/3812intf.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
-WRITE16_MEMBER(galspnbl_state::soundcommand_w)
+void galspnbl_state::soundcommand_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -217,7 +224,7 @@ void galspnbl_state::machine_start()
 void galspnbl_state::galspnbl(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'000'000));    /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	M68000(config, m_maincpu, XTAL(22'118'400)/2);    /* 11.0592 MHz??? - NEEDS VERIFICATION!! */
 	m_maincpu->set_addrmap(AS_PROGRAM, &galspnbl_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(galspnbl_state::irq3_line_hold)); /* also has vector for 6, but it does nothing */
 
@@ -232,8 +239,6 @@ void galspnbl_state::galspnbl(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(galspnbl_state::screen_update_galspnbl));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galspnbl);
 	PALETTE(config, m_palette, FUNC(galspnbl_state::galspnbl_palette)).set_format(palette_device::xBGR_444, 1024 + 32768);
@@ -288,7 +293,7 @@ ROM_START( galspnbl )
 	ROM_LOAD( "1.rom",        0x00000, 0x40000, CRC(93c06d3d) SHA1(8620d274ca7824e7e72a1ad1da3eaa804d550653) )
 ROM_END
 
-ROM_START( hotpinbl )
+ROM_START( hotpinbl ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 950804 MADE IN KOREA
 	ROM_REGION( 0x400000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "hp_07.bin",    0x000000, 0x80000, CRC(978cc13e) SHA1(0060aaf7259fdeeacb07e9ced01bdf69c27bdfb6) )
 	ROM_LOAD16_BYTE( "hp_03.bin",    0x000001, 0x80000, CRC(68388726) SHA1(d8dca9050403be70097a0f833ba189bd2fa87e80) )

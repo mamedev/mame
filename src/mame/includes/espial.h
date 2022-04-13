@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class espial_state : public driver_device
 {
@@ -47,13 +48,13 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
-	tilemap_t   *m_bg_tilemap;
-	tilemap_t   *m_fg_tilemap;
-	int       m_flipscreen;
+	tilemap_t   *m_bg_tilemap = nullptr;
+	tilemap_t   *m_fg_tilemap = nullptr;
+	int       m_flipscreen = 0;
 
 	/* sound-related */
-	uint8_t     m_main_nmi_enabled;
-	uint8_t     m_sound_nmi_enabled;
+	uint8_t     m_main_nmi_enabled = 0U;
+	uint8_t     m_sound_nmi_enabled = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -62,14 +63,14 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
-	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(espial_sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(espial_videoram_w);
-	DECLARE_WRITE8_MEMBER(espial_colorram_w);
-	DECLARE_WRITE8_MEMBER(espial_attributeram_w);
-	DECLARE_WRITE8_MEMBER(espial_scrollram_w);
-	DECLARE_WRITE8_MEMBER(espial_flipscreen_w);
+	void espial_master_interrupt_mask_w(uint8_t data);
+	void espial_master_soundlatch_w(uint8_t data);
+	void espial_sound_nmi_mask_w(uint8_t data);
+	void espial_videoram_w(offs_t offset, uint8_t data);
+	void espial_colorram_w(offs_t offset, uint8_t data);
+	void espial_attributeram_w(offs_t offset, uint8_t data);
+	void espial_scrollram_w(offs_t offset, uint8_t data);
+	void espial_flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -11,9 +11,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -30,11 +30,18 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mainlatch(*this, "mainlatch%u", 1),
 		m_palette(*this, "palette"),
+		m_crtc(*this, "crtc"),
 		m_dac(*this, "dac"),
-		m_rombank(*this, "bank1")
+		m_rombank(*this, "rombank"),
+		m_vrambank(*this, "vrambank")
 	{ }
 
 	void mjsister(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -43,12 +50,7 @@ private:
 	};
 
 	/* video-related */
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap1;
-	bool m_flip_screen;
 	bool m_video_enable;
-	int  m_screen_redraw;
-	int  m_vrambank;
 	int  m_colorbank;
 
 	/* misc */
@@ -66,15 +68,15 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<ls259_device, 2> m_mainlatch;
 	required_device<palette_device> m_palette;
+	required_device<hd6845s_device> m_crtc;
 	required_device<dac_byte_interface> m_dac;
 
 	/* memory */
 	required_memory_bank m_rombank;
-	uint8_t m_videoram0[0x8000];
-	uint8_t m_videoram1[0x8000];
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(dac_adr_s_w);
-	DECLARE_WRITE8_MEMBER(dac_adr_e_w);
+	required_memory_bank m_vrambank;
+	std::unique_ptr<uint8_t[]> m_vram;
+	void dac_adr_s_w(uint8_t data);
+	void dac_adr_e_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(rombank_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE_LINE_MEMBER(colorbank_w);
@@ -83,25 +85,19 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vrambank_w);
 	DECLARE_WRITE_LINE_MEMBER(dac_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(input_sel1_w);
-	DECLARE_WRITE8_MEMBER(input_sel2_w);
-	DECLARE_READ8_MEMBER(keys_r);
+	void input_sel1_w(uint8_t data);
+	void input_sel2_w(uint8_t data);
+	uint8_t keys_r();
 	TIMER_CALLBACK_MEMBER(dac_callback);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(interrupt);
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void redraw();
-	void plot0( int offset, uint8_t data );
-	void plot1( int offset, uint8_t data );
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void mjsister_io_map(address_map &map);
 	void mjsister_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	emu_timer *m_dac_timer;
+
+	MC6845_UPDATE_ROW(crtc_update_row);
 };
 
 
@@ -111,92 +107,52 @@ private:
  *
  *************************************/
 
-void mjsister_state::video_start()
+uint32_t mjsister_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_tmpbitmap0 = std::make_unique<bitmap_ind16>(256, 256);
-	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(256, 256);
-
-	save_item(NAME(m_videoram0));
-	save_item(NAME(m_videoram1));
-}
-
-void mjsister_state::plot0( int offset, uint8_t data )
-{
-	int x, y, c1, c2;
-
-	x = offset & 0x7f;
-	y = offset / 0x80;
-
-	c1 = (data & 0x0f)        + m_colorbank * 0x20;
-	c2 = ((data & 0xf0) >> 4) + m_colorbank * 0x20;
-
-	m_tmpbitmap0->pix16(y, x * 2 + 0) = c1;
-	m_tmpbitmap0->pix16(y, x * 2 + 1) = c2;
-}
-
-void mjsister_state::plot1( int offset, uint8_t data )
-{
-	int x, y, c1, c2;
-
-	x = offset & 0x7f;
-	y = offset / 0x80;
-
-	c1 = data & 0x0f;
-	c2 = (data & 0xf0) >> 4;
-
-	if (c1)
-		c1 += m_colorbank * 0x20 + 0x10;
-	if (c2)
-		c2 += m_colorbank * 0x20 + 0x10;
-
-	m_tmpbitmap1->pix16(y, x * 2 + 0) = c1;
-	m_tmpbitmap1->pix16(y, x * 2 + 1) = c2;
-}
-
-WRITE8_MEMBER(mjsister_state::videoram_w)
-{
-	if (m_vrambank)
-	{
-		m_videoram1[offset] = data;
-		plot1(offset, data);
-	}
-	else
-	{
-		m_videoram0[offset] = data;
-		plot0(offset, data);
-	}
-}
-
-uint32_t mjsister_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int flip = m_flip_screen;
-	int i, j;
-
-	if (m_screen_redraw)
-	{
-		int offs;
-
-		for (offs = 0; offs < 0x8000; offs++)
-		{
-			plot0(offs, m_videoram0[offs]);
-			plot1(offs, m_videoram1[offs]);
-		}
-		m_screen_redraw = 0;
-	}
-
 	if (m_video_enable)
-	{
-		for (i = 0; i < 256; i++)
-			for (j = 0; j < 4; j++)
-				bitmap.pix16(i, 256 + j) = m_colorbank * 0x20;
-
-		copybitmap(bitmap, *m_tmpbitmap0, flip, flip, 0, 0, cliprect);
-		copybitmap_trans(bitmap, *m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
-	}
+		m_crtc->screen_update(screen, bitmap, cliprect);
 	else
 		bitmap.fill(m_palette->black_pen(), cliprect);
+
 	return 0;
 }
+
+MC6845_UPDATE_ROW( mjsister_state::crtc_update_row )
+{
+	const pen_t *pen = m_palette->pens();
+
+	if (flip_screen())
+		y = 240 - y;
+
+	for (int i = 0; i < x_count; i++)
+	{
+		uint8_t x1 = i * 2 + 0;
+		uint8_t x2 = i * 2 + 1;
+
+		if (flip_screen())
+		{
+			x1 = 256 - x1;
+			x2 = 256 - x2;
+		}
+
+		// background layer
+		uint8_t data_bg = m_vram[0x400 + ((ma << 3) | (ra << 7) | i)];
+
+		bitmap.pix(y, x1) = pen[m_colorbank << 5 | ((data_bg & 0x0f) >> 0)];
+		bitmap.pix(y, x2) = pen[m_colorbank << 5 | ((data_bg & 0xf0) >> 4)];
+
+		// foreground layer
+		uint8_t data_fg = m_vram[0x8000 | (0x400 + ((ma << 3) | (ra << 7) | i))];
+
+		uint8_t c1 = ((data_fg & 0x0f) >> 0);
+		uint8_t c2 = ((data_fg & 0xf0) >> 4);
+
+		// 0 is transparent
+		if (c1) bitmap.pix(y, x1) = pen[m_colorbank << 5 | 0x10 | c1];
+		if (c2) bitmap.pix(y, x2) = pen[m_colorbank << 5 | 0x10 | c2];
+	}
+}
+
 
 /*************************************
  *
@@ -204,15 +160,15 @@ uint32_t mjsister_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
 	case TIMER_DAC:
-		dac_callback(ptr, param);
+		dac_callback(param);
 		break;
 	default:
-		assert_always(false, "Unknown id in mjsister_state::device_timer");
+		throw emu_fatalerror("Unknown id in mjsister_state::device_timer");
 	}
 }
 
@@ -228,12 +184,12 @@ TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 		m_dac_busy = 0;
 }
 
-WRITE8_MEMBER(mjsister_state::dac_adr_s_w)
+void mjsister_state::dac_adr_s_w(uint8_t data)
 {
 	m_dac_adr_s = data;
 }
 
-WRITE8_MEMBER(mjsister_state::dac_adr_e_w)
+void mjsister_state::dac_adr_e_w(uint8_t data)
 {
 	m_dac_adr_e = data;
 	m_dac_adr = m_dac_adr_s << 8;
@@ -251,13 +207,12 @@ WRITE_LINE_MEMBER(mjsister_state::rombank_w)
 
 WRITE_LINE_MEMBER(mjsister_state::flip_screen_w)
 {
-	m_flip_screen = state;
+	flip_screen_set(state);
 }
 
 WRITE_LINE_MEMBER(mjsister_state::colorbank_w)
 {
 	m_colorbank = (m_mainlatch[0]->output_state() >> 2) & 7;
-	redraw();
 }
 
 WRITE_LINE_MEMBER(mjsister_state::video_enable_w)
@@ -274,7 +229,7 @@ WRITE_LINE_MEMBER(mjsister_state::irq_enable_w)
 
 WRITE_LINE_MEMBER(mjsister_state::vrambank_w)
 {
-	m_vrambank = state;
+	m_vrambank->set_entry(state);
 }
 
 WRITE_LINE_MEMBER(mjsister_state::dac_bank_w)
@@ -287,17 +242,17 @@ WRITE_LINE_MEMBER(mjsister_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(mjsister_state::input_sel1_w)
+void mjsister_state::input_sel1_w(uint8_t data)
 {
 	m_input_sel1 = data;
 }
 
-WRITE8_MEMBER(mjsister_state::input_sel2_w)
+void mjsister_state::input_sel2_w(uint8_t data)
 {
 	m_input_sel2 = data;
 }
 
-READ8_MEMBER(mjsister_state::keys_r)
+uint8_t mjsister_state::keys_r()
 {
 	int p, i, ret = 0;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
@@ -324,13 +279,14 @@ void mjsister_state::mjsister_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("bank1").w(FUNC(mjsister_state::videoram_w));
+	map(0x8000, 0xffff).bankr("rombank").bankw("vrambank");
 }
 
 void mjsister_state::mjsister_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).nopw(); /* HD46505? */
+	map(0x00, 0x00).w(m_crtc, FUNC(hd6845s_device::address_w));
+	map(0x01, 0x01).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0x10, 0x10).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x11, 0x11).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::data_w));
@@ -342,6 +298,7 @@ void mjsister_state::mjsister_io_map(address_map &map)
 	map(0x33, 0x33).w(FUNC(mjsister_state::input_sel2_w));
 	map(0x34, 0x34).w(FUNC(mjsister_state::dac_adr_s_w));
 	map(0x35, 0x35).w(FUNC(mjsister_state::dac_adr_e_w));
+//  map(0x36, 0x36) // writes 0xf8 here once
 }
 
 
@@ -444,24 +401,19 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void mjsister_state::redraw()
-{
-	/* we can skip saving tmpbitmaps because we can redraw them from vram */
-	m_screen_redraw = 1;
-}
-
 void mjsister_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-
 	m_rombank->configure_entries(0, 4, &ROM[0x10000], 0x8000);
+
+	m_vram = make_unique_clear<uint8_t[]>(0x10000);
+	m_vrambank->configure_entries(0, 2, m_vram.get(), 0x8000);
 
 	m_dac_timer = timer_alloc(TIMER_DAC);
 
+	save_pointer(NAME(m_vram), 0x10000);
 	save_item(NAME(m_dac_busy));
-	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_video_enable));
-	save_item(NAME(m_vrambank));
 	save_item(NAME(m_colorbank));
 	save_item(NAME(m_input_sel1));
 	save_item(NAME(m_input_sel2));
@@ -470,15 +422,12 @@ void mjsister_state::machine_start()
 	save_item(NAME(m_dac_bank));
 	save_item(NAME(m_dac_adr_s));
 	save_item(NAME(m_dac_adr_e));
-	machine().save().register_postload(save_prepost_delegate(FUNC(mjsister_state::redraw), this));
 }
 
 void mjsister_state::machine_reset()
 {
 	m_dac_busy = 0;
-	m_flip_screen = 0;
 	m_video_enable = 0;
-	m_screen_redraw = 0;
 	m_input_sel1 = 0;
 	m_input_sel2 = 0;
 	m_dac_adr = 0;
@@ -518,15 +467,16 @@ void mjsister_state::mjsister(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(256+4, 256);
-	screen.set_visarea(0, 255+4, 8, 247);
+	screen.set_raw(MCLK/2, 384, 0, 256, 268, 0, 240); // 6 MHz?
 	screen.set_screen_update(FUNC(mjsister_state::screen_update));
-	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
+	HD6845S(config, m_crtc, MCLK/4); // 3 MHz?
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(2);
+	m_crtc->set_update_row_callback(FUNC(mjsister_state::crtc_update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -537,9 +487,6 @@ void mjsister_state::mjsister(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 /*************************************

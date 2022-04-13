@@ -67,19 +67,19 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ8_MEMBER(kb_r);
+	uint8_t kb_r(offs_t offset);
 	UPD65031_MEMORY_UPDATE(bankswitch_update);
 	UPD65031_SCREEN_UPDATE(lcd_update);
 
 	// cartridges read/write
-	DECLARE_READ8_MEMBER(bank0_cart_r);
-	DECLARE_READ8_MEMBER(bank1_cart_r);
-	DECLARE_READ8_MEMBER(bank2_cart_r);
-	DECLARE_READ8_MEMBER(bank3_cart_r);
-	DECLARE_WRITE8_MEMBER(bank0_cart_w);
-	DECLARE_WRITE8_MEMBER(bank1_cart_w);
-	DECLARE_WRITE8_MEMBER(bank2_cart_w);
-	DECLARE_WRITE8_MEMBER(bank3_cart_w);
+	uint8_t bank0_cart_r(offs_t offset);
+	uint8_t bank1_cart_r(offs_t offset);
+	uint8_t bank2_cart_r(offs_t offset);
+	uint8_t bank3_cart_r(offs_t offset);
+	void bank0_cart_w(offs_t offset, uint8_t data);
+	void bank1_cart_w(offs_t offset, uint8_t data);
+	void bank2_cart_w(offs_t offset, uint8_t data);
+	void bank3_cart_w(offs_t offset, uint8_t data);
 
 	// defined in video/z88.c
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t color);
@@ -105,13 +105,13 @@ private:
 
 	struct
 	{
-		uint8_t slot;
-		uint8_t page;
+		uint8_t slot = 0;
+		uint8_t page = 0;
 	} m_bank[4];
 
-	int         m_bank_type[4];
-	uint8_t *   m_bios;
-	uint8_t *   m_ram_base;
+	int         m_bank_type[4] = {};
+	uint8_t *   m_bios = 0;
+	uint8_t *   m_ram_base = 0;
 };
 
 #endif // MAME_INCLUDES_Z88_H

@@ -26,14 +26,14 @@ public:
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_READ8_MEMBER( control_r );
-	DECLARE_WRITE8_MEMBER( control_w );
+	uint8_t data_r();
+	void data_w(uint8_t data);
+	uint8_t status_r();
+	uint8_t control_r( );
+	void control_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -43,8 +43,8 @@ protected:
 
 private:
 	void update_irq();
-	DECLARE_WRITE_LINE_MEMBER( write_irq_enabled );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
+	void write_irq_enabled(int state);
+	void write_centronics_ack(int state);
 
 	enum
 	{

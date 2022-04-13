@@ -29,8 +29,8 @@ DEFINE_DEVICE_TYPE(WANGPC_BUS_SLOT, wangpcbus_slot_device, "wangpcbus_slot", "Wa
 
 wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WANGPC_BUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_bus(nullptr),
+	device_single_card_slot_interface<device_wangpcbus_card_interface>(mconfig, *this),
+	m_bus(*this, finder_base::DUMMY_TAG),
 	m_sid(0)
 {
 }
@@ -41,9 +41,9 @@ wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, cons
 
 void wangpcbus_slot_device::device_start()
 {
-	m_bus = machine().device<wangpcbus_device>(WANGPC_BUS_TAG);
-	device_wangpcbus_card_interface *dev = dynamic_cast<device_wangpcbus_card_interface *>(get_card_device());
-	if (dev) m_bus->add_card(dev, m_sid);
+	device_wangpcbus_card_interface *dev = get_card_device();
+	if (dev)
+		m_bus->add_card(*dev, m_sid);
 }
 
 
@@ -91,12 +91,12 @@ void wangpcbus_device::device_start()
 //  add_card - add card
 //-------------------------------------------------
 
-void wangpcbus_device::add_card(device_wangpcbus_card_interface *card, int sid)
+void wangpcbus_device::add_card(device_wangpcbus_card_interface &card, int sid)
 {
-	m_device_list.append(*card);
+	m_device_list.append(card);
 
-	card->m_bus = this;
-	card->m_sid = sid;
+	card.m_bus = this;
+	card.m_sid = sid;
 }
 
 
@@ -242,9 +242,16 @@ WRITE_LINE_MEMBER( wangpcbus_device::tc_w )
 //-------------------------------------------------
 
 device_wangpcbus_card_interface::device_wangpcbus_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device), m_bus(nullptr), m_sid(0), m_next(nullptr)
+	device_interface(device, "wangpcbus"), m_bus(nullptr), m_sid(0), m_next(nullptr)
 {
 	m_slot = dynamic_cast<wangpcbus_slot_device *>(device.owner());
+}
+
+
+void device_wangpcbus_card_interface::interface_pre_start()
+{
+	if (!m_bus)
+		throw device_missing_dependencies();
 }
 
 

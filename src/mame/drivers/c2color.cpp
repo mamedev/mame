@@ -26,12 +26,14 @@
 
 #include "emu.h"
 
+#include "cpu/mcs51/mcs51.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
 #include "screen.h"
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class c2_color_state : public driver_device
@@ -39,6 +41,7 @@ class c2_color_state : public driver_device
 public:
 	c2_color_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
 		, m_cart_region(nullptr)
 		, m_palette(*this, "palette")
@@ -46,7 +49,6 @@ public:
 	{ }
 
 	void c2_color(machine_config &config);
-	void leapfrog_mfleappad(machine_config &config);
 
 private:
 	virtual void machine_start() override;
@@ -54,8 +56,14 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
+	u8 cart_r(offs_t offset);
+
+	void prog_map(address_map &map);
+	void ext_map(address_map &map);
+
+	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
 	required_device<palette_device> m_palette;
@@ -84,7 +92,7 @@ void c2_color_state::machine_reset()
 {
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(c2_color_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(c2_color_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -94,12 +102,30 @@ DEVICE_IMAGE_LOAD_MEMBER(c2_color_state, cart)
 	return image_init_result::PASS;
 }
 
+u8 c2_color_state::cart_r(offs_t offset)
+{
+	// skip past 32-byte header
+	return m_cart->read_rom(offset + 32);
+}
+
+void c2_color_state::prog_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(c2_color_state::cart_r));
+}
+
+void c2_color_state::ext_map(address_map &map)
+{
+	map(0x2400, 0x2400).nopr();
+}
+
 static INPUT_PORTS_START( c2_color )
 INPUT_PORTS_END
 
 void c2_color_state::c2_color(machine_config &config)
 {
-	// unknown CPU
+	I8032(config, m_maincpu, 12'000'000); // exact type and clock unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &c2_color_state::prog_map);
+	m_maincpu->set_addrmap(AS_IO, &c2_color_state::ext_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -113,7 +139,7 @@ void c2_color_state::c2_color(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "c2color_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&c2_color_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(c2_color_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("c2color_cart");
 }

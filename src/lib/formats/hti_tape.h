@@ -4,8 +4,8 @@
 
     "HTI" format
 
-    Format of images of DC-100 tape cassettes as used in HP 9845
-    and HP 85 systems.
+    Format of images of DC-100 tape cassettes as used in HP 264x,
+    HP 9825, HP 9845 and HP 85 systems.
 
 *********************************************************************/
 #ifndef MAME_FORMATS_HTI_TAPE_H
@@ -13,9 +13,11 @@
 
 #pragma once
 
-#include "ioprocs.h"
+#include "utilfwd.h"
 
+#include <cstdint>
 #include <map>
+
 
 class hti_format_t
 {
@@ -34,11 +36,15 @@ public:
 	// Tape length: 140 ft of usable tape + 72" of punched tape at either end
 	static constexpr tape_pos_t TAPE_LENGTH = (140 * 12 + 72 * 2) * ONE_INCH_POS;
 
+	// Length of bits in delta modulation
 	// Length of 0 bits at slow tape speed: 1/(35200 Hz)
-	static constexpr tape_pos_t ZERO_BIT_LEN = 619;
-
+	static constexpr tape_pos_t DELTA_ZERO_BIT_LEN = 619;
 	// Length of 1 bits at slow tape speed: 1.75 times ZERO_BIT_LEN
-	static constexpr tape_pos_t ONE_BIT_LEN = 1083;
+	static constexpr tape_pos_t DELTA_ONE_BIT_LEN = 1083;
+	// Length of bits in Manchester modulation
+	// By "bits" here we mean each of the halves of data bit cells
+	// Zeros & ones have same length
+	static constexpr tape_pos_t MANCHESTER_BIT_LEN = 621;
 
 	// Words stored on tape
 	typedef uint16_t tape_word_t;
@@ -49,14 +55,38 @@ public:
 	// Iterator to access words on tape
 	typedef tape_track_t::iterator track_iterator_t;
 
-	bool load_tape(io_generic *io);
-	void save_tape(io_generic *io);
+	// Set image format
+	enum image_format_t {
+		// Delta modulation, 16 bits per word, 2 tracks per cartridge
+		// HP 9845 & HP 85
+		HTI_DELTA_MOD_16_BITS,
+		// Delta modulation, 17 bits per word, 2 tracks per cartridge
+		// HP 9825
+		HTI_DELTA_MOD_17_BITS,
+		// Manchester modulation, 1 track per cartridge
+		// HP 264x
+		HTI_MANCHESTER_MOD
+	};
+
+	void set_image_format(image_format_t fmt) { m_img_format = fmt; }
+
+	// Return number of tracks
+	unsigned no_of_tracks() const { return m_img_format == HTI_MANCHESTER_MOD ? 1 : 2; }
+
+	bool load_tape(util::random_read &io);
+	void save_tape(util::random_read_write &io);
 	void clear_tape();
 
-	// Return physical length of a 16-bit word on tape
-	static tape_pos_t word_length(tape_word_t w);
+	// Return physical length of a bit on tape
+	tape_pos_t bit_length(bool bit) const
+	{
+		return m_img_format == HTI_MANCHESTER_MOD ? MANCHESTER_BIT_LEN : (bit ? DELTA_ONE_BIT_LEN : DELTA_ZERO_BIT_LEN);
+	}
 
-	static tape_pos_t farthest_end(const track_iterator_t& it , bool forward);
+	// Return physical length of a 16-bit word on tape
+	tape_pos_t word_length(tape_word_t w) const;
+
+	tape_pos_t farthest_end(const track_iterator_t& it , bool forward) const;
 
 	static bool pos_offset(tape_pos_t& pos , bool forward , tape_pos_t offset);
 
@@ -84,18 +114,26 @@ public:
 	// Advance an iterator to next word of data
 	adv_res_t adv_it(unsigned track_no , bool forward , track_iterator_t& it);
 
+	// Sync with the preamble of a record
+	bool sync_with_record(unsigned track_no , track_iterator_t& it , unsigned& bit_idx);
+
+	// Get a data word from record, after syncing
+	adv_res_t next_word(unsigned track_no , track_iterator_t& it , unsigned& bit_idx , tape_word_t& word);
+
 	// Scan for beginning of next gap in a given direction
 	bool next_gap(unsigned track_no , tape_pos_t& pos , bool forward , tape_pos_t min_gap);
 
 private:
 	// Content of tape tracks
 	tape_track_t m_tracks[ 2 ];
+	// Image format
+	image_format_t m_img_format;
 
-	static bool load_track(io_generic *io , uint64_t& offset , tape_track_t& track);
-	static void dump_sequence(io_generic *io , uint64_t& offset , tape_track_t::const_iterator it_start , unsigned n_words);
+	bool load_track(util::random_read &io , tape_track_t& track , bool old_format);
+	static void dump_sequence(util::random_read_write &io , tape_track_t::const_iterator it_start , unsigned n_words);
 
-	static tape_pos_t word_end_pos(const track_iterator_t& it);
-	static void adjust_it(tape_track_t& track , track_iterator_t& it , tape_pos_t pos);
+	tape_pos_t word_end_pos(const track_iterator_t& it) const;
+	void adjust_it(tape_track_t& track , track_iterator_t& it , tape_pos_t pos) const;
 	static void ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b);
 };
 

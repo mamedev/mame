@@ -20,14 +20,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_LDV1000_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PIONEER_LDV1000, 0)
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -47,7 +39,7 @@ class pioneer_ldv1000_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto command_strobe_callback() { return m_command_strobe_cb.bind(); }
 
@@ -70,7 +62,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -86,20 +78,20 @@ private:
 	bool laser_on() const { return (m_portb1 & 0x40); }
 
 	// internal read/write handlers
-	DECLARE_WRITE8_MEMBER( z80_decoder_display_port_w );
-	DECLARE_READ8_MEMBER( z80_decoder_display_port_r );
-	DECLARE_READ8_MEMBER( z80_controller_r );
-	DECLARE_WRITE8_MEMBER( z80_controller_w );
+	void z80_decoder_display_port_w(offs_t offset, uint8_t data);
+	uint8_t z80_decoder_display_port_r(offs_t offset);
+	uint8_t z80_controller_r();
+	void z80_controller_w(uint8_t data);
 
 	// internal read/write handlers
-	DECLARE_WRITE_LINE_MEMBER( ctc_interrupt );
-	DECLARE_WRITE8_MEMBER( ppi0_porta_w );
-	DECLARE_READ8_MEMBER( ppi0_portb_r );
-	DECLARE_READ8_MEMBER( ppi0_portc_r );
-	DECLARE_WRITE8_MEMBER( ppi0_portc_w );
-	DECLARE_READ8_MEMBER( ppi1_porta_r );
-	DECLARE_WRITE8_MEMBER( ppi1_portb_w );
-	DECLARE_WRITE8_MEMBER( ppi1_portc_w );
+	void ctc_interrupt(int state);
+	void ppi0_porta_w(uint8_t data);
+	uint8_t ppi0_portb_r();
+	uint8_t ppi0_portc_r();
+	void ppi0_portc_w(uint8_t data);
+	uint8_t ppi1_porta_r();
+	void ppi1_portb_w(uint8_t data);
+	void ppi1_portc_w(uint8_t data);
 
 	void ldv1000_map(address_map &map);
 	void ldv1000_portmap(address_map &map);

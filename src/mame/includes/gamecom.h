@@ -156,53 +156,53 @@ enum
 
 struct GAMECOM_DMA
 {
-	u8 width_x;
-	u8 width_y;
-	u8 source_x;
-	u8 source_x_current;
-	u8 source_y;
-	u8 source_width;
-	u8 dest_x;
-	u8 dest_x_current;
-	u8 dest_y;
-	u8 dest_width;
-	u8 palette;
-	u8 block_width;
-	u8 block_height;
-	u8 *source_bank;
-	u16 source_current;
-	u16 source_line;
-	u16 source_mask;
-	u8 *dest_bank;
-	u16 dest_current;
-	u16 dest_line;
-	u16 dest_mask;
-	u8 transfer_mode;
-	s16 adjust_x;
-	bool decrement_y;
-	bool overwrite_mode;
+	u8 width_x = 0U;
+	u8 width_y = 0U;
+	u8 source_x = 0U;
+	u8 source_x_current = 0U;
+	u8 source_y = 0U;
+	u8 source_width = 0U;
+	u8 dest_x = 0U;
+	u8 dest_x_current = 0U;
+	u8 dest_y = 0U;
+	u8 dest_width = 0U;
+	u8 palette = 0U;
+	u8 block_width = 0U;
+	u8 block_height = 0U;
+	u8 *source_bank = 0U;
+	u16 source_current = 0U;
+	u16 source_line = 0U;
+	u16 source_mask = 0U;
+	u8 *dest_bank = 0;
+	u16 dest_current = 0U;
+	u16 dest_line = 0U;
+	u16 dest_mask = 0U;
+	u8 transfer_mode = 0U;
+	s16 adjust_x = 0U;
+	bool decrement_y = false;
+	bool overwrite_mode = false;
 };
 
 struct GAMECOM_TIMER
 {
-	bool enabled;
-	u32 prescale_count;
-	u32 prescale_max;
-	u8 upcounter_max;
+	bool enabled = false;
+	u32 prescale_count = 0U;
+	u32 prescale_max = 0U;
+	u8 upcounter_max = 0U;
 };
 
 struct gamecom_sound_t
 {
-	uint8_t sgc;
-	uint8_t sg0l;
-	uint8_t sg1l;
-	uint8_t sg2l;
-	uint16_t sg0t;
-	uint16_t sg1t;
-	uint16_t sg2t;
-	uint8_t sgda;
-	uint8_t sg0w[16];
-	uint8_t sg1w[16];
+	uint8_t sgc = 0U;
+	uint8_t sg0l = 0U;
+	uint8_t sg1l = 0U;
+	uint8_t sg2l = 0U;
+	uint16_t sg0t = 0U;
+	uint16_t sg1t = 0U;
+	uint16_t sg2t = 0U;
+	uint8_t sgda = 0U;
+	uint8_t sg0w[16]{};
+	uint8_t sg1w[16]{};
 };
 
 
@@ -224,12 +224,12 @@ public:
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
 		, m_bank4(*this, "bank4")
-		, m_region_maincpu(*this, "maincpu")
+		, m_share_maincpu(*this, "maincpu")
 		, m_region_kernel(*this, "kernel")
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
 		, m_io_in2(*this, "IN2")
-		, m_io_grid(*this, "GRID.%u", 0)
+		, m_io_grid(*this, "GRID.%u", 0U)
 	{
 	}
 
@@ -239,38 +239,38 @@ public:
 
 private:
 
-	DECLARE_READ8_MEMBER( gamecom_internal_r );
-	DECLARE_READ8_MEMBER( gamecom_pio_r );
-	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
-	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
+	uint8_t gamecom_internal_r(offs_t offset);
+	uint8_t gamecom_pio_r(offs_t offset);
+	void gamecom_internal_w(offs_t offset, uint8_t data);
+	void gamecom_pio_w(offs_t offset, uint8_t data);
 	void gamecom_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_sound0_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_sound1_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_scanline);
-	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
-	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
+	void gamecom_handle_dma(uint8_t data);
+	void gamecom_update_timers(uint8_t data);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart1_load );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart2_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gamecom_mem_map(address_map &map);
 
-	uint8_t *m_p_ram;
-	uint8_t *m_cart_ptr;
-	uint8_t m_lcdc_reg;
-	uint8_t m_lch_reg;
-	uint8_t m_lcv_reg;
-	uint8_t m_sound0_cnt;
-	uint8_t m_sound1_cnt;
-	uint16_t m_scanline;
-	uint16_t m_base_address;
-	memory_region *m_cart1_rom;
-	memory_region *m_cart2_rom;
-	emu_timer *m_clock_timer;
-	emu_timer *m_sound0_timer;
-	emu_timer *m_sound1_timer;
-	emu_timer *m_scanline_timer;
+	uint8_t *m_p_ram = nullptr;
+	uint8_t *m_cart_ptr = nullptr;
+	uint8_t m_lcdc_reg = 0U;
+	uint8_t m_lch_reg = 0U;
+	uint8_t m_lcv_reg = 0U;
+	uint8_t m_sound0_cnt = 0U;
+	uint8_t m_sound1_cnt = 0U;
+	uint16_t m_scanline = 0U;
+	uint16_t m_base_address = 0U;
+	memory_region *m_cart1_rom = nullptr;
+	memory_region *m_cart2_rom = nullptr;
+	emu_timer *m_clock_timer = nullptr;
+	emu_timer *m_sound0_timer = nullptr;
+	emu_timer *m_sound1_timer = nullptr;
+	emu_timer *m_scanline_timer = nullptr;
 	GAMECOM_DMA m_dma;
 	GAMECOM_TIMER m_timer[2];
 	gamecom_sound_t m_sound;
@@ -295,7 +295,7 @@ private:
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
-	required_memory_region m_region_maincpu;
+	required_shared_ptr<u8> m_share_maincpu;
 	required_memory_region m_region_kernel;
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;

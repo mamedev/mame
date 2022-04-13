@@ -50,7 +50,7 @@ MAIN:
 		case 0x1E:								%EXG;			return;
 		case 0x1F:								%TFR;			return;
 
-		case 0x20:				set_cond(true);			%BRANCH;	return;
+		case 0x20:				set_cond(true);		%BRANCH;	return;
 		case 0x21:				set_cond(false);		%BRANCH;	return;
 		case 0x22:				set_cond(cond_hi());	%BRANCH;	return;
 		case 0x23:				set_cond(!cond_hi());	%BRANCH;	return;
@@ -271,7 +271,7 @@ MAIN:
 		case 0xFD:				set_regop16(m_q.p.d);	%EXTENDED;	%ST16;		return;
 		case 0xFE:				set_regop16(m_u);		%EXTENDED;	%LD16;		return;
 		case 0xFF:				set_regop16(m_u);		%EXTENDED;	%ST16;		return;
-		default:													%ILLEGAL;	return;			
+		default:													%ILLEGAL;	return;
 	}
 	return;
 
@@ -279,7 +279,6 @@ DISPATCH10:
 	@m_opcode = read_opcode();
 	switch(m_opcode)
 	{
-		case 0x20:				set_cond(true);						%LBRANCH;	return;
 		case 0x21:				set_cond(false);					%LBRANCH;	return;
 		case 0x22:				set_cond(cond_hi());				%LBRANCH;	return;
 		case 0x23:				set_cond(!cond_hi());				%LBRANCH;	return;
@@ -410,7 +409,7 @@ DISPATCH10:
 		case 0xFE:				set_regop16(m_s);	%EXTENDED;		%LD16;		return;
 		case 0xFF:				set_regop16(m_s);	%EXTENDED;		%ST16;		return;
 
-		default:													%ILLEGAL;	return;			
+		default:													%ILLEGAL;	return;
 	}
 	return;
 
@@ -512,7 +511,7 @@ DISPATCH11:
 		case 0xF7:				set_regop8(m_q.r.f);	%EXTENDED;		%ST8;		return;
 		case 0xFB:				set_regop8(m_q.r.f);	%EXTENDED;		%ADD8;		return;
 
-		default:														%ILLEGAL;	return;			
+		default:														%ILLEGAL;	return;
 	}
 	return;
 
@@ -891,7 +890,7 @@ TFM:
 	// operation that executed one transfer, and bumped the program
 	// counter back.  However, some documentation suggests that TFM
 	// was abortable, so we now have a get_pending_interrupt() call
-	// here. 
+	// here.
 	//
 	// Lastly, I have no information on the precise sub-instruction timing
 	// here; the timings of the reads and writes are really just a guess.

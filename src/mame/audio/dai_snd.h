@@ -21,19 +21,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
-	DECLARE_WRITE8_MEMBER(set_volume);
+	void set_volume(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	sound_stream *      m_mixer_channel;
-	int                 m_dai_input[3];
-	uint8_t             m_osc_volume[3];
-	uint8_t             m_noise_volume;
+	sound_stream *      m_mixer_channel = nullptr;
+	int                 m_dai_input[3]{};
+	uint8_t             m_osc_volume[3]{};
+	uint8_t             m_noise_volume = 0;
 
 	static const uint16_t s_osc_volume_table[];
 	static const uint16_t s_noise_volume_table[];

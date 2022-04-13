@@ -80,7 +80,6 @@ TODO
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "mekd2.lh"
@@ -90,11 +89,6 @@ TODO
 class mekd2_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_TRACE
-	};
-
 	mekd2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -102,37 +96,38 @@ public:
 		, m_pia_u(*this, "pia_u")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
+		, m_trace_timer(*this, "trace_timer")
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void mekd2(machine_config &config);
 
 private:
-	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
-	DECLARE_READ8_MEMBER(mekd2_key_r);
-	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
-	DECLARE_WRITE8_MEMBER(mekd2_digit_w);
-	DECLARE_WRITE8_MEMBER(mekd2_segment_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mekd2_quik);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
+	DECLARE_READ_LINE_MEMBER(key40_r);
+	uint8_t key_r();
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void digit_w(uint8_t data);
+	void segment_w(uint8_t data);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(trace_timer);
 
-	void mekd2_mem(address_map &map);
+	void mem_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	uint8_t m_cass_data[4];
-	uint8_t m_segment;
-	uint8_t m_digit;
-	uint8_t m_keydata;
-	bool m_cass_state;
-	bool m_cassold;
+	uint8_t m_cass_data[4]{};
+	uint8_t m_segment = 0U;
+	uint8_t m_digit = 0U;
+	uint8_t m_keydata = 0U;
+	bool m_cassbit = 0;
+	bool m_cassold = 0;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;
+	required_device<timer_device> m_trace_timer;
 	output_finder<6> m_digits;
 };
 
@@ -144,14 +139,14 @@ private:
 
 ************************************************************/
 
-void mekd2_state::mekd2_mem(address_map &map)
+void mekd2_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram(); // user ram
 	map(0x8004, 0x8007).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8008, 0x8009).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8020, 0x8023).rw(m_pia_s, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xa000, 0xa07f).ram(); // system ram
-	map(0xe000, 0xe3ff).rom().mirror(0x1c00);   /* JBUG ROM */
+	map(0xe000, 0xe3ff).rom().mirror(0x1c00).region("maincpu",0);   /* JBUG ROM */
 }
 
 /***********************************************************
@@ -205,25 +200,18 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-void mekd2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::trace_timer)
 {
-	switch (id)
-	{
-	case TIMER_TRACE:
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in mekd2_state::device_timer");
-	}
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
+WRITE_LINE_MEMBER( mekd2_state::nmi_w )
 {
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	else
-		timer_set(attotime::from_usec(18), TIMER_TRACE);
+		m_trace_timer->adjust(attotime::from_usec(18));
 }
 
 
@@ -234,12 +222,12 @@ WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
 
 ************************************************************/
 
-READ_LINE_MEMBER( mekd2_state::mekd2_key40_r )
+READ_LINE_MEMBER( mekd2_state::key40_r )
 {
 	return BIT(m_keydata, 6);
 }
 
-READ8_MEMBER( mekd2_state::mekd2_key_r )
+uint8_t mekd2_state::key_r()
 {
 	char kbdrow[4];
 	uint8_t i;
@@ -277,17 +265,16 @@ READ8_MEMBER( mekd2_state::mekd2_key_r )
 
 ************************************************************/
 
-WRITE8_MEMBER( mekd2_state::mekd2_segment_w )
+void mekd2_state::segment_w(uint8_t data)
 {
 	m_segment = data & 0x7f;
 }
 
-WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
+void  mekd2_state::digit_w(uint8_t data)
 {
-	uint8_t i;
 	if (data < 0x3f)
 	{
-		for (i = 0; i < 6; i++)
+		for (uint8_t i = 0; i < 6; i++)
 		{
 			if (BIT(data, i))
 				m_digits[i] = ~m_segment & 0x7f;
@@ -304,12 +291,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( mekd2_state::cass_w )
-{
-	m_cass_state = state;
-}
-
-QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
+QUICKLOAD_LOAD_MEMBER(mekd2_state::quickload_cb)
 {
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
@@ -334,23 +316,23 @@ QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 	return image_init_result::PASS;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_c)
+TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_w)
 {
 	m_cass_data[3]++;
 
-	if (m_cass_state != m_cassold)
+	if (m_cassbit != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cass_state;
+		m_cassold = m_cassbit;
 	}
 
-	if (m_cass_state)
+	if (m_cassbit)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
+TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_r)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -379,23 +361,23 @@ void mekd2_state::mekd2(machine_config &config)
 {
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL_MEKD2 / 2);        /* 614.4 kHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &mekd2_state::mekd2_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mekd2_state::mem_map);
 
 	config.set_default_layout(layout_mekd2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	PIA6821(config, m_pia_s, 0);
-	m_pia_s->readpa_handler().set(FUNC(mekd2_state::mekd2_key_r));
-	m_pia_s->readcb1_handler().set(FUNC(mekd2_state::mekd2_key40_r));
-	m_pia_s->writepa_handler().set(FUNC(mekd2_state::mekd2_segment_w));
-	m_pia_s->writepb_handler().set(FUNC(mekd2_state::mekd2_digit_w));
-	m_pia_s->ca2_handler().set(FUNC(mekd2_state::mekd2_nmi_w));
+	m_pia_s->readpa_handler().set(FUNC(mekd2_state::key_r));
+	m_pia_s->readcb1_handler().set(FUNC(mekd2_state::key40_r));
+	m_pia_s->writepa_handler().set(FUNC(mekd2_state::segment_w));
+	m_pia_s->writepb_handler().set(FUNC(mekd2_state::digit_w));
+	m_pia_s->ca2_handler().set(FUNC(mekd2_state::nmi_w));
 	m_pia_s->irqa_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 	m_pia_s->irqb_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
@@ -404,7 +386,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set(FUNC(mekd2_state::cass_w));
+	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
 	clock_device &acia_tx_clock(CLOCK(config, "acia_tx_clock", XTAL_MEKD2 / 256)); // 4800Hz
 	acia_tx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
@@ -412,10 +394,11 @@ void mekd2_state::mekd2(machine_config &config)
 	clock_device &acia_rx_clock(CLOCK(config, "acia_rx_clock", 300)); // toggled by cassette circuit
 	acia_rx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_rxc));
 
-	TIMER(config, "mekd2_c").configure_periodic(FUNC(mekd2_state::mekd2_c), attotime::from_hz(4800));
-	TIMER(config, "mekd2_p").configure_periodic(FUNC(mekd2_state::mekd2_p), attotime::from_hz(40000));
+	TIMER(config, "kansas_w").configure_periodic(FUNC(mekd2_state::kansas_w), attotime::from_hz(4800));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(mekd2_state::kansas_r), attotime::from_hz(40000));
+	TIMER(config, m_trace_timer).configure_generic(FUNC(mekd2_state::trace_timer));
 
-	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(mekd2_state, mekd2_quik), this), "d2", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "d2", attotime::from_seconds(1)).set_load_callback(FUNC(mekd2_state::quickload_cb));
 }
 
 /***********************************************************
@@ -425,8 +408,8 @@ void mekd2_state::mekd2(machine_config &config)
 ************************************************************/
 
 ROM_START(mekd2)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("jbug.rom", 0xe000, 0x0400, CRC(5ed08792) SHA1(b06e74652a4c4e67c4a12ddc191ffb8c07f3332e) )
+	ROM_REGION(0x0400,"maincpu",0)
+	ROM_LOAD("jbug.rom", 0x0000, 0x0400, CRC(5ed08792) SHA1(b06e74652a4c4e67c4a12ddc191ffb8c07f3332e) )
 ROM_END
 
 /***************************************************************************
@@ -436,4 +419,4 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
-COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, empty_init, "Motorola", "MEK6800D2" , 0 )
+COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, empty_init, "Motorola", "MEK6800D2" , MACHINE_SUPPORTS_SAVE )

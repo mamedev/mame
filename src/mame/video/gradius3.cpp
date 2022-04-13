@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 #include "emu.h"
 #include "includes/gradius3.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -74,12 +76,12 @@ void gradius3_state::video_start()
 
 ***************************************************************************/
 
-READ16_MEMBER(gradius3_state::gradius3_gfxrom_r)
+uint16_t gradius3_state::gradius3_gfxrom_r(offs_t offset)
 {
 	return (m_gfxrom[2 * offset + 1] << 8) | m_gfxrom[2 * offset];
 }
 
-WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
+void gradius3_state::gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_gfxram[offset];
 

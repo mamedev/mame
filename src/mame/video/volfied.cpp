@@ -24,24 +24,24 @@ void volfied_state::video_start()
           READ AND WRITE HANDLERS
 *******************************************************/
 
-READ16_MEMBER(volfied_state::video_ram_r)
+uint16_t volfied_state::video_ram_r(offs_t offset)
 {
 	return m_video_ram[offset];
 }
 
-WRITE16_MEMBER(volfied_state::video_ram_w)
+void volfied_state::video_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask &= m_video_mask;
 
 	COMBINE_DATA(&m_video_ram[offset]);
 }
 
-WRITE16_MEMBER(volfied_state::video_ctrl_w)
+void volfied_state::video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_ctrl);
 }
 
-READ16_MEMBER(volfied_state::video_ctrl_r)
+uint16_t volfied_state::video_ctrl_r()
 {
 	/* Could this be some kind of hardware collision detection? If bit 6 is
 	   set the game will check for collisions with the large enemy, whereas
@@ -52,14 +52,15 @@ READ16_MEMBER(volfied_state::video_ctrl_r)
 	return 0x60;
 }
 
-WRITE16_MEMBER(volfied_state::video_mask_w)
+void volfied_state::video_mask_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_mask);
 }
 
-WRITE16_MEMBER(volfied_state::sprite_ctrl_w)
+void volfied_state::volfied_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)
 {
-	m_pc090oj->set_sprite_ctrl((data & 0x3c) >> 2);
+	sprite_colbank = 0x100 | ((sprite_ctrl & 0x3c) << 2);
+	pri_mask = 0; /* sprites over everything */
 }
 
 
@@ -112,7 +113,7 @@ void volfied_state::refresh_pixel_layer( bitmap_ind16 &bitmap )
 			else
 				color |= p[x] & 0xf;
 
-			bitmap.pix16(y, x - 1) = color;
+			bitmap.pix(y, x - 1) = color;
 		}
 
 		p += 512;
@@ -123,6 +124,6 @@ uint32_t volfied_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	screen.priority().fill(0, cliprect);
 	refresh_pixel_layer(bitmap);
-	m_pc090oj->draw_sprites(bitmap, cliprect, screen.priority(), 0);
+	m_pc090oj->draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }

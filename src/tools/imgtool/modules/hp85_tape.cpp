@@ -7,11 +7,17 @@
     HP-85 tape format
 
 *********************************************************************/
-
 #include "imgtool.h"
-#include "formats/imageutl.h"
+
 #include "formats/hti_tape.h"
+#include "formats/imageutl.h"
+
+#include "ioprocs.h"
+#include "opresolv.h"
+
+#include <cstdio>
 #include <iostream>
+
 
 // Constants
 static constexpr unsigned CHARS_PER_FNAME = 6;  // Characters in a filename
@@ -43,8 +49,8 @@ static constexpr tape_pos_t FMT_IFG_SIZE = 2.5 * hti_format_t::ONE_INCH_POS;
 // Formatted size of IRGs: 1"
 static constexpr tape_pos_t FMT_IRG_SIZE = hti_format_t::ONE_INCH_POS;
 
-// Formatted size of records: 2.85"
-static constexpr tape_pos_t FMT_REC_SIZE = 2.85 * hti_format_t::ONE_INCH_POS;
+// Formatted size of records: 2.67"
+static constexpr tape_pos_t FMT_REC_SIZE = 2.67 * hti_format_t::ONE_INCH_POS;
 
 // Starting position on tracks: 74" from beginning of tape
 static constexpr tape_pos_t TRACK_START = 74 * hti_format_t::ONE_INCH_POS;
@@ -109,9 +115,9 @@ private:
 	// Content
 	std::vector<sif_file_ptr_t> content;
 	// First file on track 1
-	file_no_t file_track_1;
+	file_no_t file_track_1{};
 	// No. of first record on track 1
-	uint16_t record_track_1;
+	uint16_t record_track_1 = 0;
 
 	bool dec_rec_header(const tape_word_t *hdr , file_no_t& file_no , uint16_t& rec_no , bool& has_body , unsigned& body_len);
 	bool load_whole_tape();
@@ -145,6 +151,7 @@ typedef struct {
 tape_image_85::tape_image_85(void)
 	: dirty(false)
 {
+	image.set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 }
 
 void tape_image_85::format_img(void)
@@ -157,48 +164,13 @@ void tape_image_85::format_img(void)
 	finalize_allocation();
 }
 
-namespace {
-	int my_seekproc(void *file, int64_t offset, int whence)
-	{
-		reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
-		return 0;
-	}
-
-	size_t my_readproc(void *file, void *buffer, size_t length)
-	{
-		return reinterpret_cast<imgtool::stream *>(file)->read(buffer, length);
-	}
-
-	size_t my_writeproc(void *file, const void *buffer, size_t length)
-	{
-		reinterpret_cast<imgtool::stream *>(file)->write(buffer, length);
-		return length;
-	}
-
-	uint64_t my_filesizeproc(void *file)
-	{
-		return reinterpret_cast<imgtool::stream *>(file)->size();
-	}
-
-	const struct io_procs my_stream_procs = {
-		nullptr,
-		my_seekproc,
-		my_readproc,
-		my_writeproc,
-		my_filesizeproc
-	};
-}
-
 imgtoolerr_t tape_image_85::load_from_file(imgtool::stream *stream)
 {
-	io_generic io;
-	io.file = (void *)stream;
-	io.procs = &my_stream_procs;
-	io.filler = 0;
-
-	if (!image.load_tape(&io)) {
+	auto io = imgtool::stream_read(*stream, 0);
+	if (!io || !image.load_tape(*io)) {
 		return IMGTOOLERR_READERROR;
 	}
+	io.reset();
 
 	// Prevent track boundary crossing when reading directory
 	file_track_1 = 0;
@@ -263,22 +235,24 @@ bool tape_image_85::load_sif_file(file_no_t file_no , sif_file_t& out)
 		if (!image.next_data(track , pos , true , false , it)) {
 			break;
 		}
-		// 0    Sync word
-		// 1    File word
-		// 2    Record word
-		// 3    Length word
-		// 4    Checksum
-		tape_word_t hdr[ 5 ];
-		auto res = hti_format_t::ADV_CONT_DATA;
-		for (unsigned i = 0; i < 5; i++) {
+		unsigned bit_idx = 15;
+		if (!image.sync_with_record(track , it , bit_idx)) {
+			// Couldn't align
+			return false;
+		}
+
+		// 0    File word
+		// 1    Record word
+		// 2    Length word
+		// 3    Checksum
+		tape_word_t hdr[ 4 ];
+		for (unsigned i = 0; i < 4; i++) {
+			auto res = image.next_word(track , it , bit_idx , hdr[ i ]);
 			if (res != hti_format_t::ADV_CONT_DATA) {
 				return false;
 			}
-			hdr[ i ] = it->second;
-			res = image.adv_it(track , true , it);
 		}
-		if (hdr[ 0 ] != SYNC_WORD ||
-			checksum(&hdr[ 1 ] , 3) != hdr[ 4 ]) {
+		if (checksum(&hdr[ 0 ] , 3) != hdr[ 3 ]) {
 			return false;
 		}
 
@@ -287,7 +261,7 @@ bool tape_image_85::load_sif_file(file_no_t file_no , sif_file_t& out)
 		bool hdr_has_body;
 		unsigned hdr_body_len;
 
-		if (!dec_rec_header(&hdr[ 1 ] , hdr_file_no , hdr_rec_no , hdr_has_body , hdr_body_len)) {
+		if (!dec_rec_header(&hdr[ 0 ] , hdr_file_no , hdr_rec_no , hdr_has_body , hdr_body_len)) {
 			return false;
 		}
 
@@ -304,11 +278,10 @@ bool tape_image_85::load_sif_file(file_no_t file_no , sif_file_t& out)
 		tape_word_t body[ MAX_RECORD_SIZE / 2 + 1 ];
 		unsigned word_no = (hdr_body_len + 1) / 2 + 1;
 		for (unsigned i = 0; i < word_no; i++) {
+			auto res = image.next_word(track , it , bit_idx , body[ i ]);
 			if (res != hti_format_t::ADV_CONT_DATA) {
 				return false;
 			}
-			body[ i ] = it->second;
-			res = image.adv_it(track , true , it);
 		}
 		if (checksum(&body[ 0 ] , word_no - 1) != body[ word_no - 1 ]) {
 			return false;
@@ -420,12 +393,7 @@ imgtoolerr_t tape_image_85::save_to_file(imgtool::stream *stream)
 	file_0.clear();
 	save_sif_file(track , pos , dir.size() + 1 , file_0);
 
-	io_generic io;
-	io.file = (void *)stream;
-	io.procs = &my_stream_procs;
-	io.filler = 0;
-
-	image.save_tape(&io);
+	image.save_tape(*imgtool::stream_read_write(*stream, 0));
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -864,7 +832,7 @@ namespace {
 	tape_image_85& get_tape_image(tape_state_t& ts)
 	{
 		if (ts.img == nullptr) {
-			ts.img = global_alloc(tape_image_85);
+			ts.img = new tape_image_85;
 		}
 
 		return *(ts.img);
@@ -914,7 +882,7 @@ namespace {
 		delete state.stream;
 
 		// Free tape_image
-		global_free(&tape_image);
+		delete &tape_image;
 	}
 
 	imgtoolerr_t hp85_tape_begin_enum (imgtool::directory &enumeration, const char *path)

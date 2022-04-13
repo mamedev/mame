@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/timer.h"
+#include "tilemap.h"
 
 class iqblock_state : public driver_device
 {
@@ -32,18 +33,18 @@ private:
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 
-	int m_videoenable;
-	int m_video_type;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	int m_videoenable = 0;
+	int m_video_type = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
-	DECLARE_WRITE8_MEMBER(iqblock_prot_w);
-	DECLARE_WRITE8_MEMBER(grndtour_prot_w);
-	DECLARE_WRITE8_MEMBER(irqack_w);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgscroll_w);
-	DECLARE_WRITE8_MEMBER(port_C_w);
+	void iqblock_prot_w(uint8_t data);
+	void grndtour_prot_w(uint8_t data);
+	void irqack_w(uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void fgscroll_w(offs_t offset, uint8_t data);
+	void port_C_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 

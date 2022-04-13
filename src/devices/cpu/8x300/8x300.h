@@ -46,7 +46,11 @@ public:
 	n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto sc_callback() { return m_sc_callback.bind(); }
-
+	auto wc_callback() { return m_wc_callback.bind(); }
+	auto mclk_callback() { return m_mclk_callback.bind(); }
+	auto lb_callback() { return m_lb_callback.bind(); }
+	auto rb_callback() { return m_rb_callback.bind(); }
+	auto iv_callback() { return m_iv_callback.bind(); }
 protected:
 	n8x300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -59,9 +63,9 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -73,8 +77,8 @@ protected:
 	virtual void set_reg(uint8_t reg, uint8_t val, bool xmit);
 	virtual uint8_t get_reg(uint8_t reg);
 
-	void xmit_lb(uint8_t dst, uint8_t mask);
-	void xmit_rb(uint8_t dst, uint8_t mask);
+	void xmit_lb(uint8_t dst, uint8_t mask, bool with_sc, bool with_wc);
+	void xmit_rb(uint8_t dst, uint8_t mask, bool with_sc, bool with_wc);
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -82,11 +86,16 @@ protected:
 	int m_icount;
 	bool m_increment_pc;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
+	memory_access<13, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<13, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 9, 0,  0, ENDIANNESS_BIG>::specific m_io;
 
-	devcb_write8 m_sc_callback;  // Select Command (address latch)
+	devcb_write_line m_sc_callback;	// address latch
+	devcb_write_line m_wc_callback;	// data latch
+	devcb_write_line m_lb_callback;
+	devcb_write_line m_rb_callback;
+	devcb_write_line m_mclk_callback;
+	devcb_write8 m_iv_callback;
 
 	uint16_t m_PC;  // Program Counter
 	uint16_t m_AR;  // Address Register

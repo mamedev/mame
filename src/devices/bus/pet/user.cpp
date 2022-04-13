@@ -110,7 +110,7 @@ WRITE_LINE_MEMBER( pet_user_port_device::write_m ) { if (m_card != nullptr) m_ca
 // class device_pet_user_port_interface
 
 device_pet_user_port_interface::device_pet_user_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+	: device_interface(device, "petuser")
 {
 	m_slot = dynamic_cast<pet_user_port_device *>(device.owner());
 }

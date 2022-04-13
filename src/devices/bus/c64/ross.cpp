@@ -68,7 +68,7 @@ uint8_t c64_ross_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sph
 	{
 		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
 
-		data = m_roml[addr & m_roml.mask()];
+		data = m_roml[addr];
 	}
 
 	return data;

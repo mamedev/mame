@@ -13,6 +13,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "sound/ay8910.h"
+#include "tilemap.h"
 
 
 class dday_state : public driver_device
@@ -46,32 +47,32 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
-	tilemap_t        *m_fg_tilemap;
-	tilemap_t        *m_bg_tilemap;
-	tilemap_t        *m_text_tilemap;
-	tilemap_t        *m_sl_tilemap;
-	bitmap_ind16 m_main_bitmap;
-	int            m_control;
-	int            m_sl_image;
-	int            m_sl_enable;
-	int            m_timer_value;
-	emu_timer *m_countdown_timer;
+	tilemap_t        *m_fg_tilemap = nullptr;
+	tilemap_t        *m_bg_tilemap = nullptr;
+	tilemap_t        *m_text_tilemap = nullptr;
+	tilemap_t        *m_sl_tilemap = nullptr;
+	bitmap_ind16 m_main_bitmap = 0;
+	int            m_control = 0;
+	int            m_sl_image = 0;
+	int            m_sl_enable = 0;
+	int            m_timer_value = 0;
+	emu_timer *m_countdown_timer = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<ay8910_device> m_ay1;
+	required_device<ay8912_device> m_ay1;
 
-	DECLARE_READ8_MEMBER(dday_countdown_timer_r);
-	DECLARE_WRITE8_MEMBER(dday_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(dday_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(dday_textvideoram_w);
-	DECLARE_WRITE8_MEMBER(dday_colorram_w);
-	DECLARE_READ8_MEMBER(dday_colorram_r);
-	DECLARE_WRITE8_MEMBER(dday_sl_control_w);
-	DECLARE_WRITE8_MEMBER(dday_control_w);
+	uint8_t dday_countdown_timer_r();
+	void dday_bgvideoram_w(offs_t offset, uint8_t data);
+	void dday_fgvideoram_w(offs_t offset, uint8_t data);
+	void dday_textvideoram_w(offs_t offset, uint8_t data);
+	void dday_colorram_w(offs_t offset, uint8_t data);
+	uint8_t dday_colorram_r(offs_t offset);
+	void dday_sl_control_w(uint8_t data);
+	void dday_control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);

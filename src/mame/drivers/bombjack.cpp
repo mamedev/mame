@@ -106,7 +106,7 @@ Dip Locations and factory settings verified with manual
 #include "speaker.h"
 
 
-READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
+uint8_t bombjack_state::soundlatch_read_and_clear()
 {
 	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
@@ -123,7 +123,7 @@ READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
  *
  *************************************/
 
-WRITE8_MEMBER(bombjack_state::irq_mask_w)
+void bombjack_state::irq_mask_w(uint8_t data)
 {
 	m_nmi_mask = BIT(data, 0);
 	if (!m_nmi_mask)

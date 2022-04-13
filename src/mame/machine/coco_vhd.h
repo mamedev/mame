@@ -36,18 +36,15 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 
-	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "vhd"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "vhd"; }
+	virtual const char *image_type_name() const noexcept override { return "harddisk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "hard"; }
 
 	// specific implementation
-	DECLARE_READ8_MEMBER(read) { return read(offset); }
-	DECLARE_WRITE8_MEMBER(write) { write(offset, data); }
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -59,10 +56,10 @@ protected:
 
 private:
 	required_device<cpu_device> m_cpu;
-	address_space *             m_cpu_space;
-	uint32_t                    m_logical_record_number;
-	uint32_t                    m_buffer_address;
-	uint8_t                     m_status;
+	address_space *             m_cpu_space = nullptr;
+	uint32_t                    m_logical_record_number = 0;
+	uint32_t                    m_buffer_address = 0;
+	uint8_t                     m_status = 0;
 };
 
 // device type definition

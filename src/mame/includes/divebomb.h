@@ -17,6 +17,7 @@
 #include "sound/sn76496.h"
 #include "video/k051316.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define XTAL1 XTAL(24'000'000)
 
@@ -42,6 +43,11 @@ public:
 
 	void divebomb(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_spritecpu;
 	required_device<cpu_device> m_fgcpu;
@@ -56,14 +62,11 @@ private:
 	required_device<generic_latch_8_device> m_spr2fg_latch;
 	required_device<generic_latch_8_device> m_roz2fg_latch;
 
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
 
-	uint8_t m_roz_pal;
-	bool m_roz_enable[2];
+	uint8_t m_roz_pal = 0;
+	bool m_roz_enable[2]{};
 
-	DECLARE_MACHINE_RESET(divebomb);
-	DECLARE_MACHINE_START(divebomb);
-	DECLARE_VIDEO_START(divebomb);
 	void divebomb_palette(palette_device &palette) const;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -75,15 +78,15 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_READ8_MEMBER(fgcpu_comm_flags_r);
-	DECLARE_WRITE8_MEMBER(fgram_w);
+	uint8_t fgcpu_comm_flags_r();
+	void fgram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(spritecpu_port00_w);
+	void spritecpu_port00_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(rozcpu_bank_w);
-	template<int Chip> DECLARE_WRITE8_MEMBER(rozcpu_wrap_enable_w);
-	template<int Chip> DECLARE_WRITE8_MEMBER(rozcpu_enable_w);
-	DECLARE_WRITE8_MEMBER(rozcpu_pal_w);
+	void rozcpu_bank_w(uint8_t data);
+	template<int Chip> void rozcpu_wrap_enable_w(uint8_t data);
+	template<int Chip> void rozcpu_enable_w(uint8_t data);
+	void rozcpu_pal_w(uint8_t data);
 	void divebomb_fgcpu_iomap(address_map &map);
 	void divebomb_fgcpu_map(address_map &map);
 	void divebomb_rozcpu_iomap(address_map &map);

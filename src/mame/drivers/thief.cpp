@@ -97,12 +97,12 @@ void thief_state::tape_set_motor( int bOn )
 
 /***********************************************************/
 
-WRITE8_MEMBER( thief_state::thief_input_select_w )
+void thief_state::thief_input_select_w(uint8_t data)
 {
 	m_input_select = data;
 }
 
-WRITE8_MEMBER( thief_state::tape_control_w )
+void thief_state::tape_control_w(uint8_t data)
 {
 	// avoid bogus coin counts after reset
 	if (data == 0x00)
@@ -121,7 +121,7 @@ WRITE8_MEMBER( thief_state::tape_control_w )
 	tape_set_audio(kCrashTrack, BIT(data, 6) ? 0 : 1);
 }
 
-READ8_MEMBER( thief_state::thief_io_r )
+uint8_t thief_state::thief_io_r()
 {
 	uint8_t data = 0xff;
 

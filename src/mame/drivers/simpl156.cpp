@@ -354,9 +354,9 @@ static GFXDECODE_START( gfx_simpl156 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_16x16_layout, 0x200, 32 )    /* Sprites (16x16) */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(simpl156_state::interrupt)
+WRITE_LINE_MEMBER(simpl156_state::vblank_interrupt)
 {
-	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -384,7 +384,6 @@ void simpl156_state::chainrec(machine_config &config)
 	/* basic machine hardware */
 	ARM(config, m_maincpu, 28_MHz_XTAL /* /4 */); /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &simpl156_state::chainrec_map);
-	m_maincpu->set_vblank_int("screen", FUNC(simpl156_state::interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
@@ -396,6 +395,7 @@ void simpl156_state::chainrec(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(simpl156_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(simpl156_state::vblank_interrupt));
 
 	PALETTE(config, m_palette);
 	m_palette->set_format(palette_device::xBGR_555, 4096);
@@ -406,21 +406,19 @@ void simpl156_state::chainrec(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(simpl156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(simpl156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(simpl156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(simpl156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(simpl156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(simpl156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -1048,7 +1046,7 @@ void simpl156_state::init_simpl156()
 }
 
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
-READ32_MEMBER(simpl156_state::joemacr_speedup_r)
+u32 simpl156_state::joemacr_speedup_r()
 {
 	if (m_maincpu->pc() == 0x284)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1058,11 +1056,11 @@ READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 
 void simpl156_state::init_joemacr()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32smo_delegate(*this, FUNC(simpl156_state::joemacr_speedup_r)));
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::chainrec_speedup_r)
+u32 simpl156_state::chainrec_speedup_r()
 {
 	if (m_maincpu->pc() == 0x2d4)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1071,11 +1069,11 @@ READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 
 void simpl156_state::init_chainrec()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32smo_delegate(*this, FUNC(simpl156_state::chainrec_speedup_r)));
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::prtytime_speedup_r)
+u32 simpl156_state::prtytime_speedup_r()
 {
 	if (m_maincpu->pc() == 0x4f0)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1084,12 +1082,12 @@ READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 
 void simpl156_state::init_prtytime()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32smo_delegate(*this, FUNC(simpl156_state::prtytime_speedup_r)));
 	init_simpl156();
 }
 
 
-READ32_MEMBER(simpl156_state::charlien_speedup_r)
+u32 simpl156_state::charlien_speedup_r()
 {
 	if (m_maincpu->pc() == 0xc8c8)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1098,11 +1096,11 @@ READ32_MEMBER(simpl156_state::charlien_speedup_r)
 
 void simpl156_state::init_charlien()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32smo_delegate(*this, FUNC(simpl156_state::charlien_speedup_r)));
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::osman_speedup_r)
+u32 simpl156_state::osman_speedup_r()
 {
 	if (m_maincpu->pc() == 0x5974)
 		m_maincpu->spin_until_time(attotime::from_usec(400));
@@ -1111,7 +1109,7 @@ READ32_MEMBER(simpl156_state::osman_speedup_r)
 
 void simpl156_state::init_osman()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32smo_delegate(*this, FUNC(simpl156_state::osman_speedup_r)));
 	init_simpl156();
 
 }

@@ -29,6 +29,9 @@
 
 #include <zlib.h>
 
+
+namespace {
+
 class psx1_state : public driver_device
 {
 public:
@@ -46,27 +49,17 @@ public:
 	void psu(machine_config &config);
 	void psj(machine_config &config);
 
-protected:
+private:
 	std::vector<uint8_t> m_exe_buffer;
-	int m_cd_param_p;
-	int m_cd_result_p;
-	int m_cd_result_c;
-	int m_cd_result_ready;
-	int m_cd_reset;
-	uint8_t m_cd_stat;
-	uint8_t m_cd_io_status;
-	uint8_t m_cd_param[8];
-	uint8_t m_cd_result[8];
-	DECLARE_MACHINE_RESET(psx);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void psxexe_conv32(uint32_t *uint32);
 	int load_psxexe(std::vector<uint8_t> buffer);
 	void cpe_set_register(int r, int v);
 	int load_cpe(std::vector<uint8_t> buffer);
 	int load_psf(std::vector<uint8_t> buffer);
-	DECLARE_READ16_MEMBER(parallel_r);
-	DECLARE_WRITE16_MEMBER(parallel_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(psx_exe_load);
+	uint16_t parallel_r(offs_t offset);
+	void parallel_w(offs_t offset, uint16_t data);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_exe);
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
@@ -74,7 +67,7 @@ protected:
 
 	void psx_map(address_map &map);
 	void subcpu_map(address_map &map);
-private:
+
 	required_device<psx_parallel_slot_device> m_parallel;
 	required_device<psxcd_device> m_psxcd;
 };
@@ -416,11 +409,11 @@ int psx1_state::load_psf(std::vector<uint8_t> buffer)
 	return 0;
 }
 
-READ16_MEMBER(psx1_state::parallel_r)
+uint16_t psx1_state::parallel_r(offs_t offset)
 {
 	if (m_parallel->hascard())
 	{
-		uint16_t dat = m_parallel->exp_r(space,offset,mem_mask);
+		uint16_t dat = m_parallel->exp_r(offset);
 		return dat;
 	}
 
@@ -447,11 +440,11 @@ READ16_MEMBER(psx1_state::parallel_r)
 	return 0;
 }
 
-WRITE16_MEMBER(psx1_state::parallel_w)
+void psx1_state::parallel_w(offs_t offset, uint16_t data)
 {
 	if (m_parallel->hascard())
 	{
-		m_parallel->exp_w(space,offset,data, mem_mask);
+		m_parallel->exp_w(offset, data);
 		return;
 	}
 
@@ -482,11 +475,11 @@ WRITE16_MEMBER(psx1_state::parallel_w)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER(psx1_state, psx_exe_load)
+QUICKLOAD_LOAD_MEMBER(psx1_state::quickload_exe)
 {
-	m_exe_buffer.resize(quickload_size);
+	m_exe_buffer.resize(image.length());
 
-	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), quickload_size) != quickload_size)
+	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), image.length()) != image.length())
 	{
 		m_exe_buffer.resize(0);
 		return image_init_result::FAIL;
@@ -543,8 +536,7 @@ void psx1_state::psx_base(machine_config &config)
 	spu.add_route(0, "lspeaker", 1.00);
 	spu.add_route(1, "rspeaker", 1.00);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(psx1_state, psx_exe_load), this), "cpe,exe,psf,psx");
+	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe));
 
 	PSX_PARALLEL_SLOT(config, "parallel", psx_parallel_devices, nullptr);
 
@@ -708,6 +700,9 @@ Version 4.2 E
 Version 4.3 E
 
 */
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                            FULLNAME                            FLAGS
 CONS( 1994, psj,  0,      0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

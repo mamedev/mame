@@ -2,23 +2,23 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Pyldin-601
+Pyldin-601
 
-        12/05/2009 Skeleton driver.
-        22/04/2012 Added sound, fixed keyboard, marked as working [Robbbert]
+2009-05-12 Skeleton driver.
+2012-04-22 Added sound, fixed keyboard, marked as working [Robbbert]
 
-        ToDo?
-        - PYL601 - command 'MODE80' does nothing
+ToDo?
+- PYL601 - command 'MODE80' does nothing
 
-        - PYL601a - most software looks odd (unplayable) because of the
-          different design of the screen.
-        - PYL601A - command 'MODE40' doesn't go to 40-columns, instead
-          there is a space between each letter.
+- PYL601a - most software looks odd (unplayable) because of the
+            different design of the screen.
+- PYL601A - command 'MODE40' doesn't go to 40-columns, instead
+            there is a space between each letter.
 
 
-        The BASIC
-        - to get back to dos, enter SYSTEM
-        - It has its own internal monitor: MON to enter, Q to exit.
+The BASIC
+- to get back to dos, enter SYSTEM
+- It has its own internal monitor: MON to enter, Q to exit.
 
 
 
@@ -44,7 +44,7 @@
 #include "video/mc6845.h"
 
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,14 +54,14 @@
 class pyl601_state : public driver_device
 {
 public:
-	pyl601_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_speaker(*this, "speaker"),
-		m_fdc(*this, "upd765"),
-		m_floppy(*this, "upd765:%u", 0U),
-		m_ram(*this, RAM_TAG),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")
+	pyl601_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_speaker(*this, "speaker")
+		, m_fdc(*this, "upd765")
+		, m_floppy(*this, "upd765:%u", 0U)
+		, m_ram(*this, RAM_TAG)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 	{ }
 
 	void pyl601(machine_config &config);
@@ -69,39 +69,39 @@ public:
 	void init_pyl601();
 
 private:
-	DECLARE_READ8_MEMBER(rom_page_r);
-	DECLARE_WRITE8_MEMBER(rom_page_w);
-	DECLARE_WRITE8_MEMBER(vdisk_page_w);
-	DECLARE_WRITE8_MEMBER(vdisk_h_w);
-	DECLARE_WRITE8_MEMBER(vdisk_l_w);
-	DECLARE_WRITE8_MEMBER(vdisk_data_w);
-	DECLARE_READ8_MEMBER(vdisk_data_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(keycheck_r);
-	DECLARE_WRITE8_MEMBER(video_mode_w);
-	DECLARE_READ8_MEMBER(video_mode_r);
-	DECLARE_READ8_MEMBER(timer_r);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(floppy_w);
-	DECLARE_READ8_MEMBER(floppy_r);
+	uint8_t rom_page_r();
+	void rom_page_w(uint8_t data);
+	void vdisk_page_w(uint8_t data);
+	void vdisk_h_w(uint8_t data);
+	void vdisk_l_w(uint8_t data);
+	void vdisk_data_w(uint8_t data);
+	uint8_t vdisk_data_r();
+	uint8_t keyboard_r();
+	uint8_t keycheck_r();
+	void video_mode_w(uint8_t data);
+	uint8_t video_mode_r();
+	uint8_t timer_r();
+	void speaker_w(uint8_t data);
+	void led_w(uint8_t data);
+	void floppy_w(uint8_t data);
+	uint8_t floppy_r();
 	MC6845_UPDATE_ROW(pyl601_update_row);
 	MC6845_UPDATE_ROW(pyl601a_update_row);
 	uint8_t selectedline(uint16_t data);
 
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	void pyl601_mem(address_map &map);
+	static void floppy_formats(format_registration &fr);
+	void mem_map(address_map &map);
 
-	uint8_t m_rom_page;
-	uint32_t m_vdisk_addr;
-	uint8_t m_key_code;
-	uint8_t m_keyboard_clk;
-	uint8_t m_video_mode;
-	uint8_t m_tick50_mark;
-	uint8_t m_floppy_ctrl;
+	uint8_t m_rom_page = 0U;
+	uint32_t m_vdisk_addr = 0U;
+	uint8_t m_key_code = 0U;
+	uint8_t m_keyboard_clk = 0U;
+	uint8_t m_video_mode = 0U;
+	uint8_t m_tick50_mark = 0U;
+	uint8_t m_floppy_ctrl = 0U;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;
@@ -113,12 +113,12 @@ private:
 
 
 
-READ8_MEMBER(pyl601_state::rom_page_r)
+uint8_t pyl601_state::rom_page_r()
 {
 	return m_rom_page;
 }
 
-WRITE8_MEMBER(pyl601_state::rom_page_w)
+void pyl601_state::rom_page_w(uint8_t data)
 {
 	m_rom_page = data;
 	if (data & 8)
@@ -134,29 +134,29 @@ WRITE8_MEMBER(pyl601_state::rom_page_w)
 }
 
 
-WRITE8_MEMBER(pyl601_state::vdisk_page_w)
+void pyl601_state::vdisk_page_w(uint8_t data)
 {
 	m_vdisk_addr = (m_vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16);
 }
 
-WRITE8_MEMBER(pyl601_state::vdisk_h_w)
+void pyl601_state::vdisk_h_w(uint8_t data)
 {
 	m_vdisk_addr = (m_vdisk_addr & 0xf00ff) | (data<<8);
 }
 
-WRITE8_MEMBER(pyl601_state::vdisk_l_w)
+void pyl601_state::vdisk_l_w(uint8_t data)
 {
 	m_vdisk_addr = (m_vdisk_addr & 0xfff00) | data;
 }
 
-WRITE8_MEMBER(pyl601_state::vdisk_data_w)
+void pyl601_state::vdisk_data_w(uint8_t data)
 {
 	m_ram->pointer()[0x10000 + (m_vdisk_addr & 0x7ffff)] = data;
 	m_vdisk_addr++;
 	m_vdisk_addr&=0x7ffff;
 }
 
-READ8_MEMBER(pyl601_state::vdisk_data_r)
+uint8_t pyl601_state::vdisk_data_r()
 {
 	uint8_t retVal = m_ram->pointer()[0x10000 + (m_vdisk_addr & 0x7ffff)];
 	m_vdisk_addr++;
@@ -174,14 +174,14 @@ uint8_t pyl601_state::selectedline(uint16_t data)
 	return 0;
 }
 
-READ8_MEMBER(pyl601_state::keyboard_r)
+uint8_t pyl601_state::keyboard_r()
 {
 	uint8_t ret = m_key_code;
 	m_key_code = 0xff;
 	return ret;
 }
 
-READ8_MEMBER(pyl601_state::keycheck_r)
+uint8_t pyl601_state::keycheck_r()
 {
 	uint8_t retVal = 0x3f;
 	uint8_t *keyboard = memregion("keyboard")->base();
@@ -212,34 +212,34 @@ READ8_MEMBER(pyl601_state::keycheck_r)
 }
 
 
-WRITE8_MEMBER(pyl601_state::video_mode_w)
+void pyl601_state::video_mode_w(uint8_t data)
 {
 	m_video_mode = data;
 }
 
-READ8_MEMBER(pyl601_state::video_mode_r)
+uint8_t pyl601_state::video_mode_r()
 {
 	return m_video_mode;
 }
 
-READ8_MEMBER(pyl601_state::timer_r)
+uint8_t pyl601_state::timer_r()
 {
 	uint8_t retVal= m_tick50_mark | 0x37;
 	m_tick50_mark = 0;
 	return retVal;
 }
 
-WRITE8_MEMBER(pyl601_state::speaker_w)
+void pyl601_state::speaker_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 3));
 }
 
-WRITE8_MEMBER(pyl601_state::led_w)
+void pyl601_state::led_w(uint8_t data)
 {
 //  uint8_t caps_led = BIT(data,4);
 }
 
-WRITE8_MEMBER(pyl601_state::floppy_w)
+void pyl601_state::floppy_w(uint8_t data)
 {
 	// bit 0 is reset (if zero)
 	// bit 1 is TC state
@@ -259,12 +259,12 @@ WRITE8_MEMBER(pyl601_state::floppy_w)
 	m_floppy_ctrl = data;
 }
 
-READ8_MEMBER(pyl601_state::floppy_r)
+uint8_t pyl601_state::floppy_r()
 {
 	return m_floppy_ctrl;
 }
 
-void pyl601_state::pyl601_mem(address_map &map)
+void pyl601_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xbfff).bankrw("bank1");
@@ -286,7 +286,7 @@ void pyl601_state::pyl601_mem(address_map &map)
 	map(0xe6d0, 0xe6d1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe6f0, 0xe6f0).rw(FUNC(pyl601_state::rom_page_r), FUNC(pyl601_state::rom_page_w));
 	map(0xe700, 0xefff).bankrw("bank4");
-	map(0xf000, 0xffff).bankr("bank5").bankw("bank6");
+	map(0xf000, 0xffff).rom().region("maincpu",0).bankw("bank6");
 }
 
 /* Input ports */
@@ -395,39 +395,44 @@ void pyl601_state::machine_reset()
 	membank("bank2")->set_base(ram + 0xc000);
 	membank("bank3")->set_base(ram + 0xe000);
 	membank("bank4")->set_base(ram + 0xe700);
-	membank("bank5")->set_base(memregion("maincpu")->base() + 0xf000);
 	membank("bank6")->set_base(ram + 0xf000);
 
 	m_maincpu->reset();
 }
 
-void pyl601_state::video_start()
+void pyl601_state::machine_start()
 {
+	save_item(NAME(m_rom_page));
+	save_item(NAME(m_vdisk_addr));
+	save_item(NAME(m_key_code));
+	save_item(NAME(m_keyboard_clk));
+	save_item(NAME(m_video_mode));
+	save_item(NAME(m_tick50_mark));
+	save_item(NAME(m_floppy_ctrl));
 }
 
 MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *charrom = memregion("chargen")->base();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charrom = memregion("chargen")->base();
 
-	int column, bit, i;
-	uint8_t data;
 	if (BIT(m_video_mode, 5) == 0)
 	{
-		for (column = 0; column < x_count; column++)
+		for (int column = 0; column < x_count; column++)
 		{
 			uint8_t code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
 			code = ((code << 1) | (code >> 7)) & 0xff;
+			uint8_t data;
 			if (column == cursor_x-2)
 				data = 0xff;
 			else
 				data = charrom[((code << 3) | (ra & 0x07)) & 0x7ff];
 
-			for (bit = 0; bit < 8; bit++)
+			for (int bit = 0; bit < 8; bit++)
 			{
 				int x = (column * 8) + bit;
 
-				bitmap.pix32(y, x) = palette[BIT(data, 7)];
+				bitmap.pix(y, x) = palette[BIT(data, 7)];
 
 				data <<= 1;
 			}
@@ -435,12 +440,12 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 	}
 	else
 	{
-		for (i = 0; i < x_count; i++)
+		for (int i = 0; i < x_count; i++)
 		{
-			data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
-			for (bit = 0; bit < 8; bit++)
+			uint8_t data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			for (int bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7)];
+				bitmap.pix(y, (i * 8) + bit) = palette[BIT(data, 7)];
 				data <<= 1;
 			}
 		}
@@ -449,25 +454,23 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 
 MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *charrom = memregion("chargen")->base();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charrom = memregion("chargen")->base();
 
-	int column, bit, i;
-	uint8_t data;
 	if (BIT(m_video_mode, 5) == 0)
 	{
-		for (column = 0; column < x_count; column++)
+		for (int column = 0; column < x_count; column++)
 		{
-			uint8_t code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
-			data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
+			uint8_t const code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
+			uint8_t data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
 			if (column == cursor_x)
 				data = 0xff;
 
-			for (bit = 0; bit < 8; bit++)
+			for (int bit = 0; bit < 8; bit++)
 			{
-				int x = (column * 8) + bit;
+				int const x = (column * 8) + bit;
 
-				bitmap.pix32(y, x) = palette[BIT(data, 7)];
+				bitmap.pix(y, x) = palette[BIT(data, 7)];
 
 				data <<= 1;
 			}
@@ -475,12 +478,12 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 	}
 	else
 	{
-		for (i = 0; i < x_count; i++)
+		for (int i = 0; i < x_count; i++)
 		{
-			data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
-			for (bit = 0; bit < 8; bit++)
+			uint8_t data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			for (int bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7)];
+				bitmap.pix(y, (i * 8) + bit) = palette[BIT(data, 7)];
 				data <<= 1;
 			}
 		}
@@ -500,9 +503,11 @@ INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-FLOPPY_FORMATS_MEMBER( pyl601_state::floppy_formats )
-	FLOPPY_PYLDIN_FORMAT
-FLOPPY_FORMATS_END
+void pyl601_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PYLDIN_FORMAT);
+}
 
 static void pyl601_floppies(device_slot_interface &device)
 {
@@ -548,7 +553,7 @@ void pyl601_state::pyl601(machine_config &config)
 {
 	/* basic machine hardware */
 	M6800(config, m_maincpu, 1_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pyl601_state::pyl601_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pyl601_state::mem_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pyl601_state::pyl601_interrupt));
 
 	/* video hardware */
@@ -570,7 +575,7 @@ void pyl601_state::pyl601(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);   /* ? */
-	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row), this);
+	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row));
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	FLOPPY_CONNECTOR(config, "upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
@@ -589,47 +594,47 @@ void pyl601_state::pyl601a(machine_config &config)
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pyl601a);
 
-	subdevice<mc6845_device>("crtc")->set_update_row_callback(FUNC(pyl601_state::pyl601a_update_row), this);
+	subdevice<mc6845_device>("crtc")->set_update_row_callback(FUNC(pyl601_state::pyl601a_update_row));
 }
 
 /* ROM definition */
 ROM_START( pyl601 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom",   0xf000, 0x1000, CRC(41fe4c4b) SHA1(d8ca92aea0eb283e8d7779cb976bcdfa03e81aea))
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bios.rom",   0x0000, 0x1000, CRC(41fe4c4b) SHA1(d8ca92aea0eb283e8d7779cb976bcdfa03e81aea))
 
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "video.rom",  0x0000, 0x0800, CRC(1c23ba43) SHA1(eb1cfc139858abd0aedbbf3d523f8ba55d27a11d))
 
-	ROM_REGION(0x50000, "romdisk", ROMREGION_ERASEFF)
+	ROM_REGION(0x50000, "romdisk", 0 )
 	ROM_LOAD( "rom0.rom", 0x00000, 0x10000, CRC(60103920) SHA1(ee5b4ee5b513c4a0204da751e53d63b8c6c0aab9))
 	ROM_LOAD( "rom1.rom", 0x10000, 0x10000, CRC(cb4a9b22) SHA1(dd09e4ba35b8d1a6f60e6e262aaf2f156367e385))
 	ROM_LOAD( "rom2.rom", 0x20000, 0x08000, CRC(0b7684bf) SHA1(c02ad1f2a6f484cd9d178d8b060c21c0d4e53442))
-	ROM_COPY("romdisk", 0x20000, 0x28000, 0x08000)
+	ROM_COPY( "romdisk",  0x20000, 0x28000, 0x08000)
 	ROM_LOAD( "rom3.rom", 0x30000, 0x08000, CRC(e4a86dfa) SHA1(96e6bb9ffd66f81fca63bf7491fbba81c4ff1fd2))
-	ROM_COPY("romdisk", 0x30000, 0x38000, 0x08000)
+	ROM_COPY( "romdisk",  0x30000, 0x38000, 0x08000)
 	ROM_LOAD( "rom4.rom", 0x40000, 0x08000, CRC(d88ac21d) SHA1(022db11fdcf8db81ce9efd9cd9fa50ebca88e79e))
-	ROM_COPY("romdisk", 0x40000, 0x48000, 0x08000)
+	ROM_COPY( "romdisk",  0x40000, 0x48000, 0x08000)
 
 	ROM_REGION(0x0800, "keyboard", 0)
 	ROM_LOAD( "keyboard.rom", 0x0000, 0x0800, CRC(41fbe5ca) SHA1(875adaef53bc37e92ad0b6b6ee3d8fd28344d358))
 ROM_END
 
 ROM_START( pyl601a )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios_a.rom", 0xf000, 0x1000, CRC(e018b11e) SHA1(884d59abd5fa5af1295d1b5a53693facc7945b63))
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bios_a.rom", 0x0000, 0x1000, CRC(e018b11e) SHA1(884d59abd5fa5af1295d1b5a53693facc7945b63))
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "video_a.rom", 0x0000,0x1000, CRC(00fa4077) SHA1(d39d15969a08bdb768d08bea4ec9a9cb498232fd))
 
-	ROM_REGION(0x50000, "romdisk", ROMREGION_ERASEFF)
+	ROM_REGION(0x50000, "romdisk", 0 )
 	ROM_LOAD( "rom0.rom", 0x00000, 0x10000, CRC(60103920) SHA1(ee5b4ee5b513c4a0204da751e53d63b8c6c0aab9))
 	ROM_LOAD( "rom1.rom", 0x10000, 0x10000, CRC(cb4a9b22) SHA1(dd09e4ba35b8d1a6f60e6e262aaf2f156367e385))
 	ROM_LOAD( "rom2.rom", 0x20000, 0x08000, CRC(0b7684bf) SHA1(c02ad1f2a6f484cd9d178d8b060c21c0d4e53442))
-	ROM_COPY("romdisk", 0x20000, 0x28000, 0x08000)
+	ROM_COPY( "romdisk",  0x20000, 0x28000, 0x08000)
 	ROM_LOAD( "rom3.rom", 0x30000, 0x08000, CRC(e4a86dfa) SHA1(96e6bb9ffd66f81fca63bf7491fbba81c4ff1fd2))
-	ROM_COPY("romdisk", 0x30000, 0x38000, 0x08000)
+	ROM_COPY( "romdisk",  0x30000, 0x38000, 0x08000)
 	ROM_LOAD( "rom4.rom", 0x40000, 0x08000, CRC(d88ac21d) SHA1(022db11fdcf8db81ce9efd9cd9fa50ebca88e79e))
-	ROM_COPY("romdisk", 0x40000, 0x48000, 0x08000)
+	ROM_COPY( "romdisk",  0x40000, 0x48000, 0x08000)
 
 	ROM_REGION(0x0800, "keyboard", 0)
 	ROM_LOAD( "keyboard.rom", 0x0000, 0x0800, CRC(41fbe5ca) SHA1(875adaef53bc37e92ad0b6b6ee3d8fd28344d358))
@@ -637,5 +642,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY             FULLNAME       FLAGS */
-COMP( 1989, pyl601,  0,      0,      pyl601,  pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601",  0 )
-COMP( 1989, pyl601a, pyl601, 0,      pyl601a, pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601A", 0 )
+COMP( 1989, pyl601,  0,      0,      pyl601,  pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601",  MACHINE_SUPPORTS_SAVE )
+COMP( 1989, pyl601a, pyl601, 0,      pyl601a, pyl601, pyl601_state, init_pyl601, "Mikroelektronika", "Pyldin-601A", MACHINE_SUPPORTS_SAVE )

@@ -6,6 +6,7 @@
  */
 
 #include "emu.h"
+#include "corestr.h"
 
 //#define sc45helperlog printf
 #define sc45helperlog machine.logerror
@@ -209,13 +210,12 @@ int find_input_strings(running_machine &machine)
 
 					}
 
-					strtrimspace(tempstring);
-					strmakelower(tempstring);
+					tempstring = strmakelower(strtrimspace(tempstring));
 
 
 					//if (pos <= 5)
 					{
-						assert(pos >= 0 && pos < ARRAY_LENGTH(sc4inputs[port]));
+						assert(pos >= 0 && pos < std::size(sc4inputs[port]));
 						if (sc4inputs[port][pos].used == false)
 						{
 							sc4inputs[port][pos].used = true;
@@ -498,8 +498,7 @@ int find_lamp_strings(running_machine &machine)
 				lamps[row][col].lampname = tempstring;
 				lamps[row][col].lamptypename = "matrixlamp";
 
-				strtrimspace(lamps[row][col].lampname);
-				strmakelower(lamps[row][col].lampname);
+				lamps[row][col].lampname = strmakelower(strtrimspace(lamps[row][col].lampname));
 			}
 			else
 			{
@@ -613,11 +612,11 @@ int find_lamp_strings(running_machine &machine)
 
 		for (int pos = 0; pos < 3; pos++)
 		{
-			char tempname2[32];
+			char tempname2[64];
 
-			if (pos == 0) sprintf(tempname2, "%stop", tempname);
-			if (pos == 1) sprintf(tempname2, "%smid", tempname);
-			if (pos == 2) sprintf(tempname2, "%sbot", tempname);
+			if (pos == 0) snprintf(tempname2, std::size(tempname2), "%stop", tempname);
+			if (pos == 1) snprintf(tempname2, std::size(tempname2), "%smid", tempname);
+			if (pos == 2) snprintf(tempname2, std::size(tempname2), "%sbot", tempname);
 
 
 			for (auto & lamp : lamps)
@@ -895,8 +894,7 @@ int find_reel_strings(running_machine &machine)
 
 			}
 
-			strtrimspace(tempstring);
-			strmakelower(tempstring);
+			tempstring = strmakelower(strtrimspace(tempstring));
 
 			if (tempstring[0] == '!')
 			{

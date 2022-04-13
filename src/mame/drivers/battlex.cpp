@@ -166,7 +166,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(battlex_state, battlex_in0_b4_r)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -238,17 +238,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout battlex_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28  },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
-};
-
 static const gfx_layout battlex_spritelayout =
 {
 	16,16,
@@ -263,8 +252,8 @@ static const gfx_layout battlex_spritelayout =
 };
 
 static GFXDECODE_START( gfx_battlex )
-	GFXDECODE_ENTRY( "gfx1", 0, battlex_charlayout,   64, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 64, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout,  0, 8 )
 GFXDECODE_END
 
 

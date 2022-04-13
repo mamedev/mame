@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Peter Ferrie
 /***************************************************************************
 
-    savquest.c
+    savquest.cpp
 
     "Savage Quest" (c) 1999 Interactive Light, developed by Angel Studios.
     Skeleton by R. Belmont
@@ -55,9 +55,12 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
-#include "video/voodoo.h"
+#include "video/voodoo_2.h"
 #include "machine/ds128x.h"
 #include "bus/isa/sblaster.h"
+
+
+namespace {
 
 class savquest_state : public pcat_base_state
 {
@@ -67,9 +70,17 @@ public:
 		m_vga(*this, "vga"),
 		m_voodoo(*this, "voodoo")
 	{
+		std::fill(std::begin(m_mtxc_config_reg), std::end(m_mtxc_config_reg), 0);
 	}
 
 	void savquest(machine_config &config);
+
+protected:
+	// driver_device overrides
+//  virtual void video_start();
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
@@ -83,8 +94,8 @@ private:
 	required_device<s3_vga_device> m_vga;
 	required_device<voodoo_2_device> m_voodoo;
 
-	int m_haspind;
-	int m_haspstate;
+	int m_haspind = 0;
+	int m_haspstate = 0;
 	enum hasp_states
 	{
 		HASPSTATE_NONE,
@@ -92,38 +103,33 @@ private:
 		HASPSTATE_PASSEND,
 		HASPSTATE_READ
 	};
-	int m_hasp_passind;
-	uint8_t m_hasp_tmppass[0x29];
-	uint8_t m_port379;
-	int m_hasp_passmode;
-	int m_hasp_prodind;
+	int m_hasp_passind = 0;
+	uint8_t m_hasp_tmppass[0x29]{};
+	uint8_t m_port379 = 0;
+	int m_hasp_passmode = 0;
+	int m_hasp_prodind = 0;
 
-	uint8_t m_mtxc_config_reg[256];
-	uint8_t m_piix4_config_reg[8][256];
-	uint32_t m_pci_3dfx_regs[0x40];
+	uint8_t m_mtxc_config_reg[256]{};
+	uint8_t m_piix4_config_reg[8][256]{};
+	uint32_t m_pci_3dfx_regs[0x40]{};
 
-	DECLARE_WRITE32_MEMBER( bios_f0000_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_e0000_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_e4000_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_e8000_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ec000_ram_w );
+	void bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_e0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_e4000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_e8000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ec000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER(parallel_port_r);
-	DECLARE_WRITE8_MEMBER(parallel_port_w);
+	uint8_t parallel_port_r(offs_t offset);
+	void parallel_port_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
-	DECLARE_READ8_MEMBER(smram_r);
-	DECLARE_WRITE8_MEMBER(smram_w);
+	uint8_t smram_r(offs_t offset);
+	void smram_w(offs_t offset, uint8_t data);
 
 	void savquest_io(address_map &map);
 	void savquest_map(address_map &map);
 
-	// driver_device overrides
-//  virtual void video_start();
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void intel82439tx_init();
 	void vid_3dfx_init();
 
@@ -156,7 +162,7 @@ uint8_t savquest_state::mtxc_config_r(int function, int reg)
 
 void savquest_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 
 	#if 1
 	switch(reg)
@@ -299,7 +305,7 @@ uint8_t savquest_state::piix4_config_r(int function, int reg)
 
 void savquest_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -351,7 +357,7 @@ void savquest_state::vid_3dfx_init()
 	m_pci_3dfx_regs[0x08 / 4] = 2; // revision ID
 	m_pci_3dfx_regs[0x10 / 4] = 0xff000000;
 	m_pci_3dfx_regs[0x40 / 4] = 0x4000; //INITEN_SECONDARY_REV_ID
-	m_voodoo->voodoo_set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
+	m_voodoo->set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
 }
 
 uint32_t savquest_state::pci_3dfx_r(int function, int reg, uint32_t mem_mask)
@@ -370,7 +376,7 @@ osd_printf_warning("PCI write: %x %x\n", reg, data);
 	}
 	else if (reg == 0x40)
 	{
-		m_voodoo->voodoo_set_init_enable(data);
+		m_voodoo->set_init_enable(data);
 	}
 	else if (reg == 0x54)
 	{
@@ -380,7 +386,7 @@ osd_printf_warning("PCI write: %x %x\n", reg, data);
 	m_pci_3dfx_regs[reg / 4] = data;
 }
 
-WRITE32_MEMBER(savquest_state::bios_f0000_ram_w)
+void savquest_state::bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//if (m_mtxc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
@@ -391,7 +397,7 @@ WRITE32_MEMBER(savquest_state::bios_f0000_ram_w)
 	#endif
 }
 
-WRITE32_MEMBER(savquest_state::bios_e0000_ram_w)
+void savquest_state::bios_e0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//if (m_mtxc_config_reg[0x5e] & 2)       // write to RAM if this region is write-enabled
 	#if 1
@@ -402,7 +408,7 @@ WRITE32_MEMBER(savquest_state::bios_e0000_ram_w)
 	#endif
 }
 
-WRITE32_MEMBER(savquest_state::bios_e4000_ram_w)
+void savquest_state::bios_e4000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//if (m_mtxc_config_reg[0x5e] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
@@ -413,7 +419,7 @@ WRITE32_MEMBER(savquest_state::bios_e4000_ram_w)
 	#endif
 }
 
-WRITE32_MEMBER(savquest_state::bios_e8000_ram_w)
+void savquest_state::bios_e8000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//if (m_mtxc_config_reg[0x5f] & 2)       // write to RAM if this region is write-enabled
 	#if 1
@@ -424,7 +430,7 @@ WRITE32_MEMBER(savquest_state::bios_e8000_ram_w)
 	#endif
 }
 
-WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
+void savquest_state::bios_ec000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//if (m_mtxc_config_reg[0x5f] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
@@ -441,7 +447,7 @@ static const uint8_t m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x
 										0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
 										};
 
-READ8_MEMBER(savquest_state::parallel_port_r)
+uint8_t savquest_state::parallel_port_r(offs_t offset)
 {
 	if (offset == 1)
 	{
@@ -497,7 +503,7 @@ READ8_MEMBER(savquest_state::parallel_port_r)
 	return 0;
 }
 
-WRITE8_MEMBER(savquest_state::parallel_port_w)
+void savquest_state::parallel_port_w(offs_t offset, uint8_t data)
 {
 	if (!offset)
 	{
@@ -717,22 +723,22 @@ WRITE8_MEMBER(savquest_state::parallel_port_w)
 	}
 }
 
-READ8_MEMBER(savquest_state::smram_r)
+uint8_t savquest_state::smram_r(offs_t offset)
 {
 	/* TODO: way more complex than this */
 	if(m_mtxc_config_reg[0x72] & 0x40)
 		return m_smram[offset];
 	else
-		return m_vga->mem_r(space,offset,0xff);
+		return m_vga->mem_r(offset);
 }
 
-WRITE8_MEMBER(savquest_state::smram_w)
+void savquest_state::smram_w(offs_t offset, uint8_t data)
 {
 	/* TODO: way more complex than this */
 	if(m_mtxc_config_reg[0x72] & 0x40)
 		m_smram[offset] = data;
 	else
-		m_vga->mem_w(space,offset,data,0xff);
+		m_vga->mem_w(offset,data);
 
 }
 
@@ -740,7 +746,7 @@ void savquest_state::savquest_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //.rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000f0000, 0x000fffff).bankr("bios_f0000").w(FUNC(savquest_state::bios_f0000_ram_w));
 	map(0x000e0000, 0x000e3fff).bankr("bios_e0000").w(FUNC(savquest_state::bios_e0000_ram_w));
@@ -748,7 +754,7 @@ void savquest_state::savquest_map(address_map &map)
 	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(FUNC(savquest_state::bios_e8000_ram_w));
 	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(FUNC(savquest_state::bios_ec000_ram_w));
 	map(0x00100000, 0x07ffffff).ram(); // 128MB RAM
-	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(generic_voodoo_device::read), FUNC(generic_voodoo_device::write));
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
@@ -770,7 +776,7 @@ void savquest_state::savquest_io(address_map &map)
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
-//  AM_RANGE(0x5000, 0x5007) // routes to port $eb
+//  map(0x5000, 0x5007) // routes to port $eb
 }
 
 #define AT_KEYB_HELPER(bit, text, key1) \
@@ -791,6 +797,9 @@ void savquest_state::machine_start()
 
 	intel82439tx_init();
 	vid_3dfx_init();
+
+	for (int i = 0; i < 8; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
 }
 
 void savquest_state::machine_reset()
@@ -812,7 +821,8 @@ void savquest_isa16_cards(device_slot_interface &device)
 	device.option_add("sb16", ISA16_SOUND_BLASTER_16);
 }
 
-MACHINE_CONFIG_START(savquest_state::savquest)
+void savquest_state::savquest(machine_config &config)
+{
 	PENTIUM2(config, m_maincpu, 450000000); // actually Pentium II 450
 	m_maincpu->set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
 	m_maincpu->set_addrmap(AS_IO, &savquest_state::savquest_io);
@@ -821,10 +831,10 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	pcat_common(config);
 	DS12885(config.replace(), "rtc");
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, savquest_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, savquest_state, intel82371ab_pci_r, intel82371ab_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(13, DEVICE_SELF, savquest_state, pci_3dfx_r, pci_3dfx_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device( 0, FUNC(savquest_state::intel82439tx_pci_r), FUNC(savquest_state::intel82439tx_pci_w));
+	pcibus.set_device( 7, FUNC(savquest_state::intel82371ab_pci_r), FUNC(savquest_state::intel82371ab_pci_w));
+	pcibus.set_device(13, FUNC(savquest_state::pci_3dfx_r), FUNC(savquest_state::pci_3dfx_w));
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -842,19 +852,20 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	/* video hardware */
 	pcvideo_s3_vga(config);
 
-	VOODOO_2(config, m_voodoo, STD_VOODOO_2_CLOCK);
+	VOODOO_2(config, m_voodoo, voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(4, 4); /* this is the 12Mb card */
-	m_voodoo->set_screen_tag("screen");
-	m_voodoo->set_cpu_tag(m_maincpu);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo->set_screen("screen");
+	m_voodoo->set_cpu(m_maincpu);
 	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));
-MACHINE_CONFIG_END
+}
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD( "p2xbl_award_451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317) )
 
-	ROM_REGION( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
+	ROM_REGION32_LE( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
 	ROM_LOAD( "vgabios.bin",   0x000000, 0x010000, CRC(a81423d6) SHA1(a099af621ce7fbaa55a2d9947d9f07e04f1b5fca) )
 
 	ROM_REGION( 0x080, "rtc", 0 )    /* default NVRAM */
@@ -863,6 +874,8 @@ ROM_START( savquest )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)

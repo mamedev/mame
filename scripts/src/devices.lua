@@ -54,6 +54,8 @@ function devicesProject(_target, _subtarget)
 
 	dofile(path.join("src", "bus.lua"))
 
+	pchsource(MAME_DIR .. "src/devices/machine/timer.cpp")
+
 if #disasm_files > 0 then
 	project ("dasm")
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
@@ -77,6 +79,14 @@ if #disasm_files > 0 then
 	files {
 		disasm_files
 	}
+
+	for key,value in pairs(disasm_files) do
+		if string.endswith(value, ".cpp") then
+			--print("calling pchsource with " .. value)
+			pchsource(value)
+			break
+		end
+	end
 
 	if #disasm_dependency > 0 then
 		dependency(disasm_dependency)

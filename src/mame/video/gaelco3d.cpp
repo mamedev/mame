@@ -26,7 +26,7 @@
 
 
 gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
-	: poly_manager<float, gaelco3d_object_data, 1, 2000>(state.machine()),
+	: poly_manager<float, gaelco3d_object_data, 1>(state.machine()),
 		m_state(state),
 		m_screenbits(state.m_screen->width(), state.m_screen->height()),
 		m_zbuffer(state.m_screen->width(), state.m_screen->height()),
@@ -124,7 +124,7 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 	float voz_base = tms3203x_device::fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
 	float ooz_base = tms3203x_device::fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
 	float uoz_base = tms3203x_device::fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
-	gaelco3d_object_data &object = object_data_alloc();
+	gaelco3d_object_data &object = object_data().next();
 	int color = (polydata[10] & 0x7f) << 8;
 	vertex_t vert[MAX_VERTICES];
 	uint32_t data;
@@ -170,7 +170,7 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 
 	/* extract vertices */
 	data = 0;
-	for (vertnum = 0; vertnum < ARRAY_LENGTH(vert) && !IS_POLYEND(data); vertnum++)
+	for (vertnum = 0; vertnum < std::size(vert) && !IS_POLYEND(data); vertnum++)
 	{
 		/* extract vertex data */
 		data = polydata[13 + vertnum * 2];
@@ -185,15 +185,15 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 
 		/* special case: no Z buffering and no perspective correction */
 		if (color != 0x7f00 && z0 < 0 && ooz_dx == 0 && ooz_dy == 0)
-			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_noz_noperspective, this), 0, vertnum, &vert[0]);
+			render_triangle_fan<0>(visarea, render_delegate(&gaelco3d_renderer::render_noz_noperspective, this), vertnum, &vert[0]);
 
 		/* general case: non-alpha blended */
 		else if (color != 0x7f00)
-			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_normal, this), 0, vertnum, &vert[0]);
+			render_triangle_fan<0>(visarea, render_delegate(&gaelco3d_renderer::render_normal, this), vertnum, &vert[0]);
 
 		/* color 0x7f seems to be hard-coded as a 50% alpha blend */
 		else
-			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_alphablend, this), 0, vertnum, &vert[0]);
+			render_triangle_fan<0>(visarea, render_delegate(&gaelco3d_renderer::render_alphablend, this), vertnum, &vert[0]);
 
 		m_polygons += vertnum - 2;
 	}
@@ -210,8 +210,8 @@ void gaelco3d_state::gaelco3d_renderer::render_noz_noperspective(int32_t scanlin
 	offs_t endmask = m_texture_size - 1;
 	const rgb_t *palsource = m_state.m_palette.get() + object.color;
 	uint32_t tex = object.tex;
-	uint16_t *dest = &m_screenbits.pix16(scanline);
-	uint16_t *zbuf = &m_zbuffer.pix16(scanline);
+	uint16_t *dest = &m_screenbits.pix(scanline);
+	uint16_t *zbuf = &m_zbuffer.pix(scanline);
 	int startx = extent.startx;
 	float uoz = (object.uoz_base + scanline * object.uoz_dy + startx * object.uoz_dx) * zbase;
 	float voz = (object.voz_base + scanline * object.voz_dy + startx * object.voz_dx) * zbase;
@@ -249,8 +249,8 @@ void gaelco3d_state::gaelco3d_renderer::render_normal(int32_t scanline, const ex
 	const rgb_t *palsource = m_state.m_palette.get() + object.color;
 	uint32_t tex = object.tex;
 	float z0 = object.z0;
-	uint16_t *dest = &m_screenbits.pix16(scanline);
-	uint16_t *zbuf = &m_zbuffer.pix16(scanline);
+	uint16_t *dest = &m_screenbits.pix(scanline);
+	uint16_t *zbuf = &m_zbuffer.pix(scanline);
 	int startx = extent.startx;
 	float ooz = object.ooz_base + scanline * object.ooz_dy + startx * ooz_dx;
 	float uoz = object.uoz_base + scanline * object.uoz_dy + startx * uoz_dx;
@@ -299,8 +299,8 @@ void gaelco3d_state::gaelco3d_renderer::render_alphablend(int32_t scanline, cons
 	const rgb_t *palsource = m_state.m_palette.get() + object.color;
 	uint32_t tex = object.tex;
 	float z0 = object.z0;
-	uint16_t *dest = &m_screenbits.pix16(scanline);
-	uint16_t *zbuf = &m_zbuffer.pix16(scanline);
+	uint16_t *dest = &m_screenbits.pix(scanline);
+	uint16_t *zbuf = &m_zbuffer.pix(scanline);
 	int startx = extent.startx;
 	float ooz = object.ooz_base + object.ooz_dy * scanline + startx * ooz_dx;
 	float uoz = object.uoz_base + object.uoz_dy * scanline + startx * uoz_dx;
@@ -370,7 +370,7 @@ void gaelco3d_state::gaelco3d_render(screen_device &screen)
  *
  *************************************/
 
-WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
+void gaelco3d_state::gaelco3d_render_w(uint32_t data)
 {
 	/* append the data to our buffer */
 	m_polydata_buffer[m_polydata_count++] = data;
@@ -401,7 +401,7 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
  *
  *************************************/
 
-WRITE16_MEMBER(gaelco3d_state::gaelco3d_paletteram_w)
+void gaelco3d_state::gaelco3d_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_poly->wait("Palette change");
 	COMBINE_DATA(&m_paletteram16[offset]);
@@ -409,7 +409,7 @@ WRITE16_MEMBER(gaelco3d_state::gaelco3d_paletteram_w)
 }
 
 
-WRITE32_MEMBER(gaelco3d_state::gaelco3d_paletteram_020_w)
+void gaelco3d_state::gaelco3d_paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_poly->wait("Palette change");
 	COMBINE_DATA(&m_paletteram32[offset]);
@@ -454,7 +454,7 @@ uint32_t gaelco3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
         for (y = cliprect.min_y; y <= cliprect.max_y; y++)
         {
-            uint16_t *dest = &bitmap.pix16(y);
+            uint16_t *dest = &bitmap.pix(y);
             for (x = cliprect.min_x; x <= cliprect.max_x; x++)
             {
                 int offs = (yv + y - cliprect.min_y) * 4096 + xv + x - cliprect.min_x;
@@ -474,6 +474,5 @@ uint32_t gaelco3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_video_changed = false;
 	}
 
-	logerror("---update---\n");
 	return (!ret);
 }

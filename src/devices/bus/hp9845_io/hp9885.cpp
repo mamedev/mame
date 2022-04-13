@@ -225,7 +225,8 @@ enum : unsigned {
 };
 
 hp9885_device::hp9885_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp98032_gpio_card_device(mconfig , HP9885 , tag , owner , clock)
+	: device_t(mconfig , HP9885 , tag , owner , clock)
+	, device_hp98032_gpio_interface(mconfig, *this)
 	, m_drive_connector{*this , "floppy"}
 {
 }
@@ -302,10 +303,9 @@ WRITE_LINE_MEMBER(hp9885_device::preset_w)
 	LOG("PRESET = %d\n" , state);
 }
 
-static const floppy_format_type hp9885_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_HPI_FORMAT,
-	nullptr
+static void hp9885_floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_HPI_FORMAT);
 };
 
 void hp9885_device::device_add_mconfig(machine_config &config)
@@ -359,7 +359,7 @@ void hp9885_device::device_reset()
 	set_state(FSM_IDLE);
 }
 
-void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , id , m_fsm_state , m_head_state);
 
@@ -415,10 +415,11 @@ void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param
 								return;
 							} else {
 								preset_crc();
-								m_word_cnt = 129;
 								if (m_op == OP_READ) {
+									m_word_cnt = 129;
 									set_state(FSM_RD_DATA);
 								} else {
+									m_word_cnt = 130;
 									set_state(FSM_WR_DATA);
 									m_pll.start_writing(m_pll.ctime);
 									m_had_transition = false;
@@ -484,17 +485,20 @@ void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			case FSM_WR_DATA:
 				{
 					m_word_cnt--;
-					if (m_word_cnt > 1) {
+					if (m_word_cnt > 2) {
 						if (BIT(m_status , STS_XFER_COMPLETE)) {
 							wr_word(0);
 						} else {
 							wr_word(m_input);
-							if (m_word_cnt > 2) {
+							if (m_word_cnt > 3) {
 								set_ibf(false);
 							}
 						}
-					} else if (m_word_cnt == 1) {
+					} else if (m_word_cnt == 2) {
 						wr_word(m_crc);
+					} else if (m_word_cnt == 1) {
+						// Post-amble
+						wr_word(0);
 					} else {
 						m_pll.stop_writing(m_drive , m_pll.ctime);
 						// Move to next sector

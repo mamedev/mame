@@ -65,8 +65,8 @@ private:
 	optional_device<acia6850_device> m_acia;
 
 	required_shared_ptr<uint16_t> m_CG10103_m_vram;
-	std::unique_ptr<uint16_t[]>    m_buffered_spriteram;
-	std::unique_ptr<uint16_t[]>    m_buffered_spriteram2;
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram{};
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram2{};
 	required_shared_ptr<uint16_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mixerregs;
 
@@ -76,18 +76,18 @@ private:
 		TECMO_WCUP94B_MCU,
 		VGOAL_SOCCER_MCU
 	}m_mcutype;
-	int m_gametype;
-	uint16_t m_prot_reg[2];
+	int m_gametype = 0;
+	uint16_t m_prot_reg[2]{};
 
 	// common
-	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
+	void sh_bankswitch_w(uint8_t data);
 
 	// vgoalsoc and twrldc
-	DECLARE_WRITE8_MEMBER(twcup94_prot_reg_w);
+	void twcup94_prot_reg_w(uint8_t data);
 
 	// vgoalsoc only
-	DECLARE_READ16_MEMBER(vbl_toggle_r);
-	DECLARE_WRITE16_MEMBER(vbl_toggle_w);
+	uint16_t vbl_toggle_r();
+	void vbl_toggle_w(uint16_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);

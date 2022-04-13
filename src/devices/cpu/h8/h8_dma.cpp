@@ -15,6 +15,10 @@ void h8_dma_device::device_start()
 {
 	dmach0->set_id(0<<1);
 	dmach1->set_id(1<<1);
+
+	save_item(NAME(dmabcr));
+	save_item(NAME(dmawer));
+	save_item(NAME(dreq));
 }
 
 void h8_dma_device::device_reset()
@@ -74,37 +78,37 @@ void h8_dma_device::set_input(int inputnum, int state)
 		logerror("input line %d not supported for h8_dma_device\n", inputnum);
 }
 
-READ8_MEMBER(h8_dma_device::dmawer_r)
+uint8_t h8_dma_device::dmawer_r()
 {
 	logerror("dmawer_r %02x\n", dmawer);
 	return dmawer;
 }
 
-WRITE8_MEMBER(h8_dma_device::dmawer_w)
+void h8_dma_device::dmawer_w(uint8_t data)
 {
 	dmawer = data;
 	logerror("dmawer_w %02x\n", data);
 }
 
-READ8_MEMBER(h8_dma_device::dmatcr_r)
+uint8_t h8_dma_device::dmatcr_r()
 {
 	logerror("dmatcr_r %02x\n", dmatcr);
 	return dmatcr;
 }
 
-WRITE8_MEMBER(h8_dma_device::dmatcr_w)
+void h8_dma_device::dmatcr_w(uint8_t data)
 {
 	dmatcr = data;
 	logerror("dmatcr_w %02x\n", data);
 }
 
-READ16_MEMBER(h8_dma_device::dmabcr_r)
+uint16_t h8_dma_device::dmabcr_r()
 {
 	logerror("dmabcr_r %04x\n", dmabcr);
 	return dmabcr;
 }
 
-WRITE16_MEMBER(h8_dma_device::dmabcr_w)
+void h8_dma_device::dmabcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&dmabcr);
 	logerror("dmabcr_w %04x\n", dmabcr);
@@ -146,6 +150,25 @@ void h8_dma_channel_device::set_info(const char *_intc, int _irq_base, int v0, i
 
 void h8_dma_channel_device::device_start()
 {
+	save_item(STRUCT_MEMBER(state, source));
+	save_item(STRUCT_MEMBER(state, dest));
+	save_item(STRUCT_MEMBER(state, incs));
+	save_item(STRUCT_MEMBER(state, incd));
+	save_item(STRUCT_MEMBER(state, count));
+	save_item(STRUCT_MEMBER(state, id));
+	save_item(STRUCT_MEMBER(state, autoreq));
+	save_item(STRUCT_MEMBER(state, suspended));
+	save_item(STRUCT_MEMBER(state, mode_16));
+	save_item(NAME(mar));
+	save_item(NAME(ioar));
+	save_item(NAME(etcr));
+	save_item(NAME(dmacr));
+	save_item(NAME(dtcr));
+	save_item(NAME(dta));
+	save_item(NAME(dte));
+	save_item(NAME(dtie));
+	save_item(NAME(fae));
+	save_item(NAME(sae));
 }
 
 void h8_dma_channel_device::device_reset()
@@ -154,6 +177,7 @@ void h8_dma_channel_device::device_reset()
 	mar[0] = mar[1] = 0;
 	ioar[0] = ioar[1] = 0;
 	etcr[0] = etcr[1] = 0;
+	dtcr[0] = dtcr[1] = 0;
 	fae = sae = false;
 	dta = dte = dtie = 0;
 }
@@ -164,111 +188,131 @@ void h8_dma_channel_device::set_id(int id)
 	state[1].id = id | 1;
 }
 
-READ16_MEMBER(h8_dma_channel_device::marah_r)
+uint16_t h8_dma_channel_device::marah_r()
 {
 	logerror("marah_r %06x\n", mar[0]);
 	return mar[0] >> 16;
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::marah_w)
+void h8_dma_channel_device::marah_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		mar[0] = ((data & 0x00ff) << 16) | (mar[0] & 0xffff);
 	logerror("marah_w %06x\n", mar[0]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::maral_r)
+uint16_t h8_dma_channel_device::maral_r()
 {
 	logerror("maral_r %06x\n", mar[0]);
 	return mar[0];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::maral_w)
+void h8_dma_channel_device::maral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mar[0] = (mar[0] & ~mem_mask) | (data & mem_mask);
 	logerror("maral_w %06x\n", mar[0]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::ioara_r)
+uint16_t h8_dma_channel_device::ioara_r()
 {
-	logerror("iorar_r %04x\n", ioar[0]);
 	return ioar[0];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::ioara_w)
+uint8_t h8_dma_channel_device::ioara8_r()
+{
+	return ioar[0] & 0x00ff;
+}
+
+void h8_dma_channel_device::ioara_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&ioar[0]);
 	logerror("ioara_w %04x\n", ioar[0]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::etcra_r)
+void h8_dma_channel_device::ioara8_w(uint8_t data)
+{
+	ioar[0] = data | 0xff00;
+	logerror("ioara_w %04x\n", ioar[0]);
+}
+
+uint16_t h8_dma_channel_device::etcra_r()
 {
 	logerror("etcra_r %04x\n", etcr[0]);
 	return etcr[0];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::etcra_w)
+void h8_dma_channel_device::etcra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&etcr[0]);
 	logerror("etcra_w %04x\n", etcr[0]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::marbh_r)
+uint16_t h8_dma_channel_device::marbh_r()
 {
 	logerror("marbh_r %06x\n", mar[1]);
 	return mar[1] >> 16;
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::marbh_w)
+void h8_dma_channel_device::marbh_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		mar[1] = ((data & 0x00ff) << 16) | (mar[1] & 0xffff);
 	logerror("marbh_w %06x\n", mar[1]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::marbl_r)
+uint16_t h8_dma_channel_device::marbl_r()
 {
 	logerror("marbl_r %06x\n", mar[1]);
 	return mar[1];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::marbl_w)
+void h8_dma_channel_device::marbl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mar[1] = (mar[1] & ~mem_mask) | (data & mem_mask);
 	logerror("marbl_w %06x\n", mar[1]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::ioarb_r)
+uint16_t h8_dma_channel_device::ioarb_r()
 {
-	logerror("ioarb_r %04x\n", ioar[1]);
 	return ioar[1];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::ioarb_w)
+uint8_t h8_dma_channel_device::ioarb8_r()
+{
+	return ioar[1] & 0x00ff;
+}
+
+void h8_dma_channel_device::ioarb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&ioar[1]);
 	logerror("ioarb_w %04x\n", ioar[1]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::etcrb_r)
+void h8_dma_channel_device::ioarb8_w(uint8_t data)
+{
+	ioar[1] = data | 0xff00;
+	logerror("ioarb_w %04x\n", ioar[1]);
+}
+
+uint16_t h8_dma_channel_device::etcrb_r()
 {
 	logerror("etcrb_r %04x\n", etcr[1]);
 	return etcr[1];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::etcrb_w)
+void h8_dma_channel_device::etcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&etcr[1]);
 	logerror("etcrb_w %04x\n", etcr[1]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::dmacr_r)
+uint16_t h8_dma_channel_device::dmacr_r()
 {
 	logerror("dmacr_r %04x\n", dmacr);
 	return dmacr;
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::dmacr_w)
+void h8_dma_channel_device::dmacr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&dmacr);
 	logerror("dmacr_w %04x\n", dmacr);
@@ -276,13 +320,13 @@ WRITE16_MEMBER(h8_dma_channel_device::dmacr_w)
 }
 
 // H8H DMA
-READ8_MEMBER(h8_dma_channel_device::dtcra_r)
+uint8_t h8_dma_channel_device::dtcra_r()
 {
 	logerror("dtcra_r %02x\n", dtcr[0]);
 	return dtcr[0];
 }
 
-WRITE8_MEMBER(h8_dma_channel_device::dtcra_w)
+void h8_dma_channel_device::dtcra_w(uint8_t data)
 {
 	dtcr[0] = data;
 	logerror("dtcra_w %02x\n", dtcr[0]);
@@ -291,13 +335,13 @@ WRITE8_MEMBER(h8_dma_channel_device::dtcra_w)
 	}
 }
 
-READ8_MEMBER(h8_dma_channel_device::dtcrb_r)
+uint8_t h8_dma_channel_device::dtcrb_r()
 {
 	logerror("dtcrb_r %02x\n", dtcr[1]);
 	return dtcr[1];
 }
 
-WRITE8_MEMBER(h8_dma_channel_device::dtcrb_w)
+void h8_dma_channel_device::dtcrb_w(uint8_t data)
 {
 	dtcr[1] = data;
 	logerror("dtcrb_w %02x\n", dtcr[1]);
@@ -311,35 +355,60 @@ void h8_dma_channel_device::h8h_sync()
 	// update DMACR
 	dmacr = 0;
 	if(BIT(dtcr[0], 6)) dmacr |= 1 << 15; // DTSZ
-	dmacr |= ((dtcr[0] & 0b110000) >> 4) << 13; // SAID, SAIDE
-	if(BIT(dtcr[0], 0)) dmacr |= 1 << 11; // BLKE
-	if(BIT(dtcr[1], 3)) dmacr |= 1 << 12; // BLKDIR (TMS)
-	dmacr |= ((dtcr[1] & 0b110000) >> 4) << 5; // DAID, DAIDE
-	if(BIT(dmacr, 11)) {
-		// Block Transfer Mode
-		switch(dtcr[1] & 0b111) { // DTS
-		case 0b000: dmacr |= 0b1000; break; // ITU channel 0
-		case 0b001: dmacr |= 0b1001; break; // ITU channel 1
-		case 0b010: dmacr |= 0b1010; break; // ITU channel 2
-		case 0b011: dmacr |= 0b1011; break; // ITU channel 3
-		case 0b110: dmacr |= 0b1000; break; // DREQ falling edge
+	dmacr |= ((dtcr[0] & 0b110000) >> 4) << 13; // SAID/DTID, SAIDE/RPE
+	dmacr |= ((dtcr[1] & 0b110000) >> 4) << 5; // DAID/DTID, DAIDE/RPE
+
+	uint8_t _dte = 0;
+	if(BIT(dtcr[0], 7)) _dte |= 0b01; // DTE
+	if(BIT(dtcr[1], 7)) _dte |= 0b10; // DTME/DTE
+
+	bool _fae = (dtcr[0] & 0b110) == 0b110; // A channel operates in full address mode when DTS2A and DTS1A are both set to 1.
+	bool _sae = false; // don't support
+	uint8_t _dta = 0; // don't support
+	uint8_t _dtie = 0;
+	if(_fae) {
+		// Full address mode
+		if(BIT(dtcr[0], 3)) _dtie = 0b11;
+		if(BIT(dtcr[0], 0)) {
+			// Block Transfer Mode
+			dmacr |= 1 << 11; // BLKE
+			if(BIT(dtcr[1], 3)) dmacr |= 1 << 12; // BLKDIR (TMS)
+			switch(dtcr[1] & 0b111) { // DTP (DTS)
+			case 0b000: dmacr |= 0b1000; break; // ITU channel 0
+			case 0b001: dmacr |= 0b1001; break; // ITU channel 1
+			case 0b010: dmacr |= 0b1010; break; // ITU channel 2
+			case 0b011: dmacr |= 0b1011; break; // ITU channel 3
+			case 0b110: dmacr |= 0b1000; break; // DREQ falling edge
+			}
+		} else {
+			// Normal Mode
+			switch(dtcr[1] & 0b111) { // DTP (DTS)
+			case 0b000: dmacr |= 0b0111; break; // Auto-request (burst mode)
+			case 0b010: dmacr |= 0b0110; break; // Auto-request (cycle-steal mode)
+			case 0b110: dmacr |= 0b0010; break; // DREQ falling edge
+			case 0b111: dmacr |= 0b0011; break; // DREQ low-level
+			}
 		}
 	} else {
-		// Normal Mode
-		switch(dtcr[1] & 0b111) { // DTS
-		case 0b000: dmacr |= 0b0111; break; // Auto-request (burst mode)
-		case 0b010: dmacr |= 0b0110; break; // Auto-request (cycle-steal mode)
-		case 0b110: dmacr |= 0b0010; break; // DREQ falling edge
-		case 0b111: dmacr |= 0b0011; break; // DREQ low-level
+		// Short address mode
+		if(BIT(dtcr[0], 3)) _dtie |= 0b01;
+		if(BIT(dtcr[1], 3)) _dtie |= 0b10;
+		for(int submodule = 0; submodule < 2; submodule++) {
+			switch(dtcr[submodule] & 0b111) { // DTP, DTDIR (DTS)
+			case 0b000: dmacr |= 0b01000 << (submodule ? 0 : 8); break; // ITU channel 0
+			case 0b001: dmacr |= 0b01001 << (submodule ? 0 : 8); break; // ITU channel 1
+			case 0b010: dmacr |= 0b01010 << (submodule ? 0 : 8); break; // ITU channel 2
+			case 0b011: dmacr |= 0b01011 << (submodule ? 0 : 8); break; // ITU channel 3
+			//case 0b011: dmacr |= 0b10001 << (submodule ? 0 : 8); break; // A/D converter conversion end (H8/3006)
+			case 0b100: dmacr |= 0b00100 << (submodule ? 0 : 8); break; // SCI channel 0 transmission data empty
+			case 0b101: dmacr |= 0b10101 << (submodule ? 0 : 8); break; // SCI channel 0 receive data full
+			case 0b110: dmacr |= 0b00010 << (submodule ? 0 : 8); break; // DREQ falling edge (B only)
+			case 0b111: dmacr |= 0b00011 << (submodule ? 0 : 8); break; // DREQ low-level (B only)
+			}
 		}
 	}
 
-	// set_bcr
-	bool _fae = (dtcr[0] & 0b110) == 0b110; // A channel operates in full address mode when DTS2A and DTS1A are both set to 1.
-	uint8_t _dta = 0; // don't support
-	uint8_t _dte = BIT(dtcr[0], 7) ? 0b11 : 0b00;
-	uint8_t _dtie = BIT(dtcr[0], 3) ? 0b11 : 0b00;
-	set_bcr(_fae, !_fae, _dta, _dte, _dtie);
+	set_bcr(_fae, _sae, _dta, _dte, _dtie);
 
 	start_test(-1);
 }
@@ -381,7 +450,21 @@ bool h8_dma_channel_device::start_test(int vector)
 		if(dte == 0)
 			return false;
 
-		throw emu_fatalerror("%s: DMA startup test in short address mode unimplemented.\n", tag());
+		if(vector == -1) {
+			// A has priority over B
+			if(dte & 2)
+				start(1);
+			if(dte & 1)
+				start(0);
+			return true;
+		} else if(dte & 2) {
+			// DREQ trigger (B only)
+			if(((dmacr & 0b111) == 0b0010 && vector == DREQ_EDGE) || ((dmacr & 0b111) == 0b0011 && vector == DREQ_LEVEL)) {
+				state[1].suspended = false;
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
@@ -403,7 +486,35 @@ void h8_dma_channel_device::start(int submodule)
 			cpu->set_current_dma(state + submodule);
 		}
 	} else {
-		throw emu_fatalerror("%s: DMA start in short address mode unimplemented.\n", tag());
+		uint8_t cr = submodule ? dmacr & 0x00ff : dmacr >> 8;
+		state[submodule].mode_16 = cr & 0x80;
+		state[submodule].autoreq = false;
+		state[submodule].suspended = true;
+		int32_t step = state[submodule].mode_16 ? 2 : 1;
+		if(!(cr & 0x20)) {
+			// Sequential mode
+			state[submodule].count = etcr[submodule] ? etcr[submodule] : 0x10000;
+			state[submodule].incs = cr & 0x40 ? -step : step;
+		} else if(dtie & (1 << submodule)) {
+			// Idle mode
+			state[submodule].count = etcr[submodule] ? etcr[submodule] : 0x10000;
+			state[submodule].incs = 0;
+		} else {
+			// Repeat mode
+			state[submodule].count = etcr[submodule] & 0x00ff ? etcr[submodule] & 0x00ff : 0x100;
+			state[submodule].incs = cr & 0x40 ? -step : step;
+		}
+		if(cr & 0x10) {
+			state[submodule].source = 0xff0000 | ioar[submodule];
+			state[submodule].dest = mar[submodule];
+			state[submodule].incd = state[submodule].incs;
+			state[submodule].incs = 0;
+		} else {
+			state[submodule].source = mar[submodule];
+			state[submodule].dest = 0xff0000 | ioar[submodule];
+			state[submodule].incd = 0;
+		}
+		cpu->set_current_dma(state + submodule);
 	}
 }
 
@@ -430,6 +541,20 @@ void h8_dma_channel_device::count_done(int submodule)
 				throw emu_fatalerror("%s: DMA end-of-transfer interrupt in full address/normal mode unimplemented.\n", tag());
 		}
 	} else {
-		throw emu_fatalerror("%s: DMA count done in short address mode unimplemented.\n", tag());
+		uint8_t cr = submodule ? dmacr & 0x00ff : dmacr >> 8;
+		if((cr & 0x20) && !(dtie & (1 << submodule))) {
+			// Repeat mode
+			state[submodule].count = etcr[submodule] & 0x00ff ? etcr[submodule] & 0x00ff : 0x100;
+			if(cr & 0x10)
+				state[submodule].dest = mar[submodule];
+			else
+				state[submodule].source = mar[submodule];
+		} else {
+			dte &= ~(1 << submodule);
+			dmac->clear_dte(state[0].id + submodule);
+			dtcr[submodule] &= ~0x80; // clear DTE (for H8H)
+			if(dtie & (1 << submodule))
+				throw emu_fatalerror("%s: DMA end-of-transfer interrupt in short address mode unimplemented.\n", tag());
+		}
 	}
 }

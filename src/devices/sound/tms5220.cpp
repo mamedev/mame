@@ -368,41 +368,40 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
 
 
 /* *****debugging defines***** */
+// general, somewhat obsolete, catch all for debugs which don't fit elsewhere
 #define LOG_GENERAL (1 << 0)
-// above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
-#define LOG_DUMP_INPUT_DATA (1 << 1)
 /* 5220 only; above dumps the data written to the tms52xx to stdout, useful
    for making logged data dumps for real hardware tests */
-#define LOG_FIFO (1 << 2)
+#define LOG_DUMP_INPUT_DATA (1 << 1)
 // 5220 only; above debugs FIFO stuff: writes, reads and flag updates
-#define LOG_PARSE_FRAME_DUMP_BIN (1 << 3)
+#define LOG_FIFO (1 << 2)
 // dumps each speech frame as binary
-#define LOG_PARSE_FRAME_DUMP_HEX (1 << 4)
+#define LOG_PARSE_FRAME_DUMP_BIN (1 << 3)
 // dumps each speech frame as hex
+#define LOG_PARSE_FRAME_DUMP_HEX (1 << 4)
+// dumps info if a frame ran out of data
 #define LOG_FRAME_ERRORS (1 << 6)
-// above dumps info if a frame ran out of data
+// dumps all non-speech-data command writes
 #define LOG_COMMAND_DUMP (1 << 7)
-// above dumps all non-speech-data command writes
+// dumps decoded info about command writes
 #define LOG_COMMAND_VERBOSE (1 << 8)
-// above dumps decoded info about command writes
+// spams the errorlog with i/o ready messages whenever the ready or irq pin is read
 #define LOG_PIN_READS (1 << 9)
-// above spams the errorlog with i/o ready messages whenever the ready or irq pin is read
+// dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
 #define LOG_GENERATION (1 << 10)
-// above dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
+// dumps MUCH MORE debug information related to the sample generation loop, namely the excitation, energy, pitch, k*, and output values for EVERY SINGLE SAMPLE during a frame.
 #define LOG_GENERATION_VERBOSE (1 << 11)
-// above dumps MUCH MORE debug information related to the sample generation loop, namely the excitation, energy, pitch, k*, and output values for EVERY SINGLE SAMPLE during a frame.
+// dumps the lattice filter state data each sample.
 #define LOG_LATTICE (1 << 12)
-// above dumps the lattice filter state data each sample.
+// dumps info to stderr whenever the analog clip hardware is (or would be) clipping the signal.
 #define LOG_CLIP (1 << 13)
-// above dumps info to stderr whenever the analog clip hardware is (or would be) clipping the signal.
+// debugs the io ready callback timer
 #define LOG_IO_READY (1 << 14)
-// above debugs the io ready callback timer
+// debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
 #define LOG_RS_WS (1 << 15)
-// above debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
 
 //#define VERBOSE (LOG_GENERAL | LOG_DUMP_INPUT_DATA | LOG_FIFO | LOG_PARSE_FRAME_DUMP_HEX | LOG_FRAME_ERRORS | LOG_COMMAND_DUMP | LOG_COMMAND_VERBOSE | LOG_PIN_READS | LOG_GENERATION | LOG_GENERATION_VERBOSE | LOG_LATTICE | LOG_CLIP | LOG_IO_READY | LOG_RS_WS)
 #include "logmacro.h"
-// TODO: switch the comments to be above the defines instead of below them
 
 #define MAX_SAMPLE_CHUNK    512
 
@@ -1650,7 +1649,7 @@ void tms5220_device::device_start()
 	m_data_cb.resolve();
 
 	/* initialize a stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80);
+	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_timer_io_ready = timer_alloc(0);
 
@@ -1734,7 +1733,7 @@ void tms5220_device::device_reset()
 
 ***********************************************************************************************/
 
-void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -1771,6 +1770,7 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			case 0x03:
 				/* High Impedance */
 				m_io_ready = param;
+				break;
 			case 0x00:
 				/* illegal */
 				m_io_ready = param;
@@ -1822,9 +1822,10 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 			/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			m_io_ready = false;
 			update_ready_state();
-			/* How long does /READY stay inactive, when /RS is pulled low? It might be always ~16 clocks (25 usec at 800khz as shown on the datasheet)
-			 but the patent schematic implies it might be as short as 4 clock cycles. */
-			m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
+			// The datasheet doesn't give an exact time when /READY should change, but the data is valid 6-11 usec after /RS goes low.
+			// It looks like /READY goes high soon after that (although the datasheet graph is not to scale).
+			// The value of 13 was measured on a real chip with an oscilloscope, and it fits the datasheet.
+			m_timer_io_ready->adjust(attotime::from_usec(13), 1);
 		}
 	}
 }
@@ -2055,24 +2056,20 @@ READ_LINE_MEMBER( tms5220_device::intq_r )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tms5220_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tms5220_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int16_t sample_data[MAX_SAMPLE_CHUNK];
-	stream_sample_t *buffer = outputs[0];
+	auto &output = outputs[0];
 
 	/* loop while we still have samples to generate */
-	while (samples)
+	for (int sampindex = 0; sampindex < output.samples(); )
 	{
-		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
-		int index;
+		int length = (output.samples() > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : output.samples();
 
 		/* generate the samples and copy to the target buffer */
 		process(sample_data, length);
-		for (index = 0; index < length; index++)
-			*buffer++ = sample_data[index];
-
-		/* account for the samples */
-		samples -= length;
+		for (int index = 0; index < length; index++)
+			output.put_int(sampindex++, sample_data[index], 32768);
 	}
 }
 

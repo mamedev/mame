@@ -16,13 +16,11 @@ Radio, 1985, N6
 #include "emu.h"
 
 #include "machine/netlist.h"
-
-#include "video/fixfreq.h"
-
 #include "netlist/devices/net_lib.h"
 
 #include "machine/nl_tp1983.h"
 #include "machine/nl_tp1985.h"
+#include "video/fixfreq.h"
 
 #include "screen.h"
 
@@ -56,8 +54,6 @@ protected:
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
 
-	virtual void video_start() override { }
-
 private:
 };
 
@@ -69,8 +65,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_video(*this, "fixfreq")
-	{
-	}
+	{ }
 
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
@@ -82,8 +77,6 @@ protected:
 	// driver_device overrides
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
-
-	virtual void video_start() override { }
 
 private:
 	NETDEV_ANALOG_CALLBACK_MEMBER(video_out_cb);
@@ -104,9 +97,9 @@ INPUT_PORTS_END
 
 void tp1983_state::tp1983(machine_config &config)
 {
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_tp1983);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_tp1983);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", m_video, FUNC(fixedfreq_device::update_composite_monochrome));
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
@@ -120,15 +113,15 @@ void tp1983_state::tp1983(machine_config &config)
 
 void tp1985_state::tp1985(machine_config &config)
 {
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_tp1985);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_tp1985);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(tp1985_state::video_out_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", FUNC(tp1985_state::video_out_cb));
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
-	m_video->set_horz_params(H_TOTAL_PONG-64,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
-	m_video->set_vert_params(V_TOTAL_PONG-19,V_TOTAL_PONG-16,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_horz_params(H_TOTAL_PONG-80,H_TOTAL_PONG-56,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-19,V_TOTAL_PONG-15,V_TOTAL_PONG-12,V_TOTAL_PONG);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1);
 	m_video->set_gain(0.36);

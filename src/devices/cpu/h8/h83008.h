@@ -29,8 +29,11 @@ class h83008_device : public h8h_device {
 public:
 	h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(syscr_r);
-	DECLARE_WRITE8_MEMBER(syscr_w);
+	void set_mode_a20() { mode_a20 = true; }
+	void set_mode_a24() { mode_a20 = false; }
+
+	uint8_t syscr_r();
+	void syscr_w(uint8_t data);
 
 protected:
 	required_device<h8h_intc_device> intc;

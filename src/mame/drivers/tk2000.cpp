@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, M. Capdeville
 /***************************************************************************
 
     tk2000.cpp - Microdigital TK2000
@@ -9,8 +9,12 @@
     This system is only vaguely Apple II compatible.
     The keyboard works entirely differently, which is a big deal.
 
+    TODO: emulate expansion connector (not wholly Apple II compatible)
+
     $C05A - banks RAM from c100-ffff
     $C05B - banks ROM from c100-ffff
+
+    Added Multitech MPF-II support ( another not so apple2 compatible )
 
 ************************************************************************/
 
@@ -18,7 +22,9 @@
 #include "video/apple2.h"
 
 #include "cpu/m6502/m6502.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -47,19 +53,14 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_screen(*this, "screen"),
 		m_video(*this, A2_VIDEO_TAG),
-		m_row0(*this, "ROW0"),
-		m_row1(*this, "ROW1"),
-		m_row2(*this, "ROW2"),
-		m_row3(*this, "ROW3"),
-		m_row4(*this, "ROW4"),
-		m_row5(*this, "ROW5"),
-		m_row6(*this, "ROW6"),
-		m_row7(*this, "ROW7"),
+		m_row(*this, "ROW%u", 0U),
 		m_kbspecial(*this, "keyb_special"),
 		m_sysconfig(*this, "a2_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
-		m_upperbank(*this, A2_UPPERBANK_TAG)
+		m_upperbank(*this, A2_UPPERBANK_TAG),
+		m_softlatch(*this, "softlatch"),
+		m_printer(*this, "printer")
 	{ }
 
 	void tk2000(machine_config &config);
@@ -73,40 +74,54 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<screen_device> m_screen;
 	required_device<a2_video_device> m_video;
-	required_ioport m_row0, m_row1, m_row2, m_row3, m_row4, m_row5, m_row6, m_row7;
+	required_ioport_array<8> m_row;
 	required_ioport m_kbspecial;
 	required_ioport m_sysconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
+	required_device<addressable_latch_device> m_softlatch;
+	required_device<centronics_device> m_printer;
 
 	int m_speaker_state;
 	int m_cassette_state;
 
-	uint8_t m_strobe;
-
-	bool m_page2;
+	uint8_t m_kbout;
 
 	uint8_t *m_ram_ptr;
 	int m_ram_size;
+	bool m_printer_busy;
+	bool m_ctrl_key;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
-	DECLARE_READ8_MEMBER(c080_r);
-	DECLARE_WRITE8_MEMBER(c080_w);
-	DECLARE_READ8_MEMBER(c100_r);
-	DECLARE_WRITE8_MEMBER(c100_w);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(printer_busy_w);
+	void kbout_w(uint8_t data);
+	uint8_t kbin_r();
+	uint8_t casout_r();
+	void casout_w(uint8_t data);
+	uint8_t snd_r();
+	void snd_w(uint8_t data);
+	uint8_t switches_r(offs_t offset);
+	uint8_t cassette_r();
+	DECLARE_WRITE_LINE_MEMBER(color_w);
+	DECLARE_WRITE_LINE_MEMBER(motor_a_w);
+	DECLARE_WRITE_LINE_MEMBER(motor_b_w);
+	DECLARE_WRITE_LINE_MEMBER(rom_ram_w);
+	DECLARE_WRITE_LINE_MEMBER(ctrl_key_w);
+	uint8_t c080_r(offs_t offset);
+	void c080_w(offs_t offset, uint8_t data);
+	uint8_t c100_r(offs_t offset);
+	void c100_w(offs_t offset, uint8_t data);
 
 	void apple2_map(address_map &map);
 	void inhbank_map(address_map &map);
 
-	void do_io(address_space &space, int offset);
 	uint8_t read_floatingbus();
 };
 
@@ -122,13 +137,15 @@ void tk2000_state::machine_start()
 	m_speaker->level_w(m_speaker_state);
 	m_cassette_state = 0;
 	m_cassette->output(-1.0f);
-	m_upperbank->set_bank(0);
+	m_printer_busy = false;
+	m_ctrl_key = false;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_cassette_state));
-	save_item(NAME(m_strobe));
-	save_item(NAME(m_page2));
+	save_item(NAME(m_kbout));
+	save_item(NAME(m_printer_busy));
+	save_item(NAME(m_ctrl_key));
 
 	// setup video pointers
 	m_video->m_ram_ptr = m_ram_ptr;
@@ -139,8 +156,7 @@ void tk2000_state::machine_start()
 
 void tk2000_state::machine_reset()
 {
-	m_page2 = false;
-	m_strobe = 0;
+	m_kbout = 0;
 }
 
 /***************************************************************************
@@ -170,127 +186,117 @@ uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 /***************************************************************************
     I/O
 ***************************************************************************/
-// most softswitches don't care about read vs write, so handle them here
-void tk2000_state::do_io(address_space &space, int offset)
+
+WRITE_LINE_MEMBER(tk2000_state::printer_busy_w)
 {
-	if(machine().side_effects_disabled())
-	{
-		return;
-	}
-
-	switch (offset)
-	{
-		case 0x20:
-			m_cassette_state ^= 1;
-			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
-			break;
-
-		case 0x30:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
-			break;
-
-		case 0x50:  // monochrome
-			break;
-
-		case 0x51:  // color
-			break;
-
-		case 0x54:  // set page 1
-			m_page2 = false;
-			m_video->m_page2 = false;
-			break;
-
-		case 0x55:  // set page 2
-			m_page2 = true;
-			m_video->m_page2 = true;
-			break;
-
-		case 0x5a:  // ROM
-			m_upperbank->set_bank(0);
-			break;
-
-		case 0x5b:  // RAM
-			m_upperbank->set_bank(1);
-			break;
-
-		case 0x5e:
-			break;
-
-		default:
-			printf("do_io: unk access @ $C0%02X\n", offset & 0xff);
-			break;
-	}
+	m_printer_busy = state;
 }
 
-READ8_MEMBER(tk2000_state::c000_r)
+void tk2000_state::kbout_w(uint8_t data)
 {
-	switch (offset)
-	{
-		case 0x00:
-			return 0;
+	// write row mask for keyboard scan
+	m_kbout = data;
 
-		case 0x10:  // keyboard strobe
-			return m_strobe;
+	m_printer->write_data0(BIT(data, 0));
+	m_printer->write_data1(BIT(data, 1));
+	m_printer->write_data2(BIT(data, 2));
+	m_printer->write_data3(BIT(data, 3));
+	m_printer->write_data4(BIT(data, 4));
+	m_printer->write_data5(BIT(data, 5));
+	m_printer->write_data6(BIT(data, 6));
+	m_printer->write_data7(BIT(data, 7));
+}
 
-		case 0x60: // cassette in
-		case 0x68:
-			return m_cassette->input() > 0.0 ? 0x80 : 0;
+uint8_t tk2000_state::kbin_r()
+{
+	uint8_t kbin = 0;
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_kbout, i))
+			kbin |= m_row[i]->read();
 
-		default:
-			do_io(space, offset);
-			break;
-	}
+	if (m_ctrl_key)
+		kbin |= m_kbspecial->read();
 
+	return kbin | (m_printer_busy ? 0x40 : 0);
+}
+
+uint8_t tk2000_state::casout_r()
+{
+	if (!machine().side_effects_disabled())
+		casout_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(tk2000_state::c000_w)
+void tk2000_state::casout_w(uint8_t data)
 {
-	switch (offset)
-	{
-		case 0x00:  // write row mask for keyboard scan
-			switch (data)
-			{
-				case 0:
-					break;
-
-				case 0x01: m_strobe = m_row0->read(); break;
-				case 0x02: m_strobe = m_row1->read(); break;
-				case 0x04: m_strobe = m_row2->read(); break;
-				case 0x08: m_strobe = m_row3->read(); break;
-				case 0x10: m_strobe = m_row4->read(); break;
-				case 0x20: m_strobe = m_row5->read(); break;
-				case 0x40: m_strobe = m_row6->read(); break;
-				case 0x80: m_strobe = m_row7->read(); break;
-			}
-			break;
-
-		case 0x5f:
-			m_strobe = m_kbspecial->read();
-			break;
-
-		default:
-			do_io(space, offset);
-			break;
-	}
+	m_cassette_state ^= 1;
+	m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
 }
 
-READ8_MEMBER(tk2000_state::c080_r)
+uint8_t tk2000_state::snd_r()
+{
+	if (!machine().side_effects_disabled())
+		snd_w(0);
+	return read_floatingbus();
+}
+
+void tk2000_state::snd_w(uint8_t data)
+{
+	m_speaker_state ^= 1;
+	m_speaker->level_w(m_speaker_state);
+}
+
+uint8_t tk2000_state::switches_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
+	return read_floatingbus();
+}
+
+uint8_t tk2000_state::cassette_r()
+{
+	return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+}
+
+WRITE_LINE_MEMBER(tk2000_state::color_w)
+{
+	// 0 = color, 1 = black/white
+}
+
+WRITE_LINE_MEMBER(tk2000_state::motor_a_w)
+{
+}
+
+WRITE_LINE_MEMBER(tk2000_state::motor_b_w)
+{
+}
+
+WRITE_LINE_MEMBER(tk2000_state::rom_ram_w)
+{
+	// 0 = ROM, 1 = RAM
+	m_upperbank->set_bank(state);
+}
+
+WRITE_LINE_MEMBER(tk2000_state::ctrl_key_w)
+{
+	m_ctrl_key = state;
+}
+
+uint8_t tk2000_state::c080_r(offs_t offset)
 {
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(tk2000_state::c080_w)
+void tk2000_state::c080_w(offs_t offset, uint8_t data)
 {
 }
 
-READ8_MEMBER(tk2000_state::c100_r)
+uint8_t tk2000_state::c100_r(offs_t offset)
 {
 	return m_ram_ptr[offset + 0xc100];
 }
 
-WRITE8_MEMBER(tk2000_state::c100_w)
+void tk2000_state::c100_w(offs_t offset, uint8_t data)
 {
 	m_ram_ptr[offset + 0xc100] = data;
 }
@@ -337,7 +343,7 @@ uint8_t tk2000_state::read_floatingbus()
 	//
 	Hires    = 1; //m_video->m_hires ? 1 : 0;
 	Mixed    = 0; //m_video->m_mix ? 1 : 0;
-	Page2    = m_page2 ? 1 : 0;
+	Page2    = m_video->m_page2 ? 1 : 0;
 	_80Store = 0;
 
 	// calculate video parameters according to display standard
@@ -429,7 +435,7 @@ uint8_t tk2000_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(tk2000_state::ram_r)
+uint8_t tk2000_state::ram_r(offs_t offset)
 {
 	if (offset < m_ram_size)
 	{
@@ -439,7 +445,7 @@ READ8_MEMBER(tk2000_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(tk2000_state::ram_w)
+void tk2000_state::ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram_size)
 	{
@@ -450,7 +456,12 @@ WRITE8_MEMBER(tk2000_state::ram_w)
 void tk2000_state::apple2_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rw(FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
-	map(0xc000, 0xc07f).rw(FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
+	map(0xc000, 0xc000).w(FUNC(tk2000_state::kbout_w)).nopr();
+	map(0xc010, 0xc010).r(FUNC(tk2000_state::kbin_r));
+	map(0xc020, 0xc020).rw(FUNC(tk2000_state::casout_r), FUNC(tk2000_state::casout_w));
+	map(0xc030, 0xc030).rw(FUNC(tk2000_state::snd_r), FUNC(tk2000_state::snd_w));
+	map(0xc050, 0xc05f).r(FUNC(tk2000_state::switches_r)).w(m_softlatch, FUNC(addressable_latch_device::write_a0));
+	map(0xc060, 0xc060).mirror(8).r(FUNC(tk2000_state::cassette_r));
 	map(0xc080, 0xc0ff).rw(FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
 	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
@@ -485,71 +496,71 @@ void tk2000_state::inhbank_map(address_map &map)
 */
 static INPUT_PORTS_START( tk2000 )
 	PORT_START("ROW0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift")   PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift")        PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)      PORT_CHAR('B')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)      PORT_CHAR('V')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)      PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)      PORT_CHAR('X')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)      PORT_CHAR('Z')
 
 	PORT_START("ROW1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)      PORT_CHAR('G')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)      PORT_CHAR('F')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)      PORT_CHAR('D')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)      PORT_CHAR('S')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)      PORT_CHAR('A')
 
 	PORT_START("ROW2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)      PORT_CHAR('T')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)      PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)      PORT_CHAR('E')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)      PORT_CHAR('W')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)      PORT_CHAR('Q')
 
 	PORT_START("ROW3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)      PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)      PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)      PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)      PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
 
 	PORT_START("ROW4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)      PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)      PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)      PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR('*')
 
 	PORT_START("ROW5")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)      PORT_CHAR('Y')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)      PORT_CHAR('U')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)      PORT_CHAR('I') PORT_CHAR('-')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)      PORT_CHAR('O') PORT_CHAR('=')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)      PORT_CHAR('P') PORT_CHAR('+')
 
 	PORT_START("ROW6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)      PORT_CHAR('H')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)      PORT_CHAR('J')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)      PORT_CHAR('K') PORT_CHAR('^')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)      PORT_CHAR('L') PORT_CHAR('@')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)  PORT_CHAR(':') PORT_CHAR(';')
 
 	PORT_START("ROW7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")       PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)      PORT_CHAR('N')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)      PORT_CHAR('M')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('?') PORT_CHAR('/')
 
 	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")     PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -573,9 +584,9 @@ void tk2000_state::tk2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk2000_state::apple2_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -592,10 +603,23 @@ void tk2000_state::tk2000(machine_config &config)
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&tk2000_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
+	LS259(config, m_softlatch); // U36
+	m_softlatch->q_out_cb<0>().set(FUNC(tk2000_state::color_w));
+	m_softlatch->q_out_cb<1>().set(FUNC(tk2000_state::motor_a_w));
+	m_softlatch->q_out_cb<2>().set(m_video, FUNC(a2_video_device::scr_w));
+	m_softlatch->q_out_cb<3>().set(FUNC(tk2000_state::motor_b_w));
+	m_softlatch->q_out_cb<4>().set(m_printer, FUNC(centronics_device::write_strobe));
+	m_softlatch->q_out_cb<5>().set(FUNC(tk2000_state::rom_ram_w));
+	m_softlatch->q_out_cb<7>().set(FUNC(tk2000_state::ctrl_key_w));
+
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	CENTRONICS(config, m_printer, centronics_devices, nullptr);
+	m_printer->busy_handler().set(FUNC(tk2000_state::printer_busy_w));
 }
 
 /***************************************************************************
@@ -608,5 +632,11 @@ ROM_START(tk2000)
 	ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
 ROM_END
 
+ROM_START(mpf2)
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD( "mpf_ii.rom",   0x000000, 0x004000, CRC(8780189f) SHA1(92378b0db561632b58a9b36a85f8fb00796198bb) )
+ROM_END
+
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME */
-COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000", MACHINE_NOT_WORKING )
+COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000 Color Computer", MACHINE_NOT_WORKING )
+COMP( 1982, mpf2,   tk2000, 0,      tk2000,  tk2000, tk2000_state, empty_init, "Multitech",    "Microprofessor II",     MACHINE_NOT_WORKING )

@@ -13,9 +13,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
-#include "machine/segaic16.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
+#include "screen.h"
 
 
 // ======================> segaybd_state
@@ -32,6 +32,7 @@ public:
 		, m_soundcpu(*this, "soundcpu")
 		, m_linkcpu(*this, "linkcpu")
 		, m_watchdog(*this, "watchdog")
+		, m_screen(*this, "screen")
 		, m_bsprites(*this, "bsprites")
 		, m_ysprites(*this, "ysprites")
 		, m_segaic16vid(*this, "segaic16vid")
@@ -59,17 +60,17 @@ public:
 
 private:
 	// main CPU read/write handlers
-	DECLARE_WRITE8_MEMBER(output1_w);
-	DECLARE_WRITE8_MEMBER(misc_output_w);
-	DECLARE_WRITE8_MEMBER(output2_w);
+	void output1_w(uint8_t data);
+	void misc_output_w(uint8_t data);
+	void output2_w(uint8_t data);
 
 	// linked cabinet specific handlers
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
-	DECLARE_READ16_MEMBER(link_r);
-	DECLARE_READ16_MEMBER(link2_r);
-	DECLARE_WRITE16_MEMBER(link2_w);
-//  DECLARE_READ8_MEMBER(link_portc0_r);
+	uint16_t link_r();
+	uint16_t link2_r();
+	void link2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+//  uint8_t link_portc0_r();
 
 	// input helpers
 	ioport_value analog_mux();
@@ -109,7 +110,7 @@ private:
 	// device overrides
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void update_irqs();
@@ -121,6 +122,7 @@ private:
 	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_linkcpu;
 	required_device<mb3773_device> m_watchdog;
+	required_device<screen_device> m_screen;
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
 	required_device<segaic16_video_device> m_segaic16vid;
@@ -133,12 +135,12 @@ private:
 	output_delegate m_output_cb2;
 
 	// internal state
-	uint16_t          m_pdrift_bank;
-	emu_timer *     m_scanline_timer;
-	int             m_irq2_scanline;
-	uint8_t           m_timer_irq_state;
-	uint8_t           m_vblank_irq_state;
-	uint8_t           m_misc_io_data;
+	uint16_t          m_pdrift_bank = 0;
+	emu_timer *     m_scanline_timer = nullptr;
+	int             m_irq2_scanline = 0;
+	uint8_t           m_timer_irq_state = 0;
+	uint8_t           m_vblank_irq_state = 0;
+	uint8_t           m_misc_io_data = 0;
 };
 
 #endif // MAME_INCLUDES_SEGAYBD_H

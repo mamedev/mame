@@ -7,6 +7,7 @@
     Device disassembly interfaces.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_DIDISASM_H
 #define MAME_EMU_DIDISASM_H
 
@@ -35,13 +36,7 @@ public:
 	virtual ~device_disasm_interface() = default;
 
 	// Override
-	template <typename Obj> void set_dasm_override(Obj &&cb) { m_dasm_override = std::forward<Obj>(cb); }
-	void set_dasm_override(dasm_override_delegate callback) { m_dasm_override = callback; }
-	template <class FunctionClass> void set_dasm_override(offs_t (FunctionClass::*callback)(std::ostream &, offs_t,
-		const util::disasm_interface::data_buffer &, const util::disasm_interface::data_buffer &), const char *name)
-	{
-		set_dasm_override(dasm_override_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_dasm_override(T &&... args) { m_dasm_override.set(std::forward<T>(args)...); }
 
 	// disassembler request
 	util::disasm_interface &get_disassembler();
@@ -60,6 +55,6 @@ private:
 };
 
 // iterator
-typedef device_interface_iterator<device_disasm_interface> disasm_interface_iterator;
+typedef device_interface_enumerator<device_disasm_interface> disasm_interface_enumerator;
 
 #endif // MAME_EMU_DIDISASM_H

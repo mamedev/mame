@@ -1151,6 +1151,8 @@ offs_t hc11_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		flags = STEP_OVER;
 	else if (!strcmp(op_table->mnemonic, "rts") || !strcmp(op_table->mnemonic, "rti"))
 		flags = STEP_OUT;
+	else if ((opcode >= 0x22 && opcode < 0x30) || !strcmp(op_table->mnemonic, "brset") || !strcmp(op_table->mnemonic, "brclr"))
+		flags = STEP_COND;
 
 	switch(op_table->address_mode)
 	{
@@ -1227,7 +1229,7 @@ offs_t hc11_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			imm8 = opcodes.r8(cpc++);
 			mask = opcodes.r8(cpc++);
 			rel8 = opcodes.r8(cpc++);
-			util::stream_format(stream, "%s (Y+0x%02X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+2+rel8);
+			util::stream_format(stream, "%s (Y+0x%02X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+5+rel8);
 			break;
 
 		case PAGE2:

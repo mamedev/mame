@@ -11,47 +11,116 @@
 #include "emu.h"
 #include "validity.h"
 
+#include "corestr.h"
 #include "emuopts.h"
 #include "romload.h"
 #include "video/rgbutil.h"
+#include "unicode.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <type_traits>
 #include <typeinfo>
 
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
+namespace {
 
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
+//-------------------------------------------------
+//  diamond_inheritance - forward declaration of a
+//  class to force MSVC to use unknown inheritance
+//  form of pointers to member functions
+//-------------------------------------------------
+
+class diamond_inheritance;
+
+
+//-------------------------------------------------
+//  test_delegate - a delegate that can return a
+//  result in a register
+//-------------------------------------------------
+
+using test_delegate = delegate<char (void const *&)>;
+
+
+//-------------------------------------------------
+//  make_diamond_class_delegate - make a delegate
+//  bound to an instance of an incomplete class
+//  type
+//-------------------------------------------------
+
+#if !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 7000)
+test_delegate make_diamond_class_delegate(char (diamond_inheritance::*func)(void const *&), diamond_inheritance *obj)
+{
+	return test_delegate(func, obj);
+}
+#endif // !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 7000)
+
+
+//-------------------------------------------------
+//  virtual_base - simple class that will be used
+//  as the top vertex of the diamond
+//-------------------------------------------------
+
+struct virtual_base
+{
+	char get_base(void const *&p) { p = this; return 'x'; }
+	int x;
+};
+
+
+//-------------------------------------------------
+//  virtual_derived_a - first class derived from
+//  virtual base
+//-------------------------------------------------
+
+struct virtual_derived_a : virtual virtual_base
+{
+	char get_derived_a(void const *&p) { p = this; return 'a'; }
+	int a;
+};
+
+
+//-------------------------------------------------
+//  virtual_derived_b - second class derived from
+//  virtual base
+//-------------------------------------------------
+
+struct virtual_derived_b : virtual virtual_base
+{
+	char get_derived_b(void const *&p) { p = this; return 'b'; }
+	int b;
+};
+
+
+//-------------------------------------------------
+//  diamond_inheritance - actual definition of
+//  class with diamond inheritance
+//-------------------------------------------------
+
+class diamond_inheritance : public virtual_derived_a, public virtual_derived_b
+{
+};
+
+
+//-------------------------------------------------
+//  pure_virtual_base - abstract class with a
+//  vtable
+//-------------------------------------------------
+
+struct pure_virtual_base
+{
+	virtual ~pure_virtual_base() = default;
+	virtual char operator()(void const *&p) const = 0;
+};
+
 
 //-------------------------------------------------
 //  ioport_string_from_index - return an indexed
 //  string from the I/O port system
 //-------------------------------------------------
 
-inline const char *validity_checker::ioport_string_from_index(u32 index)
+inline char const *ioport_string_from_index(u32 index)
 {
-	return ioport_configurer::string_from_token((const char *)(uintptr_t)index);
-}
-
-
-//-------------------------------------------------
-//  get_defstr_index - return the index of the
-//  string assuming it is one of the default
-//  strings
-//-------------------------------------------------
-
-inline int validity_checker::get_defstr_index(const char *string, bool suppress_error)
-{
-	// check for strings that should be DEF_STR
-	auto strindex = m_defstr_map.find(string);
-	if (!suppress_error && strindex != m_defstr_map.end() && string != ioport_string_from_index(strindex->second))
-		osd_printf_error("Must use DEF_STR( %s )\n", string);
-	return (strindex != m_defstr_map.end()) ? strindex->second : 0;
+	return ioport_configurer::string_from_token(reinterpret_cast<char const *>(uintptr_t(index)));
 }
 
 
@@ -62,293 +131,19 @@ inline int validity_checker::get_defstr_index(const char *string, bool suppress_
 //  random_s32
 //-------------------------------------------------
 #undef rand
-inline s32 validity_checker::random_i32() { return s32(random_u32()); }
-inline u32 validity_checker::random_u32() { return rand() ^ (rand() << 15); }
-inline s64 validity_checker::random_i64() { return s64(random_u64()); }
-inline u64 validity_checker::random_u64() { return u64(random_u32()) ^ (u64(random_u32()) << 30); }
-
-
-
-//-------------------------------------------------
-//  validate_tag - ensure that the given tag
-//  meets the general requirements
-//-------------------------------------------------
-
-void validity_checker::validate_tag(const char *tag)
-{
-	// some common names that are now deprecated
-	if (strcmp(tag, "main") == 0 || strcmp(tag, "audio") == 0 || strcmp(tag, "sound") == 0 || strcmp(tag, "left") == 0 || strcmp(tag, "right") == 0)
-		osd_printf_error("Invalid generic tag '%s' used\n", tag);
-
-	// scan for invalid characters
-	static char const *const validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
-	for (const char *p = tag; *p != 0; p++)
-	{
-		// only lower-case permitted
-		if (*p != tolower(u8(*p)))
-		{
-			osd_printf_error("Tag '%s' contains upper-case characters\n", tag);
-			break;
-		}
-		if (*p == ' ')
-		{
-			osd_printf_error("Tag '%s' contains spaces\n", tag);
-			break;
-		}
-		if (strchr(validchars, *p) == nullptr)
-		{
-			osd_printf_error("Tag '%s' contains invalid character '%c'\n",  tag, *p);
-			break;
-		}
-	}
-
-	// find the start of the final tag
-	const char *begin = strrchr(tag, ':');
-	if (begin == nullptr)
-		begin = tag;
-	else
-		begin += 1;
-
-	// 0-length = bad
-	if (*begin == 0)
-		osd_printf_error("Found 0-length tag\n");
-
-	// too short/too long = bad
-	if (strlen(begin) < MIN_TAG_LENGTH)
-		osd_printf_error("Tag '%s' is too short (must be at least %d characters)\n", tag, MIN_TAG_LENGTH);
-}
-
-
-
-//**************************************************************************
-//  VALIDATION FUNCTIONS
-//**************************************************************************
-
-//-------------------------------------------------
-//  validity_checker - constructor
-//-------------------------------------------------
-
-validity_checker::validity_checker(emu_options &options)
-	: m_drivlist(options)
-	, m_errors(0)
-	, m_warnings(0)
-	, m_print_verbose(options.verbose())
-	, m_current_driver(nullptr)
-	, m_current_config(nullptr)
-	, m_current_device(nullptr)
-	, m_current_ioport(nullptr)
-	, m_validate_all(false)
-{
-	// pre-populate the defstr map with all the default strings
-	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
-	{
-		const char *string = ioport_string_from_index(strnum);
-		if (string != nullptr)
-			m_defstr_map.insert(std::make_pair(string, strnum));
-	}
-}
-
-//-------------------------------------------------
-//  validity_checker - destructor
-//-------------------------------------------------
-
-validity_checker::~validity_checker()
-{
-	validate_end();
-}
-
-//-------------------------------------------------
-//  check_driver - check a single driver
-//-------------------------------------------------
-
-void validity_checker::check_driver(const game_driver &driver)
-{
-	// simply validate the one driver
-	validate_begin();
-	validate_one(driver);
-	validate_end();
-}
+inline u32 random_u32() { return rand() ^ (rand() << 15); }
+inline s32 random_i32() { return s32(random_u32()); }
+inline u64 random_u64() { return u64(random_u32()) ^ (u64(random_u32()) << 30); }
+inline s64 random_i64() { return s64(random_u64()); }
 
 
 //-------------------------------------------------
-//  check_shared_source - check all drivers that
-//  share the same source file as the given driver
+//  validate_integer_semantics - validate that
+//  integers behave as expected, particularly
+//  with regards to overflow and shifting
 //-------------------------------------------------
 
-void validity_checker::check_shared_source(const game_driver &driver)
-{
-	// initialize
-	validate_begin();
-
-	// then iterate over all drivers and check the ones that share the same source file
-	m_drivlist.reset();
-	while (m_drivlist.next())
-		if (strcmp(driver.type.source(), m_drivlist.driver().type.source()) == 0)
-			validate_one(m_drivlist.driver());
-
-	// cleanup
-	validate_end();
-}
-
-
-//-------------------------------------------------
-//  check_all_matching - check all drivers whose
-//  names match the given string
-//-------------------------------------------------
-
-bool validity_checker::check_all_matching(const char *string)
-{
-	// start by checking core stuff
-	validate_begin();
-	validate_core();
-	validate_inlines();
-	validate_rgb();
-
-	// if we had warnings or errors, output
-	if (m_errors > 0 || m_warnings > 0 || !m_verbose_text.empty())
-	{
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Core: %d errors, %d warnings\n", m_errors, m_warnings);
-		if (m_errors > 0)
-			output_indented_errors(m_error_text, "Errors");
-		if (m_warnings > 0)
-			output_indented_errors(m_warning_text, "Warnings");
-		if (!m_verbose_text.empty())
-			output_indented_errors(m_verbose_text, "Messages");
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
-	}
-
-	// then iterate over all drivers and check them
-	m_drivlist.reset();
-	bool validated_any = false;
-	while (m_drivlist.next())
-	{
-		if (m_drivlist.matches(string, m_drivlist.driver().name))
-		{
-			validate_one(m_drivlist.driver());
-			validated_any = true;
-		}
-	}
-
-	// validate devices
-	if (!string)
-		validate_device_types();
-
-	// cleanup
-	validate_end();
-
-	// if we failed to match anything, it
-	if (string && !validated_any)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", string);
-
-	return !(m_errors > 0 || m_warnings > 0);
-}
-
-
-//-------------------------------------------------
-//  validate_begin - prepare for validation by
-//  taking over the output callbacks and resetting
-//  our internal state
-//-------------------------------------------------
-
-void validity_checker::validate_begin()
-{
-	// take over error and warning outputs
-	osd_output::push(this);
-
-	// reset all our maps
-	m_names_map.clear();
-	m_descriptions_map.clear();
-	m_roms_map.clear();
-	m_defstr_map.clear();
-	m_region_map.clear();
-
-	// reset internal state
-	m_errors = 0;
-	m_warnings = 0;
-	m_already_checked.clear();
-}
-
-
-//-------------------------------------------------
-//  validate_end - restore output callbacks and
-//  clean up
-//-------------------------------------------------
-
-void validity_checker::validate_end()
-{
-	// restore the original output callbacks
-	osd_output::pop(this);
-}
-
-
-//-------------------------------------------------
-//  validate_drivers - master validity checker
-//-------------------------------------------------
-
-void validity_checker::validate_one(const game_driver &driver)
-{
-	// help verbose validation detect configuration-related crashes
-	if (m_print_verbose)
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.type.source()).c_str());
-
-	// set the current driver
-	m_current_driver = &driver;
-	m_current_config = nullptr;
-	m_current_device = nullptr;
-	m_current_ioport = nullptr;
-	m_region_map.clear();
-
-	// reset error/warning state
-	int start_errors = m_errors;
-	int start_warnings = m_warnings;
-	m_error_text.clear();
-	m_warning_text.clear();
-	m_verbose_text.clear();
-
-	// wrap in try/except to catch fatalerrors
-	try
-	{
-		machine_config config(driver, m_blank_options);
-		m_current_config = &config;
-		validate_driver();
-		validate_roms(m_current_config->root_device());
-		validate_inputs();
-		validate_devices();
-		m_current_config = nullptr;
-	}
-	catch (emu_fatalerror &err)
-	{
-		osd_printf_error("Fatal error %s", err.string());
-	}
-
-	// if we had warnings or errors, output
-	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
-	{
-		if (!m_print_verbose)
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.type.source()).c_str());
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%d errors, %d warnings\n", m_errors - start_errors, m_warnings - start_warnings);
-		if (m_errors > start_errors)
-			output_indented_errors(m_error_text, "Errors");
-		if (m_warnings > start_warnings)
-			output_indented_errors(m_warning_text, "Warnings");
-		if (!m_verbose_text.empty())
-			output_indented_errors(m_verbose_text, "Messages");
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
-	}
-
-	// reset the driver/device
-	m_current_driver = nullptr;
-	m_current_config = nullptr;
-	m_current_device = nullptr;
-	m_current_ioport = nullptr;
-}
-
-
-//-------------------------------------------------
-//  validate_core - validate core internal systems
-//-------------------------------------------------
-
-void validity_checker::validate_core()
+void validate_integer_semantics()
 {
 	// basic system checks
 	if (~0 != -1) osd_printf_error("Machine must be two's complement\n");
@@ -401,7 +196,7 @@ void validity_checker::validate_core()
 //  behaviors
 //-------------------------------------------------
 
-void validity_checker::validate_inlines()
+void validate_inlines()
 {
 	volatile u64 testu64a = random_u64();
 	volatile s64 testi64a = random_i64();
@@ -430,32 +225,32 @@ void validity_checker::validate_inlines()
 	resulti64 = mul_32x32(testi32a, testi32b);
 	expectedi64 = s64(testi32a) * s64(testi32b);
 	if (resulti64 != expectedi64)
-		osd_printf_error("Error testing mul_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testi32a, testi32b, u32(resulti64 >> 32), u32(resulti64), u32(expectedi64 >> 32), u32(expectedi64));
+		osd_printf_error("Error testing mul_32x32 (%08X x %08X) = %16X (expected %16X)\n", s32(testi32a), s32(testi32b), resulti64, expectedi64);
 
 	resultu64 = mulu_32x32(testu32a, testu32b);
 	expectedu64 = u64(testu32a) * u64(testu32b);
 	if (resultu64 != expectedu64)
-		osd_printf_error("Error testing mulu_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testu32a, testu32b, u32(resultu64 >> 32), u32(resultu64), u32(expectedu64 >> 32), u32(expectedu64));
+		osd_printf_error("Error testing mulu_32x32 (%08X x %08X) = %16X (expected %16X)\n", u32(testu32a), u32(testu32b), resultu64, expectedu64);
 
 	resulti32 = mul_32x32_hi(testi32a, testi32b);
 	expectedi32 = (s64(testi32a) * s64(testi32b)) >> 32;
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing mul_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32);
+		osd_printf_error("Error testing mul_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", s32(testi32a), s32(testi32b), resulti32, expectedi32);
 
 	resultu32 = mulu_32x32_hi(testu32a, testu32b);
 	expectedu32 = (s64(testu32a) * s64(testu32b)) >> 32;
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing mulu_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32);
+		osd_printf_error("Error testing mulu_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", u32(testu32a), u32(testu32b), resultu32, expectedu32);
 
 	resulti32 = mul_32x32_shift(testi32a, testi32b, 7);
 	expectedi32 = (s64(testi32a) * s64(testi32b)) >> 7;
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing mul_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32);
+		osd_printf_error("Error testing mul_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", s32(testi32a), s32(testi32b), resulti32, expectedi32);
 
 	resultu32 = mulu_32x32_shift(testu32a, testu32b, 7);
 	expectedu32 = (s64(testu32a) * s64(testu32b)) >> 7;
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32);
+		osd_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", u32(testu32a), u32(testu32b), resultu32, expectedu32);
 
 	while (s64(testi32a) * s64(0x7fffffff) < testi64a)
 		testi64a /= 2;
@@ -465,34 +260,34 @@ void validity_checker::validate_inlines()
 	resulti32 = div_64x32(testi64a, testi32a);
 	expectedi32 = testi64a / s64(testi32a);
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing div_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", u32(testi64a >> 32), u32(testi64a), testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing div_64x32 (%16X / %08X) = %08X (expected %08X)\n", s64(testi64a), s32(testi32a), resulti32, expectedi32);
 
 	resultu32 = divu_64x32(testu64a, testu32a);
 	expectedu32 = testu64a / u64(testu32a);
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing divu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", u32(testu64a >> 32), u32(testu64a), testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing divu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
-	resulti32 = div_64x32_rem(testi64a, testi32a, &remainder);
+	resulti32 = div_64x32_rem(testi64a, testi32a, remainder);
 	expectedi32 = testi64a / s64(testi32a);
 	expremainder = testi64a % s64(testi32a);
 	if (resulti32 != expectedi32 || remainder != expremainder)
-		osd_printf_error("Error testing div_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", u32(testi64a >> 32), u32(testi64a), testi32a, resulti32, remainder, expectedi32, expremainder);
+		osd_printf_error("Error testing div_64x32_rem (%16X / %08X) = %08X,%08X (expected %08X,%08X)\n", s64(testi64a), s32(testi32a), resulti32, remainder, expectedi32, expremainder);
 
-	resultu32 = divu_64x32_rem(testu64a, testu32a, &uremainder);
+	resultu32 = divu_64x32_rem(testu64a, testu32a, uremainder);
 	expectedu32 = testu64a / u64(testu32a);
 	expuremainder = testu64a % u64(testu32a);
 	if (resultu32 != expectedu32 || uremainder != expuremainder)
-		osd_printf_error("Error testing divu_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", u32(testu64a >> 32), u32(testu64a), testu32a, resultu32, uremainder, expectedu32, expuremainder);
+		osd_printf_error("Error testing divu_64x32_rem (%16X / %08X) = %08X,%08X (expected %08X,%08X)\n", u64(testu64a), u32(testu32a), resultu32, uremainder, expectedu32, expuremainder);
 
 	resulti32 = mod_64x32(testi64a, testi32a);
 	expectedi32 = testi64a % s64(testi32a);
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing mod_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", u32(testi64a >> 32), u32(testi64a), testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing mod_64x32 (%16X / %08X) = %08X (expected %08X)\n", s64(testi64a), s32(testi32a), resulti32, expectedi32);
 
 	resultu32 = modu_64x32(testu64a, testu32a);
 	expectedu32 = testu64a % u64(testu32a);
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing modu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", u32(testu64a >> 32), u32(testu64a), testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing modu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
 	while (s64(testi32a) * s64(0x7fffffff) < (s32(testi64a) << 3))
 		testi64a /= 2;
@@ -502,12 +297,12 @@ void validity_checker::validate_inlines()
 	resulti32 = div_32x32_shift(s32(testi64a), testi32a, 3);
 	expectedi32 = (s64(s32(testi64a)) << 3) / s64(testi32a);
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing div_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", s32(testi64a), testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing div_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", s32(testi64a), s32(testi32a), resulti32, expectedi32);
 
 	resultu32 = divu_32x32_shift(u32(testu64a), testu32a, 3);
 	expectedu32 = (u64(u32(testu64a)) << 3) / u64(testu32a);
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing divu_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", u32(testu64a), testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing divu_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", u32(testu64a), u32(testu32a), resultu32, expectedu32);
 
 	if (fabsf(recip_approx(100.0f) - 0.01f) > 0.0001f)
 		osd_printf_error("Error testing recip_approx\n");
@@ -515,14 +310,14 @@ void validity_checker::validate_inlines()
 	for (int i = 0; i <= 32; i++)
 	{
 		u32 t = i < 32 ? (1 << (31 - i) | testu32a >> i) : 0;
-		u8 resultu8 = count_leading_zeros(t);
+		u8 resultu8 = count_leading_zeros_32(t);
 		if (resultu8 != i)
-			osd_printf_error("Error testing count_leading_zeros %08x=%02x (expected %02x)\n", t, resultu8, i);
+			osd_printf_error("Error testing count_leading_zeros_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
 
 		t ^= 0xffffffff;
-		resultu8 = count_leading_ones(t);
+		resultu8 = count_leading_ones_32(t);
 		if (resultu8 != i)
-			osd_printf_error("Error testing count_leading_ones %08x=%02x (expected %02x)\n", t, resultu8, i);
+			osd_printf_error("Error testing count_leading_ones_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
 	}
 }
 
@@ -532,7 +327,7 @@ void validity_checker::validate_inlines()
 //  class
 //-------------------------------------------------
 
-void validity_checker::validate_rgb()
+void validate_rgb()
 {
 	/*
 	    This performs cursory tests of most of the vector-optimised RGB
@@ -560,33 +355,33 @@ void validity_checker::validate_rgb()
 	    scale2_add_and_clamp(const rgbaint_t&, const rgbaint_t&, const rgbaint_t&)
 	    scale_add_and_clamp(const rgbaint_t&, const rgbaint_t&);
 	    scale_imm_add_and_clamp(const s32, const rgbaint_t&);
-	    static bilinear_filter(u32, u32, u32, u32, u8, u8)
-	    bilinear_filter_rgbaint(u32, u32, u32, u32, u8, u8)
 	*/
 
-	auto random_i32_nolimit = [this]
-	{
-		s32 result;
-		do { result = random_i32(); } while ((result == std::numeric_limits<s32>::min()) || (result == std::numeric_limits<s32>::max()));
-		return result;
-	};
+	auto random_i32_nolimit =
+			[] ()
+			{
+				s32 result;
+				do { result = random_i32(); } while ((result == std::numeric_limits<s32>::min()) || (result == std::numeric_limits<s32>::max()));
+				return result;
+			};
 
 	volatile s32 expected_a, expected_r, expected_g, expected_b;
 	volatile s32 actual_a, actual_r, actual_g, actual_b;
 	volatile s32 imm;
 	rgbaint_t rgb, other;
 	rgb_t packed;
-	auto check_expected = [&] (const char *desc)
-	{
-		const volatile s32 a = rgb.get_a32();
-		const volatile s32 r = rgb.get_r32();
-		const volatile s32 g = rgb.get_g32();
-		const volatile s32 b = rgb.get_b32();
-		if (a != expected_a) osd_printf_error("Error testing %s get_a32() = %d (expected %d)\n", desc, a, expected_a);
-		if (r != expected_r) osd_printf_error("Error testing %s get_r32() = %d (expected %d)\n", desc, r, expected_r);
-		if (g != expected_g) osd_printf_error("Error testing %s get_g32() = %d (expected %d)\n", desc, g, expected_g);
-		if (b != expected_b) osd_printf_error("Error testing %s get_b32() = %d (expected %d)\n", desc, b, expected_b);
-	};
+	auto check_expected =
+			[&] (const char *desc)
+			{
+				const volatile s32 a = rgb.get_a32();
+				const volatile s32 r = rgb.get_r32();
+				const volatile s32 g = rgb.get_g32();
+				const volatile s32 b = rgb.get_b32();
+				if (a != expected_a) osd_printf_error("Error testing %s get_a32() = %d (expected %d)\n", desc, s32(a), s32(expected_a));
+				if (r != expected_r) osd_printf_error("Error testing %s get_r32() = %d (expected %d)\n", desc, s32(r), s32(expected_r));
+				if (g != expected_g) osd_printf_error("Error testing %s get_g32() = %d (expected %d)\n", desc, s32(g), s32(expected_g));
+				if (b != expected_b) osd_printf_error("Error testing %s get_b32() = %d (expected %d)\n", desc, s32(b), s32(expected_b));
+			};
 
 	// check set/get
 	expected_a = random_i32();
@@ -901,10 +696,10 @@ void validity_checker::validate_rgb()
 	actual_r = s32(u32(rgb.get_r()));
 	actual_g = s32(u32(rgb.get_g()));
 	actual_b = s32(u32(rgb.get_b()));
-	if (actual_a != expected_a) osd_printf_error("Error testing rgbaint_t::get_a() = %d (expected %d)\n", actual_a, expected_a);
-	if (actual_r != expected_r) osd_printf_error("Error testing rgbaint_t::get_r() = %d (expected %d)\n", actual_r, expected_r);
-	if (actual_g != expected_g) osd_printf_error("Error testing rgbaint_t::get_g() = %d (expected %d)\n", actual_g, expected_g);
-	if (actual_b != expected_b) osd_printf_error("Error testing rgbaint_t::get_b() = %d (expected %d)\n", actual_b, expected_b);
+	if (actual_a != expected_a) osd_printf_error("Error testing rgbaint_t::get_a() = %d (expected %d)\n", s32(actual_a), s32(expected_a));
+	if (actual_r != expected_r) osd_printf_error("Error testing rgbaint_t::get_r() = %d (expected %d)\n", s32(actual_r), s32(expected_r));
+	if (actual_g != expected_g) osd_printf_error("Error testing rgbaint_t::get_g() = %d (expected %d)\n", s32(actual_g), s32(expected_g));
+	if (actual_b != expected_b) osd_printf_error("Error testing rgbaint_t::get_b() = %d (expected %d)\n", s32(actual_b), s32(expected_b));
 
 	// test set from packed RGBA
 	imm = random_i32();
@@ -1392,6 +1187,768 @@ void validity_checker::validate_rgb()
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.cmplt_imm_rgba(actual_a + 1, std::numeric_limits<s32>::min(), std::numeric_limits<s32>::max(), actual_b);
 	check_expected("rgbaint_t::cmplt_imm_rgba");
+
+	// test bilinear_filter and bilinear_filter_rgbaint
+	// SSE implementation carries more internal precision between the bilinear stages
+#if defined(MAME_RGB_HIGH_PRECISION)
+	const int first_shift = 1;
+#else
+	const int first_shift = 8;
+#endif
+	for (int index = 0; index < 1000; index++)
+	{
+		u8 u, v;
+		rgbaint_t rgb_point[4];
+		u32 top_row, bottom_row;
+
+		for (int i = 0; i < 4; i++)
+		{
+			rgb_point[i].set(random_u32());
+		}
+
+		switch (index)
+		{
+			case 0: u = 0; v = 0; break;
+			case 1: u = 255; v = 255; break;
+			case 2: u = 0; v = 255; break;
+			case 3: u = 255; v = 0; break;
+			case 4: u = 128; v = 128; break;
+			case 5: u = 63; v = 32; break;
+			default:
+				u = random_u32() & 0xff;
+				v = random_u32() & 0xff;
+				break;
+		}
+
+		top_row = (rgb_point[0].get_a() * (256 - u) + rgb_point[1].get_a() * u) >> first_shift;
+		bottom_row = (rgb_point[2].get_a() * (256 - u) + rgb_point[3].get_a() * u) >> first_shift;
+		expected_a = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+
+		top_row = (rgb_point[0].get_r() * (256 - u) + rgb_point[1].get_r() * u) >> first_shift;
+		bottom_row = (rgb_point[2].get_r() * (256 - u) + rgb_point[3].get_r() * u) >> first_shift;
+		expected_r = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+
+		top_row = (rgb_point[0].get_g() * (256 - u) + rgb_point[1].get_g() * u) >> first_shift;
+		bottom_row = (rgb_point[2].get_g() * (256 - u) + rgb_point[3].get_g() * u) >> first_shift;
+		expected_g = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+
+		top_row = (rgb_point[0].get_b() * (256 - u) + rgb_point[1].get_b() * u) >> first_shift;
+		bottom_row = (rgb_point[2].get_b() * (256 - u) + rgb_point[3].get_b() * u) >> first_shift;
+		expected_b = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+
+		imm = rgbaint_t::bilinear_filter(rgb_point[0].to_rgba(), rgb_point[1].to_rgba(), rgb_point[2].to_rgba(), rgb_point[3].to_rgba(), u, v);
+		rgb.set(imm);
+		check_expected("rgbaint_t::bilinear_filter");
+
+		rgb.bilinear_filter_rgbaint(rgb_point[0].to_rgba(), rgb_point[1].to_rgba(), rgb_point[2].to_rgba(), rgb_point[3].to_rgba(), u, v);
+		check_expected("rgbaint_t::bilinear_filter_rgbaint");
+	}
+}
+
+
+//-------------------------------------------------
+//  validate_delegates_mfp - test delegate member
+//  function functionality
+//-------------------------------------------------
+
+void validate_delegates_mfp()
+{
+	struct base_a
+	{
+		virtual ~base_a() = default;
+		char get_a(void const *&p) { p = this; return 'a'; }
+		virtual char get_a_v(void const *&p) { p = this; return 'A'; }
+		int a;
+	};
+
+	struct base_b
+	{
+		virtual ~base_b() = default;
+		char get_b(void const *&p) { p = this; return 'b'; }
+		virtual char get_b_v(void const *&p) { p = this; return 'B'; }
+		int b;
+	};
+
+	struct multiple_inheritance : base_a, base_b
+	{
+	};
+
+	struct overridden : base_a, base_b
+	{
+		virtual char get_a_v(void const *&p) override { p = this; return 'x'; }
+		virtual char get_b_v(void const *&p) override { p = this; return 'y'; }
+	};
+
+	multiple_inheritance mi;
+	overridden o;
+	diamond_inheritance d;
+	char ch;
+	void const *addr;
+
+	// test non-virtual member functions and "this" pointer adjustment
+	test_delegate cb1(&multiple_inheritance::get_a, &mi);
+	test_delegate cb2(&multiple_inheritance::get_b, &mi);
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if ('a' != ch)
+		osd_printf_error("Error testing delegate non-virtual member function dispatch\n");
+	if (static_cast<base_a *>(&mi) != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_a *>(&mi)));
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if ('b' != ch)
+		osd_printf_error("Error testing delegate non-virtual member function dispatch\n");
+	if (static_cast<base_b *>(&mi) != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_b *>(&mi)));
+
+	// test that "this" pointer adjustment survives copy construction
+	test_delegate cb3(cb1);
+	test_delegate cb4(cb2);
+
+	addr = nullptr;
+	ch = cb3(addr);
+	if ('a' != ch)
+		osd_printf_error("Error testing copy constructed delegate non-virtual member function dispatch\n");
+	if (static_cast<base_a *>(&mi) != addr)
+		osd_printf_error("Error testing copy constructed delegate this pointer adjustment %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_a *>(&mi)));
+
+	addr = nullptr;
+	ch = cb4(addr);
+	if ('b' != ch)
+		osd_printf_error("Error testing copy constructed delegate non-virtual member function dispatch\n");
+	if (static_cast<base_b *>(&mi) != addr)
+		osd_printf_error("Error testing copy constructed delegate this pointer adjustment %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_b *>(&mi)));
+
+	// test that "this" pointer adjustment survives assignment and doesn't suffer generational loss
+	cb1 = cb4;
+	cb2 = cb3;
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if ('b' != ch)
+		osd_printf_error("Error testing assigned delegate non-virtual member function dispatch\n");
+	if (static_cast<base_b *>(&mi) != addr)
+		osd_printf_error("Error testing assigned delegate this pointer adjustment %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_b *>(&mi)));
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if ('a' != ch)
+		osd_printf_error("Error testing assigned delegate non-virtual member function dispatch\n");
+	if (static_cast<base_a *>(&mi) != addr)
+		osd_printf_error("Error testing assigned delegate this pointer adjustment %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_a *>(&mi)));
+
+	// test virtual member functions and "this" pointer adjustment
+	cb1 = test_delegate(&multiple_inheritance::get_a_v, &mi);
+	cb2 = test_delegate(&multiple_inheritance::get_b_v, &mi);
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if ('A' != ch)
+		osd_printf_error("Error testing delegate virtual member function dispatch\n");
+	if (static_cast<base_a *>(&mi) != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment for virtual member function %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_a *>(&mi)));
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if ('B' != ch)
+		osd_printf_error("Error testing delegate virtual member function dispatch\n");
+	if (static_cast<base_b *>(&mi) != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment for virtual member function %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_b *>(&mi)));
+
+	// test that virtual member functions survive copy construction
+	test_delegate cb5(cb1);
+	test_delegate cb6(cb2);
+
+	addr = nullptr;
+	ch = cb5(addr);
+	if ('A' != ch)
+		osd_printf_error("Error testing copy constructed delegate virtual member function dispatch\n");
+	if (static_cast<base_a *>(&mi) != addr)
+		osd_printf_error("Error testing copy constructed delegate this pointer adjustment for virtual member function %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_a *>(&mi)));
+
+	addr = nullptr;
+	ch = cb6(addr);
+	if ('B' != ch)
+		osd_printf_error("Error testing copy constructed delegate virtual member function dispatch\n");
+	if (static_cast<base_b *>(&mi) != addr)
+		osd_printf_error("Error testing copy constructed delegate this pointer adjustment for virtual member function %p -> %p (expected %p)\n", static_cast<void const *>(&mi), addr, static_cast<void const *>(static_cast<base_b *>(&mi)));
+
+	// test virtual member function dispatch through base pointer
+	cb1 = test_delegate(&base_a::get_a_v, static_cast<base_a *>(&o));
+	cb2 = test_delegate(&base_b::get_b_v, static_cast<base_b *>(&o));
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if ('x' != ch)
+		osd_printf_error("Error testing delegate virtual member function dispatch through base class pointer\n");
+	if (&o != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment for virtual member function through base class pointer %p -> %p (expected %p)\n", static_cast<void const *>(static_cast<base_a *>(&o)), addr, static_cast<void const *>(&o));
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if ('y' != ch)
+		osd_printf_error("Error testing delegate virtual member function dispatch through base class pointer\n");
+	if (&o != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment for virtual member function through base class pointer %p -> %p (expected %p)\n", static_cast<void const *>(static_cast<base_b *>(&o)), addr, static_cast<void const *>(&o));
+
+#if !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 7000)
+	// test creating delegates for a forward-declared class
+	cb1 = make_diamond_class_delegate(&diamond_inheritance::get_derived_a, &d);
+	cb2 = make_diamond_class_delegate(&diamond_inheritance::get_derived_b, &d);
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if ('a' != ch)
+		osd_printf_error("Error testing delegate non-virtual member function dispatch for incomplete class\n");
+	if (static_cast<virtual_derived_a *>(&d) != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment for incomplete class %p -> %p (expected %p)\n", static_cast<void const *>(&d), addr, static_cast<void const *>(static_cast<virtual_derived_b *>(&d)));
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if ('b' != ch)
+		osd_printf_error("Error testing delegate non-virtual member function dispatch for incomplete class\n");
+	if (static_cast<virtual_derived_b *>(&d) != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment for incomplete class %p -> %p (expected %p)\n", static_cast<void const *>(&d), addr, static_cast<void const *>(static_cast<virtual_derived_b *>(&d)));
+
+#if defined(_MSC_VER) && !defined(__clang__)
+	// test MSVC extension allowing casting member pointer types across virtual inheritance relationships
+	cb1 = make_diamond_class_delegate(&diamond_inheritance::get_base, &d);
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if ('x' != ch)
+		osd_printf_error("Error testing delegate non-virtual member function dispatch for incomplete class\n");
+	if (static_cast<virtual_base *>(&d) != addr)
+		osd_printf_error("Error testing delegate this pointer adjustment for incomplete class %p -> %p (expected %p)\n", static_cast<void const *>(&d), addr, static_cast<void const *>(static_cast<virtual_base *>(&d)));
+#endif // defined(_MSC_VER) && !defined(__clang__)
+#endif // !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 7000)
+}
+
+
+//-------------------------------------------------
+//  validate_delegates_latebind - test binding a
+//  delegate to an object after the function is
+//  set
+//-------------------------------------------------
+
+void validate_delegates_latebind()
+{
+	struct derived_a : pure_virtual_base, delegate_late_bind
+	{
+		virtual char operator()(void const *&p) const override { p = this; return 'a'; }
+	};
+
+	struct derived_b : pure_virtual_base, delegate_late_bind
+	{
+		virtual char operator()(void const *&p) const override { p = this; return 'b'; }
+	};
+
+	struct unrelated : delegate_late_bind
+	{
+	};
+
+	char ch;
+	void const *addr;
+	derived_a a;
+	derived_b b;
+	unrelated u;
+
+	// delegate with no target object
+	test_delegate cb1(&pure_virtual_base::operator(), static_cast<pure_virtual_base *>(nullptr));
+
+	// test late bind on construction
+	test_delegate cb2(cb1, a);
+	addr = nullptr;
+	ch = cb2(addr);
+	if (('a' != ch) || (&a != addr))
+		osd_printf_error("Error testing delegate late bind on construction\n");
+
+	// test explicit late bind
+	cb1.late_bind(b);
+	ch = cb1(addr);
+	if (('b' != ch) || (&b != addr))
+		osd_printf_error("Error testing delegate explicit late bind\n");
+
+	// test late bind when object is set
+	cb1.late_bind(a);
+	ch = cb1(addr);
+	if (('a' != ch) || (&a != addr))
+		osd_printf_error("Error testing delegate explicit late bind when object is set\n");
+
+	// test late bind on copy of delegate with target set
+	test_delegate cb3(cb1, b);
+	addr = nullptr;
+	ch = cb3(addr);
+	if (('b' != ch) || (&b != addr))
+		osd_printf_error("Error testing delegate late bind on construction using template with object set\n");
+
+	// test late bind exception
+	ch = '-';
+	try
+	{
+		cb1.late_bind(u);
+	}
+	catch (binding_type_exception const &e)
+	{
+		if ((e.target_type() != typeid(pure_virtual_base)) || (e.actual_type() != typeid(unrelated)))
+		{
+			osd_printf_error(
+					"Error testing delegate late bind type error %s -> %s (expected %s -> %s)\n",
+					e.actual_type().name(),
+					e.target_type().name(),
+					typeid(unrelated).name(),
+					typeid(pure_virtual_base).name());
+		}
+		ch = '+';
+	}
+	if ('+' != ch)
+		osd_printf_error("Error testing delegate late bind type error\n");
+
+	// test syntax for creating delegate with alternate late bind base
+	delegate<char (void const *&), pure_virtual_base> cb4(
+			[] (auto &o, void const *&p) { p = &o; return 'l'; },
+			static_cast<unrelated *>(nullptr));
+	try { cb1.late_bind(a); }
+	catch (binding_type_exception const &) { }
+}
+
+
+//-------------------------------------------------
+//  validate_delegates_functoid - test delegate
+//  functoid functionality
+//-------------------------------------------------
+
+void validate_delegates_functoid()
+{
+	using void_delegate = delegate<void (void const *&)>;
+	struct const_only
+	{
+		char operator()(void const *&p) const { return 'C'; }
+	};
+
+	struct const_or_not
+	{
+		char operator()(void const *&p) { return 'n'; }
+		char operator()(void const *&p) const { return 'c'; }
+	};
+
+	struct noncopyable
+	{
+		noncopyable() = default;
+		noncopyable(noncopyable const &) = delete;
+		noncopyable &operator=(noncopyable const &) = delete;
+
+		char operator()(void const *&p) { p = this; return '*'; }
+	};
+
+	noncopyable n;
+	char ch;
+	void const *addr = nullptr;
+
+	// test that const call operators are supported
+	test_delegate cb1{ const_only() };
+	if ('C' != cb1(addr))
+		osd_printf_error("Error testing delegate functoid dispatch\n");
+
+	// test that non-const call operators are preferred
+	cb1 = test_delegate{ const_or_not() };
+	if ('n' != cb1(addr))
+		osd_printf_error("Error testing delegate functoid dispatch\n");
+
+	// test that functoids are implicitly mutable
+	cb1 = test_delegate{ [a = &addr, c = '0'] (void const *&p) mutable { p = a; return c++; } };
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if (('0' != ch) || (&addr != addr))
+		osd_printf_error("Error testing delegate functoid %c (expected 0)\n", ch);
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if (('1' != ch) || (&addr != addr))
+		osd_printf_error("Error testing delegate functoid %c (expected 1)\n", ch);
+
+	// test that functoids survive copy construction
+	test_delegate cb2(cb1);
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if (('2' != ch) || (&addr != addr))
+		osd_printf_error("Error testing delegate functoid %c (expected 2)\n", ch);
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if (('3' != ch) || (&addr != addr))
+		osd_printf_error("Error testing delegate functoid %c (expected 3)\n", ch);
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if (('2' != ch) || (&addr != addr))
+		osd_printf_error("Error testing delegate functoid %c (expected 2)\n", ch);
+
+	// test that functoids survive assignment
+	cb1 = cb2;
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if (('4' != ch) || (&addr != addr))
+		osd_printf_error("Error testing delegate functoid %c (expected 4)\n", ch);
+
+	addr = nullptr;
+	ch = cb1(addr);
+	if (('5' != ch) || (&addr != addr))
+		osd_printf_error("Error testing delegate functoid %c (expected 5)\n", ch);
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if (('4' != ch) || (&addr != addr))
+		osd_printf_error("Error testing delegate functoid %c (expected 4)\n", ch);
+
+	// test that std::ref can be used with non-copyable functoids
+	test_delegate cb3(std::ref(n));
+
+	addr = nullptr;
+	ch = cb3(addr);
+	if (('*' != ch) || (&n != addr))
+		osd_printf_error("Error testing delegate with functoid reference wrapper %p (expected %p)\n", addr, static_cast<void const *>(&n));
+
+	// test that std::ref survives copy construction and assignment
+	cb2 = cb3;
+	test_delegate cb4(cb3);
+
+	addr = nullptr;
+	ch = cb2(addr);
+	if (('*' != ch) || (&n != addr))
+		osd_printf_error("Error testing delegate with functoid reference wrapper %p (expected %p)\n", addr, static_cast<void const *>(&n));
+
+	addr = nullptr;
+	ch = cb4(addr);
+	if (('*' != ch) || (&n != addr))
+		osd_printf_error("Error testing delegate with functoid reference wrapper %p (expected %p)\n", addr, static_cast<void const *>(&n));
+
+	// test discarding return value for delegates returning void
+	void_delegate void_cb1{ [&cb1] (void const *&p) { p = &cb1; return 123; } };
+	void_delegate void_cb2{ std::ref(n) };
+
+	addr = nullptr;
+	void_cb1(addr);
+	if (&cb1 != addr)
+		osd_printf_error("Error testing delegate with functoid requiring adapter %p (expected %p)\n", addr, static_cast<void const *>(&cb1));
+
+	addr = nullptr;
+	void_cb2(addr);
+	if (&n != addr)
+		osd_printf_error("Error testing delegate with functoid requiring adapter %p (expected %p)\n", addr, static_cast<void const *>(&n));
+
+	// test that adaptor is generated after assignment
+	void_cb2 = void_cb1;
+
+	addr = nullptr;
+	void_cb2(addr);
+	if (&cb1 != addr)
+		osd_printf_error("Error testing delegate with functoid requiring adapter %p (expected %p)\n", addr, static_cast<void const *>(&cb1));
+}
+
+} // anonymous namespace
+
+
+
+//-------------------------------------------------
+//  get_defstr_index - return the index of the
+//  string assuming it is one of the default
+//  strings
+//-------------------------------------------------
+
+inline int validity_checker::get_defstr_index(const char *string, bool suppress_error)
+{
+	// check for strings that should be DEF_STR
+	auto strindex = m_defstr_map.find(string);
+	if (!suppress_error && strindex != m_defstr_map.end() && string != ioport_string_from_index(strindex->second))
+		osd_printf_error("Must use DEF_STR( %s )\n", string);
+	return (strindex != m_defstr_map.end()) ? strindex->second : 0;
+}
+
+
+
+//-------------------------------------------------
+//  validate_tag - ensure that the given tag
+//  meets the general requirements
+//-------------------------------------------------
+
+void validity_checker::validate_tag(const char *tag)
+{
+	// some common names that are now deprecated
+	if (strcmp(tag, "main") == 0 || strcmp(tag, "audio") == 0 || strcmp(tag, "sound") == 0 || strcmp(tag, "left") == 0 || strcmp(tag, "right") == 0)
+		osd_printf_error("Invalid generic tag '%s' used\n", tag);
+
+	// scan for invalid characters
+	static char const *const validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
+	for (char const *p = tag; *p; ++p)
+	{
+		// only lower-case permitted
+		if (*p != tolower(u8(*p)))
+		{
+			osd_printf_error("Tag '%s' contains upper-case characters\n", tag);
+			break;
+		}
+		if (*p == ' ')
+		{
+			osd_printf_error("Tag '%s' contains spaces\n", tag);
+			break;
+		}
+		if (!strchr(validchars, *p))
+		{
+			osd_printf_error("Tag '%s' contains invalid character '%c'\n",  tag, *p);
+			break;
+		}
+	}
+
+	// find the start of the final tag
+	const char *begin = strrchr(tag, ':');
+	if (begin == nullptr)
+		begin = tag;
+	else
+		begin += 1;
+
+	// 0-length = bad
+	if (*begin == 0)
+		osd_printf_error("Found 0-length tag\n");
+
+	// too short/too long = bad
+	if (strlen(begin) < MIN_TAG_LENGTH)
+		osd_printf_error("Tag '%s' is too short (must be at least %d characters)\n", tag, MIN_TAG_LENGTH);
+}
+
+
+
+//**************************************************************************
+//  VALIDATION FUNCTIONS
+//**************************************************************************
+
+//-------------------------------------------------
+//  validity_checker - constructor
+//-------------------------------------------------
+
+validity_checker::validity_checker(emu_options &options, bool quick)
+	: m_drivlist(options)
+	, m_errors(0)
+	, m_warnings(0)
+	, m_print_verbose(options.verbose())
+	, m_current_driver(nullptr)
+	, m_current_device(nullptr)
+	, m_current_ioport(nullptr)
+	, m_checking_card(false)
+	, m_quick(quick)
+{
+	// pre-populate the defstr map with all the default strings
+	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
+	{
+		const char *string = ioport_string_from_index(strnum);
+		if (string != nullptr)
+			m_defstr_map.insert(std::make_pair(string, strnum));
+	}
+}
+
+//-------------------------------------------------
+//  validity_checker - destructor
+//-------------------------------------------------
+
+validity_checker::~validity_checker()
+{
+	validate_end();
+}
+
+//-------------------------------------------------
+//  check_driver - check a single driver
+//-------------------------------------------------
+
+void validity_checker::check_driver(const game_driver &driver)
+{
+	// simply validate the one driver
+	validate_begin();
+	validate_one(driver);
+	validate_end();
+}
+
+
+//-------------------------------------------------
+//  check_shared_source - check all drivers that
+//  share the same source file as the given driver
+//-------------------------------------------------
+
+void validity_checker::check_shared_source(const game_driver &driver)
+{
+	// initialize
+	validate_begin();
+
+	// then iterate over all drivers and check the ones that share the same source file
+	m_drivlist.reset();
+	while (m_drivlist.next())
+		if (strcmp(driver.type.source(), m_drivlist.driver().type.source()) == 0)
+			validate_one(m_drivlist.driver());
+
+	// cleanup
+	validate_end();
+}
+
+
+//-------------------------------------------------
+//  check_all_matching - check all drivers whose
+//  names match the given string
+//-------------------------------------------------
+
+bool validity_checker::check_all_matching(const char *string)
+{
+	// start by checking core stuff
+	validate_begin();
+	validate_integer_semantics();
+	validate_inlines();
+	validate_rgb();
+	validate_delegates_mfp();
+	validate_delegates_latebind();
+	validate_delegates_functoid();
+
+	// if we had warnings or errors, output
+	if (m_errors > 0 || m_warnings > 0 || !m_verbose_text.empty())
+	{
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Core: %d errors, %d warnings\n", m_errors, m_warnings);
+		if (m_errors > 0)
+			output_indented_errors(m_error_text, "Errors");
+		if (m_warnings > 0)
+			output_indented_errors(m_warning_text, "Warnings");
+		if (!m_verbose_text.empty())
+			output_indented_errors(m_verbose_text, "Messages");
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
+	}
+
+	// then iterate over all drivers and check them
+	m_drivlist.reset();
+	bool validated_any = false;
+	while (m_drivlist.next())
+	{
+		if (driver_list::matches(string, m_drivlist.driver().name))
+		{
+			validate_one(m_drivlist.driver());
+			validated_any = true;
+		}
+	}
+
+	// validate devices
+	if (!string)
+		validate_device_types();
+
+	// cleanup
+	validate_end();
+
+	// if we failed to match anything, it
+	if (string && !validated_any)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", string);
+
+	return !(m_errors > 0 || m_warnings > 0);
+}
+
+
+//-------------------------------------------------
+//  validate_begin - prepare for validation by
+//  taking over the output callbacks and resetting
+//  our internal state
+//-------------------------------------------------
+
+void validity_checker::validate_begin()
+{
+	// take over error and warning outputs
+	osd_output::push(this);
+
+	// reset all our maps
+	m_names_map.clear();
+	m_descriptions_map.clear();
+	m_roms_map.clear();
+	m_defstr_map.clear();
+	m_region_map.clear();
+	m_ioport_set.clear();
+
+	// reset internal state
+	m_errors = 0;
+	m_warnings = 0;
+	m_already_checked.clear();
+}
+
+
+//-------------------------------------------------
+//  validate_end - restore output callbacks and
+//  clean up
+//-------------------------------------------------
+
+void validity_checker::validate_end()
+{
+	// restore the original output callbacks
+	osd_output::pop(this);
+}
+
+
+//-------------------------------------------------
+//  validate_drivers - master validity checker
+//-------------------------------------------------
+
+void validity_checker::validate_one(const game_driver &driver)
+{
+	// help verbose validation detect configuration-related crashes
+	if (m_print_verbose)
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.type.source()));
+
+	// set the current driver
+	m_current_driver = &driver;
+	m_current_device = nullptr;
+	m_current_ioport = nullptr;
+	m_region_map.clear();
+	m_ioport_set.clear();
+	m_checking_card = false;
+
+	// reset error/warning state
+	int start_errors = m_errors;
+	int start_warnings = m_warnings;
+	m_error_text.clear();
+	m_warning_text.clear();
+	m_verbose_text.clear();
+
+	// wrap in try/catch to catch fatalerrors
+	try
+	{
+		machine_config config(driver, m_blank_options);
+		validate_driver(config.root_device());
+		validate_roms(config.root_device());
+		validate_inputs(config.root_device());
+		validate_devices(config);
+	}
+	catch (emu_fatalerror const &err)
+	{
+		osd_printf_error("Fatal error %s", err.what());
+	}
+
+	// if we had warnings or errors, output
+	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
+	{
+		if (!m_print_verbose)
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.type.source()));
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%d errors, %d warnings\n", m_errors - start_errors, m_warnings - start_warnings);
+		if (m_errors > start_errors)
+			output_indented_errors(m_error_text, "Errors");
+		if (m_warnings > start_warnings)
+			output_indented_errors(m_warning_text, "Warnings");
+		if (!m_verbose_text.empty())
+			output_indented_errors(m_verbose_text, "Messages");
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
+	}
+
+	// reset the driver/device
+	m_current_driver = nullptr;
+	m_current_device = nullptr;
+	m_current_ioport = nullptr;
+	m_region_map.clear();
+	m_ioport_set.clear();
+	m_checking_card = false;
 }
 
 
@@ -1400,26 +1957,26 @@ void validity_checker::validate_rgb()
 //  information
 //-------------------------------------------------
 
-void validity_checker::validate_driver()
+void validity_checker::validate_driver(device_t &root)
 {
 	// check for duplicate names
 	if (!m_names_map.insert(std::make_pair(m_current_driver->name, m_current_driver)).second)
 	{
 		const game_driver *match = m_names_map.find(m_current_driver->name)->second;
-		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
+		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()), match->name);
 	}
 
 	// check for duplicate descriptions
 	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->type.fullname(), m_current_driver)).second)
 	{
 		const game_driver *match = m_descriptions_map.find(m_current_driver->type.fullname())->second;
-		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
+		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()), match->name);
 	}
 
 	// determine if we are a clone
 	bool is_clone = (strcmp(m_current_driver->parent, "0") != 0);
-	int clone_of = m_drivlist.clone(*m_current_driver);
-	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
+	int clone_of = driver_list::clone(*m_current_driver);
+	if (clone_of != -1 && (driver_list::driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 		is_clone = false;
 
 	// if we have at least 100 drivers, validate the clone
@@ -1428,12 +1985,16 @@ void validity_checker::validate_driver()
 		osd_printf_error("Driver is a clone of nonexistent driver %s\n", m_current_driver->parent);
 
 	// look for recursive cloning
-	if (clone_of != -1 && &m_drivlist.driver(clone_of) == m_current_driver)
+	if (clone_of != -1 && &driver_list::driver(clone_of) == m_current_driver)
 		osd_printf_error("Driver is a clone of itself\n");
 
 	// look for clones that are too deep
-	if (clone_of != -1 && (clone_of = m_drivlist.non_bios_clone(clone_of)) != -1)
+	if (clone_of != -1 && (clone_of = driver_list::non_bios_clone(clone_of)) != -1)
 		osd_printf_error("Driver is a clone of a clone\n");
+
+	// look for drivers specifying a parent ROM device type
+	if (root.type().parent_rom_device_type())
+		osd_printf_error("Driver has parent ROM device type '%s'\n", root.type().parent_rom_device_type()->shortname());
 
 	// make sure the driver name is not too long
 	if (!is_clone && strlen(m_current_driver->name) > 16)
@@ -1463,16 +2024,16 @@ void validity_checker::validate_driver()
 		compatible_with = nullptr;
 
 	// check for this driver being compatible with a nonexistent driver
-	if (compatible_with != nullptr && m_drivlist.find(m_current_driver->compatible_with) == -1)
+	if (compatible_with != nullptr && driver_list::find(m_current_driver->compatible_with) == -1)
 		osd_printf_error("Driver is listed as compatible with nonexistent driver %s\n", m_current_driver->compatible_with);
 
 	// check for clone_of and compatible_with being specified at the same time
-	if (m_drivlist.clone(*m_current_driver) != -1 && compatible_with != nullptr)
+	if (driver_list::clone(*m_current_driver) != -1 && compatible_with != nullptr)
 		osd_printf_error("Driver cannot be both a clone and listed as compatible with another system\n");
 
 	// find any recursive dependencies on the current driver
-	for (int other_drv = m_drivlist.compatible_with(*m_current_driver); other_drv != -1; other_drv = m_drivlist.compatible_with(other_drv))
-		if (m_current_driver == &m_drivlist.driver(other_drv))
+	for (int other_drv = driver_list::compatible_with(*m_current_driver); other_drv != -1; other_drv = driver_list::compatible_with(other_drv))
+		if (m_current_driver == &driver_list::driver(other_drv))
 		{
 			osd_printf_error("Driver is recursively compatible with itself\n");
 			break;
@@ -1483,18 +2044,18 @@ void validity_checker::validate_driver()
 	device_t::feature_type const imperfect(m_current_driver->type.imperfect_features());
 	if (!(m_current_driver->flags & (machine_flags::IS_BIOS_ROOT | machine_flags::NO_SOUND_HW)) && !(unemulated & device_t::feature::SOUND))
 	{
-		sound_interface_iterator iter(m_current_config->root_device());
+		sound_interface_enumerator iter(root);
 		if (!iter.first())
 			osd_printf_error("Driver is missing MACHINE_NO_SOUND or MACHINE_NO_SOUND_HW flag\n");
 	}
 
 	// catch invalid flag combinations
 	if (unemulated & ~device_t::feature::ALL)
-		osd_printf_error("Driver has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+		osd_printf_error("Driver has invalid unemulated feature flags (0x%08X)\n", util::underlying_value(unemulated & ~device_t::feature::ALL));
 	if (imperfect & ~device_t::feature::ALL)
-		osd_printf_error("Driver has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+		osd_printf_error("Driver has invalid imperfect feature flags (0x%08X)\n", util::underlying_value(imperfect & ~device_t::feature::ALL));
 	if (unemulated & imperfect)
-		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
+		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08X)\n", util::underlying_value(unemulated & imperfect));
 	if ((m_current_driver->flags & machine_flags::NO_SOUND_HW) && ((unemulated | imperfect) & device_t::feature::SOUND))
 		osd_printf_error("Machine without sound hardware cannot have unemulated/imperfect sound\n");
 }
@@ -1507,7 +2068,7 @@ void validity_checker::validate_driver()
 void validity_checker::validate_roms(device_t &root)
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	for (device_t &device : device_iterator(root))
+	for (device_t &device : device_enumerator(root))
 	{
 		// track the current device
 		m_current_device = &device;
@@ -1550,8 +2111,8 @@ void validity_checker::validate_roms(device_t &root)
 
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
-				if (!m_region_map.insert(std::make_pair(fulltag, current_length)).second)
-					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag.c_str());
+				if (!m_region_map.emplace(fulltag, current_length).second)
+					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag);
 			}
 			else if (ROMENTRY_ISSYSTEM_BIOS(romp)) // If this is a system bios, make sure it is using the next available bios number
 			{
@@ -1579,7 +2140,7 @@ void validity_checker::validate_roms(device_t &root)
 					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags - 1);
 				auto const descins = bios_descs.emplace(romp->hashdata, biosname);
 				if (!descins.second)
-					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second.c_str());
+					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second);
 			}
 			else if (ROMENTRY_ISDEFAULT_BIOS(romp)) // if this is a default BIOS setting, remember it so it to check at the end
 			{
@@ -1619,11 +2180,15 @@ void validity_checker::validate_roms(device_t &root)
 			}
 		}
 
+		// if we haven't seen any items since the last region, print a warning
+		if (items_since_region == 0)
+			osd_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
+
 		// check that default BIOS exists
 		if (defbios && (bios_names.find(defbios) == bios_names.end()))
 			osd_printf_error("Default BIOS '%s' not found\n", defbios);
 		if (!device.get_default_bios_tag().empty() && (bios_names.find(device.get_default_bios_tag()) == bios_names.end()))
-			osd_printf_error("Configured BIOS '%s' not found\n", device.get_default_bios_tag().c_str());
+			osd_printf_error("Configured BIOS '%s' not found\n", device.get_default_bios_tag());
 
 		// check that there aren't ROMs for a non-existent BIOS option
 		if (max_bios > last_bios)
@@ -1644,7 +2209,7 @@ void validity_checker::validate_roms(device_t &root)
 //  analog input field
 //-------------------------------------------------
 
-void validity_checker::validate_analog_input_field(ioport_field &field)
+void validity_checker::validate_analog_input_field(const ioport_field &field)
 {
 	// analog ports must have a valid sensitivity
 	if (field.sensitivity() == 0)
@@ -1725,54 +2290,56 @@ void validity_checker::validate_analog_input_field(ioport_field &field)
 //  setting
 //-------------------------------------------------
 
-void validity_checker::validate_dip_settings(ioport_field &field)
+void validity_checker::validate_dip_settings(const ioport_field &field)
 {
-	const char *demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
-	const char *flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
+	char const *const demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
+	char const *const flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
+	char const *const name = field.specific_name();
 	u8 coin_list[__input_string_coinage_end + 1 - __input_string_coinage_start] = { 0 };
 	bool coin_error = false;
 
 	// iterate through the settings
-	for (ioport_setting &setting : field.settings())
+	for (auto setting = field.settings().begin(); field.settings().end() != setting; ++setting)
 	{
 		// note any coinage strings
-		int strindex = get_defstr_index(setting.name());
+		int strindex = get_defstr_index(setting->name());
 		if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end)
 			coin_list[strindex - __input_string_coinage_start] = 1;
 
 		// make sure demo sounds default to on
-		if (field.name() == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting.value())
+		if (name == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting->value())
 			osd_printf_error("Demo Sounds must default to On\n");
 
 		// check for bad demo sounds options
-		if (field.name() == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			osd_printf_error("Demo Sounds option must be Off/On, not %s\n", setting.name());
+		if (name == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+			osd_printf_error("Demo Sounds option must be Off/On, not %s\n", setting->name());
 
 		// check for bad flip screen options
-		if (field.name() == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting.name());
+		if (name == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name());
 
 		// if we have a neighbor, compare ourselves to him
-		if (setting.next() != nullptr)
+		auto const nextsetting = std::next(setting);
+		if (field.settings().end() != nextsetting)
 		{
-			// check for inverted off/on dispswitch order
-			int next_strindex = get_defstr_index(setting.next()->name(), true);
+			// check for inverted off/on DIP switch order
+			int next_strindex = get_defstr_index(nextsetting->name(), true);
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
-				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", field.name());
+				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", name);
 
-			// check for inverted yes/no dispswitch order
+			// check for inverted yes/no DIP switch order
 			else if (strindex == INPUT_STRING_Yes && next_strindex == INPUT_STRING_No)
-				osd_printf_error("%s option must have Yes/No options in the order: No, Yes\n", field.name());
+				osd_printf_error("%s option must have Yes/No options in the order: No, Yes\n", name);
 
-			// check for inverted upright/cocktail dispswitch order
+			// check for inverted upright/cocktail DIP switch order
 			else if (strindex == INPUT_STRING_Cocktail && next_strindex == INPUT_STRING_Upright)
-				osd_printf_error("%s option must have Upright/Cocktail options in the order: Upright, Cocktail\n", field.name());
+				osd_printf_error("%s option must have Upright/Cocktail options in the order: Upright, Cocktail\n", name);
 
 			// check for proper coin ordering
 			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
-						strindex >= next_strindex && setting.condition() == setting.next()->condition())
+						strindex >= next_strindex && setting->condition() == nextsetting->condition())
 			{
-				osd_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting.name(), setting.next()->name());
+				osd_printf_error("%s option has unsorted coinage %s > %s\n", name, setting->name(), nextsetting->name());
 				coin_error = true;
 			}
 		}
@@ -1782,7 +2349,7 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 	if (coin_error)
 	{
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "   Note proper coin sort order should be:\n");
-		for (int entry = 0; entry < ARRAY_LENGTH(coin_list); entry++)
+		for (int entry = 0; entry < std::size(coin_list); entry++)
 			if (coin_list[entry])
 				output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "      %s\n", ioport_string_from_index(__input_string_coinage_start + entry));
 	}
@@ -1794,11 +2361,10 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 //  stored within an ioport field or setting
 //-------------------------------------------------
 
-void validity_checker::validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map)
+void validity_checker::validate_condition(const ioport_condition &condition, device_t &device)
 {
-	// resolve the tag
-	// then find a matching port
-	if (port_map.find(device.subtag(condition.tag())) == port_map.end())
+	// resolve the tag, then find a matching port
+	if (m_ioport_set.find(device.subtag(condition.tag())) == m_ioport_set.end())
 		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
 }
 
@@ -1807,12 +2373,10 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 //  validate_inputs - validate input configuration
 //-------------------------------------------------
 
-void validity_checker::validate_inputs()
+void validity_checker::validate_inputs(device_t &root)
 {
-	std::unordered_set<std::string> port_map;
-
 	// iterate over devices
-	for (device_t &device : device_iterator(m_current_config->root_device()))
+	for (device_t &device : device_enumerator(root))
 	{
 		// see if this device has ports; if not continue
 		if (device.input_ports() == nullptr)
@@ -1828,11 +2392,11 @@ void validity_checker::validate_inputs()
 
 		// report any errors during construction
 		if (!errorbuf.empty())
-			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.c_str());
+			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf);
 
 		// do a first pass over ports to add their names and find duplicates
 		for (auto &port : portlist)
-			if (!port_map.insert(port.second->tag()).second)
+			if (!m_ioport_set.insert(port.second->tag()).second)
 				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port.second->tag());
 
 		// iterate over ports
@@ -1840,8 +2404,24 @@ void validity_checker::validate_inputs()
 		{
 			m_current_ioport = port.second->tag();
 
+			// scan for invalid characters
+			static char const *const validchars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.:^$";
+			for (char const *p = m_current_ioport; *p; ++p)
+			{
+				if (*p == ' ')
+				{
+					osd_printf_error("Tag '%s' contains spaces\n", m_current_ioport);
+					break;
+				}
+				if (!strchr(validchars, *p))
+				{
+					osd_printf_error("Tag '%s' contains invalid character '%c'\n",  m_current_ioport, *p);
+					break;
+				}
+			}
+
 			// iterate through the fields on this port
-			for (ioport_field &field : port.second->fields())
+			for (ioport_field const &field : port.second->fields())
 			{
 				// verify analog inputs
 				if (field.is_analog())
@@ -1888,19 +2468,16 @@ void validity_checker::validate_inputs()
 					// check for invalid UTF-8
 					if (!utf8_is_valid_string(name))
 						osd_printf_error("Field '%s' has invalid characters\n", name);
-
-					// look up the string and print an error if default strings are not used
-					/*strindex =get_defstr_index(defstr_map, name, driver, &error);*/
 				}
 
 				// verify conditions on the field
 				if (!field.condition().none())
-					validate_condition(field.condition(), device, port_map);
+					validate_condition(field.condition(), device);
 
 				// verify conditions on the settings
-				for (ioport_setting &setting : field.settings())
+				for (ioport_setting const &setting : field.settings())
 					if (!setting.condition().none())
-						validate_condition(setting.condition(), device, port_map);
+						validate_condition(setting.condition(), device);
 
 				// verify natural keyboard codes
 				for (int which = 0; which < 1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1); which++)
@@ -1911,9 +2488,9 @@ void validity_checker::validate_inputs()
 						if (!uchar_isvalid(code))
 						{
 							osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
-								name,
-								(unsigned)code,
-								(int)code);
+									name,
+									(unsigned)code,
+									(int)code);
 						}
 					}
 				}
@@ -1934,17 +2511,17 @@ void validity_checker::validate_inputs()
 //  checks
 //-------------------------------------------------
 
-void validity_checker::validate_devices()
+void validity_checker::validate_devices(machine_config &config)
 {
 	std::unordered_set<std::string> device_map;
 
-	for (device_t &device : device_iterator(m_current_config->root_device()))
+	for (device_t &device : device_enumerator(config.root_device()))
 	{
 		// track the current device
 		m_current_device = &device;
 
 		// validate auto-finders
-		device.findit(true);
+		device.findit(this);
 
 		// validate the device tag
 		validate_tag(device.basetag());
@@ -1970,10 +2547,11 @@ void validity_checker::validate_devices()
 				if (slot->default_option() != nullptr && option.first == slot->default_option())
 					continue;
 
+				m_checking_card = true;
 				device_t *card;
 				{
-					machine_config::token const tok(m_current_config->begin_configuration(slot->device()));
-					card = m_current_config->device_add(option.second->name(), option.second->devtype(), option.second->clock());
+					machine_config::token const tok(config.begin_configuration(slot->device()));
+					card = config.device_add(option.second->name(), option.second->devtype(), option.second->clock());
 
 					const char *const def_bios = option.second->default_bios();
 					if (def_bios)
@@ -1983,7 +2561,7 @@ void validity_checker::validate_devices()
 						additions(card);
 				}
 
-				for (device_slot_interface &subslot : slot_interface_iterator(*card))
+				for (device_slot_interface &subslot : slot_interface_enumerator(*card))
 				{
 					if (subslot.fixed())
 					{
@@ -1991,8 +2569,8 @@ void validity_checker::validate_devices()
 						device_slot_interface::slot_option const *suboption = subslot.option(subslot.default_option());
 						if (suboption)
 						{
-							machine_config::token const tok(m_current_config->begin_configuration(subslot.device()));
-							device_t *const sub_card = m_current_config->device_add(suboption->name(), suboption->devtype(), suboption->clock());
+							machine_config::token const tok(config.begin_configuration(subslot.device()));
+							device_t *const sub_card = config.device_add(suboption->name(), suboption->devtype(), suboption->clock());
 							const char *const sub_bios = suboption->default_bios();
 							if (sub_bios)
 								sub_card->set_default_bios_tag(sub_bios);
@@ -2003,20 +2581,22 @@ void validity_checker::validate_devices()
 					}
 				}
 
-				for (device_t &card_dev : device_iterator(*card))
+				for (device_t &card_dev : device_enumerator(*card))
 					card_dev.config_complete();
 				validate_roms(*card);
 
-				for (device_t &card_dev : device_iterator(*card))
+				for (device_t &card_dev : device_enumerator(*card))
 				{
 					m_current_device = &card_dev;
-					card_dev.findit(true);
+					card_dev.findit(this);
+					validate_tag(card_dev.basetag());
 					card_dev.validity_check(*this);
 					m_current_device = nullptr;
 				}
 
-				machine_config::token const tok(m_current_config->begin_configuration(slot->device()));
-				m_current_config->device_remove(option.second->name());
+				machine_config::token const tok(config.begin_configuration(slot->device()));
+				config.device_remove(option.second->name());
+				m_checking_card = false;
 			}
 		}
 	}
@@ -2042,15 +2622,18 @@ void validity_checker::validate_device_types()
 	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{
-		device_t *const dev = config.device_add("_tmp", type, 0);
+		device_t *const dev = config.device_add(type.shortname(), type, 0);
 
 		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
-		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
+		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()), name) : name);
+
+		if (m_print_verbose)
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating device %s...\n", description);
 
 		// ensure shortname exists
 		if (!dev->shortname() || !*dev->shortname())
 		{
-			osd_printf_error("Device %s does not have short name defined\n", description.c_str());
+			osd_printf_error("Device %s does not have short name defined\n", description);
 		}
 		else
 		{
@@ -2063,7 +2646,7 @@ void validity_checker::validate_device_types()
 			{
 				if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '_'))
 				{
-					osd_printf_error("Device %s short name contains invalid characters\n", description.c_str());
+					osd_printf_error("Device %s short name contains invalid characters\n", description);
 					break;
 				}
 			}
@@ -2075,12 +2658,12 @@ void validity_checker::validate_device_types()
 			if (m_names_map.end() != drvname)
 			{
 				game_driver const &dup(*drvname->second);
-				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description, core_filename_extract_base(dup.type.source()), dup.name);
 			}
 			else if (!devname.second)
 			{
 				device_t *const dup = config.device_add("_dup", *devname.first->second, 0);
-				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description, core_filename_extract_base(dup->source()), dup->shortname());
 				config.device_remove("_dup");
 			}
 		}
@@ -2088,7 +2671,7 @@ void validity_checker::validate_device_types()
 		// ensure name exists
 		if (!dev->name() || !*dev->name())
 		{
-			osd_printf_error("Device %s does not have name defined\n", description.c_str());
+			osd_printf_error("Device %s does not have name defined\n", description);
 		}
 		else
 		{
@@ -2099,35 +2682,57 @@ void validity_checker::validate_device_types()
 			if (m_descriptions_map.end() != drvdesc)
 			{
 				game_driver const &dup(*drvdesc->second);
-				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description, dev->name(), core_filename_extract_base(dup.type.source()), dup.name);
 			}
 			else if (!devdesc.second)
 			{
 				device_t *const dup = config.device_add("_dup", *devdesc.first->second, 0);
-				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description, dev->name(), core_filename_extract_base(dup->source()), dup->shortname());
 				config.device_remove("_dup");
 			}
 		}
 
 		// ensure source exists
 		if (!dev->source() || !*dev->source())
-			osd_printf_error("Device %s does not have source defined\n", description.c_str());
+			osd_printf_error("Device %s does not have source defined\n", description);
 
 		// check that reported type matches supplied type
 		if (dev->type().type() != type.type())
-			osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
+			osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description, dev->type().type().name(), type.type().name());
 
 		// catch invalid flag combinations
 		device_t::feature_type const unemulated(dev->type().unemulated_features());
 		device_t::feature_type const imperfect(dev->type().imperfect_features());
 		if (unemulated & ~device_t::feature::ALL)
-			osd_printf_error("Device has invalid unemulated feature flags (0x%08lX)\n", static_cast<unsigned long>(unemulated & ~device_t::feature::ALL));
+			osd_printf_error("Device has invalid unemulated feature flags (0x%08X)\n", util::underlying_value(unemulated & ~device_t::feature::ALL));
 		if (imperfect & ~device_t::feature::ALL)
-			osd_printf_error("Device has invalid imperfect feature flags (0x%08lX)\n", static_cast<unsigned long>(imperfect & ~device_t::feature::ALL));
+			osd_printf_error("Device has invalid imperfect feature flags (0x%08X)\n", util::underlying_value(imperfect & ~device_t::feature::ALL));
 		if (unemulated & imperfect)
-			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
+			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08X)\n", util::underlying_value(unemulated & imperfect));
 
-		config.device_remove("_tmp");
+		// check that parents are only ever one generation deep
+		auto const parent(dev->type().parent_rom_device_type());
+		if (parent)
+		{
+			auto const grandparent(parent->parent_rom_device_type());
+			if ((dev->type() == *parent) || !strcmp(parent->shortname(), name))
+				osd_printf_error("Device has parent ROM set that identical to its type\n");
+			if (grandparent)
+				osd_printf_error("Device has parent ROM set '%s' which has parent ROM set '%s'\n", parent->shortname(), grandparent->shortname());
+		}
+
+		// give devices some of the same scrutiny that drivers get - necessary for cards not default for any slots
+		validate_roms(*dev);
+		validate_inputs(*dev);
+
+		// reset the device
+		m_current_device = nullptr;
+		m_current_ioport = nullptr;
+		m_region_map.clear();
+		m_ioport_set.clear();
+
+		// remove the device in preparation for re-using the machine configuration
+		config.device_remove(type.shortname());
 	}
 
 	// if we had warnings or errors, output
@@ -2151,18 +2756,15 @@ void validity_checker::validate_device_types()
 //  and device
 //-------------------------------------------------
 
-void validity_checker::build_output_prefix(std::string &str)
+void validity_checker::build_output_prefix(std::ostream &str) const
 {
-	// start empty
-	str.clear();
-
 	// if we have a current (non-root) device, indicate that
-	if (m_current_device != nullptr && m_current_device->owner() != nullptr)
-		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag() + 1).append("': ");
+	if (m_current_device && m_current_device->owner())
+		util::stream_format(str, "%s device '%s': ", m_current_device->name(), m_current_device->tag() + 1);
 
 	// if we have a current port, indicate that as well
-	if (m_current_ioport != nullptr)
-		str.append("ioport '").append(m_current_ioport).append("': ");
+	if (m_current_ioport)
+		util::stream_format(str, "ioport '%s': ", m_current_ioport);
 }
 
 
@@ -2170,9 +2772,9 @@ void validity_checker::build_output_prefix(std::string &str)
 //  error_output - error message output override
 //-------------------------------------------------
 
-void validity_checker::output_callback(osd_output_channel channel, const char *msg, va_list args)
+void validity_checker::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
 {
-	std::string output;
+	std::ostringstream output;
 	switch (channel)
 	{
 	case OSD_OUTPUT_CHANNEL_ERROR:
@@ -2183,8 +2785,8 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 		build_output_prefix(output);
 
 		// generate the string
-		strcatvprintf(output, msg, args);
-		m_error_text.append(output);
+		util::stream_format(output, args);
+		m_error_text.append(output.str());
 		break;
 
 	case OSD_OUTPUT_CHANNEL_WARNING:
@@ -2195,8 +2797,8 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 		build_output_prefix(output);
 
 		// generate the string and output to the original target
-		strcatvprintf(output, msg, args);
-		m_warning_text.append(output);
+		util::stream_format(output, args);
+		m_warning_text.append(output.str());
 		break;
 
 	case OSD_OUTPUT_CHANNEL_VERBOSE:
@@ -2207,12 +2809,12 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 		build_output_prefix(output);
 
 		// generate the string and output to the original target
-		strcatvprintf(output, msg, args);
-		m_verbose_text.append(output);
+		util::stream_format(output, args);
+		m_verbose_text.append(output.str());
 		break;
 
 	default:
-		chain_output(channel, msg, args);
+		chain_output(channel, args);
 		break;
 	}
 }
@@ -2223,14 +2825,11 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 //  can be forwarded onto the given delegate
 //-------------------------------------------------
 
-void validity_checker::output_via_delegate(osd_output_channel channel, const char *format, ...)
+template <typename Format, typename... Params>
+void validity_checker::output_via_delegate(osd_output_channel channel, Format &&fmt, Params &&...args)
 {
-	va_list argptr;
-
 	// call through to the delegate with the proper parameters
-	va_start(argptr, format);
-	chain_output(channel, format, argptr);
-	va_end(argptr);
+	chain_output(channel, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 }
 
 //-------------------------------------------------
@@ -2243,5 +2842,5 @@ void validity_checker::output_indented_errors(std::string &text, const char *hea
 	if (text[text.size()-1] == '\n')
 		text.erase(text.size()-1, 1);
 	strreplace(text, "\n", "\n   ");
-	output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%s:\n   %s\n", header, text.c_str());
+	output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%s:\n   %s\n", header, text);
 }

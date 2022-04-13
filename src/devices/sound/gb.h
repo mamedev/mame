@@ -25,7 +25,7 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 protected:
 	enum
@@ -88,7 +88,7 @@ protected:
 		bool   length_counting;
 		bool   length_enabled;
 		/* Mode 1, 2, 3 */
-		uint64_t cycles_left;
+		int64_t cycles_left;
 		int8_t   duty;
 		/* Mode 1, 2, 4 */
 		bool   envelope_enabled;
@@ -155,7 +155,7 @@ protected:
 	void tick_envelope(struct SOUND &snd);
 	void update_state();
 	bool dac_enabled(struct SOUND &snd);
-	virtual void corrupt_wave_ram() { };
+	virtual void corrupt_wave_ram() { }
 	uint64_t noise_period_cycles();
 	TIMER_CALLBACK_MEMBER(timer_callback);
 };

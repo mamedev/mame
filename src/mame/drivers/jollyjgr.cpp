@@ -123,6 +123,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class jollyjgr_state : public driver_device
@@ -153,19 +154,19 @@ private:
 	optional_shared_ptr<uint8_t> m_bulletram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t      m_nmi_enable;
-	uint8_t      m_flip_x;
-	uint8_t      m_flip_y;
-	uint8_t      m_bitmap_disable;
-	uint8_t      m_tilemap_bank;
-	uint8_t      m_pri;
-	DECLARE_WRITE8_MEMBER(jollyjgr_videoram_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_attrram_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_misc_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_coin_lookout_w);
+	uint8_t      m_nmi_enable = 0;
+	uint8_t      m_flip_x = 0;
+	uint8_t      m_flip_y = 0;
+	uint8_t      m_bitmap_disable = 0;
+	uint8_t      m_tilemap_bank = 0;
+	uint8_t      m_pri = 0;
+	void jollyjgr_videoram_w(offs_t offset, uint8_t data);
+	void jollyjgr_attrram_w(offs_t offset, uint8_t data);
+	void jollyjgr_misc_w(uint8_t data);
+	void jollyjgr_coin_lookout_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -190,13 +191,13 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_videoram_w)
+void jollyjgr_state::jollyjgr_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
+void jollyjgr_state::jollyjgr_attrram_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -214,7 +215,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
 	m_colorram[offset] = data;
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
+void jollyjgr_state::jollyjgr_misc_w(uint8_t data)
 {
 	// they could be swapped, because it always set "data & 3"
 	m_flip_x = data & 1;
@@ -233,7 +234,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
+void jollyjgr_state::jollyjgr_coin_lookout_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 
@@ -485,12 +486,12 @@ TILE_GET_INFO_MEMBER(jollyjgr_state::get_bg_tile_info)
 {
 	int color = m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
 	int region = (m_tilemap_bank & 0x20) ? 2 : 0;
-	SET_TILE_INFO_MEMBER(region, m_videoram[tile_index], color, 0);
+	tileinfo.set(region, m_videoram[tile_index], color, 0);
 }
 
 void jollyjgr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jollyjgr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jollyjgr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
@@ -513,13 +514,13 @@ void jollyjgr_state::draw_bitmap(bitmap_rgb32 &bitmap)
 				if (color)
 				{
 					if (m_flip_x && m_flip_y)
-						bitmap.pix32(y, x * 8 + i) = m_bm_palette->pen_color(color);
+						bitmap.pix(y, x * 8 + i) = m_bm_palette->pen_color(color);
 					else if (m_flip_x && !m_flip_y)
-						bitmap.pix32(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
+						bitmap.pix(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
 					else if (!m_flip_x && m_flip_y)
-						bitmap.pix32(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
+						bitmap.pix(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
 					else
-						bitmap.pix32(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
+						bitmap.pix(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
 				}
 			}
 
@@ -601,7 +602,7 @@ uint32_t jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb
 		if (sy>=cliprect.min_y && sy<=cliprect.max_y)
 			for (int x=sx-4;x<sx;x++)
 				if (x>=cliprect.min_x && x<=cliprect.max_x)
-					bitmap.pix32(sy, x) = m_bm_palette->pen_color(bc);
+					bitmap.pix(sy, x) = m_bm_palette->pen_color(bc);
 	}
 
 	return 0;

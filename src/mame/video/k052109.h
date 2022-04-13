@@ -5,13 +5,12 @@
 
 #pragma once
 
-#include "screen.h"
+#include "tilemap.h"
 
-typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)> k052109_cb_delegate;
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
 
 
-class k052109_device : public device_t, public device_gfx_interface
+class k052109_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 	static const gfx_layout charlayout;
 	static const gfx_layout charlayout_ram;
@@ -19,13 +18,16 @@ class k052109_device : public device_t, public device_gfx_interface
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_ram);
 
 public:
+	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)>;
+
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
 	auto irq_handler() { return m_irq_handler.bind(); }
-	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb = k052109_cb_delegate(std::forward<T>(args)...); }
+	auto firq_handler() { return m_firq_handler.bind(); }
+	auto nmi_handler() { return m_nmi_handler.bind(); }
+	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb.set(std::forward<T>(args)...); }
 	void set_char_ram(bool ram);
-	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	/*
 	The callback is passed:
@@ -50,11 +52,13 @@ public:
 	void set_rmrd_line(int state);
 	int get_rmrd_line();
 	void tilemap_update();
-	int is_irq_enabled();
+	int is_irq_enabled() { return m_irq_enabled; } // FIXME: remove
 	void tilemap_mark_dirty(int tmap_num);
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
 
 	void vblank_callback(screen_device &screen, bool state);
+
+	void set_xy_offset(int dx, int dy);
 
 protected:
 	// device-level overrides
@@ -84,11 +88,11 @@ private:
 	uint8_t    m_irq_enabled;
 	uint8_t    m_romsubbank, m_scrollctrl;
 
+	int        m_dx, m_dy;
+
 	optional_region_ptr<uint8_t> m_char_rom;
 
-	optional_device<screen_device> m_screen;
-
-	k052109_cb_delegate m_k052109_cb;
+	tile_delegate m_k052109_cb;
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_firq_handler;

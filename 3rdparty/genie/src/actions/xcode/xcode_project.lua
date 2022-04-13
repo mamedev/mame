@@ -26,8 +26,8 @@
 			for _, platform in ipairs(prj.solution.xcode.platforms) do
 				local cfg = premake.getconfig(prj, cfgname, platform)
 				cfg.xcode = {}
-				cfg.xcode.targetid = xcode.newid(prj.xcode.projectnode, cfgname)
-				cfg.xcode.projectid = xcode.newid(tr, cfgname)
+				cfg.xcode.targetid = xcode.newid(prj.xcode.projectnode, "tgt:"..platform..cfgname)
+				cfg.xcode.projectid = xcode.newid(tr, "prj:"..platform..cfgname)
 				table.insert(tr.configs, cfg)
 			end
 		end
@@ -112,6 +112,44 @@
 			tree.insert(tr, tr.projects)
 		end
 
+		-- Add intermediate paths so groups have sensible locations
+
+		-- find common prefixes going up the tree
+		tree.traverse(tr, {
+			onbranchexit = function(node)
+				for _, child in ipairs(node.children) do
+					if (child.location) then
+						if (node.location) then
+							while (not string.startswith(child.location, node.location)) do
+								node.location = path.getdirectory(node.location)
+							end
+						else
+							node.location = path.getdirectory(child.location)
+						end
+					end
+				end
+			end,
+			onleaf = function(node)
+				if (node.cfg) then
+					node.location = node.cfg.name
+				end
+			end
+		}, true)
+
+		-- now convert to relative where possible
+		tree.traverse(tr, {
+			onbranchexit = function(node, depth)
+				if (node.location and node.parent and node.parent.location) then
+					node.location = path.getrelative(node.parent.location, node.location)
+				end
+			end,
+			onleaf = function(node, depth)
+				if (node.location and node.parent and node.parent.location) then
+					node.location = path.getrelative(node.parent.location, node.location)
+				end
+			end
+		}, true)
+
 		-- Final setup
 		tree.traverse(tr, {
 			onnode = function(node)
@@ -145,33 +183,4 @@
 		node.fxstageid  = xcode.newid(node, "fxs")
 
 		return tr
-	end
-
-
---
--- Generate an Xcode .xcodeproj for a Premake project.
---
--- @param prj
---    The Premake project to generate.
---
-
-	function premake.xcode.project(prj)
-		local tr = xcode.buildprjtree(prj)
-		xcode.Header(tr)
-		xcode.PBXBuildFile(tr)
-		xcode.PBXContainerItemProxy(tr)
-		xcode.PBXFileReference(tr,prj)
-		xcode.PBXFrameworksBuildPhase(tr)
-		xcode.PBXGroup(tr)
-		xcode.PBXNativeTarget(tr)
-		xcode.PBXProject(tr)
-		xcode.PBXReferenceProxy(tr)
-		xcode.PBXResourcesBuildPhase(tr)
-		xcode.PBXShellScriptBuildPhase(tr)
-		xcode.PBXSourcesBuildPhase(tr,prj)
-		xcode.PBXVariantGroup(tr)
-		xcode.PBXTargetDependency(tr)
-		xcode.XCBuildConfiguration(tr, prj)
-		xcode.XCBuildConfigurationList(tr)
-		xcode.Footer(tr)
 	end

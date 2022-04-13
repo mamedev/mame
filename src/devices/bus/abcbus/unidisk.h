@@ -20,14 +20,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> unidisk_t
+// ======================> abc_unidisk_device
 
-class unidisk_t :  public device_t,
+class abc_unidisk_device :  public device_t,
 				   public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	unidisk_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc_unidisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -58,6 +58,6 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(UNIDISK, unidisk_t)
+DECLARE_DEVICE_TYPE(ABC_UNIDISK, abc_unidisk_device)
 
 #endif // MAME_BUS_ABCBUS_UNIDISK_H

@@ -145,13 +145,13 @@ CUSTOM_INPUT_MEMBER(nova2001_state::ninjakun_io_A002_ctrl_r)
 	return m_ninjakun_io_a002_ctrl;
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_cpu1_io_A002_w)
+void nova2001_state::ninjakun_cpu1_io_A002_w(u8 data)
 {
 	if( data == 0x80 ) m_ninjakun_io_a002_ctrl |= 0x01;
 	if( data == 0x40 ) m_ninjakun_io_a002_ctrl &= ~0x02;
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
+void nova2001_state::ninjakun_cpu2_io_A002_w(u8 data)
 {
 	if( data == 0x40 ) m_ninjakun_io_a002_ctrl |= 0x02;
 	if( data == 0x80 ) m_ninjakun_io_a002_ctrl &= ~0x01;
@@ -211,7 +211,7 @@ void nova2001_state::ninjakun_shared_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().w(FUNC(nova2001_state::fg_videoram_w)).share("fg_videoram");
 	map(0xc800, 0xcfff).rw(FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xd9ff).ram().w(FUNC(nova2001_state::paletteram_w)).share("palette");
+	map(0xd800, 0xd9ff).rw(FUNC(nova2001_state::paletteram_r), FUNC(nova2001_state::paletteram_w));
 }
 
 void nova2001_state::ninjakun_cpu1_map(address_map &map)
@@ -268,7 +268,7 @@ void nova2001_state::raiders5_cpu1_map(address_map &map)
 	map(0xc001, 0xc001).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xc002, 0xc003).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0xc003, 0xc003).r("ay2", FUNC(ay8910_device::data_r));
-	map(0xd000, 0xd1ff).ram().w(FUNC(nova2001_state::paletteram_w)).share("palette");
+	map(0xd000, 0xd1ff).rw(FUNC(nova2001_state::paletteram_r), FUNC(nova2001_state::paletteram_w));
 	map(0xe000, 0xe7ff).ram().share("share1");
 }
 
@@ -393,7 +393,7 @@ static INPUT_PORTS_START( ninjakun )
 
 	PORT_START("IN2")   /* 0xa002 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nova2001_state,ninjakun_io_A002_ctrl_r, nullptr)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(nova2001_state, ninjakun_io_A002_ctrl_r)
 
 	PORT_START("DSW1") // printed "SW 2"
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW2:1")
@@ -570,24 +570,21 @@ static INPUT_PORTS_START( raiders5 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( raiders5ta )
+	PORT_INCLUDE( raiders5 )
 
+	PORT_MODIFY("IN2")
+	// instead of turning Exercise on / off this will flip the screen and swap player 1/2 controls
+	PORT_DIPNAME( 0x40, 0x40, "Swap Controls + Flip Screen" )  PORT_DIPLOCATION("SW1:7")  // Unused in manual
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /*************************************
  *
  *  Graphics layouts
  *
  *************************************/
-
-static const gfx_layout layout8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
 
 static const gfx_layout layout8x8_part =
 {
@@ -618,20 +615,20 @@ static GFXDECODE_START( gfx_nova2001 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ninjakun )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x200, 16 )    // sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x000, 16 )    // fg tiles
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,   0x100, 16 )    // bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,            0x200, 16 )    // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0x000, 16 )    // fg tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_pkunwar )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x000, 16 )    // sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 16 )    // bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,            0x000, 16 )    // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_raiders5 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,    0x200, 16 ) // sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part, 0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,      0x100, 16 ) // bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,               0x200, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part,            0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,      0x100, 16 ) // bg tiles
 GFXDECODE_END
 
 
@@ -688,7 +685,7 @@ void nova2001_state::ninjakun(machine_config &config)
 	subcpu.set_addrmap(AS_PROGRAM, &nova2001_state::ninjakun_cpu2_map);
 	subcpu.set_periodic_int(FUNC(nova2001_state::irq0_line_hold), attotime::from_hz(4*60)); /* ? */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(nova2001_state,ninjakun)
 
@@ -766,7 +763,7 @@ void nova2001_state::raiders5(machine_config &config)
 	subcpu.set_addrmap(AS_PROGRAM, &nova2001_state::raiders5_cpu2_map);
 	subcpu.set_periodic_int(FUNC(nova2001_state::irq0_line_hold), attotime::from_hz(4*60));  /* ? */
 
-	config.m_minimum_quantum = attotime::from_hz(24000);
+	config.set_maximum_quantum(attotime::from_hz(24000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -920,7 +917,7 @@ ROM_START( raiders5 )
 	ROM_LOAD( "raiders5.2", 0x4000,  0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
 
 	ROM_REGION( 0x4000, "sub", 0 )
-	ROM_LOAD( "raiders5.2", 0x0000,  0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
+	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
 	ROM_LOAD( "raiders3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
@@ -936,7 +933,7 @@ ROM_START( raiders5t )
 	ROM_LOAD( "raiders2.4d", 0x4000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
 
 	ROM_REGION( 0x4000, "sub", 0 )
-	ROM_LOAD( "raiders2.4d", 0x0000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
+	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
 	ROM_LOAD( "raiders3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
@@ -946,6 +943,22 @@ ROM_START( raiders5t )
 	ROM_LOAD( "raiders5.11n", 0x0000,  0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
 ROM_END
 
+ROM_START( raiders5ta ) // found in Italy, no UPL markings on the PCB? possibly bootleg or locally manufactured with legitimate alt code revision?
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "1.4c", 0x0000,  0x4000, CRC(e6264952) SHA1(c66fe6186ec5611073cac9c154eaf7e064dce1fc) )
+	ROM_LOAD( "2.4d", 0x4000,  0x4000, CRC(06f7c5b0) SHA1(1697c1fc0f37ac75d9df91962187e8eb69c0b9df) )
+
+	ROM_REGION( 0x4000, "sub", 0 )
+	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
+
+	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
+	ROM_LOAD( "3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
+	ROM_LOAD( "4.11g", 0x4000,  0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 ) // (need lineswapping)
+	// single byte different in unused area at 2fff ee -> 2e, possibly bitrot although more than a single bit changed
+	ROM_LOAD( "5.11n", 0x0000,  0x4000, CRC(fb532e4d) SHA1(44da82aafe53884681abf414cb3d7b913d5542c7) )
+ROM_END
 
 
 /*************************************
@@ -1023,11 +1036,12 @@ void nova2001_state::init_raiders5()
 // many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001,  0,        nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001h, nova2001, nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun,  nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,   nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,   nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5,  0,        raiders5, raiders5,  nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5t, raiders5, raiders5, raiders5,  nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5ta,raiders5, raiders5, raiders5ta,nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan, set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )

@@ -27,13 +27,16 @@ public:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ8_MEMBER(x68k_midi_reg_r);
-	DECLARE_WRITE8_MEMBER(x68k_midi_reg_w);
+	uint8_t x68k_midi_reg_r(offs_t offset);
+	void x68k_midi_reg_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_x68k_expansion_card_interface overrides
+	virtual uint8_t iack4() override;
 
 private:
 	x68k_expansion_slot_device *m_slot;

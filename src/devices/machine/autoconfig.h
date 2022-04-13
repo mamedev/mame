@@ -19,10 +19,10 @@ public:
 	virtual ~amiga_autoconfig();
 
 	// read from autoconfig space
-	DECLARE_READ16_MEMBER( autoconfig_read );
+	uint16_t autoconfig_read(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
 
 	// write to autoconfig space
-	DECLARE_WRITE16_MEMBER( autoconfig_write );
+	void autoconfig_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	enum board_type

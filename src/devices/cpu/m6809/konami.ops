@@ -561,7 +561,7 @@ ROLD:
 
 	// doing this as a loop is lame
 	while(m_temp.b.l--)
-		m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_left(m_temp.w));
+		m_q.r.d = set_flags<uint16_t>(CC_NZ, rotate_left(m_q.r.d));
 
 	eat(1);
 	return;
@@ -571,7 +571,7 @@ RORD:
 
 	// doing this as a loop is lame
 	while(m_temp.b.l--)
-		m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_right(m_temp.w));
+		m_q.r.d = set_flags<uint16_t>(CC_NZ, rotate_right(m_q.r.d));
 
 	eat(1);
 	return;

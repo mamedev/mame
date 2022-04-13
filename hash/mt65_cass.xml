@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="mt65_cass" description="Microtan 65 cassettes">
+
+	<software name="forth">
+		<description>Tan-Forth</description>
+		<year>1982</year>
+		<publisher>Tansoft</publisher>
+		<part name="cass1" interface="mt65_cass">
+			<feature name="part_id" value="FORTHW.A"/>
+			<dataarea name="cass" size="2362796">
+				<rom name="tanforth.wav" size="2362796" crc="1bee1fcb" sha1="272d1720acdbc164c9da5463035eaccc777e2c20"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mt65_cass">
+			<feature name="part_id" value="EDITOR: SCRN01-07"/>
+			<dataarea name="cass" size="3241196">
+				<rom name="editor1-7.wav" size="3241196" crc="58be5315" sha1="c4e4db823ed32411561ea919067c0ce986644168"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mt65_cass">
+			<feature name="part_id" value="PRINT UTILITY: SCRN03-05"/>
+			<dataarea name="cass" size="1449846">
+				<rom name="print3-5.wav" size="1449846" crc="235ee947" sha1="c10ae81bbc66b3fd2f53c9aa87353065093fc217"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="mt65_cass">
+			<feature name="part_id" value="ASSEMBLER: SCRN01-05"/>
+			<dataarea name="cass" size="22000">
+				<rom name="assembler1-5.wav" size="22000" crc="c65d1839" sha1="5d8a62608a1ff85747991e6a6d43664c6c40f9ec"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="mt65_cass">
+			<feature name="part_id" value="EXTENSIONS: SCRN01-04"/>
+			<dataarea name="cass" size="1827692">
+				<rom name="extension1-4.wav" size="1827692" crc="ab0ddfcb" sha1="7a52d5186cb50c6a754e95deec106484c713fa5d"/>
+			</dataarea>
+		</part>
+		<part name="cass6" interface="mt65_cass">
+			<feature name="part_id" value="BREAKOUT: SCRN01-05"/>
+			<dataarea name="cass" size="2261996">
+				<rom name="breakout1-5.wav" size="2261996" crc="3b28f92c" sha1="c6919891a33a7472bfe291b1c3feb19cad90bac6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pgmaid">
+		<description>PGM Design Aid</description>
+		<year>1982</year>
+		<publisher>Tangerine Users Group</publisher>
+		<info name="usage" value="Requires TUG PGM" />
+		<part name="cass1" interface="mt65_cass">
+			<feature name="part_id" value="PGMAID.B"/>
+			<dataarea name="cass" size="1503788">
+				<rom name="pgmaid.wav" size="1503788" crc="bc95fbc6" sha1="ee170f6ac492993be3777637ea3a593c03c0e031"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mt65_cass">
+			<feature name="part_id" value="PGMDEM.B"/>
+			<dataarea name="cass" size="743980">
+				<rom name="pgmdemo.wav" size="743980" crc="2e019306" sha1="bad1e062d49e31e78f27138171e533e64729197e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcinvs">
+		<description>Space Invasion</description>
+		<year>1980</year>
+		<publisher>Tangerine</publisher>
+		<info name="usage" value="Requires Joystick" />
+		<part name="cass" interface="mt65_cass">
+			<feature name="part_id" value="INVAD.A"/>
+			<dataarea name="cass" size="5272364">
+				<rom name="spce04.wav" size="5272364" crc="73f699e9" sha1="ab59cbe20894ea4cf2d843c7f223c27930d91ac2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tugpro">
+		<description>TUG EPROM Programmer</description>
+		<year>1981</year>
+		<publisher>Tangerine Users Group</publisher>
+		<part name="cass" interface="mt65_cass">
+			<feature name="part_id" value="TUGPRO.A"/>
+			<dataarea name="cass" size="500268">
+				<rom name="tugpro.wav" size="500268" crc="c7b005a2" sha1="cacf29a47219994e7b8d027eccc571a76a4ff43d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word">
+		<description>Columbia Word</description>
+		<year>1982</year>
+		<publisher>Tangerine Users Group</publisher>
+		<part name="cass" interface="mt65_cass">
+			<feature name="part_id" value="WORD.A"/>
+			<dataarea name="cass" size="1408294">
+				<rom name="word.wav" size="1408294" crc="fc5366f4" sha1="ebb97f238b2f53b9e89af47de0168b447fc84cc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

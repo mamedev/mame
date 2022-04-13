@@ -75,7 +75,7 @@ void mach32_8514a_device::device_start()
 //                       The Graphics Ultra Pro has an ATI68875
 // bit 12:    Enable internal uC address decode
 // bit 13-15: Card ID:  ID when using multiple controllers
-READ16_MEMBER(mach32_8514a_device::mach32_config1_r)
+uint16_t mach32_8514a_device::mach32_config1_r()
 {
 	return 0x0430;  // enable VGA, 16-bit ISA, 256Kx16 DRAM, ATI68875
 }
@@ -95,7 +95,7 @@ READ16_MEMBER(mach32_8514a_device::mach32_config1_r)
  * bit      15  Draw pixel size to be written
  * If bits 11 and 15 are both 0, then for compatibility, both will be written
  */
-WRITE16_MEMBER(mach32_8514a_device::mach32_ge_ext_config_w)
+void mach32_8514a_device::mach32_ge_ext_config_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset == 1)
 	{
@@ -115,10 +115,6 @@ void mach32_device::device_start()
 {
 	ati_vga_device::device_start();
 	ati.vga_chip_id = 0x00;  // correct?
-	vga.svga_intf.vram_size = 0x400000;
-	vga.memory.resize(vga.svga_intf.vram_size);
-	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-	save_item(NAME(vga.memory));
 }
 
 void mach32_device::device_reset()
@@ -180,11 +176,8 @@ uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		return 0;
 
 	uint32_t src = (m_cursor_address & 0x000fffff) << 2;
-	uint32_t* dst;  // destination pixel
-	uint8_t x,y,z;
-	uint32_t colour0;
-	uint32_t colour1;
 
+	uint32_t colour0, colour1;
 	if(depth == 8)
 	{
 		colour0 = pen(m_cursor_colour0_b);
@@ -197,18 +190,18 @@ uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 
 	// draw hardware pointer (64x64 max)
-	for(y=0;y<64;y++)
+	for(uint8_t y=0;y<64;y++)
 	{
-		dst = &bitmap.pix32(m_cursor_vertical + y, m_cursor_horizontal);
-		for(x=0;x<64;x+=8)
+		uint32_t *dst = &bitmap.pix(m_cursor_vertical + y, m_cursor_horizontal);
+		for(uint8_t x=0;x<64;x+=8)
 		{
-			uint16_t bits = (vga.memory[(src+0) % vga.svga_intf.vram_size] | ((vga.memory[(src+1) % vga.svga_intf.vram_size]) << 8));
+			uint16_t const bits = (vga.memory[(src+0) % vga.svga_intf.vram_size] | ((vga.memory[(src+1) % vga.svga_intf.vram_size]) << 8));
 
-			for(z=0;z<8;z++)
+			for(uint8_t z=0;z<8;z++)
 			{
 				if(((z + x) > (m_cursor_offset_horizontal-1)) && (y < (63 - m_cursor_offset_vertical)))
 				{
-					uint8_t val = (bits >> (z*2)) & 0x03;
+					uint8_t const val = (bits >> (z*2)) & 0x03;
 					switch(val)
 					{
 						case 0:  // cursor colour 0
@@ -234,14 +227,14 @@ uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 // mach32 Hardware Pointer
-WRITE16_MEMBER(mach32_device::mach32_cursor_l_w)
+void mach32_device::mach32_cursor_l_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 		m_cursor_address = (m_cursor_address & 0xf0000) | data;
 	if(LOG_MACH32) logerror("mach32 HW pointer data address: %05x",m_cursor_address);
 }
 
-WRITE16_MEMBER(mach32_device::mach32_cursor_h_w)
+void mach32_device::mach32_cursor_h_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 	{
@@ -251,19 +244,19 @@ WRITE16_MEMBER(mach32_device::mach32_cursor_h_w)
 	}
 }
 
-WRITE16_MEMBER(mach32_device::mach32_cursor_pos_h)
+void mach32_device::mach32_cursor_pos_h(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 		m_cursor_horizontal = data & 0x07ff;
 }
 
-WRITE16_MEMBER(mach32_device::mach32_cursor_pos_v)
+void mach32_device::mach32_cursor_pos_v(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 		m_cursor_vertical = data & 0x0fff;
 }
 
-WRITE16_MEMBER(mach32_device::mach32_cursor_colour_b_w)
+void mach32_device::mach32_cursor_colour_b_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 	{
@@ -274,7 +267,7 @@ WRITE16_MEMBER(mach32_device::mach32_cursor_colour_b_w)
 	}
 }
 
-WRITE16_MEMBER(mach32_device::mach32_cursor_colour_0_w)
+void mach32_device::mach32_cursor_colour_0_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 	{
@@ -284,7 +277,7 @@ WRITE16_MEMBER(mach32_device::mach32_cursor_colour_0_w)
 	}
 }
 
-WRITE16_MEMBER(mach32_device::mach32_cursor_colour_1_w)
+void mach32_device::mach32_cursor_colour_1_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 	{
@@ -294,7 +287,7 @@ WRITE16_MEMBER(mach32_device::mach32_cursor_colour_1_w)
 	}
 }
 
-WRITE16_MEMBER(mach32_device::mach32_cursor_offset_w)
+void mach32_device::mach32_cursor_offset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset == 1)
 	{

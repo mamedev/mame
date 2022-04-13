@@ -16,11 +16,9 @@
 #include <string>
 #include <vector>
 
-#include "../frontend/mame/ui/sliderchangednotifier.h"
-
 struct slider_state;
 
-class bgfx_slider : public slider_changed_notifier
+class bgfx_slider
 {
 public:
 	enum slider_type
@@ -62,7 +60,6 @@ public:
 	void import(float val);
 
 protected:
-	virtual int32_t slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, int32_t newval) override;
 	std::unique_ptr<slider_state> create_core_slider();
 	int32_t as_int() const { return int32_t(floor(m_value / m_step + 0.5f)); }
 

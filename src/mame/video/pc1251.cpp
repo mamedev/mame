@@ -77,14 +77,14 @@ const char *const pc1251_state::s_rsv[5] =
 	"1 1 11    1  "
 };
 
-READ8_MEMBER(pc1251_state::lcd_read)
+uint8_t pc1251_state::lcd_read(offs_t offset)
 {
 	uint8_t data = m_reg[offset & 0xff];
 	LOGMASKED(LOG_LCD, "pc1251 read %.3x %.2x\n", offset, data);
 	return data;
 }
 
-WRITE8_MEMBER(pc1251_state::lcd_write)
+void pc1251_state::lcd_write(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_LCD, "pc1251 write %.3x %.2x\n", offset, data);
 	m_reg[offset & 0xff] = data;

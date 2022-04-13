@@ -12,6 +12,8 @@
 #ifndef MAME_BUS_SMS_CTRL_SMSCTRL_H
 #define MAME_BUS_SMS_CTRL_SMSCTRL_H
 
+#include "screen.h"
+
 #pragma once
 
 
@@ -62,6 +64,11 @@ public:
 
 	void th_pin_w(int state);
 
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+
+	// for peripherals that interact with the machine's screen
+	required_device<screen_device> m_screen;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -76,7 +83,7 @@ private:
 // ======================> device_sms_control_port_interface
 
 // class representing interface-specific live sms_expansion card
-class device_sms_control_port_interface : public device_slot_card_interface
+class device_sms_control_port_interface : public device_interface
 {
 public:
 	// construction/destruction

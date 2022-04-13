@@ -23,14 +23,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488_device", "C64 IEEE-488 cartridge")
+DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488", "C64 IEEE-488 cartridge")
 
 
 //-------------------------------------------------
 //  tpi6525_interface tpi_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c64_ieee488_device::tpi_pa_r )
+uint8_t c64_ieee488_device::tpi_pa_r()
 {
 	/*
 
@@ -59,7 +59,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_ieee488_device::tpi_pa_w )
+void c64_ieee488_device::tpi_pa_w(uint8_t data)
 {
 	/*
 
@@ -84,7 +84,7 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pa_w )
 	m_bus->host_nrfd_w(BIT(data, 7));
 }
 
-READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
+uint8_t c64_ieee488_device::tpi_pc_r(offs_t offset)
 {
 	/*
 
@@ -106,12 +106,12 @@ READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
 	data |= m_bus->ifc_r();
 	data |= m_bus->srq_r() << 1;
 
-	data |= m_exp->exrom_r(offset, 1, 1, 1, 0) << 7;
+	data |= m_exp->exrom_r(offset, 1, 1, 1, 0, 0) << 7;
 
 	return data;
 }
 
-WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
+void c64_ieee488_device::tpi_pc_w(uint8_t data)
 {
 	/*
 
@@ -240,5 +240,5 @@ void c64_ieee488_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba
 
 int c64_ieee488_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_exp->game_r(offset, sphi2, ba, rw, m_slot->hiram());
+	return m_exp->game_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }

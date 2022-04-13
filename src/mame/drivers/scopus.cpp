@@ -48,7 +48,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
+	uint8_t memory_read_byte(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
 	void maincpu_io_map(address_map &map);
@@ -61,7 +61,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	// Character generator
-	const uint8_t *m_chargen;
+	const uint8_t *m_chargen = nullptr;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -94,11 +94,10 @@ GFXDECODE_END
 
 I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 {
-	unsigned i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
-	uint8_t pixels;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 
+	uint8_t pixels;
 	if (lten) {
 		pixels = ~0;
 	} else if (vsp != 0 || (linecount & 8) != 0) {
@@ -111,8 +110,8 @@ I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 		pixels = ~pixels;
 	}
 
-	for (i = 0; i < 7; i++) {
-		bitmap.pix32(y, x + i) = palette[ (pixels & (1U << (7 - i))) != 0 ];
+	for (unsigned i = 0; i < 7; i++) {
+		bitmap.pix(y, x + i) = palette[ BIT(pixels, 7 - i) ];
 	}
 }
 
@@ -125,7 +124,7 @@ void sagitta180_state::maincpu_map(address_map &map)
 {
 	map.global_mask(0xffff);
 	map(0x0000, 0x07ff).rom();
-//  AM_RANGE(0x0800, 0x17ff) AM_ROM
+//  map(0x0800, 0x17ff).rom();
 	map(0x1800, 0xffff).ram();
 }
 
@@ -167,7 +166,7 @@ WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(sagitta180_state::memory_read_byte)
+uint8_t sagitta180_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
@@ -191,12 +190,12 @@ void sagitta180_state::sagitta180(machine_config &config)
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
 	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
 	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 19218)); // 19218 / 19222 ? guesses...
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
@@ -216,7 +215,7 @@ void sagitta180_state::sagitta180(machine_config &config)
 
 	I8275(config, m_crtc, 12480000 / 8); /* guessed xtal */
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(sagitta180_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(sagitta180_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 	m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 	m_crtc->set_screen("screen");

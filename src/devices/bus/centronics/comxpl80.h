@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "cpu/m6805/m6805.h"
 #include "bus/centronics/ctronics.h"
 
 
@@ -64,12 +63,10 @@ private:
 
 	uint8_t m_data;
 
-	DECLARE_WRITE8_MEMBER( pa_w );
-	DECLARE_WRITE8_MEMBER( pb_w );
-	DECLARE_WRITE8_MEMBER( pc_w );
-	DECLARE_READ8_MEMBER( pd_r );
-
-	void comxpl80_mem(address_map &map);
+	void pa_w(uint8_t data);
+	void pb_w(uint8_t data);
+	void pc_w(uint8_t data);
+	uint8_t pd_r();
 };
 
 

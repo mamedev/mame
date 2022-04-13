@@ -32,9 +32,9 @@
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_FDC, bus::ti99::peb, ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
+DEFINE_DEVICE_TYPE(TI99_FDC, bus::ti99::peb::ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 #define FDC_TAG "fd1771"
@@ -99,13 +99,13 @@ WRITE_LINE_MEMBER( ti_fdc_device::fdc_hld_w )
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", m_HLD);
 }
 
-SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
+void ti_fdc_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Selection login in the PAL and some circuits on the board
 
 	// Is the card being selected?
 	m_address = offset;
-	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+	m_inDsrArea = in_dsr_space(offset, true);
 
 	if (!m_inDsrArea || !m_selected) return;
 
@@ -124,14 +124,14 @@ SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
 */
 void ti_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if ((offset & 0x1ff1)!=0x1ff0)
 			*value = m_dsrrom[offset & 0x1fff];
 	}
 }
 
-READ8Z_MEMBER(ti_fdc_device::readz)
+void ti_fdc_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -201,7 +201,7 @@ void ti_fdc_device::write(offs_t offset, uint8_t data)
 
     See schematics for the meaning of the bits.
 */
-READ8Z_MEMBER(ti_fdc_device::crureadz)
+void ti_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -349,16 +349,6 @@ void ti_fdc_device::device_start()
 
 void ti_fdc_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_DRQ = CLEAR_LINE;
 	m_IRQ = CLEAR_LINE;
 	m_DVENA = CLEAR_LINE;
@@ -389,10 +379,12 @@ void ti_fdc_device::device_config_complete()
 	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
 }
 
-FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void ti_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void tifdc_floppies(device_slot_interface &device)
 {
@@ -407,7 +399,7 @@ ROM_END
 
 void ti_fdc_device::device_add_mconfig(machine_config& config)
 {
-	FD1771(config, m_fd1771, 1_MHz_XTAL);
+	FD1771(config, m_fd1771, 2_MHz_XTAL / 2);
 	m_fd1771->intrq_wr_callback().set(FUNC(ti_fdc_device::fdc_irq_w));
 	m_fd1771->drq_wr_callback().set(FUNC(ti_fdc_device::fdc_drq_w));
 	m_fd1771->hld_wr_callback().set(FUNC(ti_fdc_device::fdc_hld_w));
@@ -439,4 +431,4 @@ const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 	return ROM_NAME( ti_fdc );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

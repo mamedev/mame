@@ -10,6 +10,7 @@
 #include "aviwrite.h"
 
 #include "modules/lib/osdobj_common.h"
+#include "fileio.h"
 #include "screen.h"
 
 
@@ -56,7 +57,7 @@ void avi_write::begin_avi_recording(const char *name)
 	m_frame = 0;
 	m_next_frame_time = m_machine.time();
 
-	const screen_device *primary_screen = screen_device_iterator(m_machine.root_device()).first();
+	const screen_device *primary_screen = screen_device_enumerator(m_machine.root_device()).first();
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
@@ -80,12 +81,12 @@ void avi_write::begin_avi_recording(const char *name)
 
 	// create a new temporary movie file
 	emu_file tempfile(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	const osd_file::error filerr = (!name || !name[0] || !std::strcmp(name, OSDOPTVAL_AUTO))
+	const std::error_condition filerr = (!name || !name[0] || !std::strcmp(name, OSDOPTVAL_AUTO))
 			? m_machine.video().open_next(tempfile, "avi")
 			: tempfile.open(name);
 
 	// if we succeeded, make a copy of the name and create the real file over top
-	if (filerr == osd_file::error::NONE)
+	if (!filerr)
 	{
 		const std::string fullpath = tempfile.fullpath();
 		tempfile.close();

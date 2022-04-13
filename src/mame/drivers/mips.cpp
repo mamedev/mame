@@ -42,10 +42,6 @@
  *   http://www.prumpleffer.de/~miod/machineroom/machines/mips/magnum/index.html
  *   https://web.archive.org/web/20140518203135/http://no-l.org/pages/riscos.html
  *
- * TODO (rx2030)
- *   - keyboard controller and keyboard
- *   - buzzer
- *
  * TODO (rx3230)
  *   - verify/complete address maps
  *   - keyboard controller and interrupts
@@ -133,7 +129,7 @@
 /*
  * Rx2030 WIP
  *
- *   status: boots RISC/os, requires unimplemented MIPS keyboard
+ *   - keyboard reset failure
  *
  * V50 internal peripherals:
  * base = 0xfe00
@@ -183,11 +179,65 @@
  *
  * Keyboard controller output port
  *  4: select 1M/4M SIMMs?
+ *
+ * PON failures
+ *   kseg0/kseg1 cache
+ *   instruction cache functionality (skipped)
+ *   instruction cache mats+ (skipped)
+ *   data cache block refill
+ *   instruction cache block refill (skipped)
+ *   scc - requires z80scc zero count interrupt
+ *   tod - loop <1 second real time?
+ *   color frame buffer (skipped)
+ *   dma controller chip
+ *   scsi controller chip
+ *   tlb (skipped) - all pass except tlb_n (requires cpu data cache)
+ *   exception (skipped)
+ *   parity
+ *   dma parity (skipped)
+ *   at serial board (skipped)
  */
 
 #include "emu.h"
 
-#include "includes/mips.h"
+// processors and memory
+#include "cpu/mips/mips1.h"
+#include "cpu/nec/v5x.h"
+#include "machine/ram.h"
+
+// i/o devices (common)
+#include "machine/at_keybc.h"
+#include "machine/z80scc.h"
+#include "machine/upd765.h"
+#include "machine/am79c90.h"
+
+// i/o devices (rx2030)
+#include "machine/mc146818.h"
+#include "machine/z8038.h"
+#include "machine/aic6250.h"
+
+// i/o devices (rx3230)
+#include "machine/timekpr.h"
+#include "machine/ncr5390.h"
+#include "machine/mips_rambo.h"
+
+// busses and connectors
+#include "machine/nscsi_bus.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
+
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/rs232/rs232.h"
+
+// video and audio
+#include "screen.h"
+#include "video/bt45x.h"
+#include "video/bt459.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
+#include "formats/pc_dsk.h"
 
 #include "imagedev/floppy.h"
 
@@ -202,11 +252,197 @@
 
 namespace {
 
-FLOPPY_FORMATS_MEMBER(mips_floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+class rx2030_state : public driver_device
+{
+public:
+	rx2030_state(machine_config const &mconfig, device_type type, char const *tag)
+		: driver_device(mconfig, type, tag)
+		, m_cpu(*this, "cpu")
+		, m_iop(*this, "iop")
+		, m_ram(*this, "ram")
+		, m_rom(*this, "rx2030")
+		, m_rtc(*this, "rtc")
+		, m_fio(*this, "fio")
+		, m_kbdc(*this, "kbdc")
+		, m_kbd(*this, "kbd")
+		, m_scc(*this, "scc")
+		, m_tty(*this, "tty%u", 0U)
+		, m_fdc(*this, "fdc")
+		, m_scsibus(*this, "scsi")
+		, m_scsi(*this, "scsi:7:aic6250")
+		, m_net(*this, "net")
+		, m_buzzer(*this, "buzzer")
+		, m_screen(*this, "screen")
+		, m_ramdac(*this, "ramdac")
+		, m_vram(*this, "vram")
+	{
+	}
 
-} // anonymous namespace
+	// machine config
+	void rx2030(machine_config &config);
+	void rs2030(machine_config &config);
+	void rc2030(machine_config &config);
+
+	void rx2030_init();
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// address maps
+	void rx2030_map(address_map &map);
+	void rs2030_map(address_map &map);
+
+	void iop_program_map(address_map &map);
+	void iop_io_map(address_map &map);
+
+	u16 mmu_r(offs_t offset, u16 mem_mask = 0xffff);
+	void mmu_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+
+	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
+	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+
+private:
+	enum iop_interface_status_mask : u8
+	{
+		FPU_ABSENT = 0x01, // clear if FPU installed
+		DBG_ABSENT = 0x02, // clear if debug board installed
+		IOP_IRQ    = 0x04, // set when CPU interrupts IOP
+		VID_ABSENT = 0x10, // clear if video board installed
+		IOP_IACK   = 0x40, // set when IOP acknowledges CPU interrupt
+		IOP_NERR   = 0x80, // clear when IOP receives parity error
+	};
+
+	// processors and memory
+	required_device<r2000a_device> m_cpu;
+	required_device<v50_device> m_iop;
+	required_device<ram_device> m_ram;
+	required_region_ptr<u16> m_rom;
+
+	// i/o devices
+	required_device<mc146818_device> m_rtc;
+	required_device<z8038_device> m_fio;
+	required_device<at_keyboard_controller_device> m_kbdc;
+	required_device<pc_kbdc_device> m_kbd;
+	required_device<z80scc_device> m_scc;
+	required_device_array<rs232_port_device, 2> m_tty;
+	required_device<wd37c65c_device> m_fdc;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<aic6250_device> m_scsi;
+	required_device<am7990_device> m_net;
+	required_device<speaker_sound_device> m_buzzer;
+
+	// optional video board
+	optional_device<screen_device> m_screen;
+	optional_device<bt458_device> m_ramdac;
+	optional_shared_ptr<u32> m_vram;
+
+	// machine state
+	u16 m_mmu[32]{};
+
+	u8 m_iop_interface = 0;
+};
+
+class rx3230_state : public driver_device
+{
+public:
+	rx3230_state(machine_config const &mconfig, device_type type, char const *tag)
+		: driver_device(mconfig, type, tag)
+		, m_cpu(*this, "cpu")
+		, m_ram(*this, "ram")
+		, m_rom(*this, "rx3230")
+		, m_rambo(*this, "rambo")
+		, m_scsibus(*this, "scsi")
+		, m_scsi(*this, "scsi:7:ncr53c94")
+		, m_net(*this, "net")
+		, m_scc(*this, "scc")
+		, m_tty(*this, "tty%u", 0U)
+		, m_rtc(*this, "rtc")
+		, m_fdc(*this, "fdc")
+		, m_kbdc(*this, "kbdc")
+		, m_kbd(*this, "kbd")
+		, m_buzzer(*this, "buzzer")
+		, m_screen(*this, "screen")
+		, m_ramdac(*this, "ramdac")
+		, m_vram(*this, "vram")
+	{
+	}
+
+	// machine config
+	void rx3230(machine_config &config);
+	void rs3230(machine_config &config);
+	void rc3230(machine_config &config);
+
+	void rx3230_init();
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// address maps
+	void rx3230_map(address_map &map);
+	void rs3230_map(address_map &map);
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+
+	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
+	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+
+	template <u8 Source> WRITE_LINE_MEMBER(irq_w);
+
+private:
+	// processors and memory
+	required_device<r3000a_device> m_cpu;
+	required_device<ram_device> m_ram;
+	required_region_ptr<u32> m_rom;
+
+	// i/o devices
+	required_device<mips_rambo_device> m_rambo;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<ncr53c94_device> m_scsi;
+	required_device<am7990_device> m_net;
+	required_device<z80scc_device> m_scc;
+	required_device_array<rs232_port_device, 2> m_tty;
+	required_device<m48t02_device> m_rtc;
+	required_device<i82072_device> m_fdc;
+	required_device<at_keyboard_controller_device> m_kbdc;
+	required_device<pc_kbdc_device> m_kbd;
+	required_device<speaker_sound_device> m_buzzer;
+
+	// optional colour video board
+	optional_device<screen_device> m_screen;
+	optional_device<bt459_device> m_ramdac;
+	optional_device<ram_device> m_vram;
+
+	enum int_reg_mask : u8
+	{
+		INT_SLOT = 0x01, // expansion slot
+		INT_KBD  = 0x02, // keyboard controller
+		INT_SCC  = 0x04, // serial controller
+		INT_SCSI = 0x08, // scsi controller
+		INT_NET  = 0x10, // ethernet controller
+		INT_DRS  = 0x20, // data rate select
+		INT_DSR  = 0x40, // data set ready
+		INT_CEB  = 0x80, // modem call indicator
+
+		INT_CLR  = 0xff,
+	};
+
+	enum gfx_reg_mask : u8
+	{
+		GFX_H_BLANK   = 0x10,
+		GFX_V_BLANK   = 0x20,
+		GFX_COLOR_RSV = 0xce, // reserved
+	};
+
+	u8 m_int_reg = 0;
+	int m_int0_state = 0;
+	int m_int1_state = 0;
+};
 
 void rx2030_state::machine_start()
 {
@@ -271,8 +507,8 @@ void rx2030_state::mmu_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offs_t const address = (m_mmu[(offset >> 11) & 0x1f] << 12) | ((offset << 1) & 0xfff);
 
-	LOGMASKED(LOG_MMU, "mmu_w offset 0x%06x reg %d page 0x%04x mapped 0x%06x data 0x%04x\n",
-		(offset << 1), (offset >> 11) & 0x1f, m_mmu[(offset >> 11) & 0x1f], address, data);
+	LOGMASKED(LOG_MMU, "mmu_w offset 0x%06x reg %d page 0x%04x mapped 0x%06x data 0x%04x (%s)\n",
+		(offset << 1), (offset >> 11) & 0x1f, m_mmu[(offset >> 11) & 0x1f], address, data, machine().describe_context());
 
 	if (ACCESSING_BITS_0_7)
 		m_ram->write(BYTE4_XOR_BE(address + 0), data);
@@ -295,15 +531,9 @@ void rx2030_state::iop_program_map(address_map &map)
 
 void rx2030_state::iop_io_map(address_map &map)
 {
-	map(0x0000, 0x003f).lrw16("mmu",
-		[this](offs_t offset, u16 mem_mask)
-		{
-			return m_mmu[offset];
-		},
-		[this](offs_t offset, u16 data, u16 mem_mask)
-		{
-			m_mmu[offset] = data;
-		});
+	map(0x0000, 0x003f).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) { return m_mmu[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { m_mmu[offset] = data; }));
 
 	map(0x0040, 0x0043).m(m_fdc, FUNC(wd37c65c_device::map)).umask16(0xff);
 	map(0x0044, 0x0045).w(m_fdc, FUNC(wd37c65c_device::dor_w)).umask16(0xff);
@@ -312,33 +542,41 @@ void rx2030_state::iop_io_map(address_map &map)
 
 	map(0x0080, 0x0083).rw(m_scsi, FUNC(aic6250_device::read), FUNC(aic6250_device::write)).umask16(0xff);
 
-	map(0x00c0, 0x00c1).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask16(0xff);
+	/*
+	 * HACK: Substitute the keyboard "set defaults" command for the "reset"
+	 * command to avoid an issue where the keyboard is still busy performing
+	 * the reset and does not accept commands being sent to it to change the
+	 * scan code set. Possibly caused by imperfect V50 timing and/or memory
+	 * wait states that make the IOP code execute more slowly than emulated.
+	 */
+	map(0x00c0, 0x00c1).lrw8(NAME([this] () { return m_kbdc->data_r(); }), NAME([this] (u8 data) { m_kbdc->data_w(data == 0xff ? 0xf6 : data); })).umask16(0xff);
 	map(0x00c4, 0x00c5).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask16(0xff);
 
-	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask16(0xff);
+	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff);
 
 	map(0x0140, 0x0143).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 
-	map(0x0180, 0x018b).lr8("mac", [](offs_t offset)
-	{
-		// Ethernet MAC address (LSB first)
-		static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
+	map(0x0180, 0x018b).lr8(
+			[] (offs_t offset)
+			{
+				// Ethernet MAC address (LSB first)
+				static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
 
-		return mac[offset];
-	}).umask16(0xff);
+				return mac[offset];
+			}, "mac_r").umask16(0xff);
 
 	// iop tests bits 0x04, 0x10 and 0x20
-	map(0x01c0, 0x01c1).lr8("?", [this]() { return m_iop_interface; }); // maybe?
+	map(0x01c0, 0x01c1).lr8(NAME([this] () { return m_iop_interface; })); // maybe?
 
 	map(0x0200, 0x0201).rw(m_fio, FUNC(z8038_device::fifo_r<1>), FUNC(z8038_device::fifo_w<1>)).umask16(0xff);
 	map(0x0202, 0x0203).rw(m_fio, FUNC(z8038_device::reg_r<1>), FUNC(z8038_device::reg_w<1>)).umask16(0xff);
 
-	map(0x0240, 0x0241).lw8("rtc", [this](u8 data) { m_rtc->write(0, data); }).umask16(0xff00);
-	map(0x0280, 0x0281).lrw8("rtc",
-		[this]() { return m_rtc->read(1); },
-		[this](u8 data) { m_rtc->write(1, data); }).umask16(0xff00);
+	map(0x0240, 0x0241).lw8(NAME([this] (u8 data) { m_rtc->write(0, data); })).umask16(0xff00);
+	map(0x0280, 0x0281).lrw8(
+			NAME([this] () { return m_rtc->read(1); }),
+			NAME([this] (u8 data) { m_rtc->write(1, data); })).umask16(0xff00);
 
-	map(0x02c0, 0x2c1).lw8("cpu_interface", [this](u8 data)
+	map(0x02c0, 0x2c1).lw8([this](u8 data)
 	{
 		switch (data)
 		{
@@ -369,15 +607,15 @@ void rx2030_state::iop_io_map(address_map &map)
 			// something to do with shared memory access?
 			//break;
 		}
-	}).umask16(0xff);
+	}, "cpu_interface_w").umask16(0xff);
 
-	map(0x0380, 0x0381).lw8("led", [this](u8 data) { logerror("led_w 0x%02x\n", data); }).umask16(0xff00);
+	map(0x0380, 0x0381).lw8(NAME([this](u8 data) { logerror("led_w 0x%02x\n", data); })).umask16(0xff00);
 }
 
 void rx2030_state::rx2030_map(address_map &map)
 {
-	map(0x02000000, 0x02000003).lrw8("iop_interface",
-		[this]() { return m_iop_interface; },
+	map(0x02000000, 0x02000003).lrw8(
+		NAME([this]() { return m_iop_interface; }),
 		[this](u8 data)
 		{
 			switch (data)
@@ -459,7 +697,7 @@ void rx2030_state::rx2030_map(address_map &map)
 				LOG("iop interface command 0x%02x (%s)\n", data, machine().describe_context());
 				break;
 			}
-		}
+		}, "iop_interface_w"
 	).umask32(0xff);
 }
 
@@ -470,6 +708,9 @@ void rx2030_state::rs2030_map(address_map &map)
 	// video hardware
 	map(0x01000000, 0x011fffff).ram().share("vram");
 	map(0x01ffff00, 0x01ffffff).m(m_ramdac, FUNC(bt458_device::map)).umask32(0xff);
+
+	//map(0x01ff1000, 0x01ff1001).w() // graphics register?
+	//map(0x01ff0080, 0x01ff0081).w() // graphics register?
 }
 
 u16 rx2030_state::lance_r(offs_t offset, u16 mem_mask)
@@ -502,10 +743,10 @@ void rx2030_state::rx2030(machine_config &config)
 	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
-	V50(config, m_iop, 20_MHz_XTAL / 2);
+	V50(config, m_iop, 20_MHz_XTAL);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
 	m_iop->set_addrmap(AS_IO, &rx2030_state::iop_io_map);
-	m_iop->out_handler<2>().set(m_buzzer, FUNC(speaker_sound_device::level_w));
+	m_iop->tout2_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// general dma configuration
 	m_iop->out_hreq_cb().set(m_iop, FUNC(v50_device::hack_w));
@@ -529,19 +770,16 @@ void rx2030_state::rx2030(machine_config &config)
 	Z8038(config, m_fio, 0);
 	m_fio->out_int_cb<1>().set_inputline(m_iop, INPUT_LINE_IRQ4);
 
-	// keyboard
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	PC_KBDC(config, m_kbd, pc_at_keyboards, nullptr);
+	m_kbd->out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	m_kbd->out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-	PC_KBDC_SLOT(config, m_kbd, 0);
-	pc_at_keyboards(*m_kbd);
-	m_kbd->set_pc_kbdc_slot(&kbdc);
-
+	// keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	//m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
-	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(m_kbd, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(m_kbd, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->set_default_bios_tag("award15");
 
 	SCC85C30(config, m_scc, 1.8432_MHz_XTAL);
@@ -568,7 +806,7 @@ void rx2030_state::rx2030(machine_config &config)
 	WD37C65C(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set_inputline(m_iop, INPUT_LINE_IRQ6);
 	//m_fdc->drq_wr_callback().set();
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);
@@ -607,9 +845,6 @@ void rx2030_state::rc2030(machine_config &config)
 	rx2030(config);
 
 	m_cpu->set_addrmap(AS_PROGRAM, &rx2030_state::rx2030_map);
-
-	// no keyboard
-	m_kbd->set_default_option(nullptr);
 
 	m_tty[1]->set_default_option("terminal");
 }
@@ -666,14 +901,17 @@ void rx3230_state::rx3230_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).noprw(); // silence ram
 
+	//map(0x10000000, 0x13ffffff); // restricted AT I/O space
+	//map(0x14000000, 0x17ffffff); // restricted AT memory space
+
 	map(0x16080004, 0x16080007).nopr(); // silence graphics register
 
 	map(0x18000000, 0x1800003f).m(m_scsi, FUNC(ncr53c94_device::map)).umask32(0xff);
 	map(0x19000000, 0x19000003).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask32(0xff);
 	map(0x19000004, 0x19000007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask32(0xff);
-	map(0x19800000, 0x19800003).lr8("int_reg", [this]() { return m_int_reg; }).umask32(0xff);
+	map(0x19800000, 0x19800003).lr8(NAME([this]() { return m_int_reg; })).umask32(0xff);
 	map(0x1a000000, 0x1a000007).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff);
-	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff); // TODO: order?
+	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff); // TODO: order?
 
 	map(0x1c000000, 0x1c000fff).m(m_rambo, FUNC(mips_rambo_device::map));
 
@@ -682,17 +920,15 @@ void rx3230_state::rx3230_map(address_map &map)
 	//map(0x1e800000, 0x1e800003).umask32(0xff); // fdc tc
 
 	map(0x1fc00000, 0x1fc3ffff).rom().region("rx3230", 0);
-
-	map(0x1ff00000, 0x1ff00003).lr8("boardtype", []() { return 0xa; }).umask32(0xff); // r? idprom boardtype?
-	//map(0x1ff00018, 0x1ff0001b).umask32(0x0000ff00); // r? idprom?
+	map(0x1ff00000, 0x1ff3ffff).rom().region("rx3230", 0); // mirror
 }
 
 void rx3230_state::rs3230_map(address_map &map)
 {
 	rx3230_map(map);
 
-	map(0x10000000, 0x12ffffff).lrw32("vram",
-		[this](offs_t offset)
+	map(0x10000000, 0x12ffffff).lrw32(
+		NAME([this](offs_t offset)
 		{
 			u32 const ram_offset = ((offset >> 13) * 0x500) + ((offset & 0x1ff) << 2);
 
@@ -703,8 +939,8 @@ void rx3230_state::rs3230_map(address_map &map)
 				u32(m_vram->read(ram_offset | 3)) << 0;
 
 			return data;
-		},
-		[this](offs_t offset, u32 data)
+		}),
+		NAME([this](offs_t offset, u32 data)
 		{
 			u32 const ram_offset = ((offset >> 13) * 0x500) + ((offset & 0x1ff) << 2);
 
@@ -712,19 +948,19 @@ void rx3230_state::rs3230_map(address_map &map)
 			m_vram->write(ram_offset | 1, data >> 16);
 			m_vram->write(ram_offset | 2, data >> 8);
 			m_vram->write(ram_offset | 3, data >> 0);
-		});
+		}));
 
 	map(0x14000000, 0x14000003).rw(m_ramdac, FUNC(bt459_device::address_lo_r), FUNC(bt459_device::address_lo_w)).umask32(0xff);
 	map(0x14080000, 0x14080003).rw(m_ramdac, FUNC(bt459_device::address_hi_r), FUNC(bt459_device::address_hi_w)).umask32(0xff);
 	map(0x14100000, 0x14100003).rw(m_ramdac, FUNC(bt459_device::register_r), FUNC(bt459_device::register_w)).umask32(0xff);
 	map(0x14180000, 0x14180003).rw(m_ramdac, FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w)).umask32(0xff);
 
-	map(0x16080004, 0x16080007).lr8("gfx_reg", [this]()
+	map(0x16080004, 0x16080007).lr8(NAME([this] ()
 	{
 		u8 const data = (m_screen->vblank() ? GFX_V_BLANK : 0) | (m_screen->hblank() ? GFX_H_BLANK : 0);
 
 		return data;
-	}).umask32(0xff); // also write 0
+	})).umask32(0xff); // also write 0
 
 	//map(0x16000004, 0x16000007).w(); // write 0x00000001
 	//map(0x16100000, 0x16100003).w(); // write 0xffffffff
@@ -841,20 +1077,17 @@ void rx3230_state::rx3230(machine_config &config)
 	I82072(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ4);
 	//m_fdc->drq_wr_callback().set();
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
-	// keyboard
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	PC_KBDC(config, m_kbd, pc_at_keyboards, nullptr);
+	m_kbd->out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	m_kbd->out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-	PC_KBDC_SLOT(config, m_kbd, 0);
-	pc_at_keyboards(*m_kbd);
-	m_kbd->set_pc_kbdc_slot(&kbdc);
-
+	// keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm
-	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(m_kbd, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(m_kbd, FUNC(pc_kbdc_device::data_write_from_mb));
 	//m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
 
 	// buzzer
@@ -1025,8 +1258,10 @@ ROM_END
 #define rom_rc3230 rom_rx3230
 #define rom_rs3230 rom_rx3230
 
+}
+
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME       FLAGS */
-COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030",      MACHINE_NOT_WORKING)
-COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030",      MACHINE_NOT_WORKING)
+COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030",      0)
+COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030",      0)
 COMP(1990,  rc3230,    0,      0,      rc3230,    0,     rx3230_state, rx3230_init, "MIPS",  "RC3230",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP(1990,  rs3230,    0,      0,      rs3230,    0,     rx3230_state, rx3230_init, "MIPS",  "Magnum 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

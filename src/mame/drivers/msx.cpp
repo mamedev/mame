@@ -527,15 +527,15 @@ PCB Layouts missing
 
 
 #include "emu.h"
+#include "cpu/z80/r800.h"
 #include "includes/msx.h"
 #include "formats/dsk_dsk.h"
 #include "formats/dmk_dsk.h"
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -551,9 +551,9 @@ void msx_state::msx_io_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x99).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
@@ -568,9 +568,9 @@ void msx2_state::msx2_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x4f).rw(FUNC(msx2_state::msx_switched_r), FUNC(msx2_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
@@ -587,9 +587,9 @@ void msx2_state::msx2p_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x4f).rw(FUNC(msx2_state::msx_switched_r), FUNC(msx2_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
@@ -1273,10 +1273,12 @@ void msx2_state::msxr_floplist(machine_config &config)
 	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
 }
 
-FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
-	FLOPPY_MSX_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void msx_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MSX_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void msx_floppies(device_slot_interface &device)
 {
@@ -1357,7 +1359,7 @@ void msx_state::msx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::msx_memory_map);
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1369,10 +1371,7 @@ void msx_state::msx(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 10.738635_MHz_XTAL / 3 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->port_a_read_callback().set(FUNC(msx_state::msx_psg_port_a_r));
@@ -1396,6 +1395,7 @@ void msx_state::msx(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fmsx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("msx_cass");
 
 	/* Software lists */
@@ -1422,7 +1422,7 @@ void msx2_state::msx2(machine_config &config)
 	Z80(config, m_maincpu, 21.477272_MHz_XTAL / 6);       /* 3.579545 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
 	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2_io_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1441,10 +1441,7 @@ void msx2_state::msx2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->port_a_read_callback().set(FUNC(msx2_state::msx_psg_port_a_r));
@@ -1468,6 +1465,7 @@ void msx2_state::msx2(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fmsx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("msx_cass");
 
 	/* real time clock */
@@ -1485,7 +1483,7 @@ void msx2_state::msx2p(machine_config &config)
 	Z80(config, m_maincpu, 21.477272_MHz_XTAL / 6);       /* 3.579545 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
 	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2p_io_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1504,10 +1502,7 @@ void msx2_state::msx2p(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->port_a_read_callback().set(FUNC(msx2_state::msx_psg_port_a_r));
@@ -1531,6 +1526,7 @@ void msx2_state::msx2p(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fmsx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("msx_cass");
 
 	/* real time clock */
@@ -1546,6 +1542,15 @@ void msx2_state::msx2_pal(machine_config &config)
 {
 	msx2(config);
 	m_v9938->set_screen_pal("screen");
+}
+
+void msx2_state::turbor(machine_config &config)
+{
+	msx2p(config);
+
+	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
+	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2p_io_map);
 }
 
 
@@ -1661,7 +1666,9 @@ ROM_END
 void msx_state::canonv20(machine_config &config)
 {
 	msx1(TMS9929A, config);
+	// XTAL: 1431818(Z80/PSG) + 10.6875(VDP)
 	// YM2149
+	// TMS9929ANL
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
@@ -1710,7 +1717,7 @@ ROM_END
 
 void msx_state::mx10(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
 	// Z80: uPD780C-1
@@ -1776,7 +1783,7 @@ ROM_END
 
 void msx_state::pv7(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot + expansion slot, or 2 cartridge slots?
@@ -1802,7 +1809,7 @@ ROM_END
 
 void msx_state::pv16(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -1943,7 +1950,7 @@ ROM_END
 
 void msx_state::cpc50a(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1967,7 +1974,7 @@ ROM_END
 
 void msx_state::cpc50b(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1991,7 +1998,7 @@ ROM_END
 
 void msx_state::cpc51(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -3397,7 +3404,8 @@ ROM_END
 void msx_state::hb10p(machine_config &config)
 {
 	msx1(TMS9929A, config);
-	// AY8910/YM2149?
+	// XTAL: 3.579545 + 22.168(VDP)
+	// YM2149 (in S3527 MSX-Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// T6950
@@ -5878,6 +5886,7 @@ ROM_END
 void msx2_state::nms8245(machine_config &config)
 {
 	msx2_pal(config);
+	// XTAL: 21328.1 (different from default)
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: wd2793, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -8564,7 +8573,7 @@ ROM_END
 
 void msx2_state::fsa1gt(machine_config &config)
 {
-	msx2(config);
+	turbor(config);
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -8609,7 +8618,7 @@ ROM_END
 
 void msx2_state::fsa1st(machine_config &config)
 {
-	msx2(config);
+	turbor(config);
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -8836,7 +8845,7 @@ COMP(1987, hbf1xd,     0,        0,     hbf1xd,     msx2jp,   msx2_state, empty_
 COMP(1988, hbf1xdm2,   0,        0,     hbf1xdm2,   msx2jp,   msx2_state, empty_init, "Sony", "HB-F1XDMK2 (Japan) (MSX2)", 0)
 COMP(19??, hbf5,       0,        0,     hbf5,       msx2,     msx2_state, empty_init, "Sony", "HB-F5 (MSX2)", 0)
 COMP(1985, hbf9p,      0,        0,     hbf9p,      msx2,     msx2_state, empty_init, "Sony", "HB-F9P (MSX2)", 0)
-COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2,     msx2_state, empty_init, "Sony", "HB-F9P Russion (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
+COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2,     msx2_state, empty_init, "Sony", "HB-F9P Russian (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
 COMP(1985, hbf9s,      hbf9p,    0,     hbf9s,      msx2,     msx2_state, empty_init, "Sony", "HB-F9S (MSX2)", 0)
 COMP(1986, hbf500,     hbf500p,  0,     hbf500,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 (Japan) (MSX2)", 0)
 COMP(198?, hbf500f,    hbf500p,  0,     hbf500f,    msx2,     msx2_state, empty_init, "Sony", "HB-F500F (MSX2)", 0) // French keyboard?

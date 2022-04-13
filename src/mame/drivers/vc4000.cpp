@@ -133,11 +133,11 @@ Q-0900^76203F0161063005080E492DCD4890597877103F020E75105A0A0C1E89F4101879
 
 #include "emu.h"
 #include "includes/vc4000.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
-READ8_MEMBER( vc4000_state::vc4000_key_r )
+uint8_t vc4000_state::vc4000_key_r(offs_t offset)
 {
 	uint8_t data=0;
 	switch(offset & 0x0f)
@@ -167,19 +167,19 @@ READ8_MEMBER( vc4000_state::vc4000_key_r )
 	return data;
 }
 
-WRITE8_MEMBER( vc4000_state::vc4000_sound_ctl )
+void vc4000_state::vc4000_sound_ctl(offs_t offset, uint8_t data)
 {
 	logerror("Write to sound control register offset= %d value= %d\n", offset, data);
 }
 
 // Write cassette - Address 0x1DFF
-WRITE8_MEMBER( vc4000_state::elektor_cass_w )
+void vc4000_state::elektor_cass_w(uint8_t data)
 {
 	m_cassette->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 // Read cassette - Address 0x1DBF
-READ8_MEMBER( vc4000_state::elektor_cass_r )
+uint8_t vc4000_state::elektor_cass_r()
 {
 	return (m_cassette->input() > 0.03) ? 0xff : 0x7f;
 }
@@ -369,25 +369,25 @@ void vc4000_state::machine_start()
 		// extra handler
 		switch (m_cart->get_type())
 		{
-			case VC4000_STD:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8sm_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-				break;
-			case VC4000_ROM4K:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-				break;
-			case VC4000_RAM1K:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x15ff, read8sm_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8sm_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
-				break;
-			case VC4000_CHESS2:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x15ff, read8sm_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1800, 0x1bff, read8sm_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8sm_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
-				break;
-			// undumped Radofin Hobby Module
-//          case VC4000_HOBBY:
-//              m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8sm_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-//              m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0800, 0x0fff, read8sm_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8sm_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
-//              break;
+		case VC4000_STD:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+			break;
+		case VC4000_ROM4K:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+			break;
+		case VC4000_RAM1K:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x15ff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::write_ram)));
+			break;
+		case VC4000_CHESS2:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x15ff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1800, 0x1bff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::write_ram)));
+			break;
+		// undumped Radofin Hobby Module
+//      case VC4000_HOBBY:
+//          m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+//          m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0800, 0x0fff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::write_ram)));
+//          break;
 		}
 
 		m_cart->save_ram();
@@ -395,7 +395,7 @@ void vc4000_state::machine_start()
 }
 
 
-QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
+QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -410,7 +410,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 		image.message(" Cannot read the file");
 	}
 	else
@@ -419,7 +419,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 		{
 			if (quick_data[0] != 2)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+				image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 				image.message(" Invalid header");
 			}
 			else
@@ -429,13 +429,13 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 
 				if (quick_length < 0x5)
 				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+					image.seterror(image_error::INVALIDIMAGE, "File too short");
 					image.message(" File too short");
 				}
 				else
 					if ((quick_length + quick_addr - 5) > 0x1600)
 					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+						image.seterror(image_error::INVALIDIMAGE, "File too long");
 						image.message(" File too long");
 					}
 					else
@@ -460,7 +460,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 			{
 				if (quick_data[0] != 0)
 				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+					image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 					image.message(" Invalid header");
 				}
 				else
@@ -469,19 +469,19 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 
 					if (exec_addr >= quick_length)
 					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+						image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
 						image.message(" Exec address beyond end of file");
 					}
 					else
 						if (quick_length < 0x904)
 						{
-							image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+							image.seterror(image_error::INVALIDIMAGE, "File too short");
 							image.message(" File too short");
 						}
 						else
 							if (quick_length > 0x2000)
 							{
-								image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+								image.seterror(image_error::INVALIDIMAGE, "File too long");
 								image.message(" File too long");
 							}
 							else
@@ -502,7 +502,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 									read_ = quick_length;
 								if (quick_length > 0x1FC0)
 									for (i = 0x1F50; i < read_; i++)
-										vc4000_video_w(space, i-0x1f00, quick_data[i]);
+										vc4000_video_w(i-0x1f00, quick_data[i]);
 
 								/* display a message about the loaded quickload */
 								image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
@@ -529,11 +529,12 @@ static void vc4000_cart(device_slot_interface &device)
 void vc4000_state::vc4000(machine_config &config)
 {
 	/* basic machine hardware */
-//  MCFG_DEVICE_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+//  S2650(config, m_maincpu, 865000);        /* 3550000/4, 3580000/3, 4430000/3 */
 	S2650(config, m_maincpu, 3546875/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::vc4000_mem);
 	m_maincpu->sense_handler().set(FUNC(vc4000_state::vc4000_vsync_r));
 	m_maincpu->set_periodic_int(FUNC(vc4000_state::vc4000_video_line), attotime::from_hz(312*53));  // GOLF needs this exact value
+	m_maincpu->intack_handler().set([]() { return 0x03; });
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -550,8 +551,7 @@ void vc4000_state::vc4000(machine_config &config)
 	VC4000_SND(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(vc4000_state, vc4000), this), "pgm,tvc");
+	QUICKLOAD(config, "quickload", "pgm,tvc").set_load_callback(FUNC(vc4000_state::quickload_cb));
 
 	/* cartridge */
 	VC4000_CART_SLOT(config, "cartslot", vc4000_cart, nullptr);
@@ -595,8 +595,8 @@ void vc4000_state::elektor(machine_config &config)
 {
 	vc4000(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::elektor_mem);
-	CASSETTE(config, "cassette");
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

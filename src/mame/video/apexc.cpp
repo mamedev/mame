@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "includes/apexc.h"
 
+#include <algorithm>
+
 const rgb_t apexc_state::palette_table[] =
 {
 	rgb_t::white(),
@@ -70,7 +72,7 @@ void apexc_state::draw_led(bitmap_ind16 &bitmap, int x, int y, int state)
 {
 	for (int yy = 1; yy < 7; yy++)
 		for (int xx = 1; xx < 7; xx++)
-			bitmap.pix16(y + yy, x + xx) = state ? 2 : 3;
+			bitmap.pix(y + yy, x + xx) = state ? 2 : 3;
 }
 
 /* write a single char on screen */
@@ -128,9 +130,11 @@ void apexc_state::teletyper_linefeed()
 {
 	uint8_t buf[teletyper_window_width];
 
+	assert(teletyper_window_offset_x + teletyper_window_width <= m_bitmap->width());
+	assert(teletyper_window_offset_y + teletyper_window_height <= m_bitmap->height());
 	for (int y = teletyper_window_offset_y; y < teletyper_window_offset_y + teletyper_window_height - teletyper_scroll_step; y++)
 	{
-		extract_scanline8(*m_bitmap, teletyper_window_offset_x, y+teletyper_scroll_step, teletyper_window_width, buf);
+		std::copy_n(&m_bitmap->pix(y+teletyper_scroll_step, teletyper_window_offset_x), teletyper_window_width, buf);
 		draw_scanline8(*m_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, m_palette->pens());
 	}
 

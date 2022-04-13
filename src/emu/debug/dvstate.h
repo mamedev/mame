@@ -25,8 +25,10 @@ class debug_view_state_source : public debug_view_source
 {
 	friend class debug_view_state;
 
+public:
 	// construction/destruction
-	debug_view_state_source(const char *name, device_t &device);
+	debug_view_state_source(std::string &&name, device_t &device);
+
 private:
 	// internal state
 	device_state_interface *m_stateintf;        // state interface

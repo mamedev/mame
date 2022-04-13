@@ -47,7 +47,7 @@ K007420_CALLBACK_MEMBER(rockrage_state::rockrage_sprite_callback)
 }
 
 
-WRITE8_MEMBER(rockrage_state::rockrage_vreg_w)
+void rockrage_state::rockrage_vreg_w(uint8_t data)
 {
 	/* bits 4-7: unused */
 	/* bit 3: bit 4 of bank # (layer 0) */
@@ -70,7 +70,7 @@ uint32_t rockrage_state::screen_update_rockrage(screen_device &screen, bitmap_in
 {
 	m_k007342->tilemap_update();
 
-	bitmap.fill(rgb_t::black(), cliprect);
+	bitmap.fill(0, cliprect);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	// Tutankhamen eyes go below sprites
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);

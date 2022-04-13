@@ -35,7 +35,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -57,7 +57,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
  *
  *************************************/
 
-READ8_MEMBER(bladestl_state::trackball_r)
+uint8_t bladestl_state::trackball_r(offs_t offset)
 {
 	int curr = m_trackball[offset]->read();
 	int delta = (curr - m_last_track[offset]) & 0xff;
@@ -66,7 +66,7 @@ READ8_MEMBER(bladestl_state::trackball_r)
 	return (delta & 0x80) | (curr >> 1);
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
+void bladestl_state::bladestl_bankswitch_w(uint8_t data)
 {
 	/* bits 0 & 1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -86,27 +86,27 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
+void bladestl_state::bladestl_port_B_w(uint8_t data)
 {
 	// bits 3-5 = ROM bank select
 	m_upd7759->set_rom_bank((data & 0x38) >> 3);
 
 	// bit 2 = SSG-C rc filter enable
-	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
 
 	// bit 1 = SSG-B rc filter enable
-	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
 
 	// bit 0 = SSG-A rc filter enable
-	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
-READ8_MEMBER(bladestl_state::bladestl_speech_busy_r)
+uint8_t bladestl_state::bladestl_speech_busy_r()
 {
 	return m_upd7759->busy_r() ? 1 : 0;
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_speech_ctrl_w)
+void bladestl_state::bladestl_speech_ctrl_w(uint8_t data)
 {
 	m_upd7759->reset_w(data & 1);
 	m_upd7759->start_w(data & 2);
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( bladestl_joy ) // Joystick set does not even have a Tr
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8") // This is buggy in version E: while it shows Off in Test Mode, the sounds always play. It was fixed for later versions
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -313,7 +313,7 @@ void bladestl_state::bladestl(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(24'000'000) / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bladestl_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -331,12 +331,12 @@ void bladestl_state::bladestl(machine_config &config)
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);
-	m_k007342->set_tile_callback(FUNC(bladestl_state::bladestl_tile_callback), this);
+	m_k007342->set_tile_callback(FUNC(bladestl_state::bladestl_tile_callback));
 	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
 	K007420(config, m_k007420, 0);
 	m_k007420->set_bank_limit(0x3ff);
-	m_k007420->set_sprite_callback(FUNC(bladestl_state::bladestl_sprite_callback), this);
+	m_k007420->set_sprite_callback(FUNC(bladestl_state::bladestl_sprite_callback));
 	m_k007420->set_palette_tag("palette");
 
 	K051733(config, "k051733", 0);

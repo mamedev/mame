@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Dirk Best,Stephane Humbert
+// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Dirk Best, Stephane Humbert
 /*
 
    Cubo CD32 (additional hardware and games by CD Express, Milan, Italy)
@@ -7,28 +7,34 @@
    The CuboCD32 is a stock retail CD32 unit with additional hardware to adapt it
    for JAMMA use.
 
+   TODO:
+   - remove m_input_hack functions, needed to make inputs working
+   - lsrquiz2i, lsrquizg: access violation on microtouch_device destructor when exiting emulation
+                          Caused by microtouch_device::rcv_complete() overrunning the m_rx_buffer
+                          array space with 149 (array size=16).
+
+
    Known Games:
-   Title                | rev. | year
-   ----------------------------------------------
-   Candy Puzzle         |  1.0 | 1995
-   Double Strixx        |      | 1995
-   Greyhound Race       |      | 199x
-   Harem Challenge      |      | 1995
-   Laser Quiz           |      | 1995
-   Laser Quiz France    |  1.0 | 1995
-   Laser Quiz Greece?   |      | 1995 *may exist
-   Laser Quiz 2 "Italy" |  1.0 | 1995
-   Laser Strixx         |      | 1995
-   Laser Strixx 2       |      | 1995
-   Lucky Five           |      | 1995
-   Magic Number         |      | 1995
-   Magic Premium        |  1.1 | 1996
-   Odeon Twister        |      | 199x
-   Odeon Twister 2      |202.19| 1999
-
-   ToDo:
-   - remove the hack needed to make inputs working
-
+   Dumped | Title                | Rev.  | Year | Notes
+   ----------------------------------------------------
+     YES  | Candy Puzzle         |  1.0  | 1995 |
+          | Double Strixx        |       | 1995 |
+     YES  | El Dorado            |  4.2  | 199x | Laser Gate 2
+          | Greyhound Race       |       | 199x |
+     YES  | Harem Challenge      |       | 1995 |
+          | Laser Quiz           |       | 1995 |
+          | Laser Quiz France    |  1.0  | 1995 |
+     YES  | Laser Quiz Greece    |       | 1995 |
+     YES  | Laser Quiz Italy     |       | 1995 |
+     YES  | Laser Quiz 2 Greece  |       | 1995 |
+     YES  | Laser Quiz 2 Italy   |  1.0  | 1995 |
+          | Laser Strixx         |       | 1995 |
+     YES  | Laser Strixx 2       |       | 1995 |
+          | Lucky Five           |       | 1995 |
+     YES  | Magic Number         |       | 1995 |
+     YES  | Magic Premium        |    1.1| 1996 |
+     YES  | Odeon Twister        |    1.4| 199x |
+     YES  | Odeon Twister 2      | 202.19| 1999 |
 
 Stephh's notes (based on the game M68EC020 code and some tests) :
 
@@ -325,21 +331,21 @@ routines :
 class cubo_state : public amiga_state
 {
 public:
-	cubo_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_player_ports(*this, {"P1", "P2"}),
-	m_microtouch(*this, "microtouch"),
-	m_cdda(*this, "cdda")
+	cubo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_player_ports(*this, {"P1", "P2"})
+		, m_microtouch(*this, "microtouch")
+		, m_cdda(*this, "cdda")
 	{ }
 
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
 	uint16_t handle_joystick_potgor(uint16_t potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
-	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
+	template <int P> DECLARE_READ_LINE_MEMBER(cd32_sel_mirror_input);
 
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
-	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+	void akiko_cia_0_port_a_write(uint8_t data);
 
 	void init_cubo();
 	void init_mgprem11();
@@ -353,9 +359,9 @@ public:
 
 	optional_ioport_array<2> m_player_ports;
 
-	int m_oldstate[2];
-	int m_cd32_shifter[2];
-	uint16_t m_potgo_value;
+	int m_oldstate[2]{};
+	int m_cd32_shifter[2]{};
+	uint16_t m_potgo_value = 0;
 
 	void cubo(machine_config &config);
 	void cubo_mem(address_map &map);
@@ -369,7 +375,7 @@ private:
 	required_device<cdda_device> m_cdda;
 
 	typedef void (cubo_state::*input_hack_func)();
-	input_hack_func m_input_hack;
+	input_hack_func m_input_hack{};
 	void chip_ram_w8_hack(offs_t byteoffs, uint8_t data);
 	void cndypuzl_input_hack();
 	void haremchl_input_hack();
@@ -403,7 +409,7 @@ WRITE_LINE_MEMBER( cubo_state::akiko_int_w )
  *************************************/
 
 
-WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
+void cubo_state::akiko_cia_0_port_a_write(uint8_t data)
 {
 	/* bit 0 = cd audio mute */
 	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
@@ -432,7 +438,7 @@ void cubo_state::cubo_mem(address_map &map)
 	map(0xa80000, 0xb7ffff).noprw();
 	map(0xb80000, 0xb8003f).rw("akiko", FUNC(akiko_device::read), FUNC(akiko_device::write));
 	map(0xbf0000, 0xbfffff).rw(FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
-	map(0xc00000, 0xdfffff).rw(FUNC(cubo_state::custom_chip_r), FUNC(cubo_state::custom_chip_w));
+	map(0xc00000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap32));
 	map(0xe00000, 0xe7ffff).rom().region("kickstart", 0x80000);
 	map(0xe80000, 0xf7ffff).noprw();
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -534,9 +540,10 @@ CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
-CUSTOM_INPUT_MEMBER( cubo_state::cd32_sel_mirror_input )
+template <int P>
+READ_LINE_MEMBER( cubo_state::cd32_sel_mirror_input )
 {
-	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
+	uint8_t bits = m_player_ports[P]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -546,22 +553,22 @@ static INPUT_PORTS_START( cubo )
 	PORT_START("CIA0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM )
 	/* this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button! */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cubo_state, cd32_sel_mirror_input<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cubo_state, cd32_sel_mirror_input<0>)
 
 	PORT_START("CIA0PORTB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cubo_state, amiga_joystick_convert<1>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cubo_state, amiga_joystick_convert<0>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cubo_input, nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cubo_state, cubo_input)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
@@ -647,7 +654,6 @@ static INPUT_PORTS_START( cubo )
 	PORT_DIPNAME( 0x80, 0x80, "DSW2 8" )
 	PORT_DIPSETTING(    0x80, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cndypuzl )
@@ -1026,9 +1032,36 @@ static INPUT_PORTS_START( mgprem11 )
 	PORT_DIPSETTING(    0x00, "OK" )
 	PORT_DIPSETTING(    0x01, "ERROR!" )
 	PORT_BIT( 0x00fe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( eldoralg )
+	PORT_INCLUDE( cubo )
+
+	// TODO: verify layout
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("P1 G") PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 F") PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 D") PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 E") PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("P2 G") PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P2 F") PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 C") PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 D") PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 A") PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P2 E") PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 B") PORT_PLAYER(2)
+
+	PORT_MODIFY("DIPSW1")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )                     /* Hold at boot for test mode */
+
+	PORT_MODIFY("DIPSW2")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN2 )
+INPUT_PORTS_END
 
 void cubo_state::cubo(machine_config &config)
 {
@@ -1036,9 +1069,15 @@ void cubo_state::cubo(machine_config &config)
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cubo_state::cubo_mem);
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cubo_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cubo_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(1024);
+	AMIGA_COPPER(config, m_copper, amiga_state::CLK_28M_PAL / 2);
+	m_copper->set_host_cpu_tag(m_maincpu);
+	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->set_ecs_mode(true);
+
+	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
 	akiko_device &akiko(AKIKO(config, "akiko", 0));
 	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
@@ -1051,7 +1090,7 @@ void cubo_state::cubo(machine_config &config)
 	// video hardware
 	pal_video(config);
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
+	PALETTE(config, m_palette, FUNC(amiga_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -1059,13 +1098,13 @@ void cubo_state::cubo(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_PAL));
-	paula.add_route(0, "lspeaker", 0.25);
-	paula.add_route(1, "rspeaker", 0.25);
-	paula.add_route(2, "rspeaker", 0.25);
-	paula.add_route(3, "lspeaker", 0.25);
-	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
-	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
+	PAULA_8364(config, m_paula, amiga_state::CLK_C1_PAL);
+	m_paula->add_route(0, "lspeaker", 0.25);
+	m_paula->add_route(1, "rspeaker", 0.25);
+	m_paula->add_route(2, "rspeaker", 0.25);
+	m_paula->add_route(3, "lspeaker", 0.25);
+	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	CDDA(config, m_cdda);
 	m_cdda->add_route(0, "lspeaker", 0.50);
@@ -1139,11 +1178,18 @@ ROM_START( lsrquiz )
 	DISK_IMAGE_READONLY( "lsrquiz", 0, BAD_DUMP SHA1(41fb6cd0c9d36bd77e9c3db69d36801edc791e96) )
 ROM_END
 
-ROM_START( lsrquiz2 )
+ROM_START( lsrquiz2i )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "lsrquiz2", 0, BAD_DUMP SHA1(78e261df1c548fa492e6cf37a9469640bb8816bf) )
+ROM_END
+
+ROM_START( lsrquizg )
+	CD32_BIOS
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "laserquizgreek2pro", 0, BAD_DUMP SHA1(8538915b4a0078f19197a5562e37ed3e6d0429a4) )
 ROM_END
 
 ROM_START( mgprem11 )
@@ -1167,6 +1213,13 @@ ROM_START( mgnumber )
 	DISK_IMAGE_READONLY( "magicnumber", 0, BAD_DUMP SHA1(60e1fadc42694742d19cc0ac2b6e99e9e33faa3d) )
 ROM_END
 
+ROM_START( odeontw )
+	CD32_BIOS
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "twister32_17_3", 0, BAD_DUMP SHA1(a40ec484708e22059f7186415283084ebf01323e) ) // has its audio cut a little, worth to mark as redump needed
+ROM_END
+
 ROM_START( odeontw2 )
 	CD32_BIOS
 
@@ -1174,6 +1227,12 @@ ROM_START( odeontw2 )
 	DISK_IMAGE_READONLY( "odeontw2", 0, BAD_DUMP SHA1(f39e09f35b65a6ae9f1eba4a22f970626b7d3b71) )
 ROM_END
 
+ROM_START( eldoralg )
+	CD32_BIOS
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "eldorado", 0, BAD_DUMP SHA1(bc1617c2e3438b729421c1d8b1bf88840b12f030) )
+ROM_END
 
 
 /*************************************
@@ -1304,77 +1363,20 @@ void cubo_state::init_mgprem11()
 	m_input_hack = &cubo_state::mgprem11_input_hack;
 }
 
-static INPUT_PORTS_START( odeontw2 )
-//  PORT_INCLUDE( cd32 )
-	PORT_START("CIA0PORTA")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("CIA0PORTB")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-
-	PORT_START("DIPSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1 1" )
-	PORT_DIPSETTING(    0x01, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x02, 0x02, "DSW1 2" )
-	PORT_DIPSETTING(    0x02, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x04, 0x04, "DSW1 3" )
-	PORT_DIPSETTING(    0x04, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x08, 0x08, "DSW1 4" )
-	PORT_DIPSETTING(    0x08, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x10, 0x10, "DSW1 5" )
-	PORT_DIPSETTING(    0x10, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x20, 0x20, "DSW1 6" )
-	PORT_DIPSETTING(    0x20, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x40, 0x40, "DSW1 7" )
-	PORT_DIPSETTING(    0x40, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x80, 0x80, "DSW1 8" )
-	PORT_DIPSETTING(    0x80, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-
-	PORT_START("DIPSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2 1" )
-	PORT_DIPSETTING(    0x01, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x02, 0x02, "DSW2 2" )
-	PORT_DIPSETTING(    0x02, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x04, 0x04, "DSW2 3" )
-	PORT_DIPSETTING(    0x04, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x08, 0x08, "DSW2 4" )
-	PORT_DIPSETTING(    0x08, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x10, 0x10, "DSW2 5" )
-	PORT_DIPSETTING(    0x10, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x20, 0x20, "DSW2 6" )
-	PORT_DIPSETTING(    0x20, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x40, 0x40, "DSW2 7" )
-	PORT_DIPSETTING(    0x40, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x80, 0x80, "DSW2 8" )
-	PORT_DIPSETTING(    0x80, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-
-INPUT_PORTS_END
-
-
-
-GAME( 1993, cubo,     0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
-GAME( 1995, cndypuzl, cubo, cubo, cndypuzl, cubo_state, init_cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, haremchl, cubo, cubo, haremchl, cubo_state, init_haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  /* no player 2 inputs (ingame), wrong pitch for most gfxs */
-GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, init_lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* wrong pitch for some gfxs, crashes during gameplay */
-GAME( 1995, lasstixx, cubo, cubo, lasstixx, cubo_state, init_lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, mgnumber, cubo, cubo, mgnumber, cubo_state, init_mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, mgprem11, cubo, cubo, mgprem11, cubo_state, init_mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, odeontw2, cubo, cubo, odeontw2, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING )
+GAME( 1993, cubo,      0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",     "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1995, cndypuzl,  cubo, cubo, cndypuzl, cubo_state, init_cndypuzl, ROT0, "CD Express",    "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, haremchl,  cubo, cubo, haremchl, cubo_state, init_haremchl, ROT0, "CD Express",    "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,   cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express",    "Laser Quiz Italy",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // no player 2 inputs (ingame), wrong pitch for most gfxs, access violation during gameplay or on emu exit (microtouch?)
+GAME( 1995, lsrquizg,  cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express",    "Laser Quiz Greece",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't accept coins, no player 2 inputs (ingame), wrong pitch for most gfxs, access violation during gameplay or on emu exit (microtouch?)
+GAME( 1995, lsrquiz2i, cubo, cubo, lsrquiz2, cubo_state, init_lsrquiz2, ROT0, "CD Express",    "Laser Quiz 2 Italy (v1.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // wrong pitch for some gfxs, access violation during gameplay (microtouch?)
+GAME( 1995, lasstixx,  cubo, cubo, lasstixx, cubo_state, init_lasstixx, ROT0, "CD Express",    "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, mgnumber,  cubo, cubo, mgnumber, cubo_state, init_mgnumber, ROT0, "CD Express",    "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, mgprem11,  cubo, cubo, mgprem11, cubo_state, init_mgprem11, ROT0, "CD Express",    "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, eldoralg,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "Shangai Games", "Eldorado (4.2)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // touchscreen is offset and cannot be calibrated, joystick buttons aren't recognized properly, has slight GFX bug with roulette ball
+GAME( 1998, odeontw,   cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister (v1.4)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "Invalid NVRAM", accesses area $6xxxxx and claims invalid RAM config if bypassed
+GAME( 1998, odeontw2,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Resets halfway thru "please wait" in service mode, therefore NVRAM cannot be inited
+// Laser Gate 2, alt title for Eldorado?
+// Lucky Five
+// Greyhound Race
+// Double Strixx

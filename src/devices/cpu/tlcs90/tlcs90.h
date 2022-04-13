@@ -13,19 +13,18 @@ class tlcs90_device : public cpu_device
 	static constexpr int MAX_PORTS = 9;
 	//static constexpr int MAX_ANALOG_INPUTS = 16;
 
-public:
-	DECLARE_READ8_MEMBER( t90_internal_registers_r );
-	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );
-
+protected:
 	TIMER_CALLBACK_MEMBER( t90_timer_callback );
 	TIMER_CALLBACK_MEMBER( t90_timer4_callback );
 
+	void tmp90840_regs(address_map &map);
 	void tmp90840_mem(address_map &map);
 	void tmp90841_mem(address_map &map);
+	void tmp90844_regs(address_map &map);
 	void tmp90ph44_mem(address_map &map);
 	void tmp91640_mem(address_map &map);
 	void tmp91641_mem(address_map &map);
-protected:
+
 	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };
 
 
@@ -43,10 +42,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 2; }
-	virtual uint32_t execute_max_cycles() const override { return 26; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 26; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void execute_burn(int32_t cycles) override;
@@ -57,8 +56,46 @@ protected:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	// internal registers
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
+	uint8_t p4_r();
+	void p4_w(uint8_t data);
+	void p4cr_w(uint8_t data);
+	uint8_t p5_r();
+	uint8_t p6_r();
+	void p6_w(uint8_t data);
+	uint8_t p7_r();
+	void p7_w(uint8_t data);
+	void p67cr_w(uint8_t data);
+	uint8_t p8_r();
+	void p8_w(uint8_t data);
+	void p8cr_w(uint8_t data);
+	uint8_t smmod_r();
+	void smmod_w(uint8_t data);
+	uint8_t tmod_r();
+	void tmod_w(uint8_t data);
+	uint8_t tclk_r();
+	void tclk_w(uint8_t data);
+	uint8_t t01mod_r();
+	void t01mod_w(uint8_t data);
+	uint8_t t23mod_r();
+	void t23mod_w(uint8_t data);
+	void treg_8bit_w(offs_t offset, uint8_t data);
+	uint8_t t4mod_r();
+	void t4mod_w(uint8_t data);
+	void treg_16bit_w(offs_t offset, uint8_t data);
+	uint8_t trun_r();
+	void trun_w(uint8_t data);
+	void intel_w(uint8_t data);
+	void inteh_w(uint8_t data);
+	void irf_clear_w(uint8_t data);
+	uint8_t bx_r();
+	void bx_w(uint8_t data);
+	uint8_t by_r();
+	void by_w(uint8_t data);
+	uint8_t reserved_r(offs_t offset);
+	void reserved_w(offs_t offset, uint8_t data);
 
 private:
 	enum class e_mode : u8 {
@@ -71,8 +108,8 @@ private:
 
 	address_space_config m_program_config;
 
-	devcb_read8 m_port_read_cb[MAX_PORTS];
-	devcb_write8 m_port_write_cb[MAX_PORTS];
+	devcb_read8::array<MAX_PORTS> m_port_read_cb;
+	devcb_write8::array<MAX_PORTS> m_port_write_cb;
 
 	PAIR        m_prvpc,m_pc,m_sp,m_af,m_bc,m_de,m_hl,m_ix,m_iy;
 	PAIR        m_af2,m_bc2,m_de2,m_hl2;
@@ -162,6 +199,10 @@ class tmp90840_device : public tlcs90_device
 public:
 	// construction/destruction
 	tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -170,6 +211,10 @@ class tmp90841_device : public tlcs90_device
 public:
 	// construction/destruction
 	tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -178,6 +223,10 @@ class tmp90845_device : public tlcs90_device
 public:
 	// construction/destruction
 	tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -186,6 +235,10 @@ class tmp91640_device : public tlcs90_device
 public:
 	// construction/destruction
 	tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -194,6 +247,10 @@ class tmp91641_device : public tlcs90_device
 public:
 	// construction/destruction
 	tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -202,6 +259,10 @@ class tmp90ph44_device : public tlcs90_device
 public:
 	// construction/destruction
 	tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 

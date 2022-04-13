@@ -6,18 +6,15 @@
 #include "sound/ay8910.h"
 
 
-/* macro to convert 4-bit unsigned samples to 16-bit signed samples */
+// macro to convert 4-bit unsigned samples to 16-bit signed samples
 #define SAMPLE_CONV4(a) (0x1111*((a&0x0f))-0x8000)
 
 #define SND_CLOCK 3072000   /* 3.072 MHz */
 
 SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 {
-	if (m_samples_region)
-	{
 		m_sample_buf = std::make_unique<int16_t[]>(2 * m_samples_region.bytes());
 		save_pointer(NAME(m_sample_buf), 2 * m_samples_region.bytes());
-	}
 }
 
 //**************************************************************************
@@ -38,7 +35,7 @@ cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, cons
 	m_sample_freq(0),
 	m_sample_volume(0),
 	m_samples(*this, "samples"),
-	m_samples_region(*this, "^samples")
+	m_samples_region(*this, "samples")
 {
 }
 
@@ -70,31 +67,31 @@ void cclimber_audio_device::device_add_mconfig(machine_config &config)
 }
 
 
-WRITE8_MEMBER(cclimber_audio_device::sample_select_w)
+void cclimber_audio_device::sample_select_w(uint8_t data)
 {
 	m_sample_num = data;
 }
 
-WRITE8_MEMBER(cclimber_audio_device::sample_rate_w)
+void cclimber_audio_device::sample_rate_w(uint8_t data)
 {
-	/* calculate the sampling frequency */
+	// calculate the sampling frequency
 	m_sample_freq = SND_CLOCK / 4 / (256 - data);
 }
 
-WRITE8_MEMBER(cclimber_audio_device::sample_volume_w)
+void cclimber_audio_device::sample_volume_w(uint8_t data)
 {
-	m_sample_volume = data & 0x1f;    /* range 0-31 */
+	m_sample_volume = data & 0x1f;    // range 0-31
 }
 
-WRITE_LINE_MEMBER(cclimber_audio_device::sample_trigger)
+void cclimber_audio_device::sample_trigger(int state)
 {
 	if (state == 0)
 		return;
 
-	play_sample(32 * m_sample_num,m_sample_freq,m_sample_volume);
+	play_sample(32 * m_sample_num, m_sample_freq, m_sample_volume);
 }
 
-WRITE8_MEMBER(cclimber_audio_device::sample_trigger_w)
+void cclimber_audio_device::sample_trigger_w(uint8_t data)
 {
 	sample_trigger(data != 0);
 }
@@ -102,16 +99,10 @@ WRITE8_MEMBER(cclimber_audio_device::sample_trigger_w)
 
 void cclimber_audio_device::play_sample(int start,int freq,int volume)
 {
-	int len;
 	int romlen = m_samples_region.bytes();
 
-	if (m_samples_region == nullptr)
-	{
-		return;
-	}
-
-	/* decode the rom samples */
-	len = 0;
+	// decode the ROM samples
+	int len = 0;
 	while (start + len < romlen && m_samples_region[start+len] != 0x70)
 	{
 		int sample;
@@ -125,5 +116,5 @@ void cclimber_audio_device::play_sample(int start,int freq,int volume)
 		len++;
 	}
 
-	m_samples->start_raw(0,m_sample_buf.get(),2 * len,freq);
+	m_samples->start_raw(0, m_sample_buf.get(), 2 * len, freq);
 }

@@ -14,7 +14,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "cubeqcpu.h"
 #include "cubedasm.h"
 
@@ -182,8 +181,8 @@ void cquestsnd_cpu_device::device_start()
 	assert(m_sound_region_tag != nullptr);
 	m_sound_data = (u16*)machine().root_device().memregion(m_sound_region_tag)->base();
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -261,8 +260,8 @@ void cquestrot_cpu_device::device_start()
 {
 	m_linedata_w.resolve_safe();
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -392,8 +391,8 @@ void cquestlin_cpu_device::device_start()
 {
 	m_linedata_r.resolve_safe(0);
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -542,7 +541,7 @@ void cquestsnd_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		u64 inst = m_cache->read_qword(SND_PC);
+		u64 inst = m_cache.read_qword(SND_PC);
 		u32 inslow = inst & 0xffffffff;
 		u32 inshig = inst >> 32;
 
@@ -798,7 +797,7 @@ void cquestrot_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		u64 inst = m_cache->read_qword(ROT_PC);
+		u64 inst = m_cache.read_qword(ROT_PC);
 
 		u32 inslow = inst & 0xffffffff;
 		u32 inshig = inst >> 32;
@@ -1218,7 +1217,7 @@ void cquestlin_cpu_device::execute_run()
 		int prog = (m_clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
 		m_curpc = LINE_PC;
-		u64 inst = m_cache->read_qword(LINE_PC);
+		u64 inst = m_cache.read_qword(LINE_PC);
 
 		u32 inslow = inst & 0xffffffff;
 		u32 inshig = inst >> 32;

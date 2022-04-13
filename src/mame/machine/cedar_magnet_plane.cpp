@@ -140,7 +140,7 @@ u32 cedar_magnet_plane_device::draw(screen_device &screen, bitmap_ind16 &bitmap,
 
 	for (int y = 0; y < 256;y++)
 	{
-		u16 *dst = &bitmap.pix16((y - m_scrolly) & 0xff);
+		u16 *const dst = &bitmap.pix((y - m_scrolly) & 0xff);
 
 		for (int x = 0; x < 256;x++)
 		{

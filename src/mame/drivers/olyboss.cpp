@@ -84,34 +84,33 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_read);
+	u8 keyboard_read();
 
 	UPD3301_DRAW_CHARACTER_MEMBER( olyboss_display_pixels );
 
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_WRITE_LINE_MEMBER( romdis_w );
-	DECLARE_READ8_MEMBER( dma_mem_r );
-	DECLARE_WRITE8_MEMBER( dma_mem_w );
-	DECLARE_READ8_MEMBER( fdcctrl_r );
-	DECLARE_WRITE8_MEMBER( fdcctrl_w );
-	DECLARE_WRITE8_MEMBER( fdcctrl85_w );
-	DECLARE_READ8_MEMBER( fdcdma_r );
-	DECLARE_WRITE8_MEMBER( fdcdma_w );
-	DECLARE_WRITE8_MEMBER( crtcdma_w );
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_WRITE8_MEMBER( rom_w );
-	DECLARE_WRITE8_MEMBER( vchrmap_w );
-	DECLARE_WRITE8_MEMBER( vchrram_w );
-	DECLARE_WRITE8_MEMBER( vchrram85_w );
-	DECLARE_WRITE8_MEMBER( ppic_w );
+	u8 dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, u8 data);
+	u8 fdcctrl_r();
+	void fdcctrl_w(u8 data);
+	void fdcctrl85_w(u8 data);
+	u8 fdcdma_r();
+	void fdcdma_w(u8 data);
+	void crtcdma_w(u8 data);
+	u8 rom_r(offs_t offset);
+	void rom_w(offs_t offset, u8 data);
+	void vchrmap_w(offs_t offset, u8 data);
+	void vchrram_w(offs_t offset, u8 data);
+	void vchrram85_w(offs_t offset, u8 data);
+	void ppic_w(u8 data);
 	void olyboss_io(address_map &map);
 	void olyboss_mem(address_map &map);
 	void olyboss85_io(address_map &map);
-	IRQ_CALLBACK_MEMBER(irq_cb);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
@@ -150,7 +149,7 @@ void olyboss_state::machine_reset()
 	m_timer->adjust(attotime::from_hz(30), 0, attotime::from_hz(30)); // unknown timer freq, possibly com2651 BRCLK
 }
 
-void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_timstate = !m_timstate;
 	if(m_pic)
@@ -173,13 +172,13 @@ void olyboss_state::olyboss_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x0, 0x8).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x00, 0x08).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
-	//AM_RANGE(0x20, 0x20) //beeper?
+	//map(0x20, 0x20) //beeper?
 	map(0x30, 0x30).rw(m_uic, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x31, 0x31).rw(m_uic, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 	map(0x40, 0x43).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	//AM_RANGE(0x50, 0x53) COM2651
+	//map(0x50, 0x53) COM2651
 	map(0x60, 0x60).rw(FUNC(olyboss_state::fdcctrl_r), FUNC(olyboss_state::fdcctrl_w));
 	map(0x80, 0x81).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 	map(0x82, 0x84).w(FUNC(olyboss_state::vchrmap_w));
@@ -203,17 +202,17 @@ static INPUT_PORTS_START( olyboss )
 	PORT_START("DSW")
 INPUT_PORTS_END
 
-READ8_MEMBER( olyboss_state::rom_r )
+u8 olyboss_state::rom_r(offs_t offset)
 {
 	return m_romen ?  m_rom->as_u8(offset) : m_lowram[offset];
 }
 
-WRITE8_MEMBER( olyboss_state::rom_w )
+void olyboss_state::rom_w(offs_t offset, u8 data)
 {
 	m_lowram[offset] = data;
 }
 
-WRITE8_MEMBER( olyboss_state::vchrram85_w )
+void olyboss_state::vchrram85_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -229,7 +228,7 @@ WRITE8_MEMBER( olyboss_state::vchrram85_w )
 	}
 }
 
-WRITE8_MEMBER( olyboss_state::vchrmap_w )
+void olyboss_state::vchrmap_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -242,7 +241,7 @@ WRITE8_MEMBER( olyboss_state::vchrmap_w )
 	}
 }
 
-WRITE8_MEMBER( olyboss_state::vchrram_w )
+void olyboss_state::vchrram_w(offs_t offset, u8 data)
 {
 	m_vchrram[(m_vchrpage << 4) + (offset ^ 0xf)] = data;
 }
@@ -252,36 +251,26 @@ WRITE_LINE_MEMBER( olyboss_state::romdis_w )
 	m_romen = state ? false : true;
 }
 
-IRQ_CALLBACK_MEMBER( olyboss_state::irq_cb )
-{
-	if(!irqline)
-		return m_pic->acknowledge();
-	return 0;
-}
-
 //**************************************************************************
 //  VIDEO
 //**************************************************************************
 
 UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 {
-	uint8_t data = cc & 0x7f;
+	u8 data = cc & 0x7f;
 	if(cc & 0x80)
 		data = m_vchrram[(data << 4) | lc];
 	else
 		data = m_char_rom->base()[(data << 4) | lc];
-	int i;
 
 	//if (lc >= 8) return;
 	if (csr)
-	{
 		data = 0xff;
-	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		int color = BIT(data, 7) ^ rvv;
-		bitmap.pix32(y, (sx * 8) + i) = color?0xffffff:0;
+		int color = BIT(data, 7);
+		bitmap.pix(y, (sx * 8) + i) = color ? 0xffffff : 0;
 		data <<= 1;
 	}
 }
@@ -290,7 +279,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 //  KEYBOARD
 //**************************************************************************
 
-READ8_MEMBER( olyboss_state::keyboard_read )
+u8 olyboss_state::keyboard_read()
 {
 	//logerror ("keyboard_read offs [%d]\n",offset);
 	if (m_keybhit)
@@ -303,7 +292,7 @@ READ8_MEMBER( olyboss_state::keyboard_read )
 	return 0x00;
 }
 
-WRITE8_MEMBER( olyboss_state::ppic_w )
+void olyboss_state::ppic_w(u8 data)
 {
 	m_uic->ireq4_w(BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 	m_fdcctrl = (m_fdcctrl & ~0x10) | (BIT(data, 5) ? 0x10 : 0);
@@ -359,42 +348,42 @@ WRITE_LINE_MEMBER( olyboss_state::tc_w )
 	}
 }
 
-READ8_MEMBER( olyboss_state::dma_mem_r )
+u8 olyboss_state::dma_mem_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	return program.read_byte(offset);
 }
 
-WRITE8_MEMBER( olyboss_state::dma_mem_w )
+void olyboss_state::dma_mem_w(offs_t offset, u8 data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.write_byte(offset, data);
 }
 
-READ8_MEMBER( olyboss_state::fdcdma_r )
+u8 olyboss_state::fdcdma_r()
 {
 	m_channel = 0;
 	return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER( olyboss_state::fdcdma_w )
+void olyboss_state::fdcdma_w(u8 data)
 {
 	m_channel = 0;
 	m_fdc->dma_w(data);
 }
 
-WRITE8_MEMBER( olyboss_state::crtcdma_w )
+void olyboss_state::crtcdma_w(u8 data)
 {
 	m_channel = 2;
-	m_crtc->dack_w(space, offset, data, mem_mask);
+	m_crtc->dack_w(data);
 }
 
-READ8_MEMBER( olyboss_state::fdcctrl_r )
+u8 olyboss_state::fdcctrl_r()
 {
 	return m_fdcctrl | m_fdctype; // 0xc0 seems to indicate an 8" drive, 0x80 a 5.25" dd drive, 0xa0 a 5.25" qd drive
 }
 
-WRITE8_MEMBER( olyboss_state::fdcctrl_w )
+void olyboss_state::fdcctrl_w(u8 data)
 {
 	m_fdcctrl = data;
 	m_romen = (m_fdcctrl & 1) ? false : true;
@@ -403,7 +392,7 @@ WRITE8_MEMBER( olyboss_state::fdcctrl_w )
 		m_fdd1->get_device()->mon_w(!(data & 4));
 }
 
-WRITE8_MEMBER( olyboss_state::fdcctrl85_w )
+void olyboss_state::fdcctrl85_w(u8 data)
 {
 	m_fdcctrl = data;
 	m_fdd0->get_device()->mon_w(!(data & 0x40));
@@ -454,7 +443,7 @@ void olyboss_state::olybossd(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w)).invert();
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	m_fdd0->enable_sound(true);
 
 	I8257(config, m_dma, XTAL(4'000'000));
@@ -468,7 +457,8 @@ void olyboss_state::olybossd(machine_config &config)
 
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
+	m_crtc->set_attribute_fetch_callback(m_crtc, FUNC(upd3301_device::default_attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->int_wr_callback().set(m_uic, FUNC(am9519_device::ireq0_w)).invert();
 	m_crtc->set_screen(SCREEN_TAG);
@@ -486,14 +476,14 @@ void olyboss_state::olybossb(machine_config &config)
 {
 	olybossd(config);
 	config.device_remove("fdc:0");
-	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void olyboss_state::olybossc(machine_config &config)
 {
 	olybossd(config);
-	FLOPPY_CONNECTOR(config, "fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void olyboss_state::bossb85(machine_config &config)
@@ -501,7 +491,7 @@ void olyboss_state::bossb85(machine_config &config)
 	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, 4_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &olyboss_state::olyboss_mem);
 	maincpu.set_addrmap(AS_IO, &olyboss_state::olyboss85_io);
-	maincpu.set_irq_acknowledge_callback(FUNC(olyboss_state::irq_cb));
+	maincpu.in_inta_func().set(m_pic, FUNC(pic8259_device::acknowledge));
 	maincpu.out_sod_func().set(FUNC(olyboss_state::romdis_w));
 
 	/* video hardware */
@@ -520,8 +510,8 @@ void olyboss_state::bossb85(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	I8257(config, m_dma, XTAL(4'000'000));
 	m_dma->out_hrq_cb().set(FUNC(olyboss_state::hrq_w));
@@ -535,6 +525,7 @@ void olyboss_state::bossb85(machine_config &config)
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
+	m_crtc->set_attribute_fetch_callback(m_crtc, FUNC(upd3301_device::default_attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->int_wr_callback().set_inputline("maincpu", I8085_RST75_LINE);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -547,8 +538,8 @@ void olyboss_state::bossb85(machine_config &config)
 void olyboss_state::bossa85(machine_config &config)
 {
 	bossb85(config);
-	FLOPPY_CONNECTOR(config.replace(), "fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config.replace(), "fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 //**************************************************************************

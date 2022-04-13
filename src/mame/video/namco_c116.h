@@ -6,7 +6,6 @@
 #pragma once
 
 
-
 //***************************************************************************
 //  TYPE DEFINITIONS
 //***************************************************************************
@@ -18,14 +17,14 @@ class namco_c116_device :
 {
 public:
 	//construction/destruction
-	namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void enable_shadows() { m_enable_shadows = true; }
 
 	//read/write handlers
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	//getters
 	uint16_t get_reg(int reg) { return m_regs[reg]; }
@@ -44,7 +43,7 @@ private:
 	std::vector<uint8_t> m_ram_g;
 	std::vector<uint8_t> m_ram_b;
 	uint16_t m_regs[8];
-	bool                m_enable_shadows;       // are shadows enabled?
+	bool m_enable_shadows; // are shadows enabled?
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_C116, namco_c116_device)

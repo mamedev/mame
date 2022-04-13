@@ -37,37 +37,37 @@ void a78_hiscore_device::device_add_mconfig(machine_config &config)
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_hiscore_device::read_10xx)
+uint8_t a78_hiscore_device::read_10xx(offs_t offset)
 {
 	return m_nvram[offset];
 }
 
-WRITE8_MEMBER(a78_hiscore_device::write_10xx)
+void a78_hiscore_device::write_10xx(offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = data;
 }
 
-READ8_MEMBER(a78_hiscore_device::read_30xx)
+uint8_t a78_hiscore_device::read_30xx(offs_t offset)
 {
 	return m_rom[offset];
 }
 
-READ8_MEMBER(a78_hiscore_device::read_04xx)
+uint8_t a78_hiscore_device::read_04xx(offs_t offset)
 {
-	return m_hscslot->read_04xx(space, offset);
+	return m_hscslot->read_04xx(offset);
 }
 
-WRITE8_MEMBER(a78_hiscore_device::write_04xx)
+void a78_hiscore_device::write_04xx(offs_t offset, uint8_t data)
 {
-	m_hscslot->write_04xx(space, offset, data);
+	m_hscslot->write_04xx(offset, data);
 }
 
-READ8_MEMBER(a78_hiscore_device::read_40xx)
+uint8_t a78_hiscore_device::read_40xx(offs_t offset)
 {
-	return m_hscslot->read_40xx(space, offset);
+	return m_hscslot->read_40xx(offset);
 }
 
-WRITE8_MEMBER(a78_hiscore_device::write_40xx)
+void a78_hiscore_device::write_40xx(offs_t offset, uint8_t data)
 {
-	m_hscslot->write_40xx(space, offset, data);
+	m_hscslot->write_40xx(offset, data);
 }

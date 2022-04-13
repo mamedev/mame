@@ -7,6 +7,7 @@
     CPU device definitions.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_DEVCPU_H
 #define MAME_EMU_DEVCPU_H
 
@@ -14,16 +15,6 @@
 
 #include "didisasm.h"
 #include "diexec.h"
-
-
-//**************************************************************************
-//  CPU DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// recompilation parameters
-#define MCFG_CPU_FORCE_NO_DRC() \
-		dynamic_cast<cpu_device &>(*device).set_force_no_drc(true);
-
 
 
 //**************************************************************************

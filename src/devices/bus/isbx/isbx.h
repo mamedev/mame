@@ -44,7 +44,7 @@
 
 class isbx_slot_device;
 
-class device_isbx_card_interface : public device_slot_card_interface
+class device_isbx_card_interface : public device_interface
 {
 public:
 	virtual uint8_t mcs0_r(offs_t offset) { return 0xff; }
@@ -70,8 +70,7 @@ protected:
 
 // ======================> isbx_slot_device
 
-class isbx_slot_device : public device_t,
-							public device_slot_interface
+class isbx_slot_device : public device_t, public device_single_card_slot_interface<device_isbx_card_interface>
 {
 public:
 	// construction/destruction
@@ -115,7 +114,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 
 	devcb_write_line   m_write_mintr0;
 	devcb_write_line   m_write_mintr1;

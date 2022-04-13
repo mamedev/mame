@@ -27,7 +27,7 @@
       The sub CPU bit-bangs 30864 bits worth of data to 0x40000003 twice.
 
     - There seems to be a bug in the game code drawing routines, causing objects to have some pixels
-      chopped off. This is most noticeable for distant thin objects (falgs, poles of the start banner).
+      chopped off. This is most noticeable for distant thin objects (flags, poles of the start banner).
       See maincpu routine at 387B8, specifically the jump at 3880E throws 4 horizontal pixels away.
 
     - The player often disappears (when she's too slow?). Is this normal ?
@@ -87,14 +87,14 @@ private:
 	u32 m_blitter_src_y;
 	u32 m_blitter_src_dy;
 
-	DECLARE_WRITE32_MEMBER(blitter_w);
-	DECLARE_READ32_MEMBER(blitter_r);
-	DECLARE_WRITE32_MEMBER(fpga_ctrl_w);
-	DECLARE_READ32_MEMBER(unk_r);
-	DECLARE_READ32_MEMBER(unk1_r);
-	DECLARE_WRITE32_MEMBER(unk1_w);
-	DECLARE_WRITE32_MEMBER(sub_ctrl_w);
-	DECLARE_READ32_MEMBER(analog_r);
+	void blitter_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 blitter_r(offs_t offset, u32 mem_mask = ~0);
+	void fpga_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 unk_r();
+	u32 unk1_r();
+	void unk1_w(u32 data);
+	void sub_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 analog_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
@@ -114,7 +114,7 @@ private:
  *************************************/
 
 // Set up blit parameters
-WRITE32_MEMBER(skimaxx_state::blitter_w)
+void skimaxx_state::blitter_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 newdata = COMBINE_DATA( &m_blitter_regs[offset] );
 
@@ -145,7 +145,7 @@ WRITE32_MEMBER(skimaxx_state::blitter_w)
 }
 
 // A read by the 68030 from this area blits one pixel to the back buffer (at the same offset)
-READ32_MEMBER(skimaxx_state::blitter_r)
+u32 skimaxx_state::blitter_r(offs_t offset, u32 mem_mask)
 {
 	u32 const penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
 	const u16 *src = m_blitter_gfx + (penaddr % m_blitter_gfx.length());
@@ -224,9 +224,9 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 	if (params->rowaddr >= 0x220)
 	{
 		u32 const rowaddr = (params->rowaddr - 0x220);
-		u16 *fg = &m_fg_buffer[rowaddr << 8];
-		u32 *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
-		u16 *dest = &bitmap.pix16(scanline);
+		u16 const *fg = &m_fg_buffer[rowaddr << 8];
+		u32 const *bg = &m_bg_buffer_front[rowaddr/2 * 1024/2];
+		u16 *dest = &bitmap.pix(scanline);
 		//int coladdr = params->coladdr;
 		//coladdr = 0;
 
@@ -268,7 +268,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
   bit 0: bit banging data
 */
 
-WRITE32_MEMBER(skimaxx_state::fpga_ctrl_w)
+void skimaxx_state::fpga_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 newdata = COMBINE_DATA( m_fpga_ctrl );
 
@@ -285,22 +285,22 @@ WRITE32_MEMBER(skimaxx_state::fpga_ctrl_w)
 }
 
 // 0x2000004c: bit 7, bit 0
-READ32_MEMBER(skimaxx_state::unk_r)
+u32 skimaxx_state::unk_r()
 {
 	return (*m_fpga_ctrl & 0x20) ? 0x80 : 0x00;
 }
 
 // 0x20000023
-READ32_MEMBER(skimaxx_state::unk1_r)
+u32 skimaxx_state::unk1_r()
 {
 	return 0x80;
 }
 
-WRITE32_MEMBER(skimaxx_state::unk1_w)
+void skimaxx_state::unk1_w(u32 data)
 {
 }
 
-WRITE32_MEMBER(skimaxx_state::sub_ctrl_w)
+void skimaxx_state::sub_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// 7e/7f at the start. 3f/7f, related to reads from 1018xxxx
 	if (ACCESSING_BITS_0_7)
@@ -319,7 +319,7 @@ WRITE32_MEMBER(skimaxx_state::sub_ctrl_w)
     ..
     1f      left max
 */
-READ32_MEMBER(skimaxx_state::analog_r)
+u32 skimaxx_state::analog_r(offs_t offset)
 {
 	return bitswap<8>(ioport(offset ? "Y" : "X")->read(), 0,1,2,3,4,5,6,7);
 }
@@ -335,7 +335,7 @@ void skimaxx_state::m68030_1_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom();
 	map(0x10000000, 0x10000003).w(FUNC(skimaxx_state::sub_ctrl_w));
 	map(0x10100000, 0x1010000f).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w)).umask32(0x0000ffff);
-//  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
+//  map(0x10180000, 0x10187fff).ram().share("share1");
 	map(0x10180000, 0x1018ffff).ram().share("share1");  // above 10188000 accessed at level end (game bug?)
 	map(0x20000000, 0x20000003).nopr(); // watchdog_r?
 
@@ -374,11 +374,11 @@ void skimaxx_state::m68030_2_map(address_map &map)
 	map(0x40000000, 0x40000003).w(FUNC(skimaxx_state::fpga_ctrl_w)).share("fpga_ctrl");
 
 	map(0x50000000, 0x5007ffff).bankrw("bgrambank");    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
-//  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
+//  map(0xfffc0000, 0xfffc7fff).ram().share("share1");
 	map(0xfffc0000, 0xfffcffff).ram().share("share1");
-//  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
+//  map(0xfffe0000, 0xffffffff).ram(); // I think this is banked with the shared RAM? (see CPU sync routines)
 	map(0xfffe0000, 0xfffeffff).ram().share("share1");  // HACK
-	map(0xfffe0010, 0xfffeffff).ram();             // HACK
+	//  map(0xfffe0010, 0xfffeffff).ram();             // HACK
 	map(0xffff0000, 0xffffffff).ram();
 }
 
@@ -589,7 +589,7 @@ ROM_START( skimaxx )
 	ROM_LOAD16_BYTE( "vc8v-2_0", 0x000000, 0x80000, CRC(a6e9ef81) SHA1(59a0fb149e17d3773adb980428a0b107647bd4fa) )
 	ROM_LOAD16_BYTE( "vc9v-2_0", 0x000001, 0x80000, CRC(b1e8ba65) SHA1(b91cf93ecd9b6067664780ab2c1b69f632c7ae05) )
 
-	ROM_REGION( 0x100000, "tmsgfx", 0 )
+	ROM_REGION16_LE( 0x100000, "tmsgfx", 0 )
 	ROM_LOAD16_BYTE( "vc10v2_0", 0x000000, 0x80000, CRC(433651cd) SHA1(9b9801703d16adbbca2b03e1714490fb166d48a0) )
 	ROM_LOAD16_BYTE( "vc11v2_0", 0x000001, 0x80000, CRC(a906fc72) SHA1(c61ad560f203c7f507cc7b7dc8834f529a6501a7) )
 

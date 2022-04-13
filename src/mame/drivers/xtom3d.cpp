@@ -49,14 +49,22 @@ MX29F1610MC 16M FlashROM (x7)
 #include "video/pc_vga.h"
 
 
+namespace {
+
 class xtom3d_state : public pcat_base_state
 {
 public:
 	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
-			{ }
+		, m_pcibus(*this, "pcibus")
+	{
+	}
 
 	void xtom3d(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
@@ -69,17 +77,15 @@ private:
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	DECLARE_WRITE32_MEMBER( isa_ram1_w );
-	DECLARE_WRITE32_MEMBER( isa_ram2_w );
+	void isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ext1_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext2_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext3_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext4_ram_w );
+	void bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ram_w );
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void intel82439tx_init();
 
 	void xtom3d_io(address_map &map);
@@ -93,6 +99,8 @@ private:
 	void piix4_config_w(int function, int reg, uint8_t data);
 	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
 	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+
+	required_device<pci_bus_legacy_device> m_pcibus;
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -247,7 +255,7 @@ uint8_t xtom3d_state::piix4_config_r(int function, int reg)
 
 void xtom3d_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -294,7 +302,7 @@ void xtom3d_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint
 }
 
 
-WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
+void xtom3d_state::isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -302,7 +310,7 @@ WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
 	}
 }
 
-WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
+void xtom3d_state::isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -310,7 +318,7 @@ WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
 	}
 }
 
-WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
+void xtom3d_state::bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -319,7 +327,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
+void xtom3d_state::bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -328,7 +336,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
+void xtom3d_state::bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -337,7 +345,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
+void xtom3d_state::bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -346,7 +354,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ram_w)
+void xtom3d_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -393,6 +401,9 @@ void xtom3d_state::machine_start()
 	m_isa_ram1 = std::make_unique<uint32_t[]>(0x4000/4);
 	m_isa_ram2 = std::make_unique<uint32_t[]>(0x4000/4);
 
+	for (int i = 0; i < 4; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
+
 	intel82439tx_init();
 }
 
@@ -407,7 +418,8 @@ void xtom3d_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-MACHINE_CONFIG_START(xtom3d_state::xtom3d)
+void xtom3d_state::xtom3d(machine_config &config)
+{
 	PENTIUM2(config, m_maincpu, 450000000/16);  // actually Pentium II 450
 	m_maincpu->set_addrmap(AS_PROGRAM, &xtom3d_state::xtom3d_map);
 	m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
@@ -416,13 +428,13 @@ MACHINE_CONFIG_START(xtom3d_state::xtom3d)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, xtom3d_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, xtom3d_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	PCI_BUS_LEGACY(config, m_pcibus, 0, 0);
+	m_pcibus->set_device(0, FUNC(xtom3d_state::intel82439tx_pci_r), FUNC(xtom3d_state::intel82439tx_pci_w));
+	m_pcibus->set_device(7, FUNC(xtom3d_state::intel82371ab_pci_r), FUNC(xtom3d_state::intel82371ab_pci_w));
 
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( xtom3d )
@@ -443,5 +455,7 @@ ROM_START( xtom3d )
 	ROM_LOAD( "u20", 0xc00000, 0x200000, CRC(452131d9) SHA1(f62a0f1a7da9025ac1f7d5de4df90166871ac1e5) )
 ROM_END
 
+} // Anonymous namespace
 
-GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)
+
+GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)

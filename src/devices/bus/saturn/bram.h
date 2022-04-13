@@ -14,8 +14,8 @@ class saturn_bram_device : public device_t,
 {
 public:
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ext_bram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ext_bram) override;
+	virtual uint32_t read_ext_bram(offs_t offset) override;
+	virtual void write_ext_bram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
 	// construction/destruction
@@ -27,8 +27,9 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override { if (!m_ext_bram.empty()) file.read(&m_ext_bram[0], m_ext_bram.size()); }
-	virtual void nvram_write(emu_file &file) override { if (!m_ext_bram.empty()) file.write(&m_ext_bram[0], m_ext_bram.size()); }
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+	virtual bool nvram_can_write() override;
 };
 
 class saturn_bram4mb_device : public saturn_bram_device

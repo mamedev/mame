@@ -33,7 +33,7 @@
  *
  *************************************/
 
-READ8_MEMBER(liberate_state::deco16_bank_r)
+uint8_t liberate_state::deco16_bank_r(offs_t offset)
 {
 	const uint8_t *ROM = memregion("user1")->base();
 
@@ -60,7 +60,7 @@ READ8_MEMBER(liberate_state::deco16_bank_r)
 	return 0;
 }
 
-READ8_MEMBER(liberate_state::deco16_io_r)
+uint8_t liberate_state::deco16_io_r(offs_t offset)
 {
 	if (offset == 0) return ioport("IN1")->read(); /* Player 1 controls */
 	if (offset == 1) return ioport("IN2")->read(); /* Player 2 controls */
@@ -72,17 +72,17 @@ READ8_MEMBER(liberate_state::deco16_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(liberate_state::deco16_bank_w)
+void liberate_state::deco16_bank_w(uint8_t data)
 {
 	m_bank = data;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x800f, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0x800f, memregion("maincpu")->base());
 }
 
-READ8_MEMBER(liberate_state::prosoccr_bank_r)
+uint8_t liberate_state::prosoccr_bank_r(offs_t offset)
 {
 	const uint8_t *ROM = memregion("user1")->base();
 
@@ -111,7 +111,7 @@ READ8_MEMBER(liberate_state::prosoccr_bank_r)
 	return 0;
 }
 
-READ8_MEMBER(liberate_state::prosoccr_charram_r)
+uint8_t liberate_state::prosoccr_charram_r(offs_t offset)
 {
 	uint8_t *SRC_GFX = memregion("shared_gfx")->base();
 
@@ -132,11 +132,11 @@ READ8_MEMBER(liberate_state::prosoccr_charram_r)
 	return m_charram[offset + m_gfx_rom_readback * 0x1800];
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
+void liberate_state::prosoccr_charram_w(offs_t offset, uint8_t data)
 {
 	if (m_bank)
 	{
-		prosoccr_io_w(space, offset & 0x0f, data);
+		prosoccr_io_w(offset & 0x0f, data);
 	}
 	else
 	{
@@ -167,7 +167,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
 //  m_gfxdecode->gfx(0)->mark_dirty((offset | 0x1800) >> 3);
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_char_bank_w)
+void liberate_state::prosoccr_char_bank_w(uint8_t data)
 {
 	m_gfx_rom_readback = data & 1; //enable GFX rom read-back
 
@@ -175,18 +175,18 @@ WRITE8_MEMBER(liberate_state::prosoccr_char_bank_w)
 		printf("%02x\n", data);
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
+void liberate_state::prosoccr_io_bank_w(uint8_t data)
 {
 	m_bank = data & 1;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::prosoccr_charram_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::prosoccr_charram_r)));
 
 }
 
-READ8_MEMBER(liberate_state::prosport_charram_r)
+uint8_t liberate_state::prosport_charram_r(offs_t offset)
 {
 	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
@@ -206,7 +206,7 @@ READ8_MEMBER(liberate_state::prosport_charram_r)
 	return 0;
 }
 
-WRITE8_MEMBER(liberate_state::prosport_charram_w)
+void liberate_state::prosport_charram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
@@ -242,8 +242,9 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
 
 void liberate_state::prosport_map(address_map &map)
 {
-	map(0x0000, 0x03ff).mirror(0x2000).ram();
-	map(0x0200, 0x021f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x0000, 0x01ff).mirror(0x2000).ram();
+	map(0x0200, 0x021f).mirror(0x2000).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x0220, 0x03ff).mirror(0x2000).ram();
 	map(0x0400, 0x07ff).ram().w(FUNC(liberate_state::prosport_bg_vram_w)).share("bg_vram");
 	map(0x0800, 0x1fff).rw(FUNC(liberate_state::prosport_charram_r), FUNC(liberate_state::prosport_charram_w)); //0x1e00-0x1fff isn't charram!
 	map(0x2400, 0x2fff).ram();
@@ -252,7 +253,7 @@ void liberate_state::prosport_map(address_map &map)
 	map(0x3800, 0x3fff).ram().share("spriteram");
 	map(0x4000, 0xffff).rom();
 	map(0x8000, 0x800f).w(FUNC(liberate_state::prosport_io_w));
-	map(0x8000, 0x800f).bankr("bank1");
+	map(0x8000, 0x800f).rom().share("bank1");
 }
 
 void liberate_state::liberate_map(address_map &map)
@@ -266,7 +267,7 @@ void liberate_state::liberate_map(address_map &map)
 	map(0x6200, 0x67ff).writeonly().share("scratchram");
 	map(0x8000, 0xffff).rom();
 	map(0x8000, 0x800f).w(FUNC(liberate_state::deco16_io_w));
-	map(0x8000, 0x800f).bankr("bank1");
+	map(0x8000, 0x800f).rom().share("bank1");
 }
 
 void liberate_state::decrypted_opcodes_map(address_map &map)
@@ -297,7 +298,7 @@ void liberate_state::deco16_io_map(address_map &map)
 void liberate_state::prosoccr_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0").w(FUNC(liberate_state::prosoccr_io_bank_w));
-	//AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
+	//map(0x01, 0x01).portr("TILT");
 }
 
 void liberate_state::liberatb_map(address_map &map)
@@ -573,17 +574,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout sprites =
 {
 	16,16,
@@ -656,28 +646,28 @@ static const gfx_layout pro_tiles =
 
 
 static GFXDECODE_START( gfx_liberate )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 4 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, sprites,     0, 4 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles1,      0, 4 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles2,      0, 4 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, gfx_8x8x3_planar,  0, 4 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, sprites,           0, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles1,            0, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tiles2,            0, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_prosport )
-	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, charlayout,  0, 4 )
-	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, charlayout,  0, 4 )
-	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, charlayout,  0, 4 )
-	GFXDECODE_ENTRY( "progolf_fg_gfx",   0x00000, charlayout,  0, 4 )
-	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, sprites,  0, 4 )
-	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, sprites,  0, 4 )
-	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, sprites,  0, 4 )
-	GFXDECODE_ENTRY( "progolf_fg_gfx",   0x00000, sprites,  0, 4 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, pro_tiles,   0, 4 ) //backgrounds
+	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, gfx_8x8x3_planar,  0, 4 )
+	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, gfx_8x8x3_planar,  0, 4 )
+	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, gfx_8x8x3_planar,  0, 4 )
+	GFXDECODE_ENTRY( "progolf_fg_gfx",   0x00000, gfx_8x8x3_planar,  0, 4 )
+	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, sprites,           0, 4 )
+	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, sprites,           0, 4 )
+	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, sprites,           0, 4 )
+	GFXDECODE_ENTRY( "progolf_fg_gfx",   0x00000, sprites,           0, 4 )
+	GFXDECODE_ENTRY( "gfx2",             0x00000, pro_tiles,         0, 4 ) //backgrounds
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_prosoccr )
-	GFXDECODE_ENTRY( "fg_gfx", 0x00000, charlayout,        0, 4 )
-	GFXDECODE_ENTRY( "sp_gfx", 0x00000, sprites,           0, 4 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   8, 2 )
+	GFXDECODE_ENTRY( "fg_gfx", 0x00000, gfx_8x8x3_planar,        0, 4 )
+	GFXDECODE_ENTRY( "sp_gfx", 0x00000, sprites,                 0, 4 )
+	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,         8, 2 )
 GFXDECODE_END
 
 /*************************************
@@ -732,7 +722,7 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 
 MACHINE_RESET_MEMBER(liberate_state,liberate)
 {
-	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
+	std::fill(std::begin(m_io_ram), std::end(m_io_ram), 0);
 
 	m_background_disable = 0;
 	m_background_color = 0;
@@ -752,7 +742,7 @@ void liberate_state::liberate_base(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(liberate_state::nmi_line_pulse), attotime::from_hz(16*60)); /* ??? */
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
@@ -817,7 +807,7 @@ void liberate_state::prosoccr(machine_config &config)
 	m_audiocpu->set_clock(10000000/8); //xtal is 12 Mhz, divider is unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::prosoccr_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	subdevice<screen_device>("screen")->set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(liberate_state::screen_update_prosoccr));
@@ -838,7 +828,7 @@ void liberate_state::prosport(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(liberate_state::nmi_line_pulse), attotime::from_hz(16*60)); /* ??? */
 
-//  config.m_minimum_quantum = attotime::from_hz(12000);
+//  config.set_maximum_quantum(attotime::from_hz(12000));
 
 	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
@@ -875,6 +865,17 @@ void liberate_state::prosport(machine_config &config)
  *
  *************************************/
 
+// top PCB is marked: "DATA EAST DECO SSI-16" and "DE-0148-1 MADE IN JAPAN" on component side
+// mid PCB is marked: "DECO DE-0157-1 CHB-01 MADE IN JAPAN" on component side
+// bottom PCB is marked: "DATA EAST DECO DSP-17A DE-0188-1 MADE IN JAPAN" on component side
+// label format is:
+// ---
+// --------------
+// | PRO SOCCER | -> game name
+// | AM 10-3    | -> rom number
+// | C 1983     | -> copyright
+// | DATA EAST  | -> copyright
+// --------------
 ROM_START( prosoccr )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "am08.9e",  0xa000, 0x2000, CRC(73d45d0d) SHA1(07736286087478af404bd9c6b279d631a01cf4e2) )

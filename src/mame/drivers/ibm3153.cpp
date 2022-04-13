@@ -54,10 +54,8 @@ public:
 
 	void ibm3153(machine_config &config);
 
-protected:
-	virtual void machine_reset() override;
-
 private:
+	virtual void machine_reset() override;
 	void ibm3153_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -78,8 +76,8 @@ void ibm3153_state::mem_map(address_map &map)
 void ibm3153_state::io_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram();
-	//ADDRESS_MAP_UNMAP_HIGH
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//map.unmap_value_high();
+	//map.global_mask(0xff);
 }
 
 

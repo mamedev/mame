@@ -40,7 +40,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -79,11 +79,11 @@ private:
 	emu_timer *m_serial_timer;
 	emu_timer *m_reset_timer;
 
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( t1_r );
 	DECLARE_WRITE_LINE_MEMBER( prog_w );
-	DECLARE_WRITE8_MEMBER( j3_w );
+	void j3_w(uint8_t data);
 
 	void abc77_io(address_map &map);
 	void abc77_map(address_map &map);

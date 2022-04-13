@@ -132,7 +132,6 @@ ROMs -
 #include "emu.h"
 #include "includes/psikyo4.h"
 
-#include "rendlay.h"
 #include "speaker.h"
 
 
@@ -151,7 +150,7 @@ static GFXDECODE_START( gfx_ps4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x40 ) // 8bpp tiles
 GFXDECODE_END
 
-WRITE8_MEMBER(psikyo4_state::eeprom_w)
+void psikyo4_state::eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->di_write((data & 0x20) ? 1 : 0);
 	m_eeprom->cs_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -166,20 +165,20 @@ INTERRUPT_GEN_MEMBER(psikyo4_state::interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
+template <int P>
 CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 {
-	int player = (uintptr_t)param;
 	int ret = 0xff;
 
-	if (m_io_select & 1) ret &= m_keys[player+0]->read();
-	if (m_io_select & 2) ret &= m_keys[player+1]->read();
-	if (m_io_select & 4) ret &= m_keys[player+2]->read();
-	if (m_io_select & 8) ret &= m_keys[player+3]->read();
+	if (m_io_select & 1) ret &= m_keys[P+0]->read();
+	if (m_io_select & 2) ret &= m_keys[P+1]->read();
+	if (m_io_select & 4) ret &= m_keys[P+2]->read();
+	if (m_io_select & 8) ret &= m_keys[P+3]->read();
 
 	return ret;
 }
 
-WRITE32_MEMBER(psikyo4_state::paletteram_w)
+void psikyo4_state::paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 
@@ -192,7 +191,7 @@ WRITE32_MEMBER(psikyo4_state::paletteram_w)
 }
 
 template<int Screen>
-WRITE32_MEMBER(psikyo4_state::bgpen_w)
+void psikyo4_state::bgpen_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bgpen[Screen][0]);
 
@@ -204,7 +203,7 @@ WRITE32_MEMBER(psikyo4_state::bgpen_w)
 }
 
 template<int Screen>
-WRITE8_MEMBER(psikyo4_state::screen_brt_w)
+void psikyo4_state::screen_brt_w(uint8_t data)
 {
 	/* Need separate brightness for both screens if displaying together */
 	double brt = data & 0xff;
@@ -225,7 +224,7 @@ WRITE8_MEMBER(psikyo4_state::screen_brt_w)
 	/* I believe this to be separate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
 }
 
-WRITE32_MEMBER(psikyo4_state::vidregs_w)
+void psikyo4_state::vidregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t const old = m_vidregs[offset];
 	data = COMBINE_DATA(&m_vidregs[offset]);
@@ -240,7 +239,7 @@ WRITE32_MEMBER(psikyo4_state::vidregs_w)
 	}
 }
 
-WRITE16_MEMBER(psikyo4_state::ymf_bank_w)
+void psikyo4_state::ymf_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// YMF banking
 	uint16_t bankdata = data;
@@ -258,7 +257,7 @@ WRITE16_MEMBER(psikyo4_state::ymf_bank_w)
 	}
 }
 
-WRITE8_MEMBER(psikyo4_state::io_select_w)
+void psikyo4_state::io_select_w(uint8_t data)
 {
 	// mahjong input multiplexing
 	m_io_select = data;
@@ -305,14 +304,14 @@ CUSTOM_INPUT_MEMBER(psikyo4_state::system_r)
 
 static INPUT_PORTS_START( hotgmck )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, system_r, nullptr)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, system_r)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, mahjong_ctrl_r<0>)
 
 	PORT_START("P3_P4")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, system_r, nullptr)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, system_r)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, mahjong_ctrl_r, (void *)4)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, mahjong_ctrl_r<4>)
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
@@ -617,8 +616,6 @@ void psikyo4_state::ps4big(machine_config &config)
 	PALETTE(config, m_palette[0]).set_entries((0x2000/4) + 1); /* palette + clear colour */
 	PALETTE(config, m_palette[1]).set_entries((0x2000/4) + 1);
 
-	config.set_default_layout(layout_dualhsxs);
-
 	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
 	m_lscreen->set_refresh_hz(60);
 	m_lscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -648,8 +645,6 @@ void psikyo4_state::ps4big(machine_config &config)
 	ymf.add_route(3, "lspeaker", 1.0);
 	ymf.add_route(4, "rspeaker", 1.0);
 	ymf.add_route(5, "lspeaker", 1.0);
-	ymf.add_route(6, "rspeaker", 1.0);
-	ymf.add_route(7, "lspeaker", 1.0);
 }
 
 void psikyo4_state::ps4small(machine_config &config)

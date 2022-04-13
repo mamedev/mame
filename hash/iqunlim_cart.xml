@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Cartridge pinout
+
+01|GND
+02|NC
+03|D10
+04|D11
+05|D4
+06|D3
+07|D12
+08|D2
+09|D5
+10|D9
+11|D13
+12|D1
+13|D6
+14|D8
+15|D14
+16|D0
+17|D7
+18|OE
+19|D15
+20|A4
+21|A0
+22|A16
+23|A1
+24|A15
+25|A2
+26|A14
+27|A3
+28|A13
+29|A12
+30|A11
+31|A10
+32|A9
+33|A5
+34|A8
+35|WE??
+36|A19
+37|A20
+38|->JUMPER R4
+39|NC
+40|CE
+41|A18
+42|A17
+43|A7
+44|A6
+45|VCC
+
+-->
+
+<softwarelist name="iqunlim_cart" description="VTech IQ Unlimited cartridges">
+	<!-- upper half of the ROM contains the English for Beginners game (in German) the lower half of the ROM contains Entertainment Trivia (in English) -->
+	<!-- different carts would have been sold with the upper address line fixed high/low to select the correct game -->
+
+	<software name="efb" supported="no">
+		<description>Englisch für Anfänger</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="iqunlim_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="27-06260-0-0.u2" size="0x80000" crc="dffcaca3" sha1="e513f4b83b067adb965cb4a4ba0c003b747f1dc7" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
+

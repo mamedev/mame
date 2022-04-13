@@ -32,27 +32,27 @@ public:
 	void daruma(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(dev0_r);
-	DECLARE_WRITE8_MEMBER(dev1_w);
-	DECLARE_WRITE8_MEMBER(dev2_w);
-	DECLARE_READ8_MEMBER(dev4_r);
+	uint8_t dev0_r();
+	void dev1_w(uint8_t data);
+	void dev2_w(uint8_t data);
+	uint8_t dev4_r();
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
 };
 
-READ8_MEMBER(daruma_state::dev0_r)
+uint8_t daruma_state::dev0_r()
 {
 	return 0xFF;
 }
 
-READ8_MEMBER(daruma_state::dev4_r)
+uint8_t daruma_state::dev4_r()
 {
 	return ioport("switches")->read();
 }
 
-WRITE8_MEMBER(daruma_state::dev1_w)
+void daruma_state::dev1_w(uint8_t data)
 {
 	//while attempting to identify which bit is used for
 	//controlling the buzzer, here's what I heard from each of
@@ -68,7 +68,7 @@ WRITE8_MEMBER(daruma_state::dev1_w)
 	m_speaker->level_w(data & 0x02);
 }
 
-WRITE8_MEMBER(daruma_state::dev2_w)
+void daruma_state::dev2_w(uint8_t data)
 {
 	//while attempting to identify which bit is used for
 	//controlling the buzzer, here's what I heard from each of
@@ -94,8 +94,8 @@ void daruma_state::mem_io(address_map &map)
 {
 	map(0x0000, 0x0000).r(FUNC(daruma_state::dev0_r));
 	map(0x1000, 0x1000).w(FUNC(daruma_state::dev1_w));
-//    AM_RANGE(0x2000, 0x2000) AM_WRITE(dev2_w)
-//    AM_RANGE(0x3000, 0x3000) AM_WRITE(dev3_w)
+//    map(0x2000, 0x2000).w(FUNC(daruma_state:dev2_w));
+//    map(0x3000, 0x3000).w(FUNC(daruma_state:dev3_w));
 	map(0x4000, 0x4000).r(FUNC(daruma_state::dev4_r));
 	map(0x8000, 0xffff).ram(); /* 32K CMOS SRAM (HYUNDAY hy62256a) */
 }

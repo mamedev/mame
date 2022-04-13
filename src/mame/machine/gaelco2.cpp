@@ -167,13 +167,13 @@ void gaelco2_state::init_wrally2()
 
 void gaelco2_state::shareram_w(offs_t offset, u8 data)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
 u8 gaelco2_state::shareram_r(offs_t offset)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 
@@ -248,51 +248,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 
 	if ((scanline % 64) == 0 && m_clr_gun_int)
 		m_maincpu->set_input_line(4, HOLD_LINE);
-}
-
-/***************************************************************************
-
-    World Rally 2 analog controls
-    - added by Mirko Mattioli <els@fastwebnet.it>
-    ---------------------------------------------------------------
-    WR2 pcb has two ADC, one for each player. The ADCs have in common
-    the clock signal line (adc_clk) and the chip enable signal line
-    (adc_cs) and, of course,  two different data out signal lines.
-    When "Pot Wheel" option is selected via dip-switch, then the gear
-    is enabled (low/high shifter); the gear is disabled in joy mode by
-    the CPU program code. No brakes are present in this game.
-    Analog controls routines come from modified code wrote by Aaron
-    Giles for gaelco3d driver.
-
-***************************************************************************/
-
-
-CUSTOM_INPUT_MEMBER(wrally2_state::wrally2_analog_bit_r)
-{
-	int which = (uintptr_t)param;
-	return (m_analog_ports[which] >> 7) & 0x01;
-}
-
-
-WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_clk)
-{
-	/* a zero/one combo is written here to clock the next analog port bit */
-	if (!state)
-	{
-		m_analog_ports[0] <<= 1;
-		m_analog_ports[1] <<= 1;
-	}
-}
-
-
-WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_cs)
-{
-	/* a zero is written here to read the analog ports, and a one is written when finished */
-	if (!state)
-	{
-		m_analog_ports[0] = m_analog0->read();
-		m_analog_ports[1] = m_analog1->read();
-	}
 }
 
 /***************************************************************************

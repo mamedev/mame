@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="jakks_gamekey_mv" description="JAKKS Pacific 'MV' Game Keys">
 
 	<!-- This list is for the 'MV' coded Game Keys, for Marvel (Spider-Man) -->

@@ -4,7 +4,7 @@
     vboy.c - Virtual Boy audio emulation
 
     By Richard Bannister and Gil Pedersen.
-    MESS device adaptation by R. Belmont
+    MAME device adaptation by R. Belmont
 */
 
 #include "emu.h"
@@ -209,9 +209,9 @@ void vboysnd_device::device_start()
 {
 	uint32_t rate = clock() / 120;
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
+	m_stream = stream_alloc(0, 2, rate);
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
 
 	for (int i=0; i<2048; i++)
@@ -259,7 +259,7 @@ void vboysnd_device::device_reset()
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void vboysnd_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void vboysnd_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_stream->update();
 }
@@ -269,15 +269,14 @@ void vboysnd_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 //  our sound stream
 //-------------------------------------------------
 
-void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vboysnd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
 	int len, i, j, channel;
 
-	outL = outputs[0];
-	outR = outputs[1];
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
-	len = samples;
+	len = outL.samples();
 
 //  if (mgetb(m_aram+SST0P) & 0x1)  // Sound Stop Reg
 //      goto end;
@@ -384,13 +383,9 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		// scale to 16 bits
 		note_left = (note_left << 5) | ((note_left >> 6) & 0x1f);
 		note_right = (note_right << 5) | ((note_right >> 6) & 0x1f);
-		if (note_left  < -32767) note_left  = -32767;
-		if (note_left  > 32767) note_left  = 32767;
-		if (note_right < -32767) note_right = -32767;
-		if (note_right > 32767) note_right = 32767;
 
-		*(outL++) = ((int16_t)note_left);
-		*(outR++) = ((int16_t)note_right);
+		outL.put_int_clamp(j, (int16_t)note_left, 32768);
+		outR.put_int_clamp(j, (int16_t)note_right, 32768);
 	}
 }
 
@@ -398,7 +393,7 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  read - read from the chip's registers and internal RAM
 //-------------------------------------------------
 
-READ8_MEMBER( vboysnd_device::read )
+uint8_t vboysnd_device::read(offs_t offset)
 {
 	m_stream->update();
 	return m_aram[offset];
@@ -408,7 +403,7 @@ READ8_MEMBER( vboysnd_device::read )
 //  write - write to the chip's registers and internal RAM
 //-------------------------------------------------
 
-WRITE8_MEMBER( vboysnd_device::write )
+void vboysnd_device::write(offs_t offset, uint8_t data)
 {
 	int freq, i;
 //    int waveAddr;
@@ -447,6 +442,7 @@ WRITE8_MEMBER( vboysnd_device::write )
 					break;
 				}
 			}
+			[[fallthrough]]; // FIXME: really?
 		case SxINT:
 			if (channel < 5)
 			{

@@ -721,7 +721,7 @@ GFXDECODE_END
 
 void pocketc_state::pocketc_base(machine_config &config)
 {
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NVRAM(config, "cpu_nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "ram_nvram", nvram_device::DEFAULT_ALL_0);

@@ -1,3 +1,4 @@
+
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
@@ -81,6 +82,20 @@ static void ccfunc_log_write(void *param)
 	((unsp_device *)param)->cfunc_log_write();
 }
 #endif
+
+void unsp_device::cfunc_muls()
+{
+	const uint32_t op = m_core->m_arg0;
+	const uint16_t size = ((op >> 3) & 15) ? ((op >> 3) & 15) : 16;
+	const uint16_t rd = (op >> 9) & 7;
+	const uint16_t rs = op & 7;
+	execute_muls_ss(rd, rs, size);
+}
+
+static void ccfunc_muls(void *param)
+{
+	((unsp_device *)param)->cfunc_muls();
+}
 
 /***************************************************************************
     CACHE MANAGEMENT
@@ -189,7 +204,7 @@ void unsp_device::code_compile_block(offs_t pc)
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
+				if (m_program.space().get_write_ptr(seqhead->physpc) != nullptr)
 					generate_checksum_block(block, compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
@@ -399,19 +414,13 @@ void unsp_device::static_generate_trigger_fiq()
 	alloc_handle(*m_drcuml, m_trigger_fiq, "trigger_fiq");
 	UML_HANDLE(block, *m_trigger_fiq);
 
-	UML_OR(block, I0, mem(&m_core->m_fiq), mem(&m_core->m_irq));
-	UML_TEST(block, I0, 1);
-	UML_RETc(block, uml::COND_NZ);
-
 	UML_TEST(block, mem(&m_core->m_enable_fiq), 1);
 	UML_RETc(block, uml::COND_Z);
 
-	UML_MOV(block, mem(&m_core->m_fiq), 1);
+	UML_TEST(block, mem(&m_core->m_fiq), 1);
+	UML_RETc(block, uml::COND_NZ);
 
-	UML_MOV(block, I0, mem(&m_core->m_sb));
-	UML_MOV(block, I1, mem(&m_core->m_irq));
-	UML_STORE(block, (void*)m_core->m_saved_sb, I1, I0, SIZE_DWORD, SCALE_x4);
-	UML_MOV(block, mem(&m_core->m_sb), mem(&m_core->m_saved_sb[2]));
+	UML_MOV(block, mem(&m_core->m_fiq), 1);
 
 	UML_MOV(block, I0, mem(&m_core->m_r[REG_SP]));
 
@@ -440,21 +449,34 @@ void unsp_device::static_generate_trigger_irq()
 	/* begin generating */
 	drcuml_block &block(m_drcuml->begin_block(256));
 
+	uml::code_label skip_ine = 1;
+
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(*m_drcuml, m_trigger_irq, "trigger_irq");
 	UML_HANDLE(block, *m_trigger_irq);
 
-	UML_OR(block, I0, mem(&m_core->m_fiq), mem(&m_core->m_irq));
-	UML_TEST(block, I0, 1);
+	// If INE is 0 and IRQ is 1, abort
+	UML_XOR(block, I1, mem(&m_core->m_irq), 1);
+	UML_AND(block, I1, I1, mem(&m_core->m_ine));
 	UML_RETc(block, uml::COND_NZ);
 
-	UML_TEST(block, mem(&m_core->m_enable_irq), 1);
-	UML_RETc(block, uml::COND_Z);
+	// If INE is 0 and IRQ is 0, we have a valid IRQ
+	UML_TEST(block, mem(&m_core->m_ine), 1);
+	UML_JMPc(block, uml::COND_Z, skip_ine);
+
+	// If INE is 1 and IRQ line is < PRI, abort
+	UML_CMP(block, I0, mem(&m_core->m_pri));
+	UML_RETc(block, uml::COND_LE);
+
+	// Update our current interrupt priority
+	UML_MOV(block, mem(&m_core->m_pri), I0);
+
+	UML_LABEL(block, skip_ine);
 
 	UML_MOV(block, mem(&m_core->m_irq), 1);
 
-	UML_MOV(block, mem(&m_core->m_saved_sb[0]), mem(&m_core->m_sb));
-	UML_MOV(block, mem(&m_core->m_sb), mem(&m_core->m_saved_sb[1]));
+	UML_TEST(block, mem(&m_core->m_enable_irq), 1);
+	UML_RETc(block, uml::COND_Z);
 
 	UML_MOV(block, I0, mem(&m_core->m_r[REG_SP]));
 	UML_MOV(block, I1, mem(&m_core->m_r[REG_PC]));
@@ -504,7 +526,7 @@ void unsp_device::generate_checksum_block(drcuml_block &block, compiler_state &c
 	}
 
 	/* full verification; sum up everything */
-	void *memptr = m_program->get_write_ptr(seqhead->physpc);
+	void *memptr = m_program.space().get_write_ptr(seqhead->physpc);
 	UML_LOAD(block, I0, memptr, 0, SIZE_WORD, SCALE_x2);
 	uint32_t sum = seqhead->opptr.w[0];
 	for (int i = 1; i < seqhead->length; i++)
@@ -517,7 +539,7 @@ void unsp_device::generate_checksum_block(drcuml_block &block, compiler_state &c
 	{
 		if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			memptr = m_program->get_write_ptr(curdesc->physpc);
+			memptr = m_program.space().get_write_ptr(curdesc->physpc);
 			UML_LOAD(block, I1, memptr, 0, SIZE_WORD, SCALE_x2);
 			UML_ADD(block, I0, I0, I1);
 			sum += curdesc->opptr.w[0];
@@ -634,12 +656,9 @@ void unsp_device::generate_add_lpc(drcuml_block &block, int32_t offset)
 
 void unsp_device::generate_update_nzsc(drcuml_block &block)
 {
-	UML_XOR(block, I1, I1, 0x0000ffff);
-	UML_SEXT(block, I1, I1, SIZE_WORD);
-	UML_SEXT(block, I2, I2, SIZE_WORD);
-	UML_CMP(block, I2, I1);
-	UML_SETc(block, uml::COND_L, I1);
-	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_S_SHIFT, UNSP_S);
+	UML_XOR(block, I1, I1, I2);
+	UML_TEST(block, I1, 0x8000);
+	UML_SETc(block, uml::COND_NZ, I2);
 
 	UML_TEST(block, I3, 0x8000);
 	UML_SETc(block, uml::COND_NZ, I1);
@@ -648,6 +667,9 @@ void unsp_device::generate_update_nzsc(drcuml_block &block)
 	UML_TEST(block, I3, 0x10000);
 	UML_SETc(block, uml::COND_NZ, I1);
 	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_C_SHIFT, UNSP_C);
+	UML_CMP(block, I2, I1);
+	UML_SETc(block, uml::COND_NE, I1);
+	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_S_SHIFT, UNSP_S);
 
 	UML_TEST(block, I3, 0x0000ffff);
 	UML_SETc(block, uml::COND_Z, I1);
@@ -692,8 +714,6 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 	const uint8_t lower_op = (op1 << 4) | op0;
 
 	uml::code_label skip_branch = compiler.m_labelnum++;
-	uml::code_label clear_fiq = compiler.m_labelnum++;
-	uml::code_label clear_irq = compiler.m_labelnum++;
 	uml::code_label reti_done = compiler.m_labelnum++;
 	uml::code_label mul_opa_nohi = compiler.m_labelnum++;
 	uml::code_label mul_opb_nohi = compiler.m_labelnum++;
@@ -769,6 +789,20 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 				UML_JMPc(block, uml::COND_NZ, skip_branch);
 				break;
 
+			case 12: // JVC
+				UML_ROLAND(block, I0, mem(&m_core->m_r[REG_SR]), 32-UNSP_S_SHIFT, 1);
+				UML_ROLAND(block, I1, mem(&m_core->m_r[REG_SR]), 32-UNSP_N_SHIFT, 1);
+				UML_CMP(block, I0, I1);
+				UML_JMPc(block, uml::COND_NE, skip_branch);
+				break;
+
+			case 13: // JVS
+				UML_ROLAND(block, I0, mem(&m_core->m_r[REG_SR]), 32-UNSP_S_SHIFT, 1);
+				UML_ROLAND(block, I1, mem(&m_core->m_r[REG_SR]), 32-UNSP_N_SHIFT, 1);
+				UML_CMP(block, I0, I1);
+				UML_JMPc(block, uml::COND_E, skip_branch);
+				break;
+
 			case 14: // JMP
 				UML_SUB(block, mem(&m_core->m_icount), mem(&m_core->m_icount), 4);
 				UML_MOV(block, I0, desc->targetpc);
@@ -820,24 +854,13 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			UML_AND(block, mem(&m_core->m_r[REG_SP]), I0, 0x0000ffff);
 
 			UML_TEST(block, mem(&m_core->m_fiq), 1);
-			UML_JMPc(block, uml::COND_NZ, clear_fiq);
+			UML_MOVc(block, uml::COND_NZ, mem(&m_core->m_fiq), 0);
+			UML_JMPc(block, uml::COND_NZ, reti_done);
+
 			UML_TEST(block, mem(&m_core->m_irq), 1);
-			UML_JMPc(block, uml::COND_NZ, clear_irq);
-			UML_JMP(block, reti_done);
-
-			UML_LABEL(block, clear_fiq);
-			UML_MOV(block, mem(&m_core->m_fiq), 0);
-			UML_MOV(block, mem(&m_core->m_saved_sb[2]), mem(&m_core->m_sb));
-			UML_LOAD(block, mem(&m_core->m_sb), (void*)m_core->m_saved_sb, mem(&m_core->m_irq), SIZE_DWORD, SCALE_x4);
-			UML_JMP(block, reti_done);
-
-			UML_LABEL(block, clear_irq);
-			UML_MOV(block, mem(&m_core->m_irq), 0);
-			UML_MOV(block, mem(&m_core->m_saved_sb[1]), mem(&m_core->m_sb));
-			UML_MOV(block, mem(&m_core->m_sb), mem(&m_core->m_saved_sb[0]));
+			UML_MOVc(block, uml::COND_NZ, mem(&m_core->m_irq), 0);
 
 			UML_LABEL(block, reti_done);
-			UML_MOV(block, mem(&m_core->m_curirq), 0);
 			generate_branch(block, compiler, desc);
 		}
 		else // pop
@@ -970,6 +993,14 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 						UML_MOV(block, mem(&m_core->m_enable_fiq), 1);
 						break;
 
+					case 4:
+						UML_MOV(block, mem(&m_core->m_fir_move), 1);
+						break;
+
+					case 5:
+						UML_MOV(block, mem(&m_core->m_fir_move), 0);
+						break;
+
 					case 8:
 						UML_MOV(block, mem(&m_core->m_enable_irq), 0);
 						break;
@@ -991,8 +1022,19 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 						break;
 
 					default:
+						logerror("unsp drc interrupt flags %02x\n", op & 0x3f);
 						return false;
 				}
+				return true;
+
+			case 0x06:
+			case 0x07:
+				if (opa == 7)
+					return false;
+
+				// MULS
+				UML_MOV(block, mem(&m_core->m_arg0), desc->opptr.w[0]);
+				UML_CALLC(block, ccfunc_muls, this);
 				return true;
 
 			default:
@@ -1116,7 +1158,7 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 				case 0x01: // imm16
 				{
 					UML_MOV(block, I2, mem(&m_core->m_r[opb]));
-					const uint16_t r1 = m_pr16(desc->pc + 1);
+					const uint16_t r1 = m_cache.read_word(desc->pc + 1);
 					generate_add_lpc(block, 1);
 					UML_MOV(block, I1, r1);
 					break;
@@ -1125,7 +1167,7 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 				case 0x02: // [imm16]
 				{
 					UML_MOV(block, I2, mem(&m_core->m_r[opb]));
-					const uint16_t r1 = m_pr16(desc->pc + 1);
+					const uint16_t r1 = m_cache.read_word(desc->pc + 1);
 					generate_add_lpc(block, 1);
 					UML_MOV(block, I0, r1);
 					if (op0 != 0x0d)
@@ -1137,7 +1179,7 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 				{
 					UML_MOV(block, I1, I2);
 					UML_MOV(block, I2, mem(&m_core->m_r[opb]));
-					const uint16_t r2 = m_pr16(desc->pc + 1);
+					const uint16_t r2 = m_cache.read_word(desc->pc + 1);
 					generate_add_lpc(block, 1);
 					UML_MOV(block, I0, r2);
 					break;

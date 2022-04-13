@@ -3,16 +3,18 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity Excellence series hardware
 (for Excel 68000, see fidel_eag68k.cpp)
 
 TODO:
-- granits gives error beeps at start, need to press clear to play
+- granits gives error beeps at start, need to press clear to play.
+  Note that this also happens on a real 6080 PCB with this ROM, granits is a modified SC12 PCB though.
+  The problem goes away if RAM stays powered-on, but PCB has no indication of NVRAM.
 - granits chessboard buttons seem too sensitive (detects input on falling edge if held too long)
+- granits has a module slot, is it usable?
+- granits overlock + dynamic /2 cpu divider? (like SC12) instead of static /2 divider
 
-*******************************************************************************
+-------------------------------------------------------------------------------
 
 Voice Excellence (model 6092)
 ----------------
@@ -113,7 +115,7 @@ VFD display, and some buttons for controlling the clock. IRQ frequency is double
 presumedly for using the blinking led as seconds counter. It only tracks player time,
 not of the opponent. And it obviously doesn't show chessmove coordinates either.
 
-*******************************************************************************
+-------------------------------------------------------------------------------
 
 Designer 2000 (model 6102)
 ----------------
@@ -124,34 +126,47 @@ basically same as (Par) Excellence hardware, reskinned board
 
 Designer 2100 (model 6103): exactly same, but running at 5MHz
 
-(Designer 1500 is on 80C50 hardware)
+(Designer 1500 is on 80C50 hardware, same ROM as The Gambit, see fidel_sc6.cpp)
 
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
 
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
-#include "sound/volt_reg.h"
+#include "machine/clock.h"
+#include "machine/sensorboard.h"
+#include "sound/dac.h"
+#include "sound/s14001a.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
 #include "fidel_des.lh" // clickable
 #include "fidel_ex.lh" // clickable
+#include "fidel_exb.lh" // clickable
 #include "fidel_exd.lh" // clickable
+#include "fidel_exv.lh" // clickable
 
 
 namespace {
 
-class excel_state : public fidelbase_state
+class excel_state : public driver_device
 {
 public:
 	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void fexcel(machine_config &config);
 	void fexcelb(machine_config &config);
 	void fexcel4(machine_config &config);
@@ -164,20 +179,47 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(speech_bankswitch);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_display;
+	required_device<dac_bit_interface> m_dac;
+	optional_device<s14001a_device> m_speech;
+	optional_region_ptr<u8> m_speech_rom;
+	optional_ioport_array<3> m_inputs;
+
 	// address maps
 	void fexcel_map(address_map &map);
 	void fexcelb_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(speech_r);
-	DECLARE_WRITE8_MEMBER(ttl_w);
-	DECLARE_READ8_MEMBER(ttl_r);
+	u8 speech_r(offs_t offset);
+	void ttl_w(offs_t offset, u8 data);
+	u8 ttl_r(offs_t offset);
+
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_speech_data = 0;
+	u8 m_speech_bank = 0;
 };
+
+void excel_state::machine_start()
+{
+	// register for savestates
+	save_item(NAME(m_select));
+	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_speech_data));
+	save_item(NAME(m_speech_bank));
+}
+
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // misc handlers
@@ -189,7 +231,7 @@ INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 	m_speech_bank = (m_speech_bank & 1) | newval << 1;
 }
 
-READ8_MEMBER(excel_state::speech_r)
+u8 excel_state::speech_r(offs_t offset)
 {
 	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
 	offset = (offset & 0x7ff) | (offset << 1 & 0x1000);
@@ -199,35 +241,30 @@ READ8_MEMBER(excel_state::speech_r)
 
 // TTL
 
-WRITE8_MEMBER(excel_state::ttl_w)
+void excel_state::ttl_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: 74259(1)
 	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
+	m_select = (m_select & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select & 0xf) & 0x3ff;
+	u16 sel = 1 << (m_select & 0xf) & 0x3ff;
 	u8 led_data = sel & 0xff;
-	m_inp_mux = sel & 0x1ff;
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q4-Q7,Q2,Q1: digit/led select (active low)
-	u8 led_sel = ~bitswap<8>(m_led_select,0,3,1,2,7,6,5,4) & 0x3f;
+	u8 led_sel = ~bitswap<8>(m_select,0,3,1,2,7,6,5,4) & 0x3f;
 
 	// a0-a2,d1: digit segment data (model 6093)
 	m_7seg_data = (m_7seg_data & ~mask) | ((data & 2) ? mask : 0);
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
 
 	// update display: 4 7seg leds, 2*8 chessboard leds
-	for (int i = 0; i < 6; i++)
-		m_display_state[i] = (led_sel >> i & 1) ? ((i < 2) ? led_data : seg_data) : 0;
-
-	set_display_size(8, 2+4);
-	set_display_segmask(0x3c, 0x7f);
-	display_update();
+	m_display->matrix_partial(0, 2, led_sel, led_data);
+	m_display->matrix_partial(2, 4, led_sel >> 2, seg_data); // 6093
 
 	// speech (model 6092)
 	if (m_speech != nullptr)
@@ -241,24 +278,34 @@ WRITE8_MEMBER(excel_state::ttl_w)
 
 		// Q0-Q5: TSI C0-C5
 		// Q7: TSI START line
-		m_speech->data_w(space, 0, m_speech_data & 0x3f);
+		m_speech->data_w(m_speech_data & 0x3f);
 		m_speech->start_w(m_speech_data >> 7 & 1);
 	}
 }
 
-READ8_MEMBER(excel_state::ttl_r)
+u8 excel_state::ttl_r(offs_t offset)
 {
+	u8 sel = m_select & 0xf;
 	u8 d7 = 0x80;
+	u8 data = 0;
 
 	// 74259(1) Q7 + 74251 I0: battery status
-	if (m_inp_matrix[10] != nullptr && m_inp_mux == 1 && ~m_led_select & 0x80)
-		d7 = m_inp_matrix[10]->read() & 0x80;
+	if (m_inputs[2] != nullptr && sel == 0 && ~m_select & 0x80)
+		d7 = m_inputs[2]->read() & 0x80;
 
 	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
-	u8 d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
+	u8 d6 = (m_inputs[1].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
 
 	// a0-a2,d7: multiplexed inputs (active low)
-	return ((read_inputs(9) >> offset & 1) ? 0 : d7) | d6 | 0x3f;
+	// read chessboard sensors
+	if (sel < 8)
+		data = m_board->read_file(sel);
+
+	// read button panel
+	else if (sel == 8)
+		data = m_inputs[0]->read();
+
+	return ((data >> offset & 1) ? 0 : d7) | d6 | 0x3f;
 }
 
 
@@ -289,9 +336,7 @@ void excel_state::fexcelb_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( fexcelb )
-	PORT_INCLUDE( generic_cb_buttons )
-
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Move / Pawn")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Hint / Knight")
@@ -305,7 +350,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fexcelv )
 	PORT_INCLUDE( fexcelb )
 
-	PORT_START("IN.9")
+	PORT_START("IN.1")
 	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, excel_state, speech_bankswitch, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( German ) )
@@ -318,7 +363,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fexcel )
 	PORT_INCLUDE( fexcelb )
 
-	PORT_START("IN.10")
+	PORT_START("IN.2")
 	PORT_CONFNAME( 0x80, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x80, "Low" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
@@ -327,14 +372,14 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fdes )
 	PORT_INCLUDE( fexcel )
 
-	PORT_MODIFY("IN.10")
+	PORT_MODIFY("IN.2")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // no low-voltage detection circuit (still works in software though)
 INPUT_PORTS_END
 
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void excel_state::fexcel(machine_config &config)
@@ -343,18 +388,22 @@ void excel_state::fexcel(machine_config &config)
 	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
-	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(excel_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(excel_state::display_decay_tick), attotime::from_msec(1));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2+4, 8);
+	m_display->set_segmask(0x3c, 0x7f);
 	config.set_default_layout(layout_fidel_ex);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void excel_state::fexcel4(machine_config &config)
@@ -372,6 +421,7 @@ void excel_state::fexcelb(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
+	config.set_default_layout(layout_fidel_exb);
 }
 
 void excel_state::fexcelp(machine_config &config)
@@ -388,7 +438,7 @@ void excel_state::granits(machine_config &config)
 	fexcelp(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(8_MHz_XTAL/2);
+	m_maincpu->set_clock(8_MHz_XTAL/2); // R65C02P4
 }
 
 void excel_state::fdes2100(machine_config &config)
@@ -398,12 +448,6 @@ void excel_state::fdes2100(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // WDC 65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
-
-	// change irq timer frequency
-	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(excel_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	config.set_default_layout(layout_fidel_des);
 }
@@ -420,6 +464,7 @@ void excel_state::fdes2000(machine_config &config)
 void excel_state::fexcelv(machine_config &config)
 {
 	fexcelb(config);
+	config.set_default_layout(layout_fidel_exv);
 
 	/* sound hardware */
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
@@ -430,8 +475,6 @@ void excel_state::fexcelv(machine_config &config)
 void excel_state::fexceld(machine_config &config)
 {
 	fexcelb(config);
-
-	/* basic machine hardware */
 	config.set_default_layout(layout_fidel_exd);
 }
 
@@ -485,7 +528,7 @@ ROM_START( fexcelpb ) // model 6083, PCB label 510-1099B01
 	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(0d17b0f0) SHA1(3a6070fd4718c62b62ff0f08637bb6eb84eb9a1c) ) // GI 27C256, no label, only 1 byte difference, assume bugfix in bookrom
 ROM_END
 
-ROM_START( granits ) // modified SC12 board, overclocked Par Excellence program
+ROM_START( granits ) // modified SC12 board, Par Excellence program
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("granit_s-4", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) )
 ROM_END
@@ -508,16 +551,16 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP MACHINE    INPUT      STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   excel_state, empty_init, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fexceld,    fexcel,   0, fexceld,   fexcelb,   excel_state, empty_init, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1985, fexcel12,   fexcel,   0, fexcel,    fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // 1st version of The Excellence
-CONS( 1985, fexcel124,  fexcel,   0, fexcel4,   fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1985, fexcela,    fexcel,   0, fexcel,    fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME       PARENT  CMP MACHINE   INPUT    STATE        INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1987, fexcel,    0,       0, fexcelb,  fexcelb, excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexcelv,   fexcel,  0, fexcelv,  fexcelv, excel_state, empty_init, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexceld,   fexcel,  0, fexceld,  fexcelb, excel_state, empty_init, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcel12,  fexcel,  0, fexcel,   fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
+CONS( 1985, fexcel124, fexcel,  0, fexcel4,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcela,   fexcel,  0, fexcel,   fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, fexcelp,    0,        0, fexcelp,   fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    excel_state, empty_init, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    excel_state, empty_init, "hack (RCS)", "Granit S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      excel_state, empty_init, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      excel_state, empty_init, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, fexcelp,   0,       0, fexcelp,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, fexcelpb,  fexcelp, 0, fexcelp,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, granits,   fexcelp, 0, granits,  fexcel,  excel_state, empty_init, "hack (RCS)", "Granit S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2000,  fexcelp, 0, fdes2000, fdes,    excel_state, empty_init, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2100,  fexcelp, 0, fdes2100, fdes,    excel_state, empty_init, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

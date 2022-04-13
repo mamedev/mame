@@ -32,11 +32,11 @@ public:
 	void set_table(int tabletype) { m_tabletype = tabletype; }
 	void set_game_type(int gametype) { m_gametype = gametype; }
 
-	DECLARE_WRITE16_MEMBER(mcu_com0_w);
-	DECLARE_WRITE16_MEMBER(mcu_com1_w);
-	DECLARE_WRITE16_MEMBER(mcu_com2_w);
-	DECLARE_WRITE16_MEMBER(mcu_com3_w);
-	DECLARE_READ16_MEMBER(mcu_status_r);
+	void mcu_com0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mcu_com1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mcu_com2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mcu_com3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mcu_status_r();
 
 protected:
 	virtual void device_start() override;

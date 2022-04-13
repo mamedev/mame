@@ -1,4 +1,4 @@
-// license:GPL-2.0
+// license:GPL-2.0+
 // copyright-holders:Segher Boessenkool, David Haywood
 /*****************************************************************************
 
@@ -43,7 +43,7 @@ protected:
 	offs_t disassemble_fxxx_011_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm);
 	offs_t disassemble_fxxx_100_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm);
 	virtual offs_t disassemble_fxxx_101_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm);
-	offs_t disassemble_fxxx_110_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm);
+	offs_t disassemble_fxxx_110_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm, const data_buffer& opcodes);
 	offs_t disassemble_fxxx_111_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm, const data_buffer& opcodes);
 
 	virtual offs_t disassemble_exxx_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm);

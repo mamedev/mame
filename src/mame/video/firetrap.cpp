@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(firetrap_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((color & 0x01) << 8),
 			color >> 4,
 			0);
@@ -97,7 +97,7 @@ inline void firetrap_state::get_bg_tile_info(tile_data &tileinfo, int tile_index
 {
 	int code = bgvideoram[tile_index];
 	int color = bgvideoram[tile_index + 0x100];
-	SET_TILE_INFO_MEMBER(gfx_region,
+	tileinfo.set(gfx_region,
 			code + ((color & 0x03) << 8),
 			(color & 0x30) >> 4,
 			TILE_FLIPXY((color & 0x0c) >> 2));
@@ -122,9 +122,9 @@ TILE_GET_INFO_MEMBER(firetrap_state::get_bg2_tile_info)
 
 void firetrap_state::video_start()
 {
-	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrap_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_fg_memory_offset),this), 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrap_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_bg_memory_offset),this), 16, 16, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrap_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_bg_memory_offset),this), 16, 16, 32, 32);
+	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrap_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(firetrap_state::get_fg_memory_offset)), 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrap_state::get_bg1_tile_info)), tilemap_mapper_delegate(*this, FUNC(firetrap_state::get_bg_memory_offset)), 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrap_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(firetrap_state::get_bg_memory_offset)), 16, 16, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg1_tilemap->set_transparent_pen(0);
@@ -137,44 +137,44 @@ void firetrap_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(firetrap_state::firetrap_fgvideoram_w)
+void firetrap_state::firetrap_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_bg1videoram_w)
+void firetrap_state::firetrap_bg1videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset & 0x6ff);
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_bg2videoram_w)
+void firetrap_state::firetrap_bg2videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset & 0x6ff);
 }
 
 
-WRITE8_MEMBER(firetrap_state::firetrap_bg1_scrollx_w)
+void firetrap_state::firetrap_bg1_scrollx_w(offs_t offset, uint8_t data)
 {
 	m_scroll1_x[offset] = data;
 	m_bg1_tilemap->set_scrollx(0, m_scroll1_x[0] | (m_scroll1_x[1] << 8));
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_bg1_scrolly_w)
+void firetrap_state::firetrap_bg1_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scroll1_y[offset] = data;
 	m_bg1_tilemap->set_scrolly(0, -(m_scroll1_y[0] | (m_scroll1_y[1] << 8)));
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_bg2_scrollx_w)
+void firetrap_state::firetrap_bg2_scrollx_w(offs_t offset, uint8_t data)
 {
 	m_scroll2_x[offset] = data;
 	m_bg2_tilemap->set_scrollx(0, m_scroll2_x[0] | (m_scroll2_x[1] << 8));
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_bg2_scrolly_w)
+void firetrap_state::firetrap_bg2_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scroll2_y[offset] = data;
 	m_bg2_tilemap->set_scrolly(0, -(m_scroll2_y[0] | (m_scroll2_y[1] << 8)));

@@ -8,16 +8,18 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_MACHINE_3DOM2_H
 #define MAME_MACHINE_3DOM2_H
 
-#include "emu.h"
+#pragma once
+
+#include "video/3dom2_te.h"
+
 #include "cpu/dspp/dspp.h"
 #include "cpu/powerpc/ppc.h"
-#include "video/3dom2_te.h"
+
 #include "screen.h"
+
 
 #define M2_BAD_TIMING       0       // HACK
 
@@ -117,12 +119,13 @@ public:
 		RAM_16MB    = 16
 	};
 
-	template <typename T, typename U>
-	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&cpu2_tag)
+	template <typename T, typename U, typename V>
+	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&cpu2_tag, V &&cde_tag)
 		: m2_bda_device(mconfig, tag, owner, clock)
 	{
 		m_cpu1.set_tag(std::forward<T>(cpu1_tag));
 		m_cpu2.set_tag(std::forward<U>(cpu2_tag));
+		m_cde.set_tag(std::forward<V>(cde_tag));
 	}
 	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -136,18 +139,8 @@ public:
 	}
 
 	// Interface
-	DECLARE_READ32_MEMBER( cpu_id_r );
-	DECLARE_WRITE32_MEMBER( cpu_id_w );
-
-	READ8_MEMBER( read_bus )
-	{
-		return read_bus8(offset);
-	}
-
-	WRITE8_MEMBER( write_bus )
-	{
-		write_bus8(offset, data);
-	}
+	uint32_t cpu_id_r(address_space &space);
+	void cpu_id_w(address_space &space, uint32_t data);
 
 	uint8_t read_bus8(offs_t offset);
 	uint16_t read_bus16(offs_t offset);
@@ -156,7 +149,7 @@ public:
 	void write_bus16(offs_t offset, uint16_t data);
 	void write_bus32(offs_t offset, uint32_t data);
 
-	void * ram_ptr() { return m_ram; }
+	void * ram_ptr() { return m_ram.get(); }
 	offs_t ram_start() { return RAM_BASE; }
 	offs_t ram_end() { return RAM_BASE + m_ram_mask; }
 	uint32_t get_rambank_size(uint32_t bank) const { return m_rambank_size[bank]; }
@@ -171,7 +164,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum base_addr
@@ -209,6 +202,7 @@ private:
 public: // TODO: THIS SHOULD NOT BE PUBLIC
 	required_device<ppc_device> m_cpu1;
 	required_device<ppc_device> m_cpu2;
+	required_device<m2_cde_device> m_cde;
 	devcb_read_line m_videores_in;
 
 	// Sub-devices
@@ -221,9 +215,9 @@ public: // TODO: THIS SHOULD NOT BE PUBLIC
 	required_device<m2_te_device>       m_te;
 
 	// System RAM
-	uint32_t                *m_ram;
-	uint32_t                m_rambank_size[2];
-	uint32_t                m_ram_mask;
+	std::unique_ptr<uint32_t[]> m_ram;
+	uint32_t                    m_rambank_size[2];
+	uint32_t                    m_ram_mask;
 
 	devcb_write16       m_dac_l;
 	devcb_write16       m_dac_r;
@@ -259,8 +253,8 @@ public:
 		update_interrupts();
 	}
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(offs_t offset, uint32_t data);
+	uint32_t read(offs_t offset);
 
 protected:
 	virtual void device_start() override;
@@ -303,8 +297,8 @@ public:
 	template <std::size_t Line> auto gpio_in_handler() { return m_gpio_in[Line].bind(); }
 	template <std::size_t Line> auto gpio_out_handler() { return m_gpio_out[Line].bind(); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;
@@ -372,14 +366,14 @@ private:
 
 
 	// GPIO
-	devcb_read_line m_gpio_in[4];
-	devcb_write_line m_gpio_out[4];
+	devcb_read_line::array<4> m_gpio_in;
+	devcb_write_line::array<4> m_gpio_out;
 
 	// Registers
-	uint32_t    m_mcfg;
-	uint32_t    m_mref;
-	uint32_t    m_mcntl;
-	uint32_t    m_reset;
+	uint32_t    m_mcfg = 0;
+	uint32_t    m_mref = 0;
+	uint32_t    m_mcntl = 0;
+	uint32_t    m_reset = 0;
 };
 
 
@@ -398,15 +392,15 @@ public:
 	auto vint1_int_handler() { return m_vint1_int_handler.bind(); }
 	template <typename T> void set_screen(T &&screen_tag) { m_screen.set_tag(std::forward<T>(screen_tag)); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum timer_id
@@ -461,8 +455,8 @@ class m2_ctrlport_device : public device_t
 public:
 	m2_ctrlport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data);
 
 protected:
 	virtual void device_start() override;
@@ -483,8 +477,8 @@ class m2_mpeg_device : public device_t
 public:
 	m2_mpeg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data);
 
 protected:
 	virtual void device_start() override;
@@ -503,11 +497,12 @@ private:
 class m2_cde_device : public device_t
 {
 public:
-	template <typename T>
-	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag)
+	template <typename T, typename U>
+	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&bda_tag)
 		: m2_cde_device(mconfig, tag, owner, clock)
 	{
 		m_cpu1.set_tag(std::forward<T>(cpu1_tag));
+		m_bda.set_tag(std::forward<U>(bda_tag));
 	}
 	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -516,10 +511,10 @@ public:
 	void set_syscfg(uint32_t syscfg) { m_syscfg = syscfg; }
 	auto sdbg_out() { return m_sdbg_out_handler.bind(); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(sdbg_in);
+	void sdbg_in(uint32_t data);
 
 	void set_external_interrupt(uint32_t which, uint32_t state)
 	{
@@ -530,7 +525,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 
@@ -691,14 +686,15 @@ private:
 	void start_dma(uint32_t ch);
 	void next_dma(uint32_t ch);
 
-	uint32_t address_to_biobus_slot(uint32_t addr) const
+	static uint32_t address_to_biobus_slot(uint32_t addr)
 	{
-		assert_always(addr >= 0x20000000 && addr <= 0x3fffffff, "Address not within BioBus address range");
+		if ((addr < 0x20000000) || (addr > 0x3fffffff))
+			throw emu_fatalerror("m2_cde_device::address_to_biobus_slot: Address not within BioBus address range");
 		return ((addr >> 24) >> 2) & 7;
 	}
 
 	required_device<ppc_device> m_cpu1;
-	m2_bda_device       *m_bda; // todo
+	required_device<m2_bda_device> m_bda;
 
 	devcb_write_line    m_int_handler;
 	devcb_write32       m_sdbg_out_handler;

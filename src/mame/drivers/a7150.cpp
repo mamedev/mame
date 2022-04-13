@@ -2,41 +2,42 @@
 // copyright-holders:Miodrag Milanovic, Sergey Svishchev
 /***************************************************************************
 
-    Robotron A7150
+Robotron A7150
 
-    04/10/2009 Skeleton driver.
+2009-10-04 Skeleton driver.
 
-    http://www.robotrontechnik.de/index.htm?/html/computer/a7150.htm
+http://www.robotrontechnik.de/index.htm?/html/computer/a7150.htm
 
-    http://www.tiffe.de/Robotron/MMS16/
-    - Confidence test is documented in A7150_Rechner...pdf, pp. 112-119
-    - Internal test of KGS -- in KGS-K7070.pdf, pp. 19-23
+http://www.tiffe.de/Robotron/MMS16/
+- Confidence test is documented in A7150_Rechner...pdf, pp. 112-119
+- Internal test of KGS -- in KGS-K7070.pdf, pp. 19-23
 
-    To do:
-    - MMS16 (Multibus clone) and slot devices
-    - native keyboard
-    - A7100 model
+After about a minute, the self-test will appear.
+
+To do:
+- Machine hangs when screen should scroll
+- MMS16 (Multibus clone) and slot devices
+- native keyboard
+- A7100 model
 
 ****************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/bankdev.h"
 #include "machine/input_merger.h"
-
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "machine/z80sio.h"
-
-#include "bus/rs232/rs232.h"
 #include "machine/isbc_215g.h"
 #include "machine/keyboard.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -69,29 +70,30 @@ public:
 
 	void a7150(machine_config &config);
 
-private:
+protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(a7150_kgs_r);
-	DECLARE_WRITE8_MEMBER(a7150_kgs_w);
+private:
+	uint8_t a7150_kgs_r(offs_t offset);
+	void a7150_kgs_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(a7150_tmr2_w);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	void a7150_tmr2_w(int state);
+	void ppi_c_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ifss_write_txd);
-	DECLARE_WRITE_LINE_MEMBER(ifss_write_dtr);
+	void ifss_write_txd(int state);
+	void ifss_write_dtr(int state);
 
-	DECLARE_READ8_MEMBER(kgs_host_r);
-	DECLARE_WRITE8_MEMBER(kgs_host_w);
-	DECLARE_WRITE_LINE_MEMBER(kgs_iml_w);
-	DECLARE_WRITE_LINE_MEMBER(ifss_loopback_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t kgs_host_r(offs_t offset);
+	void kgs_host_w(offs_t offset, uint8_t data);
+	void kgs_iml_w(int state);
+	void ifss_loopback_w(int state);
+	void kbd_put(uint8_t data);
 	void kgs_memory_remap();
 
-	bool m_kgs_msel, m_kgs_iml;
-	uint8_t m_kgs_datao, m_kgs_datai, m_kgs_ctrl;
-	bool m_ifss_loopback;
+	bool m_kgs_msel = 0, m_kgs_iml = 0;
+	uint8_t m_kgs_datao = 0, m_kgs_datai = 0, m_kgs_ctrl = 0;
+	bool m_ifss_loopback = 0;
 
 	uint32_t screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
@@ -108,8 +110,8 @@ private:
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
 
-	void a7150_io(address_map &map);
-	void a7150_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 	void k7070_cpu_banked(address_map &map);
 	void k7070_cpu_io(address_map &map);
 	void k7070_cpu_mem(address_map &map);
@@ -118,18 +120,17 @@ private:
 
 uint32_t a7150_state::screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, x, b;
 	int addr = 0;
 
-	for (y = 0; y < 400; y++)
+	for (int y = 0; y < 400; y++)
 	{
 		int horpos = 0;
-		for (x = 0; x < 80; x++)
+		for (int x = 0; x < 80; x++)
 		{
 			uint8_t code = m_video_ram[addr++];
-			for (b = 0; b < 8; b++)
+			for (int b = 0; b < 8; b++)
 			{
-				bitmap.pix16(y, horpos++) = ((code >> (7 - b)) & 0x01) ? 1 : 0;
+				bitmap.pix(y, horpos++) = (code >> (7 - b)) & 1;
 			}
 		}
 	}
@@ -137,24 +138,24 @@ uint32_t a7150_state::screen_update_k7072(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-WRITE_LINE_MEMBER(a7150_state::kgs_iml_w)
+void a7150_state::kgs_iml_w(int state)
 {
 	m_kgs_iml = !state;
 	kgs_memory_remap();
 }
 
-WRITE_LINE_MEMBER(a7150_state::a7150_tmr2_w)
+void a7150_state::a7150_tmr2_w(int state)
 {
 	m_uart8251->write_rxc(state);
 	m_uart8251->write_txc(state);
 }
 
-WRITE_LINE_MEMBER(a7150_state::ifss_loopback_w)
+void a7150_state::ifss_loopback_w(int state)
 {
 	m_ifss_loopback = !state;
 }
 
-WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
+void a7150_state::ifss_write_txd(int state)
 {
 	if (m_ifss_loopback)
 		m_uart8251->write_rxd(state);
@@ -162,7 +163,7 @@ WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
 		m_rs232->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(a7150_state::ifss_write_dtr)
+void a7150_state::ifss_write_dtr(int state)
 {
 	if (m_ifss_loopback)
 		m_uart8251->write_dsr(state);
@@ -170,7 +171,7 @@ WRITE_LINE_MEMBER(a7150_state::ifss_write_dtr)
 		m_rs232->write_dtr(state);
 }
 
-WRITE8_MEMBER(a7150_state::ppi_c_w)
+void a7150_state::ppi_c_w(uint8_t data)
 {
 	// b0 -- INTR(B)
 	// b1 -- /OBF(B)
@@ -183,7 +184,7 @@ WRITE8_MEMBER(a7150_state::ppi_c_w)
 #define KGS_ST_INT  0x04
 #define KGS_ST_ERR  0x80
 
-READ8_MEMBER(a7150_state::kgs_host_r)
+uint8_t a7150_state::kgs_host_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -218,7 +219,7 @@ READ8_MEMBER(a7150_state::kgs_host_r)
 	return data;
 }
 
-WRITE8_MEMBER(a7150_state::kgs_host_w)
+void a7150_state::kgs_host_w(offs_t offset, uint8_t data)
 {
 	if (0) logerror("%s: kgs %d <- %02x '%c', ctrl %02x\n", machine().describe_context(), offset, data,
 			 (data > 0x1f && data < 0x7f) ? data : 0x20, m_kgs_ctrl);
@@ -254,14 +255,14 @@ WRITE8_MEMBER(a7150_state::kgs_host_w)
 	}
 }
 
-WRITE8_MEMBER(a7150_state::kbd_put)
+void a7150_state::kbd_put(uint8_t data)
 {
 	m_kgs_datai = data;
 	m_kgs_ctrl |= KGS_ST_OBF | KGS_ST_INT;
 	m_pic8259->ir1_w(ASSERT_LINE);
 }
 
-READ8_MEMBER(a7150_state::a7150_kgs_r)
+uint8_t a7150_state::a7150_kgs_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -284,7 +285,7 @@ READ8_MEMBER(a7150_state::a7150_kgs_r)
 	return data;
 }
 
-WRITE8_MEMBER(a7150_state::a7150_kgs_w)
+void a7150_state::a7150_kgs_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: KGS %d <- %02x '%c', ctrl %02x\n", machine().describe_context(), offset, data,
 			 (data > 0x1f && data < 0x7f) ? data : 0x20, m_kgs_ctrl);
@@ -312,14 +313,14 @@ WRITE8_MEMBER(a7150_state::a7150_kgs_w)
 }
 
 
-void a7150_state::a7150_mem(address_map &map)
+void a7150_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xf7fff).ram();
-	map(0xf8000, 0xfffff).rom().region("user1", 0);
+	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void a7150_state::a7150_io(address_map &map)
+void a7150_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x004a, 0x004a).w("isbc_215g", FUNC(isbc_215g_device::write)); // KES board
@@ -337,18 +338,18 @@ void a7150_state::k7070_cpu_banked(address_map &map)
 	map.unmap_value_high();
 	// default map: IML=0, MSEL=0.  ROM + local RAM.
 	map(0x00000, 0x01fff).rom().region("user2", 0);
-	map(0x02000, 0x07fff).bankrw("kgs_ram1");
-	map(0x08000, 0x0ffff).bankrw("kgs_ram2");
+	map(0x02000, 0x07fff).ram().share("kgs_ram1");
+	map(0x08000, 0x0ffff).ram().share("kgs_ram2");
 	// IML=1, MSEL=0.   local RAM only.
-	map(0x10000, 0x11fff).bankrw("kgs_ram0");
-	map(0x12000, 0x17fff).bankrw("kgs_ram1");
-	map(0x18000, 0x1ffff).bankrw("kgs_ram2");
+	map(0x10000, 0x11fff).ram().share("kgs_ram0");
+	map(0x12000, 0x17fff).ram().share("kgs_ram1");
+	map(0x18000, 0x1ffff).ram().share("kgs_ram2");
 	// IML=0, MSEL=1.  ROM + local RAM.
 	map(0x20000, 0x21fff).rom().region("user2", 0);
-	map(0x22000, 0x27fff).bankrw("kgs_ram1");
+	map(0x22000, 0x27fff).ram().share("kgs_ram1");
 	// IML=1, MSEL=1.   local RAM only.
-	map(0x30000, 0x31fff).bankrw("kgs_ram0");
-	map(0x32000, 0x37fff).bankrw("kgs_ram1");
+	map(0x30000, 0x31fff).ram().share("kgs_ram0");
+	map(0x32000, 0x37fff).ram().share("kgs_ram1");
 	map(0x38000, 0x3ffff).ram().share("video_ram");
 }
 
@@ -414,7 +415,6 @@ INPUT_PORTS_END
 static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_28800 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_28800 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -447,6 +447,12 @@ void a7150_state::machine_reset()
 
 void a7150_state::machine_start()
 {
+	save_item(NAME(m_kgs_msel));
+	save_item(NAME(m_kgs_iml));
+	save_item(NAME(m_kgs_datao));
+	save_item(NAME(m_kgs_datai));
+	save_item(NAME(m_kgs_ctrl));
+	save_item(NAME(m_ifss_loopback));
 }
 
 static const z80_daisy_config k7070_daisy_chain[] =
@@ -467,14 +473,14 @@ static const z80_daisy_config k7070_daisy_chain[] =
  */
 void a7150_state::a7150(machine_config &config)
 {
-	I8086(config, m_maincpu, XTAL(9'832'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
-	m_maincpu->set_addrmap(AS_IO, &a7150_state::a7150_io);
+	I8086(config, m_maincpu, XTAL(9'832'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a7150_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &a7150_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
 	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
 
-	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000)/2));
+	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000) / 2));
 	i8087.set_space_86(m_maincpu, AS_PROGRAM);
 	i8087.irq().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
@@ -484,15 +490,15 @@ void a7150_state::a7150(machine_config &config)
 
 	// IFSP port on processor card
 	i8255_device &ppi(I8255(config, "ppi8255"));
-//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
-//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::bus_w));
+//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::read));
+//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
 	PIT8253(config, m_pit8253, 0);
-	m_pit8253->set_clk<0>(14.7456_MHz_XTAL/4);
+	m_pit8253->set_clk<0>(14.7456_MHz_XTAL / 4);
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
-	m_pit8253->set_clk<1>(14.7456_MHz_XTAL/4);
-	m_pit8253->set_clk<2>(14.7456_MHz_XTAL/4);
+	m_pit8253->set_clk<1>(14.7456_MHz_XTAL / 4);
+	m_pit8253->set_clk<2>(14.7456_MHz_XTAL / 4);
 	m_pit8253->out_handler<2>().set(FUNC(a7150_state::a7150_tmr2_w));
 
 	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(m_pic8259, FUNC(pic8259_device::ir4_w));
@@ -514,7 +520,7 @@ void a7150_state::a7150(machine_config &config)
 	ISBC_215G(config, "isbc_215g", 0, 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
-	Z80(config, m_gfxcpu, XTAL(16'000'000)/4);
+	Z80(config, m_gfxcpu, XTAL(16'000'000) / 4);
 	m_gfxcpu->set_addrmap(AS_PROGRAM, &a7150_state::k7070_cpu_mem);
 	m_gfxcpu->set_addrmap(AS_IO, &a7150_state::k7070_cpu_io);
 	m_gfxcpu->set_daisy_config(k7070_daisy_chain);
@@ -526,7 +532,7 @@ void a7150_state::a7150(machine_config &config)
 	m_video_bankdev->set_data_width(8);
 	m_video_bankdev->set_stride(0x10000);
 
-	Z80CTC(config, m_ctc, 16_MHz_XTAL/3);
+	Z80CTC(config, m_ctc, 16_MHz_XTAL / 3);
 	m_ctc->intr_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
 	m_ctc->set_clk<0>(1230750);
 	m_ctc->set_clk<1>(1230750);
@@ -536,7 +542,7 @@ void a7150_state::a7150(machine_config &config)
 	m_ctc->zc_callback<0>().append(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
-	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, XTAL(16'000'000)/4));
+	z80sio_device &sio(Z80SIO(config, Z80SIO_TAG, XTAL(16'000'000) / 4));
 	sio.out_int_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
 	sio.out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	sio.out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
@@ -557,7 +563,7 @@ void a7150_state::a7150(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
-	screen.set_raw(XTAL(16'000'000), 737,0,640, 431,0,400);
+	screen.set_raw(XTAL(16'000'000), 737, 0, 640, 431, 0, 400);
 	screen.set_screen_update(FUNC(a7150_state::screen_update_k7072));
 	screen.set_palette(m_palette);
 
@@ -566,7 +572,7 @@ void a7150_state::a7150(machine_config &config)
 
 /* ROM definition */
 ROM_START( a7150 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("2.3")
 
 	// A7100
@@ -595,7 +601,7 @@ ROM_START( a7150 )
 	ROMX_LOAD("275.rom",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60), ROM_BIOS(3) | ROM_SKIP(1))
 	ROMX_LOAD("276.rom",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946), ROM_BIOS(3) | ROM_SKIP(1))
 
-	ROM_REGION( 0x10000, "user2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "user2", ROMREGION_ERASEFF )
 	// ROM from A7100
 	ROM_LOAD( "kgs7070-152.bin", 0x0000, 0x2000, CRC(403f4235) SHA1(d07ccd40f8b600651d513f588bcf1ea4f15ed094))
 //  ROM_LOAD( "kgs7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
@@ -605,4 +611,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME  FLAGS
-COMP( 1986, a7150, 0,      0,      a7150,   a7150, a7150_state, empty_init, "VEB Robotron", "A7150",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1986, a7150, 0,      0,      a7150,   a7150, a7150_state, empty_init, "VEB Robotron", "A7150",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -7,15 +7,16 @@
     Internal menu for the cheat interface.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_CHEATOPT_H
 #define MAME_FRONTEND_UI_CHEATOPT_H
 
+#pragma once
+
 #include "ui/menu.h"
 
+
 namespace ui {
+
 class menu_cheat : public menu
 {
 public:
@@ -24,24 +25,9 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-};
-
-
-class menu_autofire : public menu
-{
-public:
-	menu_autofire(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_autofire() override;
-
-private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-
-	float refresh;
-	bool last_toggle;
+	virtual void handle(event const *ev) override;
 };
 
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_CHEATOPT_H */
+#endif // MAME_FRONTEND_UI_CHEATOPT_H

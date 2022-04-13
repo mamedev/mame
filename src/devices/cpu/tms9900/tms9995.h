@@ -3,7 +3,7 @@
 /*
   tms9995.h
 
-  See tms9995.c for documentation
+  See tms9995.cpp for documentation
   Also see tms9900.h for types of TMS99xx processors.
 */
 
@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include "debugger.h"
 #include "tms99com.h"
 
 // device type definition
@@ -54,7 +53,8 @@ public:
 	auto holda_cb() { return m_holda_line.bind(); }
 
 	// For debugger access
-	uint8_t debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; };
+	uint8_t debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; }
+	void debug_write_onchip_memory(offs_t addr, uint8_t data) { m_onchip_memory[addr & 0xff] = data; }
 	bool is_onchip(offs_t addrb) { return (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537; }
 
 	void set_overflow_interrupt( int enable ) { m_check_overflow = (enable!=0); }
@@ -66,9 +66,9 @@ protected:
 	virtual void        device_start() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t      execute_min_cycles() const override;
-	virtual uint32_t      execute_max_cycles() const override;
-	virtual uint32_t      execute_input_lines() const override;
+	virtual uint32_t      execute_min_cycles() const noexcept override;
+	virtual uint32_t      execute_max_cycles() const noexcept override;
+	virtual uint32_t      execute_input_lines() const noexcept override;
 	virtual void        execute_set_input(int irqline, int state) override;
 	virtual void        execute_run() override;
 
@@ -77,8 +77,8 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return clocks / 4.0; }
-	uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * 4.0; }
+	uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks / 4.0; }
+	uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles * 4.0; }
 
 	// Variant of the TMS9995 without internal RAM and decrementer
 	bool    m_mp9537;

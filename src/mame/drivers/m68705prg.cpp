@@ -61,13 +61,13 @@ protected:
 
 	void m68705prg(machine_config &config);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eprom)
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eprom_load)
 	{
 		auto const desired(m_mcu_region.bytes());
 		auto const actual(m_eprom_image->common_get_size("rom"));
 		if (desired > actual)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported EPROM size");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported EPROM size");
 			return image_init_result::FAIL;
 		}
 		else
@@ -78,13 +78,13 @@ protected:
 		}
 	}
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mcu)
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mcu_load)
 	{
 		auto const desired(m_mcu_region.bytes());
 		auto const actual(m_mcu_image->common_get_size("rom"));
 		if (desired != actual)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect internal MCU EPROM size");
+			image.seterror(image_error::INVALIDIMAGE, "Incorrect internal MCU EPROM size");
 			return image_init_result::FAIL;
 		}
 		else
@@ -107,11 +107,14 @@ protected:
 		m_addr = 0x0000;
 		m_pb_val = 0xff;
 
+		m_input_poll_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
+	}
+
+	virtual void machine_reset() override
+	{
 		m_digits[0] = s_7seg[(m_addr >> 0) & 0x0f];
 		m_digits[1] = s_7seg[(m_addr >> 4) & 0x0f];
 		m_digits[2] = s_7seg[(m_addr >> 8) & 0x0f];
-
-		m_input_poll_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
 	}
 
 	required_ioport                         m_sw;
@@ -145,7 +148,7 @@ public:
 	void prg(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(pb_w)
+	void pb_w(u8 data)
 	{
 		// PB4: address counter reset (active high)
 		// PB3: address counter clock (falling edge)
@@ -165,7 +168,7 @@ protected:
 		m_pb_val = data;
 
 		u8 const *const ptr(m_eprom_image->get_rom_base());
-		m_mcu->pa_w(space, 0, ptr ? ptr[m_addr & m_mcu_region.mask()] : 0xff);
+		m_mcu->pa_w(ptr ? ptr[m_addr & (m_mcu_region.length() - 1)] : 0xff);
 
 		m_digits[0] = s_7seg[(m_addr >> 0) & 0x0f];
 		m_digits[1] = s_7seg[(m_addr >> 4) & 0x0f];
@@ -174,6 +177,8 @@ protected:
 
 	virtual void machine_reset() override
 	{
+		m68705prg_state_base::machine_reset();
+
 		m_sw->field(0x01)->live().value = 0;
 		m_sw->field(0x02)->live().value = 0;
 
@@ -186,15 +191,15 @@ protected:
 		m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override
 	{
 		switch (id)
 		{
 		case TIMER_INPUT_POLL:
-			input_poll_callback(ptr, param);
+			input_poll_callback(param);
 			break;
 		default:
-			driver_device::device_timer(timer, id, param, ptr);
+			driver_device::device_timer(timer, id, param);
 		}
 	}
 
@@ -229,13 +234,13 @@ INPUT_PORTS_END
 
 void m68705prg_state_base::m68705prg(machine_config &config)
 {
-	config.m_perfect_cpu_quantum = subtag("mcu");
+	config.set_perfect_quantum("mcu");
 
 	GENERIC_SOCKET(config, m_eprom_image, generic_plain_slot, "eprom", "bin,rom");
-	m_eprom_image->set_device_load(device_image_load_delegate(&m68705prg_state_base::device_image_load_eprom, this));
+	m_eprom_image->set_device_load(FUNC(m68705prg_state_base::eprom_load));
 
 	GENERIC_SOCKET(config, m_mcu_image, generic_plain_slot, "mcu", "bin,rom");
-	m_mcu_image->set_device_load(device_image_load_delegate(&m68705prg_state_base::device_image_load_mcu, this));
+	m_mcu_image->set_device_load(FUNC(m68705prg_state_base::mcu_load));
 
 	config.set_default_layout(layout_m68705prg);
 }

@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(ABCBUS_SLOT, abcbus_slot_device, "abcbus_slot", "ABCBUS slot"
 //-------------------------------------------------
 
 device_abcbus_card_interface::device_abcbus_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "abcbus")
 {
 	m_slot = dynamic_cast<abcbus_slot_device *>(device.owner());
 }
@@ -40,7 +40,7 @@ device_abcbus_card_interface::device_abcbus_card_interface(const machine_config 
 
 abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABCBUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_abcbus_card_interface>(mconfig, *this),
 	m_write_irq(*this),
 	m_write_nmi(*this),
 	m_write_rdy(*this),
@@ -50,8 +50,16 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 	m_write_xint2(*this),
 	m_write_xint3(*this),
 	m_write_xint4(*this),
-	m_write_xint5(*this), m_card(nullptr), m_irq(0), m_nmi(0), m_pren(0),
-	m_trrq(0), m_xint2(0), m_xint3(0), m_xint4(0), m_xint5(0)
+	m_write_xint5(*this),
+	m_card(nullptr),
+	m_irq(1),
+	m_nmi(1),
+	m_pren(1),
+	m_trrq(1),
+	m_xint2(1),
+	m_xint3(1),
+	m_xint4(1),
+	m_xint5(1)
 {
 }
 
@@ -62,7 +70,7 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 
 void abcbus_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_abcbus_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -78,12 +86,25 @@ void abcbus_slot_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void abcbus_slot_device::device_reset()
+{
+	m_write_irq(1);
+	m_write_pren(1);
+	m_write_trrq(1);
+}
+
+
 // slot devices
 #include "abc890.h"
 #include "cadmouse.h"
-#include "db411223.h"
+#include "db4106.h"
+#include "db4107.h"
+#include "db4112.h"
 #include "fd2.h"
-#include "hdc.h"
 #include "lux10828.h"
 #include "lux21046.h"
 #include "lux21056.h"
@@ -108,12 +129,14 @@ void abc80_cards(device_slot_interface &device)
 	device.option_add("abc830", ABC830);
 	device.option_add("abcexp", ABC_EXPANSION_UNIT);
 	device.option_add("cadabc", ABC_CADMOUSE);
-	device.option_add("db411223", DATABOARD_4112_23);
+	device.option_add("db4106", DATABOARD_4106);
+	device.option_add("db4107", DATABOARD_4107);
+	device.option_add("db4112", DATABOARD_4112);
 	device.option_add("fd2", ABC_FD2);
 	device.option_add("memcard", ABC_MEMORY_CARD);
 	device.option_add("slow", LUXOR_55_10828);
-	device.option_add("ssa", SUPER_SMARTAID);
-	device.option_add("unidisk", UNIDISK);
+	device.option_add("ssa", ABC_SUPER_SMARTAID);
+	device.option_add("unidisk", ABC_UNIDISK);
 }
 
 
@@ -133,13 +156,14 @@ void abcbus_cards(device_slot_interface &device)
 	device.option_add("abc856", ABC856);
 	device.option_add("abc890", ABC890);
 	device.option_add("abc894", ABC894);
-	device.option_add("db411223", DATABOARD_4112_23);
-	device.option_add("hdc", ABC_HDC);
+	device.option_add("db4106", DATABOARD_4106);
+	device.option_add("db4107", DATABOARD_4107);
+	device.option_add("db4112", DATABOARD_4112);
 	device.option_add("sio", ABC_SIO);
 	device.option_add("slow", LUXOR_55_10828);
 	device.option_add("slutprov", ABC_SLUTPROV);
 	device.option_add("uni800", ABC_UNI800);
-	device.option_add("unidisk", UNIDISK);
+	device.option_add("unidisk", ABC_UNIDISK);
 	device.option_add("xebec", LUXOR_55_21056);
 }
 

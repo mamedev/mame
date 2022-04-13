@@ -2,6 +2,9 @@
 // copyright-holders:Curt Coder
 /*
 
+PET = Personal Electronic Transactor
+
+
 http://www.6502.org/users/andre/petindex/boards.html
 
 Static Board (PET 2001)
@@ -152,7 +155,7 @@ ROM sockets:  UA3   2K or 4K character
 #include "emu.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -167,6 +170,7 @@ ROM sockets:  UA3   2K or 4K character
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "machine/cbm_snqk.h"
+#include "machine/input_merger.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -198,7 +202,7 @@ public:
 		m_palette(*this, "palette"),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		m_cassette2(*this, PET_DATASSETTE_PORT2_TAG),
-		m_exp(*this, PET_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_user(*this, PET_USER_PORT_TAG),
 		m_speaker(*this, "speaker"),
 		m_cart_9000(*this, "cart_9000"),
@@ -207,7 +211,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, M6502_TAG),
 		m_char_rom(*this, "charom"),
-		m_video_ram(*this, "video_ram"),
+		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_sync_timer(nullptr),
@@ -216,12 +220,6 @@ public:
 		m_sync(0),
 		m_graphic(0),
 		m_blanktv(0),
-		m_via_irq(CLEAR_LINE),
-		m_pia1a_irq(CLEAR_LINE),
-		m_pia1b_irq(CLEAR_LINE),
-		m_pia2a_irq(CLEAR_LINE),
-		m_pia2b_irq(CLEAR_LINE),
-		m_exp_irq(CLEAR_LINE),
 		m_user_diag(1)
 	{ }
 
@@ -246,25 +244,19 @@ public:
 	void pet2001(machine_config &config);
 	void pet2001n32(machine_config &config);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
-	DECLARE_WRITE8_MEMBER( via_pa_w );
-	DECLARE_READ8_MEMBER( via_pb_r );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
+	void via_pa_w(uint8_t data);
+	uint8_t via_pb_r();
+	void via_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
 
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
+	uint8_t pia1_pa_r();
+	uint8_t pia1_pb_r();
+	void pia1_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
 
@@ -273,7 +265,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER( sync_tick );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_pet);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -302,7 +294,7 @@ protected:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 	required_ioport_array<10> m_row;
 	required_ioport m_lock;
 
@@ -313,8 +305,6 @@ protected:
 	DECLARE_MACHINE_START( pet2001 );
 	DECLARE_MACHINE_RESET( pet );
 
-
-	void check_interrupts();
 	void update_speaker();
 
 	enum
@@ -352,13 +342,6 @@ protected:
 
 	uint8_t m_via_pa;
 
-	// interrupt state
-	int m_via_irq;
-	int m_pia1a_irq;
-	int m_pia1b_irq;
-	int m_pia2a_irq;
-	int m_pia2b_irq;
-	int m_exp_irq;
 	int m_user_diag;
 };
 
@@ -386,7 +369,7 @@ public:
 	void pet4016(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER( pia1_pb_r );
+	uint8_t pia1_pb_r();
 
 };
 
@@ -466,8 +449,8 @@ private:
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
 	void read_pla2_eprom(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t m_cr;
 	void cbm8296_mem(address_map &map);
@@ -484,9 +467,9 @@ static void cbm_pet_quick_sethiaddress( address_space &space, uint16_t hiaddress
 	space.write_byte(0x2b, hiaddress >> 8);
 }
 
-QUICKLOAD_LOAD_MEMBER( pet_state, cbm_pet )
+QUICKLOAD_LOAD_MEMBER(pet_state::quickload_pet)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
 }
 
 
@@ -494,19 +477,6 @@ QUICKLOAD_LOAD_MEMBER( pet_state, cbm_pet )
 //**************************************************************************
 //  INTERRUPTS
 //**************************************************************************
-
-//-------------------------------------------------
-//  check_interrupts -
-//-------------------------------------------------
-
-void pet_state::check_interrupts()
-{
-	int irq = m_via_irq || m_pia1a_irq || m_pia1b_irq || m_pia2a_irq || m_pia2b_irq || m_exp_irq;
-
-	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
-	m_exp->irq_w(irq);
-}
-
 
 //-------------------------------------------------
 //  update_speaker -
@@ -527,7 +497,7 @@ void pet_state::update_speaker()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( pet_state::read )
+uint8_t pet_state::read(offs_t offset)
 {
 	int sel = offset >> 12;
 	int norom = m_exp->norom_r(offset, sel);
@@ -625,7 +595,7 @@ READ8_MEMBER( pet_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pet_state::write )
+void pet_state::write(offs_t offset, uint8_t data)
 {
 	int sel = offset >> 12;
 
@@ -756,7 +726,7 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( cbm8296_state::read )
+uint8_t cbm8296_state::read(offs_t offset)
 {
 	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
@@ -837,7 +807,7 @@ READ8_MEMBER( cbm8296_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cbm8296_state::write )
+void cbm8296_state::write(offs_t offset, uint8_t data)
 {
 	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
@@ -944,51 +914,51 @@ static INPUT_PORTS_START( pet )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR('9')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR('7')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91 Pi") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('^') PORT_CHAR(0x03C0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)          PORT_CHAR('O')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)          PORT_CHAR('U')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)          PORT_CHAR('T')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)          PORT_CHAR('E')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)          PORT_CHAR('Q')
 
 	PORT_START( "ROW3" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD)  PORT_CHAR('/')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR('8')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)          PORT_CHAR('P')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)          PORT_CHAR('I')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)          PORT_CHAR('Y')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)          PORT_CHAR('R')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)          PORT_CHAR('W')
 
 	PORT_START( "ROW4" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR('6')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR('4')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)          PORT_CHAR('L')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)          PORT_CHAR('J')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)          PORT_CHAR('G')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)          PORT_CHAR('D')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)          PORT_CHAR('A')
 
 	PORT_START( "ROW5" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR('*')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR('5')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(':')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)          PORT_CHAR('K')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)          PORT_CHAR('H')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)          PORT_CHAR('F')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)          PORT_CHAR('S')
 
 	PORT_START( "ROW6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR('3')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR('1')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)       PORT_CHAR(';')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)          PORT_CHAR('M')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)          PORT_CHAR('B')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)          PORT_CHAR('C')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('Z')
 
 	PORT_START( "ROW7" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR('+')
@@ -996,9 +966,9 @@ static INPUT_PORTS_START( pet )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('?')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)          PORT_CHAR('N')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)          PORT_CHAR('V')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)          PORT_CHAR('X')
 
 	PORT_START( "ROW8" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD)  PORT_CHAR('-')
@@ -1154,14 +1124,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( pet_state::via_irq_w )
-{
-	m_via_irq = state;
-
-	check_interrupts();
-}
-
-WRITE8_MEMBER( pet_state::via_pa_w )
+void pet_state::via_pa_w(uint8_t data)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -1175,7 +1138,7 @@ WRITE8_MEMBER( pet_state::via_pa_w )
 	m_via_pa = data;
 }
 
-READ8_MEMBER( pet_state::via_pb_r )
+uint8_t pet_state::via_pb_r()
 {
 	/*
 
@@ -1205,7 +1168,7 @@ READ8_MEMBER( pet_state::via_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet_state::via_pb_w )
+void pet_state::via_pb_w(uint8_t data)
 {
 	/*
 
@@ -1246,21 +1209,7 @@ WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 }
 
 
-WRITE_LINE_MEMBER( pet_state::pia1_irqa_w )
-{
-	m_pia1a_irq = state;
-
-	check_interrupts();
-}
-
-WRITE_LINE_MEMBER( pet_state::pia1_irqb_w )
-{
-	m_pia1b_irq = state;
-
-	check_interrupts();
-}
-
-READ8_MEMBER( pet_state::pia1_pa_r )
+uint8_t pet_state::pia1_pa_r()
 {
 	/*
 
@@ -1295,7 +1244,7 @@ READ8_MEMBER( pet_state::pia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet_state::pia1_pa_w )
+void pet_state::pia1_pa_w(uint8_t data)
 {
 	/*
 
@@ -1320,7 +1269,7 @@ WRITE8_MEMBER( pet_state::pia1_pa_w )
 	update_speaker();
 }
 
-READ8_MEMBER( pet_state::pia1_pb_r )
+uint8_t pet_state::pia1_pb_r()
 {
 	uint8_t data = 0xff;
 
@@ -1341,7 +1290,7 @@ READ8_MEMBER( pet_state::pia1_pb_r )
 	return data;
 }
 
-READ8_MEMBER( pet2001b_state::pia1_pb_r )
+uint8_t pet2001b_state::pia1_pb_r()
 {
 	uint8_t data = 0xff;
 
@@ -1370,20 +1319,6 @@ WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 }
 
 
-WRITE_LINE_MEMBER( pet_state::pia2_irqa_w )
-{
-	m_pia2a_irq = state;
-
-	check_interrupts();
-}
-
-WRITE_LINE_MEMBER( pet_state::pia2_irqb_w )
-{
-	m_pia2b_irq = state;
-
-	check_interrupts();
-}
-
 WRITE_LINE_MEMBER( pet_state::user_diag_w )
 {
 	m_user_diag = state;
@@ -1409,24 +1344,24 @@ TIMER_CALLBACK_MEMBER( pet_state::sync_tick )
 
 uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int y = 0; y < 200; y++)
 	{
 		for (int sx = 0; sx < 40; sx++)
 		{
-			int sy = y / 8;
-			offs_t video_addr = (sy * 40) + sx;
-			uint8_t lsd = m_video_ram[video_addr];
+			int const sy = y / 8;
+			offs_t const video_addr = (sy * 40) + sx;
+			uint8_t const lsd = m_video_ram[video_addr];
 
-			int ra = y & 0x07;
-			offs_t char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
+			int const ra = y & 0x07;
+			offs_t const char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
 			uint8_t data = m_char_rom->base()[char_addr];
 
 			for (int x = 0; x < 8; x++, data <<= 1)
 			{
-				int color = (BIT(data, 7) ^ BIT(lsd, 7)) && m_blanktv;
-				bitmap.pix32(y, (sx * 8) + x) = pen[color];
+				int const color = (BIT(data, 7) ^ BIT(lsd, 7)) && m_blanktv;
+				bitmap.pix(y, (sx * 8) + x) = pen[color];
 			}
 		}
 	}
@@ -1468,8 +1403,8 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 
 		// odd character
@@ -1481,8 +1416,8 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 	}
 }
@@ -1514,8 +1449,8 @@ MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 	}
 }
@@ -1550,8 +1485,8 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 
 		// odd character
@@ -1563,8 +1498,8 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			int const video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
+			bitmap.pix(vbp + y, hbp + x++) = pen[video];
 		}
 	}
 }
@@ -1583,9 +1518,6 @@ void cbm8296d_ieee488_devices(device_slot_interface &device)
 
 MACHINE_START_MEMBER( pet_state, pet )
 {
-	// allocate memory
-	m_video_ram.allocate(m_video_ram_size);
-
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -1611,12 +1543,6 @@ MACHINE_START_MEMBER( pet_state, pet )
 	save_item(NAME(m_sync));
 	save_item(NAME(m_graphic));
 	save_item(NAME(m_blanktv));
-	save_item(NAME(m_via_irq));
-	save_item(NAME(m_pia1a_irq));
-	save_item(NAME(m_pia1b_irq));
-	save_item(NAME(m_pia2a_irq));
-	save_item(NAME(m_pia2b_irq));
-	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_user_diag));
 }
 
@@ -1731,15 +1657,19 @@ void pet_state::_32k(machine_config &config)
 
 void pet_state::base_pet_devices(machine_config &config, const char *default_drive)
 {
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // open collector
+	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	mainirq.output_handler().append(m_exp, FUNC(pet_expansion_slot_device::irq_w));
+
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	VIA6522(config, m_via, XTAL(16'000'000)/16);
+	MOS6522(config, m_via, XTAL(16'000'000)/16);
 	m_via->readpb_handler().set(FUNC(pet_state::via_pb_r));
 	m_via->writepa_handler().set(FUNC(pet_state::via_pa_w));
 	m_via->writepb_handler().set(FUNC(pet_state::via_pb_w));
 	m_via->ca2_handler().set(FUNC(pet_state::via_ca2_w));
 	m_via->cb2_handler().set(FUNC(pet_state::via_cb2_w));
-	m_via->irq_handler().set(FUNC(pet_state::via_irq_w));
+	m_via->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set(FUNC(pet_state::pia1_pa_r));
@@ -1748,16 +1678,16 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_pia1->writepa_handler().set(FUNC(pet_state::pia1_pa_w));
 	m_pia1->ca2_handler().set(FUNC(pet_state::pia1_ca2_w));
 	m_pia1->cb2_handler().set(PET_DATASSETTE_PORT_TAG, FUNC(pet_datassette_port_device::motor_w));
-	m_pia1->irqa_handler().set(FUNC(pet_state::pia1_irqa_w));
-	m_pia1->irqb_handler().set(FUNC(pet_state::pia1_irqb_w));
+	m_pia1->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_pia1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	PIA6821(config, m_pia2, 0);
 	m_pia2->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_pia2->writepb_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 	m_pia2->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
 	m_pia2->cb2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
-	m_pia2->irqa_handler().set(FUNC(pet_state::pia2_irqa_w));
-	m_pia2->irqb_handler().set(FUNC(pet_state::pia2_irqb_w));
+	m_pia2->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
+	m_pia2->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
 	ieee488_slot_device::add_cbm_defaults(config, default_drive);
 	IEEE488(config, m_ieee, 0);
@@ -1783,8 +1713,8 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_user->pl_handler().set(m_via, FUNC(via6522_device::write_pa7));
 	m_user->pm_handler().set(m_via, FUNC(via6522_device::write_cb2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(pet_state::quickload_pet));
 	quickload.set_interface("cbm_quik");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");
@@ -1803,7 +1733,6 @@ void pet_state::pet(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(8'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1966,8 +1895,8 @@ void pet2001b_state::pet4032f(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2022,8 +1951,8 @@ void pet_state::cbm4032f(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2073,7 +2002,6 @@ void pet80_state::pet80(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
@@ -2088,8 +2016,8 @@ void pet80_state::pet80(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2143,7 +2071,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	m_crtc->set_clock(XTAL(16'000'000)/16);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	subdevice<ieee488_slot_device>("ieee8")->set_default_option("c8250");

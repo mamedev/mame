@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-    NEC PC-9801-118
+    System Sacom AMD-98 (AmuseMent boarD)
 
 ***************************************************************************/
 
@@ -14,12 +14,11 @@
 #include "bus/cbus/pc9801_cbus.h"
 #include "sound/ay8910.h"
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc9801_118_device
+// ======================> pc9801_amd98_device
 
 class pc9801_amd98_device : public device_t
 {
@@ -29,8 +28,8 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -42,8 +41,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_WRITE8_MEMBER(ay3_address_w);
-	DECLARE_WRITE8_MEMBER(ay3_data_latch_w);
+	void ay3_address_w(uint8_t data);
+	void ay3_data_latch_w(uint8_t data);
 
 	uint8_t m_ay3_latch;
 
@@ -54,12 +53,7 @@ private:
 
 };
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device)
 
-
-
-
-
-#endif // MAME_BUS_CBUS_PC9801_118_H
+#endif // MAME_BUS_CBUS_PC9801_AMD98_H

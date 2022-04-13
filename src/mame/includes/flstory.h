@@ -12,6 +12,7 @@
 #include "sound/ta7630.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class flstory_state : public driver_device
 {
@@ -32,7 +33,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_soundnmi(*this, "soundnmi")
+		m_soundnmi(*this, "soundnmi"),
+		m_extraio1(*this, "EXTRA_P1")
 	{ }
 
 	void common(machine_config &config);
@@ -41,8 +43,6 @@ public:
 	void onna34ro(machine_config &config);
 	void victnine(machine_config &config);
 	void onna34ro_mcu(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
 
 protected:
 	virtual void machine_start() override;
@@ -55,22 +55,22 @@ private:
 	optional_shared_ptr<uint8_t> m_workram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 	std::vector<uint8_t> m_paletteram;
 	std::vector<uint8_t> m_paletteram_ext;
-	uint8_t    m_gfxctrl;
-	uint8_t    m_char_bank;
-	uint8_t    m_palette_bank;
+	uint8_t    m_gfxctrl = 0;
+	uint8_t    m_char_bank = 0;
+	uint8_t    m_palette_bank = 0;
 
 	/* sound-related */
-	uint8_t    m_snd_ctrl0;
-	uint8_t    m_snd_ctrl1;
-	uint8_t    m_snd_ctrl2;
-	uint8_t    m_snd_ctrl3;
+	uint8_t    m_snd_ctrl0 = 0;
+	uint8_t    m_snd_ctrl1 = 0;
+	uint8_t    m_snd_ctrl2 = 0;
+	uint8_t    m_snd_ctrl3 = 0;
 
 	/* protection sims */
-	uint8_t m_from_mcu;
-	int      m_mcu_select;
+	uint8_t m_from_mcu = 0;
+	int      m_mcu_select = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -84,24 +84,23 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<input_merger_device> m_soundnmi;
+	optional_ioport m_extraio1;
 
-	DECLARE_READ8_MEMBER(snd_flag_r);
-	DECLARE_WRITE8_MEMBER(snd_reset_w);
-	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(victnine_mcu_w);
-	DECLARE_READ8_MEMBER(victnine_mcu_r);
-	DECLARE_READ8_MEMBER(victnine_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(flstory_videoram_w);
-	DECLARE_WRITE8_MEMBER(flstory_palette_w);
-	DECLARE_READ8_MEMBER(flstory_palette_r);
-	DECLARE_WRITE8_MEMBER(flstory_gfxctrl_w);
-	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
-	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
-	DECLARE_WRITE8_MEMBER(sound_control_0_w);
-	DECLARE_WRITE8_MEMBER(sound_control_1_w);
-	DECLARE_WRITE8_MEMBER(sound_control_2_w);
-	DECLARE_WRITE8_MEMBER(sound_control_3_w);
+	uint8_t snd_flag_r();
+	void snd_reset_w(uint8_t data);
+	uint8_t flstory_mcu_status_r();
+	uint8_t victnine_mcu_status_r();
+	void flstory_videoram_w(offs_t offset, uint8_t data);
+	void flstory_palette_w(offs_t offset, uint8_t data);
+	uint8_t flstory_palette_r(offs_t offset);
+	void flstory_gfxctrl_w(uint8_t data);
+	uint8_t victnine_gfxctrl_r();
+	void victnine_gfxctrl_w(uint8_t data);
+	void flstory_scrlram_w(offs_t offset, uint8_t data);
+	void sound_control_0_w(uint8_t data);
+	void sound_control_1_w(uint8_t data);
+	void sound_control_2_w(uint8_t data);
+	void sound_control_3_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rumba_tile_info);

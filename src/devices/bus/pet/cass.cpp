@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(PET_DATASSETTE_PORT, pet_datassette_port_device, "pet_datasse
 //-------------------------------------------------
 
 device_pet_datassette_port_interface::device_pet_datassette_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+	: device_interface(device, "petcass")
 {
 	m_slot = dynamic_cast<pet_datassette_port_device *>(device.owner());
 }
@@ -54,7 +54,7 @@ device_pet_datassette_port_interface::~device_pet_datassette_port_interface()
 
 pet_datassette_port_device::pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PET_DATASSETTE_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_pet_datassette_port_interface>(mconfig, *this),
 	m_read_handler(*this), m_cart(nullptr)
 {
 }
@@ -75,7 +75,7 @@ pet_datassette_port_device::~pet_datassette_port_device()
 
 void pet_datassette_port_device::device_start()
 {
-	m_cart = dynamic_cast<device_pet_datassette_port_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	// resolve callbacks
 	m_read_handler.resolve_safe();

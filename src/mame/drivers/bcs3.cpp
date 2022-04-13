@@ -2,29 +2,61 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        BCS 3
+BCS 3
 
-    2009-05-12 Skeleton driver.
-    2015-09-25 Improvements
+2009-05-12 Skeleton driver.
+2015-09-25 Improvements
 
-    http://hc-ddr.hucki.net/wiki/doku.php/homecomputer:bcs3
+http://hc-ddr.hucki.net/wiki/doku.php/homecomputer:bcs3
 
-    East German home built computer. No sound facilities.
-    All documents are in German.
+East German home built computer. No sound facilities.
+All documents are in German.
 
-    Main CPU is a U880 (Z80 equivalent). Other ICs also have unusual names.
+Main CPU is a U880 (Z80 equivalent). Other ICs also have unusual names.
 
-    The CTC sends an interrupt every so often. This uses a lookup table to
-    jump to an address in the range 38xx-39xx. This seems to work much the
-    same as reading video memory in the ZX80. This, I think, is to stop snow
-    appearing on the screen. It also slows everything down noticeably.
+The CTC sends an interrupt every so often. This uses a lookup table to
+jump to an address in the range 38xx-39xx. This seems to work much the
+same as reading video memory in the ZX80. This, I think, is to stop snow
+appearing on the screen. It also slows everything down noticeably.
 
-    It appears that a read of 1400 activates the Z80's /WAIT pin. This will
-    be released by a VS pulse. (Not emulated)
+It appears that a read of 1400 activates the Z80's /WAIT pin. This will
+be released by a VS pulse. (Not emulated)
 
-    Cassette is hooked up according to the documentation, but it doesn't work.
+System Clock
+    - is not a crystal, but instead an LC oscillator at 5 MHz
+    - frequency divided by 2 to form the CPU clock.
+    - bcs3b increased oscillator frequency to 7 MHz to handle 40 characters per line
 
-    Known Memory Map:
+CTC channels
+    - 0, 15625Hz, TV line sync
+    - 1, 244Hz, scanline counter for character generator (976Hz on bcs3)
+    - 2, 49Hz, TV frame sync
+    - 3, 1Hz, not used
+    During cassette save, ch 1 is disabled, which causes ch 2 and 3 to stop.
+    Ch 0 will output pulses at a rate of 1220Hz while each bit is different from
+    the last, or 2441Hz if bits are the same (1708 and 3417Hz for bcs3b).
+    These pulses are fed to a flipflop to create a train of wide and narrow
+    cycles, to be recorded onto the tape.
+
+Cassette
+    - is hooked up according to the documentation, but doesn't work.
+    - on the real machine it overrides the video output, so the video will
+      be lost during cassette operations.
+    - does not exist on "bcs3". The commands SAVE and LOAD will attempt to
+      use a non-existing rom at 0800, and crash the system.
+    - When you start any cassette-based system it asks for the number of lines
+      you'd like on the screen, or hit enter for the default. Depending on the
+      number, the BASIC program starts in a different place. So, to LOAD a tape,
+      you must have the same number of lines that the program was SAVED at.
+    - Recordings are not compatible between the versions of BASIC.
+
+Bugs:
+    - Tell it to PRINT ! (or any character it doesn't understand) and the screen
+      fills up with zeroes. String are enclosed in single quotes. Double quotes
+      will cause this bug.
+    - Undefined strings print as 0 instead of nothing.
+
+Known Memory Map:
     0000 - 0FFF: Main ROM
     1000 - 13FF: Keyboard
     1400 - 17FF: /WAIT circuit
@@ -33,7 +65,7 @@
     2000 - 3FFF: Mirror of 0000 - 1FFF.
     4000 - up  : Extra RAM (required for hack versions)
 
-    Hack versions:
+Hack versions:
     - They are fitted with Basic 3.x, require more RAM, and use hardware scrolling.
     - No schematic has been found, so the code is educated guesswork.
     - The ZX process is still to be worked out. For now, we return 0xF7 to finish.
@@ -41,7 +73,7 @@
     -- Y = USR(0F000H)
     -- Commands are S (substitute), M (move), T (test), G (go), Q (quit)
 
-    To Do:
+To Do:
     - Need software
     - Fix cassette
     - Hack versions: fix the ZX process
@@ -64,56 +96,60 @@ public:
 	bcs3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_ctc(*this, "ctc")
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
-		, m_io_keyboard(*this, "KEY.%u", 0)
+		, m_io_keyboard(*this, "KEY.%u", 0U)
 	{ }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_READ8_MEMBER(zx_r);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	void bcs3(machine_config &config);
+	void bcs3a(machine_config &config);
+	void bcs3b(machine_config &config);
 	void init_bcs3a();
 	void init_bcs3b();
 	void init_bcs3c();
 	void init_bcs3d();
+
+private:
+	u8 keyboard_r(offs_t offset);
+	u8 video_r(offs_t offset);
+	u8 zx_r();
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	u32 screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bcs3a(machine_config &config);
-	void bcs3(machine_config &config);
-	void bcs3b(machine_config &config);
 	void bcs3_io(address_map &map);
 	void bcs3_mem(address_map &map);
 	void bcs3a_mem(address_map &map);
-private:
-	bool m_cass_bit;
-	u8 s_curs;
-	u8 s_init;
-	u8 s_rows;
-	u8 s_cols;
+	void machine_start() override;
+	bool m_cassbit = 0;
+	u8 s_curs = 0U;
+	u8 s_init = 0U;
+	u8 s_rows = 0U;
+	u8 s_cols = 0U;
 
 	required_device<z80_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<z80ctc_device> m_ctc;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
-	required_device<cassette_image_device> m_cass;
+	optional_device<cassette_image_device> m_cass;
 	required_ioport_array<10> m_io_keyboard;
 };
 
-READ8_MEMBER( bcs3_state::keyboard_r )
+u8 bcs3_state::keyboard_r(offs_t offset)
 {
-	u8 i, data = 0;
+	u8 data = 0;
 
-	if (offset == 0)
+	if (offset == 0 && m_cass)
 		data = (m_cass->input() > +0.01) ? 0x80 : 0;
 
 	offset ^= 0x3ff;
 
-	for (i = 0; i < 10; i++)
+	for (u8 i = 0; i < 10; i++)
 		if (BIT(offset, i))
 			data |= m_io_keyboard[i]->read();
 
@@ -121,7 +157,7 @@ READ8_MEMBER( bcs3_state::keyboard_r )
 }
 
 // 00-7F = NUL, 0xE0 = end of line.
-READ8_MEMBER( bcs3_state::video_r )
+u8 bcs3_state::video_r(offs_t offset)
 {
 	u8 data = m_p_videoram[offset];
 	return BIT(data, 7) ? data : 0;
@@ -129,7 +165,7 @@ READ8_MEMBER( bcs3_state::video_r )
 
 // Unsure of how this works.
 // 00-7F = NUL, 0xFF = end of line, 0xF7 = finish.
-READ8_MEMBER( bcs3_state::zx_r )
+u8 bcs3_state::zx_r()
 {
 	return 0xf7;
 }
@@ -229,24 +265,24 @@ INPUT_PORTS_END
 // Official version
 u32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx,rat;
-	u16 sy=0,ma=0x50,x;
+	u16 sy=0,ma=0x50;
 
-	for (y = 0; y < 12; y++)
+	for (u8 y = 0; y < 12; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (u8 ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
-			rat = (ra + 1) & 7;
+			uint16_t *p = &bitmap.pix(sy++);
+			u8 const rat = (ra + 1) & 7;
 
-			for (x = ma; x < ma + 28; x++)
+			for (u16 x = ma; x < ma + 28; x++)
 			{
+				u8 gfx;
 				if (ra < 8)
 				{
-					chr = m_p_videoram[x] & 0x7f;
+					u8 const chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -271,27 +307,27 @@ u32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, 
    I'm assuming that it only shows a portion of this, with the cursor always in sight. */
 u32 bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx,rat;
-	u16 sy = 0, ma = s_init, x;
-	u16 cursor = (m_p_videoram[s_curs] | (m_p_videoram[s_curs+1] << 8)) - 0x3c00 - ma;  // get cursor relative position
-	rat = cursor / (s_cols+1);
-	if (rat > (s_rows-1)) ma += (rat-(s_rows-1)) * (s_cols+1);
+	u16 sy = 0, ma = s_init;
+	u16 const cursor = (m_p_videoram[s_curs] | (m_p_videoram[s_curs+1] << 8)) - 0x3c00 - ma;  // get cursor relative position
+	u8 const cw = cursor / (s_cols+1);
+	if (cw > (s_rows-1)) ma += (cw-(s_rows-1)) * (s_cols+1);
 
-	for (y = 0; y < s_rows; y++)
+	for (u8 y = 0; y < s_rows; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (u8 ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
-			rat = (ra + 1) & 7;
+			uint16_t *p = &bitmap.pix(sy++);
+			u8 const rat = (ra + 1) & 7;
 
-			for (x = ma; x < ma + s_cols; x++)
+			for (u16 x = ma; x < ma + s_cols; x++)
 			{
+				u8 gfx;
 				if (ra < 8)
 				{
-					chr = m_p_videoram[x] & 0x7f;
+					u8 const chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen[(chr<<3) | rat] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -334,16 +370,27 @@ GFXDECODE_END
 WRITE_LINE_MEMBER( bcs3_state::ctc_z0_w )
 {
 	m_ctc->trg1(state);
-	if (state)
+	if (state && m_cass)
 	{
-		m_cass_bit ^= 1;
-		m_cass->output(m_cass_bit ? -1.0 : +1.0);
+		m_cassbit ^= 1;
+		m_cass->output(m_cassbit ? -1.0 : +1.0);
 	}
 }
 
+// The manual says the cassette pulses come from here, but
+// it's total silence during cassette saving.
 WRITE_LINE_MEMBER( bcs3_state::ctc_z1_w )
 {
 	m_ctc->trg2(state);
+}
+
+void bcs3_state::machine_start()
+{
+	save_item(NAME(m_cassbit));
+	save_item(NAME(s_curs));
+	save_item(NAME(s_init));
+	save_item(NAME(s_rows));
+	save_item(NAME(s_cols));
 }
 
 static const z80_daisy_config daisy_chain_intf[] =
@@ -393,13 +440,13 @@ void bcs3_state::bcs3(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(28*8, 12*10);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(bcs3_state::screen_update_bcs3));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(28*8, 12*10);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(bcs3_state::screen_update_bcs3));
+	m_screen->set_palette("palette");
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bcs3);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -407,11 +454,25 @@ void bcs3_state::bcs3(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
 	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
-
-	CASSETTE(config, m_cass);
 }
 
 void bcs3_state::bcs3a(machine_config &config)
+{
+	bcs3(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bcs3_state::bcs3a_mem);
+	m_screen->set_size(29*8, 12*10);
+	m_screen->set_visarea(0, 29*8-1, 0, 12*10-1);
+	m_screen->set_screen_update(FUNC(bcs3_state::screen_update_bcs3a));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
+
+void bcs3_state::bcs3b(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(7'000'000) /2);
@@ -420,13 +481,13 @@ void bcs3_state::bcs3a(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(29*8, 12*10);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(bcs3_state::screen_update_bcs3a));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(40*8, 24*10);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(bcs3_state::screen_update_bcs3a));
+	m_screen->set_palette("palette");
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bcs3);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -435,14 +496,12 @@ void bcs3_state::bcs3a(machine_config &config)
 	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
 	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
-	CASSETTE(config, m_cass);
-}
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
 
-void bcs3_state::bcs3b(machine_config &config)
-{
-	bcs3a(config);
-	subdevice<screen_device>("screen")->set_size(40*8, 24*10);
-	subdevice<screen_device>("screen")->set_visarea(0, 40*8-1, 0, 24*10-1);
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 
@@ -452,6 +511,7 @@ ROM_START( bcs3 )
 	//ROM_LOAD( "se24.bin", 0x0000, 0x0800, CRC(268de5ee) SHA1(78784945956c1b0282a4e82ad55e7c3a77389e50))
 	ROM_LOAD( "se24_000.d6", 0x0000, 0x0400, CRC(157a0d28) SHA1(0a6666c289b95d98128fd282478dff6319031b6e) )
 	ROM_LOAD( "se24_400.d7", 0x0400, 0x0400, CRC(2159de0f) SHA1(09b567e750931019de914f25d5ab1e4910465de6) )
+	// Cassette rom goes here starting at 0x0800 ... but did this rom ever exist??
 
 	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD( "bcs_zg_24.d21", 0x0000, 0x0400, CRC(eaed9d84) SHA1(7023a6187cd6bd0c6489d76ff662453f14e5b636))
@@ -498,8 +558,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                   FLAGS */
-COMP( 1984, bcs3,  0,      0,      bcs3,    bcs3,  bcs3_state, empty_init, "Eckhard Schiller", "BCS 3 rev 2.4",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3a, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3a, "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3b, bcs3,   0,      bcs3b,   bcs3,  bcs3_state, init_bcs3b, "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3c, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3c, "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3d, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3d, "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, bcs3,  0,      0,      bcs3,    bcs3,  bcs3_state, empty_init, "Eckhard Schiller", "BCS 3 rev 2.4",           MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3a, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3a, "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, bcs3b, bcs3,   0,      bcs3b,   bcs3,  bcs3_state, init_bcs3b, "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, bcs3c, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3c, "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, bcs3d, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3d, "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

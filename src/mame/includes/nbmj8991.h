@@ -46,8 +46,6 @@ public:
 	void init_tokyogal();
 	void init_finalbny();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -63,33 +61,33 @@ private:
 		TIMER_BLITTER
 	};
 
-	int m_scrollx;
-	int m_scrolly;
-	int m_blitter_destx;
-	int m_blitter_desty;
-	int m_blitter_sizex;
-	int m_blitter_sizey;
-	int m_blitter_src_addr;
-	int m_blitter_direction_x;
-	int m_blitter_direction_y;
-	int m_gfxrom;
-	int m_dispflag;
-	int m_flipscreen;
-	int m_clutsel;
-	int m_screen_refresh;
+	int m_scrollx = 0;
+	int m_scrolly = 0;
+	int m_blitter_destx = 0;
+	int m_blitter_desty = 0;
+	int m_blitter_sizex = 0;
+	int m_blitter_sizey = 0;
+	int m_blitter_src_addr = 0;
+	int m_blitter_direction_x = 0;
+	int m_blitter_direction_y = 0;
+	int m_gfxrom = 0;
+	int m_dispflag = 0;
+	int m_flipscreen = 0;
+	int m_clutsel = 0;
+	int m_screen_refresh = 0;
 	bitmap_ind16 m_tmpbitmap;
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_clut;
-	int m_flipscreen_old;
-	emu_timer *m_blitter_timer;
+	int m_flipscreen_old = 0;
+	emu_timer *m_blitter_timer = nullptr;
 
-	DECLARE_WRITE8_MEMBER(soundbank_w);
-	DECLARE_WRITE8_MEMBER(palette_type1_w);
-	DECLARE_WRITE8_MEMBER(palette_type2_w);
-	DECLARE_WRITE8_MEMBER(palette_type3_w);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_READ8_MEMBER(clut_r);
-	DECLARE_WRITE8_MEMBER(clut_w);
+	void soundbank_w(uint8_t data);
+	void palette_type1_w(offs_t offset, uint8_t data);
+	void palette_type2_w(offs_t offset, uint8_t data);
+	void palette_type3_w(offs_t offset, uint8_t data);
+	void blitter_w(offs_t offset, uint8_t data);
+	uint8_t clut_r(offs_t offset);
+	void clut_w(offs_t offset, uint8_t data);
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -118,5 +116,5 @@ private:
 	void triplew1_map(address_map &map);
 	void triplew2_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };

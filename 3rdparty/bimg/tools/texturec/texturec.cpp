@@ -1,9 +1,8 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
-#include <stdio.h>
 #include <bx/allocator.h>
 #include <bx/readerwriter.h>
 #include <bx/endian.h>
@@ -13,7 +12,7 @@
 #include <bimg/encode.h>
 
 #if 0
-#	define DBG(_format, ...) fprintf(stderr, "" _format "\n", ##__VA_ARGS__)
+#	define DBG(_format, ...) bx::printf("" _format "\n", ##__VA_ARGS__)
 #else
 #	define DBG(...) BX_NOOP()
 #endif // DEBUG
@@ -90,12 +89,8 @@ void imageRgba32fNormalize(void* _dst, uint32_t _width, uint32_t _height, uint32
 		const float* rgba = (const float*)&src[0];
 		for (uint32_t xx = 0; xx < _width; ++xx, rgba += 4, dst += 16)
 		{
-			float xyz[3];
-
-			xyz[0] = rgba[0];
-			xyz[1] = rgba[1];
-			xyz[2] = rgba[2];
-			bx::vec3Norm( (float*)dst, xyz);
+			const bx::Vec3 xyz = bx::load<bx::Vec3>(rgba);
+			bx::store(dst, bx::normalize(xyz) );
 		}
 	}
 }
@@ -161,12 +156,12 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 		const bimg::ImageBlockInfo&  inputBlockInfo  = bimg::getBlockInfo(inputFormat);
 		const bimg::ImageBlockInfo&  outputBlockInfo = bimg::getBlockInfo(outputFormat);
 		const uint32_t blockWidth  = outputBlockInfo.blockWidth;
-        const uint32_t blockHeight = outputBlockInfo.blockHeight;
-        const uint32_t minBlockX   = outputBlockInfo.minBlockX;
-        const uint32_t minBlockY   = outputBlockInfo.minBlockY;
-        uint32_t outputWidth  = bx::max(blockWidth  * minBlockX, ( (input->m_width  + blockWidth  - 1) / blockWidth )*blockWidth);
-        uint32_t outputHeight = bx::max(blockHeight * minBlockY, ( (input->m_height + blockHeight - 1) / blockHeight)*blockHeight);
-        uint32_t outputDepth  = input->m_depth;
+		const uint32_t blockHeight = outputBlockInfo.blockHeight;
+		const uint32_t minBlockX   = outputBlockInfo.minBlockX;
+		const uint32_t minBlockY   = outputBlockInfo.minBlockY;
+		uint32_t outputWidth  = bx::max(blockWidth  * minBlockX, ( (input->m_width  + blockWidth  - 1) / blockWidth )*blockWidth);
+		uint32_t outputHeight = bx::max(blockHeight * minBlockY, ( (input->m_height + blockHeight - 1) / blockHeight)*blockHeight);
+		uint32_t outputDepth  = input->m_depth;
 
 		if (_options.mips
 		&&  _options.mipSkip != 0)
@@ -200,20 +195,19 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 		}
 		else if (_options.strip)
 		{
-			if (outputDepth   == 1
-			&&  outputWidth/6 == outputHeight)
+			if (outputDepth == 1
+			&& ( (outputWidth == outputHeight*6) || (outputWidth*6 == outputHeight) ) )
 			{
-				if (outputWidth/6 > _options.maxSize)
-				{
-					outputWidth  = _options.maxSize*6;
-					outputHeight = _options.maxSize;
-				}
+				const bool horizontal = outputWidth == outputHeight*6;
+
+				outputWidth  = bx::min(outputWidth,  horizontal ? _options.maxSize*6 : _options.maxSize);
+				outputHeight = bx::min(outputHeight, horizontal ? _options.maxSize   : _options.maxSize*6);
 			}
 			else
 			{
 				bimg::imageFree(input);
 
-				BX_ERROR_SET(_err, TEXTRUREC_ERROR, "Input image format is not horizontal strip.");
+				BX_ERROR_SET(_err, TEXTRUREC_ERROR, "Input image format is not horizontal or vertical strip.");
 				return NULL;
 			}
 		}
@@ -330,7 +324,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 
 			bimg::ImageContainer* dst;
 
-			if (outputWidth/2 == outputHeight)
+			if (outputWidth == outputHeight*2)
 			{
 				dst = bimg::imageCubemapFromLatLongRgba32F(_allocator, *src, true, _err);
 				bimg::imageFree(src);
@@ -454,6 +448,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, rgba
 						);
 
+					bimg::Quality::Enum nmapQuality = bimg::Quality::Enum(_options.quality + bimg::Quality::NormalMapDefault);
 					bimg::imageEncodeFromRgba32f(_allocator
 						, dstData
 						, rgbaDst
@@ -461,7 +456,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, dstMip.m_height
 						, dstMip.m_depth
 						, outputFormat
-						, _options.quality
+						, nmapQuality
 						, _err
 						);
 
@@ -493,7 +488,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							, dstMip.m_height
 							, dstMip.m_depth
 							, outputFormat
-							, _options.quality
+							, nmapQuality
 							, _err
 							);
 					}
@@ -624,10 +619,10 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, bimg::TextureFormat::R8
 						);
 					temp = BX_ALLOC(_allocator, size);
-					uint8_t* rgba = (uint8_t*)temp;
+					uint8_t* r8 = (uint8_t*)temp;
 
 					bimg::imageDecodeToR8(_allocator
-						, rgba
+						, r8
 						, mip.m_data
 						, mip.m_width
 						, mip.m_height
@@ -644,8 +639,85 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, mip.m_width
 						, mip.m_height
 						, mip.m_width
-						, rgba
+						, r8
 						);
+
+					if (_options.mips) {
+						const float alphaRef = 0.5f;
+						float coverage = bimg::imageAlphaTestCoverage(bimg::TextureFormat::A8
+							, mip.m_width
+							, mip.m_height
+							, mip.m_width
+							, r8
+							, alphaRef
+						);
+
+						size = bimg::imageGetSize(
+							NULL
+							, uint16_t(dstMip.m_width)
+							, uint16_t(dstMip.m_height)
+							, uint16_t(dstMip.m_depth)
+							, false
+							, false
+							, 1
+							, bimg::TextureFormat::RGBA8
+						);
+						void* rgbaTemp = BX_ALLOC(_allocator, size);
+						uint8_t* rgba = (uint8_t*)rgbaTemp;
+
+						bimg::imageDecodeToRgba8(
+							_allocator
+							, rgba
+							, dstMip.m_data
+							, dstMip.m_width
+							, dstMip.m_height
+							, dstMip.m_width * 4
+							, bimg::TextureFormat::A8
+						);
+
+						for (uint8_t lod = 1; lod < numMips && _err->isOk(); ++lod) {
+							bimg::imageRgba8Downsample2x2(rgba
+								, dstMip.m_width
+								, dstMip.m_height
+								, dstMip.m_depth
+								, dstMip.m_width * 4
+								, bx::strideAlign(dstMip.m_width / 2, blockWidth) * 4
+								, rgba
+							);
+
+							// For each mip, upscale to original size,
+							// scale image alpha to get same coverage as mip0
+							uint32_t upsample   = 1 << lod;
+							uint32_t destWidth  = dstMip.m_width / 2;
+							uint32_t destHeight = dstMip.m_height / 2;
+							bimg::imageScaleAlphaToCoverage(bimg::TextureFormat::RGBA8
+								, destWidth
+								, destHeight
+								, destWidth * 4
+								, rgba
+								, coverage
+								, alphaRef
+								, upsample
+							);
+
+							bimg::imageGetRawData(*output, side, lod, output->m_data, output->m_size, dstMip);
+							dstData = const_cast<uint8_t*>(dstMip.m_data);
+
+							bimg::imageEncodeFromRgba8(
+								_allocator
+								, dstData
+								, rgba
+								, dstMip.m_width
+								, dstMip.m_height
+								, dstMip.m_depth
+								, bimg::TextureFormat::A8
+								, _options.quality
+								, _err
+							);
+						}
+
+						BX_FREE(_allocator, rgbaTemp);
+					}
 				}
 				// RGBA8
 				else
@@ -787,7 +859,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							, uint16_t(mip.m_height)
 							);
 
-						printf("%f\n", result);
+						bx::printf("%f\n", result);
 
 						BX_FREE(_allocator, ref);
 					}
@@ -814,7 +886,7 @@ void help(const char* _error = NULL, bool _showHelp = true)
 {
 	if (NULL != _error)
 	{
-		fprintf(stderr, "Error:\n%s\n\n", _error);
+		bx::printf("Error:\n%s\n\n", _error);
 
 		if (!_showHelp)
 		{
@@ -822,17 +894,17 @@ void help(const char* _error = NULL, bool _showHelp = true)
 		}
 	}
 
-	fprintf(stderr
-		, "texturec, bgfx texture compiler tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2018 Branimir Karadzic. All rights reserved.\n"
+	bx::printf(
+		  "texturec, bgfx texture compiler tool, version %d.%d.%d.\n"
+		  "Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bimg#license-bsd-2-clause\n\n"
 		, BIMG_TEXTUREC_VERSION_MAJOR
 		, BIMG_TEXTUREC_VERSION_MINOR
 		, BIMG_API_VERSION
 		);
 
-	fprintf(stderr
-		, "Usage: texturec -f <in> -o <out> [-t <texture format>]\n"
+	bx::printf(
+		  "Usage: texturec -f <in> -o <out> [-t <texture format>]\n"
 
 		  "\n"
 		  "Supported file formats:\n"
@@ -846,7 +918,7 @@ void help(const char* _error = NULL, bool _showHelp = true)
 		  "    *.png (input, output)  Portable Network Graphics.\n"
 		  "    *.psd (input)          Photoshop Document.\n"
 		  "    *.pvr (input)          PowerVR.\n"
-		  "    *.tga (input)          Targa.\n"
+		  "    *.tga (input)          Truevision TGA.\n"
 
 		  "\n"
 		  "Options:\n"
@@ -858,19 +930,19 @@ void help(const char* _error = NULL, bool _showHelp = true)
 		  "  -q <quality>             Encoding quality (default, fastest, highest).\n"
 		  "  -m, --mips               Generate mip-maps.\n"
 		  "      --mipskip <N>        Skip <N> number of mips.\n"
-		  "  -n, --normalmap          Input texture is normal map.\n"
+		  "  -n, --normalmap          Input texture is normal map. (Implies --linear)\n"
 		  "      --equirect           Input texture is equirectangular projection of cubemap.\n"
-		  "      --strip              Input texture is horizontal strip of cubemap.\n"
+		  "      --strip              Input texture is horizontal or vertical strip of cubemap.\n"
 		  "      --sdf                Compute SDF texture.\n"
 		  "      --ref <alpha>        Alpha reference value.\n"
 		  "      --iqa                Image Quality Assessment\n"
 		  "      --pma                Premultiply alpha into RGB channel.\n"
 		  "      --linear             Input and output texture is linear color space (gamma correction won't be applied).\n"
 		  "      --max <max size>     Maximum width/height (image will be scaled down and\n"
-		  "                           aspect ratio will be preserved.\n"
+		  "                           aspect ratio will be preserved)\n"
 		  "      --radiance <model>   Radiance cubemap filter. (Lighting model: Phong, PhongBrdf, Blinn, BlinnBrdf, GGX)\n"
 		  "      --as <extension>     Save as.\n"
-          "      --formats            List all supported formats.\n"
+		  "      --formats            List all supported formats.\n"
 		  "      --validate           *DEBUG* Validate that output image produced matches after loading.\n"
 
 		  "\n"
@@ -878,17 +950,19 @@ void help(const char* _error = NULL, bool _showHelp = true)
 		);
 }
 
-void help(const char* _str, const bx::Error& _err)
+void help(const bx::StringView _str, const bx::Error& _err)
 {
 	std::string str;
-	if (_str != NULL)
+	if (!_str.isEmpty() )
 	{
-		str.append(_str);
-		str.append(" ");
+		str.append(_str.getPtr(), _str.getTerm() - _str.getPtr() );
+		str.append(": ");
 	}
 
 	const bx::StringView& sv = _err.getMessage();
+	str.append("'");
 	str.append(sv.getPtr(), sv.getTerm() - sv.getPtr() );
+	str.append("'");
 
 	help(str.c_str(), false);
 }
@@ -923,8 +997,8 @@ int main(int _argc, const char* _argv[])
 
 	if (cmdLine.hasArg('v', "version") )
 	{
-		fprintf(stderr
-			, "texturec, bgfx texture compiler tool, version %d.%d.%d.\n"
+		bx::printf(
+			  "texturec, bgfx texture compiler tool, version %d.%d.%d.\n"
 			, BIMG_TEXTUREC_VERSION_MAJOR
 			, BIMG_TEXTUREC_VERSION_MINOR
 			, BIMG_API_VERSION
@@ -940,20 +1014,26 @@ int main(int _argc, const char* _argv[])
 
     if (cmdLine.hasArg("formats"))
     {
-        printf("Uncompressed formats:\n");
+		bx::printf("Uncompressed formats:\n");
 
-        for (int format = bimg::TextureFormat::Unknown + 1; format < bimg::TextureFormat::UnknownDepth; format++)
-            printf("  %s\n", bimg::getName((bimg::TextureFormat::Enum) format));
+		for (int format = bimg::TextureFormat::Unknown + 1; format < bimg::TextureFormat::UnknownDepth; format++)
+		{
+			bx::printf("  %s\n", bimg::getName((bimg::TextureFormat::Enum) format));
+		}
 
-        for (int format = bimg::TextureFormat::UnknownDepth + 1; format < bimg::TextureFormat::Count; format++)
-            printf("  %s\n", bimg::getName((bimg::TextureFormat::Enum) format));
+		for (int format = bimg::TextureFormat::UnknownDepth + 1; format < bimg::TextureFormat::Count; format++)
+		{
+			bx::printf("  %s\n", bimg::getName((bimg::TextureFormat::Enum) format));
+		}
 
-        printf("Compressed formats:\n");
+		bx::printf("Compressed formats:\n");
 
-        for (int format = 0; format < bimg::TextureFormat::Unknown; format++)
-            printf("  %s\n", bimg::getName((bimg::TextureFormat::Enum) format));
+		for (int format = 0; format < bimg::TextureFormat::Unknown; format++)
+		{
+			bx::printf("  %s\n", bimg::getName((bimg::TextureFormat::Enum) format));
+		}
 
-        return bx::kExitSuccess;
+		return bx::kExitSuccess;
     }
 
 	const char* inputFileName = cmdLine.findOption('f');
@@ -1008,6 +1088,12 @@ int main(int _argc, const char* _argv[])
 	{
 		help("Image can't be equirect and strip at the same time.");
 		return bx::kExitFailure;
+	}
+
+	// Normal maps are always linear
+	if (options.normalMap)
+	{
+		options.linear = true;
 	}
 
 	const char* maxSize = cmdLine.findOption("max");
@@ -1134,6 +1220,8 @@ int main(int _argc, const char* _argv[])
 
 	if (NULL != output)
 	{
+		output->m_srgb = !options.linear;
+
 		bx::FileWriter writer;
 		if (bx::open(&writer, outputFileName, false, &err) )
 		{
@@ -1198,7 +1286,7 @@ int main(int _argc, const char* _argv[])
 
 			if (!err.isOk() )
 			{
-				help(NULL, err);
+				help("", err);
 				return bx::kExitFailure;
 			}
 		}
@@ -1289,7 +1377,7 @@ int main(int _argc, const char* _argv[])
 	}
 	else
 	{
-		help(NULL, err);
+		help("Failed to create output", err);
 		return bx::kExitFailure;
 	}
 

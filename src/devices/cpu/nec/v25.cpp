@@ -35,16 +35,16 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "v25.h"
+#include "necdasm.h"
 
 typedef uint8_t BOOLEAN;
 typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 
-#include "v25.h"
-#include "v25priv.h"
-#include "necdasm.h"
+#include "v25priv.ipp"
+
 
 DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "NEC V25")
 DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")
@@ -180,6 +180,7 @@ uint8_t v25_common_device::fetchop()
 void v25_common_device::device_reset()
 {
 	m_ip = 0;
+	m_prev_ip = 0;
 	m_IBRK = 1;
 	m_F0 = 0;
 	m_F1 = 0;
@@ -194,6 +195,7 @@ void v25_common_device::device_reset()
 	m_ParityVal = 1;
 	m_pending_irq = 0;
 	m_unmasked_irq = INT_IRQ | NMI_IRQ;
+	m_macro_service = 0;
 	m_bankswitch_irq = 0;
 	m_priority_inttu = 7;
 	m_priority_intd = 7;
@@ -205,9 +207,7 @@ void v25_common_device::device_reset()
 	m_irq_state = 0;
 	m_poll_state = 1;
 	m_mode_state = m_MF = (m_v25v35_decryptiontable) ? 0 : 1;
-	m_intp_state[0] = 0;
-	m_intp_state[1] = 0;
-	m_intp_state[2] = 0;
+	m_intm = 0;
 	m_halted = 0;
 
 	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
@@ -264,12 +264,14 @@ void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ sourc
 			break;
 	}
 
+	debugger_exception_hook(int_num);
+
 	dest_off = read_mem_word(int_num*4);
 	dest_seg = read_mem_word(int_num*4+2);
 
 	PUSH(Sreg(PS));
 	PUSH(m_ip);
-	m_ip = (WORD)dest_off;
+	m_prev_ip = m_ip = (WORD)dest_off;
 	Sreg(PS) = (WORD)dest_seg;
 	CHANGE_PC;
 }
@@ -285,7 +287,7 @@ void v25_common_device::nec_bankswitch(unsigned bank_num)
 
 	Wreg(PSW_SAVE) = tmp;
 	Wreg(PC_SAVE) = m_ip;
-	m_ip = Wreg(VECTOR_PC);
+	m_prev_ip = m_ip = Wreg(VECTOR_PC);
 	CHANGE_PC;
 }
 
@@ -295,24 +297,12 @@ void v25_common_device::nec_trap()
 	nec_interrupt(NEC_TRAP_VECTOR, BRK);
 }
 
-#define INTERRUPT(source, vector, priority) \
-	if(pending & (source)) {                \
-		m_IRQS = vector;               \
-		m_ISPR |= (1 << (priority));   \
-		m_pending_irq &= ~(source);    \
-		if(m_bankswitch_irq & (source))    \
-			nec_bankswitch(priority);    \
-		else                                    \
-			nec_interrupt(vector, source);   \
-		break;  /* break out of loop */ \
-	}
-
-/* interrupt sources subject to priority control */
-#define SOURCES (INTTU0 | INTTU1 | INTTU2 | INTD0 | INTD1 | INTP0 | INTP1 | INTP2 \
-				| INTSER0 | INTSR0 | INTST0 | INTSER1 | INTSR1 | INTST1 | INTTB)
-
 void v25_common_device::external_int()
 {
+	// interrupt sources subject to priority control
+	constexpr uint32_t SOURCES = INTTU0 | INTTU1 | INTTU2 | INTD0 | INTD1 | INTP0 | INTP1 | INTP2
+				| INTSER0 | INTSR0 | INTST0 | INTSER1 | INTSR1 | INTST1 | INTTB;
+
 	int pending = m_pending_irq & m_unmasked_irq;
 
 	if (pending & NMI_IRQ)
@@ -322,46 +312,149 @@ void v25_common_device::external_int()
 	}
 	else if (pending & SOURCES)
 	{
-		for(int i = 0; i < 8; i++)
+		int i = -1;
+		uint32_t source = 0;
+		uint8_t vector = 0;
+		uint8_t ms = 0;
+		while (++i < 8)
 		{
 			if (m_ISPR & (1 << i)) break;
 
 			if (m_priority_inttu == i)
 			{
-				INTERRUPT(INTTU0, NEC_INTTU0_VECTOR, i)
-				INTERRUPT(INTTU1, NEC_INTTU1_VECTOR, i)
-				INTERRUPT(INTTU2, NEC_INTTU2_VECTOR, i)
+				if (pending & INTTU0)
+				{
+					source = INTTU0;
+					vector = NEC_INTTU0_VECTOR;
+					ms = m_tmms[0];
+					break;
+				}
+				if (pending & INTTU1)
+				{
+					source = INTTU1;
+					vector = NEC_INTTU1_VECTOR;
+					ms = m_tmms[1];
+					break;
+				}
+				if (pending & INTTU2)
+				{
+					source = INTTU2;
+					vector = NEC_INTTU2_VECTOR;
+					ms = m_tmms[2];
+					break;
+				}
 			}
 
 			if (m_priority_intd == i)
 			{
-				INTERRUPT(INTD0, NEC_INTD0_VECTOR, i)
-				INTERRUPT(INTD1, NEC_INTD1_VECTOR, i)
+				if (pending & INTD0)
+				{
+					source = INTD0;
+					vector = NEC_INTD0_VECTOR;
+					break;
+				}
+				if (pending & INTD1)
+				{
+					source = INTD1;
+					vector = NEC_INTD1_VECTOR;
+					break;
+				}
 			}
 
 			if (m_priority_intp == i)
 			{
-				INTERRUPT(INTP0, NEC_INTP0_VECTOR, i)
-				INTERRUPT(INTP1, NEC_INTP1_VECTOR, i)
-				INTERRUPT(INTP2, NEC_INTP2_VECTOR, i)
+				if (pending & INTP0)
+				{
+					source = INTP0;
+					vector = NEC_INTP0_VECTOR;
+					break;
+				}
+				if (pending & INTP1)
+				{
+					source = INTP1;
+					vector = NEC_INTP1_VECTOR;
+					break;
+				}
+				if (pending & INTP2)
+				{
+					source = INTP2;
+					vector = NEC_INTP2_VECTOR;
+					break;
+				}
 			}
 
 			if (m_priority_ints0 == i)
 			{
-				INTERRUPT(INTSER0, NEC_INTSER0_VECTOR, i)
-				INTERRUPT(INTSR0, NEC_INTSR0_VECTOR, i)
-				INTERRUPT(INTST0, NEC_INTST0_VECTOR, i)
+				if (pending & INTSER0)
+				{
+					source = INTSER0;
+					vector = NEC_INTSER0_VECTOR;
+					break;
+				}
+				if (pending & INTSR0)
+				{
+					source = INTSR0;
+					vector = NEC_INTSR0_VECTOR;
+					ms = m_srms[0];
+					break;
+				}
+				if (pending & INTST0)
+				{
+					source = INTST0;
+					vector = NEC_INTST0_VECTOR;
+					ms = m_stms[0];
+					break;
+				}
 			}
 
 			if (m_priority_ints1 == i)
 			{
-				INTERRUPT(INTSER1, NEC_INTSER1_VECTOR, i)
-				INTERRUPT(INTSR1, NEC_INTSR1_VECTOR, i)
-				INTERRUPT(INTST1, NEC_INTST1_VECTOR, i)
+				if (pending & INTSER1)
+				{
+					source = INTSER1;
+					vector = NEC_INTSER1_VECTOR;
+					break;
+				}
+				if (pending & INTSR1)
+				{
+					source = INTSR1;
+					vector = NEC_INTSR1_VECTOR;
+					ms = m_srms[1];
+					break;
+				}
+				if (pending & INTST1)
+				{
+					source = INTST1;
+					vector = NEC_INTST1_VECTOR;
+					ms = m_stms[1];
+					break;
+				}
 			}
 
-			if (i == 7)
-				INTERRUPT(INTTB, NEC_INTTB_VECTOR, 7)
+			if (i == 7 && (pending & INTTB))
+			{
+				source = INTTB;
+				vector = NEC_INTTB_VECTOR;
+				break;
+			}
+		}
+
+		if (source != 0)
+		{
+			m_pending_irq &= ~source;
+			if (m_macro_service & source)
+			{
+				logerror("Unhandled macro service %02x\n", ms);
+			}
+			else
+			{
+				m_IRQS = vector;
+				m_ISPR |= (1 << i);
+				if (m_bankswitch_irq & source)
+					nec_bankswitch(i);
+				else
+					nec_interrupt(vector, source);
+			}
 		}
 	}
 	else if (pending & INT_IRQ)
@@ -423,7 +516,7 @@ void v25_common_device::execute_set_input(int irqline, int state)
 
 std::unique_ptr<util::disasm_interface> v25_common_device::create_disassembler()
 {
-	return std::make_unique<nec_disassembler>(m_v25v35_decryptiontable);
+	return std::make_unique<nec_disassembler>(this, m_v25v35_decryptiontable);
 }
 
 void v25_common_device::device_start()
@@ -464,9 +557,16 @@ void v25_common_device::device_start()
 	for (i = 0; i < 4; i++)
 		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v25_common_device::v25_timer_callback),this));
 
+	std::fill_n(&m_intp_state[0], 3, 0);
+	std::fill_n(&m_ems[0], 3, 0);
+	std::fill_n(&m_srms[0], 2, 0);
+	std::fill_n(&m_stms[0], 2, 0);
+	std::fill_n(&m_tmms[0], 3, 0);
+
 	save_item(NAME(m_intp_state));
 
 	save_item(NAME(m_ip));
+	save_item(NAME(m_prev_ip));
 	save_item(NAME(m_IBRK));
 	save_item(NAME(m_F0));
 	save_item(NAME(m_F1));
@@ -484,12 +584,17 @@ void v25_common_device::device_start()
 	save_item(NAME(m_ParityVal));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_unmasked_irq));
+	save_item(NAME(m_macro_service));
 	save_item(NAME(m_bankswitch_irq));
 	save_item(NAME(m_priority_inttu));
 	save_item(NAME(m_priority_intd));
 	save_item(NAME(m_priority_intp));
 	save_item(NAME(m_priority_ints0));
 	save_item(NAME(m_priority_ints1));
+	save_item(NAME(m_ems));
+	save_item(NAME(m_srms));
+	save_item(NAME(m_stms));
+	save_item(NAME(m_tmms));
 	save_item(NAME(m_IRQS));
 	save_item(NAME(m_ISPR));
 	save_item(NAME(m_nmi_state));
@@ -497,6 +602,7 @@ void v25_common_device::device_start()
 	save_item(NAME(m_poll_state));
 	save_item(NAME(m_mode_state));
 	save_item(NAME(m_no_interrupt));
+	save_item(NAME(m_intm));
 	save_item(NAME(m_halted));
 	save_item(NAME(m_TM0));
 	save_item(NAME(m_MD0));
@@ -515,11 +621,11 @@ void v25_common_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 8) {
-		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_program->cache(m_cache8);
+		m_dr8 = [this](offs_t address) -> u8 { return m_cache8.read_byte(address); };
 	} else {
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_program->cache(m_cache16);
+		m_dr8 = [this](offs_t address) -> u8 { return m_cache16.read_byte(address); };
 	}
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
@@ -533,27 +639,35 @@ void v25_common_device::device_start()
 	m_p1_out.resolve_safe();
 	m_p2_out.resolve_safe();
 
-	state_add( V25_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%05X");
-	state_add( V25_IP,    "IP", m_ip).formatstr("%04X");
-	state_add( V25_SP,    "SP", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_FLAGS, "F", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_AW,    "AW", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_CW,    "CW", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_DW,    "DW", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_BW,    "BW", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_BP,    "BP", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_IX,    "IX", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_IY,    "IY", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_ES,    "DS1", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_CS,    "PS", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_SS,    "SS", m_debugger_temp).callimport().callexport().formatstr("%04X");
-	state_add( V25_DS,    "DS0", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_PC,  "PC", m_ip).formatstr("%04X");
+	state_add<uint16_t>( V25_PSW, "PSW", [this]() { return CompressFlags(); }, [this](uint16_t data) { ExpandFlags(data); });
 
-	state_add( V25_IDB,   "IDB", m_IDB).mask(0xffe00).callimport();
+	state_add<uint16_t>( V25_AW,  "AW",  [this]() { return Wreg(AW); }, [this](uint16_t data) { Wreg(AW) = data; });
+	state_add<uint16_t>( V25_CW,  "CW",  [this]() { return Wreg(CW); }, [this](uint16_t data) { Wreg(CW) = data; });
+	state_add<uint16_t>( V25_DW,  "DW",  [this]() { return Wreg(DW); }, [this](uint16_t data) { Wreg(DW) = data; });
+	state_add<uint16_t>( V25_BW,  "BW",  [this]() { return Wreg(BW); }, [this](uint16_t data) { Wreg(BW) = data; });
+	state_add<uint16_t>( V25_SP,  "SP",  [this]() { return Wreg(SP); }, [this](uint16_t data) { Wreg(SP) = data; });
+	state_add<uint16_t>( V25_BP,  "BP",  [this]() { return Wreg(BP); }, [this](uint16_t data) { Wreg(BP) = data; });
+	state_add<uint16_t>( V25_IX,  "IX",  [this]() { return Wreg(IX); }, [this](uint16_t data) { Wreg(IX) = data; });
+	state_add<uint16_t>( V25_IY,  "IY",  [this]() { return Wreg(IY); }, [this](uint16_t data) { Wreg(IY) = data; });
+	state_add<uint16_t>( V25_DS1, "DS1", [this]() { return Sreg(DS1); }, [this](uint16_t data) { Sreg(DS1) = data; });
+	state_add<uint16_t>( V25_PS,  "PS",  [this]() { return Sreg(PS); }, [this](uint16_t data) { Sreg(PS) = data; });
+	state_add<uint16_t>( V25_SS,  "SS",  [this]() { return Sreg(SS); }, [this](uint16_t data) { Sreg(SS) = data; });
+	state_add<uint16_t>( V25_DS0, "DS0", [this]() { return Sreg(DS0); }, [this](uint16_t data) { Sreg(DS0) = data; });
+
+	state_add<uint8_t>( V25_AL, "AL", [this]() { return Breg(AL); }, [this](uint8_t data) { Breg(AL) = data; }).noshow();
+	state_add<uint8_t>( V25_AH, "AH", [this]() { return Breg(AH); }, [this](uint8_t data) { Breg(AH) = data; }).noshow();
+	state_add<uint8_t>( V25_CL, "CL", [this]() { return Breg(CL); }, [this](uint8_t data) { Breg(CL) = data; }).noshow();
+	state_add<uint8_t>( V25_CH, "CH", [this]() { return Breg(CH); }, [this](uint8_t data) { Breg(CH) = data; }).noshow();
+	state_add<uint8_t>( V25_DL, "DL", [this]() { return Breg(DL); }, [this](uint8_t data) { Breg(DL) = data; }).noshow();
+	state_add<uint8_t>( V25_DH, "DH", [this]() { return Breg(DH); }, [this](uint8_t data) { Breg(DH) = data; }).noshow();
+	state_add<uint8_t>( V25_BL, "BL", [this]() { return Breg(BL); }, [this](uint8_t data) { Breg(BL) = data; }).noshow();
+	state_add<uint8_t>( V25_BH, "BH", [this]() { return Breg(BH); }, [this](uint8_t data) { Breg(BH) = data; }).noshow();
+
+	state_add( V25_IDB, "IDB", m_IDB).mask(0xffe00).callimport();
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
-	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
 	set_icountptr(m_icount);
@@ -590,7 +704,7 @@ void v25_common_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case V25_PC:
+		case STATE_GENPC:
 			if( m_debugger_temp - (Sreg(PS)<<4) < 0x10000 )
 			{
 				m_ip = m_debugger_temp - (Sreg(PS)<<4);
@@ -600,58 +714,7 @@ void v25_common_device::state_import(const device_state_entry &entry)
 				Sreg(PS) = m_debugger_temp >> 4;
 				m_ip = m_debugger_temp & 0x0000f;
 			}
-			break;
-
-		case V25_SP:
-			Wreg(SP) = m_debugger_temp;
-			break;
-
-		case V25_FLAGS:
-			ExpandFlags(m_debugger_temp);
-			break;
-
-		case V25_AW:
-			Wreg(AW) = m_debugger_temp;
-			break;
-
-		case V25_CW:
-			Wreg(CW) = m_debugger_temp;
-			break;
-
-		case V25_DW:
-			Wreg(DW) = m_debugger_temp;
-			break;
-
-		case V25_BW:
-			Wreg(BW) = m_debugger_temp;
-			break;
-
-		case V25_BP:
-			Wreg(BP) = m_debugger_temp;
-			break;
-
-		case V25_IX:
-			Wreg(IX) = m_debugger_temp;
-			break;
-
-		case V25_IY:
-			Wreg(IY) = m_debugger_temp;
-			break;
-
-		case V25_ES:
-			Sreg(DS1) = m_debugger_temp;
-			break;
-
-		case V25_CS:
-			Sreg(PS) = m_debugger_temp;
-			break;
-
-		case V25_SS:
-			Sreg(SS) = m_debugger_temp;
-			break;
-
-		case V25_DS:
-			Sreg(DS0) = m_debugger_temp;
+			m_prev_ip = m_ip;
 			break;
 
 		case V25_IDB:
@@ -666,65 +729,11 @@ void v25_common_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-		case STATE_GENPCBASE:
-		case V25_PC:
 			m_debugger_temp = (Sreg(PS)<<4) + m_ip;
 			break;
 
-		case STATE_GENSP:
-			m_debugger_temp = (Sreg(SS)<<4) + Wreg(SP);
-			break;
-
-		case V25_SP:
-			m_debugger_temp = Wreg(SP);
-			break;
-
-		case V25_FLAGS:
-			m_debugger_temp = CompressFlags();
-			break;
-
-		case V25_AW:
-			m_debugger_temp = Wreg(AW);
-			break;
-
-		case V25_CW:
-			m_debugger_temp = Wreg(CW);
-			break;
-
-		case V25_DW:
-			m_debugger_temp = Wreg(DW);
-			break;
-
-		case V25_BW:
-			m_debugger_temp = Wreg(BW);
-			break;
-
-		case V25_BP:
-			m_debugger_temp = Wreg(BP);
-			break;
-
-		case V25_IX:
-			m_debugger_temp = Wreg(IX);
-			break;
-
-		case V25_IY:
-			m_debugger_temp = Wreg(IY);
-			break;
-
-		case V25_ES:
-			m_debugger_temp = Sreg(DS1);
-			break;
-
-		case V25_CS:
-			m_debugger_temp = Sreg(PS);
-			break;
-
-		case V25_SS:
-			m_debugger_temp = Sreg(SS);
-			break;
-
-		case V25_DS:
-			m_debugger_temp = Sreg(DS0);
+		case STATE_GENPCBASE:
+			m_debugger_temp = (Sreg(PS)<<4) + m_prev_ip;
 			break;
 	}
 }
@@ -771,6 +780,7 @@ void v25_common_device::execute_run()
 
 	while(m_icount>0) {
 		/* Dispatch IRQ */
+		m_prev_ip = m_ip;
 		if (m_no_interrupt==0 && (m_pending_irq & m_unmasked_irq))
 		{
 			if (m_pending_irq & NMI_IRQ)

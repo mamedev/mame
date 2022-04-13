@@ -38,7 +38,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
 |         GAL.U89  16.000MHz  28.000MHz                     |
 |       YM2203C                                             |
 |                   +----+  +------+    SS004.U46 SS003.U47 |
-|     Y3014B  Z80   |DE71|  |  DE  |                        |
+|VR1  Y3014B  Z80   |DE71|  |  DE  |                        |
 |                   +----+  |  52  |                        |
 |         SS008-1   +----+  +------+          U36*      U38*|
 |                   |DE71|  +------+                        |
@@ -73,6 +73,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
  Custom: Data East 52 x 2 + Data East 71 x 2 (Sprites)
          Data East 55 (Playfield)
          Data East 146 (I/O, Protection)
+         VR1 - Sound pot
 
 ***************************************************************************/
 
@@ -81,8 +82,8 @@ HB-PCB-A5   M6100691A (distributed by Taito)
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -96,7 +97,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
 
 
 
-READ16_MEMBER(sshangha_state::sshanghab_protection16_r) // bootleg inputs
+uint16_t sshangha_state::sshanghab_protection16_r(offs_t offset) // bootleg inputs
 {
 	switch (offset)
 	{
@@ -112,7 +113,7 @@ READ16_MEMBER(sshangha_state::sshanghab_protection16_r) // bootleg inputs
 }
 
 /* Probably returns 0xffff when sprite DMA is complete, the game waits on it */
-READ16_MEMBER(sshangha_state::deco_71_r)
+uint16_t sshangha_state::deco_71_r()
 {
 	return 0xffff;
 }
@@ -120,7 +121,7 @@ READ16_MEMBER(sshangha_state::deco_71_r)
 
 /******************************************************************************/
 
-READ16_MEMBER( sshangha_state::sshangha_protection_region_d_146_r )
+uint16_t sshangha_state::sshangha_protection_region_d_146_r(offs_t offset)
 {
 	int real_address = 0x3f4000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -129,7 +130,7 @@ READ16_MEMBER( sshangha_state::sshangha_protection_region_d_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( sshangha_state::sshangha_protection_region_d_146_w )
+void sshangha_state::sshangha_protection_region_d_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0x3f4000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -137,7 +138,7 @@ WRITE16_MEMBER( sshangha_state::sshangha_protection_region_d_146_w )
 	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
 }
 
-READ16_MEMBER( sshangha_state::sshangha_protection_region_8_146_r )
+uint16_t sshangha_state::sshangha_protection_region_8_146_r(offs_t offset)
 {
 	int real_address = 0x3e0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -146,57 +147,12 @@ READ16_MEMBER( sshangha_state::sshangha_protection_region_8_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( sshangha_state::sshangha_protection_region_8_146_w )
+void sshangha_state::sshangha_protection_region_8_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0x3e0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
-}
-
-/*
-
- Swizzle palette writes a bit so that the 'tilemap_12_combine_draw' code in the tilemap device works with this game (used for girl, see attract mode)
-
- Normal Palette layout
-
- 0x000 - 0x3ff  Sprites 2
- 0x400 - 0x7ff  Tilemap PF1
- 0x800 - 0xbff  Sprites 1
- 0xc00 - 0xfff  Tilemap PF2
-
- rearranged to
-
- 0x000 - 0x3ff  Sprites 1
- 0x400 - 0x7ff  Sprites 2
- 0x800 - 0xbff  Tilemap PF2
- 0xc00 - 0xfff  Tilemap PF1
-
-*/
-
-WRITE16_MEMBER(sshangha_state::palette_w)
-{
-	switch (offset & 0x600)
-	{
-	case 0x000: offset = (offset & 0x1ff) | 0x200; break;
-	case 0x200: offset = (offset & 0x1ff) | 0x600; break;
-	case 0x400: offset = (offset & 0x1ff) | 0x000; break;
-	case 0x600: offset = (offset & 0x1ff) | 0x400; break;
-	}
-
-	m_palette->write16(offset, data, mem_mask);
-}
-
-READ16_MEMBER(sshangha_state::palette_r)
-{
-	switch (offset & 0x600)
-	{
-	case 0x000: offset = (offset & 0x1ff) | 0x200; break;
-	case 0x200: offset = (offset & 0x1ff) | 0x600; break;
-	case 0x400: offset = (offset & 0x1ff) | 0x000; break;
-	case 0x600: offset = (offset & 0x1ff) | 0x400; break;
-	}
-	return m_palette->read16(offset);
 }
 
 void sshangha_state::sshangha_map(address_map &map)
@@ -222,7 +178,7 @@ void sshangha_state::sshangha_map(address_map &map)
 	map(0x370000, 0x370001).r(FUNC(sshangha_state::deco_71_r));
 	map(0x370000, 0x370007).nopw();
 
-	map(0x380000, 0x380fff).ram().rw(FUNC(sshangha_state::palette_r),FUNC(sshangha_state::palette_w)).share("palette");
+	map(0x380000, 0x380fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x381000, 0x383fff).ram(); // unused palette area
 	map(0x3e0000, 0x3e3fff).rw(FUNC(sshangha_state::sshangha_protection_region_8_146_r), FUNC(sshangha_state::sshangha_protection_region_8_146_w));
 	map(0x3ec000, 0x3f3fff).ram();
@@ -247,7 +203,7 @@ void sshangha_state::sshanghab_map(address_map &map)
 
 	map(0x340000, 0x340fff).ram(); // original spriteram, used as a buffer here
 
-	map(0x380000, 0x380fff).ram().rw(FUNC(sshangha_state::palette_r),FUNC(sshangha_state::palette_w)).share("palette");
+	map(0x380000, 0x380fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x381000, 0x383fff).ram(); // unused palette area
 
 	map(0x3c0000, 0x3c07ff).ram().share(m_spriteram); // bootleg spriteram
@@ -261,12 +217,12 @@ void sshangha_state::sshanghab_map(address_map &map)
 
 /* 8 "sound latches" shared between main and sound cpus. */
 
-READ8_MEMBER(sshangha_state::sound_shared_r)
+uint8_t sshangha_state::sound_shared_r(offs_t offset)
 {
 	return m_sound_shared_ram[offset] & 0xff;
 }
 
-WRITE8_MEMBER(sshangha_state::sound_shared_w)
+void sshangha_state::sound_shared_w(offs_t offset, uint8_t data)
 {
 	m_sound_shared_ram[offset] = data & 0xff;
 }
@@ -374,11 +330,11 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 chars */
-	4096,
+	RGN_FRAC(1,2),
 	4,      /* 4 bits per pixel  */
-	{ 8, 0, 0x100000*8+8,0x100000*8+0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ 8, 0, RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 
@@ -387,11 +343,9 @@ static const gfx_layout tilelayout =
 	16,16,
 	RGN_FRAC(1,2),
 	4,
-	{ 8, 0, 0x100000*8+8, 0x100000*8+0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -409,6 +363,12 @@ DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 	return (bank >> 4) * 0x1000;
 }
 
+// similar as tattass (deco32.cpp) but base color is pf2 color bank
+u16 sshangha_state::mix_callback(u16 p, u16 p2)
+{
+	return (p2 & 0x300) ^ (((p & 0x10) << 5) | (p & 0x0f) | ((p2 & 0x0f) << 4));
+}
+
 void sshangha_state::sshangha(machine_config &config)
 {
 	/* basic machine hardware */
@@ -419,8 +379,7 @@ void sshangha_state::sshangha(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sshangha_state::sound_map);
 
-
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -431,19 +390,18 @@ void sshangha_state::sshangha(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_sshangha);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4000);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4000/4);
 
 	DECO16IC(config, m_tilegen, 0);
 	m_tilegen->set_pf1_size(DECO_64x32);
 	m_tilegen->set_pf2_size(DECO_64x32);
-	m_tilegen->set_pf1_trans_mask(0x0f);
-	m_tilegen->set_pf2_trans_mask(0x0f);
-	m_tilegen->set_pf1_col_bank(0x30);
-	m_tilegen->set_pf2_col_bank(0x20);
+	m_tilegen->set_pf1_col_bank(0x10);
+	m_tilegen->set_pf2_col_bank(0x30);
 	m_tilegen->set_pf1_col_mask(0x0f);
 	m_tilegen->set_pf2_col_mask(0x0f);
-	m_tilegen->set_bank1_callback(FUNC(sshangha_state::bank_callback), this);
-	m_tilegen->set_bank2_callback(FUNC(sshangha_state::bank_callback), this);
+	m_tilegen->set_bank1_callback(FUNC(sshangha_state::bank_callback));
+	m_tilegen->set_bank2_callback(FUNC(sshangha_state::bank_callback));
+	m_tilegen->set_mix_callback(FUNC(sshangha_state::mix_callback));
 	m_tilegen->set_pf12_8x8_bank(0);
 	m_tilegen->set_pf12_16x16_bank(1);
 	m_tilegen->set_gfxdecode_tag("gfxdecode");
@@ -462,17 +420,14 @@ void sshangha_state::sshangha(machine_config &config)
 	m_deco146->port_c_cb().set_ioport("DSW");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left(); // sure it's stereo?
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.33);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 16_MHz_XTAL / 8, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.27);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.27);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.27);
 }
 
 void sshangha_state::sshanghab(machine_config &config)
@@ -514,6 +469,30 @@ ROM_START( sshanghaj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ss007-1.u28", 0x00000, 0x20000, CRC(bc466edf) SHA1(b96525b2c879d15b46a7753fa6ebf12a851cd019) )
 	ROM_LOAD16_BYTE( "ss006-1.u27", 0x00001, 0x20000, CRC(872a2a2d) SHA1(42d7a01465d5c403354aaf0f2dab8adb9afe61b0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "ss008.u82", 0x000000, 0x010000, CRC(04dc3647) SHA1(c06a7e8932c03de5759a9b69da0d761006b49517) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "ss001.u8",  0x000000, 0x100000, CRC(ebeca5b7) SHA1(1746e757ad9bbef2aa9028c54f25d4aa4dedf79e) )
+	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) // 2 sprite chips, 2 copies of sprite ROMs on PCB
+	ROM_LOAD( "ss003.u47", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u46", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
+ROM_END
+
+ROM_START( sshanghak ) /* Korean censored version - No girls in Paradise games */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "ss007k.u28", 0x00000, 0x20000, CRC(90dbf11c) SHA1(60ab0f3d3f43939e719196ff1775a3cd1c8c9aa0) )
+	ROM_LOAD16_BYTE( "ss006k.u27", 0x00001, 0x20000, CRC(07d94579) SHA1(25e4fb1669e12c7329e45a8ac0d52ac157a83d46) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ss008.u82", 0x000000, 0x010000, CRC(04dc3647) SHA1(c06a7e8932c03de5759a9b69da0d761006b49517) )
@@ -578,6 +557,7 @@ void sshangha_state::init_sshangha()
 }
 
 
-GAME( 1992, sshangha,  0,        sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sshanghaj, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sshanghab, sshangha, sshanghab, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshangha,  0,        sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd.",                 "Super Shanghai Dragon's Eye (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghaj, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd.",                 "Super Shanghai Dragon's Eye (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghak, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd. (Taito license)", "Super Shanghai Dragon's Eye (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghab, sshangha, sshanghab, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg",                         "Super Shanghai Dragon's Eye (World, bootleg)", MACHINE_SUPPORTS_SAVE )

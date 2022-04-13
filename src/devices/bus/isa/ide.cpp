@@ -9,17 +9,18 @@
 #include "emu.h"
 #include "ide.h"
 
+#include "bus/ata/atadev.h"
 #include "imagedev/harddriv.h"
-#include "machine/idectrl.h"
+#include "sound/cdda.h"
 #include "speaker.h"
 
 
-READ8_MEMBER(isa16_ide_device::ide16_alt_r )
+uint8_t isa16_ide_device::ide16_alt_r()
 {
 	return m_ide->read_cs1(6/2, 0xff);
 }
 
-WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
+void isa16_ide_device::ide16_alt_w(uint8_t data)
 {
 	m_ide->write_cs1(6/2, data, 0xff);
 }
@@ -48,9 +49,9 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 
 void isa16_ide_device::cdrom_headphones(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^lheadphone", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rheadphone", 1.0)
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^lheadphone", 1.0);
+	cdda->add_route(1, "^^rheadphone", 1.0);
 }
 
 static INPUT_PORTS_START( ide )

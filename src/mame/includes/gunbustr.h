@@ -11,12 +11,12 @@
 
 struct gb_tempsprite
 {
-	int gfx;
-	int code,color;
-	int flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int primask;
+	int gfx = 0;
+	int code = 0, color = 0;
+	int flipx,flipy = 0;
+	int x = 0, y = 0;
+	int zoomx = 0, zoomy = 0;
+	int primask = 0;
 };
 
 class gunbustr_state : public driver_device
@@ -30,7 +30,10 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_spritemap(*this, "spritemap"),
+		m_io_light_x(*this, "LIGHT%u_X", 0U),
+		m_io_light_y(*this, "LIGHT%u_Y", 0U)
 	{
 		m_coin_lockout = true;
 	}
@@ -48,30 +51,33 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0480scp_device> m_tc0480scp;
-	required_shared_ptr<uint32_t> m_ram;
-	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<u32> m_ram;
+	required_shared_ptr<u32> m_spriteram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_region_ptr<u16> m_spritemap;
+
+	required_ioport_array<2> m_io_light_x;
+	required_ioport_array<2> m_io_light_y;
 
 	bool m_coin_lockout;
-	std::unique_ptr<gb_tempsprite[]> m_spritelist;
-	uint32_t m_mem[2];
-	emu_timer *m_interrupt5_timer;
+	std::unique_ptr<gb_tempsprite[]> m_spritelist{};
+	emu_timer *m_interrupt5_timer = nullptr;
 
-	DECLARE_WRITE32_MEMBER(motor_control_w);
-	DECLARE_READ32_MEMBER(gunbustr_gun_r);
-	DECLARE_WRITE32_MEMBER(gunbustr_gun_w);
-	DECLARE_READ32_MEMBER(main_cycle_r);
-	DECLARE_WRITE8_MEMBER(coin_word_w);
+	void motor_control_w(u32 data);
+	u32 gun_r();
+	void gun_w(u32 data);
+	u32 main_cycle_r();
+	void coin_word_w(u8 data);
 	virtual void video_start() override;
-	uint32_t screen_update_gunbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u32 *primasks,int x_offs,int y_offs);
 
 	void gunbustr_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_GUNBUSTR_H

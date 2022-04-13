@@ -34,8 +34,8 @@ public:
 			u32 clock);
 
 	// uses two consecutive addresses
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	u8 data_r(address_space &space, offs_t offset);
+	void data_w(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(busak_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
@@ -45,10 +45,10 @@ protected:
 	void device_reset() override;
 	void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ8_MEMBER(mcu_pa_r);
-	DECLARE_READ8_MEMBER(mcu_pc_r);
-	DECLARE_WRITE8_MEMBER(mcu_pa_w);
-	DECLARE_WRITE8_MEMBER(mcu_pb_w);
+	u8 mcu_pa_r();
+	u8 mcu_pc_r();
+	void mcu_pa_w(u8 data);
+	void mcu_pb_w(u8 data);
 
 private:
 	u8 const get_bus_val() const

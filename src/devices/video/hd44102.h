@@ -36,10 +36,10 @@ public:
 	// inline configuration helpers
 	void set_offsets(int sx, int sy) { m_sx = sx; m_sy = sy; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( cs2_w );
+	void cs2_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -49,11 +49,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( control_w );
+	uint8_t status_r();
+	void control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 	inline void count_up_or_down();
 

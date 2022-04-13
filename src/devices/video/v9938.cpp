@@ -33,7 +33,6 @@ todo:
 - vdp engine -- make run at correct speed
 - vr/hr/fh flags: double-check all of that
 - make vdp engine work in exp. ram
-- fix save state support
 */
 
 #include "emu.h"
@@ -169,11 +168,11 @@ void v99x8_device::device_config_complete()
 			(m_pal_config ? VVISIBLE_PAL : VVISIBLE_NTSC) * 2 - 1 - VERTICAL_ADJUST * 2);
 
 	if (!screen().has_screen_update())
-		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(v99x8_device::screen_update), this));
+		screen().set_screen_update(*this, FUNC(v99x8_device::screen_update));
 }
 
 
-void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int scanline = (m_scanline - (m_scanline_start + m_offset_y));
 
@@ -273,20 +272,35 @@ void v99x8_device::configure_pal_ntsc()
 
 
 /*
-    Driver-specific function: update the vdp mouse state
+    Colorbus inputs
+    vdp will process mouse deltas only if it is in mouse mode
+    Reg 8: MS LP x x x x x x
 */
-void v99x8_device::update_mouse_state(int mx_delta, int my_delta, int button_state)
+void v99x8_device::colorbus_x_input(int mx_delta)
 {
-	// save button state
-	m_button_state = (button_state << 6) & 0xc0;
-
 	if ((m_cont_reg[8] & 0xc0) == 0x80)
-	{   // vdp will process mouse deltas only if it is in mouse mode
+	{
 		m_mx_delta += mx_delta;
-		m_my_delta += my_delta;
+		if (m_mx_delta < -127) m_mx_delta = -127;
+		if (m_mx_delta > 127) m_mx_delta = 127;
 	}
 }
 
+void v99x8_device::colorbus_y_input(int my_delta)
+{
+	if ((m_cont_reg[8] & 0xc0) == 0x80)
+	{
+		m_my_delta += my_delta;
+		if (m_my_delta < -127) m_my_delta = -127;
+		if (m_my_delta > 127) m_my_delta = 127;
+	}
+}
+
+void v99x8_device::colorbus_button_input(bool switch1_pressed, bool switch2_pressed)
+{
+	// save button state
+	m_button_state = (switch2_pressed? 0x80 : 0x00) | (switch1_pressed? 0x40 : 0x00);
+}
 
 
 /***************************************************************************
@@ -628,9 +642,8 @@ void v99x8_device::device_start()
 	save_item(NAME(m_stat_reg));
 	save_item(NAME(m_cont_reg));
 	save_item(NAME(m_read_ahead));
-	//  save_item(NAME(m_vram));
-	//  if ( m_vram_exp != nullptr )
-	//      save_pointer(NAME(m_vram_exp), 0x10000);
+	save_item(NAME(m_v9958_sp_mode));
+	save_item(NAME(m_address_latch));
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_blink));
@@ -700,7 +713,6 @@ void v99x8_device::device_reset()
 	configure_pal_ntsc();
 	set_screen_parameters();
 }
-
 
 void v99x8_device::reset_palette()
 {
@@ -1851,12 +1863,12 @@ void v99x8_device::refresh_32(int line)
 
 	if (m_cont_reg[9] & 0x08)
 	{
-		ln = &m_bitmap.pix32(m_scanline*2+((m_stat_reg[2]>>1)&1));
+		ln = &m_bitmap.pix(m_scanline*2+((m_stat_reg[2]>>1)&1));
 	}
 	else
 	{
-		ln = &m_bitmap.pix32(m_scanline*2);
-		ln2 = &m_bitmap.pix32(m_scanline*2+1);
+		ln = &m_bitmap.pix(m_scanline*2);
+		ln2 = &m_bitmap.pix(m_scanline*2+1);
 		double_lines = true;
 	}
 
@@ -2903,13 +2915,11 @@ void v99x8_device::report_vdp_command(uint8_t Op)
 /*************************************************************/
 uint8_t v99x8_device::command_unit_w(uint8_t Op)
 {
-	int SM;
-
 	// V9938 ops only work in SCREENs 5-8
-	if (m_mode<5)
+	if (m_mode<5 || m_mode>8)
 		return(0);
 
-	SM = m_mode-5;         // Screen mode index 0..3
+	int SM = m_mode-5;         // Screen mode index 0..3
 
 	m_mmc.CM = Op>>4;
 	if ((m_mmc.CM & 0x0C) != 0x0C && m_mmc.CM != 0)
@@ -3042,5 +3052,47 @@ void v99x8_device::update_command()
 	{
 		m_vdp_ops_count=13662;
 		if(m_vdp_engine) (this->*m_vdp_engine)();
+	}
+}
+
+void v99x8_device::device_post_load() // TODO: is there a better way to restore this?
+{
+	switch(m_mmc.CM)
+	{
+	case CM_ABRT:
+	case CM_POINT:
+	case CM_PSET:
+		m_vdp_engine=nullptr;
+		break;
+	case CM_SRCH:
+		m_vdp_engine=&v99x8_device::srch_engine;
+		break;
+	case CM_LINE:
+		m_vdp_engine=&v99x8_device::line_engine;
+		break;
+	case CM_LMMV:
+		m_vdp_engine=&v99x8_device::lmmv_engine;
+		break;
+	case CM_LMMM:
+		m_vdp_engine=&v99x8_device::lmmm_engine;
+		break;
+	case CM_LMCM:
+		m_vdp_engine=&v99x8_device::lmcm_engine;
+		break;
+	case CM_LMMC:
+		m_vdp_engine=&v99x8_device::lmmc_engine;
+		break;
+	case CM_HMMV:
+		m_vdp_engine=&v99x8_device::hmmv_engine;
+		break;
+	case CM_HMMM:
+		m_vdp_engine=&v99x8_device::hmmm_engine;
+		break;
+	case CM_YMMM:
+		m_vdp_engine=&v99x8_device::ymmm_engine;
+		break;
+	case CM_HMMC:
+		m_vdp_engine=&v99x8_device::hmmc_engine;
+		break;
 	}
 }

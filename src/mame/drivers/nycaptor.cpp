@@ -3,7 +3,7 @@
 /***************************************************************************
     N.Y. Captor - Taito '85
 
-     Driver by Tomasz Slanina  analog [at] op.pl
+     Driver by Tomasz Slanina
 ****************************************************************************
   Hardware similar to Fairyland Story
   Cycle Shooting (Taito '86) is running on (almost) the same hardware
@@ -198,7 +198,6 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -206,17 +205,17 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 //#define USE_MCU
 
 
-WRITE8_MEMBER(nycaptor_state::sub_cpu_halt_w)
+void nycaptor_state::sub_cpu_halt_w(uint8_t data)
 {
 	m_subcpu->set_input_line(INPUT_LINE_HALT, (data) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_b_r)
+uint8_t nycaptor_state::nycaptor_b_r()
 {
 	return 1;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_by_r)
+uint8_t nycaptor_state::nycaptor_by_r()
 {
 	int port = ioport("LIGHTY")->read();
 
@@ -226,56 +225,56 @@ READ8_MEMBER(nycaptor_state::nycaptor_by_r)
 	return port - 8;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_bx_r)
+uint8_t nycaptor_state::nycaptor_bx_r()
 {
 	return (ioport("LIGHTX")->read() + 0x27) | 1;
 }
 
 
-WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
+void nycaptor_state::sound_cpu_reset_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r1)
+uint8_t nycaptor_state::nycaptor_mcu_status_r1()
 {
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
 	return (CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 2 : 0;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r2)
+uint8_t nycaptor_state::nycaptor_mcu_status_r2()
 {
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	return (CLEAR_LINE != m_bmcu->host_semaphore_r()) ? 0 : 1;
 }
 
-READ8_MEMBER(nycaptor_state::sound_status_r)
+uint8_t nycaptor_state::sound_status_r()
 {
 	return (m_soundlatch->pending_r() ? 1 : 0) | (m_soundlatch2->pending_r() ? 2 : 0);
 }
 
 
 
-WRITE8_MEMBER(nycaptor_state::nmi_disable_w)
+void nycaptor_state::nmi_disable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(0);
 }
 
-WRITE8_MEMBER(nycaptor_state::nmi_enable_w)
+void nycaptor_state::nmi_enable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(1);
 }
 
-WRITE8_MEMBER(nycaptor_state::unk_w)
+void nycaptor_state::unk_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_generic_control_r)
+uint8_t nycaptor_state::nycaptor_generic_control_r()
 {
 	return m_generic_control_reg;
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_generic_control_w)
+void nycaptor_state::nycaptor_generic_control_w(uint8_t data)
 {
 	m_generic_control_reg = data;
 	membank("bank1")->set_entry((data&0x08)>>3);
@@ -349,26 +348,26 @@ void nycaptor_state::sound_map(address_map &map)
 /* Cycle Shooting */
 
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_status_r)
+uint8_t nycaptor_state::cyclshtg_mcu_status_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_r)
+uint8_t nycaptor_state::cyclshtg_mcu_r()
 {
 	return 7;
 }
 
-WRITE8_MEMBER(nycaptor_state::cyclshtg_mcu_w)
+void nycaptor_state::cyclshtg_mcu_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_status_r1)
+uint8_t nycaptor_state::cyclshtg_mcu_status_r1()
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(nycaptor_state::cyclshtg_generic_control_w)
+void nycaptor_state::cyclshtg_generic_control_w(uint8_t data)
 {
 	m_generic_control_reg = data;
 	membank("bank1")->set_entry((data >> 2) & 3);
@@ -425,7 +424,7 @@ void nycaptor_state::cyclshtg_slave_map(address_map &map)
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
-READ8_MEMBER(nycaptor_state::unk_r)
+uint8_t nycaptor_state::unk_r()
 {
 	return machine().rand();
 }
@@ -486,31 +485,31 @@ void nycaptor_state::bronx_slave_io_map(address_map &map)
 /* verified from Z80 code */
 static INPUT_PORTS_START( nycaptor )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )       /* table at 0x00e5 in CPU1 - see notes for 'colt' */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SWA:1,2")  // table at 0x00e5 in CPU1 - see notes for 'colt'
 	PORT_DIPSETTING(    0x02, "20k 80k 80k+" )
 	PORT_DIPSETTING(    0x03, "50k 150k 200k+" )
 	PORT_DIPSETTING(    0x01, "100k 300k 300k+" )
 	PORT_DIPSETTING(    0x00, "150k 300k 300k+" )
-	PORT_DIPNAME( 0x04, 0x04, "Infinite Bullets")           /* see notes */
+	PORT_DIPNAME( 0x04, 0x04, "Infinite Bullets")           PORT_DIPLOCATION("SWA:3")  // see notes
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            /* values are read from the MCU */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            PORT_DIPLOCATION("SWA:4,5")  // values are read from the MCU
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x18, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWB:1,2,3,4")  // DIPs are reversed from usual (e.g. 1C 1C = all on) but confirmed correct from manual
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
@@ -527,7 +526,7 @@ static INPUT_PORTS_START( nycaptor )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SWB:5,6,7,8")  // DIPs are reversed from usual (e.g. 1C 1C = all on) but confirmed correct from manual
 	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
@@ -546,39 +545,39 @@ static INPUT_PORTS_START( nycaptor )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSWC")
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" )                    PORT_DIPLOCATION("SWC:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Training Spot" )
+	PORT_DIPNAME( 0x02, 0x02, "Training Spot" )             PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SWC:3,4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
+	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )           PORT_DIPLOCATION("SWC:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Reset Damage" )
+	PORT_DIPNAME( 0x20, 0x20, "Reset Damage" )              PORT_DIPLOCATION("SWC:6")
 	PORT_DIPSETTING(    0x20, "Every Stage" )
 	PORT_DIPSETTING(    0x00, "Every 4 Stages" )
-	PORT_DIPNAME( 0x40, 0x40, "No Hit (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "No Hit (Cheat)")             PORT_DIPLOCATION("SWC:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )
+	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )                PORT_DIPLOCATION("SWC:8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* IPT_START2 is some similar Taito games (eg: 'flstory') */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            // IPT_START2 in some similar Taito games (eg: 'flstory')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* "I/O ERROR" if active - code at 0x083d */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* "I/O ERROR" if active - code at 0x083d */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            // "I/O ERROR" if active - code at 0x083d
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )            // "I/O ERROR" if active - code at 0x083d
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -596,7 +595,7 @@ static INPUT_PORTS_START( colt )
 	PORT_INCLUDE( nycaptor )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            /* see notes */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )    PORT_DIPLOCATION("SWA:4,5")  // see notes
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x18, "3" )
@@ -607,43 +606,43 @@ INPUT_PORTS_END
 /* verified from Z80 code */
 static INPUT_PORTS_START( cyclshtg )
 	PORT_START("DSWA")
-	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
-	TAITO_DSWA_BITS_2_TO_3
-	TAITO_COINAGE_JAPAN_OLD                                 /* coinage B isn't mentionned in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:1")
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWA:2")
+	TAITO_DSWA_BITS_2_TO_3_LOC (SWA)
+	TAITO_COINAGE_JAPAN_OLD_LOC (SWA)  // coinage B isn't mentioned in the manual
 
 	PORT_START("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )       /* table at 0x100f - see notes for 'bronx' */
+	TAITO_DIFFICULTY_LOC (SWB)
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SWB:3,4")  // table at 0x100f - see notes for 'bronx'
 	PORT_DIPSETTING(    0x0c, "150k 350k 200k+" )
 	PORT_DIPSETTING(    0x08, "200k 500k 300k+" )
 	PORT_DIPSETTING(    0x04, "300k 700k 400k+" )
 	PORT_DIPSETTING(    0x00, "400k 900k 500k+" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            /* see notes */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SWB:5,6")  // see notes
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, "Reset Damage (Cheat)" )      /* see notes */
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
+	PORT_DIPNAME( 0x80, 0x80, "Reset Damage (Cheat)" )      PORT_DIPLOCATION("SWB:8")  // see notes
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWC")
-	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x10, "Infinite Bullets" )          /* see notes */
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWC:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWC:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWC:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SWC:4" )
+	PORT_DIPNAME( 0x10, 0x10, "Infinite Bullets" )          PORT_DIPLOCATION("SWC:5")  // see notes
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWC:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWC:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWC:8" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* IPT_START2 is some similar Taito games (eg: 'flstory') */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            // IPT_START2 in some similar Taito games (eg: 'flstory')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -667,7 +666,7 @@ static INPUT_PORTS_START( bronx )
 	PORT_INCLUDE( cyclshtg )
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            /* see notes */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )   PORT_DIPLOCATION("SWB:5,6")  // see notes
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x10, "4" )
@@ -749,7 +748,7 @@ void nycaptor_state::nycaptor(machine_config &config)
 
 	TAITO68705_MCU(config, m_bmcu, 2000000);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -797,9 +796,6 @@ void nycaptor_state::nycaptor(machine_config &config)
 	// pin 22 Noise Output  not mapped
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void nycaptor_state::cyclshtg(machine_config &config)
@@ -810,6 +806,7 @@ void nycaptor_state::cyclshtg(machine_config &config)
 
 	Z80(config, m_subcpu, 8000000/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::cyclshtg_slave_map);
+	m_subcpu->set_addrmap(AS_IO, &nycaptor_state::bronx_slave_io_map);
 	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, 8000000/2);
@@ -820,7 +817,7 @@ void nycaptor_state::cyclshtg(machine_config &config)
 	TAITO68705_MCU(config, m_bmcu, 2000000);
 #endif
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -866,9 +863,6 @@ void nycaptor_state::cyclshtg(machine_config &config)
 	// pin 22 Noise Output  not mapped
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -887,7 +881,7 @@ void nycaptor_state::bronx(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(120);
+	config.set_maximum_quantum(attotime::from_hz(120));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -933,9 +927,6 @@ void nycaptor_state::bronx(machine_config &config)
 	// pin 22 Noise Output  not mapped
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -973,17 +964,20 @@ ROM_START( nycaptor )
 	ROM_LOAD( "a50_14",   0x1c000, 0x4000, CRC(24b2f1bf) SHA1(4757aec2e4b99ce33d993ce1e19ee46a4eb76e86) )
 ROM_END
 
+// note, a mix of a80 and a97 codes, are there multiple versions of this game? the a97 gfx ROM doesn't match the bronx bootleg, so maybe the bootleg is based off the a80 version?
 ROM_START( cyclshtg )
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a97_01.i17",   0x00000, 0x4000, CRC(686fac1a) SHA1(46d17cb98f064413bb76c5d869f8061d2771cda0) )
 	ROM_LOAD( "a97_02.i16",   0x04000, 0x4000, CRC(48a812f9) SHA1(8ab18cb8d6a8b7ce1ed1a4009f5435ce4b0937b4) )
-	ROM_LOAD( "a97_03.u15",   0x10000, 0x4000, CRC(67ad3067) SHA1(2e355653e91c093abe7db0a3d55d5a3f95c4a2e3) )
-	ROM_LOAD( "a97_04.u14",   0x14000, 0x4000, CRC(804e6445) SHA1(5b6771c5729faf62d5002d090c0b9c5ca5cb9ad6) )
+	ROM_LOAD( "a97_03.u15",   0x10000, 0x4000, BAD_DUMP CRC(67ad3067) SHA1(2e355653e91c093abe7db0a3d55d5a3f95c4a2e3) ) // first half of data is missing compared to bronx (rest not 100% identical when decrypted, so can't use bootleg data)
+	ROM_LOAD( "a97_04.u14",   0x14000, 0x4000, BAD_DUMP CRC(804e6445) SHA1(5b6771c5729faf62d5002d090c0b9c5ca5cb9ad6) ) // ^
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a97_05.u22",   0x0000, 0x4000, CRC(fdc36c4f) SHA1(cae2d3f07c5bd6de9d40ff7d385b999e7dc9ce82) )
 	ROM_LOAD( "a80_06.u23",   0x4000, 0x4000, CRC(2769c5ab) SHA1(b8f5a4a8c70c8d37d5e92b37faa0e25b287b3fb2) )
-	ROM_LOAD( "a97_06.i24",   0x8000, 0x4000, CRC(c0473a54) SHA1(06fa7345a44a72995146e973c2cd7a14499f4310) )
+
+	ROM_REGION( 0x08000, "user1", 0 )
+	ROM_LOAD( "a97_06.i24",   0x4000, 0x4000, BAD_DUMP CRC(c0473a54) SHA1(06fa7345a44a72995146e973c2cd7a14499f4310) ) // see above
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a80_16.i26",   0x0000, 0x4000, CRC(ce171a48) SHA1(e5ae9bb22f58c8857737bc6f5317866819a4e4d1) )
@@ -1127,7 +1121,7 @@ ROM_START( bronx )
 	ROM_LOAD( "a80_11.u11",   0x00000, 0x4000, CRC(29e1293b) SHA1(106204ec46fae5d3b5e4a4d423bc0e886a637c61) )
 	ROM_LOAD( "a80_10.u10",   0x04000, 0x4000, CRC(345f576c) SHA1(fee5b2167bcd0fdc21c0a7b22ffdf7506a24baee) )
 	ROM_LOAD( "a80_09.u9",    0x08000, 0x4000, CRC(3ef06dff) SHA1(99bbd32ae89a6becac9e1bb8a34a834d81890444) )
-	ROM_LOAD( "8.bin",          0x0c000, 0x4000, CRC(2b778d24) SHA1(caca7a18743a4bb657a7c5691d93de0ccb867003) )
+	ROM_LOAD( "8.bin",        0x0c000, 0x4000, CRC(2b778d24) SHA1(caca7a18743a4bb657a7c5691d93de0ccb867003) )
 
 	ROM_LOAD( "a80_15.u39",   0x10000, 0x4000, CRC(2cefb47d) SHA1(3bef20c9c0c4f9237a327da3cbc9a7bbf63771ea) )
 	ROM_LOAD( "a80_14.u34",   0x14000, 0x4000, CRC(91642de8) SHA1(531974fc147d25e9feada89bc82d5df62ec9d446) )
@@ -1243,9 +1237,9 @@ ROM_START( colt )
 	ROM_LOAD( "04.bin",   0x00000, 0x4000, CRC(dc61fdb2) SHA1(94fdd95082936b2445008aee60381ebe35385b4a) )
 	ROM_LOAD( "03.bin",   0x04000, 0x4000, CRC(5835b8b1) SHA1(25a48660f8fb166f996133fb9113d1566dbae281) )
 	ROM_LOAD( "02.bin",   0x10000, 0x4000, CRC(89c99a28) SHA1(1a4fdb5c13569699dfbf2bde0aeeb5e7fcc22ef9) )
+	ROM_RELOAD(           0x14000, 0x4000)
 	ROM_LOAD( "01.bin",   0x18000, 0x4000, CRC(9b0948f3) SHA1(a55e09243640ec56aa22e4b6d47165b02b880eb7) )
-	ROM_COPY( "maincpu",   0x10000, 0x014000, 0x04000 )
-	ROM_COPY( "maincpu",   0x18000, 0x01c000, 0x04000 )
+	ROM_RELOAD(           0x1c000, 0x4000)
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "05.bin",   0x0000, 0x4000, CRC(2b6e017a) SHA1(60715e1c6fbcdd2c0e114035c342ba587dfc1b4b) )
@@ -1299,7 +1293,7 @@ void nycaptor_state::init_colt()
 }
 
 GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, init_nycaptor, ROT0,  "Taito",   "N.Y. Captor",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-/* bootlegs */
-GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, init_bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, init_colt,     ROT0,  "bootleg", "Colt",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, init_bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

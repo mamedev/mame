@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(VIP_EXPANSION_SLOT, vip_expansion_slot_device, "vip_expansion
 //-------------------------------------------------
 
 device_vip_expansion_card_interface::device_vip_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "vipexp")
 {
 	m_slot = dynamic_cast<vip_expansion_slot_device *>(device.owner());
 }
@@ -53,7 +53,7 @@ device_vip_expansion_card_interface::device_vip_expansion_card_interface(const m
 
 vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIP_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_vip_expansion_card_interface>(mconfig, *this),
 	m_write_int(*this),
 	m_write_dma_out(*this),
 	m_write_dma_in(*this), m_card(nullptr)
@@ -67,7 +67,7 @@ vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconf
 
 void vip_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_vip_expansion_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_int.resolve_safe();

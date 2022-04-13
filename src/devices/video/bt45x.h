@@ -50,14 +50,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	DECLARE_READ8_MEMBER(address_r);
-	DECLARE_WRITE8_MEMBER(address_w);
-	virtual DECLARE_READ8_MEMBER(palette_r) = 0;
-	virtual DECLARE_WRITE8_MEMBER(palette_w) = 0;
-	DECLARE_READ8_MEMBER(register_r);
-	DECLARE_WRITE8_MEMBER(register_w);
-	virtual DECLARE_READ8_MEMBER(overlay_r) = 0;
-	virtual DECLARE_WRITE8_MEMBER(overlay_w) = 0;
+	u8 address_r();
+	void address_w(u8 data);
+	virtual u8 palette_r(address_space &space) = 0;
+	virtual void palette_w(u8 data) = 0;
+	u8 register_r(address_space &space);
+	void register_w(u8 data);
+	virtual u8 overlay_r(address_space &space) = 0;
+	virtual void overlay_w(u8 data) = 0;
 
 	// helpers
 	virtual void increment_address(const bool side_effects = false);
@@ -86,10 +86,10 @@ protected:
 
 	virtual u32 palette_entries() const override { return m_palette_colors + m_overlay_colors; }
 
-	virtual DECLARE_READ8_MEMBER(palette_r) override;
-	virtual DECLARE_WRITE8_MEMBER(palette_w) override;
-	virtual DECLARE_READ8_MEMBER(overlay_r) override;
-	virtual DECLARE_WRITE8_MEMBER(overlay_w) override;
+	virtual u8 palette_r(address_space &space) override;
+	virtual void palette_w(u8 data) override;
+	virtual u8 overlay_r(address_space &space) override;
+	virtual void overlay_w(u8 data) override;
 
 	std::unique_ptr<std::array<u8, 3>[]> m_color_ram;
 };
@@ -97,19 +97,24 @@ protected:
 class bt45x_mono_device_base : public bt45x_device_base
 {
 public:
-	// helpers instead of a device_palette_interface
-	u8 palette_lookup(u8 index) const { return m_color_ram[index & m_read_mask]; }
-	u8 overlay_lookup(u8 index) const { return m_color_ram[m_palette_colors + index]; }
+	// helper instead of device_palette_interface
+	u8 lookup(u8 pixel, u8 overlay = 0) const
+	{
+		if (overlay & 3)
+			return m_color_ram[m_palette_colors + (overlay & (m_command & (CR1|CR0)))];
+		else
+			return (m_command & CR6) ? m_color_ram[pixel & m_read_mask] : m_color_ram[m_palette_colors + 0];
+	}
 
 protected:
 	bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
 
 	virtual void device_start() override;
 
-	virtual DECLARE_READ8_MEMBER(palette_r) override;
-	virtual DECLARE_WRITE8_MEMBER(palette_w) override;
-	virtual DECLARE_READ8_MEMBER(overlay_r) override;
-	virtual DECLARE_WRITE8_MEMBER(overlay_w) override;
+	virtual u8 palette_r(address_space &space) override;
+	virtual void palette_w(u8 data) override;
+	virtual u8 overlay_r(address_space &space) override;
+	virtual void overlay_w(u8 data) override;
 
 	std::unique_ptr<u8[]> m_color_ram;
 };
@@ -157,10 +162,10 @@ public:
 	bt457_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual DECLARE_READ8_MEMBER(palette_r) override;
-	virtual DECLARE_WRITE8_MEMBER(palette_w) override;
-	virtual DECLARE_READ8_MEMBER(overlay_r) override;
-	virtual DECLARE_WRITE8_MEMBER(overlay_w) override;
+	virtual u8 palette_r(address_space &space) override;
+	virtual void palette_w(u8 data) override;
+	virtual u8 overlay_r(address_space &space) override;
+	virtual void overlay_w(u8 data) override;
 
 	virtual void increment_address(const bool side_effects = false) override;
 };

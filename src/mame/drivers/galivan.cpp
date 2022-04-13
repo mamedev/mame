@@ -23,11 +23,6 @@ TODO
 - bit 3 of ninjemak_gfxbank_w, there currently is a kludge to clear text RAM
   but it should really copy stuff from the extra ROM.
 - Ninja Emaki has minor protection issues, see NB1414M4 simulation for more info.
-- dangarj has unemulated protection at I/Os 0x80-1 for missing sprites.
-  This is a 1412M2, which is the same chip used in terracre.cpp and cop01.cpp
-  The protection here is used for a code snippet at 0xf9c0, that of course is the
-  sprite handling. The code snippet is sum8 with 0x27 at 0x9d74 so no, the
-  later dangar US version snippet doesn't work
 
 ***************************************************************************/
 
@@ -35,27 +30,33 @@ TODO
 #include "includes/galivan.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
-#include "screen.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
+void galivan_state::galivan_sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(((data & 0x7f) << 1) | 1);
 }
 
-READ8_MEMBER(galivan_state::soundlatch_clear_r)
+uint8_t galivan_state::soundlatch_clear_r()
 {
 	m_soundlatch->clear_w();
 	return 0;
 }
 
-READ8_MEMBER(galivan_state::IO_port_c0_r)
+uint8_t galivan_state::IO_port_c0_r()
 {
-	return (0x58); /* To Avoid Reset on Ufo Robot dangar */
+	// causes a reset in dangar if value differs.
+	return (0x58);
+}
+
+void galivan_state::vblank_ack_w(uint8_t data)
+{
+	if (m_nb1414m4 != nullptr)
+		m_nb1414m4->vblank_trigger();
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 void galivan_state::galivan_map(address_map &map)
@@ -92,22 +93,21 @@ void galivan_state::io_map(address_map &map)
 	map(0x41, 0x42).w(FUNC(galivan_state::galivan_scrollx_w));
 	map(0x43, 0x44).w(FUNC(galivan_state::galivan_scrolly_w));
 	map(0x45, 0x45).w(FUNC(galivan_state::galivan_sound_command_w));
-//  AM_RANGE(0x46, 0x46) AM_WRITENOP
-//  AM_RANGE(0x47, 0x47) AM_WRITENOP
-	map(0xc0, 0xc0).r(FUNC(galivan_state::IO_port_c0_r)); /* dangar needs to return 0x58 */
+//  map(0x46, 0x46).nopw();
+	map(0x47, 0x47).w(FUNC(galivan_state::vblank_ack_w));
+	map(0xc0, 0xc0).r(FUNC(galivan_state::IO_port_c0_r));
 }
 
 void dangarj_state::dangarj_io_map(address_map &map)
 {
 	io_map(map);
-	// 1412M2
 	map(0x80, 0x80).rw("prot_chip", FUNC(nb1412m2_device::data_r), FUNC(nb1412m2_device::data_w));
 	map(0x81, 0x81).w("prot_chip", FUNC(nb1412m2_device::command_w));
 }
 
-
-WRITE8_MEMBER(galivan_state::blit_trigger_w)
+void galivan_state::blit_trigger_w(uint8_t data)
 {
+	// TODO: may not be right, diverges with armedf.cpp
 	m_nb1414m4->exec((m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
 }
 
@@ -120,8 +120,8 @@ void galivan_state::ninjemak_io_map(address_map &map)
 	map(0x83, 0x83).portr("SERVICE");
 	map(0x84, 0x84).portr("DSW1");
 	map(0x85, 0x85).portr("DSW2").w(FUNC(galivan_state::galivan_sound_command_w));
-	map(0x86, 0x86).w(FUNC(galivan_state::blit_trigger_w));         // ??
-//  AM_RANGE(0x87, 0x87) AM_WRITENOP         // ??
+	map(0x86, 0x86).w(FUNC(galivan_state::blit_trigger_w));
+	map(0x87, 0x87).w(FUNC(galivan_state::vblank_ack_w));
 }
 
 void galivan_state::sound_map(address_map &map)
@@ -142,7 +142,7 @@ void galivan_state::sound_io_map(address_map &map)
 
 
 /***************
-   Dip Sitches
+   Dip Switches
  ***************/
 
 #define NIHON_JOYSTICK(_n_) \
@@ -338,29 +338,6 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4,0,12,8,20,16,28,24,36,32,44,40,52,48,60,56 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	16*16*4
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -375,9 +352,15 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_galivan )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0,   8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         8*16,  16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*16+16*16, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,       0,  16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb, 16*16,  16 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     16*16+16*16, 256 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_ninjemak )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,      0,   8 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb, 8*16,  16 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     8*16+16*16, 256 )
 GFXDECODE_END
 
 
@@ -392,7 +375,6 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 	/* register for saving */
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
-	save_item(NAME(m_write_layers));
 	save_item(NAME(m_layers));
 }
 
@@ -413,9 +395,7 @@ MACHINE_RESET_MEMBER(galivan_state,galivan)
 {
 	m_maincpu->reset();
 
-//  m_layers = 0x60;
 	m_layers = 0;
-	m_write_layers = 0;
 	m_galivan_scrollx[0] = m_galivan_scrollx[1] = 0;
 	m_galivan_scrolly[0] = m_galivan_scrolly[1] = 0;
 }
@@ -429,13 +409,24 @@ MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 	m_ninjemak_dispdisable = 0;
 }
 
+void galivan_state::video_config(machine_config &config)
+{
+	BUFFERED_SPRITERAM8(config, m_spriteram);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: not measured, ~60 Hz
+	m_screen->set_raw(XTAL(12'000'000)/2,382,0,32*8, 262, 2*8, 30*8);
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->set_palette(m_palette);
+}
+
 void galivan_state::galivan(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);      /* 6 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &galivan_state::galivan_map);
 	m_maincpu->set_addrmap(AS_IO, &galivan_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(galivan_state::irq0_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(galivan_state::irq0_line_assert));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(8'000'000)/2));      /* 4 MHz? */
 	audiocpu.set_addrmap(AS_PROGRAM, &galivan_state::sound_map);
@@ -445,22 +436,11 @@ void galivan_state::galivan(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,galivan)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
 
-	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(galivan_state::screen_update_galivan));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
-	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
-
+	video_config(config);
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
+	m_screen->set_screen_update(FUNC(galivan_state::screen_update_galivan));
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
+	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 16*16+16*16+256*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -469,11 +449,8 @@ void galivan_state::galivan(machine_config &config)
 
 	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 }
 
 void dangarj_state::dangarj(machine_config &config)
@@ -481,7 +458,7 @@ void dangarj_state::dangarj(machine_config &config)
 	galivan(config);
 	m_maincpu->set_addrmap(AS_IO, &dangarj_state::dangarj_io_map);
 
-	NB1412M2(config, m_prot, XTAL(8'000'000)); // divided by 2 maybe
+	NB1412M2(config, m_prot, XTAL(8'000'000)/2); // divided by 2 maybe
 }
 
 void galivan_state::ninjemak(machine_config &config)
@@ -490,7 +467,7 @@ void galivan_state::ninjemak(machine_config &config)
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);      /* 6 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &galivan_state::ninjemak_map);
 	m_maincpu->set_addrmap(AS_IO, &galivan_state::ninjemak_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(galivan_state::irq0_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(galivan_state::irq0_line_assert));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(8'000'000)/2));      /* 4 MHz? */
 	audiocpu.set_addrmap(AS_PROGRAM, &galivan_state::sound_map);
@@ -503,36 +480,22 @@ void galivan_state::ninjemak(machine_config &config)
 	NB1414M4(config, m_nb1414m4, 0);
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(galivan_state::screen_update_ninjemak));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
-	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
-
+	video_config(config);
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
+	m_screen->set_screen_update(FUNC(galivan_state::screen_update_ninjemak));
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjemak);
+	PALETTE(config, m_palette, FUNC(galivan_state::ninjemak_palette), 8*16+16*16+256*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.8);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
-
 
 void galivan_state::youmab(machine_config &config)
 {
@@ -540,6 +503,7 @@ void galivan_state::youmab(machine_config &config)
 
 	config.device_remove("nb1414m4");
 }
+
 /***************************************************************************
 
   Game driver(s)
@@ -776,9 +740,7 @@ ROM_START( dangarj ) /* all rom labels are simply numbers, with the owl logo and
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
 	ROM_LOAD( "21.14b", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
-	// following is most likely half size dumped, so we load parent set rom here.
-	ROM_LOAD( "22.15b", 0x4000, 0x4000, BAD_DUMP CRC(1d484f68) SHA1(7de13d6c6850280fed011c1d1b211cdc5ea9f935) )
-	ROM_LOAD( "14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
+	ROM_LOAD( "22.15b", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11.13d",  0x00000, 0x4000, CRC(e804ffe1) SHA1(22f16c23b9a82f104dda24bc8fccc08f3f69cf97) )   /* chars */
@@ -883,10 +845,10 @@ ROM_START( ninjemak )
 	ROM_LOAD( "ninjemak.pr1", 0x0000, 0x0100, CRC(8a62d4e4) SHA1(99ca4da01ea1b5585f6e3ebf162c3f988ab317e5) )    /* red */
 	ROM_LOAD( "ninjemak.pr2", 0x0100, 0x0100, CRC(2ccf976f) SHA1(b804ee761793697087fbe3372352f301a22feeab) )    /* green */
 	ROM_LOAD( "ninjemak.pr3", 0x0200, 0x0100, CRC(16b2a7a4) SHA1(53c410b439c8a835447f15f2ab250b363b3f7888) )    /* blue */
-	ROM_LOAD( "yncp-2d.bin",  0x0300, 0x0100, BAD_DUMP CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8)  )  /* sprite lookup table */
+	ROM_LOAD( "yncp-2d.bin",  0x0300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) )    /* sprite lookup table */
 
 	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "yncp-7f.bin",  0x0000, 0x0100, BAD_DUMP CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450)  )  /* sprite palette bank */
+	ROM_LOAD( "yncp-7f.bin",  0x0000, 0x0100, CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450) )    /* sprite palette bank */
 ROM_END
 
 ROM_START( youma )
@@ -1129,28 +1091,28 @@ ROM_START( youmab2 )
 ROM_END
 
 
-WRITE8_MEMBER(galivan_state::youmab_extra_bank_w)
+void galivan_state::youmab_extra_bank_w(uint8_t data)
 {
 	if (data == 0xff)
-		membank("bank2")->set_entry(1);
+		m_rombank->set_entry(1);
 	else if (data == 0x00)
-		membank("bank2")->set_entry(0);
+		m_rombank->set_entry(0);
 	else
 		printf("data %03x\n", data);
 }
 
-READ8_MEMBER(galivan_state::youmab_8a_r)
+uint8_t galivan_state::youmab_8a_r()
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(galivan_state::youmab_81_w)
+void galivan_state::youmab_81_w(uint8_t data)
 {
 	// ??
 }
 
 /* scrolling is tied to a serial port, reads from 0xe43d-0xe43e-0xe43f-0xe440 */
-WRITE8_MEMBER(galivan_state::youmab_84_w)
+void galivan_state::youmab_84_w(uint8_t data)
 {
 	m_shift_val &= ~((0x80 >> 7) << m_shift_scroll);
 	m_shift_val |= (((data & 0x80) >> 7) << m_shift_scroll);
@@ -1162,7 +1124,7 @@ WRITE8_MEMBER(galivan_state::youmab_84_w)
 	//if(m_shift_scroll == 25)
 }
 
-WRITE8_MEMBER(galivan_state::youmab_86_w)
+void galivan_state::youmab_86_w(uint8_t data)
 {
 	/* latch values */
 	{
@@ -1178,22 +1140,22 @@ WRITE8_MEMBER(galivan_state::youmab_86_w)
 
 void galivan_state::init_youmab()
 {
-	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8_delegate(FUNC(galivan_state::youmab_extra_bank_w),this)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x7fff, "bank3");
-	membank("bank3")->set_base(memregion("maincpu")->base());
+	// TODO: move all of this to an address map instead
+	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8smo_delegate(*this, FUNC(galivan_state::youmab_extra_bank_w))); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x7fff, memregion("maincpu")->base());
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, "bank2");
-	membank("bank2")->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
-	membank("bank2")->set_entry(0);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_rombank);
+	m_rombank->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
+	m_rombank->set_entry(0);
 
-	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8_delegate(FUNC(galivan_state::youmab_81_w),this)); // ?? often, alternating values
-	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8_delegate(FUNC(galivan_state::youmab_84_w),this)); // ?? often, sequence..
+	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8smo_delegate(*this, FUNC(galivan_state::youmab_81_w))); // ?? often, alternating values
+	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8smo_delegate(*this, FUNC(galivan_state::youmab_84_w))); // ?? often, sequence..
 
 	m_maincpu->space(AS_PROGRAM).nop_write(0xd800, 0xd81f); // scrolling isn't here..
 
-	m_maincpu->space(AS_IO).install_read_handler(0x8a, 0x8a, read8_delegate(FUNC(galivan_state::youmab_8a_r),this)); // ???
+	m_maincpu->space(AS_IO).install_read_handler(0x8a, 0x8a, read8smo_delegate(*this, FUNC(galivan_state::youmab_8a_r))); // ???
 
-	m_maincpu->space(AS_IO).install_write_handler(0x86, 0x86, write8_delegate(FUNC(galivan_state::youmab_86_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x86, 0x86, write8smo_delegate(*this, FUNC(galivan_state::youmab_86_w)));
 
 }
 
@@ -1202,7 +1164,7 @@ GAME( 1985, galivan2, galivan,  galivan,  galivan,  galivan_state, empty_init,  
 GAME( 1985, galivan3, galivan,  galivan,  galivan,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Cosmo Police Galivan (12/11/1985)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (4/07/1987)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangara,  dangar,   galivan,  dangar2,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND ) // wrong BGM in game, no SFXs
+GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (9/26/1986, bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks i/o port 0xc0?)
 GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state, empty_init,  ROT270, "bootleg",    "Ufo Robo Dangar (9/26/1986, bootleg set 2)", MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, galivan_state, empty_init,  ROT270, "Nichibutsu", "Ninja Emaki (US)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )

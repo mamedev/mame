@@ -18,8 +18,8 @@ written, so it may be normal behaviour.
 #include "includes/bublbobl.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "machine/watchdog.h"
 #include "emupal.h"
 #include "screen.h"
@@ -46,9 +46,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
-	DECLARE_WRITE8_MEMBER(missb2_oki_w);
-	DECLARE_READ8_MEMBER(missb2_oki_r);
+	void missb2_bg_bank_w(uint8_t data);
+	void missb2_oki_w(uint8_t data);
+	uint8_t missb2_oki_r();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -162,23 +162,21 @@ uint32_t missb2_state::screen_update_missb2(screen_device &screen, bitmap_rgb32 
 }
 
 
-WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
+void missb2_state::missb2_bg_bank_w(uint8_t data)
 {
-	int bank;
-
 	// I don't know how this is really connected, bit 1 is always high afaik...
-	bank = ((data & 2) ? 1 : 0) | ((data & 1) ? 4 : 0);
+	int bank = ((data & 2) ? 1 : 0) | ((data & 1) ? 4 : 0);
 
 	membank("bank2")->set_entry(bank);
 	membank("bank3")->set_entry(bank);
 }
 
-WRITE8_MEMBER(missb2_state::missb2_oki_w)
+void missb2_state::missb2_oki_w(uint8_t data)
 {
 	m_oki->write(bitswap<8>(data, 7,5,6,4,3,1,2,0));
 }
 
-READ8_MEMBER(missb2_state::missb2_oki_r)
+uint8_t missb2_state::missb2_oki_r()
 {
 	return bitswap<8>(m_oki->read(), 7,5,6,4,3,1,2,0);
 }
@@ -231,7 +229,7 @@ void missb2_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9000).rw(FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //AM_MIRROR(0x0fff) ???
+	map(0x9000, 0x9000).rw(FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //.mirror(0x0fff); ???
 	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym3526", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
 	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(missb2_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
@@ -463,7 +461,7 @@ void missb2_state::machine_reset()
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_oki->reset();
-	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
 void missb2_state::missb2(machine_config &config)
@@ -481,7 +479,7 @@ void missb2_state::missb2(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &missb2_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(missb2_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 

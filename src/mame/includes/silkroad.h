@@ -7,6 +7,7 @@
 
 #include "sound/okim6295.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class silkroad_state : public driver_device
 {
@@ -39,11 +40,11 @@ private:
 
 	required_memory_bank m_okibank;
 
-	tilemap_t *m_tilemap[3];
+	tilemap_t *m_tilemap[3]{};
 
-	DECLARE_WRITE8_MEMBER(coin_w);
-	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(okibank_w);
+	void coin_w(uint8_t data);
+	template<int Layer> void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void okibank_w(uint8_t data);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 

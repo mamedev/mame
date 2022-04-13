@@ -3,11 +3,18 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-* fidel_sc8.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity Sensory Chess Challenger "8" (SCC)
 
-*******************************************************************************
+It is the first chesscomputer with sensors under the chessboard.
 
-Fidelity Sensory Chess Challenger 8 overview:
+The box names it Sensory Chess Challenger, Sensory Chess Challenger "8" title
+is on the 1st page of the manual. Like other Fidelity chesscomputers from
+around this time, the number indicates maximum difficulty level.
+
+It was also rereleased in 1983 as "Poppy", marketed for children, the housing
+was in bright red color.
+
+Hardware notes:
 - Z80A CPU @ 3.9MHz
 - 4KB ROM(MOS 2732), 256 bytes RAM(35391CP)
 - chessboard buttons, 8*8+1 leds
@@ -16,10 +23,12 @@ Fidelity Sensory Chess Challenger 8 overview:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/volt_reg.h"
+#include "machine/sensorboard.h"
+#include "sound/dac.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -28,34 +37,58 @@ Fidelity Sensory Chess Challenger 8 overview:
 
 namespace {
 
-class scc_state : public fidelbase_state
+class scc_state : public driver_device
 {
 public:
 	scc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void scc(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_display;
+	required_device<dac_bit_interface> m_dac;
+	required_ioport m_inputs;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	u8 input_r();
+	void control_w(offs_t offset, u8 data);
+
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
 };
+
+void scc_state::machine_start()
+{
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_data));
+}
+
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
-// TTL
-
-WRITE8_MEMBER(scc_state::control_w)
+void scc_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: led data
 	u8 mask = 1 << (offset & 7);
@@ -63,15 +96,26 @@ WRITE8_MEMBER(scc_state::control_w)
 
 	// d0-d3: led select, input mux (row 9 is speaker out)
 	// d4: corner led(direct)
-	m_inp_mux = 1 << (data & 0xf);
-	m_dac->write(BIT(m_inp_mux, 9));
-	display_matrix(8, 9, m_led_data, (m_inp_mux & 0xff) | (data << 4 & 0x100));
+	m_inp_mux = data & 0xf;
+	u16 sel = 1 << m_inp_mux;
+	m_dac->write(BIT(sel, 9));
+	m_display->matrix((sel & 0xff) | (data << 4 & 0x100), m_led_data);
 }
 
-READ8_MEMBER(scc_state::input_r)
+u8 scc_state::input_r()
 {
+	u8 data = 0;
+
 	// d0-d7: multiplexed inputs (active low)
-	return ~read_inputs(9);
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_board->read_file(m_inp_mux);
+
+	// read button panel
+	else if (m_inp_mux == 8)
+		data = m_inputs->read();
+
+	return ~data;
 }
 
 
@@ -99,9 +143,7 @@ void scc_state::main_io(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( scc )
-	PORT_INCLUDE( generic_cb_buttons )
-
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Pawn")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Rook")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Knight")
@@ -115,7 +157,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void scc_state::scc(machine_config &config)
@@ -125,13 +167,17 @@ void scc_state::scc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &scc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &scc_state::main_io);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(scc_state::display_decay_tick), attotime::from_msec(1));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(150));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	config.set_default_layout(layout_fidel_sc8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
@@ -154,4 +200,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, fscc8, 0,      0, scc,     scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, fscc8, 0,      0, scc,     scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"8\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

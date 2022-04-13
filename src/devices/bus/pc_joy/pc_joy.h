@@ -16,7 +16,7 @@
 
 void pc_joysticks(device_slot_interface &device);
 
-class device_pc_joy_interface : public device_slot_card_interface
+class device_pc_joy_interface : public device_interface
 {
 public:
 	virtual ~device_pc_joy_interface();
@@ -32,13 +32,13 @@ protected:
 	device_pc_joy_interface(const machine_config &mconfig, device_t &device);
 };
 
-class pc_joy_device : public device_t, public device_slot_interface
+class pc_joy_device : public device_t, public device_single_card_slot_interface<device_pc_joy_interface>
 {
 public:
 	pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER(joy_port_r);
-	DECLARE_WRITE8_MEMBER(joy_port_w);
+	uint8_t joy_port_r();
+	void joy_port_w(uint8_t data);
 
 protected:
 	virtual void device_start() override { m_stime = machine().time(); }

@@ -217,7 +217,7 @@ int mb89352_device::get_scsi_cmd_len(uint8_t cbyte)
 	//return 6;
 }
 
-void mb89352_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mb89352_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -285,7 +285,7 @@ void mb89352_device::set_phase(int phase)
 	logerror("MB89352: phase set to %i\n",m_phase);
 }
 
-READ8_MEMBER( mb89352_device::mb89352_r )
+uint8_t mb89352_device::mb89352_r(offs_t offset)
 {
 	uint8_t ret;
 	switch(offset & 0x0f)
@@ -363,7 +363,7 @@ READ8_MEMBER( mb89352_device::mb89352_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( mb89352_device::mb89352_w )
+void mb89352_device::mb89352_w(offs_t offset, uint8_t data)
 {
 	switch(offset & 0x0f)
 	{

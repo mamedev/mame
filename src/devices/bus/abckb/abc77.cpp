@@ -305,7 +305,7 @@ INPUT_PORTS_START( abc55 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, 0)
 INPUT_PORTS_END
 
 
@@ -472,7 +472,7 @@ void abc77_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -501,7 +501,7 @@ void abc77_device::txd_w(int state)
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc77_device::p1_r )
+uint8_t abc77_device::p1_r()
 {
 	/*
 
@@ -536,7 +536,7 @@ READ8_MEMBER( abc77_device::p1_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::p2_w )
+void abc77_device::p2_w(uint8_t data)
 {
 	/*
 
@@ -601,7 +601,7 @@ WRITE_LINE_MEMBER( abc77_device::prog_w )
 //  j3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::j3_w )
+void abc77_device::j3_w(uint8_t data)
 {
 	m_j3 = data;
 }

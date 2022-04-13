@@ -169,9 +169,9 @@ model1io_device::model1io_device(const machine_config &mconfig, const char *tag,
 	m_buttons(*this, "buttons"),
 	m_dsw(*this, "dsw%u", 1U),
 	m_read_cb(*this), m_write_cb(*this),
-	m_in_cb{ {*this}, {*this}, {*this} },
+	m_in_cb(*this),
 	m_drive_read_cb(*this), m_drive_write_cb(*this),
-	m_an_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_an_cb(*this),
 	m_output_cb(*this),
 	m_secondary_controls(false)
 {
@@ -186,16 +186,10 @@ void model1io_device::device_start()
 	// resolve callbacks
 	m_read_cb.resolve_safe(0xff);
 	m_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 3; i++)
-		m_in_cb[i].resolve_safe(0xff);
-
+	m_in_cb.resolve_all_safe(0xff);
 	m_drive_read_cb.resolve_safe(0xff);
 	m_drive_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 8; i++)
-		m_an_cb[i].resolve_safe(0xff);
-
+	m_an_cb.resolve_all_safe(0xff);
 	m_output_cb.resolve_safe();
 
 	// register for save states
@@ -207,17 +201,17 @@ void model1io_device::device_start()
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( model1io_device::io_r )
+uint8_t model1io_device::io_r(offs_t offset)
 {
 	return m_read_cb(offset);
 }
 
-WRITE8_MEMBER( model1io_device::io_w )
+void model1io_device::io_w(offs_t offset, uint8_t data)
 {
 	m_write_cb(offset, data, 0xff);
 }
 
-WRITE8_MEMBER( model1io_device::io_pa_w )
+void model1io_device::io_pa_w(uint8_t data)
 {
 	// 7-------  eeprom clk
 	// -6------  eeprom cs
@@ -234,37 +228,37 @@ WRITE8_MEMBER( model1io_device::io_pa_w )
 	m_secondary_controls = bool(BIT(data, 0));
 }
 
-READ8_MEMBER( model1io_device::io_pb_r )
+uint8_t model1io_device::io_pb_r()
 {
 	return m_secondary_controls ? m_dsw[0]->read() : m_in_cb[0](0);
 }
 
-READ8_MEMBER( model1io_device::io_pc_r )
+uint8_t model1io_device::io_pc_r()
 {
 	return m_secondary_controls ? m_dsw[1]->read() : m_in_cb[1](0);
 }
 
-READ8_MEMBER( model1io_device::io_pd_r )
+uint8_t model1io_device::io_pd_r()
 {
 	return m_secondary_controls ? m_dsw[2]->read() : m_in_cb[2](0);
 }
 
-READ8_MEMBER( model1io_device::io_pe_r )
+uint8_t model1io_device::io_pe_r()
 {
 	return m_drive_read_cb(0);
 }
 
-WRITE8_MEMBER( model1io_device::io_pe_w )
+void model1io_device::io_pe_w(uint8_t data)
 {
 	m_drive_write_cb(data);
 }
 
-WRITE8_MEMBER( model1io_device::io_pf_w )
+void model1io_device::io_pf_w(uint8_t data)
 {
 	m_output_cb(data);
 }
 
-READ8_MEMBER( model1io_device::io_pg_r )
+uint8_t model1io_device::io_pg_r()
 {
 	// 7-------  eeprom do
 	// -6------  eeprom nc

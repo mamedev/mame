@@ -2,8 +2,8 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-King of Boxer - (c) 1985 Wood Place Inc.
-Ring King     - (c) 1985 Data East USA Inc. / Wood Place Inc.
+King of Boxer - (c) 1985 Woodplace Inc.
+Ring King     - (c) 1985 Data East USA Inc. / Woodplace Inc.
 
 Driver by:
 Ernesto Corvi
@@ -24,7 +24,6 @@ Main CPU:
 #include "machine/clock.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -485,7 +484,7 @@ void kingofb_state::kingofb(machine_config &config)
 
 	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // We really need heavy synching among the processors
+	config.set_maximum_quantum(attotime::from_hz(6000)); // We really need heavy synching among the processors
 
 
 	/* video hardware */
@@ -512,9 +511,6 @@ void kingofb_state::kingofb(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // 100K (R30-44 even)/200K (R31-45 odd) ladder network
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -542,7 +538,7 @@ void kingofb_state::ringking(machine_config &config)
 
 	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // We really need heavy synching among the processors
+	config.set_maximum_quantum(attotime::from_hz(6000)); // We really need heavy synching among the processors
 
 
 	/* video hardware */
@@ -569,9 +565,6 @@ void kingofb_state::ringking(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -865,9 +858,9 @@ void kingofb_state::init_ringkingw()
 }
 
 
-GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, init_ringkingw, ROT90, "Wood Place Inc.", "Ring King (US, Wood Place Inc.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, init_ringking3, ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Woodplace Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Woodplace Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, init_ringkingw, ROT90, "Woodplace Inc.", "Ring King (US, Woodplace Inc.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Woodplace Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Woodplace Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, init_ringking3, ROT90, "Woodplace Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )

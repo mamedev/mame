@@ -68,18 +68,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">vs2013\x32\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">vs2013\x32\DebugStatic\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pugixmlsd</TargetName>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs2013\x64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs2013\x64\DebugStatic\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pugixmlsd</TargetName>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">vs2013\x32\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">vs2013\x32\ReleaseStatic\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pugixmls</TargetName>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs2013\x64\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs2013\x64\ReleaseStatic\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pugixmls</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">vs2013\Win32_DebugStatic\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">vs2013\Win32_DebugStatic\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pugixml</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs2013\x64_DebugStatic\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs2013\x64_DebugStatic\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pugixml</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">vs2013\Win32_ReleaseStatic\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">vs2013\Win32_ReleaseStatic\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pugixml</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs2013\x64_ReleaseStatic\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs2013\x64_ReleaseStatic\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pugixml</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -92,18 +92,18 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Lib>
-      <OutputFile>$(OutDir)pugixmlsd.lib</OutputFile>
+      <OutputFile>$(OutDir)pugixml.lib</OutputFile>
     </Lib>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDataBaseFileName>$(OutDir)pugixmlsd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)pugixml.pdb</ProgramDataBaseFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -117,18 +117,18 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Lib>
-      <OutputFile>$(OutDir)pugixmlsd.lib</OutputFile>
+      <OutputFile>$(OutDir)pugixml.lib</OutputFile>
     </Lib>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDataBaseFileName>$(OutDir)pugixmlsd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)pugixml.pdb</ProgramDataBaseFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -142,20 +142,20 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Lib>
-      <OutputFile>$(OutDir)pugixmls.lib</OutputFile>
+      <OutputFile>$(OutDir)pugixml.lib</OutputFile>
     </Lib>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ProgramDataBaseFileName>$(OutDir)pugixmls.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)pugixml.pdb</ProgramDataBaseFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -169,20 +169,20 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Lib>
-      <OutputFile>$(OutDir)pugixmls.lib</OutputFile>
+      <OutputFile>$(OutDir)pugixml.lib</OutputFile>
     </Lib>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ProgramDataBaseFileName>$(OutDir)pugixmls.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)pugixml.pdb</ProgramDataBaseFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -22,10 +22,11 @@ void main()
 	vec4 cin = texture2D(s_tex, v_texcoord0);
 	vec4 cout = vec4(0.0, 0.0, 0.0, cin.a);
 	mat3 xy = mat3(u_chroma_a.xyz, u_chroma_b.xyz, u_chroma_c.xyz);
-	const mat3 XYZ_TO_sRGB = mat3(
-		 3.2406, -0.9689,  0.0557,
-		-1.5372,  1.8758, -0.2040,
-		-0.4986,  0.0415,  1.0570
+
+	mat3 XYZ_TO_sRGB = mtxFromRows3(
+		vec3( 3.2406, -1.5372, -0.4986),
+		vec3(-0.9689,  1.8758,  0.0415),
+		vec3( 0.0557, -0.2040,  1.0570)
 	);
 
 	for (int i = 0; i < 3; ++i) {

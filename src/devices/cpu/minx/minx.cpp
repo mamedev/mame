@@ -41,13 +41,13 @@ TODO:
 - Add support for O and C flags in NEG8 instruction
 - Verify MUL (CE D8) and DIV (CE D9)
 - Doublecheck behaviour of CMPN instructions ( CF 60 .. CF 63 )
+- DIV (CE D9) division by zero handling - is supposed to raise a EX4 exception. A real Pokemini unit will freeze. MAME currently will crash.
 
 */
 
 #include "emu.h"
 #include "minx.h"
 #include "minxd.h"
-#include "debugger.h"
 
 #define FLAG_I  0x80
 #define FLAG_D  0x40

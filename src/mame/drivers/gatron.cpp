@@ -345,7 +345,7 @@
 *    Read/Write Handlers    *
 ****************************/
 
-WRITE8_MEMBER(gatron_state::output_port_0_w)
+void gatron_state::output_port_0_w(uint8_t data)
 {
 /*---------------
   Poker 4-1 lamps
@@ -422,7 +422,7 @@ WRITE8_MEMBER(gatron_state::output_port_0_w)
 }
 
 
-WRITE8_MEMBER(gatron_state::output_port_1_w)
+void gatron_state::output_port_1_w(uint8_t data)
 {
 /*----------------
   Lamps & Counters

@@ -7,6 +7,7 @@
 
 #include "machine/taito68705interface.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
@@ -36,50 +37,7 @@ public:
 	{
 	}
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_spriteram;
-	optional_shared_ptr<uint8_t> m_protram;
-
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	uint8_t    m_gfxbank;
-	uint8_t    m_palettebank;
-
-	/* input-related */
-	uint8_t    m_paddle_select;   // selected by d008 bit 2
-
-	/* bootleg related */
-	int      m_bootleg_id;
-	uint8_t    m_bootleg_cmd;
-
-	/* hexaa */
-	uint8_t m_hexaa_from_main;
-	uint8_t m_hexaa_from_sub;
-
-	/* devices */
-	optional_ioport_array<2> m_muxports;
-	required_device<cpu_device> m_maincpu;
-	optional_device<arkanoid_mcu_device_base> m_mcuintf;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-
-	DECLARE_READ8_MEMBER(arkanoid_bootleg_f000_r);
-	DECLARE_READ8_MEMBER(arkanoid_bootleg_f002_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_bootleg_d018_w);
-	DECLARE_READ8_MEMBER(arkanoid_bootleg_d008_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_videoram_w);
-	DECLARE_WRITE8_MEMBER(arkanoid_d008_w);
-	DECLARE_WRITE8_MEMBER(tetrsark_d008_w);
-	DECLARE_WRITE8_MEMBER(brixian_d008_w);
-	DECLARE_WRITE8_MEMBER(hexa_d008_w);
-	DECLARE_READ8_MEMBER(hexaa_f000_r);
-	DECLARE_WRITE8_MEMBER(hexaa_f000_w);
-	DECLARE_WRITE8_MEMBER(hexaa_sub_80_w);
-	DECLARE_READ8_MEMBER(hexaa_sub_90_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
 	void init_block2();
 	void init_arkblock();
 	void init_hexa();
@@ -92,13 +50,6 @@ public:
 	void init_arkbloc2();
 	void init_arkangc();
 	void init_brixian();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_bootleg_init(  );
 
 	void bootleg(machine_config &config);
@@ -109,6 +60,57 @@ public:
 	void hexaa(machine_config &config);
 	void p3mcu(machine_config &config);
 	void arkanoid(machine_config &config);
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_protram;
+
+	/* video-related */
+	tilemap_t  *m_bg_tilemap = nullptr;
+	uint8_t    m_gfxbank = 0U;
+	uint8_t    m_palettebank = 0U;
+
+	/* input-related */
+	uint8_t    m_paddle_select = 0U;   // selected by d008 bit 2
+
+	/* bootleg related */
+	int      m_bootleg_id = 0;
+	uint8_t    m_bootleg_cmd = 0U;
+
+	/* hexaa */
+	uint8_t m_hexaa_from_main = 0U;
+	uint8_t m_hexaa_from_sub = 0U;
+
+	/* devices */
+	optional_ioport_array<2> m_muxports;
+	required_device<cpu_device> m_maincpu;
+	optional_device<arkanoid_mcu_device_base> m_mcuintf;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	uint8_t arkanoid_bootleg_f000_r();
+	uint8_t arkanoid_bootleg_f002_r();
+	void arkanoid_bootleg_d018_w(uint8_t data);
+	uint8_t arkanoid_bootleg_d008_r();
+	void arkanoid_videoram_w(offs_t offset, uint8_t data);
+	void arkanoid_d008_w(uint8_t data);
+	void tetrsark_d008_w(uint8_t data);
+	void brixian_d008_w(uint8_t data);
+	void hexa_d008_w(uint8_t data);
+	uint8_t hexaa_f000_r();
+	void hexaa_f000_w(uint8_t data);
+	void hexaa_sub_80_w(uint8_t data);
+	uint8_t hexaa_sub_90_r();
+	uint8_t input_mux_r();
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_map(address_map &map);
 	void bootleg_map(address_map &map);
 	void brixian_map(address_map &map);

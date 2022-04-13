@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "ultra14f.h"
 
+#include "bus/nscsi/devices.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 DEFINE_DEVICE_TYPE(ULTRA14F, ultra14f_device, "ultra14f", "Ultra-14F SCSI Host Adapter")
 
@@ -36,12 +36,6 @@ void ultra14f_device::uscpu_map(address_map &map)
 	map(0x3f8000, 0x3fffff).ram();
 }
 
-static void u14f_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("scsic", NCR53CF94); // Emulex FAS216 or similar custom-marked as USC060-6-40B
-}
-
 void ultra14f_device::scsic_config(device_t *device)
 {
 	device->set_clock(40_MHz_XTAL);
@@ -54,15 +48,15 @@ void ultra14f_device::device_add_mconfig(machine_config &config)
 	m_uscpu->set_addrmap(AS_PROGRAM, &ultra14f_device::uscpu_map);
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", u14f_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", u14f_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", u14f_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", u14f_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", u14f_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", u14f_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", u14f_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", u14f_scsi_devices, "scsic", true)
-		.set_option_machine_config("scsic", [this] (device_t *device) { scsic_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", NCR53CF94) // Emulex FAS216 or similar custom-marked as USC060-6-40B
+		.machine_config([this] (device_t *device) { scsic_config(device); });
 
 	DP8473(config, m_fdc, 24_MHz_XTAL); // custom-marked as USC020-1-24
 }

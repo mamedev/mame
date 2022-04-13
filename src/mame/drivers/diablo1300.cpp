@@ -156,12 +156,12 @@ private:
 };
 
 void diablo1300_state::diablo1300_map(address_map &map)
-{ //, AS_PROGRAM, 16, diablo1300_state )
+{
 	map(0x0000, 0x01ff).rom();
 }
 
 void diablo1300_state::diablo1300_data_map(address_map &map)
-{ // , AS_DATA, 8, diablo1300_state )
+{
 	map(0x00, 0x1f).ram();
 }
 
@@ -188,9 +188,18 @@ ROM_START( diablo )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_16BIT )
 	ROM_DEFAULT_BIOS("diablo1300")
 
-	ROM_SYSTEM_BIOS(0, "diablo1300", "Diablo Printer Series 1300 14510-xx CPU microcode")
+	ROM_SYSTEM_BIOS(0, "diablo1300", "Diablo Printer Series 1300 14510-xx CPU microcode") // Recreated 82S115 binaries using Jeffs documentation
 	ROMX_LOAD ("diablo1300.odd",  0x0001, 0x200, CRC (5e295350) SHA1 (6ea9a22b23b8bab93ae57671541d65dba698c722), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD ("diablo1300.even", 0x0000, 0x200, CRC (85562eb1) SHA1 (9335eeeabdd37255d6ffee153a027944a4519126), ROM_SKIP(1) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "diablo1355", "Diablo Printer 1355WP 14510-xx CPU microcode")  // Dumped 82S115 using Arduino
+	ROMX_LOAD ("13067-36.bin", 0x0001, 0x200, CRC (b8bf070f) SHA1 (c51f9f4009a771b1d0e9c948592c988b1f4e840f), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("13066-35.bin", 0x0000, 0x200, CRC (73698143) SHA1 (5d2b3e956ae0d2b606d081a242fc64928e68687d), ROM_SKIP(1) | ROM_BIOS(1))
+
+	ROM_REGION(0x1000, "trom", 0)
+	/* Table ROM, holds data for specific mechnical configuration of the printer engine, such as the number of characters and hammer energy for each character */
+	ROM_LOAD( "55wp92ch.bin",  0x0000, 0x200,   CRC(58ba7913) SHA1(968e87318b49ad05a66a8148e9048bfbeba2a97f) ) // Dumped 82S115 using Arduino
+
 ROM_END
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY               FULLNAME

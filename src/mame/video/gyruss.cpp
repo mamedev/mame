@@ -89,7 +89,7 @@ void gyruss_state::gyruss_palette(palette_device &palette) const
 
 
 
-WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
+void gyruss_state::gyruss_spriteram_w(offs_t offset, uint8_t data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -105,22 +105,22 @@ TILE_GET_INFO_MEMBER(gyruss_state::gyruss_get_tile_info)
 
 	tileinfo.group = (m_colorram[tile_index] & 0x10) ? 0 : 1;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	tileinfo.set(2, code, color, flags);
 }
 
 
 void gyruss_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gyruss_state::gyruss_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap->set_transmask(0, 0x00, 0);   /* opaque */
-	m_tilemap->set_transmask(1, 0x0f, 0);  /* transparent */
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gyruss_state::gyruss_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap->set_transmask(0, 0x00, 0); // opaque
+	m_tilemap->set_transmask(1, 0x0f, 0); // transparent
 
 	save_item(NAME(m_flipscreen));
 }
 
 
 
-READ8_MEMBER(gyruss_state::gyruss_scanline_r)
+uint8_t gyruss_state::gyruss_scanline_r()
 {
 	/* reads 1V - 128V */
 	return m_screen->vpos();

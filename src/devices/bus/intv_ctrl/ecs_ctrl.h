@@ -23,7 +23,7 @@ class intvecs_control_port_device;
 
 // ======================> device_intvecs_control_port_interface
 
-class device_intvecs_control_port_interface : public device_slot_card_interface
+class device_intvecs_control_port_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -41,8 +41,7 @@ protected:
 
 // ======================> intvecs_control_port_device
 
-class intvecs_control_port_device : public device_t,
-								public device_slot_interface
+class intvecs_control_port_device : public device_t, public device_single_card_slot_interface<device_intvecs_control_port_interface>
 {
 public:
 	// construction/destruction
@@ -59,16 +58,13 @@ public:
 	intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~intvecs_control_port_device();
 
-	DECLARE_READ8_MEMBER( portA_r ) { return read_portA(); }
-	DECLARE_READ8_MEMBER( portB_r ) { return read_portB(); }
-	DECLARE_WRITE8_MEMBER( portA_w ) { return write_portA(data); }
+	uint8_t porta_r() { return m_device ? m_device->read_portA() : 0; }
+	uint8_t portb_r() { return m_device ? m_device->read_portB() : 0; }
+	void porta_w(uint8_t data) { if (m_device) m_device->write_portA(data); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	uint8_t read_portA();
-	uint8_t read_portB();
-	void write_portA(uint8_t data);
 
 	device_intvecs_control_port_interface *m_device;
 };

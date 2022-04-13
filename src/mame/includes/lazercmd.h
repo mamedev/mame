@@ -64,22 +64,22 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	uint8_t m_marker_x;
-	uint8_t m_marker_y;
+	uint8_t m_marker_x = 0U;
+	uint8_t m_marker_y = 0U;
 
 	/* misc */
-	int m_timer_count;
-	uint8_t m_sense_state;
-	uint8_t m_attract;
+	int m_timer_count = 0;
+	uint8_t m_sense_state = 0U;
+	uint8_t m_attract = 0U;
 
-	DECLARE_WRITE8_MEMBER(lazercmd_ctrl_port_w);
-	DECLARE_READ8_MEMBER(lazercmd_ctrl_port_r);
-	DECLARE_WRITE8_MEMBER(lazercmd_data_port_w);
-	DECLARE_READ8_MEMBER(lazercmd_data_port_r);
-	DECLARE_WRITE8_MEMBER(lazercmd_hardware_w);
-	DECLARE_WRITE8_MEMBER(medlanes_hardware_w);
-	DECLARE_WRITE8_MEMBER(bbonk_hardware_w);
-	DECLARE_READ8_MEMBER(lazercmd_hardware_r);
+	void lazercmd_ctrl_port_w(uint8_t data);
+	uint8_t lazercmd_ctrl_port_r();
+	void lazercmd_data_port_w(uint8_t data);
+	uint8_t lazercmd_data_port_r();
+	void lazercmd_hardware_w(offs_t offset, uint8_t data);
+	void medlanes_hardware_w(offs_t offset, uint8_t data);
+	void bbonk_hardware_w(offs_t offset, uint8_t data);
+	uint8_t lazercmd_hardware_r(offs_t offset);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void lazercmd_palette(palette_device &palette) const;

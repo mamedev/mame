@@ -359,6 +359,7 @@ DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C
 
 wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device{ mconfig, type, tag, owner, clock }
+	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_addr{ 0 }
 	, m_regs{ 0 }
 	, m_command_length{ 0 }
@@ -414,6 +415,8 @@ void wd33c9x_base_device::device_start()
 
 void wd33c9x_base_device::device_reset()
 {
+	// This is a hardware reset.  Software reset is handled
+	// under COMMAND_CC_RESET.
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 	m_addr = 0;
@@ -432,6 +435,10 @@ void wd33c9x_base_device::device_reset()
 	m_irq_cb(CLEAR_LINE);
 	m_drq_cb(CLEAR_LINE);
 	m_drq_state = false;
+
+	// Hardware reset triggers a SCSI_STATUS_RESET interrupt.
+	irq_fifo_push(SCSI_STATUS_RESET);
+	update_irq();
 }
 
 
@@ -439,7 +446,7 @@ void wd33c9x_base_device::device_reset()
 //  device_timer - device-specific timer handler
 //-------------------------------------------------
 
-void wd33c9x_base_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void wd33c9x_base_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	step(true);
 }
@@ -619,7 +626,7 @@ void wd33c9x_base_device::indir_reg_w(uint8_t data)
 
 	case COMMAND: {
 		if (m_regs[AUXILIARY_STATUS] & (AUXILIARY_STATUS_INT | AUXILIARY_STATUS_CIP)) {
-			fatalerror("%s: The host should never write to the command register when INT or CIP are set.\n", shortname());
+			logerror("%s: The host should never write to the command register when INT or CIP are set.\n", shortname());
 		}
 
 		const uint8_t cc = (data & COMMAND_CC);
@@ -894,8 +901,8 @@ void wd33c9x_base_device::step(bool timeout)
 						set_scsi_state(FINISHED);
 						irq_fifo_push(SCSI_STATUS_SELECT_TRANSFER_SUCCESS);
 					} else {
-						// Makes very little sense, but the previous code did it and warzard seems to need it - XXX
-						m_regs[CONTROL] |= CONTROL_EDI;
+						set_scsi_state(FINISHED);
+						irq_fifo_push(SCSI_STATUS_DISCONNECT);
 					}
 					break;
 
@@ -1157,6 +1164,8 @@ void wd33c9x_base_device::step(bool timeout)
 					delay(send_byte());
 				} else if ((m_regs[CONTROL] & CONTROL_DM) == CONTROL_DM_POLLED) {
 					m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
+				} else {
+					delay(1);
 				}
 				break;
 
@@ -1201,9 +1210,13 @@ void wd33c9x_base_device::step(bool timeout)
 				if (!data_fifo_full()) {
 					// if it's the last message byte, ACK remains asserted, terminate with function_complete()
 					//state = (m_xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)) ? INIT_XFR_RECV_BYTE_NACK : INIT_XFR_RECV_BYTE_ACK;
-					scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
-					set_scsi_state((RECV_WAIT_REQ_1 << SUB_SHIFT) | INIT_XFR_RECV_BYTE_ACK);
-					step(false);
+					if (m_drq_state) {
+						delay(1);
+					} else {
+						scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+						set_scsi_state((RECV_WAIT_REQ_1 << SUB_SHIFT) | INIT_XFR_RECV_BYTE_ACK);
+						step(false);
+					}
 				}
 				break;
 

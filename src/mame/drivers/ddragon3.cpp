@@ -187,7 +187,7 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 #include "speaker.h"
 
@@ -198,39 +198,39 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
  *
  *************************************/
 
-WRITE8_MEMBER(ddragon3_state::oki_bankswitch_w)
+void ddragon3_state::oki_bankswitch_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
+void wwfwfest_state::wwfwfest_soundwrite(uint16_t data)
 {
 	// upper byte is always set to 0x31 for some reason
 	m_soundlatch->write(data & 0xff);
 }
 
 
-WRITE16_MEMBER(ddragon3_state::ddragon3_vreg_w)
+void ddragon3_state::ddragon3_vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vreg);
 }
 
 
-WRITE16_MEMBER(ddragon3_state::irq6_ack_w)
+void ddragon3_state::irq6_ack_w(uint16_t data)
 {
 	//  this gets written to on startup and at the end of IRQ6
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 
-WRITE16_MEMBER(ddragon3_state::irq5_ack_w)
+void ddragon3_state::irq5_ack_w(uint16_t data)
 {
 	//  this gets written to on startup and at the end of IRQ5 (input port read)
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
+void wwfwfest_state::wwfwfest_irq_ack_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(3, CLEAR_LINE);
@@ -239,20 +239,20 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
 		m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
+void wwfwfest_state::wwfwfest_flipscreen_w(uint16_t data)
 {
 	flip_screen_set(data&1);
 }
 
 /*- Palette Reads/Writes - A5 and A6 are not connected */
 
-READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram_r)
+uint16_t wwfwfest_state::wwfwfest_paletteram_r(offs_t offset)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
+void wwfwfest_state::wwfwfest_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
 	m_palette->write16(offset, data, mem_mask);
@@ -261,7 +261,7 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
 /*- Priority Control -*/
 
 
-WRITE8_MEMBER(wwfwfest_state::wwfwfest_priority_w)
+void wwfwfest_state::wwfwfest_priority_w(uint8_t data)
 {
 	m_pri = data;
 }
@@ -270,16 +270,16 @@ WRITE8_MEMBER(wwfwfest_state::wwfwfest_priority_w)
 
 
 /* DIPs are spread across the other input ports */
+template <int N>
 CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_3f_r)
 {
-	const char *tag = (const char *)param;
-	return ioport(tag)->read() & 0x3f;
+	return m_dsw[N]->read() & 0x3f;
 }
 
+template <int N>
 CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_c0_r)
 {
-	const char *tag = (const char *)param;
-	return (ioport(tag)->read() & 0xc0) >> 6;
+	return (m_dsw[N]->read() & 0xc0) >> 6;
 }
 
 
@@ -604,7 +604,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x3000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_c0_r, "DSW2")
+	PORT_BIT( 0x3000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wwfwfest_state, dsw_c0_r<1>)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -617,7 +617,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_3f_r, "DSW2")
+	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wwfwfest_state, dsw_3f_r<1>)
 
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
@@ -628,7 +628,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_3f_r, "DSW1")
+	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wwfwfest_state, dsw_3f_r<0>)
 
 	PORT_START("P4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
@@ -639,7 +639,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x0300, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_c0_r, "DSW1")
+	PORT_BIT( 0x0300, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wwfwfest_state, dsw_c0_r<0>)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )

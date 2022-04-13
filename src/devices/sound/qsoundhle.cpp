@@ -42,7 +42,7 @@ ROM_END
 qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QSOUND_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_dsp_rom(*this, "dsp")
 	, m_data_latch(0)
@@ -70,29 +70,25 @@ void qsound_hle_device::device_start()
 
 	// state save
 	// PCM registers
-	for (int j = 0; j < 16; j++) // PCM voices
-	{
-		save_item(NAME(m_voice[j].m_bank), j);
-		save_item(NAME(m_voice[j].m_addr), j);
-		save_item(NAME(m_voice[j].m_phase), j);
-		save_item(NAME(m_voice[j].m_rate), j);
-		save_item(NAME(m_voice[j].m_loop_len), j);
-		save_item(NAME(m_voice[j].m_end_addr), j);
-		save_item(NAME(m_voice[j].m_volume), j);
-		save_item(NAME(m_voice[j].m_echo), j);
-	}
+	// PCM voices
+	save_item(STRUCT_MEMBER(m_voice, m_bank));
+	save_item(STRUCT_MEMBER(m_voice, m_addr));
+	save_item(STRUCT_MEMBER(m_voice, m_phase));
+	save_item(STRUCT_MEMBER(m_voice, m_rate));
+	save_item(STRUCT_MEMBER(m_voice, m_loop_len));
+	save_item(STRUCT_MEMBER(m_voice, m_end_addr));
+	save_item(STRUCT_MEMBER(m_voice, m_volume));
+	save_item(STRUCT_MEMBER(m_voice, m_echo));
 
-	for (int j = 0; j < 3; j++) // ADPCM voices
-	{
-		save_item(NAME(m_adpcm[j].m_start_addr), j);
-		save_item(NAME(m_adpcm[j].m_end_addr), j);
-		save_item(NAME(m_adpcm[j].m_bank), j);
-		save_item(NAME(m_adpcm[j].m_volume), j);
-		save_item(NAME(m_adpcm[j].m_flag), j);
-		save_item(NAME(m_adpcm[j].m_cur_vol), j);
-		save_item(NAME(m_adpcm[j].m_step_size), j);
-		save_item(NAME(m_adpcm[j].m_cur_addr), j);
-	}
+	// ADPCM voices
+	save_item(STRUCT_MEMBER(m_adpcm, m_start_addr));
+	save_item(STRUCT_MEMBER(m_adpcm, m_end_addr));
+	save_item(STRUCT_MEMBER(m_adpcm, m_bank));
+	save_item(STRUCT_MEMBER(m_adpcm, m_volume));
+	save_item(STRUCT_MEMBER(m_adpcm, m_flag));
+	save_item(STRUCT_MEMBER(m_adpcm, m_cur_vol));
+	save_item(STRUCT_MEMBER(m_adpcm, m_step_size));
+	save_item(STRUCT_MEMBER(m_adpcm, m_cur_addr));
 
 	// PCM voices
 	save_item(NAME(m_voice_pan));
@@ -105,32 +101,30 @@ void qsound_hle_device::device_start()
 	save_item(NAME(m_echo.m_delay_line));
 	save_item(NAME(m_echo.m_delay_pos));
 
-	for (int j = 0; j < 2; j++)  // left, right
-	{
-		save_item(NAME(m_filter[j].m_tap_count), j);
-		save_item(NAME(m_filter[j].m_delay_pos), j);
-		save_item(NAME(m_filter[j].m_table_pos), j);
-		save_item(NAME(m_filter[j].m_taps), j);
-		save_item(NAME(m_filter[j].m_delay_line), j);
+	// left, right
+	save_item(STRUCT_MEMBER(m_filter, m_tap_count));
+	save_item(STRUCT_MEMBER(m_filter, m_delay_pos));
+	save_item(STRUCT_MEMBER(m_filter, m_table_pos));
+	save_item(STRUCT_MEMBER(m_filter, m_taps));
+	save_item(STRUCT_MEMBER(m_filter, m_delay_line));
 
-		save_item(NAME(m_alt_filter[j].m_tap_count), j);
-		save_item(NAME(m_alt_filter[j].m_delay_pos), j);
-		save_item(NAME(m_alt_filter[j].m_table_pos), j);
-		save_item(NAME(m_alt_filter[j].m_taps), j);
-		save_item(NAME(m_alt_filter[j].m_delay_line), j);
+	save_item(STRUCT_MEMBER(m_alt_filter, m_tap_count));
+	save_item(STRUCT_MEMBER(m_alt_filter, m_delay_pos));
+	save_item(STRUCT_MEMBER(m_alt_filter, m_table_pos));
+	save_item(STRUCT_MEMBER(m_alt_filter, m_taps));
+	save_item(STRUCT_MEMBER(m_alt_filter, m_delay_line));
 
-		save_item(NAME(m_wet[j].m_delay), j);
-		save_item(NAME(m_wet[j].m_volume), j);
-		save_item(NAME(m_wet[j].m_write_pos), j);
-		save_item(NAME(m_wet[j].m_read_pos), j);
-		save_item(NAME(m_wet[j].m_delay_line), j);
+	save_item(STRUCT_MEMBER(m_wet, m_delay));
+	save_item(STRUCT_MEMBER(m_wet, m_volume));
+	save_item(STRUCT_MEMBER(m_wet, m_write_pos));
+	save_item(STRUCT_MEMBER(m_wet, m_read_pos));
+	save_item(STRUCT_MEMBER(m_wet, m_delay_line));
 
-		save_item(NAME(m_dry[j].m_delay), j);
-		save_item(NAME(m_dry[j].m_volume), j);
-		save_item(NAME(m_dry[j].m_write_pos), j);
-		save_item(NAME(m_dry[j].m_read_pos), j);
-		save_item(NAME(m_dry[j].m_delay_line), j);
-	}
+	save_item(STRUCT_MEMBER(m_dry, m_delay));
+	save_item(STRUCT_MEMBER(m_dry, m_volume));
+	save_item(STRUCT_MEMBER(m_dry, m_write_pos));
+	save_item(STRUCT_MEMBER(m_dry, m_read_pos));
+	save_item(STRUCT_MEMBER(m_dry, m_delay_line));
 
 	save_item(NAME(m_state));
 	save_item(NAME(m_next_state));
@@ -167,22 +161,18 @@ void qsound_hle_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void qsound_hle_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void qsound_hle_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	// Clear the buffers
-	std::fill_n(outputs[0], samples, 0);
-	std::fill_n(outputs[1], samples, 0);
-
-	for (int i = 0; i < samples; i ++)
+	for (int i = 0; i < outputs[0].samples(); i ++)
 	{
 		update_sample();
-		outputs[0][i] = m_out[0];
-		outputs[1][i] = m_out[1];
+		outputs[0].put_int(i, m_out[0], 32768);
+		outputs[1].put_int(i, m_out[1], 32768);
 	}
 }
 
 
-WRITE8_MEMBER(qsound_hle_device::qsound_w)
+void qsound_hle_device::qsound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -206,7 +196,7 @@ WRITE8_MEMBER(qsound_hle_device::qsound_w)
 }
 
 
-READ8_MEMBER(qsound_hle_device::qsound_r)
+uint8_t qsound_hle_device::qsound_r()
 {
 	// ready bit (0x00 = busy, 0x80 == ready)
 	m_stream->update();
@@ -426,7 +416,7 @@ int16_t qsound_hle_device::qsound_voice::update(qsound_hle_device &dsp, int32_t 
 	if ((new_phase >> 12) >= m_end_addr)
 		new_phase -= (m_loop_len << 12);
 
-	new_phase = std::min<int32_t>(std::max<int32_t>(new_phase, -0x8000000), 0x7FFFFFF);
+	new_phase = std::clamp<int32_t>(new_phase, -0x8000000, 0x7FFFFFF);
 	m_addr = new_phase >> 12;
 	m_phase = (new_phase << 4)&0xffff;
 
@@ -475,10 +465,10 @@ int16_t qsound_hle_device::qsound_adpcm::update(qsound_hle_device &dsp, int16_t 
 	if (step <= 0)
 		delta = -delta;
 	delta += curr_sample;
-	delta = std::min<int32_t>(std::max<int32_t>(delta, -32768), 32767);
+	delta = std::clamp<int32_t>(delta, -32768, 32767);
 
 	m_step_size = (dsp.read_dsp_rom(DATA_ADPCM_TAB + 8 + step) * m_step_size) >> 6;
-	m_step_size = std::min<int16_t>(std::max<int16_t>(m_step_size, 1), 2000);
+	m_step_size = std::clamp<int16_t>(m_step_size, 1, 2000);
 
 	return (delta * m_cur_vol) >> 16;
 }
@@ -514,7 +504,7 @@ void qsound_hle_device::state_normal_update()
 	else
 		m_echo.m_length = m_echo.m_end_pos - DELAY_BASE_OFFSET;
 
-	m_echo.m_length = std::min<int16_t>(std::max<int16_t>(m_echo.m_length, 0), 1024);
+	m_echo.m_length = std::clamp<int16_t>(m_echo.m_length, 0, 1024);
 
 	// update PCM voices
 	int32_t echo_input = 0;
@@ -544,8 +534,8 @@ void qsound_hle_device::state_normal_update()
 			wet -= (m_voice_output[i] * (int16_t)read_dsp_rom(pan_index + PAN_TABLE_WET));
 		}
 		// Saturate accumulated voices
-		dry = (std::min<int32_t>(std::max<int32_t>(dry, -0x1fffffff), 0x1fffffff)) << 2;
-		wet = (std::min<int32_t>(std::max<int32_t>(wet, -0x1fffffff), 0x1fffffff)) << 2;
+		dry = std::clamp<int32_t>(dry, -0x1fffffff, 0x1fffffff) << 2;
+		wet = std::clamp<int32_t>(wet, -0x1fffffff, 0x1fffffff) << 2;
 
 		// Apply FIR filter on 'wet' input
 		wet = m_filter[ch].apply(wet >> 16);
@@ -559,7 +549,7 @@ void qsound_hle_device::state_normal_update()
 
 		// DSP round function
 		output = (output + 0x2000) & ~0x3fff;
-		m_out[ch] = (std::min<int32_t>(std::max<int32_t>(output >> 14, -0x7fff), 0x7fff));
+		m_out[ch] = std::clamp<int32_t>(output >> 14, -0x7fff, 0x7fff);
 
 		if (m_delay_update)
 		{

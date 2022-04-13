@@ -49,14 +49,14 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	bitmap_ind16 m_sprite_bitmap;
-	uint8_t      m_flipscreen;
-	int        m_punch_through_pen;
-	uint8_t      m_irq_source;
+	bitmap_ind16 m_sprite_bitmap{};
+	uint8_t      m_flipscreen = 0U;
+	int        m_punch_through_pen = 0;
+	uint8_t      m_irq_source = 0U;
 
-	DECLARE_READ8_MEMBER(ikki_e000_r);
-	DECLARE_WRITE8_MEMBER(ikki_coin_counters);
-	DECLARE_WRITE8_MEMBER(ikki_scrn_ctrl_w);
+	uint8_t ikki_e000_r();
+	void ikki_coin_counters(uint8_t data);
+	void ikki_scrn_ctrl_w(uint8_t data);
 	void ikki_palette(palette_device &palette);
 	uint32_t screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ikki_irq);

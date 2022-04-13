@@ -18,32 +18,23 @@
 #include "screen.h"
 
 
-WRITE8_MEMBER( alesis_state::kb_matrix_w )
+void alesis_state::kb_matrix_w(uint8_t data)
 {
 	m_kb_matrix = data;
 }
 
-READ8_MEMBER( alesis_state::kb_r )
+uint8_t alesis_state::kb_r()
 {
 	uint8_t data = 0xff;
 
-	if (!(m_kb_matrix & 0x01))
-		data &= m_col1->read();
-	if (!(m_kb_matrix & 0x02))
-		data &= m_col2->read();
-	if (!(m_kb_matrix & 0x04))
-		data &= m_col3->read();
-	if (!(m_kb_matrix & 0x08))
-		data &= m_col4->read();
-	if (!(m_kb_matrix & 0x10))
-		data &= m_col5->read();
-	if (!(m_kb_matrix & 0x20))
-		data &= m_col6->read();
+	for (int i = 0; i < 6; i++)
+		if (!BIT(m_kb_matrix, i))
+			data &= m_col[i]->read();
 
 	return data;
 }
 
-WRITE8_MEMBER( alesis_state::led_w )
+void alesis_state::led_w(uint8_t data)
 {
 	m_patt_led      = BIT(data, 0) ? 1 : 0;
 	m_song_led      = BIT(data, 0) ? 0 : 1;
@@ -56,7 +47,7 @@ WRITE8_MEMBER( alesis_state::led_w )
 	m_midi_led      = BIT(data, 7) ? 0 : 1;
 }
 
-READ8_MEMBER( alesis_state::p3_r )
+uint8_t alesis_state::p3_r()
 {
 	uint8_t data = 0xff;
 
@@ -65,17 +56,17 @@ READ8_MEMBER( alesis_state::p3_r )
 	return data;
 }
 
-WRITE8_MEMBER( alesis_state::p3_w )
+void alesis_state::p3_w(uint8_t data)
 {
 	m_cassette->output(data & 0x04 ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( alesis_state::sr16_lcd_w )
+void alesis_state::sr16_lcd_w(uint8_t data)
 {
 	m_lcdc->write(BIT(m_kb_matrix,7), data);
 }
 
-WRITE8_MEMBER( alesis_state::mmt8_led_w )
+void alesis_state::mmt8_led_w(uint8_t data)
 {
 	m_play_led      = BIT(data, 0) ? 0 : 1;
 	m_record_led    = BIT(data, 1) ? 0 : 1;
@@ -88,18 +79,18 @@ WRITE8_MEMBER( alesis_state::mmt8_led_w )
 	m_leds = data;
 }
 
-READ8_MEMBER( alesis_state::mmt8_led_r )
+uint8_t alesis_state::mmt8_led_r()
 {
 	return m_leds;
 }
 
-WRITE8_MEMBER( alesis_state::track_led_w )
+void alesis_state::track_led_w(uint8_t data)
 {
 	for (int i=0; i < 8; i++)
 		m_track_led[i] = BIT(data, i);
 }
 
-READ8_MEMBER( alesis_state::mmt8_p3_r )
+uint8_t alesis_state::mmt8_p3_r()
 {
 	// ---- -x--   Tape in
 	// ---- x---   Start/Stop input
@@ -110,7 +101,7 @@ READ8_MEMBER( alesis_state::mmt8_p3_r )
 	return data;
 }
 
-WRITE8_MEMBER( alesis_state::mmt8_p3_w )
+void alesis_state::mmt8_p3_w(uint8_t data)
 {
 	// ---x ----   Tape out
 	// --x- ----   Click out
@@ -143,7 +134,7 @@ void alesis_state::sr16_mem(address_map &map)
 
 void alesis_state::sr16_io(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
+	//map.unmap_value_high();
 	map(0x0000, 0x0000).mirror(0xff).w("dm3ag", FUNC(alesis_dm3ag_device::write));
 	map(0x0200, 0x0200).mirror(0xff).w(FUNC(alesis_state::sr16_lcd_w));
 	map(0x0300, 0x0300).mirror(0xff).w(FUNC(alesis_state::kb_matrix_w));
@@ -338,6 +329,7 @@ void alesis_state::alesis_palette(palette_device &palette) const
 void alesis_state::machine_start()
 {
 	m_digit.resolve();
+	m_pattern.resolve();
 	m_track_led.resolve();
 	m_patt_led.resolve();
 	m_song_led.resolve();
@@ -411,13 +403,13 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 	if (line == 1 && pos >= 6 && pos < 8)  // last 2 characters of the second line are used to control the LCD symbols
 		update_lcd_symbols(bitmap, pos, y, x, state);
 	else if (pos < 8)
-		bitmap.pix16(line*9 + y, pos*6 + x) = state;
+		bitmap.pix(line*9 + y, pos*6 + x) = state;
 }
 
 void alesis_state::hr16(machine_config &config)
 {
 	/* basic machine hardware */
-	I8031(config, m_maincpu, 12_MHz_XTAL);
+	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::hr16_mem);
 	m_maincpu->set_addrmap(AS_IO, &alesis_state::hr16_io);
 	m_maincpu->port_in_cb<1>().set_ioport("SELECT");
@@ -465,7 +457,7 @@ void alesis_state::sr16(machine_config &config)
 	config.set_default_layout(layout_sr16);
 
 	m_lcdc->set_lcd_size(2, 8);
-	m_lcdc->set_pixel_update_cb(FUNC(alesis_state::sr16_pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(alesis_state::sr16_pixel_update));
 }
 
 void alesis_state::mmt8(machine_config &config)

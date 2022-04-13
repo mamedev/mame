@@ -18,6 +18,11 @@
 #include "vbiparse.h"
 #include "avhuff.h"
 
+#include <algorithm>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -53,49 +58,6 @@ enum laserdisc_field_code
 #define GENERIC_SPINUP_TIME         (attotime::from_seconds(2))
 #define GENERIC_LOAD_TIME           (attotime::from_seconds(5))
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_GET_DISC(_func) \
-	downcast<laserdisc_device &>(*device).set_get_disc(_func);
-#define MCFG_LASERDISC_AUDIO(_func) \
-	downcast<laserdisc_device &>(*device).set_audio(_func);
-#define MCFG_LASERDISC_SCREEN(_tag) \
-	downcast<laserdisc_device &>(*device).set_screen(_tag);
-#define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \
-	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, &_class::_method, #_class "::" #_method);
-#define MCFG_LASERDISC_OVERLAY_DEVICE(_width, _height, _device, _class, _method) \
-	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, _device, &_class::_method, #_class "::" #_method);
-#define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
-	downcast<laserdisc_device &>(*device).set_overlay_clip(_minx, _maxx, _miny, _maxy);
-#define MCFG_LASERDISC_OVERLAY_POSITION(_posx, _posy) \
-	downcast<laserdisc_device &>(*device).set_overlay_position(_posx, _posy);
-#define MCFG_LASERDISC_OVERLAY_SCALE(_scalex, _scaley) \
-	downcast<laserdisc_device &>(*device).set_overlay_scale(_scalex, _scaley);
-#define MCFG_LASERDISC_OVERLAY_PALETTE(_palette_tag) \
-	downcast<laserdisc_device &>(*device).set_overlay_palette(_palette_tag);
-
-// use these to add laserdisc screens with proper video update parameters
-// TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header
-// TODO: someday we'll kill the pixel clock hack ...
-#define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _ldtag) \
-	MCFG_DEVICE_MODIFY(_ldtag) \
-	downcast<laserdisc_device &>(*device).set_screen(_tag); \
-	MCFG_SCREEN_ADD(_tag, RASTER) \
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524) \
-	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
-
-#define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _ldtag) \
-	MCFG_DEVICE_MODIFY(_ldtag) \
-	downcast<laserdisc_device &>(*device).set_screen(_tag); \
-	MCFG_SCREEN_ADD(_tag, RASTER) \
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470)*2, 1135, 0, 768, 625, 48, 624) \
-	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 
 
 //**************************************************************************
@@ -136,13 +98,16 @@ protected:
 
 public:
 	// delegates
-	typedef delegate<chd_file *(laserdisc_device &device)> get_disc_delegate;
-	typedef delegate<void (laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> audio_delegate;
-
+	typedef device_delegate<chd_file *(void)> get_disc_delegate;
+	typedef device_delegate<void (int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> audio_delegate;
 
 	laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// reset line control
+	// use these to add laserdisc screens with proper video update parameters
+	// TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header
+	// TODO: someday we'll kill the pixel clock hack ...
+	void add_ntsc_screen(machine_config &config, const char *tag);
+	void add_pal_screen(machine_config &config, const char *tag);
 
 	// core control and status
 	bool video_active() { return (!m_videosquelch && current_frame().m_numfields >= 2); }
@@ -157,49 +122,20 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// configuration
-	bool overlay_configured() const { return (m_overwidth > 0 && m_overheight > 0 && (!m_overupdate_ind16.isnull() || !m_overupdate_rgb32.isnull())); }
+	bool overlay_configured() const { return (m_overwidth > 0 && m_overheight > 0 && (!m_overupdate_rgb32.isnull())); }
 	void get_overlay_config(laserdisc_overlay_config &config) { config = static_cast<laserdisc_overlay_config &>(*this); }
 	void set_overlay_config(const laserdisc_overlay_config &config) { static_cast<laserdisc_overlay_config &>(*this) = config; }
 
 	// configuration helpers
-	void set_get_disc(get_disc_delegate &&callback) { m_getdisc_callback = std::move(callback); }
-	void set_audio(audio_delegate &&callback) { m_audio_callback = std::move(callback); }
-	template <class FunctionClass>
-	// FIXME: these should be aware of current device for resolving the tag
-	void set_overlay(uint32_t width, uint32_t height, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
-	{
-		set_overlay(width, height, screen_update_ind16_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_overlay(uint32_t width, uint32_t height, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
-	{
-		set_overlay(width, height, screen_update_rgb32_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_overlay(uint32_t width, uint32_t height, const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
-	{
-		set_overlay(width, height, screen_update_ind16_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_overlay(uint32_t width, uint32_t height, const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
-	{
-		set_overlay(width, height, screen_update_rgb32_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_overlay(uint32_t width, uint32_t height, screen_update_ind16_delegate &&update)
+	template <typename... T> void set_get_disc(T &&... args) { m_getdisc_callback.set(std::forward<T>(args)...); }
+	template <typename... T> void set_audio(T &&... args) { m_audio_callback.set(std::forward<T>(args)...); }
+	template <typename... T>
+	void set_overlay(uint32_t width, uint32_t height, T &&... args)
 	{
 		m_overwidth = width;
 		m_overheight = height;
 		m_overclip.set(0, width - 1, 0, height - 1);
-		m_overupdate_ind16 = std::move(update);
-		m_overupdate_rgb32 = screen_update_rgb32_delegate();
-	}
-	void set_overlay(uint32_t width, uint32_t height, screen_update_rgb32_delegate &&update)
-	{
-		m_overwidth = width;
-		m_overheight = height;
-		m_overclip.set(0, width - 1, 0, height - 1);
-		m_overupdate_ind16 = screen_update_ind16_delegate();
-		m_overupdate_rgb32 = std::move(update);
+		m_overupdate_rgb32.set(std::forward<T>(args)...);
 	}
 	void set_overlay_clip(int32_t minx, int32_t maxx, int32_t miny, int32_t maxy) { m_overclip.set(minx, maxx, miny, maxy); }
 	void set_overlay_position(float posx, float posy)
@@ -212,7 +148,6 @@ public:
 		m_orig_config.m_overscalex = m_overscalex = scalex;
 		m_orig_config.m_overscaley = m_overscaley = scaley;
 	}
-	template <typename T> void set_overlay_palette(T &&tag) { m_overlay_palette.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// timer IDs
@@ -223,7 +158,7 @@ protected:
 	};
 
 	// common laserdisc states
-	enum player_state
+	enum player_state : uint32_t
 	{
 		LDSTATE_NONE,                           // unspecified state
 		LDSTATE_EJECTING,                       // in the process of ejecting
@@ -255,7 +190,7 @@ protected:
 	};
 
 	// slider position
-	enum slider_position
+	enum slider_position : uint32_t
 	{
 		SLIDER_MINIMUM,                         // at the minimum value
 		SLIDER_VIRTUAL_LEADIN,                  // within the virtual lead-in area
@@ -269,8 +204,8 @@ protected:
 	struct player_state_info
 	{
 		player_state    m_state;                // current state
-		int32_t           m_substate;             // internal sub-state; starts at 0 on any state change
-		int32_t           m_param;                // parameter for current state
+		int32_t         m_substate;             // internal sub-state; starts at 0 on any state change
+		int32_t         m_param;                // parameter for current state
 		attotime        m_endtime;              // minimum ending time for current state
 	};
 
@@ -283,11 +218,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// subclass helpers
 	void set_audio_squelch(bool squelchleft, bool squelchright) { m_stream->update(); m_audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0); }
@@ -298,6 +233,7 @@ protected:
 	int32_t generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &curstate);
 
 	// general helpers
+	bool is_cav_disc() const { return m_is_cav_disc; }
 	bool is_start_of_frame(const vbi_metadata &vbi);
 	int frame_from_metadata(const vbi_metadata &metadata);
 	int chapter_from_metadata(const vbi_metadata &metadata);
@@ -311,8 +247,8 @@ private:
 	{
 		bitmap_yuy16        m_bitmap;               // cached bitmap
 		bitmap_yuy16        m_visbitmap;            // wrapper around bitmap with only visible lines
-		uint8_t               m_numfields;            // number of fields in this frame
-		int32_t               m_lastfield;            // last absolute field number
+		uint8_t             m_numfields;            // number of fields in this frame
+		int32_t             m_lastfield;            // last absolute field number
 	};
 
 	// internal helpers
@@ -327,56 +263,57 @@ private:
 	void read_track_data();
 	static void *read_async_static(void *param, int threadid);
 	void process_track_data();
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// configuration
 	get_disc_delegate m_getdisc_callback;
 	audio_delegate m_audio_callback;  // audio streaming callback
 	laserdisc_overlay_config m_orig_config;     // original overlay configuration
-	uint32_t              m_overwidth;            // overlay screen width
-	uint32_t              m_overheight;           // overlay screen height
+	uint32_t            m_overwidth;            // overlay screen width
+	uint32_t            m_overheight;           // overlay screen height
 	rectangle           m_overclip;             // overlay visarea
-	screen_update_ind16_delegate m_overupdate_ind16; // overlay update delegate
 	screen_update_rgb32_delegate m_overupdate_rgb32; // overlay update delegate
 
 	// disc parameters
 	chd_file *          m_disc;                 // handle to the disc itself
-	std::vector<uint8_t>      m_vbidata;              // pointer to precomputed VBI data
+	std::vector<uint8_t> m_vbidata;             // pointer to precomputed VBI data
+	bool                m_is_cav_disc;          // precomputed check if the mounted disc is CAV
 	int                 m_width;                // width of video
 	int                 m_height;               // height of video
-	uint32_t              m_fps_times_1million;   // frame rate of video
+	uint32_t            m_fps_times_1million;   // frame rate of video
 	int                 m_samplerate;           // audio samplerate
-	int                 m_readresult;           // result of the most recent read
-	uint32_t              m_chdtracks;            // number of tracks in the CHD
-	avhuff_decompress_config m_avhuff_config;   // decompression configuration
+	std::error_condition m_readresult;          // result of the most recent read
+	uint32_t            m_chdtracks;            // number of tracks in the CHD
+	bitmap_yuy16        m_avhuff_video;         // decompresed frame buffer
+	avhuff_decoder::config m_avhuff_config;     // decompression configuration
 
 	// async operations
 	osd_work_queue *    m_work_queue;           // work queue
-	uint32_t              m_queued_hunknum;       // queued hunk
+	uint32_t            m_queued_hunknum;       // queued hunk
 
 	// core states
-	uint8_t               m_audiosquelch;         // audio squelch state: bit 0 = audio 1, bit 1 = audio 2
-	uint8_t               m_videosquelch;         // video squelch state: bit 0 = on/off
-	uint8_t               m_fieldnum;             // field number (0 or 1)
-	int32_t               m_curtrack;             // current track at this end of this vsync
-	uint32_t              m_maxtrack;             // maximum track number
+	uint8_t             m_audiosquelch;         // audio squelch state: bit 0 = audio 1, bit 1 = audio 2
+	uint8_t             m_videosquelch;         // video squelch state: bit 0 = on/off
+	uint8_t             m_fieldnum;             // field number (0 or 1)
+	int32_t             m_curtrack;             // current track at this end of this vsync
+	uint32_t            m_maxtrack;             // maximum track number
 	attoseconds_t       m_attospertrack;        // attoseconds per track, or 0 if not moving
 	attotime            m_sliderupdate;         // time of last slider update
 
 	// video data
 	frame_data          m_frame[3];             // circular list of frames
-	uint8_t               m_videoindex;           // index of the current video buffer
+	uint8_t             m_videoindex;           // index of the current video buffer
 	bitmap_yuy16        m_emptyframe;           // blank frame
 
 	// audio data
 	sound_stream *      m_stream;
 	std::vector<int16_t>       m_audiobuffer[2];       // buffer for audio samples
-	uint32_t              m_audiobufsize;         // size of buffer
-	uint32_t              m_audiobufin;           // input index
-	uint32_t              m_audiobufout;          // output index
-	uint32_t              m_audiocursamples;      // current samples this track
-	uint32_t              m_audiomaxsamples;      // maximum samples per track
+	uint32_t            m_audiobufsize;         // size of buffer
+	uint32_t            m_audiobufin;           // input index
+	uint32_t            m_audiobufout;          // output index
+	uint32_t            m_audiocursamples;      // current samples this track
+	uint32_t            m_audiomaxsamples;      // maximum samples per track
 
 	// metadata
 	vbi_metadata        m_metadata[2];          // metadata parsed from the stream, for each field
@@ -391,11 +328,10 @@ private:
 	screen_bitmap       m_overbitmap[2];        // overlay bitmaps
 	int                 m_overindex;            // index of the overlay bitmap
 	render_texture *    m_overtex;              // texture for the overlay
-	optional_device<palette_device> m_overlay_palette; // overlay screen palette
 };
 
 // iterator - interface iterator works for subclasses too
-typedef device_interface_iterator<laserdisc_device> laserdisc_device_iterator;
+typedef device_interface_enumerator<laserdisc_device> laserdisc_device_enumerator;
 
 
 

@@ -35,7 +35,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8257.h"
 #include "sound/spkrdev.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -121,23 +121,23 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
 	/* Parallel port */
-	DECLARE_READ8_MEMBER(ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	uint8_t ppi_portb_r();
+	void ppi_portc_w(uint8_t data);
 
 	/* DMA controller */
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
-	DECLARE_WRITE8_MEMBER(dma_segment_w);
-	DECLARE_READ8_MEMBER(dma_memory_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_memory_write_byte);
-	DECLARE_READ8_MEMBER( io_dack0_r )  { uint8_t tmp = m_isabus->dack_r(0); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack1_r )  { uint8_t tmp = m_isabus->dack_r(1); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack2_r )  { uint8_t tmp = m_isabus->dack_r(2); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack3_r )  { uint8_t tmp = m_isabus->dack_r(3); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_WRITE8_MEMBER( io_dack0_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(0,data); }
-	DECLARE_WRITE8_MEMBER( io_dack1_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(1,data); }
-	DECLARE_WRITE8_MEMBER( io_dack2_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(2,data); }
-	DECLARE_WRITE8_MEMBER( io_dack3_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(3,data); }
+	void dma_segment_w(uint8_t data);
+	uint8_t dma_memory_read_byte(offs_t offset);
+	void dma_memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_dack0_r()  { uint8_t tmp = m_isabus->dack_r(0); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	uint8_t io_dack1_r()  { uint8_t tmp = m_isabus->dack_r(1); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	uint8_t io_dack2_r()  { uint8_t tmp = m_isabus->dack_r(2); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	uint8_t io_dack3_r()  { uint8_t tmp = m_isabus->dack_r(3); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	void io_dack0_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(0,data); }
+	void io_dack1_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(1,data); }
+	void io_dack2_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(2,data); }
+	void io_dack3_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(3,data); }
 	DECLARE_WRITE_LINE_MEMBER( dack0_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( dack1_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(1, state); }
 	DECLARE_WRITE_LINE_MEMBER( dack2_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(2, state); }
@@ -160,14 +160,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
 
 	/* Keyboard */
-	DECLARE_READ8_MEMBER(myb3k_kbd_r);
+	uint8_t myb3k_kbd_r();
 	void kbd_set_data_and_interrupt(u8 data);
 
 	/* Video Controller */
-	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
+	void myb3k_video_mode_w(uint8_t data);
 
 	/* Status bits */
-	DECLARE_READ8_MEMBER(myb3k_io_status_r);
+	uint8_t myb3k_io_status_r();
 
 	void myb3k_io(address_map &map);
 	void myb3k_map(address_map &map);
@@ -209,7 +209,7 @@ private:
 	{
 		TIMER_ID_KEY_INTERRUPT
 	};
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	/* Status bits */
 	enum
@@ -228,7 +228,7 @@ private:
 	required_device<i8257_device> m_dma8257;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<myb3k_keyboard_device> m_kb;
-	required_device<h46505_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<isa8_device> m_isabus;
 	optional_device<centronics_device> m_centronics;
@@ -251,18 +251,18 @@ private:
 	int8_t m_io_status;
 };
 
-READ8_MEMBER(myb3k_state::myb3k_io_status_r)
+uint8_t myb3k_state::myb3k_io_status_r()
 {
 	LOGCENT("%s\n", FUNCNAME);
 	return m_io_status & 0x0f;
 }
 
-READ8_MEMBER( myb3k_state::myb3k_kbd_r )
+uint8_t myb3k_state::myb3k_kbd_r()
 {
 	LOGKBD("%s: %02x\n", FUNCNAME, m_kbd_data);
 
 	/* IN from port 0x04 enables a 74LS244 buffer that
-	   presents to the CPU the parallell bits from the 74LS164
+	   presents to the CPU the parallel bits from the 74LS164
 	   serial to parallel converter.*/
 	m_pic8259->ir1_w(CLEAR_LINE);
 	return m_kbd_data;
@@ -281,7 +281,7 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 	timer_set(attotime::from_msec(1), TIMER_ID_KEY_INTERRUPT);
 }
 
-void myb3k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void myb3k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -305,7 +305,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 		{
 			for (int pxl = 0; pxl < 8; pxl++)
 			{
-				bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+				bitmap.pix(y, ( x_pos * 8) + pxl) = rgb_t::black();
 			}
 		}
 		else
@@ -332,7 +332,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						//pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 						/* Create the grey scale */
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 					}
 				}
 				break;
@@ -372,7 +372,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 						/* Pick up the color */
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 					}
 				}
 				break;
@@ -394,11 +394,11 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 					{
 						if ((pdat & (0x80 >> pxl)) != 0)
 						{
-							bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
+							bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
 						}
 						else
 						{
-							bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+							bitmap.pix(y, ( x_pos * 8) + pxl) = rgb_t::black();
 						}
 					}
 				}
@@ -439,7 +439,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
  *  char  40  40  80  80  40  40  80  40  40
  */
 
-WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
+void myb3k_state::myb3k_video_mode_w(uint8_t data)
 {
 	LOG("%s: %02x\n", FUNCNAME, data);
 	LOGVMOD("Video Mode %02x\n", data);
@@ -566,7 +566,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 void myb3k_state::myb3k_map(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM installed by machine_start()
+	//map(0x00000,0x3ffff).ram(); // It's either 128Kb or 256Kb RAM installed by machine_start()
 	map(0x40000, 0x7ffff).noprw();
 	map(0x80000, 0xcffff).noprw(); // Expansion Unit connected through an ISA8 cable
 	map(0xd0000, 0xeffff).ram().share("vram");  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
@@ -597,8 +597,8 @@ void myb3k_state::myb3k_io(address_map &map)
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 
 	// 1c-1d HD46505S CRTC
-	map(0x1c, 0x1c).rw(m_crtc, FUNC(h46505_device::status_r), FUNC(h46505_device::address_w));
-	map(0x1d, 0x1d).rw(m_crtc, FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
+	map(0x1c, 0x1c).rw(m_crtc, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
+	map(0x1d, 0x1d).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 
 	/* Expansion Unit 0x800 - 0xfff */
 }
@@ -798,7 +798,7 @@ WRITE_LINE_MEMBER( myb3k_state::pit_out1_changed )
 	m_speaker->level_w(state ? 1 : 0);
 }
 
-WRITE8_MEMBER(myb3k_state::dma_segment_w)
+void myb3k_state::dma_segment_w(uint8_t data)
 {
 	LOGDMA("%s: %02x\n", FUNCNAME, data);
 	m_dma_page[(data >> 6) & 3] = (data & 0x0f);
@@ -815,7 +815,7 @@ WRITE_LINE_MEMBER(myb3k_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(myb3k_state::dma_memory_read_byte)
+uint8_t myb3k_state::dma_memory_read_byte(offs_t offset)
 {
 	assert(m_dma_channel != -1);
 
@@ -826,7 +826,7 @@ READ8_MEMBER(myb3k_state::dma_memory_read_byte)
 	return tmp;
 }
 
-WRITE8_MEMBER(myb3k_state::dma_memory_write_byte)
+void myb3k_state::dma_memory_write_byte(offs_t offset, uint8_t data)
 {
 	assert(m_dma_channel != -1);
 
@@ -836,14 +836,14 @@ WRITE8_MEMBER(myb3k_state::dma_memory_write_byte)
 	return prog_space.write_byte(offset |  m_dma_page[m_dma_channel & 3] << 16, data);
 }
 
-READ8_MEMBER( myb3k_state::ppi_portb_r )
+uint8_t myb3k_state::ppi_portb_r()
 {
 	LOGPPI("%s\n", FUNCNAME);
 
 	return m_io_dsw1->read();
 }
 
-WRITE8_MEMBER( myb3k_state::ppi_portc_w )
+void myb3k_state::ppi_portc_w(uint8_t data)
 {
 	LOGPPI("%s: %02x\n", FUNCNAME, data);
 	LOGPPI(" - STROBE : %d\n", (data & PC0_STROBE)  ? 1 : 0);
@@ -928,6 +928,7 @@ static void stepone_isa_cards(device_slot_interface &device)
 	device.option_add("myb3k_com", ISA8_MYB3K_COM);
 	device.option_add("myb3k_fdc4710", ISA8_MYB3K_FDC4710);
 	device.option_add("myb3k_fdc4711", ISA8_MYB3K_FDC4711);
+	device.option_add("myb3k_fdc4712", ISA8_MYB3K_FDC4712);
 }
 
 void myb3k_state::myb3k(machine_config &config)
@@ -947,7 +948,7 @@ void myb3k_state::myb3k(machine_config &config)
 
 	/* Parallel port */
 	I8255A(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi8255->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_ppi8255->in_pb_callback().set(FUNC(myb3k_state::ppi_portb_r));
 	m_ppi8255->out_pc_callback().set(FUNC(myb3k_state::ppi_portc_w));
 
@@ -980,11 +981,11 @@ void myb3k_state::myb3k(machine_config &config)
 	// m_pit8253->out_handler<2>().set(FUNC(myb3k_state::pit_out2_changed));
 
 	/* Video controller */
-	H46505(config, m_crtc, XTAL(14'318'181) / 16); /* Main crystal divided by 16 through a 74163 4 bit counter */
+	HD6845S(config, m_crtc, XTAL(14'318'181) / 16); /* Main crystal divided by 16 through a 74163 4 bit counter */
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(myb3k_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(myb3k_state::crtc_update_row));
 
 	/* ISA8+ Expansion bus */
 	ISA8(config, m_isabus, 0);
@@ -1027,7 +1028,7 @@ void myb3k_state::myb3k(machine_config &config)
 	/* Monitor */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(14'318'181) / 3, 600, 0, 600, 400, 0, 400);
-	m_screen->set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 }
 
 void myb3k_state::jb3000(machine_config &config)
@@ -1036,6 +1037,9 @@ void myb3k_state::jb3000(machine_config &config)
 	/* Keyboard */
 	JB3000_KEYBOARD(config.replace(), m_kb, 0);
 	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
+
+	/* software lists */
+	SOFTWARE_LIST(config, "flop_list").set_original("jb3000_flop");
 }
 
 void myb3k_state::stepone(machine_config &config)
@@ -1059,7 +1063,7 @@ ROM_END
 ROM_START( jb3000 )
 	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "jb3000chrg-v2.07.bin", 0xc000, 0x2000, CRC(efffe4cb) SHA1(1305d1fb0bc39b6464f4e2f000a584f9e67f784a))
-	ROM_LOAD( "jb3000bios-v2.07.bin", 0xe000, 0x2000, CRC(c4c46cc5) SHA1(a3e186513fbe9ad0e369b481999393a3506db39e))
+	ROM_LOAD( "jb3000bios-v2.07.bin", 0xe000, 0x2000, CRC(c4c46cc5) SHA1(a3e186513fbe9ad0e369b481999393a3506db39e)) // Verified to be identical to the original myb3k BIOS
 ROM_END
 
 ROM_START( stepone )

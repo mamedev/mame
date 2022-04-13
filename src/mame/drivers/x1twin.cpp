@@ -4,7 +4,7 @@
 
     Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
 
-    Both systems doesn't interact at all, according to info on the net they just shares the
+    Both systems don't interact at all, according to info on the net they just share the
     same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
 
     TODO:
@@ -18,11 +18,13 @@
 #include "includes/x1.h"
 #include "includes/pce.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
+
+namespace {
 
 class x1twin_state : public x1_state
 {
@@ -99,7 +101,7 @@ INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 	//anything else?
 }
 
-/* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
+/* Apparently most games don't support this (not even the Konami ones!), one that does is...177 :o */
 INPUT_CHANGED_MEMBER(x1twin_state::nmi_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -436,7 +438,6 @@ void x1twin_state::x1twin(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
 	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
-	MCFG_MACHINE_START_OVERRIDE(x1twin_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
@@ -466,7 +467,7 @@ void x1twin_state::x1twin(machine_config &config)
 	pce_screen.set_raw(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242);
 	pce_screen.set_screen_update(FUNC(x1twin_state::screen_update_x1pce));
 
-	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	HD6845S(config, m_crtc, (VDP_CLOCK/48)); //unknown divider (TODO: verify chip type)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -474,8 +475,6 @@ void x1twin_state::x1twin(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK, 0x10+0x1000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
-
-	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
 	MB8877(config, m_fdc, MAIN_CLOCK / 16);
 	// TODO: guesswork, try to implicitly start the motor
@@ -506,11 +505,11 @@ void x1twin_state::x1twin(machine_config &config)
 	ay.add_route(0, "x1_r", 0.25);
 	ay.add_route(1, "x1_l", 0.5);
 	ay.add_route(2, "x1_r", 0.5);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 	m_cassette->set_interface("x1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
@@ -543,11 +542,14 @@ ROM_START( x1twin )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF) // these comes from x1 turbo
+	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF) // these come from x1 turbo
 	ROM_LOAD("kanji4.rom", 0x00000, 0x8000, BAD_DUMP CRC(3e39de89) SHA1(d3fd24892bb1948c4697dedf5ff065ff3eaf7562) )
 	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, BAD_DUMP CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
 	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, BAD_DUMP CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
+
+} // Anonymous namespace
+
 
 COMP( 1986, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )

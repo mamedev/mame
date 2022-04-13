@@ -87,20 +87,17 @@ class mos6560_device : public device_t,
 public:
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_potx_rd_callback(Object &&cb) { return m_read_potx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_poty_rd_callback(Object &&cb) { return m_read_poty.set_callback(std::forward<Object>(cb)); }
-
 	auto potx_rd_callback() { return m_read_potx.bind(); }
 	auto poty_rd_callback() { return m_read_poty.bind(); }
 
 	virtual space_config_vector memory_space_config() const override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t bus_r();
 
-	DECLARE_WRITE_LINE_MEMBER( lp_w );
+	void lp_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -124,10 +121,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	inline uint8_t read_videoram(offs_t offset);
 	inline uint8_t read_colorram(offs_t offset);
@@ -179,8 +176,8 @@ protected:
 	m_noisesamples;   /* count of samples to give out per tone */
 
 	sound_stream *m_channel;
-	std::unique_ptr<int16_t[]> m_tone;
-	std::unique_ptr<int8_t[]> m_noise;
+	std::unique_ptr<int16_t []> m_tone;
+	std::unique_ptr<int8_t []> m_noise;
 
 	emu_timer *m_line_timer;
 };

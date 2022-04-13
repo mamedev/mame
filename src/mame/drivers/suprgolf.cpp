@@ -13,7 +13,7 @@
    trees (zooming?)
  - not sure if the analog inputs are handled correctly;
  - Fix the framebuffer display in cocktail mode;
- - Albatross: bad graphics, caused by missing rom(s).
+ - Albatross: controls.
 
  Notes:
  - The game uses special control panel with 1 golf club shaped device to select shot
@@ -25,12 +25,15 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
 
 class suprgolf_state : public driver_device
 {
@@ -48,6 +51,11 @@ public:
 
 	void init_suprgolf();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
@@ -56,44 +64,40 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	std::unique_ptr<uint8_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_bg_vram;
 	std::unique_ptr<uint16_t[]> m_bg_fb;
 	std::unique_ptr<uint16_t[]> m_fg_fb;
-	uint8_t m_rom_bank;
-	uint8_t m_bg_bank;
-	uint8_t m_vreg_bank;
-	uint8_t m_msm5205next;
-	uint8_t m_msm_nmi_mask;
-	uint8_t m_vreg_pen;
-	uint8_t m_palette_switch;
-	uint8_t m_bg_vreg_test;
-	uint8_t m_toggle;
+	uint8_t m_rom_bank = 0;
+	uint8_t m_bg_bank = 0;
+	uint8_t m_vreg_bank = 0;
+	uint8_t m_msm5205next = 0;
+	uint8_t m_msm_nmi_mask = 0;
+	uint8_t m_vreg_pen = 0;
+	uint8_t m_palette_switch = 0;
+	uint8_t m_bg_vreg_test = 0;
+	uint8_t m_toggle = 0;
 
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(bg_vram_r);
-	DECLARE_WRITE8_MEMBER(bg_vram_w);
-	DECLARE_WRITE8_MEMBER(pen_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(rom2_bank_select_w);
-	DECLARE_READ8_MEMBER(vregs_r);
-	DECLARE_WRITE8_MEMBER(vregs_w);
-	DECLARE_READ8_MEMBER(rom_bank_select_r);
-	DECLARE_WRITE8_MEMBER(rom_bank_select_w);
-	DECLARE_READ8_MEMBER(pedal_extra_bits_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(writeA);
-	DECLARE_WRITE8_MEMBER(writeB);
+	uint8_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t bg_vram_r(offs_t offset);
+	void bg_vram_w(offs_t offset, uint8_t data);
+	void pen_w(uint8_t data);
+	void adpcm_data_w(uint8_t data);
+	void rom2_bank_select_w(uint8_t data);
+	uint8_t vregs_r();
+	void vregs_w(uint8_t data);
+	uint8_t rom_bank_select_r();
+	void rom_bank_select_w(uint8_t data);
+	uint8_t pedal_extra_bits_r();
+	uint8_t p1_r();
+	uint8_t p2_r();
+	void writeA(uint8_t data);
+	void writeB(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map);
@@ -105,7 +109,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 	int code = m_videoram[tile_index*2]+256*(m_videoram[tile_index*2+1]);
 	int color = m_videoram[tile_index*2+0x800] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code,
 		color,
 		0);
@@ -113,7 +117,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 
 void suprgolf_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprgolf_state::get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_paletteram = std::make_unique<uint8_t[]>(0x1000);
 	m_bg_vram = std::make_unique<uint8_t[]>(0x2000*0x20);
 	m_bg_fb = std::make_unique<uint16_t[]>(0x2000*0x20);
@@ -134,40 +138,35 @@ void suprgolf_state::video_start()
 
 uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count,color;
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
+	int count = 0;
+
+	for(int y=0;y<256;y++)
 	{
-		count = 0;
-
-		for(y=0;y<256;y++)
+		for(int x=0;x<512;x++)
 		{
-			for(x=0;x<512;x++)
-			{
-				color = m_bg_fb[count];
+			int const color = m_bg_fb[count];
 
-				if(x <= cliprect.max_x && y <= cliprect.max_y)
-					bitmap.pix16(y, x) = m_palette->pen((color & 0x7ff));
+			if(x <= cliprect.max_x && y <= cliprect.max_y)
+				bitmap.pix(y, x) = m_palette->pen((color & 0x7ff));
 
-				count++;
-			}
+			count++;
 		}
 	}
 
+	count = 0;
+
+	for(int y=0;y<256;y++)
 	{
-		count = 0;
-
-		for(y=0;y<256;y++)
+		for(int x=0;x<512;x++)
 		{
-			for(x=0;x<512;x++)
-			{
-				color = m_fg_fb[count];
+			int const color = m_fg_fb[count];
 
-				if(((m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
-					bitmap.pix16(y, x) = m_palette->pen((color & 0x7ff));
+			if(((m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
+				bitmap.pix(y, x) = m_palette->pen((color & 0x7ff));
 
-				count++;
-			}
+			count++;
 		}
 	}
 
@@ -176,7 +175,7 @@ uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER(suprgolf_state::videoram_r)
+uint8_t suprgolf_state::videoram_r(offs_t offset)
 {
 	if (m_palette_switch)
 		return m_paletteram[offset];
@@ -184,7 +183,7 @@ READ8_MEMBER(suprgolf_state::videoram_r)
 		return m_videoram[offset];
 }
 
-WRITE8_MEMBER(suprgolf_state::videoram_w)
+void suprgolf_state::videoram_w(offs_t offset, uint8_t data)
 {
 	if(m_palette_switch)
 	{
@@ -206,12 +205,12 @@ WRITE8_MEMBER(suprgolf_state::videoram_w)
 	}
 }
 
-READ8_MEMBER(suprgolf_state::vregs_r)
+uint8_t suprgolf_state::vregs_r()
 {
 	return m_vreg_bank;
 }
 
-WRITE8_MEMBER(suprgolf_state::vregs_w)
+void suprgolf_state::vregs_w(uint8_t data)
 {
 	//printf("%02x\n",data);
 
@@ -226,12 +225,12 @@ WRITE8_MEMBER(suprgolf_state::vregs_w)
 	//  printf("Video regs with data %02x activated\n",data);
 }
 
-READ8_MEMBER(suprgolf_state::bg_vram_r)
+uint8_t suprgolf_state::bg_vram_r(offs_t offset)
 {
 	return m_bg_vram[offset+m_bg_bank*0x2000];
 }
 
-WRITE8_MEMBER(suprgolf_state::bg_vram_w)
+void suprgolf_state::bg_vram_w(offs_t offset, uint8_t data)
 {
 	uint8_t hi_nibble,lo_nibble;
 	uint8_t hi_dirty_dot,lo_dirty_dot; // helpers
@@ -287,22 +286,22 @@ void suprgolf_state::machine_start()
 	save_item(NAME(m_toggle));
 }
 
-WRITE8_MEMBER(suprgolf_state::pen_w)
+void suprgolf_state::pen_w(uint8_t data)
 {
 	m_vreg_pen = data;
 }
 
-WRITE8_MEMBER(suprgolf_state::adpcm_data_w)
+void suprgolf_state::adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
 
-READ8_MEMBER(suprgolf_state::rom_bank_select_r)
+uint8_t suprgolf_state::rom_bank_select_r()
 {
 	return m_rom_bank;
 }
 
-WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
+void suprgolf_state::rom_bank_select_w(uint8_t data)
 {
 	m_rom_bank = data;
 
@@ -314,7 +313,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 	flip_screen_set(data & 0x80);
 }
 
-WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
+void suprgolf_state::rom2_bank_select_w(uint8_t data)
 {
 	//osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,m_maincpu->pcbase());
 	membank("bank1")->set_entry(data & 0x0f);
@@ -323,7 +322,7 @@ WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
-READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
+uint8_t suprgolf_state::pedal_extra_bits_r()
 {
 	uint8_t p1_sht_sw,p2_sht_sw;
 
@@ -333,12 +332,12 @@ READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
 	return p1_sht_sw | p2_sht_sw;
 }
 
-READ8_MEMBER(suprgolf_state::p1_r)
+uint8_t suprgolf_state::p1_r()
 {
 	return (ioport("P1")->read() & 0xf0) | ((ioport("P1_ANALOG")->read() & 0xf));
 }
 
-READ8_MEMBER(suprgolf_state::p2_r)
+uint8_t suprgolf_state::p2_r()
 {
 	return (ioport("P2")->read() & 0xf0) | ((ioport("P2_ANALOG")->read() & 0xf));
 }
@@ -449,12 +448,12 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(suprgolf_state::writeA)
+void suprgolf_state::writeA(uint8_t data)
 {
 	osd_printf_debug("ymwA\n");
 }
 
-WRITE8_MEMBER(suprgolf_state::writeB)
+void suprgolf_state::writeB(uint8_t data)
 {
 	osd_printf_debug("ymwA\n");
 }
@@ -465,28 +464,17 @@ WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		m_msm->write_data((m_msm5205next & 0xf0) >> 4);
+		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
 		if(m_msm_nmi_mask) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	}
 	else
 	{
-		m_msm->write_data((m_msm5205next & 0x0f) >> 0);
+		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
 	}
 }
 
-static const gfx_layout gfxlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
-};
-
 static GFXDECODE_START( gfx_suprgolf )
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0, 0x80 )
 GFXDECODE_END
 
 void suprgolf_state::machine_reset()
@@ -660,15 +648,18 @@ ROM_START( albatross )
 	ROM_LOAD( "map.4a",       0x0b0000, 0x010000, CRC(cfec1a0f) SHA1(c09ece059cb3c456b66c016c6fab3139d3f61c6a) )
 
 	ROM_REGION( 0x100000, "user2", ROMREGION_ERASEFF )
-	ROM_LOAD( "cg20.7k",0x000000, 0x10000, BAD_DUMP CRC(1e3fa2fd) SHA1(4771b90e40ebfbae4a98ff7ce6db50f635232597) ) // - empty sockets on PCB :/ (temps from Super Crowns Golf)
-	ROM_LOAD( "cg21.7j",0x010000, 0x10000, BAD_DUMP CRC(0323a2cd) SHA1(d7d4b35ad451acb2fa3d117bb0ae2f8fbd883f17) ) // /
-	ROM_LOAD( "2.4c",   0x020000, 0x20000, CRC(08d4363b) SHA1(60c5543c35f44af2f4a8f7ca4bc10633f5fa67fb) )
+	ROM_LOAD( "cg30.ic14", 0x000000, 0x10000, BAD_DUMP CRC(6b7ffee9) SHA1(7b7f0f9801ab604ea4280c6d75dfcfdb4123520c) ) // - empty sockets on PCB :/ (temps from Super Crowns Golf World version)
+	ROM_LOAD( "cg31.ic13", 0x010000, 0x10000, BAD_DUMP CRC(c5ba8e39) SHA1(aff8d5fd532f1e1d90c21bc42a349e3e83c67064) ) //
+	ROM_LOAD( "2.4c",      0x020000, 0x20000, CRC(08d4363b) SHA1(60c5543c35f44af2f4a8f7ca4bc10633f5fa67fb) ) // matches cg32 + cg33 of the World version
 
 	ROM_REGION( 0x70000, "gfx1", 0 )
-	ROM_LOAD( "chr1.3h",      0x000000, 0x020000, CRC(e62d2bb4) SHA1(f931699114a99b7eb25f8bb841d85de0d6a106a5) )
-	ROM_LOAD( "chr2.3g",      0x020000, 0x020000, CRC(808c15e6) SHA1(d7d1ac7456f492dfcc1c1b501f8dde86e405fd7b) )
-	ROM_LOAD( "chr3.3e",      0x040000, 0x020000, CRC(9a60193d) SHA1(d22c958b5bd82626fcfc94f7ad16d8cd4bacdda2) )
-	ROM_LOAD( "chr4.3d",      0x060000, 0x010000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
+	ROM_LOAD( "chr1.3h",      0x000000, 0x010000, CRC(e62d2bb4) SHA1(f931699114a99b7eb25f8bb841d85de0d6a106a5) )
+	ROM_CONTINUE(             0x040000, 0x010000 )
+	ROM_LOAD( "chr2.3g",      0x010000, 0x010000, CRC(808c15e6) SHA1(d7d1ac7456f492dfcc1c1b501f8dde86e405fd7b) )
+	ROM_CONTINUE(             0x050000, 0x010000 )
+	ROM_LOAD( "chr3.3e",      0x020000, 0x010000, CRC(9a60193d) SHA1(d22c958b5bd82626fcfc94f7ad16d8cd4bacdda2) )
+	ROM_CONTINUE(             0x060000, 0x010000 )
+	ROM_LOAD( "chr4.3d",      0x030000, 0x010000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
 ROM_END
 
 
@@ -682,6 +673,9 @@ void suprgolf_state::init_suprgolf()
 	ROM[0x74f5-0x4000] = 0x00;
 	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; //patch ROM check
 }
+
+} // Anonymous namespace
+
 
 GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, empty_init,    ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

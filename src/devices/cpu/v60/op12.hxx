@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, R. Belmont
 /*
- * MUL* and MULU* do not set OV correctly
  * DIVX: the second operand should be treated as dword instead of word
  * GETATE, GETPTE and GETRA should not be used
  * UPDPSW: _CY and _OV must be cleared or unchanged? I suppose
@@ -998,7 +997,6 @@ uint32_t v60_device::opMULB()
 
 	F12LOADOP2BYTE();
 
-	// @@@ OV not set!!
 	tmp = (int8_t)appb * (int32_t)(int8_t)m_op1;
 	appb = tmp;
 	_Z = (appb == 0);
@@ -1017,7 +1015,6 @@ uint32_t v60_device::opMULH()
 
 	F12LOADOP2HALF();
 
-	// @@@ OV not set!!
 	tmp = (int16_t)apph * (int32_t)(int16_t)m_op1;
 	apph = tmp;
 	_Z = (apph == 0);
@@ -1036,7 +1033,6 @@ uint32_t v60_device::opMULW()
 
 	F12LOADOP2WORD();
 
-	// @@@ OV not set!!
 	tmp = (int32_t)appw * (int64_t)(int32_t)m_op1;
 	appw = tmp;
 	_Z = (appw == 0);
@@ -1055,7 +1051,6 @@ uint32_t v60_device::opMULUB()
 
 	F12LOADOP2BYTE();
 
-	// @@@ OV not set!!
 	tmp = appb * (uint8_t)m_op1;
 	appb = tmp;
 	_Z = (appb == 0);
@@ -1074,7 +1069,6 @@ uint32_t v60_device::opMULUH()
 
 	F12LOADOP2HALF();
 
-	// @@@ OV not set!!
 	tmp = apph * (uint16_t)m_op1;
 	apph = tmp;
 	_Z = (apph == 0);
@@ -1093,7 +1087,6 @@ uint32_t v60_device::opMULUW()
 
 	F12LOADOP2WORD();
 
-	// @@@ OV not set!!
 	tmp = (uint64_t)appw * (uint64_t)m_op1;
 	appw = tmp;
 	_Z = (appw == 0);
@@ -1110,6 +1103,7 @@ uint32_t v60_device::opNEGB() /* TRUSTED  (C too!)*/
 
 	m_modwritevalb = 0;
 	SUBB(m_modwritevalb, (int8_t)m_op1);
+	_CY = m_modwritevalb ? 1 : 0;
 
 	F12WriteSecondOperand(0);
 	F12END();
@@ -1121,6 +1115,7 @@ uint32_t v60_device::opNEGH() /* TRUSTED  (C too!)*/
 
 	m_modwritevalh = 0;
 	SUBW(m_modwritevalh, (int16_t)m_op1);
+	_CY = m_modwritevalh ? 1 : 0;
 
 	F12WriteSecondOperand(1);
 	F12END();
@@ -1132,6 +1127,7 @@ uint32_t v60_device::opNEGW() /* TRUSTED  (C too!)*/
 
 	m_modwritevalw = 0;
 	SUBL(m_modwritevalw, (int32_t)m_op1);
+	_CY = m_modwritevalw ? 1 : 0;
 
 	F12WriteSecondOperand(2);
 	F12END();

@@ -23,8 +23,6 @@ TODO:
 #include "hcd62121.h"
 #include "hcd62121d.h"
 
-#include "debugger.h"
-
 
 enum
 {
@@ -1172,6 +1170,23 @@ void hcd62121_cpu_device::execute_run()
 				read_iregreg(size, reg1, reg2, true);
 
 				op_and(size);
+			}
+			break;
+
+		case 0x50:      /* xorb ir1,r2 */
+		case 0x51:      /* xorw ir1,r2 */
+		case 0x52:      /* xorq ir1,r2 */
+		case 0x53:      /* xort ir1,r2 */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+				u8 reg2 = read_op();
+
+				read_iregreg(size, reg1, reg2, true);
+
+				op_xor(size);
+
+				write_iregreg(size, reg1, reg2);
 			}
 			break;
 

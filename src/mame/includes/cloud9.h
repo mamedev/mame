@@ -31,19 +31,19 @@ public:
 		m_videolatch(*this, "videolatch")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	DECLARE_READ_LINE_MEMBER(vblank_r);
 	void cloud9(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(leta_r);
-	DECLARE_WRITE8_MEMBER(nvram_recall_w);
-	DECLARE_WRITE8_MEMBER(nvram_store_w);
-	DECLARE_WRITE8_MEMBER(cloud9_paletteram_w);
-	DECLARE_WRITE8_MEMBER(cloud9_videoram_w);
-	DECLARE_READ8_MEMBER(cloud9_bitmode_r);
-	DECLARE_WRITE8_MEMBER(cloud9_bitmode_w);
-	DECLARE_WRITE8_MEMBER(cloud9_bitmode_addr_w);
+	void irq_ack_w(uint8_t data);
+	uint8_t leta_r(offs_t offset);
+	void nvram_recall_w(uint8_t data);
+	void nvram_store_w(uint8_t data);
+	void cloud9_paletteram_w(offs_t offset, uint8_t data);
+	void cloud9_videoram_w(offs_t offset, uint8_t data);
+	uint8_t cloud9_bitmode_r();
+	void cloud9_bitmode_w(uint8_t data);
+	void cloud9_bitmode_addr_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -69,20 +69,20 @@ private:
 	required_device<ls259_device> m_videolatch;
 
 	/* video-related */
-	const uint8_t *m_syncprom;
-	const uint8_t *m_wpprom;
-	const uint8_t *m_priprom;
-	bitmap_ind16 m_spritebitmap;
-	double      m_rweights[3];
-	double      m_gweights[3];
-	double      m_bweights[3];
-	uint8_t       m_bitmode_addr[2];
+	const uint8_t *m_syncprom = nullptr;
+	const uint8_t *m_wpprom = nullptr;
+	const uint8_t *m_priprom = nullptr;
+	bitmap_ind16 m_spritebitmap = 0;
+	double      m_rweights[3]{};
+	double      m_gweights[3]{};
+	double      m_bweights[3]{};
+	uint8_t       m_bitmode_addr[2]{};
 
 	/* misc */
-	int         m_vblank_start;
-	int         m_vblank_end;
-	emu_timer   *m_irq_timer;
-	uint8_t       m_irq_state;
+	int         m_vblank_start = 0;
+	int         m_vblank_end = 0;
+	emu_timer   *m_irq_timer = nullptr;
+	uint8_t       m_irq_state = 0U;
 };
 
 #endif // MAME_INCLUDES_CLOUD9_H

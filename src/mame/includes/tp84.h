@@ -8,6 +8,7 @@
 #include "sound/flt_rc.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class tp84_state : public driver_device
 {
@@ -50,25 +51,25 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device_array<filter_rc_device, 3> m_filter;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	bool m_flipscreen_x;
-	bool m_flipscreen_y;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	bool m_flipscreen_x = false;
+	bool m_flipscreen_y = false;
 
-	bool m_irq_enable;
-	bool m_sub_irq_mask;
+	bool m_irq_enable = false;
+	bool m_sub_irq_mask = false;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_READ8_MEMBER(tp84_sh_timer_r);
-	DECLARE_WRITE8_MEMBER(tp84_filter_w);
-	DECLARE_WRITE8_MEMBER(tp84_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sub_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(tp84_spriteram_w);
-	DECLARE_READ8_MEMBER(tp84_scanline_r);
+	uint8_t tp84_sh_timer_r();
+	void tp84_filter_w(offs_t offset, uint8_t data);
+	void tp84_sh_irqtrigger_w(uint8_t data);
+	void sub_irq_mask_w(uint8_t data);
+	void tp84_spriteram_w(offs_t offset, uint8_t data);
+	uint8_t tp84_scanline_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

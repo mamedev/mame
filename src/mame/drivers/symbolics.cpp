@@ -99,10 +99,10 @@ public:
 
 private:
 	required_device<m68000_base_device> m_maincpu;
-	DECLARE_READ16_MEMBER(buserror_r);
-	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
-	//DECLARE_READ16_MEMBER(ram_parity_hack_r);
-	//DECLARE_WRITE16_MEMBER(ram_parity_hack_w);
+	uint16_t buserror_r();
+	uint16_t fep_paddle_id_prom_r();
+	//uint16_t ram_parity_hack_r(offs_t offset);
+	//void ram_parity_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	//bool m_parity_error_has_occurred[0x20000];
 
 	// overrides
@@ -111,10 +111,10 @@ private:
 
 	void m68k_mem(address_map &map);
 
-	//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
-READ16_MEMBER(symbolics_state::buserror_r)
+uint16_t symbolics_state::buserror_r()
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -124,12 +124,12 @@ READ16_MEMBER(symbolics_state::buserror_r)
 	return 0;
 }
 
-READ16_MEMBER(symbolics_state::fep_paddle_id_prom_r) // bits 8 and 9 do something special if both are set.
+uint16_t symbolics_state::fep_paddle_id_prom_r() // bits 8 and 9 do something special if both are set.
 {
 	return 0x0300;
 }
 /*
-READ16_MEMBER(symbolics_state::ram_parity_hack_r)
+uint16_t symbolics_state::ram_parity_hack_r(offs_t offset)
 {
     uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
     //m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
@@ -144,7 +144,7 @@ READ16_MEMBER(symbolics_state::ram_parity_hack_r)
     return *ram;
 }
 
-WRITE16_MEMBER(symbolics_state::ram_parity_hack_w)
+void symbolics_state::ram_parity_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
     uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
     m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
@@ -251,18 +251,18 @@ currently dies at context switch code loaded to ram around 38EE0, see patent 488
 void symbolics_state::m68k_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x000000, 0x01ffff) AM_ROM /* ROM lives here */
+	//map(0x000000, 0x01ffff).rom(); /* ROM lives here */
 	map(0x000000, 0x00bfff).rom();
 	// 0x00c000-0x00ffff is open bus but decoded/auto-DTACKed, does not cause bus error
 	map(0x010000, 0x01bfff).rom();
 	// 0x01c000-0x01ffff is open bus but decoded/auto-DTACKed, does not cause bus error
-	map(0x020000, 0x03ffff).ram().region("fepdram", 0); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
-	//AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(ram_parity_hack_r, ram_parity_hack_w)
-	//AM_RANGE(0x020002, 0x03ffff) AM_RAM AM_REGION("fepdram", 0) /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
+	map(0x020000, 0x03ffff).ram().share("fepdram"); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
+	//map(0x020000, 0x03ffff).rw(FUNC(symbolics_state::ram_parity_hack_r), FUNC(symbolics_state::ram_parity_hack_w));
+	//map(0x020002, 0x03ffff).ram().region("fepdram", 0); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
 	// 2x AM9128-10PC 2048x8 SRAMs @F7 and @G7 map somewhere
 	// 6x AM2148-50 1024x4bit SRAMs @F22-F27 map somewhere
-	//AM_RANGE(0x040000, 0xffffff) AM_READ(buserror_r);
-	//AM_RANGE(0x800000, 0xffffff) AM_RAM /* paged access to lispm ram? */
+	//map(0x040000, 0xffffff).r(FUNC(symbolics_state::buserror_r));
+	//map(0x800000, 0xffffff).ram(); /* paged access to lispm ram? */
 	//FF00B0 is readable, may be to read the MC/SQ/DP/AU continuity lines?
 	map(0xff00a0, 0xff00bf).rom().region("fep_paddle_prom",0);
 	map(0xff00c0, 0xff00df).rom().region("fep_prom",0);
@@ -281,15 +281,15 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-/*void symbolics_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+/*void symbolics_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
     switch (id)
     {
     case TIMER_OUTFIFO_READ:
-        outfifo_read_cb(ptr, param);
+        outfifo_read_cb(param);
         break;
     default:
-        assert_always(false, "Unknown id in symbolics_state::device_timer");
+        throw emu_fatalerror("Unknown id in symbolics_state::device_timer");
     }
 }
 
@@ -340,7 +340,7 @@ void symbolics_state::symbolics(machine_config &config)
 ******************************************************************************/
 
 ROM_START( s3670 )
-	ROM_REGION16_BE(0x40000,"maincpu", 0)
+	ROM_REGION16_BE(0x40000,"maincpu", ROMREGION_ERASEFF)
 	// the older 'FEP V24' has similar roms but a different hw layout and memory map
 	ROM_SYSTEM_BIOS( 0, "v127", "Symbolics 3600 L-Machine 'NFEP V127'")
 	ROMX_LOAD("00h.127.27c128.d13", 0x00000, 0x2000, CRC(b8d7c8da) SHA1(663a09359f5db63beeac00e5c2783ccc25b94250), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "00H.127" @D13
@@ -355,7 +355,7 @@ ROM_START( s3670 )
 	ROM_CONTINUE( 0x18000, 0x2000 )
 	ROMX_LOAD("10l.127.27c128.d10", 0x08001, 0x2000, CRC(b8ddb3c8) SHA1(e6c3b96340c5c767ef18abf48b73fa8e5d7353b9), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "10L.127" @D10
 	ROM_CONTINUE( 0x18001, 0x2000 )
-	// D17, D11 are empty sockets; these would map to 0x0c000-0ffff and 0x1c000-0x1ffff
+	// D17, D11 are empty sockets; these would map to 0x0c000-0ffff and 0x1c000-0x1ffff; these are verified from real hardware to read as 0xFF, so there must be pull-up resistors on the EPROM bus/auto-DTACK area
 	ROM_REGION16_BE( 0x20,"fep_paddle_prom", 0)
 	ROM_LOAD("fpa-458.bin", 0x0000, 0x0020, CRC(5e034b33) SHA1(fea84183825013b2adc290f71d97e5cffd0cf7fd)) // nFEP Paddle S/N 458
 	ROM_REGION16_BE( 0x20,"fep_prom", 0)
@@ -392,7 +392,6 @@ ROM_START( s3670 )
 	    LBARB.4           @I18 <- 4887235 page 625 has LBARB rev1, pal16l8
 	    SERCTL.4          @K6 <- 4887235 page 620 has SERCTL rev4, pal16l8
 	*/
-	ROM_REGION16_BE( 0x20000, "fepdram", ROMREGION_ERASE00 )
 
 ROM_END
 

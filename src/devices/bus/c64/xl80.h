@@ -49,10 +49,10 @@ protected:
 private:
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	required_device<h46505_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 };
 
 

@@ -61,6 +61,26 @@ void saturn_bram_device::device_reset()
 {
 }
 
+bool saturn_bram_device::nvram_read(util::read_stream &file)
+{
+	size_t actual;
+	if (m_ext_bram.empty())
+		return true;
+	else
+		return !file.read(&m_ext_bram[0], m_ext_bram.size(), actual) && actual == m_ext_bram.size();
+}
+
+bool saturn_bram_device::nvram_write(util::write_stream &file)
+{
+	size_t actual;
+	return !file.write(&m_ext_bram[0], m_ext_bram.size(), actual) && actual == m_ext_bram.size();
+}
+
+bool saturn_bram_device::nvram_can_write()
+{
+	return !m_ext_bram.empty();
+}
+
 void saturn_bram_device::nvram_default()
 {
 	static const uint8_t init[16] =
@@ -81,7 +101,7 @@ void saturn_bram_device::nvram_default()
 
 // Battery RAM: single chip
 
-READ32_MEMBER(saturn_bram_device::read_ext_bram)
+uint32_t saturn_bram_device::read_ext_bram(offs_t offset)
 {
 	if (offset < m_ext_bram.size()/2)
 		return (m_ext_bram[offset * 2] << 16) | m_ext_bram[offset * 2 + 1];
@@ -92,7 +112,7 @@ READ32_MEMBER(saturn_bram_device::read_ext_bram)
 	}
 }
 
-WRITE32_MEMBER(saturn_bram_device::write_ext_bram)
+void saturn_bram_device::write_ext_bram(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset < m_ext_bram.size()/2)
 	{

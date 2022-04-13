@@ -179,6 +179,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	int shift = space->addr_shift();
 	int alignment = m_intf.opcode_alignment();
 	endianness_t endian = space->endianness();
+	bool is_octal = space->is_octal();
 
 	m_pc_mask = space->logaddrmask();
 
@@ -954,44 +955,80 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	// Define the data -> string conversion
 	switch(shift) {
 	case -3:
-		m_data_to_string = [this](offs_t pc, offs_t size) {
-			std::ostringstream out;
-			for(offs_t i=0; i != size; i++) {
-				if(i)
-					out << ' ';
-				util::stream_format(out, "%016X", r64(pc));
-				pc = m_next_pc_wrap(pc, 1);
-			}
-			return out.str();
-		};
-		break;
-
-	case -2:
-		switch(alignment) {
-		case 1:
+		if(is_octal)
 			m_data_to_string = [this](offs_t pc, offs_t size) {
 				std::ostringstream out;
 				for(offs_t i=0; i != size; i++) {
 					if(i)
 						out << ' ';
-					util::stream_format(out, "%08X", r32(pc));
+					util::stream_format(out, "%022o", r64(pc));
 					pc = m_next_pc_wrap(pc, 1);
 				}
 				return out.str();
 			};
-			break;
-
-		case 2:
+		else
 			m_data_to_string = [this](offs_t pc, offs_t size) {
 				std::ostringstream out;
-				for(offs_t i=0; i != size; i += 2) {
+				for(offs_t i=0; i != size; i++) {
 					if(i)
 						out << ' ';
 					util::stream_format(out, "%016X", r64(pc));
-					pc = m_next_pc_wrap(pc, 2);
+					pc = m_next_pc_wrap(pc, 1);
 				}
 				return out.str();
 			};
+		break;
+
+	case -2:
+		switch(alignment) {
+		case 1:
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i++) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%011o", r32(pc));
+						pc = m_next_pc_wrap(pc, 1);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i++) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%08X", r32(pc));
+						pc = m_next_pc_wrap(pc, 1);
+					}
+					return out.str();
+				};
+			break;
+
+		case 2:
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 2) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%022o", r64(pc));
+						pc = m_next_pc_wrap(pc, 2);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 2) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%016X", r64(pc));
+						pc = m_next_pc_wrap(pc, 2);
+					}
+					return out.str();
+				};
 			break;
 		}
 		break;
@@ -999,42 +1036,78 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	case -1:
 		switch(alignment) {
 		case 1:
-			m_data_to_string = [this](offs_t pc, offs_t size) {
-				std::ostringstream out;
-				for(offs_t i=0; i != size; i++) {
-					if(i)
-						out << ' ';
-					util::stream_format(out, "%04X", r16(pc));
-					pc = m_next_pc_wrap(pc, 1);
-				}
-				return out.str();
-			};
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i++) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%06o", r16(pc));
+						pc = m_next_pc_wrap(pc, 1);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i++) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%04X", r16(pc));
+						pc = m_next_pc_wrap(pc, 1);
+					}
+					return out.str();
+				};
 			break;
 
 		case 2:
-			m_data_to_string = [this](offs_t pc, offs_t size) {
-				std::ostringstream out;
-				for(offs_t i=0; i != size; i += 2) {
-					if(i)
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 2) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%011o", r32(pc));
+						pc = m_next_pc_wrap(pc, 2);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 2) {
+						if(i)
 						out << ' ';
-					util::stream_format(out, "%08X", r32(pc));
-					pc = m_next_pc_wrap(pc, 2);
-				}
-				return out.str();
-			};
+							util::stream_format(out, "%08X", r32(pc));
+						pc = m_next_pc_wrap(pc, 2);
+					}
+					return out.str();
+				};
 			break;
 
 		case 4:
-			m_data_to_string = [this](offs_t pc, offs_t size) {
-				std::ostringstream out;
-				for(offs_t i=0; i != size; i += 4) {
-					if(i)
-						out << ' ';
-					util::stream_format(out, "%016X", r64(pc));
-					pc = m_next_pc_wrap(pc, 4);
-				}
-				return out.str();
-			};
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 4) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%022o", r64(pc));
+						pc = m_next_pc_wrap(pc, 4);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 4) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%016X", r64(pc));
+						pc = m_next_pc_wrap(pc, 4);
+					}
+					return out.str();
+				};
 			break;
 		}
 		break;
@@ -1042,70 +1115,130 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	case 0:
 		switch(alignment) {
 		case 1:
-			m_data_to_string = [this](offs_t pc, offs_t size) {
-				std::ostringstream out;
-				for(offs_t i=0; i != size; i++) {
-					if(i)
-						out << ' ';
-					util::stream_format(out, "%02X", r8(pc));
-					pc = m_next_pc_wrap(pc, 1);
-				}
-				return out.str();
-			};
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i++) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%03o", r8(pc));
+						pc = m_next_pc_wrap(pc, 1);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i++) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%02X", r8(pc));
+						pc = m_next_pc_wrap(pc, 1);
+					}
+					return out.str();
+				};
 			break;
 
 		case 2:
-			m_data_to_string = [this](offs_t pc, offs_t size) {
-				std::ostringstream out;
-				for(offs_t i=0; i != size; i += 2) {
-					if(i)
-						out << ' ';
-					util::stream_format(out, "%04X", r16(pc));
-					pc = m_next_pc_wrap(pc, 2);
-				}
-				return out.str();
-			};
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 2) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%06o", r16(pc));
+						pc = m_next_pc_wrap(pc, 2);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 2) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%04X", r16(pc));
+						pc = m_next_pc_wrap(pc, 2);
+					}
+					return out.str();
+				};
 			break;
 
 		case 4:
-			m_data_to_string = [this](offs_t pc, offs_t size) {
-				std::ostringstream out;
-				for(offs_t i=0; i != size; i += 4) {
-					if(i)
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 4) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%011o", r32(pc));
+						pc = m_next_pc_wrap(pc, 4);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 4) {
+						if(i)
 						out << ' ';
-					util::stream_format(out, "%08X", r32(pc));
-					pc = m_next_pc_wrap(pc, 4);
-				}
-				return out.str();
-			};
+						util::stream_format(out, "%08X", r32(pc));
+						pc = m_next_pc_wrap(pc, 4);
+					}
+					return out.str();
+				};
 			break;
 
 		case 8:
-			m_data_to_string = [this](offs_t pc, offs_t size) {
-				std::ostringstream out;
-				for(offs_t i=0; i != size; i += 8) {
-					if(i)
-						out << ' ';
-					util::stream_format(out, "%016X", r64(pc));
-					pc = m_next_pc_wrap(pc, 8);
-				}
-				return out.str();
-			};
+			if(is_octal)
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 8) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%022o", r64(pc));
+						pc = m_next_pc_wrap(pc, 8);
+					}
+					return out.str();
+				};
+			else
+				m_data_to_string = [this](offs_t pc, offs_t size) {
+					std::ostringstream out;
+					for(offs_t i=0; i != size; i += 8) {
+						if(i)
+							out << ' ';
+						util::stream_format(out, "%016X", r64(pc));
+						pc = m_next_pc_wrap(pc, 8);
+					}
+					return out.str();
+				};
 			break;
 		}
 		break;
 
 	case 3:
-		m_data_to_string = [this](offs_t pc, offs_t size) {
-			std::ostringstream out;
-			for(offs_t i=0; i != size; i += 16) {
-				if(i)
-					out << ' ';
-				util::stream_format(out, "%04X", r16(pc));
-				pc = m_next_pc_wrap(pc, 16);
-			}
-			return out.str();
-		};
+		if(is_octal)
+			m_data_to_string = [this](offs_t pc, offs_t size) {
+				std::ostringstream out;
+				for(offs_t i=0; i != size; i += 16) {
+					if(i)
+						out << ' ';
+					util::stream_format(out, "%06o", r16(pc));
+					pc = m_next_pc_wrap(pc, 16);
+				}
+				return out.str();
+			};
+		else
+			m_data_to_string = [this](offs_t pc, offs_t size) {
+				std::ostringstream out;
+				for(offs_t i=0; i != size; i += 16) {
+					if(i)
+						out << ' ';
+					util::stream_format(out, "%04X", r16(pc));
+					pc = m_next_pc_wrap(pc, 16);
+				}
+				return out.str();
+			};
 		break;
 	}
 

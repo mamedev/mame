@@ -65,7 +65,7 @@
 
 // ======================> device_tvcexp_interface
 
-class device_tvcexp_interface : public device_slot_card_interface
+class device_tvcexp_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -75,10 +75,10 @@ public:
 	virtual uint8_t id_r() { return 0x00; }   // ID_A and ID_B lines
 	virtual void int_ack() { }
 	virtual uint8_t int_r() { return 1; }
-	virtual DECLARE_READ8_MEMBER(read) { return 0x00; }
-	virtual DECLARE_WRITE8_MEMBER(write) { }
-	virtual DECLARE_READ8_MEMBER(io_read) { return 0x00; }
-	virtual DECLARE_WRITE8_MEMBER(io_write) { }
+	virtual uint8_t read(offs_t offset) { return 0x00; }
+	virtual void write(offs_t offset, uint8_t data) { }
+	virtual uint8_t io_read(offs_t offset) { return 0x00; }
+	virtual void io_write(offs_t offset, uint8_t data) { }
 
 protected:
 	device_tvcexp_interface(const machine_config &mconfig, device_t &device);
@@ -86,8 +86,7 @@ protected:
 
 // ======================> tvcexp_slot_device
 
-class tvcexp_slot_device : public device_t,
-							public device_slot_interface
+class tvcexp_slot_device : public device_t, public device_single_card_slot_interface<device_tvcexp_interface>
 {
 public:
 	// construction/destruction
@@ -108,13 +107,13 @@ public:
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 
 	// reading and writing
-	virtual uint8_t id_r();
-	virtual void int_ack();
-	virtual uint8_t int_r();
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(io_read);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
+	uint8_t id_r();
+	void int_ack();
+	uint8_t int_r();
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t io_read(offs_t offset);
+	void io_write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

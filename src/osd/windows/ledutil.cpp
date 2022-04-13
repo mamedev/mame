@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Paul Priest
 //============================================================
 //
-//  ledutil.c - Win32 example code that tracks changing
+//  ledutil.cpp - Win32 example code that tracks changing
 //  outputs and updates the keyboard LEDs in response
 //
 //============================================================
@@ -34,9 +34,9 @@
 
 // standard C headers
 #include <conio.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 // MAME output header file
 typedef int running_machine;

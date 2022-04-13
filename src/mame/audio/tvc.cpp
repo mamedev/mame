@@ -31,7 +31,7 @@ void tvc_sound_device::device_start()
 	// resolve callbacks
 	m_write_sndint.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 	m_sndint_timer = timer_alloc(TIMER_SNDINT);
 }
 
@@ -52,7 +52,7 @@ void tvc_sound_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_write_sndint(1);
 }
@@ -62,15 +62,15 @@ void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 //  our sound stream
 //-------------------------------------------------
 
-void tvc_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tvc_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int rate = machine().sample_rate() / 2;
-
+	auto &output = outputs[0];
+	int rate = output.sample_rate() / 2;
 	if (m_enabled && m_freq)
 	{
-		while( samples-- > 0 )
+		for (int sampindex = 0; sampindex < output.samples(); sampindex++)
 		{
-			*outputs[0]++ = m_signal * (m_volume * 0x0800);
+			output.put_int(sampindex, m_signal * m_volume, 32768 / 0x0800);
 			m_incr -= m_freq;
 			while(m_incr < 0)
 			{
@@ -82,7 +82,7 @@ void tvc_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	else
 	{
 		// fill output with 0 if the sound is disabled
-		memset(outputs[0], 0, samples * sizeof(stream_sample_t));
+		output.fill(0);
 	}
 }
 
@@ -92,7 +92,7 @@ void tvc_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 //  ports write
 //-------------------------------------------------
 
-WRITE8_MEMBER(tvc_sound_device::write)
+void tvc_sound_device::write(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
@@ -102,7 +102,7 @@ WRITE8_MEMBER(tvc_sound_device::write)
 	{
 		case 1:
 			m_enabled = BIT(data, 4);
-			// fall through
+			[[fallthrough]];
 
 		case 0:
 		{

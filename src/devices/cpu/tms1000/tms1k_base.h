@@ -20,7 +20,6 @@
 // pinout reference
 
 /*
-
             ____   ____                         ____   ____
      R8  1 |*   \_/    | 28 R7           R0  1 |*   \_/    | 28 Vss
      R9  2 |           | 27 R6           R1  2 |           | 27 OSC2
@@ -83,8 +82,11 @@ public:
 	auto write_pdc() { return m_write_pdc.bind(); }
 
 	// Use this if the output PLA is unknown:
-	// If the microinstructions (or other) PLA is unknown, try using one from another romset.
 	void set_output_pla(const u16 *output_pla) { m_output_pla_table = output_pla; }
+
+	// If the microinstructions PLA is unknown, try using one from another romset.
+	// If that's not possible, use this callback:
+	auto set_decode_micro() { return m_decode_micro.bind(); }
 
 	u8 debug_peek_o_index() { return m_o_index; } // get output PLA index, for debugging (don't use in emulation)
 
@@ -97,8 +99,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 1; }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_one();
 
@@ -207,6 +209,7 @@ protected:
 	optional_device<pla_device> m_mpla;
 	optional_device<pla_device> m_ipla;
 	optional_device<pla_device> m_opla;
+	optional_memory_region m_opla_b; // binary dump of output PLA, in place of PLA file
 	optional_device<pla_device> m_spla;
 
 	u8 m_pc;        // 6 or 7-bit program counter
@@ -245,7 +248,6 @@ protected:
 	u32 m_fixed;
 	u32 m_micro;
 	int m_subcycle;
-	int m_icount;
 	u8 m_o_index;
 
 	u8 m_o_pins;    // how many O pins
@@ -265,12 +267,16 @@ protected:
 	devcb_read8 m_read_ctl;
 	devcb_write8 m_write_ctl;
 	devcb_write_line m_write_pdc;
+	devcb_read32 m_decode_micro;
 
 	u32 m_o_mask;
 	u32 m_r_mask;
 	u32 m_k_mask;
 	u32 m_pc_mask;
 	u32 m_x_mask;
+
+	int m_icount;
+	int m_state_count;
 
 	// lookup tables
 	std::vector<u32> m_fixed_decode;

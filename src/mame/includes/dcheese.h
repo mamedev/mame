@@ -36,8 +36,6 @@ public:
 	void fredmem(machine_config &config);
 	void dcheese(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
-
 protected:
 	enum
 	{
@@ -48,7 +46,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_region_ptr<u16> m_palrom;
@@ -58,19 +56,19 @@ private:
 	required_ioport m_2a000e_io;
 
 	/* video-related */
-	u16   m_blitter_color[2];
-	u16   m_blitter_xparam[16];
-	u16   m_blitter_yparam[16];
-	u16   m_blitter_vidparam[32];
+	u16   m_blitter_color[2]{};
+	u16   m_blitter_xparam[16]{};
+	u16   m_blitter_yparam[16]{};
+	u16   m_blitter_vidparam[32]{};
 
 	std::unique_ptr<bitmap_ind16> m_dstbitmap;
-	emu_timer *m_blitter_timer;
-	emu_timer *m_signal_irq_timer;
+	emu_timer *m_blitter_timer = nullptr;
+	emu_timer *m_signal_irq_timer = nullptr;
 
 	/* misc */
-	u8    m_irq_state[5];
-	u8    m_sound_control;
-	u8    m_sound_msb_latch;
+	u8    m_irq_state[5]{};
+	u8    m_sound_control = 0;
+	u8    m_sound_msb_latch = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -79,16 +77,16 @@ private:
 	required_device<bsmt2000_device> m_bsmt;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(eeprom_control_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_WRITE8_MEMBER(bsmt_data_w);
-	DECLARE_WRITE16_MEMBER(blitter_color_w);
-	DECLARE_WRITE16_MEMBER(blitter_xparam_w);
-	DECLARE_WRITE16_MEMBER(blitter_yparam_w);
-	DECLARE_WRITE16_MEMBER(blitter_vidparam_w);
-	DECLARE_WRITE16_MEMBER(blitter_unknown_w);
-	DECLARE_READ16_MEMBER(blitter_vidparam_r);
+	void eeprom_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 sound_status_r();
+	void sound_control_w(u8 data);
+	void bsmt_data_w(offs_t offset, u8 data);
+	void blitter_color_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void blitter_xparam_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void blitter_yparam_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void blitter_vidparam_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void blitter_unknown_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 blitter_vidparam_r(offs_t offset);
 	void dcheese_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);

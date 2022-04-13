@@ -30,7 +30,7 @@ Computer Quiz Atama no Taisou
 
 -----------------------------------------
 TZU-093
-CPU: Z80(IC9) surface scrached Z80?(IC28)
+CPU: Z80(IC9) surface scratched Z80?(IC28)
 Sound: AY-3-8910 x2
 OSC: 14.000MHz
 RAMs:
@@ -50,7 +50,7 @@ CC.48        [209cab0d]  |
 CB.47        [8bc85c0c]  |
 CD.46        [22e8d103] /
 
-IC36.BIN     [643e3077] (surface scrached, 27C256)
+IC36.BIN     [643e3077] (surface scratched, 27C256)
 IC35.BIN     [fe0302a0]  |
 IC34.BIN     [06e7c7da]  |
 IC33.BIN     [323a70e7] /
@@ -178,20 +178,20 @@ protected:
 private:
 	uint8_t m_videoram[VMEM_SIZE];
 	uint8_t m_colorram[VMEM_SIZE];
-	uint8_t m_prot_data;
+	uint8_t m_prot_data = 0;
 	pen_t m_pens[NUM_PENS];
 
-	uint8_t m_atamanot_prot_state;
+	uint8_t m_atamanot_prot_state = 0;
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER(ssingles_videoram_w);
-	DECLARE_WRITE8_MEMBER(ssingles_colorram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_READ8_MEMBER(c001_r);
-	DECLARE_WRITE8_MEMBER(c001_w);
-	DECLARE_READ8_MEMBER(atamanot_prot_r);
-	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
+	void ssingles_videoram_w(offs_t offset, uint8_t data);
+	void ssingles_colorram_w(offs_t offset, uint8_t data);
+	uint8_t c000_r();
+	uint8_t c001_r();
+	void c001_w(uint8_t data);
+	uint8_t atamanot_prot_r(offs_t offset);
+	void atamanot_prot_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
@@ -218,20 +218,18 @@ static constexpr rgb_t ssingles_colors[NUM_PENS] =
 
 MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 {
-	uint32_t tile_address;
-	uint16_t cell, palette;
-	uint8_t b0, b1;
-	const uint8_t *gfx = memregion("gfx1")->base();
+	uint8_t const *const gfx = memregion("gfx1")->base();
 
 	for (int cx = 0; cx < x_count; ++cx)
 	{
 		int address = ((ma >> 1) + (cx >> 1)) & 0xff;
 
-		cell = m_videoram[address] + (m_colorram[address] << 8);
+		uint16_t cell = m_videoram[address] + (m_colorram[address] << 8);
 
-		tile_address = ((cell & 0x3ff) << 4) + ra;
-		palette = (cell >> 10) & 0x1c;
+		uint32_t tile_address = ((cell & 0x3ff) << 4) + ra;
+		uint16_t palette = (cell >> 10) & 0x1c;
 
+		uint8_t b0, b1;
 		if (cx & 1)
 		{
 			b0 = gfx[tile_address + 0x0000]; /*  9.bin */
@@ -245,7 +243,7 @@ MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 
 		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			bitmap.pix(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
 			b0 >>= 1;
 			b1 >>= 1;
 		}
@@ -254,20 +252,18 @@ MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 
 MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 {
-	uint32_t tile_address;
-	uint16_t cell, palette;
-	uint8_t b0, b1;
 	const uint8_t *gfx = memregion("gfx1")->base();
 
 	for (int cx = 0; cx < x_count; ++cx)
 	{
 		int address = ((ma >> 1) + (cx >> 1)) & 0xff;
 
-		cell = m_videoram[address] + (m_colorram[address] << 8);
+		uint16_t cell = m_videoram[address] + (m_colorram[address] << 8);
 
-		tile_address = ((cell & 0x1ff) << 4) + ra;
-		palette = (cell >> 10) & 0x1c;
+		uint32_t tile_address = ((cell & 0x1ff) << 4) + ra;
+		uint16_t palette = (cell >> 10) & 0x1c;
 
+		uint8_t b0, b1;
 		if (cx & 1)
 		{
 			b0 = gfx[tile_address + 0x0000]; /*  9.bin */
@@ -281,7 +277,7 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 
 		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			bitmap.pix(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
 			b0 >>= 1;
 			b1 >>= 1;
 		}
@@ -289,14 +285,14 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 }
 
 
-WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
+void ssingles_state::ssingles_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *vram = memregion("vram")->base();
 	vram[offset] = data;
 	m_videoram[offset]=data;
 }
 
-WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
+void ssingles_state::ssingles_colorram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *cram = memregion("cram")->base();
 	cram[offset] = data;
@@ -311,18 +307,18 @@ void ssingles_state::video_start()
 }
 
 
-READ8_MEMBER(ssingles_state::c000_r)
+uint8_t ssingles_state::c000_r()
 {
 	return m_prot_data;
 }
 
-READ8_MEMBER(ssingles_state::c001_r)
+uint8_t ssingles_state::c001_r()
 {
 	m_prot_data=0xc4;
 	return 0;
 }
 
-WRITE8_MEMBER(ssingles_state::c001_w)
+void ssingles_state::c001_w(uint8_t data)
 {
 	m_prot_data^=data^0x11;
 }
@@ -356,7 +352,7 @@ void ssingles_state::ssingles_map(address_map &map)
 }
 
 
-READ8_MEMBER(ssingles_state::atamanot_prot_r)
+uint8_t ssingles_state::atamanot_prot_r(offs_t offset)
 {
 	static const char prot_id[] = { "PROGRAM BY KOYAMA" };
 
@@ -377,7 +373,7 @@ READ8_MEMBER(ssingles_state::atamanot_prot_r)
 	return 0;
 }
 
-WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
+void ssingles_state::atamanot_prot_w(uint8_t data)
 {
 	m_atamanot_prot_state = data;
 }
@@ -390,11 +386,11 @@ void ssingles_state::atamanot_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x60ff).ram(); //kanji tilemap?
-//  AM_RANGE(0x6000, 0x7fff) AM_ROM
+//  map(0x6000, 0x7fff).rom();
 	map(0x8000, 0x83ff).r(FUNC(ssingles_state::atamanot_prot_r));
-//  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
-//  AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
-//  AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
+//  map(0x8000, 0x9fff).rom().region("question", 0x10000);
+//  map(0xc000, 0xc000).r(FUNC(ssingles_state::c000_r));
+//  map(0xc001, 0xc001).rw(FUNC(ssingles_state::c001_r), FUNC(ssingles_state::c001_w));
 }
 
 void ssingles_state::ssingles_io_map(address_map &map)
@@ -408,7 +404,7 @@ void ssingles_state::ssingles_io_map(address_map &map)
 	map(0x16, 0x16).portr("DSW0");
 	map(0x18, 0x18).portr("DSW1");
 	map(0x1c, 0x1c).portr("INPUTS");
-//  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//  map(0x1a, 0x1a).nopw(); //video/crt related
 	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
 }
@@ -424,7 +420,7 @@ void ssingles_state::atamanot_io_map(address_map &map)
 	map(0x16, 0x16).portr("DSW0");
 	map(0x18, 0x18).portr("DSW1").w(FUNC(ssingles_state::atamanot_prot_w));
 	map(0x1c, 0x1c).portr("INPUTS");
-//  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//  map(0x1a, 0x1a).nopw(); //video/crt related
 	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
 }
@@ -433,7 +429,7 @@ static INPUT_PORTS_START( ssingles )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //must be LOW
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ssingles_state,controls_r, nullptr)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ssingles_state, controls_r)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
@@ -571,7 +567,7 @@ void ssingles_state::ssingles(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(ssingles_state::ssingles_update_row), this);
+	crtc.set_update_row_callback(FUNC(ssingles_state::ssingles_update_row));
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
@@ -595,7 +591,7 @@ void ssingles_state::atamanot(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ssingles_state::atamanot_io_map);
 
 	mc6845_device &crtc(*subdevice<mc6845_device>("crtc"));
-	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row), this);
+	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row));
 	crtc.out_vsync_callback().set(FUNC(ssingles_state::atamanot_irq));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atamanot);

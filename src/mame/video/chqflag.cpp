@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/chqflag.h"
+#include "screen.h"
 
 
 /***************************************************************************

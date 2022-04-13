@@ -85,12 +85,12 @@ const tiny_rom_entry *c64_xl80_device::device_rom_region() const
 
 MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t code = m_ram[((ma + column) & 0x7ff)];
-		uint16_t addr = (code << 3) | (ra & 0x07);
+		uint8_t const code = m_ram[((ma + column) & 0x7ff)];
+		uint16_t const addr = (code << 3) | (ra & 0x07);
 		uint8_t data = m_char_rom->base()[addr & 0x7ff];
 
 		if (column == cursor_x)
@@ -100,10 +100,10 @@ MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 
 		for (int bit = 0; bit < 8; bit++)
 		{
-			int x = (column * 8) + bit;
-			int color = BIT(data, 7) && de;
+			int const x = (column * 8) + bit;
+			int const color = BIT(data, 7) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = pen[color];
+			bitmap.pix(vbp + y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}
@@ -126,7 +126,7 @@ GFXDECODE_END
 void c64_xl80_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::white()));
-	screen.set_screen_update(HD46505SP_TAG, FUNC(h46505_device::screen_update));
+	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_size(80*8, 24*8);
 	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
 	screen.set_refresh_hz(50);
@@ -134,11 +134,11 @@ void c64_xl80_device::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_c64_xl80);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	H46505(config, m_crtc, XTAL(14'318'181) / 8);
+	HD6845S(config, m_crtc, XTAL(14'318'181) / 8);
 	m_crtc->set_screen(MC6845_SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(c64_xl80_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(c64_xl80_device::crtc_update_row));
 }
 
 
@@ -157,7 +157,7 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 	m_crtc(*this, HD46505SP_TAG),
 	m_palette(*this, "palette"),
 	m_char_rom(*this, HD46505SP_TAG),
-	m_ram(*this, "ram")
+	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE)
 {
 }
 
@@ -168,8 +168,6 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 
 void c64_xl80_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(RAM_SIZE);
 }
 
 

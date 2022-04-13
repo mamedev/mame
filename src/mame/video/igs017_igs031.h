@@ -7,19 +7,21 @@
 
 #include "machine/i8255.h"
 #include "emupal.h"
+#include "tilemap.h"
 
-typedef device_delegate<u16 (u16)> igs017_igs031_palette_scramble_delegate;
-
-class igs017_igs031_device : public device_t,
-							public device_gfx_interface,
-							public device_video_interface,
-							public device_memory_interface
+class igs017_igs031_device :
+		public device_t,
+		public device_gfx_interface,
+		public device_video_interface,
+		public device_memory_interface
 {
 public:
+	typedef device_delegate<u16 (u16)> palette_scramble_delegate;
+
 	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_i8255_tag(T &&tag) { m_i8255.set_tag(std::forward<T>(tag)); }
-	template <typename... T> void set_palette_scramble_cb(T &&... args) { m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_palette_scramble_cb(T &&... args) { m_palette_scramble_cb.set(std::forward<T>(args)...); }
 
 	void set_text_reverse_bits()
 	{
@@ -27,8 +29,6 @@ public:
 	}
 
 	u16 palette_callback_straight(u16 bgr) const;
-
-	igs017_igs031_palette_scramble_delegate m_palette_scramble_cb;
 
 	void map(address_map &map);
 
@@ -50,7 +50,7 @@ public:
 	void bg_w(offs_t offset, u8 data);
 
 	void expand_sprites();
-	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int offsx, int offsy, int dimx, int dimy, int flipx, int flipy, u32 color, u32 addr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -68,6 +68,8 @@ protected:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 private:
+	palette_scramble_delegate m_palette_scramble_cb;
+
 	address_space_config        m_space_config;
 
 	required_shared_ptr<u8> m_spriteram;
@@ -80,17 +82,17 @@ private:
 	// the gfx roms were often hooked up with the bits backwards, allow us to handle it here to save doing it in every driver.
 	bool m_revbits;
 
-	u8 m_toggle;
-	int m_debug_addr;
-	int m_debug_width;
-	bool m_video_disable;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	u8 m_toggle = 0;
+	int m_debug_addr = 0;
+	int m_debug_width = 0;
+	bool m_video_disable = false;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 	std::unique_ptr<u8[]> m_sprites_gfx;
-	u32 m_sprites_gfx_size;
+	u32 m_sprites_gfx_size = 0;
 
-	bool m_nmi_enable;
-	bool m_irq_enable;
+	bool m_nmi_enable = false;
+	bool m_irq_enable = false;
 };
 
 DECLARE_DEVICE_TYPE(IGS017_IGS031, igs017_igs031_device)

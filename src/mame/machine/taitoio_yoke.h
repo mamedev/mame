@@ -22,9 +22,9 @@ public:
 	taitoio_yoke_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_READ16_MEMBER( throttle_r );
-	DECLARE_READ16_MEMBER( stickx_r );
-	DECLARE_READ16_MEMBER( sticky_r );
+	u16 throttle_r();
+	u16 stickx_r();
+	u16 sticky_r();
 
 	DECLARE_READ_LINE_MEMBER( slot_up_r );
 	DECLARE_READ_LINE_MEMBER( slot_down_r );
@@ -40,6 +40,11 @@ protected:
 //  virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+private:
+	required_ioport m_stick_x;
+	required_ioport m_stick_y;
+	required_ioport m_throttle;
 };
 
 

@@ -60,6 +60,7 @@ DD10 DD14  DD18     H5            DD21
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class dmndrby_state : public driver_device
@@ -88,10 +89,10 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_dderby_vidchars;
 	required_shared_ptr<uint8_t> m_dderby_vidattribs;
-	uint8_t *m_racetrack_tilemap_rom;
-	tilemap_t *m_racetrack_tilemap;
-	uint8_t m_io_port[8];
-	int m_bg;
+	uint8_t *m_racetrack_tilemap_rom = nullptr;
+	tilemap_t *m_racetrack_tilemap = nullptr;
+	uint8_t m_io_port[8]{};
+	int m_bg = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -99,9 +100,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(dderby_sound_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(output_w);
+	void dderby_sound_w(uint8_t data);
+	uint8_t input_r(offs_t offset);
+	void output_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
 	void dmndrby_palette(palette_device &palette) const;
 	uint32_t screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -113,14 +114,14 @@ private:
 };
 
 
-WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
+void dmndrby_state::dderby_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
-READ8_MEMBER(dmndrby_state::input_r)
+uint8_t dmndrby_state::input_r(offs_t offset)
 {
 	switch(offset & 7)
 	{
@@ -137,7 +138,7 @@ READ8_MEMBER(dmndrby_state::input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(dmndrby_state::output_w)
+void dmndrby_state::output_w(offs_t offset, uint8_t data)
 {
 	/*
 	---- x--- refill meter [4]
@@ -361,7 +362,7 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_dmndrby_tile_info)
 	int flipx = (attr&0x40)>>6;
 
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			col,
 			TILE_FLIPYX(flipx) );
@@ -373,7 +374,7 @@ void dmndrby_state::video_start()
 	m_bg = 0;
 
 	m_racetrack_tilemap_rom = memregion("user1")->base();
-	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dmndrby_state::get_dmndrby_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 16, 512);
+	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_dmndrby_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 16, 512);
 	m_racetrack_tilemap->mark_all_dirty();
 
 }
@@ -546,7 +547,7 @@ void dmndrby_state::dderby(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dmndrby_state::dderby_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */

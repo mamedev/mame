@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 #include "emu.h"
 #include "includes/pc8401a.h"
-#include "rendlay.h"
+
 #include "pc8500.lh"
 
 /* PC-8401A */
@@ -72,7 +72,7 @@ void pc8401a_state::pc8401a_video(machine_config &config)
 	m_screen_lcd->set_visarea(0, 480-1, 0, 128-1);
 	m_screen_lcd->set_palette("palette");
 
-	SED1330(config, m_lcdc, 0);
+	SED1330(config, m_lcdc, 7.987_MHz_XTAL);
 	m_lcdc->set_screen(m_screen_lcd);
 	m_lcdc->set_addrmap(0, &pc8401a_state::pc8401a_lcdc);
 }
@@ -91,7 +91,7 @@ void pc8500_state::pc8500_video(machine_config &config)
 	m_screen_lcd->set_visarea(0, 480-1, 0, 200-1);
 	m_screen_lcd->set_palette("palette");
 
-	SED1330(config, m_lcdc, 0);
+	SED1330(config, m_lcdc, 8000000);
 	m_lcdc->set_screen(SCREEN_TAG);
 	m_lcdc->set_addrmap(0, &pc8500_state::pc8500_lcdc);
 

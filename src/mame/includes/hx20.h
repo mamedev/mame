@@ -49,12 +49,13 @@ public:
 		, m_kbrequest(1)
 	{ }
 
-	void cm6000(machine_config &config);
 	void hx20(machine_config &config);
+	void cm6032(machine_config &config);
+	void cm6127(machine_config &config);
 
 private:
-	required_device<hd63701_cpu_device> m_maincpu;
-	required_device<hd63701_cpu_device> m_subcpu;
+	required_device<hd6301v1_cpu_device> m_maincpu;
+	required_device<hd6301v1_cpu_device> m_subcpu;
 	required_device<mc146818_device> m_rtc;
 	required_device_array<upd7227_device, 6> m_lcdc;
 	required_device<speaker_sound_device> m_speaker;
@@ -69,25 +70,25 @@ private:
 	void hx20_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( ksc_w );
-	DECLARE_READ8_MEMBER( krtn07_r );
-	DECLARE_READ8_MEMBER( krtn89_r );
-	DECLARE_WRITE8_MEMBER( lcd_cs_w );
-	DECLARE_WRITE8_MEMBER( lcd_data_w );
+	void ksc_w(uint8_t data);
+	uint8_t krtn07_r();
+	uint8_t krtn89_r();
+	void lcd_cs_w(uint8_t data);
+	void lcd_data_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( main_p1_r );
-	DECLARE_WRITE8_MEMBER( main_p1_w );
-	DECLARE_READ8_MEMBER( main_p2_r );
-	DECLARE_WRITE8_MEMBER( main_p2_w );
+	uint8_t main_p1_r();
+	void main_p1_w(uint8_t data);
+	uint8_t main_p2_r();
+	void main_p2_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( slave_p1_r );
-	DECLARE_WRITE8_MEMBER( slave_p1_w );
-	DECLARE_READ8_MEMBER( slave_p2_r );
-	DECLARE_WRITE8_MEMBER( slave_p2_w );
-	DECLARE_READ8_MEMBER( slave_p3_r );
-	DECLARE_WRITE8_MEMBER( slave_p3_w );
-	DECLARE_READ8_MEMBER( slave_p4_r );
-	DECLARE_WRITE8_MEMBER( slave_p4_w );
+	uint8_t slave_p1_r();
+	void slave_p1_w(uint8_t data);
+	uint8_t slave_p2_r();
+	void slave_p2_w(uint8_t data);
+	uint8_t slave_p3_r();
+	void slave_p3_w(uint8_t data);
+	uint8_t slave_p4_r();
+	void slave_p4_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 
@@ -95,30 +96,32 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( sio_pin_w ) { m_sio_pin = state; }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( optrom_load );
-	DECLARE_READ8_MEMBER( optrom_r );
+	uint8_t optrom_r(offs_t offset);
 
 	void update_interrupt();
 
 	// CPU state
-	int m_slave_sio;
-	int m_slave_rx;
-	int m_slave_tx;
-	int m_slave_flag;
-	int m_rtc_irq;
+	int m_slave_sio = 0;
+	int m_slave_rx = 0;
+	int m_slave_tx = 0;
+	int m_slave_flag = 0;
+	int m_rtc_irq = 0;
 
 	// keyboard state
-	uint8_t m_ksc;
-	int m_kbrequest;
+	uint8_t m_ksc = 0;
+	int m_kbrequest = 0;
 
 	// video state
-	uint8_t m_lcd_data;
+	uint8_t m_lcd_data = 0;
 
 	// sio state
-	int m_sio_rx;
-	int m_sio_pin;
-	void cm6000_mem(address_map &map);
+	int m_sio_rx = 0;
+	int m_sio_pin = 0;
+
 	void hx20_mem(address_map &map);
 	void hx20_sub_mem(address_map &map);
+	void cm6032_mem(address_map &map);
+	void cm6127_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_HX20_H

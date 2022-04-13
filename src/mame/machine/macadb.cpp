@@ -2,27 +2,36 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  macadb.c - handles various aspects of ADB on the Mac.
+  macadb.cpp - handles various aspects of ADB on the Mac.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mac.h"
+#include "macadb.h"
 
-#define LOG_ADB             0
-#define LOG_ADB_MCU_CMD     0
-#define LOG_ADB_TALK_LISTEN 0
+#define LOG_TALK_LISTEN     (1 << 1U)
+#define LOG_STATE           (1 << 2U)
+#define LOG_LINESTATE       (1 << 3U)
+#define VERBOSE             (0)
+#include "logmacro.h"
 
 // ADB states
-#define ADB_STATE_NEW_COMMAND   (0)
-#define ADB_STATE_XFER_EVEN (1)
-#define ADB_STATE_XFER_ODD  (2)
-#define ADB_STATE_IDLE      (3)
-#define ADB_STATE_NOTINIT   (4)
+static constexpr int32_t ADB_STATE_NEW_COMMAND  = 0;
+static constexpr int32_t ADB_STATE_XFER_EVEN    = 1;
+static constexpr int32_t ADB_STATE_XFER_ODD     = 2;
+static constexpr int32_t ADB_STATE_IDLE         = 3;
+static constexpr int32_t ADB_STATE_NOTINIT      = 4;
 
 // ADB commands
-#define ADB_CMD_RESET       (0)
-#define ADB_CMD_FLUSH       (1)
+static constexpr int ADB_CMD_RESET              = 0;
+static constexpr int ADB_CMD_FLUSH              = 1;
+
+// use 1 MHz base to get microseconds (hack: *2 to get old wrong HC05 numbers to all realign to reality)
+static constexpr int adb_timebase = 2000000;
+
+static constexpr int adb_short = 85;
+static constexpr int adb_long = 157;
+static constexpr int adb_srq = ((85+157)*3);
 
 // ADB line states
 enum
@@ -67,30 +76,232 @@ enum
 	LST_SENDSTOPa
 };
 
+// device type definition
+DEFINE_DEVICE_TYPE(MACADB, macadb_device, "macadb", "Mac ADB HLE")
+
+static INPUT_PORTS_START( macadb )
+	PORT_START("MOUSE0") /* Mouse - button */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+
+	PORT_START("MOUSE1") /* Mouse - X AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START("MOUSE2") /* Mouse - Y AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	/* This handles the standard (not Extended) Apple ADB keyboard, which is similar to the IIgs keyboard */
+	PORT_START("KEY0")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)             PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)             PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)             PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)             PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)             PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)             PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)             PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)             PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)             PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)             PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    /* extra key on ISO : */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)             PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)             PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)             PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)             PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)             PORT_CHAR('r') PORT_CHAR('R')
+
+	PORT_START("KEY1")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)             PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)             PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)             PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)             PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)             PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)             PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)             PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)             PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)        PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)             PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)             PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)         PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)             PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)             PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)    PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)             PORT_CHAR('o') PORT_CHAR('O')
+
+	PORT_START("KEY2")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)             PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)     PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)             PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)             PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)             PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)             PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)         PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)             PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)         PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)     PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)         PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)         PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)             PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)             PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)          PORT_CHAR('.') PORT_CHAR('>')
+
+	PORT_START("KEY3")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)           PORT_CHAR('\t')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)         PORT_CHAR(' ')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)         PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)     PORT_CHAR(8)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")     PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command / Open Apple") PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option / Solid Apple") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up Arrow") PORT_CODE(KEYCODE_UP)          PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
+
+	/* keypad */
+	PORT_START("KEY4")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x40
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)           PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))   // 0x41
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x42
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))  // 0x43
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x44
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 0x45
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x46
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))    // 0x47
+	PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x48, 49, 4a
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 0x4b
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) // 0x4c
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x4d
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)         PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // 0x4e
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x4f
+
+	PORT_START("KEY5")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x50
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD)) // 0x51
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)             PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) // 0x52
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)             PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) // 0x53
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 0x54
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)             PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) // 0x55
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)             PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) // 0x56
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)             PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) // 0x57
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)             PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) // 0x58
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)             PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) // 0x59
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x5a
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)             PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) // 0x5b
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) // 0x5c
+	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+macadb_device::macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MACADB, tag, owner, clock),
+		m_mouse0(*this, "MOUSE0"),
+		m_mouse1(*this, "MOUSE1"),
+		m_mouse2(*this, "MOUSE2"),
+		m_keys(*this, "KEY%u", 0),
+		write_via_clock(*this),
+		write_via_data(*this),
+		write_adb_data(*this),
+		write_adb_irq(*this),
+		m_bIsMCUMode(false)
+{
+}
+
+ioport_constructor macadb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(macadb);
+}
+
+void macadb_device::device_start()
+{
+	write_via_clock.resolve_safe();
+	write_via_data.resolve_safe();
+	write_adb_data.resolve_safe();
+	write_adb_irq.resolve_safe();
+
+	this->m_adb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macadb_device::mac_adb_tick),this));
+	this->m_adb_timer->adjust(attotime::never);
+
+	std::fill(std::begin(m_adb_buffer), std::end(m_adb_buffer), 0);
+	m_adb_listenreg = 0;
+	m_adb_listenaddr = 0;
+	m_adb_stream_ptr = 0;
+	m_adb_linein = 0;
+	std::fill(std::begin(m_adb_keybuf), std::end(m_adb_keybuf), 0);
+
+	save_item(NAME(m_last_adb_time));
+	save_item(NAME(m_key_matrix));
+	save_item(NAME(m_adb_waiting_cmd));
+	save_item(NAME(m_adb_datasize));
+	save_item(NAME(m_adb_buffer));
+	save_item(NAME(m_adb_command));
+	save_item(NAME(m_adb_send));
+	save_item(NAME(m_adb_timer_ticks));
+	save_item(NAME(m_adb_extclock));
+	save_item(NAME(m_adb_direction));
+	save_item(NAME(m_adb_listenreg));
+	save_item(NAME(m_adb_listenaddr));
+	save_item(NAME(m_adb_last_talk));
+	save_item(NAME(m_adb_srq_switch));
+	save_item(NAME(m_adb_stream_ptr));
+	save_item(NAME(m_adb_linestate));
+	save_item(NAME(m_adb_srqflag));
+	save_item(NAME(m_adb_keybuf));
+	save_item(NAME(m_adb_keybuf_start));
+	save_item(NAME(m_adb_keybuf_end));
+	save_item(NAME(m_adb_mouseaddr));
+	save_item(NAME(m_adb_lastmousex));
+	save_item(NAME(m_adb_lastmousey));
+	save_item(NAME(m_adb_lastbutton));
+	save_item(NAME(m_adb_mouse_initialized));
+	save_item(NAME(m_adb_keybaddr));
+	save_item(NAME(m_adb_keybinitialized));
+	save_item(NAME(m_adb_currentkeys));
+	save_item(NAME(m_adb_modifiers));
+	save_item(NAME(m_adb_linein));
+}
+
+WRITE_LINE_MEMBER(macadb_device::adb_data_w)
+{
+	if (m_adb_timer_ticks > 0)
+	{
+		m_adb_command <<= 1;
+		if (state)
+		{
+			m_adb_command |= 1;
+		}
+		else
+		{
+			m_adb_command &= ~1;
+		}
+	}
+}
+
 /* *************************************************************************
  * High-level ADB primitives used by all lower-level implementations
  * *************************************************************************/
 
-#if LOG_ADB
 static char const *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
-#endif
 
-int mac_state::adb_pollkbd(int update)
+int macadb_device::adb_pollkbd(int update)
 {
-	int i, j, keybuf, report, codes[2], result;
+	int report, codes[2], result;
 
 	codes[0] = codes[1] = 0xff; // key up
 	report = result = 0;
 
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		keybuf = m_keys[i]->read();
+		int keybuf = m_keys[i]->read();
 
 		// any changes in this row?
 		if ((keybuf != m_key_matrix[i]) && (report < 2))
 		{
 			// check each column bit
-			for (j=0; j<16; j++)
+			for (int j = 0; j < 16; j++)
 			{
 				if (((keybuf ^ m_key_matrix[i]) >> j) & 1)
 				{
@@ -185,7 +396,10 @@ int mac_state::adb_pollkbd(int update)
 		}
 	}
 
-//  printf("ADB keyboard: update %d keys %02x %02x\n", update, codes[0], codes[1]);
+//  if ((codes[0] != 0xff) || (codes[1] != 0xff))
+//  {
+//      printf("ADB keyboard: update %d keys %02x %02x\n", update, codes[0], codes[1]);
+//  }
 
 	// figure out if there was a change
 	if ((m_adb_currentkeys[0] != codes[0]) || (m_adb_currentkeys[1] != codes[1]))
@@ -211,7 +425,7 @@ int mac_state::adb_pollkbd(int update)
 	return result;
 }
 
-int mac_state::adb_pollmouse()
+int macadb_device::adb_pollmouse()
 {
 	int NewX, NewY, NewButton;
 
@@ -232,13 +446,15 @@ int mac_state::adb_pollmouse()
 	return 0;
 }
 
-void mac_state::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
+void macadb_device::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 {
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
 
-	NewX = ioport("MOUSE2")->read();
-	NewY = ioport("MOUSE1")->read();
+	NewX = m_mouse2->read();
+	NewY = m_mouse1->read();
+
+//  printf("pollmouse: X %d Y %d\n", NewX, NewY);
 
 	/* see if it moved in the x coord */
 	if (NewX != m_adb_lastmousex)
@@ -276,14 +492,14 @@ void mac_state::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 	*MouseY = (uint8_t)MouseCountY;
 }
 
-void mac_state::adb_talk()
+void macadb_device::adb_talk()
 {
 	int addr, reg;
 
 	addr = (m_adb_command>>4);
 	reg = (m_adb_command & 3);
 
-	//printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", m_adb_command, (m_adb_command>>2)&3, addr, reg, m_adb_mouseaddr, m_adb_keybaddr);
+//  printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", m_adb_command, (m_adb_command>>2)&3, addr, reg, m_adb_mouseaddr, m_adb_keybaddr);
 
 	if (m_adb_waiting_cmd)
 	{
@@ -294,17 +510,13 @@ void mac_state::adb_talk()
 				switch (reg)
 				{
 					case ADB_CMD_RESET:
-						#if LOG_ADB || LOG_ADB_TALK_LISTEN
-						printf("ADB RESET: reg %x address %x\n", reg, addr);
-						#endif
+						LOGMASKED(LOG_TALK_LISTEN, "ADB RESET: reg %x address %x\n", reg, addr);
 						m_adb_direction = 0;
 						m_adb_send = 0;
 						break;
 
 					case ADB_CMD_FLUSH:
-						#if LOG_ADB || LOG_ADB_TALK_LISTEN
-						printf("ADB FLUSH: reg %x address %x\n", reg, addr);
-						#endif
+						LOGMASKED(LOG_TALK_LISTEN, "ADB FLUSH: reg %x address %x\n", reg, addr);
 
 						m_adb_direction = 0;
 						m_adb_send = 0;
@@ -319,32 +531,23 @@ void mac_state::adb_talk()
 				m_adb_datasize = 0;
 				if ((addr == m_adb_keybaddr) || (addr == m_adb_mouseaddr))
 				{
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("ADB LISTEN: reg %x address %x\n", reg, addr);
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "ADB LISTEN: reg %x address %x\n", reg, addr);
 					m_adb_direction = 1;    // input from Mac
 					m_adb_command = 0;
 					m_adb_listenreg = reg;
 					m_adb_listenaddr = addr;
-					if ((ADB_IS_EGRET) || (ADB_IS_CUDA))
-					{
-						m_adb_stream_ptr = 0;
-						memset(m_adb_buffer, 0, sizeof(m_adb_buffer));
-					}
+					m_adb_stream_ptr = 0;
+					memset(m_adb_buffer, 0, sizeof(m_adb_buffer));
 				}
 				else
 				{
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("ADB LISTEN to unknown device, timing out\n");
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "ADB LISTEN to unknown device %d, timing out\n", addr);
 					m_adb_direction = 0;
 				}
 				break;
 
 			case 3: // talk
-				#if LOG_ADB || LOG_ADB_TALK_LISTEN
-				printf("ADB TALK: reg %x address %x (K %x M %x)\n", reg, addr, m_adb_keybaddr, m_adb_mouseaddr);
-				#endif
+				LOGMASKED(LOG_TALK_LISTEN, "ADB TALK: reg %x address %x (K %x M %x)\n", reg, addr, m_adb_keybaddr, m_adb_mouseaddr);
 
 				// keep track of what device the Mac last TALKed to
 				m_adb_last_talk = addr;
@@ -354,9 +557,7 @@ void mac_state::adb_talk()
 				{
 					uint8_t mouseX, mouseY;
 
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("Talking to mouse, register %x\n", reg);
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "Talking to mouse, register %x\n", reg);
 
 					switch (reg)
 					{
@@ -371,6 +572,7 @@ void mac_state::adb_talk()
 							{
 								this->adb_accummouse(&mouseX, &mouseY);
 							}
+							//printf("X %x Y %x\n", mouseX, mouseY);
 							m_adb_buffer[0] = (m_adb_lastbutton & 0x01) ? 0x00 : 0x80;
 							m_adb_buffer[0] |= mouseX & 0x7f;
 							m_adb_buffer[1] = mouseY & 0x7f;
@@ -398,9 +600,7 @@ void mac_state::adb_talk()
 				else if (addr == m_adb_keybaddr)
 				{
 					int kbd_has_data = 1;
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("Talking to keyboard, register %x\n", reg);
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "Talking to keyboard, register %x\n", reg);
 
 					switch (reg)
 					{
@@ -426,7 +626,7 @@ void mac_state::adb_talk()
 
 							if(kbd_has_data)
 							{
-								if(m_adb_keybuf_start == m_adb_keybuf_end)
+								if (m_adb_keybuf_start == m_adb_keybuf_end)
 								{
 	//                              printf("%s: buffer empty\n", __func__);
 									m_adb_buffer[0] = 0xff;
@@ -446,6 +646,12 @@ void mac_state::adb_talk()
 										m_adb_buffer[0] = 0xff;
 									}
 								}
+								m_adb_datasize = 2;
+							}
+							else
+							{
+								m_adb_buffer[0] = 0xff;
+								m_adb_buffer[1] = 0xff;
 								m_adb_datasize = 2;
 							}
 							break;
@@ -480,9 +686,7 @@ void mac_state::adb_talk()
 				}
 				else
 				{
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
 					m_adb_buffer[0] = m_adb_buffer[1] = 0;
 					m_adb_datasize = 0;
 
@@ -498,9 +702,7 @@ void mac_state::adb_talk()
 	}
 	else
 	{
-		#if LOG_ADB || LOG_ADB_TALK_LISTEN
-		printf("Got LISTEN data %02x %02x for device %x reg %x\n", m_adb_command, m_adb_buffer[1], m_adb_listenaddr, m_adb_listenreg);
-		#endif
+		LOGMASKED(LOG_TALK_LISTEN, "Got LISTEN data %02x %02x for device %x reg %x\n", m_adb_command, m_adb_buffer[1], m_adb_listenaddr, m_adb_listenreg);
 
 		m_adb_direction = 0;
 
@@ -508,28 +710,25 @@ void mac_state::adb_talk()
 		{
 			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
 			{
-				#if LOG_ADB || LOG_ADB_TALK_LISTEN
-				printf("MOUSE: moving to address %x\n", m_adb_command);
-				#endif
+				LOGMASKED(LOG_TALK_LISTEN, "MOUSE: moving to address %x\n", m_adb_command);
 				m_adb_mouseaddr = m_adb_command&0x0f;
+				m_adb_mouse_initialized = 1;
 			}
 		}
 		else if (m_adb_listenaddr == m_adb_keybaddr)
 		{
 			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
 			{
-				#if LOG_ADB || LOG_ADB_TALK_LISTEN
-				printf("KEYBOARD: moving to address %x\n", m_adb_command);
-				#endif
+				LOGMASKED(LOG_TALK_LISTEN, "KEYBOARD: moving to address %x\n", m_adb_command);
 				m_adb_keybaddr = m_adb_command&0x0f;
 			}
 		}
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
+TIMER_CALLBACK_MEMBER(macadb_device::mac_adb_tick)
 {
-	if ((ADB_IS_EGRET) || (ADB_IS_CUDA))
+	if (m_bIsMCUMode)
 	{
 		switch (m_adb_linestate)
 		{
@@ -539,20 +738,23 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 				break;
 
 			case LST_TSTOPSTART:
+				LOGMASKED(LOG_LINESTATE, "Send: TStopStart begin\n");
 				set_adb_line(ASSERT_LINE);
-				m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+				m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
 				m_adb_linestate++;
 				break;
 
 			case LST_TSTOPSTARTa:
+				LOGMASKED(LOG_LINESTATE, "Send: TStopStart end\n");
 				set_adb_line(CLEAR_LINE);
-				m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+				m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
 				m_adb_linestate++;
 				break;
 
 			case LST_STARTBIT:
+				LOGMASKED(LOG_LINESTATE, "Send: Start bit\n");
 				set_adb_line(ASSERT_LINE);
-				m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
+				m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
 				m_adb_linestate++;
 				break;
 
@@ -567,13 +769,13 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 				set_adb_line(CLEAR_LINE);
 				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
 				{
-//                    printf("1 ");
-					m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+					LOGMASKED(LOG_LINESTATE, "Send: 1\n");
+					m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
 				}
 				else
 				{
-//                    printf("0 ");
-					m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
+					LOGMASKED(LOG_LINESTATE, "Send: 0\n");
+					m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
 				}
 				m_adb_linestate++;
 				break;
@@ -588,11 +790,11 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 				set_adb_line(ASSERT_LINE);
 				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
 				{
-					m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
 				}
 				else
 				{
-					m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
 				}
 				m_adb_buffer[m_adb_stream_ptr] <<= 1;
 				m_adb_linestate++;
@@ -603,12 +805,12 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
 				{
 //                    printf("  ");
-					m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
 				}
 				else
 				{
 //                    printf("  ");
-					m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
 				}
 
 				m_adb_stream_ptr++;
@@ -623,12 +825,14 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 				break;
 
 			case LST_SENDSTOP:
+				LOGMASKED(LOG_LINESTATE, "Send: Stop bit begin\n");
 				set_adb_line(CLEAR_LINE);
-				m_adb_timer->adjust(attotime::from_ticks((57*2), 1000000));
+				m_adb_timer->adjust(attotime::from_ticks((adb_short*2), adb_timebase));
 				m_adb_linestate++;
 				break;
 
 			case LST_SENDSTOPa:
+				LOGMASKED(LOG_LINESTATE, "Send: Stop bit end\n");
 				set_adb_line(ASSERT_LINE);
 				m_adb_timer->adjust(attotime::never);
 				m_adb_linestate = LST_IDLE;
@@ -640,26 +844,41 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 		// for input to Mac, the VIA reads on the *other* clock edge, so update this here
 		if (!m_adb_direction)
 		{
-			m_via1->write_cb2((m_adb_send & 0x80)>>7);
+			write_via_data((m_adb_send & 0x80)>>7);
 			m_adb_send <<= 1;
 		}
 
 		// do one clock transition on CB1 to advance the VIA shifter
-		m_via1->write_cb1(m_adb_extclock ^ 1);
-		m_via1->write_cb1(m_adb_extclock);
+		//printf("ADB transition (%d)\n", m_adb_timer_ticks);
+		if (m_adb_direction)
+		{
+			write_via_clock(m_adb_extclock ^ 1);
+			write_via_clock(m_adb_extclock);
+		}
+		else
+		{
+			write_via_clock(m_adb_extclock);
+			write_via_clock(m_adb_extclock ^ 1);
+		}
 
 		m_adb_timer_ticks--;
 		if (!m_adb_timer_ticks)
 		{
 			m_adb_timer->adjust(attotime::never);
 
-			if ((m_adb_direction) && (ADB_IS_BITBANG_CLASS))
+			if ((m_adb_direction) && (!m_bIsMCUMode))
 			{
 				adb_talk();
 				if((m_adb_last_talk == 2) && m_adb_datasize) {
 					m_adb_timer_ticks = 8;
 					m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				}
+			}
+
+			if (!(m_adb_direction) && !(m_bIsMCUMode))
+			{
+			//  write_via_clock(m_adb_extclock);
+				write_via_clock(m_adb_extclock ^ 1);
 			}
 		}
 		else
@@ -669,13 +888,11 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 	}
 }
 
-void mac_state::mac_adb_newaction(int state)
+void macadb_device::mac_adb_newaction(int state)
 {
 	if (state != m_adb_state)
 	{
-		#if LOG_ADB
-		printf("New ADB state: %s\n", adb_statenames[state]);
-		#endif
+		LOGMASKED(LOG_STATE, "New ADB state: %s\n", adb_statenames[state]);
 
 		m_adb_state = state;
 		m_adb_timer_ticks = 8;
@@ -686,12 +903,13 @@ void mac_state::mac_adb_newaction(int state)
 				m_adb_command = m_adb_send = 0;
 				m_adb_direction = 1;    // Mac is shifting us a command
 				m_adb_waiting_cmd = 1;  // we're going to get a command
-				m_adb_irq_pending = 0;
+				write_adb_irq(CLEAR_LINE);
 				m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				break;
 
 			case ADB_STATE_XFER_EVEN:
 			case ADB_STATE_XFER_ODD:
+				//printf("EVEN/ODD: adb datasize %d\n", m_adb_datasize);
 				if (m_adb_datasize > 0)
 				{
 					int i;
@@ -701,6 +919,7 @@ void mac_state::mac_adb_newaction(int state)
 					{
 						// set up the byte
 						m_adb_send = m_adb_buffer[0];
+						//printf("ADB sending %02x\n", m_adb_send);
 						m_adb_datasize--;
 
 						// move down the rest of the buffer, if any
@@ -714,402 +933,28 @@ void mac_state::mac_adb_newaction(int state)
 				else
 				{
 					m_adb_send = 0;
-					m_adb_irq_pending = 1;
+					write_adb_irq(ASSERT_LINE);
 				}
 
 				m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				break;
 
 			case ADB_STATE_IDLE:
-				m_adb_irq_pending = 0;
+				write_adb_irq(CLEAR_LINE);
 				break;
 		}
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::mac_pmu_tick)
+void macadb_device::adb_vblank()
 {
-	// state 10 means this is in response to an ADB command
-	if (m_pm_state == 10)
-	{
-		#if LOG_ADB
-		printf("PM: was state 10, chunk-chunking CB1\n");
-		#endif
-		m_pm_state = 0;
-
-		// tick CB1, which should cause a PMU interrupt on PMU machines
-		m_adb_extclock ^= 1;
-		m_via1->write_cb1(m_adb_extclock);
-		m_adb_extclock ^= 1;
-		m_via1->write_cb1(m_adb_extclock);
-	}
-	else
-	{
-		#if LOG_ADB
-		printf("PM: timer tick, lowering ACK\n");
-		#endif
-		m_pm_ack &= ~2;    // lower ACK to handshake next step
-	}
-}
-
-void mac_state::pmu_one_byte_reply(uint8_t result)
-{
-	m_pm_out[0] = m_pm_out[1] = 1;  // length
-	m_pm_out[2] = result;
-	m_pm_slen = 3;
-	m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-}
-
-void mac_state::pmu_three_byte_reply(uint8_t result1, uint8_t result2, uint8_t result3)
-{
-	m_pm_out[0] = m_pm_out[1] = 3;  // length
-	m_pm_out[2] = result1;
-	m_pm_out[3] = result2;
-	m_pm_out[4] = result3;
-	m_pm_slen = 5;
-	m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-}
-
-void mac_state::pmu_exec()
-{
-	m_pm_sptr = 0;  // clear send pointer
-	m_pm_slen = 0;  // and send length
-	m_pm_dptr = 0;  // and receive pointer
-
-//  printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
-	switch (m_pm_cmd[0])
-	{
-		case 0x10:  // subsystem power and clock ctrl
-			break;
-
-		case 0x20:  // send ADB command (PMU must issue an IRQ on completion)
-			#if 0
-			printf("PMU: Send ADB %02x %02x cmd %02x flag %02x data %02x %02x\n",
-					m_pm_cmd[0],    // 0x20
-					m_pm_cmd[1],    // ???
-					m_pm_cmd[2],    // adb flags (2 for autopoll active, 3 to reset bus?)
-					m_pm_cmd[3],    // length of ADB data
-					m_pm_cmd[4],    // adb data
-					m_pm_cmd[5]);
-			#endif
-
-			#if 0
-			m_pm_state = 10;
-			m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			if (ADB_IS_PM_VIA1_CLASS)
-			{
-				m_pmu_int_status = 0x1;
-			}
-			else if (ADB_IS_PM_VIA2_CLASS)
-			{
-				m_pmu_int_status = 0x10;
-			}
-			else
-			{
-				fatalerror("mac: unknown ADB PMU type\n");
-			}
-			m_pmu_last_adb_command = m_pm_cmd[2];
-			m_adb_command = m_pm_cmd[2];
-			m_adb_waiting_cmd = 1;
-			adb_talk();
-
-			if ((m_pm_cmd[2] & 0xf) == 0xb) // LISTEN register 3 (remap)
-			{
-				m_adb_waiting_cmd = 0;
-				m_adb_command = mac->m_pm_cmd[5];
-				adb_talk();
-			}
-			#else
-			if (((m_pm_cmd[2] == 0xfc) || (m_pm_cmd[2] == 0x2c)) && (m_pm_cmd[3] == 4))
-			{
-//              printf("PMU: request to poll ADB, returning nothing\n");
-				m_pm_slen = 0;
-				m_pmu_int_status = 0;
-			}
-			else
-			{
-				m_pm_state = 10;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-				if (ADB_IS_PM_VIA1_CLASS)
-				{
-					m_pmu_int_status = 0x1;
-				}
-				else if (ADB_IS_PM_VIA2_CLASS)
-				{
-					m_pmu_int_status = 0x10;
-				}
-				else
-				{
-					fatalerror("mac: unknown ADB PMU type\n");
-				}
-				m_pmu_last_adb_command = m_pm_cmd[2];
-			}
-
-			m_adb_command = m_pm_cmd[2];
-			m_adb_waiting_cmd = 1;
-			adb_talk();
-			#endif
-			break;
-
-		case 0x21:  // turn ADB auto-poll off (does this need a reply?)
-			break;
-
-		case 0x28:  // read ADB
-			if (m_adb_datasize > 0)
-			{
-				m_adb_datasize = 1; // hack
-
-				m_pm_out[0] = m_pm_out[1] = 3 + m_adb_datasize;
-				m_pm_out[2] = 0;
-//              m_pm_out[3] = m_pmu_last_adb_command;
-				m_pm_out[3] = 0;
-				m_pm_out[4] = m_adb_datasize;
-				for (int i = 0; i < m_adb_datasize; i++)
-				{
-					m_pm_out[5+i] = 0; //mac->m_adb_buffer[i];
-				}
-				m_pm_slen = 5 + m_adb_datasize;
-			}
-			else
-			{
-				m_pm_out[0] = m_pm_out[1] = 4;
-				m_pm_out[2] = 0;
-				m_pm_out[3] = 0;
-//              m_pm_out[3] = m_pmu_last_adb_command;
-				m_pm_out[4] = 1;    // length of following data
-				m_pm_out[5] = 0;
-				m_pm_slen = 6;
-			}
-/*          printf("ADB packet: ");
-            for (int i = 0; i < m_pm_slen; i++)
-            {
-                printf("%02x ", m_pm_out[i]);
-            }
-            printf("\n");*/
-			m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1000)));
-			break;
-
-		case 0x31:  // write first 20 bytes of PRAM
-			{
-				for (int i = 0; i < 20; i++)
-				{
-					m_adb_pram[i] = m_pm_cmd[1+i];
-				}
-			}
-			break;
-
-		case 0x32:  // write extended PRAM byte(s).  cmd[2] = address, cmd[3] = length, cmd[4...] = data
-			if ((m_pm_cmd[2] + m_pm_cmd[3]) < 0x100)
-			{
-				int i;
-
-				for (i = 0; i < m_pm_cmd[3]; i++)
-				{
-					m_adb_pram[m_pm_cmd[2] + i] = m_pm_cmd[4+i];
-				}
-			}
-			break;
-
-		case 0x38:  // read time
-			{
-				m_pm_out[0] = m_pm_out[1] = 4;
-				m_pm_out[2] = 0x63; // famous Mac RTC value of 8/27/56 8:35:00 PM
-				m_pm_out[3] = 0x0b;
-				m_pm_out[4] = 0xd1;
-				m_pm_out[5] = 0x78;
-				m_pm_slen = 6;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			}
-			break;
-
-		case 0x39:  // read first 20 bytes of PRAM
-			{
-				int i;
-
-				m_pm_out[0] = m_pm_out[1] = 20;
-				for (i = 0; i < 20; i++)
-				{
-					m_pm_out[2 + i] = m_adb_pram[i];
-				}
-				m_pm_slen = 22;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			}
-			break;
-
-		case 0x3a:  // read extended PRAM byte(s).  cmd[2] = address, cmd[3] = length
-			if ((m_pm_cmd[2] + m_pm_cmd[3]) < 0x100)
-			{
-				int i;
-
-				m_pm_out[0] = m_pm_out[1] = m_pm_cmd[3];
-				for (i = 0; i < m_pm_cmd[3]; i++)
-				{
-					m_pm_out[2 + i] = m_adb_pram[m_pm_cmd[2] + i];
-				}
-				m_pm_slen = m_pm_out[0] + 2;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			}
-			break;
-
-		case 0x40:  // set screen contrast
-			break;
-
-		case 0x41:
-			break;
-
-		case 0x58:  // read internal modem status
-			pmu_one_byte_reply(0);
-			break;
-
-		case 0x60:  // set low power warning and cutoff battery levels
-			break;
-
-		case 0x68:  // read battery/charger level
-			pmu_three_byte_reply(255, 255, 255);
-			break;
-
-		case 0x69:  // read battery/charger instantaneous level and status
-			pmu_three_byte_reply(255, 255, 255);
-			break;
-
-		case 0x6b:  // read extended battery/charger level and status (wants an 8 byte reply)
-			m_pm_out[0] = m_pm_out[1] = 8;  // length
-			m_pm_out[2] = 255;
-			m_pm_out[3] = 255;
-			m_pm_out[4] = 255;
-			m_pm_out[5] = 255;
-			m_pm_out[6] = 255;
-			m_pm_out[7] = 255;
-			m_pm_out[8] = 255;
-			m_pm_out[9] = 255;
-			m_pm_slen = 10;
-			m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			break;
-
-		case 0x6c:  // read battery ID
-			pmu_one_byte_reply(1);
-			break;
-
-		case 0x78:  // read interrupt flag
-			if (ADB_IS_PM_VIA2_CLASS)   // PB 140/170 use a "leaner" PMU protocol where you get the data for a PMU interrupt here
-			{
-				#if 0
-				if ((m_pmu_int_status&0xf0) == 0x10)
-				{
-					if (m_adb_datasize > 0)
-					{
-						m_adb_datasize = 1; // hack
-						m_pm_out[0] = m_pm_out[1] = 2 + m_adb_datasize;
-						m_pm_out[2] = m_pmu_int_status; // ADB status in low nibble
-						m_pm_out[3] = m_pmu_last_adb_command;         // ADB command that was sent
-						for (int i = 0; i < m_adb_datasize; i++)
-						{
-							m_pm_out[4+i] = 0; //m_adb_buffer[i];
-						}
-						m_pm_slen = 4 + m_adb_datasize;
-						m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
-
-/*                      printf("ADB packet: ");
-                        for (int i = 0; i < m_pm_slen; i++)
-                        {
-                            printf("%02x ", m_pm_out[i]);
-                        }
-                        printf("\n");*/
-					}
-					else
-					{
-						m_pm_out[0] = m_pm_out[1] = 2;
-						m_pm_out[2] = m_pmu_int_status; // ADB status in low nibble
-						m_pm_out[3] = m_pmu_last_adb_command;         // ADB command that was sent OR 0x80 for extra error-ness
-						m_pm_out[4] = 0;                              // return data
-						m_pm_slen = 4;
-						m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
-					}
-				}
-				else
-				{
-					pmu_one_byte_reply(mac, m_pmu_int_status);
-				}
-				#else
-				if ((m_pmu_int_status&0xf0) == 0x10)
-				{
-					m_pm_out[0] = m_pm_out[1] = 2;
-					m_pm_out[2] = m_pmu_int_status; // ADB status in low nibble
-					m_pm_out[3] = m_pmu_last_adb_command;         // ADB command that was sent OR 0x80 for extra error-ness
-					m_pm_out[4] = 0;                              // return data
-					m_pm_slen = 4;
-					m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
-				}
-				else
-				{
-					pmu_one_byte_reply(m_pmu_int_status);
-				}
-				#endif
-			}
-			else
-			{
-				pmu_one_byte_reply(m_pmu_int_status);
-			}
-
-			m_pmu_int_status = 0;
-			break;
-
-		case 0x90: // sound power control
-			break;
-
-		case 0x98:  // read sound power state
-			pmu_one_byte_reply(1);
-			break;
-
-		case 0xd8:  // read A/D converter (not sure what this does)
-			pmu_one_byte_reply(0);
-			break;
-
-		case 0xe0:  // write PMU internal RAM
-			break;
-
-		case 0xe8:  // read PMU internal RAM (just return zeroes)
-			{
-				int i;
-
-				m_pm_out[0] = m_pm_out[1] = m_pm_cmd[4];
-//              printf("PMU read at %x\n", m_pm_cmd[2] | (m_pm_cmd[3]<<8));
-
-				// note: read at 0xEE00 0 = target disk mode, 0xff = normal bootup
-				// (actually 0x00EE, the 50753 port 6)
-
-				for (i = 0; i < m_pm_cmd[4]; i++)
-				{
-					m_pm_out[2 + i] = 0xff;
-				}
-				m_pm_slen = m_pm_out[0] + 2;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			}
-			break;
-
-		case 0xec:  // PMU self-test (send 1 count byte + reply)
-			pmu_one_byte_reply(0);
-			break;
-
-		default:
-			fatalerror("PMU: Unhandled command %02x\n", m_pm_cmd[0]);
-	}
-
-	if (m_pm_slen > 0)
-	{
-		m_pm_state = 1;
-	}
-}
-
-void mac_state::adb_vblank()
-{
-	if ((m_adb_state == ADB_STATE_IDLE) || ((ADB_IS_PM_CLASS) && (m_pmu_poll)))
+	if (m_adb_state == ADB_STATE_IDLE)
 	{
 		if (this->adb_pollmouse())
 		{
 			// if the mouse was the last TALK, we can just send the new data
 			// otherwise we need to pull SRQ
-			if ((m_adb_last_talk == m_adb_mouseaddr) && !(ADB_IS_PM_CLASS))
+			if (m_adb_last_talk == m_adb_mouseaddr)
 			{
 				// repeat last TALK to get updated data
 				m_adb_waiting_cmd = 1;
@@ -1118,35 +963,18 @@ void mac_state::adb_vblank()
 				m_adb_timer_ticks = 8;
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
-			#if 0
-			else if (ADB_IS_PM_CLASS)
-			{
-				m_adb_waiting_cmd = 1;
-				this->adb_talk();
-				m_pm_state = 10;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-				if (ADB_IS_PM_VIA1_CLASS)
-				{
-					m_pmu_int_status = 0x1;
-				}
-				else if (ADB_IS_PM_VIA2_CLASS)
-				{
-					m_pmu_int_status = 0x10;
-				}
-			}
-			#endif
 			else
 			{
-				m_adb_irq_pending = 1;
+				write_adb_irq(ASSERT_LINE);
 				m_adb_command = m_adb_send = 0;
-				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see  the IRQ
+				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see the IRQ
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				m_adb_srq_switch = 1;
 			}
 		}
 		else if (this->adb_pollkbd(0))
 		{
-			if ((m_adb_last_talk == m_adb_keybaddr) && !(ADB_IS_PM_CLASS))
+			if (m_adb_last_talk == m_adb_keybaddr)
 			{
 				// repeat last TALK to get updated data
 				m_adb_waiting_cmd = 1;
@@ -1155,19 +983,9 @@ void mac_state::adb_vblank()
 				m_adb_timer_ticks = 8;
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
-			#if 0
-			else if (ADB_IS_PM_CLASS)
-			{
-				m_adb_waiting_cmd = 1;
-				this->adb_talk();
-				m_pm_state = 10;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-				m_pmu_int_status = 0x1;
-			}
-			#endif
 			else
 			{
-				m_adb_irq_pending = 1;
+				write_adb_irq(ASSERT_LINE);
 				m_adb_command = m_adb_send = 0;
 				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see  the IRQ
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
@@ -1177,25 +995,20 @@ void mac_state::adb_vblank()
 	}
 }
 
-void mac_state::adb_reset()
+void macadb_device::device_reset()
 {
 	int i;
 
 	m_adb_srq_switch = 0;
-	m_adb_irq_pending = 0;      // no interrupt
+	write_adb_irq(CLEAR_LINE);      // no interrupt
 	m_adb_timer_ticks = 0;
 	m_adb_command = 0;
 	m_adb_extclock = 0;
 	m_adb_send = 0;
 	m_adb_waiting_cmd = 0;
-	m_adb_streaming = MCU_STREAMING_NONE;
 	m_adb_state = 0;
 	m_adb_srqflag = false;
-	m_pmu_poll = 0;
-	if (ADB_IS_BITBANG_CLASS)
-	{
-		m_adb_state = ADB_STATE_NOTINIT;
-	}
+	m_adb_state = ADB_STATE_NOTINIT;
 	m_adb_direction = 0;
 	m_adb_datasize = 0;
 	m_adb_last_talk = -1;
@@ -1218,12 +1031,13 @@ void mac_state::adb_reset()
 	}
 	m_adb_keybuf_start = 0;
 	m_adb_keybuf_end = 0;
+
+	m_last_adb_time = 0;
 }
 
-WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
+WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 {
-	int dtime = 0;
-/*    static char const *const states[] =
+/*  static char const *const states[] =
     {
         "idle",
         "attention",
@@ -1241,16 +1055,16 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
         "srqnodata"
     };*/
 
-	if (ADB_IS_EGRET)
+	if (state == m_adb_linein)
 	{
-		dtime = m_egret->get_adb_dtime();
+		return;
 	}
-	else if (ADB_IS_CUDA)
-	{
-		dtime = m_cuda->get_adb_dtime();
-	}
+	m_adb_linein = state;
 
-/*    if (m_adb_linestate <= 12)
+	int dtime = (int)(machine().time().as_ticks(adb_timebase) - m_last_adb_time);
+	m_last_adb_time = machine().time().as_ticks(adb_timebase);
+
+/*  if (m_adb_linestate <= 12)
     {
         printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
     }
@@ -1281,11 +1095,11 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 		case LST_IDLE:
 			if ((state) && (dtime >= 4500))     // reset
 			{
-//                printf("ADB RESET\n");
+				//printf("ADB RESET\n");
 			}
 			else if ((state) && (dtime >= 1200))    // attention
 			{
-//                printf("ADB ATTENTION\n");
+				//printf("ADB ATTENTION\n");
 				m_adb_waiting_cmd = 1;
 				m_adb_direction = 0;
 				m_adb_linestate++;
@@ -1295,7 +1109,7 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 		case LST_ATTENTION:
 			if ((!state) && (dtime >= 90))     // Tsync
 			{
-//                printf("ADB Tsync\n");
+				//printf("ADB Tsync\n");
 				m_adb_command = 0;
 				m_adb_linestate++;
 			}
@@ -1315,7 +1129,7 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 				{
 					m_adb_command |= 1;
 				}
-//                printf("ADB bit %d\n", m_adb_command & 1);
+				LOGMASKED(LOG_LINESTATE, "ADB bit %d (dtime = %d)\n", m_adb_command & 1, dtime);
 
 				if (m_adb_linestate != LST_BIT7)
 				{
@@ -1325,7 +1139,7 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 				{
 					if (m_adb_direction)
 					{
-//                        printf("listen byte[%d] = %02x\n", m_adb_stream_ptr, m_adb_command);
+						LOGMASKED(LOG_LINESTATE, "listen byte[%d] = %02x\n", m_adb_stream_ptr, m_adb_command);
 						m_adb_buffer[m_adb_stream_ptr++] = m_adb_command;
 						m_adb_command = 0;
 					}
@@ -1338,7 +1152,7 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 		case LST_TSTOP:
 			if (state)
 			{
-//                printf("ADB TSTOP, command byte %02x\n", m_adb_command);
+				LOGMASKED(LOG_LINESTATE, "ADB TSTOP, command byte %02x\n", m_adb_command);
 
 				if (m_adb_direction)
 				{
@@ -1359,13 +1173,14 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 
 				if (m_adb_datasize > 0)
 				{
-/*                    printf("Device has %d bytes of data: ", m_adb_datasize);
-                    for (int i = 0; i < m_adb_datasize; i++)
-                    {
-                        printf("%02x ", m_adb_buffer[i]);
-                    }*/
+					LOGMASKED(LOG_TALK_LISTEN, "Device has %d bytes of data:\n", m_adb_datasize);
+					for (int i = 0; i < m_adb_datasize; i++)
+					{
+						LOGMASKED(LOG_TALK_LISTEN, "  %02x", m_adb_buffer[i]);
+					}
+					LOGMASKED(LOG_TALK_LISTEN, "\n");
 					m_adb_linestate = LST_TSTOPSTART;   // T1t
-					m_adb_timer->adjust(attotime::from_ticks(324/4, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(324/4, adb_timebase));
 					m_adb_stream_ptr = 0;
 				}
 				else if (m_adb_direction)   // if direction is set, we LISTENed to a valid device
@@ -1377,7 +1192,7 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 					if (m_adb_srqflag)
 					{
 						m_adb_linestate = LST_SRQNODATA;
-						m_adb_timer->adjust(attotime::from_ticks(486, 1000000));   // SRQ time
+						m_adb_timer->adjust(attotime::from_ticks(adb_srq, adb_timebase));   // SRQ time
 					}
 					else
 					{
@@ -1390,7 +1205,7 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 		case LST_WAITT1T:
 			if ((!state) && (dtime >= 300))     // T1t
 			{
-//                printf("ADB T1t\n");
+				LOGMASKED(LOG_LINESTATE, "ADB T1t\n");
 				m_adb_linestate++;
 			}
 			break;
@@ -1398,22 +1213,10 @@ WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 		case LST_RCVSTARTBIT:
 			if ((!state) && (dtime >= 90))       // start
 			{
-//                printf("ADB start\n");
+				LOGMASKED(LOG_LINESTATE, "ADB start\n");
 				m_adb_linestate = LST_BIT0;
 				m_adb_command = 0;
 			}
 			break;
-	}
-}
-
-void mac_state::set_adb_line(int linestate)
-{
-	if (ADB_IS_EGRET)
-	{
-		m_egret->set_adb_line(linestate);
-	}
-	else if (ADB_IS_CUDA)
-	{
-		m_cuda->set_adb_line(linestate);
 	}
 }

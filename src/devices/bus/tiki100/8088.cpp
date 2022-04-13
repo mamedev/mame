@@ -52,7 +52,7 @@ const tiny_rom_entry *tiki100_8088_device::device_rom_region() const
 void tiki100_8088_device::i8088_mem(address_map &map)
 {
 	map(0x00000, 0xbffff).ram();
-	map(0xc0000, 0xcffff).rw(":" TIKI100_BUS_TAG, FUNC(tiki100_bus_device::exin_mrq_r), FUNC(tiki100_bus_device::exin_mrq_w));
+	//map(0xc0000, 0xcffff).rw(m_bus, FUNC(tiki100_bus_device::exin_mrq_r), FUNC(tiki100_bus_device::exin_mrq_w)); don't have m_bus until start
 	map(0xff000, 0xfffff).rom().region(I8088_TAG, 0);
 }
 
@@ -99,6 +99,10 @@ tiki100_8088_device::tiki100_8088_device(const machine_config &mconfig, const ch
 
 void tiki100_8088_device::device_start()
 {
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(
+			0xc0000, 0xcffff,
+			read8sm_delegate(*m_bus, FUNC(tiki100_bus_device::exin_mrq_r)),
+			write8sm_delegate(*m_bus, FUNC(tiki100_bus_device::exin_mrq_w)));
 }
 
 
@@ -151,7 +155,7 @@ void tiki100_8088_device::iorq_w(offs_t offset, uint8_t data)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( tiki100_8088_device::read )
+uint8_t tiki100_8088_device::read()
 {
 	return m_busak << 4 | m_data;
 }
@@ -161,7 +165,7 @@ READ8_MEMBER( tiki100_8088_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( tiki100_8088_device::write )
+void tiki100_8088_device::write(uint8_t data)
 {
 	m_data = data & 0x0f;
 

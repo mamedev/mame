@@ -45,11 +45,15 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
 
 class onetwo_state : public driver_device
 {
@@ -73,14 +77,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint8_t> m_fgram;
 	required_memory_bank m_mainbank;
 
-	/* video-related */
+	// video-related
 	tilemap_t *m_fg_tilemap;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -88,9 +92,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_WRITE8_MEMBER(cpubank_w);
-	DECLARE_WRITE8_MEMBER(coin_counters_w);
+	void fgram_w(offs_t offset, uint8_t data);
+	void cpubank_w(uint8_t data);
+	void coin_counters_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	static rgb_t BBBGGGGGxBBRRRRR(uint32_t raw);
@@ -115,12 +119,12 @@ TILE_GET_INFO_MEMBER(onetwo_state::get_fg_tile_info)
 
 	code &= 0x7fff;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void onetwo_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(onetwo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 uint32_t onetwo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -135,18 +139,18 @@ uint32_t onetwo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
  *
  *************************************/
 
-WRITE8_MEMBER(onetwo_state::fgram_w)
+void onetwo_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(onetwo_state::cpubank_w)
+void onetwo_state::cpubank_w(uint8_t data)
 {
 	m_mainbank->set_entry(data);
 }
 
-WRITE8_MEMBER(onetwo_state::coin_counters_w)
+void onetwo_state::coin_counters_w(uint8_t data)
 {
 	m_watchdog->watchdog_reset();
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
@@ -197,8 +201,8 @@ void onetwo_state::sound_cpu(address_map &map)
 void onetwo_state::sound_cpu_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::data_w));
 	map(0x40, 0x40).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc0, 0xc0).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
@@ -250,7 +254,7 @@ static INPUT_PORTS_START( onetwo )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) ) PORT_DIPLOCATION("SW2:1") /* Flip Screen? */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) ) PORT_DIPLOCATION("SW2:1") // Flip Screen?
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
@@ -265,7 +269,7 @@ static INPUT_PORTS_START( onetwo )
 	PORT_DIPNAME( 0x10, 0x10, "Women Select" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	/* In stop mode, press 2 to stop and 1 to restart */
+	// In stop mode, press 2 to stop and 1 to restart
 	PORT_DIPNAME( 0x20, 0x20, "Stop Mode (Cheat)") PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -342,7 +346,7 @@ void onetwo_state::machine_start()
 
 void onetwo_state::onetwo(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &onetwo_state::main_cpu);
 	m_maincpu->set_addrmap(AS_IO, &onetwo_state::main_cpu_io);
@@ -354,7 +358,7 @@ void onetwo_state::onetwo(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(16));
@@ -366,7 +370,7 @@ void onetwo_state::onetwo(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_onetwo);
 	PALETTE(config, m_palette).set_format(2, &onetwo_state::BBBGGGGGxBBRRRRR, 0x80);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -377,7 +381,7 @@ void onetwo_state::onetwo(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000*2, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 4_MHz_XTAL / 2, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified, no resonator on PCB so probably derived from the 4 MHz XTAL
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -388,10 +392,10 @@ void onetwo_state::onetwo(machine_config &config)
  *************************************/
 
 ROM_START( onetwo )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* main z80 */
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "maincpu", 0x00000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -404,10 +408,10 @@ ROM_START( onetwo )
 ROM_END
 
 ROM_START( onetwoe )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* main z80 */
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "main_prog", 0x00000,  0x20000, CRC(6c1936e9) SHA1(d8fb3056299c9b45e0b537e77dc0d633882705dd) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -418,6 +422,9 @@ ROM_START( onetwoe )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*************************************
  *

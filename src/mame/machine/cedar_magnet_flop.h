@@ -24,8 +24,8 @@ public:
 	void port62_w(u8 data);
 	void port63_w(u8 data);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -34,14 +34,14 @@ protected:
 
 private:
 	required_region_ptr<u8> m_disk;
-	u8 m_flopdat;
-	u8 m_flopcmd;
-	u8 m_flopsec;
-	u8 m_flopstat;
-	u8 m_floptrk;
+	u8 m_flopdat = 0;
+	u8 m_flopcmd = 0;
+	u8 m_flopsec = 0;
+	u8 m_flopstat = 0;
+	u8 m_floptrk = 0;
 
-	u8 m_curtrack;
-	int m_secoffs;
+	u8 m_curtrack = 0;
+	int m_secoffs = 0;
 
 };
 

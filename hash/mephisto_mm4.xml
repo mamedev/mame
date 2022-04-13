@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="mephisto_mm4" description="Mephisto MM IV Modules">
+
+<!-- HG 440 module is exclusively used with MM IV -->
+
+	<software name="hg440">
+		<description>Mephisto HG 440 Opening Library</description>
+		<year>1987</year>
+		<publisher>Hegener + Glaser</publisher>
+		<part name="cart" interface="mephisto_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="hg_440" size="0x4000" crc="81ffcdfd" sha1="b0f7bcc11d1e821daf92cde31e3446c8be0bbe19" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

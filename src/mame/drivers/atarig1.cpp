@@ -35,22 +35,9 @@
  *
  *************************************/
 
-void atarig1_state::update_interrupts()
+void atarig1_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-MACHINE_START_MEMBER(atarig1_state,atarig1)
-{
-	atarigen_state::machine_start();
-}
-
-
-MACHINE_RESET_MEMBER(atarig1_state,atarig1)
-{
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 
@@ -61,7 +48,7 @@ MACHINE_RESET_MEMBER(atarig1_state,atarig1)
  *
  *************************************/
 
-WRITE16_MEMBER(atarig1_state::mo_command_w)
+void atarig1_state::mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	m_rle->command_write((data == 0 && m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -75,14 +62,14 @@ WRITE16_MEMBER(atarig1_state::mo_command_w)
  *
  *************************************/
 
-WRITE16_MEMBER(atarig1_state::a2d_select_w)
+void atarig1_state::a2d_select_w(offs_t offset, uint16_t data)
 {
 	if (m_adc.found())
 		m_adc->address_offset_start_w(offset, 0);
 }
 
 
-READ16_MEMBER(atarig1_state::a2d_data_r)
+uint16_t atarig1_state::a2d_data_r()
 {
 	if (m_adc.found())
 		return m_adc->data_r() << 8;
@@ -98,38 +85,9 @@ READ16_MEMBER(atarig1_state::a2d_data_r)
  *
  *************************************/
 
-void atarig1_state::update_bank(int bank)
+void atarig1_state::pitfightb_cheap_slapstic_tweak(offs_t offset)
 {
-	/* if the bank has changed, copy the memory; Pit Fighter needs this */
-	if (bank != m_bslapstic_bank)
-	{
-		/* bank 0 comes from the copy we made earlier */
-		if (bank == 0)
-			memcpy(m_bslapstic_base, m_bslapstic_bank0.get(), 0x2000);
-		else
-			memcpy(m_bslapstic_base, &m_bslapstic_base[bank * 0x1000], 0x2000);
-
-		/* remember the current bank */
-		m_bslapstic_bank = bank;
-	}
-}
-
-
-void atarig1_state::device_post_load()
-{
-	if (m_bslapstic_base != nullptr)
-	{
-		int bank = m_bslapstic_bank;
-		m_bslapstic_bank = -1;
-		update_bank(bank);
-	}
-}
-
-
-READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
-{
-	int result = m_bslapstic_base[offset & 0xfff];
-
+	offset = offset & 0x3fff;
 	/* the cheap replacement slapstic just triggers on the simple banking */
 	/* addresses; a software patch ensure that this is good enough */
 
@@ -140,34 +98,19 @@ READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
 	/* one of 4 bankswitchers produces the result */
 	else if (m_bslapstic_primed)
 	{
+		m_bslapstic_primed = false;
 		if (offset == 0x42)
-			update_bank(0), m_bslapstic_primed = false;
+			m_slapstic_bank->set_entry(0);
 		else if (offset == 0x52)
-			update_bank(1), m_bslapstic_primed = false;
+			m_slapstic_bank->set_entry(1);
 		else if (offset == 0x62)
-			update_bank(2), m_bslapstic_primed = false;
+			m_slapstic_bank->set_entry(2);
 		else if (offset == 0x72)
-			update_bank(3), m_bslapstic_primed = false;
+			m_slapstic_bank->set_entry(3);
+		else
+			m_bslapstic_primed = true;
 	}
-	return result;
 }
-
-
-void atarig1_state::pitfightb_cheap_slapstic_init()
-{
-	/* install a read handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),this));
-	m_bslapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0x38000);
-
-	/* allocate memory for a copy of bank 0 */
-	m_bslapstic_bank0 = std::make_unique<uint8_t[]>(0x2000);
-	memcpy(m_bslapstic_bank0.get(), m_bslapstic_base, 0x2000);
-
-	/* not primed by default */
-	m_bslapstic_primed = false;
-}
-
-
 
 /*************************************
  *
@@ -177,10 +120,7 @@ void atarig1_state::pitfightb_cheap_slapstic_init()
 
 void atarig1_state::main_map(address_map &map)
 {
-	map(0x000000, 0x037fff).rom();
-	map(0x038000, 0x03ffff).rom(); /* pitfight slapstic goes here */
-	map(0x040000, 0x077fff).rom();
-	map(0x078000, 0x07ffff).rom(); /* hydra slapstic goes here */
+	map(0x000000, 0x07ffff).rom();
 	map(0xf80000, 0xf80001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xf88000, 0xf8ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0xf90000, 0xf90000).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
@@ -191,15 +131,28 @@ void atarig1_state::main_map(address_map &map)
 	map(0xfc8000, 0xfc8007).rw(FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
 	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-/*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
+/*  map(0xfe0000, 0xfe7fff).r(FUNC(atarig1_state::from_r));*/
 	map(0xfe8000, 0xfe89ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0xff0000, 0xffffff).ram();
 	map(0xff0000, 0xff0fff).ram().share("rle");
-	map(0xff2000, 0xff2001).w(FUNC(atarig1_state::mo_command_w)).share("mo_command");
-	map(0xff4000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
-	map(0xff6000, 0xff6fff).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0xff1000, 0xff1fff).ram();
+	map(0xff2000, 0xff2001).ram().w(FUNC(atarig1_state::mo_command_w)).share("mo_command");
+	map(0xff2002, 0xff3fff).ram();
+	map(0xff4000, 0xff5fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0xff6000, 0xff6fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0xff7000, 0xffffff).ram();
 }
 
+void atarig1_state::pitfight_map(address_map &map)
+{
+	main_map(map);
+	map(0x038000, 0x039fff).mirror(0x6000).bankr(m_slapstic_bank); /* pitfight slapstic goes here */
+}
+
+void atarig1_state::hydra_map(address_map &map)
+{
+	main_map(map);
+	map(0x078000, 0x079fff).mirror(0x6000).bankr(m_slapstic_bank); /* hydra slapstic goes here */
+}
 
 
 /*************************************
@@ -336,21 +289,10 @@ static const gfx_layout pftoplayout =
 	8*8
 };
 
-static const gfx_layout anlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
 
 static GFXDECODE_START( gfx_atarig1 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x300, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x300, 8 )
 GFXDECODE_END
 
@@ -399,13 +341,11 @@ static const atari_rle_objects_config modesc_pitfight =
 void atarig1_state::atarig1(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
-	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::main_map);
-
-	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
-	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarig1_state::scanline_update), m_screen, 0, 8);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -420,12 +360,10 @@ void atarig1_state::atarig1(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarig1_state::screen_update_atarig1));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(atarig1_state::video_int_write_line));
-
-	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_1, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -433,15 +371,16 @@ void atarig1_state::atarig1(machine_config &config)
 	ATARI_JSA_II(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("IN0").bit(14);
-	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.6);
 }
 
 
 void atarig1_state::hydrap(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::main_map);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");
@@ -453,45 +392,66 @@ void atarig1_state::hydrap(machine_config &config)
 void atarig1_state::hydra(machine_config &config)
 {
 	hydrap(config);
-	SLAPSTIC(config, "slapstic", 116, true);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::hydra_map);
+	SLAPSTIC(config, m_slapstic, 116);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x78000, 0x79fff, 0x6000);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pfslap111(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, "slapstic", 111, true);
+	SLAPSTIC(config, m_slapstic, 111);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x39fff, 0x6000);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pfslap112(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, "slapstic", 112, true);
+	SLAPSTIC(config, m_slapstic, 112);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x39fff, 0x6000);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pfslap113(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, "slapstic", 113, true);
+	SLAPSTIC(config, m_slapstic, 113);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x39fff, 0x6000);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pfslap114(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, "slapstic", 114, true);
+	SLAPSTIC(config, m_slapstic, 114);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x39fff, 0x6000);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pitfightb(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
 }
 
@@ -1339,7 +1299,7 @@ ROM_END
 
 void atarig1_state::init_hydra()
 {
-	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x78000, 0x2000);
 	m_is_pitfight = false;
 }
 
@@ -1350,14 +1310,17 @@ void atarig1_state::init_hydrap()
 
 void atarig1_state::init_pitfight()
 {
-	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x38000, 0x2000);
 	m_is_pitfight = true;
 }
 
 void atarig1_state::init_pitfightb()
 {
-	pitfightb_cheap_slapstic_init();
-	save_item(NAME(m_bslapstic_bank));
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x38000, 0x2000);
+
+	/* not primed by default */
+	m_bslapstic_primed = false;
+
 	save_item(NAME(m_bslapstic_primed));
 	m_is_pitfight = true;
 }

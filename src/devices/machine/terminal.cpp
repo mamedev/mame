@@ -154,7 +154,7 @@ generic_terminal_device::generic_terminal_device(const machine_config &mconfig, 
 	, m_y_pos(0)
 	, m_bell_timer(nullptr)
 	, m_beeper(*this, "beeper")
-	, m_keyboard_cb()
+	, m_keyboard_cb(*this)
 {
 }
 
@@ -220,7 +220,7 @@ void generic_terminal_device::term_write(uint8_t data)
 		case 0x0d: // carriage return
 			m_x_pos = 0;
 			if (!(options & 0x080)) break;
-
+			[[fallthrough]];
 		case 0x0a: // linefeed
 			m_y_pos++;
 			if (m_y_pos >= m_height)
@@ -276,7 +276,7 @@ uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bi
 	{
 		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint32_t *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = ma; x < ma + m_width; x++)
 			{
@@ -347,7 +347,7 @@ void generic_terminal_device::device_start()
 {
 	m_buffer = std::make_unique<uint8_t []>(m_width * m_height);
 	m_bell_timer = timer_alloc(BELL_TIMER_ID);
-	m_keyboard_cb.bind_relative_to(*owner());
+	m_keyboard_cb.resolve();
 	save_pointer(NAME(m_buffer), m_width * m_height);
 	save_item(NAME(m_x_pos));
 	save_item(NAME(m_framecnt));
@@ -361,7 +361,7 @@ void generic_terminal_device::device_reset()
 	m_framecnt = 0;
 }
 
-void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

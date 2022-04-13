@@ -13,6 +13,7 @@
     To do:
     - character attributes
     - improve keyboard response and add LED layout (MS7002)
+    - verify CRTC clock
 
     Chips:
     - DD5 - KR580WM80A (8080 clone) - CPU
@@ -47,10 +48,9 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define LOG_GENERAL (1U <<  0)
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -86,7 +86,7 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state?0:1); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state ? 0 : 1); }
 
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(display_attr);
@@ -94,21 +94,21 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
-	DECLARE_WRITE8_MEMBER(pic_w);
+	void pic_w(u8 data);
 	IRQ_CALLBACK_MEMBER(ms6102_int_ack);
 
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(vdack_w);
+	u8 memory_read_byte(offs_t offset);
+	void vdack_w(u8 data);
 
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
+	u8 crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(misc_status_r);
-	u16 m_dmaaddr;
+	u8 misc_status_r();
+	u16 m_dmaaddr = 0;
 
-	DECLARE_WRITE8_MEMBER(kbd_uart_clock_w);
+	void kbd_uart_clock_w(u8 data);
 
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<kr1601rr1_device> m_earom;
 	required_device<i8214_device> m_pic;
@@ -163,10 +163,10 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(ms6102_state::hrq_w)
 {
-	/* HACK - this should be connected to the HOLD line of 8080 */
+	/* FIXME: this should be connected to the HOLD line of 8080 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 
-	/* HACK - this should be connected to the HLDA line of 8080 */
+	/* FIXME: this should be connected to the HLDA line of 8080 */
 	m_dma8257->hlda_w(state);
 }
 
@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER(ms6102_state::irq_w)
 	m_maincpu->set_input_line(I8085_INTR_LINE, ASSERT_LINE);
 }
 
-READ8_MEMBER(ms6102_state::memory_read_byte)
+u8 ms6102_state::memory_read_byte(offs_t offset)
 {
 	m_dmaaddr = offset;
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
@@ -183,7 +183,7 @@ READ8_MEMBER(ms6102_state::memory_read_byte)
 
 I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
 	if (!vsp)
 		gfx = m_p_chargen[linecount | (charcode << 4)];
@@ -192,34 +192,34 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 		gfx ^= 0xff;
 
 	for(u8 i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_attr) // TODO: attributes
 {
 }
 
-READ8_MEMBER(ms6102_state::crtc_r)
+u8 ms6102_state::crtc_r(offs_t offset)
 {
-	m_crtc2->read(space, offset);
-	return m_crtc1->read(space, offset); // cs is same for both crtcs so they should return the same thing
+	m_crtc2->read(offset);
+	return m_crtc1->read(offset); // cs is same for both crtcs so they should return the same thing
 }
 
-WRITE8_MEMBER(ms6102_state::crtc_w)
+void ms6102_state::crtc_w(offs_t offset, u8 data)
 {
-	m_crtc1->write(space, offset, data);
-	m_crtc2->write(space, offset, data);
+	m_crtc1->write(offset, data);
+	m_crtc2->write(offset, data);
 }
 
-READ8_MEMBER(ms6102_state::misc_status_r)
+u8 ms6102_state::misc_status_r()
 {
-	uint8_t status = 0;
+	u8 status = 0;
 	if (!m_kbd_uart->tbmt_r())
 		status |= 1 << 6;
 	return status;
 }
 
-WRITE8_MEMBER(ms6102_state::kbd_uart_clock_w)
+void ms6102_state::kbd_uart_clock_w(u8 data)
 {
 	m_kbd_uart->write_tcp(BIT(data, 1));
 	m_kbd_uart->write_rcp(BIT(data, 1));
@@ -231,24 +231,23 @@ WRITE8_MEMBER(ms6102_state::kbd_uart_clock_w)
 }
 
 
-WRITE8_MEMBER(ms6102_state::pic_w)
+void ms6102_state::pic_w(u8 data)
 {
-	m_pic->b_w((data & 7) ^ 7);
-	m_pic->sgs_w(BIT(data, 3) ^ 1);
+	m_pic->b_sgs_w(~data);
 }
 
-WRITE8_MEMBER(ms6102_state::vdack_w)
+void ms6102_state::vdack_w(u8 data)
 {
 	if(m_dmaaddr & 1)
-		m_crtc1->dack_w(space, offset, data);
+		m_crtc1->dack_w(data);
 	else
-		m_crtc2->dack_w(space, offset, data | 0x80);
+		m_crtc2->dack_w(data | 0x80);
 }
 
 IRQ_CALLBACK_MEMBER(ms6102_state::ms6102_int_ack)
 {
 	m_maincpu->set_input_line(I8085_INTR_LINE, CLEAR_LINE);
-	return 0xc7 | (m_pic->a_r() << 3);
+	return 0xc7 | ((m_pic->a_r() ^ 7) << 3);
 }
 
 
@@ -330,13 +329,13 @@ void ms6102_state::ms6102(machine_config &config)
 	m_dma8257->in_memr_cb().set(FUNC(ms6102_state::memory_read_byte));
 	m_dma8257->out_iow_cb<2>().set(FUNC(ms6102_state::vdack_w));
 
-	I8275(config, m_crtc1, XTAL(16'400'000) / 8); // XXX
+	I8275(config, m_crtc1, XTAL(16'400'000) / 8);
 	m_crtc1->set_character_width(8);
 	m_crtc1->set_display_callback(FUNC(ms6102_state::display_pixels));
 	m_crtc1->drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
 	m_crtc1->set_screen(m_screen);
 
-	I8275(config, m_crtc2, XTAL(16'400'000) / 8); // XXX
+	I8275(config, m_crtc2, XTAL(16'400'000) / 8);
 	m_crtc2->set_character_width(8);
 	m_crtc2->set_display_callback(FUNC(ms6102_state::display_attr));
 	m_crtc2->irq_wr_callback().set(FUNC(ms6102_state::irq<5>));

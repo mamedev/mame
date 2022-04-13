@@ -20,7 +20,7 @@
 #include "machine/i8255.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
-#include "machine/clock.h"
+#include "machine/mc14411.h"
 #include "machine/input_merger.h"
 
 //**************************************************************************
@@ -41,19 +41,22 @@ protected:
 	virtual void device_reset() override;
 
 	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	template<mc14411_device::timer_id T> DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 	required_device<i8255_device> m_ppi8255;
 	required_device<via6522_device> m_via6522;
 	required_device<acia6850_device> m_acia;
-	required_device<clock_device> m_acia_clock;
+	required_device<mc14411_device> m_mc14411;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232;
 	required_device<input_merger_device> m_irqs;
+	required_ioport m_txc;
+	required_ioport m_rxc;
 };
 
 

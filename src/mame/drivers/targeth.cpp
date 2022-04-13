@@ -103,12 +103,12 @@ TIMER_CALLBACK_MEMBER(targeth_state::gun2_irq)
 	m_gun_irq_timer[1]->adjust( m_screen->time_until_pos(160, 0 ) );
 }
 
-WRITE8_MEMBER(targeth_state::oki_bankswitch_w)
+void targeth_state::oki_bankswitch_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 0x0f);
 }
 
-WRITE16_MEMBER(targeth_state::output_latch_w)
+void targeth_state::output_latch_w(offs_t offset, uint16_t data)
 {
 	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
 }
@@ -123,15 +123,15 @@ WRITE_LINE_MEMBER(targeth_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(targeth_state::shareram_w)
+void targeth_state::shareram_w(offs_t offset, uint8_t data)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
-READ8_MEMBER(targeth_state::shareram_r)
+uint8_t targeth_state::shareram_r(offs_t offset)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 
@@ -277,6 +277,7 @@ void targeth_state::targeth(machine_config &config)
 
 	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2));
 	ds5002fp.set_addrmap(0, &targeth_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<2>().set(FUNC(targeth_state::coin1_counter_w));

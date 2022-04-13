@@ -53,6 +53,8 @@ void marineb_state::machine_reset()
 {
 	m_palette_bank = 0;
 	m_column_scroll = 0;
+
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // needed to prevent NMI from occurring on soft reset due to race condition
 }
 
 void marineb_state::machine_start()
@@ -74,6 +76,14 @@ WRITE_LINE_MEMBER(marineb_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
+uint8_t marineb_state::system_watchdog_r()
+{
+	// '161 counter is cleared by RD7, not WR7 (except on wanted and bcruzm12)
+	if (!machine().side_effects_disabled())
+		m_watchdog->reset_w();
+	return m_system->read();
+}
+
 void marineb_state::marineb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -88,7 +98,13 @@ void marineb_state::marineb_map(address_map &map)
 	map(0xa000, 0xa000).portr("P2");
 	map(0xa800, 0xa800).portr("P1");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb800, 0xb800).portr("SYSTEM").nopw();     /* also watchdog */
+	map(0xb800, 0xb800).r(FUNC(marineb_state::system_watchdog_r)).nopw();
+}
+
+void marineb_state::wanted_map(address_map &map)
+{
+	marineb_map(map);
+	map(0xb800, 0xb800).portr("SYSTEM").w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
 
@@ -122,27 +138,27 @@ static INPUT_PORTS_START( marineb )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5") /* coinage doesn't work?? - always 1C / 1C or Free Play?? */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x04, "???" )
-//  PORT_DIPSETTING(    0x08, "???" )
-//  PORT_DIPSETTING(    0x0c, "???" )
-//  PORT_DIPSETTING(    0x10, "???" )
-//  PORT_DIPSETTING(    0x14, "???" )
-//  PORT_DIPSETTING(    0x18, "???" )
+//  PORT_DIPSETTING(    0x14, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
+//  PORT_DIPSETTING(    0x18, DEF_STR( 3C_2C ) )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+//  PORT_DIPSETTING(    0x10, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x1c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "20000 50000" )
 	PORT_DIPSETTING(    0x20, "40000 70000" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -172,26 +188,26 @@ static INPUT_PORTS_START( changes )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4") /* coinage doesn't work?? - always 1C / 1C or Free Play?? */
+//  PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x04, "???" )
-//  PORT_DIPSETTING(    0x08, "???" )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x00, "1st Bonus Life" )
+	PORT_DIPNAME( 0x10, 0x00, "1st Bonus Life" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x10, "40000" )
-	PORT_DIPNAME( 0x20, 0x00, "2nd Bonus Life" )
+	PORT_DIPNAME( 0x20, 0x00, "2nd Bonus Life" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "50000" )
 	PORT_DIPSETTING(    0x20, "100000" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -219,23 +235,23 @@ static INPUT_PORTS_START( hoccer )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Unknown ) )  /* difficulty maybe? */
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
@@ -351,39 +367,36 @@ static INPUT_PORTS_START( bcruzm12 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	PORT_START("SYSTEM")    /* we use same tags as above, to simplify reads */
-	PORT_DIPNAME( 0x03, 0x01, "2nd Bonus Life" )
+	PORT_DIPNAME( 0x03, 0x01, "2nd Bonus Life" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x01, "60000" )
 	PORT_DIPSETTING(    0x02, "80000" )
 	PORT_DIPSETTING(    0x03, "100000" )
-	PORT_DIPNAME( 0x0c, 0x04, "1st Bonus Life" )
+	PORT_DIPNAME( 0x0c, 0x04, "1st Bonus Life" ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x04, "30000" )
 	PORT_DIPSETTING(    0x08, "40000" )
 	PORT_DIPSETTING(    0x0c, "50000" )
-	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x40, " A 3C/1C  B 3C/1C" )
 	PORT_DIPSETTING(    0xe0, " A 3C/1C  B 1C/2C" )
 	PORT_DIPSETTING(    0xf0, " A 3C/1C  B 1C/4C" )
@@ -528,13 +541,13 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(marineb_state::marineb_vblank_irq)
 {
 	if (state && m_irq_mask)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
 {
 	if (state && m_irq_mask)
-		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -549,6 +562,8 @@ void marineb_state::marineb(machine_config &config)
 	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::nmi_mask_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w));
+
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 16);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -605,6 +620,7 @@ void marineb_state::wanted(machine_config &config)
 	marineb(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &marineb_state::wanted_map);
 	m_maincpu->set_addrmap(AS_IO, &marineb_state::wanted_io_map);
 
 	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::irq_mask_w));

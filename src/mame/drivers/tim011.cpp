@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
+#include "formats/imd_dsk.h"
 #include "machine/upd765.h"
 #include "emupal.h"
 #include "screen.h"
@@ -36,12 +37,12 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(print_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
-	DECLARE_READ8_MEMBER(print_r);
-	DECLARE_READ8_MEMBER(scroll_r);
-	uint8_t m_scroll;
+	void print_w(uint8_t data);
+	void scroll_w(uint8_t data);
+	void fdc_dma_w(uint8_t data);
+	uint8_t print_r();
+	uint8_t scroll_r();
+	uint8_t m_scroll = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
@@ -66,9 +67,9 @@ void tim011_state::tim011_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x007f).ram(); /* Z180 internal registers */
 	map(0x0080, 0x009f).m(m_fdc, FUNC(upd765a_device::map));
-	//AM_RANGE(0x00a0, 0x00a0) AM_MIRROR(0x001f)  AM_WRITE(fdc_dma_w)
-	//AM_RANGE(0x00c0, 0x00c1) AM_MIRROR(0x000e)  AM_READWRITE(print_r,print_w)
-	//AM_RANGE(0x00d0, 0x00d0) AM_MIRROR(0x000f)  AM_READWRITE(scroll_r,scroll_w)
+	//map(0x00a0, 0x00a0).mirror(0x001f).w(FUNC(tim011_state::fdc_dma_w));
+	//map(0x00c0, 0x00c1).mirror(0x000e).rw(FUNC(tim011_state::print_r), FUNC(tim011_state::print_w));
+	//map(0x00d0, 0x00d0).mirror(0x000f).rw(FUNC(tim011_state::scroll_r), FUNC(tim011_state::scroll_w));
 	map(0x8000, 0xffff).ram(); // Video RAM 43256 SRAM  (32KB)
 }
 
@@ -94,28 +95,28 @@ uint32_t tim011_state::screen_update_tim011(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(tim011_state::fdc_dma_w)
+void tim011_state::fdc_dma_w(uint8_t data)
 {
 	printf("fdc_dma_w :%02x\n",data);
 }
 
-WRITE8_MEMBER(tim011_state::print_w)
+void tim011_state::print_w(uint8_t data)
 {
 	//printf("print_w :%02x\n",data);
 }
 
-READ8_MEMBER(tim011_state::print_r)
+uint8_t tim011_state::print_r()
 {
 	//printf("print_r\n");
 	return 0;
 }
 
-WRITE8_MEMBER(tim011_state::scroll_w)
+void tim011_state::scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }
 
-READ8_MEMBER(tim011_state::scroll_r)
+uint8_t tim011_state::scroll_r()
 {
 	return m_scroll;
 }
@@ -125,17 +126,16 @@ static void tim011_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-static const floppy_format_type tim011_floppy_formats[] = {
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	nullptr
-};
+static void tim011_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 void tim011_state::tim011(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'288'000) / 2); // location U17 HD64180
+	HD64180RP(config, m_maincpu, XTAL(12'288'000)); // location U17 HD64180
 	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
 	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
 	m_maincpu->set_vblank_int("screen", FUNC(tim011_state::irq0_line_hold));

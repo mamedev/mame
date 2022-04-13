@@ -28,33 +28,33 @@ public:
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	void set_ram_size(int size) { m_ram_size = size; };
-	void set_simm0_size(int size) { m_simm0_size = size; };
+	void set_ram_size(int size) { m_ram_size = size; }
+	void set_simm0_size(int size) { m_simm0_size = size; }
 
 	virtual void config_map(address_map &map) override;
 
-	DECLARE_READ32_MEMBER(  pcictrl_r);
-	DECLARE_WRITE32_MEMBER( pcictrl_w);
+	uint32_t pcictrl_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	//cpu bus registers
-	DECLARE_READ32_MEMBER (cpu_if_r);
-	DECLARE_WRITE32_MEMBER(cpu_if_w);
+	uint32_t cpu_if_r(offs_t offset, uint32_t mem_mask = ~0);
+	void cpu_if_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER (master1_r);
-	DECLARE_WRITE32_MEMBER(master1_w);
+	uint32_t master1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void master1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER (master2_r);
-	DECLARE_WRITE32_MEMBER(master2_w);
+	uint32_t master2_r(offs_t offset, uint32_t mem_mask = ~0);
+	void master2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER (master_io_r);
-	DECLARE_WRITE32_MEMBER(master_io_w);
+	uint32_t master_io_r(offs_t offset, uint32_t mem_mask = ~0);
+	void master_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void target1_map(address_map &map);
-	DECLARE_READ32_MEMBER (target1_r);
-	DECLARE_WRITE32_MEMBER(target1_w);
+	uint32_t target1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void target1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void target2_map(address_map &map);
-	DECLARE_READ32_MEMBER (target2_r);
-	DECLARE_WRITE32_MEMBER(target2_w);
+	uint32_t target2_r(offs_t offset, uint32_t mem_mask = ~0);
+	void target2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;

@@ -80,7 +80,9 @@ Notes:
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
 #include "video/voodoo.h"
+#include "sound/ks0164.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class funkball_state : public pcat_base_state
@@ -89,6 +91,7 @@ public:
 	funkball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 		, m_voodoo(*this, "voodoo_0")
+		, m_sound(*this, "ks0164")
 		, m_unk_ram(*this, "unk_ram")
 		, m_flashbank(*this, "flashbank")
 		, m_inputs(*this, "IN.%u", 0)
@@ -97,25 +100,28 @@ public:
 	void funkball(machine_config &config);
 
 private:
-	uint8_t m_funkball_config_reg_sel;
-	uint8_t m_funkball_config_regs[256];
-	uint32_t m_cx5510_regs[256/4];
+	uint8_t m_funkball_config_reg_sel = 0;
+	uint8_t m_funkball_config_regs[256]{};
+	uint32_t m_cx5510_regs[256/4]{};
 	std::unique_ptr<uint8_t[]> m_bios_ram;
 
-	uint32_t m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4]{};
 
-	uint32_t flashbank_addr;
+	uint32_t flashbank_addr = 0;
+	uint16_t m_latched_timer = 0;
 
 	// devices
 	required_device<voodoo_1_device> m_voodoo;
+	required_device<ks0164_device> m_sound;
 
 	required_shared_ptr<uint32_t> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
-	required_ioport_array<16> m_inputs;
+	required_ioport_array<14> m_inputs;
 
-	DECLARE_WRITE32_MEMBER( flash_w );
-//  DECLARE_WRITE8_MEMBER( bios_ram_w );
-	DECLARE_READ8_MEMBER( in_r );
+	void flash_w (offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+//  void bios_ram_w(offs_t offset, uint8_t data);
+	uint8_t in_r(offs_t offset);
+	uint8_t timer_r(offs_t offset);
 
 	uint8_t funkball_config_reg_r();
 	void funkball_config_reg_w(uint8_t data);
@@ -126,16 +132,16 @@ private:
 	struct
 	{
 		/* PCI */
-		uint32_t command;
-		uint32_t base_addr;
+		uint32_t command = 0;
+		uint32_t base_addr = 0;
 
-		uint32_t init_enable;
+		uint32_t init_enable = 0;
 	} m_voodoo_pci_regs;
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_WRITE8_MEMBER(bios_ram_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
+	uint32_t biu_ctrl_r(offs_t offset);
+	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ram_w(offs_t offset, uint8_t data);
+	uint8_t io20_r(offs_t offset);
+	void io20_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void flashbank_map(address_map &map);
@@ -148,13 +154,28 @@ private:
 	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
+uint8_t funkball_state::timer_r(offs_t offset)
+{
+	if (offset == 0)
+	{
+		// exact frequency unknown, but the code checks against 32539 for a timeout
+		// so guessing that could be it
+		m_latched_timer = machine().time().as_ticks(32539);
+		return m_latched_timer >> 8;
+	}
+
+	// the game polls this timer frequently; eat cycles as a cheap speedup
+	m_maincpu->eat_cycles(500);
+	return m_latched_timer;
+}
+
 void funkball_state::video_start()
 {
 }
 
 uint32_t funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 uint32_t funkball_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask)
@@ -195,7 +216,7 @@ void funkball_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32
 			break;
 		case 0x40:
 			m_voodoo_pci_regs.init_enable = data;
-			m_voodoo->voodoo_set_init_enable(data);
+			m_voodoo->set_init_enable(data);
 			break;
 	}
 }
@@ -229,7 +250,7 @@ void funkball_state::funkball_config_reg_w(uint8_t data)
 	m_funkball_config_regs[m_funkball_config_reg_sel] = data;
 }
 
-READ8_MEMBER(funkball_state::io20_r)
+uint8_t funkball_state::io20_r(offs_t offset)
 {
 	uint8_t r = 0;
 
@@ -244,7 +265,7 @@ READ8_MEMBER(funkball_state::io20_r)
 	return r;
 }
 
-WRITE8_MEMBER(funkball_state::io20_w)
+void funkball_state::io20_w(offs_t offset, uint8_t data)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -257,7 +278,7 @@ WRITE8_MEMBER(funkball_state::io20_w)
 	}
 }
 
-WRITE32_MEMBER(funkball_state::flash_w)
+void funkball_state::flash_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&flashbank_addr);
 	int tempbank = (flashbank_addr & 0x7fff) | ((flashbank_addr & 0x00800000) >> 8);
@@ -268,7 +289,7 @@ WRITE32_MEMBER(funkball_state::flash_w)
 }
 
 
-READ32_MEMBER(funkball_state::biu_ctrl_r)
+uint32_t funkball_state::biu_ctrl_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -277,7 +298,7 @@ READ32_MEMBER(funkball_state::biu_ctrl_r)
 	return m_biu_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(funkball_state::biu_ctrl_w)
+void funkball_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
@@ -297,7 +318,7 @@ WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 	}
 }
 
-WRITE8_MEMBER(funkball_state::bios_ram_w)
+void funkball_state::bios_ram_w(offs_t offset, uint8_t data)
 {
 	if(m_biu_ctrl_reg[0x0c/4] & (2 << ((offset & 0x4000)>>14)*4)) // memory is write-able
 	{
@@ -305,7 +326,7 @@ WRITE8_MEMBER(funkball_state::bios_ram_w)
 	}
 }
 
-READ8_MEMBER( funkball_state::in_r )
+uint8_t funkball_state::in_r(offs_t offset)
 {
 	return m_inputs[offset]->read();
 }
@@ -327,10 +348,10 @@ void funkball_state::funkball_map(address_map &map)
 	map(0x000fc000, 0x000fffff).bankr("bios_bank4");
 	map(0x000e0000, 0x000fffff).w(FUNC(funkball_state::bios_ram_w));
 	map(0x00100000, 0x07ffffff).ram();
-//  AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
+//  map(0x08000000, 0x0fffffff).noprw();
 	map(0x40008000, 0x400080ff).rw(FUNC(funkball_state::biu_ctrl_r), FUNC(funkball_state::biu_ctrl_w));
 	map(0x40010e00, 0x40010eff).ram().share("unk_ram");
-	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(generic_voodoo_device::read), FUNC(generic_voodoo_device::write));
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
@@ -338,7 +359,7 @@ void funkball_state::flashbank_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rw("u29", FUNC(intel_28f320j5_device::read), FUNC(intel_28f320j5_device::write)); // needed to boot
 	map(0x00400000, 0x007fffff).rw("u30", FUNC(intel_28f320j5_device::read), FUNC(intel_28f320j5_device::write)); // i assume it maps directly after
-//  AM_RANGE(0x02000000, 0x023fffff) AM_DEVREADWRITE16("u3", intel_28f320j5_device, read, write, 0xffffffff ) // sound program, don't think it matters where we map it, might not even be visible in this space
+//  map(0x02000000, 0x023fffff).rw("u3", FUNC(intel_28f320j5_device::read), FUNC(intel_28f320j5_device::write)); // sound program, don't think it matters where we map it, might not even be visible in this space
 	/* it checks for 64MBit chips at 0x80000000 the way things are set up, they must return an intel Flash ID of 0x15 */
 }
 
@@ -354,10 +375,14 @@ void funkball_state::funkball_io(address_map &map)
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
+	map(0x0320, 0x0323).rw(m_sound, FUNC(ks0164_device::mpu401_data_r), FUNC(ks0164_device::mpu401_data_w)).umask32(0x000000ff);
+	map(0x0320, 0x0323).rw(m_sound, FUNC(ks0164_device::mpu401_status_r), FUNC(ks0164_device::mpu401_ctrl_w)).umask32(0x0000ff00);
+
 	map(0x0360, 0x0363).w(FUNC(funkball_state::flash_w));
 
-//  AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
-	map(0x0360, 0x036f).r(FUNC(funkball_state::in_r)); // inputs
+//  map(0x0320, 0x0323).r(FUNC(funkball_state::test_r));
+	map(0x0360, 0x036d).r(FUNC(funkball_state::in_r)); // inputs
+	map(0x036e, 0x036f).r(FUNC(funkball_state::timer_r)); // inputs
 }
 
 static INPUT_PORTS_START( funkball )
@@ -679,56 +704,6 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN.14")
-	PORT_DIPNAME( 0x01, 0x01, "14" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN.15")
-	PORT_DIPNAME( 0x01, 0x01, "15" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void funkball_state::machine_start()
@@ -756,14 +731,14 @@ void funkball_state::machine_reset()
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_57600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_57600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "TERM_CONF", 0x080, 0x080 ) // Auto LF on CR
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(funkball_state::funkball)
+void funkball_state::funkball(machine_config &config)
+{
 	MEDIAGX(config, m_maincpu, 66666666*3.5); // 66,6 MHz x 3.5
 	m_maincpu->set_addrmap(AS_PROGRAM, &funkball_state::funkball_map);
 	m_maincpu->set_addrmap(AS_IO, &funkball_state::funkball_io);
@@ -771,9 +746,9 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, funkball_state, voodoo_0_pci_r, voodoo_0_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, funkball_state, cx5510_pci_r, cx5510_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device(7, FUNC(funkball_state::voodoo_0_pci_r), FUNC(funkball_state::voodoo_0_pci_w));
+	pcibus.set_device(18, FUNC(funkball_state::cx5510_pci_r), FUNC(funkball_state::cx5510_pci_w));
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -781,11 +756,12 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&funkball_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* video hardware */
-	VOODOO_1(config, m_voodoo, STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo, voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
-	m_voodoo->set_screen_tag("screen");
-	m_voodoo->set_cpu_tag(m_maincpu);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo->set_screen("screen");
+	m_voodoo->set_cpu(m_maincpu);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -809,13 +785,20 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	INTEL_28F320J5(config, "u29");
 	INTEL_28F320J5(config, "u30");
 	INTEL_28F320J5(config, "u3");
-MACHINE_CONFIG_END
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	KS0164(config, m_sound, 16.9344_MHz_XTAL);
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
+}
 
 ROM_START( funkball )
 	ROM_REGION32_LE(0x20000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "512k-epr.u62", 0x010000, 0x010000, CRC(cced894a) SHA1(298c81716e375da4b7215f3e588a45ca3ea7e35c) )
 
-	ROM_REGION16_BE(0x400000, "u3", ROMREGION_ERASE00) // Sound Program / Samples
+	ROM_REGION(0x400000, "ks0164", ROMREGION_ERASE00) // Sound Program / Samples
 	ROM_LOAD16_WORD_SWAP( "flash.u3", 0x000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
 
 	ROM_REGION16_BE(0x400000, "u29", ROMREGION_ERASE00) // Main Program
@@ -826,4 +809,4 @@ ROM_START( funkball )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING)

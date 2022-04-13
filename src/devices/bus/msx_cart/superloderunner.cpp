@@ -20,7 +20,7 @@ void msx_cart_superloderunner_device::device_start()
 	save_item(NAME(m_selected_bank));
 
 	// Install evil memory write handler
-	memory_space().install_write_handler(0x0000, 0x0000, write8smo_delegate(FUNC(msx_cart_superloderunner_device::banking), this));
+	memory_space().install_write_handler(0x0000, 0x0000, write8smo_delegate(*this, FUNC(msx_cart_superloderunner_device::banking)));
 }
 
 

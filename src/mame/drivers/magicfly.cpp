@@ -444,11 +444,11 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(10'000'000)
@@ -476,22 +476,22 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
-	int m_input_selector;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_input_selector = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(magicfly_videoram_w);
-	DECLARE_WRITE8_MEMBER(magicfly_colorram_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_port_w);
+	void magicfly_videoram_w(offs_t offset, uint8_t data);
+	void magicfly_colorram_w(offs_t offset, uint8_t data);
+	uint8_t mux_port_r();
+	void mux_port_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_magicfly_tile_info);
 	TILE_GET_INFO_MEMBER(get_7mezzo_tile_info);
 	void magicfly_palette(palette_device &palette) const;
 	void bchance_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(7mezzo);
-	uint32_t screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magicfly(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void magicfly_map(address_map &map);
 };
 
@@ -501,13 +501,13 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(magicfly_state::magicfly_videoram_w)
+void magicfly_state::magicfly_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(magicfly_state::magicfly_colorram_w)
+void magicfly_state::magicfly_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -536,12 +536,12 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x08) << 4);  /* only for 1st offset */
 	//m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 void magicfly_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magicfly_state::get_magicfly_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
@@ -567,16 +567,16 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x04) << 5);  /* only for 1st offset */
 	//m_colorram[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 VIDEO_START_MEMBER(magicfly_state, 7mezzo)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magicfly_state::get_7mezzo_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
-uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -642,7 +642,7 @@ void magicfly_state::bchance_palette(palette_device &palette) const
 **************************************************/
 
 
-READ8_MEMBER(magicfly_state::mux_port_r)
+uint8_t magicfly_state::mux_port_r()
 {
 	switch( m_input_selector )
 	{
@@ -655,7 +655,7 @@ READ8_MEMBER(magicfly_state::mux_port_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(magicfly_state::mux_port_w)
+void magicfly_state::mux_port_w(uint8_t data)
 {
 /*  - bits -
     7654 3210
@@ -955,7 +955,6 @@ void magicfly_state::magicfly(machine_config &config)
 	screen.set_size((39+1)*8, (31+1)*8);                /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06. */
 	screen.set_screen_update(FUNC(magicfly_state::screen_update_magicfly));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_magicfly);
 	PALETTE(config, "palette", FUNC(magicfly_state::magicfly_palette), 32);
@@ -969,8 +968,6 @@ void magicfly_state::magicfly(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

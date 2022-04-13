@@ -45,6 +45,9 @@ tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, d
 
 void tc8830f_device::device_start()
 {
+	// assumes it can make an address mask with m_mem.length() - 1
+	assert(!(m_mem.length() & (m_mem.length() - 1)));
+
 	// create the stream
 	m_stream = stream_alloc(0, 1, clock() / 0x10);
 
@@ -79,11 +82,11 @@ void tc8830f_device::device_clock_changed()
 
 
 
-void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tc8830f_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int32_t mix = 0;
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		if (m_playing)
 		{
@@ -92,7 +95,7 @@ void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			m_bitcount = (m_bitcount + 1) & 7;
 			if (m_bitcount == 0)
 			{
-				m_address = (m_address + 1) & m_mem.mask();
+				m_address = (m_address + 1) & (m_mem.length() - 1);
 				if (m_address == m_stop_address)
 					m_playing = false;
 			}
@@ -125,7 +128,7 @@ void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			mix = m_output;
 		}
 
-		outputs[0][i] = mix;
+		outputs[0].put_int(i, mix, 32768);
 	}
 }
 
@@ -197,7 +200,7 @@ void tc8830f_device::write_p(uint8_t data)
 				m_address = (m_address & ~(0xf << (m_cmd_rw*4))) | (data << (m_cmd_rw*4));
 				if (m_cmd_rw == 5)
 				{
-					m_address &= m_mem.mask();
+					m_address &= m_mem.length() - 1;
 					m_bitcount = 0;
 					m_cmd_rw = -1;
 				}
@@ -208,7 +211,7 @@ void tc8830f_device::write_p(uint8_t data)
 				m_stop_address = (m_stop_address & ~(0xf << (m_cmd_rw*4))) | (data << (m_cmd_rw*4));
 				if (m_cmd_rw == 5)
 				{
-					m_stop_address &= m_mem.mask();
+					m_stop_address &= m_mem.length() - 1;
 					m_cmd_rw = -1;
 				}
 				break;
@@ -232,9 +235,9 @@ void tc8830f_device::write_p(uint8_t data)
 
 					// update addresses and start
 					uint8_t offs = m_phrase * 4;
-					m_address = (m_mem[offs] | m_mem[offs|1]<<8 | m_mem[offs|2]<<16) & m_mem.mask();
+					m_address = (m_mem[offs] | m_mem[offs|1]<<8 | m_mem[offs|2]<<16) & (m_mem.length() - 1);
 					offs += 4;
-					m_stop_address = (m_mem[offs] | m_mem[offs|1]<<8 | m_mem[offs|2]<<16) & m_mem.mask();
+					m_stop_address = (m_mem[offs] | m_mem[offs|1]<<8 | m_mem[offs|2]<<16) & (m_mem.length() - 1);
 
 					m_bitcount = 0;
 					m_prevbits = 0;

@@ -132,12 +132,11 @@ private:
 	uint8_t m_bank = 0;
 	uint8_t m_layer = 0;
 
-	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(layer_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	void sound_nmi_ack_w(uint8_t data);
+	void soundlatch_w(uint8_t data);
+	void bank_w(uint8_t data);
+	void layer_w(uint8_t data);
+	void portc_w(uint8_t data);
 	void flipjack_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(update_row);
 
@@ -174,8 +173,8 @@ MC6845_UPDATE_ROW(flipjack_state::update_row)
 {
 	const bool flip = !BIT(m_layer, 0);
 	const uint16_t row_base = ((ma & 0x03e0) << 3 | (ra & 7) << 5) ^ (flip ? 0x1fff : 0);
-	uint32_t *const pbegin = &bitmap.pix32(y);
-	uint32_t *const pend = &bitmap.pix32(y, x_count * 8);
+	uint32_t *const pbegin = &bitmap.pix(y);
+	uint32_t *const pend = &bitmap.pix(y, x_count * 8);
 
 	std::fill(pbegin, pend, rgb_t::black());
 
@@ -240,7 +239,7 @@ MC6845_UPDATE_ROW(flipjack_state::update_row)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(flipjack_state::bank_w)
+void flipjack_state::bank_w(uint8_t data)
 {
 	// d0-d1: tile bank
 	// d2: prg bank
@@ -250,7 +249,7 @@ WRITE8_MEMBER(flipjack_state::bank_w)
 	m_prgbank->set_entry(BIT(data, 2));
 }
 
-WRITE8_MEMBER(flipjack_state::layer_w)
+void flipjack_state::layer_w(uint8_t data)
 {
 	// d0: flip screen
 	// d1: enable playfield layer
@@ -260,20 +259,20 @@ WRITE8_MEMBER(flipjack_state::layer_w)
 	m_layer = data;
 }
 
-WRITE8_MEMBER(flipjack_state::soundlatch_w)
+void flipjack_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	if (BIT(data, 7))
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(flipjack_state::sound_nmi_ack_w)
+void flipjack_state::sound_nmi_ack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(flipjack_state::portc_w)
+void flipjack_state::portc_w(uint8_t data)
 {
 	// vestigial hopper output?
 }
@@ -292,8 +291,8 @@ void flipjack_state::main_map(address_map &map)
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x7000, 0x7000).w(FUNC(flipjack_state::soundlatch_w));
-	map(0x7010, 0x7010).w("crtc", FUNC(hd6845_device::address_w));
-	map(0x7011, 0x7011).w("crtc", FUNC(hd6845_device::register_w));
+	map(0x7010, 0x7010).w("crtc", FUNC(hd6845s_device::address_w));
+	map(0x7011, 0x7011).w("crtc", FUNC(hd6845s_device::register_w));
 	map(0x7020, 0x7020).portr("DSW");
 	map(0x7800, 0x7800).w(FUNC(flipjack_state::layer_w));
 	map(0x8000, 0x9fff).rom();
@@ -439,15 +438,15 @@ void flipjack_state::flipjack(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0); // from crtc
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
-	hd6845_device &crtc(HD6845(config, "crtc", VIDEO_CLOCK/8));
+	hd6845s_device &crtc(HD6845S(config, "crtc", VIDEO_CLOCK/8));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline("maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 	crtc.out_vsync_callback().append_inputline("audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
-	crtc.set_update_row_callback(FUNC(flipjack_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(flipjack_state::update_row));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_flipjack);
 	PALETTE(config, m_palette, FUNC(flipjack_state::flipjack_palette), 128+8);

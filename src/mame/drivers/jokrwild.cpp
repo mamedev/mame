@@ -78,6 +78,7 @@
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK    XTAL(8'000'000)   /* guess */
 
@@ -103,18 +104,18 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
-	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
-	DECLARE_READ8_MEMBER(rng_r);
-	DECLARE_WRITE8_MEMBER(testa_w);
-	DECLARE_WRITE8_MEMBER(testb_w);
+	void jokrwild_videoram_w(offs_t offset, uint8_t data);
+	void jokrwild_colorram_w(offs_t offset, uint8_t data);
+	uint8_t rng_r(offs_t offset);
+	void testa_w(uint8_t data);
+	void testb_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void jokrwild_palette(palette_device &palette) const;
-	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void jokrwild_map(address_map &map);
 };
 
@@ -123,13 +124,13 @@ private:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(jokrwild_state::jokrwild_videoram_w)
+void jokrwild_state::jokrwild_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jokrwild_state::jokrwild_colorram_w)
+void jokrwild_state::jokrwild_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -146,15 +147,15 @@ TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 0xc0) << 2);
 	int color = (attr & 0x0f);
 
-	SET_TILE_INFO_MEMBER(0, code , color , 0);
+	tileinfo.set(0, code , color , 0);
 }
 
 void jokrwild_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jokrwild_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
 }
 
-uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -170,7 +171,7 @@ void jokrwild_state::jokrwild_palette(palette_device &palette) const
 *    Read/Write  Handlers    *
 *****************************/
 
-READ8_MEMBER(jokrwild_state::rng_r)
+uint8_t jokrwild_state::rng_r(offs_t offset)
 {
 	if(m_maincpu->pc() == 0xab32)
 		return (offset == 0) ? 0x9e : 0x27;
@@ -194,7 +195,7 @@ void jokrwild_state::jokrwild_map(address_map &map)
 	map(0x2400, 0x27ff).ram(); //stack RAM
 	map(0x4004, 0x4007).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //optical sensor is here
-//  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
+//  map(0x4010, 0x4010).nopr(); /* R ???? */
 	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x6001, 0x6001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x6100, 0x6100).portr("SW1");
@@ -398,12 +399,12 @@ GFXDECODE_END
 *    PIA Interfaces    *
 ***********************/
 
-WRITE8_MEMBER(jokrwild_state::testa_w)
+void jokrwild_state::testa_w(uint8_t data)
 {
 //  printf("%02x A\n",data);
 }
 
-WRITE8_MEMBER(jokrwild_state::testb_w)
+void jokrwild_state::testb_w(uint8_t data)
 {
 //  printf("%02x B\n",data);
 }
@@ -438,7 +439,6 @@ void jokrwild_state::jokrwild(machine_config &config)
 	screen.set_size((32+1)*8, (32+1)*8);                  // From MC6845, registers 00 & 04. (value-1)
 	screen.set_visarea(0*8, 24*8-1, 0*8, 26*8-1);    // From MC6845, registers 01 & 06.
 	screen.set_screen_update(FUNC(jokrwild_state::screen_update_jokrwild));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_jokrwild);
 	PALETTE(config, "palette", FUNC(jokrwild_state::jokrwild_palette), 512);

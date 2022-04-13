@@ -8,8 +8,12 @@ Driver by Angelo Salese & Robbbert.
 
 TODO:
 - implement printer;
-- Challenge Golf: has gfx and input bugs (starts with home/end keys!?);
-- Colours are incorrect
+- Implement 2nd cart slot
+- Keyboard works in all scenarios, but it is a guess.
+- RAM handling can't be right: PCB has 30KB shared RAM (manual also says this in the technical specs),
+  but MAME allocates much more
+- Find out what port F3 does - read and write - used by many games
+- Find out what ports 23 and EF do - used by rengo
 
 Notes:
 - BS-BASIC v1.0 notes:
@@ -22,17 +26,9 @@ Notes:
      btanb. After that, scrolling works correctly.
   -- Need a real machine to confirm these problems, but if true, one can only wonder how such
      obvious issues made it out the door.
-- To stop a cmt load, press STOP + SHIFT keys
+- To stop a cmt load, press STOP + SHIFT keys (this combination is the BREAK key).
 
-Known programs:
-- BS_BASIC V1.0
-- Challenge Golf
-- Excite Tennis
-- Excite Baseball
-- Perfect Mah-Jongg
-- Mobile Suit (says Mobil Suit on the start screen)
-- The ProWrestling
-- 3-dimension graphics
+For a list of all known software and devices for the system, please see hash/rx78.xml.
 
 ==============================================================================================================
 Summary of Monitor commands.
@@ -58,19 +54,26 @@ Summary of Monitor commands.
             using handshaking similar to a centronics printer. The incoming file is loaded into
             memory and it appears that the operator is not provided any information of what happened.
 
+==============================================================================================================
+
+Known issues:
+- Sekigahara: Possible joystick problem (need to be checked again)
+- Need more software to test with.
+BTANB:
+- ProWrestling: When player 1 jumps at player 2 and misses, he always lands behind player 2.
+
 *************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "machine/ram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class rx78_state : public driver_device
@@ -83,66 +86,77 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
 		, m_palette(*this, "palette")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void init_rx78();
 	void rx78(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( key_r );
-	DECLARE_READ8_MEMBER( cass_r );
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( cass_w );
-	DECLARE_WRITE8_MEMBER( vram_w );
-	DECLARE_WRITE8_MEMBER( vram_read_bank_w );
-	DECLARE_WRITE8_MEMBER( vram_write_bank_w );
-	DECLARE_WRITE8_MEMBER( key_w );
-	DECLARE_WRITE8_MEMBER( vdp_reg_w );
-	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
-	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
+	u8 key_r();
+	u8 cass_r();
+	u8 vram_r(offs_t offset);
+	void cass_w(u8 data);
+	void vram_w(offs_t offset, u8 data);
+	void vram_read_bank_w(u8 data);
+	void vram_write_bank_w(u8 data);
+	void key_w(u8 data);
+	void vdp_reg_w(offs_t offset, u8 data);
+	void vdp_bg_reg_w(u8 data);
+	void vdp_pri_mask_w(u8 data);
+	void portf3_w(u8 data);
+	void create_palette(palette_device &palette);
+	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	void rx78_io(address_map &map);
 	void rx78_mem(address_map &map);
 
-	uint8_t m_vram_read_bank;
-	uint8_t m_vram_write_bank;
-	uint8_t m_pal_reg[7];
-	uint8_t m_pri_mask;
-	uint8_t m_key_mux;
+	u8 m_vram_read_bank = 0U;
+	u8 m_vram_write_bank = 0U;
+	u8 m_pal_reg[7]{};
+	u8 m_pri_mask = 0U;
+	u8 m_key_mux = 0U;
+	u8 m_background = 0U;
+	bool m_irq_en = true;
+	u8 m_irq_slow = 0U;
+	u8 m_irq_count = 0U;
+	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
+	required_ioport_array<16> m_io_keyboard;
 };
 
 
 #define MASTER_CLOCK XTAL(28'636'363)
 
 
-WRITE8_MEMBER( rx78_state::cass_w )
+void rx78_state::cass_w(u8 data)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( rx78_state::cass_r )
+u8 rx78_state::cass_r()
 {
-	return (m_cass->input() > 0.03);
+	return (m_cass->input() > 0.03) ? 0 : 1;
 }
 
 
 uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *vram = memregion("vram")->base();
-	int color,pen[3];
-	const int borderx = 32, bordery = 20;
+	u8 layers;
+	u8 laycol[2];
+	const u8 borderx = 32, bordery = 20;
 
-	bitmap.fill(16, cliprect);
+	bitmap.fill(64, cliprect); // set the border
 
-	int count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
+	u16 count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
 
 	for(u8 y=0; y<184; y++)
 	{
@@ -150,29 +164,26 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		{
 			for (u8 i = 0; i < 8; i++)
 			{
-				/* bg color */
-				pen[0] = (m_pri_mask & 0x08) ? (vram[count + 0x6000] >> (i)) : 0x00;
-				pen[1] = (m_pri_mask & 0x10) ? (vram[count + 0x8000] >> (i)) : 0x00;
-				pen[2] = (m_pri_mask & 0x20) ? (vram[count + 0xa000] >> (i)) : 0x00;
+				layers = 0;
+				for (u8 j = 0; j < 6; j++)
+					if (BIT(m_pri_mask, j))
+						layers |= (BIT(m_vram[count + j*0x2000], i))<<j;
 
-				color  = ((pen[0] & 1) << 0);
-				color |= ((pen[1] & 1) << 1);
-				color |= ((pen[2] & 1) << 2);
+				laycol[0] = 0;
+				laycol[1] = 0;
+				for (u8 j = 0; j < 6; j++)
+					if (BIT(layers, j))
+						laycol[BIT(m_pal_reg[6], j)] |= m_pal_reg[j];
 
-				if(color)
-					bitmap.pix16(y+bordery, x+i+borderx) = color | 8;
+				// This fixes text in Space Enemy
+				if (m_pal_reg[6])
+					for (u8 j = 0; j < 6; j++)
+						if (BIT(layers, j))
+							if (!m_pal_reg[j])
+								laycol[0] = 0;
 
-				/* fg color */
-				pen[0] = (m_pri_mask & 0x01) ? (vram[count + 0x0000] >> (i)) : 0x00;
-				pen[1] = (m_pri_mask & 0x02) ? (vram[count + 0x2000] >> (i)) : 0x00;
-				pen[2] = (m_pri_mask & 0x04) ? (vram[count + 0x4000] >> (i)) : 0x00;
-
-				color  = ((pen[0] & 1) << 0);
-				color |= ((pen[1] & 1) << 1);
-				color |= ((pen[2] & 1) << 2);
-
-				if(color)
-					bitmap.pix16(y+bordery, x+i+borderx) = color;
+				u8 color = laycol[1] ? laycol[1] : (laycol[0] ? laycol[0] : m_background);
+				bitmap.pix(y+bordery, x+i+borderx) = color;
 			}
 			count++;
 		}
@@ -182,96 +193,97 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-READ8_MEMBER( rx78_state::key_r )
+u8 rx78_state::key_r()
 {
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-											"KEY4", "KEY5", "KEY6", "KEY7",
-											"KEY8", "JOY1P_0","JOY1P_1","JOY1P_2",
-											"JOY2P_0", "JOY2P_1", "JOY2P_2", "UNUSED" };
+	if((m_key_mux >= 1) && (m_key_mux <= 15))
+		return m_io_keyboard[m_key_mux]->read();
 
-	if(m_key_mux == 0x30) //status read
-	{
-		u8 res = 0;
-		for(u8 i=0; i<15; i++)
-			res |= ioport(keynames[i])->read();
+	u8 res = 0;
+	for(u8 i=1; i<10; i++)
+		res |= m_io_keyboard[i]->read();
 
-		return res;
-	}
-
-	if(m_key_mux >= 1 && m_key_mux <= 15)
-		return ioport(keynames[m_key_mux - 1])->read();
-
-	return 0;
+	return res;
 }
 
-WRITE8_MEMBER( rx78_state::key_w )
+void rx78_state::key_w(u8 data)
 {
-	m_key_mux = data;
+	// special codes: 10 (disable irq?) used by gundam and exbaseb; 30 (no idea) used by basic
+	m_key_mux = data & 15;
+	m_irq_en = !BIT(data, 4);
+	m_maincpu->set_input_line(0, CLEAR_LINE);    // fixes exbaseb opening screen
 }
 
-READ8_MEMBER( rx78_state::vram_r )
+// guess
+void rx78_state::portf3_w(u8 data)
 {
-	uint8_t *vram = memregion("vram")->base();
+	data &= 3;
+	if (data == 3)
+		m_irq_slow = 64;    // fixes cracer traffic light
+	else
+	if (data == 2)
+		m_irq_slow = 8;     // fixes seki flash rate of sight
+	else
+		m_irq_slow = 0;
+}
 
+u8 rx78_state::vram_r(offs_t offset)
+{
 	if(m_vram_read_bank == 0 || m_vram_read_bank > 6)
 		return 0xff;
 
-	return vram[offset + ((m_vram_read_bank - 1) * 0x2000)];
+	return m_vram[offset + ((m_vram_read_bank - 1) * 0x2000)];
 }
 
-WRITE8_MEMBER( rx78_state::vram_w )
+void rx78_state::vram_w(offs_t offset, u8 data)
 {
-	uint8_t *vram = memregion("vram")->base();
-
 	for (u8 i = 0; i < 6; i++)
 		if (BIT(m_vram_write_bank, i))
-			vram[offset + i * 0x2000] = data;
+			m_vram[offset + i * 0x2000] = data;
 }
 
-WRITE8_MEMBER( rx78_state::vram_read_bank_w )
+void rx78_state::vram_read_bank_w(u8 data)
 {
 	m_vram_read_bank = data;
 }
 
-WRITE8_MEMBER( rx78_state::vram_write_bank_w )
+void rx78_state::vram_write_bank_w(u8 data)
 {
 	m_vram_write_bank = data;
 }
 
-WRITE8_MEMBER( rx78_state::vdp_reg_w )
+void rx78_state::vdp_reg_w(offs_t offset, u8 data)
 {
-	uint8_t r,g,b,res,i;
-
-	m_pal_reg[offset] = data;
-
-	for(i=0;i<16;i++)
-	{
-		res = ((i & 1) ? m_pal_reg[0 + (i & 8 ? 3 : 0)] : 0) | ((i & 2) ? m_pal_reg[1 + (i & 8 ? 3 : 0)] : 0) | ((i & 4) ? m_pal_reg[2 + (i & 8 ? 3 : 0)] : 0);
-		if(res & m_pal_reg[6]) //color mask, TODO: check this
-			res &= m_pal_reg[6];
-
-		r = (res & 0x11) == 0x11 ? 0xff : ((res & 0x11) == 0x01 ? 0x7f : 0x00);
-		g = (res & 0x22) == 0x22 ? 0xff : ((res & 0x22) == 0x02 ? 0x7f : 0x00);
-		b = (res & 0x44) == 0x44 ? 0xff : ((res & 0x44) == 0x04 ? 0x7f : 0x00);
-
-		m_palette->set_pen_color(i, rgb_t(r,g,b));
-	}
+	if (offset < 6)
+		m_pal_reg[offset] = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
+	else
+		m_pal_reg[offset] = data & 0x3f;
 }
 
-WRITE8_MEMBER( rx78_state::vdp_bg_reg_w )
+void rx78_state::vdp_bg_reg_w(u8 data)
 {
-	int r,g,b;
-
-	r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0x00);
-	g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0x00);
-	b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0x00);
-
-	m_palette->set_pen_color(0x10, rgb_t(r,g,b));
+	u8 r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0);
+	u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
+	u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
+	m_palette->set_pen_color(64, rgb_t(r,g,b));   // use this as the border colour
+	m_background = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
 }
 
-WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
+void rx78_state::vdp_pri_mask_w(u8 data)
 {
 	m_pri_mask = data;
+}
+
+void rx78_state::create_palette(palette_device &palette)
+{
+	constexpr u8 level[] = { 0, 0x7f, 0, 0xff };
+	for (u8 i = 0; i < 64; i++)
+	{
+		u8 r = level[BIT(i, 0, 2)];
+		u8 g = level[BIT(i, 2, 2)];
+		u8 b = level[BIT(i, 4, 2)];
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+	vdp_bg_reg_w(0);
 }
 
 
@@ -279,7 +291,7 @@ void rx78_state::rx78_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom().region("roms", 0);
-	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
+	//map(0x2000, 0x5fff)      // mapped by the cartslot
 	map(0x6000, 0xafff).ram(); //ext RAM
 	map(0xb000, 0xebff).ram();
 	map(0xec00, 0xffff).rw(FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
@@ -289,11 +301,14 @@ void rx78_state::rx78_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
-//  AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
+//  map(0x23, 0x23).nopw(); //used by rengo
+//  map(0xe2, 0xe2).noprw(); //printer
+//  map(0xe3, 0xe3).nopw(); //printer
+//  map(0xef, 0xef).nopw(); //used by rengo
 	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
 	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
 	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));
+	map(0xf3, 0xf3).w(FUNC(rx78_state::portf3_w));
 	map(0xf4, 0xf4).rw(FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
 	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
 	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
@@ -303,7 +318,10 @@ void rx78_state::rx78_io(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( rx78 )
-	PORT_START("KEY0")
+	PORT_START("X0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("X1")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
@@ -313,7 +331,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
-	PORT_START("KEY1")
+	PORT_START("X2")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
@@ -323,7 +341,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
-	PORT_START("KEY2")
+	PORT_START("X3")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('@') PORT_CHAR('`')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')
@@ -333,7 +351,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')
 
-	PORT_START("KEY3")
+	PORT_START("X4")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
@@ -343,7 +361,7 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o')
 
-	PORT_START("KEY4")
+	PORT_START("X5")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
@@ -353,78 +371,71 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')
 
-	PORT_START("KEY5")
+	PORT_START("X6")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up Down Arrow") PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up Down Arrow") PORT_CODE(KEYCODE_PGUP) PORT_CHAR('^')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right Left Arrow") PORT_CODE(KEYCODE_PGDN)
 
-	PORT_START("KEY6")
+	PORT_START("X7")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CLR / HOME") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED )
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("INST / DEL") PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("INST / DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 
-	PORT_START("KEY7")
+	PORT_START("X8")
 	PORT_BIT(0x07,IP_ACTIVE_HIGH,IPT_UNUSED )
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP") PORT_CODE(KEYCODE_END)
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP") PORT_CODE(KEYCODE_END) PORT_CHAR(0xff) PORT_CHAR(3)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
 
-	PORT_START("KEY8")
+	PORT_START("X9")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) //kana shift?
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0xf8,IP_ACTIVE_HIGH,IPT_UNUSED )
 
-	PORT_START("JOY1P_0")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Left") PORT_PLAYER(1)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_START("X10")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Left") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START("JOY1P_1")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Left")  PORT_PLAYER(1)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Right") PORT_PLAYER(1)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("X11")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Left")  PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Right") PORT_PLAYER(1)
 
-	PORT_START("JOY1P_2")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(1)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Right") PORT_PLAYER(1)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(1)
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_START("X12")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Right") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START("JOY2P_0")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Left") PORT_PLAYER(2)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_START("X13")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Left") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START("JOY2P_1")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Left")  PORT_PLAYER(2)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Right") PORT_PLAYER(2)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("X14")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Left")  PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Right") PORT_PLAYER(2)
 
-	PORT_START("JOY2P_2")
-	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(2)
-	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Right") PORT_PLAYER(2)
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(2)
-	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-
-	PORT_START("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("X15")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Right") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -432,16 +443,53 @@ void rx78_state::machine_reset()
 {
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	if (m_cart->exists())
-		prg.install_read_handler(0x2000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+	{
+		u32 size = m_cart->common_get_size("rom");
+		if (size > 0x9000)
+			size = 0x9000;
+		if (size)
+			prg.install_read_handler(0x2000, size+0x1FFF, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
+	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
+void rx78_state::machine_start()
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	m_vram = make_unique_clear<u8[]>(0xc000);
+	save_pointer(NAME(m_vram), 0xc000);
+	save_item(NAME(m_vram_read_bank));
+	save_item(NAME(m_vram_write_bank));
+	save_pointer(NAME(m_pal_reg), 7);
+	save_item(NAME(m_pri_mask));
+	save_item(NAME(m_key_mux));
+	save_item(NAME(m_background));
+}
 
-	if (size != 0x2000 && size != 0x4000)
+INTERRUPT_GEN_MEMBER(rx78_state::interrupt)
+{
+	if (m_irq_en)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		m_irq_count++;
+		if (m_irq_count > m_irq_slow)
+		{
+			m_irq_count = 0;
+			irq0_line_hold(device);
+		}
+	}
+	else
+	// wait for a keypress
+	if (key_r())
+	{
+		irq0_line_hold(device);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
+{
+	u32 size = m_cart->common_get_size("rom");
+
+	if (size != 0x2000 && size != 0x4000 && size != 0x8000)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -469,13 +517,13 @@ static GFXDECODE_START( gfx_rx78 )
 	GFXDECODE_ENTRY( "roms", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
-
-MACHINE_CONFIG_START(rx78_state::rx78)
+void rx78_state::rx78(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/7); // unknown divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &rx78_state::rx78_mem);
 	m_maincpu->set_addrmap(AS_IO, &rx78_state::rx78_io);
-	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::irq0_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::interrupt));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -488,38 +536,34 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	screen.set_screen_update(FUNC(rx78_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, m_palette).set_entries(16+1); //+1 for the background color
+	PALETTE(config, m_palette, FUNC(rx78_state::create_palette), 64+1);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(rx78_state, rx78_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "rx78_cart", "bin,rom").set_device_load(FUNC(rx78_state::cart_load));
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("16K");
 
-	CASSETTE(config, m_cass);
-
 	SPEAKER(config, "mono").front_center();
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	SN76489A(config, "sn1", XTAL(28'636'363)/8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown divider
 
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_interface("rx78_cass");
+
 	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("rx78");
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("rx78_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("rx78_cass");
+}
 
 /* ROM definition */
 ROM_START( rx78 )
 	ROM_REGION( 0x2000, "roms", 0 )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(a194ea53) SHA1(ba39e73e6eb7cbb8906fff1f81a98964cd62af0d))
-
-	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 void rx78_state::init_rx78()
 {
-	uint32_t ram_size = m_ram->size();
+	u32 ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
 	if (ram_size == 0x4000)
@@ -529,4 +573,4 @@ void rx78_state::init_rx78()
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY   FULLNAME     FLAGS */
-COMP( 1983, rx78, 0,      0,      rx78,    rx78,  rx78_state, init_rx78, "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )
+COMP( 1983, rx78, 0,      0,      rx78,    rx78,  rx78_state, init_rx78, "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

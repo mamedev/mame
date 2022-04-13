@@ -1,4 +1,5 @@
-// license:BSD-3-Clause copyright-holders:Joakim Larsson Edstrom
+// license:BSD-3-Clause
+// copyright-holders:Joakim Larsson Edstrom
 /*
   Diablo Printer TTL CPU
 */
@@ -28,9 +29,9 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	//virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	//virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	//virtual void execute_set_input(int inputnum, int state) override;
 
@@ -56,10 +57,10 @@ protected:
 
 	inline uint8_t read_reg(uint16_t reg);
 	inline uint16_t read_port(uint16_t port){ return 0;}
-	inline uint16_t read_table(uint16_t offset){ return 0;}
+	inline uint8_t read_table(uint16_t offset);// { return 0;}
 	inline void write_reg(uint16_t reg, uint8_t data);
-	inline void write_port(uint16_t port, uint16_t data){}
-	inline uint16_t read_ibus(){ return 0; }
+	inline void write_port(uint16_t port, uint16_t data);
+	inline uint16_t read_ibus(); // { return 0; }
 
 	// CPU registers
 	uint16_t m_pc;
@@ -72,9 +73,21 @@ protected:
 	int m_icount;
 
 	// address spaces
-	address_space *m_program;
-	address_space *m_data;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<9, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<9, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<5, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
+
+	// rom regions
+	memory_region *m_table;
+
+#if 0
+	// Callbacks and set methods
+	write_line_delegate m_xxx_cb; // Called when xxx happens in CPU
+	void call_xxx_cb(int state){ if (!m_xxx.cb.isnull()) (m_xxx_cb)(state);
+public:
+	void set_xxx_callback( write_line_delegate callback ){ m_xxx_cb = callback; }
+	void set_line_yyy(int state){ m_yyy = state; }
+#endif
 };
 
 // device type definition
@@ -88,7 +101,8 @@ enum
 {
 	DIABLO_PC = 1,
 	DIABLO_A,
-	DIABLO_B
+	DIABLO_B,
+	DIABLO_CARRY
 };
 
 #endif // MAME_CPU_DIABLO_DIABLO1300_H

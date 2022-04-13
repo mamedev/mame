@@ -291,8 +291,7 @@ void atari_maria_device::draw_scanline()
 
 	// draw line buffer to screen
 	m_active_buffer = !m_active_buffer; // switch buffers
-	uint16_t *scanline;
-	scanline = &m_bitmap.pix16(m_screen->vpos());
+	uint16_t *const scanline = &m_bitmap.pix(m_screen->vpos());
 
 
 	for (int i = 0; i < 160; i++)
@@ -411,7 +410,7 @@ uint32_t atari_maria_device::screen_update(screen_device &screen, bitmap_ind16 &
 }
 
 
-READ8_MEMBER(atari_maria_device::read)
+uint8_t atari_maria_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -424,7 +423,7 @@ READ8_MEMBER(atari_maria_device::read)
 	}
 }
 
-WRITE8_MEMBER(atari_maria_device::write)
+void atari_maria_device::write(offs_t offset, uint8_t data)
 {
 	if ((offset & 3) != 0)
 		m_maria_palette[offset] = data;

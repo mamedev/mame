@@ -637,12 +637,14 @@ std::string m68k_disassembler::d68000_asl_ea()
 std::string m68k_disassembler::d68000_bcc_8()
 {
 	u32 temp_pc = m_cpu_pc;
+	m_flags = STEP_COND;
 	return util::string_format("b%-2s     $%x", m_cc[(m_cpu_ir>>8)&0xf], temp_pc + make_int_8(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68000_bcc_16()
 {
 	u32 temp_pc = m_cpu_pc;
+	m_flags = STEP_COND;
 	return util::string_format("b%-2s     $%x", m_cc[(m_cpu_ir>>8)&0xf], temp_pc + make_int_16(read_imm_16()));
 }
 
@@ -652,6 +654,7 @@ std::string m68k_disassembler::d68020_bcc_32()
 	auto limit = limit_cpu_types(M68020_PLUS);
 	if(limit.first)
 		return limit.second;
+	m_flags = STEP_COND;
 	return util::string_format("b%-2s     $%x; (2+)", m_cc[(m_cpu_ir>>8)&0xf], temp_pc + read_imm_32());
 }
 
@@ -933,7 +936,7 @@ std::string m68k_disassembler::d68020_cas2_32()
 
 std::string m68k_disassembler::d68000_chk_16()
 {
-	m_flags = STEP_OVER;
+	m_flags = STEP_OVER | STEP_COND;
 	return util::string_format("chk.w   %s, D%d", get_ea_mode_str_16(m_cpu_ir), (m_cpu_ir>>9)&7);
 }
 
@@ -942,7 +945,7 @@ std::string m68k_disassembler::d68020_chk_32()
 	auto limit = limit_cpu_types(M68020_PLUS);
 	if(limit.first)
 		return limit.second;
-	m_flags = STEP_OVER;
+	m_flags = STEP_OVER | STEP_COND;
 	return util::string_format("chk.l   %s, D%d; (2+)", get_ea_mode_str_32(m_cpu_ir), (m_cpu_ir>>9)&7);
 }
 
@@ -1265,14 +1268,14 @@ std::string m68k_disassembler::d68040_cpush()
 std::string m68k_disassembler::d68000_dbra()
 {
 	u32 temp_pc = m_cpu_pc;
-	m_flags = STEP_OVER;
+	m_flags = STEP_COND;
 	return util::string_format("dbra    D%d, $%x", m_cpu_ir & 7, temp_pc + make_int_16(read_imm_16()));
 }
 
 std::string m68k_disassembler::d68000_dbcc()
 {
 	u32 temp_pc = m_cpu_pc;
-	m_flags = STEP_OVER;
+	m_flags = STEP_COND;
 	return util::string_format("db%-2s    D%d, $%x", m_cc[(m_cpu_ir>>8)&0xf], m_cpu_ir & 7, temp_pc + make_int_16(read_imm_16()));
 }
 
@@ -1897,9 +1900,9 @@ std::string m68k_disassembler::d68010_movec()
 	}
 
 	if(BIT(m_cpu_ir, 0))
-		return util::string_format("movec %c%d, %s; (%s)", BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, reg_name, processor);
+		return util::string_format("movec   %c%d, %s; (%s)", BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, reg_name, processor);
 	else
-		return util::string_format("movec %s, %c%d; (%s)", reg_name, BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, processor);
+		return util::string_format("movec   %s, %c%d; (%s)", reg_name, BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, processor);
 }
 
 std::string m68k_disassembler::d68000_movem_pd_16()
@@ -2749,7 +2752,7 @@ std::string m68k_disassembler::d68020_trapcc_0()
 	auto limit = limit_cpu_types(M68020_PLUS);
 	if(limit.first)
 		return limit.second;
-	m_flags = STEP_OVER;
+	m_flags = STEP_OVER | STEP_COND;
 	return util::string_format("trap%-2s; (2+)", m_cc[(m_cpu_ir>>8)&0xf]);
 }
 
@@ -2758,7 +2761,7 @@ std::string m68k_disassembler::d68020_trapcc_16()
 	auto limit = limit_cpu_types(M68020_PLUS);
 	if(limit.first)
 		return limit.second;
-	m_flags = STEP_OVER;
+	m_flags = STEP_OVER | STEP_COND;
 	return util::string_format("trap%-2s  %s; (2+)", m_cc[(m_cpu_ir>>8)&0xf], get_imm_str_u16());
 }
 
@@ -2767,13 +2770,13 @@ std::string m68k_disassembler::d68020_trapcc_32()
 	auto limit = limit_cpu_types(M68020_PLUS);
 	if(limit.first)
 		return limit.second;
-	m_flags = STEP_OVER;
+	m_flags = STEP_OVER | STEP_COND;
 	return util::string_format("trap%-2s  %s; (2+)", m_cc[(m_cpu_ir>>8)&0xf], get_imm_str_u32());
 }
 
 std::string m68k_disassembler::d68000_trapv()
 {
-	m_flags = STEP_OVER;
+	m_flags = STEP_OVER | STEP_COND;
 	return util::string_format("trapv");
 }
 

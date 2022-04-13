@@ -15,7 +15,7 @@
 inline void z88_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t color)
 {
 	if (x < Z88_SCREEN_WIDTH)
-		bitmap.pix16(y, x) = color;
+		bitmap.pix(y, x) = color;
 }
 
 // convert absolute offset into correct address to get data from

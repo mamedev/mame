@@ -14,6 +14,11 @@
 
 #include "emu.h"
 
+#ifdef __sun
+#define ASIO_DISABLE_DEV_POLL
+#define ASIO_HAS_EPOLL
+#endif
+
 #include <thread>
 #include <set>
 #include "asio.h"
@@ -155,7 +160,7 @@ public:
 
   void deliver_to_all(std::string msg)
   {
-	for (auto client: m_clients)
+	for (const auto &client: m_clients)
 	  client->deliver(msg);
   }
 

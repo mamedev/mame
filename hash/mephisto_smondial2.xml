@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="mephisto_smondial2" description="Mephisto Super Mondial II Modules">
+
+	<software name="college">
+		<description>College Module</description>
+		<year>1988</year>
+		<publisher>Hegener + Glaser</publisher>
+		<part name="cart" interface="smondial2_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="college_7.7.88" size="0x4000" crc="02fbdf33" sha1="7d1c87b446ef00f4a533f5193f33b3e05af9ff33" offset="0" /> <!-- TC57256AD-12, first half empty -->
+				<rom size="0x4000" offset="0" loadflag="continue"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

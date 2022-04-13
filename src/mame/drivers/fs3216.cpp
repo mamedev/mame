@@ -18,7 +18,7 @@
 #include "machine/upd765.h"
 #include "machine/x2212.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/mc6845.h"
 #include "screen.h"
 
@@ -93,15 +93,15 @@ private:
 	required_shared_ptr<u16> m_videoram;
 	required_region_ptr<u8> m_chargen;
 
-	u32 m_mmu_reg[4];
-	bool m_from_reset;
+	u32 m_mmu_reg[4]{};
+	bool m_from_reset = false;
 
-	u8 m_floppy_status;
-	u8 m_floppy_control;
-	u8 m_floppy_select;
-	u8 m_fdc_select;
-	u16 m_fdc_dma_count;
-	emu_timer *m_fdc_dma_timer;
+	u8 m_floppy_status = 0;
+	u8 m_floppy_control = 0;
+	u8 m_floppy_select = 0;
+	u8 m_fdc_select = 0;
+	u16 m_fdc_dma_count = 0;
+	emu_timer *m_fdc_dma_timer = nullptr;
 	std::unique_ptr<u8[]> m_fdc_ram;
 };
 
@@ -141,7 +141,7 @@ void fs3216_state::machine_reset()
 
 MC6845_UPDATE_ROW(fs3216_state::crt_update_row)
 {
-	u32 *px = &bitmap.pix32(y);
+	u32 *px = &bitmap.pix(y);
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -343,9 +343,9 @@ void fs3216_state::floppy_control_w(u8 data)
 		m_floppy_status &= 0xef;
 	}
 
+	m_fdc->reset_w(!BIT(data, 1));
 	if (!BIT(data, 1))
 	{
-		m_fdc->soft_reset();
 		m_fdc_dma_count = 0;
 		m_fdc->tc_w(0);
 	}
@@ -467,7 +467,7 @@ void fs3216_state::fs3216(machine_config &config)
 	M68000(config, m_maincpu, 44.2368_MHz_XTAL / 8); // 5.5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fs3216_state::main_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &fs3216_state::fc7_map);
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(fs3216_state::mmu_reset_w), this));
+	m_maincpu->set_reset_callback(FUNC(fs3216_state::mmu_reset_w));
 
 	ADDRESS_MAP_BANK(config, m_clb);
 	m_clb->set_addrmap(0, &fs3216_state::clb_map);
@@ -494,14 +494,14 @@ void fs3216_state::fs3216(machine_config &config)
 	m_fdc->us_wr_callback().set(FUNC(fs3216_state::fdc_us_w));
 
 	for (int i = 0; i < 4; i++)
-		FLOPPY_CONNECTOR(config, m_floppy[i], fs3216_floppies, i < 1 ? "525dd" : nullptr, floppy_image_device::default_floppy_formats);
+		FLOPPY_CONNECTOR(config, m_floppy[i], fs3216_floppies, i < 1 ? "525dd" : nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	X2212(config, m_earom);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 14.58_MHz_XTAL / 9)); // HD46505RP
 	crtc.set_char_width(9);
 	crtc.set_show_border_area(false);
-	crtc.set_update_row_callback(FUNC(fs3216_state::crt_update_row), this);
+	crtc.set_update_row_callback(FUNC(fs3216_state::crt_update_row));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());

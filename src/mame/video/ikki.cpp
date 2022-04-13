@@ -53,7 +53,7 @@ void ikki_state::ikki_palette(palette_device &palette)
 	}
 }
 
-WRITE8_MEMBER(ikki_state::ikki_scrn_ctrl_w)
+void ikki_state::ikki_scrn_ctrl_w(uint8_t data)
 {
 	m_flipscreen = BIT(data, 2);
 }
@@ -97,10 +97,10 @@ void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t const pen = m_sprite_bitmap.pix16(y, x);
+			uint16_t const pen = m_sprite_bitmap.pix(y, x);
 
 			if (m_palette->pen_indirect(pen) != 0x100)
-				bitmap.pix16(y, x) = pen;
+				bitmap.pix(y, x) = pen;
 		}
 	}
 }

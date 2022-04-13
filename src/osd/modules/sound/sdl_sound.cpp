@@ -284,7 +284,7 @@ void sound_sdl::update_audio_stream(bool is_throttled, const int16_t *buffer, in
 void sound_sdl::set_mastervolume(int _attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	attenuation = std::max(std::min(_attenuation, 0), -32);
+	attenuation = std::clamp(_attenuation, -32, 0);
 
 	if (stream_in_initialized)
 	{
@@ -335,7 +335,6 @@ int sound_sdl::init(const osd_options &options)
 	int         n_channels = 2;
 	int         audio_latency;
 	SDL_AudioSpec   aspec, obtained;
-	char audio_driver[16] = "";
 
 	if (LOG_SOUND)
 		sound_log = std::make_unique<std::ofstream>(SDLMAME_SOUND_LOG);
@@ -350,8 +349,8 @@ int sound_sdl::init(const osd_options &options)
 		}
 
 		osd_printf_verbose("Audio: Start initialization\n");
-		strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
-		osd_printf_verbose("Audio: Driver is %s\n", audio_driver);
+		char const *const audio_driver = SDL_GetCurrentAudioDriver();
+		osd_printf_verbose("Audio: Driver is %s\n", audio_driver ? audio_driver : "not initialized");
 
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
 		stream_in_initialized = 0;
@@ -373,7 +372,7 @@ int sound_sdl::init(const osd_options &options)
 		sdl_xfer_samples = obtained.samples;
 
 		// pin audio latency
-		audio_latency = std::max(std::min(m_audio_latency, MAX_AUDIO_LATENCY), 1);
+		audio_latency = std::clamp(m_audio_latency, 1, MAX_AUDIO_LATENCY);
 
 		// compute the buffer sizes
 		stream_buffer_size = (sample_rate() * 2 * sizeof(int16_t) * (2 + audio_latency)) / 30;

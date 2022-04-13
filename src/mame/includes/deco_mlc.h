@@ -30,12 +30,15 @@ public:
 		{ }
 
 	void init_mlc();
+	void init_acchi();
 	void init_avengrgs();
 
-	void mlc(machine_config &config);
-	void mlc_6bpp(machine_config &config);
+	void acchi(machine_config &config);
 	void avengrgs(machine_config &config);
+	void mlc(machine_config &config);
 	void mlc_5bpp(machine_config &config);
+	void mlc_6bpp(machine_config &config);
+	void stadhr96(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -51,54 +54,52 @@ private:
 	optional_device<deco146_device> m_deco146;
 	required_device<timer_device> m_raster_irq_timer;
 
-	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_irq_ram;
-	required_shared_ptr<uint32_t> m_clip_ram;
-	required_shared_ptr<uint32_t> m_vram;
+	required_shared_ptr<u32> m_mainram;
+	required_shared_ptr<u32> m_irq_ram;
+	required_shared_ptr<u32> m_clip_ram;
+	required_shared_ptr<u32> m_vram;
 
-	required_region_ptr<uint8_t> m_gfx2;
+	required_region_ptr<u8> m_gfx2;
 
-	int m_irqLevel;
-	uint32_t m_mlc_raster_table_1[4*256];
-	uint32_t m_mlc_raster_table_2[4*256];
-	uint32_t m_mlc_raster_table_3[4*256];
-	uint32_t m_vbl_i;
-	int m_lastScanline[9];
-	uint32_t m_colour_mask;
-	uint32_t m_shadow_mask;
+	int m_irqLevel = 0;
+	u32 m_vbl_i = 0U;
+	u32 m_colour_mask = 0U;
+	u32 m_shadow_mask = 0U;
+	u32 m_shadow_shift = 0U;
 
-	std::unique_ptr<uint16_t[]> m_spriteram;
-	std::unique_ptr<uint16_t[]> m_spriteram_spare;
-	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
+	std::unique_ptr<u16[]> m_spriteram{};
+	std::unique_ptr<u16[]> m_spriteram_spare{};
+	std::unique_ptr<u16[]> m_buffered_spriteram{};
 
-	DECLARE_READ32_MEMBER(mlc_440008_r);
-	DECLARE_READ32_MEMBER(mlc_44001c_r);
-	DECLARE_WRITE32_MEMBER(mlc_44001c_w);
+	u32 mlc_440008_r();
+	u32 mlc_44001c_r(offs_t offset);
+	void mlc_44001c_w(u32 data);
 
-	DECLARE_READ32_MEMBER(mlc_200000_r);
-	DECLARE_READ32_MEMBER(mlc_200004_r);
-	DECLARE_READ32_MEMBER(mlc_200070_r);
-	DECLARE_READ32_MEMBER(mlc_20007c_r);
-	DECLARE_READ32_MEMBER(mlc_scanline_r);
-	DECLARE_WRITE32_MEMBER(irq_ram_w);
-	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_READ32_MEMBER(spriteram_r);
-	DECLARE_WRITE32_MEMBER(spriteram_w);
+	u32 mlc_200000_r();
+	u32 mlc_200004_r();
+	u32 mlc_200070_r();
+	u32 mlc_20007c_r();
+	u32 mlc_scanline_r();
+	void irq_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 avengrgs_speedup_r();
+	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 spriteram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
+	u16 sh96_protection_region_0_146_r(offs_t offset);
+	void sh96_protection_region_0_146_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
-	void draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest);
-	void drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_element *gfx,
-		uint32_t code1,uint32_t code2, uint32_t color,int flipx,int sx,
+	void draw_sprites( const rectangle &cliprect, int scanline, u32* dest, u8* pri);
+	void drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gfx_element *gfx,
+		u32 code1,u32 code2, u32 color,int flipx,int sx,
 		int transparent_color,int use8bpp,
-		int scalex, int alpha, int srcline, int shadowMode, int alphaMode);
-	void descramble_sound(  );
+		int scalex, int srcline, int shadowMode);
+	void descramble_sound();
 
 	void avengrgs_map(address_map &map);
-	void decomlc_map(address_map &map);
+	void decomlc_146_map(address_map &map);
+	void decomlc_no146_map(address_map &map);
 };

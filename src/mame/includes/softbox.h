@@ -39,13 +39,13 @@ private:
 	// device_ieee488_interface overrides
 	virtual void ieee488_ifc(int state);
 
-	DECLARE_READ8_MEMBER( ppi0_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi0_pb_w );
+	uint8_t ppi0_pa_r();
+	void ppi0_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( ppi1_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi1_pb_w );
-	DECLARE_READ8_MEMBER( ppi1_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
+	uint8_t ppi1_pa_r();
+	void ppi1_pb_w(uint8_t data);
+	uint8_t ppi1_pc_r();
+	void ppi1_pc_w(uint8_t data);
 
 	enum
 	{
@@ -56,7 +56,7 @@ private:
 
 	void softbox_io(address_map &map);
 	void softbox_mem(address_map &map);
-	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
+	int m_ifc = 0;  // Tracks previous state of IEEE-488 IFC line
 
 	virtual void machine_start() override;
 	virtual void device_reset_after_children() override;

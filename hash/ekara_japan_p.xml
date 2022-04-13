@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="ekara_japan_p" description="Takara e-kara (Japan) P-xx / PCxxxx- series cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 
@@ -24,7 +27,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="pc0001-bht.u1" size="0x100000" crc="4fbc13a6" sha1="142191a6522c1aa9c7772de6dc1b5706816258de" offset="0" />
+				<rom name="pc0001-bht.u1" size="0x100000" crc="4fbc13a6" sha1="142191a6522c1aa9c7772de6dc1b5706816258de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35,7 +38,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="pc0002-tpj.u1" size="0x100000" crc="2ce065ed" sha1="1c0ae8050f7093a53f74637f27063f720f19610c" offset="0" />
+				<rom name="pc0002-tpj.u1" size="0x100000" crc="2ce065ed" sha1="1c0ae8050f7093a53f74637f27063f720f19610c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +49,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="pc0002-tpj(alt).u1" size="0x100000" crc="f8c54474" sha1="4ae876d8deed068c710700499cba22b88bea3d17" offset="0" />
+				<rom name="pc0002-tpj(alt).u1" size="0x100000" crc="f8c54474" sha1="4ae876d8deed068c710700499cba22b88bea3d17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +60,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="pc0003-enb.u1" size="0x100000" crc="2fa57d12" sha1="01954a20e190c3f9e1d16c4285c9ec39f601eb80" offset="0" />
+				<rom name="pc0003-enb.u1" size="0x100000" crc="2fa57d12" sha1="01954a20e190c3f9e1d16c4285c9ec39f601eb80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +72,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
-				<rom name="pc0004-bht.u1" size="0x100000" crc="95e35899" sha1="a9bd2694f5ee4b964e8d73afc3e88c0eb18ca1d2" offset="0" />
+				<rom name="pc0004-bht.u1" size="0x100000" crc="95e35899" sha1="a9bd2694f5ee4b964e8d73afc3e88c0eb18ca1d2"/>
 			</dataarea>
 		</part>
 	</software>

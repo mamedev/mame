@@ -88,7 +88,6 @@ ioport_constructor ss50_mpc_device::device_input_ports() const
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_300)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
@@ -136,7 +135,7 @@ void ss50_mpc_device::device_start()
 
 WRITE_LINE_MEMBER(ss50_mpc_device::serial_input_w)
 {
-	m_pia->set_a_input(state << 7, 0x7f);
+	m_pia->write_porta_line(7, state);
 	m_loopback->in_w<0>(state);
 }
 

@@ -1,0 +1,5 @@
+bazel-*
+.bazelrc
+build
+.vs
+.vscode

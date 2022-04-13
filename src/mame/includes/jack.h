@@ -13,6 +13,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class jack_state : public driver_device
 {
@@ -57,25 +58,25 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
 
 	/* misc */
-	int m_timer_rate;
-	uint8_t m_joinem_nmi_enable;
-	uint8_t m_joinem_palette_bank;
-	int m_question_address;
-	int m_question_rom;
-	int m_remap_address[16];
+	int m_timer_rate = 0;
+	uint8_t m_joinem_nmi_enable = 0U;
+	uint8_t m_joinem_palette_bank = 0U;
+	int m_question_address = 0;
+	int m_question_rom = 0;
+	int m_remap_address[16]{};
 
 	IRQ_CALLBACK_MEMBER(jack_sh_irq_ack);
-	DECLARE_WRITE8_MEMBER(joinem_control_w);
-	DECLARE_WRITE8_MEMBER(joinem_scroll_w);
-	DECLARE_READ8_MEMBER(striv_question_r);
-	DECLARE_WRITE8_MEMBER(jack_videoram_w);
-	DECLARE_WRITE8_MEMBER(jack_colorram_w);
-	DECLARE_READ8_MEMBER(jack_flipscreen_r);
-	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
-	DECLARE_READ8_MEMBER(timer_r);
+	void joinem_control_w(uint8_t data);
+	void joinem_scroll_w(offs_t offset, uint8_t data);
+	uint8_t striv_question_r(offs_t offset);
+	void jack_videoram_w(offs_t offset, uint8_t data);
+	void jack_colorram_w(offs_t offset, uint8_t data);
+	uint8_t jack_flipscreen_r(offs_t offset);
+	void jack_flipscreen_w(offs_t offset, uint8_t data);
+	uint8_t timer_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);

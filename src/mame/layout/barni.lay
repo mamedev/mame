@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Robbbert
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="red_led" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.09375" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<group name="7x7">
+		<repeat count="7">
+			<param name="n" start="~s~" increment="1" />
+			<param name="x" start="~t~" increment="20" />
+			<param name="y" start="~u~" increment="0" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="~y~" width="18" height="24" />
+			</element>
+		</repeat>
+	</group>
+
+	<group name="2x7">
+		<repeat count="2">
+			<param name="n" start="~s~" increment="1" />
+			<param name="x" start="~t~" increment="20" />
+			<param name="y" start="60" increment="0" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="~y~" width="18" height="24" />
+			</element>
+		</repeat>
+	</group>
+
+	<view name="Standard">
+		<bounds left="5" top="5" right="520" bottom="140" />
+
+		<!-- Player 1 -->
+		<param name="s" value="0" /><!-- first digit number -->
+		<param name="t" value="30" /><!-- first x-coordinate -->
+		<param name="u" value="30" /><!-- first y-coordinate -->
+		<group ref="7x7"></group>
+
+		<!-- Player 2 -->
+		<param name="s" value="8" />
+		<param name="t" value="360" />
+		<param name="u" value="30" />
+		<group ref="7x7"></group>
+
+		<!-- Player 3 -->
+		<param name="s" value="16" />
+		<param name="t" value="30" />
+		<param name="u" value="90" />
+		<group ref="7x7"></group>
+
+		<!-- Player 4 -->
+		<param name="s" value="24" />
+		<param name="t" value="360" />
+		<param name="u" value="90" />
+		<group ref="7x7"></group>
+
+		<!-- Ball in play -->
+		<param name="s" value="32" />
+		<param name="t" value="190" />
+		<group ref="2x7"></group>
+
+		<!-- Credits -->
+		<param name="s" value="34" />
+		<param name="t" value="240" />
+		<group ref="2x7"></group>
+
+		<!-- Match -->
+		<param name="s" value="36" />
+		<param name="t" value="290" />
+		<group ref="2x7"></group>
+
+		<!-- From here is incomplete -->
+		<!-- Player-up LED -->
+		<element name="led5" ref="red_led"><!-- Player 1's turn -->
+			<bounds x="40" y="12" width="7" height="7" />
+		</element>
+		<element name="led6" ref="red_led">
+			<bounds x="310" y="12" width="7" height="7" />
+		</element>
+	</view>
+</mamelayout>

@@ -193,11 +193,12 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(10'000'000)
@@ -224,16 +225,16 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void counters_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void gluck2_map(address_map &map);
 };
 
@@ -243,13 +244,13 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(gluck2_state::videoram_w)
+void gluck2_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gluck2_state::colorram_w)
+void gluck2_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -269,17 +270,17 @@ TILE_GET_INFO_MEMBER(gluck2_state::get_tile_info)
 	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   /* bits 1-6-7 handle the gfx banks */
 	int color = (attr & 0x3c) >> 2;                             /* bits 2-3-4-5 handle the color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 
 void gluck2_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gluck2_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gluck2_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
-uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -290,7 +291,7 @@ uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 *                R/W Handlers                 *
 **********************************************/
 
-WRITE8_MEMBER(gluck2_state::counters_w)
+void gluck2_state::counters_w(uint8_t data)
 {
 /*  - bits -
     7654 3210
@@ -503,7 +504,6 @@ void gluck2_state::gluck2(machine_config &config)
 	screen.set_size((39+1)*8, (38+1)*8);                /* from MC6845 init, registers 00 & 04. (value - 1) */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);  /* from MC6845 init, registers 01 & 06. */
 	screen.set_screen_update(FUNC(gluck2_state::screen_update));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gluck2);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);

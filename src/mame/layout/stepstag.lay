@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
 	<view name="Stepping Stage Custom">
 		<screen tag="lscreen">
 			<bounds x="0" y="0" width="9" height="13.2" />
 		</screen>
-		<screen tag="mscreen">
+		<screen tag="screen">
 			<bounds x="9.1" y="0" width="16" height="13.2" />
 		</screen>
 		<screen tag="rscreen">

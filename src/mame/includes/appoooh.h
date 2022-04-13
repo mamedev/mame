@@ -7,6 +7,7 @@
 
 #include "sound/msm5205.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class appoooh_state : public driver_device
 {
@@ -32,13 +33,13 @@ public:
 	void robowrese(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(adpcm_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(fg_colorram_w);
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(bg_colorram_w);
-	DECLARE_WRITE8_MEMBER(out_w);
+	void adpcm_w(uint8_t data);
+	void scroll_w(uint8_t data);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void fg_colorram_w(offs_t offset, uint8_t data);
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void bg_colorram_w(offs_t offset, uint8_t data);
+	void out_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
@@ -69,14 +70,14 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	/* video-related */
-	tilemap_t  *m_fg_tilemap;
-	tilemap_t  *m_bg_tilemap;
-	int m_scroll_x;
-	int m_priority;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	int m_scroll_x = 0;
+	int m_priority = 0;
 
 	/* sound-related */
-	uint32_t   m_adpcm_data;
-	uint32_t   m_adpcm_address;
+	uint32_t   m_adpcm_data = 0U;
+	uint32_t   m_adpcm_address = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -84,7 +85,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<msm5205_device> m_msm;
 
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0U;
 };
 
 #endif // MAME_INCLUDES_APPOOOH_H

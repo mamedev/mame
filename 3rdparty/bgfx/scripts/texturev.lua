@@ -30,6 +30,13 @@ project ("texturev")
 		defines { "ENTRY_CONFIG_USE_SDL=1" }
 		links   { "SDL2" }
 
+		configuration { "linux or freebsd" }
+			if _OPTIONS["with-wayland"]  then
+				links {
+					"wayland-egl",
+				}
+			end
+
 		configuration { "x32", "windows" }
 			libdirs { "$(SDL2_DIR)/lib/x86" }
 
@@ -52,7 +59,7 @@ project ("texturev")
 				"Xcursor",
 			}
 
-		configuration { "osx" }
+		configuration { "osx*" }
 			linkoptions {
 				"-framework CoreVideo",
 				"-framework IOKit",
@@ -80,6 +87,7 @@ project ("texturev")
 
 	configuration { "vs20* or mingw*" }
 		links {
+			"comdlg32",
 			"gdi32",
 			"psapi",
 		}
@@ -116,27 +124,8 @@ project ("texturev")
 			"GLESv2",
 		}
 
-	configuration { "nacl*" }
+	configuration { "wasm*" }
 		kind "ConsoleApp"
-		targetextension ".nexe"
-		links {
-			"ppapi",
-			"ppapi_gles2",
-			"pthread",
-		}
-
-	configuration { "pnacl" }
-		kind "ConsoleApp"
-		targetextension ".pexe"
-		links {
-			"ppapi",
-			"ppapi_gles2",
-			"pthread",
-		}
-
-	configuration { "asmjs" }
-		kind "ConsoleApp"
-		targetextension ".bc"
 
 	configuration { "linux-* or freebsd" }
 		links {
@@ -156,7 +145,7 @@ project ("texturev")
 			"pthread",
 		}
 
-	configuration { "osx" }
+	configuration { "osx*" }
 		linkoptions {
 			"-framework Cocoa",
 			"-framework Metal",
@@ -174,7 +163,7 @@ project ("texturev")
 			"-framework QuartzCore",
 		}
 
-	configuration { "xcode4", "ios" }
+	configuration { "xcode*", "ios" }
 		kind "WindowedApp"
 
 	configuration { "qnx*" }

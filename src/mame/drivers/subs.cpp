@@ -24,9 +24,10 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 /*************************************
@@ -54,15 +55,16 @@ void subs_state::subs_palette(palette_device &palette) const
 void subs_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x008f).ram();
 	map(0x0000, 0x0000).w(FUNC(subs_state::noise_reset_w));
 	map(0x0000, 0x0007).r(FUNC(subs_state::control_r));
 	map(0x0020, 0x0020).w(FUNC(subs_state::steer_reset_w));
 	map(0x0020, 0x0027).r(FUNC(subs_state::coin_r));
-//  AM_RANGE(0x0040, 0x0040) AM_WRITE(timer_reset_w)
+//  map(0x0040, 0x0040).w(FUNC(subs_state::timer_reset_w));
 	map(0x0060, 0x0063).r(FUNC(subs_state::options_r));
 	map(0x0060, 0x006f).w("latch", FUNC(ls259_device::write_a0));
-	map(0x0090, 0x009f).share("spriteram");
+	map(0x0090, 0x009f).ram().share("spriteram");
+	map(0x00a0, 0x01ff).ram();
 	map(0x0800, 0x0bff).ram().share("videoram");
 	map(0x2000, 0x3fff).rom();
 }

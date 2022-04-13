@@ -168,7 +168,7 @@ void gridlee_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(gridlee_state::analog_port_r)
+uint8_t gridlee_state::analog_port_r(offs_t offset)
 {
 	int delta, sign, magnitude;
 	uint8_t newval;
@@ -250,7 +250,7 @@ void gridlee_state::poly17_init()
  *
  *************************************/
 
-READ8_MEMBER(gridlee_state::random_num_r)
+uint8_t gridlee_state::random_num_r()
 {
 	uint32_t cc;
 
@@ -289,7 +289,7 @@ void gridlee_state::cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("spriteram");
 	map(0x0800, 0x7fff).ram().w(FUNC(gridlee_state::gridlee_videoram_w)).share("videoram");
-	map(0x9000, 0x9000).select(0x0070).lw8("latch_w", [this](offs_t offset, u8 data) { m_latch->write_d0(offset >> 4, data); });
+	map(0x9000, 0x9000).select(0x0070).lw8(NAME([this] (offs_t offset, u8 data) { m_latch->write_d0(offset >> 4, data); }));
 	map(0x9200, 0x9200).w(FUNC(gridlee_state::gridlee_palette_select_w));
 	map(0x9380, 0x9380).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x9500, 0x9501).r(FUNC(gridlee_state::analog_port_r));

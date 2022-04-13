@@ -63,7 +63,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(arabian_state::ay8910_porta_w)
+void arabian_state::ay8910_porta_w(uint8_t data)
 {
 	/*
 	    bit 7 = ENA
@@ -76,7 +76,7 @@ WRITE8_MEMBER(arabian_state::ay8910_porta_w)
 }
 
 
-WRITE8_MEMBER(arabian_state::ay8910_portb_w)
+void arabian_state::ay8910_portb_w(uint8_t data)
 {
 	/*
 	    bit 5 = /IREQ to custom CPU
@@ -101,7 +101,7 @@ WRITE8_MEMBER(arabian_state::ay8910_portb_w)
  *
  *************************************/
 
-READ8_MEMBER(arabian_state::mcu_port_r0_r)
+uint8_t arabian_state::mcu_port_r0_r()
 {
 	uint8_t val = m_mcu_port_r[0];
 
@@ -111,28 +111,28 @@ READ8_MEMBER(arabian_state::mcu_port_r0_r)
 	return val;
 }
 
-READ8_MEMBER(arabian_state::mcu_port_r1_r)
+uint8_t arabian_state::mcu_port_r1_r()
 {
 	uint8_t val = m_mcu_port_r[1];
 
 	return val;
 }
 
-READ8_MEMBER(arabian_state::mcu_port_r2_r)
+uint8_t arabian_state::mcu_port_r2_r()
 {
 	uint8_t val = m_mcu_port_r[2];
 
 	return val;
 }
 
-READ8_MEMBER(arabian_state::mcu_port_r3_r)
+uint8_t arabian_state::mcu_port_r3_r()
 {
 	uint8_t val = m_mcu_port_r[3];
 
 	return val;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_r0_w)
+void arabian_state::mcu_port_r0_w(uint8_t data)
 {
 	uint32_t ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
 
@@ -144,22 +144,22 @@ WRITE8_MEMBER(arabian_state::mcu_port_r0_w)
 	m_mcu_port_r[0] = data & 0x0f;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_r1_w)
+void arabian_state::mcu_port_r1_w(uint8_t data)
 {
 	m_mcu_port_r[1] = data & 0x0f;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_r2_w)
+void arabian_state::mcu_port_r2_w(uint8_t data)
 {
 	m_mcu_port_r[2] = data & 0x0f;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_r3_w)
+void arabian_state::mcu_port_r3_w(uint8_t data)
 {
 	m_mcu_port_r[3] = data & 0x0f;
 }
 
-READ8_MEMBER(arabian_state::mcu_portk_r)
+uint8_t arabian_state::mcu_portk_r()
 {
 	uint8_t val = 0xf;
 
@@ -187,7 +187,7 @@ READ8_MEMBER(arabian_state::mcu_portk_r)
 	return val & 0x0f;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_o_w)
+void arabian_state::mcu_port_o_w(uint8_t data)
 {
 	uint8_t out = data & 0x0f;
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(arabian_state::mcu_port_o_w)
 		m_mcu_port_o = (m_mcu_port_o & 0xf0) | out;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_p_w)
+void arabian_state::mcu_port_p_w(uint8_t data)
 {
 	m_mcu_port_p = data & 0x0f;
 }
@@ -375,7 +375,7 @@ void arabian_state::arabian(machine_config &config)
 	m_mcu->read_r<3>().set(FUNC(arabian_state::mcu_port_r3_r));
 	m_mcu->write_r<3>().set(FUNC(arabian_state::mcu_port_r3_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

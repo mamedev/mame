@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="hp86_rom" description="HP-86/7 Option ROMs">
+	<software name="miksam">
+		<description>MIKSAM ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15011"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0x0e"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom016.bin" size="0x2000" crc="f3639add" sha1="975039f0373ac209094943df262261b46bf0f14d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="assembler">
+		<description>Assembler ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15007"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0x28"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom050.bin" size="0x2000" crc="bdce8a12" sha1="395a763cf1f133c987973d8880a43afc494ba897"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="matrix1">
+		<description>Matrix 1 ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15004"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xb0"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom260.bin" size="0x2000" crc="b57fd7fd" sha1="4a9251c4b6d7b8f12f80f4276e0c71e4ef6f8fcb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="matrix2">
+		<description>Matrix 2 ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15004"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xb1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom261.bin" size="0x2000" crc="681c878e" sha1="a625fe5ae775eeb8436016c5baa8679c71bc184f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="io">
+		<description>I/O ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15003"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xc0"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom300.bin" size="0x2000" crc="c8583a7a" sha1="fa088c4c58e44044ac01f8c9bdb88ac91a59d3c1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="ems">
+		<description>Extended Mass Storage ROM</description>
+		<year>1984</year>
+		<publisher>Structured Software Systems</publisher>
+		<info name="serial" value="00087-15013"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xcf"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom317.bin" size="0x2000" crc="187f7a1e" sha1="4e52f81139a7bbb6e0ed8758dc4fe2307c3da074"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="service">
+		<description>Service ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-60912"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xe0"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom340.bin" size="0x2000" crc="f8e0647e" sha1="6729f022be586502656944c8517e2e4c0a0ea6c5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="service_hpib">
+		<description>HPIB service ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-60913"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xe1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom341.bin" size="0x2000" crc="2927aeeb" sha1="c5f76fb86146b001c30bdb20bc7f27004530d9b0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="advprg1">
+		<description>Advanced programming 1 ROM</description>
+		<year>1983</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15005"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xe7"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom347.bin" size="0x2000" crc="14c085f8" sha1="1e796ae3925480ef50cd407981c5208994d9ab6a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="advprg2">
+		<description>Advanced programming 2 ROM</description>
+		<year>1983</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15005"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xe8"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom350.bin" size="0x2000" crc="0749ced1" sha1="9a2578df0e5237c0ba03517dc57431c93f1c7a84"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="plotter">
+		<description>Printer/plotter ROM</description>
+		<year>1982</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="00087-15002"/>
+
+		<part name="rom" interface="hp80_rom">
+			<feature name="sc" value="0xf0"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="rom360.bin" size="0x2000" crc="982e6ee3" sha1="2b074bb99f387ad55c55d72479627ac8e1546c48"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

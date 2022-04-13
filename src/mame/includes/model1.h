@@ -24,12 +24,6 @@
 
 #include <functional>
 
-
-#define DECLARE_TGP_FUNCTION(name) void name()
-
-enum {FIFO_SIZE = 256};
-enum {MAT_STACK_SIZE = 32};
-
 class model1_state : public driver_device
 {
 public:
@@ -48,8 +42,6 @@ public:
 		, m_poly_rom(*this, "polygons")
 		, m_copro_tables(*this, "copro_tables")
 		, m_copro_data(*this, "copro_data")
-		, m_mr2(*this, "mr2")
-		, m_mr(*this, "mr")
 		, m_display_list0(*this, "display_list0")
 		, m_display_list1(*this, "display_list1")
 		, m_color_xlat(*this, "color_xlat")
@@ -58,12 +50,11 @@ public:
 		, m_tiles(*this, "tile")
 		, m_digits(*this, "digit%u", 0U)
 		, m_outs(*this, "out%u", 0U)
+		, m_throttle(*this, "THROTTLE")
 	{
 	}
 
 	void model1(machine_config &config);
-	void model1_hle(machine_config &config);
-
 	void vf(machine_config &config);
 	void vr(machine_config &config);
 	void vformula(machine_config &config);
@@ -74,13 +65,13 @@ public:
 
 	struct spoint_t
 	{
-		int32_t x, y;
+		int32_t x = 0, y = 0;
 	};
 
 	struct point_t
 	{
-		float x, y, z;
-		float xx, yy;
+		float x = 0, y = 0, z = 0;
+		float xx = 0, yy = 0;
 		spoint_t s;
 	};
 
@@ -107,68 +98,53 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-
-	DECLARE_WRITE16_MEMBER(bank_w);
+	void bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	// TGP
-	DECLARE_READ16_MEMBER(fifoin_status_r);
-	DECLARE_WRITE16_MEMBER(md1_w);
-	DECLARE_WRITE16_MEMBER(md0_w);
-	DECLARE_WRITE16_MEMBER(p_w);
-	DECLARE_WRITE16_MEMBER(mr_w);
-	DECLARE_WRITE16_MEMBER(mr2_w);
+	u16 fifoin_status_r();
 
-	DECLARE_READ16_MEMBER(v60_copro_fifo_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_fifo_w);
-	DECLARE_READ16_MEMBER(v60_copro_ram_adr_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_ram_adr_w);
-	DECLARE_READ16_MEMBER(v60_copro_ram_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_ram_w);
+	u16 v60_copro_fifo_r(offs_t offset);
+	void v60_copro_fifo_w(offs_t offset, u16 data);
+	u16 v60_copro_ram_adr_r();
+	void v60_copro_ram_adr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 v60_copro_ram_r(offs_t offset);
+	void v60_copro_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(copro_ram_r);
-	DECLARE_WRITE32_MEMBER(copro_ram_w);
-	DECLARE_READ32_MEMBER(copro_fifoin_pop);
-	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
+	void copro_sincos_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_sincos_r(offs_t offset);
+	void copro_inv_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_inv_r(offs_t offset);
+	void copro_isqrt_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_isqrt_r(offs_t offset);
+	void copro_atan_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_atan_r();
+	void copro_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_data_r(offs_t offset);
+	void copro_ramadr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_ramadr_r(offs_t offset);
+	void copro_ramdata_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_ramdata_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER(copro_sincos_w);
-	DECLARE_READ32_MEMBER(copro_sincos_r);
-	DECLARE_WRITE32_MEMBER(copro_inv_w);
-	DECLARE_READ32_MEMBER(copro_inv_r);
-	DECLARE_WRITE32_MEMBER(copro_isqrt_w);
-	DECLARE_READ32_MEMBER(copro_isqrt_r);
-	DECLARE_WRITE32_MEMBER(copro_atan_w);
-	DECLARE_READ32_MEMBER(copro_atan_r);
-	DECLARE_WRITE32_MEMBER(copro_data_w);
-	DECLARE_READ32_MEMBER(copro_data_r);
-	DECLARE_WRITE32_MEMBER(copro_ramadr_w);
-	DECLARE_READ32_MEMBER(copro_ramadr_r);
-	DECLARE_WRITE32_MEMBER(copro_ramdata_w);
-	DECLARE_READ32_MEMBER(copro_ramdata_r);
-
-	void copro_hle_vf();
-	void copro_hle_swa();
 	void copro_reset();
 
-	u32 m_copro_sincos_base;
-	u32 m_copro_inv_base;
-	u32 m_copro_isqrt_base;
-	u32 m_copro_atan_base[4];
-	u32 m_copro_data_base;
-	u32 m_copro_ram_adr;
+	u32 m_copro_sincos_base = 0;
+	u32 m_copro_inv_base = 0;
+	u32 m_copro_isqrt_base = 0;
+	u32 m_copro_atan_base[4]{};
+	u32 m_copro_data_base = 0;
+	u32 m_copro_ram_adr[4]{};
 
-	uint16_t m_r360_state;
-	DECLARE_READ8_MEMBER(r360_r);
-	DECLARE_WRITE8_MEMBER(r360_w);
+	uint16_t m_r360_state = 0;
+	uint8_t r360_r();
+	void r360_w(uint8_t data);
 
 	// Rendering
 	virtual void video_start() override;
-	DECLARE_READ16_MEMBER(model1_listctl_r);
-	DECLARE_WRITE16_MEMBER(model1_listctl_w);
+	u16 model1_listctl_r(offs_t offset);
+	void model1_listctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
@@ -231,10 +207,10 @@ private:
 	// Machine
 	void irq_raise(int level);
 	void irq_init();
-	DECLARE_WRITE8_MEMBER(irq_control_w);
+	void irq_control_w(u8 data);
 
-	uint8_t m_irq_status;
-	int m_last_irq;
+	uint8_t m_irq_status = 0;
+	int m_last_irq = 0;
 
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
@@ -251,14 +227,12 @@ private:
 	required_region_ptr<uint32_t> m_copro_tables;
 	optional_memory_region        m_copro_data;
 
-	required_shared_ptr<uint16_t> m_mr2;
-	required_shared_ptr<uint16_t> m_mr;
 	required_shared_ptr<uint16_t> m_display_list0;
 	required_shared_ptr<uint16_t> m_display_list1;
 	required_shared_ptr<uint16_t> m_color_xlat;
 
 	// Sound
-	int m_sound_irq;
+	int m_sound_irq = 0;
 
 	// TGP FIFO
 	void    fifoout_push(uint32_t data);
@@ -267,109 +241,10 @@ private:
 	float   fifoin_pop_f();
 	uint16_t  ram_get_i();
 	float   ram_get_f();
-	u32 m_v60_copro_fifo_r, m_v60_copro_fifo_w;
+	u32 m_v60_copro_fifo_r = 0, m_v60_copro_fifo_w = 0;
 
 	// TGP
 	void    tgp_reset();
-
-	DECLARE_TGP_FUNCTION( fadd );
-	DECLARE_TGP_FUNCTION( fsub );
-	DECLARE_TGP_FUNCTION( fmul );
-	DECLARE_TGP_FUNCTION( fdiv );
-	DECLARE_TGP_FUNCTION( matrix_push );
-	DECLARE_TGP_FUNCTION( matrix_pop );
-	DECLARE_TGP_FUNCTION( matrix_write );
-	DECLARE_TGP_FUNCTION( clear_stack );
-	DECLARE_TGP_FUNCTION( matrix_mul );
-	DECLARE_TGP_FUNCTION( anglev );
-	DECLARE_TGP_FUNCTION( triangle_normal );
-	DECLARE_TGP_FUNCTION( normalize );
-	DECLARE_TGP_FUNCTION( acc_seti );
-	DECLARE_TGP_FUNCTION( track_select );
-	DECLARE_TGP_FUNCTION( load_base );
-	DECLARE_TGP_FUNCTION( transpose );
-	DECLARE_TGP_FUNCTION( anglep );
-	DECLARE_TGP_FUNCTION( matrix_ident );
-	DECLARE_TGP_FUNCTION( matrix_read );
-	DECLARE_TGP_FUNCTION( matrix_trans );
-	DECLARE_TGP_FUNCTION( matrix_scale );
-	DECLARE_TGP_FUNCTION( matrix_rotx );
-	DECLARE_TGP_FUNCTION( matrix_roty );
-	DECLARE_TGP_FUNCTION( matrix_rotz );
-	DECLARE_TGP_FUNCTION( track_read_quad );
-	DECLARE_TGP_FUNCTION( intercept );
-	DECLARE_TGP_FUNCTION( transform_point );
-	DECLARE_TGP_FUNCTION( fcos_m1 );
-	DECLARE_TGP_FUNCTION( fsin_m1 );
-	DECLARE_TGP_FUNCTION( fcosm_m1 );
-	DECLARE_TGP_FUNCTION( fsinm_m1 );
-	DECLARE_TGP_FUNCTION( distance3 );
-	DECLARE_TGP_FUNCTION( ftoi );
-	DECLARE_TGP_FUNCTION( itof );
-	DECLARE_TGP_FUNCTION( acc_set );
-	DECLARE_TGP_FUNCTION( acc_get );
-	DECLARE_TGP_FUNCTION( acc_add );
-	DECLARE_TGP_FUNCTION( acc_sub );
-	DECLARE_TGP_FUNCTION( acc_mul );
-	DECLARE_TGP_FUNCTION( acc_div );
-	DECLARE_TGP_FUNCTION( f42 );
-	DECLARE_TGP_FUNCTION( xyz2rqf );
-	DECLARE_TGP_FUNCTION( f43 );
-	DECLARE_TGP_FUNCTION( f43_swa );
-	DECLARE_TGP_FUNCTION( track_read_tri );
-	DECLARE_TGP_FUNCTION( matrix_sdir );
-	DECLARE_TGP_FUNCTION( fsqrt );
-	DECLARE_TGP_FUNCTION( vlength );
-	DECLARE_TGP_FUNCTION( f47 );
-	DECLARE_TGP_FUNCTION( track_read_info );
-	DECLARE_TGP_FUNCTION( colbox_set );
-	DECLARE_TGP_FUNCTION( colbox_test );
-	DECLARE_TGP_FUNCTION( f49_swa );
-	DECLARE_TGP_FUNCTION( f50_swa );
-	DECLARE_TGP_FUNCTION( f52 );
-	DECLARE_TGP_FUNCTION( matrix_rdir );
-	DECLARE_TGP_FUNCTION( track_lookup );
-	DECLARE_TGP_FUNCTION( f56 );
-	DECLARE_TGP_FUNCTION( int_normal );
-	DECLARE_TGP_FUNCTION( matrix_readt );
-	DECLARE_TGP_FUNCTION( acc_geti );
-	DECLARE_TGP_FUNCTION( int_point );
-	DECLARE_TGP_FUNCTION( col_setcirc );
-	DECLARE_TGP_FUNCTION( col_testpt );
-	DECLARE_TGP_FUNCTION( push_and_ident );
-	DECLARE_TGP_FUNCTION( catmull_rom );
-	DECLARE_TGP_FUNCTION( distance );
-	DECLARE_TGP_FUNCTION( car_move );
-	DECLARE_TGP_FUNCTION( cpa );
-	DECLARE_TGP_FUNCTION( vmat_store );
-	DECLARE_TGP_FUNCTION( vmat_restore );
-	DECLARE_TGP_FUNCTION( vmat_mul );
-	DECLARE_TGP_FUNCTION( vmat_read );
-	DECLARE_TGP_FUNCTION( matrix_rtrans );
-	DECLARE_TGP_FUNCTION( matrix_unrot );
-	DECLARE_TGP_FUNCTION( f80 );
-	DECLARE_TGP_FUNCTION( vmat_save );
-	DECLARE_TGP_FUNCTION( vmat_load );
-	DECLARE_TGP_FUNCTION( ram_setadr );
-	DECLARE_TGP_FUNCTION( groundbox_test );
-	DECLARE_TGP_FUNCTION( f89 );
-	DECLARE_TGP_FUNCTION( f92 );
-	DECLARE_TGP_FUNCTION( f93 );
-	DECLARE_TGP_FUNCTION( f94 );
-	DECLARE_TGP_FUNCTION( vmat_flatten );
-	DECLARE_TGP_FUNCTION( vmat_load1 );
-	DECLARE_TGP_FUNCTION( ram_trans );
-	DECLARE_TGP_FUNCTION( f98_load );
-	DECLARE_TGP_FUNCTION( f98 );
-	DECLARE_TGP_FUNCTION( f99 );
-	DECLARE_TGP_FUNCTION( f100 );
-	DECLARE_TGP_FUNCTION( groundbox_set );
-	DECLARE_TGP_FUNCTION( f102 );
-	DECLARE_TGP_FUNCTION( f103 );
-	DECLARE_TGP_FUNCTION( dump );
-	DECLARE_TGP_FUNCTION( function_get_vf );
-	DECLARE_TGP_FUNCTION( function_get_swa );
-
 	class clipper_t
 	{
 	public:
@@ -390,63 +265,21 @@ private:
 	};
 
 	std::unique_ptr<view_t> m_view;
-	point_t *m_pointdb;
+	std::unique_ptr<point_t[]> m_pointdb;
 	point_t *m_pointpt;
-	quad_t      *m_quaddb;
+	std::unique_ptr<quad_t[]> m_quaddb;
 	quad_t      *m_quadpt;
-	quad_t      **m_quadind;
-	offs_t      m_pushpc;
-	u32 m_copro_hle_active_list_pos, m_copro_hle_active_list_length;
-	typedef void (model1_state::*tgp_func)();
+	std::unique_ptr<quad_t *[]> m_quadind;
 
-	struct function
-	{
-		tgp_func cb;
-		int count;
-	};
-
-	static float tsin(s16 angle);
-	static float tcos(s16 angle);
-
-	static const struct function ftab_vf[];
-	static const struct function ftab_swa[];
-	uint32_t  m_copro_hle_list_length;
-	float   m_cmat[12];
-	float   m_mat_stack[MAT_STACK_SIZE][12];
-	float   m_mat_vector[21][12];
-	int32_t   m_mat_stack_pos;
-	float   m_acc;
-	float   m_tgp_vf_xmin;
-	float   m_tgp_vf_xmax;
-	float   m_tgp_vf_zmin;
-	float   m_tgp_vf_zmax;
-	float   m_tgp_vf_ygnd;
-	float   m_tgp_vf_yflr;
-	float   m_tgp_vf_yjmp;
-	float   m_tgp_vr_circx;
-	float   m_tgp_vr_circy;
-	float   m_tgp_vr_circrad;
-	float   m_tgp_vr_cbox[12];
-	int     m_tgp_vr_select;
-
-	float   m_tgp_int_px;
-	float   m_tgp_int_py;
-	float   m_tgp_int_pz;
-	uint32_t  m_tgp_int_adr;
-	uint16_t  m_v60_copro_ram_adr;
-	uint16_t  m_v60_copro_ram_latch[2];
-	uint16_t  m_copro_hle_ram_scan_adr;
+	uint16_t  m_v60_copro_ram_adr = 0;
+	uint16_t  m_v60_copro_ram_latch[2]{};
 	std::unique_ptr<uint32_t[]> m_copro_ram_data;
-	float   m_tgp_vr_base[4];
-	int     m_ccount;
-	uint16_t  m_listctl[2];
-	uint16_t  *m_glist;
-	bool    m_render_done;
+	uint16_t  m_listctl[2]{};
+	uint16_t  *m_glist = nullptr;
+	bool    m_render_done = false;
 
 	std::unique_ptr<uint16_t[]> m_tgp_ram;
 	std::unique_ptr<uint32_t[]> m_poly_ram;
-
-	void configure_fifos();
 
 	// Rendering helper functions
 	uint32_t  readi(int adr) const;
@@ -498,7 +331,7 @@ private:
 	clipper_t m_clipfn[4];
 
 	// run-time rendering
-	uint16_t* m_display_list_current;
+	uint16_t* m_display_list_current = nullptr;
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;
@@ -507,15 +340,16 @@ private:
 	// I/O related
 	output_finder<2> m_digits;
 	output_finder<8> m_outs;
-	DECLARE_READ8_MEMBER(dpram_r);
-	DECLARE_WRITE8_MEMBER(gen_outputs_w);
-	DECLARE_WRITE8_MEMBER(vf_outputs_w);
-	DECLARE_WRITE8_MEMBER(vr_outputs_w);
-	DECLARE_WRITE8_MEMBER(swa_outputs_w);
-	DECLARE_WRITE8_MEMBER(wingwar_outputs_w);
-	DECLARE_WRITE8_MEMBER(wingwar360_outputs_w);
-	DECLARE_WRITE8_MEMBER(netmerc_outputs_w);
-	DECLARE_WRITE8_MEMBER(drive_board_w);
+	optional_ioport m_throttle;
+	u8 dpram_r(offs_t offset);
+	void gen_outputs_w(uint8_t data);
+	void vf_outputs_w(uint8_t data);
+	void vr_outputs_w(uint8_t data);
+	void swa_outputs_w(uint8_t data);
+	void wingwar_outputs_w(uint8_t data);
+	void wingwar360_outputs_w(uint8_t data);
+	void netmerc_outputs_w(uint8_t data);
+	void drive_board_w(uint8_t data);
 };
 
 #endif // MAME_INCLUDES_MODEL1_H

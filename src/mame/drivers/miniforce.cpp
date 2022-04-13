@@ -97,6 +97,7 @@
  */
 #include "emu.h"
 #include "bus/vme/vme.h"
+#include "bus/vme/vme_cp31.h"
 #include "bus/vme/vme_fccpu20.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
@@ -147,11 +148,11 @@ void miniforce_state::miniforce_mem(address_map &map)
 {
 	map.unmap_value_high();
 /* The ROMs contains an OS9 bootloader. It is position independent but reset vector suggests that it sits flat on adress 0 (zero) */
-//  AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
-//  AM_RANGE (0x004000, 0x01ffff) AM_ROM AM_REGION("roms", 0x004000)/* System EPROM Area 112Kb for System ROM - not verified    */
-//  AM_RANGE (0x020000, 0x03ffff) AM_RAM /* Not verified */
-//  AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//  AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//  map(0x000000, 0x003fff).rom().region("roms", 0x000000); /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
+//  map(0x004000, 0x01ffff).rom().region("roms", 0x004000);/* System EPROM Area 112Kb for System ROM - not verified    */
+//  map(0x020000, 0x03ffff).ram(); /* Not verified */
+//  map(0x100000, 0xfeffff).rw(FUNC(miniforce_state::vme_a24_r), FUNC(miniforce_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+//  map(0xff0000, 0xffffff).rw(FUNC(miniforce_state::vme_a16_r), FUNC(miniforce_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 #endif
 
@@ -173,6 +174,7 @@ INPUT_PORTS_END
 
 static void miniforce_vme_cards(device_slot_interface &device)
 {
+	device.option_add("cp31", VME_CP31);
 	device.option_add("fccpu21", VME_FCCPU21);
 	device.option_add("fcisio", VME_FCISIO1);
 	device.option_add("fcscsi", VME_FCSCSI1);

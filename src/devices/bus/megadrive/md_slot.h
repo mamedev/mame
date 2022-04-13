@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -78,6 +78,8 @@ enum
 	SMOUSE,                      /* Smart Mouse */
 	SOULBLAD,                    /* Soul Blade */
 	SQUIRRELK,                   /* Squirrel King */
+	SRAM_ARG96,                  /* Futbol Argentino 96 (Argentina) (hack of J. League Pro Striker 2) */
+	TC2000,                      /* TC 2000 (Argentina, protected) */
 	TEKKENSP,                    /* Tekken Special */
 	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
 
@@ -89,7 +91,7 @@ enum
 
 // ======================> device_md_cart_interface
 
-class device_md_cart_interface : public device_slot_card_interface
+class device_md_cart_interface : public device_interface
 {
 	friend class base_md_cart_slot_device;
 public:
@@ -97,25 +99,25 @@ public:
 	virtual ~device_md_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write) {}
-	virtual DECLARE_READ16_MEMBER(read_a13) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_a13) {}
-	virtual DECLARE_READ16_MEMBER(read_a15) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_a15) {}
+	virtual uint16_t read(offs_t offset) { return 0xffff; }
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) {}
+	virtual uint16_t read_a13(offs_t offset) { return 0xffff; }
+	virtual void write_a13(offs_t offset, uint16_t data) {}
+	virtual uint16_t read_a15(offs_t offset) { return 0xffff; }
+	virtual void write_a15(offs_t offset, uint16_t data) {}
 
 	virtual int read_test() { return 0; }   // used by Virtua Racing test
 
-	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
-	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { m_device.logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
+	// this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly
+	virtual void write_tmss_bank(offs_t offset, uint16_t data) { device().logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); }
 
 	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
-	virtual uint16_t* get_rom_base() { return m_rom; };
-	virtual uint16_t* get_nvram_base() { return &m_nvram[0]; };
-	virtual uint32_t get_rom_size() { return m_rom_size; };
-	virtual uint32_t get_nvram_size() { return m_nvram.size()*sizeof(uint16_t); };
-	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) {};
+	virtual uint16_t* get_rom_base() { return m_rom; }
+	virtual uint16_t* get_nvram_base() { return &m_nvram[0]; }
+	virtual uint32_t get_rom_size() { return m_rom_size; }
+	virtual uint32_t get_nvram_size() { return m_nvram.size()*sizeof(uint16_t); }
+	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) {}
 
 	void save_nvram() { device().save_item(NAME(m_nvram)); }
 
@@ -134,7 +136,7 @@ protected:
 	int m_nvram_handlers_installed;
 
 	// internal state
-public: // FIXME: this needs to be public becuase the S&K "lock-on" cart is implemented in a really dodgy way
+public: // FIXME: this needs to be public because the S&K "lock-on" cart is implemented in a really dodgy way
 	uint16_t  *m_rom;
 protected:
 	uint32_t  m_rom_size;
@@ -147,28 +149,18 @@ protected:
 // ======================> base_md_cart_slot_device
 
 class base_md_cart_slot_device : public device_t,
-								public device_image_interface,
-								public device_slot_interface
+								public device_cartrom_image_interface,
+								public device_single_card_slot_interface<device_md_cart_interface>
 {
 public:
 	// construction/destruction
-	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~base_md_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const override { return 1; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -181,19 +173,18 @@ public:
 
 	void setup_custom_mappers();
 	void setup_nvram();
-	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 	void file_logging(uint8_t *ROM, uint32_t rom_len, uint32_t nvram_len);
 
 	void save_nvram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
-	virtual DECLARE_READ16_MEMBER(read_a13);
-	virtual DECLARE_WRITE16_MEMBER(write_a13);
-	virtual DECLARE_READ16_MEMBER(read_a15);
-	virtual DECLARE_WRITE16_MEMBER(write_a15);
-	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { if (m_cart) m_cart->write_tmss_bank(space, offset, data, mem_mask); };
+	virtual uint16_t read(offs_t offset);
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual uint16_t read_a13(offs_t offset);
+	virtual void write_a13(offs_t offset, uint16_t data);
+	virtual uint16_t read_a15(offs_t offset);
+	virtual void write_a15(offs_t offset, uint16_t data);
+	virtual void write_tmss_bank(offs_t offset, uint16_t data) { if (m_cart) m_cart->write_tmss_bank(offset, data); }
 
 	virtual int read_test() { if (m_cart) return m_cart->read_test(); else return 0; }  // used by Virtua Racing test
 
@@ -202,7 +193,12 @@ public:
 
 	int m_type;
 	device_md_cart_interface*       m_cart;
-	bool                            m_must_be_loaded;
+
+protected:
+	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 // ======================> md_cart_slot_device
@@ -222,8 +218,8 @@ public:
 	}
 
 	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "megadriv_cart"; }
-	virtual const char *file_extensions() const override { return "smd,bin,md,gen"; }
+	virtual const char *image_interface() const noexcept override { return "megadriv_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "smd,bin,md,gen"; }
 };
 
 // ======================> pico_cart_slot_device
@@ -242,8 +238,8 @@ public:
 		set_fixed(false);
 	}
 	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "pico_cart"; }
-	virtual const char *file_extensions() const override { return "bin,md"; }
+	virtual const char *image_interface() const noexcept override { return "pico_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,md"; }
 };
 
 // ======================> copera_cart_slot_device
@@ -262,8 +258,8 @@ public:
 		set_fixed(false);
 	}
 	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "copera_cart"; }
-	virtual const char *file_extensions() const override { return "bin,md"; }
+	virtual const char *image_interface() const noexcept override { return "copera_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,md"; }
 };
 
 

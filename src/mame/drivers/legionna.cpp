@@ -45,11 +45,13 @@ Denjin Makai
 
 - Needs to patch a sound-related comm to make this to work, same as SD Gundam Psycho Salamander No Kyoui (68k never writes to port 6 for whatever reason).
 
-- There are a bunch of unemulated registers, one of them seems to be a brightness control of some sort. Needs a PCB side-by-side test.
-
-- backdrop color is ugly, especially noticeable in the port harbour stage (level 4). It should be dark blue or black but it's currently grey.
-
 - there are some ROM writes from time to time, could be a coding bug or something related to the protection.
+
+- There's a minor gap in one of the transitions during final stage, after the conveyor belt and the horizontal elevator (the one with tons of grenades), this is known to not happen on a real PCB.
+
+- "Mai T Joplin" text in credits is slightly off of screen area even on real HW (btanb)
+
+- Initials can be entered into ranking screen only if player(s) never ever continues (btanb)
 
 Godzilla
 --------
@@ -85,8 +87,8 @@ Preliminary COP MCU memory map
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -105,12 +107,17 @@ u8 legionna_state::denjinmk_sound_comms_r(offs_t offset)
 
 void legionna_state::legionna_cop_map(address_map &map)
 {
-	map(0x100400, 0x100401).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_lo_w)); // grainbow
-	map(0x100402, 0x100403).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_hi_w)); // grainbow
-	map(0x10040c, 0x10040d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_size_w)); // grainbow
-	map(0x100410, 0x100411).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_inc_w)); // grainbow
-	map(0x100412, 0x100413).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_hi_w)); // grainbow
-	map(0x100414, 0x100415).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_lo_w)); // grainbow
+	// grainbow sprite DMA
+	// the three NOP writes are initied before every sprite DMA
+	map(0x100400, 0x100401).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_lo_w));
+	map(0x100402, 0x100403).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_hi_w));
+	map(0x100404, 0x100405).nopw(); // $0002
+	map(0x10040a, 0x10040b).nopw(); // $ffff
+	map(0x10040c, 0x10040d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_size_w));
+	map(0x10040e, 0x10040f).nopw(); // $0023
+	map(0x100410, 0x100411).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_inc_w));
+	map(0x100412, 0x100413).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_hi_w));
+	map(0x100414, 0x100415).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_lo_w));
 
 	map(0x10041c, 0x10041d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_target_w)); // angle target (for 0x6200 COP macro)
 	map(0x10041e, 0x10041f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_step_w));   // angle step   (for 0x6200 COP macro)
@@ -153,6 +160,8 @@ void legionna_state::legionna_cop_map(address_map &map)
 	map(0x10047c, 0x10047d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_dst_w));
 	map(0x10047e, 0x10047f).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_mode_r), FUNC(raiden2cop_device::cop_dma_mode_w));
 
+//  map(0x100488, 0x100489).nopw(); grainbow $0010
+//  map(0x10048a, 0x10048b).nopw(); grainbow $0000
 	map(0x10048c, 0x10048d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_abs_y_w)); // 68k
 	map(0x10048e, 0x10048f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_abs_x_w)); // 68k
 
@@ -188,17 +197,17 @@ void legionna_state::legionna_map(address_map &map)
 	map(0x100470, 0x100471).nopw(); // toggles 0x2000 / 0x0000, tile bank on some games
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100700, 0x10071f).lrw8(
+								 NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
-	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::text_w).share("textram");
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");    /* palette xRRRRxGGGGxBBBBx ? */
 	map(0x105000, 0x105fff).ram().share("spriteram");
 	map(0x106000, 0x107fff).ram();
@@ -218,13 +227,13 @@ void legionna_state::heatbrl_map(address_map &map)
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
-	map(0x1007c0, 0x1007df).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
-	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x1007c0, 0x1007df).lrw8(
+								 NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::text_w).share("textram");
 	map(0x103000, 0x103fff).ram().share("spriteram");
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x108000, 0x11ffff).ram();
@@ -235,22 +244,21 @@ void legionna_state::godzilla_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100470, 0x100471).w(FUNC(legionna_state::denjinmk_setgfxbank));
+	map(0x100470, 0x100471).w(FUNC(legionna_state::heatbrl_setgfxbank));
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100700, 0x10071f).lrw8(
+								 NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x100800, 0x100fff).ram();
-	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
-	map(0x103800, 0x103fff).ram(); // check?
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::text_w).share("textram");
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x105000, 0x105fff).ram().share("spriteram");
 	map(0x106000, 0x1067ff).ram();
@@ -263,7 +271,7 @@ void legionna_state::godzilla_map(address_map &map)
 
 // additional z80 i/o port, present only in Godzilla (512KB OKI ROM vs 256KB)
 // Notice Denjin Makai has a 512KB OKI ROM too but latter half is empty
-WRITE8_MEMBER(legionna_state::godzilla_oki_bank_w)
+void legionna_state::godzilla_oki_bank_w(u8 data)
 {
 	// bit 1 used, unknown purpose (always on?)
 	m_oki->set_rom_bank(data & 1);
@@ -279,7 +287,7 @@ void legionna_state::godzilla_sound_io_map(address_map &map)
 
 // Denjin Makai: Looks like they specifically swapped address line A1 in this range?
 // Initially thought it was a palette DMA mode 4 but it doesn't apply for Godzilla, causing color bugs in the background tilemap.
-WRITE16_MEMBER(legionna_state::palette_swap_w)
+void legionna_state::palette_swap_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset^=1;
 	COMBINE_DATA(&m_swappal[offset]);
@@ -294,17 +302,17 @@ void legionna_state::denjinmk_map(address_map &map)
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).r(FUNC(legionna_state::denjinmk_sound_comms_r))
-		.lw8("seibu_sound_w", [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+			.lw8(NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
 	map(0x100800, 0x100fff).ram();
-	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::text_w).share("textram");
 	map(0x104000, 0x104fff).ram().w(FUNC(legionna_state::palette_swap_w)).share("swappal");
 	map(0x105000, 0x105fff).ram().share("spriteram");
 	map(0x106000, 0x107fff).ram();
@@ -321,18 +329,18 @@ void legionna_state::grainbow_map(address_map &map)
 	map(0x100480, 0x100487).w(FUNC(legionna_state::grainbow_layer_config_w)); // probably a COP feature
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100700, 0x10071f).lrw8(
+								 NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
-	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x104000, 0x104fff).ram(); // .w(FUNC(legionna_state::paletteram_xBBBBBGGGGGRRRRR_word_w)).share("paletteram");
 	map(0x105000, 0x105fff).ram();
@@ -348,18 +356,18 @@ void legionna_state::cupsoc_map(address_map &map)
 	map(0x100000, 0x1003ff).ram();
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100700, 0x10071f).lrw8(
+								 NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
-	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x104000, 0x104fff).ram();
 	map(0x105000, 0x106fff).ram();
@@ -376,26 +384,26 @@ void legionna_state::cupsocs_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100600, 0x10067f).lrw16("crtc_rw",
-								  [this](address_space &space, offs_t offset, u16 mem_mask) {
-									  return m_crtc->read(space, offset ^ 0x20, mem_mask);
-								  },
-								  [this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
-									  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
-								  });
+	map(0x100600, 0x10067f).lrw16(
+								  NAME([this](offs_t offset) {
+									  return m_crtc->read(offset ^ 0x20);
+								  }),
+								  NAME([this](offs_t offset, u16 data) {
+									  m_crtc->write(offset ^ 0x20, data);
+								  }));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");
 	map(0x100708, 0x100709).portr("PLAYERS34");
 	map(0x10070c, 0x10070d).portr("SYSTEM");
 	map(0x10071c, 0x10071d).portr("DSW2");
-	map(0x100740, 0x10075f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
-	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100740, 0x10075f).lrw8(
+								 NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x104000, 0x104fff).ram();
 	map(0x105000, 0x106fff).ram();
@@ -445,59 +453,68 @@ static INPUT_PORTS_START( legionna )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // ???
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // ???
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(      0x0015, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(      0x0017, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0019, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x001b, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 8C_3C ) )
-	PORT_DIPSETTING(      0x001d, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(      0x001f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0009, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0013, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0011, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x001e, "A 1/1 B 1/2" )
-	PORT_DIPSETTING(      0x0014, "A 2/1 B 1/3" )
-	PORT_DIPSETTING(      0x000a, "A 3/1 B 1/5" )
-	PORT_DIPSETTING(      0x0000, "A 5/1 B 1/6" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_START("DSW1") // Note: If the joystick is held in any direction at power-on the DIP switches are shown on screen.
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" )                PORT_DIPLOCATION("SW01:1")
+	PORT_DIPSETTING(      0x0001, "Mode 1" )
+	PORT_DIPSETTING(      0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) )         PORT_DIPLOCATION("SW01:2,3,4,5") PORT_CONDITION("DSW1", 0x0001, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x001e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0012, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x001a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0016, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0x0014, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ))           PORT_DIPLOCATION("SW01:2,3") PORT_CONDITION("DSW1", 0x0001, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coin_B ))           PORT_DIPLOCATION("SW01:4,5") PORT_CONDITION("DSW1", 0x0001, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )         PORT_DIPLOCATION("SW01:6") // manual says 'NOT IN USE'
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Freeze" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Freeze" )                   PORT_DIPLOCATION("SW01:7")  // manual says 'NOT IN USE'
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("SW01:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )           PORT_DIPLOCATION("SW02:1,2")
 	PORT_DIPSETTING(      0x0200, "1" )
 	PORT_DIPSETTING(      0x0300, "2" )
 	PORT_DIPSETTING(      0x0100, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0400, 0x0400, "Extend" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Extend Play" )              PORT_DIPLOCATION("SW02:3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )         PORT_DIPLOCATION("SW02:4") // manual says 'NOT IN USE'
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("SW02:5,6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x3000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW02:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW02:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) )
 
 	PORT_START("PLAYERS34")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -558,57 +575,66 @@ static INPUT_PORTS_START( heatbrl )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(      0x0015, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(      0x0017, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0019, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x001b, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 8C_3C ) )
-	PORT_DIPSETTING(      0x001d, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(      0x001f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0009, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0013, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0011, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x001e, "A 1/1 B 1/2" )
-	PORT_DIPSETTING(      0x0014, "A 2/1 B 1/3" )
-	PORT_DIPSETTING(      0x000a, "A 3/1 B 1/5" )
-	PORT_DIPSETTING(      0x0000, "A 5/1 B 1/6" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Players ) )
-	PORT_DIPSETTING(      0x0020, "2" )
-	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Freeze" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_START("DSW1") // Note: If any player 1 button is held down at power-on the DIP switches are shown on screen for 40 seconds.
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" )                PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, "Mode 1" )
+	PORT_DIPSETTING(      0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) )         PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW1", 0x0001, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x001e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0012, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x001a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0016, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0x0014, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ))           PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW1", 0x0001, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coin_B ))           PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW1", 0x0001, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0060, 0x0060, "Cabinet Setting" )          PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(      0x0060, "2 Players & 1 Coin Slot" )
+	PORT_DIPSETTING(      0x0040, "4 Players & 1 Coin Slot" )
+	PORT_DIPSETTING(      0x0020, "4 Players (2x 2P Linked) & 1-4 Coin Slots" )
+	PORT_DIPSETTING(      0x0000, "4 Players & 4 Coin Slots" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )           PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, "1" )
 	PORT_DIPSETTING(      0x0100, "2" )
 	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPNAME( 0x0400, 0x0400, "Extend" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Players Start & Join" )     PORT_DIPLOCATION("SW2:3,4") // Listed as-is from the manual but test mode shows different text for 2 choices
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )     // 1 or 2 players can start
+	PORT_DIPSETTING(      0x0800, "2 Start, 1 Can Join" ) // test shows 'Double Coin Start'. This is for a 4 player cab.
+	PORT_DIPSETTING(      0x0400, "2 Start, 2 Can Join" ) // test shows 'Normal'... probably for a 4-player cab or 2 linked cabs with a minimum of 2 players.
+	PORT_DIPSETTING(      0x0000, "1 Start, 2 Can Join" ) // test shows 'Double Coin Start'... also probably for a 4 player cab or 2 linked cabs.
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -645,31 +671,31 @@ static INPUT_PORTS_START( godzilla )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Demo_Sounds ) )   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Service_Mode ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Service_Mode ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 2C_1C ) )
@@ -678,19 +704,19 @@ static INPUT_PORTS_START( godzilla )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coin_B ) )        PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0000, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(      0x2800, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Free_Play ) )     PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -750,18 +776,18 @@ static INPUT_PORTS_START( grainbow )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_START("DSW1") // DIP switch sheet or manual needed to improve this.
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )         PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, "2")
 	PORT_DIPSETTING(      0x0003, "3")
 	PORT_DIPSETTING(      0x0000, "5")
 	PORT_DIPSETTING(      0x0001, "4")
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) ) // ???
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SW1:3,4") // could be something else, not difficulty???
 	PORT_DIPSETTING(      0x000c, "2" ) // Internal value stored at 0x1086cc and often used as table offset
 	PORT_DIPSETTING(      0x0008, "0" )
 	PORT_DIPSETTING(      0x0004, "4" )
-	//PORT_DIPSETTING(      0x0000, "4" ) // Was one of these settings intended to be 6?
-	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0000, "4" ) // Was one of these settings intended to be 6?
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(      0x00a0, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x00b0, DEF_STR( 5C_1C ) )
@@ -778,54 +804,54 @@ static INPUT_PORTS_START( grainbow )
 	PORT_DIPSETTING(      0x0070, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )   PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) // Dead code?
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Demo_Sounds ) )   PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Service_Mode ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Service_Mode ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW3:7") // toggling this has no effect in test mode, always shown on.
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW3:8") // toggling this has no effect in test mode, always shown on.
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW,  IPT_UNUSED )
@@ -884,34 +910,34 @@ static INPUT_PORTS_START( denjinmk )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_START("DSW1") // DIP switch sheet or manual needed to improve this.
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Language ) ) // it actually skips the story entirely, so just remain JP as default
-	PORT_DIPSETTING(      0x0080, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )                    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Language ) )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Japanese ) ) // On English it skips the story entirely, so leave JP as default
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0600, "3 Coins / 5 Credits" )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ) )
@@ -924,11 +950,11 @@ static INPUT_PORTS_START( denjinmk )
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_B ) )        PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x6000, "3 Coins / 5 Credits" )
+	PORT_DIPSETTING(      0x6000, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(      0xf000, DEF_STR( 1C_1C ) )
@@ -948,7 +974,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( cupsoc )
-	// TODO: dip-conditional with coin slots
+	// p3 and p4 inputs are routed thru two 10-pins on lower-left of PCB
+	// TODO: dip-conditional with coin slots... Not actually needed as there are no conditional DIPs on this game.
 	// SEIBU_COIN_INPUTS override
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -966,8 +993,10 @@ static INPUT_PORTS_START( cupsoc )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) //TEST
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNUSED )
+	// 9-10 of p4 connector
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START4 )
+	// 9-10 of p3 presumably routes anywhere on following (GND on manuals)
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PLAYERS12")
@@ -975,39 +1004,42 @@ static INPUT_PORTS_START( cupsoc )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Unused (Debug)")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Pass")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Unused (Debug)")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("PLAYERS34")
+	// 1-8 p3 connector
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON1  ) PORT_PLAYER(3)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON2  ) PORT_PLAYER(3)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Shoot")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Pass")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Unused (Debug)")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_COIN3 ) // p3 coin slot
+	// 1-8 p4 connector
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Shoot")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 Pass")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Unused (Debug)")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4 ) // p4 coin slot
 
+	// manuals confirms all OFF as default setting
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0007, 0x0007, "Coin 1 (3)" )
+	PORT_DIPNAME( 0x0007, 0x0007, "Coin 1 (3)" ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
@@ -1016,7 +1048,7 @@ static INPUT_PORTS_START( cupsoc )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, "Coin 2 (4)" )
+	PORT_DIPNAME( 0x0038, 0x0038, "Coin 2 (4)" ) PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
@@ -1025,85 +1057,83 @@ static INPUT_PORTS_START( cupsoc )
 	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Staring Coin" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Starting Coin" ) PORT_DIPLOCATION("SW1:7") // x2 means at least 2 players must start which
+	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )                         // is similar to Heated Barrel SW2: 3,4
 	PORT_DIPSETTING(      0x0000, "x2" )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, "Time vs Computer" )
+	PORT_DIPNAME( 0x0300, 0x0300, "Time vs Computer, 1 Player" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, "1:30" )
 	PORT_DIPSETTING(      0x0300, "2:00" )
 	PORT_DIPSETTING(      0x0100, "2:30" )
 	PORT_DIPSETTING(      0x0000, "3:00" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Time vs Player, 2 Players" )
+	// the duplicate settings of following three aren't actually documented in manual
+	// tested 2p/4p via stopwatch, matches 2min and 3min of effective time.
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Time Player vs Player, 2 Players" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, "2:00" )
 	PORT_DIPSETTING(      0x0c00, "2:30" )
 	PORT_DIPSETTING(      0x0400, "3:00" )
-	PORT_DIPSETTING(      0x0000, "x:xx" )
-	PORT_DIPNAME( 0x3000, 0x3000, "Time vs Player, 3 Players" )
+	PORT_DIPSETTING(      0x0000, "2:00 (duplicate)" )
+	PORT_DIPNAME( 0x3000, 0x3000, "Time Player vs Player, 3 Players" ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x2000, "2:30" )
 	PORT_DIPSETTING(      0x3000, "3:00" )
 	PORT_DIPSETTING(      0x1000, "3:30" )
-	PORT_DIPSETTING(      0x0000, "x:xx" )
-	PORT_DIPNAME( 0xc000, 0xc000, "Time vs Player, 4 Players" )
+	PORT_DIPSETTING(      0x0000, "2:30 (duplicate)" )
+	PORT_DIPNAME( 0xc000, 0xc000, "Time Player vs Player, 4 Players" ) PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0x8000, "3:00" )
 	PORT_DIPSETTING(      0xc000, "3:30" )
 	PORT_DIPSETTING(      0x4000, "4:00" )
-	PORT_DIPSETTING(      0x0000, "x:xx" )
+	PORT_DIPSETTING(      0x0000, "3:00 (duplicate)" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x000c, 0x0000, "Players / Coin Mode" )
-	PORT_DIPSETTING(      0x0000, "4 Players / 1 Coin Slot" )
-	PORT_DIPSETTING(      0x0004, "4 Players / 4 Coin Slots" )
-	PORT_DIPSETTING(      0x0008, "4 Players / 2 Coin Slots" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x000c, 0x000c, "Cabinet Setting" ) PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(      0x000c, "2 Players" )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Service_Mode ) )
+	PORT_DIPSETTING(      0x0008, "4 Players & 4 Coin Slots" )
+	PORT_DIPSETTING(      0x0004, "4 Players (2x 2P Linked) & 1-4 Coin Slots" )
+	PORT_DIPSETTING(      0x0000, "4 Players & 1 Coin Slot" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW3:7") // toggling this has no effect in test mode, always shown on.
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW3:8") // toggling this has no effect in test mode, always shown on.
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	// probably not mapped, service lists 3*8 dips
-	PORT_DIPNAME( 0xff00, 0xff00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0xff00, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*****************************************************************************/
 
-static const gfx_layout legionna_new_charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 4, 8, 12 },
-	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
+	{ STEP4(0, 4) },
+	{ STEP4(3, -1), STEP4(4*4+3, -1) },
+	{ STEP8(0, 4*8) },
+	8*8*4
 };
 
 
-void legionna_state::descramble_legionnaire_gfx(uint8_t* src)
+void legionna_state::descramble_legionnaire_gfx(u8* src)
 {
 	int len = 0x10000;
 
 	/*  rearrange gfx */
-	std::vector<uint8_t> buffer(len);
+	std::vector<u8> buffer(len);
 	{
-		int i;
-		for (i = 0;i < len; i++)
+		for (int i = 0; i < len; i++)
 		{
 			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
@@ -1115,84 +1145,33 @@ void legionna_state::descramble_legionnaire_gfx(uint8_t* src)
 		}
 		memcpy(src,&buffer[0],len);
 	}
-
 }
 
 
-static const gfx_layout legionna_tilelayout =
+static const gfx_layout tilelayout =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 2*4, 3*4, 0*4, 1*4 },
-	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
-		64*8+3, 64*8+2, 64*8+1, 64*8+0, 64*8+16+3, 64*8+16+2, 64*8+16+1, 64*8+16+0 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
+	{ STEP4(0, 4) },
+	{ STEP4(3, -1), STEP4(4*4+3, -1), STEP4(4*8*16+3, -1), STEP4(4*8*16+4*4+3, -1) },
+	{ STEP16(0, 4*8) },
+	16*16*4
 };
 
-static const gfx_layout legionna_tilelayout2 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0*4, 1*4, 2*4, 3*4 },
-	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
-		64*8+3, 64*8+2, 64*8+1, 64*8+0, 64*8+16+3, 64*8+16+2, 64*8+16+1, 64*8+16+0 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
-};
-
-static const gfx_layout legionna_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 2*4, 3*4, 0*4, 1*4 },
-	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
-		64*8+3, 64*8+2, 64*8+1, 64*8+0, 64*8+16+3, 64*8+16+2, 64*8+16+1, 64*8+16+0 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
-};
-
-static GFXDECODE_START( gfx_legionna )
-	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout, 48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,      0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,     32*16, 16 )
-	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,    0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout2,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
+static GFXDECODE_START( gfx_legionna ) // Background and Midground has shared ROM
+	GFXDECODE_ENTRY( "sprite", 0, tilelayout, 64*16, 64 )
+	GFXDECODE_ENTRY( "char",   0, charlayout, 48*16, 16 )
+	GFXDECODE_ENTRY( "back",   0, tilelayout,     0, 32 )
+	GFXDECODE_ENTRY( "fore",   0, tilelayout, 32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_heatbrl )
-	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_cupsoc )
-	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,   0, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
-GFXDECODE_END
-
-
-static GFXDECODE_START( gfx_grainbow )
-	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,        0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,        32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,      0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,        32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,        16*16, 16 )
+static GFXDECODE_START( gfx_heatbrl ) // Midground has independent ROM
+	GFXDECODE_ENTRY( "sprite", 0, tilelayout, 64*16, 64 )
+	GFXDECODE_ENTRY( "char",   0, charlayout, 48*16, 16 )
+	GFXDECODE_ENTRY( "back",   0, tilelayout,  0*16, 16 )
+	GFXDECODE_ENTRY( "fore",   0, tilelayout, 32*16, 16 )
+	GFXDECODE_ENTRY( "mid",    0, tilelayout, 16*16, 16 )
 GFXDECODE_END
 
 /*****************************************************************************/
@@ -1336,7 +1315,7 @@ void legionna_state::godzilla(machine_config &config)
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 	m_crtc->layer_scroll_base_callback().set(FUNC(legionna_state::tile_scroll_base_w));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
@@ -1444,7 +1423,7 @@ void legionna_state::grainbow(machine_config &config)
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grainbow);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
@@ -1489,7 +1468,11 @@ void legionna_state::cupsoc(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(42*8, 36*8);
-	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	// TODO: real PCB is a bit more complex,
+	// it's really 320x256 in-game but with 8px border color on top/bottom.
+	// Border color is also not pure black but a very dark grey,
+	// can be seen when throw-in on bottom line occurs.
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(legionna_state::screen_update_grainbow));
 	screen.set_palette(m_palette);
 
@@ -1498,7 +1481,7 @@ void legionna_state::cupsoc(machine_config &config)
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cupsoc);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
@@ -1555,24 +1538,15 @@ ROM_START( legionna )
 	ROM_REGION( 0x010000, "char", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
 
-	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
+	ROM_REGION( 0x010000, "fore", 0 )  /* BK3 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
-	ROM_LOAD( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
+	ROM_LOAD16_WORD_SWAP( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
+	ROM_LOAD16_WORD_SWAP( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, "user2", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
-	ROM_LOAD( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )    /* 3 sets of tiles ('MBK','LBK','BK3') */
-
-	ROM_REGION( 0x80000, "gfx3", 0 )  /* MBK */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x80000 )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
-	/* Not Used */
-
-	ROM_REGION( 0x80000, "gfx6", 0 )    /* LBK */
-	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
+	ROM_REGION( 0x100000, "back", 0 )    /* 3 sets of tiles ('MBK','LBK','BK3') */
+	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
@@ -1603,24 +1577,15 @@ ROM_START( legionnaj )
 	ROM_REGION( 0x010000, "char", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
 
-	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
+	ROM_REGION( 0x010000, "fore", 0 )  /* BK3 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
-	ROM_LOAD( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
+	ROM_LOAD16_WORD_SWAP( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
+	ROM_LOAD16_WORD_SWAP( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, "user2", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
-	ROM_LOAD( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )    /* 3 sets of tiles ('MBK','LBK','BK3') */
-
-	ROM_REGION( 0x80000, "gfx3", 0 )  /* MBK */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x80000 )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
-	/* Not Used */
-
-	ROM_REGION( 0x80000, "gfx6", 0 )    /* LBK */
-	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
+	ROM_REGION( 0x100000, "back", 0 )    /* 3 sets of tiles ('MBK','LBK','BK3') */
+	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
@@ -1651,24 +1616,15 @@ ROM_START( legionnau )
 	ROM_REGION( 0x010000, "char", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
 
-	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
+	ROM_REGION( 0x010000, "fore", 0 )  /* BK3 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
-	ROM_LOAD( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
+	ROM_LOAD16_WORD_SWAP( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
+	ROM_LOAD16_WORD_SWAP( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, "user2", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
-	ROM_LOAD( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )    /* 3 sets of tiles ('MBK','LBK','BK3') */
-
-	ROM_REGION( 0x80000, "gfx3", 0 )  /* MBK */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x80000 )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
-	/* Not Used */
-
-	ROM_REGION( 0x80000, "gfx6", 0 )    /* LBK */
-	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
+	ROM_REGION( 0x100000, "back", 0 )    /* 3 sets of tiles ('MBK','LBK','BK3') */
+	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
@@ -1697,20 +1653,17 @@ ROM_START( heatbrl )
 	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )   /* sprites */
-	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
-	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
-	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
+	ROM_REGION( 0x080000, "mid", 0 )    /* LBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
 	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
@@ -1739,20 +1692,17 @@ ROM_START( heatbrl2 )
 	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )   /* sprites */
-	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
-	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
-	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
+	ROM_REGION( 0x080000, "mid", 0 )    /* LBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
 	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
@@ -1781,20 +1731,17 @@ ROM_START( heatbrl3 ) // only the maincpu and audiocpu ROMs were provided for th
 	ROM_LOAD16_BYTE( "barrel_5.u072.5v", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )   /* sprites */
-	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
-	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
-	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
+	ROM_REGION( 0x080000, "mid", 0 )    /* LBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
 	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
@@ -1828,19 +1775,17 @@ barrel1,2,3,4.OBJ
 barrel1,2,3,4.BG */
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
-	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
+	ROM_REGION( 0x080000, "mid", 0 )    /* LBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
 	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
@@ -1869,19 +1814,17 @@ ROM_START( heatbrlu )
 	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
-	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
+	ROM_REGION( 0x080000, "mid", 0 )    /* LBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
 	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
@@ -1914,20 +1857,17 @@ ROM_START( heatbrle )
 	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
-	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
-	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
+	ROM_REGION( 0x080000, "mid", 0 )    /* LBK tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
 	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
@@ -2007,21 +1947,16 @@ ROM_START( godzilla )
 	ROM_LOAD16_BYTE( "10.615",       0x000001, 0x010000, CRC(9c22bc13) SHA1(a94d9ed63ee1f5e358ebcaf517e6a1c986fa5d96) )
 
 	ROM_REGION( 0x800000, "sprite", ROMREGION_ERASE00 )
-	ROM_LOAD( "obj1.748",     0x000000, 0x200000, CRC(0dfaf26d) SHA1(2af3ea06369c40ae89c2f8362c273f4801db8e68) )
-	ROM_LOAD( "obj2.756",     0x200000, 0x200000, CRC(32b1516a) SHA1(4adcf4b957f6b9baf1a5b8807b381db664de632d) )
-	ROM_LOAD( "obj3.743",     0x400000, 0x100000, CRC(5af0114e) SHA1(9362de9ade6db67ab0e3a2dfea580e688bbf7729) )
-	ROM_LOAD( "obj4.757",     0x500000, 0x100000, CRC(7448b054) SHA1(5c08319329eb8c90b63e5393c0011bc39911ebbb) )
+	ROM_LOAD16_WORD_SWAP( "obj1.748",     0x000000, 0x200000, CRC(0dfaf26d) SHA1(2af3ea06369c40ae89c2f8362c273f4801db8e68) )
+	ROM_LOAD16_WORD_SWAP( "obj2.756",     0x200000, 0x200000, CRC(32b1516a) SHA1(4adcf4b957f6b9baf1a5b8807b381db664de632d) )
+	ROM_LOAD16_WORD_SWAP( "obj3.743",     0x400000, 0x100000, CRC(5af0114e) SHA1(9362de9ade6db67ab0e3a2dfea580e688bbf7729) )
+	ROM_LOAD16_WORD_SWAP( "obj4.757",     0x500000, 0x100000, CRC(7448b054) SHA1(5c08319329eb8c90b63e5393c0011bc39911ebbb) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "bg1.618",      0x000000, 0x100000, CRC(78fbbb84) SHA1(b1f5d4041bb88c5b2a561949239b11c3fd7c5fbc) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "bg1.618",      0x000000, 0x100000, CRC(78fbbb84) SHA1(b1f5d4041bb88c5b2a561949239b11c3fd7c5fbc) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x100000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "bg2.619",      0x000000, 0x100000, CRC(8ac192a5) SHA1(54b557e81a704c70a651e6b8da70207a2a70530f) )
-
-	ROM_REGION( 0x100000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx3", 0x80000, 0x00000, 0x080000 )
+	ROM_REGION( 0x100000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "bg2.619",      0x000000, 0x100000, CRC(8ac192a5) SHA1(54b557e81a704c70a651e6b8da70207a2a70530f) ) // 1xxxxxxxxxxxxxxxxxxx = 0xff filled
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "pcm.922",      0x000000, 0x080000, CRC(59cbef10) SHA1(6b89b7286f80f9c903dfb81dc93a03c38dff707c) )
@@ -2031,6 +1966,55 @@ ROM_START( godzilla )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d2.313",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) )
+ROM_END
+
+/*
+
+Denjin Makai newer set
+PCB labeled BP942KS
+All "denjin" ROM labels from this set are actually written in kanji chars.
+
+*/
+
+ROM_START( denjinmk )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD32_BYTE( "denjin_1.u025", 0x000000, 0x040000, CRC(b23a6e6f) SHA1(73ab330dfc0d2799984874f02da51deb8323b9e2) )
+	ROM_LOAD32_BYTE( "denjin_2.u024", 0x000001, 0x040000, CRC(4fde59e7) SHA1(1618db14a18acc2acabdd93b8e2563d7221e643d) )
+	ROM_LOAD32_BYTE( "denjin_3.u026", 0x000002, 0x040000, CRC(4f10292b) SHA1(c61c88cacc433bb9af6a4225ce5959dd0fefd084) )
+	ROM_LOAD32_BYTE( "denjin_4.u023", 0x000003, 0x040000, CRC(209f1f6b) SHA1(3f6709dc79fae47ef4181d405d3aa94c2df5963a) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
+	ROM_LOAD( "denjin_7.u1016",  0x000000, 0x08000, CRC(970f36dd) SHA1(010a9edeaedb9e258cd02b3e9294264d00ec7c45) )
+	ROM_CONTINUE(         0x010000, 0x08000 )   /* banked stuff */
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "char", 0 )
+	ROM_LOAD16_BYTE( "denjin_6.u0620", 0x000000, 0x010000, CRC(e1f759b1) SHA1(ddc60e78e7791a59c59403dd4089b3f6e1ecf8cb) )
+	ROM_LOAD16_BYTE( "denjin_5.u0615", 0x000001, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) )
+
+	ROM_REGION( 0x500000, "sprite", 0 )
+	ROM_LOAD16_WORD_SWAP( "obj-0-3.748", 0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
+	ROM_LOAD16_WORD_SWAP( "obj-4-5.756", 0x200000, 0x100000, CRC(01f8d4e6) SHA1(25b69da693be8c3404f750b419c330a7a56e88ec) ) /* 4,5 */
+	ROM_LOAD16_WORD_SWAP( "obj-6-7.743", 0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
+	ROM_LOAD16_WORD_SWAP( "obj-8-9.757", 0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
+
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "bg-1-ab.618", 0x000000, 0x100000, CRC(eaad151a) SHA1(bdd1d83ee8497efe20f21baf873e786446372bcb) )
+
+	ROM_REGION( 0x100000, "mid", 0 )    /* BK2 used (or LBK; just identification string differs?) */
+	ROM_LOAD16_WORD_SWAP( "bg-2-ab.617", 0x000000, 0x100000, CRC(40938f74) SHA1(d68b0f8245a8b390ad5d4e6ebc7514a939b8ac51) )
+
+	ROM_REGION( 0x100000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "bg-3-ab.619", 0x000000, 0x100000, CRC(de7366ee) SHA1(0c3969d15f3cd963e579d4164b6e0a6b4012c9c6) )
+
+	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
+	ROM_LOAD( "denjin_8.u0922",     0x000000, 0x040000, CRC(a11adb8f) SHA1(50e1158767b506d962bff861c2a6609246d764c4) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "s68e08.844",  0x000000, 0x000200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
+
+	ROM_REGION( 0x080000, "user1", 0 )
+	ROM_LOAD( "copx-d2.313", 0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) )
 ROM_END
 
 /*
@@ -2105,19 +2089,18 @@ Notes:
 
       S68E08 : PROM type 82S147, labelled 'S68E08'
 
-
 */
 
-ROM_START( denjinmk )
+ROM_START( denjinmka )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD32_BYTE( "rom1.025",        0x000000, 0x040000, CRC(44a648e8) SHA1(a3c1721e89ac6b9fc16f80682b2f701cb24b5d76) )
-	ROM_LOAD32_BYTE( "rom2.024",        0x000001, 0x040000, CRC(e5ee8fe0) SHA1(2ebff4fdbe82062fb526598e10f11358b0b5c02f) )
-	ROM_LOAD32_BYTE( "rom3.026",        0x000002, 0x040000, CRC(781b942e) SHA1(f1f4ddc332de3dc29b716a1b82c2ecc2045efb3a) )
-	ROM_LOAD32_BYTE( "rom4.023",        0x000003, 0x040000, CRC(502a588b) SHA1(9055b631240fe52d33b572e34275d31a9f3d290f) )
+	ROM_LOAD32_BYTE( "rom1.025", 0x000000, 0x040000, CRC(44a648e8) SHA1(a3c1721e89ac6b9fc16f80682b2f701cb24b5d76) )
+	ROM_LOAD32_BYTE( "rom2.024", 0x000001, 0x040000, CRC(e5ee8fe0) SHA1(2ebff4fdbe82062fb526598e10f11358b0b5c02f) )
+	ROM_LOAD32_BYTE( "rom3.026", 0x000002, 0x040000, CRC(781b942e) SHA1(f1f4ddc332de3dc29b716a1b82c2ecc2045efb3a) )
+	ROM_LOAD32_BYTE( "rom4.023", 0x000003, 0x040000, CRC(502a588b) SHA1(9055b631240fe52d33b572e34275d31a9f3d290f) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
-	ROM_LOAD( "rom5.016",        0x000000, 0x08000, CRC(7fe7e352) SHA1(1ceae22186751ca91dfffab7bd11f275e693451f) )
-	ROM_CONTINUE(             0x010000, 0x08000 )   /* banked stuff */
+	ROM_LOAD( "rom5.016", 0x000000, 0x08000, CRC(7fe7e352) SHA1(1ceae22186751ca91dfffab7bd11f275e693451f) )
+	ROM_CONTINUE(         0x010000, 0x08000 )   /* banked stuff */
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "char", 0 )
@@ -2125,22 +2108,19 @@ ROM_START( denjinmk )
 	ROM_LOAD16_BYTE( "rom8.615",       0x000001, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) )
 
 	ROM_REGION( 0x500000, "sprite", 0 )
-	ROM_LOAD( "obj-0-3.748",     0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
-	ROM_LOAD( "obj-4-5.756",     0x200000, 0x100000, CRC(01f8d4e6) SHA1(25b69da693be8c3404f750b419c330a7a56e88ec) ) /* 4,5 */
-	ROM_LOAD( "obj-6-7.743",     0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
-	ROM_LOAD( "obj-8-9.757",     0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
+	ROM_LOAD16_WORD_SWAP( "obj-0-3.748", 0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
+	ROM_LOAD16_WORD_SWAP( "obj-4-5.756", 0x200000, 0x100000, CRC(01f8d4e6) SHA1(25b69da693be8c3404f750b419c330a7a56e88ec) ) /* 4,5 */
+	ROM_LOAD16_WORD_SWAP( "obj-6-7.743", 0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
+	ROM_LOAD16_WORD_SWAP( "obj-8-9.757", 0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "bg-1-ab.618",      0x000000, 0x100000, CRC(eaad151a) SHA1(bdd1d83ee8497efe20f21baf873e786446372bcb) )
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "bg-1-ab.618",      0x000000, 0x100000, CRC(eaad151a) SHA1(bdd1d83ee8497efe20f21baf873e786446372bcb) )
 
-	ROM_REGION( 0x100000, "gfx4", 0 )   /* BK2 used */
-	ROM_LOAD( "bg-2-ab.617",      0x000000, 0x100000, CRC(40938f74) SHA1(d68b0f8245a8b390ad5d4e6ebc7514a939b8ac51) )
+	ROM_REGION( 0x100000, "mid", 0 )    /* BK2 used (or LBK; just identification string differs?) */
+	ROM_LOAD16_WORD_SWAP( "bg-2-ab.617",      0x000000, 0x100000, CRC(40938f74) SHA1(d68b0f8245a8b390ad5d4e6ebc7514a939b8ac51) )
 
-	ROM_REGION( 0x100000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "bg-3-ab.619",      0x000000, 0x100000,  CRC(de7366ee) SHA1(0c3969d15f3cd963e579d4164b6e0a6b4012c9c6) )
-
-	ROM_REGION( 0x100000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx4", 0x000000, 0x00000, 0x100000 )
+	ROM_REGION( 0x100000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "bg-3-ab.619",      0x000000, 0x100000, CRC(de7366ee) SHA1(0c3969d15f3cd963e579d4164b6e0a6b4012c9c6) )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "rom6.922",      0x000000, 0x040000, CRC(09e13213) SHA1(9500e057104c6b83da0467938e46d9efa2f49f4c) )
@@ -2221,20 +2201,14 @@ ROM_START( grainbow )
 	ROM_LOAD16_BYTE( "rb-f2.615",    0x000001, 0x010000, CRC(a30e0903) SHA1(b9e7646da1ccab6dadaca6beda08125b34946653) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
-	ROM_LOAD( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
+	ROM_LOAD16_WORD_SWAP( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
+	ROM_LOAD16_WORD_SWAP( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
+	ROM_REGION( 0x100000, "back", 0 )
+	ROM_LOAD16_WORD_SWAP( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x100000, "gfx5", 0 )
-	ROM_LOAD( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
-
-	ROM_REGION( 0x100000, "gfx6", 0 )
-//#define ROM_COPY(rgn,srcoffset,offset,length)
-	ROM_COPY( "gfx3", 0x80000, 0x00000, 0x80000 )
+	ROM_REGION( 0x100000, "fore", 0 )
+	ROM_LOAD16_WORD_SWAP( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "rb-ad.922",    0x000000, 0x020000, CRC(a364cb42) SHA1(c527b39a1627ecee20a2c4df4cf2b5f2ba729081) )
@@ -2261,20 +2235,14 @@ ROM_START( grainbowk )
 	ROM_LOAD16_BYTE( "rb-f2.615",   0x000001, 0x010000, CRC(a30e0903) SHA1(b9e7646da1ccab6dadaca6beda08125b34946653) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
-	ROM_LOAD( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
+	ROM_LOAD16_WORD_SWAP( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
+	ROM_LOAD16_WORD_SWAP( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
+	ROM_REGION( 0x100000, "back", 0 )
+	ROM_LOAD16_WORD_SWAP( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x100000, "gfx5", 0 )
-	ROM_LOAD( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
-
-	ROM_REGION( 0x100000, "gfx6", 0 )
-//#define ROM_COPY(rgn,srcoffset,offset,length)
-	ROM_COPY( "gfx3", 0x80000, 0x00000, 0x80000 )
+	ROM_REGION( 0x100000, "fore", 0 )
+	ROM_LOAD16_WORD_SWAP( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "rb-ad.922",    0x000000, 0x020000, CRC(a364cb42) SHA1(c527b39a1627ecee20a2c4df4cf2b5f2ba729081) )
@@ -2300,18 +2268,13 @@ ROM_START( cupsoc )
 	ROM_LOAD16_BYTE( "scc_05.bin", 0x000001, 0x010000, CRC(c0358503) SHA1(e87991c6a6f3e060a1b03b4899fa891510fca15f) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2340,18 +2303,13 @@ ROM_START( cupsoca )
 	ROM_LOAD16_BYTE( "soca_5.bin", 0x000001, 0x010000, CRC(73a3e024) SHA1(aeb359dd2dc9eb96330f494c44123bab3f5986a4) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2380,18 +2338,13 @@ ROM_START( cupsocb )
 	ROM_LOAD16_BYTE( "soca_5.bin", 0x000001, 0x010000, CRC(73a3e024) SHA1(aeb359dd2dc9eb96330f494c44123bab3f5986a4) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2420,18 +2373,13 @@ ROM_START( cupsocs )
 	ROM_LOAD16_BYTE( "5_7y.bin", 0x000001, 0x010000, CRC(26cbfaf0) SHA1(1ba7bc1cecb4bd06ba5c2d3eaa9c9e38e2106cd2) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "8_7a.bin", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2462,18 +2410,13 @@ ROM_START( cupsocs2 )
 	ROM_LOAD16_BYTE( "seibu5.7y", 0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2502,18 +2445,13 @@ ROM_START( olysoc92 )
 	ROM_LOAD16_BYTE( "seibu5.7y", 0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2542,18 +2480,13 @@ ROM_START( olysoc92a )
 	ROM_LOAD16_BYTE( "5_7y.bin", 0x000001, 0x010000, CRC(26cbfaf0) SHA1(1ba7bc1cecb4bd06ba5c2d3eaa9c9e38e2106cd2) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2583,18 +2516,13 @@ ROM_START( olysoc92b )
 	ROM_LOAD16_BYTE( "5", 0x000001, 0x010000, CRC(ec21c8dc) SHA1(93a9bf13d7c53e76762307c028f427ff2888629c) )  // sldh
 
 	ROM_REGION( 0x200000, "sprite", 0 )
-	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
-	ROM_LOAD( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+	ROM_REGION( 0x100000, "back", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
-	ROM_LOAD( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
+	ROM_REGION( 0x080000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "8", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2630,7 +2558,7 @@ ROM_END
 void legionna_state::init_cupsoc_debug()
 {
 #if CUPSOC_DEBUG_MODE
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
 	ROM[0xffffa/2]  = 0x0000;
 	ROM[0xffff6/2] ^= 0x00ff;
 #endif
@@ -2638,7 +2566,7 @@ void legionna_state::init_cupsoc_debug()
 
 void legionna_state::init_olysoc92()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
 	ROM[0xffffe/2] ^= 0x0003; // show Olympic Soccer '92 title
 
 	init_cupsoc_debug();
@@ -2646,7 +2574,7 @@ void legionna_state::init_olysoc92()
 
 void legionna_state::init_cupsocs()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
 	ROM[0xffffa/2] = 0x00ff; // disable debug text (this is already 0x00ff in the bootleg sets for the same reason)
 
 	init_cupsoc_debug();
@@ -2661,12 +2589,12 @@ void legionna_state::init_cupsoc()
 
 void legionna_state::init_legiongfx()
 {
-	descramble_legionnaire_gfx(memregion("gfx5")->base() );
+	descramble_legionnaire_gfx(memregion("fore")->base() );
 }
 
 void legionna_state::init_godzilla()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
 	// TODO: some game elements don't collide properly, @see seibucop.cpp
 	ROM[(0xbe0e + 0x0a)/2] = 0xb000;
 	ROM[(0xbe0e + 0x1a)/2] = 0xb800;
@@ -2688,9 +2616,10 @@ GAME( 1992, heatbrlu,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,
 GAME( 1992, heatbrle,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
 
 GAME( 1993, godzilla,  0,        godzilla, godzilla, legionna_state, init_godzilla,  ROT0, "Banpresto", "Godzilla (Japan)", 0 )
-GAME( 1993, grainbow,  0,        grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, grainbowk, grainbow, grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1994, denjinmk,  0,        denjinmk, denjinmk, legionna_state, empty_init,     ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
+GAME( 1993, grainbow,  0,        grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", 0 )
+GAME( 1993, grainbowk, grainbow, grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", 0 )
+GAME( 1994, denjinmk,  0,        denjinmk, denjinmk, legionna_state, empty_init,     ROT0, "Winkysoft (Banpresto license)", "Denjin Makai (set 1)", 0 )
+GAME( 1994, denjinmka, denjinmk, denjinmk, denjinmk, legionna_state, empty_init,     ROT0, "Winkysoft (Banpresto license)", "Denjin Makai (set 2)", 0 )
 
 GAME( 1992, cupsoc,    0,        cupsoc,   cupsoc,   legionna_state, init_cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsoca,   cupsoc,   cupsoc,   cupsoc,   legionna_state, init_cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #ifndef MAME_MACHINE_CMI_ANKBD_H
-#define MAME_MACHINE_CMI_ANKBD_H 1
+#define MAME_MACHINE_CMI_ANKBD_H
 
 #pragma once
 
@@ -32,7 +32,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_READ8_MEMBER( col_r );
+	u8 col_r();
 	DECLARE_WRITE_LINE_MEMBER( txd_w );
 	DECLARE_WRITE_LINE_MEMBER( rts_w );
 

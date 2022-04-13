@@ -8,13 +8,23 @@
 #include "machine/rescap.h"
 
 /*
- * FLT_RC_LOWPASS:
+ * FLT_RC_LOWPASS_3R:
  *
  * signal >--R1--+--R2--+
  *               |      |
  *               C      R3---> amp
  *               |      |
  *              GND    GND
+ *
+ * Set C=0 to disable filter
+ *
+ * FLT_RC_LOWPASS:
+ *
+ * signal >--R1--+----> amp
+ *               |
+ *               C
+ *               |
+ *              GND
  *
  * Set C=0 to disable filter
  *
@@ -30,14 +40,15 @@
  *
  * FLT_RC_AC:
  *
- * Same as FLT_RC_HIGHPASS, but with standard frequency of 16 HZ
+ * Same as FLT_RC_HIGHPASS, but with a standard cutoff frequency of ~16Hz
+ * (10KOhm R, 1uF C)
  * This filter may be setup just with
  *
  * FILTER_RC(config, "tag", 0).set_ac();
  *
  * Default behaviour:
  *
- * Without set_ac(), a disabled FLT_RC_LOWPASS is created
+ * Without set_ac(), a disabled FLT_RC_LOWPASS_3R is created
  *
  */
 
@@ -52,9 +63,10 @@ class filter_rc_device : public device_t, public device_sound_interface
 public:
 	enum
 	{
-		LOWPASS      = 0,
-		HIGHPASS     = 1,
-		AC           = 2
+		LOWPASS_3R   = 0,
+		LOWPASS      = 2,
+		HIGHPASS     = 3,
+		AC           = 4
 	};
 
 	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -70,17 +82,27 @@ public:
 		return *this;
 	}
 
+	filter_rc_device &set_lowpass(double R, double C)
+	{
+		m_type = LOWPASS;
+		m_R1 = R;
+		m_R2 = 0;
+		m_R3 = 0;
+		m_C = C;
+		return *this;
+	}
+
 	filter_rc_device &filter_rc_set_RC(int type, double R1, double R2, double R3, double C)
 	{
 		m_stream->update();
 		set_rc(type, R1, R2, R3, C);
-		recalc();
+		m_last_sample_rate = 0;
 		return *this;
 	}
 
 	filter_rc_device &set_ac()
 	{
-		return set_rc(filter_rc_device::AC, 10000, 0, 0, CAP_U(1));
+		return set_rc(filter_rc_device::AC, RES_K(10), 0, 0, CAP_U(1));
 	}
 
 protected:
@@ -88,16 +110,17 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	void recalc();
 
 private:
 	sound_stream*  m_stream;
-	int            m_k;
-	int            m_memory;
+	stream_buffer::sample_t m_k;
+	stream_buffer::sample_t m_memory;
 	int            m_type;
+	int            m_last_sample_rate;
 	double         m_R1;
 	double         m_R2;
 	double         m_R3;

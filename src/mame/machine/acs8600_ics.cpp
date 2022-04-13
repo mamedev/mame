@@ -30,23 +30,23 @@ const tiny_rom_entry *acs8600_ics_device::device_rom_region() const
 	return ROM_NAME(acs8600_ics);
 }
 
-WRITE8_MEMBER(acs8600_ics_device::hiaddr_w)
+void acs8600_ics_device::hiaddr_w(u8 data)
 {
 	m_hiaddr = data;
 }
 
-WRITE8_MEMBER(acs8600_ics_device::ctrl_w)
+void acs8600_ics_device::ctrl_w(u8 data)
 {
 	m_ctrl = data;
 	m_out_irq1_func(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(acs8600_ics_device::hostram_r)
+u8 acs8600_ics_device::hostram_r(offs_t offset)
 {
 	return m_host_space->read_byte((m_hiaddr << 16) | (BIT(m_ctrl, 0) << 15) | (offset & 0x7fff));
 }
 
-WRITE8_MEMBER(acs8600_ics_device::hostram_w)
+void acs8600_ics_device::hostram_w(offs_t offset, u8 data)
 {
 	m_host_space->write_byte((m_hiaddr << 16) | (BIT(m_ctrl, 0) << 15) | (offset & 0x7fff), data);
 }
@@ -59,7 +59,6 @@ WRITE_LINE_MEMBER(acs8600_ics_device::attn_w)
 static DEVICE_INPUT_DEFAULTS_START(altos8600_terminal)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -87,11 +86,11 @@ void acs8600_ics_device::ics_io(address_map &map)
 
 static const z80_daisy_config ics_daisy_chain[] =
 {
-	"sio1",
-	"sio2",
-	"sio3",
-	"sio4",
-	nullptr
+	{ "sio1" },
+	{ "sio2" },
+	{ "sio3" },
+	{ "sio4" },
+	{ nullptr }
 };
 
 void acs8600_ics_device::device_add_mconfig(machine_config &config)

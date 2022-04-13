@@ -215,13 +215,13 @@ void mu50_state::mu50_iomap(address_map &map)
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu50_state::pb_r), FUNC(mu50_state::pb_w));
 	map(h8_device::PORT_C, h8_device::PORT_C).rw(FUNC(mu50_state::pc_r), FUNC(mu50_state::pc_w));
 	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu50_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).lr16("gnd", []() -> u16 { return 0; });
+	map(h8_device::ADC_1, h8_device::ADC_1).lr16([]() -> u16 { return 0; }, "gnd");
 	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu50_state::adc_al_r));
-	map(h8_device::ADC_3, h8_device::ADC_3).lr16("gnd", []() -> u16 { return 0; });
+	map(h8_device::ADC_3, h8_device::ADC_3).lr16([]() -> u16 { return 0; }, "gnd");
 	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu50_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).lr16("gnd", []() -> u16 { return 0; });
+	map(h8_device::ADC_5, h8_device::ADC_6).lr16([]() -> u16 { return 0; }, "gnd");
 	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu50_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).lr16("gnd", []() -> u16 { return 0; });
+	map(h8_device::ADC_7, h8_device::ADC_7).lr16([]() -> u16 { return 0; }, "gnd");
 }
 
 void mu50_state::mu50(machine_config &config)

@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 		bank = 3;
 	else
 		bank = 2;
-	SET_TILE_INFO_MEMBER(bank, tile & 0x7f, m_background_color, 0);
+	tileinfo.set(bank, tile & 0x7f, m_background_color, 0);
 }
 
 TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
 	tile = videoram[tile_index] + (colorram[tile_index] << 8);
 	color = (colorram[tile_index] & 0x70) >> 4;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
@@ -97,12 +97,12 @@ TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
 
 	tile += m_io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
 
-	SET_TILE_INFO_MEMBER(8, tile, 0, 0);
+	tileinfo.set(8, tile, 0, 0);
 }
 
 /***************************************************************************/
 
-WRITE8_MEMBER(liberate_state::deco16_io_w)
+void liberate_state::deco16_io_w(offs_t offset, uint8_t data)
 {
 	m_io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
@@ -132,7 +132,7 @@ WRITE8_MEMBER(liberate_state::deco16_io_w)
 	}
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_io_w)
+void liberate_state::prosoccr_io_w(offs_t offset, uint8_t data)
 {
 	m_io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
@@ -161,7 +161,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_w)
 }
 
 /* completely different i/o...*/
-WRITE8_MEMBER(liberate_state::prosport_io_w)
+void liberate_state::prosport_io_w(offs_t offset, uint8_t data)
 {
 	m_io_ram[offset] = data;
 
@@ -182,19 +182,19 @@ WRITE8_MEMBER(liberate_state::prosport_io_w)
 	}
 }
 
-WRITE8_MEMBER(liberate_state::liberate_videoram_w)
+void liberate_state::liberate_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(liberate_state::liberate_colorram_w)
+void liberate_state::liberate_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
+void liberate_state::prosport_bg_vram_w(offs_t offset, uint8_t data)
 {
 	m_bg_vram[offset] = data;
 	m_back_tilemap->mark_tile_dirty(offset);
@@ -204,8 +204,8 @@ WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
 
 VIDEO_START_MEMBER(liberate_state,prosoccr)
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(liberate_state::back_scan)), 16, 16, 32, 32);
+	m_fix_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_fix_tile_info)),  tilemap_mapper_delegate(*this, FUNC(liberate_state::fix_scan)),   8,  8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 
@@ -218,8 +218,8 @@ VIDEO_START_MEMBER(liberate_state,prosoccr)
 
 VIDEO_START_MEMBER(liberate_state,boomrang)
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(liberate_state::back_scan)), 16, 16, 32, 32);
+	m_fix_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_fix_tile_info)),  tilemap_mapper_delegate(*this, FUNC(liberate_state::fix_scan)),   8,  8, 32, 32);
 
 	m_back_tilemap->set_transmask(0, 0x0001, 0x007e); /* Bottom 1 pen/Top 7 pens */
 	m_fix_tilemap->set_transparent_pen(0);
@@ -227,16 +227,16 @@ VIDEO_START_MEMBER(liberate_state,boomrang)
 
 VIDEO_START_MEMBER(liberate_state,liberate)
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(liberate_state::back_scan)), 16, 16, 32, 32);
+	m_fix_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_fix_tile_info)),  tilemap_mapper_delegate(*this, FUNC(liberate_state::fix_scan)),   8,  8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START_MEMBER(liberate_state,prosport)
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::prosport_get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::prosport_get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(liberate_state::back_scan)), 16, 16, 32, 32);
+	m_fix_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_fix_tile_info)),           tilemap_mapper_delegate(*this, FUNC(liberate_state::fix_scan)),   8,  8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 }

@@ -5,10 +5,13 @@
 *.pyc
 *.pyo
 *.rej
+*.L68
+*.S68
 .DS_Store
 
 /*
 /*/
+!/.github/
 !/3rdparty/
 !/android-project/
 !/benchmarks/
@@ -30,7 +33,6 @@
 !/tests/
 !/doxygen/
 !/web/
-!/.drone.yml
 !/.gitattributes
 !/.gitignore
 !/.travis.yml
@@ -40,7 +42,9 @@
 !/*.bdf
 !/LICENSE
 /.idea
+.vscode
 docs/build
+docs/source/_build
 regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt

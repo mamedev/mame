@@ -22,22 +22,22 @@ public:
 	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_out_device();
 
-	DECLARE_WRITE8_MEMBER(out_w);
-	DECLARE_WRITE8_MEMBER(out4_w); // fixed offset 4
-	DECLARE_WRITE8_MEMBER(gi_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	void out_w(offs_t offset, uint8_t data);
+	void out4_w(uint8_t data); // fixed offset 4
+	void gi_w(uint8_t data);
+	void led_w(uint8_t data);
 
 	void set_names(const char *const *names);
 	void set_handler(handler_t cb);
 	void set_gi_count(int _count);
 
 protected:
-	uint8_t state[6], gi;
-	bool first_after_led;
+	uint8_t state[6]{}, gi = 0;
+	bool first_after_led = false;
 	attotime previous_gi_update;
-	int gi_count;
+	int gi_count = 0;
 	uint32_t gi_time[5];
-	emu_timer *timer;
+	emu_timer *timer = nullptr;
 	const char *const *names;
 	handler_t handler_cb;
 
@@ -45,7 +45,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void gi_update();
 };

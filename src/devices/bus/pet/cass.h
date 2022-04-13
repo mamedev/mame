@@ -39,7 +39,7 @@
 
 class device_pet_datassette_port_interface;
 
-class pet_datassette_port_device : public device_t, public device_slot_interface
+class pet_datassette_port_device : public device_t, public device_single_card_slot_interface<device_pet_datassette_port_interface>
 {
 public:
 	template <typename T>
@@ -80,7 +80,7 @@ protected:
 // ======================> device_pet_datassette_port_interface
 
 // class representing interface-specific live c64_expansion card
-class device_pet_datassette_port_interface : public device_slot_card_interface
+class device_pet_datassette_port_interface : public device_interface
 {
 public:
 	// construction/destruction

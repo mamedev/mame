@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-/***************************************************************************
+/************************************************************************************************
 
-        Unior
+Unior
 
-    2009-05-12 Skeleton driver.
-    2013-10-09 Added DMA and CRTC
-    2013-10-11 Added PPI, PIT, UART, sound
+2009-05-12 Skeleton driver.
+2013-10-09 Added DMA and CRTC
+2013-10-11 Added PPI, PIT, UART, sound
 
-    Some info obtained from EMU-80.
-    The schematic is difficult to read, and some code is guesswork.
+Some info obtained from EMU-80.
+The schematic is difficult to read, and some code is guesswork.
 
 The monitor will only allow certain characters to be typed, thus the
 modifier keys appear to do nothing. There is no need to use the enter
@@ -18,36 +18,41 @@ key; using spacebar and the correct parameters is enough.
 If you press Shift, indicators for numlock and capslock will appear.
 
 Monitor commands:
-C
+C - ?
 D - hex dump
 E - save
-F
-G
+F - fill memory
+G - go
 H - set register
 I - load
 J - modify memory
-K
+K - ?
 L - list registers
-M
+M - ?
 
 ToDo:
-- Cassette
-- Colour
+- Colour - created by PROM D9 (type K555PT4) - we need a proper dump of it.
 
-****************************************************************************/
+**********************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
+#include "imagedev/cassette.h"
 #include "machine/i8251.h"
-#include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8257.h"
-#include "video/i8275.h"
+#include "machine/pit8253.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "video/i8275.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class unior_state : public driver_device
 {
@@ -55,52 +60,67 @@ public:
 	unior_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_pit(*this, "pit")
 		, m_dma(*this, "dma")
+		, m_uart(*this, "uart")
+		, m_cass(*this, "cassette")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
-		, m_p_vram(*this, "vram")
+		, m_io_keyboard(*this, "X%d", 0U)
 	{ }
 
 	void unior(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_READ8_MEMBER(ppi0_b_r);
-	DECLARE_WRITE8_MEMBER(ppi0_b_w);
-	DECLARE_READ8_MEMBER(ppi1_a_r);
-	DECLARE_READ8_MEMBER(ppi1_b_r);
-	DECLARE_READ8_MEMBER(ppi1_c_r);
-	DECLARE_WRITE8_MEMBER(ppi1_a_w);
-	DECLARE_WRITE8_MEMBER(ppi1_c_w);
+	void vram_w(offs_t offset, u8 data);
+	void scroll_w(u8 data);
+	u8 ppi0_b_r();
+	void ppi0_b_w(u8 data);
+	u8 ppi1_a_r();
+	u8 ppi1_b_r();
+	u8 ppi1_c_r();
+	void ppi1_a_w(u8 data);
+	void ppi1_c_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	void unior_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(dma_r);
+	u8 dma_r(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
-	void unior_io(address_map &map);
-	void unior_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_4c;
-	uint8_t m_4e;
+	u8 m_4c = 0U;
+	u8 m_4e = 0U;
+	bool m_txe = false, m_txd = false, m_rts = false, m_casspol = false;
+	u8 m_cass_data[4]{};
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	std::unique_ptr<u8[]> m_vram;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
+	required_device<i8251_device> m_uart;
+	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
-	required_region_ptr<u8> m_p_vram;
+	required_ioport_array<11> m_io_keyboard;
 };
 
-void unior_state::unior_mem(address_map &map)
+void unior_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xf7ff).ram();
-	map(0xf800, 0xffff).rom().w(FUNC(unior_state::vram_w)); // main video
+	map(0x0000, 0xf7ff).ram().share("mainram");
+	map(0xf800, 0xffff).rom().region("maincpu", 0).w(FUNC(unior_state::vram_w)); // main video
 }
 
-void unior_state::unior_io(address_map &map)
+void unior_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -110,7 +130,7 @@ void unior_state::unior_io(address_map &map)
 	map(0x50, 0x50).w(FUNC(unior_state::scroll_w));
 	map(0x60, 0x61).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xec, 0xed).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xec, 0xed).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -179,7 +199,7 @@ static INPUT_PORTS_START( unior )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0xA4)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') // I then hangs
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) // Russian A
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
@@ -215,7 +235,7 @@ static INPUT_PORTS_START( unior )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 
-	PORT_START("XA")
+	PORT_START("X10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
@@ -234,7 +254,7 @@ INPUT_PORTS_END
 *************************************************/
 
 /* F4 Character Displayer */
-static const gfx_layout unior_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -248,25 +268,25 @@ static const gfx_layout unior_charlayout =
 };
 
 static GFXDECODE_START( gfx_unior )
-	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( unior_state::vram_w )
+void unior_state::vram_w(offs_t offset, u8 data)
 {
-	m_p_vram[offset] = data;
+	m_vram[offset] = data;
 }
 
 // pulses a 1 to scroll
-WRITE8_MEMBER( unior_state::scroll_w )
+void unior_state::scroll_w(u8 data)
 {
 	if (data)
-		memmove(m_p_vram, m_p_vram+80, 24*80);
+		memmove(m_vram.get(), m_vram.get()+80, 24*80);
 }
 
 I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u8 gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
 
 	if (vsp)
 		gfx = 0;
@@ -277,8 +297,8 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 	if (rvv)
 		gfx ^= 0xff;
 
-	for(uint8_t i=0;i<6;i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
+	for(u8 i=0;i<6;i++)
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 static constexpr rgb_t unior_pens[3] =
@@ -299,35 +319,79 @@ void unior_state::unior_palette(palette_device &palette) const
     i8255
 
 *************************************************/
+TIMER_DEVICE_CALLBACK_MEMBER( unior_state::kansas_r )
+{
+	if (m_rts)
+	{
+		m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
+		m_casspol = 1;
+		return;
+	}
+
+	m_cass_data[1]++;
+	m_cass_data[2]++;
+
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		if (m_cass_data[1] > 13)
+			m_casspol ^= 1;
+		m_cass_data[1] = 0;
+		m_cass_data[2] = 0;
+		m_uart->write_rxd(m_casspol);
+	}
+	if ((m_cass_data[2] & 7)==2)
+	{
+		m_cass_data[3]++;
+		m_uart->write_rxc(BIT(m_cass_data[3], 0));
+	}
+}
+
+WRITE_LINE_MEMBER(unior_state::ctc_z1_w)
+{
+	// write - incoming 2400Hz
+	m_uart->write_txc(state);
+	if (!m_txe)
+	{
+		m_cass->output((m_txd ^ state) ? -1.0 : 1.0);
+	}
+
+	// read - incoming 3202Hz
+}
 
 
-READ8_MEMBER( unior_state::ppi0_b_r )
+u8 unior_state::ppi0_b_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( unior_state::ppi0_b_w )
+// Bit 4 - cassette relay?
+void unior_state::ppi0_b_w(u8 data)
 {
 }
 
-READ8_MEMBER( unior_state::ppi1_a_r )
+u8 unior_state::ppi1_a_r()
 {
 	return m_4c;
 }
 
-READ8_MEMBER( unior_state::ppi1_b_r )
+u8 unior_state::ppi1_b_r()
 {
-	char kbdrow[6];
-	sprintf(kbdrow,"X%X", m_4c&15);
-	return ioport(kbdrow)->read();
+	u8 t = m_4c & 15;
+	if (t < 11)
+		return m_io_keyboard[t]->read();
+	else
+		return 0xff;
 }
 
-READ8_MEMBER( unior_state::ppi1_c_r )
+u8 unior_state::ppi1_c_r()
 {
 	return m_4e;
 }
 
-WRITE8_MEMBER( unior_state::ppi1_a_w )
+void unior_state::ppi1_a_w(u8 data)
 {
 	m_4c = data;
 }
@@ -339,7 +403,7 @@ d5 = unknown
 d6 = connect to A7 of the palette prom
 d7 = not used
 */
-WRITE8_MEMBER( unior_state::ppi1_c_w )
+void unior_state::ppi1_c_w(u8 data)
 {
 	m_4e = data;
 	m_pit->write_gate2(BIT(data, 4));
@@ -351,12 +415,12 @@ WRITE8_MEMBER( unior_state::ppi1_c_w )
 
 *************************************************/
 
-READ8_MEMBER(unior_state::dma_r)
+u8 unior_state::dma_r(offs_t offset)
 {
 	if (offset < 0xf800)
 		return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 	else
-		return m_p_vram[offset & 0x7ff];
+		return m_vram[offset & 0x7ff];
 }
 
 WRITE_LINE_MEMBER( unior_state::hrq_w )
@@ -374,15 +438,50 @@ WRITE_LINE_MEMBER( unior_state::hrq_w )
 
 void unior_state::machine_reset()
 {
-	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xF800);
+	m_uart->write_cts(0);
+	m_uart->write_dsr(0);
+	m_casspol = 0;
+	m_cass_data[0] = m_cass_data[1] = 0;
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf800, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
+
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
+}
+
+void unior_state::machine_start()
+{
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_vram), 0x0800);
+	save_item(NAME(m_4c));
+	save_item(NAME(m_4e));
+	save_item(NAME(m_txe));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_casspol));
+	save_item(NAME(m_cass_data));
 }
 
 void unior_state::unior(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(20'000'000) / 9);
-	m_maincpu->set_addrmap(AS_PROGRAM, &unior_state::unior_mem);
-	m_maincpu->set_addrmap(AS_IO, &unior_state::unior_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unior_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &unior_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -397,15 +496,22 @@ void unior_state::unior(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(unior_state::kansas_r), attotime::from_hz(38400));
+
 	/* Devices */
-	I8251(config, "uart", 0);
+	I8251(config, m_uart, 20_MHz_XTAL / 9);
+	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
+	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
+	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(20_MHz_XTAL / 12);
 	m_pit->set_clk<1>(20_MHz_XTAL / 9);
-	m_pit->out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
-	m_pit->out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
-	m_pit->set_clk<2>(16_MHz_XTAL / 9 / 64); // unknown frequency
+	m_pit->out_handler<1>().set(FUNC(unior_state::ctc_z1_w));
+	m_pit->set_clk<2>(20_MHz_XTAL / 9 / 64); // unknown frequency
 	m_pit->out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	i8255_device &ppi0(I8255(config, "ppi0"));
@@ -429,25 +535,25 @@ void unior_state::unior(machine_config &config)
 
 	i8275_device &crtc(I8275(config, "crtc", XTAL(20'000'000) / 12));
 	crtc.set_character_width(6);
-	crtc.set_display_callback(FUNC(unior_state::display_pixels), this);
+	crtc.set_display_callback(FUNC(unior_state::display_pixels));
 	crtc.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	crtc.set_screen("screen");
 }
 
 /* ROM definition */
 ROM_START( unior )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "unior.rom", 0xf800, 0x0800, CRC(23a347e8) SHA1(2ef3134e2f4a696c3b52a145fa5a2d4c3487194b))
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "unior.rom.d30", 0x0000, 0x0800, CRC(23a347e8) SHA1(2ef3134e2f4a696c3b52a145fa5a2d4c3487194b))
 
-	ROM_REGION( 0x0840, "chargen", ROMREGION_ERASEFF )
-	ROM_LOAD( "unior.fnt",   0x0000, 0x0800, CRC(4f654828) SHA1(8c0ac11ea9679a439587952e4908940b67c4105e))
+	ROM_REGION( 0x0840, "chargen", 0 )
+	ROM_LOAD( "unior.fnt.d5",   0x0000, 0x0800, CRC(4f654828) SHA1(8c0ac11ea9679a439587952e4908940b67c4105e))
 	// according to schematic this should be 256 bytes
-	ROM_LOAD( "palette.rom", 0x0800, 0x0040, CRC(b4574ceb) SHA1(f7a82c61ab137de8f6a99b0c5acf3ac79291f26a))
-
-	ROM_REGION( 0x0800, "vram", ROMREGION_ERASEFF )
+	ROM_LOAD( "palette.rom.d9", 0x0800, 0x0040, BAD_DUMP CRC(b4574ceb) SHA1(f7a82c61ab137de8f6a99b0c5acf3ac79291f26a))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 
 /*    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS */
-COMP( 19??, unior, radio86, 0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_NOT_WORKING )
+COMP( 19??, unior, 0,       0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

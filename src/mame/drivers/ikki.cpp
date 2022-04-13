@@ -41,14 +41,14 @@ TODO:
  *
  *************************************/
 
-READ8_MEMBER(ikki_state::ikki_e000_r)
+uint8_t ikki_state::ikki_e000_r()
 {
 /* bit1: interrupt type?, bit0: CPU2 busack? */
 
 	return (m_irq_source << 1);
 }
 
-WRITE8_MEMBER(ikki_state::ikki_coin_counters)
+void ikki_state::ikki_coin_counters(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -242,7 +242,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 {
 	int scanline = param;
 
-	if(scanline == 240 || scanline == 120) // TODO: where non-timer IRQ happens?
+	// TODO: where non-vblank IRQ happens?
+	if(scanline == 240 || scanline == 120)
 	{
 		m_maincpu->set_input_line(0,HOLD_LINE);
 
@@ -264,8 +265,7 @@ void ikki_state::ikki(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &ikki_state::ikki_cpu2);
 	m_subcpu->set_periodic_int(FUNC(ikki_state::irq0_line_hold), attotime::from_hz(2*(PIXEL_CLOCK/HTOTAL/VTOTAL)));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
-
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

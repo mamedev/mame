@@ -334,7 +334,7 @@ Notes (23-Jan-2016 AS):
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -384,12 +384,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::scanline)
 
 ***************************************************************************/
 
-READ8_MEMBER(psychic5_state::bankselect_r)
+uint8_t psychic5_state::bankselect_r()
 {
 	return m_bank_latch;
 }
 
-WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
+void psychic5_state::psychic5_bankselect_w(uint8_t data)
 {
 	if (m_bank_latch != data)
 	{
@@ -398,7 +398,7 @@ WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 	}
 }
 
-WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
+void psychic5_state::bombsa_bankselect_w(uint8_t data)
 {
 	if (m_bank_latch != data)
 	{
@@ -407,7 +407,7 @@ WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
 	}
 }
 
-WRITE8_MEMBER(psychic5_state::psychic5_coin_counter_w)
+void psychic5_state::psychic5_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -419,7 +419,7 @@ WRITE8_MEMBER(psychic5_state::psychic5_coin_counter_w)
 	}
 }
 
-WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
+void psychic5_state::bombsa_flipscreen_w(uint8_t data)
 {
 	// bit 7 toggles flip screen
 	if (data & 0x80)
@@ -515,7 +515,7 @@ void psychic5_state::bombsa_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).writeonly();                               // Is this a confirm of some sort?
+	map(0xf000, 0xf000).nopw();                               // Is this a confirm of some sort?
 }
 
 void psychic5_state::bombsa_soundport_map(address_map &map)
@@ -733,7 +733,7 @@ void psychic5_state::psychic5(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::psychic5_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::psychic5_soundport_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);      /* Allow time for 2nd cpu to interleave */
+	config.set_maximum_quantum(attotime::from_hz(600));      /* Allow time for 2nd cpu to interleave */
 
 	MCFG_MACHINE_START_OVERRIDE(psychic5_state,psychic5)
 
@@ -748,7 +748,6 @@ void psychic5_state::psychic5(machine_config &config)
 	JALECO_BLEND(config, m_blend, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -782,7 +781,7 @@ void psychic5_state::bombsa(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::bombsa_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::bombsa_soundport_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_START_OVERRIDE(psychic5_state,bombsa)
 
@@ -795,7 +794,6 @@ void psychic5_state::bombsa(machine_config &config)
 	PALETTE(config, m_palette).set_entries(768);
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

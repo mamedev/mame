@@ -8,6 +8,7 @@
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define PIXMAP_COLOR_BASE  (16 + 32)
 #define BITMAPRAM_SIZE      0x6000
@@ -51,30 +52,30 @@ private:
 	required_device_array<ay8910_device, 2> m_ay;
 
 	/* video-related */
-	bitmap_ind16 m_pixbitmap;
-	tilemap_t   *m_bg_tilemap;
-	std::unique_ptr<uint8_t[]>     m_bitmapram;
-	int       m_bm_plane;
-	int       m_pixcolor;
-	int       m_scroll[4];
-	int       m_lastflip;
-	int       m_lastpixcolor;
+	bitmap_ind16 m_pixbitmap{};
+	tilemap_t   *m_bg_tilemap = nullptr;
+	std::unique_ptr<uint8_t[]>     m_bitmapram{};
+	int       m_bm_plane = 0;
+	int       m_pixcolor = 0;
+	int       m_scroll[4]{};
+	int       m_lastflip = 0;
+	int       m_lastpixcolor = 0;
 
 	/* sound-related */
-	int       m_soundlatch;
-	int       m_last_snd_ctrl;
+	int       m_soundlatch = 0;
+	int       m_last_snd_ctrl = 0;
 
-	DECLARE_WRITE8_MEMBER(subirqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sub_irqack_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(soundcontrol_w);
-	DECLARE_WRITE8_MEMBER(plane_select_w);
-	DECLARE_READ8_MEMBER(bitmapram_r);
-	DECLARE_WRITE8_MEMBER(internal_bitmapram_w);
-	DECLARE_WRITE8_MEMBER(bitmapram_w);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(_1800_w);
+	void subirqtrigger_w(uint8_t data);
+	void sub_irqack_w(uint8_t data);
+	void soundlatch_w(uint8_t data);
+	void soundcontrol_w(uint8_t data);
+	void plane_select_w(uint8_t data);
+	uint8_t bitmapram_r(offs_t offset);
+	void internal_bitmapram_w(offs_t offset, uint8_t data);
+	void bitmapram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
+	void _1800_w(uint8_t data);
 
 
 	TILE_GET_INFO_MEMBER(get_tile_info);

@@ -56,10 +56,10 @@ private:
 	required_memory_bank m_prgbank;
 	required_memory_bank m_nvram_bank;
 	std::vector<uint8_t> m_nvram_mem;
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_READ8_MEMBER(audio_r);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	void bank1_w(uint8_t data);
+	void bank2_w(uint8_t data);
+	uint8_t audio_r(offs_t offset);
+	void dma8237_1_dack_w(uint8_t data);
 	virtual void machine_start() override;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 	static void pcat_dyn_sb_conf(device_t *device);
@@ -79,7 +79,7 @@ void pcat_dyn_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memcpy(base, memregion("nvram")->base(), size);
 }
 
-READ8_MEMBER(pcat_dyn_state::audio_r)
+uint8_t pcat_dyn_state::audio_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -89,12 +89,12 @@ READ8_MEMBER(pcat_dyn_state::audio_r)
 	return 0;
 }
 
-WRITE8_MEMBER(pcat_dyn_state::bank1_w)
+void pcat_dyn_state::bank1_w(uint8_t data)
 {
 	m_prgbank->set_entry(data);
 }
 
-WRITE8_MEMBER(pcat_dyn_state::bank2_w)
+void pcat_dyn_state::bank2_w(uint8_t data)
 {
 	m_nvram_bank->set_entry(data & 1);
 }
@@ -126,7 +126,7 @@ void pcat_dyn_state::pcat_io(address_map &map)
 }
 
 //TODO: use atmb device
-WRITE8_MEMBER( pcat_dyn_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void pcat_dyn_state::dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 
 static INPUT_PORTS_START( pcat_dyn )
 	// M,N,Numpad 6 -- Hang
@@ -159,8 +159,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void pcat_dyn_state::pcat_dyn_sb_conf(device_t *device)
 {
-	device = device->subdevice("pc_joy");
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
+	device->subdevice<pc_joy_device>("pc_joy")->set_default_option(nullptr); // remove joystick
 }
 
 void pcat_dyn_state::pcat_dyn(machine_config &config)
@@ -174,7 +173,9 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	/* video hardware */
 	pcvideo_trident_vga(config);
 	subdevice<screen_device>("screen")->set_refresh_hz(60);
-	TVGA9000_VGA(config.replace(), "vga", 0);
+	tvga9000_device &vga(TVGA9000_VGA(config.replace(), "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x200000);
 
 	pcat_common(config);
 
@@ -234,7 +235,7 @@ ROM_START(toursol)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* Motherboard BIOS */
 	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
-	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
+	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
 	ROM_CONTINUE(               0x00001, 0x04000 )
 
@@ -258,7 +259,7 @@ ROM_START(toursol1)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* Motherboard BIOS */
 	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
-	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
+	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
 	ROM_CONTINUE(               0x00001, 0x04000 )
 
@@ -267,6 +268,7 @@ ROM_START(toursol1)
 	ROM_LOAD("prom.1", 0x40000, 0x40000, CRC(8f96e2a8) SHA1(bc3ce8b99e6ff40e355df2c3f797f1fe88b3b219))
 	ROM_LOAD("prom.2", 0x80000, 0x40000, CRC(8b0ac5cf) SHA1(1c2b6a53c9ff4d18a5227d899facbbc719f40205))
 	ROM_LOAD("prom.3", 0xc0000, 0x40000, CRC(9352e965) SHA1(2bfb647ec27c60a8c821fdf7483199e1a444cea8))
+	ROM_FILL(0x334f6, 1, 0xeb) // skip prot(?) check
 
 	ROM_REGION(0x2000, "nvram", 0)
 	ROM_LOAD("prom.7", 0, 0x2000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))

@@ -83,19 +83,19 @@ void shaolins_state::shaolins_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(shaolins_state::videoram_w)
+void shaolins_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(shaolins_state::colorram_w)
+void shaolins_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(shaolins_state::palettebank_w)
+void shaolins_state::palettebank_w(uint8_t data)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -104,13 +104,13 @@ WRITE8_MEMBER(shaolins_state::palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(shaolins_state::scroll_w)
+void shaolins_state::scroll_w(uint8_t data)
 {
 	for (int col = 4; col < 32; col++)
 		m_bg_tilemap->set_scrolly(col, data + 1);
 }
 
-WRITE8_MEMBER(shaolins_state::nmi_w)
+void shaolins_state::nmi_w(uint8_t data)
 {
 	m_nmi_enable = data;
 
@@ -119,6 +119,9 @@ WRITE8_MEMBER(shaolins_state::nmi_w)
 		flip_screen_set(data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
+
+	machine().bookkeeping().coin_counter_w(0,data & 0x08);
+	machine().bookkeeping().coin_counter_w(1,data & 0x10);
 }
 
 TILE_GET_INFO_MEMBER(shaolins_state::get_bg_tile_info)
@@ -128,12 +131,12 @@ TILE_GET_INFO_MEMBER(shaolins_state::get_bg_tile_info)
 	int color = (attr & 0x0f) + 16 * m_palettebank;
 	int flags = (attr & 0x20) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void shaolins_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shaolins_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(shaolins_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
@@ -144,31 +147,23 @@ void shaolins_state::video_start()
 
 void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 32; offs >= 0; offs -= 32 ) /* max 24 sprites */
+	for (int offs = 23 * 2; offs >= 0; offs -= 2) /* max 24 sprites */
 	{
-		if (m_spriteram[offs] && m_spriteram[offs + 6]) /* stop rogue sprites on high score screen */
-		{
-			int code = m_spriteram[offs + 8];
-			int color = (m_spriteram[offs + 9] & 0x0f) | (m_palettebank << 4);
-			int flipx = !(m_spriteram[offs + 9] & 0x40);
-			int flipy = m_spriteram[offs + 9] & 0x80;
-			int sx = 240 - m_spriteram[offs + 6];
-			int sy = 248 - m_spriteram[offs + 4];
+		int code = m_spriteram2[offs + 1];
+		int color = (m_spriteram[offs + 0] & 0x0f) | (m_palettebank << 4);
+		int flipx = !(m_spriteram[offs + 0] & 0x40);
+		int flipy = m_spriteram[offs + 0] & 0x80;
+		int sx = m_spriteram2[offs + 0];
+		int sy = 241 - m_spriteram[offs + 1];
 
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 248 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
+		if (flip_screen())
+			sy--;
 
-			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
-				code, color,
-				flipx, flipy,
-				sx, sy,
-				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, m_palettebank << 5));
-		}
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+			code, color,
+			flipx, flipy,
+			sx, sy,
+			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, m_palettebank << 5));
 	}
 }
 

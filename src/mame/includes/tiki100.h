@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Frode van der Meeren
 #ifndef MAME_INCLUDES_TIKI100_H
 #define MAME_INCLUDES_TIKI100_H
 
@@ -16,8 +16,8 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
@@ -46,6 +46,7 @@ class tiki100_state : public driver_device
 public:
 	tiki100_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_screen(*this, "screen"),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
 		m_fdc(*this, FD1797_TAG),
@@ -57,10 +58,10 @@ public:
 		m_floppy1(*this, FD1797_TAG":1"),
 		m_cassette(*this, CASSETTE_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
-		m_exp(*this, TIKI100_BUS_TAG),
+		m_exp(*this, "tiki100bus"),
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
-		m_video_ram(*this, "video_ram"),
+		m_video_ram(*this, "video_ram", TIKI100_VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 		m_y(*this, "Y%u", 1),
 		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
@@ -74,27 +75,28 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mrq_r );
-	DECLARE_WRITE8_MEMBER( mrq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mrq_r(offs_t offset);
+	void mrq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( video_mode_w );
-	DECLARE_WRITE8_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( system_w );
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void video_mode_w(uint8_t data);
+	void palette_w(uint8_t data);
+	void system_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( bar0_w );
 	DECLARE_WRITE_LINE_MEMBER( bar2_w );
-	DECLARE_WRITE8_MEMBER( video_scroll_w );
+	void video_scroll_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_pb_r();
+	void pio_pb_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
+	TIMER_DEVICE_CALLBACK_MEMBER( scanline_start );
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -108,6 +110,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	required_device<screen_device> m_screen;
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<fd1797_device> m_fdc;
@@ -122,8 +125,8 @@ private:
 	required_device<tiki100_bus_device> m_exp;
 	required_memory_region m_rom;
 	required_memory_region m_prom;
-	optional_shared_ptr<uint8_t> m_video_ram;
-	required_ioport_array<12> m_y;
+	memory_share_creator<uint8_t> m_video_ram;
+	required_ioport_array<13> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
@@ -137,24 +140,25 @@ private:
 	};
 
 	// memory state
-	bool m_rome;
-	bool m_vire;
+	bool m_rome = false;
+	bool m_vire = false;
 
 	// video state
-	uint8_t m_scroll;
-	uint8_t m_mode;
-	uint8_t m_palette_val;
+	uint8_t m_scroll = 0;
+	uint8_t m_mode = 0;
+	uint8_t m_palette_val = 0;
+	uint8_t m_current_pixel = 0;
 
 	// keyboard state
-	int m_keylatch;
+	int m_keylatch = 0;
 
 	// printer state
-	int m_centronics_ack;
-	int m_centronics_busy;
-	int m_centronics_perror;
+	int m_centronics_ack = 0;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
 
 	// serial state
-	bool m_st;
+	bool m_st = false;
 
 };
 

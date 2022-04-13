@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="mindset_flop" description="Mindset Corporation Mindset Floppy Discs">
+	<software name="vyper" supported="partial">
+		<description>Vyper</description>
+		<year>1984</year>
+		<publisher>Synapse Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="133536">
+				<rom name="vyper.imd" size="133536" crc="2b64537e" sha1="203a880a034659199f99716cac9c3592031f9f3c" offset="0" />
+			</dataarea>
+		</part>
+		<!-- the scp image isn't currently used but might be preferable at a later date -->
+		<part name="flop1scp" interface="unused">
+			<dataarea name="flop" size="6524462">
+				<rom name="vyper.scp" size="6524462" crc="e625f90f" sha1="bd69f346a49926742e37b98d3946020ab814d53c"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

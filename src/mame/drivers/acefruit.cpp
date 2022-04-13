@@ -43,9 +43,9 @@ public:
 
 	void init_sidewndr();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(sidewndr_payout_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_coinage_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_payout_r);
 
 protected:
 	enum
@@ -55,14 +55,14 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
-	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
-	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
-	DECLARE_WRITE8_MEMBER(acefruit_lamp_w);
-	DECLARE_WRITE8_MEMBER(acefruit_solenoid_w);
+	void acefruit_colorram_w(offs_t offset, uint8_t data);
+	void acefruit_coin_w(uint8_t data);
+	void acefruit_sound_w(uint8_t data);
+	void acefruit_lamp_w(offs_t offset, uint8_t data);
+	void acefruit_solenoid_w(uint8_t data);
 
 	void acefruit_palette(palette_device &palette) const;
 	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -90,10 +90,9 @@ private:
 
 void acefruit_state::acefruit_update_irq(int vpos)
 {
-	int col;
 	int row = vpos / 8;
 
-	for( col = 0; col < 32; col++ )
+	for( int col = 0; col < 32; col++ )
 	{
 		int tile_index = ( col * 32 ) + row;
 		int color = m_colorram[ tile_index ];
@@ -101,14 +100,14 @@ void acefruit_state::acefruit_update_irq(int vpos)
 		switch( color )
 		{
 		case 0x0c:
-			m_maincpu->set_input_line(0, HOLD_LINE );
+			m_maincpu->set_input_line(0, HOLD_LINE);
 			break;
 		}
 	}
 }
 
 
-void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int vpos = m_screen->vpos();
 
@@ -116,15 +115,15 @@ void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case TIMER_ACEFRUIT_REFRESH:
 
-			m_screen->update_partial(vpos );
-			acefruit_update_irq(vpos);
+		m_screen->update_partial(vpos);
+		acefruit_update_irq(vpos);
 
-			vpos = ( ( vpos / 8 ) + 1 ) * 8;
+		vpos = ((vpos / 8) + 1) * 8;
 
-			m_refresh_timer->adjust( m_screen->time_until_pos(vpos) );
-			break;
+		m_refresh_timer->adjust(m_screen->time_until_pos(vpos));
+		break;
 	default:
-			assert_always(false, "Unknown id in acefruit_state::device_timer");
+		throw emu_fatalerror("Unknown id in acefruit_state::device_timer");
 	}
 }
 
@@ -149,16 +148,14 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 {
 	int startrow = cliprect.min_y / 8;
 	int endrow = cliprect.max_y / 8;
-	int row;
-	int col;
 
-	for( row = startrow; row <= endrow; row++ )
+	for( int row = startrow; row <= endrow; row++ )
 	{
 		int spriterow = 0;
 		int spriteindex = 0;
 		int spriteparameter = 0;
 
-		for( col = 0; col < 32; col++ )
+		for( int col = 0; col < 32; col++ )
 		{
 			int tile_index = ( col * 32 ) + row;
 			int code = m_videoram[ tile_index ];
@@ -170,20 +167,18 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
-				int y;
-				int x;
 				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
 				gfx_element *gfx =  m_gfxdecode->gfx(0);
 
-				for( x = 0; x < 16; x++ )
+				for( int x = 0; x < 16; x++ )
 				{
 					int sprite = ( m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
 					const uint8_t *gfxdata = gfx->get_data(sprite);
 
-					for( y = 0; y < 8; y++ )
+					for( int y = 0; y < 8; y++ )
 					{
-						uint16_t *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
+						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->rowbytes() ) + ( ( spriteindex % 64 ) >> 1 ) );
 					}
 
@@ -192,14 +187,11 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 			}
 			else
 			{
-				int y;
-				int x;
-
-				for( x = 0; x < 16; x++ )
+				for( int x = 0; x < 16; x++ )
 				{
-					for( y = 0; y < 8; y++ )
+					for( int y = 0; y < 8; y++ )
 					{
-						uint16_t *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
+						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = 0;
 					}
 				}
@@ -229,82 +221,58 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
+template <int Mask>
+int acefruit_state::sidewndr_payout_r()
 {
-	int bit_mask = (uintptr_t)param;
+	if (Mask < 2)
+		return BIT(m_port_payout->read(), Mask);
 
-	switch (bit_mask)
-	{
-		case 0x01:
-			return ((m_port_payout->read() & bit_mask) >> 0);
-		case 0x02:
-			return ((m_port_payout->read() & bit_mask) >> 1);
-		default:
-			logerror("sidewndr_payout_r : invalid %02X bit_mask\n",bit_mask);
-			return 0;
-	}
+	logerror("sidewndr_payout_r : invalid %02X bit_mask\n",Mask);
+	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
+template <int Mask>
+int acefruit_state::starspnr_coinage_r()
 {
-	int bit_mask = (uintptr_t)param;
+	if (Mask < 4)
+		return BIT(m_port_coinage->read(), Mask);
 
-	switch (bit_mask)
-	{
-		case 0x01:
-			return ((m_port_coinage->read() & bit_mask) >> 0);
-		case 0x02:
-			return ((m_port_coinage->read() & bit_mask) >> 1);
-		case 0x04:
-			return ((m_port_coinage->read() & bit_mask) >> 2);
-		case 0x08:
-			return ((m_port_coinage->read() & bit_mask) >> 3);
-		default:
-			logerror("starspnr_coinage_r : invalid %02X bit_mask\n",bit_mask);
-			return 0;
-	}
+	logerror("starspnr_coinage_r : invalid %02X bit_mask\n",Mask);
+	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
+template <int Mask>
+int acefruit_state::starspnr_payout_r()
 {
-	int bit_mask = (uintptr_t)param;
+	if (Mask < 3)
+		return BIT(m_port_payout->read(), Mask);
 
-	switch (bit_mask)
-	{
-		case 0x01:
-			return ((m_port_payout->read() & bit_mask) >> 0);
-		case 0x02:
-			return ((m_port_payout->read() & bit_mask) >> 1);
-		case 0x04:
-			return ((m_port_payout->read() & bit_mask) >> 2);
-		default:
-			logerror("starspnr_payout_r : invalid %02X bit_mask\n",bit_mask);
-			return 0;
-	}
+	logerror("starspnr_payout_r : invalid %02X bit_mask\n",Mask);
+	return 0;
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_colorram_w)
+void acefruit_state::acefruit_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[ offset ] = data & 0xf;
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_coin_w)
+void acefruit_state::acefruit_coin_w(uint8_t data)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_sound_w)
+void acefruit_state::acefruit_sound_w(uint8_t data)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
+void acefruit_state::acefruit_lamp_w(offs_t offset, uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[(offset << 3) | i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
+void acefruit_state::acefruit_solenoid_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_solenoids[i] = BIT(data, i);
@@ -383,14 +351,14 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel/Clear" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )              /* "Token in" - also "Refill" when "Refill" mode ON */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,sidewndr_payout_r, (void *)0x01)
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, sidewndr_payout_r<0x00>)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")   // 3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Hold/Nudge 1" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME( "Accountancy System" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )              /* "50P in" */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,sidewndr_payout_r, (void *)0x02)
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, sidewndr_payout_r<0x01>)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN4")   // 4
@@ -497,7 +465,7 @@ static INPUT_PORTS_START( starspnr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect/Cancel" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x08) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x03>) /* to be confirmed */
 
 	PORT_START("IN2")   // 2
 	/* tested at 0xe83c */
@@ -507,7 +475,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xef82 after IN5 bit 1 and after IN1 bit 3 - after coins are tested - table at 0xefa8 (3 bytes) */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeeba with IN3 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x02) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x01>) /* to be confirmed */
 	/* tested at 0x1b0f */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -516,7 +484,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xe8ea and 0xecbe */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeeba with IN2 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x01) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x00>) /* to be confirmed */
 	/* tested at 0x0178 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -527,7 +495,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xed86 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x04) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x02>) /* to be confirmed */
 
 	PORT_START("IN5")   // 5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME( "Hold 3" )
@@ -536,7 +504,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xec6f */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN6 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x01) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x00>) /* to be confirmed */
 	/* tested at 0xe312 and 0xe377 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -545,7 +513,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xee42, 0xee5e and 0xeff5 before IN1 bit 0 - invalid code after 0xf000 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN5 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x02) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x01>) /* to be confirmed */
 	/* tested at 0xe8dd and 0xec1c */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -557,7 +525,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xedcb */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN5 bit 3 and IN6 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x04) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x02>) /* to be confirmed */
 	/* tested at 0xec2a */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 

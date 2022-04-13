@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class snookr10_state : public driver_device
 {
@@ -25,12 +26,12 @@ public:
 	void tenballs(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(dsw_port_1_r);
-	DECLARE_READ8_MEMBER(port2000_8_r);
-	DECLARE_WRITE8_MEMBER(output_port_0_w);
-	DECLARE_WRITE8_MEMBER(output_port_1_w);
-	DECLARE_WRITE8_MEMBER(snookr10_videoram_w);
-	DECLARE_WRITE8_MEMBER(snookr10_colorram_w);
+	uint8_t dsw_port_1_r();
+	uint8_t port2000_8_r();
+	void output_port_0_w(uint8_t data);
+	void output_port_1_w(uint8_t data);
+	void snookr10_videoram_w(offs_t offset, uint8_t data);
+	void snookr10_colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(apple10_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(crystalc_get_bg_tile_info);
@@ -47,17 +48,17 @@ private:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-	int m_outportl;
-	int m_outporth;
-	int m_bit0;
-	int m_bit1;
-	int m_bit2;
-	int m_bit3;
-	int m_bit4;
-	int m_bit5;
+	int m_outportl = 0;
+	int m_outporth = 0;
+	int m_bit0 = 0;
+	int m_bit1 = 0;
+	int m_bit2 = 0;
+	int m_bit3 = 0;
+	int m_bit4 = 0;
+	int m_bit5 = 0;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;

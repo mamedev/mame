@@ -53,15 +53,11 @@ DEFINE_DEVICE_TYPE(K005289, k005289_device, "k005289", "K005289 SCC")
 //  k005289_device - constructor
 //-------------------------------------------------
 
-k005289_device::k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k005289_device::k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, K005289, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_sound_prom(*this, DEVICE_SELF)
 	, m_stream(nullptr)
-	, m_rate(0)
-	, m_mixer_table(nullptr)
-	, m_mixer_lookup(nullptr)
-	, m_mixer_buffer(nullptr)
 {
 }
 
@@ -73,30 +69,19 @@ k005289_device::k005289_device(const machine_config &mconfig, const char *tag, d
 void k005289_device::device_start()
 {
 	/* get stream channels */
-	m_rate = clock() / CLOCK_DIVIDER;
-	m_stream = stream_alloc(0, 1, m_rate);
-
-	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer = std::make_unique<short[]>(2 * m_rate);
-
-	/* build the mixer table */
-	make_mixer_table(2);
+	m_stream = stream_alloc(0, 1, clock());
 
 	/* reset all the voices */
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_voice)
 	{
-		m_counter[i] = 0;
-		m_frequency[i] = 0;
-		m_freq_latch[i] = 0;
-		m_waveform[i] = i * 0x100;
-		m_volume[i] = 0;
+		elem.reset();
 	}
 
-	save_item(NAME(m_counter));
-	save_item(NAME(m_frequency));
-	save_item(NAME(m_freq_latch));
-	save_item(NAME(m_waveform));
-	save_item(NAME(m_volume));
+	save_item(STRUCT_MEMBER(m_voice, counter));
+	save_item(STRUCT_MEMBER(m_voice, frequency));
+	save_item(STRUCT_MEMBER(m_voice, pitch));
+	save_item(STRUCT_MEMBER(m_voice, waveform));
+	save_item(STRUCT_MEMBER(m_voice, volume));
 }
 
 
@@ -104,137 +89,68 @@ void k005289_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k005289_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
-	short *mix;
-	int i,v,f;
-
-	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer.get(), 0, samples * sizeof(int16_t));
-
-	v=m_volume[0];
-	f=m_frequency[0];
-	if (v && f)
+	outputs[0].fill(0);
+	for (int sampid = 0; sampid < outputs[0].samples(); sampid++)
 	{
-		const unsigned char *w = &m_sound_prom[m_waveform[0]];
-		int c = m_counter[0];
-
-		mix = m_mixer_buffer.get();
-
-		/* add our contribution */
-		for (i = 0; i < samples; i++)
+		for (int i = 0; i < 2; i++)
 		{
-			int offs;
-
-			c += CLOCK_DIVIDER;
-			offs = (c / f) & 0x1f;
-			*mix++ += ((w[offs] & 0x0f) - 8) * v;
+			voice_t &v = m_voice[i];
+			if ((v.counter--) < 0)
+			{
+				v.waveform = (v.waveform & ~0x1f) | ((v.waveform + 1) & 0x1f);
+				v.counter = v.frequency;
+			}
+			outputs[0].add_int(sampid, ((m_sound_prom[((i & 1) << 8) | v.waveform] & 0xf) - 8) * v.volume, 512);
 		}
-
-		/* update the counter for this voice */
-		m_counter[0] = c % (f * 0x20);
 	}
-
-	v=m_volume[1];
-	f=m_frequency[1];
-	if (v && f)
-	{
-		const unsigned char *w = &m_sound_prom[m_waveform[1]];
-		int c = m_counter[1];
-
-		mix = m_mixer_buffer.get();
-
-		/* add our contribution */
-		for (i = 0; i < samples; i++)
-		{
-			int offs;
-
-			c += CLOCK_DIVIDER;
-			offs = (c / f) & 0x1f;
-			*mix++ += ((w[offs] & 0x0f) - 8) * v;
-		}
-
-		/* update the counter for this voice */
-		m_counter[1] = c % (f * 0x20);
-	}
-
-	/* mix it down */
-	mix = m_mixer_buffer.get();
-	for (i = 0; i < samples; i++)
-		*buffer++ = m_mixer_lookup[*mix++];
 }
-
-
 
 
 /********************************************************************************/
 
-/* build a table to divide by the number of voices */
-void k005289_device::make_mixer_table(int voices)
-{
-	int count = voices * 128;
-	int i;
-	int gain = 16;
-
-	/* allocate memory */
-	m_mixer_table = std::make_unique<int16_t[]>(256 * voices);
-
-	/* find the middle of the table */
-	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
-
-	/* fill in the table - 16 bit case */
-	for (i = 0; i < count; i++)
-	{
-		int val = i * gain * 16 / voices;
-		if (val > 32767) val = 32767;
-		m_mixer_lookup[ i] = val;
-		m_mixer_lookup[-i] = -val;
-	}
-}
-
-
-WRITE8_MEMBER( k005289_device::k005289_control_A_w )
+void k005289_device::control_A_w(u8 data)
 {
 	m_stream->update();
 
-	m_volume[0] = data & 0xf;
-	m_waveform[0] = data & 0xe0;
+	m_voice[0].volume = data & 0xf;
+	m_voice[0].waveform = (m_voice[0].waveform & ~0xe0) | (data & 0xe0);
 }
 
 
-WRITE8_MEMBER( k005289_device::k005289_control_B_w )
+void k005289_device::control_B_w(u8 data)
 {
 	m_stream->update();
 
-	m_volume[1] = data & 0xf;
-	m_waveform[1] = (data & 0xe0) + 0x100;
+	m_voice[1].volume = data & 0xf;
+	m_voice[1].waveform = (m_voice[1].waveform & ~0xe0) | (data & 0xe0);
 }
 
 
-WRITE8_MEMBER( k005289_device::ld1_w )
+void k005289_device::ld1_w(offs_t offset, u8 data)
 {
-	m_freq_latch[0] = 0xfff - offset;
+	m_voice[0].pitch = 0xfff - offset;
 }
 
 
-WRITE8_MEMBER( k005289_device::ld2_w )
+void k005289_device::ld2_w(offs_t offset, u8 data)
 {
-	m_freq_latch[1] = 0xfff - offset;
+	m_voice[1].pitch = 0xfff - offset;
 }
 
 
-WRITE8_MEMBER( k005289_device::tg1_w )
-{
-	m_stream->update();
-
-	m_frequency[0] = m_freq_latch[0];
-}
-
-
-WRITE8_MEMBER( k005289_device::tg2_w )
+void k005289_device::tg1_w(u8 data)
 {
 	m_stream->update();
 
-	m_frequency[1] = m_freq_latch[1];
+	m_voice[0].frequency = m_voice[0].pitch;
+}
+
+
+void k005289_device::tg2_w(u8 data)
+{
+	m_stream->update();
+
+	m_voice[1].frequency = m_voice[1].pitch;
 }

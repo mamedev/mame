@@ -35,8 +35,8 @@ DEFINE_DEVICE_TYPE(CXD1095, cxd1095_device, "cxd1095", "CXD1095 I/O Expander")
 
 cxd1095_device::cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CXD1095, tag, owner, clock)
-	, m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_input_cb(*this)
+	, m_output_cb(*this)
 {
 }
 
@@ -47,10 +47,8 @@ cxd1095_device::cxd1095_device(const machine_config &mconfig, const char *tag, d
 void cxd1095_device::device_start()
 {
 	// resolve callbacks
-	for (auto &cb : m_input_cb)
-		cb.resolve();
-	for (auto &cb : m_output_cb)
-		cb.resolve();
+	m_input_cb.resolve_all();
+	m_output_cb.resolve_all();
 
 	std::fill(std::begin(m_data_latch), std::end(m_data_latch), 0);
 
@@ -72,7 +70,7 @@ void cxd1095_device::device_reset()
 //  read - read from an input port
 //-------------------------------------------------
 
-READ8_MEMBER(cxd1095_device::read)
+u8 cxd1095_device::read(offs_t offset)
 {
 	if (offset < 5)
 	{
@@ -100,7 +98,7 @@ READ8_MEMBER(cxd1095_device::read)
 //  control registers
 //-------------------------------------------------
 
-WRITE8_MEMBER(cxd1095_device::write)
+void cxd1095_device::write(offs_t offset, u8 data)
 {
 	if (offset < 5)
 	{

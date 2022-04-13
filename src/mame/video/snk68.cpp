@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(snk68_state::get_tile_info)
 	int tile = m_fg_tile_offset + (m_fg_videoram[2*tile_index] & 0xff);
 	int color = m_fg_videoram[2*tile_index+1] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(searchar_state::get_tile_info)
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(searchar_state::get_tile_info)
 	// used in the ikari3 intro
 	int flags = (data & 0x8000) ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 /***************************************************************************
@@ -58,7 +58,7 @@ void snk68_state::common_video_start()
 
 void snk68_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk68_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk68_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_fg_tile_offset = 0;
 
 	common_video_start();
@@ -68,7 +68,7 @@ void snk68_state::video_start()
 
 void searchar_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(searchar_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(searchar_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	snk68_state::common_video_start();
 }
@@ -79,27 +79,27 @@ void searchar_state::video_start()
 
 ***************************************************************************/
 
-READ16_MEMBER(snk68_state::fg_videoram_r)
+uint16_t snk68_state::fg_videoram_r(offs_t offset)
 {
 	// RAM is only 8-bit
 	return m_fg_videoram[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(snk68_state::fg_videoram_w)
+void snk68_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data |= 0xff00;
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(searchar_state::fg_videoram_w)
+void searchar_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// RAM is full 16-bit, though only half of it is used by the hardware
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(snk68_state::flipscreen_w)
+void snk68_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(BIT(data, 3));
 	m_sprites->set_flip(BIT(data, 3));
@@ -112,7 +112,7 @@ WRITE8_MEMBER(snk68_state::flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(searchar_state::flipscreen_w)
+void searchar_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(BIT(data, 3));
 	m_sprites->set_flip(BIT(data, 3));
@@ -129,7 +129,7 @@ WRITE8_MEMBER(searchar_state::flipscreen_w)
 
 uint32_t snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0x7ff, cliprect);
+	bitmap.fill(m_palette->get_backdrop_pen(), cliprect);
 
 	m_sprites->draw_sprites_all(bitmap, cliprect);
 

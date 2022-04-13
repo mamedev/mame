@@ -203,7 +203,7 @@ sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, d
 
 void sn76477_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	if (clock() > 0)
 	{
@@ -892,10 +892,12 @@ void sn76477_device::log_complete_state()
 
 void sn76477_device::open_wav_file()
 {
-	char wav_file_name[30];
+	std::string s = tag();
+	std::replace(s.begin(), s.end(), ':', '_');
 
-	sprintf(wav_file_name, LOG_WAV_FILE_NAME, tag());
-	m_file = wav_open(wav_file_name, m_our_sample_rate, 2);
+	const std::string wav_file_name = util::string_format(LOG_WAV_FILE_NAME, s);
+
+	m_file = util::wav_open(wav_file_name, m_our_sample_rate, 2);
 
 	LOG(1, "SN76477:         Logging output: %s\n", wav_file_name);
 }
@@ -903,13 +905,13 @@ void sn76477_device::open_wav_file()
 
 void sn76477_device::close_wav_file()
 {
-	wav_close(m_file);
+	m_file.reset();
 }
 
 
 void sn76477_device::add_wav_data(int16_t data_l, int16_t data_r)
 {
-	wav_add_data_16lr(m_file, &data_l, &data_r, 1);
+	util::wav_add_data_16lr(*m_file, &data_l, &data_r, 1);
 }
 
 
@@ -1699,7 +1701,7 @@ void sn76477_device::state_save_register()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sn76477_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	double one_shot_cap_charging_step;
 	double one_shot_cap_discharging_step;
@@ -1718,7 +1720,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	double voltage_out;
 	double center_to_peak_voltage_out;
 
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	/* compute charging values, doing it here ensures that we always use the latest values */
 	one_shot_cap_charging_step = compute_one_shot_cap_charging_rate() / m_our_sample_rate;
@@ -1742,7 +1744,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 
 	/* process 'samples' number of samples */
-	while (samples--)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		/* update the one-shot cap voltage */
 		if (!m_one_shot_cap_voltage_ext)
@@ -1991,12 +1993,12 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		    32767 = 2 * OUT_CENTER_LEVEL_VOLTAGE + OUT_LOW_CLIP_THRESHOLD
 
 		              / Vout - Vmin    \
-		    sample = |  ----------- - 1 | * 32767
+		    sample = |  ----------- - 1 |
 		              \ Vcen - Vmin    /
 		 */
-		*buffer++ = (((voltage_out - OUT_LOW_CLIP_THRESHOLD) / (OUT_CENTER_LEVEL_VOLTAGE - OUT_LOW_CLIP_THRESHOLD)) - 1) * 32767;
+		buffer.put(sampindex, ((voltage_out - OUT_LOW_CLIP_THRESHOLD) / (OUT_CENTER_LEVEL_VOLTAGE - OUT_LOW_CLIP_THRESHOLD)) - 1);
 
-		if (LOG_WAV && LOG_WAV_ENABLED_ONLY && !m_enable)
+		if (LOG_WAV && (!m_enable || !LOG_WAV_ENABLED_ONLY))
 		{
 			int16_t log_data_l;
 			int16_t log_data_r;
@@ -2005,30 +2007,48 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			{
 			case 0:
 				log_data_l = LOG_WAV_GAIN_FACTOR * voltage_out;
-				log_data_r = LOG_WAV_GAIN_FACTOR * voltage_out;
 				break;
 			case 1:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_enable;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_enable;
 				break;
 			case 2:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_one_shot_cap_voltage;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_one_shot_cap_voltage;
 				break;
 			case 3:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_attack_decay_cap_voltage;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_attack_decay_cap_voltage;
 				break;
 			case 4:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_slf_cap_voltage;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_slf_cap_voltage;
 				break;
 			case 5:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_vco_cap_voltage;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_vco_cap_voltage;
 				break;
 			case 6:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_noise_filter_cap_voltage;
+				break;
+			}
+
+			switch (LOG_WAV_VALUE_R)
+			{
+			case 0:
+				log_data_r = LOG_WAV_GAIN_FACTOR * voltage_out;
+				break;
+			case 1:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_enable;
+				break;
+			case 2:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_one_shot_cap_voltage;
+				break;
+			case 3:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_attack_decay_cap_voltage;
+				break;
+			case 4:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_slf_cap_voltage;
+				break;
+			case 5:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_vco_cap_voltage;
+				break;
+			case 6:
 				log_data_r = LOG_WAV_GAIN_FACTOR * m_noise_filter_cap_voltage;
 				break;
 			}

@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
-<!-- Screen mode is configured in Test Mode -> Game System -> Monitor -->
+	<!-- Screen mode is configured in Test Mode -> Game System -> Monitor -->
 
 	<view name="Wide (16:9)">
 		<screen index="0">

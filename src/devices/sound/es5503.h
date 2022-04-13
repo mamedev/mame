@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include "dirom.h"
+
 // ======================> es5503_device
 
 class es5503_device : public device_t,
-						public device_sound_interface,
-						public device_rom_interface
+					  public device_sound_interface,
+					  public device_rom_interface<17>
 {
 public:
 	// construction/destruction
@@ -18,8 +20,6 @@ public:
 	// channels must be a power of two
 	void set_channels(int channels) { output_channels = channels; }
 
-	template <class Object> devcb_base &set_irqf(Object &&cb) { return m_irq_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_adcf(Object &&cb) { return m_adc_func.set_callback(std::forward<Object>(cb)); }
 	auto irq_func() { return m_irq_func.bind(); }
 	auto adc_func() { return m_adc_func.bind(); }
 
@@ -33,10 +33,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
@@ -83,6 +83,8 @@ private:
 	uint32_t output_rate;
 
 	emu_timer *m_timer;
+
+	std::vector<int32_t> m_mix_buffer;
 
 	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift);
 };

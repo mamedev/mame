@@ -7,6 +7,7 @@
 
 #include "machine/timer.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class pingpong_state : public driver_device
 {
@@ -18,24 +19,26 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_banks(*this, "bank%d", 1U)
 	{ }
 
-	int m_intenable;
-	int m_question_addr_high;
+	int m_intenable = 0;
+	int m_question_addr_high = 0;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	tilemap_t *m_bg_tilemap;
+	optional_memory_bank_array<8> m_banks;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	DECLARE_WRITE8_MEMBER(cashquiz_question_bank_high_w);
-	DECLARE_WRITE8_MEMBER(cashquiz_question_bank_low_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(pingpong_videoram_w);
-	DECLARE_WRITE8_MEMBER(pingpong_colorram_w);
+	void cashquiz_question_bank_high_w(uint8_t data);
+	void cashquiz_question_bank_low_w(uint8_t data);
+	void coin_w(uint8_t data);
+	void pingpong_videoram_w(offs_t offset, uint8_t data);
+	void pingpong_colorram_w(offs_t offset, uint8_t data);
 	void init_cashquiz();
 	void init_merlinmm();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -47,8 +50,10 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void merlinmm(machine_config &config);
 	void pingpong(machine_config &config);
+	void cashquiz(machine_config &config);
 	void merlinmm_map(address_map &map);
 	void pingpong_map(address_map &map);
+	void cashquiz_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PINGPONG_H

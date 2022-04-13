@@ -103,6 +103,45 @@ int64_t Constant::GetS64() const {
   }
 }
 
+uint64_t Constant::GetZeroExtendedValue() const {
+  const auto* int_type = type()->AsInteger();
+  assert(int_type != nullptr);
+  const auto width = int_type->width();
+  assert(width <= 64);
+
+  uint64_t value = 0;
+  if (const IntConstant* ic = AsIntConstant()) {
+    if (width <= 32) {
+      value = ic->GetU32BitValue();
+    } else {
+      value = ic->GetU64BitValue();
+    }
+  } else {
+    assert(AsNullConstant() && "Must be an integer constant.");
+  }
+  return value;
+}
+
+int64_t Constant::GetSignExtendedValue() const {
+  const auto* int_type = type()->AsInteger();
+  assert(int_type != nullptr);
+  const auto width = int_type->width();
+  assert(width <= 64);
+
+  int64_t value = 0;
+  if (const IntConstant* ic = AsIntConstant()) {
+    if (width <= 32) {
+      // Let the C++ compiler do the sign extension.
+      value = int64_t(ic->GetS32BitValue());
+    } else {
+      value = ic->GetS64BitValue();
+    }
+  } else {
+    assert(AsNullConstant() && "Must be an integer constant.");
+  }
+  return value;
+}
+
 ConstantManager::ConstantManager(IRContext* ctx) : ctx_(ctx) {
   // Populate the constant table with values from constant declarations in the
   // module.  The values of each OpConstant declaration is the identity
@@ -117,7 +156,7 @@ Type* ConstantManager::GetType(const Instruction* inst) const {
 }
 
 std::vector<const Constant*> ConstantManager::GetOperandConstants(
-    Instruction* inst) const {
+    const Instruction* inst) const {
   std::vector<const Constant*> constants;
   for (uint32_t i = 0; i < inst->NumInOperands(); i++) {
     const Operand* operand = &inst->GetInOperand(i);
@@ -165,7 +204,12 @@ std::vector<const Constant*> ConstantManager::GetConstantsFromIds(
 
 Instruction* ConstantManager::BuildInstructionAndAddToModule(
     const Constant* new_const, Module::inst_iterator* pos, uint32_t type_id) {
+  // TODO(1841): Handle id overflow.
   uint32_t new_id = context()->TakeNextId();
+  if (new_id == 0) {
+    return nullptr;
+  }
+
   auto new_inst = CreateInstruction(new_id, new_const, type_id);
   if (!new_inst) {
     return nullptr;
@@ -180,8 +224,6 @@ Instruction* ConstantManager::BuildInstructionAndAddToModule(
 
 Instruction* ConstantManager::GetDefiningInstruction(
     const Constant* c, uint32_t type_id, Module::inst_iterator* pos) {
-  assert(type_id == 0 ||
-         context()->get_type_mgr()->GetType(type_id) == c->type());
   uint32_t decl_id = FindDeclaredConstant(c, type_id);
   if (decl_id == 0) {
     auto iter = context()->types_values_end();
@@ -249,7 +291,7 @@ std::unique_ptr<Constant> ConstantManager::CreateConstant(
   }
 }
 
-const Constant* ConstantManager::GetConstantFromInst(Instruction* inst) {
+const Constant* ConstantManager::GetConstantFromInst(const Instruction* inst) {
   std::vector<uint32_t> literal_words_or_ids;
 
   // Collect the constant defining literals or component ids.
@@ -345,6 +387,55 @@ const Constant* ConstantManager::GetConstant(
     const Type* type, const std::vector<uint32_t>& literal_words_or_ids) {
   auto cst = CreateConstant(type, literal_words_or_ids);
   return cst ? RegisterConstant(std::move(cst)) : nullptr;
+}
+
+const Constant* ConstantManager::GetNumericVectorConstantWithWords(
+    const Vector* type, const std::vector<uint32_t>& literal_words) {
+  const auto* element_type = type->element_type();
+  uint32_t words_per_element = 0;
+  if (const auto* float_type = element_type->AsFloat())
+    words_per_element = float_type->width() / 32;
+  else if (const auto* int_type = element_type->AsInteger())
+    words_per_element = int_type->width() / 32;
+
+  if (words_per_element != 1 && words_per_element != 2) return nullptr;
+
+  if (words_per_element * type->element_count() !=
+      static_cast<uint32_t>(literal_words.size())) {
+    return nullptr;
+  }
+
+  std::vector<uint32_t> element_ids;
+  for (uint32_t i = 0; i < type->element_count(); ++i) {
+    auto first_word = literal_words.begin() + (words_per_element * i);
+    std::vector<uint32_t> const_data(first_word,
+                                     first_word + words_per_element);
+    const analysis::Constant* element_constant =
+        GetConstant(element_type, const_data);
+    auto element_id = GetDefiningInstruction(element_constant)->result_id();
+    element_ids.push_back(element_id);
+  }
+
+  return GetConstant(type, element_ids);
+}
+
+uint32_t ConstantManager::GetFloatConst(float val) {
+  Type* float_type = context()->get_type_mgr()->GetFloatType();
+  utils::FloatProxy<float> v(val);
+  const Constant* c = GetConstant(float_type, v.GetWords());
+  return GetDefiningInstruction(c)->result_id();
+}
+
+uint32_t ConstantManager::GetSIntConst(int32_t val) {
+  Type* sint_type = context()->get_type_mgr()->GetSIntType();
+  const Constant* c = GetConstant(sint_type, {static_cast<uint32_t>(val)});
+  return GetDefiningInstruction(c)->result_id();
+}
+
+uint32_t ConstantManager::GetUIntConst(uint32_t val) {
+  Type* uint_type = context()->get_type_mgr()->GetUIntType();
+  const Constant* c = GetConstant(uint_type, {val});
+  return GetDefiningInstruction(c)->result_id();
 }
 
 std::vector<const analysis::Constant*> Constant::GetVectorComponents(

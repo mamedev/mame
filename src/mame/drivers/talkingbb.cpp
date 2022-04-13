@@ -18,14 +18,13 @@ The speech driver is by Forrest S. Mozer's company.
 
 The cartridge slots are for extra teams. There are around 8 cartridges, each one
 included 3 or 4 baseball teams, with exception to the "Hall of Fame" cartridge.
-Players enter 3-digit code to select the team.
+Players enter a 3-digit code to select the team.
 
 TODO:
 - add cartridge slots
 - Buttons are unresponsive at initial game setup, you need to hold the yes/no button
   until it responds. The keypad reading routine is at $1A5D, it gets skipped for several
   seconds at a time. Once in-game, everything is fine though. BTANB or different cause?
-- get rid of savestate workaround once outputs support savestates
 
 *******************************************************************************
 
@@ -106,9 +105,8 @@ Substitutes:
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/timer.h"
+#include "video/pwm.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -124,8 +122,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu"),
-		m_delay_display(*this, "delay_display_%u", 0),
-		m_out_led(*this, "led%u", 0U),
+		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -133,54 +130,37 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void device_post_load() override;
 
 private:
 	// devices/pointers
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	required_device_array<timer_device, 12> m_delay_display;
-	output_finder<12> m_out_led;
+	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_inputs;
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
-	u8 m_bank;
-	u8 m_led_select;
-	u8 m_led_cache[12];
-
-	void set_led(int i, int value) { m_led_cache[i] = m_out_led[i] = value; }
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_display) { set_led(param, 0); }
+	u8 m_bank = 0;
+	u8 m_inp_mux = 0;
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(switch_r);
+	void bank_w(u8 data);
+	u8 bank_r(offs_t offset);
+	void input_w(u8 data);
+	u8 input_r();
+	u8 switch_r();
 };
 
 void talkingbb_state::machine_start()
 {
-	// resolve handlers
-	m_out_led.resolve();
-
 	// zerofill
 	m_bank = 0;
-	m_led_select = 0;
-	memset(m_led_cache, 0, sizeof(m_led_cache));
+	m_inp_mux = 0;
 
 	// register for savestates
 	save_item(NAME(m_bank));
-	save_item(NAME(m_led_select));
-	save_item(NAME(m_led_cache));
-}
-
-void talkingbb_state::device_post_load()
-{
-	for (int i = 0; i < 4; i++)
-		m_out_led[i] = m_led_cache[i];
+	save_item(NAME(m_inp_mux));
 }
 
 
@@ -189,7 +169,7 @@ void talkingbb_state::device_post_load()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(talkingbb_state::bank_w)
+void talkingbb_state::bank_w(u8 data)
 {
 	// d0-d1: upper rom bank
 	// d2-d4: upper rom enable (bus conflict possible)
@@ -197,7 +177,7 @@ WRITE8_MEMBER(talkingbb_state::bank_w)
 	m_bank = data;
 }
 
-READ8_MEMBER(talkingbb_state::bank_r)
+u8 talkingbb_state::bank_r(offs_t offset)
 {
 	u32 hi = (~m_bank & 3) << 15;
 	u8 data = (m_bank & 4) ? 0xff : m_rom[offset | hi];
@@ -207,7 +187,7 @@ READ8_MEMBER(talkingbb_state::bank_r)
 	return data;
 }
 
-WRITE8_MEMBER(talkingbb_state::input_w)
+void talkingbb_state::input_w(u8 data)
 {
 	// no effect if P30 is low (never happens though)
 	if (~m_bank & 1)
@@ -215,22 +195,11 @@ WRITE8_MEMBER(talkingbb_state::input_w)
 
 	// d4-d7: led select (also input mux)
 	// d0-d2: led data
-	for (int i = 0; i < 12; i++)
-	{
-		u8 prev = BIT(m_led_select >> 4, i & 3) & BIT(~m_led_select, i >> 2);
-		u8 cur = BIT(data >> 4, i & 3) & BIT(~data, i >> 2);
-
-		// they're strobed, so on falling edge, delay them going off to prevent flicker or stuck display
-		if (prev & ~cur)
-			m_delay_display[i]->adjust(attotime::from_msec(50), i);
-		else if (cur)
-			set_led(i, 1);
-	}
-
-	m_led_select = data;
+	m_inp_mux = data >> 4;
+	m_display->matrix(m_inp_mux, ~data & 7);
 }
 
-READ8_MEMBER(talkingbb_state::input_r)
+u8 talkingbb_state::input_r()
 {
 	// open bus if P30 is low (never happens though)
 	if (~m_bank & 1)
@@ -240,13 +209,13 @@ READ8_MEMBER(talkingbb_state::input_r)
 
 	// multiplexed inputs
 	for (int i = 0; i < 4; i++)
-		if (BIT(m_led_select >> 4, i))
+		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
 
 	return ~data;
 }
 
-READ8_MEMBER(talkingbb_state::switch_r)
+u8 talkingbb_state::switch_r()
 {
 	// d5: mode switch
 	return ~m_inputs[4]->read();
@@ -288,7 +257,7 @@ void talkingbb_state::main_io(address_map &map)
  RUNNER]  STEAL]             X-BASE]  ENTER]    |    REPLAY]   RELIEF]             SUB]      ENTER]
                                                 |
                   [0                            |                       [0
-				   SWING]                       |                        BALL]
+                   SWING]                       |                        BALL]
 */
 
 static INPUT_PORTS_START( talkingbb )
@@ -355,17 +324,12 @@ void talkingbb_state::talkingbb(machine_config &config)
 	m_maincpu->port_in_cb<3>().set(FUNC(talkingbb_state::switch_r));
 
 	/* video hardware */
-	for (int i = 0; i < 12; i++)
-		TIMER(config, m_delay_display[i]).configure_generic(FUNC(talkingbb_state::delay_display));
-
+	PWM_DISPLAY(config, m_display).set_size(4, 3);
 	config.set_default_layout(layout_talkingbb);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

@@ -20,15 +20,15 @@ class galastrm_state;
 
 struct gs_poly_data
 {
-	bitmap_ind16* texbase;
+	bitmap_ind16* texbase = nullptr;
 };
 
-class galastrm_renderer : public poly_manager<float, gs_poly_data, 2, 10000>
+class galastrm_renderer : public poly_manager<float, gs_poly_data, 2>
 {
 public:
 	galastrm_renderer(galastrm_state &state);
 
-	void tc0610_draw_scanline(int32_t scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
+	void tc0610_draw_scanline(s32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid);
 	void tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectangle &clip);
 
 	bitmap_ind16 &screenbits() { return m_screenbits; }
@@ -53,20 +53,19 @@ public:
 		m_tc0110pcr(*this, "tc0110pcr"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_screen(*this, "screen")
 	{ }
 
 	void galastrm(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
+	DECLARE_READ_LINE_MEMBER(frame_counter_r);
 
 protected:
 	virtual void video_start() override;
 
 private:
-	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<u32> m_spriteram;
 
-	required_region_ptr<uint16_t> m_spritemap_rom;
+	required_region_ptr<u16> m_spritemap_rom;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -75,37 +74,36 @@ private:
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 
 	struct gs_tempsprite
 	{
-		int gfx;
-		int code,color;
-		int flipx,flipy;
-		int x,y;
-		int zoomx,zoomy;
-		int primask;
+		u8 gfx = 0U;
+		u32 code = 0U, color = 0U;
+		bool flipx = false, flipy = false;
+		int x = 0, y = 0;
+		int zoomx = 0, zoomy = 0;
+		u32 primask = 0U;
 	};
 
-	uint16_t m_frame_counter;
-	int m_tc0610_addr[2];
-	int16_t m_tc0610_ctrl_reg[2][8];
-	std::unique_ptr<gs_tempsprite[]> m_spritelist;
-	struct gs_tempsprite *m_sprite_ptr_pre;
-	bitmap_ind16 m_tmpbitmaps;
-	std::unique_ptr<galastrm_renderer> m_poly;
+	u16 m_frame_counter = 0U;
+	int m_tc0610_addr[2]{};
+	s16 m_tc0610_ctrl_reg[2][8]{};
+	std::unique_ptr<gs_tempsprite[]> m_spritelist{};
+	struct gs_tempsprite *m_sprite_ptr_pre{};
+	bitmap_ind16 m_tmpbitmaps{};
+	std::unique_ptr<galastrm_renderer> m_poly{};
 
-	int m_rsxb;
-	int m_rsyb;
-	int m_rsxoffs;
-	int m_rsyoffs;
+	int m_rsxb = 0;
+	int m_rsyb = 0;
+	int m_rsxoffs = 0;
+	int m_rsyoffs = 0;
 
-	template<int Chip> DECLARE_WRITE16_MEMBER(tc0610_w);
-	DECLARE_WRITE8_MEMBER(coin_word_w);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template<int Chip> void tc0610_w(offs_t offset, u16 data);
+	void coin_word_w(u8 data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites_pre(int x_offs, int y_offs);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u32 *primasks, int priority);
 
 	void main_map(address_map &map);
 };

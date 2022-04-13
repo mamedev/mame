@@ -17,7 +17,7 @@ TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_bg)
 	int code = m_background_videoram[tile_index*2] + ((m_background_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = m_background_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 	tileinfo.group = (color == 8);
 }
 
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_fg)
 	int code = m_foreground_videoram[tile_index*2] + ((m_foreground_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = m_foreground_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.group = (color == 9);
 }
 
@@ -38,8 +38,8 @@ TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_fg)
 
 void speedbal_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(speedbal_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS_FLIP_X,  16, 16, 16, 16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(speedbal_state::get_tile_info_fg),this), TILEMAP_SCAN_COLS_FLIP_X,   8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(speedbal_state::get_tile_info_bg)), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(speedbal_state::get_tile_info_fg)), TILEMAP_SCAN_COLS_FLIP_X,  8,  8, 32, 32);
 
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x00f7,0x0000); /* split type 1 has pen 0-2, 4-7 transparent in front half */
@@ -56,7 +56,7 @@ void speedbal_state::video_start()
  *                                   *
  *************************************/
 
-WRITE8_MEMBER(speedbal_state::foreground_videoram_w)
+void speedbal_state::foreground_videoram_w(offs_t offset, uint8_t data)
 {
 	m_foreground_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset>>1);
@@ -68,7 +68,7 @@ WRITE8_MEMBER(speedbal_state::foreground_videoram_w)
  *                                   *
  *************************************/
 
-WRITE8_MEMBER(speedbal_state::background_videoram_w)
+void speedbal_state::background_videoram_w(offs_t offset, uint8_t data)
 {
 	m_background_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset>>1);

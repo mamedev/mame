@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -9,11 +9,11 @@
 #include "error.h"
 #include "string.h"
 
-BX_ERROR_RESULT(BX_ERROR_ACCESS,        BX_MAKEFOURCC('b', 'x', 0, 0) );
-BX_ERROR_RESULT(BX_ERROR_NOT_DIRECTORY, BX_MAKEFOURCC('b', 'x', 0, 1) );
-
 namespace bx
 {
+	BX_ERROR_RESULT(kErrorAccess,       BX_MAKEFOURCC('b', 'x', 1, 1) );
+	BX_ERROR_RESULT(kErrorNotDirectory, BX_MAKEFOURCC('b', 'x', 1, 2) );
+
 	constexpr int32_t kMaxFilePath = 1024;
 
 	/// Special predefined OS directories.
@@ -79,9 +79,13 @@ namespace bx
 		///
 		void join(const StringView& _str);
 
-		/// Returns C string to file path.
+		/// Implicitly converts FilePath to StringView.
 		///
-		const char* get() const;
+		operator StringView() const;
+
+		/// Returns zero-terminated C string pointer to file path.
+		///
+		const char* getCPtr() const;
 
 		/// If path is `/abv/gd/555/333/pod.mac` returns `/abv/gd/555/333/`.
 		///
@@ -110,22 +114,6 @@ namespace bx
 	private:
 		char m_filePath[kMaxFilePath];
 	};
-
-	/// Creates a directory named `_filePath`.
-	///
-	bool make(const FilePath& _filePath, Error* _err = NULL);
-
-	/// Creates a directory named `_filePath` along with all necessary parents.
-	///
-	bool makeAll(const FilePath& _filePath, Error* _err = NULL);
-
-	/// Removes file or directory.
-	///
-	bool remove(const FilePath& _filePath, Error* _err = NULL);
-
-	/// Removes file or directory recursivelly.
-	///
-	bool removeAll(const FilePath& _filePath, Error* _err = NULL);
 
 } // namespace bx
 

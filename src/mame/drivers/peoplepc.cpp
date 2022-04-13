@@ -1,8 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
+/*********************************************************************************************
+The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
+
+[ASC] [ESC] [F1 ] [F2 ] [F3 ] [F4 ] [F5 ] [F6 ] [F7 ] [F8 ] [F9 ] [F10] [F11] [F11] [PRN]
+[mu°] [1 !] [2 "] [3 §] [4 $] [5 %] [6 &] [7 /] [8 (] [9 )] [0 =] [ß ?] [´ `] [BKS] [ C ]   [ 7 ] [ 8 ] [ 9 ] [<- ] [ ->]
+[ TAB ]  [ Q ] [ W ] [ E ] [ R ] [ T ] [ Z ] [ U ] [ I ] [ O ] [ P ] [ Ü ] [+ *]  [ DEL ]   [ 4 ] [ 5 ] [ 5 ] [ - ] [HOM]
+[SHIFTLOCK] [ A ] [ S ] [ D ] [ F ] [ G ] [ H ] [ J ] [ K ] [ L ] [ Ö ] [ Ä ] [# '] [RET]   [ 1 ] [ 2 ] [ 3 ] [RET] [UP ]
+[SHIFT] [2 3]  [ Y ] [ X ] [ C ] [ V ] [ B ] [ N ] [ M ] [, ;] [. :] [- _] [ Ü ]    [URN]   [    0    ] [ . ] [URN] [DWN]
+[ CTRL  ] [                    SPACE                     ]
+
+* The ASC key top left has a red LED, "Depressing the ASCII key, [...], switches off the LED indicator. This key acts as a
+  toggle between the ASCII character set, and your country's standard (NATIONAL) character set. You would use this feature if
+  you wanted to work with another character set, such as French or Spanish."
+* the mu° has the Greek lowercase mu and the degree characters
+* PRN is PRINT
+* BKS is the full word BACKSPACE
+* the C to the right of BKS has a red keycap, it deletes the complete line
+* the five direction keys are all marked with arrows, HOME being diagonally to the top left
+* SHIFTLOCK also has an LED indicator, and is released by pressing one of the SHIFT keys
+
+**********************************************************************************************/
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -15,6 +38,7 @@
 #include "bus/rs232/keyboard.h"
 #include "emupal.h"
 #include "screen.h"
+#include "formats/imd_dsk.h"
 
 class peoplepc_state : public driver_device
 {
@@ -30,6 +54,7 @@ public:
 		m_flop0(*this, "upd765:0"),
 		m_flop1(*this, "upd765:1"),
 		m_dmac(*this, "i8257"),
+		m_crtc(*this, "h46505"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_gvram(*this, "gvram"),
 		m_cvram(*this, "cvram"),
@@ -48,26 +73,26 @@ private:
 	required_device<floppy_connector> m_flop0;
 	required_device<floppy_connector> m_flop1;
 	required_device<i8257_device> m_dmac;
+	required_device<hd6845s_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_shared_ptr<uint16_t> m_cvram;
 	std::vector<uint8_t> m_charram;
 
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE16_MEMBER(charram_w);
-	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
-	DECLARE_WRITE8_MEMBER(dmapg_w);
+	uint8_t get_slave_ack(offs_t offset);
+	void charram_w(offs_t offset, uint16_t data);
+	void dmapg_w(uint8_t data);
+	void p7c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	static void floppy_formats(format_registration &fr);
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 
-	uint8_t m_dma0pg;
+	uint8_t m_dma0pg = 0, m_p7c = 0;
 	void peoplepc_io(address_map &map);
 	void peoplepc_map(address_map &map);
 
@@ -90,29 +115,32 @@ static const gfx_layout peoplepc_charlayout =
 
 MC6845_UPDATE_ROW(peoplepc_state::update_row)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i, j;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	for(i = 0; i < x_count; i++)
+	for(int i = 0; i < x_count; i++)
 	{
-		if(0)
+		if(BIT(m_p7c, 1))
 		{
-			uint16_t offset = ((ma | (ra << 1)) << 4) + i;
-			uint8_t data = m_gvram[offset] >> (offset & 1 ? 8 : 0);
+			uint16_t data = m_gvram[((((ma / 40) * 16) + ra) * 64) + i];
 
-			for(j = 8; j >= 0; j--)
-				bitmap.pix32(y, (i * 8) + j) = palette[( data & 1 << j ) ? 1 : 0];
+			for(int j = 15; j >= 0; j--)
+				bitmap.pix(y, (i * 16) + j) = palette[BIT(data, j)];
 		}
 		else
 		{
-			uint8_t data = m_charram[(m_cvram[(ma + i) & 0x3fff] & 0x7f) * 32 + ra];
-			for(j = 0; j < 8; j++)
-				bitmap.pix32(y, (i * 8) + j) = palette[(data & (1 << j)) ? 1 : 0];
+			uint16_t data = m_cvram[(ma + i) & 0x3fff];
+			uint8_t chr = m_charram[(data & 0x7f) * 32 + ra];
+			if(data & 0x1000)
+				chr ^= 0xff;
+			if(((data & 0x800) && (ra > 14)) || (i == cursor_x))
+				chr = 0xff;
+			for(int j = 0; j < 8; j++)
+				bitmap.pix(y, (i * 8) + j) = palette[BIT(chr, j)];
 		}
 	}
 }
 
-READ8_MEMBER(peoplepc_state::get_slave_ack)
+uint8_t peoplepc_state::get_slave_ack(offs_t offset)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -120,27 +148,21 @@ READ8_MEMBER(peoplepc_state::get_slave_ack)
 	return 0x00;
 }
 
-WRITE16_MEMBER(peoplepc_state::charram_w)
+void peoplepc_state::charram_w(offs_t offset, uint16_t data)
 {
 	m_charram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::tty_clock_tick_w)
-{
-	m_8251ser->write_txc(state);
-	m_8251ser->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER(peoplepc_state::kbd_clock_tick_w)
-{
-	m_8251key->write_txc(state);
-	m_8251key->write_rxc(state);
-}
-
-WRITE8_MEMBER(peoplepc_state::dmapg_w)
+void peoplepc_state::dmapg_w(uint8_t data)
 {
 	m_dma0pg = data;
+}
+
+void peoplepc_state::p7c_w(uint8_t data)
+{
+	m_p7c = data;
+	m_crtc->set_hpixels_per_column(BIT(data, 1) ? 16 : 8);
 }
 
 WRITE_LINE_MEMBER(peoplepc_state::tc_w)
@@ -154,13 +176,13 @@ WRITE_LINE_MEMBER(peoplepc_state::hrq_w)
 	m_dmac->hlda_w(state);
 }
 
-READ8_MEMBER(peoplepc_state::memory_read_byte)
+uint8_t peoplepc_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(peoplepc_state::memory_write_byte)
+void peoplepc_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
@@ -219,6 +241,7 @@ void peoplepc_state::peoplepc_io(address_map &map)
 	map(0x006c, 0x006c).w("h46505", FUNC(mc6845_device::address_w));
 	map(0x006e, 0x006e).rw("h46505", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0070, 0x0070).w(FUNC(peoplepc_state::dmapg_w));
+	map(0x007c, 0x007c).w(FUNC(peoplepc_state::p7c_w));
 }
 
 static void peoplepc_floppies(device_slot_interface &device)
@@ -226,9 +249,11 @@ static void peoplepc_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-FLOPPY_FORMATS_MEMBER( peoplepc_state::floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
+void peoplepc_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 void peoplepc_keyboard_devices(device_slot_interface &device)
 {
@@ -237,7 +262,6 @@ void peoplepc_keyboard_devices(device_slot_interface &device)
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -251,20 +275,22 @@ void peoplepc_state::olypeopl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &peoplepc_state::peoplepc_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_0", FUNC(pic8259_device::inta_cb));
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(XTAL(14'745'600)/6);
-	pit8253.out_handler<0>().set(FUNC(peoplepc_state::kbd_clock_tick_w));
+	pit8253.out_handler<0>().set(m_8251key, FUNC(i8251_device::write_txc));
+	pit8253.out_handler<0>().append(m_8251key, FUNC(i8251_device::write_rxc));
+	pit8253.out_handler<0>().append("pit8253", FUNC(pit8253_device::write_clk2));
 	pit8253.set_clk<1>(XTAL(14'745'600)/6);
-	pit8253.out_handler<1>().set(FUNC(peoplepc_state::tty_clock_tick_w));
-	pit8253.set_clk<2>(XTAL(14'745'600)/6);
+	pit8253.out_handler<1>().set(m_8251ser, FUNC(i8251_device::write_txc));
+	pit8253.out_handler<1>().append(m_8251ser, FUNC(i8251_device::write_rxc));
 	pit8253.out_handler<2>().set("pic8259_0", FUNC(pic8259_device::ir0_w));
 
-	pic8259_device &pic8259_0(PIC8259(config, "pic8259_0", 0));
+	pic8259_device &pic8259_0(PIC8259(config, "pic8259_0"));
 	pic8259_0.out_int_callback().set_inputline(m_maincpu, 0);
 	pic8259_0.in_sp_callback().set_constant(1);
 	pic8259_0.read_slave_ack_callback().set(FUNC(peoplepc_state::get_slave_ack));
 
-	PIC8259(config, m_pic_1, 0);
+	PIC8259(config, m_pic_1);
 	m_pic_1->out_int_callback().set("pic8259_0", FUNC(pic8259_device::ir7_w));
 	m_pic_1->in_sp_callback().set_constant(0);
 
@@ -277,11 +303,11 @@ void peoplepc_state::olypeopl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	h46505_device &crtc(H46505(config, "h46505", XTAL(22'000'000)/8));
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(peoplepc_state::update_row), this);
+	HD6845S(config, m_crtc, XTAL(22'000'000)/8); // HD46505SP according to User's Guide
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(peoplepc_state::update_row));
 
 	I8257(config, m_dmac, XTAL(14'745'600)/3);
 	m_dmac->out_hrq_cb().set(FUNC(peoplepc_state::hrq_w));
@@ -291,13 +317,13 @@ void peoplepc_state::olypeopl(machine_config &config)
 	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::dma_w));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL(8'000'000)/2, true, true);
 	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
 	FLOPPY_CONNECTOR(config, "upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats);
 
-	I8251(config, m_8251key, 0);
+	I8251(config, m_8251key, XTAL(14'745'600)/6);
 	m_8251key->rxrdy_handler().set("pic8259_1", FUNC(pic8259_device::ir1_w));
 	m_8251key->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
 
@@ -305,17 +331,32 @@ void peoplepc_state::olypeopl(machine_config &config)
 	kbd.rxd_handler().set(m_8251key, FUNC(i8251_device::write_rxd));
 	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	I8251(config, m_8251ser, 0);
+	I8048(config, "kbdmcu", 4'608'000).set_disable(); // XTAL unknown
+
+	I8251(config, m_8251ser, XTAL(14'745'600)/6);
+	m_8251ser->rxrdy_handler().set("pic8259_0", FUNC(pic8259_device::ir5_w));
+	m_8251ser->txrdy_handler().set("pic8259_0", FUNC(pic8259_device::ir6_w));
+	m_8251ser->txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
+	m_8251ser->rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
+	m_8251ser->dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
+
+	rs232_port_device &rs232c(RS232_PORT(config, "rs232c", default_rs232_devices, nullptr));
+	rs232c.rxd_handler().set(m_8251ser, FUNC(i8251_device::write_rxd));
+	rs232c.dsr_handler().set(m_8251ser, FUNC(i8251_device::write_dsr));
+	rs232c.cts_handler().set(m_8251ser, FUNC(i8251_device::write_cts));
 }
 
 ROM_START( olypeopl )
-	ROM_REGION(0x2000,"maincpu", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "hd",  "HD ROM")
 	ROMX_LOAD( "u01271c0.bin", 0x00000, 0x1000, CRC(8e0ef114) SHA1(774bab0a3e29853e9f6b951cf73082063ea61e6d), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "u01271d0.bin", 0x00001, 0x1000, CRC(e2419bf9) SHA1(d88381f8709c91e2adba08f378e29bd0d19ee5ae), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "2fd",  "2 FD ROM")
 	ROMX_LOAD( "u01277f3.bin", 0x00000, 0x1000, CRC(428ff135) SHA1(ec11f0e43455570c40f5dc4b84f8420da5939368), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "u01277g3.bin", 0x00001, 0x1000, CRC(3295691c) SHA1(7d7ade62117d11656b8dd86cf0703127616d55bc), ROM_SKIP(1) | ROM_BIOS(1))
+
+	ROM_REGION(0x400, "kbdmcu", 0)
+	ROM_LOAD( "m1.bin", 0x000, 0x400, NO_DUMP )
 ROM_END
 
-COMP( 198?, olypeopl, 0, 0, olypeopl, 0, peoplepc_state, empty_init, "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1983, olypeopl, 0, 0, olypeopl, 0, peoplepc_state, empty_init, "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -298,14 +298,15 @@
 
 ***************************************************************************/
 
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_TILEMAP_H
 #define MAME_EMU_TILEMAP_H
+
+#pragma once
+
+#include "memarray.h"
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 
 //**************************************************************************
@@ -360,68 +361,6 @@ enum tilemap_standard_mapper
 	TILEMAP_STANDARD_COUNT
 };
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// primitives
-#define MCFG_TILEMAP_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TILEMAP)
-#define MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	downcast<tilemap_device &>(*device).set_gfxdecode(_gfxtag);
-#define MCFG_TILEMAP_BYTES_PER_ENTRY(_bpe) \
-	downcast<tilemap_device &>(*device).set_bytes_per_entry(_bpe);
-#define MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
-	downcast<tilemap_device &>(*device).set_info_callback(tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-#define MCFG_TILEMAP_INFO_CB_DEVICE(_device, _class, _method) \
-	downcast<tilemap_device &>(*device).set_info_callback(tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)nullptr));
-#define MCFG_TILEMAP_LAYOUT_STANDARD(_standard, _columns, _rows) \
-	downcast<tilemap_device &>(*device).set_layout(TILEMAP_##_standard, _columns, _rows);
-#define MCFG_TILEMAP_LAYOUT_CB_DRIVER(_class, _method, _columns, _rows) \
-	downcast<tilemap_device &>(*device).set_layout(tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr), _columns, _rows);
-#define MCFG_TILEMAP_LAYOUT_CB_DEVICE(_device, _class, _method, _columns, _rows) \
-	downcast<tilemap_device &>(*device).set_layout(tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)nullptr), _columns, _rows);
-#define MCFG_TILEMAP_TILE_SIZE(_width, _height) \
-	downcast<tilemap_device &>(*device).set_tile_size(_width, _height);
-#define MCFG_TILEMAP_TRANSPARENT_PEN(_pen) \
-	downcast<tilemap_device &>(*device).set_configured_transparent_pen(_pen);
-
-// common cases
-#define MCFG_TILEMAP_ADD_STANDARD(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows) \
-	MCFG_TILEMAP_ADD(_tag) \
-	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
-	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
-	MCFG_TILEMAP_LAYOUT_STANDARD(_mapper, _columns, _rows) \
-	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight)
-#define MCFG_TILEMAP_ADD_CUSTOM(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows) \
-	MCFG_TILEMAP_ADD(_tag) \
-	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
-	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
-	MCFG_TILEMAP_LAYOUT_CB_DRIVER(_class, _mapper, _columns, _rows) \
-	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight)
-#define MCFG_TILEMAP_ADD_STANDARD_TRANSPEN(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows, _transpen) \
-	MCFG_TILEMAP_ADD(_tag) \
-	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
-	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
-	MCFG_TILEMAP_LAYOUT_STANDARD(_mapper, _columns, _rows) \
-	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight) \
-	MCFG_TILEMAP_TRANSPARENT_PEN(_transpen)
-#define MCFG_TILEMAP_ADD_CUSTOM_TRANSPEN(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows, _transpen) \
-	MCFG_TILEMAP_ADD(_tag) \
-	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
-	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
-	MCFG_TILEMAP_LAYOUT_CB_DRIVER(_columns, _mapper, _rows, _class) \
-	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight) \
-	MCFG_TILEMAP_TRANSPARENT_PEN(_transpen)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -471,7 +410,6 @@ class tilemap_t
 	friend class tilemap_device;
 	friend class tilemap_manager;
 	friend class simple_list<tilemap_t>;
-	friend resource_pool_object<tilemap_t>::~resource_pool_object();
 
 	// logical index
 	typedef u32 logical_index;
@@ -485,17 +423,19 @@ class tilemap_t
 	// maximum index in each array
 	static const pen_t MAX_PEN_TO_FLAGS = 256;
 
+	void init_common(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
+
 protected:
 	// tilemap_manager controls our allocations
-	tilemap_t();
+	tilemap_t(device_t &owner);
 	virtual ~tilemap_t();
 
 	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
+	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
 
 public:
 	// getters
 	running_machine &machine() const;
-	tilemap_device *device() const { return m_device; }
 	device_palette_interface &palette() const { return *m_palette; }
 	device_gfx_interface &decoder() const { return *m_tileinfo.decoder; }
 
@@ -547,10 +487,10 @@ public:
 	void configure_groups(gfx_element &gfx, indirect_pen_t transcolor);
 
 	// drawing
-	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
-	void draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
-	void draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
-	void draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
+	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
+	void draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
+	void draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
+	void draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
 	void draw_debug(screen_device &screen, bitmap_rgb32 &dest, u32 scrollx, u32 scrolly, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES);
 
 	// mappers
@@ -620,7 +560,7 @@ private:
 
 	// managers and devices
 	tilemap_manager *           m_manager;              // reference to the owning manager
-	tilemap_device *            m_device;               // pointer to our owning device
+	device_t *                  m_device;               // pointer to our owning device
 	device_palette_interface *  m_palette;              // palette used for drawing
 	tilemap_t *                 m_next;                 // pointer to next tilemap
 	void *                      m_user_data;            // user data value
@@ -687,8 +627,12 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// tilemap creation
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated = nullptr);
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated = nullptr);
+	template <typename T, typename U>
+	tilemap_t &create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows)
+	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, nullptr); }
+	template <typename T, typename U, class V>
+	std::enable_if_t<std::is_base_of<device_t, V>::value, tilemap_t &> create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, V &allocated)
+	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, &static_cast<tilemap_t &>(allocated)); }
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
@@ -699,6 +643,10 @@ public:
 	void set_flip_all(u32 attributes);
 
 private:
+	// tilemap creation
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated);
+
 	// allocate an instance index
 	int alloc_instance() { return ++m_instance; }
 
@@ -741,29 +689,42 @@ public:
 		set_tile_size(tilewidth, tileheight);
 	}
 
+	template <typename T>
+	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxtag, int entrybytes, u16 tilewidth, u16 tileheight)
+		: tilemap_device(mconfig, tag, owner, (u32)0)
+	{
+		set_gfxdecode(std::forward<T>(gfxtag));
+		set_bytes_per_entry(entrybytes);
+		set_tile_size(tilewidth, tileheight);
+	}
+
 	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_bytes_per_entry(int bpe) { m_bytes_per_entry = bpe; }
 
-	void set_info_callback(tilemap_get_info_delegate tile_get_info) { m_get_info = tile_get_info; }
-	template <class FunctionClass> void set_info_callback(const char *devname, void (FunctionClass::*callback)(tilemap_t &, tile_data &, tilemap_memory_index), const char *name)
-	{
-		set_info_callback(tilemap_get_info_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_info_callback(void (FunctionClass::*callback)(tilemap_t &, tile_data &, tilemap_memory_index), const char *name)
-	{
-		set_info_callback(tilemap_get_info_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_info_callback(T &&... args) { m_get_info.set(std::forward<T>(args)...); }
 
-	void set_layout(tilemap_standard_mapper mapper, u32 columns, u32 rows) {
+	void set_layout(tilemap_standard_mapper mapper, u32 columns, u32 rows)
+	{
+		assert(TILEMAP_STANDARD_COUNT > mapper);
 		m_standard_mapper = mapper;
 		m_num_columns = columns;
 		m_num_rows = rows;
 	}
-	void set_layout(tilemap_mapper_delegate mapper, u32 columns, u32 rows) {
+	template <typename F>
+	void set_layout(F &&callback, const char *name, u32 columns, u32 rows)
+	{
 		m_standard_mapper = TILEMAP_STANDARD_COUNT;
-		m_mapper = mapper;
+		m_mapper.set(std::forward<F>(callback), name);
+		m_num_columns = columns;
+		m_num_rows = rows;
+	}
+	template <typename T, typename F>
+	void set_layout(T &&target, F &&callback, const char *name, u32 columns, u32 rows)
+	{
+		m_standard_mapper = TILEMAP_STANDARD_COUNT;
+		m_mapper.set(std::forward<T>(target), std::forward<F>(callback), name);
 		m_num_columns = columns;
 		m_num_rows = rows;
 	}
@@ -832,14 +793,11 @@ private:
 // function definition for a logical-to-memory mapper
 #define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(u32 col, u32 row, u32 num_cols, u32 num_rows)
 
-// useful macro inside of a TILE_GET_INFO callback to set tile information
-#define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(GFX, CODE, COLOR, FLAGS)
-
-// Macros for setting tile attributes in the TILE_GET_INFO callback:
+// Helpers for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0
 //   TILE_FLIP_XY assumes that flipy is in bit 0 and flipx is in bit 1
-#define TILE_FLIPYX(YX)                 ((YX) & 3)
-#define TILE_FLIPXY(XY)                 ((((XY) & 2) >> 1) | (((XY) & 1) << 1))
+template <typename T> constexpr u8 TILE_FLIPYX(T yx) { return u8(yx & 3); }
+template <typename T> constexpr u8 TILE_FLIPXY(T xy) { return u8(((xy & 2) >> 1) | ((xy & 1) << 1)); }
 
 
 

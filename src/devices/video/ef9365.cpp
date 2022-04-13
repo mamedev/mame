@@ -51,10 +51,6 @@
         for this chip. So i add the interrupt line support, but
         bug(s) is possible.
 
-    The needed charset file charset_ef9365.rom (CRC 8d3053be) is available
-    there : http://hxc2001.free.fr/Squale/rom/charset_ef9365.zip
-    This ROM charset is into the EF9365/EF9366.
-
     To see how to use this driver, have a look to the Squale machine
     driver (squale.cpp).
     If you have any question, don't hesitate to contact me at the email
@@ -285,7 +281,7 @@ void ef9365_device::set_color_entry( int index, uint8_t r, uint8_t g, uint8_t b 
 {
 	if( index < nb_of_colors )
 	{
-		palette[index] = rgb_t(r, g, b);
+		m_palette->set_pen_color(index, rgb_t(r, g, b));
 	}
 	else
 	{
@@ -309,26 +305,17 @@ void ef9365_device::set_color_filler( uint8_t color )
 
 void ef9365_device::device_start()
 {
-	int i;
-
 	m_irq_handler.resolve_safe();
 
 	m_busy_timer = timer_alloc(BUSY_TIMER);
 
 	m_videoram = &space(0);
-	m_current_color = 0x0F;
+	m_current_color = 0x00;
 
 	m_irq_vb = 0;
 	m_irq_lb = 0;
 	m_irq_rdy = 0;
 	m_irq_state = 0;
-
-	// Default palette : Black and white
-	palette[0] = rgb_t(0, 0, 0);
-	for( i = 1; i < 16 ; i++ )
-	{
-		palette[i] = rgb_t(255, 255, 255);
-	}
 
 	m_screen_out.allocate( bitplane_xres, screen().height() );
 
@@ -390,7 +377,7 @@ void ef9365_device::update_interrupts()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void ef9365_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ef9365_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -547,7 +534,7 @@ void ef9365_device::plot(int x_pos,int y_pos)
 
 const static unsigned int vectortype_code[][8] =
 {
-	{0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00}, // Continous drawing
+	{0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00}, // Continuous drawing
 	{0x82,0x02,0x00,0x00,0x00,0x00,0x00,0x00}, // Dotted - 2 dots on, 2 dots off
 	{0x84,0x04,0x00,0x00,0x00,0x00,0x00,0x00}, // Dashed - 4 dots on, 4 dots off
 	{0x8A,0x02,0x82,0x02,0x00,0x00,0x00,0x00}  // Dotted-Dashed - 10 dots on, 2 dots off, 2 dots on, 2 dots off
@@ -828,22 +815,21 @@ int ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 			{
 				if ( block || get_char_pix( c, x_char, ( (y_char_res - 1) - y_char ) ) )
 				{
-					if( m_registers[EF936X_REG_CTRL2] & 0x04) // Titled character ?
+					if( m_registers[EF936X_REG_CTRL2] & 0x04) // Tilted character
 					{
 						for(q = 0; q < q_factor; q++)
 						{
 							for(p = 0; p < p_factor; p++)
 							{
 								if( !(m_registers[EF936X_REG_CTRL2] & 0x08) )
-								{   // Titled - Horizontal orientation
+								{ // Tilted - Horizontal orientation
 									plot(
 											x + ( (y_char*q_factor) + q ) + ( (x_char*p_factor) + p ),
 											y + ( (y_char*q_factor) + q )
 										);
 								}
 								else
-								{
-									// Titled - Vertical orientation
+								{ // Tilted - Vertical orientation
 									plot(
 											x - ( (y_char*q_factor)+ q ),
 											y + ( (x_char*p_factor)+ p ) - ( ( ( (y_char_res - 1 ) - y_char) * q_factor ) + ( q_factor - q ) )
@@ -859,14 +845,14 @@ int ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 							for(p = 0; p < p_factor; p++)
 							{
 								if( !(m_registers[EF936X_REG_CTRL2] & 0x08) )
-								{   // Normal - Horizontal orientation
+								{ // Normal - Horizontal orientation
 									plot(
 											x + ( (x_char*p_factor) + p ),
 											y + ( (y_char*q_factor) + q )
 										);
 								}
 								else
-								{   // Normal - Vertical orientation
+								{ // Normal - Vertical orientation
 									plot(
 											x - ( (y_char*q_factor) + q ),
 											y + ( (x_char*p_factor) + p )
@@ -887,7 +873,7 @@ int ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 		else
 		{
 			y = y + ( (x_char_res + 1 ) * p_factor ) ;
-			set_x_reg(y);
+			set_y_reg(y);
 		}
 	}
 
@@ -905,7 +891,7 @@ int ef9365_device::cycles_to_us(int cycles)
 
 //-------------------------------------------------
 // dump_bitplanes_word: Latch the bitplane words
-// pointed by the x & y regiters
+// pointed by the x & y registers
 // (Memory read back function)
 //-------------------------------------------------
 
@@ -1165,23 +1151,20 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 }
 
 //-------------------------------------------------
-// screen_update: Framebuffer video ouput
+// screen_update: Framebuffer video output
 //-------------------------------------------------
 
 uint32_t ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i,j,ptr,p;
-	unsigned char color_index;
-
-	for(j=0;j<bitplane_yres;j++)
+	for(int j=0;j<bitplane_yres;j++)
 	{
-		for(i=0;i<bitplane_xres;i++)
+		for(int i=0;i<bitplane_xres;i++)
 		{
-			color_index = 0x00;
+			unsigned char color_index = 0x00;
 
-			ptr = ( bitplane_xres * j ) + i;
+			int ptr = ( bitplane_xres * j ) + i;
 
-			for( p = 0; p < nb_of_bitplanes; p++)
+			for(int p = 0; p < nb_of_bitplanes; p++)
 			{
 				if( m_videoram->read_byte( (BITPLANE_MAX_SIZE*p) + (ptr>>3)) & (0x80>>(ptr&7)))
 				{
@@ -1189,7 +1172,7 @@ uint32_t ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				}
 			}
 
-			m_screen_out.pix32(j, i) = palette[ color_index ];
+			m_screen_out.pix(j, i) = m_palette->pen( color_index );
 		}
 	}
 

@@ -13,7 +13,7 @@
 #pragma once
 
 #include "screen.h"
-
+#include <map>
 
 //**************************************************************************
 //  MC6847 CONFIGURATION / INTERFACE
@@ -54,16 +54,7 @@ public:
 	auto hsync_wr_callback() { return m_write_hsync.bind(); }
 	auto fsync_wr_callback() { return m_write_fsync.bind(); }
 
-	template <typename Object> void set_get_char_rom(Object &&cb) { m_charrom_cb = std::forward<Object>(cb); }
-	void set_get_char_rom(get_char_rom_delegate cb) { m_charrom_cb = cb; }
-	template <class FunctionClass> void set_get_char_rom(const char *devname, uint8_t (FunctionClass::*cb)(uint8_t, int), const char *name)
-	{
-		set_get_char_rom(get_char_rom_delegate(cb, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_get_char_rom(uint8_t (FunctionClass::*cb)(uint8_t, int), const char *name)
-	{
-		set_get_char_rom(get_char_rom_delegate(cb, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_get_char_rom(T &&... args) { m_charrom_cb.set(std::forward<T>(args)...); }
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
@@ -90,7 +81,7 @@ protected:
 
 	pixel_t *bitmap_addr(bitmap_rgb32 &bitmap, int y, int x)
 	{
-		return &bitmap.pix32(y, x);
+		return &bitmap.pix(y, x);
 	}
 
 	static uint8_t simplify_mode(uint8_t data, uint8_t mode)
@@ -116,7 +107,7 @@ protected:
 				uint8_t character = data[i];
 
 				// based on the mode, determine which entry to use
-				const entry *e = &m_entries[mode % ARRAY_LENGTH(m_entries)];
+				const entry *e = &m_entries[mode % std::size(m_entries)];
 
 				// identify the character in the font data
 				const uint8_t *font_character = e->m_fontdata + (character & e->m_character_mask) * 12;
@@ -178,9 +169,39 @@ protected:
 
 		// artifacting config
 		void setup_config(device_t *device);
-		void poll_config() { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
+		bool poll_config();
+		void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
+		bool get_pal_artifacting() { return m_palartifacting; }
+		void create_color_blend_table( const pixel_t *palette );
 
 		// artifacting application
+		template<int xscale>
+		void process_artifacts_pal(bitmap_rgb32 &bitmap, int y, int base_x, int base_y, uint8_t mode, const pixel_t *palette)
+		{
+			if( !m_artifacting || !m_palartifacting )
+				return;
+
+			if( (mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG) )
+			{
+				pixel_t *line1 = &bitmap.pix(y + base_y, base_x);
+				pixel_t *line2 = &bitmap.pix(y + base_y + 1, base_x);
+				std::map<std::pair<pixel_t,pixel_t>,pixel_t>::const_iterator newColor;
+
+				for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )
+				{
+					if( line1[pixel] == line2[pixel] )
+						continue;
+
+					newColor = m_palcolorblendmap.find(std::pair<pixel_t,pixel_t>(line1[pixel],line2[pixel]));
+					if( newColor != m_palcolorblendmap.end() )
+					{
+						line1[pixel] = newColor->second;
+						line2[pixel] = newColor->second;
+					}
+				}
+			}
+		}
+
 		template<int xscale>
 		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette)
 		{
@@ -218,11 +239,15 @@ protected:
 		}
 
 	private:
+		bool m_palartifacting;
 		ioport_port *m_config;
 		ioport_value m_artifacting;
 		ioport_value m_saved_artifacting;
 		pixel_t m_saved_c0, m_saved_c1;
 		pixel_t m_expanded_colors[128];
+
+		// PAL color blend emulation values.
+		std::map<std::pair<pixel_t,pixel_t>,pixel_t> m_palcolorblendmap;
 
 		void update_colors(pixel_t c0, pixel_t c1);
 		static pixel_t mix_color(double factor, uint8_t c0, uint8_t c1);
@@ -250,7 +275,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 

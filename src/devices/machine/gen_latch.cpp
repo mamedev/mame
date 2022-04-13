@@ -9,6 +9,11 @@
 #include "emu.h"
 #include "gen_latch.h"
 
+#define LOG_WARN (1U << 0)
+#define VERBOSE (LOG_WARN)
+
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  DEVICE TYPE DEFINITIONS
@@ -51,7 +56,7 @@ void generic_latch_base_device::device_start()
 //  init_callback - set initial state
 //-------------------------------------------------
 
-void generic_latch_base_device::init_callback(void *ptr, s32 param)
+void generic_latch_base_device::init_callback(s32 param)
 {
 	m_data_pending_cb(m_latch_written ? 1 : 0);
 }
@@ -148,13 +153,13 @@ WRITE_LINE_MEMBER( generic_latch_8_device::clear )
 //  callback to set a latch value
 //-------------------------------------------------
 
-void generic_latch_8_device::sync_callback(void *ptr, s32 param)
+void generic_latch_8_device::sync_callback(s32 param)
 {
 	u8 value = param;
 
 	// if the latch has been written and the value is changed, log a warning
 	if (is_latch_written() && m_latched_value != value)
-		logerror("Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
+		LOGMASKED(LOG_WARN, "Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
 	m_latched_value = value;
@@ -219,13 +224,13 @@ WRITE_LINE_MEMBER( generic_latch_16_device::clear )
 //  callback to set a latch value
 //-------------------------------------------------
 
-void generic_latch_16_device::sync_callback(void *ptr, s32 param)
+void generic_latch_16_device::sync_callback(s32 param)
 {
 	u16 value = param;
 
 	// if the latch has been written and the value is changed, log a warning
 	if (is_latch_written() && m_latched_value != value)
-		logerror("Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
+		LOGMASKED(LOG_WARN, "Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
 	m_latched_value = value;

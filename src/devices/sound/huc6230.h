@@ -11,13 +11,15 @@
 class huc6230_device : public device_t, public device_sound_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // Incorrect ADPCM
+
 	huc6230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <unsigned N> auto adpcm_update_cb() { return m_adpcm_update_cb[N].bind(); }
-	auto cdda_cb() { return m_cdda_cb.bind(); }
+	auto vca_callback() { return m_vca_cb.bind(); }
 
 	// write only
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -26,7 +28,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	struct adpcm_channel {
@@ -48,13 +50,13 @@ private:
 	required_device<c6280_device> m_psg;
 	adpcm_channel m_adpcm_channel[2];
 	uint32_t m_adpcm_freq;
-	uint32_t m_cdda_lvol;
-	uint32_t m_cdda_rvol;
+	uint32_t m_pcm_lvol;
+	uint32_t m_pcm_rvol;
 
 	TIMER_CALLBACK_MEMBER(adpcm_timer);
 
-	devcb_read8 m_adpcm_update_cb[2];
-	devcb_write8 m_cdda_cb;
+	devcb_read8::array<2> m_adpcm_update_cb;
+	devcb_write8 m_vca_cb;
 };
 
 DECLARE_DEVICE_TYPE(HuC6230, huc6230_device)

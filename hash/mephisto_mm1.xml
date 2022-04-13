@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="mephisto_mm1" description="Mephisto MM I Modules">
+
+<!-- HG 170 module is exclusively used with MM I -->
+
+	<software name="hg170">
+		<description>Mephisto HG 170 Opening Library</description>
+		<year>1983</year>
+		<publisher>Hegener + Glaser</publisher>
+		<part name="cart" interface="mephisto_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="170" size="0x4000" crc="eaa77329" sha1="7dbf0b4120731f7092940da18cc87253a3eb3164" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

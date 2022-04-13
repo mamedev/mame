@@ -118,8 +118,9 @@ protected:
 				// allocate a new monitor info
 				std::shared_ptr<osd_monitor_info> monitor = std::make_shared<sdl_monitor_info>(*this, i, temp, 1.0f);
 
-				osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->devicename().c_str(),
-				monitor->position_size().width(), monitor->position_size().height());
+				osd_printf_verbose("Adding monitor %s (%d x %d)\n",
+						monitor->devicename(),
+						monitor->position_size().width(), monitor->position_size().height());
 
 				// guess the aspect ratio assuming square pixels
 				monitor->set_aspect(static_cast<float>(monitor->position_size().width()) / static_cast<float>(monitor->position_size().height()));

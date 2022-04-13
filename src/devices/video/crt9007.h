@@ -63,13 +63,13 @@ public:
 	auto slg_callback() { return m_write_slg.bind(); }
 	auto sld_callback() { return m_write_sld.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	void set_character_width(unsigned value);
 
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
-	DECLARE_WRITE_LINE_MEMBER( lpstb_w );
+	void ack_w(int state);
+	void lpstb_w(int state);
 
 protected:
 	// device-level overrides
@@ -78,7 +78,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

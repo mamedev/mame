@@ -1,5 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Please note that sometimes these disks will produce a Bad Sector message.
+It's unknown if this is a disk or emulation problem.
+
+-->
 <softwarelist name="mm1_flop" description="MikroMikko 1 floppies">
 
 	<software name="boot">
@@ -9,7 +16,43 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="boot.dsk" size="655360" crc="788c23a8" sha1="06c8d388a8e19ddfa267537454f3c65e72a80d80" offset="0" />
+				<rom name="boot.dsk" size="655360" crc="788c23a8" sha1="06c8d388a8e19ddfa267537454f3c65e72a80d80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games">
+		<description>Games disk</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="596921">
+				<rom name="10.imd" size="596921" crc="c6d44694" sha1="f8b6b0cbc8eb258dd7351c51d419399e0301a89b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games2">
+		<description>Games2 disk</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="640867">
+				<rom name="8.imd" size="640867" crc="121629f5" sha1="b2f5fd77d92a7b2879eaf0b11ba71dd38b9df241"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boot2">
+		<description>Boot2 disk</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="640867">
+				<rom name="mm1i.imd" size="640867" crc="47af9adc" sha1="3b88d4fc56d73cffb972114c3b18499ba9a4ac24"/>
 			</dataarea>
 		</part>
 	</software>

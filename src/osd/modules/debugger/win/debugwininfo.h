@@ -5,14 +5,14 @@
 //  debugwininfo.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_DEBUGWININFO_H
+#define MAME_DEBUGGER_WIN_DEBUGWININFO_H
 
-#ifndef __DEBUG_WIN_DEBUG_WIN_INFO_H__
-#define __DEBUG_WIN_DEBUG_WIN_INFO_H__
+#pragma once
 
 #include "debugwin.h"
 
 #include "debugbaseinfo.h"
-
 
 
 class debugwin_info : protected debugbase_info
@@ -75,13 +75,20 @@ protected:
 		ID_SOFT_RESET,
 		ID_EXIT,
 
-		ID_1_BYTE_CHUNKS,
-		ID_2_BYTE_CHUNKS,
-		ID_4_BYTE_CHUNKS,
-		ID_8_BYTE_CHUNKS,
-		ID_FLOATING_POINT_32BIT,
-		ID_FLOATING_POINT_64BIT,
-		ID_FLOATING_POINT_80BIT,
+		ID_1_BYTE_CHUNKS_HEX,
+		ID_2_BYTE_CHUNKS_HEX,
+		ID_4_BYTE_CHUNKS_HEX,
+		ID_8_BYTE_CHUNKS_HEX,
+		ID_1_BYTE_CHUNKS_OCT,
+		ID_2_BYTE_CHUNKS_OCT,
+		ID_4_BYTE_CHUNKS_OCT,
+		ID_8_BYTE_CHUNKS_OCT,
+		ID_FLOAT_32BIT,
+		ID_FLOAT_64BIT,
+		ID_FLOAT_80BIT,
+		ID_HEX_ADDRESSES,
+		ID_DEC_ADDRESSES,
+		ID_OCT_ADDRESSES,
 		ID_LOGICAL_ADDRESSES,
 		ID_PHYSICAL_ADDRESSES,
 		ID_REVERSE_VIEW,
@@ -97,6 +104,9 @@ protected:
 
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
+		ID_SHOW_REGISTERPOINTS,
+
+		ID_CLEAR_LOG,
 
 		ID_DEVICE_OPTIONS   // always keep this at the end
 	};

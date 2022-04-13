@@ -69,29 +69,29 @@ private:
 	inline void load_xy_reg();
 	void mover();
 
-	DECLARE_READ8_MEMBER( video_ram_r );
-	DECLARE_WRITE8_MEMBER( video_ram_w );
+	uint8_t video_ram_r(offs_t offset);
+	void video_ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( iord0_r );
-	DECLARE_WRITE8_MEMBER( ldsx_hb_w );
-	DECLARE_WRITE8_MEMBER( ldsx_lb_w );
-	DECLARE_WRITE8_MEMBER( ldsy_hb_w );
-	DECLARE_WRITE8_MEMBER( ldsy_lb_w );
-	DECLARE_WRITE8_MEMBER( ldtx_hb_w );
-	DECLARE_WRITE8_MEMBER( ldtx_lb_w );
-	DECLARE_WRITE8_MEMBER( ldty_hb_w );
-	DECLARE_WRITE8_MEMBER( ldty_lb_w );
-	DECLARE_WRITE8_MEMBER( ldfx_hb_w );
-	DECLARE_WRITE8_MEMBER( ldfx_lb_w );
-	DECLARE_WRITE8_MEMBER( ldfy_hb_w );
-	DECLARE_WRITE8_MEMBER( ldfy_lb_w );
-	DECLARE_WRITE8_MEMBER( wrml_w );
-	DECLARE_WRITE8_MEMBER( wrdl_w );
-	DECLARE_WRITE8_MEMBER( wrmask_strobe_hb_w );
-	DECLARE_WRITE8_MEMBER( wrmask_strobe_lb_w );
-	DECLARE_WRITE8_MEMBER( enable_clocks_w );
-	DECLARE_WRITE8_MEMBER( flag_strobe_w );
-	DECLARE_WRITE8_MEMBER( endisp_w );
+	uint8_t iord0_r();
+	void ldsx_hb_w(uint8_t data);
+	void ldsx_lb_w(uint8_t data);
+	void ldsy_hb_w(uint8_t data);
+	void ldsy_lb_w(uint8_t data);
+	void ldtx_hb_w(uint8_t data);
+	void ldtx_lb_w(uint8_t data);
+	void ldty_hb_w(uint8_t data);
+	void ldty_lb_w(uint8_t data);
+	void ldfx_hb_w(uint8_t data);
+	void ldfx_lb_w(uint8_t data);
+	void ldfy_hb_w(uint8_t data);
+	void ldfy_lb_w(uint8_t data);
+	void wrml_w(offs_t offset, uint8_t data);
+	void wrdl_w(offs_t offset, uint8_t data);
+	void wrmask_strobe_hb_w(uint8_t data);
+	void wrmask_strobe_lb_w(uint8_t data);
+	void enable_clocks_w(uint8_t data);
+	void flag_strobe_w(uint8_t data);
+	void endisp_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -110,31 +110,31 @@ private:
 	required_region_ptr<uint8_t> m_shinf_rom;
 	required_region_ptr<uint16_t> m_drmsk_rom;
 
-	int m_endisp;               // enable display
-	int m_clocks_disabled;      // clocks disabled
-	uint16_t m_gmdi;              // video RAM data latch
-	uint16_t m_wrm;               // write mask latch
-	uint8_t m_ms[16];             // mover sequence control
-	uint8_t m_ds[16];             // display sequence control
-	uint8_t m_flag;               // flags
-	uint16_t m_xsize;             // X size
-	uint16_t m_ysize;             // Y size
-	int m_udx;                  // up/down X
-	int m_udy;                  // up/down Y
-	uint16_t m_xfrom;             // X from
-	uint16_t m_xto;               // X to
-	uint16_t m_yto;               // Y to
-	uint16_t m_ty;                // to Y
-	uint32_t m_mfa;               // mover from address
-	uint32_t m_mta;               // mover to address
-	uint8_t m_sh;                 //
-	uint16_t m_mdor;              //
-	int m_hold_1w_cyk;          //
-	int m_wrms0;                //
-	int m_wrms1;                //
-	int m_rmc;                  // row match count
-	int m_cmc;                  // column match count
-	int m_amm;                  // active mover mask
+	int m_endisp = 0;               // enable display
+	int m_clocks_disabled = 0;      // clocks disabled
+	uint16_t m_gmdi = 0;              // video RAM data latch
+	uint16_t m_wrm = 0;               // write mask latch
+	uint8_t m_ms[16]{};             // mover sequence control
+	uint8_t m_ds[16]{};             // display sequence control
+	uint8_t m_flag = 0;               // flags
+	uint16_t m_xsize = 0;             // X size
+	uint16_t m_ysize = 0;             // Y size
+	int m_udx = 0;                  // up/down X
+	int m_udy = 0;                  // up/down Y
+	uint16_t m_xfrom = 0;             // X from
+	uint16_t m_xto = 0;               // X to
+	uint16_t m_yto = 0;               // Y to
+	uint16_t m_ty = 0;                // to Y
+	uint32_t m_mfa = 0;               // mover from address
+	uint32_t m_mta = 0;               // mover to address
+	uint8_t m_sh = 0;                 //
+	uint16_t m_mdor = 0;              //
+	int m_hold_1w_cyk = 0;          //
+	int m_wrms0 = 0;                //
+	int m_wrms1 = 0;                //
+	int m_rmc = 0;                  // row match count
+	int m_cmc = 0;                  // column match count
+	int m_amm = 0;                  // active mover mask
 };
 
 

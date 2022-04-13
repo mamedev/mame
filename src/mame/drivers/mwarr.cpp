@@ -73,9 +73,9 @@ private:
 
 	required_memory_bank m_okibank;
 
-	DECLARE_WRITE16_MEMBER(mwarr_brightness_w);
+	void mwarr_brightness_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(oki1_bank_w);
+	void oki1_bank_w(uint16_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -94,7 +94,7 @@ private:
  *
  *************************************/
 
-WRITE16_MEMBER(mwarr_state::oki1_bank_w)
+void mwarr_state::oki1_bank_w(uint16_t data)
 {
 	m_okibank->set_entry(data & 3);
 }
@@ -277,15 +277,12 @@ uint32_t mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &b
 	return m_video->draw(screen, bitmap, cliprect);
 }
 
-WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
+void mwarr_state::mwarr_brightness_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int i;
-	double brightness;
-
 	COMBINE_DATA(&m_mwarr_ram[0x14 / 2]);
 
-	brightness = (double)(data & 0xff);
-	for (i = 0; i < 0x800; i++)
+	double brightness = (double)(data & 0xff);
+	for (int i = 0; i < 0x800; i++)
 	{
 		m_palette->set_pen_contrast(i, brightness/255);
 	}

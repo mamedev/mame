@@ -5,22 +5,24 @@
 
 #pragma once
 
+#include "dirom.h"
+
 // #define SEGA315_DUMP_DEBUG // dump stuff to files to help with decryption efforts
 
 DECLARE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device)
 
 class sega_315_5838_comp_device :  public device_t,
-								   public device_rom_interface
+								   public device_rom_interface<23>
 {
 public:
 	// construction/destruction
 	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(data_r);
+	uint16_t data_r();
 
-	DECLARE_WRITE32_MEMBER(data_w_doa);
-	DECLARE_WRITE32_MEMBER(data_w);
-	DECLARE_WRITE32_MEMBER(srcaddr_w);
+	void data_w_doa(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void srcaddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void debug_helper(int id);
 
@@ -45,20 +47,20 @@ private:
 	void write_prot_data(uint32_t data, uint32_t mem_mask, int rev_words);
 	void set_prot_addr(uint32_t data, uint32_t mem_mask);
 
-	uint32_t m_srcoffset;
-	uint32_t m_srcstart; // failsafe
-	bool m_abort;
+	uint32_t m_srcoffset = 0;
+	uint32_t m_srcstart = 0; // failsafe
+	bool m_abort = false;
 
 	struct {
-		uint16_t mode;
+		uint16_t mode = 0;
 		struct {
-			uint8_t len;       /* in bits */
-			uint8_t idx;       /* in the dictionary */
-			uint16_t pattern;  /* of the first node */
-		} tree[12];
-		int it2;
-		uint8_t dictionary[256];
-		int id;
+			uint8_t len = 0;       /* in bits */
+			uint8_t idx = 0;       /* in the dictionary */
+			uint16_t pattern = 0;  /* of the first node */
+		} tree[13];
+		int it2 = 0;
+		uint8_t dictionary[256]{};
+		int id = 0;
 	} m_compstate;
 
 	void set_table_upload_mode_w(uint16_t val);
@@ -67,10 +69,10 @@ private:
 	uint8_t get_decompressed_byte(void);
 	uint16_t decipher(uint16_t c);
 
-	int m_num_bits_compressed;
-	uint16_t m_val_compressed;
-	int m_num_bits;
-	uint16_t m_val;
+	int m_num_bits_compressed = 0;
+	uint16_t m_val_compressed = 0;
+	int m_num_bits = 0;
+	uint16_t m_val = 0;
 
 	int m_hackmode;
 #ifdef SEGA315_DUMP_DEBUG

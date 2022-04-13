@@ -15,7 +15,7 @@ Dip locations added from dip listing at crazykong.com
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -31,12 +31,12 @@ Dip locations added from dip listing at crazykong.com
 #define VBEND        (16)
 #define VBSTART      (240)
 
-READ8_MEMBER(citycon_state::citycon_in_r)
+uint8_t citycon_state::citycon_in_r()
 {
 	return ioport(flip_screen() ? "P2" : "P1")->read();
 }
 
-READ8_MEMBER(citycon_state::citycon_irq_ack_r)
+uint8_t citycon_state::citycon_irq_ack_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 

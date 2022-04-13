@@ -3,7 +3,7 @@
 /*
 BMC Bowling (c) 1994.05 BMC, Ltd
 
-- TS 2004.10.22 - analog[at]op.pl
+- TS 2004.10.22
 
   Game is almost playable, especially with NVRAM_HACK (undefine it
   to get real nvram  access, but sometimes it's impossible to get back to
@@ -66,7 +66,7 @@ Place for 4 8 switch dips
 dips 1 & 3 are all connected via resistors
 dips 2 & 4 are standard 8 switch dips
 
-EEPROM       Label         Use
+EPROM        Label         Use
 ----------------------------------------
 ST M27C1001  bmc_8ex.bin - 68K code 0x00
 ST M27C1001  bmc_7ex.bin - 68K code 0x01
@@ -107,7 +107,7 @@ Main board:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -122,7 +122,7 @@ public:
 	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_stats_ram(*this, "nvram", 16),
+		m_stats_ram(*this, "nvram"),
 		m_vid1(*this, "vid1"),
 		m_vid2(*this, "vid2"),
 		m_palette(*this, "palette"),
@@ -135,73 +135,74 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(random_read);
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_READ8_MEMBER(via_b_in);
-	DECLARE_WRITE8_MEMBER(via_a_out);
-	DECLARE_WRITE8_MEMBER(via_b_out);
+	uint8_t random_read();
+	uint16_t protection_r();
+	void scroll_w(uint16_t data);
+	void via_a_out(uint8_t data);
+	void via_b_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
-	DECLARE_READ8_MEMBER(dips1_r);
-	DECLARE_WRITE8_MEMBER(input_mux_w);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t dips1_r();
+	void input_mux_w(uint8_t data);
+	void int_ack_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
 	void main_mem(address_map &map);
 	void ramdac_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint8_t> m_stats_ram;
+	required_shared_ptr<uint16_t> m_stats_ram;
 	required_shared_ptr<uint16_t> m_vid1;
 	required_shared_ptr<uint16_t> m_vid2;
 	required_device<palette_device> m_palette;
 
 	required_ioport_array<2> m_input;
-	uint8_t m_selected_input;
+	uint8_t m_selected_input = 0;
 };
 
 
-uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 /*
       280x230,4 bitmap layers, 8bpp,
         missing scroll and priorities   (maybe fixed ones)
 */
 
-	int x,y,z,pixdat;
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
-	z=0;
-	for (y=0;y<230;y++)
+	int z=0;
+	for (int y=0; y<230; y++)
 	{
-		for (x=0;x<280;x+=2)
+		for (int x=0; x<280; x+=2)
 		{
+			int pixdat;
+
 			pixdat = m_vid2[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid2[z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[0x8000+z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			pixdat = m_vid1[z];
 
 			if(pixdat&0xff)
-				bitmap.pix16(y, x+1) = (pixdat&0xff);
+				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
 			if(pixdat>>8)
-				bitmap.pix16(y, x) = (pixdat>>8);
+				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
 
 			z++;
 		}
@@ -209,12 +210,12 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ16_MEMBER(bmcbowl_state::random_read)
+uint8_t bmcbowl_state::random_read()
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(bmcbowl_state::protection_r)
+uint16_t bmcbowl_state::protection_r()
 {
 	switch(m_maincpu->pcbase())
 	{
@@ -230,24 +231,17 @@ READ16_MEMBER(bmcbowl_state::protection_r)
 	return machine().rand();
 }
 
-WRITE16_MEMBER(bmcbowl_state::scroll_w)
+void bmcbowl_state::scroll_w(uint16_t data)
 {
 	//TODO - scroll
 }
 
-
-READ8_MEMBER(bmcbowl_state::via_b_in)
-{
-	return ioport("IN3")->read();
-}
-
-
-WRITE8_MEMBER(bmcbowl_state::via_a_out)
+void bmcbowl_state::via_a_out(uint8_t data)
 {
 	// related to video hw ? BG scroll ?
 }
 
-WRITE8_MEMBER(bmcbowl_state::via_b_out)
+void bmcbowl_state::via_b_out(uint8_t data)
 {
 	//used
 }
@@ -298,9 +292,14 @@ static const uint8_t bmc_nv3[]=
 void bmcbowl_state::init_stats(const uint8_t *table, int table_len, int address)
 {
 	for (int i = 0; i < table_len; i++)
-		m_stats_ram[address+2*i]=table[i];
+		m_stats_ram[address+i] = 0xff00 | table[i];
 }
 #endif
+
+void bmcbowl_state::int_ack_w(uint8_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+}
 
 void bmcbowl_state::machine_start()
 {
@@ -310,12 +309,12 @@ void bmcbowl_state::machine_start()
 void bmcbowl_state::machine_reset()
 {
 #ifdef NVRAM_HACK
-	for (int i = 0; i < m_stats_ram.bytes(); i++)
-		m_stats_ram[i] = 0xff;
+	for (int i = 0; i < m_stats_ram.bytes()/2; i++)
+		m_stats_ram[i] = 0xffff;
 
-	init_stats(bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
-	init_stats(bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
-	init_stats(bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
+	init_stats(bmc_nv1,std::size(bmc_nv1),0);
+	init_stats(bmc_nv2,std::size(bmc_nv2),0x3b0/2);
+	init_stats(bmc_nv3,std::size(bmc_nv3),0xfe2/2);
 #endif
 }
 
@@ -331,7 +330,7 @@ void bmcbowl_state::main_mem(address_map &map)
 	map(0x091000, 0x091001).nopw();
 	map(0x091800, 0x091801).w(FUNC(bmcbowl_state::scroll_w));
 
-	map(0x092000, 0x09201f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x092000, 0x09201f).m("via6522_0", FUNC(via6522_device::map)).umask16(0x00ff);
 
 	map(0x093000, 0x093003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x092800, 0x092803).w("aysnd", FUNC(ay8910_device::data_address_w)).umask16(0xff00);
@@ -353,7 +352,7 @@ void bmcbowl_state::main_mem(address_map &map)
 	map(0x30c0c0, 0x30c0c1).nopw();
 	map(0x30c100, 0x30c101).r(FUNC(bmcbowl_state::protection_r));
 	map(0x30c140, 0x30c141).nopw();
-	map(0x30ca00, 0x30ca01).r(FUNC(bmcbowl_state::random_read)).nopw();
+	map(0x30ca01, 0x30ca01).rw(FUNC(bmcbowl_state::random_read), FUNC(bmcbowl_state::int_ack_w));
 }
 
 
@@ -440,7 +439,7 @@ static INPUT_PORTS_START( bmcbowl )
 
 INPUT_PORTS_END
 
-READ8_MEMBER(bmcbowl_state::dips1_r)
+uint8_t bmcbowl_state::dips1_r()
 {
 	switch(m_selected_input)
 	{
@@ -452,7 +451,7 @@ READ8_MEMBER(bmcbowl_state::dips1_r)
 }
 
 
-WRITE8_MEMBER(bmcbowl_state::input_mux_w)
+void bmcbowl_state::input_mux_w(uint8_t data)
 {
 	m_selected_input = data;
 }
@@ -473,8 +472,8 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.set_size(35*8, 30*8);
 	screen.set_visarea(0*8, 35*8-1, 0*8, 29*8-1);
 	screen.set_screen_update(FUNC(bmcbowl_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
+	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE); // probably not the source of this interrupt
+	screen.screen_vblank().append("via6522_0", FUNC(via6522_device::write_cb1));
 
 	PALETTE(config, m_palette).set_entries(256);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
@@ -500,8 +499,8 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	/* via */
-	via6522_device &via(VIA6522(config, "via6522_0", 1000000));
-	via.readpb_handler().set(FUNC(bmcbowl_state::via_b_in));
+	via6522_device &via(MOS6522(config, "via6522_0", XTAL(3'579'545) / 4)); // clock not verified (controls music tempo)
+	via.readpb_handler().set_ioport("IN3");
 	via.writepa_handler().set(FUNC(bmcbowl_state::via_a_out));
 	via.writepb_handler().set(FUNC(bmcbowl_state::via_b_out));
 	via.ca2_handler().set(FUNC(bmcbowl_state::via_ca2_out));

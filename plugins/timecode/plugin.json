@@ -1,0 +1,10 @@
+{
+	"plugin": {
+		"name": "timecode",
+		"description": "Timecode recorder plugin",
+		"version": "0.0.1",
+		"author": "Vas Crabb",
+		"type": "plugin",
+		"start": "false"
+	  }
+}

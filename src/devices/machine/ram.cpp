@@ -1,19 +1,28 @@
 // license:BSD-3-Clause
-// copyright-holders: Dirk Best
+// copyright-holders:Nathan Woods, Dirk Best
 /*************************************************************************
 
-    RAM device
+RAM device
 
-    Provides a configurable amount of RAM to drivers
+Provides a configurable amount of RAM to drivers
+
+TODO:
+- add RAM size options to UI, eg. under Machine Configuration
+- remove limitations due to hardcoded RAM_TAG:
+  + *configurable* RAM device can only be added to root device
+    (that is the driver device)
+  + can only have one *configurable* RAM device per machine driver
 
 **************************************************************************/
 
 #include "emu.h"
 #include "ram.h"
+
+#include "corestr.h"
 #include "emuopts.h"
 
-#include <stdio.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cctype>
 
 #include <algorithm>
 #include <functional>
@@ -115,7 +124,7 @@ ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t 
 	: device_t(mconfig, RAM, tag, owner, clock)
 	, m_size(0)
 	, m_default_size(0)
-	, m_default_value(0xCD)
+	, m_default_value(0xff)
 	, m_extra_options_string(nullptr)
 {
 }
@@ -148,7 +157,7 @@ void ram_device::device_start()
 				else
 					util::stream_format(output, "%s,%s).\n", m_default_size, m_extra_options_string);
 
-				osd_printf_error("%s", output.str().c_str());
+				osd_printf_error("%s", output.str());
 
 				osd_printf_warning("Setting value to default %s\n", m_default_size);
 
@@ -190,7 +199,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 
 		// report any errors
 		if (!bad_option.empty())
-			osd_printf_error("Invalid RAM option: %s\n", bad_option.c_str());
+			osd_printf_error("Invalid RAM option: %s\n", bad_option);
 
 		// report duplicates
 		using extra_option_ref_set = std::set<std::reference_wrapper<extra_option const>, bool (*)(extra_option const &, extra_option const &)>;
@@ -199,7 +208,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		{
 			auto const ins(sorted.emplace(opt));
 			if (!ins.second)
-				osd_printf_error("Duplicate RAM options: %s == %s (%u)\n", ins.first->get().first.c_str(), opt.first.c_str(), opt.second);
+				osd_printf_error("Duplicate RAM options: %s == %s (%u)\n", ins.first->get().first, opt.first, opt.second);
 		}
 	}
 }

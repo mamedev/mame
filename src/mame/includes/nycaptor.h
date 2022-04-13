@@ -10,6 +10,7 @@
 #include "sound/msm5232.h"
 #include "machine/taito68705interface.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class nycaptor_state : public driver_device
 {
@@ -54,17 +55,17 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	std::vector<uint8_t> m_paletteram;
 	std::vector<uint8_t> m_paletteram_ext;
-	uint8_t m_gfxctrl;
-	uint8_t m_char_bank;
-	uint8_t m_palette_bank;
+	uint8_t m_gfxctrl = 0;
+	uint8_t m_char_bank = 0;
+	uint8_t m_palette_bank = 0;
 
 	/* misc */
-	int m_generic_control_reg;
-	int m_gametype;
-	int m_mask;
+	int m_generic_control_reg = 0;
+	int m_gametype = 0;
+	int m_mask = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -78,32 +79,32 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<input_merger_device> m_soundnmi;
 
-	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
-	DECLARE_READ8_MEMBER(nycaptor_b_r);
-	DECLARE_READ8_MEMBER(nycaptor_by_r);
-	DECLARE_READ8_MEMBER(nycaptor_bx_r);
-	DECLARE_WRITE8_MEMBER(sound_cpu_reset_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_READ8_MEMBER(nycaptor_generic_control_r);
-	DECLARE_WRITE8_MEMBER(nycaptor_generic_control_w);
-	DECLARE_READ8_MEMBER(cyclshtg_mcu_status_r);
-	DECLARE_READ8_MEMBER(cyclshtg_mcu_r);
-	DECLARE_WRITE8_MEMBER(cyclshtg_mcu_w);
-	DECLARE_READ8_MEMBER(cyclshtg_mcu_status_r1);
-	DECLARE_WRITE8_MEMBER(cyclshtg_generic_control_w);
-	DECLARE_READ8_MEMBER(unk_r);
+	void sub_cpu_halt_w(uint8_t data);
+	uint8_t nycaptor_b_r();
+	uint8_t nycaptor_by_r();
+	uint8_t nycaptor_bx_r();
+	void sound_cpu_reset_w(uint8_t data);
+	void nmi_disable_w(uint8_t data);
+	void nmi_enable_w(uint8_t data);
+	uint8_t nycaptor_generic_control_r();
+	void nycaptor_generic_control_w(uint8_t data);
+	uint8_t cyclshtg_mcu_status_r();
+	uint8_t cyclshtg_mcu_r();
+	void cyclshtg_mcu_w(uint8_t data);
+	uint8_t cyclshtg_mcu_status_r1();
+	void cyclshtg_generic_control_w(uint8_t data);
+	uint8_t unk_r();
 
-	DECLARE_READ8_MEMBER(nycaptor_mcu_status_r1);
-	DECLARE_READ8_MEMBER(nycaptor_mcu_status_r2);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(nycaptor_videoram_w);
-	DECLARE_WRITE8_MEMBER(nycaptor_palette_w);
-	DECLARE_READ8_MEMBER(nycaptor_palette_r);
-	DECLARE_WRITE8_MEMBER(nycaptor_gfxctrl_w);
-	DECLARE_READ8_MEMBER(nycaptor_gfxctrl_r);
-	DECLARE_WRITE8_MEMBER(nycaptor_scrlram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
+	uint8_t nycaptor_mcu_status_r1();
+	uint8_t nycaptor_mcu_status_r2();
+	uint8_t sound_status_r();
+	void nycaptor_videoram_w(offs_t offset, uint8_t data);
+	void nycaptor_palette_w(offs_t offset, uint8_t data);
+	uint8_t nycaptor_palette_r(offs_t offset);
+	void nycaptor_gfxctrl_w(uint8_t data);
+	uint8_t nycaptor_gfxctrl_r();
+	void nycaptor_scrlram_w(offs_t offset, uint8_t data);
+	void unk_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nycaptor_spot();

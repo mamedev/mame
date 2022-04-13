@@ -78,6 +78,8 @@
 #define SH3_ICR0_IPRA_ADDR  ((0xfffffee0 - SH3_UPPER_REGBASE)/4)
 #define SH3_IPRB_ADDR       ((0xfffffee4 - SH3_UPPER_REGBASE)/4)
 
+#define SH3_SCSSR_ADDR      ((0xfffffe88 - SH3_UPPER_REGBASE)/4)
+
 #define SH3_TOCR_TSTR_ADDR  ((0xfffffe90 - SH3_UPPER_REGBASE)/4)
 #define SH3_TCOR0_ADDR      ((0xfffffe94 - SH3_UPPER_REGBASE)/4)
 #define SH3_TCNT0_ADDR      ((0xfffffe98 - SH3_UPPER_REGBASE)/4)

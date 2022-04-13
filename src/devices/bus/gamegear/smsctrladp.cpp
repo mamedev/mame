@@ -77,6 +77,8 @@ WRITE_LINE_MEMBER( sms_ctrl_adaptor_device::th_pin_w )
 void sms_ctrl_adaptor_device::device_add_mconfig(machine_config &config)
 {
 	SMS_CONTROL_PORT(config, m_subctrl_port, sms_control_port_devices, "joypad");
+	if (m_port != nullptr)
+		m_subctrl_port->set_screen_tag(m_port->m_screen);
 	m_subctrl_port->th_input_handler().set(FUNC(sms_ctrl_adaptor_device::th_pin_w));
 }
 

@@ -16,7 +16,7 @@
  * Sunsoft-5B [mapper 69]
 
  TODO:
- - check 1-line glitches due to IRQ in Sunsoft-3
+ - 1-line glitches in Fantasy Zone II (Sunsoft-3) seem to be PPU timing related. The cycle-based IRQ timer below "should" be ok.
 
  ***********************************************************************************************************/
 
@@ -91,22 +91,12 @@ nes_sunsoft_5_device::nes_sunsoft_5_device(const machine_config &mconfig, const 
 }
 
 
-void nes_sunsoft_1_device::device_start()
-{
-	common_start();
-}
-
 void nes_sunsoft_1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
-}
-
-void nes_sunsoft_2_device::device_start()
-{
-	common_start();
 }
 
 void nes_sunsoft_2_device::pcb_reset()
@@ -136,6 +126,7 @@ void nes_sunsoft_3_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
+
 	m_irq_toggle = 0;
 	m_irq_count = 0;
 	m_irq_enable = 0;
@@ -167,9 +158,7 @@ void nes_sunsoft_fme7_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	// this has to be hardcoded because some some scanline code only suits NTSC... it will be fixed with PPU rewrite
-	irq_timer->adjust(attotime::zero, 0, attotime::from_hz((21477272.724 / 12)));
-//  irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_wram_bank));
 	save_item(NAME(m_latch));
@@ -256,28 +245,20 @@ void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 
  Sunsoft-3 board emulation
 
- The two games using this board have incompatible mirroring
- wiring, making necessary two distinct mappers & pcb_id
+ Games: Fantasy Zone II, Mito Koumon II - Sekai Manyuki
 
  iNES: mapper 67
 
  -------------------------------------------------*/
 
-
-void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
-		if (m_irq_enable)
+		if (m_irq_enable && --m_irq_count == 0xffff)
 		{
-			if (!m_irq_count)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_count = 0xffff;
-				m_irq_enable = 0;
-			}
-			else
-				m_irq_count--;
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
 		}
 	}
 }
@@ -289,18 +270,11 @@ void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 	switch (offset & 0x7800)
 	{
 		case 0x0800:
-			chr2_0(data, CHRROM);
-			break;
 		case 0x1800:
-			chr2_2(data, CHRROM);
-			break;
 		case 0x2800:
-			chr2_4(data, CHRROM);
-			break;
 		case 0x3800:
-			chr2_6(data, CHRROM);
+			chr2_x((offset >> 11) & 0x06, data & 0x3f, CHRROM);
 			break;
-		case 0x4000:
 		case 0x4800:
 			m_irq_toggle ^= 1;
 			if (m_irq_toggle)
@@ -311,7 +285,6 @@ void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 		case 0x5800:
 			m_irq_enable = BIT(data, 4);
 			m_irq_toggle = 0;
-			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x6800:
 			switch (data & 3)
@@ -323,10 +296,10 @@ void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 			}
 			break;
 		case 0x7800:
-			prg16_89ab(data);
+			prg16_89ab(data & 0x0f);
 			break;
 		default:
-			LOG_MMC(("Sunsoft 3 write_h uncaught write, offset: %04x, data: %02x\n", offset, data));
+			set_irq_line(CLEAR_LINE);
 			break;
 	}
 }
@@ -443,34 +416,30 @@ uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 /*-------------------------------------------------
 
  JxROM & Sunsoft 5A / 5B / FME7 board emulation
 
- Notice that Sunsoft-5B = FME7 + sound chip (the latter being
- currently unemulated in MESS)
+ Notice that Sunsoft-5B = FME7 + sound chip
 
  iNES: mapper 69
 
  -------------------------------------------------*/
 
-void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
-		if ((m_irq_enable & 0x80)) // bit7, counter decrement
+		if (BIT(m_irq_enable, 7)) // counter decrement enabled
 		{
-			if (!m_irq_count)
+			if (--m_irq_count == 0xffff)
 			{
-				m_irq_count = 0xffff;
-				if (m_irq_enable & 0x01) // bit0, trigger enable
+				if (BIT(m_irq_enable, 0)) // IRQs enabled
 					set_irq_line(ASSERT_LINE);
 			}
-			else
-				m_irq_count--;
 		}
 	}
 }
@@ -515,8 +484,7 @@ void nes_sunsoft_fme7_device::fme7_write(offs_t offset, uint8_t data)
 					break;
 				case 0x0d:
 					m_irq_enable = data;
-					if (!(m_irq_enable & 1))
-						set_irq_line(CLEAR_LINE);
+					set_irq_line(CLEAR_LINE);
 					break;
 				case 0x0e:
 					m_irq_count = (m_irq_count & 0xff00) | data;
@@ -564,7 +532,7 @@ uint8_t nes_sunsoft_fme7_device::read_m(offs_t offset)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
 	}
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 
@@ -616,5 +584,5 @@ void nes_sunsoft_5_device::device_add_mconfig(machine_config &config)
 
 	// TODO: this is not how Sunsoft 5B clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	YM2149(config, m_ym2149, (XTAL(21'477'272)/12)/2).add_route(ALL_OUTPUTS, "addon", 0.50); // divide by 2 for the internal divider
+	SUNSOFT_5B_SOUND(config, m_ym2149, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.50);
 }

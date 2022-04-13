@@ -7,110 +7,158 @@ Games on this system include....
 
 GD build date
     yyyymmdd   Game                                                 Manufacturer / Developer   Media    Number       Key Chip
-+-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------|
-|*| 20021029 | The House of the Dead III                          | Sega / Wow Entertainment | GDROM  | GDX-0001   | 317-0348-COM |
-| | 2003     | Crazy Taxi High Roller                             | Sega / Hitmaker          | GDROM  | GDX-0002   | 317-0353-COM |
-| | 2003     | Crazy Taxi High Roller (Rev A)                     | Sega / Hitmaker          | GDROM  | GDX-0002A  | 317-0353-COM |
-|*| 20030224 | Crazy Taxi High Roller (Rev B)                     | Sega / Hitmaker          | GDROM  | GDX-0002B  | 317-0353-COM |
-| | 2003     | Virtua Cop 3                                       | Sega                     | GDROM  | GDX-0003   | 317-0354-COM |
-|*| 20030226 | Virtua Cop 3 (Rev A)                               | Sega                     | GDROM  | GDX-0003A  | 317-0354-COM |
-| | 20030226 | Virtua Cop 3 (Rev A)                               | Sega                     | CF     | MDA-G0010  | 317-0354-COM |
-|*| 20030521 | Virtua Cop 3 (Rev B)                               | Sega                     | GDROM  | GDX-0003B  | 317-0354-COM |
-| | 2003     | OutRun 2                                           | Sega                     | GDROM  | GDX-0004   | 317-0372-COM |
-|*| 20031017 | OutRun 2 (Rev A)                                   | Sega                     | GDROM  | GDX-0004A  | 317-0372-COM |
-| | 200312   | OutRun 2 (Rev A)                                   | Sega                     | CF     | MDA-G0011  | 317-0372-COM |
-| | 20030911 | OutRun 2 prototype (Rev P)                         | Sega                     | GDROM  | GDX-0004P  | 317-0372-COM |
-| | 2004     | Sega Golf Club Network Pro Tour                    | Sega                     | GDROM  | GDX-0005   |              |
-| | 2004     | Sega Network Taisen Mahjong MJ 2                   | Sega                     | GDROM  | GDX-0006   | 317-0374-JPN |
-| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev A)           | Sega                     | GDROM  | GDX-0006A  | 317-0374-JPN |
-| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev B)           | Sega                     | GDROM  | GDX-0006B  | 317-0374-JPN |
-|*| 20041102 | Sega Network Taisen Mahjong MJ 2 (Rev C)           | Sega                     | GDROM  | GDX-0006C  | 317-0374-JPN |
-| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev D)           | Sega                     | GDROM  | GDX-0006D  | 317-0374-JPN |
-| | 2005     | Sega Network Taisen Mahjong MJ 2 (Rev E)           | Sega                     | GDROM  | GDX-0006E  | 317-0374-JPN |
-|*| 2005     | Sega Network Taisen Mahjong MJ 2 (Rev F)           | Sega                     | GDROM  | GDX-0006F  | 317-0374-JPN |
-|*| 20050202 | Sega Network Taisen Mahjong MJ 2 (Rev G)           | Sega                     | GDROM  | GDX-0006G  | 317-0374-JPN |
-|*| 20031211 | Ollie King                                         | Sega / Amusement Vision  | GDROM  | GDX-0007   | 317-0377-COM |
-| | 2004     | Wangan Midnight Maximum Tune (Japan)               | Namco                    | GDROM  | GDX-0008   | 317-5101-JPN |
-| | 2004     | Wangan Midnight Maximum Tune (Japan, Rev A)        | Namco                    | GDROM  | GDX-0008A  | 317-5101-JPN |
-|*| 20040610 | Wangan Midnight Maximum Tune (Japan, Rev B)        | Namco                    | GDROM  | GDX-0008B  | 317-5101-JPN |
-| | 2004     | Wangan Midnight Maximum Tune (Export)              | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
-| | 2004     | Wangan Midnight Maximum Tune (Export, Rev A)       | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
-|*| 20040610 | Wangan Midnight Maximum Tune (Export, Rev B)       | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
-| | 2004     | Sega Club Golf                                     | Sega                     | GDROM  | GDX-0010   |              |
-|*| 20040909 | OutRun 2 Special Tours (Japan)                     | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
-|*| 20041229 | OutRun 2 Special Tours (Japan, Rev A)              | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
-|*| 20040914 | Ghost Squad                                        | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
-|*| 20041209 | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
-| | 20041209 | Ghost Squad (Rev A)                                | Sega                     | CF     | MDA-G0013  | 317-0398-COM |
-|*| 20050208 | Gundam Battle Operating Simulator                  | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
-|*| 20040910 | OutRun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0396-COM |
-|*| 20041229 | OutRun 2 Special Tours (Rev A)                     | Sega                     | GDROM  | GDX-0014A  | 317-0396-COM |
-| | 20041229 | OutRun 2 Special Tours (Rev A)                     | Sega                     | CF     | MDA-G0012  | 317-0396-COM |
-|*| 20050218 | Wangan Midnight Maximum Tune 2 (Japan)             | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
-|*| 20050908 | Wangan Midnight Maximum Tune 2 (Japan, Rev A)      | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
-|*| 20050218 | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
-|*| 20050908 | Wangan Midnight Maximum Tune 2 (Export, Rev A)     | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
-| | 2005     | Sega Network Taisen Mahjong MJ 3                   | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
-| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev A)           | Sega                     | GDROM  | GDX-0017A  | 317-0414-JPN |
-| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega                     | GDROM  | GDX-0017B  | 317-0414-JPN |
-|*| 20051109 | Sega Network Taisen Mahjong MJ 3 (Rev C)           | Sega                     | GDROM  | GDX-0017C  | 317-0414-JPN |
-|*| 20060217 | Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega                     | GDROM  | GDX-0017D  | 317-0414-JPN |
-| | 2006     | Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega                     | GDROM  | GDX-0017E  | 317-0414-JPN |
-|*| 2006     | Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
-| | 2005     | Sega Club Golf 2006: Next Tours                    | Sega                     | GDROM  | GDX-0018   |              |
-|*| 20051107 | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  | 317-0428-JPN |
-| | 2005     | Firmware Update For MJ 3                           | Sega                     | GDROM  | GDX-0019   |              |
-| | 200?     | Sega Club Golf 2006                                | Sega                     | GDROM  | GDX-0020   |              |
-| | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution         | Sega                     | GDROM  | GDX-0021   | 317-0457-JPN |
-|*| 20070217 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  | 317-0457-JPN |
-|*| 20070525 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  | 317-0457-JPN |
-| | 200?     | Sega Network Taisen Mahjong MJ 3 Evo Test Ver      | Sega                     | GDROM  | GDX-0022   |              |
-| | 200?     | Firmware Update For MJ 3 Evo                       | Sega                     | GDROM  | GDX-0023   |              |
-| | 2009     | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
-|*| 20090331 | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
-|*| 20030226 | Chihiro Change Region GD USA                       | Sega                     | GDROM  | 611-0028A  | 317-0351-EXP |
-|*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C | 317-0376-JPN |
-|*| 2005     | Sangokushi Taisen Ver.1.002                        | Sega                     | DVDROM | CDV-10009D |              |
-|*| 2005     | Mobile Suit Gundam 0079 Card Builder               | Banpresto                | DVDROM | CDV-10010  | 317-0415-JPN |
-|*| 2006     | Sangokushi Taisen 2 Ver.2.007                      | Sega                     | DVDROM | CDV-10019A |              |
-|*| 2005     | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
-|*| 2006     | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
-|*| 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02      | Banpresto                | DVDROM | CDV-10024B | 317-0415-JPN |
-|*| 2006     | Sangokushi Taisen 2                                | Sega                     | DVDROM | CDV-10029  |              |
-|*| 2007     | Mobile Suit Gundam 0083 Card Builder               | Banpresto                | DVDROM | CDV-10030  | 317-0484-JPN |
-|*| 2008     | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
-|*| 2008     | Sangokushi Taisen 3 Ver.J                          | Sega                     | DVDROM | CDV-10036J |              |
-|*| 2008     | Mobile Suit Gundam 0083 Card Builder Ver.2.10      | Bandai Namco - Banpresto | DVDROM | CDV-10037B | 317-0484-JPN |
-|*| 2008     | Sangokushi Taisen 3 War Begins Ver.3.59            | Sega                     | DVDROM | CDV-10041  |              |
-|*| 2008     | Sangokushi Taisen 3 War Begins                     | Sega                     | DVDROM | CDV-10042  |              |
-+-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------+
++-+----------+------------------------------------------------------+--------------------------+--------+------------+--------------|
+|*| 20021029 | The House of the Dead III                            | Sega / Wow Entertainment | GDROM  | GDX-0001   | 317-0348-COM |
+| | 2003     | Crazy Taxi High Roller                               | Sega / Hitmaker          | GDROM  | GDX-0002   | 317-0353-COM |
+| | 2003     | Crazy Taxi High Roller (Rev A)                       | Sega / Hitmaker          | GDROM  | GDX-0002A  | 317-0353-COM |
+|*| 20030224 | Crazy Taxi High Roller (Rev B)                       | Sega / Hitmaker          | GDROM  | GDX-0002B  | 317-0353-COM |
+| | 2003     | Virtua Cop 3                                         | Sega                     | GDROM  | GDX-0003   | 317-0354-COM |
+|*| 20030226 | Virtua Cop 3 (Rev A)                                 | Sega                     | GDROM  | GDX-0003A  | 317-0354-COM |
+| | 20030226 | Virtua Cop 3 (Rev A)                                 | Sega                     | CF     | MDA-G0010  | 317-0354-COM |
+|*| 20030521 | Virtua Cop 3 (Rev B)                                 | Sega                     | GDROM  | GDX-0003B  | 317-0354-COM |
+| | 2003     | OutRun 2                                             | Sega                     | GDROM  | GDX-0004   | 317-0372-COM |
+|*| 20031017 | OutRun 2 (Rev A)                                     | Sega                     | GDROM  | GDX-0004A  | 317-0372-COM |
+| | 200312   | OutRun 2 (Rev A)                                     | Sega                     | CF     | MDA-G0011  | 317-0372-COM |
+| | 20030911 | OutRun 2 prototype (Rev P)                           | Sega                     | GDROM  | GDX-0004P  | 317-0372-COM |
+| | 2004     | Sega Golf Club Network Pro Tour                      | Sega                     | GDROM  | GDX-0005   |              |
+| | 2004     | Sega Network Taisen Mahjong MJ 2                     | Sega                     | GDROM  | GDX-0006   | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev A)             | Sega                     | GDROM  | GDX-0006A  | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev B)             | Sega                     | GDROM  | GDX-0006B  | 317-0374-JPN |
+|*| 20041102 | Sega Network Taisen Mahjong MJ 2 (Rev C)             | Sega                     | GDROM  | GDX-0006C  | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev D)             | Sega                     | GDROM  | GDX-0006D  | 317-0374-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 2 (Rev E)             | Sega                     | GDROM  | GDX-0006E  | 317-0374-JPN |
+|*| 2005     | Sega Network Taisen Mahjong MJ 2 (Rev F)             | Sega                     | GDROM  | GDX-0006F  | 317-0374-JPN |
+|*| 20050202 | Sega Network Taisen Mahjong MJ 2 (Rev G)             | Sega                     | GDROM  | GDX-0006G  | 317-0374-JPN |
+|*| 20031211 | Ollie King                                           | Sega / Amusement Vision  | GDROM  | GDX-0007   | 317-0377-COM |
+| | 2004     | Wangan Midnight Maximum Tune (Japan)                 | Namco                    | GDROM  | GDX-0008   | 317-5101-JPN |
+| | 2004     | Wangan Midnight Maximum Tune (Japan, Rev A)          | Namco                    | GDROM  | GDX-0008A  | 317-5101-JPN |
+|*| 20040610 | Wangan Midnight Maximum Tune (Japan, Rev B)          | Namco                    | GDROM  | GDX-0008B  | 317-5101-JPN |
+| | 2004     | Wangan Midnight Maximum Tune (Export)                | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
+| | 2004     | Wangan Midnight Maximum Tune (Export, Rev A)         | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
+|*| 20040610 | Wangan Midnight Maximum Tune (Export, Rev B)         | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
+| | 2004     | Sega Golf Club Network Pro Tour 2005                 | Sega                     | GDROM  | GDX-0010   | ???          |
+|*| 2004     | Sega Golf Club Network Pro Tour 2005 (Rev B)         | Sega                     | GDROM  | GDX-0010B  | ???          |
+|*| 2004     | Sega Golf Club Network Pro Tour 2005 (Rev C)         | Sega                     | GDROM  | GDX-0010C  | ???          |
+|*| 20040909 | OutRun 2 Special Tours (Japan)                       | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
+|*| 20041229 | OutRun 2 Special Tours (Japan, Rev A)                | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
+|*| 20040914 | Ghost Squad                                          | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
+|*| 20041209 | Ghost Squad (Rev A)                                  | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
+| | 20041209 | Ghost Squad (Rev A)                                  | Sega                     | CF     | MDA-G0013  | 317-0398-COM |
+|*| 20050208 | Gundam Battle Operating Simulator                    | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
+|*| 20040910 | OutRun 2 Special Tours                               | Sega                     | GDROM  | GDX-0014   | 317-0396-COM |
+|*| 20041229 | OutRun 2 Special Tours (Rev A)                       | Sega                     | GDROM  | GDX-0014A  | 317-0396-COM |
+| | 20041229 | OutRun 2 Special Tours (Rev A)                       | Sega                     | CF     | MDA-G0012  | 317-0396-COM |
+|*| 20050218 | Wangan Midnight Maximum Tune 2 (Japan)               | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
+|*| 20050908 | Wangan Midnight Maximum Tune 2 (Japan, Rev A)        | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
+|*| 20050218 | Wangan Midnight Maximum Tune 2 (Export)              | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
+|*| 20050908 | Wangan Midnight Maximum Tune 2 (Export, Rev A)       | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
+| | 2005     | Sega Network Taisen Mahjong MJ 3                     | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev A)             | Sega                     | GDROM  | GDX-0017A  | 317-0414-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev B)             | Sega                     | GDROM  | GDX-0017B  | 317-0414-JPN |
+|*| 20051109 | Sega Network Taisen Mahjong MJ 3 (Rev C)             | Sega                     | GDROM  | GDX-0017C  | 317-0414-JPN |
+|*| 20060217 | Sega Network Taisen Mahjong MJ 3 (Rev D)             | Sega                     | GDROM  | GDX-0017D  | 317-0414-JPN |
+| | 2006     | Sega Network Taisen Mahjong MJ 3 (Rev E)             | Sega                     | GDROM  | GDX-0017E  | 317-0414-JPN |
+|*| 2006     | Sega Network Taisen Mahjong MJ 3 (Rev F)             | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
+| | 2005     | Sega Club Golf 2006: Next Tours                      | Sega                     | GDROM  | GDX-0018   |              |
+|*| 20051107 | Sega Club Golf 2006: Next Tours (Rev A)              | Sega                     | GDROM  | GDX-0018A  | 317-0428-JPN |
+| | 2005     | Firmware Update For MJ 3                             | Sega                     | GDROM  | GDX-0019   |              |
+| | 200?     | Sega Club Golf 2006                                  | Sega                     | GDROM  | GDX-0020   |              |
+| | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution           | Sega                     | GDROM  | GDX-0021   | 317-0457-JPN |
+|*| 20070217 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)   | Sega                     | GDROM  | GDX-0021A  | 317-0457-JPN |
+|*| 20070525 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)   | Sega                     | GDROM  | GDX-0021B  | 317-0457-JPN |
+| | 200?     | Sega Network Taisen Mahjong MJ 3 Evo Test Ver        | Sega                     | GDROM  | GDX-0022   |              |
+|*| 20061222 | Sega Network Taisen Mahjong MJ 3 Evo Firmware Update | Sega                     | GDROM  | GDX-0023   | 317-0457-JPN |
+| | 2009     | Firmware Update For Compact Flash Box                | Sega                     | GDROM  | GDX-0024   |              |
+|*| 20090331 | Firmware Update For Compact Flash Box (Rev A)        | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
+|*| 20030226 | Chihiro Change Region GD USA                         | Sega                     | GDROM  | 611-0028A  | 317-0351-EXP |
+|*| 200412   | Quest Of D Ver.1.01C                                 | Sega                     | CDROM  | CDV-10005C | 317-0376-JPN |
+|*| 2005     | Sangokushi Taisen Ver.1.002                          | Sega                     | DVDROM | CDV-10009D |              |
+|*| 2005     | Mobile Suit Gundam 0079 Card Builder                 | Banpresto                | DVDROM | CDV-10010  | 317-0415-JPN |
+|*| 2006     | Sangokushi Taisen 2 Ver.2.007                        | Sega                     | DVDROM | CDV-10019A |              |
+|*| 2005     | Sangokushi Taisen                                    | Sega                     | DVDROM | CDV-10022  |              |
+|*| 2006     | Sangokushi Taisen 2 Firmware Update                  | Sega                     | DVDROM | CDV-10023  |              |
+|*| 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02        | Banpresto                | DVDROM | CDV-10024B | 317-0415-JPN |
+|*| 2006     | Sangokushi Taisen 2 Ver.2.100                        | Sega                     | DVDROM | CDV-10029  |              |
+|*| 2007     | Mobile Suit Gundam 0083 Card Builder                 | Banpresto                | DVDROM | CDV-10030  | 317-0484-JPN |
+|*| 2008     | Sangokushi Taisen 3                                  | Sega                     | DVDROM | CDV-10036  |              |
+|*| 2008     | Sangokushi Taisen 3 Ver.J                            | Sega                     | DVDROM | CDV-10036J |              |
+|*| 2008     | Mobile Suit Gundam 0083 Card Builder Ver.2.10        | Bandai Namco - Banpresto | DVDROM | CDV-10037B | 317-0484-JPN |
+|*| 2008     | Sangokushi Taisen 3 War Begins Ver.3.59              | Sega                     | DVDROM | CDV-10041  |              |
+|*| 2008     | Sangokushi Taisen 3 War Begins                       | Sega                     | DVDROM | CDV-10042  |              |
++-+----------+------------------------------------------------------+--------------------------+--------+------------+--------------+
 * denotes these games are archived.
 
-   Year   Game (Unknown media)                                Manufacturer
-+-+-----------------------------------------------------------+------------+
-| | 2004 | Quest Of D                                         | Sega       |
-| | 2004 | Quest Of D (Ver.1.02)                              | Sega       |
-| | 2004 | Quest Of D (Ver.1.10)                              | Sega       |
-| | 2004 | Quest Of D (Ver.1.10a)                             | Sega       |
-| | 2005 | Quest Of D (Ver.1.20)                              | Sega       |
-| | 2005 | Quest Of D (Ver.1.20a)                             | Sega       |
-| | 2005 | Quest Of D (Ver.1.21)                              | Sega       |
-| | 2005 | Quest Of D: Gofu no Keisyousya (Ver.2.00)          | Sega       |
-| | 2005 | Quest Of D: Gofu no Keisyousya (Ver.2.01)          | Sega       |
-| | 2006 | Quest Of D: Gofu no Keisyousya (Ver.2.02b)         | Sega       |
-| | 2006 | Quest Of D: Oukoku no Syugosya (Ver.3.00)          | Sega       |
-| | 2006 | Quest Of D: Oukoku no Syugosya (Ver.3.01)          | Sega       |
-| | 2007 | Quest Of D: The Battle Kingdom (Ver.4.00)          | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.00b)         | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.00c)         | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.01)          | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.03)                       | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.10)                       | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.11)                       | Sega       |
-| | 2006 | Sangokushi Taisen (Ver.1.12)                       | Sega       |
-| | 2006 | Sangokushi Taisen 2 (Ver.2.01)                     | Sega       |
-| | 2005 | Sega Golf Club Network Pro Tour 2005               | Sega       |
-+-+------+----------------------------------------------------+------------+
+    Year   Game (Unknown media)                                Manufacturer  Number
++-+-----------------------------------------------------------+------------+------------+
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005  |
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005A |
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005B |
+| | 2004 | Quest Of D 1.01D                                   | Sega       | CDV-10005D |
+| | 2004 | Quest Of D 1.02                                    | Sega       | CDV-10005E |
+| | 2004 | Quest Of D Senko Habai                             | Sega       | CDV-10005P |
+| | 2004 | Quest Of D 1.10                                    | Sega       | CDV-10006  |
+| | 2004 | Quest Of D 1.10A                                   | Sega       | CDV-10006A |
+| | 200? | Sangokushi Taisen                                  | Sega       | CDV-10009  |
+| | 200? | Sangokushi Taisen 0.94                             | Sega       | CDV-10009A |
+| | 200? | Sangokushi Taisen 1.00                             | Sega       | CDV-10009B |
+| | 200? | Sangokushi Taisen 1.001                            | Sega       | CDV-10009C |
+| | 200? | Sangokushi Taisen 1.002                            | Sega       | CDV-10009E |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009F |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009G |
+| | 200? | Sangokushi Taisen 1.100                            | Sega       | CDV-10009H |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009J |
+| | 200? | Sangokushi Taisen 1.100                            | Sega       | CDV-10009K |
+| | 200? | Sangokushi Taisen 1.110                            | Sega       | CDV-10009L |
+| | 200? | Sangokushi Taisen 1.120                            | Sega       | CDV-10009M |
+| | 200? | Sangokushi Taisen 1.120                            | Sega       | CDV-10009N |
+| | 200? | Sangokushi Taisen 1.100 (kakinhenkou)              | Sega       | CDV-10009P |
+| | 200? | Sangokushi Taisen 1.121                            | Sega       | CDV-10009Q |
+| | 200? | Sangokushi Taisen 1.122                            | Sega       | CDV-10009R |
+| | 200? | Mobile Suit Gundam 0079 Card Builder               | Banpresto  | CDV-10010A |
+| | 200? | Quest Of D 1.20                                    | Sega       | CDV-10012  |
+| | 200? | Quest Of D 1.20A                                   | Sega       | CDV-10012A |
+| | 200? | Sangokushi Taisen 1.00 (Asia)                      | Sega       | CDV-10014  |
+| | 200? | Sangokushi Taisen (Asia)                           | Sega       | CDV-10014B |
+| | 200? | Sangokushi Taisen (Asia)                           | Sega       | CDV-10014C |
+| | 200? | Quest Of D 1.21                                    | Sega       | CDV-10016  |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.00                | Sega       | CDV-10017  |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.01                | Sega       | CDV-10017A |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02                | Sega       | CDV-10017B |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02B               | Sega       | CDV-10017C |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02C               | Sega       | CDV-10017D |
+| | 200? | Sangokushi Taisen 2                                | Sega       | CDV-10019  |
+| | 200? | Sangokushi Taisen 2 2.010                          | Sega       | CDV-10019B |
+| | 200? | Mobile Suit Gundam 0079 Card Builder 2.00          | Banpresto  | CDV-10024  |
+| | 200? | Mobile Suit Gundam 0079 Card Builder 2.00          | Banpresto  | CDV-10024A |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.00                | Sega       | CDV-10026  |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01                | Sega       | CDV-10026A |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01A               | Sega       | CDV-10026B |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01B               | Sega       | CDV-10026C |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.02                | Sega       | CDV-10026D |
+| | 200? | Sangokushi Taisen 2                                | Sega       | CDV-10029A |
+| | 200? | Mobile Suit Gundam 0083 Card Builder               | Banpresto  | CDV-10030A |
+| | 200? | Sangokushi Taisen 2 (Asia)                         | Sega       | CDV-10032  |
+| | 200? | Sangokushi Taisen 2 (Asia)                         | Sega       | CDV-10032A |
+| | 200? | Sangokushi Taisen 2 (Asia) Check disc              | Sega       | CDV-10033  |
+| | 200? | Sangokushi Taisen 2 (Asia) Firmware update         | Sega       | CDV-10034  |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035  |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035A |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035C |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036A |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036B |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036D |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036G |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036H |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036K |
+| | 200? | Mobile Suit Gundam 0083 Card Builder 2.00          | Banpresto  | CDV-10037  |
+| | 200? | Mobile Suit Gundam 0083 Card Builder 2.02          | Banpresto  | CDV-10037A |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038  |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038A |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038B |
+| | 200? | Sega Golf Club Network Pro Tour 2005 (DVD NMC TJP) | Sega       | CDV-10039  |
+| | 200? | Sangokushi Taisen 3 (Export)                       | Sega       | CDV-10040  |
+| | 200? | Sangokushi Taisen 3 (Export)                       | Sega       | CDV-10040A |
++-+------+----------------------------------------------------+------------+------------+
 
 A Chihiro system consists of several boards.
 The system is in 2 separate metal boxes that fit together to form one box.
@@ -382,11 +430,12 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 #include "machine/pci.h"
+#include "machine/idectrl.h"
 #include "includes/xbox_pci.h"
 #include "includes/xbox.h"
 
+#include "bus/ata/idehd.h"
 #include "cpu/i386/i386.h"
-#include "machine/idehd.h"
 #include "machine/jvs13551.h"
 #include "machine/jvshost.h"
 #include "machine/naomigd.h"
@@ -464,11 +513,11 @@ int jvs_master::received_packet(uint8_t *buffer)
 
 DECLARE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device)
 
-class ohci_hlean2131qc_device : public device_t, public ohci_function, public device_slot_card_interface
+class ohci_hlean2131qc_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
 	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine) override;
+	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 	void set_region_base(uint8_t *data);
@@ -522,11 +571,11 @@ DEFINE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device, "ohci_hlean2131qc"
 
 DECLARE_DEVICE_TYPE(OHCI_HLEAN2131SC, ohci_hlean2131sc_device)
 
-class ohci_hlean2131sc_device : public device_t, public ohci_function, public device_slot_card_interface
+class ohci_hlean2131sc_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
 	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine) override;
+	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 	void set_region_base(uint8_t *data);
@@ -575,7 +624,7 @@ class chihiro_state : public xbox_base_state
 public:
 	chihiro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xbox_base_state(mconfig, type, tag)
-		, m_ide(*this, "ide")
+		, m_ide(*this, "ide1")
 		, m_dimmboard(*this, "rom_board")
 		, m_hack_index(-1)
 		, m_hack_counter(0)
@@ -586,8 +635,8 @@ public:
 	void chihiro_base(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(mediaboard_r);
-	DECLARE_WRITE32_MEMBER(mediaboard_w);
+	uint32_t mediaboard_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mediaboard_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	void baseboard_ide_event(int type, uint8_t *read, uint8_t *write);
@@ -612,9 +661,9 @@ private:
 	void chihiro_map_io(address_map &map);
 
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
-	void jamtable_disasm_command(int ref, const std::vector<std::string> &params);
-	void chihiro_help_command(int ref, const std::vector<std::string> &params);
-	void debug_commands(int ref, const std::vector<std::string> &params);
+	void jamtable_disasm_command(const std::vector<std::string> &params);
+	void chihiro_help_command(const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -635,7 +684,6 @@ St.     Instr.       Comment
 /* jamtable disassembler */
 void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint32_t size) // 0xff000080 == fff00080
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
 	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
@@ -647,11 +695,11 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = cpu.read_byte(space, addr, true);
+		uint32_t opcode = space.read_byte(addr);
 		addr++;
-		uint32_t op1 = cpu.read_dword(space, addr, true);
+		uint32_t op1 = space.read_dword_unaligned(addr);
 		addr += 4;
-		uint32_t op2 = cpu.read_dword(space, addr, true);
+		uint32_t op2 = space.read_dword_unaligned(addr);
 		addr += 4;
 
 		char sop1[16];
@@ -730,7 +778,7 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	}
 }
 
-void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::string> &params)
+void chihiro_state::jamtable_disasm_command(const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
 	uint64_t  addr, size;
@@ -744,7 +792,7 @@ void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::stri
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string> &params)
+void chihiro_state::chihiro_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -753,14 +801,14 @@ void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string>
 	con.printf("  chihiro help -- this list\n");
 }
 
-void chihiro_state::debug_commands(int ref, const std::vector<std::string> &params)
+void chihiro_state::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 	if (params[0] == "jamdis")
-		jamtable_disasm_command(ref, params);
+		jamtable_disasm_command(params);
 	else
-		chihiro_help_command(ref, params);
+		chihiro_help_command(params);
 }
 
 void chihiro_state::hack_eeprom()
@@ -829,8 +877,7 @@ const uint8_t ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0
 
 ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OHCI_HLEAN2131QC, tag, owner, clock)
-	, ohci_function()
-	, device_slot_card_interface(mconfig, *this)
+	, device_usb_ohci_function_interface(mconfig, *this)
 	, m_jvs_master(*this, "^^^^jvs_master")
 {
 	maximum_send = 0;
@@ -842,9 +889,9 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, 
 	jvs.buffer_out_packets = 0;
 }
 
-void ohci_hlean2131qc_device::initialize(running_machine &machine)
+void ohci_hlean2131qc_device::initialize()
 {
-	ohci_function::initialize(machine);
+	device_usb_ohci_function_interface::initialize();
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1137,7 +1184,7 @@ void ohci_hlean2131qc_device::process_jvs_packet()
 
 void ohci_hlean2131qc_device::device_start()
 {
-	initialize(machine());
+	initialize();
 	if (region_tag)
 		set_region_base(memregion(region_tag)->base() + region_offset);
 }
@@ -1158,8 +1205,7 @@ const uint8_t ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0
 
 ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OHCI_HLEAN2131SC, tag, owner, clock)
-	, ohci_function()
-	, device_slot_card_interface(mconfig, *this)
+	, device_usb_ohci_function_interface(mconfig, *this)
 {
 	region = nullptr;
 	region_tag = nullptr;
@@ -1180,9 +1226,9 @@ void ohci_hlean2131sc_device::set_region(const char *_region_tag, int _region_of
 	region_offset = _region_offset;
 }
 
-void ohci_hlean2131sc_device::initialize(running_machine &machine)
+void ohci_hlean2131sc_device::initialize()
 {
-	ohci_function::initialize(machine);
+	device_usb_ohci_function_interface::initialize();
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1469,7 +1515,7 @@ void ohci_hlean2131sc_device::process_packet()
 
 void ohci_hlean2131sc_device::device_start()
 {
-	initialize(machine());
+	initialize();
 	if (region_tag)
 		set_region_base(memregion(region_tag)->base() + region_offset);
 }
@@ -1488,9 +1534,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	uint8_t read_buffer[0x20];
-	uint8_t write_buffer[0x20];
-	chihiro_state *chihirosystem;
+	uint8_t read_buffer[0x20]{};
+	uint8_t write_buffer[0x20]{};
+	chihiro_state *chihirosystem{};
 	static const int size_factor = 2;
 };
 
@@ -1685,7 +1731,7 @@ uint8_t *chihiro_state::baseboard_ide_dimmboard(uint32_t lba)
 	return nullptr;
 }
 
-READ32_MEMBER(chihiro_state::mediaboard_r)
+uint32_t chihiro_state::mediaboard_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r;
 
@@ -1706,7 +1752,7 @@ READ32_MEMBER(chihiro_state::mediaboard_r)
 	return r;
 }
 
-WRITE32_MEMBER(chihiro_state::mediaboard_w)
+void chihiro_state::mediaboard_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("I/O port write %04x mask %08X value %08X\n", offset * 4 + 0x4000, mem_mask, data);
 	// irq 10
@@ -1716,13 +1762,11 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 
 void chihiro_state::chihiro_map(address_map &map)
 {
-	xbox_base_map(map);
 	map(0xff000000, 0xff07ffff).rom().region("bios", 0).mirror(0x00f80000);
 }
 
 void chihiro_state::chihiro_map_io(address_map &map)
 {
-	xbox_base_map_io(map);
 	map(0x4000, 0x40ff).rw(FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
 }
 
@@ -1795,11 +1839,11 @@ void chihiro_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1));
 	}
 	m_hack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)
-		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
+		if (machine().basename() == hacks[a].game_name) {
 			m_hack_index = a;
 			break;
 		}
@@ -1868,12 +1912,12 @@ void chihiro_state::chihiro_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chihiro_state::chihiro_map);
 	m_maincpu->set_addrmap(AS_IO, &chihiro_state::chihiro_map_io);
 
-	subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(ide_baseboard, nullptr, "bb", true);
+	subdevice<ide_controller_32_device>("pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
 
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_baseboard, nullptr, false);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port3", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port4", usb_baseboard, nullptr, false);
 
 	JVS_MASTER(config, "jvs_master", 0);
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));
@@ -1906,12 +1950,14 @@ void chihiro_state::chihirogd(machine_config &config)
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define CHIHIRO_BIOS \
-	ROM_REGION( 0x80000, "bios", 0) \
+	ROM_REGION32_LE( 0x80000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "mediaboard", 0) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr-23887_29lv160te.ic4", 0x000000, 0x200000, CRC(13034372) SHA1(77197fba2781ed1d81402c48bd743adb26d3161a) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr21042_m29w160et.bin", 0x000000, 0x200000, CRC(a4fcab0b) SHA1(a13cf9c5cdfe8605d82150b7573652f419b30197) ) \
 	ROM_REGION( 0x204080, "others", 0) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "315-6351a_epc1pc8.ic2", 0x0000, 0x1ff01, CRC(488624ea) SHA1(1a607337a186415ae90b48934ce2aae81639d4de) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x0000, 0x2000,   CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x2000, 0x80,     CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x2080, 0x2000,   CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) )
@@ -2120,6 +2166,26 @@ ROM_START( wangmid )
 	ROM_LOAD("crp1231lr10_ver0110.ic2", 0, 0x20000, CRC(0d30707c) SHA1(425e25c6203d0b400d12391916db3f7cdad00f7a) ) // H8/3003 code
 ROM_END
 
+ROM_START( scg05ntb )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0010b", 0, SHA1(8da05ff36679f45b2b43d9c5ca3177b8a9e76af5) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-unknown.pic", 0x000000, 0x004000, CRC(36858860) SHA1(b36a0c10b614fdeb7dcd94f4898efc24e5db896a) )
+ROM_END
+
+ROM_START( scg05nt )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0010c", 0, SHA1(ef3d7577960a21cc71b4523fa26880f7897b628c) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-unknown.pic", 0x000000, 0x004000, CRC(36858860) SHA1(b36a0c10b614fdeb7dcd94f4898efc24e5db896a) )
+ROM_END
+
 ROM_START( outr2stjo )
 	CHIHIRO_BIOS
 
@@ -2146,8 +2212,8 @@ ROM_START( ghostsqo )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0012", 0, SHA1(ad5d08cc3b8cfd0890feb152670b429c28659512) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
-	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
+	ROM_REGION( 0x4010, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0398-com.pic", 0x00, 0x4010, CRC(0b9dfe4b) SHA1(eaa6663cfc49a7bda0ee60844f9d710c99a2b48a) )
 ROM_END
 
 /*
@@ -2160,9 +2226,8 @@ Product Number    GDX-0012A
 Version           V2.000
 Release Date      20041209
 Manufacturer ID
-BHU.BIN
-970efe79ce32ab4a
-PIC
+
+PIC16C621A-20/P
 253-5508-0398
 317-0398-COM
 */
@@ -2172,8 +2237,8 @@ ROM_START( ghostsqu )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0012a", 0, SHA1(d14adac9cdfd8095362fa9600c50bf038d4e5a99) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
-	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
+	ROM_REGION( 0x4010, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0398-com.pic", 0x00, 0x4010, CRC(0b9dfe4b) SHA1(eaa6663cfc49a7bda0ee60844f9d710c99a2b48a) )
 ROM_END
 
 ROM_START( gundamos )
@@ -2301,6 +2366,16 @@ ROM_START( mj3evo )
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0021b", 0, SHA1(c97d1dc95cdf1b4bd5d7cf6b4db0757f3d6bd723) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0457-jpn.pic", 0x000000, 0x004000, CRC(650fcc94) SHA1(c88488900460fb3deecb3cf376fc043b10c020ef) )
+ROM_END
+
+ROM_START( mj3evoup )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0023", 0, SHA1(fd88b7abff4f0932ac650d103e52ac598e82e5fb) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0457-jpn.pic", 0x000000, 0x004000, CRC(650fcc94) SHA1(c88488900460fb3deecb3cf376fc043b10c020ef) )
@@ -2526,7 +2601,9 @@ ROM_END
 // 0009     GAME( 2004, wangmido, wangmid,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (GDX-0009)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0009A    GAME( 2004, wangmida, wangmid,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export, Rev A) (GDX-0009A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0009B */ GAME( 2004, wangmid,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export, Rev B) (GDX-0009B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0010  Sega Golf Club
+// 0010  Sega Golf Club Network Pro Tour 2005
+/* 0010B */ GAME( 2004, scg05ntb, scg05nt,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Golf Club Network Pro Tour 2005 (Rev B) (GDX-0010B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0010C */ GAME( 2004, scg05nt,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Golf Club Network Pro Tour 2005 (Rev C) (GDX-0010C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0011  */ GAME( 2004, outr2stjo,outr2st,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan) (GDX-0011)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0011A */ GAME( 2004, outr2stj, outr2st,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan, Rev A) (GDX-0011A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0012  */ GAME( 2004, ghostsqo, ghostsqu, chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Ghost Squad (GDX-0012)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
@@ -2553,7 +2630,7 @@ ROM_END
 /* 0021A */ GAME( 2007, mj3evoa,  mj3evo,    chihirogd,   chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) (GDX-0021A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0021B */ GAME( 2007, mj3evo,   chihiro,   chihirogd,   chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) (GDX-0021B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0022  Taisen Mahjong MJ 3 Evolution Test Version
-// 0023  Firmware Update For MJ 3 Evolution
+/* 0023  */ GAME( 2006, mj3evoup, chihiro,   chihirogd,   chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution Firmware Update (GDX-0023)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (4.01) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 

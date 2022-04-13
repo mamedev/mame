@@ -35,8 +35,8 @@ DEFINE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device, "snes_control_po
 //  device_snes_control_port_interface - constructor
 //-------------------------------------------------
 
-device_snes_control_port_interface::device_snes_control_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_snes_control_port_interface::device_snes_control_port_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "snesctrl")
 {
 	m_port = dynamic_cast<snes_control_port_device *>(device.owner());
 }
@@ -61,7 +61,10 @@ device_snes_control_port_interface::~device_snes_control_port_interface()
 
 snes_control_port_device::snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SNES_CONTROL_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this), m_device(nullptr)
+	device_single_card_slot_interface<device_snes_control_port_interface>(mconfig, *this),
+	m_onscreen_cb(*this),
+	m_gunlatch_cb(*this),
+	m_device(nullptr)
 {
 }
 
@@ -81,9 +84,9 @@ snes_control_port_device::~snes_control_port_device()
 
 void snes_control_port_device::device_start()
 {
-	m_device = dynamic_cast<device_snes_control_port_interface *>(get_card_device());
-	m_onscreen_cb.bind_relative_to(*owner());
-	m_gunlatch_cb.bind_relative_to(*owner());
+	m_device = get_card_device();
+	m_onscreen_cb.resolve();
+	m_gunlatch_cb.resolve();
 }
 
 

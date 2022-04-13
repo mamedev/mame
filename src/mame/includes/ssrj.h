@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class ssrj_state : public driver_device
 {
@@ -40,16 +41,16 @@ private:
 	required_shared_ptr<uint8_t> m_vram4;
 	required_shared_ptr<uint8_t> m_scrollram;
 
-	int m_oldport;
-	tilemap_t *m_tilemap1;
-	tilemap_t *m_tilemap2;
-	tilemap_t *m_tilemap4;
+	int m_oldport = 0;
+	tilemap_t *m_tilemap1 = nullptr;
+	tilemap_t *m_tilemap2 = nullptr;
+	tilemap_t *m_tilemap4 = nullptr;
 	std::unique_ptr<uint8_t[]> m_buffer_spriteram;
 
-	DECLARE_READ8_MEMBER(wheel_r);
-	DECLARE_WRITE8_MEMBER(vram1_w);
-	DECLARE_WRITE8_MEMBER(vram2_w);
-	DECLARE_WRITE8_MEMBER(vram4_w);
+	uint8_t wheel_r();
+	void vram1_w(offs_t offset, uint8_t data);
+	void vram2_w(offs_t offset, uint8_t data);
+	void vram4_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);

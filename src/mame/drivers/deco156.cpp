@@ -48,17 +48,17 @@ public:
 	void wcvol95(machine_config &config);
 
 private:
-	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
-	DECLARE_READ32_MEMBER(pf1_rowscroll_r);
-	DECLARE_READ32_MEMBER(pf2_rowscroll_r);
-	DECLARE_READ32_MEMBER(spriteram_r);
-	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(spriteram_w);
-	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
+	void hvysmsh_eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t pf1_rowscroll_r(offs_t offset);
+	uint32_t pf2_rowscroll_r(offs_t offset);
+	uint32_t spriteram_r(offs_t offset);
+	void pf1_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void pf2_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void hvysmsh_oki_0_bank_w(uint32_t data);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
 	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
@@ -110,7 +110,7 @@ uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 /***************************************************************************/
 
-WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
+void deco156_state::hvysmsh_eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -119,17 +119,17 @@ WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
 	}
 }
 
-WRITE32_MEMBER(deco156_state::hvysmsh_oki_0_bank_w)
+void deco156_state::hvysmsh_oki_0_bank_w(uint32_t data)
 {
 	m_oki1->set_rom_bank(data & 1);
 }
 
-READ32_MEMBER(deco156_state::pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(deco156_state::pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(deco156_state::spriteram_r){ return m_spriteram[offset] ^ 0xffff0000; }
-WRITE32_MEMBER(deco156_state::pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
+uint32_t deco156_state::pf1_rowscroll_r(offs_t offset) { return m_pf1_rowscroll[offset] ^ 0xffff0000; }
+uint32_t deco156_state::pf2_rowscroll_r(offs_t offset) { return m_pf2_rowscroll[offset] ^ 0xffff0000; }
+uint32_t deco156_state::spriteram_r(offs_t offset) { return m_spriteram[offset] ^ 0xffff0000; }
+void deco156_state::pf1_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask) { data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
+void deco156_state::pf2_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask) { data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
+void deco156_state::spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask) { data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
 
 
 void deco156_state::hvysmsh_map(address_map &map)
@@ -266,22 +266,9 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8    /* every char takes 8 consecutive bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
 };
 
 static const gfx_layout tilelayout =
@@ -290,25 +277,23 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(8*2*16,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
 static GFXDECODE_START( gfx_hvysmsh )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )    /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 512, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
 
 /**********************************************************************************/
 
-INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)
+WRITE_LINE_MEMBER(deco156_state::vblank_interrupt)
 {
-	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 DECO16IC_BANK_CB_MEMBER(deco156_state::bank_callback)
@@ -334,7 +319,6 @@ void deco156_state::hvysmsh(machine_config &config)
 	/* basic machine hardware */
 	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco156_state::hvysmsh_map);
-	m_maincpu->set_vblank_int("screen", FUNC(deco156_state::deco32_vbl_interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -344,6 +328,7 @@ void deco156_state::hvysmsh(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(deco156_state::screen_update));
+	screen.screen_vblank().set(FUNC(deco156_state::vblank_interrupt));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
@@ -351,21 +336,19 @@ void deco156_state::hvysmsh(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
@@ -386,7 +369,6 @@ void deco156_state::wcvol95(machine_config &config)
 	/* basic machine hardware */
 	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco156_state::wcvol95_map);
-	m_maincpu->set_vblank_int("screen", FUNC(deco156_state::deco32_vbl_interrupt));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -396,6 +378,7 @@ void deco156_state::wcvol95(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(deco156_state::screen_update));
+	screen.screen_vblank().set(FUNC(deco156_state::vblank_interrupt));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -403,21 +386,19 @@ void deco156_state::wcvol95(machine_config &config)
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
@@ -497,8 +478,8 @@ ROM_START( hvysmsh ) /* Europe -2  1993/06/30 */
 	ROM_CONTINUE( 0x180000, 0x080000)
 
 	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
-	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+	ROM_LOAD( "mbg-01.10a", 0x400000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD( "mbg-02.11a", 0x000000, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
@@ -522,8 +503,8 @@ ROM_START( hvysmshj ) /* Japan -2  1993/06/30 */
 	ROM_CONTINUE( 0x180000, 0x080000)
 
 	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
-	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+	ROM_LOAD( "mbg-01.10a", 0x400000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD( "mbg-02.11a", 0x000000, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
@@ -547,8 +528,8 @@ ROM_START( hvysmsha ) /* Asia -4  1993/09/06 */
 	ROM_CONTINUE( 0x180000, 0x080000)
 
 	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
-	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+	ROM_LOAD( "mbg-01.10a", 0x400000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD( "mbg-02.11a", 0x000000, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
@@ -608,8 +589,8 @@ ROM_START( wcvol95 )
 	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
-	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
+	ROM_LOAD( "mbx-01.12a",    0x100000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
+	ROM_LOAD( "mbx-02.13a",    0x000000, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
 
 	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
@@ -632,8 +613,8 @@ ROM_START( wcvol95j )
 	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
-	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
+	ROM_LOAD( "mbx-01.12a",    0x100000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
+	ROM_LOAD( "mbx-02.13a",    0x000000, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
 
 	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
@@ -657,8 +638,8 @@ ROM_START( wcvol95x )
 	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
-	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
+	ROM_LOAD( "mbx-01.12a",    0x100000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
+	ROM_LOAD( "mbx-02.13a",    0x000000, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
 
 	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )

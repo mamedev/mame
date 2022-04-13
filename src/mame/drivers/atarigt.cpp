@@ -7,11 +7,12 @@
     driver by Aaron Giles
 
     Games supported:
-        * T-Mek (1994) [2 sets]
+        * T-Mek (1994) [5 sets]
         * Primal Rage (1994) [2 sets]
 
     Known bugs:
-        * protection devices unknown
+        * Protection not fully understood
+        * T-Mek's serial communications hardware is missing. The twin and single cabs seemingly use different link hardware but both link the same.
 
 ****************************************************************************
 
@@ -69,16 +70,34 @@
  *
  *************************************/
 
-void atarigt_state::update_interrupts()
+INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
 {
-	m_maincpu->set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_scanline_int_state = true;
+	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
+WRITE_LINE_MEMBER(atarigt_state::video_int_write_line)
 {
-	scanline_int_write_line(1);
+	if (state)
+	{
+		m_video_int_state = true;
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+	}
+}
+
+
+void atarigt_state::scanline_int_ack_w(uint32_t data)
+{
+	m_scanline_int_state = false;
+	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+}
+
+
+void atarigt_state::video_int_ack_w(uint32_t data)
+{
+	m_video_int_state = false;
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -88,10 +107,16 @@ INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(atarigt_state,atarigt)
+void atarigt_state::machine_start()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
+	atarigen_state::machine_start();
+
+	m_scanline_int_state = false;
+	m_video_int_state = false;
+	m_ignore_writes = false;
+
+	save_item(NAME(m_scanline_int_state));
+	save_item(NAME(m_video_int_state));
 }
 
 
@@ -102,7 +127,7 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
  *
  *************************************/
 
-WRITE8_MEMBER(atarigt_state::cage_irq_callback)
+void atarigt_state::cage_irq_callback(uint8_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, data != 0 ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -113,7 +138,7 @@ WRITE8_MEMBER(atarigt_state::cage_irq_callback)
  *
  *************************************/
 
-READ32_MEMBER(atarigt_state::special_port2_r)
+uint32_t atarigt_state::special_port2_r()
 {
 	int temp = m_service_io->read();
 	temp ^= 0x0001;     /* /A2DRDY always high for now */
@@ -121,7 +146,7 @@ READ32_MEMBER(atarigt_state::special_port2_r)
 }
 
 
-READ32_MEMBER(atarigt_state::special_port3_r)
+uint32_t atarigt_state::special_port3_r()
 {
 	int temp = m_coin_io->read();
 	if (m_video_int_state) temp ^= 0x0001;
@@ -163,7 +188,7 @@ inline void atarigt_state::compute_fake_pots(int *pots)
 }
 
 
-READ8_MEMBER(atarigt_state::analog_port_r)
+uint8_t atarigt_state::analog_port_r(offs_t offset)
 {
 	if (!m_adc.found())
 		return 0xff;
@@ -200,7 +225,7 @@ READ8_MEMBER(atarigt_state::analog_port_r)
  *
  *************************************/
 
-WRITE32_MEMBER(atarigt_state::latch_w)
+void atarigt_state::latch_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	    D13 = 68.DISA
@@ -229,7 +254,7 @@ WRITE32_MEMBER(atarigt_state::latch_w)
 }
 
 
-WRITE32_MEMBER(atarigt_state::mo_command_w)
+void atarigt_state::mo_command_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
@@ -237,7 +262,7 @@ WRITE32_MEMBER(atarigt_state::mo_command_w)
 }
 
 
-WRITE32_MEMBER(atarigt_state::led_w)
+void atarigt_state::led_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  logerror("LED = %08X & %08X\n", data, mem_mask);
 }
@@ -250,7 +275,7 @@ WRITE32_MEMBER(atarigt_state::led_w)
  *
  *************************************/
 
-READ32_MEMBER(atarigt_state::sound_data_r)
+uint32_t atarigt_state::sound_data_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -262,7 +287,7 @@ READ32_MEMBER(atarigt_state::sound_data_r)
 }
 
 
-WRITE32_MEMBER(atarigt_state::sound_data_w)
+void atarigt_state::sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		m_cage->control_w(data);
@@ -560,7 +585,7 @@ if (LOG_PROTECTION)
  *
  *************************************/
 
-READ32_MEMBER(atarigt_state::colorram_protection_r)
+uint32_t atarigt_state::colorram_protection_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offs_t address = 0xd80000 + offset * 4;
 	uint32_t result32 = 0;
@@ -568,13 +593,13 @@ READ32_MEMBER(atarigt_state::colorram_protection_r)
 
 	if (ACCESSING_BITS_16_31)
 	{
-		result = atarigt_colorram_r(address);
+		result = colorram_r(address);
 		(this->*m_protection_r)(space, address, &result);
 		result32 |= result << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		result = atarigt_colorram_r(address + 2);
+		result = colorram_r(address + 2);
 		(this->*m_protection_r)(space, address + 2, &result);
 		result32 |= result;
 	}
@@ -583,20 +608,20 @@ READ32_MEMBER(atarigt_state::colorram_protection_r)
 }
 
 
-WRITE32_MEMBER(atarigt_state::colorram_protection_w)
+void atarigt_state::colorram_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offs_t address = 0xd80000 + offset * 4;
 
 	if (ACCESSING_BITS_16_31)
 	{
 		if (!m_ignore_writes)
-			atarigt_colorram_w(address, data >> 16, mem_mask >> 16);
+			colorram_w(address, data >> 16, mem_mask >> 16);
 		(this->*m_protection_w)(space, address, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		if (!m_ignore_writes)
-			atarigt_colorram_w(address + 2, data, mem_mask);
+			colorram_w(address + 2, data, mem_mask);
 		(this->*m_protection_w)(space, address + 2, data);
 	}
 }
@@ -616,12 +641,15 @@ void atarigt_state::main_map(address_map &map)
 	map(0xd00010, 0xd0001f).r(FUNC(atarigt_state::analog_port_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd4ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
-	map(0xd70000, 0xd7ffff).ram();
-	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
-	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd70000, 0xd71fff).ram();
+	map(0xd72000, 0xd75fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
+	map(0xd76000, 0xd76fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd77000, 0xd77fff).ram();
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(FUNC(atarigt_state::mo_command_w)).share("mo_command");
-	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
+	map(0xd79000, 0xd7a1ff).ram();
+	map(0xd7a200, 0xd7a203).ram().w(FUNC(atarigt_state::mo_command_w)).share("mo_command");
+	map(0xd7a204, 0xd7ffff).ram();
+	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w));
 	map(0xe04000, 0xe04003).w(FUNC(atarigt_state::led_w));
 	map(0xe08000, 0xe08003).w(FUNC(atarigt_state::latch_w));
 	map(0xe0a000, 0xe0a003).w(FUNC(atarigt_state::scanline_int_ack_w));
@@ -759,21 +787,9 @@ static const gfx_layout pftoplayout =
 };
 
 
-static const gfx_layout anlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
-
 static GFXDECODE_START( gfx_atarigt )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
 GFXDECODE_END
 
@@ -803,14 +819,14 @@ static const atari_rle_objects_config modesc =
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarigt_state::atarigt)
-
+void atarigt_state::atarigt(machine_config &config)
+{
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, ATARI_CLOCK_50MHz/2);
+	M68EC020(config, m_maincpu, 50_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigt_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(atarigt_state::scanline_int_gen), attotime::from_hz(250));
 
-	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarigt_state::scanline_update), m_screen, 0, 8);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -818,32 +834,31 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarigt);
 	PALETTE(config, m_palette).set_entries(MRAM_ENTRIES);
 
-	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8);
+	m_playfield_tilemap->set_layout(FUNC(atarigt_state::playfield_scan), 128,64);
+	m_playfield_tilemap->set_info_callback(FUNC(atarigt_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(atarigt_state::get_alpha_tile_info));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarigt_state::screen_update_atarigt));
 	m_screen->screen_vblank().set(FUNC(atarigt_state::video_int_write_line));
-
-	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
 
 	/* sound hardware */
 	ATARI_CAGE(config, m_cage, 0);
 	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
-
-MACHINE_CONFIG_END
+}
 
 void atarigt_state::tmek(machine_config &config)
 {
 	atarigt(config);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16); // should be 447 kHz according to schematics, but that fails the self-test
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16); // should be 447 kHz according to schematics, but that fails the self-test
 	m_adc->in_callback<2>().set_ioport("AN4");
 	m_adc->in_callback<3>().set_ioport("AN1");
 	m_adc->in_callback<6>().set_ioport("AN2");
@@ -1297,7 +1312,7 @@ ROM_END
  *
  *************************************/
 
-WRITE32_MEMBER(atarigt_state::tmek_pf_w)
+void atarigt_state::tmek_pf_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offs_t pc = m_maincpu->pc();
 
@@ -1325,7 +1340,7 @@ void atarigt_state::init_tmek()
 	m_protection_w = &atarigt_state::tmek_protection_w;
 
 	/* temp hack */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32_delegate(FUNC(atarigt_state::tmek_pf_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32s_delegate(*this, FUNC(atarigt_state::tmek_pf_w)));
 }
 
 
@@ -1347,10 +1362,10 @@ void atarigt_state::init_primrage()
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
 GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )

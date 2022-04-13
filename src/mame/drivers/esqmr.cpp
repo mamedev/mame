@@ -202,8 +202,12 @@
 #include "emu.h"
 #include "machine/esqvfd.h"
 
+#include "cpu/m6805/m68hc05.h"
 #include "machine/68340.h"
+#include "machine/68340ser.h"
 #include "sound/es5506.h"
+#include "machine/esqpanel.h"
+//#include "machine/mb8421.h"
 
 #include "speaker.h"
 
@@ -214,7 +218,7 @@ public:
 	esqmr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sq1vfd(*this, "sq1vfd")
+		, m_panel(*this, "sq1vfd")
 	{ }
 
 	void mr(machine_config &config);
@@ -223,12 +227,15 @@ public:
 
 private:
 	required_device<m68340_cpu_device> m_maincpu;
-	required_device<esq2x40_sq1_device> m_sq1vfd;
+	required_device<esqpanel2x40_vfx_device> m_panel;
 
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	u16 esq5506_read_adc();
+	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
+	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
+
 	void mr_map(address_map &map);
 };
 
@@ -239,16 +246,27 @@ void esqmr_state::machine_reset()
 void esqmr_state::mr_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
-//  AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
-//  AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
-//    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
+	map(0x00300000, 0x0037ffff).rom().region("maincpu", 0x80000);   // MR-61 needs this
+	map(0x00c00000, 0x00c7ffff).ram();
+	map(0x00dc0000, 0x00dc003f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
+	map(0x00de0000, 0x00de003f).rw("ensoniq2", FUNC(es5506_device::read), FUNC(es5506_device::write));
+}
+
+WRITE_LINE_MEMBER(esqmr_state::duart_tx_a)
+{
+	//m_mdout->write_txd(state);
+}
+
+WRITE_LINE_MEMBER(esqmr_state::duart_tx_b)
+{
+	m_panel->rx_w(state);
 }
 
 WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
 {
 }
 
-READ16_MEMBER(esqmr_state::esq5506_read_adc)
+u16 esqmr_state::esq5506_read_adc()
 {
 	return 0;
 }
@@ -258,7 +276,17 @@ void esqmr_state::mr(machine_config &config)
 	M68340(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &esqmr_state::mr_map);
 
-	ESQ2X40_SQ1(config, m_sq1vfd, 60);
+	mc68340_serial_module_device &duart(*m_maincpu->subdevice<mc68340_serial_module_device>("serial"));
+	duart.set_clocks(500000, 500000, 1000000, 1000000);
+	duart.a_tx_cb().set(FUNC(esqmr_state::duart_tx_a));
+	duart.b_tx_cb().set(FUNC(esqmr_state::duart_tx_b));
+
+	M68HC705C4A(config, "mcu", 4'000'000);
+
+	//IDT7130(config, "dpram"); // present in PCB, but unknown purpose (mcu communication?)
+
+	ESQPANEL2X40_VFX(config, m_panel);
+	m_panel->write_tx().set(duart, FUNC(mc68340_serial_module_device::rx_b_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -292,6 +320,8 @@ ROM_START( mr61 )
 	ROM_LOAD16_WORD_SWAP( "mrw-osf-11af-2.10.bin",  0x000000, 0x080000, CRC(5854314e) SHA1(8fb2e2ee2f5fb12eae8ea33cb18f757efaec6780) )
 	ROM_LOAD16_WORD_SWAP( "mrw-romc-32ef-1.20.bin", 0x080000, 0x080000, CRC(68321347) SHA1(56cb96943ba42c35ba2787a49b5f4adf7c8dffb8) )
 
+	ROM_REGION(0x2000, "mcu", ROMREGION_ERASE00)
+
 	ROM_REGION(0x400000, "waverom", ROMREGION_ERASE00)
 
 	ROM_REGION(0x400000, "waverom2", ROMREGION_ERASE00)
@@ -304,8 +334,12 @@ ROM_END
 ROM_START( mrrack )
 	// 68340 main MCU
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "mr_r_ec51_lo_1.50.u36", 0x000001, 0x080000, CRC(b29988a1) SHA1(986c2def11de27fa2b9be55ac32f7fec0c414bca) )
-	ROM_LOAD16_BYTE( "mr_r_9dac_up_1.50.u35", 0x000000, 0x080000, CRC(71511692) SHA1(54744f16f1db1ac5abb2f70b6e04aebf1e0e029d) )
+	ROM_SYSTEM_BIOS(0, "v153", "Version 1.53")
+	ROMX_LOAD( "ensoniq_mr_rack_1.53_lo_46a3.u36", 0x000001, 0x080000, CRC(0dba5bef) SHA1(6f64ec7547ea1fc72b42e2679379cd63cbbfc25e), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD( "ensoniq_mr_rack_1.53_hi_f320.u35", 0x000000, 0x080000, CRC(cb045660) SHA1(53d0f27e9f897c979c26a365bdfaf8911fb6f4d4), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROM_SYSTEM_BIOS(1, "v150", "Version 1.50")
+	ROMX_LOAD( "mr_r_ec51_lo_1.50.u36", 0x000001, 0x080000, CRC(b29988a1) SHA1(986c2def11de27fa2b9be55ac32f7fec0c414bca), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "mr_r_9dac_up_1.50.u35", 0x000000, 0x080000, CRC(71511692) SHA1(54744f16f1db1ac5abb2f70b6e04aebf1e0e029d), ROM_BIOS(1) | ROM_SKIP(1) )
 
 	// 68705 display/front panel MCU
 	ROM_REGION(0x2000, "mcu", 0)

@@ -98,7 +98,7 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 {
 	// if what we have is valid, just return it again
 	if (m_rect_list_bounds == cliprect)
-		return m_rect_list.first();
+		return m_rect_list.empty() ? nullptr : m_rect_list.first();
 
 	// reclaim the dirty list and start over
 	m_rect_allocator.reclaim_all(m_rect_list);
@@ -153,5 +153,5 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 
 	// mark the list as valid
 	m_rect_list_bounds = cliprect;
-	return m_rect_list.first();
+	return m_rect_list.empty() ? nullptr : m_rect_list.first();
 }

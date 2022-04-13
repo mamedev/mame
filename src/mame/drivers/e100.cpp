@@ -37,6 +37,7 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "speaker.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -128,17 +129,17 @@
  */
 
 /* Esselte 100 driver class */
-class e100_state : public driver_device // public didact_state
+class e100_state : public driver_device
 {
 public:
 	e100_state(const machine_config &mconfig, device_type type, const char * tag)
-	//      : didact_state(mconfig, type, tag)
 		: driver_device(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 		,m_kbd_74145(*this, "kbd_74145")
-		,m_videoram(*this, "videoram")
+		,m_vram(*this, "vram")
 		,m_cassette(*this, "cassette")
 		,m_rs232(*this, "rs232")
+		,m_chargen(*this, "chargen")
 		,m_io_line0(*this, "LINE0")
 		,m_io_line1(*this, "LINE1")
 		,m_io_line2(*this, "LINE2")
@@ -160,20 +161,19 @@ public:
 private:
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_kbd_74145;
-	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<rs232_port_device> m_rs232;
-	uint8_t *m_char_ptr;
-	uint8_t *m_vram;
+	required_region_ptr<uint8_t> m_chargen;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_READ8_MEMBER( pia1_kbA_r );
-	DECLARE_WRITE8_MEMBER( pia1_kbA_w );
-	DECLARE_READ8_MEMBER( pia1_kbB_r );
-	DECLARE_WRITE8_MEMBER( pia1_kbB_w );
+	uint8_t pia_r(offs_t offset);
+	void pia_w(offs_t offset, uint8_t data);
+	uint8_t pia1_kbA_r();
+	void pia1_kbA_w(uint8_t data);
+	uint8_t pia1_kbB_r();
+	void pia1_kbB_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( pia1_ca1_r );
 	DECLARE_READ_LINE_MEMBER( pia1_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
@@ -205,12 +205,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(e100_state::rtc_w)
 void e100_state::machine_start()
 {
 	LOG("%s()\n", FUNCNAME);
-	m_char_ptr  = memregion("chargen")->base();
-	m_vram      = (uint8_t *)m_videoram.target();
 
 	/* register for state saving */
-	save_pointer (NAME (m_char_ptr), sizeof(m_char_ptr));
-	save_pointer (NAME (m_vram), sizeof(m_vram));
 	save_item(NAME(m_50hz));
 	save_item(NAME(m_pia1_B));
 }
@@ -231,7 +227,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			/* look up the character data */
 			charcode = m_vram[vramad];
 			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
-			chardata = &m_char_ptr[(charcode * 8)];
+			chardata = &m_chargen[(charcode * 8)];
 			/* plot the character */
 			for (y = 0; y < 8; y++)
 			{
@@ -239,7 +235,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				for (x = 0; x < 8; x++)
 				{
 					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
-					bitmap.pix16(row + y, col + x) = (*chardata & (1 << x)) ? 1 : 0;
+					bitmap.pix(row + y, col + x) = (*chardata & (1 << x)) ? 1 : 0;
 				}
 				chardata++;
 			}
@@ -252,7 +248,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 /* PIA write - the Esselte 100 allows the PIA:s to be accessed simultaneously */
-WRITE8_MEMBER( e100_state::pia_w )
+void e100_state::pia_w(offs_t offset, uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 	if ((offset & 0x08) == 0x08)
@@ -276,7 +272,7 @@ WRITE8_MEMBER( e100_state::pia_w )
 }
 
 /* PIA read  - the Esselte 100 allows the PIA:s to be accessed simultaneously */
-READ8_MEMBER( e100_state::pia_r )
+uint8_t e100_state::pia_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -305,12 +301,12 @@ READ8_MEMBER( e100_state::pia_r )
 	return data;
 }
 
-WRITE8_MEMBER( e100_state::pia1_kbA_w )
+void e100_state::pia1_kbA_w(uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
-READ8_MEMBER( e100_state::pia1_kbA_r )
+uint8_t e100_state::pia1_kbA_r()
 {
 	int ls145;
 	uint8_t pa = 0x00;
@@ -369,7 +365,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
 #define SERIAL_IN  0x20
 #define CASS_OUT   0x40
 #define CASS_IN    0x80
-WRITE8_MEMBER( e100_state::pia1_kbB_w )
+void e100_state::pia1_kbB_w(uint8_t data)
 {
 	uint8_t col;
 
@@ -386,7 +382,7 @@ WRITE8_MEMBER( e100_state::pia1_kbB_w )
 	m_rs232->write_txd(data & SERIAL_OUT ? 0 : 1);
 }
 
-READ8_MEMBER( e100_state::pia1_kbB_r )
+uint8_t e100_state::pia1_kbB_r()
 {
 	m_pia1_B &= ~(CASS_IN|SERIAL_IN);
 
@@ -423,7 +419,7 @@ void e100_state::e100_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0x87ff).rom().region("roms", 0);
-	map(0xc000, 0xc3ff).ram().share("videoram");
+	map(0xc000, 0xc3ff).ram().share(m_vram);
 	map(0xc800, 0xc81f).rw(FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
 	map(0xd000, 0xffff).rom().region("roms", 0x1000);
 }
@@ -541,6 +537,7 @@ INPUT_PORTS_END
 void e100_state::e100(machine_config &config)
 {
 	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &e100_state::e100_map);
 
 	/* Devices */
@@ -578,6 +575,7 @@ void e100_state::e100(machine_config &config)
 	/* Serial port support */
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
+	SPEAKER(config, "mono").front_center();
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
 	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active
 	 * Once running enable/disable internal UI by pressing Scroll Lock in case it interferes with target keys
@@ -587,7 +585,8 @@ void e100_state::e100(machine_config &config)
 	 * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
 	 */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

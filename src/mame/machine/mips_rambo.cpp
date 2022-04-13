@@ -111,7 +111,7 @@ template <unsigned Channel> u16 mips_rambo_device::fifo_r()
 	return m_fifo[Channel].dequeue();
 }
 
-template <unsigned Channel> READ32_MEMBER(mips_rambo_device::mode_r)
+template <unsigned Channel> u32 mips_rambo_device::mode_r()
 {
 	u32 data = m_channel[Channel].mode | m_fifo[Channel].queue_length();
 
@@ -123,21 +123,21 @@ template <unsigned Channel> READ32_MEMBER(mips_rambo_device::mode_r)
 	return data;
 }
 
-READ32_MEMBER(mips_rambo_device::tcount_r)
+u32 mips_rambo_device::tcount_r()
 {
 	u32 const data = attotime_to_clocks(machine().time() - m_tcount);
 
 	return data;
 }
 
-WRITE32_MEMBER(mips_rambo_device::tcount_w)
+void mips_rambo_device::tcount_w(u32 data)
 {
 	LOGMASKED(LOG_REG, "tcount_w 0x%08x (%s)\n", data, machine().describe_context());
 
 	m_tcount = machine().time();
 }
 
-WRITE32_MEMBER(mips_rambo_device::tbreak_w)
+void mips_rambo_device::tbreak_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_REG, "tbreak_w 0x%08x (%s)\n", data, machine().describe_context());
 
@@ -146,7 +146,7 @@ WRITE32_MEMBER(mips_rambo_device::tbreak_w)
 	m_timer->adjust(clocks_to_attotime(m_tbreak) - (machine().time() - m_tcount));
 }
 
-WRITE32_MEMBER(mips_rambo_device::control_w)
+void mips_rambo_device::control_w(u32 data)
 {
 	LOGMASKED(LOG_REG, "control_w 0x%08x (%s)\n", data, machine().describe_context());
 
@@ -164,7 +164,7 @@ WRITE32_MEMBER(mips_rambo_device::control_w)
 	}
 }
 
-template <unsigned Channel> WRITE32_MEMBER(mips_rambo_device::load_address_w)
+template <unsigned Channel> void mips_rambo_device::load_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_REG, "load_address_w<%d> 0x%08x (%s)\n", Channel, data, machine().describe_context());
 
@@ -181,7 +181,7 @@ template <unsigned Channel> void mips_rambo_device::fifo_w(u16 data)
 		m_dma->adjust(attotime::zero, Channel);
 }
 
-template <unsigned Channel> WRITE32_MEMBER(mips_rambo_device::mode_w)
+template <unsigned Channel> void mips_rambo_device::mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_REG, "mode_w<%d> 0x%08x (%s)\n", Channel, data, machine().describe_context());
 
@@ -201,7 +201,7 @@ template <unsigned Channel> WRITE32_MEMBER(mips_rambo_device::mode_w)
 		m_dma->adjust(attotime::zero, Channel);
 }
 
-template <unsigned Channel> WRITE16_MEMBER(mips_rambo_device::block_count_w)
+template <unsigned Channel> void mips_rambo_device::block_count_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOGMASKED(LOG_REG, "block_count_w<%d> 0x%04x (%s)\n", Channel, data, machine().describe_context());
 

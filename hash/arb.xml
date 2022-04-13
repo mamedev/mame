@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="arb" description="ARB Modules">
 
@@ -15,6 +18,21 @@
 				<rom                                offset="0x6000" size="0x1000" loadflag="reload" />
 				<rom name="5000-5800_ea_8332a160-1" offset="0x5000" size="0x1000" crc="aac1dff2" sha1="9a7fc6dc98e53120e511d266304ad07f248f415a" />
 				<rom                                offset="0x7000" size="0x1000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avelan">
+		<description>Avelan</description>
+		<year>198?</year>
+		<publisher>AVE Micro Systems</publisher>
+		<part name="cart" interface="arb">
+			<feature name="altboard" value="1" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="avelan.bin" offset="0x4000" size="0x1000" crc="01e713d1" sha1="a32e22de4d32fd0a97f8be6b5bc33d0c558aa323" />
+				<rom                   offset="0x5000" size="0x1000" loadflag="reload" />
+				<rom                   offset="0x6000" size="0x1000" loadflag="reload" />
+				<rom                   offset="0x7000" size="0x1000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>

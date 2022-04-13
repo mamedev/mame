@@ -64,9 +64,9 @@ private:
 
 	uint8_t m_registers[0x10];
 
-	DECLARE_WRITE8_MEMBER( address_w );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	void address_w(uint8_t data);
+	uint8_t data_r();
+	void data_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(CS8221, cs8221_device)

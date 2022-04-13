@@ -13,10 +13,13 @@
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
 
+#include <iostream>
+
+
 const options_entry osd_options::s_option_entries[] =
 {
 	{ nullptr,                               nullptr,           OPTION_HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
-#ifdef SDLMAME_MACOSX
+#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 	{ OSDOPTION_UIMODEKEY,                   "DEL",             OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #else
 	{ OSDOPTION_UIMODEKEY,                   "SCRLOCK",         OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
@@ -40,6 +43,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD DEBUGGING OPTIONS" },
 	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,   OPTION_STRING,    "debugger used: " },
+	{ OSDOPTION_DEBUGGER_PORT,                "23946",          OPTION_INTEGER,   "port to use for gdbstub debugger" },
 	{ OSDOPTION_DEBUGGER_FONT ";dfont",       OSDOPTVAL_AUTO,   OPTION_STRING,    "font to use for debugger views" },
 	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",           OPTION_FLOAT,     "font size to use for debugger views" },
 	{ OSDOPTION_WATCHDOG ";wdog",             "0",              OPTION_INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
@@ -91,7 +95,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
 	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "use bilinear filtering when scaling emulated video" },
-	{ OSDOPTION_PRESCALE "(1-3)",             "1",              OPTION_INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
+	{ OSDOPTION_PRESCALE "(1-8)",             "1",              OPTION_INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
 
 #if USE_OPENGL
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OpenGL-SPECIFIC OPTIONS" },
@@ -125,7 +129,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD SOUND OPTIONS" },
 	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "sound output method: " },
-	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+	{ OSDOPTION_AUDIO_LATENCY "(0-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 #ifndef NO_USE_PORTAUDIO
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "PORTAUDIO OPTIONS" },
@@ -151,11 +155,11 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
 	{ OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
-	{ OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
+	{ OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, d3d12, metal, opengl, gles, vulkan)" },
 	{ OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
 	{ OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
 	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
-	{ OSDOPTION_BGFX_LUT,                     "",                OPTION_STRING, "LUT texture name" },
+	{ OSDOPTION_BGFX_LUT,                     "lut-default.png", OPTION_STRING, "LUT texture name" },
 	{ OSDOPTION_BGFX_AVI_NAME,                OSDOPTVAL_AUTO,    OPTION_STRING, "filename for BGFX output logging" },
 
 		// End of list
@@ -222,11 +226,15 @@ void osd_common_t::register_options()
 #ifndef NO_USE_PORTAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
 #endif
+#ifndef NO_USE_PULSEAUDIO
+	REGISTER_MODULE(m_mod_man, SOUND_PULSEAUDIO);
+#endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
 	REGISTER_MODULE(m_mod_man, MONITOR_WIN32);
 	REGISTER_MODULE(m_mod_man, MONITOR_DXGI);
+	REGISTER_MODULE(m_mod_man, MONITOR_MAC);
 
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
@@ -235,6 +243,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
 	REGISTER_MODULE(m_mod_man, DEBUG_QT);
 	REGISTER_MODULE(m_mod_man, DEBUG_IMGUI);
+	REGISTER_MODULE(m_mod_man, DEBUG_GDBSTUB);
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
 #endif
 
@@ -251,7 +260,6 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
-	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_UWP);
 	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
 
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
@@ -269,7 +277,6 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
-	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_UWP);
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
@@ -284,42 +291,42 @@ void osd_common_t::register_options()
 	int num;
 	std::vector<const char *> dnames;
 
-	m_mod_man.get_module_names(OSD_MONITOR_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_MONITOR_PROVIDER, 20, num, names);
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_MONITOR_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_FONT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_KEYBOARDINPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_KEYBOARDINPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_KEYBOARDINPUT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_MOUSEINPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_MOUSEINPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_MOUSEINPUT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_LIGHTGUNINPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_LIGHTGUNINPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_LIGHTGUNINPUT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_JOYSTICKINPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_JOYSTICKINPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_JOYSTICKINPUT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_SOUND_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_SOUND_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
@@ -327,7 +334,7 @@ void osd_common_t::register_options()
 
 #if 0
 	// Register midi options and update options
-	m_mod_man.get_module_names(OSD_MIDI_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_MIDI_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
@@ -335,13 +342,13 @@ void osd_common_t::register_options()
 #endif
 
 	// Register debugger options and update options
-	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_DEBUG_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_OUTPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_OUTPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
@@ -378,28 +385,28 @@ void osd_common_t::update_option(const std::string &key, std::vector<const char 
 //-------------------------------------------------
 //  output_callback  - callback for osd_printf_...
 //-------------------------------------------------
-void osd_common_t::output_callback(osd_output_channel channel, const char *msg, va_list args)
+void osd_common_t::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
 {
 	switch (channel)
 	{
-		case OSD_OUTPUT_CHANNEL_ERROR:
-		case OSD_OUTPUT_CHANNEL_WARNING:
-			vfprintf(stderr, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_INFO:
-		case OSD_OUTPUT_CHANNEL_LOG:
-			vfprintf(stdout, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_VERBOSE:
-			if (verbose()) vfprintf(stdout, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_DEBUG:
+	case OSD_OUTPUT_CHANNEL_ERROR:
+	case OSD_OUTPUT_CHANNEL_WARNING:
+		util::stream_format(std::cerr, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_INFO:
+	case OSD_OUTPUT_CHANNEL_LOG:
+		util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_VERBOSE:
+		if (verbose()) util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_DEBUG:
 #ifdef MAME_DEBUG
-			vfprintf(stdout, msg, args);
+		util::stream_format(std::cout, args);
 #endif
-			break;
-		default:
-			break;
+		break;
+	default:
+		break;
 	}
 }
 
@@ -439,7 +446,7 @@ void osd_common_t::init(running_machine &machine)
 
 	m_machine = &machine;
 
-	osd_options &options = downcast<osd_options &>(machine.options());
+	auto &options = downcast<osd_options &>(machine.options());
 	// extract the verbose printing option
 	if (options.verbose())
 		set_verbose(true);
@@ -558,7 +565,7 @@ void osd_common_t::set_mastervolume(int attenuation)
 //  additions/modifications to the input list
 //-------------------------------------------------
 
-void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &typelist)
+void osd_common_t::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
 	//
 	// inptport.c defines some general purpose defaults for key and joystick bindings.
@@ -618,7 +625,7 @@ bool osd_common_t::execute_command(const char *command)
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
 		osd_module *om = select_module_options(options(), OSD_MIDI_PROVIDER);
-		midi_module *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
+		auto *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
 
 		if (om->probe())
 		{
@@ -672,7 +679,7 @@ void osd_common_t::init_subsystems()
 
 	m_output = select_module_options<output_module *>(options(), OSD_OUTPUT_PROVIDER);
 	m_output->set_machine(&machine());
-	machine().output().set_notifier(nullptr, output_notifier_callback, this);
+	machine().output().set_global_notifier(output_notifier_callback, this);
 
 	m_mod_man.init(options());
 

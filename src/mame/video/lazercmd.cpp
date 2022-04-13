@@ -28,25 +28,23 @@ int lazercmd_state::vert_scale(int data)
 /* meadows lanes normaly use 2x2 pixels and lazer command uses either */
 void lazercmd_state::plot_pattern( bitmap_ind16 &bitmap, int x, int y )
 {
-	int xbit, ybit, size;
-
-	size = 2;
+	int size = 2;
 	if (ioport("DSW")->read() & 0x40)
 	{
 		size = 4;
 	}
 
-	for (ybit = 0; ybit < 2; ybit++)
+	for (int ybit = 0; ybit < 2; ybit++)
 	{
 		if (y + ybit < 0 || y + ybit >= VERT_RES * VERT_CHR)
 			return;
 
-		for (xbit = 0; xbit < size; xbit++)
+		for (int xbit = 0; xbit < size; xbit++)
 		{
 			if (x + xbit < 0 || x + xbit >= HORZ_RES * HORZ_CHR)
 				continue;
 
-			bitmap.pix16(y + ybit, x + xbit) = 4;
+			bitmap.pix(y + ybit, x + xbit) = 4;
 		}
 	}
 }

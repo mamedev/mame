@@ -88,14 +88,14 @@ EB26IC73.BIN    27C240      /  Main Program
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/vs9209.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /*** SOUND *******************************************************************/
 
-WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
+void suprslam_state::suprslam_sh_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
@@ -219,17 +219,6 @@ INPUT_PORTS_END
 
 /*** GFX DECODE **************************************************************/
 
-static const gfx_layout suprslam_8x8x4_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-
 static const gfx_layout suprslam_16x16x4_layout =
 {
 	16,16,
@@ -245,7 +234,7 @@ static const gfx_layout suprslam_16x16x4_layout =
 };
 
 static GFXDECODE_START( gfx_suprslam )
-	GFXDECODE_ENTRY( "gfx1", 0, suprslam_8x8x4_layout,   0x000, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,    0x000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, suprslam_16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, suprslam_16x16x4_layout, 0x100, 16 )
 GFXDECODE_END
@@ -300,7 +289,7 @@ void suprslam_state::suprslam(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 0x800);
 
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::suprslam_tile_callback), this);
+	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::suprslam_tile_callback));
 	m_spr->set_gfx_region(1);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
@@ -334,10 +323,10 @@ ROM_START( suprslam )
 	ROM_LOAD( "eb26ic38.bin", 0x000000, 0x020000, CRC(153f2c50) SHA1(b70f248cfb18239fcd26e36fb36159f219debf2c) )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic66.bin", 0x000000, 0x200000, CRC(8cb33682) SHA1(0e6189ef0673227d35b9a154e333cc6cf9b65df6) )
 
-	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic59.bin", 0x000000, 0x100000, CRC(4ae4095b) SHA1(62b0600b18febb6cecb6370b03a2d6b7756840a2) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* 8x8x4 'Screen' Layer GFX */

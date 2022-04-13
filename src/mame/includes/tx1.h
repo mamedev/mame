@@ -65,6 +65,9 @@ public:
 	void buggyboy(machine_config &config);
 	void buggybjr(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	struct math_t
 	{
@@ -77,7 +80,7 @@ private:
 		uint16_t  retval;
 		uint16_t  muxlatch;   // TX-1
 		int     dbgaddr;
-		int     dbgpc;
+		int     dbgpc = 0;
 
 		uint16_t get_datarom_addr() const;
 		uint16_t get_bb_datarom_addr() const;
@@ -87,8 +90,8 @@ private:
 	class sn74s516_t
 	{
 	public:
-		int16_t   X;
-		int16_t   Y;
+		int16_t   X = 0;
+		int16_t   Y = 0;
 
 		union
 		{
@@ -100,9 +103,9 @@ private:
 			int32_t ZW32;
 		} ZW;
 
-		int     code;
-		int     state;
-		int     ZWfl;
+		int     code = 0;
+		int     state = 0;
+		int     ZWfl = 0;
 
 		void kick(running_machine &machine, math_t &math, uint16_t *data, int ins);
 
@@ -114,29 +117,29 @@ private:
 
 	struct vregs_t
 	{
-		uint16_t  scol;       /* Road colours */
-		uint32_t  slock;      /* Scroll lock */
-		uint8_t   flags;      /* Road flags */
+		uint16_t  scol = 0;       /* Road colours */
+		uint32_t  slock = 0;      /* Scroll lock */
+		uint8_t   flags = 0;      /* Road flags */
 
-		uint32_t  ba_val;     /* Accumulator */
-		uint32_t  ba_inc;
-		uint32_t  bank_mode;
+		uint32_t  ba_val = 0;     /* Accumulator */
+		uint32_t  ba_inc = 0;
+		uint32_t  bank_mode = 0;
 
-		uint16_t  h_val;      /* Accumulator */
-		uint16_t  h_inc;
-		uint16_t  h_init;
+		uint16_t  h_val = 0;      /* Accumulator */
+		uint16_t  h_inc = 0;
+		uint16_t  h_init = 0;
 
-		uint8_t   slin_val;   /* Accumulator */
-		uint8_t   slin_inc;
+		uint8_t   slin_val = 0;   /* Accumulator */
+		uint8_t   slin_inc = 0;
 
 		/* Buggyboy only */
-		uint8_t   wa8;
-		uint8_t   wa4;
+		uint8_t   wa8 = 0;
+		uint8_t   wa4 = 0;
 
-		uint16_t  wave_lfsr;
-		uint8_t   sky;
-		uint16_t  gas;
-		uint8_t   shift;
+		uint16_t  wave_lfsr = 0;
+		uint8_t   sky = 0;
+		uint16_t  gas = 0;
+		uint8_t   shift = 0;
 	};
 
 	math_t m_math;
@@ -160,7 +163,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<tx1_sound_device> m_sound;
 
-	emu_timer *m_interrupt_timer;
+	emu_timer *m_interrupt_timer = nullptr;
 
 	vregs_t m_vregs;
 	std::unique_ptr<uint8_t[]> m_chr_bmp;
@@ -168,39 +171,37 @@ private:
 	std::unique_ptr<uint8_t[]> m_rod_bmp;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
-	bool m_needs_update;
+	bool m_needs_update = false;
 
 	void kick_sn74s516(uint16_t *data, int ins);
 	void tx1_update_state();
 	void buggyboy_update_state();
 
-	DECLARE_READ16_MEMBER(tx1_math_r);
-	DECLARE_WRITE16_MEMBER(tx1_math_w);
-	DECLARE_READ16_MEMBER(tx1_spcs_rom_r);
-	DECLARE_READ16_MEMBER(tx1_spcs_ram_r);
-	DECLARE_WRITE16_MEMBER(tx1_spcs_ram_w);
-	DECLARE_READ16_MEMBER(buggyboy_math_r);
-	DECLARE_WRITE16_MEMBER(buggyboy_math_w);
-	DECLARE_READ16_MEMBER(buggyboy_spcs_rom_r);
-	DECLARE_WRITE16_MEMBER(buggyboy_spcs_ram_w);
-	DECLARE_READ16_MEMBER(buggyboy_spcs_ram_r);
-	DECLARE_READ16_MEMBER(tx1_crtc_r);
-	DECLARE_WRITE16_MEMBER(tx1_crtc_w);
-	DECLARE_WRITE16_MEMBER(tx1_bankcs_w);
-	DECLARE_WRITE16_MEMBER(tx1_slincs_w);
-	DECLARE_WRITE16_MEMBER(tx1_slock_w);
-	DECLARE_WRITE16_MEMBER(tx1_scolst_w);
-	DECLARE_WRITE16_MEMBER(tx1_flgcs_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_gas_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_sky_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_scolst_w);
-	DECLARE_WRITE16_MEMBER(resume_math_w);
-	DECLARE_WRITE16_MEMBER(halt_math_w);
-	DECLARE_READ16_MEMBER(dipswitches_r);
-	DECLARE_MACHINE_RESET(tx1);
+	uint16_t tx1_math_r(offs_t offset);
+	void tx1_math_w(offs_t offset, uint16_t data);
+	uint16_t tx1_spcs_rom_r(offs_t offset);
+	uint16_t tx1_spcs_ram_r(offs_t offset);
+	void tx1_spcs_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t buggyboy_math_r(offs_t offset);
+	void buggyboy_math_w(offs_t offset, uint16_t data);
+	uint16_t buggyboy_spcs_rom_r(offs_t offset);
+	void buggyboy_spcs_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t buggyboy_spcs_ram_r(offs_t offset);
+	uint16_t tx1_crtc_r();
+	void tx1_crtc_w(offs_t offset, uint16_t data);
+	void tx1_bankcs_w(offs_t offset, uint16_t data);
+	void tx1_slincs_w(offs_t offset, uint16_t data);
+	void tx1_slock_w(uint16_t data);
+	void tx1_scolst_w(uint16_t data);
+	void tx1_flgcs_w(uint16_t data);
+	void buggyboy_gas_w(offs_t offset, uint16_t data);
+	void buggyboy_sky_w(uint16_t data);
+	void buggyboy_scolst_w(uint16_t data);
+	void resume_math_w(uint16_t data);
+	void halt_math_w(uint16_t data);
+	u16 dipswitches_r();
 	DECLARE_VIDEO_START(tx1);
 	void tx1_palette(palette_device &palette) const;
-	DECLARE_MACHINE_RESET(buggyboy);
 	DECLARE_VIDEO_START(buggyboy);
 	void buggyboy_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(buggybjr);

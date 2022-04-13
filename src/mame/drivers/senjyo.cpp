@@ -83,7 +83,6 @@ I/O read/write
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -93,7 +92,6 @@ void senjyo_state::machine_start()
 	save_item(NAME(m_sound_cmd));
 	save_item(NAME(m_single_volume));
 	save_item(NAME(m_sound_state));
-	save_item(NAME(m_bgstripes));
 }
 
 void senjyo_state::machine_reset()
@@ -101,21 +99,20 @@ void senjyo_state::machine_reset()
 	m_sound_cmd = 0;
 	m_single_volume = 0;
 	m_sound_state = 0;
-	m_bgstripes = 0;
 }
 
-WRITE8_MEMBER(senjyo_state::irq_ctrl_w)
+void senjyo_state::irq_ctrl_w(uint8_t data)
 {
 	// irq ack is mandatory for senjyo: it's basically used as an irq mask during POST.
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(senjyo_state::flip_screen_w)
+void senjyo_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER(senjyo_state::sound_cmd_w)
+void senjyo_state::sound_cmd_w(uint8_t data)
 {
 	m_sound_cmd = data;
 
@@ -131,20 +128,25 @@ void senjyo_state::senjyo_map(address_map &map)
 	map(0x9400, 0x97ff).ram().w(FUNC(senjyo_state::fgcolorram_w)).share("fgcolorram");
 	map(0x9800, 0x987f).ram().share("spriteram");
 	map(0x9c00, 0x9dff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9e00, 0x9e3f).ram();
 	map(0x9e00, 0x9e1f).ram().share("fgscroll");
 	map(0x9e20, 0x9e21).ram().share("scrolly3");
-/*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
+/*  map(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
+	map(0x9e22, 0x9e24).ram();
 	map(0x9e25, 0x9e25).ram().share("scrollx3");
+	map(0x9e26, 0x9e26).ram();
 	map(0x9e27, 0x9e27).ram().share("bgstripesram");  /* controls width of background stripes */
 	map(0x9e28, 0x9e29).ram().share("scrolly2");
-/*  AM_RANGE(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200) */
+/*  map(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200) */
+	map(0x9e2a, 0x9e2c).ram();
 	map(0x9e2d, 0x9e2d).ram().share("scrollx2");
+	map(0x9e2e, 0x9e2f).ram();
 	map(0x9e30, 0x9e31).ram().share("scrolly1");
-/*  AM_RANGE(0x9e32, 0x9e33) height of the layer (Senjyo only, fixed at 0x100) */
+/*  map(0x9e32, 0x9e33) height of the layer (Senjyo only, fixed at 0x100) */
+	map(0x9e32, 0x9e34).ram();
 	map(0x9e35, 0x9e35).ram().share("scrollx1");
-/*  AM_RANGE(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
-/*  AM_RANGE(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
+/*  map(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
+/*  map(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
+	map(0x9e36, 0x9e3f).ram();
 	map(0xa000, 0xa7ff).ram().w(FUNC(senjyo_state::bg3videoram_w)).share("bg3videoram");
 	map(0xa800, 0xafff).ram().w(FUNC(senjyo_state::bg2videoram_w)).share("bg2videoram");
 	map(0xb000, 0xb7ff).ram().w(FUNC(senjyo_state::bg1videoram_w)).share("bg1videoram");
@@ -182,13 +184,13 @@ void senjyo_state::senjyo_sound_io_map(address_map &map)
 /* For the bootleg */
 
 /* are scroll registers 1+2 linked on the bootleg?, only one copy is written */
-WRITE8_MEMBER(senjyo_state::starforb_scrolly2)
+void senjyo_state::starforb_scrolly2(offs_t offset, uint8_t data)
 {
 	m_scrolly2[offset] = data;
 	m_scrolly1[offset] = data;
 }
 
-WRITE8_MEMBER(senjyo_state::starforb_scrollx2)
+void senjyo_state::starforb_scrollx2(offs_t offset, uint8_t data)
 {
 	m_scrollx2[offset] = data;
 	m_scrollx1[offset] = data;
@@ -592,9 +594,6 @@ void senjyo_state::senjyo(machine_config &config)
 	SN76496(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -675,7 +674,7 @@ ROM_START( senjyo )
 	ROM_LOAD( "08k_10b.bin", 0x0a000, 0x2000, CRC(a9f41ec9) SHA1(c24f9d54593e764a0b4530b1a2550b999916992c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
-	ROM_LOAD( "07b.bin",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  /* unknown - timing? */
+	ROM_LOAD( "07b.bin",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  /* waveform */
 ROM_END
 
 ROM_START( starforc )
@@ -712,7 +711,7 @@ ROM_START( starforc )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
-	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* unknown - timing? */
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
 ROM_END
 
 ROM_START( starforcb )
@@ -754,7 +753,7 @@ ROM_START( starforcb )
 	ROM_LOAD( "b10.8l", 0x0a000, 0x2000, CRC(6ea27bec) SHA1(30da81a99d5920107751afda359576e426c497c4) )
 
 	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
-	ROM_LOAD( "a18s030.7b",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )   /* unknown - timing? */
+	ROM_LOAD( "a18s030.7b",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )   /* waveform */
 ROM_END
 
 ROM_START( starforca )
@@ -796,7 +795,7 @@ ROM_START( starforca )
 	ROM_LOAD( "10.bin",  0x0a000, 0x2000, CRC(6ea27bec) SHA1(30da81a99d5920107751afda359576e426c497c4) )
 
 	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
-	ROM_LOAD( "prom.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* unknown - timing? */
+	ROM_LOAD( "prom.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
 ROM_END
 
 ROM_START( starforce )
@@ -835,7 +834,7 @@ ROM_START( starforce )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
-	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* unknown - timing? */
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
 ROM_END
 
 ROM_START( megaforc )
@@ -872,7 +871,7 @@ ROM_START( megaforc )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
-	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* unknown - timing? */
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
 ROM_END
 
 ROM_START( megaforcu ) /* While no "For use in the United States" notice, it's licensed to a US company for distribution */
@@ -909,7 +908,7 @@ ROM_START( megaforcu ) /* While no "For use in the United States" notice, it's l
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
-	ROM_LOAD( "07b.bin",  0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )    /* unknown - timing? */
+	ROM_LOAD( "07b.bin",  0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )    /* waveform */
 ROM_END
 
 ROM_START( baluba )
@@ -946,7 +945,7 @@ ROM_START( baluba )
 	ROM_LOAD( "3",   0x08000, 0x4000, CRC(7ac24983) SHA1(4ac32d95af3147af5b9b1af1f292bb629c5d4fb9) )
 
 	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
-	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  /* unknown - timing? */
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  /* waveform */
 ROM_END
 
 

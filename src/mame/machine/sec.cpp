@@ -5,144 +5,183 @@
 #include "emu.h"
 #include "sec.h"
 
+DEFINE_DEVICE_TYPE(SEC, sec_device, "sec", "Barcrest/Bell Fruit Serial Electronic Counter (SEC)")
 
-
-void SEC::reset(void)
+sec_device::sec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEC, tag, owner, clock)
 {
-	m_clk = 1;
-	m_curbyte = m_clks = n_reqpos = m_rxclk = m_rxlen = m_rxpos = 0;
 }
 
-void SEC::write_cs_line(uint8_t bit)
+void sec_device::device_start()
 {
-	if ( bit )
+	save_item(NAME(m_counters));
+	save_item(NAME(m_strings));
+	save_item(NAME(m_market));
+	save_item(NAME(m_nocnt));
+	save_item(NAME(m_last));
+
+	save_item(NAME(m_curbyte));
+	save_item(NAME(m_data));
+
+	save_item(NAME(m_clk));
+	save_item(NAME(m_clks));
+	save_item(NAME(m_rxpos));
+	save_item(NAME(m_rxclk));
+	save_item(NAME(m_rxdat));
+	save_item(NAME(m_rxlen));
+	save_item(NAME(m_chars_left));
+
+	save_item(NAME(m_reqpos));
+
+	save_item(NAME(m_request));
+	save_item(NAME(m_reply));
+
+	save_item(NAME(m_enabled));
+}
+
+void sec_device::device_reset()
+{
+	m_clk = 1;
+	m_curbyte = 0;
+	m_clks = 0;
+	m_reqpos = 0;
+	m_rxclk = 0;
+	m_rxlen = 0;
+	m_rxpos = 0;
+}
+
+WRITE_LINE_MEMBER(sec_device::cs_w)
+{
+	if (state)
 	{
-		if ( !enabled )
+		if (!m_enabled)
 		{
-			enabled = true;
+			m_enabled = true;
 			m_rxdat = 0;
 		}
 	}
 	else
 	{
-		if ( enabled )
+		if (m_enabled)
 		{
 			m_rxdat = 1;
 		}
 
-		enabled = false;
+		m_enabled = false;
 		reset();
 	}
 }
 
-void SEC::write_data_line(uint8_t bit)
+WRITE_LINE_MEMBER(sec_device::data_w)
 {
-	m_data = bit ? 1 : 0;
+	m_data = (uint8_t)state;
 }
 
-uint8_t SEC::read_data_line(void)
+int sec_device::data_r(void)
 {
 	return m_rxdat;
 }
 
-void SEC::write_clock_line(uint8_t bit)
+WRITE_LINE_MEMBER(sec_device::clk_w)
 {
-	bit = bit ? 1 : 0;
+	state = state ? 1 : 0;
 
-	if ( (m_clk ^ bit) & 1 )
+	if (m_clk ^ state)
 	{
-		if ( !bit )
+		if (!state)
 		{
-			m_curbyte = ( m_curbyte << 1 ) | m_data;
-			if ( m_rxclk == 8 )
+			m_curbyte = (m_curbyte << 1) | m_data;
+			if (m_rxclk == 8)
 			{
 				m_rxclk = 0;
 				m_rxpos++;
 				m_rxlen--;
 			}
 
-			if ( m_rxlen )
-				m_rxdat = (m_reply[m_rxpos] & 0x80) >> 7;
+			if (m_rxlen)
+				m_rxdat = BIT(m_reply[m_rxpos], 7);
 			else
-				m_rxdat = enabled ? 0 : 1;
+				m_rxdat = m_enabled ? 0 : 1;
 		}
 		else
 		{
 			m_clks++;
-			if ( m_rxlen )
+			if (m_rxlen)
 			{
 				m_reply[m_rxpos] <<= 1;
 				m_rxclk++;
 			}
 
-			if ( m_clks == 8 )
+			if (m_clks == 8)
 			{
 				m_clks = 0;
-				if ( !m_rxlen )
+				if (!m_rxlen)
 				{
-					m_request[n_reqpos++] = m_curbyte;
-					if ( chars_left )
+					m_request[m_reqpos++] = m_curbyte;
+					if (m_chars_left)
 					{
-						chars_left--;
-						if ( !chars_left )
+						m_chars_left--;
+						if (!m_chars_left)
 						{
-							n_reqpos--;
-							Do_Command();
-							n_reqpos = 0;
+							m_reqpos--;
+							do_command();
+							m_reqpos = 0;
 						}
 					}
-					if ( n_reqpos == 3 )
-						chars_left = m_curbyte + 1;
+					if (m_reqpos == 3)
+					{
+						m_chars_left = m_curbyte + 1;
+					}
 				}
 			}
 		}
-		m_clk = bit;
+		m_clk = state;
 	}
 }
 
 
 
-void SEC::Do_Command(void)
+void sec_device::do_command(void)
 {
 	m_last = m_request[1];
-	switch ( m_request[0] )
+	switch (m_request[0])
 	{
-		case SEC_REQUEST_VERSION:    Cmd_Get_Ver(); break;
-		case SEC_REQUEST_STATUS:     Cmd_Get_Sta(); break;
-		case SEC_REQUEST_MARKET:     Cmd_Get_Mrk(); break;
-		case SEC_REQEUST_LAST_ERROR: Cmd_Get_Err(); break;
-		case SEC_REQUEST_FINGERPRNT: Cmd_Get_Fpr(); break;
-		case SEC_REQUEST_LAST_CMD:   Cmd_Get_Lst(); break;
-		case SEC_REQUEST_COUNT_VAL:  Cmd_Get_Cnt(); break;
-		case SEC_SET_NUM_COUNTERS:   Cmd_Set_Ncn(); break;
-		case SEC_SET_MARKET:         Cmd_Set_Mrk(); break;
-		case SEC_SET_COUNTER_TXT:    Cmd_Set_Txt(); break;
-		case SEC_COUNT_INC_SMALL:    Cmd_Inc_Sml(); break;
-		case SEC_COUNT_INC_MED:      Cmd_Inc_Med(); break;
-		case SEC_COUNT_INC_LARGE:    Cmd_Inc_Lrg(); break;
+		case SEC_REQUEST_VERSION:    cmd_get_ver(); break;
+		case SEC_REQUEST_STATUS:     cmd_get_sta(); break;
+		case SEC_REQUEST_MARKET:     cmd_get_mrk(); break;
+		case SEC_REQEUST_LAST_ERROR: cmd_get_err(); break;
+		case SEC_REQUEST_FINGERPRNT: cmd_get_fpr(); break;
+		case SEC_REQUEST_LAST_CMD:   cmd_get_lst(); break;
+		case SEC_REQUEST_COUNT_VAL:  cmd_get_cnt(); break;
+		case SEC_SET_NUM_COUNTERS:   cmd_set_ncn(); break;
+		case SEC_SET_MARKET:         cmd_set_mrk(); break;
+		case SEC_SET_COUNTER_TXT:    cmd_set_txt(); break;
+		case SEC_COUNT_INC_SMALL:    cmd_inc_sml(); break;
+		case SEC_COUNT_INC_MED:      cmd_inc_med(); break;
+		case SEC_COUNT_INC_LARGE:    cmd_inc_lrg(); break;
 
 		/* acknowledge these without doing anything */
-		case SEC_SHOW_TEXT:          Cmd_NOP();     break;
-		case SEC_SHOW_COUNTER_VAL:   Cmd_NOP();     break;
-		case SEC_SHOW_COUNTER_TXT:   Cmd_NOP();     break;
-		case SEC_SHOW_BITPATTERN:    Cmd_NOP();     break;
-		case SEC_COUNT_CYCLE_DISP:   Cmd_NOP();     break;
-		case SEC_STOP_CYCLE:         Cmd_NOP();     break;
-		case SEC_SELF_TEST:          Cmd_NOP();     break;
+		case SEC_SHOW_TEXT:          cmd_nop();     break;
+		case SEC_SHOW_COUNTER_VAL:   cmd_nop();     break;
+		case SEC_SHOW_COUNTER_TXT:   cmd_nop();     break;
+		case SEC_SHOW_BITPATTERN:    cmd_nop();     break;
+		case SEC_COUNT_CYCLE_DISP:   cmd_nop();     break;
+		case SEC_STOP_CYCLE:         cmd_nop();     break;
+		case SEC_SELF_TEST:          cmd_nop();     break;
 	}
 }
 
-uint8_t SEC::CalcByteSum(int length)
+uint8_t sec_device::calc_byte_sum(int length)
 {
 	uint8_t csum = 0;
-	for ( int i = 0; i < 3 + length; i++ )
+	for (int i = 0; i < 3 + length; i++)
 	{
 		csum += m_reply[i];
 	}
 	return csum;
 }
 
-void SEC::Cmd_Get_Err(void)
+void sec_device::cmd_get_err(void)
 {
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
@@ -150,14 +189,14 @@ void SEC::Cmd_Get_Err(void)
 
 	m_reply[3] = 0; // Last Error
 
-	m_reply[4] = CalcByteSum(1);
+	m_reply[4] = calc_byte_sum(1);
 
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 5;
 }
 
-void SEC::Cmd_Get_Fpr(void)
+void sec_device::cmd_get_fpr(void)
 {
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
@@ -169,14 +208,14 @@ void SEC::Cmd_Get_Fpr(void)
 	m_reply[5] = 0x00;
 	m_reply[6] = 0x00;
 
-	m_reply[7] = CalcByteSum(4);
+	m_reply[7] = calc_byte_sum(4);
 
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 8;
 }
 
-void SEC::Cmd_Get_Lst(void)
+void sec_device::cmd_get_lst(void)
 {
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
@@ -188,14 +227,14 @@ void SEC::Cmd_Get_Lst(void)
 	m_reply[5] = 0x00;
 	m_reply[6] = 0x00;
 
-	m_reply[7] = CalcByteSum(4);
+	m_reply[7] = calc_byte_sum(4);
 
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 8;
 }
 
-void SEC::Cmd_Get_Ver(void)
+void sec_device::cmd_get_ver(void)
 {
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
@@ -206,14 +245,14 @@ void SEC::Cmd_Get_Ver(void)
 	m_reply[4] = '2';
 	m_reply[5] = 'E';
 
-	m_reply[6] = CalcByteSum(3);
+	m_reply[6] = calc_byte_sum(3);
 
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 7;
 }
 
-void SEC::Cmd_Get_Cnt(void)
+void sec_device::cmd_get_cnt(void)
 {
 	char temp[10];
 
@@ -228,14 +267,14 @@ void SEC::Cmd_Get_Cnt(void)
 	m_reply[5] = ((temp[4] - 0x30) << 4) + (temp[5] - 0x30);
 	m_reply[6] = ((temp[6] - 0x30) << 4) + (temp[7] - 0x30);
 
-	m_reply[7] = CalcByteSum(4);
+	m_reply[7] = calc_byte_sum(4);
 
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 8;
 }
 
-void SEC::Cmd_Get_Sta(void)
+void sec_device::cmd_get_sta(void)
 {
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
@@ -243,14 +282,14 @@ void SEC::Cmd_Get_Sta(void)
 
 	m_reply[3] = 0x20; // Status
 
-	m_reply[4] = CalcByteSum(1);
+	m_reply[4] = calc_byte_sum(1);
 
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 5;
 }
 
-void SEC::Cmd_Get_Mrk(void)
+void sec_device::cmd_get_mrk(void)
 {
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
@@ -258,58 +297,58 @@ void SEC::Cmd_Get_Mrk(void)
 
 	m_reply[3] = m_market;
 
-	m_reply[4] = CalcByteSum(1);
+	m_reply[4] = calc_byte_sum(1);
 
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 5;
 }
 
-void SEC::Cmd_Set_Ncn(void)
+void sec_device::cmd_set_ncn(void)
 {
 	m_nocnt = m_request[3];
 
 	m_reply[0] = SEC_ACK;
 	m_reply[1] = m_last;
 	m_reply[2] = 0;
-	m_reply[3] = CalcByteSum(0);
+	m_reply[3] = calc_byte_sum(0);
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 4;
 }
 
-void SEC::Cmd_Set_Mrk(void)
+void sec_device::cmd_set_mrk(void)
 {
 	m_market = m_request[3];
 
 	m_reply[0] = SEC_ACK;
 	m_reply[1] = m_last;
 	m_reply[2] = 0;
-	m_reply[3] = CalcByteSum(0);
+	m_reply[3] = calc_byte_sum(0);
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 4;
 }
 
-void SEC::Cmd_Set_Txt(void)
+void sec_device::cmd_set_txt(void)
 {
 	char valbuf[8];
 	uint8_t meter = m_request[3];
-	memcpy( valbuf, &m_request[4], 7);
+	memcpy(valbuf, &m_request[4], 7);
 	valbuf[7] = 0;
 	strcpy(m_strings[meter], valbuf);
 
 	m_reply[0] = SEC_ACK;
 	m_reply[1] = m_last;
 	m_reply[2] = 0;
-	m_reply[3] = CalcByteSum(0);
+	m_reply[3] = calc_byte_sum(0);
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 4;
 }
 
 
-void SEC::Cmd_Inc_Sml(void)
+void sec_device::cmd_inc_sml(void)
 {
 	uint8_t meter = m_request[3];
 	uint8_t value = m_request[4] & 0xf;
@@ -318,13 +357,13 @@ void SEC::Cmd_Inc_Sml(void)
 	m_reply[0] = SEC_ACK;
 	m_reply[1] = m_last;
 	m_reply[2] = 0;
-	m_reply[3] = CalcByteSum(0);
+	m_reply[3] = calc_byte_sum(0);
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 4;
 }
 
-void SEC::Cmd_Inc_Med(void)
+void sec_device::cmd_inc_med(void)
 {
 	uint8_t meter = m_request[3];
 	uint8_t value = m_request[4];
@@ -333,13 +372,13 @@ void SEC::Cmd_Inc_Med(void)
 	m_reply[0] = SEC_ACK;
 	m_reply[1] = m_last;
 	m_reply[2] = 0;
-	m_reply[3] = CalcByteSum(0);
+	m_reply[3] = calc_byte_sum(0);
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 4;
 }
 
-void SEC::Cmd_Inc_Lrg(void)
+void sec_device::cmd_inc_lrg(void)
 {
 	uint8_t meter = m_request[3];
 	uint8_t value = m_request[4] + 256 * m_request[5];
@@ -348,18 +387,18 @@ void SEC::Cmd_Inc_Lrg(void)
 	m_reply[0] = SEC_ACK;
 	m_reply[1] = m_last;
 	m_reply[2] = 0;
-	m_reply[3] = CalcByteSum(0);
+	m_reply[3] = calc_byte_sum(0);
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 4;
 }
 
-void SEC::Cmd_NOP(void)
+void sec_device::cmd_nop(void)
 {
 	m_reply[0] = SEC_ACK;
 	m_reply[1] = m_last;
 	m_reply[2] = 0;
-	m_reply[3] = CalcByteSum(0);
+	m_reply[3] = calc_byte_sum(0);
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 4;

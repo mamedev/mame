@@ -2,11 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        BOB85 driver by Miodrag Milanovic
+BOB85 driver by Miodrag Milanovic
 
-        2008-05-24 Preliminary driver.
-        2009-05-12 Skeleton driver.
-        2013-06-02 Working driver.
+2008-05-24 Preliminary driver.
+2009-05-12 Skeleton driver.
+2013-06-02 Working driver.
+2019-07-14 Fixed cassette load - it loads correctly then says EEEE
 
 Pasting:
         0-F : as is
@@ -23,7 +24,9 @@ Test Paste:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/timer.h"
 #include "imagedev/cassette.h"
+#include "speaker.h"
 #include "bob85.lh"
 
 
@@ -41,18 +44,20 @@ public:
 		{ }
 
 	void bob85(machine_config &config);
-	void bob85_io(address_map &map);
-	void bob85_mem(address_map &map);
-	DECLARE_READ8_MEMBER(bob85_keyboard_r);
-	DECLARE_WRITE8_MEMBER(bob85_7seg_w);
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
 
 private:
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	uint8_t bob85_keyboard_r();
+	void bob85_7seg_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(sod_w);
+	DECLARE_READ_LINE_MEMBER(sid_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	uint8_t m_prev_key;
 	uint8_t m_count_key;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	u16 m_casscnt;
+	bool m_cassold, m_cassbit;
+	void machine_start() override;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
@@ -63,7 +68,7 @@ private:
 
 
 
-READ8_MEMBER(bob85_state::bob85_keyboard_r)
+uint8_t bob85_state::bob85_keyboard_r()
 {
 	uint8_t retVal = 0;
 	uint8_t line0 = m_line0->read();
@@ -134,19 +139,19 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 	}
 }
 
-WRITE8_MEMBER(bob85_state::bob85_7seg_w)
+void bob85_state::bob85_7seg_w(offs_t offset, uint8_t data)
 {
 	m_digits[offset] = bitswap<8>( data,3,2,1,0,7,6,5,4 );
 }
 
-void bob85_state::bob85_mem(address_map &map)
+void bob85_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x02ff).rom();
 	map(0x0600, 0x09ff).ram();
 }
 
-void bob85_state::bob85_io(address_map &map)
+void bob85_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0a, 0x0a).r(FUNC(bob85_state::bob85_keyboard_r));
@@ -185,8 +190,34 @@ static INPUT_PORTS_START( bob85 )
 	PORT_BIT(0xC0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-void bob85_state::machine_reset()
+void bob85_state::machine_start()
 {
+	m_digits.resolve();
+	save_item(NAME(m_prev_key));
+	save_item(NAME(m_count_key));
+	save_item(NAME(m_casscnt));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cassbit));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( bob85_state::kansas_r )
+{
+	/* cassette - turn pulses into a bit */
+	bool cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	m_casscnt++;
+
+	if (cass_ws != m_cassold)
+	{
+		m_cassold = cass_ws;
+		m_cassbit = (m_casscnt < 12) ? 1 : 0;
+		m_casscnt = 0;
+	}
+	else
+	if (m_casscnt > 32)
+	{
+		m_casscnt = 32;
+		m_cassbit = 0;
+	}
 }
 
 WRITE_LINE_MEMBER( bob85_state::sod_w )
@@ -196,32 +227,36 @@ WRITE_LINE_MEMBER( bob85_state::sod_w )
 
 READ_LINE_MEMBER( bob85_state::sid_r )
 {
-	return m_cass->input() > 0.0;
+	return m_cassbit;
 }
 
 void bob85_state::bob85(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, XTAL(5'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &bob85_state::bob85_mem);
-	m_maincpu->set_addrmap(AS_IO, &bob85_state::bob85_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bob85_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &bob85_state::io_map);
 	m_maincpu->in_sid_func().set(FUNC(bob85_state::sid_r));
 	m_maincpu->out_sod_func().set(FUNC(bob85_state::sod_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_bob85);
 
+	SPEAKER(config, "mono").front_center();
+
 	// devices
-	CASSETTE(config, m_cass).set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED));
+	CASSETTE(config, m_cass).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(bob85_state::kansas_r), attotime::from_hz(40000));
 }
 
 /* ROM definition */
 ROM_START( bob85 )
-	ROM_REGION( 0x600, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0300, "maincpu", 0 )
 	ROM_LOAD( "bob85.rom", 0x0000, 0x0300, BAD_DUMP CRC(adde33a8) SHA1(00f26dd0c52005e7705e6cc9cb11a20e572682c6) ) // should be 6 separate 74S287's (256x4)
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY             FULLNAME  FLAGS
-COMP( 1984, bob85, 0,      0,      bob85,   bob85, bob85_state, empty_init, "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)
+COMP( 1984, bob85, 0,      0,      bob85,   bob85, bob85_state, empty_init, "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

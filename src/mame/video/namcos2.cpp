@@ -29,19 +29,19 @@ void namcos2_state::TilemapCB_finalap2(uint16_t code, int *tile, int *mask)
  * ---- ---- xxxx ---- always zero?
  * ---- ---- ---- xxxx sprite bank
  */
-READ16_MEMBER(namcos2_state::gfx_ctrl_r)
+uint16_t namcos2_state::gfx_ctrl_r()
 {
 	return m_gfx_ctrl;
 }
 
-WRITE16_MEMBER(namcos2_state::gfx_ctrl_w)
+void namcos2_state::gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gfx_ctrl);
 }
 
 /**************************************************************************/
 
-READ8_MEMBER(namcos2_state::c116_r)
+uint8_t namcos2_state::c116_r(offs_t offset)
 {
 	if ((offset & 0x1800) == 0x1800)
 	{
@@ -51,7 +51,7 @@ READ8_MEMBER(namcos2_state::c116_r)
 		/* registers 6,7: unmapped? */
 		if (offset > 0x180b) return 0xff; // fix for finallap boot
 	}
-	return m_c116->read(space, offset, mem_mask);
+	return m_c116->read(offset);
 }
 
 /**************************************************************************/
@@ -70,6 +70,8 @@ void namcos2_state::create_shadow_table()
 void namcos2_state::video_start()
 {
 	create_shadow_table();
+
+	save_item(NAME(m_gfx_ctrl));
 }
 
 void namcos2_state::apply_clip(rectangle &clip, const rectangle &cliprect)
@@ -91,7 +93,9 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	apply_clip(clip, cliprect);
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
-	bool roz_enable = ((m_gfx_ctrl & 0x7000) ? true : false);
+	// Phelios contradicts with this so disabled
+	// (level 0 ROZ is actually used by stages 2, 3 and 4 at very least)
+	//bool roz_enable = ((m_gfx_ctrl & 0x7000) ? true : false);
 
 	for (pri = 0; pri < 16; pri++)
 	{
@@ -99,7 +103,7 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
 
-			if (roz_enable)
+			//if (roz_enable)
 			{
 				if (((m_gfx_ctrl & 0x7000) >> 12) == pri / 2)
 				{
@@ -230,7 +234,7 @@ uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind
 			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
 		}
 		m_c169roz->draw(screen, bitmap, clip, pri);
-		m_ns2sprite->draw_sprites_metalhawk(screen, bitmap, clip, pri);
+		m_ns2sprite->draw_sprites(screen, bitmap, clip, pri, 0);
 	}
 	return 0;
 }

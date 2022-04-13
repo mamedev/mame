@@ -17,8 +17,6 @@
 
 image_init_result general_cbm_loadsnap(
 		device_image_interface &image,
-		const char *file_type,
-		int snapshot_size,
 		address_space &space,
 		offs_t offset,
 		void (*cbm_sethiaddress)(address_space &space, uint16_t hiaddress));

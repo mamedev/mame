@@ -65,14 +65,14 @@ class gba_lcd_device
 public:
 	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(video_r);
-	DECLARE_WRITE32_MEMBER(video_w);
-	DECLARE_READ32_MEMBER(gba_pram_r);
-	DECLARE_WRITE32_MEMBER(gba_pram_w);
-	DECLARE_READ32_MEMBER(gba_vram_r);
-	DECLARE_WRITE32_MEMBER(gba_vram_w);
-	DECLARE_READ32_MEMBER(gba_oam_r);
-	DECLARE_WRITE32_MEMBER(gba_oam_w);
+	uint32_t video_r(offs_t offset, uint32_t mem_mask = ~0);
+	void video_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gba_pram_r(offs_t offset);
+	void gba_pram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gba_vram_r(offs_t offset);
+	void gba_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gba_oam_r(offs_t offset);
+	void gba_oam_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);
 

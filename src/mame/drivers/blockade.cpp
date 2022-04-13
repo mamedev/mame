@@ -2,7 +2,7 @@
 // copyright-holders: Frank Palazzolo, Dirk Best
 /***************************************************************************
 
-    Blockade/CoMOTION/Blasto/Hustle/Minesweeper
+    Blockade/CoMotion/Blasto/Hustle/Minesweeper
 
     TODO:
     - Noise generator
@@ -19,6 +19,7 @@
 
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "blockade.lh"
 
@@ -44,16 +45,16 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
-	DECLARE_WRITE8_MEMBER(coin_latch_w);
+	DECLARE_READ_LINE_MEMBER(coin_r);
+	void coin_latch_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info);
 
-	DECLARE_WRITE8_MEMBER(sound_freq_w);
-	DECLARE_WRITE8_MEMBER(env_on_w);
-	DECLARE_WRITE8_MEMBER(env_off_w);
+	void sound_freq_w(uint8_t data);
+	void env_on_w(uint8_t data);
+	void env_off_w(uint8_t data);
 
 	void blockade(machine_config &config);
 	void main_io_map(address_map &map);
@@ -61,7 +62,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -106,7 +107,7 @@ void blockade_state::main_io_map(address_map &map)
 
 static INPUT_PORTS_START( blockade )
 	PORT_START("coin")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, 0)
 
 	// These are not dip switches, they are mapped to connectors on the board.  Different games
 	// had different harnesses which plugged in here, and some pins were unused.
@@ -122,7 +123,7 @@ static INPUT_PORTS_START( blockade )
 	PORT_CONFSETTING(   0x50, "4" )
 	PORT_CONFSETTING(   0x30, "5" )
 	PORT_CONFSETTING(   0x70, "6" )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
@@ -153,7 +154,7 @@ static INPUT_PORTS_START( comotion )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -192,7 +193,7 @@ static INPUT_PORTS_START( blasto )
 	PORT_CONFSETTING(   0x00, "70 Secs") // though service manual says 60
 	PORT_CONFSETTING(   0x08, "90 Secs")
 	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
@@ -227,7 +228,7 @@ static INPUT_PORTS_START( hustle )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START2)
 	PORT_BIT(0x60, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
@@ -264,7 +265,7 @@ static INPUT_PORTS_START( mineswpr )
 	PORT_CONFSETTING(   0x50, "4")
 	PORT_CONFSETTING(   0x30, "5")
 	PORT_CONFSETTING(   0x70, "6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -295,7 +296,7 @@ static INPUT_PORTS_START( mineswpr4 )
 	PORT_CONFSETTING(   0x50, "4")
 	PORT_CONFSETTING(   0x30, "5")
 	PORT_CONFSETTING(   0x70, "6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -331,12 +332,12 @@ INPUT_CHANGED_MEMBER( blockade_state::coin_inserted )
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-CUSTOM_INPUT_MEMBER( blockade_state::coin_r )
+READ_LINE_MEMBER( blockade_state::coin_r )
 {
 	return m_coin_latch;
 }
 
-WRITE8_MEMBER( blockade_state::coin_latch_w )
+void blockade_state::coin_latch_w(uint8_t data)
 {
 	if (BIT(data, 7))
 	{
@@ -350,7 +351,7 @@ WRITE8_MEMBER( blockade_state::coin_latch_w )
 //  VIDEO
 //**************************************************************************
 
-WRITE8_MEMBER( blockade_state::videoram_w )
+void blockade_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -376,7 +377,7 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER( blockade_state::tile_info )
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 
@@ -411,21 +412,18 @@ DISCRETE_SOUND_START( blockade_discrete )
 	DISCRETE_OUTPUT(NODE_10, 7500)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( blockade_state::sound_freq_w )
+void blockade_state::sound_freq_w(uint8_t data)
 {
 	m_discrete->write(BLOCKADE_NOTE_DATA, data);
-	return;
 }
 
-WRITE8_MEMBER( blockade_state::env_on_w )
+void blockade_state::env_on_w(uint8_t data)
 {
 	m_samples->start(0, 0);
-	return;
 }
 
-WRITE8_MEMBER( blockade_state::env_off_w )
+void blockade_state::env_off_w(uint8_t data)
 {
-	return;
 }
 
 const char *const blockade_sample_names[] =
@@ -442,7 +440,7 @@ const char *const blockade_sample_names[] =
 
 void blockade_state::machine_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blockade_state::tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blockade_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_vblank_timer = timer_alloc(0);
 
@@ -457,7 +455,7 @@ void blockade_state::machine_reset()
 	m_coin_inserted = 0;
 }
 
-void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// resume cpu, on the real system, this is connected the READY input
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -523,6 +521,20 @@ ROM_START( comotion )
 	ROM_LOAD_NIB_LOW( "316-0005.u29", 0x000, 0x100, CRC(53fb8821) SHA1(0a499aa4cf15f7ebea155aacd914de8851544215))
 ROM_END
 
+// typed in from patent US4089524, lacks bugfix(?) at 0x68
+ROM_START( comotionp )
+	ROM_REGION(0x800, "maincpu", 0)
+	// ROM_LOAD("comotionp.bin", 0x000, 0x800, CRC(3992bf85) SHA1(42191d4afc460a0da1429a63a50adb0a5acac276))
+	ROM_LOAD_NIB_HIGH("comotionp-1h.u2", 0x000, 0x400, CRC(3e88b7dd) SHA1(1059a6dc9f77f3ea8af0ba2737a1379b4fcfd860))
+	ROM_LOAD_NIB_LOW( "comotionp-1l.u3", 0x000, 0x400, CRC(1f5bbfd9) SHA1(7c2276552503a92bac6b495becae122d637da2ec))
+	ROM_LOAD_NIB_HIGH("comotionp-2h.u4", 0x400, 0x400, CRC(eec29372) SHA1(3890ff7d0d847b9cc9e09a62152dc2b6bc143d50))
+	ROM_LOAD_NIB_LOW( "comotionp-2l.u5", 0x400, 0x400, CRC(c68b63de) SHA1(53962eba1bee39470ec8505ddbfcd274b05cee08))
+
+	ROM_REGION(0x100, "gfx1", 0)
+	ROM_LOAD_NIB_HIGH("316-0006.u43", 0x000, 0x100, CRC(8f071297) SHA1(811471c87b77b4b9ab056cf0c0743fc2616b754c))  // these are reversed
+	ROM_LOAD_NIB_LOW( "316-0005.u29", 0x000, 0x100, CRC(53fb8821) SHA1(0a499aa4cf15f7ebea155aacd914de8851544215))
+ROM_END
+
 ROM_START( blasto )
 	ROM_REGION(0x800, "maincpu", 0)
 	ROM_LOAD_NIB_HIGH("316-0089.u2", 0x000, 0x400, CRC(ec99d043) SHA1(10650e54bf55f3ace5c199215c2fce211916d3b7))
@@ -574,7 +586,8 @@ ROM_END
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROTATION  COMPANY    FULLNAME                  FLAGS                                            LAYOUT
 GAMEL(1976, blockade,  0,        blockade, blockade,  blockade_state, empty_init, ROT0,     "Gremlin", "Blockade",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMOTION",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMotion",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotionp, comotion, blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMotion (patent)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
 GAME( 1978, blasto,    0,        blockade, blasto,    blockade_state, empty_init, ROT0,     "Gremlin", "Blasto",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // b/w, no overlay
 GAMEL(1977, hustle,    0,        blockade, hustle,    blockade_state, empty_init, ROT0,     "Gremlin", "Hustle",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
 GAME( 1977, mineswpr,  0,        blockade, mineswpr,  blockade_state, empty_init, ROT0,     "Amutech", "Minesweeper",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -39,7 +39,7 @@ INPUT_PORTS_END
 
 void ampscarp_state::ampscarp(machine_config &config)
 {
-	MC68HC11(config, m_maincpu, 8'000'000); // type and clock unknown
+	MC68HC11A1(config, m_maincpu, 8'000'000); // type and clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampscarp_state::mem_map);
 }
 

@@ -16,18 +16,18 @@ class k051649_device : public device_t,
 						public device_sound_interface
 {
 public:
-	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void    k051649_waveform_w(offs_t offset, uint8_t data);
-	uint8_t k051649_waveform_r(offs_t offset);
-	void    k051649_volume_w(offs_t offset, uint8_t data);
-	void    k051649_frequency_w(offs_t offset, uint8_t data);
-	void    k051649_keyonoff_w(uint8_t data);
-	void    k051649_test_w(uint8_t data);
-	uint8_t k051649_test_r();
+	void k051649_waveform_w(offs_t offset, u8 data);
+	u8   k051649_waveform_r(offs_t offset);
+	void k051649_volume_w(offs_t offset, u8 data);
+	void k051649_frequency_w(offs_t offset, u8 data);
+	void k051649_keyonoff_w(u8 data);
+	void k051649_test_w(u8 data);
+	u8   k051649_test_r();
 
-	void    k052539_waveform_w(offs_t offset, uint8_t data);
-	uint8_t k052539_waveform_r(offs_t offset);
+	void k052539_waveform_w(offs_t offset, u8 data);
+	u8   k052539_waveform_r(offs_t offset);
 
 	void scc_map(address_map &map);
 protected:
@@ -38,7 +38,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// Parameters for a channel
@@ -46,18 +46,20 @@ private:
 	{
 		sound_channel() :
 			counter(0),
+			clock(0),
 			frequency(0),
 			volume(0),
-			key(0)
+			key(false)
 		{
 			std::fill(std::begin(waveram), std::end(waveram), 0);
 		}
 
-		unsigned long counter;
-		int frequency;
-		int volume;
-		int key;
-		signed char waveram[32];
+		u8 counter;     // address counter for wavetable
+		u32 clock;      // internal clock
+		u16 frequency;  // frequency; result: (input clock / (32 * (frequency + 1)))
+		int volume;     // volume
+		bool key;       // keyon/off
+		s8 waveram[32]; // 32 byte wavetable
 	};
 
 	void make_mixer_table(int voices);
@@ -66,16 +68,9 @@ private:
 
 	/* global sound parameters */
 	sound_stream *m_stream;
-	int m_mclock;
-	int m_rate;
-
-	/* mixer tables and internal buffers */
-	std::unique_ptr<int16_t[]> m_mixer_table;
-	int16_t *m_mixer_lookup;
-	std::vector<short> m_mixer_buffer;
 
 	/* chip registers */
-	uint8_t m_test;
+	u8 m_test;
 };
 
 DECLARE_DEVICE_TYPE(K051649, k051649_device)

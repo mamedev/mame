@@ -145,19 +145,43 @@ enum
 //  dma_request -
 //-------------------------------------------------
 
-void am9517a_device::dma_request(int channel, int state)
+void am9517a_device::dma_request(int channel, bool state)
 {
 	LOG("AM9517A Channel %u DMA Request: %u\n", channel, state);
 
-	if (state ^ COMMAND_DREQ_ACTIVE_LOW)
-	{
+	if (state)
 		m_status |= (1 << (channel + 4));
-	}
 	else
-	{
 		m_status &= ~(1 << (channel + 4));
-	}
+
 	trigger(1);
+}
+
+
+//-------------------------------------------------
+//  mask_channel -
+//-------------------------------------------------
+
+void am9517a_device::mask_channel(int channel, bool state)
+{
+	LOG("AM9517A Channel %u Mask: %u\n", channel, state);
+
+	if (state)
+		m_mask |= 1 << channel;
+	else
+		m_mask &= ~(1 << channel);
+}
+
+
+//-------------------------------------------------
+//  set_mask_register -
+//-------------------------------------------------
+
+void am9517a_device::set_mask_register(uint8_t mask)
+{
+	LOG("AM9517A Mask Register: %01x\n", mask);
+
+	m_mask = mask;
 }
 
 
@@ -167,7 +191,7 @@ void am9517a_device::dma_request(int channel, int state)
 
 inline bool am9517a_device::is_request_active(int channel)
 {
-	return (BIT(m_status, channel + 4) & ~BIT(m_mask, channel)) ? true : false;
+	return (BIT(COMMAND_DREQ_ACTIVE_LOW ? ~m_status : m_status, channel + 4) && !BIT(m_mask, channel)) ? true : false;
 }
 
 
@@ -397,8 +421,7 @@ void am9517a_device::end_of_process()
 		m_mask |= 1 << m_current_channel;
 	}
 
-	// signal end of process
-	set_eop(ASSERT_LINE);
+	set_eop(CLEAR_LINE);
 	set_hreq(0);
 
 	m_current_channel = -1;
@@ -425,13 +448,14 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 		m_hack(0),
 		m_ready(1),
 		m_command(0),
+		m_status(0),
 		m_out_hreq_cb(*this),
 		m_out_eop_cb(*this),
 		m_in_memr_cb(*this),
 		m_out_memw_cb(*this),
-		m_in_ior_cb{ { *this }, { *this }, { *this }, { *this } },
-		m_out_iow_cb{ { *this }, { *this }, { *this }, { *this } },
-		m_out_dack_cb{ { *this }, { *this }, { *this }, { *this } }
+		m_in_ior_cb(*this),
+		m_out_iow_cb(*this),
+		m_out_dack_cb(*this)
 {
 }
 
@@ -445,8 +469,8 @@ v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag,
 	: am9517a_device(mconfig, V5X_DMAU, tag, owner, clock)
 	, m_in_mem16r_cb(*this)
 	, m_out_mem16w_cb(*this)
-	, m_in_io16r_cb{ { *this },{ *this },{ *this },{ *this } }
-	, m_out_io16w_cb{ { *this },{ *this },{ *this },{ *this } }
+	, m_in_io16r_cb(*this)
+	, m_out_io16w_cb(*this)
 
 {
 }
@@ -470,12 +494,9 @@ void am9517a_device::device_start()
 	m_out_eop_cb.resolve_safe();
 	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
-	for(auto &cb : m_in_ior_cb)
-		cb.resolve_safe(0);
-	for(auto &cb : m_out_iow_cb)
-		cb.resolve_safe();
-	for(auto &cb : m_out_dack_cb)
-		cb.resolve_safe();
+	m_in_ior_cb.resolve_all_safe(0);
+	m_out_iow_cb.resolve_all_safe();
+	m_out_dack_cb.resolve_all_safe();
 
 	for(auto &elem : m_channel)
 	{
@@ -501,17 +522,16 @@ void am9517a_device::device_start()
 	save_item(NAME(m_temp));
 	save_item(NAME(m_request));
 
-	for (int i = 0; i < 4; i++)
-	{
-		save_item(NAME(m_channel[i].m_address), i);
-		save_item(NAME(m_channel[i].m_count), i);
-		save_item(NAME(m_channel[i].m_base_address), i);
-		save_item(NAME(m_channel[i].m_base_count), i);
-		save_item(NAME(m_channel[i].m_mode), i);
-	}
+	save_item(STRUCT_MEMBER(m_channel, m_address));
+	save_item(STRUCT_MEMBER(m_channel, m_count));
+	save_item(STRUCT_MEMBER(m_channel, m_base_address));
+	save_item(STRUCT_MEMBER(m_channel, m_base_count));
+	save_item(STRUCT_MEMBER(m_channel, m_mode));
 
 	m_address_mask = 0xffff;
 
+	// force clear upon initial reset
+	m_eop = ASSERT_LINE;
 }
 
 
@@ -523,7 +543,7 @@ void am9517a_device::device_reset()
 {
 	m_state = STATE_SI;
 	m_command = 0;
-	m_status = 0;
+	m_status &= 0xf0;
 	m_request = 0;
 	m_mask = 0x0f;
 	m_temp = 0;
@@ -531,10 +551,9 @@ void am9517a_device::device_reset()
 	m_current_channel = -1;
 	m_last_channel = 3;
 	m_hreq = -1;
-	m_eop = 0;
 
 	set_hreq(0);
-	set_eop(ASSERT_LINE);
+	set_eop(CLEAR_LINE);
 
 	set_dack();
 }
@@ -551,8 +570,6 @@ void am9517a_device::execute_run()
 		switch (m_state)
 		{
 		case STATE_SI:
-			set_eop(CLEAR_LINE);
-
 			if (!COMMAND_DISABLE)
 			{
 				int priority[] = { 0, 1, 2, 3 };
@@ -628,10 +645,23 @@ void am9517a_device::execute_run()
 
 		case STATE_S2:
 			set_dack();
-			m_state = COMMAND_COMPRESSED_TIMING ? STATE_S4 : STATE_S3;
+			if (COMMAND_COMPRESSED_TIMING)
+			{
+				// signal end of process during last cycle
+				if (m_channel[m_current_channel].m_count == 0)
+					set_eop(ASSERT_LINE);
+
+				m_state = STATE_S4;
+			}
+			else
+				m_state = STATE_S3;
 			break;
 
 		case STATE_S3:
+			// signal end of process during last cycle
+			if (m_channel[m_current_channel].m_count == 0)
+				set_eop(ASSERT_LINE);
+
 			dma_read();
 
 			if (COMMAND_EXTENDED_WRITE)
@@ -691,6 +721,10 @@ void am9517a_device::execute_run()
 			break;
 
 		case STATE_S23:
+			// signal end of process during last cycle
+			if (m_channel[m_current_channel].m_count == 0)
+				set_eop(ASSERT_LINE);
+
 			m_state = STATE_S24;
 			break;
 
@@ -756,7 +790,8 @@ uint8_t am9517a_device::read(offs_t offset)
 			break;
 		}
 
-		m_msb = !m_msb;
+		if (!machine().side_effects_disabled())
+			m_msb = !m_msb;
 	}
 	else
 	{
@@ -764,9 +799,12 @@ uint8_t am9517a_device::read(offs_t offset)
 		{
 		case REGISTER_STATUS:
 			data = m_status;
+			if (COMMAND_DREQ_ACTIVE_LOW)
+				data ^= 0xf0;
 
 			// clear TC bits
-			m_status &= 0xf0;
+			if (!machine().side_effects_disabled())
+				m_status &= 0xf0;
 			break;
 
 		case REGISTER_TEMPORARY:
@@ -844,15 +882,11 @@ void am9517a_device::write(offs_t offset, uint8_t data)
 
 				if (BIT(data, 2))
 				{
-					m_request |= (1 << (channel + 4));
-					if (COMMAND_MEM_TO_MEM)
-					{
-						m_request |= (1 << channel);
-					}
+					m_request |= (1 << channel);
 				}
 				else
 				{
-					m_request &= ~(1 << (channel + 4));
+					m_request &= ~(1 << channel);
 				}
 
 				LOG("AM9517A Request Register: %01x\n", m_request);
@@ -862,17 +896,7 @@ void am9517a_device::write(offs_t offset, uint8_t data)
 		case REGISTER_SINGLE_MASK:
 			{
 				int channel = data & 0x03;
-
-				if (BIT(data, 2))
-				{
-					m_mask |= (1 << channel);
-				}
-				else
-				{
-					m_mask &= ~(1 << channel);
-				}
-
-				LOG("AM9517A Mask Register: %01x\n", m_mask);
+				mask_channel(channel, BIT(data, 2));
 			}
 			break;
 
@@ -902,15 +926,11 @@ void am9517a_device::write(offs_t offset, uint8_t data)
 			break;
 
 		case REGISTER_CLEAR_MASK:
-			LOG("AM9517A Clear Mask Register\n");
-
-			m_mask = 0;
+			set_mask_register(0);
 			break;
 
 		case REGISTER_MASK:
-			m_mask = data & 0x0f;
-
-			LOG("AM9517A Mask Register: %01x\n", m_mask);
+			set_mask_register(data & 0x0f);
 			break;
 		}
 	}
@@ -1003,10 +1023,8 @@ void v5x_dmau_device::device_start()
 
 	m_in_mem16r_cb.resolve_safe(0);
 	m_out_mem16w_cb.resolve_safe();
-	for (auto &cb : m_in_io16r_cb)
-		cb.resolve_safe(0);
-	for (auto &cb : m_out_io16w_cb)
-		cb.resolve_safe();
+	m_in_io16r_cb.resolve_all_safe(0);
+	m_out_io16w_cb.resolve_all_safe();
 
 	m_selected_channel = 0;
 	m_base = 0;
@@ -1087,7 +1105,8 @@ uint8_t v5x_dmau_device::read(offs_t offset)
 		case 0x0b:  // Status
 			ret = m_status;
 			// clear TC bits
-			m_status &= 0xf0;
+			if (!machine().side_effects_disabled())
+				m_status &= 0xf0;
 			break;
 		case 0x0c:  // Temporary (low)
 			ret = m_temp & 0xff;
@@ -1260,7 +1279,7 @@ void pcxport_dmac_device::device_reset()
 {
 	m_state = STATE_SI;
 	m_command = 0;
-	m_status = 0;
+	m_status &= 0xf0;
 	m_request = 0;
 	m_mask = 0;
 	m_temp = 0;
@@ -1268,10 +1287,9 @@ void pcxport_dmac_device::device_reset()
 	m_current_channel = -1;
 	m_last_channel = 3;
 	m_hreq = -1;
-	m_eop = 0;
 
 	set_hreq(0);
-	set_eop(ASSERT_LINE);
+	set_eop(CLEAR_LINE);
 
 	set_dack();
 }
@@ -1300,8 +1318,7 @@ void pcxport_dmac_device::end_of_process()
 	}
 	// don't mask out channel if not autoinitialize
 
-	// signal end of process
-	set_eop(ASSERT_LINE);
+	set_eop(CLEAR_LINE);
 	set_hreq(0);
 
 	m_current_channel = -1;
@@ -1322,4 +1339,5 @@ void eisa_dma_device::device_start()
 	m_address_mask = 0xffffffffU;
 
 	save_item(NAME(m_stop));
+	save_item(NAME(m_ext_mode));
 }

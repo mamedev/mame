@@ -18,8 +18,8 @@ public:
 private:
 	required_device<m68000_device> m_cpu;
 
-	DECLARE_READ8_MEMBER(p4_r);
-	DECLARE_READ8_MEMBER(p5_r);
+	uint8_t p4_r();
+	uint8_t p5_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -40,13 +40,13 @@ void mt735_state::machine_reset()
 {
 }
 
-READ8_MEMBER(mt735_state::p4_r)
+uint8_t mt735_state::p4_r()
 {
 	logerror("p4_r (%06x)\n", m_cpu->pc());
 	return 0xe0;
 }
 
-READ8_MEMBER(mt735_state::p5_r)
+uint8_t mt735_state::p5_r()
 {
 	logerror("p5_r (%06x)\n", m_cpu->pc());
 	return 0x00;

@@ -9,14 +9,16 @@
 #define MAME_MACHINE_ATARIFDC_H
 
 #include "imagedev/flopdrv.h"
+#include "machine/6821pia.h"
+#include "sound/pokey.h"
 
 class atari_fdc_device : public device_t
 {
 public:
 	atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( serin_r );
-	DECLARE_WRITE8_MEMBER( serout_w );
+	uint8_t serin_r();
+	void serout_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 	void atari_load_proc(device_image_interface &image, bool is_created);
 
@@ -32,7 +34,6 @@ private:
 	void add_serin(uint8_t data, int with_checksum);
 	void a800_serial_command();
 	void a800_serial_write();
-	legacy_floppy_image_device *atari_floppy_get_device_child(int drive);
 
 	struct atari_drive
 	{
@@ -48,6 +49,10 @@ private:
 		int bseclen;        /* boot sector length (sectors 1..3) */
 		int sectors;        /* total sectors, ie. tracks x heads x spt */
 	};
+
+	required_device_array<legacy_floppy_image_device, 4> m_floppy;
+	required_device<pokey_device> m_pokey;
+	required_device<pia6821_device> m_pia;
 
 	int  m_serout_count;
 	int  m_serout_offs;

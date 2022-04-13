@@ -69,7 +69,16 @@ const char* const E_SPV_NV_mesh_shader = "SPV_NV_mesh_shader";
 //SPV_NV_raytracing
 const char* const E_SPV_NV_ray_tracing = "SPV_NV_ray_tracing";
 
+//SPV_NV_ray_tracing_motion_blur
+const char* const E_SPV_NV_ray_tracing_motion_blur = "SPV_NV_ray_tracing_motion_blur";
+
 //SPV_NV_shading_rate
 const char* const E_SPV_NV_shading_rate = "SPV_NV_shading_rate";
+
+//SPV_NV_cooperative_matrix
+const char* const E_SPV_NV_cooperative_matrix = "SPV_NV_cooperative_matrix";
+
+//SPV_NV_shader_sm_builtins
+const char* const E_SPV_NV_shader_sm_builtins = "SPV_NV_shader_sm_builtins";
 
 #endif  // #ifndef GLSLextNV_H

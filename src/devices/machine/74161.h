@@ -73,7 +73,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cet_w );
 	DECLARE_WRITE_LINE_MEMBER( cep_w );
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
-	DECLARE_WRITE8_MEMBER( p_w );
+	void p_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( p1_w );
 	DECLARE_WRITE_LINE_MEMBER( p2_w );
 	DECLARE_WRITE_LINE_MEMBER( p3_w );
@@ -81,6 +81,9 @@ public:
 
 	DECLARE_READ_LINE_MEMBER( output_r );
 	DECLARE_READ_LINE_MEMBER( tc_r );
+
+	void set_cet_pin_value(int value) { m_cetpre = value; }
+	void set_cep_pin_value(int value) { m_ceppre = value; }
 
 protected:
 	// construction/destruction
@@ -111,9 +114,12 @@ private:
 	uint8_t m_pclock;   // pin 2
 	uint8_t m_p;        // pins 3-6 from LSB to MSB
 
+	// Preset inputs
+	uint8_t m_cetpre;
+	uint8_t m_ceppre;
+
 	// outputs
 	uint8_t m_out;      // pins 14-11 from LSB to MSB
-	uint8_t m_tc;       // pin 15
 
 	const bool      m_synchronous_reset;
 	const uint8_t   m_limit;

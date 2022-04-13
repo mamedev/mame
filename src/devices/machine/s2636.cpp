@@ -203,7 +203,7 @@ void s2636_device::device_start()
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intack));
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 	save_item(NAME(m_sample_cnt));
 	save_item(NAME(m_sound_lvl));
 
@@ -247,7 +247,7 @@ void s2636_device::render_next_line()
 
 	// pre-clear the line for convenience
 	rectangle const &vis_area = screen().visible_area();
-	uint16_t *const   row = &m_bitmap.pix16(m_screen_line);
+	uint16_t *const   row = &m_bitmap.pix(m_screen_line);
 	m_bitmap.plot_box(0, m_screen_line, m_bitmap.width(), 1, 0);
 
 	if ((vis_area.min_y > m_screen_line) || (vis_area.max_y < m_screen_line))
@@ -405,7 +405,7 @@ void s2636_device::render_next_line()
 //  bus access handlers
 //-------------------------------------------------
 
-READ8_MEMBER( s2636_device::read_data )
+uint8_t s2636_device::read_data(offs_t offset)
 {
 	mask_offset(offset);
 	uint8_t data = m_registers[offset];
@@ -424,7 +424,7 @@ READ8_MEMBER( s2636_device::read_data )
 	return data;
 }
 
-WRITE8_MEMBER( s2636_device::write_data )
+void s2636_device::write_data(offs_t offset, uint8_t data)
 {
 	mask_offset(offset);
 
@@ -434,7 +434,7 @@ WRITE8_MEMBER( s2636_device::write_data )
 	m_registers[offset] = data;
 }
 
-WRITE_LINE_MEMBER( s2636_device::write_intack )
+void s2636_device::write_intack(int state)
 {
 	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state));
 
@@ -450,10 +450,11 @@ WRITE_LINE_MEMBER( s2636_device::write_intack )
 //  sound_stream_update - generate audio output
 //-------------------------------------------------
 
-void s2636_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+
+void s2636_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
-	while (samples--)
+	auto &buffer = outputs[0];
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		if (!m_sample_cnt)
 		{
@@ -469,7 +470,7 @@ void s2636_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			}
 		}
 
-		*buffer++ = m_sound_lvl ? 0x7fff : 0x0000;
+		buffer.put(sampindex, m_sound_lvl ? 1.0 : 0.0);
 		m_sample_cnt--;
 	}
 }

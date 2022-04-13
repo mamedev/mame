@@ -17,6 +17,7 @@
  Maneater (1975/11)              YES
  Play Five (1975?)               UNKNOWN
  Scandia (cabinet) (1975/08)     NO
+ Space Out (late 1970s)          UNKNOWN (most likely)
  Two Game (1974)                 UNKNOWN
  U.N. Command (1977)             YES?
 
@@ -102,7 +103,7 @@ void pse_state::video_start()
 void pse_state::pse(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_pse);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_pse);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

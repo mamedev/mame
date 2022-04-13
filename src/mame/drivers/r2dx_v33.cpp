@@ -68,9 +68,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/3812intf.h"
-//#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "machine/r2crypt.h"
 
 #include "speaker.h"
@@ -358,7 +357,7 @@ void r2dx_v33_state::tilemapdma_w(address_space &space, u16 data)
 	{
 		u16 tileval = space.read_word(src);
 		src += 2;
-		m_videoram_private_w(space, i, tileval, 0xffff);
+		m_videoram_private_w(i, tileval);
 	}
 }
 
@@ -403,7 +402,7 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//map(0x00640, 0x006bf).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
-	map(0x0068e, 0x0068f).nopw(); // sprite buffering
+	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w)); // could be encryption key uploads just like raiden2.cpp ?
 	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
 //  map(0x006b4, 0x006b5).nopw();
@@ -432,8 +431,7 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 	map(0x00800, 0x00fff).ram(); // copies eeprom here?
 	map(0x01000, 0x0bfff).ram();
 
-	map(0x0c000, 0x0c7ff).ram().share("spriteram");
-	map(0x0c800, 0x0cfff).ram();
+	map(0x0c000, 0x0cfff).ram().share("spriteram");
 	map(0x0d000, 0x0d7ff).ram(); //.w(FUNC(r2dx_v33_state::background_w)).share("back_data");
 	map(0x0d800, 0x0dfff).ram(); //.w(FUNC(r2dx_v33_state::foreground_w).share("fore_data");
 	map(0x0e000, 0x0e7ff).ram(); //.w(FUNC(r2dx_v33_state::midground_w).share("mid_data");
@@ -471,7 +469,7 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//map(0x00640, 0x006bf)rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
-	map(0x0068e, 0x0068f).nopw(); // sprite buffering
+	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x006b0, 0x006b1).w(FUNC(r2dx_v33_state::mcu_prog_w));
 	map(0x006b2, 0x006b3).w(FUNC(r2dx_v33_state::mcu_prog_w2));
 //  map(0x006b4, 0x006b5).nopw();
@@ -484,15 +482,14 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 
 //  map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
 
-	map(0x00780, 0x0079f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x00780, 0x0079f).lrw8(
+							   NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+							   NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 
 	map(0x00800, 0x00fff).ram();
 	map(0x01000, 0x0bfff).ram();
 
-	map(0x0c000, 0x0c7ff).ram().share("spriteram");
-	map(0x0c800, 0x0cfff).ram();
+	map(0x0c000, 0x0cfff).ram().share("spriteram");
 	map(0x0d000, 0x0d7ff).ram(); //.w(FUNC(r2dx_v33_state::background_w)).share("back_data");
 	map(0x0d800, 0x0dfff).ram(); //.w(FUNC(r2dx_v33_state::foreground_w)).share("fore_data");
 	map(0x0e000, 0x0e7ff).ram(); //.w(FUNC(r2dx_v33_state::midground_w)).share("mid_data");
@@ -630,19 +627,19 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!3,!4")
-	PORT_DIPSETTING(      0x0c00, "2" )
-	PORT_DIPSETTING(      0x0800, "4" )
-	PORT_DIPSETTING(      0x0400, "3" )
 	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0c00, "2" )
+	PORT_DIPSETTING(      0x0400, "3" )
+	PORT_DIPSETTING(      0x0800, "4" )
 	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	PORT_DIPSETTING(      0x3000, "1000000" )
-	PORT_DIPSETTING(      0x2000, "2000000" )
-	PORT_DIPSETTING(      0x1000, "Every 1000000" )
+	PORT_DIPSETTING(      0x2000, "1000000" )
+	PORT_DIPSETTING(      0x3000, "2000000" )
+	PORT_DIPSETTING(      0x1000, "3000000" )
 	PORT_DIPSETTING(      0x0000, "No Extend" )
 	PORT_DIPNAME( 0x4000, 0x4000, "Demo Sound" ) PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -747,6 +744,8 @@ void r2dx_v33_state::rdx_v33(machine_config &config)
 	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(r2dx_v33_state::tile_scroll_w));
 
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -782,6 +781,8 @@ void r2dx_v33_state::nzerotea(machine_config &config)
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(r2dx_v33_state::tile_scroll_w));
+
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1081,6 +1082,7 @@ GAME( 1997, nzeroteama,  zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzer
 
 // 'V33 SYSTEM TYPE_C' - uses V33 CPU, basically the same board as TYPE_C VER2
 // there is a version of New Zero Team on "V33 SYSTEM TYPE_C" board with EEPROM rather than dipswitches like Zero Team 2000
+// 1998 release of New Zero team on this hardware also exists, but not dumped: https://youtu.be/8mnFjXCc9BI
 
 // 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
 GAME( 2000, zerotm2k,    zeroteam, zerotm2k, zerotm2k, r2dx_v33_state, init_zerotm2k,  ROT0,  "Seibu Kaihatsu", "Zero Team 2000", MACHINE_SUPPORTS_SAVE)

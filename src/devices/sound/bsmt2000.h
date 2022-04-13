@@ -14,6 +14,7 @@
 #pragma once
 
 #include "cpu/tms32010/tms32010.h"
+#include "dirom.h"
 
 
 //**************************************************************************
@@ -25,7 +26,7 @@
 
 class bsmt2000_device : public device_t,
 						public device_sound_interface,
-						public device_rom_interface
+						public device_rom_interface<32>
 {
 public:
 	typedef device_delegate<void ()> ready_callback;
@@ -34,15 +35,7 @@ public:
 	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	void set_ready_callback(ready_callback callback) { m_ready_callback = callback; }
-	template <class FunctionClass> void set_ready_callback(const char *devname, void (FunctionClass::*callback)(), const char *name)
-	{
-		set_ready_callback(ready_callback(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_ready_callback(void (FunctionClass::*callback)(), const char *name)
-	{
-		set_ready_callback(ready_callback(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_ready_callback(T &&... args) { m_ready_callback.set(std::forward<T>(args)...); }
 
 	// public interface
 	uint16_t read_status();
@@ -57,23 +50,23 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
 
 public:
 	// internal TMS I/O callbacks
-	DECLARE_READ16_MEMBER( tms_register_r );
-	DECLARE_READ16_MEMBER( tms_data_r );
-	DECLARE_READ16_MEMBER( tms_rom_r );
-	DECLARE_WRITE16_MEMBER( tms_rom_addr_w );
-	DECLARE_WRITE16_MEMBER( tms_rom_bank_w );
-	DECLARE_WRITE16_MEMBER( tms_left_w );
-	DECLARE_WRITE16_MEMBER( tms_right_w );
+	uint16_t tms_register_r();
+	uint16_t tms_data_r();
+	uint16_t tms_rom_r();
+	void tms_rom_addr_w(uint16_t data);
+	void tms_rom_bank_w(uint16_t data);
+	void tms_left_w(uint16_t data);
+	void tms_right_w(uint16_t data);
 
 private:
 	// timers

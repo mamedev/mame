@@ -42,31 +42,70 @@ icq3250a-d
 */
 
 #include "emu.h"
-#include "includes/comquest.h"
 
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68hc05.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 
-#ifdef UNUSED_FUNCTION
-READ8_MEMBER(comquest_state::comquest_read)
+namespace {
+
+class comquest_state : public driver_device
+{
+public:
+	comquest_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+	void comquest(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+
+	//uint8_t m_data[128][8];
+
+	[[maybe_unused]] uint8_t comquest_read(offs_t offset);
+	[[maybe_unused]] void comquest_write(offs_t offset, uint8_t data);
+
+	uint32_t screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void comquest_mem(address_map &map);
+};
+
+
+uint8_t comquest_state::comquest_read(offs_t offset)
 {
 	uint8_t data=0;
 	logerror("comquest read %.4x %.2x\n",offset,data);
 	return data;
 }
 
-WRITE8_MEMBER(comquest_state::comquest_write)
+void comquest_state::comquest_write(offs_t offset, uint8_t data)
 {
-	logerror("comquest read %.4x %.2x\n",offset,data);
+	logerror("comquest write %.4x %.2x\n",offset,data);
 }
+
+uint32_t comquest_state::screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 128; y++) {
+		for (int x = 0, j = 0; j < 8; j++, x += 8 * 4) {
+#if 0
+			m_gfxdecode->gfx(0)->opaque(bitmap,0, state->m_data[y][j],0,
+					0,0,x,y);
 #endif
+		}
+	}
+	return 0;
+}
+
 
 void comquest_state::comquest_mem(address_map &map)
 {
-//  { 0x0000, 0x7fff, SMH_BANK(1) },
-	map(0x0000, 0xfff).rom();
+	map(0x8000, 0xffff).rom().region("gfx1", 0x4000);
 }
 
 static INPUT_PORTS_START( comquest )
@@ -217,9 +256,7 @@ void comquest_state::machine_reset()
 void comquest_state::comquest(machine_config &config)
 {
 	/* basic machine hardware */
-	M6805(config, m_maincpu, 4000000);     /* 4000000? */
-	/* HD63705(config, m_maincpu, 4000000);    instruction set looks like m6805/m6808 */
-	/* M68705(config, m_maincpu, 4000000); instruction set looks like m6805/m6808 */
+	M68HC05L11(config, m_maincpu, 4000000);     /* 4000000? */
 
 /*
     8 bit bus, integrated io, serial io?,
@@ -266,10 +303,8 @@ void comquest_state::comquest(machine_config &config)
 }
 
 ROM_START(comquest)
-//  ROM_REGION(0x10000,"maincpu",0)
-//  ROM_REGION(0x80000,"user1",0)
-	ROM_REGION(0x100000,"maincpu",0)
-	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
+	ROM_REGION(0x1000,"maincpu",0)
+	ROM_LOAD("hc05_internal.bin", 0x0000, 0x1000, NO_DUMP)
 /*
 000 +16kbyte graphics data? (first bytes: 80 0d 04 00 00 08 04 00 0f 02 04 01 00 10 04 01)
 040 16kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 4f c7 f1 1d 4f)
@@ -299,6 +334,8 @@ ROM_START(comquest)
 	ROM_REGION(0x80000,"gfx1",0)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

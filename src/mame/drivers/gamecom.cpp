@@ -32,9 +32,8 @@ Game Status:
 #include "emu.h"
 #include "includes/gamecom.h"
 
-#include "sound/volt_reg.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "gamecom.lh"
@@ -42,13 +41,11 @@ Game Status:
 
 void gamecom_state::gamecom_mem_map(address_map &map)
 {
-	map(0x0000, 0x0013).ram().region("maincpu", 0x00);
+	map(0x0000, 0x03ff).ram().share("maincpu");
 	map(0x0014, 0x0017).rw(FUNC(gamecom_state::gamecom_pio_r), FUNC(gamecom_state::gamecom_pio_w));        // buttons
-	map(0x0018, 0x001F).ram().region("maincpu", 0x18);
 	map(0x0020, 0x007F).rw(FUNC(gamecom_state::gamecom_internal_r), FUNC(gamecom_state::gamecom_internal_w));/* CPU internal register file */
-	map(0x0080, 0x03FF).ram().region("maincpu", 0x80);                     /* RAM */
-	map(0x0400, 0x0FFF).noprw();                                                /* Nothing */
-	map(0x1000, 0x1FFF).rom();                                                /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */
+	map(0x0400, 0x0FFF).noprw();                                          /* Nothing */
+	map(0x1000, 0x1FFF).rom().region("maincpu", 0);                       /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */
 	map(0x2000, 0x3FFF).bankr("bank1");                                   /* External ROM/Flash. Controlled by MMU1 */
 	map(0x4000, 0x5FFF).bankr("bank2");                                   /* External ROM/Flash. Controlled by MMU2 */
 	map(0x6000, 0x7FFF).bankr("bank3");                                   /* External ROM/Flash. Controlled by MMU3 */
@@ -255,7 +252,8 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 	m_maincpu->set_input_line(sm8500_cpu_device::LCDC_INT, ASSERT_LINE );
 }
 
-MACHINE_CONFIG_START(gamecom_state::gamecom)
+void gamecom_state::gamecom(machine_config &config)
+{
 	/* basic machine hardware */
 	SM8500(config, m_maincpu, XTAL(11'059'200)/2);   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamecom_state::gamecom_mem_map);
@@ -263,7 +261,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
 	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -285,30 +283,20 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC (Digital audio)
 	DAC_4BIT_R2R(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
 	DAC_4BIT_R2R(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_linear_slot, "gamecom_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,tgc")
-	MCFG_GENERIC_LOAD(gamecom_state, gamecom_cart1)
-
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_linear_slot, "gamecom_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,tgc")
-	MCFG_GENERIC_LOAD(gamecom_state, gamecom_cart2)
-
+	GENERIC_CARTSLOT(config, "cartslot1", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart1_load));
+	GENERIC_CARTSLOT(config, "cartslot2", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart2_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("gamecom");
-MACHINE_CONFIG_END
+}
 
 ROM_START( gamecom )
-	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "internal.bin", 0x1000,  0x1000, CRC(a0cec361) SHA1(03368237e8fed4a8724f3b4a1596cf4b17c96d33) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "internal.bin", 0x0000,  0x1000, CRC(a0cec361) SHA1(03368237e8fed4a8724f3b4a1596cf4b17c96d33) )
 
 	ROM_REGION( 0x40000, "kernel", 0 )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
-CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND)
+CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)

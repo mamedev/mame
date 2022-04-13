@@ -7,6 +7,7 @@
 
 #include "audio/seibu.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class dcon_state : public driver_device, public seibu_sound_common
 {
@@ -39,25 +40,25 @@ private:
 	required_shared_ptr<uint16_t> m_textram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_background_layer;
-	tilemap_t *m_foreground_layer;
-	tilemap_t *m_midground_layer;
-	tilemap_t *m_text_layer;
+	tilemap_t *m_background_layer = nullptr;
+	tilemap_t *m_foreground_layer = nullptr;
+	tilemap_t *m_midground_layer = nullptr;
+	tilemap_t *m_text_layer = nullptr;
 
-	int m_gfx_bank_select;
-	int m_last_gfx_bank;
-	uint16_t m_scroll_ram[6];
-	uint16_t m_layer_en;
+	int m_gfx_bank_select = 0;
+	int m_last_gfx_bank = 0;
+	uint16_t m_scroll_ram[6]{};
+	uint16_t m_layer_en = 0U;
 
 	u8 sdgndmps_sound_comms_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
-	DECLARE_WRITE16_MEMBER(background_w);
-	DECLARE_WRITE16_MEMBER(foreground_w);
-	DECLARE_WRITE16_MEMBER(midground_w);
-	DECLARE_WRITE16_MEMBER(text_w);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gfxbank_w(uint16_t data);
+	void background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void midground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);

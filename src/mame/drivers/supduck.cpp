@@ -31,22 +31,23 @@ All clock timing comes from crystal 1
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class supduck_state : public driver_device
 {
 public:
 	supduck_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_spriteram(*this, "spriteram") ,
-			m_text_videoram(*this, "textvideoram"),
-			m_fore_videoram(*this, "forevideoram"),
-			m_back_videoram(*this, "backvideoram"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_spritegen(*this, "spritegen"),
-			m_soundlatch(*this, "soundlatch")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_spriteram(*this, "spriteram")
+		, m_text_videoram(*this, "textvideoram")
+		, m_fore_videoram(*this, "forevideoram")
+		, m_back_videoram(*this, "backvideoram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
+		, m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void supduck(machine_config &config);
@@ -67,23 +68,23 @@ private:
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	tilemap_t     *m_text_tilemap;
-	tilemap_t     *m_fore_tilemap;
-	tilemap_t     *m_back_tilemap;
+	tilemap_t     *m_text_tilemap = nullptr;
+	tilemap_t     *m_fore_tilemap = nullptr;
+	tilemap_t     *m_back_tilemap = nullptr;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(text_videoram_w);
-	DECLARE_WRITE16_MEMBER(fore_videoram_w);
-	DECLARE_WRITE16_MEMBER(back_videoram_w);
-	DECLARE_WRITE16_MEMBER(supduck_scroll_w);
+	void text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fore_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void back_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void supduck_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(supduck_4000_w);
-	DECLARE_WRITE16_MEMBER(supduck_4002_w);
+	void supduck_4000_w(uint16_t data);
+	void supduck_4002_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILEMAP_MAPPER_MEMBER(supduk_tilemap_scan);
 
-	DECLARE_WRITE8_MEMBER(okibank_w);
+	void okibank_w(uint8_t data);
 
 	void main_map(address_map &map);
 	void oki_map(address_map &map);
@@ -122,14 +123,20 @@ TILEMAP_MAPPER_MEMBER(supduck_state::supduk_tilemap_scan)
 
 void supduck_state::video_start()
 {
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_fore_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fore_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
+	m_fore_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_fore_tile_info)), tilemap_mapper_delegate(*this, FUNC(supduck_state::supduk_tilemap_scan)), 32, 32, 128,64);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(supduck_state::supduk_tilemap_scan)), 32, 32, 128,64);
 
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);
 
+	m_text_tilemap->set_scrolldx(128, 128);
+	m_text_tilemap->set_scrolldy(  6,   6);
+	m_fore_tilemap->set_scrolldx(128, 128);
+	m_fore_tilemap->set_scrolldy(  6,   6);
+	m_back_tilemap->set_scrolldx(128, 128);
+	m_back_tilemap->set_scrolldy(  6,   6);
 }
 
 uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -139,26 +146,26 @@ uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fore_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), true);
 
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-WRITE16_MEMBER(supduck_state::text_videoram_w)
+void supduck_state::text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_text_videoram[offset]);
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(supduck_state::fore_videoram_w)
+void supduck_state::fore_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_videoram[offset]);
 	m_fore_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(supduck_state::back_videoram_w)
+void supduck_state::back_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_videoram[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
@@ -174,7 +181,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 	int color = attr & 0x0f;
 	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
@@ -190,7 +197,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 		flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
@@ -206,17 +213,17 @@ TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 	int flags = (data & 0x2000) ? TILE_FLIPX : 0;
 		flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	tileinfo.set(2, code, color, flags);
 }
 
 
 
-WRITE16_MEMBER(supduck_state::supduck_4000_w)
+void supduck_state::supduck_4000_w(uint16_t data)
 {
 }
 
 
-WRITE16_MEMBER(supduck_state::supduck_4002_w)
+void supduck_state::supduck_4002_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -225,7 +232,7 @@ WRITE16_MEMBER(supduck_state::supduck_4002_w)
 
 }
 
-WRITE16_MEMBER(supduck_state::supduck_scroll_w)
+void supduck_state::supduck_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -282,7 +289,7 @@ void supduck_state::oki_map(address_map &map)
 	map(0x20000, 0x3ffff).bankr("okibank");
 }
 
-WRITE8_MEMBER(supduck_state::okibank_w)
+void supduck_state::okibank_w(uint8_t data)
 {
 	// bit 0x80 is written on startup?
 
@@ -369,32 +376,14 @@ static INPUT_PORTS_START( supduck )
 INPUT_PORTS_END
 
 
-static const gfx_layout spritelayout_bionicc=
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,4),   /* 2048 sprites */
-	4,      /* 4 bits per pixel */
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		0,1,2,3,4,5,6,7,
-		(16*8)+0,(16*8)+1,(16*8)+2,(16*8)+3,
-		(16*8)+4,(16*8)+5,(16*8)+6,(16*8)+7
-	},
-	{
-		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
-	},
-	256   /* every sprite takes 256 consecutive bytes */
-};
-
-static const gfx_layout vramlayout_bionicc=
+static const gfx_layout vramlayout=
 {
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),   /* 1024 character */
 	2,      /* 2 bitplanes */
 	{ 4,0 },
-	{ 0,1,2,3,8,9,10,11 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	128   /* every character takes 128 consecutive bytes */
 };
 
@@ -405,30 +394,18 @@ static const gfx_layout tile_layout =
 	RGN_FRAC(1, 2),
 	4,
 	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
-	{
-		0, 1, 2, 3, 8 + 0, 8 + 1, 8 + 2, 8 + 3,
-		64 * 8 + 0, 64 * 8 + 1, 64 * 8 + 2, 64 * 8 + 3, 64 * 8 + 8 + 0, 64 * 8 + 8 + 1, 64 * 8 + 8 + 2, 64 * 8 + 8 + 3,
-		2 * 64 * 8 + 0, 2 * 64 * 8 + 1, 2 * 64 * 8 + 2, 2 * 64 * 8 + 3, 2 * 64 * 8 + 8 + 0, 2 * 64 * 8 + 8 + 1, 2 * 64 * 8 + 8 + 2, 2 * 64 * 8 + 8 + 3,
-		3 * 64 * 8 + 0, 3 * 64 * 8 + 1, 3 * 64 * 8 + 2, 3 * 64 * 8 + 3, 3 * 64 * 8 + 8 + 0, 3 * 64 * 8 + 8 + 1, 3 * 64 * 8 + 8 + 2, 3 * 64 * 8 + 8 + 3,
-	},
-	{
-		0 * 16, 1 * 16, 2 * 16, 3 * 16, 4 * 16, 5 * 16, 6 * 16, 7 * 16,
-		8 * 16, 9 * 16, 10 * 16, 11 * 16, 12 * 16, 13 * 16, 14 * 16, 15 * 16,
-		16 * 16, 17 * 16, 18 * 16, 19 * 16, 20 * 16, 21 * 16, 22 * 16, 23 * 16,
-		24 * 16, 25 * 16, 26 * 16, 27 * 16, 28 * 16, 29 * 16, 30 * 16, 31 * 16
-	},
+	{ STEP4(0,1),        STEP4(4*2,1),          STEP4(4*2*2*32,1), STEP4(4*2*2*32+4*2,1),
+	  STEP4(4*2*2*64,1), STEP4(4*2*2*64+4*2,1), STEP4(4*2*2*96,1), STEP4(4*2*2*96+4*2,1) },
+	{ STEP32(0,4*2*2) },
 	256 * 8
 };
 
 
-
 static GFXDECODE_START( gfx_supduck )
-	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0,  16 )    /* colors   0-  63 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256,  16 )    /* colors 256- 319 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_bionicc,  512, 16 )    /* colors 512- 767 */
+	GFXDECODE_ENTRY( "gfx1", 0, vramlayout,  768, 64 )    /* colors 768-1023 */
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0, 16 )    /* colors   0-  63 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256, 16 )    /* colors 256- 319 */
 GFXDECODE_END
-
 
 
 void supduck_state::machine_start()
@@ -454,11 +431,8 @@ void supduck_state::supduck(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(supduck_state::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
@@ -467,6 +441,8 @@ void supduck_state::supduck(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supduck);
 
 	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_color_base(512);    /* colors 512- 767 */
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGBRRRRGGGGBBBB_bit4, 0x800/2);
 
@@ -510,11 +486,11 @@ ROM_START( supduck )
 	ROM_LOAD( "13.ul31",   0x40000, 0x20000, CRC(bff7b7cd) SHA1(2f65cadcfcc02fe31ba721eea9f45d4a729e4374) )
 	ROM_LOAD( "14.ul32",   0x60000, 0x20000, CRC(97a7310b) SHA1(76b82bfea64b59890c0ba2e1688b7321507a4da7) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "15.u1d",   0x60000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
-	ROM_LOAD( "16.u2d",   0x40000, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
-	ROM_LOAD( "17.u1c",   0x20000, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
-	ROM_LOAD( "18.u2c",   0x00000, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
+	ROM_REGION( 0x80000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "15.u1d",   0x00000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
+	ROM_LOAD32_BYTE( "16.u2d",   0x00001, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
+	ROM_LOAD32_BYTE( "17.u1c",   0x00002, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
+	ROM_LOAD32_BYTE( "18.u2c",   0x00003, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "2.su12",   0x00000, 0x20000, CRC(745d42fb) SHA1(f9aee3ddbad3cc2f3a7002ee0d762eb041967e1e) ) // static sample data

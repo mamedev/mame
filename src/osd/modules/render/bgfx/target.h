@@ -44,10 +44,13 @@ public:
 	uint32_t                    screen_index() const { return m_screen; }
 
 	// bgfx_texture_handle_provider
-	virtual uint16_t width() const override { return m_width; }
-	virtual uint16_t height() const override { return m_height; }
 	virtual bgfx::TextureHandle texture() const override;
 	virtual bool is_target() const override { return true; }
+	virtual uint16_t width() const override { return m_width; }
+	virtual uint16_t height() const override { return m_height; }
+	virtual uint16_t rowpixels() const override { return m_width; }
+	virtual int width_div_factor() const override { return 1; }
+	virtual int width_mul_factor() const override { return 1; }
 
 private:
 	std::string                 m_name;

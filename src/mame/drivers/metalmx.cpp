@@ -286,10 +286,17 @@ uint32_t metalmx_state::screen_update_metalmx(screen_device &screen, bitmap_ind1
 	/* TODO: TMS34020 should take care of this */
 
 //  uint32_t *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
-	uint16_t const *const src_base = m_gsp_vram;
+	uint32_t const *const src_base = &m_gsp_vram[0];
 
 	for (int y = (std::max)(0, cliprect.min_y); y <= (std::min)(383, cliprect.max_y); ++y)
-		std::copy_n(&src_base[512 * y], 512, &bitmap.pix16(y));
+	{
+		uint16_t *pix = &bitmap.pix(y);
+		for (int x = 0; x < 256; x++)
+		{
+			*pix++ = src_base[256 * y + x] & 0xffff;
+			*pix++ = src_base[256 * y + x] >> 16;
+		}
+	}
 
 	return 0;
 }
@@ -301,25 +308,25 @@ uint32_t metalmx_state::screen_update_metalmx(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-READ32_MEMBER(metalmx_state::unk_r)
+uint32_t metalmx_state::unk_r()
 {
 	return 0;//machine().rand();
 }
 
-READ32_MEMBER(metalmx_state::watchdog_r)
+uint32_t metalmx_state::watchdog_r()
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(metalmx_state::shifter_w)
+void metalmx_state::shifter_w(uint32_t data)
 {
 }
 
-WRITE32_MEMBER(metalmx_state::motor_w)
+void metalmx_state::motor_w(uint32_t data)
 {
 }
 
-WRITE32_MEMBER(metalmx_state::reset_w)
+void metalmx_state::reset_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -336,7 +343,7 @@ WRITE32_MEMBER(metalmx_state::reset_w)
  *
  *************************************/
 
-READ32_MEMBER(metalmx_state::sound_data_r)
+uint32_t metalmx_state::sound_data_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -347,7 +354,7 @@ READ32_MEMBER(metalmx_state::sound_data_r)
 	return result;
 }
 
-WRITE32_MEMBER(metalmx_state::sound_data_w)
+void metalmx_state::sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		m_cage->control_w(data);
@@ -355,7 +362,7 @@ WRITE32_MEMBER(metalmx_state::sound_data_w)
 		m_cage->main_w(data >> 16);
 }
 
-WRITE8_MEMBER(metalmx_state::cage_irq_callback)
+void metalmx_state::cage_irq_callback(uint8_t data)
 {
 	/* TODO */
 }
@@ -367,7 +374,7 @@ WRITE8_MEMBER(metalmx_state::cage_irq_callback)
  *************************************/
 
 template<int Chip>
-WRITE32_MEMBER(metalmx_state::dsp32c_w)
+void metalmx_state::dsp32c_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset <<= 1;
 
@@ -380,7 +387,7 @@ WRITE32_MEMBER(metalmx_state::dsp32c_w)
 }
 
 template<int Chip>
-READ32_MEMBER(metalmx_state::dsp32c_r)
+uint32_t metalmx_state::dsp32c_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -404,53 +411,48 @@ READ32_MEMBER(metalmx_state::dsp32c_r)
  *
  *************************************/
 
-WRITE32_MEMBER(metalmx_state::host_gsp_w)
+void metalmx_state::host_gsp_w(offs_t offset, uint32_t data)
 {
 	address_space &gsp_space = m_gsp->space(AS_PROGRAM);
 
-	gsp_space.write_word((0xc0000000 + (offset << 5) + 0x10) / 8, data);
-	gsp_space.write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
+	gsp_space.write_dword(0xc0000000 + (offset << 5), (data << 16) | (data >> 16));
 }
 
-READ32_MEMBER(metalmx_state::host_gsp_r)
+uint32_t metalmx_state::host_gsp_r(offs_t offset)
 {
 	address_space &gsp_space = m_gsp->space(AS_PROGRAM);
-	uint32_t val;
 
-	val  = gsp_space.read_word((0xc0000000 + (offset << 5) + 0x10) / 8);
-	val |= gsp_space.read_word((0xc0000000 + (offset << 5)) / 8) << 16;
-	return val;
+	uint32_t val = gsp_space.read_dword(0xc0000000 + (offset << 5));
+	return (val << 16) | (val >> 16);
 }
 
 
-READ32_MEMBER(metalmx_state::host_dram_r)
+uint32_t metalmx_state::host_dram_r(offs_t offset)
 {
-	return (m_gsp_dram[offset * 2] << 16) | m_gsp_dram[offset * 2 + 1];
+	return (m_gsp_dram[offset] << 16) | (m_gsp_dram[offset] >> 16);
 }
 
-WRITE32_MEMBER(metalmx_state::host_dram_w)
+void metalmx_state::host_dram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(m_gsp_dram + offset * 2 + 1);
-	data >>= 16;
-	mem_mask >>= 16;
-	COMBINE_DATA(m_gsp_dram + offset * 2);
+	data = (data << 16) | (data >> 16);
+	mem_mask = (mem_mask << 16) | (mem_mask >> 16);
+	COMBINE_DATA(&m_gsp_dram[offset]);
 }
 
-READ32_MEMBER(metalmx_state::host_vram_r)
+uint32_t metalmx_state::host_vram_r(offs_t offset)
 {
-	return (m_gsp_vram[offset * 2] << 16) | m_gsp_vram[offset * 2 + 1];
+	return (m_gsp_vram[offset] << 16) | (m_gsp_vram[offset] >> 16);
 }
 
-WRITE32_MEMBER(metalmx_state::host_vram_w)
+void metalmx_state::host_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(m_gsp_vram + offset * 2 + 1);
-	data >>= 16;
-	mem_mask >>= 16;
-	COMBINE_DATA(m_gsp_vram + offset * 2);
+	data = (data << 16) | (data >> 16);
+	mem_mask = (mem_mask << 16) | (mem_mask >> 16);
+	COMBINE_DATA(&m_gsp_vram[offset]);
 }
 
 
-WRITE32_MEMBER(metalmx_state::timer_w)
+void metalmx_state::timer_w(offs_t offset, uint32_t data)
 {
 	// Offsets
 	// 9000 with 1 changes to external clock source
@@ -525,8 +527,8 @@ void metalmx_state::adsp_data_map(address_map &map)
 
 void metalmx_state::gsp_map(address_map &map)
 {
-	map(0x88800000, 0x8880000f).ram(); /* ? */
-	map(0x88c00000, 0x88c0000f).ram(); /* ? */
+	map(0x88800000, 0x8880001f).ram(); /* ? */
+	map(0x88c00000, 0x88c0001f).ram(); /* ? */
 	map(0xff000000, 0xff7fffff).ram().share("gsp_dram");
 	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
 }

@@ -43,6 +43,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "machine/x2212.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class firefox_state : public driver_device
@@ -68,37 +69,35 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 	void firefox(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(firefox_disc_status_r);
-	DECLARE_READ8_MEMBER(firefox_disc_data_r);
-	DECLARE_WRITE8_MEMBER(firefox_disc_read_w);
+	uint8_t firefox_disc_status_r();
+	uint8_t firefox_disc_data_r();
+	void firefox_disc_read_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(firefox_disc_lock_w);
 	DECLARE_WRITE_LINE_MEMBER(audio_enable_left_w);
 	DECLARE_WRITE_LINE_MEMBER(audio_enable_right_w);
 	DECLARE_WRITE_LINE_MEMBER(firefox_disc_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(firefox_disc_write_w);
-	DECLARE_WRITE8_MEMBER(firefox_disc_data_w);
-	DECLARE_WRITE8_MEMBER(tileram_w);
-	DECLARE_WRITE8_MEMBER(tile_palette_w);
-	DECLARE_WRITE8_MEMBER(sprite_palette_w);
-	DECLARE_WRITE8_MEMBER(firefox_objram_bank_w);
+	void firefox_disc_data_w(uint8_t data);
+	void tileram_w(offs_t offset, uint8_t data);
+	void tile_palette_w(offs_t offset, uint8_t data);
+	void sprite_palette_w(offs_t offset, uint8_t data);
+	void firefox_objram_bank_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(adc_select_w);
-	DECLARE_WRITE8_MEMBER(nvram_w);
-	DECLARE_READ8_MEMBER(nvram_r);
-	DECLARE_WRITE8_MEMBER(rom_bank_w);
-	DECLARE_WRITE8_MEMBER(main_irq_clear_w);
-	DECLARE_WRITE8_MEMBER(main_firq_clear_w);
-	DECLARE_WRITE8_MEMBER(self_reset_w);
+	uint8_t adc_r();
+	void adc_select_w(uint8_t data);
+	void nvram_w(offs_t offset, uint8_t data);
+	uint8_t nvram_r(address_space &space, offs_t offset);
+	void rom_bank_w(uint8_t data);
+	void main_irq_clear_w(uint8_t data);
+	void main_firq_clear_w(uint8_t data);
+	void self_reset_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
-	DECLARE_READ8_MEMBER(riot_porta_r);
-	DECLARE_WRITE8_MEMBER(riot_porta_w);
+	uint8_t riot_porta_r();
+	void riot_porta_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
 	uint32_t screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
@@ -165,7 +164,7 @@ fffe=reset e7cc
    40 = DISKFULL - Active low
    80 = DISKDAV - Active low data available
    */
-READ8_MEMBER(firefox_state::firefox_disc_status_r)
+uint8_t firefox_state::firefox_disc_status_r()
 {
 	uint8_t result = 0xff;
 
@@ -180,14 +179,14 @@ READ8_MEMBER(firefox_state::firefox_disc_status_r)
 
 /* 4105 - DREAD */
 /* this reset RDDSK (&DSKRD) */
-READ8_MEMBER(firefox_state::firefox_disc_data_r)
+uint8_t firefox_state::firefox_disc_data_r()
 {
 	return m_n_disc_read_data;
 }
 
 /* DISK READ ENABLE */
 /* 4218 - DSKREAD, set RDDSK */
-WRITE8_MEMBER(firefox_state::firefox_disc_read_w)
+void firefox_state::firefox_disc_read_w(uint8_t data)
 {
 	m_n_disc_read_data = m_laserdisc->data_r();
 }
@@ -220,7 +219,7 @@ WRITE_LINE_MEMBER(firefox_state::firefox_disc_write_w)
 }
 
 /* latch the data */
-WRITE8_MEMBER(firefox_state::firefox_disc_data_w)
+void firefox_state::firefox_disc_data_w(uint8_t data)
 {
 	m_n_disc_data = data;
 }
@@ -236,11 +235,11 @@ WRITE8_MEMBER(firefox_state::firefox_disc_data_w)
 
 TILE_GET_INFO_MEMBER(firefox_state::bgtile_get_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+	tileinfo.set(0, m_tileram[tile_index], 0, 0);
 }
 
 
-WRITE8_MEMBER(firefox_state::tileram_w)
+void firefox_state::tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data;
 	m_bgtiles->mark_tile_dirty(offset);
@@ -249,7 +248,7 @@ WRITE8_MEMBER(firefox_state::tileram_w)
 
 void firefox_state::video_start()
 {
-	m_bgtiles = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firefox_state::bgtile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_bgtiles = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firefox_state::bgtile_get_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 	m_bgtiles->set_transparent_pen(0);
 	m_bgtiles->set_scrolldy(m_screen->visible_area().top(), 0);
 }
@@ -257,35 +256,32 @@ void firefox_state::video_start()
 
 uint32_t firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int sprite;
 	int gfxtop = screen.visible_area().top();
 
 	bitmap.fill(m_palette->pen_color(256), cliprect);
 
-	for( sprite = 0; sprite < 32; sprite++ )
+	for (int sprite = 0; sprite < 32; sprite++)
 	{
-		uint8_t *sprite_data = m_spriteram + ( 0x200 * m_sprite_bank ) + ( sprite * 16 );
-		int flags = sprite_data[ 0 ];
-		int y = sprite_data[ 1 ] + ( 256 * ( ( flags >> 0 ) & 1 ) );
-		int x = sprite_data[ 2 ] + ( 256 * ( ( flags >> 1 ) & 1 ) );
+		uint8_t *sprite_data = m_spriteram + (0x200 * m_sprite_bank) + (sprite * 16);
+		int flags = sprite_data[0];
+		int y = sprite_data[1] + (256 * ((flags >> 0) & 1));
+		int x = sprite_data[2] + (256 * ((flags >> 1) & 1));
 
-		if( x != 0 )
+		if (x != 0)
 		{
-			int row;
-
-			for( row = 0; row < 8; row++ )
+			for (int row = 0; row < 8; row++)
 			{
-				int color = ( flags >> 2 ) & 0x03;
+				int color = (flags >> 2) & 0x03;
 				int flipy = flags & 0x10;
 				int flipx = flags & 0x20;
-				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
+				int code = sprite_data[15 - row] + (256 * ((flags >> 6) & 3));
 
-				m_gfxdecode->gfx( 1 )->transpen(bitmap,cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - (row * 16), 0);
 			}
 		}
 	}
 
-	m_bgtiles->draw(screen, bitmap, cliprect, 0, 0 );
+	m_bgtiles->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -308,19 +304,19 @@ void firefox_state::set_rgba( int start, int index, unsigned char *palette_ram )
 	m_palette->set_pen_color( start + index, rgb_t( a, r, g, b ) );
 }
 
-WRITE8_MEMBER(firefox_state::tile_palette_w)
+void firefox_state::tile_palette_w(offs_t offset, uint8_t data)
 {
 	m_tile_palette[ offset ] = data;
 	set_rgba( 0, offset & 0xff, m_tile_palette );
 }
 
-WRITE8_MEMBER(firefox_state::sprite_palette_w)
+void firefox_state::sprite_palette_w(offs_t offset, uint8_t data)
 {
 	m_sprite_palette[ offset ] = data;
 	set_rgba( 256, offset & 0xff, m_sprite_palette );
 }
 
-WRITE8_MEMBER(firefox_state::firefox_objram_bank_w)
+void firefox_state::firefox_objram_bank_w(uint8_t data)
 {
 	m_sprite_bank = data & 0x03;
 }
@@ -331,16 +327,6 @@ WRITE8_MEMBER(firefox_state::firefox_objram_bank_w)
  *  Main <-> sound communication
  *
  *************************************/
-
-CUSTOM_INPUT_MEMBER(firefox_state::mainflag_r)
-{
-	return m_soundlatch->pending_r() ? 1 : 0;
-}
-
-CUSTOM_INPUT_MEMBER(firefox_state::soundflag_r)
-{
-	return m_soundlatch2->pending_r() ? 1 : 0;
-}
 
 WRITE_LINE_MEMBER(firefox_state::sound_reset_w)
 {
@@ -359,7 +345,7 @@ WRITE_LINE_MEMBER(firefox_state::sound_reset_w)
  *
  *************************************/
 
-READ8_MEMBER(firefox_state::riot_porta_r)
+uint8_t firefox_state::riot_porta_r()
 {
 	/* bit 7 = MAINFLAG */
 	/* bit 6 = SOUNDFLAG */
@@ -373,7 +359,7 @@ READ8_MEMBER(firefox_state::riot_porta_r)
 	return (m_soundlatch->pending_r() ? 0x80 : 0x00) | (m_soundlatch2->pending_r() ? 0x40 : 0x00) | 0x10 | (m_tms->readyq_r() << 2);
 }
 
-WRITE8_MEMBER(firefox_state::riot_porta_w)
+void firefox_state::riot_porta_w(uint8_t data)
 {
 	/* handle 5220 read */
 	m_tms->rsq_w((data>>1) & 1);
@@ -389,13 +375,13 @@ WRITE8_MEMBER(firefox_state::riot_porta_w)
  *
  *************************************/
 
-WRITE8_MEMBER(firefox_state::nvram_w)
+void firefox_state::nvram_w(offs_t offset, uint8_t data)
 {
-	m_nvram_1c->write(space, offset, data >> 4);
-	m_nvram_1d->write(space, offset, data & 0xf);
+	m_nvram_1c->write(offset, data >> 4);
+	m_nvram_1d->write(offset, data & 0xf);
 }
 
-READ8_MEMBER(firefox_state::nvram_r)
+uint8_t firefox_state::nvram_r(address_space &space, offs_t offset)
 {
 	return (m_nvram_1c->read(space, offset) << 4) | (m_nvram_1d->read(space, offset) & 0x0f);
 }
@@ -407,22 +393,22 @@ READ8_MEMBER(firefox_state::nvram_r)
  *
  *************************************/
 
-WRITE8_MEMBER(firefox_state::rom_bank_w)
+void firefox_state::rom_bank_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(firefox_state::main_irq_clear_w)
+void firefox_state::main_irq_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE );
 }
 
-WRITE8_MEMBER(firefox_state::main_firq_clear_w)
+void firefox_state::main_firq_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
-WRITE8_MEMBER(firefox_state::self_reset_w)
+void firefox_state::self_reset_w(uint8_t data)
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
@@ -542,8 +528,8 @@ static INPUT_PORTS_START( firefox )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("rdin1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firefox_state,mainflag_r, nullptr)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firefox_state,soundflag_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch2", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -612,17 +598,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -635,8 +610,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_firefox )
-	GFXDECODE_ENTRY("tiles",   0, tilelayout,   0,   1)
-	GFXDECODE_ENTRY("sprites", 0, spritelayout, 256, 4)
+	GFXDECODE_ENTRY("tiles",   0, gfx_8x8x4_packed_msb,   0,   1)
+	GFXDECODE_ENTRY("sprites", 0, spritelayout,           256, 4)
 GFXDECODE_END
 
 
@@ -647,8 +622,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(firefox_state::firefox)
-
+void firefox_state::firefox(machine_config &config)
+{
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MASTER_XTAL/8); // 68B09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &firefox_state::main_map);
@@ -658,7 +633,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	M6502(config, m_audiocpu, MASTER_XTAL/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &firefox_state::audio_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	adc0809_device &adc(ADC0809(config, "adc", MASTER_XTAL/16)); // nominally 900 kHz
 	adc.in_callback<0>().set_ioport("PITCH");
@@ -693,11 +668,9 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	PHILIPS_22VP931(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(64*8, 525, FUNC(firefox_state::screen_update_firefox));
 	m_laserdisc->set_overlay_clip(7*8, 53*8-1, 44, 480+44);
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 0.50);
 	m_laserdisc->add_route(1, "rspeaker", 0.50);
-
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	X2212(config, "nvram_1c").set_auto_save(true);
 	X2212(config, "nvram_1d").set_auto_save(true);
@@ -737,7 +710,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	TMS5220(config, m_tms, MASTER_XTAL/2/11);
 	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
 	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
-MACHINE_CONFIG_END
+}
 
 
 

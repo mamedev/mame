@@ -93,8 +93,9 @@ void dspv_device::snd_w(offs_t offset, u16 data)
 	logerror("w %02x, %04x %s\n", offset, data, machine().describe_context());
 }
 
-void dspv_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dspv_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	outputs[0].fill(0);
 }
 
 void dspv_device::device_start()
@@ -121,17 +122,17 @@ void dspv_device::device_reset()
 	m_prg_adr = 0;
 }
 
-uint32_t dspv_device::execute_min_cycles() const
+uint32_t dspv_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t dspv_device::execute_max_cycles() const
+uint32_t dspv_device::execute_max_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t dspv_device::execute_input_lines() const
+uint32_t dspv_device::execute_input_lines() const noexcept
 {
 	return 0;
 }

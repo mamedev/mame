@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="psion1" description="Psion Organiser I Datapack">
 	<software name="financep" supported="no">
 		<description>Finance Pack</description>

@@ -19,17 +19,17 @@ public:
 
 	struct cx_timer_t
 	{
-		uint32_t value;
-		uint32_t limit;
-		uint32_t mode;
-		uint32_t timebase;
-		emu_timer *timer;
+		uint32_t value = 0U;
+		uint32_t limit = 0U;
+		uint32_t mode = 0U;
+		uint32_t timebase = 0U;
+		emu_timer *timer = nullptr;
 	};
 
 	struct cx_timer_regs_t
 	{
-		cx_timer_t timer[MAX_CX_TIMERS];
-		uint32_t timer_irq;
+		cx_timer_t timer[MAX_CX_TIMERS]{};
+		uint32_t timer_irq = 0U;
 	};
 
 	cxhumax_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -42,131 +42,133 @@ public:
 	{
 	}
 
+	void cxhumax(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<intel_28f320j3d_device> m_flash;
 	required_shared_ptr<uint32_t> m_ram;
 	required_device<generic_terminal_device> m_terminal;
 
-	DECLARE_WRITE32_MEMBER ( flash_w );
-	DECLARE_READ32_MEMBER ( flash_r );
+	void flash_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t flash_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER ( cx_hsx_w );
-	DECLARE_READ32_MEMBER ( cx_hsx_r );
+	void cx_hsx_w(offs_t offset, uint32_t data);
+	uint32_t cx_hsx_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_romdescr_w );
-	DECLARE_READ32_MEMBER ( cx_romdescr_r );
-	DECLARE_WRITE32_MEMBER ( cx_isaromdescr_w );
-	DECLARE_READ32_MEMBER ( cx_isaromdescr_r );
-	DECLARE_WRITE32_MEMBER ( cx_isadescr_w );
-	DECLARE_READ32_MEMBER ( cx_isadescr_r );
-	DECLARE_WRITE32_MEMBER ( cx_rommap_w );
-	DECLARE_READ32_MEMBER ( cx_rommap_r );
-	DECLARE_WRITE32_MEMBER ( cx_rommode_w );
-	DECLARE_READ32_MEMBER ( cx_rommode_r );
-	DECLARE_WRITE32_MEMBER ( cx_xoemask_w );
-	DECLARE_READ32_MEMBER ( cx_xoemask_r );
-	DECLARE_WRITE32_MEMBER ( cx_pci_w );
-	DECLARE_READ32_MEMBER ( cx_pci_r );
-	DECLARE_WRITE32_MEMBER ( cx_extdesc_w );
-	DECLARE_READ32_MEMBER ( cx_extdesc_r );
+	void cx_romdescr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_romdescr_r(offs_t offset);
+	void cx_isaromdescr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_isaromdescr_r(offs_t offset);
+	void cx_isadescr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_isadescr_r(offs_t offset);
+	void cx_rommap_w(offs_t offset, uint32_t data);
+	uint32_t cx_rommap_r(offs_t offset);
+	void cx_rommode_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_rommode_r(offs_t offset);
+	void cx_xoemask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_xoemask_r(offs_t offset);
+	void cx_pci_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_pci_r(offs_t offset);
+	void cx_extdesc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_extdesc_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_remap_w );
-	DECLARE_WRITE32_MEMBER ( cx_scratch_w );
-	DECLARE_READ32_MEMBER ( cx_scratch_r );
+	void cx_remap_w(offs_t offset, uint32_t data);
+	void cx_scratch_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_scratch_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_timers_w );
-	DECLARE_READ32_MEMBER ( cx_timers_r );
+	void cx_timers_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_timers_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_uart2_w );
-	DECLARE_READ32_MEMBER ( cx_uart2_r );
+	void cx_uart2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_uart2_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_pll_w );
-	DECLARE_READ32_MEMBER ( cx_pll_r );
-	DECLARE_WRITE32_MEMBER ( cx_clkdiv_w );
-	DECLARE_READ32_MEMBER ( cx_clkdiv_r );
-	DECLARE_WRITE32_MEMBER ( cx_pllprescale_w );
-	DECLARE_READ32_MEMBER ( cx_pllprescale_r );
+	void cx_pll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_pll_r(offs_t offset);
+	void cx_clkdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_clkdiv_r(offs_t offset);
+	void cx_pllprescale_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_pllprescale_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_chipcontrol_w );
-	DECLARE_READ32_MEMBER ( cx_chipcontrol_r );
+	void cx_chipcontrol_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_chipcontrol_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_intctrl_w );
-	DECLARE_READ32_MEMBER ( cx_intctrl_r );
+	void cx_intctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_intctrl_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_ss_w );
-	DECLARE_READ32_MEMBER ( cx_ss_r );
+	void cx_ss_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_ss_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_i2c0_w );
-	DECLARE_READ32_MEMBER ( cx_i2c0_r );
-	DECLARE_WRITE32_MEMBER ( cx_i2c1_w );
-	DECLARE_READ32_MEMBER ( cx_i2c1_r );
-	DECLARE_WRITE32_MEMBER ( cx_i2c2_w );
-	DECLARE_READ32_MEMBER ( cx_i2c2_r );
+	void cx_i2c0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_i2c0_r(offs_t offset);
+	void cx_i2c1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_i2c1_r(offs_t offset);
+	void cx_i2c2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_i2c2_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_mc_cfg_w );
-	DECLARE_READ32_MEMBER ( cx_mc_cfg_r );
+	void cx_mc_cfg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_mc_cfg_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_drm0_w );
-	DECLARE_READ32_MEMBER ( cx_drm0_r );
-	DECLARE_WRITE32_MEMBER ( cx_drm1_w );
-	DECLARE_READ32_MEMBER ( cx_drm1_r );
+	void cx_drm0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_drm0_r(offs_t offset);
+	void cx_drm1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_drm1_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_hdmi_w );
-	DECLARE_READ32_MEMBER ( cx_hdmi_r );
+	void cx_hdmi_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_hdmi_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER ( cx_gxa_w );
-	DECLARE_READ32_MEMBER ( cx_gxa_r );
+	void cx_gxa_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_gxa_r(offs_t offset);
 
-	DECLARE_READ32_MEMBER ( dummy_flash_r );
+	uint32_t dummy_flash_r();
 
-	uint32_t m_romdescr_reg;
-	uint32_t m_isaromdescr_regs[0x0C/4];
-	uint32_t m_isadescr_regs[0x10/4];
-	uint32_t m_rommode_reg;
-	uint32_t m_xoemask_reg;
-	uint32_t m_pci_regs[0x08/4];
-	uint32_t m_extdesc_regs[0x80/4];
+	uint32_t m_romdescr_reg = 0U;
+	uint32_t m_isaromdescr_regs[0x0C/4]{};
+	uint32_t m_isadescr_regs[0x10/4]{};
+	uint32_t m_rommode_reg = 0U;
+	uint32_t m_xoemask_reg = 0U;
+	uint32_t m_pci_regs[0x08/4]{};
+	uint32_t m_extdesc_regs[0x80/4]{};
 
-	uint32_t m_scratch_reg;
-	cx_timer_regs_t m_timer_regs;
+	uint32_t m_scratch_reg = 0U;
+	cx_timer_regs_t m_timer_regs{};
 
-	uint32_t m_uart2_regs[0x30/4];
+	uint32_t m_uart2_regs[0x30/4]{};
 
-	uint32_t m_pll_regs[0x14/4];
-	uint32_t m_clkdiv_regs[0x18/4];
-	uint32_t m_pllprescale_reg;
+	uint32_t m_pll_regs[0x14/4]{};
+	uint32_t m_clkdiv_regs[0x18/4]{};
+	uint32_t m_pllprescale_reg = 0U;
 
-	uint32_t m_intctrl_regs[0x38/4];
+	uint32_t m_intctrl_regs[0x38/4]{};
 
-	uint32_t m_ss_regs[0x18/4];
-	uint8_t m_ss_tx_fifo[8];              // 8 entries (size hardcoded to 8 bits per entry - TODO)
+	uint32_t m_ss_regs[0x18/4]{};
+	uint8_t m_ss_tx_fifo[8]{};              // 8 entries (size hardcoded to 8 bits per entry - TODO)
 
-	uint32_t m_i2c0_regs[0x20/4];
-	uint32_t m_i2c1_regs[0x20/4];
+	uint32_t m_i2c0_regs[0x20/4]{};
+	uint32_t m_i2c1_regs[0x20/4]{};
 	required_device<i2cmem_device> m_i2cmem;
-	uint32_t m_i2c2_regs[0x20/4];
+	uint32_t m_i2c2_regs[0x20/4]{};
 
 	void i2cmem_start();
 	void i2cmem_stop();
 	uint8_t i2cmem_read_byte(int last);
 	void i2cmem_write_byte(uint8_t data);
 
-	uint32_t m_mccfg_regs[0x0C/4];
+	uint32_t m_mccfg_regs[0x0C/4]{};
 
-	uint32_t m_chipcontrol_regs[0x74/4];
+	uint32_t m_chipcontrol_regs[0x74/4]{};
 
-	uint32_t m_drm0_regs[0xfc/4];
-	uint32_t m_drm1_regs[0xfc/4];
+	uint32_t m_drm0_regs[0xfc/4]{};
+	uint32_t m_drm1_regs[0xfc/4]{};
 
-	uint32_t m_hdmi_regs[0x400/4];
+	uint32_t m_hdmi_regs[0x400/4]{};
 
-	uint32_t m_gxa_cmd_regs[0x130/4];
+	uint32_t m_gxa_cmd_regs[0x130/4]{};
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_tick);
-	void cxhumax(machine_config &config);
 	void cxhumax_map(address_map &map);
 };
 

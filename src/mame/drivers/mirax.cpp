@@ -145,20 +145,20 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_nAyCtrl;
-	uint8_t m_nmi_mask;
-	uint8_t m_flipscreen_x;
-	uint8_t m_flipscreen_y;
+	uint8_t m_nAyCtrl = 0;
+	uint8_t m_nmi_mask = 0;
+	uint8_t m_flipscreen_x = 0;
+	uint8_t m_flipscreen_y = 0;
 
-	DECLARE_WRITE8_MEMBER(audio_w);
+	void audio_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	void sound_cmd_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter0_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter1_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(ay1_sel);
-	DECLARE_WRITE8_MEMBER(ay2_sel);
+	void ay1_sel(uint8_t data);
+	void ay2_sel(uint8_t data);
 
 	void mirax_palette(palette_device &palette) const;
 
@@ -270,18 +270,18 @@ void mirax_state::machine_start()
 	save_item(NAME(m_flipscreen_y));
 }
 
-WRITE8_MEMBER(mirax_state::audio_w)
+void mirax_state::audio_w(offs_t offset, uint8_t data)
 {
 	m_nAyCtrl=offset;
 }
 
-WRITE8_MEMBER(mirax_state::ay1_sel)
+void mirax_state::ay1_sel(uint8_t data)
 {
 	m_ay[0]->address_w(m_nAyCtrl);
 	m_ay[0]->data_w(data);
 }
 
-WRITE8_MEMBER(mirax_state::ay2_sel)
+void mirax_state::ay2_sel(uint8_t data)
 {
 	m_ay[1]->address_w(m_nAyCtrl);
 	m_ay[1]->data_w(data);
@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mirax_state::sound_cmd_w)
+void mirax_state::sound_cmd_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -335,7 +335,7 @@ void mirax_state::mirax_main_map(address_map &map)
 	map(0xf400, 0xf400).portr("DSW2");
 	map(0xf500, 0xf507).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xf800, 0xf800).w(FUNC(mirax_state::sound_cmd_w));
-//  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
+//  map(0xf900, 0xf900) //sound cmd mirror? ack?
 }
 
 void mirax_state::mirax_sound_map(address_map &map)
@@ -459,20 +459,9 @@ static const gfx_layout layout16 =
 	16*16
 };
 
-static const gfx_layout layout8 =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3)},
-	{ 0, 1, 2, 3, 4, 5, 6, 7},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-	8*8
-};
-
 static GFXDECODE_START( gfx_mirax )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8,     0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout16,    0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,     0, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout16,             0, 8 )
 GFXDECODE_END
 
 

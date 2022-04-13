@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_tile_info)
 	int tile  = (m_videoram[VRAM][Layer][tile_index] & 0x3fff) | (m_gfxbank[VRAM][Layer] << 14);
 	int color = (m_videoram[VRAM][Layer][tile_index] & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(Layer, tile, color, 0);
+	tileinfo.set(Layer, tile, color, 0);
 }
 
 template<int VRAM, int Layer>
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_tile_info)
 {
 	int tile = m_videoram[VRAM][Layer][tile_index] | (m_gfxbank[VRAM][Layer] << 16);
 
-	SET_TILE_INFO_MEMBER(Layer, tile, 0, 0);
+	tileinfo.set(Layer, tile, 0, 0);
 }
 
 
@@ -49,12 +49,12 @@ inline void fromanc2_state::fromanc2_dispvram_w( offs_t offset, uint16_t data, u
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_0_w){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 0); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_1_w){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 2); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_2_w){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 0); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_3_w){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 2); }
+void fromanc2_state::fromanc2_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 0); }
+void fromanc2_state::fromanc2_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 2); }
+void fromanc2_state::fromanc2_videoram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 0); }
+void fromanc2_state::fromanc2_videoram_3_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 2); }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_0_w)
+void fromanc2_state::fromanc2_gfxreg_0_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -67,7 +67,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_1_w)
+void fromanc2_state::fromanc2_gfxreg_1_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -80,7 +80,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_1_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_2_w)
+void fromanc2_state::fromanc2_gfxreg_2_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -93,7 +93,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_2_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_3_w)
+void fromanc2_state::fromanc2_gfxreg_3_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -106,7 +106,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_3_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_0_w)
+void fromanc2_state::fromanc2_gfxbank_0_w(uint16_t data)
 {
 	m_gfxbank[0][0] = (data & 0x000f) >>  0;
 	m_gfxbank[0][1] = (data & 0x00f0) >>  4;
@@ -118,7 +118,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_0_w)
 	m_tilemap[0][3]->mark_all_dirty();
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_1_w)
+void fromanc2_state::fromanc2_gfxbank_1_w(uint16_t data)
 {
 	m_gfxbank[1][0] = (data & 0x000f) >>  0;
 	m_gfxbank[1][1] = (data & 0x00f0) >>  4;
@@ -139,11 +139,11 @@ inline void fromanc2_state::fromancr_vram_w(offs_t offset, uint16_t data, uint16
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_0_w){ fromancr_vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_1_w){ fromancr_vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_2_w){ fromancr_vram_w(offset, data, mem_mask, 2); }
+void fromanc2_state::fromancr_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 1); }
+void fromanc2_state::fromancr_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 0); }
+void fromanc2_state::fromancr_videoram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 2); }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_0_w)
+void fromanc2_state::fromancr_gfxreg_0_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -156,7 +156,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_1_w)
+void fromanc2_state::fromancr_gfxreg_1_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -190,11 +190,11 @@ inline void fromanc2_state::fromanc4_vram_w( offs_t offset, uint16_t data, uint1
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x3fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_0_w){ fromanc4_vram_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_1_w){ fromanc4_vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_2_w){ fromanc4_vram_w(offset, data, mem_mask, 0); }
+void fromanc2_state::fromanc4_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 2); }
+void fromanc2_state::fromanc4_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 1); }
+void fromanc2_state::fromanc4_videoram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 0); }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_0_w)
+void fromanc2_state::fromanc4_gfxreg_0_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -212,7 +212,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_1_w)
+void fromanc2_state::fromanc4_gfxreg_1_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -230,7 +230,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_1_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_2_w)
+void fromanc2_state::fromanc4_gfxreg_2_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -257,14 +257,14 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_2_w)
 
 VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 {
-	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromanc2_get_tile_info<0, 0>, "v0_l0", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromanc2_get_tile_info<0, 1>, "v0_l1", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromanc2_get_tile_info<0, 2>, "v0_l2", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[0][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromanc2_get_tile_info<0, 3>, "v0_l3", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromanc2_get_tile_info<1, 0>, "v1_l0", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromanc2_get_tile_info<1, 1>, "v1_l1", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromanc2_get_tile_info<1, 2>, "v1_l2", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromanc2_get_tile_info<1, 3>, "v1_l3", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromanc2_get_tile_info<0, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromanc2_get_tile_info<0, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromanc2_get_tile_info<0, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromanc2_get_tile_info<0, 3>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromanc2_get_tile_info<1, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromanc2_get_tile_info<1, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromanc2_get_tile_info<1, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromanc2_get_tile_info<1, 3>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	for (int screen = 0; screen < 2; screen++)
 	{
@@ -295,13 +295,13 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 
 VIDEO_START_MEMBER(fromanc2_state,fromancr)
 {
-	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<0, 0>, "v0_l0", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<0, 1>, "v0_l1", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<0, 2>, "v0_l2", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][3] = nullptr;
-	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<1, 0>, "v1_l0", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<1, 1>, "v1_l1", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<1, 2>, "v1_l2", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1][3] = nullptr;
 
 	for (int screen = 0; screen < 2; screen++)
@@ -327,17 +327,23 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 	save_item(NAME(m_scrolly[1]));
 	save_item(NAME(m_gfxbank[0]));
 	save_item(NAME(m_gfxbank[1]));
+
+	for (int i = 0; i < 2; i++)
+	{
+		std::fill(std::begin(m_scrollx[i]), std::end(m_scrollx[i]), 0 );
+		std::fill(std::begin(m_scrolly[i]), std::end(m_scrolly[i]), 0 );
+	}
 }
 
 VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 {
-	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<0, 0>, "v0_l0", this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<0, 1>, "v0_l1", this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<0, 2>, "v0_l2", this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[0][3] = nullptr;
-	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<1, 0>, "v1_l0", this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<1, 1>, "v1_l1", this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&fromanc2_state::fromancr_get_tile_info<1, 2>, "v1_l2", this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[1][3] = nullptr;
 
 	for (int screen = 0; screen < 2; screen++)

@@ -10,6 +10,7 @@
 #include "sound/msm5232.h"
 #include "sound/ta7630.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* Disabled because the mcu dump is currently unavailable. -AS */
 //#define USE_MCU
@@ -48,27 +49,27 @@ private:
 	required_shared_ptr<uint8_t> m_videoram2;
 
 	/* video-related */
-	bitmap_ind16    *m_tmp_bitmap1;
-	bitmap_ind16    *m_tmp_bitmap2;
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
-	tilemap_t     *m_bg2_tilemap;
-	int         m_bg2_textbank;
+	bitmap_ind16    *m_tmp_bitmap1 = nullptr;
+	bitmap_ind16    *m_tmp_bitmap2 = nullptr;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	tilemap_t     *m_fg_tilemap = nullptr;
+	tilemap_t     *m_bg2_tilemap = nullptr;
+	int         m_bg2_textbank = 0;
 
 	/* sound-related */
-	int         m_sound_nmi_enable;
-	int         m_pending_nmi;
+	int         m_sound_nmi_enable = 0;
+	int         m_pending_nmi = 0;
 
 	/* fake mcu (in msisaac.c) */
 #ifndef USE_MCU
-	uint8_t       m_mcu_val;
-	uint8_t       m_direction;
+	uint8_t       m_mcu_val = 0;
+	uint8_t       m_direction = 0;
 #endif
 
-	uint8_t       m_snd_ctrl0;
-	uint8_t       m_snd_ctrl1;
-	uint8_t       m_snd_ctrl2;
-	uint8_t       m_snd_ctrl3;
+	uint8_t       m_snd_ctrl0 = 0;
+	uint8_t       m_snd_ctrl1 = 0;
+	uint8_t       m_snd_ctrl2 = 0;
+	uint8_t       m_snd_ctrl3 = 0;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -80,25 +81,25 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(ms_unknown_w);
-	DECLARE_READ8_MEMBER(msisaac_mcu_r);
-	DECLARE_READ8_MEMBER(msisaac_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(msisaac_mcu_w);
-	DECLARE_WRITE8_MEMBER(sound_control_1_w);
-	DECLARE_WRITE8_MEMBER(msisaac_fg_scrolly_w);
-	DECLARE_WRITE8_MEMBER(msisaac_fg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(msisaac_bg2_scrolly_w);
-	DECLARE_WRITE8_MEMBER(msisaac_bg2_scrollx_w);
-	DECLARE_WRITE8_MEMBER(msisaac_bg_scrolly_w);
-	DECLARE_WRITE8_MEMBER(msisaac_bg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(msisaac_bg2_textbank_w);
-	DECLARE_WRITE8_MEMBER(msisaac_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(msisaac_bg2_videoram_w);
-	DECLARE_WRITE8_MEMBER(msisaac_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(sound_control_0_w);
+	void sound_command_w(uint8_t data);
+	void nmi_disable_w(uint8_t data);
+	void nmi_enable_w(uint8_t data);
+	void ms_unknown_w(uint8_t data);
+	uint8_t msisaac_mcu_r(offs_t offset);
+	uint8_t msisaac_mcu_status_r(offs_t offset);
+	void msisaac_mcu_w(offs_t offset, uint8_t data);
+	void sound_control_1_w(uint8_t data);
+	void msisaac_fg_scrolly_w(uint8_t data);
+	void msisaac_fg_scrollx_w(uint8_t data);
+	void msisaac_bg2_scrolly_w(uint8_t data);
+	void msisaac_bg2_scrollx_w(uint8_t data);
+	void msisaac_bg_scrolly_w(uint8_t data);
+	void msisaac_bg_scrollx_w(uint8_t data);
+	void msisaac_bg2_textbank_w(uint8_t data);
+	void msisaac_bg_videoram_w(offs_t offset, uint8_t data);
+	void msisaac_bg2_videoram_w(offs_t offset, uint8_t data);
+	void msisaac_fg_videoram_w(offs_t offset, uint8_t data);
+	void sound_control_0_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);

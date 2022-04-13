@@ -15,6 +15,8 @@
 #include "bus/c64/exp.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
+#include "machine/ds75160a.h"
+#include "machine/ds75161a.h"
 #include "machine/i8255.h"
 
 
@@ -25,12 +27,12 @@
 
 // ======================> buscard_t
 
-class buscard_t : public device_t,
+class c64_buscard_device : public device_t,
 				  public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
-	buscard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_buscard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -50,14 +52,34 @@ protected:
 
 private:
 	required_device<i8255_device> m_ppi;
+	required_device<ds75160a_device> m_ieee1;
+	required_device<ds75161a_device> m_ieee2;
 	required_device<ieee488_device> m_bus;
 	required_device<centronics_device> m_centronics;
 	required_device<c64_expansion_slot_device> m_exp;
+	required_ioport m_s1;
+	required_memory_region m_rom;
+
+	bool m_te;
+	int m_bank;
+	bool m_basic;
+	bool m_dipsw;
+	bool m_busy;
+
+	uint8_t ppi_pa_r();
+	void ppi_pa_w(uint8_t data);
+	void ppi_pb_w(uint8_t data);
+	uint8_t ppi_pc_r();
+	void ppi_pc_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER( busy_w );
+
+	bool pd_pgm1(offs_t offset, int sphi2);
+	bool pd_pgm234(offs_t offset, int sphi2, int bank);
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(C64_BUSCARD, buscard_t)
+DECLARE_DEVICE_TYPE(C64_BUSCARD, c64_buscard_device)
 
 
 #endif // MAME_BUS_C64_BUSCARD_H

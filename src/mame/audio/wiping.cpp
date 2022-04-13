@@ -2,16 +2,20 @@
 // copyright-holders:Allard van der Bas
 /***************************************************************************
 
-    Wiping sound driver (quick hack of the Namco sound driver)
+    Wiping sound driver
+
+    Nichibutsu / Woodplace Inc. custom part?
 
     used by wiping.cpp and clshroad.cpp
+
+    TODO:
+    - Identify actual part, sound device was originally based off
+      Namco customs (on which involvement seems pretty thin here);
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "audio/wiping.h"
-
-static constexpr int defgain = 48;
 
 DEFINE_DEVICE_TYPE(WIPING_CUSTOM, wiping_sound_device, "wiping_sound", "Wiping Custom Sound")
 
@@ -19,14 +23,11 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, WIPING_CUSTOM, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_last_channel(nullptr),
-	m_sound_prom(nullptr),
-	m_sound_rom(nullptr),
+	m_sound_prom(*this, "soundproms"),
+	m_sound_rom(*this, "samples"),
 	m_num_voices(0),
 	m_sound_enable(0),
-	m_stream(nullptr),
-	m_mixer_table(nullptr),
-	m_mixer_lookup(nullptr),
-	m_mixer_buffer(nullptr)
+	m_stream(nullptr)
 {
 	memset(m_channel_list, 0, sizeof(wp_sound_channel)*MAX_VOICES);
 	memset(m_soundregs, 0, sizeof(uint8_t)*0x4000);
@@ -42,20 +43,14 @@ void wiping_sound_device::device_start()
 	wp_sound_channel *voice;
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock()/2);
+	m_stream = stream_alloc(0, 1, clock()); // 48000 Hz
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer   = make_unique_clear<short[]>(clock()/2);
-
-	/* build the mixer table */
-	make_mixer_table(8, defgain);
+	m_mixer_buffer.resize(clock());
 
 	/* extract globals from the interface */
 	m_num_voices = 8;
 	m_last_channel = m_channel_list + m_num_voices;
-
-	m_sound_rom = machine().root_device().memregion("samples")->base();
-	m_sound_prom = machine().root_device().memregion("soundproms")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	m_sound_enable = 1;
@@ -71,39 +66,16 @@ void wiping_sound_device::device_start()
 
 	save_item(NAME(m_soundregs));
 
-	for (int i = 0; i < MAX_VOICES; i++)
-	{
-		save_item(NAME(m_channel_list[i].frequency), i);
-		save_item(NAME(m_channel_list[i].counter), i);
-		save_item(NAME(m_channel_list[i].volume), i);
-		save_item(NAME(m_channel_list[i].oneshot), i);
-		save_item(NAME(m_channel_list[i].oneshotplaying), i);
-	}
+	save_item(STRUCT_MEMBER(m_channel_list, frequency));
+	save_item(STRUCT_MEMBER(m_channel_list, counter));
+	save_item(STRUCT_MEMBER(m_channel_list, volume));
+	save_item(STRUCT_MEMBER(m_channel_list, oneshot));
+	save_item(STRUCT_MEMBER(m_channel_list, oneshotplaying));
 }
-
-/* build a table to divide by the number of voices; gain is specified as gain*16 */
-void wiping_sound_device::make_mixer_table(int voices, int gain)
-{
-	/* allocate memory */
-	m_mixer_table = make_unique_clear<int16_t[]>(256 * voices);
-
-	/* find the middle of the table */
-	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
-
-	/* fill in the table - 16 bit case */
-	for (int i = 0; i < voices * 128; i++)
-	{
-		int val = i * gain * 16 / voices;
-		if (val > 32767) val = 32767;
-		m_mixer_lookup[ i] = val;
-		m_mixer_lookup[-i] = -val;
-	}
-}
-
 
 /********************************************************************************/
 
-WRITE8_MEMBER( wiping_sound_device::sound_w )
+void wiping_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	wp_sound_channel *voice;
 	int base;
@@ -153,9 +125,9 @@ WRITE8_MEMBER( wiping_sound_device::sound_w )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void wiping_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 	wp_sound_channel *voice;
 	short *mix;
 	int i;
@@ -163,12 +135,12 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	/* if no sound, we're done */
 	if (m_sound_enable == 0)
 	{
-		memset(buffer, 0, samples * sizeof(*buffer));
+		buffer.fill(0);
 		return;
 	}
 
 	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer.get(), 0, samples * sizeof(short));
+	std::fill_n(&m_mixer_buffer[0], buffer.samples(), 0);
 
 	/* loop over each voice and add its contribution */
 	for (voice = m_channel_list; voice < m_last_channel; voice++)
@@ -182,10 +154,10 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			const uint8_t *w = voice->wave;
 			int c = voice->counter;
 
-			mix = m_mixer_buffer.get();
+			mix = &m_mixer_buffer[0];
 
 			/* add our contribution */
-			for (i = 0; i < samples; i++)
+			for (i = 0; i < buffer.samples(); i++)
 			{
 				int offs;
 
@@ -229,7 +201,7 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	}
 
 	/* mix it down */
-	mix = m_mixer_buffer.get();
-	for (i = 0; i < samples; i++)
-		*buffer++ = m_mixer_lookup[*mix++];
+	mix = &m_mixer_buffer[0];
+	for (i = 0; i < buffer.samples(); i++)
+		buffer.put_int(i, *mix++, 128 * MAX_VOICES);
 }

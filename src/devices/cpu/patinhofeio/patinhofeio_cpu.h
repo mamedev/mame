@@ -107,8 +107,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -120,9 +120,9 @@ private:
 	uint16_t read_panel_keys_register();
 	devcb_read16 m_rc_read_cb;
 	devcb_read16 m_buttons_read_cb;
-	devcb_read8 m_iodev_read_cb[16];
-	devcb_write8 m_iodev_write_cb[16];
-	devcb_read8 m_iodev_status_cb[16];
+	devcb_read8::array<16> m_iodev_read_cb;
+	devcb_write8::array<16> m_iodev_write_cb;
+	devcb_read8::array<16> m_iodev_status_cb;
 	uint8_t m_mode;
 };
 

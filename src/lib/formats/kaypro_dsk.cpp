@@ -16,8 +16,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
-
 #include "formats/kaypro_dsk.h"
 
 kayproii_format::kayproii_format() : upd765_format(formats)
@@ -26,7 +24,7 @@ kayproii_format::kayproii_format() : upd765_format(formats)
 
 const char *kayproii_format::name() const
 {
-	return "kaypro";
+	return "kaypro2";
 }
 
 const char *kayproii_format::description() const
@@ -36,7 +34,7 @@ const char *kayproii_format::description() const
 
 const char *kayproii_format::extensions() const
 {
-	return "kay";
+	return "kay,dsk";
 }
 
 const kayproii_format::format kayproii_format::formats[] = {
@@ -53,7 +51,7 @@ kaypro2x_format::kaypro2x_format() : upd765_format(formats)
 
 const char *kaypro2x_format::name() const
 {
-	return "kaypro";
+	return "kaypro2x";
 }
 
 const char *kaypro2x_format::description() const
@@ -63,7 +61,7 @@ const char *kaypro2x_format::description() const
 
 const char *kaypro2x_format::extensions() const
 {
-	return "kay";
+	return "kay,dsk";
 }
 
 const kaypro2x_format::format kaypro2x_format::formats[] = {
@@ -74,5 +72,5 @@ const kaypro2x_format::format kaypro2x_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_KAYPROII_FORMAT = &floppy_image_format_creator<kayproii_format>;
-const floppy_format_type FLOPPY_KAYPRO2X_FORMAT = &floppy_image_format_creator<kaypro2x_format>;
+const kayproii_format FLOPPY_KAYPROII_FORMAT;
+const kaypro2x_format FLOPPY_KAYPRO2X_FORMAT;

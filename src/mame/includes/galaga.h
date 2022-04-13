@@ -5,12 +5,15 @@
 
 #pragma once
 
+#include "video/starfield_05xx.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
+
 
 class galaga_state : public driver_device
 {
@@ -30,30 +33,35 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_leds(*this, "led%u", 0U)
+		, m_starfield(*this, "starfield")
+		, m_galaga_gfxbank(0)
+		, m_main_irq_mask(0)
+		, m_sub_irq_mask(0)
+		, m_sub2_nmi_mask(0)
 	{ }
 
-	DECLARE_READ8_MEMBER(bosco_dsw_r);
+	uint8_t bosco_dsw_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE_LINE_MEMBER(irq1_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(irq2_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
-	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
+	void galaga_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(gatsbee_bank_w);
-	DECLARE_WRITE8_MEMBER(out_0);
-	DECLARE_WRITE8_MEMBER(out_1);
-	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
-	DECLARE_READ8_MEMBER(namco_52xx_si_r);
+	void out(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(lockout);
+	uint8_t namco_52xx_rom_r(offs_t offset);
+	uint8_t namco_52xx_si_r();
 	void init_galaga();
 	void init_gatsbee();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_VIDEO_START(galaga);
 	void galaga_palette(palette_device &palette) const;
 	uint32_t screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_galaga);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	uint16_t get_next_lfsr_state(uint16_t lfsr);
 	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void galaga(machine_config &config);
 	void gatsbee(machine_config &config);
@@ -66,8 +74,9 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-	/* memory pointers */
+	/* memory pointers, devices */
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_galaga_ram1;
 	optional_shared_ptr<uint8_t> m_galaga_ram2;
@@ -81,34 +90,18 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
-	emu_timer *m_cpu3_interrupt_timer;
+	optional_device<starfield_05xx_device> m_starfield; // not present on battles, digdug, xevious
+	emu_timer *m_cpu3_interrupt_timer = nullptr;
 
-	/* machine state */
-	uint32_t m_stars_scrollx;
-	uint32_t m_stars_scrolly;
-
-	uint32_t m_galaga_gfxbank; // used by catsbee
-
-	/* devices */
-
-	/* bank support */
+	uint32_t m_galaga_gfxbank; // used by gatsbee
 
 	/* shared */
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_nmi_mask;
-
-	struct star
-	{
-		uint16_t x,y;
-		uint8_t col,set;
-	};
-
-	static star const s_star_seed_tab[];
-
 };
 
 DISCRETE_SOUND_EXTERN( galaga_discrete );

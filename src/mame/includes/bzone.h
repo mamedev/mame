@@ -31,21 +31,22 @@ public:
 		m_startled(*this, "startled")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	void init_bradley();
+	DECLARE_READ_LINE_MEMBER(clock_r);
 	void bzone(machine_config &config);
+	void bradley(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(bzone_coin_counter_w);
-	DECLARE_READ8_MEMBER(analog_data_r);
-	DECLARE_WRITE8_MEMBER(analog_select_w);
+	void bzone_coin_counter_w(offs_t offset, uint8_t data);
+	uint8_t analog_data_r();
+	void analog_select_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
-	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
+	void bzone_sounds_w(uint8_t data);
 
 	void bzone_base(machine_config &config);
 	void bzone_audio(machine_config &config);
 	void bzone_map(address_map &map);
+	void bradley_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
@@ -54,7 +55,7 @@ protected:
 	output_finder<> m_startled;
 
 private:
-	uint8_t m_analog_data;
+	uint8_t m_analog_data = 0U;
 };
 
 
@@ -71,11 +72,11 @@ public:
 	void redbaron(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(redbaron_joy_r);
-	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	uint8_t redbaron_joy_r();
+	void redbaron_joysound_w(uint8_t data);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -86,7 +87,7 @@ private:
 	required_device<er2055_device> m_earom;
 	required_device<redbaron_sound_device> m_redbaronsound;
 	required_ioport_array<2> m_fake_ports;
-	uint8_t m_rb_input_select;
+	uint8_t m_rb_input_select = 0U;
 };
 
 #endif // MAME_INCLUDES_BZONE_H

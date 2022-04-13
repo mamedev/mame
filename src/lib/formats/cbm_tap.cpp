@@ -60,11 +60,11 @@ pulse length is determined by the following formula:
   A data value of $00 represents an "overflow" condition, any pulse  length
 which is more that 255 * 8 in length.
 
-  The value of "clock cylces" from above  (985248)  is  based  on  the  PAL
+  The value of "clock cycles" from above  (985248)  is  based  on  the  PAL
 value.  Since  this  file  format  was  developed  in  Europe,   which   is
 predominantly PAL video, this is only logical.  The  NTSC  value  would  be
 1022730, which is very close to  the  PAL,  and  therefore  won't  cause  a
-compatability problem converting European and NTSC tapes. I would stick  to
+compatibility problem converting European and NTSC tapes. I would stick  to
 using the PAL value just in case.
 
 
@@ -94,9 +94,8 @@ Unfortunately, I have no such a .tap file to test, so my implementation
 below could be not working.  FP ]
 */
 
-#include <assert.h>
-
 #include "cbm_tap.h"
+#include "imageutl.h"
 
 
 #define CBM_WAV_FREQUENCY   44100
@@ -137,7 +136,7 @@ static int      len;
 /* This in fact gives the number of samples for half of the pulse */
 static inline int tap_data_to_samplecount(int data, int frequency)
 {
-//  return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));      // MESS TZX formula
+//  return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));      // MAME TZX formula
 	return (int) (0.5 * (((double)CBM_WAV_FREQUENCY / frequency) * (double)((data) + 0.5)));    // tap2wav formula
 }
 
@@ -339,7 +338,7 @@ static int cbm_tap_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 
 
 
-static const struct CassetteLegacyWaveFiller cbm_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller cbm_legacy_fill_wave = {
 	cbm_tap_fill_wave,      /* fill_wave */
 	-1,                     /* chunk_size */
 	0,                      /* chunk_samples */
@@ -350,19 +349,19 @@ static const struct CassetteLegacyWaveFiller cbm_legacy_fill_wave = {
 };
 
 
-static cassette_image::error cbm_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error cbm_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )
 {
-	return cassette_legacy_identify( cassette, opts, &cbm_legacy_fill_wave );
+	return cassette->legacy_identify( opts, &cbm_legacy_fill_wave );
 }
 
 
 static cassette_image::error cbm_cassette_load( cassette_image *cassette )
 {
-	return cassette_legacy_construct( cassette, &cbm_legacy_fill_wave );
+	return cassette->legacy_construct( &cbm_legacy_fill_wave );
 }
 
 
-static const struct CassetteFormat cbm_tap_cassette_format = {
+static const cassette_image::Format cbm_tap_cassette_format = {
 	"tap",
 	cbm_cassette_identify,
 	cbm_cassette_load,

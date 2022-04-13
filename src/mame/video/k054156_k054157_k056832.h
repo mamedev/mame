@@ -6,9 +6,9 @@
 #pragma once
 
 #include "video/k055555.h" // still needs k055555_get_palette_index
+#include "tilemap.h"
 
-typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k056832_cb_delegate;
-#define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags)
+#define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags, int *priority)
 
 #define K056832_PAGE_COUNT 16
 
@@ -31,6 +31,8 @@ class k055555_device;
 class k056832_device : public device_t, public device_gfx_interface
 {
 public:
+	using tile_delegate = device_delegate<void (int layer, int *code, int *color, int *flags, int *priority)>;
+
 	template <typename T> k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag)
 		: k056832_device(mconfig, tag, owner, clock)
 	{
@@ -39,7 +41,7 @@ public:
 
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_tile_callback(T &&... args) { m_k056832_cb = k056832_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_tile_callback(T &&... args) { m_k056832_cb.set(std::forward<T>(args)...); }
 
 	void set_config(int bpp, int big, int djmain_hack)
 	{
@@ -108,8 +110,8 @@ protected:
 
 private:
 	// internal state
-	tilemap_t   *m_tilemap[K056832_PAGE_COUNT];
-	bitmap_ind16  *m_pixmap[K056832_PAGE_COUNT];
+	tilemap_t   *m_tilemap[K056832_PAGE_COUNT]{};
+	bitmap_ind16  *m_pixmap[K056832_PAGE_COUNT]{};
 
 	std::vector<uint16_t> m_videoram;
 
@@ -121,7 +123,7 @@ private:
 	int       m_num_gfx_banks;    // depends on size of graphics ROMs
 	int       m_cur_gfx_banks;        // cached info for K056832_regs[0x1a]
 
-	k056832_cb_delegate   m_k056832_cb;
+	tile_delegate      m_k056832_cb;
 
 	int                m_gfx_num;
 	int                m_bpp;
@@ -131,7 +133,7 @@ private:
 	// ROM readback involves reading 2 halves of a word
 	// from the same location in a row.  Reading the
 	// RAM window resets this state so you get the first half.
-	int       m_rom_half;
+	int       m_rom_half = 0;
 
 	// locally cached values
 	int       m_layer_assoc_with_page[K056832_PAGE_COUNT];
@@ -184,11 +186,11 @@ private:
 	void change_rombank();
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
-	template<class _BitmapClass>
-	int update_linemap(screen_device &screen, _BitmapClass &bitmap, int page, int flags);
+	template<class BitmapClass>
+	int update_linemap(screen_device &screen, BitmapClass &bitmap, int page, int flags);
 
-	template<class _BitmapClass>
-	void tilemap_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
+	template<class BitmapClass>
+	void tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
 
 	void create_gfx();
 	void create_tilemaps();

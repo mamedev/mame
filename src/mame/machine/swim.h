@@ -8,9 +8,10 @@
     early Macs
 
 *********************************************************************/
-
 #ifndef MAME_MACHINE_SWIM_H
 #define MAME_MACHINE_SWIM_H
+
+#pragma once
 
 #include "machine/applefdc.h"
 
@@ -19,7 +20,7 @@
     DEVICE
 ***************************************************************************/
 
-DECLARE_DEVICE_TYPE(SWIM, swim_device)
+DECLARE_DEVICE_TYPE(LEGACY_SWIM, swim_device)
 
 class swim_device : public applefdc_base_device
 {
@@ -33,8 +34,8 @@ public:
 	swim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	virtual uint8_t read(uint8_t offset) override;
-	virtual void write(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -45,11 +46,11 @@ protected:
 	virtual void iwm_modereg_w(uint8_t data) override;
 
 private:
-	uint8_t       m_swim_mode;
-	uint8_t       m_swim_magic_state;
-	uint8_t       m_parm_offset;
-	uint8_t       m_ism_regs[8];
-	uint8_t       m_parms[16];
+	uint8_t       m_swim_mode = 0;
+	uint8_t       m_swim_magic_state = 0;
+	uint8_t       m_parm_offset = 0;
+	uint8_t       m_ism_regs[8]{};
+	uint8_t       m_parms[16]{};
 };
 
 #endif // MAME_MACHINE_SWIM_H

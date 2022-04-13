@@ -14,6 +14,8 @@
 #include "softlist_dev.h"
 #include "hashfile.h"
 
+#include "corestr.h"
+
 #include <stack>
 
 
@@ -34,7 +36,7 @@ const options_entry emu_options::s_option_entries[] =
 
 	// search path options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
-	{ OPTION_HOMEPATH,                                   ".",         OPTION_STRING,     "path to base folder for plugin data (read/write)" },
+	{ OPTION_PLUGINDATAPATH,                             ".",         OPTION_STRING,     "path to base folder for plugin data (read/write)" },
 	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "roms",      OPTION_STRING,     "path to ROM sets and hard disk images" },
 	{ OPTION_HASHPATH ";hash_directory;hash",            "hash",      OPTION_STRING,     "path to software definition files" },
 	{ OPTION_SAMPLEPATH ";sp",                           "samples",   OPTION_STRING,     "path to audio sample sets" },
@@ -57,6 +59,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      OPTION_STRING,     "directory to save/load screenshots" },
 	{ OPTION_DIFF_DIRECTORY,                             "diff",      OPTION_STRING,     "directory to save hard drive image difference files" },
 	{ OPTION_COMMENT_DIRECTORY,                          "comments",  OPTION_STRING,     "directory to save debugger comments" },
+	{ OPTION_SHARE_DIRECTORY,                            "share",     OPTION_STRING,     "directory to share with emulated machines" },
 
 	// state/playback options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE STATE/PLAYBACK OPTIONS" },
@@ -66,7 +69,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_REWIND_CAPACITY "(1-2048)",                 "100",       OPTION_INTEGER,    "rewind buffer size in megabytes" },
 	{ OPTION_PLAYBACK ";pb",                             nullptr,     OPTION_STRING,     "playback an input file" },
 	{ OPTION_RECORD ";rec",                              nullptr,     OPTION_STRING,     "record an input file" },
-	{ OPTION_RECORD_TIMECODE,                            "0",         OPTION_BOOLEAN,    "record an input timecode file (requires -record option)" },
 	{ OPTION_EXIT_AFTER_PLAYBACK,                        "0",         OPTION_BOOLEAN,    "close the program at the end of playback" },
 
 	{ OPTION_MNGWRITE,                                   nullptr,     OPTION_STRING,     "optional filename to write a MNG movie of the current session" },
@@ -74,7 +76,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_WAVWRITE,                                   nullptr,     OPTION_STRING,     "optional filename to write a WAV file of the current session" },
 	{ OPTION_SNAPNAME,                                   "%g/%i",     OPTION_STRING,     "override of the default snapshot/movie naming; %g == gamename, %i == index" },
 	{ OPTION_SNAPSIZE,                                   "auto",      OPTION_STRING,     "specify snapshot/movie resolution (<width>x<height>) or 'auto' to use minimal size " },
-	{ OPTION_SNAPVIEW,                                   "internal",  OPTION_STRING,     "specify snapshot/movie view or 'internal' to use internal pixel-aspect views" },
+	{ OPTION_SNAPVIEW,                                   "auto",      OPTION_STRING,     "snapshot/movie view - 'auto' for default, or 'native' for per-screen pixel-aspect views" },
 	{ OPTION_SNAPBILINEAR,                               "1",         OPTION_BOOLEAN,    "specify if the snapshot/movie should have bilinear filtering applied" },
 	{ OPTION_STATENAME,                                  "%g",        OPTION_STRING,     "override of the default state subfolder naming; %g == gamename" },
 	{ OPTION_BURNIN,                                     "0",         OPTION_BOOLEAN,    "create burn-in snapshots for each screen" },
@@ -82,12 +84,13 @@ const options_entry emu_options::s_option_entries[] =
 	// performance options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE PERFORMANCE OPTIONS" },
 	{ OPTION_AUTOFRAMESKIP ";afs",                       "0",         OPTION_BOOLEAN,    "enable automatic frameskip adjustment to maintain emulation speed" },
-	{ OPTION_FRAMESKIP ";fs(0-10)",                      "0",         OPTION_INTEGER,    "set frameskip to fixed value, 0-10 (autoframeskip must be disabled)" },
+	{ OPTION_FRAMESKIP ";fs(0-10)",                      "0",         OPTION_INTEGER,    "set frameskip to fixed value, 0-10 (upper limit with autoframeskip)" },
 	{ OPTION_SECONDS_TO_RUN ";str",                      "0",         OPTION_INTEGER,    "number of emulated seconds to run before automatically exiting" },
 	{ OPTION_THROTTLE,                                   "1",         OPTION_BOOLEAN,    "throttle emulation to keep system running in sync with real time" },
 	{ OPTION_SLEEP,                                      "1",         OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
 	{ OPTION_SPEED "(0.01-100)",                         "1.0",       OPTION_FLOAT,      "controls the speed of gameplay, relative to realtime; smaller numbers are slower" },
 	{ OPTION_REFRESHSPEED ";rs",                         "0",         OPTION_BOOLEAN,    "automatically adjust emulation speed to keep the emulated refresh rate slower than the host screen" },
+	{ OPTION_LOWLATENCY ";lolat",                        "0",         OPTION_BOOLEAN,    "draws new frame before throttling to reduce input latency" },
 
 	// render options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE RENDER OPTIONS" },
@@ -113,11 +116,6 @@ const options_entry emu_options::s_option_entries[] =
 	// artwork options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE ARTWORK OPTIONS" },
 	{ OPTION_ARTWORK_CROP ";artcrop",                    "0",         OPTION_BOOLEAN,    "crop artwork so emulated screen image fills output screen/window in one axis" },
-	{ OPTION_USE_BACKDROPS ";backdrop",                  "1",         OPTION_BOOLEAN,    "enable backdrops if artwork is enabled and available" },
-	{ OPTION_USE_OVERLAYS ";overlay",                    "1",         OPTION_BOOLEAN,    "enable overlays if artwork is enabled and available" },
-	{ OPTION_USE_BEZELS ";bezel",                        "1",         OPTION_BOOLEAN,    "enable bezels if artwork is enabled and available" },
-	{ OPTION_USE_CPANELS ";cpanel",                      "1",         OPTION_BOOLEAN,    "enable cpanels if artwork is enabled and available" },
-	{ OPTION_USE_MARQUEES ";marquee",                    "1",         OPTION_BOOLEAN,    "enable marquees if artwork is enabled and available" },
 	{ OPTION_FALLBACK_ARTWORK,                           nullptr,     OPTION_STRING,     "fallback artwork if no external artwork or internal driver layout defined" },
 	{ OPTION_OVERRIDE_ARTWORK,                           nullptr,     OPTION_STRING,     "override artwork for external artwork and internal driver layout" },
 
@@ -133,6 +131,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE VECTOR OPTIONS" },
 	{ OPTION_BEAM_WIDTH_MIN,                             "1.0",       OPTION_FLOAT,      "set vector beam width minimum" },
 	{ OPTION_BEAM_WIDTH_MAX,                             "1.0",       OPTION_FLOAT,      "set vector beam width maximum" },
+	{ OPTION_BEAM_DOT_SIZE,                              "1.0",       OPTION_FLOAT,      "set vector beam size for dots" },
 	{ OPTION_BEAM_INTENSITY_WEIGHT,                      "0",         OPTION_FLOAT,      "set vector beam intensity weight " },
 	{ OPTION_FLICKER,                                    "0",         OPTION_FLOAT,      "set vector flicker effect" },
 
@@ -141,10 +140,12 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SAMPLERATE ";sr(1000-1000000)",             "48000",     OPTION_INTEGER,    "set sound output sample rate" },
 	{ OPTION_SAMPLES,                                    "1",         OPTION_BOOLEAN,    "enable the use of external samples if available" },
 	{ OPTION_VOLUME ";vol",                              "0",         OPTION_INTEGER,    "sound volume in decibels (-32 min, 0 max)" },
+	{ OPTION_COMPRESSOR,                                 "1",         OPTION_BOOLEAN,    "enable compressor for sound" },
+	{ OPTION_SPEAKER_REPORT "(0-4)",                     "0",         OPTION_INTEGER,    "print report of speaker ouput maxima (0=none, or 1-4 for more detail)" },
 
 	// input options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE INPUT OPTIONS" },
-	{ OPTION_COIN_LOCKOUT ";coinlock",                   "1",         OPTION_BOOLEAN,    "ignore coin inputs if coin lockout ouput is active" },
+	{ OPTION_COIN_LOCKOUT ";coinlock",                   "1",         OPTION_BOOLEAN,    "ignore coin inputs if coin lockout output is active" },
 	{ OPTION_CTRLR,                                      nullptr,     OPTION_STRING,     "preconfigure for specified controller" },
 	{ OPTION_MOUSE,                                      "0",         OPTION_BOOLEAN,    "enable mouse input" },
 	{ OPTION_JOYSTICK ";joy",                            "1",         OPTION_BOOLEAN,    "enable joystick input" },
@@ -180,6 +181,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ OPTION_UPDATEINPAUSE,                              "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 	{ OPTION_DEBUGSCRIPT,                                nullptr,     OPTION_STRING,     "script for debugger" },
+	{ OPTION_DEBUGLOG,                                   "0",         OPTION_BOOLEAN,    "write debug console output to debug.log" },
 
 	// comm options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE COMM OPTIONS" },
@@ -203,7 +205,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_RAMSIZE ";ram",                             nullptr,     OPTION_STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         OPTION_BOOLEAN,    "ask for confirmation before exiting" },
 	{ OPTION_UI_MOUSE,                                   "1",         OPTION_BOOLEAN,    "display UI mouse cursor" },
-	{ OPTION_LANGUAGE ";lang",                           "English",   OPTION_STRING,     "set UI display language" },
+	{ OPTION_LANGUAGE ";lang",                           "",          OPTION_STRING,     "set UI display language" },
 	{ OPTION_NVRAM_SAVE ";nvwrite",                      "1",         OPTION_BOOLEAN,    "save NVRAM data on exit" },
 
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "SCRIPTING OPTIONS" },
@@ -241,7 +243,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			// This is returning an empty string instead of nullptr to signify that
 			// specifying the value is a meaningful operation.  The option types that
@@ -291,7 +293,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			const char *result = nullptr;
 			if (m_host.specified())
@@ -302,6 +304,7 @@ namespace
 				// happen in practice
 				//
 				// In reality, I want to really return std::optional<std::string> here
+				// FIXME: the std::string assignment can throw exceptions, and returning std::optional<std::string> also isn't safe in noexcept
 				m_temp = m_host.specified_value();
 				result = m_temp.c_str();
 			}
@@ -329,7 +332,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			return m_host.value().c_str();
 		}
@@ -389,9 +392,9 @@ namespace
 		if (!same_name)
 			result.push_back(image.brief_instance_name());
 
-		if (image.instance_name() != image.cannonical_instance_name())
+		if (image.instance_name() != image.canonical_instance_name())
 		{
-			result.push_back(image.cannonical_instance_name());
+			result.push_back(image.canonical_instance_name());
 			if (!same_name)
 				result.push_back(image.brief_instance_name() + "1");
 		}
@@ -488,7 +491,7 @@ void emu_options::set_system_name(std::string &&new_system_name)
 	{
 		// if so, first extract the base name (the reason for this is drag-and-drop on Windows; a side
 		// effect is a command line like 'mame pacman.foo' will work correctly, but so be it)
-		std::string new_system_base_name = core_filename_extract_base(m_attempted_system_name, true);
+		std::string new_system_base_name(core_filename_extract_base(m_attempted_system_name, true));
 
 		// perform the lookup (and error if it cannot be found)
 		int index = driver_list::find(new_system_base_name.c_str());
@@ -506,17 +509,6 @@ void emu_options::set_system_name(std::string &&new_system_name)
 		if (m_support == option_support::FULL)
 			update_slot_and_image_options();
 	}
-}
-
-
-//-------------------------------------------------
-//  set_system_name - called to set the system
-//  name; will adjust slot/image options as appropriate
-//-------------------------------------------------
-
-void emu_options::set_system_name(const std::string &new_system_name)
-{
-	set_system_name(std::string(new_system_name));
 }
 
 
@@ -567,9 +559,9 @@ bool emu_options::add_and_remove_slot_options()
 		// create the configuration
 		machine_config config(*m_system, *this);
 
-		for (const device_slot_interface &slot : slot_interface_iterator(config.root_device()))
+		for (const device_slot_interface &slot : slot_interface_enumerator(config.root_device()))
 		{
-			// come up with the cannonical name of the slot
+			// come up with the canonical name of the slot
 			const char *slot_option_name = slot.slot_name();
 
 			// erase this option from existing (so we don't purge it later)
@@ -635,7 +627,7 @@ bool emu_options::add_and_remove_image_options()
 	// "cartridge" starting out, but become "cartridge1" when another cartridge device is added.
 	//
 	// To get around this behavior, our internal data structures work in terms of what is
-	// returned by cannonical_instance_name(), which will be something like "cartridge1" both
+	// returned by canonical_instance_name(), which will be something like "cartridge1" both
 	// for a singular cartridge device and the first cartridge in a multi cartridge system.
 	//
 	// The need for this behavior was identified by Tafoid when the following command line
@@ -651,9 +643,9 @@ bool emu_options::add_and_remove_image_options()
 	// first, create a list of existing image options; this is so we can purge
 	// any stray slot options that are no longer pertinent when we're done; we
 	// have to do this for both "flavors" of name
-	existing_option_tracker<::image_option> existing(m_image_options_cannonical);
+	existing_option_tracker<::image_option> existing(m_image_options_canonical);
 
-	// wipe the non-cannonical image options; we're going to rebuild it
+	// wipe the non-canonical image options; we're going to rebuild it
 	m_image_options.clear();
 
 	// it is perfectly legal for this to be called without a system; we
@@ -664,21 +656,21 @@ bool emu_options::add_and_remove_image_options()
 		machine_config config(*m_system, *this);
 
 		// iterate through all image devices
-		for (device_image_interface &image : image_interface_iterator(config.root_device()))
+		for (device_image_interface &image : image_interface_enumerator(config.root_device()))
 		{
-			const std::string &cannonical_name(image.cannonical_instance_name());
+			const std::string &canonical_name(image.canonical_instance_name());
 
 			// erase this option from existing (so we don't purge it later)
-			existing.remove(cannonical_name);
+			existing.remove(canonical_name);
 
 			// do we need to add this option?
-			auto iter = m_image_options_cannonical.find(cannonical_name);
-			::image_option *this_option = iter != m_image_options_cannonical.end() ? &iter->second : nullptr;
+			auto iter = m_image_options_canonical.find(canonical_name);
+			::image_option *this_option = iter != m_image_options_canonical.end() ? &iter->second : nullptr;
 			if (!this_option)
 			{
-				// we do - add it to both m_image_options_cannonical and m_image_options
-				auto pair = std::make_pair(cannonical_name, ::image_option(*this, image.cannonical_instance_name()));
-				this_option = &m_image_options_cannonical.emplace(std::move(pair)).first->second;
+				// we do - add it to both m_image_options_canonical and m_image_options
+				auto pair = std::make_pair(canonical_name, ::image_option(*this, image.canonical_instance_name()));
+				this_option = &m_image_options_canonical.emplace(std::move(pair)).first->second;
 				changed = true;
 
 				// if this image is user loadable, we have to surface it in the core_options
@@ -708,15 +700,15 @@ bool emu_options::add_and_remove_image_options()
 	// at this point we need to purge stray image options that may no longer be pertinent
 	for (auto &opt_name : existing)
 	{
-		auto iter = m_image_options_cannonical.find(*opt_name);
-		assert(iter != m_image_options_cannonical.end());
+		auto iter = m_image_options_canonical.find(*opt_name);
+		assert(iter != m_image_options_canonical.end());
 
 		// if this is represented in core_options, remove it
 		if (iter->second.option_entry())
 			remove_entry(*iter->second.option_entry());
 
 		// remove this option
-		m_image_options_cannonical.erase(iter);
+		m_image_options_canonical.erase(iter);
 		changed = true;
 	}
 
@@ -745,7 +737,7 @@ void emu_options::reevaluate_default_card_software()
 		found = false;
 
 		// iterate through all slot devices
-		for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
+		for (device_slot_interface &slot : slot_interface_enumerator(config.root_device()))
 		{
 			// retrieve info about the device instance
 			auto &slot_opt(slot_option(slot.slot_name()));
@@ -883,9 +875,9 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 
 		// and set up a configuration
 		machine_config config(*m_system, *this);
-		software_list_device_iterator iter(config.root_device());
+		software_list_device_enumerator iter(config.root_device());
 		if (iter.count() == 0)
-			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_identifier.c_str());
+			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_identifier);
 
 		// and finally set up the stack
 		std::stack<std::string> software_identifier_stack;
@@ -958,7 +950,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 						//      ...
 						//      <sharedfeat name = "ctrl1_default" value = "paddle" />
 						//  </software>
-						for (const feature_list_item &fi : swinfo->shared_info())
+						for (const software_info_item &fi : swinfo->shared_features())
 						{
 							const std::string default_suffix = "_default";
 							if (fi.name().size() > default_suffix.size()
@@ -1059,7 +1051,7 @@ void emu_options::command_argument_processed()
 {
 	// some command line arguments require that the system name be set, so we can get slot options
 	if (command_arguments().size() == 1 && !core_iswildstr(command_arguments()[0].c_str()) &&
-		(command() == "listdevices" || (command() == "listslots") || (command() == "listmedia")))
+		(command() == "listdevices" || (command() == "listslots") || (command() == "listmedia") || (command() == "listsoftware")))
 	{
 		set_system_name(command_arguments()[0]);
 	}
@@ -1139,7 +1131,7 @@ void slot_option::specify(std::string &&text, bool peg_priority)
 
 	// we need to do some elementary parsing here
 	const char *bios_arg = ",bios=";
-	const size_t pos = text.find(bios_arg);
+	const std::string::size_type pos = text.find(bios_arg);
 	if (pos != std::string::npos)
 	{
 		m_specified = true;
@@ -1164,9 +1156,31 @@ void slot_option::specify(std::string &&text, bool peg_priority)
 //  slot_option::specify
 //-------------------------------------------------
 
-void slot_option::specify(const std::string &text, bool peg_priority)
+void slot_option::specify(std::string_view text, bool peg_priority)
 {
-	specify(std::string(text), peg_priority);
+	// record the old value; we may need to trigger an update
+	const std::string old_value = value();
+
+	// we need to do some elementary parsing here
+	const char *bios_arg = ",bios=";
+	const std::string_view::size_type pos = text.find(bios_arg);
+	if (pos != std::string_view::npos)
+	{
+		m_specified = true;
+		m_specified_value = text.substr(0, pos);
+		m_specified_bios = text.substr(pos + strlen(bios_arg));
+	}
+	else
+	{
+		m_specified = true;
+		m_specified_value = text;
+		m_specified_bios = "";
+	}
+
+	conditionally_peg_priority(m_entry, peg_priority);
+
+	// we may have changed
+	possibly_changed(old_value);
 }
 
 
@@ -1237,9 +1251,9 @@ core_options::entry::shared_ptr slot_option::setup_option_entry(const char *name
 //  image_option ctor
 //-------------------------------------------------
 
-image_option::image_option(emu_options &host, const std::string &cannonical_instance_name)
+image_option::image_option(emu_options &host, const std::string &canonical_instance_name)
 	: m_host(host)
-	, m_canonical_instance_name(cannonical_instance_name)
+	, m_canonical_instance_name(canonical_instance_name)
 {
 }
 
@@ -1248,7 +1262,7 @@ image_option::image_option(emu_options &host, const std::string &cannonical_inst
 //  image_option::specify
 //-------------------------------------------------
 
-void image_option::specify(const std::string &value, bool peg_priority)
+void image_option::specify(std::string_view value, bool peg_priority)
 {
 	if (value != m_value)
 	{

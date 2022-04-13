@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 			uint8_t *RAM = memregion("adpcm")->base();
 
 			m_adpcm_data = RAM[m_adpcm_address++];
-			m_msm->write_data(m_adpcm_data >> 4);
+			m_msm->data_w(m_adpcm_data >> 4);
 
 			if (m_adpcm_data == 0x70)
 			{
@@ -192,14 +192,14 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 		}
 		else
 		{
-			m_msm->write_data(m_adpcm_data & 0x0f);
+			m_msm->data_w(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}
 }
 
 /* adpcm address write */
-WRITE8_MEMBER(appoooh_state::adpcm_w)
+void appoooh_state::adpcm_w(uint8_t data)
 {
 	m_adpcm_address = data << 8;
 	m_msm->reset_w(0);
@@ -221,13 +221,14 @@ void appoooh_state::main_map(address_map &map)
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram(); /* RAM ? */
 
-	map(0xf000, 0xffff).ram();
-	map(0xf000, 0xf01f).share("spriteram");
-	map(0xf020, 0xf3ff).w(FUNC(appoooh_state::fg_videoram_w)).share("fg_videoram");
-	map(0xf420, 0xf7ff).w(FUNC(appoooh_state::fg_colorram_w)).share("fg_colorram");
-	map(0xf800, 0xf81f).share("spriteram_2");
-	map(0xf820, 0xfbff).w(FUNC(appoooh_state::bg_videoram_w)).share("bg_videoram");
-	map(0xfc20, 0xffff).w(FUNC(appoooh_state::bg_colorram_w)).share("bg_colorram");
+	map(0xf000, 0xf01f).ram().share("spriteram");
+	map(0xf020, 0xf3ff).ram().w(FUNC(appoooh_state::fg_videoram_w)).share("fg_videoram");
+	map(0xf400, 0xf41f).ram();
+	map(0xf420, 0xf7ff).ram().w(FUNC(appoooh_state::fg_colorram_w)).share("fg_colorram");
+	map(0xf800, 0xf81f).ram().share("spriteram_2");
+	map(0xf820, 0xfbff).ram().w(FUNC(appoooh_state::bg_videoram_w)).share("bg_videoram");
+	map(0xfc00, 0xfc1f).ram();
+	map(0xfc20, 0xffff).ram().w(FUNC(appoooh_state::bg_colorram_w)).share("bg_colorram");
 }
 
 void appoooh_state::decrypted_opcodes_map(address_map &map)

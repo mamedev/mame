@@ -13,11 +13,12 @@ NOTES:
 A couple of things unaccounted for:
 
 No backgrounds ROMs from the original board...
-- This may be related to the SubCPU. I don't think it's contributing
-  much right now, but I could be wrong. And it would explain that vast
-  expanse of bankswitch ROM on a slave CPU....
-- Just had a look at the sprites, and they seem like kosher sprites all
-  the way up.... So it must be hidden in the sub-cpu somewhere?
+- TOSHIBA TRJ-100 installed at the second board should contain the image
+  as U.S. Championship V'Ball has a TRJ-101 that contains it. It also contains
+  related logic to generate 16-bits address and to decode pixels at 6MHz pixel
+  clock, based on given attributes in multicycles, screen flip flag, and clocks.
+  It seems almost equivalent to Double Dragon's  IC38, 39, 40, 53, 54, and all
+  logic in the page 9 of the schematics for the second board.
 - Got two bootleg sets with background gfx roms. Using those on the
   original games for now.
 
@@ -67,6 +68,179 @@ Input is unique but has a few similarities to DD2 (the coin inputs)
 
 2008-07
 Dip locations and factory settings verified with China Gate US manual.
+
+
+PCB Layout
+----------
+
+TA-0023-P1-03 (Main Board)
+|-----------------------------------------------------|
+|        |      J1      |     |      J2      |        |
+|        ----------------     ----------------        |
+| X1                                                  |
+|                                                     |
+|                                                     |
+|    LH0080A                                          |
+|                                                     |
+|                                                     |
+|                HD68B09EP    HD68B09EP               |
+|     23J0-0      (main)        (sub)         23J6-0  |
+|                                                     |
+|  YM2151                              23J5-0         |
+|       23J1 23J2  23J3-0      23J4-0                 |
+|        -0   -0                                      |
+|                                                     |
+|                                                     |
+|   YM3012  M6295                                     |
+|                                                     |
+|                                                     |
+|            X2                                       |
+|                                                     |
+|                                             SW2 SW1 |
+|                                                     |
+|                                                     |
+|  VR1           |-------------------|                |
+|                |   ||  JAMMA       |                |
+|----------------|---||--------------|----------------|
+
+Clock
+    X1        - 3.579545MHz
+    X2        - 1.056MHz
+
+CPUs
+    HD68B09EP - HITACHI 6809E for main
+    HD68B09EP - HITACHI 6809E for sub
+    LH0080A   - SHARP Z80 for sound
+
+Sound
+    YM2151    - YAMAHA FM sound
+    YM3012    - YAMAHA DAC for YM2151
+    M6295     - OKI ADPCM
+
+PROM
+    23J5-0    - user1 (82S129)
+
+ROMs
+    23J0-0    - soundcpu EPROM
+    23J1-0    - oki mask ROM
+    23J2-0    - oki mask ROM
+    23J3-0    - maincpu EPROM
+    23J4-0    - sub EPROM
+    23J6-0    - gfx1 mask ROM
+
+SRAMs
+    not listed yet
+
+Others
+    VR1       - Speaker volume
+    SW1       - DIPSW1
+    SW2       - DIPSW2
+    JAMMA     - Standard JAMMA connector
+
+
+TA-0023-P2-03 (Video Board)
+|-----------------------------------------------------|
+|        |      J2      |     |      J1      |        |
+|        ----------------     ----------------        |
+|                                                     |
+|                                                     |
+|        23JB-0                   IC7                 |
+|                                                     |
+|                                                     |
+| X1                                                  |
+|                                                     |
+|                                                     |
+|                                           IC40      |
+|                                                     |
+|                                        |------------|
+|      IC70                              |1           |
+|                                        |            |
+|                                        |            |
+|                         IC78   IC75    |  TRJ-100   |
+|                                        |            |
+|                                        |            |
+|                                        |32          |
+|                                        |------------|
+|                                                     |
+|   IC106     23J7-0  23J8-0  23J9-0  23JA-0          |
+|                                                     |
+|                                                     |
+|                                                     |
+|-----------------------------------------------------|
+
+Clock
+    X1        - 12MHz
+
+PROM
+    23JB-0    - user1 (82S131)
+
+ROMs
+    23J7-0    - gfx2 mask ROM
+    23J8-0    - gfx2 mask ROM
+    23J9-0    - gfx2 mask ROM
+    23JA-0    - gfx2 mask ROM
+    TJR-100   - gfx3 custom ROM (undumped)
+
+SRAMs (2KBx8bits) Motorola MCM2016HN55, SANYO LC3517?
+    IC7       - ?
+    IC40      - bgvideoram
+    IC70      - ?
+    IC75      - ?
+    IC78      - ?
+    IC106     - ?
+
+Connectors
+    J1, J2    - 50pins, almost same assignments with ones for Double Dragon.
+                At this moment, 17pin is known to be used for TRJ-100.
+
+
+TRJ-100 pin assigns
+-------------------
+Following assignments are estimated based on the circuit around the TRJ-100 in
+comparison with one for Double Dragon.
+/M2H2 clock is special for this PCB, and M2H is used in Double Dragon instead.
+This signal is created by NAND with M2H (1.5MHz) and MH (3MHz).
+
+Following pictures show each clock timing. '%' is the timing to latch AT[7:0]
+by these clocks.
+        _    ________
+/M2H2 - _\__/%  _____\  duty 1:3, 1.5MHz
+/M2H  -  \_____/%    \  duty 1:1, 1.5MHz, inverted
+          _____
+M2H   -  /%    \_____/  duty 1:1, 1.5MHz
+
+ 1 - VCC
+ 2 I /M2H  - inverted 1.5MHz, used to latch AT[7:0] for A[13:6]
+ 3 I AT0   - connected with bgvideoram d0, used as A6 and A14
+ 4 I AT1   - connected with bgvideoram d1, used as A7 and A15
+ 5 I AT2   - connected with bgvideoram d2, used as A8 and A16
+ 6 I AT3   - connected with bgvideoram d3, used as A9 and BPL0
+ 7 I AT4   - connected with bgvideoram d4, used as A10 and BPL1
+ 8 I AT5   - connected with bgvideoram d5, used as A11 and BPL2
+ 9 I AT6   - connected with bgvideoram d6, used as A12 and BINV
+10 I AT7   - connected with bgvideoram d7, used as A13 and BPA
+11 I /M2H2 - /(M2H & MH), used to latch AT[7:0] for A[16:14], BPL, BIN, and BPA
+12 O BPAL0 - connected with J2 26pin
+13 O BPAL1 - connected with J2 24pin
+14 O BPAL2 - connected with J2 22pin
+15 O BPRT  - connected with J2 20pin
+16 I /CE?  - connected with J1 17pin, always LOW as far as it's observed
+17 I BHP3  - back horizontal (y) position 0, used to select output
+18 I /1P   - screen flip
+19 I BHP0  - back horizontal (y) position 1, used to select output
+20 I BHP1  - back horizontal (y) position 2, used as A5
+21 I BHP2  - back horizontal (y) position 3, used as A6
+22 I /HCLK - inverted 6MHZ clock, used as a pixel clock to shift output
+23 I BVP0  - back vertical (x) position 0, used as A0
+24 I BVP1  - back vertical (x) position 1, used as A1
+25 I BVP2  - back vertical (x) position 2, used as A2
+26 I BVP3  - back vertical (x) position 3, used as A3
+27 O BCOL0 - connected with J2 34pin
+28 O BCOL1 - connected with J2 32pin
+29 O BCOL2 - connected with J2 30pin
+30 O BCOL3 - connected with J2 28pin
+31 GND
+32 GND
 */
 
 #include "emu.h"
@@ -77,11 +251,13 @@ Dip locations and factory settings verified with China Gate US manual.
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define MAIN_CLOCK      XTAL(12'000'000)
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
@@ -106,17 +282,28 @@ protected:
 	virtual void video_start() override;
 
 private:
+	// for Sai Yu Gou Ma Roku
+	int            m_adpcm_addr = 0;
+	int            m_i8748_P1 = 0;
+	int            m_i8748_P2 = 0;
+	int            m_pcm_shift = 0;
+	int            m_pcm_nibble = 0;
+	int            m_mcu_command = 0;
+#if 0
+	int            m_m5205_clk = 0;
+#endif
+
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
-	DECLARE_WRITE8_MEMBER(interrupt_w);
-	DECLARE_WRITE8_MEMBER(video_ctrl_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sub_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sub_irq_ack_w);
-	DECLARE_READ8_MEMBER(saiyugoub1_mcu_command_r);
-	DECLARE_WRITE8_MEMBER(saiyugoub1_mcu_command_w);
-	DECLARE_WRITE8_MEMBER(saiyugoub1_adpcm_rom_addr_w);
-	DECLARE_WRITE8_MEMBER(saiyugoub1_adpcm_control_w);
-	DECLARE_WRITE8_MEMBER(saiyugoub1_m5205_clk_w);
+	void interrupt_w(offs_t offset, uint8_t data);
+	void video_ctrl_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void sub_bankswitch_w(uint8_t data);
+	void sub_irq_ack_w(uint8_t data);
+	uint8_t saiyugoub1_mcu_command_r();
+	void saiyugoub1_mcu_command_w(uint8_t data);
+	void saiyugoub1_adpcm_rom_addr_w(uint8_t data);
+	void saiyugoub1_adpcm_control_w(uint8_t data);
+	void saiyugoub1_m5205_clk_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(saiyugoub1_m5205_irq_r);
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
 
@@ -133,10 +320,8 @@ private:
 
 void chinagat_state::video_start()
 {
-	ddragon_state::video_start();
-
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(chinagat_state::background_scan),this), 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinagat_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(chinagat_state::background_scan)), 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinagat_state::get_fg_16color_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldy(-8, -8);
@@ -181,7 +366,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(chinagat_state::chinagat_scanline)
 		scanline = 0;
 }
 
-WRITE8_MEMBER(chinagat_state::interrupt_w)
+void chinagat_state::interrupt_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -207,7 +392,7 @@ WRITE8_MEMBER(chinagat_state::interrupt_w)
 	}
 }
 
-WRITE8_MEMBER(chinagat_state::video_ctrl_w)
+void chinagat_state::video_ctrl_w(uint8_t data)
 {
 	/***************************
 	---- ---x   X Scroll MSB
@@ -221,22 +406,22 @@ WRITE8_MEMBER(chinagat_state::video_ctrl_w)
 	flip_screen_set(~data & 0x04);
 }
 
-WRITE8_MEMBER(chinagat_state::bankswitch_w)
+void chinagat_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
-WRITE8_MEMBER(chinagat_state::sub_bankswitch_w)
+void chinagat_state::sub_bankswitch_w(uint8_t data)
 {
 	membank("bank4")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
-WRITE8_MEMBER(chinagat_state::sub_irq_ack_w)
+void chinagat_state::sub_irq_ack_w(uint8_t data)
 {
 	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
 }
 
-READ8_MEMBER(chinagat_state::saiyugoub1_mcu_command_r )
+uint8_t chinagat_state::saiyugoub1_mcu_command_r()
 {
 #if 0
 	if (m_mcu_command == 0x78)
@@ -247,7 +432,7 @@ READ8_MEMBER(chinagat_state::saiyugoub1_mcu_command_r )
 	return m_mcu_command;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_mcu_command_w )
+void chinagat_state::saiyugoub1_mcu_command_w(uint8_t data)
 {
 	m_mcu_command = data;
 #if 0
@@ -258,13 +443,13 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_mcu_command_w )
 #endif
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_rom_addr_w )
+void chinagat_state::saiyugoub1_adpcm_rom_addr_w(uint8_t data)
 {
 	/* i8748 Port 1 write */
 	m_i8748_P1 = data;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
+void chinagat_state::saiyugoub1_adpcm_control_w(uint8_t data)
 {
 	/* i8748 Port 2 write */
 	uint8_t *saiyugoub1_adpcm_rom = memregion("adpcm")->base();
@@ -292,7 +477,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 			}
 		}
 
-		m_adpcm_addr = ((m_adpcm_addr & 0x07fff) | (data & 0x70 << 11));
+		m_adpcm_addr = ((m_adpcm_addr & 0x07fff) | ((data & 0x70) << 11));
 
 		m_pcm_nibble = saiyugoub1_adpcm_rom[m_adpcm_addr & 0x3ffff];
 
@@ -302,7 +487,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 
 		if (((m_i8748_P2 & 0xc) >= 8) && ((data & 0xc) == 4))
 		{
-			m_adpcm->write_data(m_pcm_nibble);
+			m_adpcm->data_w(m_pcm_nibble);
 			logerror("Writing %02x to m5205\n", m_pcm_nibble);
 		}
 		logerror("$ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%1x  PCM_data=%02x\n", m_adpcm_addr, m_i8748_P1, data, m_i8748_P2, m_pcm_shift, m_pcm_nibble);
@@ -310,7 +495,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 	m_i8748_P2 = data;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_m5205_clk_w )
+[[maybe_unused]] void chinagat_state::saiyugoub1_m5205_clk_w(uint8_t data)
 {
 	/* i8748 T0 output clk mode */
 	/* This signal goes through a divide by 8 counter */
@@ -351,7 +536,7 @@ void chinagat_state::main_map(address_map &map)
 	map(0x2800, 0x2fff).ram().w(FUNC(chinagat_state::ddragon_bgvideoram_w)).share("bgvideoram");
 	map(0x3000, 0x317f).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3400, 0x357f).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x3800, 0x397f).bankw("bank3").share("spriteram");
+	map(0x3800, 0x397f).ram().share("spriteram");
 	map(0x3e00, 0x3e04).w(FUNC(chinagat_state::interrupt_w));
 	map(0x3e06, 0x3e06).writeonly().share("scrolly_lo");
 	map(0x3e07, 0x3e07).writeonly().share("scrollx_lo");
@@ -371,8 +556,8 @@ void chinagat_state::sub_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("share1");
 	map(0x2000, 0x2000).w(FUNC(chinagat_state::sub_bankswitch_w));
 	map(0x2800, 0x2800).w(FUNC(chinagat_state::sub_irq_ack_w)); /* Called on CPU start and after return from jump table */
-//  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
-//  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
+//  map(0x2a2b, 0x2a2b).nopr(); /* What lives here? */
+//  map(0x2a30, 0x2a30).nopr(); /* What lives here? */
 	map(0x4000, 0x7fff).bankr("bank4");
 	map(0x8000, 0xffff).rom();
 }
@@ -394,14 +579,14 @@ void chinagat_state::ym2203c_sound_map(address_map &map)
 // but only on the title screen....
 
 	map(0x8800, 0x8801).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("oki", okim6295_device, write)
+//  map(0x8802, 0x8802).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+//  map(0x8803, 0x8803).w("oki", FUNC(okim6295_device::write));
 	map(0x8804, 0x8805).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0x8804, 0x8804) AM_WRITEONLY
-//  AM_RANGE(0x8805, 0x8805) AM_WRITEONLY
+//  map(0x8804, 0x8804).writeonly();
+//  map(0x8805, 0x8805).writeonly();
 
-//  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+//  map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+//  map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xA000, 0xA000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -531,8 +716,6 @@ GFXDECODE_END
 
 void chinagat_state::machine_start()
 {
-	ddragon_state::machine_start();
-
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
@@ -554,8 +737,6 @@ void chinagat_state::machine_start()
 
 void chinagat_state::machine_reset()
 {
-	ddragon_state::machine_reset();
-
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
 	m_adpcm_sound_irq = 0;
@@ -584,7 +765,7 @@ void chinagat_state::chinagat(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));     /* 3.579545 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -631,7 +812,7 @@ void chinagat_state::saiyugoub1(machine_config &config)
 	mcu.p1_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_rom_addr_w));
 	mcu.p2_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_control_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -672,7 +853,7 @@ void chinagat_state::saiyugoub2(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));       /* 3.579545 MHz oscillator */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::ym2203c_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -733,7 +914,7 @@ ROM_START( chinagat )
 
 	ROM_REGION(0x40000, "gfx3", 0 ) /* Background */
 	ROM_LOAD( "chinagat_a-13", 0x00000, 0x10000, BAD_DUMP CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) ) // not dumped yet, these were taken from the bootleg set instead
-	ROM_LOAD( "chinagat_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // Where are these on the real board?
+	ROM_LOAD( "chinagat_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // TRJ-100 should contain it, but not dumped yet.
 	ROM_LOAD( "chinagat_a-15", 0x20000, 0x10000, BAD_DUMP CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
 	ROM_LOAD( "chinagat_a-14", 0x30000, 0x10000, BAD_DUMP CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 
@@ -770,7 +951,7 @@ ROM_START( saiyugou )
 
 	ROM_REGION(0x40000, "gfx3", 0 ) /* Background */
 	ROM_LOAD( "saiyugou_a-13", 0x00000, 0x10000, BAD_DUMP CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) ) // not dumped yet, these were taken from the bootleg set instead
-	ROM_LOAD( "saiyugou_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // Where are these on the real board?
+	ROM_LOAD( "saiyugou_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // TRJ-100 should contain it, but not dumped yet.
 	ROM_LOAD( "saiyugou_a-15", 0x20000, 0x10000, BAD_DUMP CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
 	ROM_LOAD( "saiyugou_a-14", 0x30000, 0x10000, BAD_DUMP CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 
@@ -787,16 +968,16 @@ ROM_START( saiyugoub1 )
 	ROM_REGION( 0x28000, "maincpu", 0 ) /* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "23j3-0.51",  0x10000, 0x18000, CRC(aa8132a2) SHA1(87c3bd447767f263113c4865afc905a0e484a625) )    /* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
-	   ROM_LOAD( "a-5.bin", 0x10000, 0x10000, CRC(39795aa5) )      Banks 0x4000 long @ 0x4000
-	   ROM_LOAD( "a-9.bin", 0x20000, 0x08000, CRC(051ebe92) )      Banks 0x4000 long @ 0x4000
+	   ROM_LOAD( "a-5.bin", 0x10000, 0x10000, CRC(39795aa5) SHA1(475dc547b823436b25f3bdff22434e3898c23d9f) )    Banks 0x4000 long @ 0x4000
+	   ROM_LOAD( "a-9.bin", 0x20000, 0x08000, CRC(051ebe92) SHA1(f3d179e7794f18aa65f24422364c1d71735fcc29) )     Banks 0x4000 long @ 0x4000
 	*/
 	ROM_CONTINUE(           0x08000, 0x08000 )              /* Static code */
 
 	ROM_REGION( 0x28000, "sub", 0 ) /* Slave CPU: 128KB for code (bankswitched using $2000) */
 	ROM_LOAD( "23j4-0.48",  0x10000, 0x18000, CRC(2914af38) SHA1(3d690fa50b7d36a22de82c026d59a16126a7b73c) )    /* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
-	   ROM_LOAD( "a-4.bin", 0x10000, 0x10000, CRC(9effddc1) )      Banks 0x4000 long @ 0x4000
-	   ROM_LOAD( "a-8.bin", 0x20000, 0x08000, CRC(a436edb8) )      Banks 0x4000 long @ 0x4000
+	   ROM_LOAD( "a-4.bin", 0x10000, 0x10000, CRC(9effddc1) SHA1(f4d336991ba73241c683a12c5949f8929fcaae14) )     Banks 0x4000 long @ 0x4000
+	   ROM_LOAD( "a-8.bin", 0x20000, 0x08000, CRC(a436edb8) SHA1(f6504bcfe6dd9d756bcf5443fb702a7c82408ea9) )     Banks 0x4000 long @ 0x4000
 	*/
 	ROM_CONTINUE(           0x08000, 0x08000 )              /* Static code */
 
@@ -809,8 +990,8 @@ ROM_START( saiyugoub1 )
 	ROM_REGION(0x20000, "gfx1", 0 ) /* Text */
 	ROM_LOAD( "23j6-0.18",  0x00000, 0x20000, CRC(86d33df0) SHA1(3419959c28703c5177de9c11b61e1dba9e76aca5) )    /* 0,1,2,3 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
-	   ROM_LOAD( "a-2.bin", 0x00000, 0x10000, CRC(baa5a3b9) )      0,1
-	   ROM_LOAD( "a-3.bin", 0x10000, 0x10000, CRC(532d59be) )      2,3
+	   ROM_LOAD( "a-2.bin", 0x00000, 0x10000, CRC(baa5a3b9) SHA1(073685f4c9dbe90480cf5debea999ae3d7d49346) )     0,1
+	   ROM_LOAD( "a-3.bin", 0x10000, 0x10000, CRC(532d59be) SHA1(48d7cf73362d019a5d9a8e1669c86ef52307bad1) )     2,3
 	*/
 
 	ROM_REGION(0x80000, "gfx2", 0 ) /* Sprites */
@@ -819,14 +1000,14 @@ ROM_START( saiyugoub1 )
 	ROM_LOAD( "23j9-0.101",  0x40000, 0x20000, CRC(8caf6097) SHA1(50ad192f831b055586a4a9974f8c6c2f2063ede5) )   /* 0,1 */
 	ROM_LOAD( "23ja-0.100",  0x60000, 0x20000, CRC(f678594f) SHA1(4bdcf9407543925f4630a8c7f1f48b85f76343a9) )   /* 0,1 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same
-	   ROM_LOAD( "a-23.bin", 0x00000, 0x10000, CRC(12b56225) )     2,3
-	   ROM_LOAD( "a-22.bin", 0x10000, 0x10000, CRC(b592aa9b) )     2,3
-	   ROM_LOAD( "a-21.bin", 0x20000, 0x10000, CRC(a331ba3d) )     2,3
-	   ROM_LOAD( "a-20.bin", 0x30000, 0x10000, CRC(2515d742) )     2,3
-	   ROM_LOAD( "a-19.bin", 0x40000, 0x10000, CRC(d796f2e4) )     0,1
-	   ROM_LOAD( "a-18.bin", 0x50000, 0x10000, CRC(c9e1c2f9) )     0,1
-	   ROM_LOAD( "a-17.bin", 0x60000, 0x10000, CRC(00b6db0a) )     0,1
-	   ROM_LOAD( "a-16.bin", 0x70000, 0x10000, CRC(f196818b) )     0,1
+	   ROM_LOAD( "a-23.bin", 0x00000, 0x10000, CRC(12b56225) SHA1(cc1617b92194f40dd343d83a98165912553215d9) )    2,3
+	   ROM_LOAD( "a-22.bin", 0x10000, 0x10000, CRC(b592aa9b) SHA1(c04dcda040e7598ebc90bd0e0ba7117c2fcc7f4b) )    2,3
+	   ROM_LOAD( "a-21.bin", 0x20000, 0x10000, CRC(a331ba3d) SHA1(c7a8c5f10031b0ffcb4bb5bf73e5edfb0013373d) )    2,3
+	   ROM_LOAD( "a-20.bin", 0x30000, 0x10000, CRC(2515d742) SHA1(eada6a8dcd19dc380a097e8a312822abdf01f9b9) )    2,3
+	   ROM_LOAD( "a-19.bin", 0x40000, 0x10000, CRC(d796f2e4) SHA1(8e50b117e64160e59f7c55f7fb57cde32f4c0030) )    0,1
+	   ROM_LOAD( "a-18.bin", 0x50000, 0x10000, CRC(c9e1c2f9) SHA1(5db992822fd5458a76861763ae661b7c6f22b9c7) )    0,1
+	   ROM_LOAD( "a-17.bin", 0x60000, 0x10000, CRC(00b6db0a) SHA1(3219233159c1ce350bb572a43fe66836e67e72d7) )    0,1
+	   ROM_LOAD( "a-16.bin", 0x70000, 0x10000, CRC(f196818b) SHA1(f4a27e90720094f6a06b6b7f1dad7be25de8e9ba) )    0,1
 	*/
 
 	ROM_REGION(0x40000, "gfx3", 0 ) /* Background */
@@ -852,16 +1033,16 @@ ROM_START( saiyugoub2 )
 	ROM_REGION( 0x28000, "maincpu", 0 ) /* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "23j3-0.51",   0x10000, 0x18000, CRC(aa8132a2) SHA1(87c3bd447767f263113c4865afc905a0e484a625) )   /* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
-	   ROM_LOAD( "sai5.bin", 0x10000, 0x10000, CRC(39795aa5) )     Banks 0x4000 long @ 0x4000
-	   ROM_LOAD( "sai9.bin", 0x20000, 0x08000, CRC(051ebe92) )     Banks 0x4000 long @ 0x4000
+	   ROM_LOAD( "sai5.bin", 0x10000, 0x10000, CRC(39795aa5) SHA1(475dc547b823436b25f3bdff22434e3898c23d9f) )    Banks 0x4000 long @ 0x4000
+	   ROM_LOAD( "sai9.bin", 0x20000, 0x08000, CRC(051ebe92) SHA1(f3d179e7794f18aa65f24422364c1d71735fcc29) )    Banks 0x4000 long @ 0x4000
 	*/
 	ROM_CONTINUE(            0x08000, 0x08000 )             /* Static code */
 
 	ROM_REGION( 0x28000, "sub", 0 ) /* Slave CPU: 128KB for code (bankswitched using $2000) */
 	ROM_LOAD( "23j4-0.48", 0x10000, 0x18000, CRC(2914af38) SHA1(3d690fa50b7d36a22de82c026d59a16126a7b73c) ) /* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
-	   ROM_LOAD( "sai4.bin", 0x10000, 0x10000, CRC(9effddc1) )     Banks 0x4000 long @ 0x4000
-	   ROM_LOAD( "sai8.bin", 0x20000, 0x08000, CRC(a436edb8) )     Banks 0x4000 long @ 0x4000
+	   ROM_LOAD( "sai4.bin", 0x10000, 0x10000, CRC(9effddc1) SHA1(f4d336991ba73241c683a12c5949f8929fcaae14) )    Banks 0x4000 long @ 0x4000
+	   ROM_LOAD( "sai8.bin", 0x20000, 0x08000, CRC(a436edb8) SHA1(f6504bcfe6dd9d756bcf5443fb702a7c82408ea9) )    Banks 0x4000 long @ 0x4000
 	*/
 	ROM_CONTINUE(         0x08000, 0x08000 )                /* Static code */
 
@@ -874,8 +1055,8 @@ ROM_START( saiyugoub2 )
 	ROM_REGION(0x20000, "gfx1", 0 ) /* Text */
 	ROM_LOAD( "23j6-0.18", 0x00000, 0x20000, CRC(86d33df0) SHA1(3419959c28703c5177de9c11b61e1dba9e76aca5) ) /* 0,1,2,3 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
-	   ROM_LOAD( "sai2.bin", 0x00000, 0x10000, CRC(baa5a3b9) )     0,1
-	   ROM_LOAD( "sai3.bin", 0x10000, 0x10000, CRC(532d59be) )     2,3
+	   ROM_LOAD( "sai2.bin", 0x00000, 0x10000, CRC(baa5a3b9) SHA1(073685f4c9dbe90480cf5debea999ae3d7d49346) )    0,1
+	   ROM_LOAD( "sai3.bin", 0x10000, 0x10000, CRC(532d59be) SHA1(48d7cf73362d019a5d9a8e1669c86ef52307bad1) )    2,3
 	*/
 
 	ROM_REGION(0x80000, "gfx2", 0 ) /* Sprites */
@@ -884,14 +1065,14 @@ ROM_START( saiyugoub2 )
 	ROM_LOAD( "23j9-0.101",   0x40000, 0x20000, CRC(8caf6097) SHA1(50ad192f831b055586a4a9974f8c6c2f2063ede5) )  /* 0,1 */
 	ROM_LOAD( "23ja-0.100",   0x60000, 0x20000, CRC(f678594f) SHA1(4bdcf9407543925f4630a8c7f1f48b85f76343a9) )  /* 0,1 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same
-	   ROM_LOAD( "sai23.bin", 0x00000, 0x10000, CRC(12b56225) )    2,3
-	   ROM_LOAD( "sai22.bin", 0x10000, 0x10000, CRC(b592aa9b) )    2,3
-	   ROM_LOAD( "sai21.bin", 0x20000, 0x10000, CRC(a331ba3d) )    2,3
-	   ROM_LOAD( "sai20.bin", 0x30000, 0x10000, CRC(2515d742) )    2,3
-	   ROM_LOAD( "sai19.bin", 0x40000, 0x10000, CRC(d796f2e4) )    0,1
-	   ROM_LOAD( "sai18.bin", 0x50000, 0x10000, CRC(c9e1c2f9) )    0,1
-	   ROM_LOAD( "roku17.bin",0x60000, 0x10000, CRC(00b6db0a) )    0,1
-	   ROM_LOAD( "sai16.bin", 0x70000, 0x10000, CRC(f196818b) )    0,1
+	   ROM_LOAD( "sai23.bin", 0x00000, 0x10000, CRC(12b56225) SHA1(cc1617b92194f40dd343d83a98165912553215d9) )   2,3
+	   ROM_LOAD( "sai22.bin", 0x10000, 0x10000, CRC(b592aa9b) SHA1(c04dcda040e7598ebc90bd0e0ba7117c2fcc7f4b) )   2,3
+	   ROM_LOAD( "sai21.bin", 0x20000, 0x10000, CRC(a331ba3d) SHA1(c7a8c5f10031b0ffcb4bb5bf73e5edfb0013373d) )   2,3
+	   ROM_LOAD( "sai20.bin", 0x30000, 0x10000, CRC(2515d742) SHA1(eada6a8dcd19dc380a097e8a312822abdf01f9b9) )   2,3
+	   ROM_LOAD( "sai19.bin", 0x40000, 0x10000, CRC(d796f2e4) SHA1(8e50b117e64160e59f7c55f7fb57cde32f4c0030) )   0,1
+	   ROM_LOAD( "sai18.bin", 0x50000, 0x10000, CRC(c9e1c2f9) SHA1(5db992822fd5458a76861763ae661b7c6f22b9c7) )   0,1
+	   ROM_LOAD( "roku17.bin",0x60000, 0x10000, CRC(00b6db0a) SHA1(3219233159c1ce350bb572a43fe66836e67e72d7) )   0,1
+	   ROM_LOAD( "sai16.bin", 0x70000, 0x10000, CRC(f196818b) SHA1(f4a27e90720094f6a06b6b7f1dad7be25de8e9ba) )   0,1
 	*/
 
 	ROM_REGION(0x40000, "gfx3", 0 ) /* Background */
@@ -925,6 +1106,8 @@ void chinagat_state::init_chinagat()
 	membank("bank1")->configure_entries(0, 6, &MAIN[0x10000], 0x4000);
 	membank("bank4")->configure_entries(0, 6, &SUB[0x10000], 0x4000);
 }
+
+} // Anonymous namespace
 
 
 //  ( YEAR  NAME        PARENT    MACHINE     INPUT     STATE           INIT           MONITOR COMPANY    FULLNAME     FLAGS ) */

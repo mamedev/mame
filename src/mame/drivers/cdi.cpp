@@ -3,8 +3,8 @@
 /******************************************************************************
 
 
-    Philips CD-I-based games
-    ------------------------
+    Philips CD-i consoles and games
+    -------------------------------
 
     Preliminary MAME driver by Ryan Holtz
     Help provided by CD-i Fan
@@ -14,15 +14,36 @@
 
 STATUS:
 
-Quizard does not work for unknown reasons.
+  CD-i:
+- The SLAVE MCU cannot be low-level emulated until there is proper /DTACK
+  support in the 68k core. A2/A1 and D7..D0 are hooked up to Port C bits 1/0
+  and Port A respectively, the Read/Write signal is sent to Port D bit 7, and
+  /DTACK is received from Port B bit 6. The MCU therefore has the capability to
+  pull /DTACK high on a data read in order to tell the 68k to hold off until
+  data is ready.
+
+- There is currently a lack of documentation on any of the chips used for
+  audio in any of the CD-i models. The CDIC, which was used on Mono-I boards,
+  is partially emulated thanks to information provided by CD-i Fan, the author
+  of CD-i Emu. Desired documentation includes:
+  * GSX38KG307CE46, "ATTEX"
+  * Philips IMS66490, "CDIC" ADPCM decoder
+  * PC85010 DSP
 
 TODO:
 
-- Proper abstraction of the 68070's internal devices (UART,DMA,Timers etc.)
-- Mono-I: Full emulation of the CDIC, SLAVE and/or MCD212 customs
+- Screen clocks are a hack right now; they should be exactly CLOCK_A/2. However, the
+  MCD-212 documentation states in both tables and timing diagrams that vertical retrace
+  has an additional half-line even in non-interlaced mode, which cannot be represented
+  in the current screen-timing framework. The input clock has been adjusted downward
+  to factor out this half-line, resulting in the expected 50Hz exactly in PAL mode.
+
+- Proper abstraction of the 68070's internal devices (UART, DMA, Timers, etc.)
+
+- Mono-I: Full emulation of the CDIC, as well as the SERVO and SLAVE MCUs
+
 - Mono-II: SERVO and SLAVE I/O device hookup
 - Mono-II: DSP56k hookup
-- Mono-II: Move 68HC05 I/O device hookup into CPU core
 
 *******************************************************************************/
 
@@ -46,8 +67,11 @@ TODO:
 // TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
 #define CLOCK_A 30_MHz_XTAL
 
-#define LOG_SERVO       (1 << 0)
-#define LOG_SLAVE       (1 << 1)
+#define LOG_DVC             (1 << 1)
+#define LOG_QUIZARD_READS   (1 << 2)
+#define LOG_QUIZARD_WRITES  (1 << 3)
+#define LOG_QUIZARD_OTHER   (1 << 4)
+#define LOG_UART            (1 << 5)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
@@ -60,75 +84,48 @@ TODO:
 
 void cdi_state::cdimono1_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
-	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
-	map(0x00300000, 0x00303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
+	map(0x000000, 0xffffff).rw(FUNC(cdi_state::bus_error_r), FUNC(cdi_state::bus_error_w));
+	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
+	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
+	map(0x300000, 0x303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
+	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
-	map(0x00303c00, 0x00303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
-	map(0x00310000, 0x00317fff).rw(m_slave_hle, FUNC(cdislave_device::slave_r), FUNC(cdislave_device::slave_w));
-	map(0x00318000, 0x0031ffff).noprw();
-	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
-	map(0x00400000, 0x0047ffff).rom().region("maincpu", 0);
-	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
-	map(0x00500000, 0x0057ffff).ram();
-	map(0x00580000, 0x00ffffff).noprw();
-	map(0x00e00000, 0x00efffff).ram(); // DVC
+	map(0x303c00, 0x303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
+	map(0x310000, 0x317fff).rw(m_slave_hle, FUNC(cdislave_hle_device::slave_r), FUNC(cdislave_hle_device::slave_w));
+	map(0x318000, 0x31ffff).noprw();
+	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
+	map(0x400000, 0x47ffff).r(FUNC(cdi_state::main_rom_r));
+	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
+	map(0x500000, 0x57ffff).ram();
+	map(0xd00000, 0xdfffff).ram(); // DVC RAM block 1
+	map(0xe00000, 0xe7ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
+	map(0xe80000, 0xefffff).ram(); // DVC RAM block 2
 }
 
 void cdi_state::cdimono2_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
-	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
+	map(0x000000, 0x07ffff).ram().share("plane0");
+	map(0x200000, 0x27ffff).ram().share("plane1");
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
+	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
-	//AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
-	//AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
-	//AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave", cdislave_device, slave_r, slave_w)
-	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
-	map(0x00400000, 0x0047ffff).rom().region("maincpu", 0);
-	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
-	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	map(0x00500000, 0x00ffffff).noprw();
-	//AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
+	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
+	map(0x400000, 0x47ffff).r(FUNC(cdi_state::main_rom_r));
+	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 }
 
 void cdi_state::cdi910_mem(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
-	map(0x00180000, 0x001fffff).rom().region("maincpu", 0); // boot vectors point here
-
-	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
+	map(0x000000, 0x07ffff).ram().share("plane0");
+	map(0x180000, 0x1fffff).rom().region("maincpu", 0); // boot vectors point here
+	map(0x200000, 0x27ffff).ram().share("plane1");
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
+	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
-//  AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
-//  AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
-//  AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave_hle", cdislave_device, slave_r, slave_w)
-//  AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
-	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
-//  AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	map(0x00500000, 0x00ffffff).noprw();
-//  AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-}
-
-
-void cdi_state::cdimono2_servo_mem(address_map &map)
-{
-	map(0x0000, 0x001f).rw(FUNC(cdi_state::servo_io_r), FUNC(cdi_state::servo_io_w));
-	map(0x0050, 0x00ff).ram();
-	map(0x0100, 0x1fff).rom().region("servo", 0x100);
-}
-
-void cdi_state::cdimono2_slave_mem(address_map &map)
-{
-	map(0x0000, 0x001f).rw(FUNC(cdi_state::slave_io_r), FUNC(cdi_state::slave_io_w));
-	map(0x0050, 0x00ff).ram();
-	map(0x0100, 0x1fff).rom().region("slave", 0x100);
+	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
+	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
+	map(0x500000, 0xffffff).noprw();
 }
 
 
@@ -136,597 +133,221 @@ void cdi_state::cdimono2_slave_mem(address_map &map)
 *      Input ports       *
 *************************/
 
-INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
-{
-	bool send = false;
-
-	switch((uintptr_t)param)
-	{
-		case 0x39:
-			if (m_input1.read_safe(0) & 0x01) send = true;
-			break;
-		case 0x37:
-			if (m_input1.read_safe(0) & 0x02) send = true;
-			break;
-		case 0x31:
-			if (m_input1.read_safe(0) & 0x04) send = true;
-			break;
-		case 0x32:
-			if (m_input1.read_safe(0) & 0x08) send = true;
-			break;
-		case 0x33:
-			if (m_input1.read_safe(0) & 0x10) send = true;
-			break;
-
-		case 0x30:
-			if (m_input2.read_safe(0) & 0x01) send = true;
-			break;
-		case 0x38:
-			if (m_input2.read_safe(0) & 0x02) send = true;
-			break;
-		case 0x34:
-			if (m_input2.read_safe(0) & 0x04) send = true;
-			break;
-		case 0x35:
-			if (m_input2.read_safe(0) & 0x08) send = true;
-			break;
-		case 0x36:
-			if (m_input2.read_safe(0) & 0x10) send = true;
-			break;
-	}
-
-	if(send)
-	{
-		uint8_t data = (uint8_t)((uintptr_t)param & 0x000000ff);
-		m_maincpu->quizard_rx(data);
-	}
-}
-
 static INPUT_PORTS_START( cdi )
-	PORT_START("DEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "Plane B Disable")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Force Backdrop Color")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
-	PORT_CONFNAME( 0xf0, 0x00, "Backdrop Color")
-	PORT_CONFSETTING(    0x00, "Black" )
-	PORT_CONFSETTING(    0x10, "Half-Bright Blue" )
-	PORT_CONFSETTING(    0x20, "Half-Bright Green" )
-	PORT_CONFSETTING(    0x30, "Half-Bright Cyan" )
-	PORT_CONFSETTING(    0x40, "Half-Bright Red" )
-	PORT_CONFSETTING(    0x50, "Half-Bright Magenta" )
-	PORT_CONFSETTING(    0x60, "Half-Bright Yellow" )
-	PORT_CONFSETTING(    0x70, "Half-Bright White" )
-	PORT_CONFSETTING(    0x80, "Black (Alternate)" )
-	PORT_CONFSETTING(    0x90, "Blue" )
-	PORT_CONFSETTING(    0xa0, "Green" )
-	PORT_CONFSETTING(    0xb0, "Cyan" )
-	PORT_CONFSETTING(    0xc0, "Red" )
-	PORT_CONFSETTING(    0xd0, "Magenta" )
-	PORT_CONFSETTING(    0xe0, "Yellow" )
-	PORT_CONFSETTING(    0xf0, "White" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cdimono2 )
-	PORT_START("DEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "Plane B Disable")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Force Backdrop Color")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
-	PORT_CONFNAME( 0xf0, 0x00, "Backdrop Color")
-	PORT_CONFSETTING(    0x00, "Black" )
-	PORT_CONFSETTING(    0x10, "Half-Bright Blue" )
-	PORT_CONFSETTING(    0x20, "Half-Bright Green" )
-	PORT_CONFSETTING(    0x30, "Half-Bright Cyan" )
-	PORT_CONFSETTING(    0x40, "Half-Bright Red" )
-	PORT_CONFSETTING(    0x50, "Half-Bright Magenta" )
-	PORT_CONFSETTING(    0x60, "Half-Bright Yellow" )
-	PORT_CONFSETTING(    0x70, "Half-Bright White" )
-	PORT_CONFSETTING(    0x80, "Black (Alternate)" )
-	PORT_CONFSETTING(    0x90, "Blue" )
-	PORT_CONFSETTING(    0xa0, "Green" )
-	PORT_CONFSETTING(    0xb0, "Cyan" )
-	PORT_CONFSETTING(    0xc0, "Red" )
-	PORT_CONFSETTING(    0xd0, "Magenta" )
-	PORT_CONFSETTING(    0xe0, "Yellow" )
-	PORT_CONFSETTING(    0xf0, "White" )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( quizard )
-	PORT_INCLUDE( cdi )
+	PORT_START("P0")
+	PORT_DIPNAME( 0x07, 0x05, "Settings" )
+	PORT_DIPSETTING(    0x00, "1 Coin, 0 Bonus Limit, 0 Bonus Number" )
+	PORT_DIPSETTING(    0x01, "2 Coins, 0 Bonus Limit, 0 Bonus Number" )
+	PORT_DIPSETTING(    0x02, "1 Coin, 2 Bonus Limit, 1 Bonus Number" )
+	PORT_DIPSETTING(    0x03, "1 Coin, 3 Bonus Limit, 1 Bonus Number" )
+	PORT_DIPSETTING(    0x04, "1 Coin, 5 Bonus Limit, 1 Bonus Number" )
+	PORT_DIPSETTING(    0x05, "1 Coin, 5 Bonus Limit, 2 Bonus Number" )
+	PORT_DIPSETTING(    0x06, "1 Coin, 10 Bonus Limit, 2 Bonus Number" )
+	PORT_DIPSETTING(    0x07, "2 Coins, 4 Bonus Limit, 1 Bonus Number" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xc8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("INPUT1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x39)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x37)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Player 1 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x31)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Player 1 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x32)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Player 1 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x33)
-	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("P1")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START("INPUT2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x30)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Start 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x38)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Player 2 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x34)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Player 2 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x35)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Player 2 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x36)
-	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 1 A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Player 1 B")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Player 1 C")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Player 2 A")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Player 2 B")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Player 2 C")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER( cdi_state::mcu_frame )
-{
-	m_maincpu->mcu_frame();
-}
+/***************************
+*  Machine Initialization  *
+***************************/
 
-MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
+void cdi_state::machine_reset()
 {
-	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
-	uint16_t *dst   = m_planea;
+	uint16_t *src = &m_main_rom[0];
+	uint16_t *dst = &m_plane_ram[0][0];
 	memcpy(dst, src, 0x8);
-	memset(m_servo_io_regs, 0, 0x20);
-	memset(m_slave_io_regs, 0, 0x20);
 }
 
-MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
+void quizard_state::machine_start()
 {
-	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
-	uint16_t *dst   = m_planea;
-	memcpy(dst, src, 0x8);
-
-	m_maincpu->reset();
+	save_item(NAME(m_mcu_rx_from_cpu));
+	save_item(NAME(m_mcu_initial_byte));
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard1 )
+void quizard_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	cdi_state::machine_reset();
 
-	m_maincpu->set_quizard_mcu_value(0x021f);
-	m_maincpu->set_quizard_mcu_ack(0x5a);
-}
-
-MACHINE_RESET_MEMBER( cdi_state, quizard2 )
-{
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
-
-	// 0x2b1: Italian
-	// 0x001: French
-	// 0x188: German
-
-	m_maincpu->set_quizard_mcu_value(0x188);
-	m_maincpu->set_quizard_mcu_ack(0x59);
+	m_mcu_rx_from_cpu = 0x00;
+	m_mcu_initial_byte = true;
 }
 
 
+/***************************
+*  Wait-State Handling     *
+***************************/
 
-MACHINE_RESET_MEMBER( cdi_state, quizard3 )
+template<int Channel>
+uint16_t cdi_state::plane_r(offs_t offset, uint16_t mem_mask)
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
-
-	m_maincpu->set_quizard_mcu_value(0x00ae);
-	m_maincpu->set_quizard_mcu_ack(0x58);
+	m_maincpu->eat_cycles(m_mcd212->ram_dtack_cycle_count<Channel>());
+	return m_plane_ram[Channel][offset];
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard4 )
+template<int Channel>
+void cdi_state::plane_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	m_maincpu->eat_cycles(m_mcd212->ram_dtack_cycle_count<Channel>());
+	COMBINE_DATA(&m_plane_ram[Channel][offset]);
+}
 
-	//m_maincpu->set_quizard_mcu_value(0x0139);
-	m_maincpu->set_quizard_mcu_value(0x011f);
-	m_maincpu->set_quizard_mcu_ack(0x57);
+uint16_t cdi_state::main_rom_r(offs_t offset)
+{
+	m_maincpu->eat_cycles(m_mcd212->rom_dtack_cycle_count());
+	return m_main_rom[offset];
 }
 
 
+/**********************
+*  BERR Handling      *
+**********************/
 
-/**************************
-*     68HC05 Handlers     *
-**************************/
-
-READ8_MEMBER( cdi_state::servo_io_r )
+uint16_t cdi_state::bus_error_r(offs_t offset)
 {
-	if (machine().side_effects_disabled())
+	if(!machine().side_effects_disabled())
 	{
-		return 0;
+		m_maincpu->set_buserror_details(offset*2, true, m_maincpu->get_fc());
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
+	return 0xff;
+}
+
+void cdi_state::bus_error_w(offs_t offset, uint16_t data)
+{
+	if(!machine().side_effects_disabled())
+	{
+		m_maincpu->set_buserror_details(offset*2, false, m_maincpu->get_fc());
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
+}
+
+
+/**********************
+*  Quizard Protection *
+**********************/
+
+void quizard_state::mcu_rtsn_from_cpu(int state)
+{
+	LOGMASKED(LOG_UART, "MCU receiving RTSN from CPU: %d\n", state);
+}
+
+void quizard_state::mcu_rx_from_cpu(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "MCU receiving %02x from CPU\n", data);
+	if (m_mcu_initial_byte)
+	{
+		m_mcu_initial_byte = false;
+		return;
 	}
 
-	uint8_t ret = m_servo_io_regs[offset];
+	m_mcu_rx_from_cpu = data;
 
-	switch(offset)
-	{
-		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			LOGMASKED(LOG_SERVO, "SERVO Port A Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			ret = 0x08;
-			LOGMASKED(LOG_SERVO, "SERVO Port B Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			ret |= INV_CADDYSWITCH_IN;
-			LOGMASKED(LOG_SERVO, "SERVO Port C Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			LOGMASKED(LOG_SERVO, "SERVO Port D Input read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			LOGMASKED(LOG_SERVO, "SERVO Port A DDR read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			LOGMASKED(LOG_SERVO, "SERVO Port B DDR read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			LOGMASKED(LOG_SERVO, "SERVO Port C DDR read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SPI_CTRL:
-			LOGMASKED(LOG_SERVO, "SERVO SPI Control read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SPI_STATUS:
-			LOGMASKED(LOG_SERVO, "SERVO SPI Status read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SPI_DATA:
-			LOGMASKED(LOG_SERVO, "SERVO SPI Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_BAUD:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Baud Rate read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Control 1 read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Control 2 read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_STATUS:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Status read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_DATA:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			LOGMASKED(LOG_SERVO, "SERVO Timer Control read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			LOGMASKED(LOG_SERVO, "SERVO Timer Status read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::ICAP_HI:
-			LOGMASKED(LOG_SERVO, "SERVO Input Capture Hi read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::ICAP_LO:
-			LOGMASKED(LOG_SERVO, "SERVO Input Capture Lo read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::OCMP_HI:
-			LOGMASKED(LOG_SERVO, "SERVO Output Compare Hi read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::OCMP_LO:
-			LOGMASKED(LOG_SERVO, "SERVO Output Compare Lo read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::COUNT_HI:
-		{
-			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
-			ret = count >> 8;
-			LOGMASKED(LOG_SERVO, "SERVO Count Hi read (%02x)\n", ret);
-			break;
-		}
-		case m68hc05eg_io_reg_t::COUNT_LO:
-		{
-			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
-			ret = count & 0x00ff;
-			LOGMASKED(LOG_SERVO, "SERVO Count Lo read (%02x)\n", ret);
-			break;
-		}
-		case m68hc05eg_io_reg_t::ACOUNT_HI:
-		{
-			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
-			ret = count >> 8;
-			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Hi read (%02x)\n", ret);
-			break;
-		}
-		case m68hc05eg_io_reg_t::ACOUNT_LO:
-		{
-			const uint16_t count = (m_servo->total_cycles() / 4) & 0x0000ffff;
-			ret = count & 0x00ff;
-			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Lo read (%02x)\n", ret);
-			break;
-		}
-		default:
-			logerror("Unknown SERVO I/O read (%02x)\n", offset);
-			break;
-	}
-
-	return ret;
+	m_mcu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	m_mcu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
-
-WRITE8_MEMBER( cdi_state::servo_io_w )
+uint8_t quizard_state::mcu_p0_r()
 {
-	switch(offset)
-	{
-		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			LOGMASKED(LOG_SERVO, "SERVO Port A Data write (%02x)\n", data);
-			return;
-		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			LOGMASKED(LOG_SERVO, "SERVO Port B Data write (%02x)\n", data);
-			return;
-		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			LOGMASKED(LOG_SERVO, "SERVO Port C Data write (%02x)\n", data);
-			return;
-		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			LOGMASKED(LOG_SERVO, "SERVO Port D Input write (%02x)\n", data);
-			return;
-		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			LOGMASKED(LOG_SERVO, "SERVO Port A DDR write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			LOGMASKED(LOG_SERVO, "SERVO Port B DDR write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			LOGMASKED(LOG_SERVO, "SERVO Port C DDR write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SPI_CTRL:
-			LOGMASKED(LOG_SERVO, "SERVO SPI Control write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SPI_STATUS:
-			LOGMASKED(LOG_SERVO, "SERVO SPI Status write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SPI_DATA:
-			LOGMASKED(LOG_SERVO, "SERVO SPI Data write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_BAUD:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Baud Rate write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Control 1 write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Control 2 write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_STATUS:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Status write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_DATA:
-			LOGMASKED(LOG_SERVO, "SERVO SCC Data write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			LOGMASKED(LOG_SERVO, "SERVO Timer Control write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			LOGMASKED(LOG_SERVO, "SERVO Timer Status write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::ICAP_HI:
-			LOGMASKED(LOG_SERVO, "SERVO Input Capture Hi write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::ICAP_LO:
-			LOGMASKED(LOG_SERVO, "SERVO Input Capture Lo write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::OCMP_HI:
-			LOGMASKED(LOG_SERVO, "SERVO Output Compare Hi write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::OCMP_LO:
-			LOGMASKED(LOG_SERVO, "SERVO Output Compare Lo write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::COUNT_HI:
-			LOGMASKED(LOG_SERVO, "SERVO Count Hi write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::COUNT_LO:
-			LOGMASKED(LOG_SERVO, "SERVO Count Lo write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::ACOUNT_HI:
-			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Hi write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::ACOUNT_LO:
-			LOGMASKED(LOG_SERVO, "SERVO Alternate Count Lo write (%02x)\n", data);
-			break;
-		default:
-			logerror("Unknown SERVO I/O write (%02x = %02x)\n", offset, data);
-			break;
-	}
-
-	m_servo_io_regs[offset] = data;
+	const uint8_t data = m_inputs[0]->read();
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 0 Read (%02x)\n", machine().describe_context(), data);
+	return data;
 }
 
-READ8_MEMBER( cdi_state::slave_io_r )
+uint8_t quizard_state::mcu_p1_r()
 {
-	if (machine().side_effects_disabled())
-	{
-		return 0;
-	}
-
-	uint8_t ret = m_slave_io_regs[offset];
-
-	switch(offset)
-	{
-		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port A Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port B Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port C Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port D Input read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port A DDR read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port B DDR read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port C DDR read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SPI_CTRL:
-			LOGMASKED(LOG_SLAVE, "SLAVE SPI Control read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SPI_STATUS:
-			LOGMASKED(LOG_SLAVE, "SLAVE SPI Status read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SPI_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE SPI Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_BAUD:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Baud Rate read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 1 read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 2 read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_STATUS:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Status read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::SCC_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Data read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			LOGMASKED(LOG_SLAVE, "SLAVE Timer Control read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			LOGMASKED(LOG_SLAVE, "SLAVE Timer Status read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::ICAP_HI:
-			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Hi read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::ICAP_LO:
-			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Lo read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::OCMP_HI:
-			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Hi read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::OCMP_LO:
-			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Lo read (%02x)\n", ret);
-			break;
-		case m68hc05eg_io_reg_t::COUNT_HI:
-		{
-			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
-			ret = count >> 8;
-			LOGMASKED(LOG_SLAVE, "SLAVE Count Hi read (%02x)\n", ret);
-			break;
-		}
-		case m68hc05eg_io_reg_t::COUNT_LO:
-		{
-			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
-			ret = count & 0x00ff;
-			LOGMASKED(LOG_SLAVE, "SLAVE Count Lo read (%02x)\n", ret);
-			break;
-		}
-		case m68hc05eg_io_reg_t::ACOUNT_HI:
-		{
-			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
-			ret = count >> 8;
-			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Hi read (%02x)\n", ret);
-			break;
-		}
-		case m68hc05eg_io_reg_t::ACOUNT_LO:
-		{
-			const uint16_t count = (m_slave->total_cycles() / 4) & 0x0000ffff;
-			ret = count & 0x00ff;
-			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Lo read (%02x)\n", ret);
-			break;
-		}
-		default:
-			logerror("Unknown SLAVE I/O read (%02x)\n", offset);
-			break;
-	}
-
-	return ret;
+	uint8_t data = m_inputs[1]->read();
+	if (BIT(~m_inputs[0]->read(), 4))
+		data &= ~(1 << 4);
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 1 Read (%02x)\n", machine().describe_context(), data);
+	return data;
 }
 
-WRITE8_MEMBER( cdi_state::slave_io_w )
+uint8_t quizard_state::mcu_p2_r()
 {
-	switch(offset)
-	{
-		case m68hc05eg_io_reg_t::PORT_A_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port A Data write (%02x)\n", data);
-			return;
-		case m68hc05eg_io_reg_t::PORT_B_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port B Data write (%02x)\n", data);
-			return;
-		case m68hc05eg_io_reg_t::PORT_C_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port C Data write (%02x)\n", data);
-			return;
-		case m68hc05eg_io_reg_t::PORT_D_INPUT:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port D Input write (%02x)\n", data);
-			return;
-		case m68hc05eg_io_reg_t::PORT_A_DDR:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port A DDR write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::PORT_B_DDR:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port B DDR write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::PORT_C_DDR:
-			LOGMASKED(LOG_SLAVE, "SLAVE Port C DDR write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SPI_CTRL:
-			LOGMASKED(LOG_SLAVE, "SLAVE SPI Control write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SPI_STATUS:
-			LOGMASKED(LOG_SLAVE, "SLAVE SPI Status write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SPI_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE SPI Data write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_BAUD:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Baud Rate write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_CTRL1:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 1 write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_CTRL2:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Control 2 write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_STATUS:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Status write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::SCC_DATA:
-			LOGMASKED(LOG_SLAVE, "SLAVE SCC Data write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::TIMER_CTRL:
-			LOGMASKED(LOG_SLAVE, "SLAVE Timer Control write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::TIMER_STATUS:
-			LOGMASKED(LOG_SLAVE, "SLAVE Timer Status write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::ICAP_HI:
-			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Hi write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::ICAP_LO:
-			LOGMASKED(LOG_SLAVE, "SLAVE Input Capture Lo write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::OCMP_HI:
-			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Hi write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::OCMP_LO:
-			LOGMASKED(LOG_SLAVE, "SLAVE Output Compare Lo write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::COUNT_HI:
-			LOGMASKED(LOG_SLAVE, "SLAVE Count Hi write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::COUNT_LO:
-			LOGMASKED(LOG_SLAVE, "SLAVE Count Lo write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::ACOUNT_HI:
-			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Hi write (%02x)\n", data);
-			break;
-		case m68hc05eg_io_reg_t::ACOUNT_LO:
-			LOGMASKED(LOG_SLAVE, "SLAVE Alternate Count Lo write (%02x)\n", data);
-			break;
-		default:
-			logerror("Unknown SLAVE I/O write (%02x = %02x)\n", offset, data);
-			break;
-	}
+	const uint8_t data = m_inputs[2]->read();
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 2 Read (%02x)\n", machine().describe_context(), data);
+	return data;
+}
 
-	m_slave_io_regs[offset] = data;
+uint8_t quizard_state::mcu_p3_r()
+{
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 3 Read (%02x)\n", machine().describe_context(), 0x04);
+	return 0x04;
+}
+
+void quizard_state::mcu_p0_w(uint8_t data)
+{
+	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 0 Write (%02x)\n", machine().describe_context(), data);
+}
+
+void quizard_state::mcu_p1_w(uint8_t data)
+{
+	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 1 Write (%02x)\n", machine().describe_context(), data);
+}
+
+void quizard_state::mcu_p2_w(uint8_t data)
+{
+	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 2 Write (%02x)\n", machine().describe_context(), data);
+}
+
+void quizard_state::mcu_p3_w(uint8_t data)
+{
+	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 3 Write (%02x)\n", machine().describe_context(), data);
+	m_maincpu->uart_ctsn(BIT(data, 6));
+}
+
+void quizard_state::mcu_tx(uint8_t data)
+{
+	LOGMASKED(LOG_QUIZARD_OTHER, "%s: MCU transmitting %02x\n", machine().describe_context(), data);
+	m_maincpu->uart_rx(data);
+}
+
+uint8_t quizard_state::mcu_rx()
+{
+	uint8_t data = m_mcu_rx_from_cpu;
+	LOGMASKED(LOG_QUIZARD_OTHER, "%s: MCU receiving %02x\n", machine().describe_context(), data);
+	return data;
+}
+
+/*************************
+*     DVC cartridge      *
+*************************/
+
+uint16_t cdi_state::dvc_r(offs_t offset, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_DVC, "%s: dvc_r: %08x = 0000 & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), mem_mask);
+	return 0;
+}
+
+void cdi_state::dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_DVC, "%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), data, mem_mask);
 }
 
 /*************************
@@ -759,40 +380,33 @@ static const uint16_t cdi220_lcd_char[20*22] =
 	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400
 };
 
-void cdi_state::draw_lcd(int y)
+uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (y >= 22 || !m_slave_hle.found())
-		return;
+	if (!m_slave_hle.found())
+		return 0;
 
-	uint32_t *scanline = &m_lcdbitmap.pix32(y);
-
-	for (int lcd = 0; lcd < 8; lcd++)
+	for (int y = 0; y < 22; y++)
 	{
-		uint16_t data = (m_slave_hle->get_lcd_state()[lcd*2] << 8) |
-						m_slave_hle->get_lcd_state()[lcd*2 + 1];
-		for (int x = 0; x < 20; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+
+		for (int lcd = 0; lcd < 8; lcd++)
 		{
-			if (data & cdi220_lcd_char[y*20 + x])
+			uint16_t data = (m_slave_hle->get_lcd_state()[lcd*2] << 8) |
+							m_slave_hle->get_lcd_state()[lcd*2 + 1];
+			for (int x = 0; x < 20; x++)
 			{
-				scanline[(7 - lcd)*24 + x] = rgb_t::white();
-			}
-			else
-			{
-				scanline[(7 - lcd)*24 + x] = rgb_t::black();
+				if (data & cdi220_lcd_char[y*20 + x])
+				{
+					scanline[(7 - lcd)*24 + x] = rgb_t::white();
+				}
+				else
+				{
+					scanline[(7 - lcd)*24 + x] = rgb_t::black();
+				}
 			}
 		}
 	}
-}
 
-void cdi_state::video_start()
-{
-	if (m_lcd)
-		m_lcd->register_screen_bitmap(m_lcdbitmap);
-}
-
-uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	copybitmap(bitmap, m_lcdbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -807,20 +421,17 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
 	m_maincpu->iack4_callback().set(m_cdic, FUNC(cdicdic_device::intack_r));
 
-	MCD212(config, m_mcd212, CLOCK_A);
+	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
-	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
-	m_lcd->set_refresh_hz(60);
+	m_lcd->set_refresh_hz(50);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lcd->set_size(192, 22);
 	m_lcd->set_visarea(0, 192-1, 0, 22-1);
@@ -836,7 +447,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_cdic->set_clock2(45.1584_MHz_XTAL * 3 / 7); // generated by PLL circuit incorporating 19.3575 MHz XTAL
 	m_cdic->intreq_callback().set(m_maincpu, FUNC(scc68070_device::in4_w));
 
-	CDI_SLAVE(config, m_slave_hle, 0);
+	CDI_SLAVE_HLE(config, m_slave_hle, 0);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
 	/* sound hardware */
@@ -849,10 +460,6 @@ void cdi_state::cdimono1_base(machine_config &config)
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
 	MK48T08(config, "mk48t08");
 }
 
@@ -862,17 +469,14 @@ void cdi_state::cdimono2(machine_config &config)
 	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_mem);
 
-	MCD212(config, m_mcd212, CLOCK_A);
+	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
-	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -885,12 +489,8 @@ void cdi_state::cdimono2(machine_config &config)
 
 	config.set_default_layout(layout_cdi);
 
-	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
-
-	M68HC05EG(config, m_servo, 4_MHz_XTAL); // FIXME: actually MC68HC05C8
-	m_servo->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_servo_mem);
-	M68HC05EG(config, m_slave, 4_MHz_XTAL); // FIXME: actually MC68HC05C8
-	m_slave->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_slave_mem);
+	M68HC05C8(config, m_servo, 4_MHz_XTAL);
+	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
@@ -904,10 +504,6 @@ void cdi_state::cdimono2(machine_config &config)
 
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MK48T08(config, "mk48t08");
 }
@@ -917,17 +513,14 @@ void cdi_state::cdi910(machine_config &config)
 	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdi910_mem);
 
-	MCD212(config, m_mcd212, CLOCK_A);
+	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
-	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -940,12 +533,8 @@ void cdi_state::cdi910(machine_config &config)
 
 	config.set_default_layout(layout_cdi);
 
-	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
-
-	M68HC05EG(config, m_servo, 4_MHz_XTAL); // FIXME: actually MC68HSC05C8
-	m_servo->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_servo_mem);
-	M68HC05EG(config, m_slave, 4_MHz_XTAL); // FIXME: actually MC68HSC05C8
-	m_slave->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_slave_mem);
+	M68HC05C8(config, m_servo, 4_MHz_XTAL);
+	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
@@ -960,10 +549,6 @@ void cdi_state::cdi910(machine_config &config)
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
 	MK48T08(config, "mk48t08");
 }
 
@@ -971,55 +556,29 @@ void cdi_state::cdi910(machine_config &config)
 void cdi_state::cdimono1(machine_config &config)
 {
 	cdimono1_base(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 }
 
-void cdi_state::quizard(machine_config &config)
+void quizard_state::quizard(machine_config &config)
 {
 	cdimono1_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(cdi_state::mcu_frame));
-}
+	m_maincpu->set_addrmap(AS_PROGRAM, &quizard_state::cdimono1_mem);
+	m_maincpu->uart_rtsn_callback().set(FUNC(quizard_state::mcu_rtsn_from_cpu));
+	m_maincpu->uart_tx_callback().set(FUNC(quizard_state::mcu_rx_from_cpu));
 
-
-READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
-{
-	return machine().rand();
-}
-
-void cdi_state::quizard1(machine_config &config)
-{
-	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1)
-
-	i8751_device &mcu(I8751(config, "mcu", 8000000));
-	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
-//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
-}
-
-void cdi_state::quizard2(machine_config &config)
-{
-	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2)
-}
-
-void cdi_state::quizard3(machine_config &config)
-{
-	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3)
-}
-
-void cdi_state::quizard4(machine_config &config)
-{
-	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4)
-
-	i8751_device &mcu(I8751(config, "mcu", 8000000));
-	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
-//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
+	I8751(config, m_mcu, 8000000);
+	m_mcu->port_in_cb<0>().set(FUNC(quizard_state::mcu_p0_r));
+	m_mcu->port_in_cb<1>().set(FUNC(quizard_state::mcu_p1_r));
+	m_mcu->port_in_cb<2>().set(FUNC(quizard_state::mcu_p2_r));
+	m_mcu->port_in_cb<3>().set(FUNC(quizard_state::mcu_p3_r));
+	m_mcu->port_out_cb<0>().set(FUNC(quizard_state::mcu_p0_w));
+	m_mcu->port_out_cb<1>().set(FUNC(quizard_state::mcu_p1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(quizard_state::mcu_p2_w));
+	m_mcu->port_out_cb<3>().set(FUNC(quizard_state::mcu_p3_w));
+	m_mcu->serial_tx_cb().set(FUNC(quizard_state::mcu_tx));
+	m_mcu->serial_rx_cb().set(FUNC(quizard_state::mcu_rx));
 }
 
 /*************************
@@ -1035,14 +594,13 @@ ROM_START( cdimono1 )
 	ROM_SYSTEM_BIOS( 2, "pcdi220_alt", "Philips CD-i 220?" ) // doesn't boot
 	ROMX_LOAD( "cdi220.rom", 0x000000, 0x80000, CRC(584c0af8) SHA1(5d757ab46b8c8fc36361555d978d7af768342d47), ROM_BIOS(2) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	// The two MCU dumps below are taken from the cdi910. We still need dumps from a Mono-I board in case the revisions are different.
+	ROM_REGION(0x2000, "servo", 0)
+	ROM_LOAD( "zx405037p__cdi_servo_2.1__b43t__llek9215.mc68hc705c8a_withtestrom.7201", 0x0000, 0x2000, CRC(7a3af407) SHA1(fdf8d78d6a0df4a56b5b963d72eabd39fcec163f) BAD_DUMP )
 
 	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_LOAD( "zx405042p__cdi_slave_2.0__b43t__zzmk9213.mc68hc705c8a_withtestrom.7206", 0x0000, 0x2000, CRC(688cda63) SHA1(56d0acd7caad51c7de703247cd6d842b36173079) BAD_DUMP )
 ROM_END
-
-
 
 ROM_START( cdi910 )
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -1050,8 +608,6 @@ ROM_START( cdi910 )
 	ROMX_LOAD( "philips__cd-i_2.1__mb834200b-15__26b_aa__9224_z01.tc574200.7211", 0x000000, 0x80000, CRC(4ae3bee3) SHA1(9729b4ee3ce0c17172d062339c47b1ab822b222b), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE )
 	ROM_SYSTEM_BIOS( 1, "cdi910_alt", "alt" )
 	ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000, CRC(2f3048d2) SHA1(11c4c3e602060518b52e77156345fa01f619e793), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
-
-	// cdic
 
 	ROM_REGION(0x2000, "servo", 0)
 	ROM_LOAD( "zx405037p__cdi_servo_2.1__b43t__llek9215.mc68hc705c8a_withtestrom.7201", 0x0000, 0x2000, CRC(7a3af407) SHA1(fdf8d78d6a0df4a56b5b963d72eabd39fcec163f) )
@@ -1075,7 +631,6 @@ ROM_START( cdimono2 )
 	ROM_LOAD( "zc405352p__slave_cdi_4.1__0d67p__lltr9403.mc68hc705c8a.7206", 0x0000, 0x2000, CRC(5b19da07) SHA1(cf02d84977050c71e87a38f1249e83c43a93949b) )
 ROM_END
 
-
 ROM_START( cdi490a )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "cdi490", "CD-i 490" )
@@ -1086,9 +641,6 @@ ROM_START( cdi490a )
 	ROM_LOAD( "vmpega.rom", 0x0000, 0x40000, CRC(db264e8b) SHA1(be407fbc102f1731a0862554855e963e5a47c17b) )
 ROM_END
 
-
-
-
 ROM_START( cdibios ) // for the quizard sets
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
@@ -1096,222 +648,189 @@ ROM_START( cdibios ) // for the quizard sets
 	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220 F2" )
 	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(1) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
+	// The MCU dump below is taken from the cdi910. We still need a dump from a Mono-I board SLAVE MCU in case the revisions are different.
 	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_LOAD( "zx405042p__cdi_slave_2.0__b43t__zzmk9213.mc68hc705c8a_withtestrom.7206", 0x0000, 0x2000, CRC(688cda63) SHA1(56d0acd7caad51c7de703247cd6d842b36173079) BAD_DUMP )
 ROM_END
 
 /*  Quizard notes
 
     The MCU controls the protection sequence, which in turn controls the game display language.
-    Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
+    Each Quizard game (1,2,3,4) requires its own MCU, you can upgrade between revisions by changing
     just the CD, but not between games as a new MCU is required.
 
-    The only dumped MCUs are German region ones for Quizard 1 and 4.
-    A Czech Quizard 4 MCU was located but it was an 89c51 type instead
+    MCU Notes:
+    i8751 MCU dumps confirmed good on original hardware
+    German language MCUs for Quizard 1 through 4 are dumped
+    Czech language MCU for Quizard 4 is dumped
+    Italian language MCU for Quizard 1 is known to exist (IT 11 L2, not dumped)
+    Alt. German language MCU for Quizard 2 is known to exist (DE 122 D3, not dumped)
 
 */
 
 
-// Quizard (1)
+//********************************************************
+//                     Quizard (1)
+//********************************************************
 
 ROM_START( quizard ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
+	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German language
 ROM_END
-
 
 ROM_START( quizard_17 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German language
 ROM_END
 
 ROM_START( quizard_12 ) /* CD-ROM printed 01/95 */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German language
 ROM_END
 
 ROM_START( quizard_10 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-
 	// software: BurnAtOnce 0.99.5 / CHDMAN 0.163
 	// Drive: TS-L633R
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard10", 0, SHA1(5715db50f0d5ffe06f47c0943f4bf0481ab6048e) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German language
 ROM_END
 
 
-// Quizard 2
+//********************************************************
+//                     Quizard 2
+//********************************************************
 
 ROM_START( quizard2 ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard2_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "dn_122_d3.bin", 0x0000, 0x1000, CRC(d48063ea) SHA1(b512fa5e53f296a180340e09b53613dd1c0d38bc) ) // German language - DE 122 D3 known to exist
 ROM_END
 
 ROM_START( quizard2_22 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard2_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "dn_122_d3.bin", 0x0000, 0x1000, CRC(d48063ea) SHA1(b512fa5e53f296a180340e09b53613dd1c0d38bc) ) // German language - DE 122 D3 known to exist
 ROM_END
 
-// Quizard 3
+
+//********************************************************
+//                     Quizard 3
+//********************************************************
 
 ROM_START( quizard3 ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_132_d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // German language
+ROM_END
+
+ROM_START( quizard3a ) /* CD-ROM printed ??/?? */
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 
-	ROM_REGION(0x1000, "mcu", 0) // d8751h
-	ROM_LOAD( "de132d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_132_a1.bin", 0x0000, 0x1000, CRC(313ac673) SHA1(cb0ee7e9a6eaa5f4d000f5ea99b7ee4c440b31d1) ) // German language - earlier version of MCU code
 ROM_END
 
 ROM_START( quizard3_32 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 
-	ROM_REGION(0x1000, "mcu", 0) // d8751h
-	ROM_LOAD( "de132d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_132_d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // German language
 ROM_END
 
+
+//********************************************************
+//                     Quizard 4
+//********************************************************
 
 ROM_START( quizard4 ) /* CD-ROM printed 09/98 */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizard4r42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
+ROM_END
+
+ROM_START( quizard4cz ) /* CD-ROM printed 09/98 */
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "ts142_cz1.bin", 0x0000, 0x1000, CRC(fdc1f457) SHA1(5169c4d2ea4073a854c3f619205161386c9af8af) ) // Czech language - works with all Quizard 4 versions
 ROM_END
 
 ROM_START( quizard4_41 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
 ROM_END
 
 ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
 ROM_END
 
 
@@ -1319,30 +838,31 @@ ROM_END
 *      Game driver(s)    *
 *************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY         FULLNAME */
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY       FULLNAME */
 // BIOS / System
-CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",      "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
-CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",      "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
-CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",      "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING  )
-CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",      "CD-i 490",   MACHINE_NOT_WORKING  )
+CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",    "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",    "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
 
-// The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
-/*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE     INIT         MONITOR     COMPANY         FULLNAME */
-GAME( 1995, cdibios,     0,        cdimono1_base, quizard,  cdi_state, empty_init,  ROT0,       "Philips",      "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
+// The Quizard games are retail CD-i units in a cabinet, with an additional JAMMA adapter and dongle for protection, hence being clones of the system.
+/*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE          INIT         MONITOR     COMPANY         FULLNAME */
+GAME( 1995, cdibios,     0,        cdimono1,      quizard,  cdi_state,     empty_init,  ROT0,     "Philips",  "CD-i (Mono-I) (PAL) BIOS", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, quizard,     cdibios,  quizard1,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard (v1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_17,  quizard,  quizard1,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard (v1.7)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_12,  quizard,  quizard1,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard (v1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_10,  quizard,  quizard1,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard (v1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard,     cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.8, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard_17,  quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.7, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard_12,  quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.2, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard_10,  quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.0, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, quizard2,    cdibios,  quizard2,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 2 (v2.3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard2_22, quizard2, quizard2,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 2 (v2.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2,    cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.3, German, i8751 DN 122 D3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard2_22, quizard2, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.2, German, i8751 DN 122 D3)", MACHINE_IMPERFECT_SOUND )
 
-// Quizard 3 and 4 will hang after inserting a coin (incomplete protection sims?)
+// Quizard 3 and 4 will hang after starting a game (CDIC issues?)
+GAME( 1995, quizard3,    cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4, German, i8751 DE 132 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard3a,   quizard3, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4, German, i8751 DE 132 A1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, quizard3_32, quizard3, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.2, German, i8751 DE 132 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, quizard3,    cdibios,  quizard3,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 3 (v3.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, quizard3_32, quizard3, quizard3,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 3 (v3.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-
-GAME( 1998, quizard4,    cdibios,  quizard4,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 4 Rainbow (v4.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998, quizard4_41, quizard4, quizard4,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 4 Rainbow (v4.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997, quizard4_40, quizard4, quizard4,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 4 Rainbow (v4.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4,    cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, quizard4cz,  quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, Czech, i8751 TS142 CZ1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, quizard4_41, quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.1, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, quizard4_40, quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.0, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -25,9 +25,9 @@ CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
 			((CLEAR_LINE != m_mcuintf->mcu_semaphore_r()) ? 0x00 : 0x02);
 }
 
-CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
+uint8_t arkanoid_state::input_mux_r()
 {
-	return m_muxports[(0 == m_paddle_select) ? 0 : 1]->read();
+	return m_muxports[(0 == m_paddle_select) ? 0 : 1].read_safe(0xff);
 }
 
 /*
@@ -91,7 +91,7 @@ TO DO (2006.09.12) :
 
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
+uint8_t arkanoid_state::arkanoid_bootleg_f000_r()
 {
 	uint8_t arkanoid_bootleg_val = 0x00;
 
@@ -133,7 +133,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
 }
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f002_r)
+uint8_t arkanoid_state::arkanoid_bootleg_f002_r()
 {
 	uint8_t arkanoid_bootleg_val = 0x00;
 
@@ -220,7 +220,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f002_r)
 }
 
 /* Kludge for some bootlegs that write this address */
-WRITE8_MEMBER(arkanoid_state::arkanoid_bootleg_d018_w)
+void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 {
 	m_bootleg_cmd = 0x00;
 
@@ -383,6 +383,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_bootleg_d018_w)
 						m_bootleg_cmd = 0x00;
 					if (m_maincpu->pc() == 0x7c47)
 						m_bootleg_cmd = 0x00;
+					[[fallthrough]]; // FIXME: really?
 				case 0x89:  /* unneeded value : no read back */
 					if (m_maincpu->pc() == 0x67e5)
 						m_bootleg_cmd = 0x00;
@@ -433,6 +434,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_bootleg_d018_w)
 						m_bootleg_cmd = 0x00;
 					if (m_maincpu->pc() == 0x7c47)
 						m_bootleg_cmd = 0x00;
+					[[fallthrough]]; // FIXME: really?
 				case 0x89:  /* unneeded value : no read back */
 					if (m_maincpu->pc() == 0x67e5)
 						m_bootleg_cmd = 0x00;
@@ -475,18 +477,18 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_bootleg_d018_w)
 }
 
 #ifdef UNUSED_CODE
-READ8_MEMBER(arkanoid_state::block2_bootleg_f000_r)
+uint8_t arkanoid_state::block2_bootleg_f000_r()
 {
 	return m_bootleg_cmd;
 }
 #endif
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_d008_r)
+uint8_t arkanoid_state::arkanoid_bootleg_d008_r()
 {
 	uint8_t arkanoid_bootleg_d008_bit[8];
 	uint8_t arkanoid_bootleg_d008_val;
-	uint8_t arkanoid_paddle_value = ioport("MUX")->read();
+	uint8_t arkanoid_paddle_value = input_mux_r();
 	int b;
 
 	arkanoid_bootleg_d008_bit[4] = arkanoid_bootleg_d008_bit[6] = arkanoid_bootleg_d008_bit[7] = 0;  /* untested bits */

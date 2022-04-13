@@ -2,9 +2,9 @@
 // copyright-holders:Hyllian
 
 /*
-   
+
   *******  Super XBR Shader  *******
-   
+
   Copyright (c) 2016 Hyllian - sergiogdb@gmail.com
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -48,6 +48,7 @@
 	"passes": [
 		{
 			"effect": "misc/deposterize-pass0",
+			"applytint": true,
 			"name": "Deposterize, Pass 0",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" }

@@ -64,12 +64,19 @@
 --
 
 	function premake.config.isincrementallink(cfg)
-		if cfg.kind == "StaticLib"
-				or config.isoptimizedbuild(cfg.flags)
-				or cfg.flags.NoIncrementalLink then
+		if cfg.kind == "StaticLib" then
 			return false
 		end
-		return true
+		return not config.islinkeroptimizedbuild(cfg.flags) and not cfg.flags.NoIncrementalLink
+	end
+
+
+--
+-- Determine if this configuration uses one of the optimize flags.
+--
+
+	function premake.config.isoptimizedbuild(flags)
+		return flags.Optimize or flags.OptimizeSize or flags.OptimizeSpeed
 	end
 
 
@@ -79,7 +86,21 @@
 -- instead of incremental.
 --
 
-	function premake.config.isoptimizedbuild(flags)
-		return flags.Optimize or flags.OptimizeSize or flags.OptimizeSpeed
+	function premake.config.islinkeroptimizedbuild(flags)
+		return config.isoptimizedbuild(flags) and not flags.NoOptimizeLink
 	end
 
+
+--
+-- Determines if this configuration uses edit and continue.
+--
+
+	function premake.config.iseditandcontinue(cfg)
+		if cfg.flags.NoEditAndContinue
+				or cfg.flags.Managed
+				or (cfg.kind ~= "StaticLib" and not config.isincrementallink(cfg))
+				or config.islinkeroptimizedbuild(cfg.flags) then
+			return false
+		end
+		return true
+	end

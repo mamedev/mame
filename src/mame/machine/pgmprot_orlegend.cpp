@@ -18,7 +18,7 @@
 
 void pgm_asic3_state::asic3_compute_hold(int y, int z)
 {
-	unsigned short old = m_asic3_hold;
+	const u16 old = m_asic3_hold;
 
 	m_asic3_hold = ((old << 1) | (old >> 15));
 
@@ -27,7 +27,7 @@ void pgm_asic3_state::asic3_compute_hold(int y, int z)
 	m_asic3_hold ^= BIT(m_asic3_x, 2) << 10;
 	m_asic3_hold ^= BIT(old, 5);
 
-	switch (ioport("Region")->read()) // The mode is dependent on the region
+	switch (m_region->read()) // The mode is dependent on the region
 	{
 		case 0:
 		case 1:
@@ -47,18 +47,18 @@ void pgm_asic3_state::asic3_compute_hold(int y, int z)
 		break;
 	}
 }
-READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
+u16 pgm_asic3_state::pgm_asic3_r()
 {
 	switch (m_asic3_reg)
 	{
 		case 0x00: // region is supplied by the protection device
-			return (m_asic3_latch[0] & 0xf7) | ((ioport("Region")->read() << 3) & 0x08);
+			return (m_asic3_latch[0] & 0xf7) | ((m_region->read() << 3) & 0x08);
 
 		case 0x01:
 			return m_asic3_latch[1];
 
 		case 0x02: // region is supplied by the protection device
-			return (m_asic3_latch[2] & 0x7f) | ((ioport("Region")->read() << 6) & 0x80);
+			return (m_asic3_latch[2] & 0x7f) | ((m_region->read() << 6) & 0x80);
 
 		case 0x03:
 			return bitswap<8>(m_asic3_hold, 5,2,9,7,10,13,12,15);
@@ -93,9 +93,10 @@ READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
 	return 0;
 }
 
-WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
+void pgm_asic3_state::pgm_asic3_w(offs_t offset, u16 data)
 {
-	if (offset == 0) {
+	if (offset == 0)
+	{
 		m_asic3_reg = data;
 		return;
 	}
@@ -165,7 +166,8 @@ void pgm_asic3_state::init_orlegend()
 {
 	pgm_basic_init();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xC04000, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::pgm_asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc04000, 0xc0400f, read16smo_delegate(*this, FUNC(pgm_asic3_state::pgm_asic3_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc04000, 0xc0400f, write16sm_delegate(*this, FUNC(pgm_asic3_state::pgm_asic3_w)));
 
 	m_asic3_reg = 0;
 	m_asic3_latch[0] = 0;

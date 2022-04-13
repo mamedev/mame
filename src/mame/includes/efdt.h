@@ -7,6 +7,7 @@
 
 #include "machine/74259.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class efdt_state : public driver_device
@@ -19,7 +20,7 @@ public:
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_vlatch(*this, "vlatch%u", 1U),
-		m_videoram(*this, "videoram", 8)
+		m_videoram(*this, "videoram")
 	{ }
 
 	void efdt(machine_config &config);
@@ -38,18 +39,14 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
-	uint8_t m_soundlatch[4];
-	uint8_t m_soundCommand;
-	uint8_t m_soundControl;
+	uint8_t m_soundlatch[4]{};
+	uint8_t m_soundCommand = 0U;
+	uint8_t m_soundControl = 0U;
 
 
 	/* video-related */
-	tilemap_t      *m_tilemap[2];
-	int             m_tilebank;
-
-	DECLARE_WRITE8_MEMBER(efdt_videoram_w);
-	DECLARE_WRITE8_MEMBER(efdt_vregs1_w);
-	DECLARE_WRITE8_MEMBER(efdt_vregs2_w);
+	tilemap_t      *m_tilemap[2]{};
+	int             m_tilebank = 0;
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
@@ -59,18 +56,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clear_w);
 
-	DECLARE_READ8_MEMBER(main_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(main_soundlatch_w);
+	uint8_t main_soundlatch_r(offs_t offset);
+	void main_soundlatch_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(soundlatch_0_r);
-	DECLARE_READ8_MEMBER(soundlatch_1_r);
-	DECLARE_READ8_MEMBER(soundlatch_2_r);
-	DECLARE_READ8_MEMBER(soundlatch_3_r);
+	uint8_t soundlatch_0_r();
+	uint8_t soundlatch_1_r();
+	uint8_t soundlatch_2_r();
+	uint8_t soundlatch_3_r();
 
-	DECLARE_WRITE8_MEMBER(soundlatch_0_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_1_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_2_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_3_w);
+	void soundlatch_0_w(uint8_t data);
+	void soundlatch_1_w(uint8_t data);
+	void soundlatch_2_w(uint8_t data);
+	void soundlatch_3_w(uint8_t data);
 
 	uint32_t screen_update_efdt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

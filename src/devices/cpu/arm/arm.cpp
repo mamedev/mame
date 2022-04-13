@@ -1,12 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
-/* arm.c
-
+// copyright-holders:Bryan McPhail, Phil Stroffolino
+/*
     ARM 2/3/6 Emulation (26 bit address bus)
 
     Todo:
-      Timing - Currently very approximated, nothing relies on proper timing so far.
-      IRQ timing not yet correct (again, nothing is affected by this so far).
+      - Timing - Currently very approximated, nothing relies on proper timing so far.
+      - IRQ timing not yet correct (again, nothing is affected by this so far).
 
     Recent changes (2005):
       Fixed software interrupts
@@ -19,7 +18,6 @@
 
 #include "emu.h"
 #include "arm.h"
-#include "debugger.h"
 #include "armdasm.h"
 
 #define ARM_DEBUG_CORE 0
@@ -337,16 +335,14 @@ void arm_cpu_device::device_reset()
 
 void arm_cpu_device::execute_run()
 {
-	uint32_t pc;
-	uint32_t insn;
-
 	do
 	{
+		arm_check_irq_state();
 		debugger_instruction_hook(R15 & ADDRESS_MASK);
 
 		/* load instruction */
-		pc = R15;
-		insn = m_pr32( pc & ADDRESS_MASK );
+		uint32_t pc = R15;
+		uint32_t insn = m_pr32( pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{
@@ -443,9 +439,6 @@ void arm_cpu_device::execute_run()
 			m_icount -= S_CYCLE;
 			R15 += 4;
 		}
-
-		arm_check_irq_state();
-
 	} while( m_icount > 0 );
 } /* arm_execute */
 
@@ -469,7 +462,7 @@ void arm_cpu_device::arm_check_irq_state()
 		R15 = eARM_MODE_FIQ;    /* Set FIQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x1c|eARM_MODE_FIQ|I_MASK|F_MASK; /* Mask both IRQ & FIRQ, set PC=0x1c */
-		m_pendingFiq=0;
+		standard_irq_callback(ARM_FIRQ_LINE);
 		return;
 	}
 
@@ -478,7 +471,7 @@ void arm_cpu_device::arm_check_irq_state()
 		R15 = eARM_MODE_IRQ;    /* Set IRQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x18|eARM_MODE_IRQ|I_MASK|(pc&F_MASK); /* Mask only IRQ, set PC=0x18 */
-		m_pendingIrq=0;
+		standard_irq_callback(ARM_IRQ_LINE);
 		return;
 	}
 }
@@ -489,21 +482,13 @@ void arm_cpu_device::execute_set_input(int irqline, int state)
 	switch (irqline)
 	{
 	case ARM_IRQ_LINE: /* IRQ */
-		if (state && (R15&0x3)!=eARM_MODE_IRQ) /* Don't allow nested IRQs */
-			m_pendingIrq=1;
-		else
-			m_pendingIrq=0;
+		m_pendingIrq = state ? 1 : 0;
 		break;
 
 	case ARM_FIRQ_LINE: /* FIRQ */
-		if (state && (R15&0x3)!=eARM_MODE_FIQ) /* Don't allow nested FIRQs */
-			m_pendingFiq=1;
-		else
-			m_pendingFiq=0;
+		m_pendingFiq = state ? 1 : 0;
 		break;
 	}
-
-	arm_check_irq_state();
 }
 
 
@@ -511,12 +496,15 @@ void arm_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
-	if(m_program->endianness() == ENDIANNESS_LITTLE) {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-	} else {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+	if(m_program->endianness() == ENDIANNESS_LITTLE)
+	{
+		m_program->cache(m_cachele);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cachele.read_dword(address); };
+	}
+	else
+	{
+		m_program->cache(m_cachebe);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cachebe.read_dword(address); };
 	}
 
 	save_item(NAME(m_sArmRegister));
@@ -553,8 +541,8 @@ void arm_cpu_device::device_start()
 	state_add( ARM32_SR13, "SR13", m_sArmRegister[eR13_SVC] ).formatstr("%08X");
 	state_add( ARM32_SR14, "SR14", m_sArmRegister[eR14_SVC] ).formatstr("%08X");
 
-	state_add(STATE_GENPC, "GENPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "GENPC", m_sArmRegister[15]).mask(ADDRESS_MASK).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sArmRegister[15]).formatstr("%11s").noshow();
 
 	set_icountptr(m_icount);
@@ -779,7 +767,7 @@ void arm_cpu_device::HandleMemSingle( uint32_t insn )
 		((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
 		| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) \
 			<< V_BIT) \
-		| (((~(rn)) < (op2)) << C_BIT) \
+		| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
 		| HandleALUNZFlags(rd)) \
 		+ 4; \
 	else R15 += 4;
@@ -838,7 +826,7 @@ void arm_cpu_device::HandleALU( uint32_t insn )
 	{
 		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : nullptr);
 
-			if (!(insn & INSN_S))
+		if (!(insn & INSN_S))
 			sc=0;
 	}
 

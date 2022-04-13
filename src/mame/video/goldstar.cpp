@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
 /***************************************************************************
 
-  video.c
+  goldstar.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -21,13 +21,13 @@
 ***************************************************************************/
 
 
-WRITE8_MEMBER(goldstar_state::goldstar_fg_vidram_w)
+void goldstar_state::goldstar_fg_vidram_w(offs_t offset, uint8_t data)
 {
 	m_fg_vidram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(goldstar_state::goldstar_fg_atrram_w)
+void goldstar_state::goldstar_fg_atrram_w(offs_t offset, uint8_t data)
 {
 	m_fg_atrram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0xf0) << 4,
 			attr & 0x0f,
 			0);
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0x0f) << 8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 
 
 
-WRITE8_MEMBER(goldstar_state::goldstar_reel1_ram_w)
+void goldstar_state::goldstar_reel1_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
@@ -68,14 +68,14 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel1_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel1_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel1_ram[tile_index],
 			m_bgcolor,
 			0);
 }
 
 
-WRITE8_MEMBER(goldstar_state::goldstar_reel2_ram_w)
+void goldstar_state::goldstar_reel2_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
@@ -83,13 +83,13 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel2_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel2_ram[tile_index],
 			m_bgcolor,
 			0);
 }
 
-WRITE8_MEMBER(goldstar_state::goldstar_reel3_ram_w)
+void goldstar_state::goldstar_reel3_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -97,7 +97,7 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel3_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel3_ram[tile_index],
 			m_bgcolor,
 			0);
@@ -105,15 +105,15 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 
 VIDEO_START_MEMBER(goldstar_state, goldstar)
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
 	m_reel3_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
@@ -122,9 +122,9 @@ VIDEO_START_MEMBER(goldstar_state, goldstar)
 
 VIDEO_START_MEMBER(goldstar_state, cherrym)
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
@@ -133,14 +133,14 @@ VIDEO_START_MEMBER(goldstar_state, cherrym)
 	m_cmaster_girl_num = 0;
 	m_cmaster_girl_pal = 0;
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_cherrym_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_cm_enable_reg = 0x0b;
 }
 
 
-WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
+void goldstar_state::goldstar_fa00_w(uint8_t data)
 {
 	/* bit 1 toggles continuously - might be irq enable or watchdog reset */
 
@@ -153,9 +153,9 @@ WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
 
 
 
-uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -198,9 +198,9 @@ uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_in
 }
 
 
-uint32_t goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -231,7 +231,7 @@ uint32_t goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind
 
 
 
-WRITE8_MEMBER(cmaster_state::outport0_w)
+void cmaster_state::outport0_w(uint8_t data)
 {
 	m_cm_enable_reg = data;
 	/*
@@ -246,7 +246,7 @@ WRITE8_MEMBER(cmaster_state::outport0_w)
 	//popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(cmaster_state::girl_scroll_w)
+void cmaster_state::girl_scroll_w(uint8_t data)
 {
 	m_cm_girl_scroll = data;
 	/*
@@ -258,7 +258,7 @@ WRITE8_MEMBER(cmaster_state::girl_scroll_w)
 	*/
 }
 
-WRITE8_MEMBER(cmaster_state::background_col_w)
+void cmaster_state::background_col_w(uint8_t data)
 {
 	//printf("cm_background_col_w %02x\n",data);
 
@@ -295,9 +295,9 @@ WRITE8_MEMBER(cmaster_state::background_col_w)
 }
 
 
-uint32_t cmaster_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cmaster_state::screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -338,7 +338,7 @@ TILE_GET_INFO_MEMBER(wingco_state::get_magical_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code | (attr & 0xf0)<<4) + (m_tile_bank * 0x1000),
 			attr & 0x0f,
 			0);
@@ -347,11 +347,11 @@ TILE_GET_INFO_MEMBER(wingco_state::get_magical_fg_tile_info)
 
 VIDEO_START_MEMBER(wingco_state, bingowng)
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
@@ -360,15 +360,15 @@ VIDEO_START_MEMBER(wingco_state, bingowng)
 
 VIDEO_START_MEMBER(wingco_state, magical)
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(32);
 	m_reel2_tilemap->set_scroll_cols(32);
 	m_reel3_tilemap->set_scroll_cols(32);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_magical_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_magical_fg_tile_info)),TILEMAP_SCAN_ROWS, 8,8, 64,32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
@@ -376,9 +376,9 @@ VIDEO_START_MEMBER(wingco_state, magical)
 }
 
 
-uint32_t wingco_state::screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wingco_state::screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -414,9 +414,9 @@ uint32_t wingco_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -466,9 +466,9 @@ uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_ind16
 }
 
 
-uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -484,7 +484,7 @@ uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_ind16 
 
 		// are these hardcoded, or registers?
 		//const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
-		const rectangle visible2(0*8, (14+48)*8-1, 14*8, (36+7)*8-1);  // seems to be the one used...
+		const rectangle visible2(0*8, (14+48)*8-1, 14*8, 32*8-1);  // seems to be the one used...
 		//const rectangle visible3(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
 
 //      m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
@@ -500,43 +500,43 @@ uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_ind16 
 
 
 
-WRITE8_MEMBER(sanghopm_state::fg_vidram_w)
+void sanghopm_state::fg_vidram_w(offs_t offset, uint8_t data)
 {
 	m_fg_vidram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::fg_atrram_w)
+void sanghopm_state::fg_atrram_w(offs_t offset, uint8_t data)
 {
 	m_fg_atrram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::bg_vidram_w)
+void sanghopm_state::bg_vidram_w(offs_t offset, uint8_t data)
 {
 	m_bg_vidram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::bg_atrram_w)
+void sanghopm_state::bg_atrram_w(offs_t offset, uint8_t data)
 {
 	m_bg_atrram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::reel1_attrram_w)
+void sanghopm_state::reel1_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel1_attrram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::reel2_attrram_w)
+void sanghopm_state::reel2_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel2_attrram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sanghopm_state::reel3_attrram_w)
+void sanghopm_state::reel3_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel3_attrram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -548,7 +548,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -559,7 +559,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_bg_tile_info)
 	int const code = m_bg_vidram[tile_index];
 	int const attr = m_bg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -570,7 +570,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel1_tile_info)
 	int const code = m_reel1_ram[tile_index];
 	int const attr = m_reel1_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -581,7 +581,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel2_tile_info)
 	int const code = m_reel2_ram[tile_index];
 	int const attr = m_reel2_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70)>>4,
 			0);
@@ -592,7 +592,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel3_tile_info)
 	int const code = m_reel3_ram[tile_index];
 	int const attr = m_reel3_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70)>>4,
 			0);
@@ -601,24 +601,24 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel3_tile_info)
 
 VIDEO_START_MEMBER(sanghopm_state, sangho)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
 	m_reel3_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
 
-uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	m_bg_tilemap->set_scrolly(0, -16);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -650,20 +650,20 @@ uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_ind1
 
 
 
-WRITE8_MEMBER(unkch_state::reel1_attrram_w)
+void unkch_state::reel1_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel1_attrram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(unkch_state::reel2_attrram_w)
+void unkch_state::reel2_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel2_attrram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(unkch_state::reel3_attrram_w)
+void unkch_state::reel3_attrram_w(offs_t offset, uint8_t data)
 {
 	m_reel3_attrram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -675,7 +675,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel1_tile_info)
 	int const code = m_reel1_ram[tile_index];
 	int const attr = m_reel1_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -686,7 +686,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel2_tile_info)
 	int const code = m_reel2_ram[tile_index];
 	int const attr = m_reel2_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -697,7 +697,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel3_tile_info)
 	int const code = m_reel3_ram[tile_index];
 	int const attr = m_reel3_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -706,9 +706,9 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel3_tile_info)
 
 VIDEO_START_MEMBER(unkch_state, unkch)
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(unkch_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(unkch_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(unkch_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(32);
 	m_reel2_tilemap->set_scroll_cols(32);
@@ -718,15 +718,15 @@ VIDEO_START_MEMBER(unkch_state, unkch)
 	m_cmaster_girl_pal = 0;
 	m_vidreg = 0x00;
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(unkch_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_cherrym_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_cm_enable_reg = 0x0b;
 }
 
-uint32_t unkch_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t unkch_state::screen_update_unkch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;

@@ -46,7 +46,7 @@ int nc_state::card_calculate_mask(int size)
 
 
 // load pcmcia card data
-DEVICE_IMAGE_LOAD_MEMBER( nc_state, nc_pcmcia_card )
+DEVICE_IMAGE_LOAD_MEMBER( nc_state::load_pcmcia_card )
 {
 	uint32_t size = m_card->common_get_size("rom");
 
@@ -61,7 +61,7 @@ DEVICE_IMAGE_LOAD_MEMBER( nc_state, nc_pcmcia_card )
 
 
 // save pcmcia card data back
-DEVICE_IMAGE_UNLOAD_MEMBER( nc_state, nc_pcmcia_card )
+DEVICE_IMAGE_UNLOAD_MEMBER( nc_state::unload_pcmcia_card )
 {
 	// if there is no data to write, quit
 	if (!m_card_size)

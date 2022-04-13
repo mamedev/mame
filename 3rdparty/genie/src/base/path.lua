@@ -157,7 +157,7 @@
 	end
 
 	function path.iscppfile(fname)
-		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c", ".m", ".mm" })
+		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c++", ".c", ".m", ".mm" })
 	end
 
 	function path.iscxfile(fname)
@@ -174,6 +174,10 @@
 
 	function path.isappxmanifest(fname)
 		return path.hasextension(fname, ".appxmanifest")
+	end
+
+	function path.isandroidbuildfile(fname)
+		return path.getname(fname) == "AndroidManifest.xml"
 	end
 
 	function path.isnatvis(fname)
@@ -202,8 +206,17 @@
 	end
 
 	function path.issourcefilevs(fname)
-		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c" })
+		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c++", ".c" })
 			or path.iscxfile(fname)
+	end
+
+--
+-- Returns true if the filename represents a compiled object file. This check
+-- is used to support object files in the "files" list for archiving.
+--
+
+	function path.isobjectfile(fname)
+		return path.hasextension(fname, { ".o", ".obj" })
 	end
 
 --

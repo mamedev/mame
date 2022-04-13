@@ -39,7 +39,6 @@ Dumped: 06/04/2009 f205v
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -176,7 +175,7 @@ void slotunbl_state::slotunbl_map(address_map &map)
 	map(0x4000, 0x43ff).ram();
 	map(0x4800, 0x4fff).ram();
 	map(0x5000, 0x53ff).ram().share("video");
-//  AM_RANGE(0x5400, 0x5fff) AM_RAM
+//  map(0x5400, 0x5fff).ram();
 	map(0x6000, 0x6000).portr("IN0");
 	map(0x6800, 0x6800).portr("DSW");
 	map(0x7000, 0x7000).portr("IN1");
@@ -369,9 +368,6 @@ void murogmbl_state::murogmbl(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void slotunbl_state::slotunbl(machine_config &config)
@@ -395,9 +391,6 @@ void slotunbl_state::slotunbl(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START(murogmbl)

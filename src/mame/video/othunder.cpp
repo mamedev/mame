@@ -64,45 +64,38 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs)
+void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u32 *primasks, int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
-	uint16_t *spriteram16 = m_spriteram;
-	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, curx, cury;
+	const u32 tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk, map_offset, code, j, k, px, py;
-	int bad_chunks;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = m_spritelist.get();
 
-	for (offs = (m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
+	for (int offs = (m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
-		data = spriteram16[offs + 0];
-		zoomy = (data & 0xfe00) >> 9;
-		y = data & 0x1ff;
+		u16 data = m_spriteram[offs + 0];
+		int zoomy = (data & 0xfe00) >> 9;
+		int y = data & 0x1ff;
 
-		data = spriteram16[offs + 1];
-		flipx = (data & 0x4000) >> 14;
-		priority = (data & 0x8000) >> 15;
-		x = data & 0x1ff;
+		data = m_spriteram[offs + 1];
+		int flipx = (data & 0x4000) >> 14;
+		const int priority = (data & 0x8000) >> 15;
+		int x = data & 0x1ff;
 
-		data = spriteram16[offs + 2];
-		color = (data & 0xff00) >> 8;
-		zoomx = (data & 0x7f);
+		data = m_spriteram[offs + 2];
+		const u32 color = (data & 0xff00) >> 8;
+		int zoomx = (data & 0x7f);
 
-		data = spriteram16[offs + 3];
-		tilenum = data & 0x1fff;    // $80000 spritemap rom maps up to $2000 64x64 sprites
-		flipy = (data & 0x8000) >> 15;
+		data = m_spriteram[offs + 3];
+		const u16 tilenum = data & 0x1fff;    // $80000 spritemap rom maps up to $2000 64x64 sprites
+		int flipy = (data & 0x8000) >> 15;
 
 		if (!tilenum)
 			continue;
 
-		map_offset = tilenum << 5;
+		const int map_offset = tilenum << 5;
 
 		zoomx += 1;
 		zoomy += 1;
@@ -113,19 +106,19 @@ void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		bad_chunks = 0;
+		int bad_chunks = 0;
 
-		for (sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
+		for (int sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
 		{
-			k = sprite_chunk % 4;   /* 4 chunks per row */
-			j = sprite_chunk / 4;   /* 8 rows */
+			const int k = sprite_chunk % 4;   /* 4 chunks per row */
+			const int j = sprite_chunk / 4;   /* 8 rows */
 
-			px = k;
-			py = j;
+			int px = k;
+			int py = j;
 			if (flipx)  px = 3 - k; /* pick tiles back to front for x and y flips */
 			if (flipy)  py = 7 - j;
 
-			code = spritemap[map_offset + px + (py << 2)] & tile_mask;
+			const u16 code = m_sprmap_rom[map_offset + px + (py << 2)] & tile_mask;
 
 			if (code == 0xffff)
 			{
@@ -133,11 +126,11 @@ void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				continue;
 			}
 
-			curx = x + ((k * zoomx) / 4);
-			cury = y + ((j * zoomy) / 8);
+			int curx = x + ((k * zoomx) / 4);
+			int cury = y + ((j * zoomy) / 8);
 
-			zx= x + (((k + 1) * zoomx) / 4) - curx;
-			zy= y + (((j + 1) * zoomy) / 8) - cury;
+			const int zx = x + (((k + 1) * zoomx) / 4) - curx;
+			const int zy = y + (((j + 1) * zoomy) / 8) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -200,7 +193,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-uint32_t othunder_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 othunder_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3];
 
@@ -221,7 +214,7 @@ uint32_t othunder_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	/* Sprites can be under/over the layer below text layer */
 	{
-		static const int primasks[2] = {0xf0, 0xfc};
+		static const u32 primasks[2] = {0xf0, 0xfc};
 		draw_sprites(screen, bitmap, cliprect, primasks, 3);
 	}
 

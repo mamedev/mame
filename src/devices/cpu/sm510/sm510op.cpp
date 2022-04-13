@@ -4,24 +4,20 @@
 // SM510 shared opcode handlers
 
 #include "emu.h"
-#include "sm510.h"
+#include "sm510base.h"
 
 
 // internal helpers
 
 u8 sm510_base_device::ram_r()
 {
-	int blh = (m_sbl) ? 8 : 0; // from SBL (optional)
-	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
-	u8 address = (bmh | blh | m_bm << 4 | m_bl) & m_datamask;
+	u8 address = (m_bmask | m_bm << 4 | m_bl) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
 void sm510_base_device::ram_w(u8 data)
 {
-	int blh = (m_sbl) ? 8 : 0; // from SBL (optional)
-	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
-	u8 address = (bmh | blh | m_bm << 4 | m_bl) & m_datamask;
+	u8 address = (m_bmask | m_bm << 4 | m_bl) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -52,7 +48,6 @@ u8 sm510_base_device::bitmask(u16 param)
 }
 
 
-
 // instruction set
 
 // RAM address instructions
@@ -69,11 +64,6 @@ void sm510_base_device::op_lbl()
 	// LBL xy: load BM/BL with 8-bit immediate value
 	m_bl = m_param & 0xf;
 	m_bm = (m_param & m_datamask) >> 4;
-}
-
-void sm510_base_device::op_sbl()
-{
-	// SBL: set BL high bit for next opcode - handled in execute_one()
 }
 
 void sm510_base_device::op_sbm()
@@ -128,7 +118,7 @@ void sm510_base_device::op_rtn1()
 void sm510_base_device::op_t()
 {
 	// T xy: jump(transfer) within current page
-	m_pc = (m_pc & ~0x3f) | (m_op & 0x3f);
+	m_pc = (m_pc & ~m_pagemask) | (m_op & m_pagemask);
 }
 
 void sm510_base_device::op_tl()
@@ -152,7 +142,6 @@ void sm510_base_device::op_tm()
 	u8 idx = m_program->read_byte(m_op & 0x3f);
 	do_branch(idx >> 6 & 3, 4, idx & 0x3f);
 }
-
 
 
 // Data transfer instructions
@@ -203,7 +192,7 @@ void sm510_base_device::op_lax()
 void sm510_base_device::op_ptw()
 {
 	// PTW: output W latch
-	m_write_s(0, m_w, 0xff);
+	m_write_s(m_w);
 }
 
 void sm510_base_device::op_wr()
@@ -226,13 +215,13 @@ void sm510_base_device::op_ws()
 void sm510_base_device::op_kta()
 {
 	// KTA: input K to ACC
-	m_acc = m_read_k(0, 0xff) & 0xf;
+	m_acc = m_read_k() & 0xf;
 }
 
 void sm510_base_device::op_atbp()
 {
-	// ATBP: output ACC to BP(internal LCD backplate signal)
-	m_bp = m_acc & 1;
+	// ATBP: output ACC to BP LCD flag(s)
+	m_bp = m_acc;
 }
 
 void sm510_base_device::op_atx()
@@ -354,8 +343,8 @@ void sm510_base_device::op_tabl()
 void sm510_base_device::op_tis()
 {
 	// TIS: skip next if 1S(gamma flag) is clear, reset it after
-	m_skip = !m_1s;
-	m_1s = false;
+	m_skip = !m_gamma;
+	m_gamma = 0;
 }
 
 void sm510_base_device::op_tal()
@@ -440,12 +429,6 @@ void sm510_base_device::op_idiv()
 	m_div = 0;
 }
 
-void sm510_base_device::op_dr()
-{
-	// DR: reset divider low 8 bits
-	m_div &= 0x7f;
-}
-
 void sm510_base_device::op_dta()
 {
 	// DTA: transfer divider low 4 bits to ACC
@@ -468,5 +451,5 @@ void sm510_base_device::op_clkhi()
 
 void sm510_base_device::op_illegal()
 {
-	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_prev_pc);
+	logerror("unknown opcode $%02X at $%04X\n", m_op, m_prev_pc);
 }

@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(TTL7404, ttl7404_device, "7404", "5/7404 Hex Inverters")
 
 ttl7404_device::ttl7404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL7404, tag, owner, clock)
-	, m_y_func{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_y_func(*this)
 	, m_a(0)
 	, m_y(0x3f)
 {
@@ -21,11 +21,10 @@ ttl7404_device::ttl7404_device(const machine_config &mconfig, const char *tag, d
 
 void ttl7404_device::device_start()
 {
+	m_y_func.resolve_all_safe();
+
 	save_item(NAME(m_a));
 	save_item(NAME(m_y));
-
-	for (std::size_t bit = 0; bit < 6; bit++)
-		m_y_func[bit].resolve_safe();
 }
 
 void ttl7404_device::device_reset()

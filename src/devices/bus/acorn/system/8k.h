@@ -47,6 +47,7 @@ private:
 
 	required_device_array<generic_slot_device, 2> m_rom;
 	required_ioport m_links;
+	u8 m_ram[8192];
 };
 
 

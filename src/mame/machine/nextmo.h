@@ -16,24 +16,24 @@ public:
 
 	void map(address_map &map);
 
-	DECLARE_READ8_MEMBER(r4_r);
-	DECLARE_WRITE8_MEMBER(r4_w);
-	DECLARE_READ8_MEMBER(r5_r);
-	DECLARE_WRITE8_MEMBER(r5_w);
-	DECLARE_READ8_MEMBER(r6_r);
-	DECLARE_WRITE8_MEMBER(r6_w);
-	DECLARE_READ8_MEMBER(r7_r);
-	DECLARE_WRITE8_MEMBER(r7_w);
-	DECLARE_READ8_MEMBER(r8_r);
-	DECLARE_WRITE8_MEMBER(r8_w);
-	DECLARE_READ8_MEMBER(r9_r);
-	DECLARE_WRITE8_MEMBER(r9_w);
-	DECLARE_READ8_MEMBER(ra_r);
-	DECLARE_WRITE8_MEMBER(ra_w);
-	DECLARE_READ8_MEMBER(rb_r);
-	DECLARE_WRITE8_MEMBER(rb_w);
-	DECLARE_READ8_MEMBER(r10_r);
-	DECLARE_WRITE8_MEMBER(r10_w);
+	uint8_t r4_r();
+	void r4_w(uint8_t data);
+	uint8_t r5_r();
+	void r5_w(uint8_t data);
+	uint8_t r6_r();
+	void r6_w(uint8_t data);
+	uint8_t r7_r();
+	void r7_w(uint8_t data);
+	uint8_t r8_r();
+	void r8_w(uint8_t data);
+	uint8_t r9_r();
+	void r9_w(uint8_t data);
+	uint8_t ra_r();
+	void ra_w(uint8_t data);
+	uint8_t rb_r();
+	void rb_w(uint8_t data);
+	uint8_t r10_r(offs_t offset);
+	void r10_w(offs_t offset, uint8_t data);
 
 	uint8_t dma_r();
 	void dma_w(uint8_t data);

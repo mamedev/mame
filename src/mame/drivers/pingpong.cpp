@@ -18,7 +18,7 @@ Ping Pong (c) 1985 Konami
 
 
 
-WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
+void pingpong_state::cashquiz_question_bank_high_w(uint8_t data)
 {
 	if( data != 0xff )
 	{
@@ -35,21 +35,19 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
 	}
 }
 
-WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
+void pingpong_state::cashquiz_question_bank_low_w(uint8_t data)
 {
 	if(data >= 0x60 && data <= 0xdf)
 	{
-		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
-		const char *bank = bankname[data & 7];
 		int bankaddr = m_question_addr_high | ((data - 0x60) * 0x100);
 		uint8_t *questions = memregion("user1")->base() + bankaddr;
-		membank(bank)->set_base(questions);
+		m_banks[data & 7]->set_base(questions);
 
 	}
 }
 
 
-WRITE8_MEMBER(pingpong_state::coin_w)
+void pingpong_state::coin_w(uint8_t data)
 {
 	/* bit 2 = irq enable, bit 3 = nmi enable */
 	m_intenable = data & 0x0c;
@@ -129,6 +127,23 @@ void pingpong_state::merlinmm_map(address_map &map)
 	map(0xa600, 0xa600).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
+void pingpong_state::cashquiz_map(address_map &map)
+{
+	merlinmm_map(map);
+	map(0x5000, 0x57ff).unmaprw();
+
+	map(0x4000, 0x4000).w(FUNC(pingpong_state::cashquiz_question_bank_high_w));
+	map(0x4001, 0x4001).w(FUNC(pingpong_state::cashquiz_question_bank_low_w));
+
+	map(0x5000, 0x50ff).bankr("bank1");
+	map(0x5100, 0x51ff).bankr("bank2");
+	map(0x5200, 0x52ff).bankr("bank3");
+	map(0x5300, 0x53ff).bankr("bank4");
+	map(0x5400, 0x54ff).bankr("bank5");
+	map(0x5500, 0x55ff).bankr("bank6");
+	map(0x5600, 0x56ff).bankr("bank7");
+	map(0x5700, 0x57ff).bankr("bank8");
+}
 
 
 static INPUT_PORTS_START( pingpong )
@@ -484,6 +499,12 @@ void pingpong_state::merlinmm(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
+void pingpong_state::cashquiz(machine_config &config)
+{
+	merlinmm(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::cashquiz_map);
+}
+
 
 /***************************************************************************
 
@@ -491,21 +512,21 @@ void pingpong_state::merlinmm(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( pingpong )
+ROM_START( pingpong ) /* GX555 - PWB200222A */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp_e04.rom",   0x0000, 0x4000, CRC(18552f8f) SHA1(cb03659b5e8a68003e72182a20979384d829280f) )
-	ROM_LOAD( "pp_e03.rom",   0x4000, 0x4000, CRC(ae5f01e8) SHA1(f0d6a2c64822f2662fed3f601e279db18246f894) )
+	ROM_LOAD( "555_e04.7a",   0x0000, 0x4000, CRC(18552f8f) SHA1(cb03659b5e8a68003e72182a20979384d829280f) )
+	ROM_LOAD( "555_e03.6a",   0x4000, 0x4000, CRC(ae5f01e8) SHA1(f0d6a2c64822f2662fed3f601e279db18246f894) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "pp_e01.rom",   0x0000, 0x2000, CRC(d1d6f090) SHA1(7b7d7cb90bed746dda871227463145263e4b0c5a) )
+	ROM_LOAD( "555_e01.7h",   0x0000, 0x2000, CRC(d1d6f090) SHA1(7b7d7cb90bed746dda871227463145263e4b0c5a) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "pp_e02.rom",   0x0000, 0x2000, CRC(33c687e0) SHA1(7c90de4d163d2ffad00c8cb6a194fa6125a4f4c1) )
+	ROM_LOAD( "555_e02.12c",   0x0000, 0x2000, CRC(33c687e0) SHA1(7c90de4d163d2ffad00c8cb6a194fa6125a4f4c1) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pingpong.3j",  0x0000, 0x0020, CRC(3e04f06e) SHA1(a642c350f148e062d56eb2a2fc53c470603000e3) ) /* palette (this might be bad) */
-	ROM_LOAD( "pingpong.5h",  0x0020, 0x0100, CRC(8456046a) SHA1(8226f1325c14eb8aed5cd3c3d6bad9f9fd88c5fa) ) /* characters */
-	ROM_LOAD( "pingpong.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
+	ROM_LOAD( "555e06.3j",  0x0000, 0x0020, CRC(3e04f06e) SHA1(a642c350f148e062d56eb2a2fc53c470603000e3) ) /* palette (this might be bad) */
+	ROM_LOAD( "555e05.5h",  0x0020, 0x0100, CRC(8456046a) SHA1(8226f1325c14eb8aed5cd3c3d6bad9f9fd88c5fa) ) /* characters */
+	ROM_LOAD( "555e07.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
 ROM_END
 
 ROM_START( merlinmm )
@@ -581,32 +602,12 @@ void pingpong_state::init_cashquiz()
 	for (int i = 0; i < 0x40000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
-	/* questions banking handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_low_w),this));
-
-	// 8 independents banks for questions
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5000, 0x50ff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5100, 0x51ff, "bank2");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5200, 0x52ff, "bank3");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5300, 0x53ff, "bank4");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5400, 0x54ff, "bank5");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5500, 0x55ff, "bank6");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5600, 0x56ff, "bank7");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5700, 0x57ff, "bank8");
-
 	// setup default banks
-	membank("bank1")->set_base(memregion("user1")->base() + 0x100*0 );
-	membank("bank2")->set_base(memregion("user1")->base() + 0x100*1 );
-	membank("bank3")->set_base(memregion("user1")->base() + 0x100*2 );
-	membank("bank4")->set_base(memregion("user1")->base() + 0x100*3 );
-	membank("bank5")->set_base(memregion("user1")->base() + 0x100*4 );
-	membank("bank6")->set_base(memregion("user1")->base() + 0x100*5 );
-	membank("bank7")->set_base(memregion("user1")->base() + 0x100*6 );
-	membank("bank8")->set_base(memregion("user1")->base() + 0x100*7 );
+	for(int i=0; i<8; i++)
+		m_banks[i]->set_base(memregion("user1")->base() + 0x100*i);
 }
 
 
 GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, empty_init,    ROT0,  "Konami",         "Konami's Ping-Pong",            0 )
 GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, init_merlinmm, ROT90, "Zilec-Zenitone", "Merlins Money Maze",            0 )
-GAME( 1986, cashquiz, 0, merlinmm, cashquiz, pingpong_state, init_cashquiz, ROT0,  "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, cashquiz, 0, cashquiz, cashquiz, pingpong_state, init_cashquiz, ROT0,  "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", MACHINE_IMPERFECT_GRAPHICS )

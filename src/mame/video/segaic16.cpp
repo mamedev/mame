@@ -373,6 +373,161 @@ Quick review of the system16 hardware:
 
 
 
+//**************************************************************************
+//  PALETTE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  sega_16bit_common_base - constructor
+//-------------------------------------------------
+
+sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag)
+	, m_paletteram(*this, "paletteram")
+	, m_palette_entries(0)
+	, m_palette(*this, "palette")
+{
+	palette_init();
+}
+
+
+//-------------------------------------------------
+//  palette_init - precompute weighted RGB values
+//  for each input value 0-31
+//-------------------------------------------------
+
+void sega_16bit_common_base::palette_init()
+{
+	//
+	//  Color generation details
+	//
+	//  Each color is made up of 5 bits, connected through one or more resistors like so:
+	//
+	//  Bit 0 = 1 x 3.9K ohm
+	//  Bit 1 = 1 x 2.0K ohm
+	//  Bit 2 = 1 x 1.0K ohm
+	//  Bit 3 = 2 x 1.0K ohm
+	//  Bit 4 = 4 x 1.0K ohm
+	//
+	//  Another data bit is connected by a tristate buffer to the color output through a
+	//  470 ohm resistor. The buffer allows the resistor to have no effect (tristate),
+	//  halve brightness (pull-down) or double brightness (pull-up). The data bit source
+	//  is bit 15 of each color RAM entry.
+	//
+
+	// compute weight table for regular palette entries
+	static const int resistances_normal[6] = { 3900, 2000, 1000, 1000/2, 1000/4, 0   };
+	double weights_normal[6];
+	compute_resistor_weights(0, 255, -1.0,
+		6, resistances_normal, weights_normal, 0, 0,
+		0, nullptr, nullptr, 0, 0,
+		0, nullptr, nullptr, 0, 0);
+
+	// compute weight table for shadow/hilight palette entries
+	static const int resistances_sh[6]     = { 3900, 2000, 1000, 1000/2, 1000/4, 470 };
+	double weights_sh[6];
+	compute_resistor_weights(0, 255, -1.0,
+		6, resistances_sh, weights_sh, 0, 0,
+		0, nullptr, nullptr, 0, 0,
+		0, nullptr, nullptr, 0, 0);
+
+	// compute R, G, B for each weight
+	for (int value = 0; value < 32; value++)
+	{
+		const u8 i4 = (value >> 4) & 1;
+		const u8 i3 = (value >> 3) & 1;
+		const u8 i2 = (value >> 2) & 1;
+		const u8 i1 = (value >> 1) & 1;
+		const u8 i0 = (value >> 0) & 1;
+		m_palette_normal[value] = combine_weights(weights_normal, i0, i1, i2, i3, i4, 0);
+		m_palette_shadow[value] = combine_weights(weights_sh, i0, i1, i2, i3, i4, 0);
+		m_palette_hilight[value] = combine_weights(weights_sh, i0, i1, i2, i3, i4, 1);
+	}
+}
+
+
+//-------------------------------------------------
+//  paletteram_w - handle writes to palette RAM
+//-------------------------------------------------
+
+void sega_16bit_common_base::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// compute the number of entries
+	if (m_palette_entries == 0)
+		m_palette_entries = memshare("paletteram")->bytes() / 2;
+
+	// get the new value
+	u16 newval = m_paletteram[offset];
+	COMBINE_DATA(&newval);
+	m_paletteram[offset] = newval;
+
+	//     byte 0    byte 1
+	//  sBGR BBBB GGGG RRRR
+	//  x000 4321 4321 4321
+	const u8 r = ((newval >> 12) & 0x01) | ((newval << 1) & 0x1e);
+	const u8 g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
+	const u8 b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
+
+	// shadow / hilight toggle bit in palette RAM
+	rgb_t effects = (newval & 0x8000) ?
+				rgb_t(m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]) :
+				rgb_t(m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, effects);
+}
+
+void sega_16bit_common_base::hangon_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// compute the number of entries
+	if (m_palette_entries == 0)
+		m_palette_entries = memshare("paletteram")->bytes() / 2;
+
+	// get the new value
+	u16 newval = m_paletteram[offset];
+	COMBINE_DATA(&newval);
+	m_paletteram[offset] = newval;
+
+	//     byte 0    byte 1
+	//  xBGR BBBB GGGG RRRR
+	//  x000 4321 4321 4321
+	const u8 r = ((newval >> 12) & 0x01) | ((newval << 1) & 0x1e);
+	const u8 g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
+	const u8 b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
+
+	// hangon has external shadow / hilight toggle bit
+	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
+}
+
+void sega_16bit_common_base::philko_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// compute the number of entries
+	if (m_palette_entries == 0)
+		m_palette_entries = memshare("paletteram")->bytes() / 2;
+
+	// get the new value
+	u16 newval = m_paletteram[offset];
+	COMBINE_DATA(&newval);
+	m_paletteram[offset] = newval;
+
+	//     byte 0    byte 1
+	//  sRRR RRGG GGGB BBBB
+	//  x432 1043 2104 3210
+	const u8 b = (newval >> 0) & 0x1f;
+	const u8 g = (newval >> 5) & 0x1f;
+	const u8 r = (newval >> 10) & 0x1f;
+
+	// shadow / hilight toggle bit in palette RAM
+	rgb_t effects = (newval & 0x8000) ?
+				rgb_t(m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]) :
+				rgb_t(m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, effects);
+}
+
+
+
 DEFINE_DEVICE_TYPE(SEGAIC16VID, segaic16_video_device, "segaic16_video", "Sega 16-bit Video")
 
 segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -382,11 +537,11 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 	, m_tileram(*this, "^tileram")
 	, m_textram(*this, "^textram")
 	, m_rotateram(*this, "^rotateram")
+	, m_pagelatch_cb(*this, DEVICE_SELF, FUNC(segaic16_video_device::tilemap_16b_fill_latch))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	memset(m_rotate, 0, sizeof(m_rotate));
 	memset(m_bg_tilemap, 0, sizeof(m_bg_tilemap));
-	m_pagelatch_cb =  segaic16_video_pagelatch_delegate(FUNC(segaic16_video_device::tilemap_16b_fill_latch), this);
 }
 
 void segaic16_video_device::device_start()
@@ -396,7 +551,7 @@ void segaic16_video_device::device_start()
 
 	save_item(NAME(m_display_enable));
 
-	m_pagelatch_cb.bind_relative_to(*owner());
+	m_pagelatch_cb.resolve();
 }
 
 void segaic16_video_device::device_reset()
@@ -653,7 +808,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_tile_info )
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (data >> 12) & 1;
 }
 
@@ -665,7 +820,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_text_info )
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (data >> 11) & 1;
 }
 
@@ -867,7 +1022,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_tile_info )
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -880,7 +1035,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_text_info )
 	int color = (data >> 9) & 0x07;
 	int code = data & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
+	tileinfo.set(0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -894,7 +1049,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_tile_info )
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -907,7 +1062,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_text_info )
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
+	tileinfo.set(0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -1050,8 +1205,8 @@ static void tilemap_16b_reset(screen_device &screen, segaic16_video_device::tile
 void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks)
 {
 	struct tilemap_info *info = &m_bg_tilemap[which];
-	tilemap_get_info_delegate get_text_info;
-	tilemap_get_info_delegate get_tile_info;
+	tilemap_get_info_delegate get_text_info(*this);
+	tilemap_get_info_delegate get_tile_info(*this);
 	int pagenum;
 	int i;
 
@@ -1080,8 +1235,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 	switch (type)
 	{
 		case TILEMAP_HANGON:
-			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_text_info),this);
-			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_tile_info),this);
+			get_text_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16a_text_info));
+			get_tile_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16a_tile_info));
 			info->numpages = 4;
 			info->draw_layer = tilemap_16a_draw_layer;
 			info->reset = nullptr;
@@ -1089,8 +1244,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			break;
 
 		case TILEMAP_16A:
-			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_text_info),this);
-			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_tile_info),this);
+			get_text_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16a_text_info));
+			get_tile_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16a_tile_info));
 			info->numpages = 8;
 			info->draw_layer = tilemap_16a_draw_layer;
 			info->reset = nullptr;
@@ -1098,8 +1253,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			break;
 
 		case TILEMAP_16B:
-			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16b_text_info),this);
-			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16b_tile_info),this);
+			get_text_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16b_text_info));
+			get_tile_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16b_tile_info));
 			info->numpages = 16;
 			info->draw_layer = tilemap_16b_draw_layer;
 			info->reset = tilemap_16b_reset;
@@ -1107,8 +1262,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			break;
 
 		case TILEMAP_16B_ALT:
-			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16b_alt_text_info),this);
-			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16b_alt_tile_info),this);
+			get_text_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16b_alt_text_info));
+			get_tile_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16b_alt_tile_info));
 			info->numpages = 16;
 			info->draw_layer = tilemap_16b_draw_layer;
 			info->reset = tilemap_16b_reset;
@@ -1287,26 +1442,26 @@ void segaic16_video_device::tilemap_set_colscroll(int which, int enable)
  *
  *************************************/
 
-READ16_MEMBER( segaic16_video_device::tileram_r )
+uint16_t segaic16_video_device::tileram_r(offs_t offset)
 {
 	return m_tileram[offset];
 }
 
 
-WRITE16_MEMBER( segaic16_video_device::tileram_w )
+void segaic16_video_device::tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tileram[offset]);
 	m_bg_tilemap[0].tilemaps[offset / (64*32)]->mark_tile_dirty(offset % (64*32));
 }
 
 
-READ16_MEMBER( segaic16_video_device::textram_r )
+uint16_t segaic16_video_device::textram_r(offs_t offset)
 {
 	return m_textram[offset];
 }
 
 
-WRITE16_MEMBER( segaic16_video_device::textram_w )
+void segaic16_video_device::textram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
@@ -1384,23 +1539,22 @@ void segaic16_video_device::rotate_draw(int which, bitmap_ind16 &bitmap, const r
 	int32_t dxx = (info->buffer[0x3f6] << 16) | info->buffer[0x3f7];
 	int32_t dxy = (info->buffer[0x3f8] << 16) | info->buffer[0x3f9];
 	int32_t dyx = (info->buffer[0x3fa] << 16) | info->buffer[0x3fb];
-	int x, y;
 
 	/* advance forward based on the clip rect */
 	currx += dxx * (cliprect.min_x + 27) + dxy * cliprect.min_y;
 	curry += dyx * (cliprect.min_x + 27) + dyy * cliprect.min_y;
 
 	/* loop over screen Y coordinates */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
-		uint16_t *src = &srcbitmap.pix16(0);
-		uint8_t *pri = &priority_bitmap.pix8(y);
+		uint16_t *dest = &bitmap.pix(y);
+		uint16_t const *const src = &srcbitmap.pix(0);
+		uint8_t *pri = &priority_bitmap.pix(y);
 		int32_t tx = currx;
 		int32_t ty = curry;
 
 		/* loop over screen X coordinates */
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* fetch the pixel from the source bitmap */
 			int sx = (tx >> 14) & 0x1ff;
@@ -1438,7 +1592,7 @@ void segaic16_video_device::rotate_draw(int which, bitmap_ind16 &bitmap, const r
  *
  *************************************/
 
-READ16_MEMBER( segaic16_video_device::rotate_control_r )
+uint16_t segaic16_video_device::rotate_control_r()
 {
 	struct rotate_info *info = &m_rotate[0];
 

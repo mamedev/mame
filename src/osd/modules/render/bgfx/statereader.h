@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef __DRAWBGFX_STATE_READER__
-#define __DRAWBGFX_STATE_READER__
+#ifndef DRAWBGFX_STATE_READER
+#define DRAWBGFX_STATE_READER
 
 #include <rapidjson/document.h>
 
@@ -63,4 +63,4 @@ private:
 	static void get_vec_values(const Value& value_array, float* data, const unsigned int count);
 };
 
-#endif // __DRAWBGFX_STATE_READER__
+#endif // DRAWBGFX_STATE_READER

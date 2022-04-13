@@ -216,22 +216,27 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/powerpc/ppc.h"
 #include "machine/3dom2.h"
-#include "machine/ataintf.h"
-#include "machine/cr589.h"
+
+#include "bus/ata/ataintf.h"
+#include "bus/ata/cr589.h"
+#include "cpu/powerpc/ppc.h"
 #include "machine/eepromser.h"
 #include "machine/timekpr.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "sound/ymz280b.h"
-#include "cdrom.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
 #include "romload.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "cdrom.h"
+
+
+namespace {
 
 #define M2_CLOCK        XTAL(66'666'700)
 
@@ -240,7 +245,7 @@ Notes:
 
 /*************************************
  *
- *  ROM definition(s)
+ *  driver state class
  *
  *************************************/
 
@@ -290,26 +295,26 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ppc1_int);
 	DECLARE_WRITE_LINE_MEMBER(ppc2_int);
 
-	DECLARE_WRITE32_MEMBER(cde_sdbg_out);
+	void cde_sdbg_out(uint32_t data);
 
-	DECLARE_WRITE16_MEMBER(ldac_out);
-	DECLARE_WRITE16_MEMBER(rdac_out);
+	void ldac_out(uint16_t data);
+	void rdac_out(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(ata_int);
 
-	DECLARE_READ16_MEMBER(konami_io0_r);
-	DECLARE_WRITE16_MEMBER(konami_io0_w);
-	DECLARE_READ16_MEMBER(konami_sio_r);
-	DECLARE_WRITE16_MEMBER(konami_sio_w);
-	DECLARE_READ16_MEMBER(konami_io1_r);
-	DECLARE_WRITE16_MEMBER(konami_io1_w);
-	DECLARE_WRITE16_MEMBER(konami_eeprom_w);
+	uint16_t konami_io0_r(offs_t offset);
+	void konami_io0_w(offs_t offset, uint16_t data);
+	uint16_t konami_sio_r(offs_t offset, uint16_t mem_mask = ~0);
+	void konami_sio_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t konami_io1_r(offs_t offset);
+	void konami_io1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void konami_eeprom_w(uint16_t data);
 
 	void init_totlvice();
 	void init_btltryst();
 	void init_hellngt();
 
-	DECLARE_WRITE16_MEMBER(konami_atapi_unk_w)
+	void konami_atapi_unk_w(uint16_t data)
 	{
 		// 8000 = /Reset
 		// 4000 = C000 ... DOIO DMA ... 4000
@@ -324,14 +329,14 @@ public:
 		}
 	}
 
-	DECLARE_READ16_MEMBER(konami_ide_r)
+	uint16_t konami_ide_r(offs_t offset, uint16_t mem_mask = ~0)
 	{
-		return swapendian_int16(m_ata->read_cs0(offset, mem_mask));
+		return swapendian_int16(m_ata->cs0_r(offset, mem_mask));
 	}
 
-	DECLARE_WRITE16_MEMBER(konami_ide_w)
+	void konami_ide_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
 	{
-		m_ata->write_cs0(offset, swapendian_int16(data), mem_mask);
+		m_ata->cs0_w(offset, swapendian_int16(data), mem_mask);
 	}
 
 private:
@@ -352,13 +357,13 @@ private:
 	optional_device<ymz280b_device> m_ymz280b;
 
 	// ATAPI
-	cdrom_file *m_available_cdroms;
+	cdrom_file *m_available_cdroms = nullptr;
 
 	// Konami SIO
-	uint16_t    m_sio_data;
+	uint16_t    m_sio_data = 0;
 
-	uint32_t    m_ata_int; // TEST
-	emu_timer *m_atapi_timer;
+	uint32_t    m_ata_int = 0; // TEST
+	emu_timer *m_atapi_timer = nullptr;
 
 	TIMER_CALLBACK_MEMBER( atapi_delay )
 	{
@@ -366,10 +371,10 @@ private:
 		m_ata_int = param;
 	}
 
-	void debug_help_command(int ref, const std::vector<std::string> &params);
-	void debug_commands(int ref, const std::vector<std::string> &params);
+	void debug_help_command(const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
 
-	void dump_task_command(int ref, const std::vector<std::string> &params);
+	void dump_task_command(const std::vector<std::string> &params);
 };
 
 
@@ -390,7 +395,7 @@ WRITE_LINE_MEMBER(konamim2_state::ppc2_int)
 	m_ppc2->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE32_MEMBER(konamim2_state::cde_sdbg_out)
+void konamim2_state::cde_sdbg_out(uint32_t data)
 {
 	if (data == 0xd)
 		putc('\n', stdout);
@@ -406,12 +411,12 @@ WRITE32_MEMBER(konamim2_state::cde_sdbg_out)
 #endif
 }
 
-WRITE16_MEMBER( konamim2_state::ldac_out )
+void konamim2_state::ldac_out(uint16_t data)
 {
 	m_ldac->write(data);
 }
 
-WRITE16_MEMBER( konamim2_state::rdac_out )
+void konamim2_state::rdac_out(uint16_t data)
 {
 	m_rdac->write(data);
 }
@@ -436,7 +441,7 @@ WRITE_LINE_MEMBER( konamim2_state::ata_int )
  *
  *************************************/
 
-READ16_MEMBER( konamim2_state::konami_io0_r )
+uint16_t konamim2_state::konami_io0_r(offs_t offset)
 {
 //  printf("IO R: %08X\n", offset);
 
@@ -500,7 +505,7 @@ READ16_MEMBER( konamim2_state::konami_io0_r )
 	return 0;
 }
 
-WRITE16_MEMBER( konamim2_state::konami_io0_w )
+void konamim2_state::konami_io0_w(offs_t offset, uint16_t data)
 {
 	// 9: 0000, 0xFFF
 //  printf("IO W: %08x %08x\n", offset, data);
@@ -531,7 +536,7 @@ WRITE16_MEMBER( konamim2_state::konami_io0_w )
  7: |........ ........| Unknown
 */
 
-READ16_MEMBER( konamim2_state::konami_io1_r )
+uint16_t konamim2_state::konami_io1_r(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -590,7 +595,7 @@ READ16_MEMBER( konamim2_state::konami_io1_r )
 	return data;
 }
 
-WRITE16_MEMBER( konamim2_state::konami_io1_w )
+void konamim2_state::konami_io1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 0x0200 = ADC?
 	// 0x0800 = Coin counter 1
@@ -635,7 +640,7 @@ WRITE16_MEMBER( konamim2_state::konami_io1_w )
  7: |xxxxxxxx xxxxxxxx| Register R/W
 */
 
-READ16_MEMBER( konamim2_state::konami_sio_r )
+uint16_t konamim2_state::konami_sio_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -651,7 +656,7 @@ READ16_MEMBER( konamim2_state::konami_sio_r )
 	return data;
 }
 
-WRITE16_MEMBER( konamim2_state::konami_sio_w )
+void konamim2_state::konami_sio_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -664,7 +669,7 @@ WRITE16_MEMBER( konamim2_state::konami_sio_w )
 }
 
 // TODO: Use output port
-WRITE16_MEMBER( konamim2_state::konami_eeprom_w )
+void konamim2_state::konami_eeprom_w(uint16_t data)
 {
 	// 3 = CS
 	// 2 = CLK
@@ -688,23 +693,19 @@ void konamim2_state::machine_start()
 	m_ppc1->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_ppc2->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	// Breakpoints don't wortk with fast RAM
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
-	{
-		m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
-		m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
-	}
+	m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
+	m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 
-	m_available_cdroms = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
+	m_available_cdroms = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom"));
 
 	// TODO: REMOVE
-	m_atapi_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( konamim2_state::atapi_delay ),this ) );
+	m_atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamim2_state::atapi_delay), this));
 	m_atapi_timer->adjust( attotime::never );
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 0, 1, 4, std::bind(&konamim2_state::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 1, 4, std::bind(&konamim2_state::debug_commands, this, _1));
 	}
 }
 
@@ -1111,8 +1112,8 @@ INPUT_PORTS_END
 
 void konamim2_state::cr589_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 1.0);
-	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 0.5);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 0.5);
 	device = device->subdevice("cdda");
 }
 
@@ -1128,7 +1129,7 @@ void konamim2_state::konamim2(machine_config &config)
 	m_ppc2->set_addrmap(AS_PROGRAM, &konamim2_state::m2_map);
 
 	// M2 hardware
-	M2_BDA(config, m_bda, M2_CLOCK, m_ppc1, m_ppc2);
+	M2_BDA(config, m_bda, M2_CLOCK, m_ppc1, m_ppc2, m_cde);
 	m_bda->set_ram_size(m2_bda_device::RAM_8MB, m2_bda_device::RAM_8MB);
 	m_bda->subdevice<m2_powerbus_device>("powerbus")->int_handler().set(FUNC(konamim2_state::ppc1_int));
 	m_bda->subdevice<m2_memctl_device>("memctl")->gpio_out_handler<3>().set(FUNC(konamim2_state::ppc2_int)).invert();
@@ -1137,7 +1138,7 @@ void konamim2_state::konamim2(machine_config &config)
 	m_bda->ldac_handler().set(FUNC(konamim2_state::ldac_out));
 	m_bda->rdac_handler().set(FUNC(konamim2_state::rdac_out));
 
-	M2_CDE(config, m_cde, M2_CLOCK, m_ppc1);
+	M2_CDE(config, m_cde, M2_CLOCK, m_ppc1, m_bda);
 	m_cde->int_handler().set(":bda:powerbus", FUNC(m2_powerbus_device::int_line<BDAINT_EXTD4_LINE>));
 	m_cde->set_syscfg(SYSCONFIG_ARCADE);
 	m_cde->sdbg_out().set(FUNC(konamim2_state::cde_sdbg_out));
@@ -1163,12 +1164,6 @@ void konamim2_state::konamim2(machine_config &config)
 	// TODO!
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -1383,9 +1378,6 @@ ROM_START( totlvice )
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	// was converted from the following cue/bin pair, is this sufficient / good for this platform? - there are a lot of audio tracks that need verifying as non-corrupt
-	//ROM_LOAD( "TotalVice-GQ639-EBA01.cue",  0, 0x00000555, CRC(55ef2f62) SHA1(8e31b3e62244e6090a93228dae377552340dcdeb) )
-	//ROM_LOAD( "TotalVice-GQ639-EBA01.bin",  0, 0x1ec4db10, CRC(5882f8ba) SHA1(e589d500d99d2f4cff4506cd5ac9a5bfc8d30675) )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "639eba01", 0, BAD_DUMP SHA1(d95c13575e015169b126f7e8492d150bd7e5ebda) )
 ROM_END
@@ -1423,7 +1415,7 @@ ROM_START( totlvica )
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "639aab01", 0, SHA1(bb99db2eeaecabfda8f20b7b06f714605bbd5b7c) )
+	DISK_IMAGE_READONLY( "639aab01", 0, SHA1(34f34b26399cc04ffb0207df69f52eba42892eb6) )
 ROM_END
 
 ROM_START( totlvicj )
@@ -1453,8 +1445,8 @@ ROM_END
 
 void konamim2_state::install_m48t58()
 {
-	read8sm_delegate read_delegate(FUNC(m48t58_device::read), &(*m_m48t58));
-	write8sm_delegate write_delegate(FUNC(m48t58_device::write), &(*m_m48t58));
+	read8sm_delegate read_delegate(*m_m48t58, FUNC(m48t58_device::read));
+	write8sm_delegate write_delegate(*m_m48t58, FUNC(m48t58_device::write));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
@@ -1462,8 +1454,8 @@ void konamim2_state::install_m48t58()
 
 void konamim2_state::install_ymz280b()
 {
-	read8sm_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
-	write8sm_delegate write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
+	read8sm_delegate read_delegate(*m_ymz280b, FUNC(ymz280b_device::read));
+	write8sm_delegate write_delegate(*m_ymz280b, FUNC(ymz280b_device::write));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
@@ -1486,36 +1478,13 @@ void konamim2_state::init_hellngt()
 }
 
 
-
-/*************************************
- *
- *  Game driver(s)
- *
- *************************************/
-
-GAME( 1997, polystar,  0,        polystar, polystar, konamim2_state, empty_init,    ROT0, "Konami", "Tobe! Polystars (ver JAA)",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, totlvice,  0,        totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EBA)",         MACHINE_IMPERFECT_TIMING )
-//GAME( 1997, totlvicd, totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1997, totlvicj,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver JAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1997, totlvica,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver AAB)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1997, totlvicu,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver UAC)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAC)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-//GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_IMPERFECT_TIMING )
-GAME( 1998, evilngte,  evilngt,  evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver EAA)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         MACHINE_IMPERFECT_TIMING )
-
-//CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
-
-
 /*************************************
  *
  *  Debugging Aids
  *
  *************************************/
 
-void konamim2_state::debug_help_command(int ref, const std::vector<std::string> &params)
+void konamim2_state::debug_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -1524,20 +1493,20 @@ void konamim2_state::debug_help_command(int ref, const std::vector<std::string> 
 	con.printf("  konm2 dump_dspp,<address> -- Dump DSPP object at <address>\n");
 }
 
-void konamim2_state::debug_commands(int ref, const std::vector<std::string> &params)
+void konamim2_state::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 
 	if (params[0] == "help")
-		debug_help_command(ref, params);
+		debug_help_command(params);
 	else if (params[0] == "dump_task")
-		dump_task_command(ref, params);
+		dump_task_command(params);
 	else if (params[0] == "dump_dspp")
 		subdevice<dspp_device>("bda:dspp")->dump_state();
 }
 
-void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &params)
+void konamim2_state::dump_task_command(const std::vector<std::string> &params)
 {
 	typedef uint32_t   Item;
 	typedef uint32_t   m2ptr;
@@ -1585,7 +1554,6 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 		m2ptr         pt_UserData;        /* user-private data            */
 	};
 
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_ppc1->space();
 	uint64_t addr;
@@ -1607,14 +1575,14 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 
 	Task task;
 
-	task.t.pn_Next = cpu.read_dword(space, address + offsetof(ItemNode, pn_Next), true);
-	task.t.pn_Prev = cpu.read_dword(space, address + offsetof(ItemNode, pn_Prev), true);
-	task.t.n_SubsysType = cpu.read_byte(space, address + offsetof(ItemNode, n_SubsysType), true);
-	task.t.n_Type = cpu.read_byte(space, address + offsetof(ItemNode, n_Type), true);
-	task.t.n_Priority = cpu.read_byte(space, address + offsetof(ItemNode, n_Priority), true);
-	task.t.n_Flags = cpu.read_byte(space, address + offsetof(ItemNode, n_Flags), true);
-	task.t.n_Size = cpu.read_dword(space, address + offsetof(ItemNode, n_Size), true);
-	task.t.pn_Name = cpu.read_dword(space, address + offsetof(ItemNode, pn_Name), true);
+	task.t.pn_Next = space.read_dword(address + offsetof(ItemNode, pn_Next));
+	task.t.pn_Prev = space.read_dword(address + offsetof(ItemNode, pn_Prev));
+	task.t.n_SubsysType = space.read_byte(address + offsetof(ItemNode, n_SubsysType));
+	task.t.n_Type = space.read_byte(address + offsetof(ItemNode, n_Type));
+	task.t.n_Priority = space.read_byte(address + offsetof(ItemNode, n_Priority));
+	task.t.n_Flags = space.read_byte(address + offsetof(ItemNode, n_Flags));
+	task.t.n_Size = space.read_dword(address + offsetof(ItemNode, n_Size));
+	task.t.pn_Name = space.read_dword(address + offsetof(ItemNode, pn_Name));
 
 	char name[128];
 	char *ptr = name;
@@ -1622,31 +1590,31 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 
 	do
 	{
-		*ptr = cpu.read_byte(space, nameptr++, true);
+		*ptr = space.read_byte(nameptr++);
 	} while (*ptr++ != 0);
 
-	task.t.n_Version = cpu.read_byte(space, address + offsetof(ItemNode, n_Version), true);
-	task.t.n_Revision = cpu.read_byte(space, address + offsetof(ItemNode, n_Revision), true);
-	task.t.n_Reserved0 = cpu.read_byte(space, address + offsetof(ItemNode, n_Reserved0), true);
-	task.t.n_ItemFlags = cpu.read_byte(space, address + offsetof(ItemNode, n_ItemFlags), true);
-	task.t.n_Item = cpu.read_dword(space, address + offsetof(ItemNode, n_Item), true);
-	task.t.n_Owner = cpu.read_dword(space, address + offsetof(ItemNode, n_Owner), true);
-	task.t.pn_Reserved1 = cpu.read_dword(space, address + offsetof(ItemNode, pn_Reserved1), true);
+	task.t.n_Version = space.read_byte(address + offsetof(ItemNode, n_Version));
+	task.t.n_Revision = space.read_byte(address + offsetof(ItemNode, n_Revision));
+	task.t.n_Reserved0 = space.read_byte(address + offsetof(ItemNode, n_Reserved0));
+	task.t.n_ItemFlags = space.read_byte(address + offsetof(ItemNode, n_ItemFlags));
+	task.t.n_Item = space.read_dword(address + offsetof(ItemNode, n_Item));
+	task.t.n_Owner = space.read_dword(address + offsetof(ItemNode, n_Owner));
+	task.t.pn_Reserved1 = space.read_dword(address + offsetof(ItemNode, pn_Reserved1));
 
-	task.pt_ThreadTask = cpu.read_dword(space, address + offsetof(Task, pt_ThreadTask), true);
-	task.t_WaitBits = cpu.read_dword(space, address + offsetof(Task, t_WaitBits), true);
-	task.t_SigBits = cpu.read_dword(space, address + offsetof(Task, t_SigBits), true);
-	task.t_AllocatedSigs = cpu.read_dword(space, address + offsetof(Task, t_AllocatedSigs), true);
-	task.pt_StackBase = cpu.read_dword(space, address + offsetof(Task, pt_StackBase), true);
-	task.t_StackSize = cpu.read_dword(space, address + offsetof(Task, t_StackSize), true);
-	task.t_MaxUSecs = cpu.read_dword(space, address + offsetof(Task, t_MaxUSecs), true);
-	task.t_ElapsedTime.tt_Hi = cpu.read_dword(space, address + offsetof(Task, t_ElapsedTime)+0, true);
-	task.t_ElapsedTime.tt_Lo = cpu.read_dword(space, address + offsetof(Task, t_ElapsedTime)+4, true);
-	task.t_NumTaskLaunch = cpu.read_dword(space, address + offsetof(Task, t_NumTaskLaunch), true);
-	task.t_Flags = cpu.read_dword(space, address + offsetof(Task, t_Flags), true);
-	task.t_Module = cpu.read_dword(space, address + offsetof(Task, t_Module), true);
-	task.t_DefaultMsgPort = cpu.read_dword(space, address + offsetof(Task, t_DefaultMsgPort), true);
-	task.pt_UserData = cpu.read_dword(space, address + offsetof(Task, pt_UserData), true);
+	task.pt_ThreadTask = space.read_dword(address + offsetof(Task, pt_ThreadTask));
+	task.t_WaitBits = space.read_dword(address + offsetof(Task, t_WaitBits));
+	task.t_SigBits = space.read_dword(address + offsetof(Task, t_SigBits));
+	task.t_AllocatedSigs = space.read_dword(address + offsetof(Task, t_AllocatedSigs));
+	task.pt_StackBase = space.read_dword(address + offsetof(Task, pt_StackBase));
+	task.t_StackSize = space.read_dword(address + offsetof(Task, t_StackSize));
+	task.t_MaxUSecs = space.read_dword(address + offsetof(Task, t_MaxUSecs));
+	task.t_ElapsedTime.tt_Hi = space.read_dword(address + offsetof(Task, t_ElapsedTime)+0);
+	task.t_ElapsedTime.tt_Lo = space.read_dword(address + offsetof(Task, t_ElapsedTime)+4);
+	task.t_NumTaskLaunch = space.read_dword(address + offsetof(Task, t_NumTaskLaunch));
+	task.t_Flags = space.read_dword(address + offsetof(Task, t_Flags));
+	task.t_Module = space.read_dword(address + offsetof(Task, t_Module));
+	task.t_DefaultMsgPort = space.read_dword(address + offsetof(Task, t_DefaultMsgPort));
+	task.pt_UserData = space.read_dword(address + offsetof(Task, pt_UserData));
 
 //  m2ptr       pt_ThreadTask;      /* I am a thread of what task?  */
 //  uint32_t     t_WaitBits;        /* signals being waited for     */
@@ -1693,3 +1661,28 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 	con.printf("UserData:       %08X\n", task.pt_UserData);
 	con.printf("\n");
 }
+
+} // anonymous namespace
+
+
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1997, polystar,  0,        polystar, polystar, konamim2_state, empty_init,    ROT0, "Konami", "Tobe! Polystars (ver JAA)",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, totlvice,  0,        totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EBA)",         MACHINE_IMPERFECT_TIMING )
+//GAME( 1997, totlvicd, totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvicj,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver JAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvica,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver AAB)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvicu,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver UAC)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAC)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_IMPERFECT_TIMING )
+GAME( 1998, evilngte,  evilngt,  evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver EAA)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         MACHINE_IMPERFECT_TIMING )
+
+//CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )

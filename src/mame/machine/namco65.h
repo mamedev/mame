@@ -59,33 +59,33 @@ private:
 	devcb_read8        m_in_ph_cb;
 	devcb_read8        m_in_pdsw_cb;
 
-	devcb_read8   m_port_analog_in_cb[8];
-	devcb_read8   m_port_dial_in_cb[4];
+	devcb_read8::array<8> m_port_analog_in_cb;
+	devcb_read8::array<4> m_port_dial_in_cb;
 
 	devcb_read8        m_dp_in;
 	devcb_write8       m_dp_out;
 
-	DECLARE_READ8_MEMBER(namcos2_mcu_port_d_r);
-	DECLARE_WRITE8_MEMBER(namcos2_mcu_port_d_w);
+	uint8_t namcos2_mcu_port_d_r();
+	void namcos2_mcu_port_d_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(namcos2_mcu_analog_port_r );
-	DECLARE_WRITE8_MEMBER(namcos2_mcu_analog_port_w);
+	uint8_t namcos2_mcu_analog_port_r();
+	void namcos2_mcu_analog_port_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(namcos2_mcu_analog_ctrl_r);
-	DECLARE_WRITE8_MEMBER(namcos2_mcu_analog_ctrl_w);
+	uint8_t namcos2_mcu_analog_ctrl_r();
+	void namcos2_mcu_analog_ctrl_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(mcub_r) { return m_in_pb_cb(); }
-	DECLARE_READ8_MEMBER(mcuc_r) { return m_in_pc_cb(); }
-	DECLARE_READ8_MEMBER(mcuh_r) { return m_in_ph_cb(); }
-	DECLARE_READ8_MEMBER(mcudsw_r) { return m_in_pdsw_cb(); }
+	uint8_t mcub_r() { return m_in_pb_cb(); }
+	uint8_t mcuc_r() { return m_in_pc_cb(); }
+	uint8_t mcuh_r() { return m_in_ph_cb(); }
+	uint8_t mcudsw_r() { return m_in_pdsw_cb(); }
 
-	DECLARE_READ8_MEMBER(mcudi0_r) { return m_port_dial_in_cb[0](); }
-	DECLARE_READ8_MEMBER(mcudi1_r) { return m_port_dial_in_cb[1](); }
-	DECLARE_READ8_MEMBER(mcudi2_r) { return m_port_dial_in_cb[2](); }
-	DECLARE_READ8_MEMBER(mcudi3_r) { return m_port_dial_in_cb[3](); }
+	uint8_t mcudi0_r() { return m_port_dial_in_cb[0](); }
+	uint8_t mcudi1_r() { return m_port_dial_in_cb[1](); }
+	uint8_t mcudi2_r() { return m_port_dial_in_cb[2](); }
+	uint8_t mcudi3_r() { return m_port_dial_in_cb[3](); }
 
 	int m_mcu_analog_ctrl;
 	int m_mcu_analog_data;

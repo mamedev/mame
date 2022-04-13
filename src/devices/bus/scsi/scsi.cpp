@@ -4,8 +4,8 @@
 #include "emu.h"
 #include "scsi.h"
 
-scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SCSI_PORT, tag, owner, clock),
+scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SCSI_PORT, tag, owner, clock),
 	m_bsy_handler(*this),
 	m_sel_handler(*this),
 	m_cd_handler(*this),
@@ -673,7 +673,7 @@ DEFINE_DEVICE_TYPE(SCSI_PORT, scsi_port_device, "scsi", "SCSI Port")
 
 scsi_port_slot_device::scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCSI_PORT_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<scsi_port_interface>(mconfig, *this),
 	m_dev(nullptr),
 	m_bsy(0),
 	m_sel(0),
@@ -706,8 +706,8 @@ void scsi_port_slot_device::device_start()
 
 DEFINE_DEVICE_TYPE(SCSI_PORT_SLOT, scsi_port_slot_device, "scsi_slot", "SCSI Connector")
 
-scsi_port_interface::scsi_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+scsi_port_interface::scsi_port_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "scsi")
 {
 	m_slot = dynamic_cast<scsi_port_slot_device *>(device.owner());
 }

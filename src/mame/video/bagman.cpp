@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  bagman.c
+  bagman.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -13,13 +13,13 @@
 #include "includes/bagman.h"
 
 
-WRITE8_MEMBER(bagman_state::videoram_w)
+void bagman_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bagman_state::colorram_w)
+void bagman_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -102,26 +102,27 @@ TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
+	tileinfo.set(gfxbank, code, color, 0);
 }
 
 void bagman_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bagman_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bagman_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 }
 
 
 void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	// Spriteram is at the start of the colorram
+	for (int offs = 0x20 - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 
-		sx = m_spriteram[offs + 3];
-		sy = 256 - m_spriteram[offs + 2] - 16;
-		flipx = m_spriteram[offs] & 0x40;
-		flipy = m_spriteram[offs] & 0x80;
+		sx = m_colorram[offs + 3];
+		sy = 256 - m_colorram[offs + 2] - 16;
+		flipx = m_colorram[offs] & 0x40;
+		flipy = m_colorram[offs] & 0x80;
 		if (flip_screen())
 		{
 			sx = 256 - sx - 15;
@@ -130,11 +131,11 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		if (m_spriteram[offs + 2] && m_spriteram[offs + 3])
+		if (m_colorram[offs + 2] && m_colorram[offs + 3])
 			m_gfxdecode->gfx(1)->transpen(bitmap,
 					cliprect,
-					(m_spriteram[offs] & 0x3f) + 2 * (m_spriteram[offs + 1] & 0x20),
-					m_spriteram[offs + 1] & 0x1f,
+					(m_colorram[offs] & 0x3f) + 2 * (m_colorram[offs + 1] & 0x20),
+					m_colorram[offs + 1] & 0x1f,
 					flipx,flipy,
 					sx,sy,0);
 	}

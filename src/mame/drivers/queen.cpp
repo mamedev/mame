@@ -48,12 +48,12 @@ public:
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
-	uint8_t m_mtxc_config_reg[256];
-	uint8_t m_piix4_config_reg[4][256];
+	uint8_t m_mtxc_config_reg[256]{};
+	uint8_t m_piix4_config_reg[4][256]{};
 
-	DECLARE_WRITE32_MEMBER( bios_ext_ram_w );
+	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ram_w );
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -165,19 +165,18 @@ void queen_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint3
 
 uint8_t queen_state::piix4_config_r(int function, int reg)
 {
-	if ((function >= 4) && (function <= 7))
-	{
-		return 0; // BIOS performs a brute-force scan for devices
-	}
-
 //  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return m_piix4_config_reg[function][reg];
+	if ((function < 4) && (reg < 256))
+		return m_piix4_config_reg[function][reg];
+	else
+		return 0; // BIOS performs a brute-force scan for devices
 }
 
 void queen_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
-	m_piix4_config_reg[function][reg] = data;
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+	if ((function < 4) && (reg < 256))
+		m_piix4_config_reg[function][reg] = data;
 }
 
 uint32_t queen_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
@@ -223,7 +222,7 @@ void queen_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint3
 }
 
 
-WRITE32_MEMBER(queen_state::bios_ext_ram_w)
+void queen_state::bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x63] & 0x40)     // write to RAM if this region is write-enabled
 	{
@@ -232,7 +231,7 @@ WRITE32_MEMBER(queen_state::bios_ext_ram_w)
 }
 
 
-WRITE32_MEMBER(queen_state::bios_ram_w)
+void queen_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x63] & 0x10)     // write to RAM if this region is write-enabled
 	{
@@ -280,9 +279,8 @@ void queen_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0x20000);
 }
 
-
-
-MACHINE_CONFIG_START(queen_state::queen)
+void queen_state::queen(machine_config &config)
+{
 	PENTIUM3(config, m_maincpu, 533000000/16); // Celeron or Pentium 3, 533 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &queen_state::queen_map);
 	m_maincpu->set_addrmap(AS_IO, &queen_state::queen_io);
@@ -290,9 +288,9 @@ MACHINE_CONFIG_START(queen_state::queen)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, queen_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, queen_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device(0, FUNC(queen_state::intel82439tx_pci_r), FUNC(queen_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(queen_state::intel82371ab_pci_r), FUNC(queen_state::intel82371ab_pci_w));
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -302,13 +300,11 @@ MACHINE_CONFIG_START(queen_state::queen)
 
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
-
-
+}
 
 
 ROM_START( queen )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "bios-original.bin", 0x00000, 0x40000, CRC(feb542d4) SHA1(3cc5d8aeb0e3b7d9ed33248a4f3dc507d29debd9) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
@@ -320,4 +316,4 @@ ROM_START( queen )
 ROM_END
 
 
-GAME( 2002?, queen,  0,    queen, at_keyboard, queen_state, empty_init, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )
+GAME( 2002?, queen,  0,    queen, 0, queen_state, empty_init, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )

@@ -59,7 +59,7 @@ void ep64_expansion_bus_cards(device_slot_interface &device);
 class device_ep64_expansion_bus_card_interface;
 
 class ep64_expansion_bus_slot_device : public device_t,
-										public device_slot_interface
+										public device_single_card_slot_interface<device_ep64_expansion_bus_card_interface>
 {
 	friend class device_ep64_expansion_bus_card_interface;
 
@@ -90,9 +90,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	devcb_write_line m_write_irq;
@@ -108,7 +106,7 @@ private:
 
 // ======================> device_ep64_expansion_bus_card_interface
 
-class device_ep64_expansion_bus_card_interface : public device_slot_card_interface
+class device_ep64_expansion_bus_card_interface : public device_interface
 {
 protected:
 	// construction/destruction

@@ -133,6 +133,7 @@
 			vc2010.filefiltergroup(prj, "None")
 			vc2010.filefiltergroup(prj, "ClInclude")
 			vc2010.filefiltergroup(prj, "ClCompile")
+			vc2010.filefiltergroup(prj, "Object")
 			vc2010.filefiltergroup(prj, "ResourceCompile")
 			vc2010.filefiltergroup(prj, "CustomBuild")
 			vc2010.filefiltergroup(prj, "AppxManifest")

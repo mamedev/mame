@@ -15,10 +15,11 @@
 
 enum
 {
-	ICF  = 0x00800000,
-	OCFA = 0x00080000,
-	OCFB = 0x00040000,
-	OVF  = 0x00020000
+	ICF  = 0x80,
+	OCFA = 0x08,
+	OCFB = 0x04,
+	OVF  = 0x02,
+	CCLRA = 0x01
 };
 
 #define SH12_AM  0xc7ffffff

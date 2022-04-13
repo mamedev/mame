@@ -15,8 +15,7 @@
 
 #include "debugvw.h"
 
-#include "softfloat/mamesf.h"
-#include "softfloat/softfloat.h"
+#include "softfloat3/source/include/softfloat.h"
 
 
 //**************************************************************************
@@ -28,21 +27,23 @@ class debug_view_memory_source : public debug_view_source
 {
 	friend class debug_view_memory;
 
-	debug_view_memory_source(const char *name, address_space &space);
-	debug_view_memory_source(const char *name, memory_region &region);
-	debug_view_memory_source(const char *name, void *base, int element_size, int num_elements);
-
 public:
+	debug_view_memory_source(std::string &&name, address_space &space);
+	debug_view_memory_source(std::string &&name, memory_region &region);
+	debug_view_memory_source(std::string &&name, void *base, int element_size, int num_elements, int num_blocks, int block_stride);
+
 	address_space *space() const { return m_space; }
 
 private:
-	address_space *m_space;                     // address space we reference (if any)
+	address_space           *m_space;           // address space we reference (if any)
 	device_memory_interface *m_memintf;         // pointer to the memory interface of the device
-	void *              m_base;                 // pointer to memory base
-	offs_t              m_length;               // length of memory
-	offs_t              m_offsetxor;            // XOR to apply to offsets
-	endianness_t        m_endianness;           // endianness of memory
-	u8                  m_prefsize;             // preferred bytes per chunk
+	void *                  m_base;             // pointer to memory base
+	offs_t                  m_blocklength;      // length of each block of memory
+	offs_t                  m_numblocks;        // number of blocks of memory
+	offs_t                  m_blockstride;      // stride between blocks of memory
+	offs_t                  m_offsetxor;        // XOR to apply to offsets
+	endianness_t            m_endianness;       // endianness of memory
+	u8                      m_prefsize;         // preferred bytes per chunk
 };
 
 
@@ -54,23 +55,43 @@ class debug_view_memory : public debug_view
 	// construction/destruction
 	debug_view_memory(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate);
 
+	struct memory_view_pos;
+
 public:
+	enum class data_format
+	{
+		HEX_8BIT = 1,
+		HEX_16BIT = 2,
+		HEX_32BIT = 4,
+		HEX_64BIT = 8,
+		FLOAT_32BIT = 9,
+		FLOAT_64BIT = 10,
+		FLOAT_80BIT = 11,
+		OCTAL_8BIT = 12,
+		OCTAL_16BIT = 13,
+		OCTAL_32BIT = 14,
+		OCTAL_64BIT = 15
+	};
+	static bool is_valid_format(data_format format) { return int(format) >= 0 && int(format) < std::size(s_memory_pos_table) && get_posdata(format).m_bytes != 0; }
+
 	// getters
 	const char *expression() const { return m_expression.string(); }
-	int get_data_format() { flush_updates(); return m_data_format; }
+	data_format get_data_format() { flush_updates(); return m_data_format; }
 	u32 chunks_per_row() { flush_updates(); return m_chunks_per_row; }
 	bool reverse() const { return m_reverse_view; }
 	bool ascii() const { return m_ascii_view; }
 	bool physical() const { return m_no_translation; }
+	int address_radix() const { return m_address_radix; }
 	offs_t addressAtCursorPosition(const debug_view_xy& pos) { return get_cursor_pos(pos).m_address; }
 
 	// setters
 	void set_expression(const std::string &expression);
 	void set_chunks_per_row(u32 rowchunks);
-	void set_data_format(int format); // 1-8 current values 9 32bit floating point
+	void set_data_format(data_format format);
 	void set_reverse(bool reverse);
-	void set_ascii(bool reverse);
+	void set_ascii(bool ascii);
 	void set_physical(bool physical);
+	void set_address_radix(int radix);
 
 protected:
 	// view overrides
@@ -87,6 +108,11 @@ private:
 		u8 m_shift;
 	};
 
+	// data format helpers
+	static bool is_hex_format(data_format format) { return int(format) <= 8; }
+	static bool is_octal_format(data_format format) { return int(format) >= 12; }
+	static const memory_view_pos &get_posdata(data_format format) { return s_memory_pos_table[int(format)]; }
+
 	// internal helpers
 	void enumerate_sources();
 	void recompute();
@@ -101,18 +127,22 @@ private:
 	// memory access
 	bool read(u8 size, offs_t offs, u64 &data);
 	void write(u8 size, offs_t offs, u64 data);
-	bool read(u8 size, offs_t offs, floatx80 &data);
+	bool read(u8 size, offs_t offs, extFloat80_t &data);
+	bool read_chunk(offs_t address, int chunknum, u64 &chunkdata);
+	void generate_row(debug_view_char *destmin, debug_view_char *destmax, debug_view_char *destrow, offs_t address);
 
 	// internal state
 	debug_view_expression m_expression;         // expression describing the start address
 	u32                 m_chunks_per_row;       // number of chunks displayed per line
 	u8                  m_bytes_per_chunk;      // bytes per chunk
 	u8                  m_steps_per_chunk;      // bytes per chunk
-	int                 m_data_format;          // 1-8 current values 9 32bit floating point
+	data_format         m_data_format;          // 1-8 current values 9 32bit floating point
 	bool                m_reverse_view;         // reverse-endian view?
 	bool                m_ascii_view;           // display ASCII characters?
 	bool                m_no_translation;       // don't run addresses through the cpu translation hook
 	bool                m_edit_enabled;         // can modify contents ?
+	u8                  m_shift_bits;           // number of bits for each character/cursor position
+	u8                  m_address_radix;        // numerical radix for address column and expressions
 	offs_t              m_maxaddr;              // (derived) maximum address to display
 	u32                 m_bytes_per_row;        // (derived) number of bytes displayed per line
 	u32                 m_byte_offset;          // (derived) offset of starting visible byte
@@ -128,10 +158,11 @@ private:
 
 	struct memory_view_pos
 	{
-		u8           m_spacing;              /* spacing between each entry */
-		u8           m_shift[24];            /* shift for each character */
+		u8           m_bytes;                // bytes per entry
+		u8           m_spacing;              // spacing between each entry
+		u8           m_shift[28];            // shift for each character
 	};
-	static const memory_view_pos s_memory_pos_table[12]; // table for rendering at different data formats
+	static const memory_view_pos s_memory_pos_table[16]; // table for rendering at different data formats
 
 	// constants
 	static constexpr int MEM_MAX_LINE_WIDTH = 1024;

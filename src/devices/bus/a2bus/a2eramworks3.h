@@ -38,12 +38,33 @@ protected:
 	virtual bool allow_dhr() override { return true; }
 	virtual void write_c07x(uint8_t offset, uint8_t data) override;
 
+	int m_bank;
+
 private:
 	uint8_t m_ram[8*1024*1024];
-	int m_bank;
+};
+
+class a2eaux_franklin384_device: public a2eaux_ramworks3_device
+{
+public:
+	a2eaux_franklin384_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void write_c07x(uint8_t offset, uint8_t data) override;
+};
+
+class a2eaux_franklin512_device: public a2eaux_ramworks3_device
+{
+public:
+	a2eaux_franklin512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void write_c07x(uint8_t offset, uint8_t data) override;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(A2EAUX_RAMWORKS3, a2eaux_ramworks3_device)
+DECLARE_DEVICE_TYPE(A2EAUX_FRANKLIN384, a2eaux_franklin384_device)
+DECLARE_DEVICE_TYPE(A2EAUX_FRANKLIN512, a2eaux_franklin512_device)
 
 #endif // MAME_BUS_A2BUS_A2ERAMWORKS3_H

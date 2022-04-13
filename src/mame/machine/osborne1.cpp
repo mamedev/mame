@@ -13,58 +13,51 @@ There are three IRQ sources:
 #include "includes/osborne1.h"
 
 
-WRITE8_MEMBER( osborne1_state::bank_0xxx_w )
+void osborne1_state::bank_0xxx_w(offs_t offset, u8 data)
 {
-	if (!m_rom_mode)
+	if (!rom_mode())
 		m_ram->pointer()[offset] = data;
 }
 
-WRITE8_MEMBER( osborne1_state::bank_1xxx_w )
+void osborne1_state::bank_1xxx_w(offs_t offset, u8 data)
 {
-	if (!m_rom_mode)
+	if (!rom_mode())
 		m_ram->pointer()[0x1000 + offset] = data;
 }
 
-READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
+u8 osborne1_state::bank_2xxx_3xxx_r(offs_t offset)
 {
-	if (!m_rom_mode)
+	if (!rom_mode())
 		return m_ram->pointer()[0x2000 + offset];
 
 	// Since each peripheral only checks two bits, many addresses will
 	// result in multiple peripherals attempting to drive the bus.  This is
 	// simulated by ANDing all the values together.
-	uint8_t data = 0xFF;
+	u8 data = 0xFF;
 	if ((offset & 0x900) == 0x100) // Floppy
 		data &= m_fdc->read(offset & 0x03);
 	if ((offset & 0x900) == 0x900) // IEEE488 PIA
 		data &= m_pia0->read(offset & 0x03);
 	if ((offset & 0xA00) == 0x200) // Keyboard
 	{
-		if (offset & 0x01) data &= m_keyb_row[0]->read();
-		if (offset & 0x02) data &= m_keyb_row[1]->read();
-		if (offset & 0x04) data &= m_keyb_row[3]->read();
-		if (offset & 0x08) data &= m_keyb_row[4]->read();
-		if (offset & 0x10) data &= m_keyb_row[5]->read();
-		if (offset & 0x20) data &= m_keyb_row[2]->read();
-		if (offset & 0x40) data &= m_keyb_row[6]->read();
-		if (offset & 0x80) data &= m_keyb_row[7]->read();
+		for (unsigned b = 0; 8 > b; ++b)
+		{
+			if (BIT(offset, b))
+				data &= m_keyb_row[b]->read();
+		}
 	}
 	if ((offset & 0xA00) == 0xA00) // Serial
 	{
 		data &= m_acia->read(offset & 0x01);
-	}
-	if ((offset & 0xC00) == 0x400) // SCREEN-PAC
-	{
-		if (m_screen_pac) data &= 0xFB;
 	}
 	if ((offset & 0xC00) == 0xC00) // Video PIA
 		data &= m_pia1->read(offset & 0x03);
 	return data;
 }
 
-WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
+void osborne1_state::bank_2xxx_3xxx_w(offs_t offset, u8 data)
 {
-	if (!m_rom_mode)
+	if (!rom_mode())
 	{
 		m_ram->pointer()[0x2000 + offset] = data;
 	}
@@ -79,33 +72,55 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 		{
 			m_acia->write(offset & 0x01, data);
 		}
-		if ((offset & 0xC00) == 0x400) // SCREEN-PAC
-		{
-			m_resolution = data & 0x01;
-			m_hc_left = (data & 0x02) ? 0 : 1;
-		}
 		if ((offset & 0xC00) == 0xC00) // Video PIA
 			m_pia1->write(offset & 0x03, data);
 	}
 }
 
-WRITE8_MEMBER( osborne1_state::videoram_w )
+u8 osborne1sp_state::bank_2xxx_3xxx_r(offs_t offset)
+{
+	u8 data = osborne1_state::bank_2xxx_3xxx_r(offset);
+	if (!rom_mode())
+		return data;
+
+	if ((offset & 0xC00) == 0x400) // SCREEN-PAC
+	{
+		data &= 0xFB;
+	}
+	return data;
+}
+
+void osborne1sp_state::bank_2xxx_3xxx_w(offs_t offset, u8 data)
+{
+	osborne1_state::bank_2xxx_3xxx_w(offset, data);
+
+	if (rom_mode())
+	{
+		if ((offset & 0xC00) == 0x400) // SCREEN-PAC
+		{
+			m_resolution = BIT(data, 0);
+			m_hc_left = BIT(~data, 1);
+		}
+	}
+}
+
+void osborne1_state::videoram_w(offs_t offset, u8 data)
 {
 	// Attribute RAM is only one bit wide - low seven bits are discarded and read back high
 	if (m_bit_9)
 		data |= 0x7F;
 	else
 		m_tilemap->mark_tile_dirty(offset);
-	reinterpret_cast<uint8_t *>(m_bank_fxxx->base())[offset] = data;
+	reinterpret_cast<u8 *>(m_bank_fxxx->base())[offset] = data;
 }
 
-READ8_MEMBER( osborne1_state::opcode_r )
+u8 osborne1_state::opcode_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
 		// Update the flipflops that control bank selection and NMI
-		uint8_t const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
-		if (!m_rom_mode)
+		u8 const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
+		if (!rom_mode())
 		{
 			set_rom_mode(m_ub4a_q ? 0 : 1);
 			m_ub4a_q = m_ub6a_q;
@@ -115,10 +130,10 @@ READ8_MEMBER( osborne1_state::opcode_r )
 	}
 
 	// Now that's sorted out we can call the normal read handler
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	return m_mem_cache.read_byte(offset);
 }
 
-WRITE8_MEMBER( osborne1_state::bankswitch_w )
+void osborne1_state::bankswitch_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -144,14 +159,15 @@ WRITE8_MEMBER( osborne1_state::bankswitch_w )
 WRITE_LINE_MEMBER( osborne1_state::irqack_w )
 {
 	// Update the flipflops that control bank selection and NMI
-	if (!m_rom_mode) set_rom_mode(m_ub4a_q ? 0 : 1);
+	if (!rom_mode())
+		set_rom_mode(m_ub4a_q ? 0 : 1);
 	m_ub4a_q = 0;
 	m_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_ub6a_q ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
+u8 osborne1_state::ieee_pia_pb_r()
 {
 	/*
 	    bit     description
@@ -165,7 +181,7 @@ READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
 	    6       NDAC
 	    7       NRFD
 	*/
-	uint8_t data = 0;
+	u8 data = 0;
 
 	data |= m_ieee->eoi_r() << 3;
 	data |= m_ieee->dav_r() << 5;
@@ -175,7 +191,7 @@ READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
+void osborne1_state::ieee_pia_pb_w(u8 data)
 {
 	/*
 	    bit     description
@@ -202,14 +218,14 @@ WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
 }
 
 
-WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
+void osborne1_state::video_pia_port_a_w(u8 data)
 {
 	m_scroll_x = data >> 1;
 
 	m_fdc->dden_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
+void osborne1_state::video_pia_port_b_w(u8 data)
 {
 	m_speaker->level_w((BIT(data, 5) && m_beep_state) ? 1 : 0);
 
@@ -254,7 +270,7 @@ INPUT_CHANGED_MEMBER( osborne1_state::reset_key )
 }
 
 
-void osborne1_state::init_osborne1()
+void osborne1_state::machine_start()
 {
 	m_bank_0xxx->configure_entries(0, 1, m_ram->pointer(), 0);
 	m_bank_0xxx->configure_entries(1, 1, m_region_maincpu->base(), 0);
@@ -266,12 +282,13 @@ void osborne1_state::init_osborne1()
 	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::video_callback), this));
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(osborne1_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
+			tilemap_get_info_delegate(*this, FUNC(osborne1_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 10, 128, 32);
 
 	m_acia_rxc_txc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::acia_rxc_txc_callback), this));
 
-	save_item(NAME(m_screen_pac));
+	m_maincpu->space(AS_PROGRAM).cache(m_mem_cache);
+
 	save_item(NAME(m_acia_rxc_txc_div));
 	save_item(NAME(m_acia_rxc_txc_p_low));
 	save_item(NAME(m_acia_rxc_txc_p_high));
@@ -285,9 +302,6 @@ void osborne1_state::init_osborne1()
 	save_item(NAME(m_scroll_y));
 	save_item(NAME(m_beep_state));
 
-	save_item(NAME(m_resolution));
-	save_item(NAME(m_hc_left));
-
 	save_item(NAME(m_acia_irq_state));
 	save_item(NAME(m_acia_rxc_txc_state));
 }
@@ -295,25 +309,24 @@ void osborne1_state::init_osborne1()
 void osborne1_state::machine_reset()
 {
 	// Refresh configuration
-	m_screen_pac = 0 != (m_cnf->read() & 0x01);
-	switch (m_cnf->read() & 0x06)
+	switch (m_cnf->read() & 0x03)
 	{
 	case 0x00:
 		m_acia_rxc_txc_div      = 16;
 		m_acia_rxc_txc_p_low    = 23;
 		m_acia_rxc_txc_p_high   = 29;
 		break;
-	case 0x02:
+	case 0x01:
 		m_acia_rxc_txc_div      = 16;
 		m_acia_rxc_txc_p_low    = 9;
 		m_acia_rxc_txc_p_high   = 15;
 		break;
-	case 0x04:
+	case 0x02:
 		m_acia_rxc_txc_div      = 16;
 		m_acia_rxc_txc_p_low    = 5;
 		m_acia_rxc_txc_p_high   = 8;
 		break;
-	case 0x06:
+	case 0x03:
 		m_acia_rxc_txc_div      = 8;
 		m_acia_rxc_txc_p_low    = 5;
 		m_acia_rxc_txc_p_high   = 8;
@@ -331,10 +344,6 @@ void osborne1_state::machine_reset()
 	m_acia_rxc_txc_state = 0;
 	update_acia_rxc_txc();
 
-	// Reset video hardware
-	m_resolution = 0;
-	m_hc_left = 1;
-
 	// The low bits of attribute RAM are not physically present and hence always read high
 	for (unsigned i = 0; i < 0x1000; i++)
 		m_ram->pointer()[0x10000 + i] |= 0x7F;
@@ -342,93 +351,123 @@ void osborne1_state::machine_reset()
 
 void osborne1_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_bitmap);
 	m_video_timer->adjust(m_screen->time_until_pos(1, 0));
 }
 
+void osborne1sp_state::machine_start()
+{
+	osborne1_state::machine_start();
+
+	save_item(NAME(m_resolution));
+	save_item(NAME(m_hc_left));
+}
+
+void osborne1sp_state::machine_reset()
+{
+	osborne1_state::machine_reset();
+
+	// Reset video hardware
+	m_resolution = 0;
+	m_hc_left = 1;
+}
+
+template <int Width, unsigned Scale>
+inline void osborne1_state::draw_rows(uint16_t col, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; cliprect.max_y >= y; ++y)
+	{
+		// Vertical scroll is latched at the start of the visible area
+		if (0 == y)
+			m_scroll_y = m_pia1->b_output() & 0x1F;
+
+		// Draw a line of the display
+		u8 const ra(y % 10);
+		uint16_t *p(&bitmap.pix(y));
+		uint16_t const row(((m_scroll_y + (y / 10)) << 7) & 0x0F80);
+
+		for (uint16_t x = 0; Width > x; ++x)
+		{
+			uint16_t const offs(row | ((col + x) & 0x7F));
+			u8 const chr(m_ram->pointer()[0xF000 + offs]);
+			u8 const clr((m_ram->pointer()[0x10000 + offs] & 0x80) ? 2 : 1);
+
+			u8 const gfx(((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)]);
+
+			// Display a scanline of a character
+			for (unsigned b = 0; 8 > b; ++b)
+			{
+				uint16_t const pixel(BIT(gfx, 7 - b) ? clr : 0);
+				for (unsigned i = 0; Scale > i; ++i)
+					*p++ = pixel;
+			}
+		}
+	}
+}
+
+// The derivation of the initial column is not obvious.  The 7-bit
+// column counter is preloaded near the beginning of the horizontal
+// blank period.  The initial column is offset by the number of
+// character clock periods in the horizontal blank period minus one
+// because it latches the value before it's displayed.  Using the
+// standard video display, there are 12 character clock periods in
+// the horizontal blank period, so subtracting 1 gives 0x0B.  Using
+// the SCREEN-PAC's high-resolution mode, the character clock is
+// twice the frequency giving 24 character clock periods in the
+// horizontal blanking period, so subtracting 1 gives 0x17.  Using
+// the standard video display, the column counter is preloaded with
+// the high 7 bits of the value from PIA1 PORTB.  The SCREEN-PAC
+// takes the two high bits of this value, but sets the low five bits
+// to a fixed value of 1 or 9 depending on the value of the HC-LEFT
+// signal (set by bit 1 of the value written to 0x2400).  Of course
+// it depends on the value wrapping around to zero when it counts
+// past 0x7F.
+
 uint32_t osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	draw_rows<52, 1>(scroll_x() + 0x0B, bitmap, cliprect);
+
+	return 0;
+}
+
+uint32_t osborne1sp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// The derivation of the initial column is not obvious.  The 7-bit
+	// column counter is preloaded near the beginning of the horizontal
+	// blank period.  The initial column is offset by the number of
+	// character clock periods in the horizontal blank period minus one
+	// because it latches the value before it's displayed.  Using the
+	// standard video display, there are 12 character clock periods in
+	// the horizontal blank period, so subtracting 1 gives 0x0B.  Using
+	// the SCREEN-PAC's high-resolution mode, the character clock is
+	// twice the frequency giving 24 character clock periods in the
+	// horizontal blanking period, so subtracting 1 gives 0x17.  Using
+	// the standard video display, the column counter is preloaded with
+	// the high 7 bits of the value from PIA1 PORTB.  The SCREEN-PAC
+	// takes the two high bits of this value, but sets the low five bits
+	// to a fixed value of 1 or 9 depending on the value of the HC-LEFT
+	// signal (set by bit 1 of the value written to 0x2400).  Of course
+	// it depends on the value wrapping around to zero when it counts
+	// past 0x7F.
+	if (m_resolution)
+		draw_rows<104, 1>((scroll_x() & 0x60) + (m_hc_left ? 0x09 : 0x01) + 0x17, bitmap, cliprect);
+	else
+		draw_rows<52, 2>(scroll_x() + 0x0B, bitmap, cliprect);
+
 	return 0;
 }
 
 
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
-	int const y = m_screen->vpos();
-	uint8_t const ra = y % 10;
-	uint8_t const port_b = m_pia1->b_output();
-
-	// Check for start/end of visible area and clear/set CA1 on video PIA
-	if (y == 0)
-	{
-		m_scroll_y = port_b & 0x1F;
-		m_pia1->ca1_w(0);
-	}
-	else if (y == 240)
-	{
-		m_pia1->ca1_w(1);
-	}
-
-	if (y < 240)
-	{
-		// Draw a line of the display
-		uint16_t *p = &m_bitmap.pix16(y);
-		bool const hires = m_screen_pac & m_resolution;
-		uint16_t const row = ((m_scroll_y + (y / 10)) << 7) & 0xF80;
-
-		// The derivation of the initial column is not obvious.  The 7-bit
-		// column counter is preloaded near the beginning of the horizontal
-		// blank period.  The initial column is offset by the number of
-		// character clock periods in the horizontal blank period minus one
-		// because it latches the value before it's displayed.  Using the
-		// standard video display, there are 12 character clock periods in
-		// the horizontal blank period, so subtracting 1 gives 0x0B.  Using
-		// the SCREEN-PAC's high-resolution mode, the character clock is
-		// twice the frequency giving 24 character clock periods in the
-		// horizontal blanking period, so subtracting 1 gives 0x17.  Using
-		// the standard video display, the column counter is preloaded with
-		// the high 7 bits of the value from PIA1 PORTB.  The SCREEN-PAC
-		// takes the two high bits of this value, but sets the low five bits
-		// to a fixed value of 1 or 9 depending on the value of the HC-LEFT
-		// signal (set by bit 1 of the value written to 0x2400).  Of course
-		// it depends on the value wrapping around to zero when it counts
-		// past 0x7F.
-		uint16_t const col = hires ? ((m_scroll_x & 0x60) + (m_hc_left ? 0x09 : 0x01) + 0x17) : (m_scroll_x + 0x0B);
-
-		for (uint16_t x = 0; x < (hires ? 104 : 52); x++)
-		{
-			uint16_t const offs = row | ((col + x) & 0x7F);
-			uint8_t const chr = m_ram->pointer()[0xF000 + offs];
-			uint8_t const clr = (m_ram->pointer()[0x10000 + offs] & 0x80) ? 2 : 1;
-
-			uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)];
-
-			// Display a scanline of a character
-			*p++ = BIT(gfx, 7) ? clr : 0;
-			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 6) ? clr : 0;
-			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 5) ? clr : 0;
-			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 4) ? clr : 0;
-			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 3) ? clr : 0;
-			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 2) ? clr : 0;
-			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 1) ? clr : 0;
-			if (!hires) { p[0] = p[-1]; p++; }
-			*p++ = BIT(gfx, 0) ? clr : 0;
-			if (!hires) { p[0] = p[-1]; p++; }
-		}
-	}
+	int const y(m_screen->vpos());
+	u8 const ra(y % 10);
 
 	// The beeper is gated so it's active four out of every ten scanlines
 	m_beep_state = (ra & 0x04) ? 1 : 0;
-	m_speaker->level_w((BIT(port_b, 5) && m_beep_state) ? 1 : 0);
+	m_speaker->level_w((m_beep_state && BIT(m_pia1->b_output(), 5)) ? 1 : 0);
 
-	m_video_timer->adjust(m_screen->time_until_pos(y + 1, 0));
+	int const next((y - ra) + ((ra < 4) ? 4 : (ra < 8) ? 8 : 14));
+	m_video_timer->adjust(m_screen->time_until_pos((m_screen->height() > next) ? next : 0, 0));
 }
 
 TIMER_CALLBACK_MEMBER(osborne1_state::acia_rxc_txc_callback)
@@ -445,7 +484,7 @@ TILE_GET_INFO_MEMBER(osborne1_state::get_tile_info)
 }
 
 
-bool osborne1_state::set_rom_mode(uint8_t value)
+bool osborne1_state::set_rom_mode(u8 value)
 {
 	if (value != m_rom_mode)
 	{
@@ -460,7 +499,7 @@ bool osborne1_state::set_rom_mode(uint8_t value)
 	}
 }
 
-bool osborne1_state::set_bit_9(uint8_t value)
+bool osborne1_state::set_bit_9(u8 value)
 {
 	if (value != m_bit_9)
 	{
@@ -500,14 +539,14 @@ MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint16_t const base = (ma >> 1) & 0xF80;
-	uint32_t *p = &bitmap.pix32(y);
-	for (uint8_t x = 0; x < x_count; ++x)
+	uint32_t *p = &bitmap.pix(y);
+	for (u8 x = 0; x < x_count; ++x)
 	{
 		uint16_t const offset = base | ((ma + x) & 0x7F);
-		uint8_t const chr = m_ram->pointer()[0xF000 | offset];
-		uint8_t const clr = BIT(m_ram->pointer()[0x10000 | offset], 7) ? 2 : 1;
+		u8 const chr = m_ram->pointer()[0xF000 | offset];
+		u8 const clr = BIT(m_ram->pointer()[0x10000 | offset], 7) ? 2 : 1;
 
-		uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_nuevo[(ra << 7) | (chr & 0x7F)];
+		u8 const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_nuevo[(ra << 7) | (chr & 0x7F)];
 
 		for (unsigned bit = 0; 8 > bit; ++bit)
 			*p++ = palette[BIT(gfx, 7 - bit) ? clr : 0];

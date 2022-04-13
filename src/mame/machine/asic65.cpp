@@ -169,7 +169,7 @@ void asic65_device::reset_line(int state)
  *
  *************************************/
 
-void asic65_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void asic65_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -181,7 +181,7 @@ void asic65_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_ourcpu->set_input_line(0, ASSERT_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in asic65_device::device_timer");
+		throw emu_fatalerror("Unknown id in asic65_device::device_timer");
 	}
 }
 

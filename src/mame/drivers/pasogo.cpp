@@ -111,7 +111,7 @@ TODO:
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 /*
   rtc interrupt irq 2
@@ -150,22 +150,22 @@ private:
 
 	struct
 	{
-		uint8_t index;
-		uint8_t data[0x100];
+		uint8_t index = 0;
+		uint8_t data[0x100]{};
 		struct {
-			uint16_t data;
+			uint16_t data = 0;
 		} bios_timer; // 1.19 MHz tclk signal
 		struct {
-			int seconds, minutes, hours, days;
-			int alarm_seconds, alarm_minutes, alarm_hours, alarm_days;
+			int seconds = 0, minutes = 0, hours = 0, days = 0;
+			int alarm_seconds = 0, alarm_minutes = 0, alarm_hours = 0, alarm_days = 0;
 
-			int onehertz_interrupt_on;
-			int onehertz_interrupt_request;
-			int alarm_interrupt_on;
-			int alarm_interrupt_request;
+			int onehertz_interrupt_on = 0;
+			int onehertz_interrupt_request = 0;
+			int alarm_interrupt_on = 0;
+			int alarm_interrupt_request = 0;
 		} rtc;
 		struct {
-			int write_protected;
+			int write_protected = 0;
 		} pmu;
 	} m_vg230;
 
@@ -176,9 +176,9 @@ private:
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
 
-	memory_region *m_cart_rom;
-	uint8_t m_ems_index;
-	uint16_t m_ems_bank[28];
+	memory_region *m_cart_rom = nullptr;
+	uint8_t m_ems_index = 0;
+	uint16_t m_ems_bank[28]{};
 	void emsbank_map(address_map &map);
 	void pasogo_io(address_map &map);
 	void pasogo_mem(address_map &map);
@@ -503,23 +503,22 @@ INPUT_CHANGED_MEMBER(pasogo_state::contrast)
 
 uint32_t pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *vram = (uint8_t *)m_vram.target();
-	int x, y;
-	for (y=0; y<240; y++)
+	uint8_t const *const vram = (uint8_t *)m_vram.target();
+	for (int y=0; y<240; y++)
 	{
-		for (x=0; x<(320/8); x++)
+		for (int x=0; x<(320/8); x++)
 		{
-			int a = (y & 3) * 0x2000;
-			uint8_t d1 = vram[a + (y >> 2) * 80 + x];
-			uint16_t *line = &bitmap.pix16(y, x << 3);
-			*line++ = ((d1 >> 7) & 1);
-			*line++ = ((d1 >> 6) & 1);
-			*line++ = ((d1 >> 5) & 1);
-			*line++ = ((d1 >> 4) & 1);
-			*line++ = ((d1 >> 3) & 1);
-			*line++ = ((d1 >> 2) & 1);
-			*line++ = ((d1 >> 1) & 1);
-			*line++ = ((d1 >> 0) & 1);
+			int const a = (y & 3) * 0x2000;
+			uint8_t const d1 = vram[a + (y >> 2) * 80 + x];
+			uint16_t *line = &bitmap.pix(y, x << 3);
+			*line++ = BIT(d1, 7);
+			*line++ = BIT(d1, 6);
+			*line++ = BIT(d1, 5);
+			*line++ = BIT(d1, 4);
+			*line++ = BIT(d1, 3);
+			*line++ = BIT(d1, 2);
+			*line++ = BIT(d1, 1);
+			*line++ = BIT(d1, 0);
 		}
 	}
 	return 0;
@@ -541,7 +540,7 @@ void pasogo_state::machine_reset()
 	membank("bank27")->set_base(m_cart_rom->base());
 	m_ems_index = 0;
 	memset(m_ems_bank, 0, sizeof(m_ems_bank));
-	contrast(*color->fields().first(), nullptr, 0, color->read());
+	contrast(*color->fields().first(), 0, 0, color->read());
 }
 
 void pasogo_state::pasogo(machine_config &config)
@@ -554,7 +553,10 @@ void pasogo_state::pasogo(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "ems").set_map(&pasogo_state::emsbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x4000);
 
-	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 

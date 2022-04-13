@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="mt65_snap" description="Microtan 65 snapshots">
+
+	<software name="advent1">
+		<description>Adventure 1: The Sceptre of Hamloth</description>
+		<year>1981</year>
+		<publisher>Microtanic Software</publisher>
+		<info name="author" value="I.Dickinson" />
+		<info name="usage" value="Requires ASCII Keyboard" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Adventure1.m65" size="8263" crc="adf3e99f" sha1="4cc95098d7b76f1e9e67e4175a6729bbead687b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrof">
+		<description>Astro Fighter</description>
+		<year>1984</year>
+		<publisher>Geoff Macdonald</publisher>
+		<info name="usage" value="Requires Hex Keypad" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Astro Fighter.m65" size="8263" crc="d2499579" sha1="980e89750f6805ca683d5028b02c6c210de65df1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berzerk">
+		<description>Berzerk</description>
+		<year>198?</year>
+		<publisher>Geoff Macdonald</publisher>
+		<info name="usage" value="Requires Hex Keypad" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Berzerk.m65" size="8263" crc="251f9029" sha1="d4a4f850a49e33492fd72ecee12f7eb667092bfa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender">
+		<description>Defender</description>
+		<year>1984</year>
+		<publisher>Geoff Macdonald</publisher>
+		<info name="usage" value="Requires Joystick" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Defender.m65" size="8263" crc="c3965948" sha1="fd419aca846bd0fc8304c852152a2831d92313ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gobbler">
+		<description>The Gobbler</description>
+		<year>198?</year>
+		<publisher>Microtanic Software</publisher>
+		<info name="author" value="A.Moore" />
+		<info name="usage" value="Requires ASCII Keyboard: A=Up, Z=Down, &lt;=Left, &gt;=Right" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Gobbler.m65" size="8263" crc="41e82728" sha1="a1a51a85a617b733e63c129829ead6aed173fc15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangman">
+		<description>Games Pack 1: Hangman</description>
+		<year>1981</year>
+		<publisher>Microtanic Software</publisher>
+		<info name="usage" value="Requires ASCII Keyboard" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Hangman.m65" size="8263" crc="e1ea0fd4" sha1="5ec58abba586b6c432d2eb39231cf0dd5f023c35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othello">
+		<description>Games Pack 1: Othello</description>
+		<year>1981</year>
+		<publisher>Microtanic Software</publisher>
+		<info name="usage" value="Requires ASCII Keyboard" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Othello.m65" size="8263" crc="7d8e4d22" sha1="31254f2bc4630f4467de33e2d30a378c923f394c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llander">
+		<description>Games Pack 1: Lunar Lander</description>
+		<year>1981</year>
+		<publisher>Microtanic Software</publisher>
+		<info name="usage" value="Requires ASCII Keyboard" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Lunar Lander.m65" size="8263" crc="66e2b0cd" sha1="beecda4f86c25f5313d095831457951c46d6dd3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbells">
+		<description>Hell's Bells</description>
+		<year>1985</year>
+		<publisher>Geoff Macdonald</publisher>
+		<info name="usage" value="Requires Joystick" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Hells Bells.m65" size="8263" crc="9b90eb6a" sha1="f631554755641ca336440765bf3aae696a62aa07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mooncrst">
+		<description>Moon Cresta</description>
+		<year>1985</year>
+		<publisher>Geoff Macdonald</publisher>
+		<info name="usage" value="Requires Joystick" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Moon Cresta.m65" size="8263" crc="56c83d14" sha1="a8e33b994c940dfc5431d2c99c4301b5963a2644"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonresc">
+		<description>Moon Rescue</description>
+		<year>1984</year>
+		<publisher>Geoff Macdonald</publisher>
+		<info name="usage" value="Requires Joystick" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Moon Rescue.m65" size="8263" crc="9532232f" sha1="1565c6e4f525e5b1bbd890a9f67f89c5b3a1f81a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slotmchn">
+		<description>Slot Machine</description>
+		<year>1983</year>
+		<publisher>Geoff Macdonald</publisher>
+		<info name="usage" value="Requires ASCII Keyboard" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Slot Machine.m65" size="8263" crc="8765d9a7" sha1="75f6098809de46cff892059a59bb2e5484fb0ed0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcinvs">
+		<description>Space Invasion</description>
+		<year>1980</year>
+		<publisher>Tangerine</publisher>
+		<info name="usage" value="Requires Joystick" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Space Invasion.m65" size="8263" crc="59484e43" sha1="f746f72e66177659dc772a1842e0eb06c424cce7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcrocks">
+		<description>Space Rocks</description>
+		<year>198?</year>
+		<publisher>Peter Neal Discos</publisher>
+		<info name="usage" value="Requires Hex Keypad" />
+		<part name="snap" interface="mt65_snap">
+			<dataarea name="snap" size="8263">
+				<rom name="Space Rocks.m65" size="8263" crc="2fa9de19" sha1="3fba2c8fdc881eecbc52ced563493792349ba6b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

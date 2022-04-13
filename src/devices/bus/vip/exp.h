@@ -40,13 +40,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define VIP_EXPANSION_SLOT_TAG      "exp"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -54,8 +47,7 @@
 
 class device_vip_expansion_card_interface;
 
-class vip_expansion_slot_device : public device_t,
-									public device_slot_interface
+class vip_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_vip_expansion_card_interface>
 {
 public:
 	// construction/destruction
@@ -109,7 +101,7 @@ protected:
 
 // ======================> device_vip_expansion_card_interface
 
-class device_vip_expansion_card_interface : public device_slot_card_interface
+class device_vip_expansion_card_interface : public device_interface
 {
 	friend class vip_expansion_slot_device;
 

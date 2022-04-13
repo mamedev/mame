@@ -48,7 +48,7 @@ void mb60553_zooming_tilemap_device::device_start()
 	save_item(NAME(m_bank));
 	save_item(NAME(m_regs));
 
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mb60553_zooming_tilemap_device::get_tile_info),this),tilemap_mapper_delegate(FUNC(mb60553_zooming_tilemap_device::twc94_scan),this), 16,16,128,64);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mb60553_zooming_tilemap_device::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(mb60553_zooming_tilemap_device::twc94_scan)), 16,16,128,64);
 	m_tmap->set_transparent_pen(0);
 }
 
@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(mb60553_zooming_tilemap_device::get_tile_info)
 	pal = (data >> 12) & 0xF;
 	bankno = (data >> 9) & 0x7;
 
-	SET_TILE_INFO_MEMBER(m_gfx_region, tileno + m_bank[bankno] * 0x200, pal + m_pal_base, 0);
+	tileinfo.set(m_gfx_region, tileno + m_bank[bankno] * 0x200, pal + m_pal_base, 0);
 }
 
 void mb60553_zooming_tilemap_device::reg_written( int num_reg)
@@ -289,7 +289,7 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 	}
 }
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::regs_w)
+void mb60553_zooming_tilemap_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldreg = m_regs[offset];
 
@@ -299,30 +299,30 @@ WRITE16_MEMBER(mb60553_zooming_tilemap_device::regs_w)
 		reg_written(offset);
 }
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::vram_w)
+void mb60553_zooming_tilemap_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
 	m_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::line_w)
+void mb60553_zooming_tilemap_device::line_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_lineram[offset]);
 }
 
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::regs_r)
+uint16_t mb60553_zooming_tilemap_device::regs_r(offs_t offset)
 {
 	return m_regs[offset];
 }
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::vram_r)
+uint16_t mb60553_zooming_tilemap_device::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::line_r)
+uint16_t mb60553_zooming_tilemap_device::line_r(offs_t offset)
 {
 	return m_lineram[offset];
 }

@@ -30,24 +30,24 @@ public:
 	void external_interrupt_2();
 
 private:
-	DECLARE_READ16_MEMBER(imr_r);
-	DECLARE_WRITE16_MEMBER(imr_w);
-	DECLARE_READ16_MEMBER(ipr_r);
-	DECLARE_WRITE16_MEMBER(ipr_w);
-	DECLARE_READ16_MEMBER(iisr_r);
-	DECLARE_WRITE16_MEMBER(iisr_w);
-	DECLARE_READ16_MEMBER(scr_r);
-	DECLARE_WRITE16_MEMBER(scr_w);
-	DECLARE_READ16_MEMBER(pdr_r);
-	DECLARE_WRITE16_MEMBER(pdr_w);
-	DECLARE_READ16_MEMBER(pdir_r);
-	DECLARE_WRITE16_MEMBER(pdir_w);
-	DECLARE_READ8_MEMBER(icr_r);
-	DECLARE_WRITE8_MEMBER(icr_w);
+	uint16_t imr_r();
+	void imr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ipr_r();
+	void ipr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t iisr_r();
+	void iisr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t scr_r();
+	void scr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pdr_r();
+	void pdr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pdir_r();
+	void pdir_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t icr_r(offs_t offset);
+	void icr_w(offs_t offset, uint8_t data);
 
 	// Hardware Registers
-	DECLARE_READ16_MEMBER( regs_r );
-	DECLARE_WRITE16_MEMBER( regs_w );
+	uint16_t regs_r(offs_t offset);
+	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void tmp68301_regs(address_map &map);
 

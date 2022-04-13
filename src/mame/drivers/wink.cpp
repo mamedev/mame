@@ -21,6 +21,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class wink_state : public driver_device
@@ -45,24 +46,24 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_sound_flag;
-	uint8_t m_tile_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_sound_flag = 0U;
+	uint8_t m_tile_bank = 0U;
 
-	bool m_nmi_enable;
+	bool m_nmi_enable = false;
 
-	DECLARE_WRITE8_MEMBER(bgram_w);
+	void bgram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(player_mux_w);
 	DECLARE_WRITE_LINE_MEMBER(tile_banking_w);
 	template<int Player> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_READ8_MEMBER(analog_port_r);
-	DECLARE_READ8_MEMBER(player_inputs_r);
-	DECLARE_WRITE8_MEMBER(sound_irq_w);
-	DECLARE_READ8_MEMBER(prot_r);
-	DECLARE_WRITE8_MEMBER(prot_w);
-	DECLARE_READ8_MEMBER(sound_r);
+	uint8_t analog_port_r();
+	uint8_t player_inputs_r();
+	void sound_irq_w(uint8_t data);
+	uint8_t prot_r();
+	void prot_w(uint8_t data);
+	uint8_t sound_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -92,12 +93,12 @@ TILE_GET_INFO_MEMBER(wink_state::get_bg_tile_info)
 		code |= 0x100;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void wink_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wink_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wink_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t wink_state::screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -106,10 +107,9 @@ uint32_t wink_state::screen_update_wink(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE8_MEMBER(wink_state::bgram_w)
+void wink_state::bgram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -144,17 +144,17 @@ WRITE_LINE_MEMBER(wink_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(Player, state);
 }
 
-READ8_MEMBER(wink_state::analog_port_r)
+uint8_t wink_state::analog_port_r()
 {
 	return ioport(/* player_mux ? "DIAL2" : */ "DIAL1")->read();
 }
 
-READ8_MEMBER(wink_state::player_inputs_r)
+uint8_t wink_state::player_inputs_r()
 {
 	return ioport(/* player_mux ? "INPUTS2" : */ "INPUTS1")->read();
 }
 
-WRITE8_MEMBER(wink_state::sound_irq_w)
+void wink_state::sound_irq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
@@ -170,7 +170,7 @@ void wink_state::wink_map(address_map &map)
 }
 
 
-READ8_MEMBER(wink_state::prot_r)
+uint8_t wink_state::prot_r()
 {
 	//take a0-a7 and do some math using the variable created from the upper address-lines,
 	//put the result onto the databus.
@@ -190,7 +190,7 @@ the 8bit result is placed on the databus.
 	return 0x20; //hack to pass the jump calculated using this value
 }
 
-WRITE8_MEMBER(wink_state::prot_w)
+void wink_state::prot_w(uint8_t data)
 {
 	//take a9-a15 and stuff them in a variable for later use.
 }
@@ -206,7 +206,7 @@ void wink_state::wink_io(address_map &map)
 	map(0xa0, 0xa0).r(FUNC(wink_state::player_inputs_r));
 	map(0xa4, 0xa4).portr("DSW1");   //dipswitch bank2
 	map(0xa8, 0xa8).portr("DSW2");   //dipswitch bank1
-//  AM_RANGE(0xac, 0xac) AM_WRITENOP            //protection - loads video xor unit (written only once at startup)
+//  map(0xac, 0xac).nopw();            //protection - loads video xor unit (written only once at startup)
 	map(0xb0, 0xb0).portr("DSW3");   //unused inputs
 	map(0xb4, 0xb4).portr("DSW4");   //dipswitch bank3
 	map(0xc0, 0xdf).w(FUNC(wink_state::prot_w));       //load load protection-buffer from upper address bus
@@ -243,59 +243,55 @@ static INPUT_PORTS_START( wink )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )    // slam
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "1" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x26, 0x26, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x26, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x24, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x22, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_5C ) )
+	PORT_DIPNAME( 0xc8, 0xc8, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0xc8, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x88, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x48, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_5C ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x11, 0x11, "Ball Save Barrier" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x11, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "1 Credit Award" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x88, 0x80, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x88, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "3" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -324,12 +320,14 @@ static INPUT_PORTS_START( wink )
 	PORT_DIPNAME( 0x01, 0x01, "Summary" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "4" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x44, 0x44, "Credit Payout" )
+	PORT_DIPSETTING(    0x44, "2.5%" )
+	PORT_DIPSETTING(    0x40, "5%" )
+	PORT_DIPSETTING(    0x04, "10%" )
+	PORT_DIPSETTING(    0x00, "20%" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -337,10 +335,7 @@ static INPUT_PORTS_START( wink )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Reset Summary Stats" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -360,7 +355,7 @@ static GFXDECODE_START( gfx_wink )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
-READ8_MEMBER(wink_state::sound_r)
+uint8_t wink_state::sound_r()
 {
 	return m_sound_flag;
 }

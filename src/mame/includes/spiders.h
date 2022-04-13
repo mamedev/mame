@@ -32,15 +32,15 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(gfx_rom_intf_w);
-	DECLARE_READ8_MEMBER(gfx_rom_r);
+	void gfx_rom_intf_w(uint8_t data);
+	uint8_t gfx_rom_r();
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
 	DECLARE_WRITE_LINE_MEMBER(ic60_74123_output_changed);
-	DECLARE_WRITE8_MEMBER(spiders_audio_command_w);
-	DECLARE_WRITE8_MEMBER(spiders_audio_a_w);
-	DECLARE_WRITE8_MEMBER(spiders_audio_b_w);
-	DECLARE_WRITE8_MEMBER(spiders_audio_ctrl_w);
+	void spiders_audio_command_w(uint8_t data);
+	void spiders_audio_a_w(uint8_t data);
+	void spiders_audio_b_w(uint8_t data);
+	void spiders_audio_ctrl_w(uint8_t data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -55,11 +55,11 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<pia6821_device, 4> m_pia;
 
-	uint8_t m_flipscreen;
-	uint16_t m_gfx_rom_address;
-	uint8_t m_gfx_rom_ctrl_mode;
-	uint8_t m_gfx_rom_ctrl_latch;
-	uint8_t m_gfx_rom_ctrl_data;
+	uint8_t m_flipscreen = 0;
+	uint16_t m_gfx_rom_address = 0;
+	uint8_t m_gfx_rom_ctrl_mode = 0;
+	uint8_t m_gfx_rom_ctrl_latch = 0;
+	uint8_t m_gfx_rom_ctrl_data = 0;
 };
 
 #endif // MAME_INCLUDES_SPIDERS_H

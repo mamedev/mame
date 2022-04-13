@@ -14,6 +14,7 @@
 #include "machine/x2212.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class foodf_state : public driver_device
 {
@@ -39,11 +40,11 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void update_interrupts();
-	DECLARE_WRITE16_MEMBER(nvram_recall_w);
-	DECLARE_WRITE8_MEMBER(digital_w);
-	DECLARE_WRITE16_MEMBER(foodf_paletteram_w);
+	void nvram_recall_w(uint16_t data);
+	void digital_w(uint8_t data);
+	void foodf_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void foodf_set_flip(int flip);
-	DECLARE_READ8_MEMBER(pot_r);
+	uint8_t pot_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);
@@ -51,8 +52,8 @@ private:
 
 	void main_map(address_map &map);
 
-	bool m_scanline_int_state;
-	bool m_video_int_state;
+	bool m_scanline_int_state = false;
+	bool m_video_int_state = false;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<x2212_device> m_nvram;
@@ -63,10 +64,10 @@ private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<timer_device> m_scan_timer;
 
-	double          m_rweights[3];
-	double          m_gweights[3];
-	double          m_bweights[2];
-	uint8_t           m_playfield_flip;
+	double          m_rweights[3]{};
+	double          m_gweights[3]{};
+	double          m_bweights[2]{};
+	uint8_t           m_playfield_flip = 0U;
 
 	required_shared_ptr<uint16_t> m_spriteram;
 	output_finder<2> m_leds;

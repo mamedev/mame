@@ -41,8 +41,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_votrax(*this, "votrax"),
 		m_astrocade_sound1(*this, "astrocade1"),
+		m_astrocade_sound2(*this, "astrocade2"),
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
+		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
@@ -55,8 +57,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<votrax_sc01_device> m_votrax;
 	optional_device<astrocade_io_device> m_astrocade_sound1;
+	optional_device<astrocade_io_device> m_astrocade_sound2;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;
+	optional_shared_ptr<uint8_t> m_nvram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
@@ -64,70 +68,70 @@ public:
 	optional_memory_bank m_bank8000;
 	optional_ioport_array<4> m_handle;
 
-	uint8_t m_video_config;
-	uint8_t m_sparkle[4];
-	char m_totalword[256];
-	char *m_totalword_ptr;
-	char m_oldword[256];
-	int m_plural;
-	uint8_t m_ram_write_enable;
-	uint8_t m_input_select;
-	std::unique_ptr<uint8_t[]> m_sparklestar;
-	uint8_t m_interrupt_enabl;
-	uint8_t m_interrupt_vector;
-	uint8_t m_interrupt_scanline;
-	uint8_t m_vertical_feedback;
-	uint8_t m_horizontal_feedback;
-	emu_timer *m_scanline_timer;
-	emu_timer *m_intoff_timer;
-	uint8_t m_colors[8];
-	uint8_t m_colorsplit;
-	uint8_t m_bgdata;
-	uint8_t m_vblank;
-	uint8_t m_video_mode;
-	uint8_t m_funcgen_expand_color[2];
-	uint8_t m_funcgen_control;
-	uint8_t m_funcgen_expand_count;
-	uint8_t m_funcgen_rotate_count;
-	uint8_t m_funcgen_rotate_data[4];
-	uint8_t m_funcgen_shift_prev_data;
-	uint8_t m_funcgen_intercept;
-	uint16_t m_pattern_source;
-	uint8_t m_pattern_mode;
-	uint16_t m_pattern_dest;
-	uint8_t m_pattern_skip;
-	uint8_t m_pattern_width;
-	uint8_t m_pattern_height;
-	std::unique_ptr<uint16_t[]> m_profpac_videoram;
-	uint16_t m_profpac_palette[16];
-	uint8_t m_profpac_colormap[4];
-	uint8_t m_profpac_intercept;
-	uint8_t m_profpac_vispage;
-	uint8_t m_profpac_readpage;
-	uint8_t m_profpac_readshift;
-	uint8_t m_profpac_writepage;
-	uint8_t m_profpac_writemode;
-	uint16_t m_profpac_writemask;
-	uint8_t m_profpac_vw;
-	DECLARE_WRITE8_MEMBER(protected_ram_enable_w);
-	DECLARE_READ8_MEMBER(protected_ram_r);
-	DECLARE_WRITE8_MEMBER(protected_ram_w);
-	DECLARE_READ8_MEMBER(input_mux_r);
+	uint8_t m_video_config = 0U;
+	uint8_t m_sparkle[4]{};
+	char m_totalword[256]{};
+	char *m_totalword_ptr = nullptr;
+	char m_oldword[256]{};
+	int m_plural = 0;
+	uint8_t m_ram_write_enable = 0U;
+	uint8_t m_input_select = 0U;
+	std::unique_ptr<uint8_t[]> m_sparklestar{};
+	uint8_t m_interrupt_enabl = 0U;
+	uint8_t m_interrupt_vector = 0U;
+	uint8_t m_interrupt_scanline = 0U;
+	uint8_t m_vertical_feedback = 0U;
+	uint8_t m_horizontal_feedback = 0U;
+	emu_timer *m_scanline_timer = nullptr;
+	emu_timer *m_intoff_timer = nullptr;
+	uint8_t m_colors[8]{};
+	uint8_t m_colorsplit = 0U;
+	uint8_t m_bgdata = 0U;
+	uint8_t m_vblank = 0U;
+	uint8_t m_video_mode = 0U;
+	uint8_t m_funcgen_expand_color[2]{};
+	uint8_t m_funcgen_control = 0U;
+	uint8_t m_funcgen_expand_count = 0U;
+	uint8_t m_funcgen_rotate_count = 0U;
+	uint8_t m_funcgen_rotate_data[4]{};
+	uint8_t m_funcgen_shift_prev_data = 0U;
+	uint8_t m_funcgen_intercept = 0U;
+	uint16_t m_pattern_source = 0U;
+	uint8_t m_pattern_mode = 0U;
+	uint16_t m_pattern_dest = 0U;
+	uint8_t m_pattern_skip = 0U;
+	uint8_t m_pattern_width = 0U;
+	uint8_t m_pattern_height = 0U;
+	std::unique_ptr<uint16_t[]> m_profpac_videoram{};
+	uint16_t m_profpac_palette[16]{};
+	uint8_t m_profpac_colormap[4]{};
+	uint8_t m_profpac_intercept = 0U;
+	uint8_t m_profpac_vispage = 0U;
+	uint8_t m_profpac_readpage = 0U;
+	uint8_t m_profpac_readshift = 0U;
+	uint8_t m_profpac_writepage = 0U;
+	uint8_t m_profpac_writemode = 0U;
+	uint16_t m_profpac_writemask = 0U;
+	uint8_t m_profpac_vw = 0U;
+	void protected_ram_enable_w(uint8_t data);
+	uint8_t protected_ram_r(offs_t offset);
+	void protected_ram_w(offs_t offset, uint8_t data);
+	uint8_t input_mux_r(offs_t offset);
 	template<int Coin> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	template<int Bit> DECLARE_WRITE_LINE_MEMBER(sparkle_w);
 	DECLARE_WRITE_LINE_MEMBER(gorf_sound_switch_w);
-	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
-	DECLARE_WRITE8_MEMBER(demndrgn_banksw_w);
-	DECLARE_READ8_MEMBER(video_register_r);
-	DECLARE_WRITE8_MEMBER(video_register_w);
-	DECLARE_WRITE8_MEMBER(astrocade_funcgen_w);
-	DECLARE_WRITE8_MEMBER(expand_register_w);
-	DECLARE_WRITE8_MEMBER(astrocade_pattern_board_w);
-	DECLARE_WRITE8_MEMBER(profpac_page_select_w);
-	DECLARE_READ8_MEMBER(profpac_intercept_r);
-	DECLARE_WRITE8_MEMBER(profpac_screenram_ctrl_w);
-	DECLARE_READ8_MEMBER(profpac_videoram_r);
-	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
+	void profpac_banksw_w(uint8_t data);
+	void demndrgn_banksw_w(uint8_t data);
+	uint8_t video_register_r(offs_t offset);
+	void video_register_w(offs_t offset, uint8_t data);
+	void astrocade_funcgen_w(address_space &space, offs_t offset, uint8_t data);
+	void expand_register_w(uint8_t data);
+	void astrocade_pattern_board_w(offs_t offset, uint8_t data);
+	void profpac_page_select_w(uint8_t data);
+	uint8_t profpac_intercept_r();
+	void profpac_screenram_ctrl_w(offs_t offset, uint8_t data);
+	uint8_t profpac_videoram_r(offs_t offset);
+	void profpac_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
 	DECLARE_WRITE_LINE_MEMBER(lightpen_trigger_w);
 	void init_profpac();
@@ -139,8 +143,6 @@ public:
 	void init_demndrgn();
 	void init_ebases();
 	void init_gorf();
-	void init_astrocde();
-	virtual void video_start() override;
 	void astrocade_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(profpac);
 	void profpac_palette(palette_device &palette) const;
@@ -154,10 +156,9 @@ public:
 	inline void increment_dest(uint8_t curwidth);
 	void execute_blit();
 	void init_sparklestar();
-	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(votrax_speech_w);
-	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
+	void votrax_speech_w(uint8_t data);
+	DECLARE_READ_LINE_MEMBER( votrax_speech_status_r );
 
 	void astrocade_base(machine_config &config);
 	void astrocade_16color_base(machine_config &config);
@@ -181,8 +182,11 @@ public:
 	void seawolf2_map(address_map &map);
 	void spacezap_map(address_map &map);
 	void wow_map(address_map &map);
+
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class seawolf2_state : public astrocde_state
@@ -195,16 +199,16 @@ public:
 
 	void seawolf2(machine_config &config);
 private:
-	DECLARE_WRITE8_MEMBER(sound_1_w);
-	DECLARE_WRITE8_MEMBER(sound_2_w);
+	void sound_1_w(uint8_t data);
+	void sound_2_w(uint8_t data);
 
 	void port_map_discrete(address_map &map);
 
 	virtual void machine_start() override;
 
 	required_device<samples_device> m_samples;
-	uint8_t m_port_1_last;
-	uint8_t m_port_2_last;
+	uint8_t m_port_1_last = 0U;
+	uint8_t m_port_2_last = 0U;
 };
 
 class ebases_state : public astrocde_state
@@ -218,8 +222,8 @@ public:
 	void ebases(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
 private:
-	DECLARE_WRITE8_MEMBER(trackball_select_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
+	void trackball_select_w(uint8_t data);
+	void coin_w(uint8_t data);
 
 	void ebases_map(address_map &map);
 	void port_map_ebases(address_map &map);
@@ -239,7 +243,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(joystick_r);
 private:
 	DECLARE_WRITE_LINE_MEMBER(input_select_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void sound_w(uint8_t data);
 
 	void port_map_16col_pattern_demndrgn(address_map &map);
 
@@ -257,9 +261,9 @@ public:
 
 	void tenpindx(machine_config &config);
 private:
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(counter_w);
-	DECLARE_WRITE8_MEMBER(lights_w);
+	void lamp_w(offs_t offset, uint8_t data);
+	void counter_w(uint8_t data);
+	void lights_w(uint8_t data);
 
 	virtual void machine_start() override;
 

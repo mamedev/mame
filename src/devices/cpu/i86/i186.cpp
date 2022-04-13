@@ -3,9 +3,12 @@
 // Peripheral code from rmnimbus driver by Phill Harvey-Smith which is
 // based on the Leland sound driver by Aaron Giles and Paul Leaman
 
+// Note: the X1 input (typically an XTAL) is divided by 2 internally.
+// The device clock should therefore be twice the desired operating
+// frequency (and twice the speed rating suffixed to the part number).
+
 #include "emu.h"
 #include "i186.h"
-#include "debugger.h"
 #include "i86inline.h"
 
 #define LOG_PORTS           0
@@ -118,21 +121,21 @@ const uint8_t i80186_cpu_device::m_i80186_timing[] =
 	33,             /* (80186) BOUND */
 };
 
-DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "Intel I80186")
-DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel I80188")
+DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "Intel 80186")
+DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel 80188")
 
 i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
+	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
+	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)
@@ -144,6 +147,8 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 	, m_out_chip_select_func(*this)
 	, m_out_tmrout0_func(*this)
 	, m_out_tmrout1_func(*this)
+	, m_irmx_irq_cb(*this)
+	, m_irmx_irq_ack(*this)
 {
 }
 
@@ -524,6 +529,16 @@ void i80186_cpu_device::execute_run()
 					m_regs.w[AX] = 0xffff;  // FPU not present
 				break;
 
+			case 0xe6: // i_outal
+				write_port_byte_al(fetch());
+				CLK(OUT_IMM8);
+				break;
+
+			case 0xee: // i_outdxal
+				write_port_byte_al(m_regs.w[DX]);
+				CLK(OUT_DX8);
+				break;
+
 			case 0xf2: // i_repne
 			case 0xf3:
 				{
@@ -550,7 +565,7 @@ void i80186_cpu_device::execute_run()
 						break;
 					}
 				}
-				// through to default
+				[[fallthrough]];
 			default:
 				if(!common_op(op))
 				{
@@ -574,70 +589,59 @@ void i80186_cpu_device::device_start()
 	state_add( I8086_VECTOR, "V", m_int_vector).formatstr("%02X");
 
 	state_add( I8086_PC, "PC", m_pc ).callimport().formatstr("%05X");
-	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%05X").noshow();
+	state_add<uint32_t>( STATE_GENPCBASE, "CURPC", [this] { return (m_sregs[CS] << 4) + m_prev_ip; }).mask(0xfffff).noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
-	// Most of these mnemonics are not official and only chosen as convenient shorthand.
-	state_add( I80186_RELOC, "RELOC", m_reloc ).formatstr("%04X");
+	// Most of these mnemonics are borrowed from the Intel 80C186EA/80C188EA User's Manual.
+	// (The 80C186EA/80C188EA's peripheral block is mapped incompatibly but mostly functionally analogous.)
+	state_add( I80186_RELREG, "RELREG", m_reloc ).formatstr("%04X");
 	state_add( I80186_UMCS, "UMCS", m_mem.upper ).formatstr("%04X");
 	state_add( I80186_LMCS, "LMCS", m_mem.lower ).formatstr("%04X");
 	state_add( I80186_PACS, "PACS", m_mem.peripheral ).formatstr("%04X");
 	state_add( I80186_MMCS, "MMCS", m_mem.middle ).formatstr("%04X");
 	state_add( I80186_MPCS, "MPCS", m_mem.middle_size ).formatstr("%04X");
-	state_add( I80186_DMA_SP + 0, "DMA0_SP", m_dma[0].source ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_DP + 0, "DMA0_DP", m_dma[0].dest ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_TC + 0, "DMA0_TC", m_dma[0].count ).formatstr("%04X");
-	state_add( I80186_DMA_CR + 0, "DMA0_CR", m_dma[0].control ).formatstr("%04X");
-	state_add( I80186_DMA_SP + 1, "DMA1_SP", m_dma[1].source ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_DP + 1, "DMA1_DP", m_dma[1].dest ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_TC + 1, "DMA1_TC", m_dma[1].count ).formatstr("%04X");
-	state_add( I80186_DMA_CR + 1, "DMA1_CR", m_dma[1].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 0, "T0_COUNT", m_timer[0].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 0, "T0_MAX_A", m_timer[0].maxA ).formatstr("%04X");
-	state_add( I80186_T_MAX_B + 0, "T0_MAX_B", m_timer[0].maxB ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 0, "T0_CONTROL", m_timer[0].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 1, "T1_COUNT", m_timer[1].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 1, "T1_MAX_A", m_timer[1].maxA ).formatstr("%04X");
-	state_add( I80186_T_MAX_B + 1, "T1_MAX_B", m_timer[1].maxB ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 1, "T1_CONTROL", m_timer[1].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 2, "T2_COUNT", m_timer[2].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 2, "T2_MAX", m_timer[2].maxA ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 2, "T2_CONTROL", m_timer[2].control ).formatstr("%04X");
-	state_add( I80186_ISR, "ISR", m_intr.in_service ).formatstr("%04X");
-	state_add( I80186_IRR, "IRR", m_intr.request ).formatstr("%04X");
-	state_add( I80186_PMR, "PMR", m_intr.priority_mask ).formatstr("%04X");
-	state_add( I80186_ICSR, "ICSR", m_intr.status ).formatstr("%04X");
-	state_add( I80186_TMRCR, "TMRCR", m_intr.timer ).formatstr("%04X");
-	state_add( I80186_D0CR, "D0CR", m_intr.dma[0] ).formatstr("%04X");
-	state_add( I80186_D1CR, "D1CR", m_intr.dma[1] ).formatstr("%04X");
-	state_add( I80186_I0CR, "I0CR", m_intr.ext[0] ).formatstr("%04X");
-	state_add( I80186_I1CR, "I1CR", m_intr.ext[1] ).formatstr("%04X");
-	state_add( I80186_I2CR, "I2CR", m_intr.ext[2] ).formatstr("%04X");
-	state_add( I80186_I3CR, "I3CR", m_intr.ext[3] ).formatstr("%04X");
-	state_add( I80186_POLL, "POLL", m_intr.poll_status ).formatstr("%04X");
+	state_add( I80186_DxSRC + 0, "D0SRC", m_dma[0].source ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxDST + 0, "D0DST", m_dma[0].dest ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxTC + 0, "D0TC", m_dma[0].count ).formatstr("%04X");
+	state_add( I80186_DxCON + 0, "D0CON", m_dma[0].control ).formatstr("%04X");
+	state_add( I80186_DxSRC + 1, "D1SRC", m_dma[1].source ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxDST + 1, "D1DST", m_dma[1].dest ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxTC + 1, "D1TC", m_dma[1].count ).formatstr("%04X");
+	state_add( I80186_DxCON + 1, "D1CON", m_dma[1].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 0, "T0CNT", m_timer[0].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 0, "T0CMPA", m_timer[0].maxA ).formatstr("%04X");
+	state_add( I80186_TxCMPB + 0, "T0CMPB", m_timer[0].maxB ).formatstr("%04X");
+	state_add( I80186_TxCON + 0, "T0CON", m_timer[0].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 1, "T1CNT", m_timer[1].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 1, "T1CMPA", m_timer[1].maxA ).formatstr("%04X");
+	state_add( I80186_TxCMPB + 1, "T1CMPB", m_timer[1].maxB ).formatstr("%04X");
+	state_add( I80186_TxCON + 1, "T1CON", m_timer[1].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 2, "T2CNT", m_timer[2].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 2, "T2CMPA", m_timer[2].maxA ).formatstr("%04X");
+	state_add( I80186_TxCON + 2, "T2CON", m_timer[2].control ).formatstr("%04X");
+	state_add( I80186_INSERV, "INSERV", m_intr.in_service ).formatstr("%04X");
+	state_add( I80186_REQST, "REQST", m_intr.request ).formatstr("%04X");
+	state_add( I80186_PRIMSK, "PRIMSK", m_intr.priority_mask ).formatstr("%04X");
+	state_add( I80186_INTSTS, "INTSTS", m_intr.status ).formatstr("%04X");
+	state_add( I80186_TCUCON, "TCUCON", m_intr.timer[0] ).formatstr("%04X");
+	state_add( I80186_DMA0CON, "DMA0CON", m_intr.dma[0] ).formatstr("%04X");
+	state_add( I80186_DMA1CON, "DMA1CON", m_intr.dma[1] ).formatstr("%04X");
+	state_add( I80186_I0CON, "I0CON", m_intr.ext[0] ).formatstr("%04X");
+	state_add( I80186_I1CON, "I1CON", m_intr.ext[1] ).formatstr("%04X");
+	state_add( I80186_I2CON, "I2CON", m_intr.ext[2] ).formatstr("%04X");
+	state_add( I80186_I3CON, "I3CON", m_intr.ext[3] ).formatstr("%04X");
+	state_add( I80186_POLLSTS, "POLLSTS", m_intr.poll_status ).formatstr("%04X");
 
 	// register for savestates
-	save_item(NAME(m_timer[0].control));
-	save_item(NAME(m_timer[0].maxA));
-	save_item(NAME(m_timer[0].maxB));
-	save_item(NAME(m_timer[0].active_count));
-	save_item(NAME(m_timer[0].count));
-	save_item(NAME(m_timer[1].control));
-	save_item(NAME(m_timer[1].maxA));
-	save_item(NAME(m_timer[1].maxB));
-	save_item(NAME(m_timer[1].active_count));
-	save_item(NAME(m_timer[1].count));
-	save_item(NAME(m_timer[2].control));
-	save_item(NAME(m_timer[2].maxA));
-	save_item(NAME(m_timer[2].count));
-	save_item(NAME(m_dma[0].source));
-	save_item(NAME(m_dma[0].dest));
-	save_item(NAME(m_dma[0].count));
-	save_item(NAME(m_dma[0].control));
-	save_item(NAME(m_dma[1].source));
-	save_item(NAME(m_dma[1].dest));
-	save_item(NAME(m_dma[1].count));
-	save_item(NAME(m_dma[1].control));
+	save_item(STRUCT_MEMBER(m_timer, control));
+	save_item(STRUCT_MEMBER(m_timer, maxA));
+	save_item(STRUCT_MEMBER(m_timer, maxB));
+	save_item(STRUCT_MEMBER(m_timer, count));
+	save_item(STRUCT_MEMBER(m_dma, source));
+	save_item(STRUCT_MEMBER(m_dma, dest));
+	save_item(STRUCT_MEMBER(m_dma, count));
+	save_item(STRUCT_MEMBER(m_dma, control));
+	save_item(NAME(m_intr.vector));
 	save_item(NAME(m_intr.pending));
 	save_item(NAME(m_intr.ack_mask));
 	save_item(NAME(m_intr.priority_mask));
@@ -663,6 +667,7 @@ void i80186_cpu_device::device_start()
 	memset(&m_intr, 0, sizeof(intr_state));
 	memset(&m_mem, 0, sizeof(mem_state));
 	m_reloc = 0;
+	m_last_dma = 0;
 
 	m_timer[0].int_timer = timer_alloc(TIMER_INT0);
 	m_timer[1].int_timer = timer_alloc(TIMER_INT1);
@@ -672,6 +677,8 @@ void i80186_cpu_device::device_start()
 	m_out_tmrout1_func.resolve_safe();
 	m_read_slave_ack_func.resolve_safe(0);
 	m_out_chip_select_func.resolve_safe();
+	m_irmx_irq_cb.resolve_safe();
+	m_irmx_irq_ack.resolve();
 }
 
 void i80186_cpu_device::device_reset()
@@ -679,7 +686,9 @@ void i80186_cpu_device::device_reset()
 	i8086_common_cpu_device::device_reset();
 	/* reset the interrupt state */
 	m_intr.priority_mask    = 0x0007;
-	m_intr.timer            = 0x000f;
+	m_intr.timer[0]         = 0x000f;
+	m_intr.timer[1]         = 0x000f;
+	m_intr.timer[2]         = 0x000f;
 	m_intr.dma[0]           = 0x000f;
 	m_intr.dma[1]           = 0x000f;
 	m_intr.ext[0]           = 0x000f;
@@ -709,7 +718,6 @@ void i80186_cpu_device::device_reset()
 		elem.control = 0;
 		elem.maxA = 0;
 		elem.maxB = 0;
-		elem.active_count = false;
 		elem.count = 0;
 	}
 }
@@ -718,8 +726,10 @@ uint8_t i80186_cpu_device::read_port_byte(uint16_t port)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
-		uint16_t ret = internal_port_r(*m_io, (port >> 1) & 0x7f, (port & 1) ? 0xff00 : 0x00ff);
-		return (port & 1) ? (ret >> 8) : (ret & 0xff);
+		if(port & 1)
+			return internal_port_r((port >> 1) & 0x7f, 0xff00) >> 8;
+		else
+			return internal_port_r((port >> 1) & 0x7f, 0x00ff) & 0xff;
 	}
 	return m_io->read_byte(port);
 }
@@ -728,12 +738,11 @@ uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
+		// Unaligned reads from the internal bus are swapped rather than split
 		if(port & 1)
-		{
-			uint8_t low = read_port_byte(port);
-			return read_port_byte(port + 1) << 8 | low;
-		}
-		return internal_port_r(*m_io, (port >> 1) & 0x7f);
+			return swapendian_int16(internal_port_r((port >> 1) & 0x7f));
+		else
+			return internal_port_r((port >> 1) & 0x7f);
 	}
 	return m_io->read_word_unaligned(port);
 }
@@ -741,22 +750,39 @@ uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 void i80186_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
-		internal_port_w(*m_io, (port >> 1) & 0x7f, (port & 1) ? (data << 8) : data, (port & 1) ? 0xff00 : 0x00ff);
+	{
+		if(port & 1)
+			internal_port_w((port >> 1) & 0x7f, data << 8);
+		else
+			internal_port_w((port >> 1) & 0x7f, data);
+	}
 	else
 		m_io->write_byte(port, data);
+}
+
+void i80186_cpu_device::write_port_byte_al(uint16_t port)
+{
+	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
+	{
+		// Both AH and AL are written onto the internal bus
+		if(port & 1)
+			internal_port_w((port >> 1) & 0x7f, swapendian_int16(m_regs.w[AX]));
+		else
+			internal_port_w((port >> 1) & 0x7f, m_regs.w[AX]);
+	}
+	else
+		m_io->write_byte(port, m_regs.w[AL]);
 }
 
 void i80186_cpu_device::write_port_word(uint16_t port, uint16_t data)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
+		// Unaligned writes to the internal bus are swapped rather than split
 		if(port & 1)
-		{
-			write_port_byte(port, data & 0xff);
-			write_port_byte(port + 1, data >> 8);
-		}
+			internal_port_w((port >> 1) & 0x7f, swapendian_int16(data));
 		else
-			internal_port_w(*m_io, (port >> 1) & 0x7f, data);
+			internal_port_w((port >> 1) & 0x7f, data);
 	}
 	else
 		m_io->write_word_unaligned(port, data);
@@ -766,7 +792,7 @@ uint8_t i80186_cpu_device::read_byte(uint32_t addr)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
 	{
-		uint16_t ret = internal_port_r(*m_program, (addr >> 1) & 0x7f, (addr & 1) ? 0xff00 : 0x00ff);
+		uint16_t ret = internal_port_r((addr >> 1) & 0x7f, (addr & 1) ? 0xff00 : 0x00ff);
 		return (addr & 1) ? (ret >> 8) : (ret & 0xff);
 	}
 	return m_program->read_byte(addr);
@@ -776,12 +802,11 @@ uint16_t i80186_cpu_device::read_word(uint32_t addr)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
 	{
+		// Unaligned reads from the internal bus are swapped rather than split
 		if(addr & 1)
-		{
-			uint8_t low = read_byte(addr);
-			return read_byte(addr + 1) << 8 | low;
-		}
-		return internal_port_r(*m_program, (addr >> 1) & 0x7f);
+			return swapendian_int16(internal_port_r((addr >> 1) & 0x7f));
+		else
+			return internal_port_r((addr >> 1) & 0x7f);
 	}
 	return m_program->read_word_unaligned(addr);
 }
@@ -789,7 +814,7 @@ uint16_t i80186_cpu_device::read_word(uint32_t addr)
 void i80186_cpu_device::write_byte(uint32_t addr, uint8_t data)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
-		internal_port_w(*m_program, (addr >> 1) & 0x7f, (addr & 1) ? (data << 8) : data, (addr & 1) ? 0xff00 : 0x00ff);
+		internal_port_w((addr >> 1) & 0x7f, (addr & 1) ? (data << 8) : data);
 	else
 		m_program->write_byte(addr, data);
 }
@@ -798,13 +823,11 @@ void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
 	{
+		// Unaligned writes from the internal bus are swapped rather than split
 		if(addr & 1)
-		{
-			write_byte(addr, data & 0xff);
-			write_byte(addr + 1, data >> 8);
-		}
+			internal_port_w((addr >> 1) & 0x7f, swapendian_int16(data));
 		else
-			internal_port_w(*m_program, (addr >> 1) & 0x7f, data);
+			internal_port_w((addr >> 1) & 0x7f, data);
 	}
 	else
 		m_program->write_word_unaligned(addr, data);
@@ -815,6 +838,17 @@ void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
  *  80186 interrupt controller
  *
  *************************************/
+IRQ_CALLBACK_MEMBER(i80186_cpu_device::inta_callback)
+{
+	if (BIT(m_reloc, 14))
+	{
+		if (!m_irmx_irq_ack.isnull())
+			return m_irmx_irq_ack(device, irqline);
+		return 0;
+	}
+	return int_callback(device, irqline);
+}
+
 IRQ_CALLBACK_MEMBER(i80186_cpu_device::int_callback)
 {
 	uint8_t   vector;
@@ -853,28 +887,44 @@ IRQ_CALLBACK_MEMBER(i80186_cpu_device::int_callback)
 	if((LOG_INTERRUPTS) && (m_intr.in_service!=old))
 		logerror("intr.in_service changed from %02X to %02X\n",old,m_intr.in_service);
 
-	if (m_intr.ack_mask == 0x0001)
+	if (!BIT(m_reloc, 14))
 	{
-		switch (m_intr.poll_status & 0x1f)
+		if (m_intr.ack_mask == 0x0001)
 		{
-			case 0x08:  m_intr.status &= ~0x01; break;
-			case 0x12:  m_intr.status &= ~0x02; break;
-			case 0x13:  m_intr.status &= ~0x04; break;
+			switch (m_intr.poll_status & 0x1f)
+			{
+				case 0x08:  m_intr.status &= ~0x01; break;
+				case 0x12:  m_intr.status &= ~0x02; break;
+				case 0x13:  m_intr.status &= ~0x04; break;
+			}
 		}
+
+		/* return the vector */
+		switch(m_intr.poll_status & 0x1F)
+		{
+			case 0x0C: vector = (m_intr.ext[0] & EXTINT_CTRL_CASCADE) ? m_read_slave_ack_func(0) : (m_intr.poll_status & 0x1f); break;
+			case 0x0D: vector = (m_intr.ext[1] & EXTINT_CTRL_CASCADE) ? m_read_slave_ack_func(1) : (m_intr.poll_status & 0x1f); break;
+			default:
+				vector = m_intr.poll_status & 0x1f; break;
+		}
+	}
+	else
+	{
+		if (m_intr.ack_mask & 0x31)
+		{
+			if (m_intr.ack_mask & 1)
+				m_intr.status &= ~0x01;
+			else if(m_intr.ack_mask & 0x10)
+				m_intr.status &= ~0x02;
+			else if(m_intr.ack_mask & 0x20)
+				m_intr.status &= ~0x04;
+		}
+		vector = m_intr.poll_status & 0xff;
 	}
 	m_intr.ack_mask = 0;
 
 	/* a request no longer pending */
 	m_intr.poll_status &= ~0x8000;
-
-	/* return the vector */
-	switch(m_intr.poll_status & 0x1F)
-	{
-		case 0x0C: vector = (m_intr.ext[0] & EXTINT_CTRL_CASCADE) ? m_read_slave_ack_func(0) : (m_intr.poll_status & 0x1f); break;
-		case 0x0D: vector = (m_intr.ext[1] & EXTINT_CTRL_CASCADE) ? m_read_slave_ack_func(1) : (m_intr.poll_status & 0x1f); break;
-		default:
-			vector = m_intr.poll_status & 0x1f; break;
-	}
 
 	if (LOG_INTERRUPTS)
 	{
@@ -899,27 +949,52 @@ void i80186_cpu_device::update_interrupt_state()
 	for (Priority = 0; Priority <= m_intr.priority_mask; Priority++)
 	{
 		/* note: by checking 4 bits, we also verify that the mask is off */
-		if ((m_intr.timer & 0x0F) == Priority)
+		if (BIT(m_reloc, 14))
 		{
-			/* if we're already servicing something at this level, don't generate anything new */
-			if (m_intr.in_service & 0x01)
-				return;
-
-			/* if there's something pending, generate an interrupt */
-			if (m_intr.status & 0x07)
+			for (IntNo = 0; IntNo < 3; IntNo++)
 			{
-				if (m_intr.status & 1)
-					new_vector = 0x08;
-				else if (m_intr.status & 2)
-					new_vector = 0x12;
-				else if (m_intr.status & 4)
-					new_vector = 0x13;
-				else
-					logerror("Invalid timer interrupt!\n");
+				if ((m_intr.timer[IntNo] & 0x0F) == Priority)
+				{
+					int irq = (1 << IntNo);
+					/* if we're already servicing something at this level, don't generate anything new */
+					if (m_intr.in_service & 0x01)
+						return;
 
-				/* set the clear mask and generate the int */
-				m_intr.ack_mask = 0x0001;
-				goto generate_int;
+					/* if there's something pending, generate an interrupt */
+					if (m_intr.status & irq)
+					{
+						new_vector = m_intr.vector | Priority;
+						/* set the clear mask and generate the int */
+						m_intr.ack_mask = IntNo ? (8 << IntNo) : 1;
+						goto generate_int;
+					}
+				}
+			}
+		}
+		else
+		{
+			if ((m_intr.timer[0] & 0x0F) == Priority)
+			{
+				/* if we're already servicing something at this level, don't generate anything new */
+				if (m_intr.in_service & 0x01)
+					return;
+
+				/* if there's something pending, generate an interrupt */
+				if (m_intr.status & 0x07)
+				{
+					if (m_intr.status & 1)
+						new_vector = 0x08;
+					else if (m_intr.status & 2)
+						new_vector = 0x12;
+					else if (m_intr.status & 4)
+						new_vector = 0x13;
+					else
+						logerror("Invalid timer interrupt!\n");
+
+					/* set the clear mask and generate the int */
+					m_intr.ack_mask = 0x0001;
+					goto generate_int;
+				}
 			}
 		}
 
@@ -934,13 +1009,19 @@ void i80186_cpu_device::update_interrupt_state()
 				/* if there's something pending, generate an interrupt */
 				if (m_intr.request & (0x04 << IntNo))
 				{
-					new_vector = 0x0a + IntNo;
+					if (BIT(m_reloc, 14))
+						new_vector = m_intr.vector | Priority;
+					else
+						new_vector = 0x0a + IntNo;
 
 					/* set the clear mask and generate the int */
 					m_intr.ack_mask = 0x0004 << IntNo;
 					goto generate_int;
 				}
 			}
+
+		if (BIT(m_reloc, 14))
+			continue;
 
 		/* check external interrupts */
 		for (IntNo = 0; IntNo < 4; IntNo++)
@@ -976,14 +1057,22 @@ void i80186_cpu_device::update_interrupt_state()
 		}
 	}
 	m_intr.pending = 0;
-	set_input_line(0, CLEAR_LINE);
+	if (!BIT(m_reloc, 14))
+		set_input_line(0, CLEAR_LINE);
+	else
+		m_irmx_irq_cb(CLEAR_LINE);
 	return;
 
 generate_int:
 	/* generate the appropriate interrupt */
 	m_intr.poll_status = 0x8000 | new_vector;
 	if (!m_intr.pending)
-		set_input_line(0, ASSERT_LINE);
+	{
+		if (!BIT(m_reloc, 14))
+			set_input_line(0, ASSERT_LINE);
+		else
+			m_irmx_irq_cb(ASSERT_LINE);
+	}
 	m_intr.pending = 1;
 	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine().time().as_double(), new_vector);
 }
@@ -1022,11 +1111,27 @@ void i80186_cpu_device::handle_eoi(int data)
 		for (Priority = 0; ((Priority <= 7) && !handled); Priority++)
 		{
 			/* check for in-service timers */
-			if ((m_intr.timer & 0x07) == Priority && (m_intr.in_service & 0x01))
+			if (BIT(m_reloc, 14))
 			{
-				m_intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine().time().as_double());
-				handled=1;
+				for (IntNo = 0; ((IntNo < 2) && !handled) ; IntNo++)
+				{
+					int mask = IntNo ? (8 << IntNo) : 1;
+					if ((m_intr.timer[IntNo] & 0x07) == Priority && (m_intr.in_service & mask))
+					{
+						m_intr.in_service &= ~mask;
+						if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer%d\n", machine().time().as_double(), IntNo);
+						handled=1;
+					}
+				}
+			}
+			else
+			{
+				if ((m_intr.timer[0] & 0x07) == Priority && (m_intr.in_service & 0x01))
+				{
+					m_intr.in_service &= ~0x01;
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine().time().as_double());
+					handled=1;
+				}
 			}
 
 			/* check for in-service DMA interrupts */
@@ -1037,6 +1142,9 @@ void i80186_cpu_device::handle_eoi(int data)
 					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine().time().as_double(), IntNo);
 					handled=1;
 				}
+
+			if (BIT(m_reloc, 14))
+				continue;
 
 			/* check external interrupts */
 			for (IntNo = 0; ((IntNo < 4) && !handled) ; IntNo++)
@@ -1054,6 +1162,17 @@ void i80186_cpu_device::handle_eoi(int data)
 /* Trigger an external interrupt, optionally supplying the vector to take */
 void i80186_cpu_device::external_int(uint16_t intno, int state)
 {
+	if (BIT(m_reloc, 14))
+	{
+		if (!intno)
+		{
+			set_input_line(0, state);
+			return;
+		}
+		logerror("irq to line %d in irmx mode\n",intno);
+		return;
+	}
+
 	if (!(m_intr.ext_state & (1 << intno)) == !state)
 		return;
 
@@ -1079,7 +1198,7 @@ void i80186_cpu_device::external_int(uint16_t intno, int state)
  *
  *************************************/
 
-void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -1126,36 +1245,21 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 				else
 				{
 					if(which)
-						m_out_tmrout1_func(t->active_count);
+						m_out_tmrout1_func((t->control & 0x1000) ? 1 : 0);
 					else
-						m_out_tmrout0_func(t->active_count);
+						m_out_tmrout0_func((t->control & 0x1000) ? 1 : 0);
 				}
 			}
 
 			/* if we're continuous or altcounting, reset */
-			if((t->control & 1) || ((t->control & 2) && (which != 2) && !t->active_count))
+			if((t->control & 1) || ((t->control & 2) && !(t->control & 0x1000)))
 			{
-				int count;
-				if((t->control & 2) && (which != 2))
-				{
-					count = t->active_count ? t->maxA : t->maxB;
-					if(!t->active_count)
-					{
-						t->active_count = 1;
-						t->control |= 0x1000;
-					}
-					else
-					{
-						t->active_count = 0;
-						t->control &= ~0x1000;
-					}
-				}
+				if((t->control & 2) && !(t->control & 0x1000))
+					t->control |= 0x1000;
 				else
-					count = t->maxA;
+					t->control &= ~0x1000;
 
-				count = count ? count : 0x10000;
-				if(!(t->control & 4))
-					t->int_timer->adjust((attotime::from_hz(clock()/8) * count), which);
+				restart_timer(which);
 				if (LOG_TIMER) logerror("  Repriming interrupt\n");
 			}
 			else
@@ -1173,13 +1277,21 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 }
 
 
+void i80186_cpu_device::restart_timer(int which)
+{
+	timer_state *t = &m_timer[which];
+	int count = (t->control & 0x1000) ? t->maxB : t->maxA;
+	if(!(t->control & 4))
+		t->int_timer->adjust((attotime::from_hz(clock()/8) * (count ? count : 0x10000)), which);
+}
+
 void i80186_cpu_device::internal_timer_sync(int which)
 {
 	timer_state *t = &m_timer[which];
 
 	/* if we have a timing timer running, adjust the count */
-	if ((t->control & 0x8000) && !(t->control & 0x0c))
-		t->count = (((which != 2) && t->active_count) ? t->maxB : t->maxA) - t->int_timer->remaining().as_ticks(clock() / 8);
+	if ((t->control & 0x8000) && !(t->control & 0x0c) && t->int_timer->enabled())
+		t->count = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->int_timer->remaining().as_ticks(clock() / 8);
 }
 
 void i80186_cpu_device::inc_timer(int which)
@@ -1189,11 +1301,11 @@ void i80186_cpu_device::inc_timer(int which)
 	t->count++;
 	if (t->control & 2)
 	{
-		if (t->count == (t->active_count ? t->maxB : t->maxA))
-			device_timer(*t->int_timer, which, which, nullptr);
+		if (t->count == ((t->control & 0x1000) ? t->maxB : t->maxA))
+			device_timer(*t->int_timer, which, which);
 	}
 	else if (t->count == t->maxA)
-		device_timer(*t->int_timer, which, which, nullptr);
+		device_timer(*t->int_timer, which, which);
 }
 
 void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control)
@@ -1252,7 +1364,6 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 	/* handle control changes */
 	if (new_control != -1)
 	{
-		int diff;
 		uint16_t resbits = (which == 2) ? 0x1fde : 0x1fc0;
 
 		/* merge back in the bits we don't modify */
@@ -1263,12 +1374,8 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 			new_control = (new_control & ~0x8000) | (t->control & 0x8000);
 		new_control &= ~0x4000;
 
-		/* check for control bits we don't handle */
-		diff = new_control ^ t->control;
-		if (diff & 0x0010)
-			logerror("%05X:ERROR! -unsupported timer mode %04X\n", m_pc, new_control);
-
 		/* if we have real changes, update things */
+		uint16_t diff = new_control ^ t->control;
 		if (diff != 0)
 		{
 			/* if we're going off, make sure our timers are gone */
@@ -1293,6 +1400,10 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 			}
 		}
 
+		/* RIU is cleared whenever ALT = 0 */
+		if (!(new_control & 0x0002))
+			new_control &= ~0x1000;
+
 		/* set the new control register */
 		t->control = new_control;
 	}
@@ -1300,11 +1411,9 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 	/* update the interrupt timer */
 	if (update_int_timer)
 	{
-		t->active_count = 0;
-		t->control &= ~0x1000;
-		if ((t->control & 0x8000) && !(t->control & 4))
+		if ((t->control & 0x8004) == 0x8000 && (!(t->control & 0x10) || t->int_timer->enabled()))
 		{
-			int diff = t->maxA - t->count;
+			int diff = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->count;
 			if (diff <= 0)
 				diff += 0x10000;
 			t->int_timer->adjust(attotime::from_hz(clock()/8) * diff, which);
@@ -1313,6 +1422,22 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 		else
 		{
 			t->int_timer->adjust(attotime::never, which);
+		}
+	}
+}
+
+void i80186_cpu_device::external_tmrin(int which, int state)
+{
+	// TODO: make this an actual edge trigger
+	if (state)
+	{
+		if ((m_timer[which].control & 0x8004) == 0x8004)
+			inc_timer(which);
+		else if ((m_timer[which].control & 0x8014) == 0x8010)
+		{
+			m_timer[which].count = 0;
+			restart_timer(which);
+			if (LOG_TIMER) logerror("Retriggered timer %d\n", which);
 		}
 	}
 }
@@ -1421,12 +1546,16 @@ void i80186_cpu_device::drq_callback(int which)
 	}
 }
 
-READ16_MEMBER(i80186_cpu_device::internal_port_r)
+uint16_t i80186_cpu_device::internal_port_r(offs_t offset, uint16_t mem_mask)
 {
 	int temp, which;
 
 	switch (offset)
 	{
+		case 0x10:
+			if (LOG_PORTS) logerror("%05X:read interrupt vector\n", m_pc);
+			return m_intr.vector;
+
 		case 0x11:
 			if (LOG_PORTS) logerror("%05X:ERROR - read from 80186 EOI\n", m_pc);
 			break;
@@ -1434,7 +1563,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", m_pc);
 			if (m_intr.poll_status & 0x8000)
-				int_callback(*this, 0);
+				inta_callback(*this, 0);
 			return m_intr.poll_status;
 
 		case 0x13:
@@ -1443,13 +1572,21 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 
 		case 0x14:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt mask\n", m_pc);
-			temp  = (m_intr.timer  >> 3) & 0x01;
+			temp  = (m_intr.timer[0]  >> 3) & 0x01;
 			temp |= (m_intr.dma[0] >> 1) & 0x04;
 			temp |= (m_intr.dma[1] >> 0) & 0x08;
-			temp |= (m_intr.ext[0] << 1) & 0x10;
-			temp |= (m_intr.ext[1] << 2) & 0x20;
-			temp |= (m_intr.ext[2] << 3) & 0x40;
-			temp |= (m_intr.ext[3] << 4) & 0x80;
+			if (BIT(m_reloc, 14))
+			{
+				temp |= (m_intr.timer[1] << 1) & 0x10;
+				temp |= (m_intr.timer[2] << 2) & 0x20;
+			}
+			else
+			{
+				temp |= (m_intr.ext[0] << 1) & 0x10;
+				temp |= (m_intr.ext[1] << 2) & 0x20;
+				temp |= (m_intr.ext[2] << 3) & 0x40;
+				temp |= (m_intr.ext[3] << 4) & 0x80;
+			}
 			return temp;
 
 		case 0x15:
@@ -1473,7 +1610,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 
 		case 0x19:
 			if (LOG_PORTS) logerror("%05X:read 80186 timer interrupt control\n", m_pc);
-			return m_intr.timer;
+			return m_intr.timer[0];
 
 		case 0x1a:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA 0 interrupt control\n", m_pc);
@@ -1485,19 +1622,31 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
 
 		case 0x1c:
 			if (LOG_PORTS) logerror("%05X:read 80186 INT 0 interrupt control\n", m_pc);
-			return m_intr.ext[0];
+			if (BIT(m_reloc, 14))
+				return m_intr.timer[1];
+			else
+				return m_intr.ext[0];
 
 		case 0x1d:
 			if (LOG_PORTS) logerror("%05X:read 80186 INT 1 interrupt control\n", m_pc);
-			return m_intr.ext[1];
+			if (BIT(m_reloc, 14))
+				return m_intr.timer[2];
+			else
+				return m_intr.ext[1];
 
 		case 0x1e:
 			if (LOG_PORTS) logerror("%05X:read 80186 INT 2 interrupt control\n", m_pc);
-			return m_intr.ext[2];
+			if (BIT(m_reloc, 14))
+				return 0;
+			else
+				return m_intr.ext[2];
 
 		case 0x1f:
 			if (LOG_PORTS) logerror("%05X:read 80186 INT 3 interrupt control\n", m_pc);
-			return m_intr.ext[3];
+			if (BIT(m_reloc, 14))
+				return 0;
+			else
+				return m_intr.ext[3];
 
 		case 0x28:
 		case 0x2c:
@@ -1601,15 +1750,20 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
  *
  *************************************/
 
-WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
+void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 {
 	int which;
 
 	switch (offset)
 	{
+		case 0x10:
+			if (LOG_PORTS) logerror("%05X:write interrupt vector = %04X\n", m_pc, data);
+			m_intr.vector = data & 0xf8;
+			break;
+
 		case 0x11:
 			if (LOG_PORTS) logerror("%05X:80186 EOI = %04X\n", m_pc, data);
-			handle_eoi(0x8000);
+			handle_eoi(data);
 			update_interrupt_state();
 			break;
 
@@ -1623,13 +1777,21 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 
 		case 0x14:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt mask = %04X\n", m_pc, data);
-			m_intr.timer  = (m_intr.timer  & ~0x08) | ((data << 3) & 0x08);
+			m_intr.timer[0]  = (m_intr.timer[0]  & ~0x08) | ((data << 3) & 0x08);
 			m_intr.dma[0] = (m_intr.dma[0] & ~0x08) | ((data << 1) & 0x08);
 			m_intr.dma[1] = (m_intr.dma[1] & ~0x08) | ((data << 0) & 0x08);
-			m_intr.ext[0] = (m_intr.ext[0] & ~0x08) | ((data >> 1) & 0x08);
-			m_intr.ext[1] = (m_intr.ext[1] & ~0x08) | ((data >> 2) & 0x08);
-			m_intr.ext[2] = (m_intr.ext[2] & ~0x08) | ((data >> 3) & 0x08);
-			m_intr.ext[3] = (m_intr.ext[3] & ~0x08) | ((data >> 4) & 0x08);
+			if (BIT(m_reloc, 14))
+			{
+				m_intr.timer[1] = (m_intr.timer[1] & ~0x08) | ((data >> 1) & 0x08);
+				m_intr.timer[2] = (m_intr.timer[2] & ~0x08) | ((data >> 2) & 0x08);
+			}
+			else
+			{
+				m_intr.ext[0] = (m_intr.ext[0] & ~0x08) | ((data >> 1) & 0x08);
+				m_intr.ext[1] = (m_intr.ext[1] & ~0x08) | ((data >> 2) & 0x08);
+				m_intr.ext[2] = (m_intr.ext[2] & ~0x08) | ((data >> 3) & 0x08);
+				m_intr.ext[3] = (m_intr.ext[3] & ~0x08) | ((data >> 4) & 0x08);
+			}
 			update_interrupt_state();
 			break;
 
@@ -1659,7 +1821,7 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 
 		case 0x19:
 			if (LOG_PORTS) logerror("%05X:80186 timer interrupt contol = %04X\n", m_pc, data);
-			m_intr.timer = data & 0x000f;
+			m_intr.timer[0] = data & 0x000f;
 			update_interrupt_state();
 			break;
 
@@ -1677,25 +1839,33 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 
 		case 0x1c:
 			if (LOG_PORTS) logerror("%05X:80186 INT 0 interrupt control = %04X\n", m_pc, data);
-			m_intr.ext[0] = data & 0x007f;
+			if (BIT(m_reloc, 14))
+				m_intr.timer[1] = data & 0x000f;
+			else
+				m_intr.ext[0] = data & 0x007f;
 			update_interrupt_state();
 			break;
 
 		case 0x1d:
 			if (LOG_PORTS) logerror("%05X:80186 INT 1 interrupt control = %04X\n", m_pc, data);
-			m_intr.ext[1] = data & 0x007f;
+			if (BIT(m_reloc, 14))
+				m_intr.timer[2] = data & 0x000f;
+			else
+				m_intr.ext[1] = data & 0x007f;
 			update_interrupt_state();
 			break;
 
 		case 0x1e:
 			if (LOG_PORTS) logerror("%05X:80186 INT 2 interrupt control = %04X\n", m_pc, data);
-			m_intr.ext[2] = data & 0x001f;
+			if (!BIT(m_reloc, 14))
+				m_intr.ext[2] = data & 0x001f;
 			update_interrupt_state();
 			break;
 
 		case 0x1f:
 			if (LOG_PORTS) logerror("%05X:80186 INT 3 interrupt control = %04X\n", m_pc, data);
-			m_intr.ext[3] = data & 0x001f;
+			if (!BIT(m_reloc, 14))
+				m_intr.ext[3] = data & 0x001f;
 			update_interrupt_state();
 			break;
 
@@ -1809,9 +1979,9 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 			break;
 
 		case 0x7f:
+			// 80188 byte output to this port is *not* masked!
 			if (LOG_PORTS) logerror("%05X:80186 relocation register = %04X\n", m_pc, data);
 			m_reloc = data;
-
 			break;
 
 		default:

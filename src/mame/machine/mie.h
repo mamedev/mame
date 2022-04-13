@@ -32,49 +32,58 @@ public:
 
 	template <uint8_t Which, typename T>
 	void set_gpio_name(T &&gpio_port_tag) { gpio_port[Which].set_tag(std::forward<T>(gpio_port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_gpio_names(T &&first_tag, U &&... other_tags)
+	{
+		set_gpio_name<First>(std::forward<T>(first_tag));
+		set_gpio_names<First + 1>(std::forward<U>(other_tags)...);
+	}
 
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(lreg_r);
-	DECLARE_WRITE8_MEMBER(lreg_w);
-	DECLARE_READ8_MEMBER(tbuf_r);
-	DECLARE_WRITE8_MEMBER(tbuf_w);
-	DECLARE_READ8_MEMBER(gpio_r);
-	DECLARE_WRITE8_MEMBER(gpio_w);
-	DECLARE_READ8_MEMBER(gpiodir_r);
-	DECLARE_WRITE8_MEMBER(gpiodir_w);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(adc_w);
+	uint8_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint8_t data);
+	uint8_t lreg_r();
+	void lreg_w(uint8_t data);
+	uint8_t tbuf_r(offs_t offset);
+	void tbuf_w(offs_t offset, uint8_t data);
+	uint8_t gpio_r(offs_t offset);
+	void gpio_w(offs_t offset, uint8_t data);
+	uint8_t gpiodir_r();
+	void gpiodir_w(uint8_t data);
+	uint8_t adc_r();
+	void adc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(irq_enable_r);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_READ8_MEMBER(maple_irqlevel_r);
-	DECLARE_WRITE8_MEMBER(maple_irqlevel_w);
-	DECLARE_READ8_MEMBER(irq_pending_r);
-	DECLARE_WRITE8_MEMBER(irq_pending_w);
+	uint8_t irq_enable_r();
+	void irq_enable_w(uint8_t data);
+	uint8_t maple_irqlevel_r();
+	void maple_irqlevel_w(uint8_t data);
+	uint8_t irq_pending_r();
+	void irq_pending_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(jvs_r);
-	DECLARE_WRITE8_MEMBER(jvs_w);
-	DECLARE_WRITE8_MEMBER(jvs_dest_w);
-	DECLARE_READ8_MEMBER(jvs_status_r);
-	DECLARE_WRITE8_MEMBER(jvs_control_w);
-	DECLARE_READ8_MEMBER(jvs_sense_r);
-	DECLARE_WRITE8_MEMBER(jvs_lcr_w);
+	uint8_t jvs_r();
+	void jvs_w(uint8_t data);
+	void jvs_dest_w(uint8_t data);
+	uint8_t jvs_status_r();
+	void jvs_control_w(uint8_t data);
+	uint8_t jvs_sense_r();
+	void jvs_lcr_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(read_ff);
-	DECLARE_READ8_MEMBER(read_00);
-	DECLARE_READ8_MEMBER(read_78xx);
+	uint8_t read_ff();
+	uint8_t read_00();
+	uint8_t read_78xx(offs_t offset);
 
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;
 
 	void mie_map(address_map &map);
 	void mie_port(address_map &map);
+
 protected:
+	template <uint8_t First> void set_gpio_names() { }
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -98,16 +107,16 @@ private:
 
 	// internal state
 	required_device<cpu_device> cpu;
-	emu_timer *timer;
+	emu_timer *timer = nullptr;
 	required_device<mie_jvs_device> jvs;
 	optional_ioport_array<8> gpio_port;
 
-	uint32_t tbuf[TBUF_SIZE];
-	uint32_t control, lreg, jvs_rpos;
-	uint8_t gpiodir, gpio_val[8];
-	uint8_t irq_enable, irq_pending, maple_irqlevel;
-	uint8_t jvs_control, jvs_dest;
-	uint8_t jvs_lcr;
+	uint32_t tbuf[TBUF_SIZE]{};
+	uint32_t control = 0, lreg = 0, jvs_rpos = 0;
+	uint8_t gpiodir = 0, gpio_val[8]{};
+	uint8_t irq_enable = 0, irq_pending = 0, maple_irqlevel = 0;
+	uint8_t jvs_control = 0, jvs_dest = 0;
+	uint8_t jvs_lcr = 0;
 
 	void raise_irq(int level);
 	void recalc_irq();

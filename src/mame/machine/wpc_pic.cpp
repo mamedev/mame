@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(WPC_PIC, wpc_pic_device, "wpc_pic", "Williams Pinball Control
 
 wpc_pic_device::wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_PIC, tag, owner, clock),
-	swarray(*this, ":SW.%u", 0)
+	swarray(*this, ":X%u", 0)
 {
 	serial = "000 000000 00000 000";
 }
@@ -22,7 +22,7 @@ void wpc_pic_device::set_serial(const char *_serial)
 	serial = _serial;
 }
 
-READ8_MEMBER(wpc_pic_device::read)
+uint8_t wpc_pic_device::read()
 {
 	uint8_t data = 0x00;
 	if(curcmd == 0x0d)
@@ -54,7 +54,7 @@ void wpc_pic_device::check_game_id()
 	}
 }
 
-WRITE8_MEMBER(wpc_pic_device::write)
+void wpc_pic_device::write(uint8_t data)
 {
 	if(chk_count) {
 		cmpchk[3-chk_count] = data;

@@ -63,24 +63,24 @@ class intellec4_state : public driver_device
 public:
 	void bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 data);
 
-	DECLARE_READ8_MEMBER(pm_read);
-	DECLARE_WRITE8_MEMBER(pm_write);
+	u8 pm_read(offs_t offset);
+	void pm_write(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(rom0_in);
-	DECLARE_READ8_MEMBER(rom2_in);
-	DECLARE_READ8_MEMBER(rom3_in);
-	DECLARE_READ8_MEMBER(rome_in);
-	DECLARE_READ8_MEMBER(romf_in);
+	u8 rom0_in();
+	u8 rom2_in();
+	u8 rom3_in();
+	u8 rome_in();
+	u8 romf_in();
 
-	DECLARE_WRITE8_MEMBER(rom0_out);
-	DECLARE_WRITE8_MEMBER(rom1_out);
-	DECLARE_WRITE8_MEMBER(rom2_out);
-	DECLARE_WRITE8_MEMBER(rom3_out);
-	DECLARE_WRITE8_MEMBER(rome_out);
-	DECLARE_WRITE8_MEMBER(romf_out);
+	void rom0_out(u8 data);
+	void rom1_out(u8 data);
+	void rom2_out(u8 data);
+	void rom3_out(u8 data);
+	void rome_out(u8 data);
+	void romf_out(u8 data);
 
-	DECLARE_WRITE8_MEMBER(ram0_out);
-	DECLARE_WRITE8_MEMBER(ram1_out);
+	void ram0_out(u8 data);
+	void ram1_out(u8 data);
 
 	// universal slot outputs
 	DECLARE_WRITE_LINE_MEMBER(bus_reset_4002);
@@ -121,6 +121,11 @@ protected:
 		, m_led_active_bank(*this, "led_active_bank_%u", 0U)
 		, m_led_execution(*this, "led_execution_x%u_%u", 2U, 0U)
 		, m_led_last_ptr(*this, "led_last_ptr_x%u_%u", 2U, 0U)
+		, m_led_status_ptr_valid(*this, "led_status_ptr_valid")
+		, m_led_status_search(*this, "led_status_search")
+		, m_led_mode_mon(*this, "led_mode_mon")
+		, m_led_mode_ram(*this, "led_mode_ram")
+		, m_led_mode_prom(*this, "led_mode_prom")
 	{
 	}
 
@@ -199,6 +204,11 @@ private:
 	output_finder<4>            m_led_active_bank;
 	output_finder<2, 4>         m_led_execution;
 	output_finder<2, 4>         m_led_last_ptr;
+	output_finder<>             m_led_status_ptr_valid;
+	output_finder<>             m_led_status_search;
+	output_finder<>             m_led_mode_mon;
+	output_finder<>             m_led_mode_ram;
+	output_finder<>             m_led_mode_prom;
 
 	emu_timer   *m_reset_timer = nullptr;
 
@@ -238,20 +248,20 @@ private:
 
 INPUT_PORTS_START(intellec4)
 	PORT_START("MODE")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("RESET")                                         PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_reset,       nullptr)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("RESET MODE")                                    PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_reset_mode,  nullptr)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("MON")              PORT_CODE(KEYCODE_1_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_prg_mode<0>, nullptr)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("RAM")              PORT_CODE(KEYCODE_2_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_prg_mode<1>, nullptr)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("PROM")             PORT_CODE(KEYCODE_3_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_prg_mode<2>, nullptr)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("RESET")                                         PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_reset,       0)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("RESET MODE")                                    PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_reset_mode,  0)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("MON")              PORT_CODE(KEYCODE_1_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_prg_mode<0>, 0)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("RAM")              PORT_CODE(KEYCODE_2_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_prg_mode<1>, 0)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_KEYPAD )             PORT_NAME("PROM")             PORT_CODE(KEYCODE_3_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_prg_mode<2>, 0)
 
 	PORT_START("CONTROL")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("RUN")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_run,         nullptr)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("NEXT INST")                                     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_next_inst,   nullptr)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("DECR")             PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_decr,        nullptr)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("INCR")             PORT_CODE(KEYCODE_PLUS_PAD)  PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_incr,        nullptr)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("LOAD")             PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_load,        nullptr)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("CMA ENABLE")                                    PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_cma_enable,  nullptr)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("CMA WRITE")        PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_cma_write,   nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("RUN")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_run,         0)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("NEXT INST")                                     PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_next_inst,   0)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("DECR")             PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_decr,        0)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("INCR")             PORT_CODE(KEYCODE_PLUS_PAD)  PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_incr,        0)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("LOAD")             PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_load,        0)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("CMA ENABLE")                                    PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_cma_enable,  0)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("CMA WRITE")        PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_cma_write,   0)
 
 	PORT_START("ADDRDAT")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("ADDRESS/DATA 0")
@@ -274,8 +284,8 @@ INPUT_PORTS_START(intellec4)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("PASSES 3")
 
 	PORT_START("PROM")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("PRGM PROM PWR")                                 PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_prgm_pwr,    nullptr)
-	PORT_CONFNAME( 0x0002, 0x0002, "PROM PROGRAMMER DATA OUT ENABLE" )                                                    PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_do_enable,   nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("PRGM PROM PWR")                                 PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_prgm_pwr,    0)
+	PORT_CONFNAME( 0x0002, 0x0002, "PROM PROGRAMMER DATA OUT ENABLE" )                                                    PORT_CHANGED_MEMBER(DEVICE_SELF, intellec4_state, sw_do_enable,   0)
 	PORT_CONFSETTING(      0x0000, DEF_STR(Off) )
 	PORT_CONFSETTING(      0x0002, DEF_STR(On)  )
 INPUT_PORTS_END
@@ -339,7 +349,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
 		break;
 	case mcs40_cpu_device_base::phase::X3:
 		if (m_search_complete != m_adr_cmp_latch)
-			machine().output().set_value("led_status_search", m_search_complete = m_adr_cmp_latch);
+			m_led_status_search = m_search_complete = m_adr_cmp_latch;
 		if (!m_search_complete && !m_cma_enable)
 		{
 			display_execution(data, 0x0fU);
@@ -347,7 +357,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
 			{
 				display_pointer(data, 0x0fU);
 				if (!m_panel_reset && !m_pointer_valid)
-					machine().output().set_value("led_status_ptr_valid", m_pointer_valid = true);
+					m_led_status_ptr_valid = m_pointer_valid = true;
 			}
 		}
 		if (!m_panel_reset && !m_adr_cmp_latch)
@@ -355,7 +365,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
 		if (!m_search_complete && !m_panel_reset && !m_cma_enable && !m_sw_run && (m_latched_addr == m_display_addr))
 			m_pass_counter = (m_pass_counter + 1U) & 0x0fU;
 		if (m_adr_cmp_latch && !m_next_inst && !m_search_complete)
-			machine().output().set_value("led_status_search", m_search_complete = true);
+			m_led_status_search = m_search_complete = true;
 		if (!m_cpu_reset && !m_cma_enable && !m_sw_run)
 			m_panel_reset = false;
 		break;
@@ -367,7 +377,7 @@ void intellec4_state::bus_cycle(mcs40_cpu_device_base::phase step, u8 sync, u8 d
   Program memory access handlers
 ----------------------------------*/
 
-READ8_MEMBER(intellec4_state::pm_read)
+u8 intellec4_state::pm_read(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -380,7 +390,7 @@ READ8_MEMBER(intellec4_state::pm_read)
 	return m_ram_data & 0x0fU;
 }
 
-WRITE8_MEMBER(intellec4_state::pm_write)
+void intellec4_state::pm_write(offs_t offset, u8 data)
 {
 	// always causes data to be latched
 	u16 const addr((u16(m_ram_page) << 8) | ((offset >> 1) & 0x00ffU));
@@ -397,83 +407,83 @@ WRITE8_MEMBER(intellec4_state::pm_write)
   I/O port handlers
 ----------------------------------*/
 
-READ8_MEMBER(intellec4_state::rom0_in)
+u8 intellec4_state::rom0_in()
 {
 	// bit 0 of this port is ANDed with the TTY input
 	return m_tty->rxd_r() ? 0x0eU : 0x0fU;
 }
 
-READ8_MEMBER(intellec4_state::rom2_in)
+u8 intellec4_state::rom2_in()
 {
 	// lower nybble of PROM programmer data
 	return m_prom_programmer->do_r() & 0x0fU;
 }
 
-READ8_MEMBER(intellec4_state::rom3_in)
+u8 intellec4_state::rom3_in()
 {
 	// upper nybble of PROM programmer data
 	return (m_prom_programmer->do_r() >> 4) & 0x0fU;
 }
 
-READ8_MEMBER(intellec4_state::rome_in)
+u8 intellec4_state::rome_in()
 {
 	// upper nybble of RAM data latch
 	return (m_ram_data >> 4) & 0x0fU;
 }
 
-READ8_MEMBER(intellec4_state::romf_in)
+u8 intellec4_state::romf_in()
 {
 	// lower nybble of RAM data latch
 	return m_ram_data & 0x0fU;
 }
 
-WRITE8_MEMBER(intellec4_state::rom0_out)
+void intellec4_state::rom0_out(u8 data)
 {
 	// lower nybble of PROM programmer address
 	m_prom_addr = (m_prom_addr & 0xf0U) | (data & 0x0fU);
 	m_prom_programmer->a_w(m_prom_addr);
 }
 
-WRITE8_MEMBER(intellec4_state::rom1_out)
+void intellec4_state::rom1_out(u8 data)
 {
 	// upper nybble of PROM programmer address
 	m_prom_addr = (m_prom_addr & 0x0fU) | ((data << 4) & 0xf0U);
 	m_prom_programmer->a_w(m_prom_addr);
 }
 
-WRITE8_MEMBER(intellec4_state::rom2_out)
+void intellec4_state::rom2_out(u8 data)
 {
 	// lower nybble of PROM programmer data
 	m_prom_data = (m_prom_data & 0xf0U) | (data & 0x0fU);
 	m_prom_programmer->di_w(m_prom_data);
 }
 
-WRITE8_MEMBER(intellec4_state::rom3_out)
+void intellec4_state::rom3_out(u8 data)
 {
 	// upper nybble of PROM programmer data
 	m_prom_data = (m_prom_data & 0x0fU) | ((data << 4) & 0xf0U);
 	m_prom_programmer->di_w(m_prom_data);
 }
 
-WRITE8_MEMBER(intellec4_state::rome_out)
+void intellec4_state::rome_out(u8 data)
 {
 	// bit 0 of this port enables program memory write
 	m_ram_write = BIT(data, 0);
 }
 
-WRITE8_MEMBER(intellec4_state::romf_out)
+void intellec4_state::romf_out(u8 data)
 {
 	// sets the program memory page for read/write operations
 	m_ram_page = data & 0x0fU;
 }
 
-WRITE8_MEMBER(intellec4_state::ram0_out)
+void intellec4_state::ram0_out(u8 data)
 {
 	// bit 0 of this port controls the TTY current loop
 	m_tty->write_txd(BIT(data, 0));
 }
 
-WRITE8_MEMBER(intellec4_state::ram1_out)
+void intellec4_state::ram1_out(u8 data)
 {
 	// bit 0 of this port controls the paper tape motor (0 = stop, 1 = run)
 	m_tty->write_rts(BIT(~data, 0));
@@ -525,9 +535,10 @@ INPUT_CHANGED_MEMBER(intellec4_state::sw_reset_mode)
 
 template <unsigned N> INPUT_CHANGED_MEMBER(intellec4_state::sw_prg_mode)
 {
-	static constexpr char const *const mode_leds[3] = { "led_mode_mon", "led_mode_ram", "led_mode_prom" };
 	static constexpr int prg_banks[3] = { BANK_PRG_MON, BANK_PRG_RAM, BANK_PRG_PROM };
 	static constexpr int io_banks[3] = { BANK_IO_MON, BANK_IO_NEITHER, BANK_IO_PROM };
+
+	std::tuple<output_finder<> &, output_finder<> &, output_finder<> &> mode_leds(m_led_mode_mon, m_led_mode_ram, m_led_mode_prom);
 
 	if (oldval && !newval)
 	{
@@ -537,7 +548,7 @@ template <unsigned N> INPUT_CHANGED_MEMBER(intellec4_state::sw_prg_mode)
 			{
 				m_program_banks->set_bank(prg_banks[N]);
 				m_rom_port_banks->set_bank(io_banks[N]);
-				machine().output().set_value(mode_leds[N], m_ff_prg_mode[N] = true);
+				std::get<N>(mode_leds) = m_ff_prg_mode[N] = true;
 			}
 			trigger_reset();
 		}
@@ -547,11 +558,11 @@ template <unsigned N> INPUT_CHANGED_MEMBER(intellec4_state::sw_prg_mode)
 			m_rom_port_banks->set_bank(BANK_IO_NEITHER);
 		}
 		if ((0U != N) && m_ff_prg_mode[0])
-			machine().output().set_value(mode_leds[0], m_ff_prg_mode[0] = false);
+			std::get<0>(mode_leds) = m_ff_prg_mode[0] = false;
 		if ((1U != N) && m_ff_prg_mode[1])
-			machine().output().set_value(mode_leds[1], m_ff_prg_mode[1] = false);
+			std::get<1>(mode_leds) = m_ff_prg_mode[1] = false;
 		if ((2U != N) && m_ff_prg_mode[2])
-			machine().output().set_value(mode_leds[2], m_ff_prg_mode[2] = false);
+			std::get<2>(mode_leds) = m_ff_prg_mode[2] = false;
 	}
 	m_sw_prg_mode[N] = !bool(newval);
 }
@@ -635,6 +646,11 @@ void intellec4_state::driver_start()
 	m_led_active_bank.resolve();
 	m_led_execution.resolve();
 	m_led_last_ptr.resolve();
+	m_led_status_ptr_valid.resolve();
+	m_led_status_search.resolve();
+	m_led_mode_mon.resolve();
+	m_led_mode_ram.resolve();
+	m_led_mode_prom.resolve();
 
 	save_item(NAME(m_ram_page));
 	save_item(NAME(m_ram_data));
@@ -714,11 +730,11 @@ void intellec4_state::driver_reset()
 	m_prom_programmer->prgm_prom_pwr(BIT(sw_prom_prgm, BIT_SW_PRGM_PWR));
 
 	// set front panel LEDs
-	machine().output().set_value("led_status_ptr_valid", m_pointer_valid);
-	machine().output().set_value("led_status_search",    m_search_complete);
-	machine().output().set_value("led_mode_mon",         m_ff_prg_mode[0]);
-	machine().output().set_value("led_mode_ram",         m_ff_prg_mode[1]);
-	machine().output().set_value("led_mode_prom",        m_ff_prg_mode[2]);
+	m_led_status_ptr_valid = m_pointer_valid;
+	m_led_status_search    = m_search_complete;
+	m_led_mode_mon         = m_ff_prg_mode[0];
+	m_led_mode_ram         = m_ff_prg_mode[1];
+	m_led_mode_prom        = m_ff_prg_mode[2];
 }
 
 
@@ -809,7 +825,6 @@ void intellec4_state::intellec4_program_memory(address_map &map)
 DEVICE_INPUT_DEFAULTS_START(tty)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD",    0x00ff, RS232_BAUD_110)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD",    0x00ff, RS232_BAUD_110)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0x00ff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS",  0x00ff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY",    0x00ff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS",  0x00ff, RS232_STOPBITS_2)
@@ -1001,9 +1016,9 @@ void intellec4_state::reset_panel()
 		m_panel_reset = true;
 		m_adr_cmp_latch = false;
 		if (m_search_complete && !m_next_inst)
-			machine().output().set_value("led_status_search", m_search_complete = false);
+			m_led_status_search = m_search_complete = false;
 		if (m_pointer_valid)
-			machine().output().set_value("led_status_ptr_valid", m_pointer_valid = false);
+			m_led_status_ptr_valid = m_pointer_valid = false;
 	}
 }
 
@@ -1018,6 +1033,7 @@ class mod4_state : public intellec4_state
 public:
 	mod4_state(machine_config const &mconfig, device_type type, char const *tag)
 		: intellec4_state(mconfig, type, tag)
+		, m_led_status_cpu(*this, "led_status_cpu")
 	{
 	}
 
@@ -1043,6 +1059,8 @@ private:
 
 	TIMER_CALLBACK_MEMBER(one_shot_expired);
 
+	output_finder<> m_led_status_cpu;
+
 	emu_timer   *m_one_shot_timer = nullptr;
 
 	// control board state
@@ -1064,8 +1082,8 @@ INPUT_PORTS_START(mod4)
 	PORT_INCLUDE(intellec4)
 
 	PORT_MODIFY("MODE")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("HOLD")     PORT_CODE(KEYCODE_LEFT)  PORT_CHANGED_MEMBER(DEVICE_SELF, mod4_state, sw_hold,     nullptr)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("ONE SHOT") PORT_CODE(KEYCODE_RIGHT) PORT_CHANGED_MEMBER(DEVICE_SELF, mod4_state, sw_one_shot, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_TOGGLE PORT_NAME("HOLD")     PORT_CODE(KEYCODE_LEFT)  PORT_CHANGED_MEMBER(DEVICE_SELF, mod4_state, sw_hold,     0)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYPAD )             PORT_NAME("ONE SHOT") PORT_CODE(KEYCODE_RIGHT) PORT_CHANGED_MEMBER(DEVICE_SELF, mod4_state, sw_one_shot, 0)
 INPUT_PORTS_END
 
 
@@ -1133,7 +1151,7 @@ void mod4_state::mod4(machine_config &config)
 	cpu.set_ram_status_map(&mod4_state::intellec4_ram_status);
 	cpu.set_ram_ports_map(&mod4_state::intellec4_ram_ports);
 	cpu.set_program_memory_map(&mod4_state::intellec4_program_memory);
-	cpu.set_bus_cycle_cb(FUNC(mod4_state::bus_cycle), this);
+	cpu.set_bus_cycle_cb(FUNC(mod4_state::bus_cycle));
 	cpu.sync_cb().set(m_bus, FUNC(bus::intellec4::univ_bus_device::sync_in));
 
 	m_bus->test_out_cb().set(FUNC(mod4_state::bus_test));
@@ -1149,6 +1167,8 @@ void mod4_state::mod4(machine_config &config)
 void mod4_state::driver_start()
 {
 	intellec4_state::driver_start();
+
+	m_led_status_cpu.resolve();
 
 	m_one_shot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mod4_state::one_shot_expired), this));
 
@@ -1176,7 +1196,7 @@ void mod4_state::driver_reset()
 	m_bus->test_in((m_one_shot || m_sw_hold) ? 0 : 1);
 
 	// set front panel LEDs
-	machine().output().set_value("led_status_cpu", true); // actually driven by clock phase 2 - let's assume it's always running
+	m_led_status_cpu = true; // actually driven by clock phase 2 - let's assume it's always running
 }
 
 
@@ -1359,7 +1379,7 @@ void mod40_state::mod40(machine_config &config)
 	cpu.set_ram_status_map(&mod40_state::intellec4_ram_status);
 	cpu.set_ram_ports_map(&mod40_state::intellec4_ram_ports);
 	cpu.set_program_memory_map(&mod40_state::intellec4_program_memory);
-	cpu.set_bus_cycle_cb(FUNC(mod40_state::bus_cycle), this);
+	cpu.set_bus_cycle_cb(FUNC(mod40_state::bus_cycle));
 	cpu.sync_cb().set(m_bus, FUNC(bus::intellec4::univ_bus_device::sync_in));
 	cpu.stp_ack_cb().set(FUNC(mod40_state::stp_ack));
 

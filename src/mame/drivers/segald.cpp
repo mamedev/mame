@@ -47,7 +47,7 @@ public:
 	void init_astron();
 
 private:
-	uint8_t m_nmi_enable;
+	uint8_t m_nmi_enable = 0;
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_obj_ram;
@@ -55,19 +55,19 @@ private:
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_shared_ptr<uint8_t> m_fix_ram;
 
-	uint8_t m_ldv1000_input_latch;
-	uint8_t m_ldv1000_output_latch;
+	uint8_t m_ldv1000_input_latch = 0;
+	uint8_t m_ldv1000_output_latch = 0;
 
-	DECLARE_READ8_MEMBER(astron_DISC_read);
-	DECLARE_READ8_MEMBER(astron_OUT_read);
-	DECLARE_READ8_MEMBER(astron_OBJ_read);
-	DECLARE_READ8_MEMBER(astron_COLOR_read);
-	DECLARE_WRITE8_MEMBER(astron_DISC_write);
-	DECLARE_WRITE8_MEMBER(astron_OUT_write);
-	DECLARE_WRITE8_MEMBER(astron_OBJ_write);
-	DECLARE_WRITE8_MEMBER(astron_COLOR_write);
-	DECLARE_WRITE8_MEMBER(astron_FIX_write);
-	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
+	uint8_t astron_DISC_read(offs_t offset);
+	uint8_t astron_OUT_read(offs_t offset);
+	uint8_t astron_OBJ_read(offs_t offset);
+	uint8_t astron_COLOR_read(offs_t offset);
+	void astron_DISC_write(offs_t offset, uint8_t data);
+	void astron_OUT_write(offs_t offset, uint8_t data);
+	void astron_OBJ_write(offs_t offset, uint8_t data);
+	void astron_COLOR_write(offs_t offset, uint8_t data);
+	void astron_FIX_write(offs_t offset, uint8_t data);
+	void astron_io_bankswitch_w(uint8_t data);
 	virtual void machine_start() override;
 	uint32_t screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
@@ -82,15 +82,13 @@ private:
 /* VIDEO GOODS */
 void segald_state::astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
-	uint8_t characterX, characterY;
-
-	for (characterX = 0; characterX < 32; characterX++)
+	for (uint8_t character_x = 0; character_x < 32; character_x++)
 	{
-		for (characterY = 0; characterY < 32; characterY++)
+		for (uint8_t character_y = 0; character_y < 32; character_y++)
 		{
-			int current_screen_character = (characterY*32) + characterX;
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, m_fix_ram[current_screen_character],
-					1, 0, 0, characterX*8, characterY*8, 0);
+			int current_screen_character = (character_y * 32) + character_x;
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, m_fix_ram[current_screen_character],
+					1, 0, 0, character_x * 8, character_y * 8, 0);
 		}
 	}
 }
@@ -107,15 +105,11 @@ void segald_state::astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 /*  const uint8_t SPR_GFXOFS_LO = 6;*/
 /*  const uint8_t SPR_GFXOFS_HI = 7;*/
 
-	int sx,sy;
-	int spr_number;
-	int spr_base;
-
-	for (spr_number = 0; spr_number < 32; spr_number++)
+	for (int spr_number = 0; spr_number < 32; spr_number++)
 	{
-		spr_base = 0x10 * spr_number;
-		sy = m_obj_ram[spr_base + SPR_Y_TOP];
-		sx = m_obj_ram[spr_base + SPR_X_LO];
+		int spr_base = 0x10 * spr_number;
+		int sy = m_obj_ram[spr_base + SPR_Y_TOP];
+		int sx = m_obj_ram[spr_base + SPR_X_LO];
 
 		if (sx != 0 || sy != 0)
 			logerror("Hey!  A sprite's not at 0,0 : %d %d", sx, sy);
@@ -137,7 +131,7 @@ uint32_t segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 
 
 /* MEMORY HANDLERS */
 /* READS */
-READ8_MEMBER(segald_state::astron_DISC_read)
+uint8_t segald_state::astron_DISC_read(offs_t offset)
 {
 	if (m_nmi_enable)
 		m_ldv1000_input_latch = m_laserdisc->status_r();
@@ -147,19 +141,19 @@ READ8_MEMBER(segald_state::astron_DISC_read)
 	return m_ldv1000_input_latch;
 }
 
-READ8_MEMBER(segald_state::astron_OUT_read)
+uint8_t segald_state::astron_OUT_read(offs_t offset)
 {
 	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", m_out_ram[offset], offset, m_maincpu->pc());
 	return m_out_ram[offset];
 }
 
-READ8_MEMBER(segald_state::astron_OBJ_read)
+uint8_t segald_state::astron_OBJ_read(offs_t offset)
 {
 	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", m_obj_ram[offset], offset, m_maincpu->pc());
 	return m_obj_ram[offset];
 }
 
-READ8_MEMBER(segald_state::astron_COLOR_read)
+uint8_t segald_state::astron_COLOR_read(offs_t offset)
 {
 	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", m_color_ram[offset], offset, m_maincpu->pc());
 	return m_color_ram[offset];
@@ -167,7 +161,7 @@ READ8_MEMBER(segald_state::astron_COLOR_read)
 
 
 /* WRITES */
-WRITE8_MEMBER(segald_state::astron_DISC_write)
+void segald_state::astron_DISC_write(offs_t offset, uint8_t data)
 {
 	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, m_maincpu->pc());
 
@@ -177,7 +171,7 @@ WRITE8_MEMBER(segald_state::astron_DISC_write)
 		m_laserdisc->data_w(m_ldv1000_output_latch);
 }
 
-WRITE8_MEMBER(segald_state::astron_OUT_write)
+void segald_state::astron_OUT_write(offs_t offset, uint8_t data)
 {
 	logerror("OUT write : 0x%04x @  0x%04x [0x%x]\n", data, offset, m_maincpu->pc());
 
@@ -213,13 +207,13 @@ WRITE8_MEMBER(segald_state::astron_OUT_write)
 	m_out_ram[offset] = data;
 }
 
-WRITE8_MEMBER(segald_state::astron_OBJ_write)
+void segald_state::astron_OBJ_write(offs_t offset, uint8_t data)
 {
 	m_obj_ram[offset] = data;
 	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, m_maincpu->pc());
 }
 
-WRITE8_MEMBER(segald_state::astron_COLOR_write)
+void segald_state::astron_COLOR_write(offs_t offset, uint8_t data)
 {
 	uint8_t r, g, b, a;
 	uint8_t highBits, lowBits;
@@ -242,13 +236,13 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, m_maincpu->pc());
 }
 
-WRITE8_MEMBER(segald_state::astron_FIX_write)
+void segald_state::astron_FIX_write(offs_t offset, uint8_t data)
 {
 	m_fix_ram[offset] = data;
 	/* logerror("%s FIX write : 0x%04x [0x%x]\n", machine().describe_context(), data, offset); */
 }
 
-WRITE8_MEMBER(segald_state::astron_io_bankswitch_w)
+void segald_state::astron_io_bankswitch_w(uint8_t data)
 {
 	logerror("Banking 0x%x\n", data);
 	membank("bank1")->set_entry(data & 0xff);
@@ -377,7 +371,8 @@ void segald_state::machine_start()
 
 
 /* DRIVER */
-MACHINE_CONFIG_START(segald_state::astron)
+void segald_state::astron(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, SCHEMATIC_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segald_state::mainmem);
@@ -386,12 +381,11 @@ MACHINE_CONFIG_START(segald_state::astron)
 
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(segald_state::screen_update_astron));
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segald);
 	PALETTE(config, m_palette).set_entries(256);
@@ -399,7 +393,7 @@ MACHINE_CONFIG_START(segald_state::astron)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( astron )

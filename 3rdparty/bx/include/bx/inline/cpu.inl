@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -8,11 +8,16 @@
 #endif // BX_CPU_H_HEADER_GUARD
 
 #if BX_COMPILER_MSVC
-#	if BX_PLATFORM_WINRT
+#	if BX_PLATFORM_WINRT || (BX_PLATFORM_WINDOWS && !BX_CPU_X86)
+#		ifndef WIN32_LEAN_AND_MEAN
+#			define WIN32_LEAN_AND_MEAN
+#		endif // WIN32_LEAN_AND_MEAN
 #		include <windows.h>
-#	endif // BX_PLATFORM_WINRT
+#	endif // BX_PLATFORM_WINRT || (BX_PLATFORM_WINDOWS && !BX_CPU_X86)
 
-#	include <emmintrin.h> // _mm_fence
+#	if BX_CPU_X86
+#		include <emmintrin.h> // _mm_fence
+#	endif // BX_CPU_X86
 
 extern "C" void _ReadBarrier();
 #	pragma intrinsic(_ReadBarrier)
@@ -66,7 +71,7 @@ namespace bx
 		_ReadBarrier();
 #else
 		asm volatile("":::"memory");
-#endif // BX_COMPILER
+#endif // BX_COMPILER_*
 	}
 
 	inline void writeBarrier()
@@ -75,7 +80,7 @@ namespace bx
 		_WriteBarrier();
 #else
 		asm volatile("":::"memory");
-#endif // BX_COMPILER
+#endif // BX_COMPILER_*
 	}
 
 	inline void readWriteBarrier()
@@ -84,18 +89,20 @@ namespace bx
 		_ReadWriteBarrier();
 #else
 		asm volatile("":::"memory");
-#endif // BX_COMPILER
+#endif // BX_COMPILER_*
 	}
 
 	inline void memoryBarrier()
 	{
-#if BX_PLATFORM_WINRT
-		MemoryBarrier();
-#elif BX_COMPILER_MSVC
+#if BX_COMPILER_MSVC
+#	if BX_CPU_X86
 		_mm_mfence();
+#	else
+		MemoryBarrier();
+#	endif // BX_CPU_X86
 #else
 		__sync_synchronize();
-#endif // BX_COMPILER
+#endif // BX_COMPILER_MSVC
 	}
 
 	template<>
@@ -105,7 +112,7 @@ namespace bx
 		return int32_t(_InterlockedCompareExchange( (volatile long*)(_ptr), long(_new), long(_old) ) );
 #else
 		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
-#endif // BX_COMPILER
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -115,7 +122,7 @@ namespace bx
 		return uint32_t(_InterlockedCompareExchange( (volatile long*)(_ptr), long(_new), long(_old) ) );
 #else
 		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
-#endif // BX_COMPILER
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -125,7 +132,7 @@ namespace bx
 		return _InterlockedCompareExchange64(_ptr, _new, _old);
 #else
 		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
-#endif // BX_COMPILER
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -135,7 +142,7 @@ namespace bx
 		return uint64_t(_InterlockedCompareExchange64( (volatile int64_t*)(_ptr), int64_t(_new), int64_t(_old) ) );
 #else
 		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
-#endif // BX_COMPILER
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -145,7 +152,7 @@ namespace bx
 		return _InterlockedExchangeAdd( (volatile long*)_ptr, _add);
 #else
 		return __sync_fetch_and_add(_ptr, _add);
-#endif // BX_COMPILER_
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -174,7 +181,7 @@ namespace bx
 #	endif
 #else
 		return __sync_fetch_and_add(_ptr, _add);
-#endif // BX_COMPILER_
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -190,7 +197,7 @@ namespace bx
 		return atomicFetchAndAdd(_ptr, _add) + _add;
 #else
 		return __sync_add_and_fetch(_ptr, _add);
-#endif // BX_COMPILER_
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -200,7 +207,7 @@ namespace bx
 		return atomicFetchAndAdd(_ptr, _add) + _add;
 #else
 		return __sync_add_and_fetch(_ptr, _add);
-#endif // BX_COMPILER_
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -222,7 +229,7 @@ namespace bx
 		return atomicFetchAndAdd(_ptr, -_sub);
 #else
 		return __sync_fetch_and_sub(_ptr, _sub);
-#endif // BX_COMPILER_
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -232,7 +239,7 @@ namespace bx
 		return atomicFetchAndAdd(_ptr, -_sub);
 #else
 		return __sync_fetch_and_sub(_ptr, _sub);
-#endif // BX_COMPILER_
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -254,7 +261,7 @@ namespace bx
 		return atomicFetchAndAdd(_ptr, -_sub) - _sub;
 #else
 		return __sync_sub_and_fetch(_ptr, _sub);
-#endif // BX_COMPILER_
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -264,7 +271,7 @@ namespace bx
 		return atomicFetchAndAdd(_ptr, -_sub) - _sub;
 #else
 		return __sync_sub_and_fetch(_ptr, _sub);
-#endif // BX_COMPILER_
+#endif // BX_COMPILER_*
 	}
 
 	template<>
@@ -345,7 +352,7 @@ namespace bx
 		return _InterlockedExchangePointer(_ptr, _new);
 #else
 		return __sync_lock_test_and_set(_ptr, _new);
-#endif // BX_COMPILER
+#endif // BX_COMPILER_*
 	}
 
 } // namespace bx

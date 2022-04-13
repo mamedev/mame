@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -47,20 +47,20 @@ enum
 
 // ======================> device_vcs_cart_interface
 
-class device_vcs_cart_interface : public device_slot_card_interface
+class device_vcs_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_vcs_cart_interface();
 
 	// reading from ROM
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
+	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
 	// writing to RAM chips (sometimes it is in a different range than write_bank!)
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
+	virtual void write_ram(offs_t offset, uint8_t data) { }
 
 	// read/write to bankswitch address
-	virtual DECLARE_READ8_MEMBER(read_bank) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_bank) { }
+	virtual uint8_t read_bank(address_space &space, offs_t offset) { return 0xff; }
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) { }
 
 	virtual void setup_addon_ptr(uint8_t *ptr) { }
 
@@ -84,8 +84,8 @@ protected:
 // ======================> vcs_cart_slot_device
 
 class vcs_cart_slot_device : public device_t,
-								public device_image_interface,
-								public device_slot_interface
+								public device_cartrom_image_interface,
+								public device_single_card_slot_interface<device_vcs_cart_interface>
 {
 public:
 	// construction/destruction
@@ -104,33 +104,28 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	int get_cart_type() { return m_type; };
-	static int identify_cart_type(const uint8_t *ROM, uint32_t len);
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 1; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "a2600_cart"; }
-	virtual const char *file_extensions() const override { return "bin,a26"; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "a2600_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,a26"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_bank);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	int get_cart_type() { return m_type; }
+	static int identify_cart_type(const uint8_t *ROM, uint32_t len);
 
-private:
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset);
+	virtual uint8_t read_bank(address_space &space, offs_t offset);
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data);
+	virtual void write_ram(offs_t offset, uint8_t data);
+
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+private:
 	device_vcs_cart_interface*       m_cart;
 	int m_type;
 

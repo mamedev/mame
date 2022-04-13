@@ -2,9 +2,9 @@
 // copyright-holders:Hyllian
 
 /*
-   
+
   *******  Super XBR 3D Shader, pass0  *******
-   
+
   Copyright (c) 2016 Hyllian - sergiogdb@gmail.com
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,31 +28,31 @@
 */
 
 {
-    "blend": {
-    	"equation": "add",
-    	"srcColor": "1",
-    	"dstColor": "0",
-    	"srcAlpha": "1",
-    	"dstAlpha": "0"
-    },
-    "depth": {
-    	"function": "always",
-    	"writeenable": false
-    },
-    "cull": {
-    	"mode": "none"
-    },
-    "write": {
-    	"rgb": true,
-    	"alpha": true
-    },
-    "vertex": "chains/xbr/super-xbr/vs_super-2xbr-3d-pass0",
-    "fragment": "chains/xbr/super-xbr/fs_super-2xbr-3d-pass0",
-    "uniforms": [
-    	{ "name": "s0",               "type": "int",  "values": [ 1.0 ] },
-    	{ "name": "XBR_EDGE_STR",     "type": "vec4", "values": [ 0.6, 0.0, 0.0, 0.0 ] },
-    	{ "name": "XBR_WEIGHT",       "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
-    	{ "name": "XBR_ANTI_RINGING", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_tex_size0",      "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
-    ]
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+	"vertex": "chains/xbr/super-xbr/vs_super-2xbr-3d-pass0",
+	"fragment": "chains/xbr/super-xbr/fs_super-2xbr-3d-pass0",
+	"uniforms": [
+		{ "name": "s0",               "type": "int",  "values": [ 1.0 ] },
+		{ "name": "XBR_EDGE_STR",     "type": "vec4", "values": [ 0.6, 0.0, 0.0, 0.0 ] },
+		{ "name": "XBR_WEIGHT",       "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "XBR_ANTI_RINGING", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_size0",      "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+	]
 }

@@ -242,7 +242,7 @@ void redbaron_state::machine_start()
 
 void redbaron_state::machine_reset()
 {
-	earom_control_w(machine().dummy_space(), 0, 0);
+	earom_control_w(0);
 }
 
 
@@ -267,13 +267,13 @@ INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
+READ_LINE_MEMBER(bzone_state::clock_r)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
-WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
+void bzone_state::bzone_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
@@ -286,15 +286,15 @@ WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
  *
  *************************************/
 
-READ8_MEMBER(redbaron_state::redbaron_joy_r)
+uint8_t redbaron_state::redbaron_joy_r()
 {
 	return m_fake_ports[m_rb_input_select ? 0 : 1]->read();
 }
 
-WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
+void redbaron_state::redbaron_joysound_w(uint8_t data)
 {
 	m_rb_input_select = data & 1;
-	m_redbaronsound->sounds_w(space, offset, data);
+	m_redbaronsound->sounds_w(data);
 }
 
 
@@ -305,18 +305,18 @@ WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
  *
  *************************************/
 
-READ8_MEMBER(redbaron_state::earom_read)
+uint8_t redbaron_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(redbaron_state::earom_write)
+void redbaron_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address((offset ^ 0x20) & 0x3f);
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(redbaron_state::earom_control_w)
+void redbaron_state::earom_control_w(uint8_t data)
 {
 	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
@@ -339,17 +339,27 @@ void bzone_state::bzone_map(address_map &map)
 	map(0x0a00, 0x0a00).portr("DSW0");
 	map(0x0c00, 0x0c00).portr("DSW1");
 	map(0x1000, 0x1000).w(FUNC(bzone_state::bzone_coin_counter_w));
-	map(0x1200, 0x1200).w("avg", FUNC(avg_bzone_device::go_w));
+	map(0x1200, 0x1200).w("avg", FUNC(avg_device::go_w));
 	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x1600, 0x1600).w("avg", FUNC(avg_bzone_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_device::reset_w));
 	map(0x1800, 0x1800).r(m_mathbox, FUNC(mathbox_device::status_r));
 	map(0x1810, 0x1810).r(m_mathbox, FUNC(mathbox_device::lo_r));
 	map(0x1818, 0x1818).r(m_mathbox, FUNC(mathbox_device::hi_r));
 	map(0x1820, 0x182f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1840, 0x1840).w(FUNC(bzone_state::bzone_sounds_w));
 	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x7fff).rom();
+}
+
+void bzone_state::bradley_map(address_map &map)
+{
+	bzone_map(map);
+	map(0x0400, 0x07ff).ram();
+	map(0x1808, 0x1808).portr("1808");
+	map(0x1809, 0x1809).portr("1809");
+	map(0x180a, 0x180a).r(FUNC(bzone_state::analog_data_r));
+	map(0x1848, 0x1850).w(FUNC(bzone_state::analog_select_w));
 }
 
 void redbaron_state::redbaron_map(address_map &map)
@@ -360,20 +370,20 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x0a00, 0x0a00).portr("DSW0");
 	map(0x0c00, 0x0c00).portr("DSW1");
 	map(0x1000, 0x1000).nopw();        /* coin out - Manual states this is "Coin Counter" */
-	map(0x1200, 0x1200).w("avg", FUNC(avg_bzone_device::go_w));
+	map(0x1200, 0x1200).w("avg", FUNC(avg_device::go_w));
 	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x1600, 0x1600).w("avg", FUNC(avg_bzone_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_device::reset_w));
 	map(0x1800, 0x1800).r("mathbox", FUNC(mathbox_device::status_r));
 	map(0x1802, 0x1802).portr("IN4");
 	map(0x1804, 0x1804).r("mathbox", FUNC(mathbox_device::lo_r));
 	map(0x1806, 0x1806).r("mathbox", FUNC(mathbox_device::hi_r));
 	map(0x1808, 0x1808).w(FUNC(redbaron_state::redbaron_joysound_w));  /* and select joystick pot also */
 	map(0x180a, 0x180a).nopw();                /* sound reset, yet todo */
-	map(0x180c, 0x180c).w(FUNC(redbaron_state::earom_control_w));
+	map(0x180c, 0x180c).nopr().w(FUNC(redbaron_state::earom_control_w));
 	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
-	map(0x1860, 0x187f).w("mathbox", FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x1860, 0x187f).nopr().w("mathbox", FUNC(mathbox_device::go_w));
+	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x7fff).rom();
 }
 
@@ -394,9 +404,9 @@ void redbaron_state::redbaron_map(address_map &map)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step") \
 	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)\
 	/* bit 7 is tied to a 3kHz clock */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bzone_state, clock_r)
 
 
 #define BZONEDSW0\
@@ -586,7 +596,8 @@ void bzone_state::bzone_base(machine_config &config)
 	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG_BZONE(config, "avg", 0));
-	avg.set_vector_tag("vector");
+	avg.set_vector("vector");
+	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	/* Drivers */
 	MATHBOX(config, m_mathbox, 0);
@@ -598,6 +609,12 @@ void bzone_state::bzone(machine_config &config)
 
 	/* sound hardware */
 	bzone_audio(config);
+}
+
+void bzone_state::bradley(machine_config &config)
+{
+	bzone(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::bradley_map);
 }
 
 void redbaron_state::redbaron(machine_config &config)
@@ -666,7 +683,7 @@ ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -696,7 +713,7 @@ ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -727,7 +744,7 @@ ROM_START( bzonec ) /* cocktail version */
 	ROM_LOAD( "bz3b3800",   0x3800, 0x0800, CRC(76cf57f6) SHA1(1b8f3fcd664ed04ce60d94fdf27e56b20d52bdbd) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -759,7 +776,7 @@ ROM_START( bradley )
 	ROM_LOAD( "bta3.bin",   0x3800, 0x0800, CRC(d669d796) SHA1(ad606882320cd13612c7962d4718680fe5a35dd3) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -813,7 +830,7 @@ ROM_START( redbaron ) /* Analog Vec Gen A035742-02 Rev. C+ */
 	ROM_LOAD( "037007-01.a3",  0x3800, 0x0800, CRC(60250ede) SHA1(9c48952bd69863bee0c6dce09f3613149e0151ef) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* 74S287N or compatible bprom like the 82S129 */
 
 	/* Mathbox PROMs */
@@ -847,7 +864,7 @@ ROM_START( redbarona ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "037007-01e.a3",  0x3800, 0x0800, CRC(60250ede) SHA1(9c48952bd69863bee0c6dce09f3613149e0151ef) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* 74S287N or compatible bprom like the 82S129 */
 
 	/* Mathbox PROMs */
@@ -875,31 +892,19 @@ ROM_END
  *
  *************************************/
 
-READ8_MEMBER(bzone_state::analog_data_r)
+uint8_t bzone_state::analog_data_r()
 {
 	return m_analog_data;
 }
 
 
-WRITE8_MEMBER(bzone_state::analog_select_w)
+void bzone_state::analog_select_w(offs_t offset, uint8_t data)
 {
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
 	if (offset <= 2)
 		m_analog_data = ioport(analog_port[offset])->read();
 }
-
-
-void bzone_state::init_bradley()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_ram(0x400, 0x7ff);
-	space.install_read_port(0x1808, 0x1808, "1808");
-	space.install_read_port(0x1809, 0x1809, "1809");
-	space.install_read_handler(0x180a, 0x180a, read8_delegate(FUNC(bzone_state::analog_data_r),this));
-	space.install_write_handler(0x1848, 0x1850, write8_delegate(FUNC(bzone_state::analog_select_w),this));
-}
-
 
 
 /*************************************
@@ -911,6 +916,6 @@ void bzone_state::init_bradley()
 GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
 GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
 GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    init_bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
+GAME( 1980, bradley,   0,        bradley,  bradley,  bzone_state,    empty_init,  ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
 GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
 GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )

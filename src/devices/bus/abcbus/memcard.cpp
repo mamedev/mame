@@ -63,7 +63,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ABC_MEMORY_CARD, abc_memory_card_device, "abc_mem", "ABC Memory Card")
+DEFINE_DEVICE_TYPE(ABC_MEMORY_CARD, abc_memory_card_device, "abc_memcard", "ABC Memory Card")
 
 
 //-------------------------------------------------

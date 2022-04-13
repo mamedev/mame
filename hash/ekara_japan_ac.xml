@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="ekara_japan_ac" description="Takara e-kara (Japan) ACxxxx series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+
+	<!--
+	Japanese cart listing (by AC code)  * = dumped
+	 * = dumped
+
+	this numbering is a little unusual, maybe the 'A' series Pichi Pichi Pitch
+	are actually 1-8 here, just lacking the actual AC markings.
+	see ekara_japan_a.xml
+
+	*AC0009-KIR / KR-1  Kirarin Cartridge Vol.1 (bundled with Kirarin microphone)
+
+	(more?)
+
+	-->
+
+	<software name="ac0009" supported="no">
+		<description>KR-1 Kirarin Cartridge Vol.1 (Japan) (AC0009-KIR)</description>
+		<year>2007</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekara_ac0009-kir.bin" size="0x100000" crc="351c99c3" sha1="86c2d231d0d07f5e214e19f49dc1bda3aac42eb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

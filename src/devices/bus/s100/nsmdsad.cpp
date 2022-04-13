@@ -61,7 +61,7 @@ static void mds_ad_floppies(device_slot_interface &device)
 void s100_mds_ad_device::device_add_mconfig(machine_config &config)
 {
 	for (auto &floppy : m_floppy)
-		FLOPPY_CONNECTOR(config, floppy, mds_ad_floppies, "525dd", floppy_image_device::default_floppy_formats);
+		FLOPPY_CONNECTOR(config, floppy, mds_ad_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 

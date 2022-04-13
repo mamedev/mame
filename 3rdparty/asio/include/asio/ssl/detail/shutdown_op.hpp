@@ -2,7 +2,7 @@
 // ssl/detail/shutdown_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,11 @@ namespace detail {
 class shutdown_op
 {
 public:
+  static ASIO_CONSTEXPR const char* tracking_name()
+  {
+    return "ssl::stream<>::async_shutdown";
+  }
+
   engine::want operator()(engine& eng,
       asio::error_code& ec,
       std::size_t& bytes_transferred) const
@@ -41,7 +46,17 @@ public:
       const asio::error_code& ec,
       const std::size_t&) const
   {
-    handler(ec);
+    if (ec == asio::error::eof)
+    {
+      // The engine only generates an eof when the shutdown notification has
+      // been received from the peer. This indicates that the shutdown has
+      // completed successfully, and thus need not be passed on to the handler.
+      ASIO_MOVE_OR_LVALUE(Handler)(handler)(asio::error_code());
+    }
+    else
+    {
+      ASIO_MOVE_OR_LVALUE(Handler)(handler)(ec);
+    }
   }
 };
 

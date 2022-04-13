@@ -14,13 +14,14 @@
 
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 
 // standard windows headers
 #include <windows.h>
 #include <winioctl.h>
 #include <tchar.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cctype>
 
 
 namespace {

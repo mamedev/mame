@@ -230,7 +230,7 @@ void rp5c01_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -287,10 +287,10 @@ void rp5c01_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void rp5c01_device::nvram_read(emu_file &file)
+bool rp5c01_device::nvram_read(util::read_stream &file)
 {
-	if (m_battery_backed)
-		file.read(m_ram, RAM_SIZE);
+	size_t actual;
+	return !file.read(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
 }
 
 
@@ -299,10 +299,10 @@ void rp5c01_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void rp5c01_device::nvram_write(emu_file &file)
+bool rp5c01_device::nvram_write(util::write_stream &file)
 {
-	if (m_battery_backed)
-		file.write(m_ram, RAM_SIZE);
+	size_t actual;
+	return !file.write(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
 }
 
 
@@ -310,7 +310,7 @@ void rp5c01_device::nvram_write(emu_file &file)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( rp5c01_device::read )
+uint8_t rp5c01_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 	offset &= 0x0f;
@@ -355,7 +355,7 @@ READ8_MEMBER( rp5c01_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( rp5c01_device::write )
+void rp5c01_device::write(offs_t offset, uint8_t data)
 {
 	data &= 0x0f;
 	offset &= 0x0f;

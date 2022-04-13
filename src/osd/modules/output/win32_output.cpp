@@ -78,7 +78,7 @@ public:
 
 	virtual void notify(const char *outname, int32_t value) override;
 
-	int create_window_class(void);
+	int create_window_class();
 	LRESULT register_client(HWND hwnd, LPARAM id);
 	LRESULT unregister_client(HWND hwnd, LPARAM id);
 	LRESULT send_id_string(HWND hwnd, LPARAM id);
@@ -162,7 +162,7 @@ void output_win32::exit()
 	{
 		registered_client *temp = m_clientlist;
 		m_clientlist = temp->next;
-		global_free(temp);
+		delete temp;
 	}
 
 	// broadcast a shutdown message
@@ -174,7 +174,7 @@ void output_win32::exit()
 //  create_window_class
 //============================================================
 
-int output_win32::create_window_class(void)
+int output_win32::create_window_class()
 {
 	static bool classes_created = false;
 
@@ -231,6 +231,7 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 				output.machine().pause();
 			else if (lparam == 0 && output.machine().paused())
 				output.machine().resume();
+			break;
 		case IM_MAME_SAVESTATE:
 			if (lparam == 0)
 				output.machine().schedule_load("auto");
@@ -261,19 +262,19 @@ LRESULT output_win32::register_client(HWND hwnd, LPARAM id)
 		if ((*client)->id == id)
 		{
 			(*client)->hwnd = hwnd;
-			machine().output().notify_all(this);
+			machine().output().notify_all([this] (const char *outname, int32_t value) { notify(outname, value); });
 			return 1;
 		}
 
 	// add us to the end
-	*client = global_alloc(registered_client);
+	*client = new registered_client;
 	(*client)->next = nullptr;
 	(*client)->id = id;
 	(*client)->hwnd = hwnd;
 	(*client)->machine = &machine();
 
 	// request a notification for all outputs
-	machine().output().notify_all(this);
+	machine().output().notify_all([this] (const char *outname, int32_t value) { notify(outname, value); });
 	return 0;
 }
 
@@ -293,7 +294,7 @@ LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 		{
 			registered_client *temp = *client;
 			*client = (*client)->next;
-			global_free(temp);
+			delete temp;
 			found = true;
 			break;
 		}
@@ -326,7 +327,7 @@ LRESULT output_win32::send_id_string(HWND hwnd, LPARAM id)
 	// allocate memory for the message
 	datalen = sizeof(copydata_id_string) + strlen(name) + 1;
 	std::vector<uint8_t> buffer(datalen);
-	copydata_id_string *temp = (copydata_id_string *)&buffer[0];
+	auto *temp = (copydata_id_string *)&buffer[0];
 	temp->id = id;
 	strcpy(temp->string, name);
 
@@ -346,12 +347,9 @@ LRESULT output_win32::send_id_string(HWND hwnd, LPARAM id)
 
 void output_win32::notify(const char *outname, int32_t value)
 {
-	registered_client *client;
 	// loop over clients and notify them
-	for (client = m_clientlist; client != nullptr; client = client->next)
-	{
+	for (registered_client *client = m_clientlist; client != nullptr; client = client->next)
 		PostMessage(client->hwnd, om_mame_update_state, client->machine->output().name_to_id(outname), value);
-	}
 }
 
 

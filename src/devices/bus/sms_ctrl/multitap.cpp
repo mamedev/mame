@@ -131,4 +131,11 @@ void sms_multitap_device::device_add_mconfig(machine_config &config)
 	SMS_CONTROL_PORT(config, m_subctrl2_port, sms_control_port_devices, "joypad");
 	SMS_CONTROL_PORT(config, m_subctrl3_port, sms_control_port_devices, "joypad");
 	SMS_CONTROL_PORT(config, m_subctrl4_port, sms_control_port_devices, "joypad");
+	if (m_port != nullptr)
+	{
+		m_subctrl1_port->set_screen_tag(m_port->m_screen);
+		m_subctrl2_port->set_screen_tag(m_port->m_screen);
+		m_subctrl3_port->set_screen_tag(m_port->m_screen);
+		m_subctrl4_port->set_screen_tag(m_port->m_screen);
+	}
 }

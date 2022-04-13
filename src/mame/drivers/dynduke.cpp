@@ -72,8 +72,8 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -331,7 +331,7 @@ void dynduke_state::dynduke(machine_config &config)
 	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
 	sei80bu.set_addrmap(AS_PROGRAM, &dynduke_state::sei80bu_encrypted_full_map);
 
-	config.m_minimum_quantum = attotime::from_hz(3600);
+	config.set_maximum_quantum(attotime::from_hz(3600));
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);

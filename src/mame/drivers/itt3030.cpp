@@ -4,6 +4,8 @@
 
     ITT 3030
 
+    When the machine is started you get a black screen.
+    Hold down B until the cursor appears. It will then boot from the floppy.
 
     ToDo:
     - Check Beeper
@@ -200,6 +202,7 @@ Beeper Circuit, all ICs shown:
 #include "video/tms9927.h"          //Display hardware
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "formats/itt3030_dsk.h"
 #include "debugger.h"
@@ -241,18 +244,18 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_WRITE8_MEMBER(bank_w);
+	uint8_t vsync_r();
+	void beep_w(uint8_t data);
+	void bank_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_stat_r);
-	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
-	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
+	void kbd_matrix_w(uint8_t data);
+	uint8_t kbd_port2_r();
+	void kbd_port2_w(uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_stat_r();
+	void fdc_cmd_w(uint8_t data);
+	static void itt3030_floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
@@ -266,7 +269,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<i8741_device> m_kbdmcu;
+	required_device<i8741a_device> m_kbdmcu;
 	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
 	required_device<address_map_bank_device> m_48kbank;
@@ -279,11 +282,11 @@ private:
 	// shared pointers
 	required_shared_ptr<uint8_t> m_vram;
 
-	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
+	uint8_t m_kbdclk = 0, m_kbdread = 0, m_kbdport2 = 0;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	floppy_image_device *m_curfloppy;
-	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
+	floppy_image_device *m_curfloppy = nullptr;
+	bool m_fdc_irq = false, m_fdc_drq = false, m_fdc_hld = false;
 };
 
 //**************************************************************************
@@ -311,7 +314,7 @@ void itt3030_state::itt3030_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x20, 0x2f).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write));
-	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
+	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 	map(0x32, 0x32).w(FUNC(itt3030_state::beep_w));
 	map(0x35, 0x35).r(FUNC(itt3030_state::vsync_r));
 	map(0x50, 0x53).rw(FUNC(itt3030_state::fdc_r), FUNC(itt3030_state::fdc_w));
@@ -329,7 +332,7 @@ READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
+void itt3030_state::kbd_matrix_w(uint8_t data)
 {
 //  printf("matrix_w: %02x (col %d row %d clk %d)\n", data, m_kbdcol, m_kbdrow, (data & 0x80) ? 1 : 0);
 
@@ -343,12 +346,12 @@ WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(itt3030_state::kbd_port2_w)
+void itt3030_state::kbd_port2_w(uint8_t data)
 {
 	m_kbdport2 = data;
 }
 
-READ8_MEMBER(itt3030_state::kbd_port2_r)
+uint8_t itt3030_state::kbd_port2_r()
 {
 	return m_kbdport2;
 }
@@ -466,7 +469,7 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-READ8_MEMBER(itt3030_state::vsync_r)
+uint8_t itt3030_state::vsync_r()
 {
 	uint8_t ret = 0;
 
@@ -483,7 +486,7 @@ READ8_MEMBER(itt3030_state::vsync_r)
 	return ret;
 }
 
-WRITE8_MEMBER(itt3030_state::bank_w)
+void itt3030_state::bank_w(uint8_t data)
 {
 	int bank = 8;
 
@@ -543,7 +546,7 @@ void itt3030_state::itt3030_palette(palette_device &palette) const
 //  SOUND
 //**************************************************************************
 
-WRITE8_MEMBER( itt3030_state::beep_w )
+void itt3030_state::beep_w(uint8_t data)
 {
 	m_beep->set_state(data&1);
 }
@@ -578,7 +581,7 @@ WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
     1 Write protect (the disk in the selected drive is write protected)
     0 HLT (Halt signal during head load and track change)
 */
-READ8_MEMBER(itt3030_state::fdc_stat_r)
+uint8_t itt3030_state::fdc_stat_r()
 {
 	uint8_t res = 0;
 	floppy_image_device *floppy1 = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
@@ -597,12 +600,12 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 }
 
 /* As far as we can tell, the mess of ttl de-inverts the bus */
-READ8_MEMBER(itt3030_state::fdc_r)
+uint8_t itt3030_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(itt3030_state::fdc_w)
+void itt3030_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
@@ -617,7 +620,7 @@ WRITE8_MEMBER(itt3030_state::fdc_w)
     1 KOMP - write comp on/off
     0 RG J - Change separator stage to read
 */
-WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
+void itt3030_state::fdc_cmd_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -658,9 +661,11 @@ WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
 //  FLOPPY - Drive definitions
 //**************************************************************************
 
-FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
-	FLOPPY_ITT3030_FORMAT
-FLOPPY_FORMATS_END
+void itt3030_state::itt3030_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ITT3030_FORMAT);
+}
 
 
 static void itt3030_floppies(device_slot_interface &device)
@@ -707,7 +712,7 @@ void itt3030_state::itt3030(machine_config &config)
 	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 	// T0 is the key matrix return
 	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-	I8741(config, m_kbdmcu, 6_MHz_XTAL);
+	I8741A(config, m_kbdmcu, 6_MHz_XTAL);
 	m_kbdmcu->t0_in_cb().set(FUNC(itt3030_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(itt3030_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(itt3030_state::kbd_port2_r));
@@ -745,6 +750,8 @@ void itt3030_state::itt3030(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("itt3030");
 }
 
 

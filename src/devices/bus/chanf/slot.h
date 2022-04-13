@@ -3,7 +3,7 @@
 #ifndef MAME_BUS_CHANF_SLOT_H
 #define MAME_BUS_CHANF_SLOT_H
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -25,17 +25,17 @@ enum
 
 // ======================> device_channelf_cart_interface
 
-class device_channelf_cart_interface : public device_slot_card_interface
+class device_channelf_cart_interface : public device_interface
 {
 public:
 	// device_channelf_cart_interface/destruction
 	virtual ~device_channelf_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
-	virtual DECLARE_WRITE8_MEMBER(write_bank)  {}
+	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) { }
+	virtual void write_bank(uint8_t data)  { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -59,8 +59,8 @@ protected:
 // ======================> channelf_cart_slot_device
 
 class channelf_cart_slot_device : public device_t,
-								public device_image_interface,
-								public device_slot_interface
+								public device_cartrom_image_interface,
+								public device_single_card_slot_interface<device_channelf_cart_interface>
 {
 public:
 	// construction/destruction
@@ -77,37 +77,30 @@ public:
 	channelf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~channelf_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual void call_unload() override {}
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+	virtual void call_unload() override { }
+
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "channelf_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,chf"; }
+
+	// slot interface overrides
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "channelf_cart"; }
-	virtual const char *file_extensions() const override { return "bin,chf"; }
-
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	uint8_t read_rom(offs_t offset);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
+	void write_bank(uint8_t data);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
 	device_channelf_cart_interface*       m_cart;

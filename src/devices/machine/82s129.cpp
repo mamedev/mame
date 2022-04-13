@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER( prom82s129_base_device::ce2_w )
 		update();
 }
 
-WRITE8_MEMBER( prom82s129_base_device::a_w )
+void prom82s129_base_device::a_w(uint8_t data)
 {
 	uint8_t last_a = m_a;
 	m_a = data;
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER( prom82s129_base_device::a5_w ) { write_line(5, state); }
 WRITE_LINE_MEMBER( prom82s129_base_device::a6_w ) { write_line(6, state); }
 WRITE_LINE_MEMBER( prom82s129_base_device::a7_w ) { write_line(7, state); }
 
-READ8_MEMBER( prom82s129_base_device::output_r )
+uint8_t prom82s129_base_device::output_r()
 {
 	return m_out;
 }

@@ -439,7 +439,7 @@ void vastar_common_state::common(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &vastar_common_state::cpu2_port_map);
 	m_subcpu->set_periodic_int(FUNC(vastar_common_state::irq0_line_hold), attotime::from_hz(242)); /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(vastar_common_state::nmi_mask_w));
@@ -484,13 +484,15 @@ void dogfightp_state::dogfightp(machine_config &config)
 	common(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &dogfightp_state::dogfightp_main_map);
-	m_maincpu->set_vblank_int("videopcb:screen", FUNC(vastar_common_state::vblank_irq));
+	m_maincpu->set_vblank_int("screen", FUNC(vastar_common_state::vblank_irq));
 
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
 	mainlatch.q_out_cb<1>().set("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
 
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
 	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb", 0));
-	videopcb.set_palette("videopcb:palette");
+	videopcb.set_screen("screen");
 	videopcb.set_percuss_hardware(true);
 }
 

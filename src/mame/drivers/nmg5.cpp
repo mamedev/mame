@@ -225,12 +225,13 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "video/decospr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class nmg5_state : public driver_device
@@ -272,14 +273,14 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 
 	/* video-related */
-	tilemap_t  *m_tilemap[2];
+	tilemap_t  *m_tilemap[2]{};
 	std::unique_ptr<bitmap_ind16> m_pixmap;
 
 	/* misc */
-	uint8_t m_prot_val;
-	uint8_t m_input_data;
-	uint8_t m_priority_reg;
-	uint8_t m_gfx_bank;
+	uint8_t m_prot_val = 0;
+	uint8_t m_input_data = 0;
+	uint8_t m_priority_reg = 0;
+	uint8_t m_gfx_bank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -289,15 +290,15 @@ private:
 	optional_device<decospr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_READ8_MEMBER(pixmap_r);
-	DECLARE_WRITE8_MEMBER(pixmap_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_WRITE16_MEMBER(gfx_bank_w);
-	DECLARE_WRITE16_MEMBER(priority_reg_w);
-	DECLARE_WRITE8_MEMBER(oki_banking_w);
+	uint8_t pixmap_r(offs_t offset);
+	void pixmap_w(offs_t offset, uint8_t data);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void soundlatch_w(uint8_t data);
+	uint16_t prot_r();
+	void prot_w(uint16_t data);
+	void gfx_bank_w(uint16_t data);
+	void priority_reg_w(uint16_t data);
+	void oki_banking_w(uint8_t data);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nmg5_map(address_map &map);
@@ -309,47 +310,47 @@ private:
 
 
 
-READ8_MEMBER(nmg5_state::pixmap_r)
+uint8_t nmg5_state::pixmap_r(offs_t offset)
 {
 	int const sy = offset >> 8;
 	int const sx = (offset & 0xff) << 1;
 
-	return ((m_pixmap->pix16(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix16(sy & 0xff, sx |  1) & 0xf);
+	return ((m_pixmap->pix(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix(sy & 0xff, sx |  1) & 0xf);
 }
 
-WRITE8_MEMBER(nmg5_state::pixmap_w)
+void nmg5_state::pixmap_w(offs_t offset, uint8_t data)
 {
 	int const sy = offset >> 8;
 	int const sx = (offset & 0xff) << 1;
 
-	m_pixmap->pix16(sy & 0xff, sx & ~1) = 0x300 + ((data & 0xf0) >> 4);
-	m_pixmap->pix16(sy & 0xff, sx |  1) = 0x300 + (data & 0x0f);
+	m_pixmap->pix(sy & 0xff, sx & ~1) = 0x300 + ((data & 0xf0) >> 4);
+	m_pixmap->pix(sy & 0xff, sx |  1) = 0x300 + (data & 0x0f);
 }
 
 template<int Layer>
-WRITE16_MEMBER(nmg5_state::vram_w)
+void nmg5_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(nmg5_state::soundlatch_w)
+void nmg5_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ16_MEMBER(nmg5_state::prot_r)
+uint16_t nmg5_state::prot_r()
 {
 	return m_prot_val | m_input_data;
 }
 
-WRITE16_MEMBER(nmg5_state::prot_w)
+void nmg5_state::prot_w(uint16_t data)
 {
 	m_input_data = data & 0x0f;
 }
 
-WRITE16_MEMBER(nmg5_state::gfx_bank_w)
+void nmg5_state::gfx_bank_w(uint16_t data)
 {
 	if (m_gfx_bank != (data & 3))
 	{
@@ -358,7 +359,7 @@ WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 	}
 }
 
-WRITE16_MEMBER(nmg5_state::priority_reg_w)
+void nmg5_state::priority_reg_w(uint16_t data)
 {
 	m_priority_reg = data & 7;
 
@@ -366,7 +367,7 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 		popmessage("unknown priority_reg value = %d\n", m_priority_reg);
 }
 
-WRITE8_MEMBER(nmg5_state::oki_banking_w)
+void nmg5_state::oki_banking_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -856,12 +857,12 @@ static INPUT_PORTS_START( wondstck )
 INPUT_PORTS_END
 
 template<int Layer>
-TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ SET_TILE_INFO_MEMBER(0, m_vram[Layer][tile_index] | (m_gfx_bank << 16), Layer ^ 1, 0);}
+TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ tileinfo.set(0, m_vram[Layer][tile_index] | (m_gfx_bank << 16), Layer ^ 1, 0);}
 
 void nmg5_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmg5_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmg5_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1]->set_transparent_pen(0);
 
 	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);

@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(VSMILE_CTRL_PORT, vsmile_ctrl_port_device, "vsmile_ctrl_port"
 //**************************************************************************
 
 device_vsmile_ctrl_interface::device_vsmile_ctrl_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "vsmilectrl")
 	, m_port(dynamic_cast<vsmile_ctrl_port_device *>(device.owner()))
 {
 }
@@ -34,8 +34,6 @@ device_vsmile_ctrl_interface::~device_vsmile_ctrl_interface()
 
 void device_vsmile_ctrl_interface::interface_validity_check(validity_checker &valid) const
 {
-	device_slot_card_interface::interface_validity_check(valid);
-
 	if (device().owner() && !m_port)
 	{
 		osd_printf_error(
@@ -47,8 +45,6 @@ void device_vsmile_ctrl_interface::interface_validity_check(validity_checker &va
 
 void device_vsmile_ctrl_interface::interface_pre_start()
 {
-	device_slot_card_interface::interface_pre_start();
-
 	if (m_port && !m_port->started())
 		throw device_missing_dependencies();
 }
@@ -64,7 +60,7 @@ vsmile_ctrl_port_device::vsmile_ctrl_port_device(
 		device_t *owner,
 		uint32_t clock)
 	: device_t(mconfig, VSMILE_CTRL_PORT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_vsmile_ctrl_interface>(mconfig, *this)
 	, m_rts_cb(*this)
 	, m_data_cb(*this)
 {
@@ -74,23 +70,9 @@ vsmile_ctrl_port_device::~vsmile_ctrl_port_device()
 {
 }
 
-void vsmile_ctrl_port_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_vsmile_ctrl_interface *>(card))
-	{
-		osd_printf_error(
-				"Card device %s (%s) does not implement device_vsmile_ctrl_interface\n",
-				card->tag(),
-				card->name());
-	}
-}
-
 void vsmile_ctrl_port_device::device_resolve_objects()
 {
-	device_vsmile_ctrl_interface *const card(dynamic_cast<device_vsmile_ctrl_interface *>(get_card_device()));
-	if (card)
-		m_device = card;
+	m_device = get_card_device();
 
 	m_rts_cb.resolve_safe();
 	m_data_cb.resolve_safe();
@@ -98,21 +80,8 @@ void vsmile_ctrl_port_device::device_resolve_objects()
 
 void vsmile_ctrl_port_device::device_start()
 {
-	device_t *const card(get_card_device());
-	if (card)
-	{
-		if (!m_device)
-		{
-			throw emu_fatalerror(
-					"vsmile_ctrl_port_device: card device %s (%s) does not implement device_vsmile_ctrl_interface\n",
-					card->tag(),
-					card->name());
-		}
-		else
-		{
-			m_device->select_w(0);
-		}
-	}
+	if (m_device)
+		m_device->select_w(0);
 }
 
 
@@ -176,14 +145,14 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 				"%s: discarding byte %02X because FIFO is full (length %u, Tx %sactive)\n",
 				machine().describe_context(),
 				data,
-				ARRAY_LENGTH(m_tx_fifo),
+				std::size(m_tx_fifo),
 				m_tx_active ? "" : "in");
 		return false;
 	}
 
 	// queue the byte
 	m_tx_fifo[m_tx_fifo_tail] = data;
-	m_tx_fifo_tail = (m_tx_fifo_tail + 1) % ARRAY_LENGTH(m_tx_fifo);
+	m_tx_fifo_tail = (m_tx_fifo_tail + 1) % std::size(m_tx_fifo);
 	m_tx_fifo_empty = false;
 
 	// assert RTS and start transmitting if necessary
@@ -204,7 +173,7 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 	}
 	else
 	{
-		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		unsigned const fifo_used((m_tx_fifo_tail + std::size(m_tx_fifo) - m_tx_fifo_head) % std::size(m_tx_fifo));
 		LOG("%s: queued byte %02X (%u bytes queued, Tx %sactive)\n", machine().describe_context(), data, fifo_used, m_tx_active ? "" : "in");
 	}
 
@@ -219,7 +188,7 @@ void vsmile_ctrl_device_base::select_w(int state)
 		if (state && !m_tx_fifo_empty && !m_tx_active)
 		{
 			m_rts_timer->reset();
-			unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+			unsigned const fifo_used((m_tx_fifo_tail + std::size(m_tx_fifo) - m_tx_fifo_head) % std::size(m_tx_fifo));
 			LOG("%s: select asserted, starting transmission (%u bytes queued)\n", machine().describe_context(), fifo_used);
 			m_tx_active = true;
 			m_tx_timer->adjust(attotime::from_hz(9600 / 10));
@@ -250,7 +219,7 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::tx_timer_expired)
 
 	// deliver the byte to the host (bits have shifted out now)
 	uint8_t const data(m_tx_fifo[m_tx_fifo_head]);
-	m_tx_fifo_head = (m_tx_fifo_head + 1) % ARRAY_LENGTH(m_tx_fifo);
+	m_tx_fifo_head = (m_tx_fifo_head + 1) % std::size(m_tx_fifo);
 	if (m_tx_fifo_head == m_tx_fifo_tail)
 		m_tx_fifo_empty = true;
 	data_out(data);
@@ -263,7 +232,7 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::tx_timer_expired)
 	}
 	else
 	{
-		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		unsigned const fifo_used((m_tx_fifo_tail + std::size(m_tx_fifo) - m_tx_fifo_head) % std::size(m_tx_fifo));
 		LOG("transmitted byte %02X (%u bytes queued, select %sasserted)\n", data, fifo_used, m_select ? "" : "de");
 	}
 
@@ -283,7 +252,7 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::tx_timer_expired)
 	{
 		LOG("select deasserted, waiting to transmit\n");
 		m_tx_active = false;
-		m_rts_timer->adjust(attotime::from_msec(500));
+		//m_rts_timer->adjust(attotime::from_msec(2000));
 	}
 }
 
@@ -296,7 +265,7 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::rts_timer_expired)
 	// clear out anything queued and let the implementation deal with it
 	if (!m_tx_fifo_empty)
 	{
-		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		unsigned const fifo_used((m_tx_fifo_tail + std::size(m_tx_fifo) - m_tx_fifo_head) % std::size(m_tx_fifo));
 		LOG("timeout waiting for select after asserting RTS (%u bytes queued)\n", fifo_used);
 		m_tx_fifo_head = m_tx_fifo_tail = 0U;
 		m_tx_fifo_empty = true;
@@ -308,8 +277,14 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::rts_timer_expired)
 
 
 #include "pad.h"
+#include "mat.h"
+#include "keyboard.h"
 
 void vsmile_controllers(device_slot_interface &device)
 {
 	device.option_add("joy", VSMILE_PAD);
+	device.option_add("mat", VSMILE_MAT);
+	device.option_add("smartkb_us", VSMILE_KEYBOARD_US);
+	device.option_add("smartkb_fr", VSMILE_KEYBOARD_FR);
+	device.option_add("smartkb_ge", VSMILE_KEYBOARD_GE);
 }

@@ -214,30 +214,30 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "machine/mb8421.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /**********************************************************************************/
 
-WRITE16_MEMBER(dassault_state::priority_w)
+void dassault_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 }
 
-WRITE16_MEMBER(dassault_state::main_irq_ack_w)
+void dassault_state::main_irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(dassault_state::sub_irq_ack_w)
+void dassault_state::sub_irq_ack_w(uint16_t data)
 {
 	m_subcpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }
 
-READ16_MEMBER(dassault_state::dassault_control_r)
+uint16_t dassault_state::dassault_control_r(offs_t offset)
 {
 	switch (offset << 1)
 	{
@@ -260,14 +260,14 @@ READ16_MEMBER(dassault_state::dassault_control_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(dassault_state::dassault_control_w)
+void dassault_state::dassault_control_w(uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	if (data & 0xfffe)
 		logerror("Coin cointrol %04x\n", data);
 }
 
-READ16_MEMBER(dassault_state::dassault_sub_control_r)
+uint16_t dassault_state::dassault_sub_control_r()
 {
 	return ioport("VBLANK1")->read();
 }
@@ -504,7 +504,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
+void dassault_state::sound_bankswitch_w(uint8_t data)
 {
 	/* the second OKIM6295 ROM is bank switched */
 	m_oki2->set_rom_bank(data & 1);
@@ -538,8 +538,8 @@ void dassault_state::dassault(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-//  config.m_minimum_quantum = attotime::from_hz(8400); /* 140 CPU slices per frame */
-	config.m_perfect_cpu_quantum = subtag("maincpu"); // I was seeing random lockups.. let's see if this helps
+//  config.set_maximum_quantum(attotime::from_hz(8400)); /* 140 CPU slices per frame */
+	config.set_perfect_quantum(m_maincpu); // I was seeing random lockups.. let's see if this helps
 
 	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
 	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);
@@ -559,14 +559,12 @@ void dassault_state::dassault(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0);
 	m_deco_tilegen[0]->set_pf2_col_bank(16);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(dassault_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(dassault_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(dassault_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(dassault_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -574,14 +572,12 @@ void dassault_state::dassault(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0);
 	m_deco_tilegen[1]->set_pf2_col_bank(16);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(dassault_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(dassault_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(dassault_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(dassault_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");

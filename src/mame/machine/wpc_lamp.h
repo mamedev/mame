@@ -14,20 +14,20 @@ public:
 	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_lamp_device();
 
-	DECLARE_WRITE8_MEMBER(row_w);
-	DECLARE_WRITE8_MEMBER(col_w);
+	void row_w(uint8_t data);
+	void col_w(uint8_t data);
 
 	void set_names(const char *const *lamp_names);
 
 protected:
-	uint8_t state[64];
-	uint8_t col, row;
-	emu_timer *timer;
+	uint8_t state[64]{};
+	uint8_t col = 0, row = 0;
+	emu_timer *timer = nullptr;
 	const char *const *names;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void update();
 };

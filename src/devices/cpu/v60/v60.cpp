@@ -76,7 +76,6 @@ Package: 132-pin PGA, 200-pin QFP
 #include "emu.h"
 #include "v60.h"
 #include "v60d.h"
-#include "debugger.h"
 
 DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "NEC V60")
 DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "NEC V70")
@@ -152,17 +151,17 @@ std::unique_ptr<util::disasm_interface> v60_device::create_disassembler()
 #define SetSZPF_Word(x)     {_Z = ((uint16_t)(x) == 0);  _S = ((x)&0x8000) ? 1 : 0; }
 #define SetSZPF_Long(x)     {_Z = ((uint32_t)(x) == 0);  _S = ((x)&0x80000000) ? 1 : 0; }
 
-#define ORB(dst, src)       { (dst) |= (src); _CY = _OV = 0; SetSZPF_Byte(dst); }
-#define ORW(dst, src)       { (dst) |= (src); _CY = _OV = 0; SetSZPF_Word(dst); }
-#define ORL(dst, src)       { (dst) |= (src); _CY = _OV = 0; SetSZPF_Long(dst); }
+#define ORB(dst, src)       { (dst) |= (src); _OV = 0; SetSZPF_Byte(dst); }
+#define ORW(dst, src)       { (dst) |= (src); _OV = 0; SetSZPF_Word(dst); }
+#define ORL(dst, src)       { (dst) |= (src); _OV = 0; SetSZPF_Long(dst); }
 
-#define ANDB(dst, src)      { (dst) &= (src); _CY = _OV = 0; SetSZPF_Byte(dst); }
-#define ANDW(dst, src)      { (dst) &= (src); _CY = _OV = 0; SetSZPF_Word(dst); }
-#define ANDL(dst, src)      { (dst) &= (src); _CY = _OV = 0; SetSZPF_Long(dst); }
+#define ANDB(dst, src)      { (dst) &= (src); _OV = 0; SetSZPF_Byte(dst); }
+#define ANDW(dst, src)      { (dst) &= (src); _OV = 0; SetSZPF_Word(dst); }
+#define ANDL(dst, src)      { (dst) &= (src); _OV = 0; SetSZPF_Long(dst); }
 
-#define XORB(dst, src)      { (dst) ^= (src); _CY = _OV = 0; SetSZPF_Byte(dst); }
-#define XORW(dst, src)      { (dst) ^= (src); _CY = _OV = 0; SetSZPF_Word(dst); }
-#define XORL(dst, src)      { (dst) ^= (src); _CY = _OV = 0; SetSZPF_Long(dst); }
+#define XORB(dst, src)      { (dst) ^= (src); _OV = 0; SetSZPF_Byte(dst); }
+#define XORW(dst, src)      { (dst) ^= (src); _OV = 0; SetSZPF_Word(dst); }
+#define XORL(dst, src)      { (dst) ^= (src); _OV = 0; SetSZPF_Long(dst); }
 
 #define SUBB(dst, src)      { unsigned res = (dst) - (src); SetCFB(res); SetOFB_Sub(res, src, dst); SetSZPF_Byte(res); dst = (uint8_t)res; }
 #define SUBW(dst, src)      { unsigned res = (dst) - (src); SetCFW(res); SetOFW_Sub(res, src, dst); SetSZPF_Word(res); dst = (uint16_t)res; }
@@ -359,7 +358,6 @@ uint32_t v60_device::v60_update_psw_for_exception(int is_interrupt, int target_l
 uint32_t v60_device::opUNHANDLED()
 {
 	fatalerror("Unhandled OpCode found : %02x at %08x\n", OpRead16(PC), PC);
-	//return 0; /* never reached, fatalerror won't return */
 }
 
 // Opcode jump table
@@ -412,17 +410,17 @@ void v60_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	if (m_program->data_width() == 16)
 	{
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address); };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word_unaligned(address); };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword_unaligned(address); };
+		m_program->cache(m_cache16);
+		m_pr8  = [this](offs_t address) -> u8  { return m_cache16.read_byte(address); };
+		m_pr16 = [this](offs_t address) -> u16 { return m_cache16.read_word_unaligned(address); };
+		m_pr32 = [this](offs_t address) -> u32 { return m_cache16.read_dword_unaligned(address); };
 	}
 	else
 	{
-		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address); };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word_unaligned(address); };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword_unaligned(address); };
+		m_program->cache(m_cache32);
+		m_pr8  = [this](offs_t address) -> u8  { return m_cache32.read_byte(address); };
+		m_pr16 = [this](offs_t address) -> u16 { return m_cache32.read_word_unaligned(address); };
+		m_pr32 = [this](offs_t address) -> u32 { return m_cache32.read_dword_unaligned(address); };
 	}
 
 	m_io = &space(AS_IO);
@@ -497,8 +495,7 @@ void v60_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", PC).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_PPC ).noshow();
-	state_add( STATE_GENSP, "GENSP", SP ).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).callimport().formatstr("%7s").noshow();
 
 	set_icountptr(m_icount);
 }
@@ -514,6 +511,18 @@ void v60_device::state_export(const device_state_entry &entry)
 	}
 }
 
+void v60_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+		switch(entry.index()) {
+		case STATE_GENFLAGS:
+				str = string_format("%c%c%c%c",
+												PSW & 1 ? 'Z' : '.',
+												PSW & 2 ? 'S' : '.',
+												PSW & 4 ? 'O' : '.',
+												PSW & 8 ? 'C' : '.');
+				break;
+		}
+}
 
 void v60_device::state_import(const device_state_entry &entry)
 {

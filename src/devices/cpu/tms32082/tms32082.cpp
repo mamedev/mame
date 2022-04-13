@@ -11,7 +11,6 @@
 #include "tms32082.h"
 #include "dis_pp.h"
 #include "dis_mp.h"
-#include "debugger.h"
 
 DEFINE_DEVICE_TYPE(TMS32082_MP, tms32082_mp_device, "tms32082_mp", "Texas Instruments TMS32082 MP")
 DEFINE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device, "tms32082_pp", "Texas Instruments TMS32082 PP")
@@ -47,6 +46,7 @@ const uint32_t tms32082_mp_device::SHIFT_MASK[] =
 tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS32082_MP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms32082_mp_device::mp_internal_map), this))
+	, m_cmd_callback(*this)
 {
 }
 
@@ -70,46 +70,38 @@ std::unique_ptr<util::disasm_interface> tms32082_mp_device::create_disassembler(
 	return std::make_unique<tms32082_mp_disassembler>();
 }
 
-void tms32082_mp_device::set_command_callback(write32_delegate callback)
+
+void tms32082_mp_device::tc_command_execute(int channel, uint32_t entrypoint)
 {
-	m_cmd_callback = callback;
-}
+	[[maybe_unused]] static const char* CHANNEL_NAME[16] = {
+		"XPT15", "XPT14", "XPT13", "XPT12", "XPT11", "XPT10", "XPT9", "XPT8",
+		"XPT7", "XPT6", "XPT5", "XPT4", "XPT3", "XPT2", "XPT1", "MP"
+	};
 
+	uint32_t address = entrypoint;
 
-READ32_MEMBER(tms32082_mp_device::mp_param_r)
-{
-	//printf("mp_param_w: %08X, %08X\n", offset, mem_mask);
-	return m_param_ram[offset];
-}
+	uint32_t next_entry = m_program.read_dword(address + 0);
+	uint32_t pt_options = m_program.read_dword(address + 4);
 
-WRITE32_MEMBER(tms32082_mp_device::mp_param_w)
-{
-	//printf("mp_param_w: %08X, %08X, %08X\n", offset, data, mem_mask);
-
-	COMBINE_DATA(&m_param_ram[offset]);
-
-	if (offset == 0x3f)
+	if ((pt_options & 0x00100000) == 0)
 	{
-		// initiate Transfer Controller operation
-		// TODO: move TC functionality to separate device
-		uint32_t address = data;
+		// long-form transfer
 
-		uint32_t next_entry = m_program->read_dword(address + 0);
-		uint32_t pt_options = m_program->read_dword(address + 4);
-		uint32_t src_addr = m_program->read_dword(address + 8);
-		uint32_t dst_addr = m_program->read_dword(address + 12);
-		uint32_t src_b_count = m_program->read_word(address + 16);
-		uint32_t src_a_count = m_program->read_word(address + 18);
-		uint32_t dst_b_count = m_program->read_word(address + 20);
-		uint32_t dst_a_count = m_program->read_word(address + 22);
-		uint32_t src_c_count = m_program->read_dword(address + 24);
-		uint32_t dst_c_count = m_program->read_dword(address + 28);
-		uint32_t src_b_pitch = m_program->read_dword(address + 32);
-		uint32_t dst_b_pitch = m_program->read_dword(address + 36);
-		uint32_t src_c_pitch = m_program->read_dword(address + 40);
-		uint32_t dst_c_pitch = m_program->read_dword(address + 44);
+		uint32_t src_addr = m_program.read_dword(address + 8);
+		uint32_t dst_addr = m_program.read_dword(address + 12);
+		uint32_t src_b_count = m_program.read_word(address + 16);
+		uint32_t src_a_count = m_program.read_word(address + 18);
+	//  uint32_t dst_b_count = m_program.read_word(address + 20);
+	//  uint32_t dst_a_count = m_program.read_word(address + 22);
+		uint32_t src_c_count = m_program.read_dword(address + 24);
+	//  uint32_t dst_c_count = m_program.read_dword(address + 28);
+		uint32_t src_b_pitch = m_program.read_dword(address + 32);
+		uint32_t dst_b_pitch = m_program.read_dword(address + 36);
+		uint32_t src_c_pitch = m_program.read_dword(address + 40);
+		uint32_t dst_c_pitch = m_program.read_dword(address + 44);
 
-		printf("TC operation:\n");
+		/*
+		printf("TC operation (long form) %s:\n", CHANNEL_NAME[channel]);
 		printf("   Next entry: %08X\n", next_entry);
 		printf("   PT options: %08X\n", pt_options);
 		printf("   SRC addr:   %08X\n", src_addr);
@@ -122,6 +114,7 @@ WRITE32_MEMBER(tms32082_mp_device::mp_param_w)
 		printf("   DST B pitch: %08X\n", dst_b_pitch);
 		printf("   SRC C pitch: %08X\n", src_c_pitch);
 		printf("   DST C pitch: %08X\n", dst_c_pitch);
+		*/
 
 		if (pt_options != 0x80000000)
 			fatalerror("TC transfer, options = %08X\n", pt_options);
@@ -141,13 +134,64 @@ WRITE32_MEMBER(tms32082_mp_device::mp_param_w)
 					uint32_t src = src_addr + c_src_offset + b_src_offset + ia;
 					uint32_t dst = dst_addr + c_dst_offset + b_dst_offset + ia;
 
-					uint32_t data = m_program->read_byte(src);
-					m_program->write_byte(dst, data);
+					uint32_t data = m_program.read_byte(src);
+					m_program.write_byte(dst, data);
 
 					//printf("%08X: %02X -> %08X\n", src, data, dst);
 				}
 			}
 		}
+	}
+	else
+	{
+		// short-form transfer
+
+		bool stop = false;
+
+		do
+		{
+
+		//  uint32_t src_addr = m_program.read_dword(address + 8);
+		//  uint32_t dst_addr = m_program.read_dword(address + 12);
+
+		//  int count = pt_options & 0xffff;
+			stop = (pt_options & 0x80000000) ? true : false;
+
+			/*
+			printf("TC operation (short form) %s [%08X]:\n", CHANNEL_NAME[channel], address);
+			printf("   Next entry: %08X\n", next_entry);
+			printf("   PT options: %08X\n", pt_options);
+			printf("   Byte count: %08X\n", count);
+			printf("   SRC addr:   %08X\n", src_addr);
+			printf("   DST addr:   %08X\n", dst_addr);
+			*/
+
+			address = next_entry;
+			if (!stop)
+			{
+				next_entry = m_program.read_dword(address);
+				pt_options = m_program.read_dword(address + 4);
+			}
+		} while (!stop);
+	}
+}
+
+
+uint32_t tms32082_mp_device::mp_param_r(offs_t offset, uint32_t mem_mask)
+{
+	//printf("mp_param_w: %08X, %08X\n", offset, mem_mask);
+	return m_param_ram[offset];
+}
+
+void tms32082_mp_device::mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	//printf("mp_param_w: %08X, %08X, %08X\n", offset, data, mem_mask);
+
+	COMBINE_DATA(&m_param_ram[offset]);
+
+	if (offset >= 0x30 && offset <= 0x3f)
+	{
+		tc_command_execute(offset - 0x30, data);
 	}
 }
 
@@ -155,7 +199,8 @@ WRITE32_MEMBER(tms32082_mp_device::mp_param_w)
 
 void tms32082_mp_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
+	space(AS_PROGRAM).specific(m_program);
+	m_cmd_callback.resolve();
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_fetchpc));
@@ -221,8 +266,8 @@ void tms32082_mp_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	set_icountptr(m_icount);
 }
@@ -258,48 +303,32 @@ void tms32082_mp_device::device_reset()
 
 	m_intpen = 0;
 	m_ie = 0;
+
+	m_pp_status = 0xf0000;      // start with all PPs halted
 }
 
 void tms32082_mp_device::processor_command(uint32_t command)
 {
-	printf("MP CMND %08X: ", command);
-
-	if (command & 0x80000000)
-		printf("Reset ");
-	if (command & 0x40000000)
-		printf("Halt ");
+	// unhalt PPs
 	if (command & 0x20000000)
-		printf("Unhalt ");
-	if (command & 0x10000000)
-		printf("ICR ");
-	if (command & 0x08000000)
-		printf("DCR ");
-	if (command & 0x00004000)
-		printf("Task ");
-	if (command & 0x00002000)
-		printf("Msg ");
+	{
+		if (command & 0x00000001)
+			m_pp_status &= ~0x10000;
+		if (command & 0x00000002)
+			m_pp_status &= ~0x20000;
+	}
 
-	printf("to: ");
-
-	if (command & 0x00000400)
-		printf("VC ");
-	if (command & 0x00000200)
-		printf("TC ");
-	if (command & 0x00000100)
-		printf("MP ");
-	if (command & 0x00000008)
-		printf("PP3 ");
-	if (command & 0x00000004)
-		printf("PP2 ");
-	if (command & 0x00000002)
-		printf("PP1 ");
-	if (command & 0x00000001)
-		printf("PP0 ");
+	// halt PPs
+	if (command & 0x40000000)
+	{
+		if (command & 0x00000001)
+			m_pp_status |= 0x10000;
+		if (command & 0x00000002)
+			m_pp_status |= 0x20000;
+	}
 
 	if (!m_cmd_callback.isnull())
-		m_cmd_callback(*m_program, 0, command, 0xffffffff);
-
-	printf("\n");
+		m_cmd_callback(space(AS_PROGRAM), command);
 }
 
 uint32_t tms32082_mp_device::read_creg(int reg)
@@ -312,6 +341,11 @@ uint32_t tms32082_mp_device::read_creg(int reg)
 		case 0x1:           // EIP
 			return m_eip;
 
+		case 0x2:           // CONFIG
+			// Type = 0010: 2 Parallel Processors
+			// Release = 0011: Production release silicon
+			return (0x2 << 12) | (0x3 << 4);
+
 		case 0x4:           // INTPEN
 			return m_intpen;
 
@@ -319,7 +353,7 @@ uint32_t tms32082_mp_device::read_creg(int reg)
 			return m_ie;
 
 		case 0xa:           // PPERROR
-			return 0xe0000;
+			return m_pp_status;
 
 		case 0xe:           // TCOUNT
 			return m_tcount;
@@ -334,7 +368,7 @@ uint32_t tms32082_mp_device::read_creg(int reg)
 			return m_outp;
 
 		default:
-			printf("read_creg(): %08X\n", reg);
+			//printf("read_creg(): %08X\n", reg);
 			break;
 	}
 	return 0;
@@ -364,7 +398,6 @@ void tms32082_mp_device::write_creg(int reg, uint32_t data)
 
 		case 0x6:           // IE
 			m_ie = data;
-			printf("IE = %08X\n", data);
 			break;
 
 		case 0xe:           // TCOUNT
@@ -384,7 +417,7 @@ void tms32082_mp_device::write_creg(int reg, uint32_t data)
 			break;
 
 		default:
-			printf("write_creg(): %08X, %08X\n", reg, data);
+			//printf("write_creg(): %08X, %08X\n", reg, data);
 			break;
 	}
 }
@@ -406,7 +439,7 @@ void tms32082_mp_device::check_interrupts()
 				m_ie &= ~1;                 // clear global interrupt mask
 
 				// get new pc from vector table
-				m_fetchpc = m_pc = m_program->read_dword(0x01010180 + (i * 4));
+				m_fetchpc = m_pc = m_program.read_dword(0x01010180 + (i * 4));
 				return;
 			}
 		}
@@ -439,7 +472,7 @@ void tms32082_mp_device::execute_set_input(int inputnum, int state)
 
 uint32_t tms32082_mp_device::fetch()
 {
-	uint32_t w = m_cache->read_dword(m_fetchpc);
+	uint32_t w = m_cache.read_dword(m_fetchpc);
 	m_fetchpc += 4;
 	return w;
 }
@@ -509,7 +542,7 @@ std::unique_ptr<util::disasm_interface> tms32082_pp_device::create_disassembler(
 
 void tms32082_pp_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
+	space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_fetchpc));
@@ -520,8 +553,8 @@ void tms32082_pp_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	set_icountptr(m_icount);
 }

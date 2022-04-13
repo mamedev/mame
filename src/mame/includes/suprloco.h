@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class suprloco_state : public driver_device
 {
@@ -35,12 +36,12 @@ private:
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	tilemap_t *m_bg_tilemap;
-	int m_control;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_control = 0;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(scrollram_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void scrollram_w(offs_t offset, uint8_t data);
+	void control_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

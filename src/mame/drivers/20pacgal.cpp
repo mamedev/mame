@@ -44,8 +44,7 @@
         * Check the ASCI interface, there probably is fully working debug code.
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
-        * Is the clock divide 3 or 4?
-        * Galaga attract mode isn't correct; referenct : https://youtu.be/OQyWaN9fTgw?t=2m33s
+        * Galaga attract mode isn't correct; reference : https://youtu.be/OQyWaN9fTgw?t=2m33s
 
 +-------------------------------------------------------+
 |                        +-------------+                |
@@ -73,14 +72,14 @@
 |  D4     +-------------+   +-------+                   |
 +-------------------------------------------------------+
 
-     CPU: Z8S18020VSC ZiLOG Z180 (20MHz part)
+     CPU: Z8S18020VSC ZiLOG Z180 (20MHz part) at 18.432MHz
 Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macrocells, 83MHz speed)
   MEMORY: CY7C199-15VC 32K x 8 Static RAM x 3 (or equivalent ISSI IS61C256AH-15J)
      OSC: 73.728MHz
   EEPROM: 93LC46A 128 x 8-bit 1K microwire compatible Serial EEPROM
      VOL: Volume adjust
       D4: Diode - Status light
-      J1: 5 2-pin jumper array
+      J1: 10 pin JTAG interface for programming the CY37256P160 CPLDs
 
 ***************************************************************************/
 
@@ -90,8 +89,6 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 #include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -102,7 +99,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *************************************/
 
 #define MASTER_CLOCK        (XTAL(73'728'000))
-#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)  /* divider is either 3 or 4 */
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)
 #define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
 
 
@@ -113,7 +110,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *
  *************************************/
 
-WRITE8_MEMBER(_20pacgal_state::irqack_w)
+void _20pacgal_state::irqack_w(uint8_t data)
 {
 	m_irq_mask = data & 1;
 
@@ -121,7 +118,7 @@ WRITE8_MEMBER(_20pacgal_state::irqack_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
+void _20pacgal_state::timer_pulse_w(uint8_t data)
 {
 	//printf("timer pulse %02x\n", data);
 }
@@ -132,7 +129,7 @@ WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
  *
  *************************************/
 
-WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
+void _20pacgal_state::_20pacgal_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -145,7 +142,7 @@ WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
  *
  *************************************/
 
-WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
+void _20pacgal_state::ram_bank_select_w(uint8_t data)
 {
 	if (m_game_selected != (data & 1))
 	{
@@ -155,7 +152,7 @@ WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
 	}
 }
 
-WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
+void _20pacgal_state::ram_48000_w(offs_t offset, uint8_t data)
 {
 	if (m_game_selected)
 	{
@@ -172,17 +169,17 @@ WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
  *
  *************************************/
 
-WRITE8_MEMBER(_20pacgal_state::sprite_gfx_w)
+void _20pacgal_state::sprite_gfx_w(offs_t offset, uint8_t data)
 {
 	m_sprite_gfx_ram[offset] = data;
 }
 
-WRITE8_MEMBER(_20pacgal_state::sprite_ram_w)
+void _20pacgal_state::sprite_ram_w(offs_t offset, uint8_t data)
 {
 	m_sprite_ram[offset] = data;
 }
 
-WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
+void _20pacgal_state::sprite_lookup_w(offs_t offset, uint8_t data)
 {
 	m_sprite_color_lookup[offset] = data;
 }
@@ -234,7 +231,7 @@ void _20pacgal_state::_20pacgal_map(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
+uint8_t _25pacman_state::_25pacman_io_87_r()
 {
 	return 0xff;
 }
@@ -250,11 +247,11 @@ void _25pacman_state::_25pacman_io_map(address_map &map)
 	map(0x80, 0x80).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x81, 0x81).w(FUNC(_25pacman_state::timer_pulse_w));        /* ??? pulsed by the timer irq */
 	map(0x82, 0x82).w(FUNC(_25pacman_state::irqack_w));
-//  AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
+//  map(0x84, 0x84).noprw(); /* ?? */
 	map(0x85, 0x86).writeonly().share("stars_seed");    /* stars: rng seed (lo/hi) */
 	map(0x87, 0x87).r(FUNC(_25pacman_state::_25pacman_io_87_r)); // not eeprom on this
 	map(0x87, 0x87).nopw();
-//  AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
+//  map(0x88, 0x88).w(FUNC(_25pacman_state::ram_bank_select_w));
 	map(0x89, 0x89).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x8a, 0x8a).writeonly().share("stars_ctrl");    /* stars: bits 3-4 = active set; bit 5 = enable */
 	map(0x8b, 0x8b).writeonly().share("flip");
@@ -376,6 +373,11 @@ void _20pacgal_state::machine_start()
 {
 	common_save_state();
 
+	m_game_selected = 0;
+
+	// center the DAC; not all revisions do this
+	m_dac->data_w(0x80);
+
 	// membank currently used only by 20pacgal
 	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0x08000);
 	m_mainbank->configure_entry(1, m_ram_48000.get());
@@ -384,10 +386,7 @@ void _20pacgal_state::machine_start()
 void _25pacman_state::machine_start()
 {
 	common_save_state();
-}
 
-void _20pacgal_state::machine_reset()
-{
 	m_game_selected = 0;
 }
 
@@ -400,7 +399,7 @@ WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 void _20pacgal_state::_20pacgal(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, MAIN_CPU_CLOCK);
+	Z8S180(config, m_maincpu, MAIN_CPU_CLOCK); // 18.432MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &_20pacgal_state::_20pacgal_map);
 	m_maincpu->set_addrmap(AS_IO, &_20pacgal_state::_20pacgal_io_map);
 
@@ -419,9 +418,6 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	namco.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void _25pacman_state::_25pacman(machine_config &config)

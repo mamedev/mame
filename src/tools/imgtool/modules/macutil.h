@@ -12,7 +12,7 @@
 #ifndef MACUTIL_H
 #define MACUTIL_H
 
-#include "imgtool.h"
+#include "library.h"
 
 enum mac_fork_t
 {

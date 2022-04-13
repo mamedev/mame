@@ -4,7 +4,9 @@
 
 #ifndef __M7700DS_H__
 #define __M7700DS_H__
-
+#ifdef __sun
+#undef SEC
+#endif
 /*
 
 Mitsubishi 7700 CPU Emulator v0.10
@@ -71,6 +73,7 @@ private:
 	public:
 		bool is_call() const { return m_name == op::JSR; }
 		bool is_return() const { return (m_name == op::RTS) || (m_name == op::RTI); }
+		bool is_bcond() const { return (ea == RELB && m_name != op::BRA) || (m_name == op::BBS) || (m_name == op::BBC); }
 		const char *name() const { return s_opnames[unsigned(m_name)]; }
 
 		static const m7700_opcode_struct &get(unsigned char ins) { return s_opcodes[ins]; }

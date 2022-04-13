@@ -16,7 +16,6 @@
 #include "tms34010.h"
 #include "34010dsm.h"
 
-#include "debugger.h"
 #include "screen.h"
 
 #define LOG_GENERAL      (1U << 0)
@@ -59,10 +58,10 @@ DEFINE_DEVICE_TYPE(TMS34020, tms34020_device, "tms34020", "Texas Instruments TMS
     GLOBAL VARIABLES
 ***************************************************************************/
 
-tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map)
+tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map, bool is_34020)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3, internal_regs_map)
+	, m_program_config("program", ENDIANNESS_LITTLE, is_34020 ? 32 : 16, 32, 3, internal_regs_map)
 	, m_pc(0)
 	, m_ppc(0)
 	, m_st(0)
@@ -76,35 +75,35 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	, m_convmp(0)
 	, m_gfxcycles(0)
 	, m_pixelshift(0)
-	, m_is_34020(0)
+	, m_is_34020(is_34020)
 	, m_reset_deferred(false)
 	, m_halt_on_reset(false)
 	, m_hblank_stable(0)
 	, m_external_host_access(0)
 	, m_executing(0)
-	, m_program(nullptr)
-	, m_cache(nullptr)
 	, m_pixclock(0)
 	, m_pixperclock(0)
 	, m_scantimer(nullptr)
 	, m_icount(0)
+	, m_scanline_ind16_cb(*this)
+	, m_scanline_rgb32_cb(*this)
 	, m_output_int_cb(*this)
 	, m_ioreg_pre_write_cb(*this)
+	, m_to_shiftreg_cb(*this)
+	, m_from_shiftreg_cb(*this)
 {
 }
 
 
 tms34010_device::tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms340x0_device(mconfig, TMS34010, tag, owner, clock, address_map_constructor(FUNC(tms34010_device::internal_regs_map), this))
+	: tms340x0_device(mconfig, TMS34010, tag, owner, clock, address_map_constructor(FUNC(tms34010_device::internal_regs_map), this), false)
 {
-	m_is_34020 = 0;
 }
 
 
 tms34020_device::tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms340x0_device(mconfig, TMS34020, tag, owner, clock, address_map_constructor(FUNC(tms34020_device::internal_regs_map), this))
+	: tms340x0_device(mconfig, TMS34020, tag, owner, clock, address_map_constructor(FUNC(tms34020_device::internal_regs_map), this), true)
 {
-	m_is_34020 = 1;
 }
 
 device_memory_interface::space_config_vector tms340x0_device::memory_space_config() const
@@ -187,10 +186,13 @@ device_memory_interface::space_config_vector tms340x0_device::memory_space_confi
 #define OFFSET()       BREG(4)
 #define WSTART_X()     BREG_X(5)
 #define WSTART_Y()     BREG_Y(5)
+#define WSTART_XY()    BREG_XY(5)
 #define WEND_X()       BREG_X(6)
 #define WEND_Y()       BREG_Y(6)
+#define WEND_XY()      BREG_XY(6)
 #define DYDX_X()       BREG_X(7)
 #define DYDX_Y()       BREG_Y(7)
+#define DYDX_XY()      BREG_XY(7)
 #define COLOR0()       BREG(8)
 #define COLOR1()       BREG(9)
 #define COUNT()        BREG(10)
@@ -225,37 +227,120 @@ inline void tms340x0_device::RESET_ST()
 }
 
 /* shortcuts for reading opcodes */
-inline uint32_t tms340x0_device::ROPCODE()
+uint16_t tms34010_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
-	return m_cache->read_word(pc);
+	return m_cache.read_word(pc);
 }
 
-inline int16_t tms340x0_device::PARAM_WORD()
+uint16_t tms34020_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
-	return m_cache->read_word(pc);
+	return m_cache.read_word(pc);
 }
 
-inline int32_t tms340x0_device::PARAM_LONG()
+int16_t tms34010_device::PARAM_WORD()
+{
+	uint32_t pc = m_pc;
+	m_pc += 2 << 3;
+	return m_cache.read_word(pc);
+}
+
+int16_t tms34020_device::PARAM_WORD()
+{
+	uint32_t pc = m_pc;
+	m_pc += 2 << 3;
+	return m_cache.read_word(pc);
+}
+
+int32_t tms34010_device::PARAM_LONG()
 {
 	uint32_t pc = m_pc;
 	m_pc += 4 << 3;
-	return (uint16_t)m_cache->read_word(pc) | (m_cache->read_word(pc + 16) << 16);
+	return (uint16_t)m_cache.read_word(pc) | (m_cache.read_word(pc + 16) << 16);
 }
 
-inline int16_t tms340x0_device::PARAM_WORD_NO_INC()
-{
-	return m_cache->read_word(m_pc);
-}
-
-inline int32_t tms340x0_device::PARAM_LONG_NO_INC()
+int32_t tms34020_device::PARAM_LONG()
 {
 	uint32_t pc = m_pc;
-	return (uint16_t)m_cache->read_word(pc) | (m_cache->read_word(pc + 16) << 16);
+	m_pc += 4 << 3;
+	return m_cache.read_dword_unaligned(pc);
 }
+
+int16_t tms34010_device::PARAM_WORD_NO_INC()
+{
+	return m_cache.read_word(m_pc);
+}
+
+int16_t tms34020_device::PARAM_WORD_NO_INC()
+{
+	return m_cache.read_word(m_pc);
+}
+
+int32_t tms34010_device::PARAM_LONG_NO_INC()
+{
+	uint32_t pc = m_pc;
+	return (uint16_t)m_cache.read_word(pc) | (m_cache.read_word(pc + 16) << 16);
+}
+
+int32_t tms34020_device::PARAM_LONG_NO_INC()
+{
+	return m_cache.read_dword_unaligned(m_pc);
+}
+
+uint32_t tms34010_device::TMS34010_RDMEM_WORD(offs_t A)
+{
+	return m_program.read_word(A);
+}
+
+uint32_t tms34020_device::TMS34010_RDMEM_WORD(offs_t A)
+{
+	return m_program.read_word(A);
+}
+
+uint32_t tms34010_device::TMS34010_RDMEM_DWORD(offs_t A)
+{
+	uint32_t result = m_program.read_word(A);
+	return result | (m_program.read_word(A+16)<<16);
+}
+
+uint32_t tms34020_device::TMS34010_RDMEM_DWORD(offs_t A)
+{
+	return m_program.read_dword_unaligned(A);
+}
+
+void tms34010_device::TMS34010_WRMEM_WORD(offs_t A, uint32_t V)
+{
+	m_program.write_word(A,V);
+}
+
+void tms34020_device::TMS34010_WRMEM_WORD(offs_t A, uint32_t V)
+{
+	if (BIT(A, 4))
+		m_program.write_dword(A-16,(V<<16)|(V>>16),0xffff0000);
+	else
+		m_program.write_dword(A,V,0x0000ffff);
+}
+
+void tms34010_device::TMS34010_WRMEM_DWORD(offs_t A, uint32_t V)
+{
+	m_program.write_word(A,V);
+	m_program.write_word(A+16,V>>16);
+}
+
+void tms34020_device::TMS34010_WRMEM_DWORD(offs_t A, uint32_t V)
+{
+	if (BIT(A, 4))
+	{
+		m_program.write_dword(A-16,(V<<16)|(V>>16),0xffff0000);
+		m_program.write_dword(A+16,(V<<16)|(V>>16),0x0000ffff);
+	}
+	else
+		m_program.write_dword(A,V);
+}
+
 
 /* read memory byte */
 inline uint32_t tms340x0_device::RBYTE(offs_t offset)
@@ -326,7 +411,7 @@ uint32_t tms340x0_device::read_pixel_32(offs_t offset)
 uint32_t tms340x0_device::read_pixel_shiftreg(offs_t offset)
 {
 	if (!m_to_shiftreg_cb.isnull())
-		m_to_shiftreg_cb(*m_program, offset, &m_shiftreg[0]);
+		m_to_shiftreg_cb(offset, &m_shiftreg[0]);
 	else
 		fatalerror("To ShiftReg function not set. PC = %08X\n", m_pc);
 	return m_shiftreg[0];
@@ -468,7 +553,7 @@ void tms340x0_device::write_pixel_r_t_32(offs_t offset, uint32_t data)
 void tms340x0_device::write_pixel_shiftreg(offs_t offset, uint32_t data)
 {
 	if (!m_from_shiftreg_cb.isnull())
-		m_from_shiftreg_cb(*m_program, offset, &m_shiftreg[0]);
+		m_from_shiftreg_cb(offset, &m_shiftreg[0]);
 	else
 		fatalerror("From ShiftReg function not set. PC = %08X\n", m_pc);
 }
@@ -626,17 +711,14 @@ void tms340x0_device::check_interrupt()
 
 void tms340x0_device::device_start()
 {
-	m_scanline_ind16_cb.bind_relative_to(*owner());
-	m_scanline_rgb32_cb.bind_relative_to(*owner());
+	m_scanline_ind16_cb.resolve();
+	m_scanline_rgb32_cb.resolve();
 	m_output_int_cb.resolve();
 	m_ioreg_pre_write_cb.resolve();
-	m_to_shiftreg_cb.bind_relative_to(*owner());
-	m_from_shiftreg_cb.bind_relative_to(*owner());
+	m_to_shiftreg_cb.resolve();
+	m_from_shiftreg_cb.resolve();
 
 	m_external_host_access = false;
-
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, 3, ENDIANNESS_LITTLE>();
 
 	/* set up the state table */
 	{
@@ -644,7 +726,6 @@ void tms340x0_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
 		state_add(TMS34010_SP,     "SP",        m_regs[15].reg);
-		state_add(STATE_GENSP,     "GENSP",     m_regs[15].reg).noshow();
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 
@@ -672,9 +753,25 @@ void tms340x0_device::device_start()
 	save_item(NAME(m_convmp));
 	save_item(NAME(m_pixelshift));
 	save_item(NAME(m_gfxcycles));
-	save_pointer(NAME(&m_regs[0].reg), ARRAY_LENGTH(m_regs));
+	save_pointer(NAME(&m_regs[0].reg), std::size(m_regs));
 
 	set_icountptr(m_icount);
+}
+
+void tms34010_device::device_start()
+{
+	tms340x0_device::device_start();
+
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+}
+
+void tms34020_device::device_start()
+{
+	tms340x0_device::device_start();
+
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 }
 
 void tms340x0_device::device_reset()
@@ -789,7 +886,7 @@ void tms340x0_device::execute_run()
 			uint16_t op;
 			m_ppc = m_pc;
 			op = ROPCODE();
-			(this->*s_opcode_table[op >> 4])(op);
+			execute_op(op);
 		} while (m_icount > 0);
 	}
 	else
@@ -800,10 +897,20 @@ void tms340x0_device::execute_run()
 			m_ppc = m_pc;
 			debugger_instruction_hook(m_pc);
 			op = ROPCODE();
-			(this->*s_opcode_table[op >> 4])(op);
+			execute_op(op);
 		} while (m_icount > 0);
 	}
 	m_executing = false;
+}
+
+void tms34010_device::execute_op(uint16_t op)
+{
+	(this->*s_opcode_table[op >> 4])(op);
+}
+
+void tms34020_device::execute_op(uint16_t op)
+{
+	(this->*s_opcode_table[op >> 4])(op);
 }
 
 
@@ -915,7 +1022,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	if (enabled && vcount == SMART_IOREG(DPYINT))
 	{
 		/* generate the display interrupt signal */
-		internal_interrupt_callback(nullptr, TMS34010_DI);
+		internal_interrupt_callback(TMS34010_DI);
 	}
 
 	/* at the start of VBLANK, load the starting display address */
@@ -1079,7 +1186,7 @@ uint32_t tms340x0_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bi
 		params.heblnk = params.hsblnk = cliprect.max_x + 1;
 
 	/* blank out the blank regions */
-	uint16_t *dest = &bitmap.pix16(cliprect.min_y);
+	uint16_t *dest = &bitmap.pix(cliprect.min_y);
 	for (x = cliprect.min_x; x < params.heblnk; x++)
 		dest[x] = blackpen;
 	for (x = params.hsblnk; x <= cliprect.max_x; x++)
@@ -1110,7 +1217,7 @@ uint32_t tms340x0_device::tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bi
 		params.heblnk = params.hsblnk = cliprect.max_x + 1;
 
 	/* blank out the blank regions */
-	uint32_t *dest = &bitmap.pix32(cliprect.min_y);
+	uint32_t *dest = &bitmap.pix(cliprect.min_y);
 	for (x = cliprect.min_x; x < params.heblnk; x++)
 		dest[x] = blackpen;
 	for (x = params.hsblnk; x <= cliprect.max_x; x++)
@@ -1496,7 +1603,7 @@ u16 tms34020_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
-	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
+	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg020_name[offset]);
 
 	switch (offset)
 	{

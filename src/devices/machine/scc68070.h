@@ -139,6 +139,8 @@ public:
 	auto iack4_callback() { return m_iack4_callback.bind(); }
 	auto iack5_callback() { return m_iack5_callback.bind(); }
 	auto iack7_callback() { return m_iack7_callback.bind(); }
+	auto uart_tx_callback() { return m_uart_tx_callback.bind(); }
+	auto uart_rtsn_callback() { return m_uart_rtsn_callback.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(in2_w);
 	DECLARE_WRITE_LINE_MEMBER(in4_w);
@@ -149,18 +151,11 @@ public:
 
 	// external callbacks
 	void uart_rx(uint8_t data);
-	void uart_tx(uint8_t data);
+	void uart_ctsn(int state);
 
-	// UART Access for Quizard
-	void set_quizard_mcu_value(uint16_t value);
-	void set_quizard_mcu_ack(uint8_t ack);
-	void quizard_rx(uint8_t data);
-
-	void mcu_frame();
-
-	TIMER_CALLBACK_MEMBER( timer0_callback );
-	TIMER_CALLBACK_MEMBER( rx_callback );
-	TIMER_CALLBACK_MEMBER( tx_callback );
+	void timer0_callback();
+	void rx_callback();
+	void tx_callback();
 
 	// register structures
 	struct i2c_regs_t
@@ -199,6 +194,7 @@ public:
 		int16_t transmit_pointer;
 		uint8_t transmit_buffer[32768];
 		emu_timer* tx_timer;
+		bool transmit_ctsn;
 	};
 
 	struct timer_regs_t
@@ -268,23 +264,74 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_execute_interface overrides
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) / 2; }
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 2); }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
+
+	// m68000_base_device overrides
+	virtual void m68k_reset_peripherals() override;
 
 private:
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
+	static constexpr device_timer_id TIMER_TMR0 = 0;
+	static constexpr device_timer_id TIMER_UART_RX = 1;
+	static constexpr device_timer_id TIMER_UART_TX = 2;
+
 	void update_ipl();
 	uint8_t iack_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(periphs_r);
-	DECLARE_WRITE16_MEMBER(periphs_w);
+	// Interrupts
+	uint8_t lir_r();
+	void lir_w(uint8_t data);
+	uint8_t picr1_r();
+	void picr1_w(uint8_t data);
+	uint8_t picr2_r();
+	void picr2_w(uint8_t data);
+
+	// I2C interface
+	uint8_t idr_r();
+	void idr_w(uint8_t data);
+	uint8_t iar_r();
+	void iar_w(uint8_t data);
+	uint8_t isr_r();
+	void isr_w(uint8_t data);
+	uint8_t icr_r();
+	void icr_w(uint8_t data);
+	uint8_t iccr_r();
+	void iccr_w(uint8_t data);
+
+	// UART interface
+	uint8_t umr_r();
+	void umr_w(uint8_t data);
+	uint8_t usr_r();
+	uint8_t ucsr_r();
+	void ucsr_w(uint8_t data);
+	uint8_t ucr_r();
+	void ucr_w(uint8_t data);
+	uint8_t uth_r();
+	void uth_w(uint8_t data);
+	uint8_t urh_r();
+
+	// Timers
+	uint16_t timer_r(offs_t offset, uint16_t mem_mask);
+	void timer_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	// DMA controller
+	uint16_t dma_r(offs_t offset, uint16_t mem_mask);
+	void dma_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	// MMU
+	uint16_t mmu_r(offs_t offset, uint16_t mem_mask);
+	void mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	void uart_rx_check();
 	void uart_tx_check();
+	void uart_tx(uint8_t data);
+	void uart_do_tx();
 	void set_timer_callback(int channel);
 
 	// callbacks
@@ -292,14 +339,10 @@ private:
 	devcb_read8 m_iack4_callback;
 	devcb_read8 m_iack5_callback;
 	devcb_read8 m_iack7_callback;
+	devcb_write8 m_uart_tx_callback;
+	devcb_write_line m_uart_rtsn_callback;
 
 	// internal state
-	uint16_t m_seeds[10];
-	uint8_t m_state[8];
-
-	uint16_t m_mcu_value;
-	uint8_t m_mcu_ack;
-
 	uint8_t m_ipl;
 	int m_in2_line;
 	int m_in4_line;
@@ -308,7 +351,7 @@ private:
 	int m_int1_line;
 	int m_int2_line;
 
-	uint16_t m_lir;
+	uint8_t m_lir;
 	uint8_t m_picr1;
 	uint8_t m_picr2;
 	bool m_timer_int;
@@ -321,11 +364,6 @@ private:
 	timer_regs_t m_timers;
 	dma_regs_t m_dma;
 	mmu_regs_t m_mmu;
-
-	// non-static internal members
-	void quizard_calculate_state();
-	void quizard_set_seeds(uint8_t *rx);
-	void quizard_handle_byte_tx();
 };
 
 // device type definition

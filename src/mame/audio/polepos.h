@@ -19,12 +19,12 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
 	DECLARE_WRITE_LINE_MEMBER(clson_w);
-	DECLARE_WRITE8_MEMBER(polepos_engine_sound_lsb_w);
-	DECLARE_WRITE8_MEMBER(polepos_engine_sound_msb_w);
+	void polepos_engine_sound_lsb_w(uint8_t data);
+	void polepos_engine_sound_msb_w(uint8_t data);
 
 private:
 	struct filter2_context

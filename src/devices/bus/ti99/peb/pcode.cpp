@@ -86,9 +86,9 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_P_CODE, bus::ti99::peb, ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
+DEFINE_DEVICE_TYPE(TI99_P_CODE, bus::ti99::peb::ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define PCODE_GROM_TAG "pcode_grom"
 #define PCODE_ROM_TAG "pcode_rom"
@@ -115,10 +115,10 @@ ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const 
 {
 }
 
-SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
+void ti_pcode_card_device::setaddress_dbin(offs_t offset, int state)
 {
 	m_address = offset;
-	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+	m_inDsrArea = in_dsr_space(offset, true);
 
 	line_state a14 = ((m_address & 2)!=0)? ASSERT_LINE : CLEAR_LINE;
 
@@ -142,25 +142,26 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 	}
 }
 
-void ti_pcode_card_device::debugger_read(uint16_t offset, uint8_t& value)
+void ti_pcode_card_device::debugger_read(offs_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
-	if (m_active && ((offset & m_select_mask)==m_select_value))
+	if (m_active && in_dsr_space(offset, true))
 	{
 		bool isrom0 = ((offset & 0xf000)==0x4000);
 		bool isrom12 = ((offset & 0xf000)==0x5000);
-		if (isrom0) value = m_rom[m_address & 0x0fff];
+		if (isrom0) value = m_rom[offset & 0x0fff];
 		else
 			if (isrom12) value = m_rom[(m_bank_select<<12) | (offset & 0x0fff)];
 	}
 }
 
-READ8Z_MEMBER( ti_pcode_card_device::readz )
+void ti_pcode_card_device::readz(offs_t offset, uint8_t *value)
 {
 	// Care for debugger
 	if (machine().side_effects_disabled())
 	{
 		debugger_read(offset, *value);
+		return;
 	}
 
 	if (m_active && m_inDsrArea && m_selected)
@@ -240,7 +241,7 @@ WRITE_LINE_MEMBER( ti_pcode_card_device::clock_in)
     we just ignore any request. (Note that CRU lines are not like memory; you
     may be able to write to them, but not necessarily read them again.)
 */
-READ8Z_MEMBER(ti_pcode_card_device::crureadz)
+void ti_pcode_card_device::crureadz(offs_t offset, uint8_t *value)
 {
 }
 
@@ -287,16 +288,6 @@ void ti_pcode_card_device::device_start()
 
 void ti_pcode_card_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_bank_select = 1;
 	m_selected = false;
 	m_clock_count = 0;
@@ -323,7 +314,7 @@ INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 
 INPUT_PORTS_START( ti99_pcode )
 	PORT_START( ACTIVE_TAG )
-	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, nullptr)
+	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, 0)
 		PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -366,4 +357,4 @@ ioport_constructor ti_pcode_card_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ti99_pcode );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

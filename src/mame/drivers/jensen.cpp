@@ -24,13 +24,76 @@
  */
 #include "emu.h"
 
-#include "includes/jensen.h"
+#include "cpu/alpha/alpha.h"
 #include "cpu/alpha/alphad.h"
+
+ // memory
+#include "machine/ram.h"
+#include "machine/xc1700e.h"
+#include "machine/intelfsh.h"
+
+// various hardware
+#include "machine/i82357.h"
+
+// busses and connectors
+#include "bus/rs232/rs232.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
 
 #include "debugger.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
+
+namespace {
+
+class jensen_state : public driver_device
+{
+public:
+	jensen_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_cpu(*this, "cpu")
+		, m_ram(*this, "ram")
+		, m_srom(*this, "srom")
+		, m_feprom(*this, "feprom%u", 0)
+		, m_isp(*this, "isp")
+	{
+	}
+
+	// machine config
+	void jensen(machine_config &config);
+
+	void d2k300axp(machine_config &config);
+	void d2k500axp(machine_config &config);
+	void dpcaxp150(machine_config &config);
+
+	void init_common();
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// address maps
+	void local_memory(address_map &map);
+	void local_io(address_map &map);
+	void eisa_memory(address_map &map);
+	void eisa_io(address_map &map);
+
+private:
+	// devices
+	required_device<alpha_device> m_cpu;
+	required_device<ram_device> m_ram;
+	required_device<xc1765e_device> m_srom;
+	required_device_array<intel_e28f008sa_device, 2> m_feprom;
+
+	required_device<i82357_device> m_isp;
+
+	// machine state
+	u8 m_hae = 0;
+	u8 m_sysctl = 0;
+	u8 m_spare = 0;
+};
 
 void jensen_state::machine_start()
 {
@@ -54,46 +117,46 @@ void jensen_state::local_memory(address_map &map)
 void jensen_state::local_io(address_map &map)
 {
 	map(0x00000000, 0x0000001f); // EISA INTA cycle
-	map(0x80000000, 0x9fffffff).lr8("feprom0", [this](offs_t offset) { return m_feprom[0]->read(offset >> 9); });
-	map(0xa0000000, 0xbfffffff).lr8("feprom1", [this](offs_t offset) { return m_feprom[1]->read(offset >> 9); });
+	map(0x80000000, 0x9fffffff).lr8(NAME([this] (offs_t offset) { return m_feprom[0]->read(offset >> 9); }));
+	map(0xa0000000, 0xbfffffff).lr8(NAME([this] (offs_t offset) { return m_feprom[1]->read(offset >> 9); }));
 
 	//map(0xc0000000, 0xc1ffffff); // vl82c106 bits 24:9 -> vlsi 15:0 i.e. >> 9
 
-	map(0xd0000000, 0xd0000000).lrw8("hae", [this]() { return m_hae; }, [this](u8 data) { m_hae = data & 0x7f; });
-	map(0xe0000000, 0xe0000000).lrw8("sysctl", [this]() { return m_sysctl; }, [this](u8 data) { m_sysctl = data; logerror("led %x\n", data & 0xf); });
-	map(0xf0000000, 0xf0000000).lrw8("spare", [this]() { return m_spare; }, [this](u8 data) { m_spare = data; });
+	map(0xd0000000, 0xd0000000).lrw8(NAME([this] () { return m_hae; }), NAME([this] (u8 data) { m_hae = data & 0x7f; }));
+	map(0xe0000000, 0xe0000000).lrw8(NAME([this] () { return m_sysctl; }), NAME([this] (u8 data) { m_sysctl = data; logerror("led %x\n", data & 0xf); }));
+	map(0xf0000000, 0xf0000000).lrw8(NAME([this] () { return m_spare; }), NAME([this] (u8 data) { m_spare = data; }));
 }
 
 void jensen_state::eisa_memory(address_map &map)
 {
-	map(0x00000000, 0xffffffff).lrw8("eisa_memory",
-		[this](offs_t offset)
-		{
-			LOG("eisa_memory_r 0x%08x\n", (u32(m_hae) << 25) | (offset >> 7));
+	map(0x00000000, 0xffffffff).lrw8(
+			NAME([this] (offs_t offset)
+			{
+				LOG("eisa_memory_r 0x%08x\n", (u32(m_hae) << 25) | (offset >> 7));
 
-			return 0;
-		},
-		[this](offs_t offset, u8 data)
-		{
-			LOG("eisa_memory_w 0x%08x data 0x%02x\n", (u32(m_hae) << 25) | (offset >> 7), data);
-		});
+				return 0;
+			}),
+			NAME([this] (offs_t offset, u8 data)
+			{
+				LOG("eisa_memory_w 0x%08x data 0x%02x\n", (u32(m_hae) << 25) | (offset >> 7), data);
+			}));
 }
 
 void jensen_state::eisa_io(address_map &map)
 {
-	map(0x00000000, 0xffffffff).lrw8("eisa_io",
-		[this](offs_t offset)
-		{
-			LOG("eisa_io_r offset 0x%08x address 0x%08x count %d (%s)\n", offset,
-				(u32(m_hae) << 25) | (offset >> 7), (offset >> 5) & 3, machine().describe_context());
+	map(0x00000000, 0xffffffff).lrw8(
+			NAME([this] (offs_t offset)
+			{
+				LOG("eisa_io_r offset 0x%08x address 0x%08x count %d (%s)\n", offset,
+					(u32(m_hae) << 25) | (offset >> 7), (offset >> 5) & 3, machine().describe_context());
 
-			return 0;
-		},
-		[this](offs_t offset, u8 data)
-		{
-			LOG("eisa_io_w offset 0x%08x address 0x%08x count %d data 0x%02x (%s)\n",
-				offset, (u32(m_hae) << 25) | (offset >> 7), (offset >> 5) & 3, data, machine().describe_context());
-		});
+				return 0;
+			}),
+			NAME([this] (offs_t offset, u8 data)
+			{
+				LOG("eisa_io_w offset 0x%08x address 0x%08x count %d data 0x%02x (%s)\n",
+					offset, (u32(m_hae) << 25) | (offset >> 7), (offset >> 5) & 3, data, machine().describe_context());
+			}));
 }
 
 void jensen_state::jensen(machine_config &config)
@@ -118,18 +181,12 @@ void jensen_state::jensen(machine_config &config)
 	INTEL_E28F008SA(config, m_feprom[0]);
 	INTEL_E28F008SA(config, m_feprom[1]);
 
-	// pc keyboard connector
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	//kbdc.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	//kbdc.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	[[maybe_unused]] pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	//kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	//kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", 0));
-	pc_at_keyboards(kbd);
-	kbd.set_default_option(STR_KBD_MICROSOFT_NATURAL);
-	kbd.set_pc_kbdc_slot(&kbdc);
-
-	// TODO: VL82C106 (rtc, 2xserial, parallel, 2xps/2)
+	// TODO: VL82C106 (rtc, dual serial, parallel, dual ps/2)
 	// TODO: 18.432 MHz crystal
 #if 0
 	rs232_port_device &com1(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
@@ -227,18 +284,24 @@ ROM_START(dpcaxp150)
 	 */
 	ROM_REGION32_LE(0x100000, "feprom1", 0)
 
-	// source: dumped from physical board
-	ROM_SYSTEM_BIOS(0, "v19", "Version 1.9, 22-JUN-1995")
-	ROMX_LOAD("001z5__bl07.v19", 0x00000, 0x100000, CRC(26da3478) SHA1(baa7c92b01244aad84420268a06d04c6e2a30754), ROM_BIOS(0))
+	// source: extracted from ftp://ftp.hp.com/pub/alphaserver/firmware/retired_platforms/alphapc/dec2000_axp150/dec2000_v2_2.exe
+	ROM_SYSTEM_BIOS(0, "v22", "Version 2.2, 12-FEB-1996")
+	ROMX_LOAD("001z5__bl07.v22", 0x00000, 0x100000, CRC(1edb9c98) SHA1(a45f0dde236e189a57afc1ed354201180ab2f234), ROM_BIOS(0))
 
-	// source: extracted from ftp://ftp.hp.com/pub/alphaserver/firmware/retired_platforms/alphapc/dec2000_axp150/
-	ROM_SYSTEM_BIOS(1, "v22", "Version 2.2, 12-FEB-1996")
-	ROMX_LOAD("001z5__bl07.v22", 0x00000, 0x100000, CRC(1edb9c98) SHA1(a45f0dde236e189a57afc1ed354201180ab2f234), ROM_BIOS(1))
+	// source: extracted from https://archive.org/download/ntrisc/alpha/ftp.alphant.com/Drivers/fw150v431.zip
+	ROM_SYSTEM_BIOS(1, "v19", "Version 1.9, 22-JUN-1995")
+	ROMX_LOAD("001z5__bl07.v19", 0x00000, 0x100000, CRC(53e981ee) SHA1(c726981441af88d8a224b1f81efee3a6ec95f227), ROM_BIOS(1))
 
-	// source: extracted from https://archive.org/details/decpcaxp
+	// source: extracted from https://archive.org/download/decpcaxp/DEC%20PC%20AXP%20Firmware%20Upgrade%20No9%20GXE.img
 	ROM_SYSTEM_BIOS(2, "v13", "Version 1.3, 10-JUN-1994")
 	ROMX_LOAD("001z5__bl07.v13", 0x00000, 0x100000, CRC(8035f370) SHA1(2ebd75267ab7373d344efe44e700645ed31b44cd), ROM_BIOS(2))
+
+	// source: extracted from https://archive.org/download/ntrisc/alpha/ftp.alphant.com/Drivers/fw35-1.zip
+	ROM_SYSTEM_BIOS(3, "vff", "Version f.f, 19-MAY-1994")
+	ROMX_LOAD("001z5__bl07.vff", 0x00000, 0x100000, CRC(99238153) SHA1(ce543bd11937bdf24c4d9e898e917438c2163a20), ROM_BIOS(3))
 ROM_END
+
+}
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME                  FLAGS */
 COMP( 1993,  d2k300axp, 0,      0,      d2k300axp, 0,     jensen_state, init_common, "DEC",   "DEC 2000 Model 300 AXP", MACHINE_IS_SKELETON)

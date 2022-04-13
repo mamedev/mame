@@ -36,8 +36,8 @@ DEFINE_DEVICE_TYPE(SATURN_CONTROL_PORT, saturn_control_port_device, "saturn_cont
 //  device_saturn_control_port_interface - constructor
 //-------------------------------------------------
 
-device_saturn_control_port_interface::device_saturn_control_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_saturn_control_port_interface::device_saturn_control_port_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "saturnctrl")
 {
 	m_port = dynamic_cast<saturn_control_port_device *>(device.owner());
 }
@@ -62,7 +62,8 @@ device_saturn_control_port_interface::~device_saturn_control_port_interface()
 
 saturn_control_port_device::saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SATURN_CONTROL_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this), m_device(nullptr)
+	device_single_card_slot_interface<device_saturn_control_port_interface>(mconfig, *this),
+	m_device(nullptr)
 {
 }
 
@@ -82,7 +83,7 @@ saturn_control_port_device::~saturn_control_port_device()
 
 void saturn_control_port_device::device_start()
 {
-	m_device = dynamic_cast<device_saturn_control_port_interface *>(get_card_device());
+	m_device = get_card_device();
 }
 
 

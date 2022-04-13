@@ -59,6 +59,11 @@ Notes:
     DIPSW1  -
     DIPSW2  -
 
+ROM checksum program:
+    10 FOR I%=0% TO 16383%
+    20 A%=A%+PEEK(I%)
+    30 NEXT I%
+    40 ;A%; I%
 */
 
 /*
@@ -71,13 +76,14 @@ Notes:
     - GeJo 80-column card
     - Mikrodatorn 64K expansion
     - Metric ABC CAD 1000
+    - ROMs with checksum 10042
 
 */
 
 #include "emu.h"
 #include "includes/abc80.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -97,14 +103,14 @@ Notes:
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( abc80_state::read )
+u8 abc80_state::read(offs_t offset)
 {
-	uint8_t data = 0xff;
-	uint8_t mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
+	u8 data = 0xff;
+	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
 	if (!(mmu & MMU_XM))
 	{
-		data = m_bus->xmemfl_r(space, offset);
+		data = m_bus->xmemfl_r(offset);
 	}
 	else if (!(mmu & MMU_ROM))
 	{
@@ -127,13 +133,13 @@ READ8_MEMBER( abc80_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc80_state::write )
+void abc80_state::write(offs_t offset, u8 data)
 {
-	uint8_t mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
+	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
 	if (!(mmu & MMU_XM))
 	{
-		m_bus->xmemw_w(space, offset, data);
+		m_bus->xmemw_w(offset, data);
 	}
 	else if (mmu & MMU_VRAMS)
 	{
@@ -155,7 +161,7 @@ WRITE8_MEMBER( abc80_state::write )
 //  csg_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc80_state::csg_w )
+void abc80_state::csg_w(u8 data)
 {
 	m_csg->enable_w(!BIT(data, 0));
 	m_csg->vco_voltage_w(BIT(data, 1) ? 2.5 : 0);
@@ -213,7 +219,7 @@ void abc80_state::abc80_io(address_map &map)
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( abc80_state::pio_pa_r )
+u8 abc80_state::pio_pa_r()
 {
 	/*
 
@@ -232,7 +238,7 @@ READ8_MEMBER( abc80_state::pio_pa_r )
 
 	*/
 
-	uint8_t data = 0;
+	u8 data = 0;
 
 	//data |= m_kb->data_r();
 	data |= m_key_data;
@@ -241,7 +247,7 @@ READ8_MEMBER( abc80_state::pio_pa_r )
 	return data;
 }
 
-READ8_MEMBER( abc80_state::pio_pb_r )
+u8 abc80_state::pio_pb_r()
 {
 	/*
 
@@ -258,7 +264,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 
 	*/
 
-	uint8_t data = 0;
+	u8 data = 0;
 
 	// receive data
 	data |= m_rs232->rxd_r();
@@ -277,7 +283,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc80_state::pio_pb_w )
+void abc80_state::pio_pb_w(u8 data)
 {
 	/*
 
@@ -356,7 +362,7 @@ void abc80_state::kbd_w(u8 data)
 	m_key_data = data;
 	m_key_strobe = 1;
 
-	uint8_t pio_data = 0x80 | data;
+	u8 pio_data = 0x80 | data;
 	m_pio->port_a_write(pio_data);
 
 	timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
@@ -372,7 +378,7 @@ void abc80_state::kbd_w(u8 data)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -447,17 +453,22 @@ void abc80_state::machine_start()
 	save_item(NAME(m_motor));
 	save_item(NAME(m_tape_in));
 	save_item(NAME(m_tape_in_latch));
+
+	//zero-fill
+	m_key_data = 0;
+	m_key_strobe = 0;
+	m_blink = 0;
 }
 
-QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
+QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	offs_t address = space.read_byte(BOFA + 1) << 8 | space.read_byte(BOFA);
 	if (LOG) logerror("BOFA %04x\n",address);
 
-	std::vector<uint8_t> data;
-	data.resize(quickload_size);
+	int quickload_size = image.length();
+	std::vector<u8> data(quickload_size);
 	image.fread(&data[0], quickload_size);
 	for (int i = 1; i < quickload_size; i++)
 		space.write_byte(address++, data[i]);
@@ -485,7 +496,8 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 //  machine_config( abc80 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc80_state::abc80)
+void abc80_state::abc80(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(11'980'800)/2/2); // 2.9952 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc80_state::abc80_mem);
@@ -509,8 +521,6 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
 	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	// devices
 	Z80PIO(config, m_pio, XTAL(11'980'800)/2/2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -520,18 +530,19 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("abc80_cass");
 
 	ABC80_KEYBOARD(config, m_kb, 0);
 	m_kb->keydown_wr_callback().set(FUNC(abc80_state::keydown_w));
 
-	ABCBUS_SLOT(config, ABCBUS_TAG, XTAL(11'980'800)/2/2, abc80_cards, "abcexp");
+	ABCBUS_SLOT(config, m_bus, XTAL(11'980'800)/2/2, abc80_cards, "abcexp");
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
-	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", attotime::from_seconds(2))
+	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc80_state::quickload_cb));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K");
@@ -539,7 +550,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
-MACHINE_CONFIG_END
+}
 
 
 
@@ -553,13 +564,13 @@ MACHINE_CONFIG_END
 
 ROM_START( abc80 )
 	ROM_REGION( 0x4000, Z80_TAG, 0 )
-	ROM_DEFAULT_BIOS("v2")
-	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
+	ROM_DEFAULT_BIOS("9913")
+	ROM_SYSTEM_BIOS( 0, "11273", "Checksum 11273" )
 	ROMX_LOAD( "3506_3.a5", 0x0000, 0x1000, CRC(7c004fb6) SHA1(9aee1d085122f4537c3e6ecdab9d799bd429ef52), ROM_BIOS(0) )
 	ROMX_LOAD( "3507_3.a3", 0x1000, 0x1000, CRC(d1850a84) SHA1(f7719f3af9173601a2aa23ae38ae00de1a387ad8), ROM_BIOS(0) )
 	ROMX_LOAD( "3508_3.a4", 0x2000, 0x1000, CRC(b55528e9) SHA1(3e5017e8cacad1f13215242f1bbd89d1d3eee131), ROM_BIOS(0) )
 	ROMX_LOAD( "3509_3.a2", 0x3000, 0x1000, CRC(659cab1e) SHA1(181db748cef22cdcccd311a60aa6189c85343db7), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
+	ROM_SYSTEM_BIOS( 1, "9913", "Checksum 9913" )
 	ROMX_LOAD( "3506_3_v2.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(1) )
 	ROMX_LOAD( "3507_3_v2.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(1) )
 	ROMX_LOAD( "3508_3_v2.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(1) )

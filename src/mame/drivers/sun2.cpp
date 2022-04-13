@@ -174,14 +174,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER( mmu_r );
-	DECLARE_WRITE16_MEMBER( mmu_w );
+	uint16_t mmu_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask);
 	void tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem_mask);
-	DECLARE_READ16_MEMBER( video_ctrl_r );
-	DECLARE_WRITE16_MEMBER( video_ctrl_w );
-	DECLARE_READ16_MEMBER( ram_r );
-	DECLARE_WRITE16_MEMBER( ram_w );
+	uint16_t video_ctrl_r();
+	void video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t ethernet_r();
 	void ethernet_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_int_w);
@@ -212,18 +212,18 @@ private:
 	uint8_t m_ethernet_status;
 };
 
-READ16_MEMBER( sun2_state::ram_r )
+uint16_t sun2_state::ram_r(offs_t offset)
 {
 	if (offset < m_ram_size_words) return m_ram_ptr[offset];
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sun2_state::ram_w )
+void sun2_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < m_ram_size_words) COMBINE_DATA(&m_ram_ptr[offset]);
 }
 
-READ16_MEMBER( sun2_state::mmu_r )
+uint16_t sun2_state::mmu_r(offs_t offset, uint16_t mem_mask)
 {
 	return tl_mmu_r(m_maincpu->get_fc(), offset, mem_mask);
 }
@@ -360,7 +360,7 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sun2_state::mmu_w )
+void sun2_state::mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	tl_mmu_w(m_maincpu->get_fc(), offset, data, mem_mask);
 }
@@ -489,12 +489,12 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 }
 
 // BW2 video control
-READ16_MEMBER( sun2_state::video_ctrl_r )
+uint16_t sun2_state::video_ctrl_r()
 {
 	return m_bw2_ctrl;
 }
 
-WRITE16_MEMBER( sun2_state::video_ctrl_w )
+void sun2_state::video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("sun2: BW2: %x to video_ctrl\n", data);
 	COMBINE_DATA(&m_bw2_ctrl);
@@ -509,7 +509,7 @@ uint8_t sun2_state::ethernet_r()
 void sun2_state::ethernet_w(uint8_t data)
 {
 	m_edlc->reset_w(!BIT(data, 7));
-	// Bit 6 = loopback control (active low, though inverted for MB502)
+	m_edlc->set_loopback(!BIT(data, 6)); // LBC on MB502
 	m_edlc->ca(BIT(data, 5));
 
 	m_ethernet_status = (data & 0xf0) | (m_ethernet_status & 0x0f);
@@ -568,10 +568,11 @@ void sun2_state::vmetype1space_map(address_map &map)
 	map(0x7f0000, 0x7f07ff).rom().region("bootprom", 0);    // uses MMU loophole to read 32k from a 2k window
 	map(0x7f0800, 0x7f0800).mirror(0x7fe).rw(FUNC(sun2_state::ethernet_r), FUNC(sun2_state::ethernet_w)).cswidth(16);
 	// 7f1000-7f17ff: AM9518 encryption processor
-	//AM_RANGE(0x7f1800, 0x7f1801) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, cb_r, cb_w, 0xff00)
-	//AM_RANGE(0x7f1802, 0x7f1803) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, db_r, db_w, 0xff00)
-	//AM_RANGE(0x7f1804, 0x7f1805) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ca_r, ca_w, 0xff00)
-	//AM_RANGE(0x7f1806, 0x7f1807) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, da_r, da_w, 0xff00)
+	//map(0x7f1800, 0x7f1800).rw(SCC1_TAG, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
+	//map(0x7f1802, 0x7f1802).rw(SCC1_TAG, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
+	map(0x7f1804, 0x7f1805).nopr();
+	//map(0x7f1804, 0x7f1804).rw(SCC1_TAG, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));
+	//map(0x7f1806, 0x7f1806).rw(SCC1_TAG, FUNC(z80scc_device::da_r), FUNC(z80scc_device::da_w));
 	map(0x7f2000, 0x7f2000).rw(SCC2_TAG, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
 	map(0x7f2002, 0x7f2002).rw(SCC2_TAG, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
 	map(0x7f2004, 0x7f2004).rw(SCC2_TAG, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));
@@ -595,7 +596,7 @@ void sun2_state::mbustype0space_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rw(FUNC(sun2_state::ram_r), FUNC(sun2_state::ram_w));
 	// 7f80000-7f807ff: Keyboard/mouse SCC8530
-	//AM_RANGE(0x7f8000, 0x7f8007) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
+	//map(0x7f8000, 0x7f8007).rw(SCC1_TAG, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff00);
 	map(0x700000, 0x71ffff).ram().share("bw2_vram");
 	map(0x781800, 0x781801).rw(FUNC(sun2_state::video_ctrl_r), FUNC(sun2_state::video_ctrl_w));
 }
@@ -606,7 +607,7 @@ void sun2_state::mbustype1space_map(address_map &map)
 	map(0x000000, 0x0007ff).rom().region("bootprom", 0);    // uses MMU loophole to read 32k from a 2k window
 	// 001000-0017ff: AM9518 encryption processor
 	// 001800-001fff: Parallel port
-	map(0x002000, 0x0027ff).rw(SCC2_TAG, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask16(0xff00);
+	map(0x002000, 0x0027ff).rw(SCC2_TAG, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff00);
 	map(0x002800, 0x002803).mirror(0x7fc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0x003800, 0x00383f).mirror(0x7c0).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0xff00); // 12 wait states generated by PAL16R6 (U415)
 }
@@ -623,29 +624,26 @@ void sun2_state::mbustype3space_map(address_map &map)
 
 uint32_t sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
+	uint8_t const *const m_vram = (uint8_t *)m_bw2_vram.target();
 
 	if (!(m_bw2_ctrl & 0x8000)) return 0;
 
-	for (y = 0; y < 900; y++)
+	for (int y = 0; y < 900; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1152/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 1152/8; x++)
 		{
-			pixels = m_vram[(y * (1152/8)) + (BYTE_XOR_BE(x))];
+			uint8_t const pixels = m_vram[(y * (1152/8)) + (BYTE_XOR_BE(x))];
 
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
+			*scanline++ = palette[BIT(pixels, 7)];
+			*scanline++ = palette[BIT(pixels, 6)];
+			*scanline++ = palette[BIT(pixels, 5)];
+			*scanline++ = palette[BIT(pixels, 4)];
+			*scanline++ = palette[BIT(pixels, 3)];
+			*scanline++ = palette[BIT(pixels, 2)];
+			*scanline++ = palette[BIT(pixels, 1)];
+			*scanline++ = palette[BIT(pixels, 0)];
 		}
 	}
 

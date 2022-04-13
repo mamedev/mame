@@ -29,7 +29,7 @@ public:
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	DECLARE_READ8_MEMBER(ga_hack_r);
+	u8 ga_hack_r();
 
 	void mem_map(address_map &map);
 	void program_map(address_map &map);
@@ -42,7 +42,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(tv965_state::draw_character)
 {
 }
 
-READ8_MEMBER(tv965_state::ga_hack_r)
+u8 tv965_state::ga_hack_r()
 {
 	return 0x08;
 }
@@ -86,7 +86,7 @@ void tv965_state::tv965(machine_config &config)
 	scn2672_device &crtc(SCN2672(config, "crtc", 26.9892_MHz_XTAL / 10));
 	crtc.set_character_width(10);
 	crtc.set_display_callback(FUNC(tv965_state::draw_character));
-	crtc.intr_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	crtc.intr_callback().set_inputline(m_maincpu, G65816_LINE_NMI);
 	crtc.set_screen("screen");
 
 	mos6551_device &acia1(MOS6551(config, "acia1", 0));

@@ -7,6 +7,7 @@
 
 
 #include "cpu/m6809/m6809.h"
+#include "cpu/m6809/6x09dasm.h"
 
 class konami1_device : public m6809_base_device {
 public:
@@ -23,9 +24,20 @@ protected:
 		virtual uint8_t read_opcode(uint16_t adr) override;
 	};
 
+	class disassembler : public m6809_disassembler {
+	public:
+		uint16_t m_boundary;
+		disassembler(uint16_t boundary) : m6809_disassembler(), m_boundary(boundary) {}
+		virtual ~disassembler() = default;
+		virtual u32 interface_flags() const override;
+		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
+	};
+
 	uint16_t m_boundary;
 
 	virtual void device_start() override;
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI1, konami1_device)

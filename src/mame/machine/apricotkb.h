@@ -37,14 +37,14 @@ public:
 
 	uint8_t read_keyboard();
 
-	DECLARE_READ8_MEMBER( kb_lo_r );
-	DECLARE_READ8_MEMBER( kb_hi_r );
-	DECLARE_READ8_MEMBER( kb_p6_r );
-	DECLARE_WRITE8_MEMBER( kb_p3_w );
-	DECLARE_WRITE8_MEMBER( kb_y0_w );
-	DECLARE_WRITE8_MEMBER( kb_y4_w );
-	DECLARE_WRITE8_MEMBER( kb_y8_w );
-	DECLARE_WRITE8_MEMBER( kb_yc_w );
+	uint8_t kb_lo_r();
+	uint8_t kb_hi_r();
+	uint8_t kb_p6_r();
+	void kb_p3_w(uint8_t data);
+	void kb_y0_w(uint8_t data);
+	void kb_y4_w(uint8_t data);
+	void kb_y8_w(uint8_t data);
+	void kb_yc_w(uint8_t data);
 
 	void apricot_keyboard_io(address_map &map);
 protected:

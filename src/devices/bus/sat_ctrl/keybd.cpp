@@ -251,7 +251,7 @@ INPUT_CHANGED_MEMBER(saturn_keybd_device::key_stroke)
 {
 	if (newval && !oldval)
 	{
-		m_data = ((uint8_t)(uintptr_t)(param) & 0xff);
+		m_data = (uint8_t(param) & 0xff);
 		m_status |= 8;
 	}
 

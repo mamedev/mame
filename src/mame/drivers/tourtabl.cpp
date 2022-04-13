@@ -31,9 +31,9 @@ public:
 
 private:
 	virtual void machine_start() override { m_leds.resolve(); }
-	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
-	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
-	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
+	void tourtabl_led_w(uint8_t data);
+	uint16_t tourtabl_read_input_port(offs_t offset);
+	uint8_t tourtabl_get_databus_contents(offs_t offset);
 	void main_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -44,7 +44,7 @@ private:
 #define MASTER_CLOCK    XTAL(3'579'545)
 
 
-WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
+void tourtabl_state::tourtabl_led_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 6); /* start 1 */
 	m_leds[1] = BIT(data, 5); /* start 2 */
@@ -55,14 +55,14 @@ WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
 }
 
 
-READ16_MEMBER(tourtabl_state::tourtabl_read_input_port)
+uint16_t tourtabl_state::tourtabl_read_input_port(offs_t offset)
 {
 	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
 	return ioport(tianames[offset])->read();
 }
 
-READ8_MEMBER(tourtabl_state::tourtabl_get_databus_contents)
+uint8_t tourtabl_state::tourtabl_get_databus_contents(offs_t offset)
 {
 	return offset;
 }
@@ -180,7 +180,6 @@ void tourtabl_state::tourtabl(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200);
 	screen.set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
-	screen.set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

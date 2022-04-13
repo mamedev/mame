@@ -82,17 +82,17 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
+DEFINE_DEVICE_TYPE(TI99_DATAMUX, bus::ti99::internal::datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 /*
     Constructor
 */
 datamux_device::datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI99_DATAMUX, tag, owner, clock),
-	m_video(*owner, TI_VDP_TAG),
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI99_VDP_TAG),
+	m_sound(*owner, TI99_SOUNDCHIP_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
 	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ram16b(*owner, TI99_EXPRAM_TAG),
@@ -123,31 +123,25 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 
 void datamux_device::read_all(uint16_t addr, uint8_t *value)
 {
-	// Valid access
-	bool validaccess = ((addr & 0x0400)==0);
-
-	if (validaccess)
+	// GROM access
+	if ((addr & 0xfc01)==0x9800)
 	{
-		// GROM access
-		if ((addr & 0xf801)==0x9800)
+		if (m_console_groms_present)
 		{
-			if (m_console_groms_present)
-			{
-				m_grom0->readz(value);
-				m_grom1->readz(value);
-				m_grom2->readz(value);
-			}
-			// GROMport (GROMs)
-			m_gromport->readz(addr, value);
-			m_grom_idle = false;
+			m_grom0->readz(value);
+			m_grom1->readz(value);
+			m_grom2->readz(value);
 		}
+		// GROMport (GROMs)
+		m_gromport->readz(addr, value);
+		m_grom_idle = false;
+	}
 
-		// Video
-		if ((addr & 0xf801)==0x8800)
-		{
-			// Forward to VDP unless we have an EVPC
-			if (m_video != nullptr) *value = m_video->read(addr>>1); // A14 determines data or register read
-		}
+	// Video
+	if ((addr & 0xfc01)==0x8800)
+	{
+		// Forward to VDP unless we have an EVPC
+		if (m_video != nullptr) *value = m_video->read((addr>>1)&1); // A14 determines data or register read
 	}
 
 	// GROMport (ROMs)
@@ -185,10 +179,10 @@ void datamux_device::write_all(uint16_t addr, uint8_t value)
 	}
 
 	// Video
-	if ((addr & 0xf801)==0x8800)
+	if ((addr & 0xfc01)==0x8c00)
 	{
 		// Forward to VDP unless we have an EVPC
-		if (m_video != nullptr) m_video->write(addr>>1, value);   // A14 determines data or register write
+		if (m_video != nullptr) m_video->write((addr>>1)&1, value);   // A14 determines data or register write
 	}
 
 	// I/O port gets all accesses
@@ -318,14 +312,14 @@ void datamux_device::debugger_write(uint16_t addr, uint16_t data)
 			if ((addrb & 0xe000)==0x6000)
 			{
 				m_gromport->romgq_line(ASSERT_LINE);
-				m_gromport->write(addr+1, data & 0xff);
-				m_gromport->write(addr, (data>>8) & 0xff);
+				m_gromport->write(addrb+1, data & 0xff);
+				m_gromport->write(addrb, (data>>8) & 0xff);
 				m_gromport->romgq_line(m_romgq_state);  // reset to previous state
 			}
 
 			m_ioport->memen_in(ASSERT_LINE);
-			m_ioport->write(addr+1, data & 0xff);
-			m_ioport->write(addr,  (data>>8) & 0xff);
+			m_ioport->write(addrb+1, data & 0xff);
+			m_ioport->write(addrb,  (data>>8) & 0xff);
 			m_ioport->memen_in(m_memen_state);   // reset to previous state
 		}
 	}
@@ -378,7 +372,7 @@ uint16_t datamux_device::read(offs_t offset)
 				// Reading the even address now (addr)
 				uint8_t hbyte = 0;
 				read_all(m_addr_buf, &hbyte);
-				LOGMASKED(LOG_ACCESS, "Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+				LOGMASKED(LOG_ACCESS, "%04x -> %02x\n",  m_addr_buf, hbyte);
 
 				value = (hbyte<<8) | m_latch;
 			}
@@ -506,9 +500,11 @@ WRITE_LINE_MEMBER( datamux_device::clock_in )
 				}
 				if (m_waitcount==2)
 				{
+					// Clear the latch (if no device responds on the bus, we assume the data lines as 0)
+					m_latch = 0;
 					// read odd byte
 					read_all(m_addr_buf+1, &m_latch);
-					LOGMASKED(LOG_ACCESS, "Read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
+					LOGMASKED(LOG_ACCESS, "%04x -> %02x\n",  m_addr_buf+1, m_latch);
 					// do the setaddress for the even address
 					setaddress_all(m_addr_buf);
 				}
@@ -636,5 +632,4 @@ ioport_constructor datamux_device::device_input_ports() const
 	return INPUT_PORTS_NAME(datamux);
 }
 
-} } } // end namespace bus::ti99::internal
-
+} // end namespace bus::ti99::internal

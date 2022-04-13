@@ -253,35 +253,35 @@ void cclimber_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
+void cclimber_state::swimmer_sh_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
-WRITE8_MEMBER(cclimber_state::yamato_p0_w)
+void cclimber_state::yamato_p0_w(uint8_t data)
 {
 	m_yamato_p0 = data;
 }
 
-WRITE8_MEMBER(cclimber_state::yamato_p1_w)
+void cclimber_state::yamato_p1_w(uint8_t data)
 {
 	m_yamato_p1 = data;
 }
 
-READ8_MEMBER(cclimber_state::yamato_p0_r)
+uint8_t cclimber_state::yamato_p0_r()
 {
 	return m_yamato_p0;
 }
 
-READ8_MEMBER(cclimber_state::yamato_p1_r)
+uint8_t cclimber_state::yamato_p1_r()
 {
 	return m_yamato_p1;
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::toprollr_rombank_w)
+void cclimber_state::toprollr_rombank_w(int state)
 {
 	m_toprollr_rombank = m_mainlatch->q5_r() | (m_mainlatch->q6_r() << 1);
 
@@ -291,7 +291,6 @@ WRITE_LINE_MEMBER(cclimber_state::toprollr_rombank_w)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 MACHINE_RESET_MEMBER(cclimber_state,cclimber)
 {
 	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
@@ -299,15 +298,14 @@ MACHINE_RESET_MEMBER(cclimber_state,cclimber)
 
 	m_toprollr_rombank = 0;
 }
-#endif
 
-WRITE_LINE_MEMBER(cclimber_state::nmi_mask_w)
+void cclimber_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 }
 
 
-READ8_MEMBER(cclimber_state::bagmanf_a000_r)
+uint8_t cclimber_state::bagmanf_a000_r()
 {
 	// Should this actually use the same PAL16R6 as the parent set?
 	return 0x3f;
@@ -317,7 +315,7 @@ READ8_MEMBER(cclimber_state::bagmanf_a000_r)
 /* Note that River Patrol reads/writes to a000-a4f0. This is a bug in the code.
    The instruction at 0x0593 should say LD DE,$8000 */
 
-void cclimber_state::cclimber_map(address_map &map)
+void cclimber_state::rpatrol_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6bff).ram();             /* Crazy Kong only */
@@ -327,16 +325,26 @@ void cclimber_state::cclimber_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
+	map(0xa800, 0xa800).portr("P2");
+	map(0xb000, 0xb000).portr("DSW");
+	map(0xb800, 0xb800).portr("SYSTEM");
+}
+
+void cclimber_state::cclimber_map(address_map &map)
+{
+	rpatrol_map(map);
+
 	map(0xa800, 0xa800).portr("P2").w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
 	map(0xb000, 0xb000).portr("DSW").w("cclimber_audio", FUNC(cclimber_audio_device::sample_volume_w));
-	map(0xb800, 0xb800).portr("SYSTEM");
 }
 
 void cclimber_state::decrypted_opcodes_map(address_map &map)
@@ -351,14 +359,16 @@ void cclimber_state::cannonb_map(address_map &map)
 	map(0x6000, 0x6bff).ram();
 	map(0x8000, 0x83ff).ram();
 	map(0x8800, 0x88ff).nopr().writeonly().share("bigspriteram"); /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
-//  AM_RANGE(0x8900, 0x8bff) AM_WRITEONLY  /* not used, but initialized */
+//  map(0x8900, 0x8bff).writeonly();  /* not used, but initialized */
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
@@ -402,10 +412,12 @@ void cclimber_state::yamato_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
@@ -473,6 +485,13 @@ void cclimber_state::cclimber_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x09).w("cclimber_audio:aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x0c, 0x0c).r("cclimber_audio:aysnd", FUNC(ay8910_device::data_r));
+}
+
+void cclimber_state::rpatrol_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x09).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x0c, 0x0c).r("aysnd", FUNC(ay8910_device::data_r));
 }
 
 void cclimber_state::yamato_portmap(address_map &map)
@@ -665,6 +684,17 @@ static INPUT_PORTS_START( ckongb )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ckongb2 )
+	PORT_INCLUDE( ckong )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cannonb )
@@ -1093,13 +1123,13 @@ static GFXDECODE_START( gfx_toprollr )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, cclimber_charlayout,   24*4, 16 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(cclimber_state::vblank_irq)
+void cclimber_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(cclimber_state::bagmanf_vblank_irq)
+void cclimber_state::bagmanf_vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -1145,6 +1175,19 @@ void cclimber_state::cclimber(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	CCLIMBER_AUDIO(config, "cclimber_audio", 0);
+}
+
+void cclimber_state::rpatrol(machine_config &config)
+{
+	root(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::rpatrol_map);
+	m_maincpu->set_addrmap(AS_IO, &cclimber_state::rpatrol_portmap);
+
+	// sound hardware
+	SPEAKER(config, "speaker").front_center();
+
+	AY8910(config, "aysnd", XTAL(18'432'000)/3/2/2).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void cclimber_state::cclimberx(machine_config &config)
@@ -1326,7 +1369,7 @@ ROM_START( cclimber )
 	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
 	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13",         0x0000, 0x1000, CRC(e0042f75) SHA1(86cb31b110742a0f7ae33052c88f42d00deb5468) )
 	ROM_LOAD( "cc12",         0x1000, 0x1000, CRC(5da13aaa) SHA1(b2d41e69435d09c456648a10e33f5e1fbb0bc64c) )
 ROM_END
@@ -1358,7 +1401,7 @@ ROM_START( cclimbera )
 	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
 	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13",         0x0000, 0x1000, CRC(e0042f75) SHA1(86cb31b110742a0f7ae33052c88f42d00deb5468) )
 	ROM_LOAD( "cc12",         0x1000, 0x1000, CRC(5da13aaa) SHA1(b2d41e69435d09c456648a10e33f5e1fbb0bc64c) )
 ROM_END
@@ -1390,7 +1433,7 @@ ROM_START( cclimberj )
 	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
 	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1410,7 +1453,7 @@ ROM_START( ccboot )
 	/* 0x1800-0xffff - empty */
 	ROM_LOAD( "m04.bin",      0x2000, 0x0800, CRC(6fb80538) SHA1(6ba5add5c0190e79191b3fa749a1b94e766e3950) )
 	/* 0x2800-0x2fff - empty */
-	ROM_LOAD( "m03.bin",      0x3800, 0x0800, CRC(67127253) SHA1(e27556ed74e73644a2578ce6645c312d64f484c6) )
+	ROM_LOAD( "m03.bin",      0x3000, 0x0800, CRC(67127253) SHA1(e27556ed74e73644a2578ce6645c312d64f484c6) )
 	/* 0x3800-0x3fff - empty */
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
@@ -1423,7 +1466,7 @@ ROM_START( ccboot )
 	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
 	ROM_LOAD( "ccboot.prm",   0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) )    /* decryption table (not used) */
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1456,7 +1499,7 @@ ROM_START( ccboot2 )
 	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
 	ROM_LOAD( "ccboot.prm",   0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) )    /* decryption table (not used) */
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1489,7 +1532,7 @@ ROM_START( ccbootmr )  /* Model Racing bootleg */
 	ROM_LOAD( "198-74288.c9", 0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) )
 	ROM_LOAD( "214-74187.cpu",0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) )    /* decryption table (not used) */
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "213.r4",       0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "212.n4",       0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1517,7 +1560,7 @@ ROM_START( cclimbroper )
 	ROM_LOAD( "cc9-2716.cpu",         0x0000, 0x0800, CRC(a546a18f) SHA1(302ba08cef61b1badc361666fd559713037a2e43) )
 	ROM_LOAD( "cc8-2716.cpu",         0x0800, 0x0800, CRC(0224e507) SHA1(c9b534246b6bb743294581a5e74608a295cf0734) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc7-2532.cpu",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cc6-2532.cpu",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 
@@ -1550,7 +1593,7 @@ ROM_START( cclimbrrod )
 	ROM_LOAD( "cc9.bin",         0x0000, 0x0800, CRC(6fb2afaf) SHA1(d2fe31d00af10e6bcabef51885ce52fb17d1bfbc) )
 	ROM_LOAD( "cc8.bin",         0x0800, 0x0800, CRC(227ee804) SHA1(0cda61a0ceeab299e7d40d33bf6dad3490928323) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc7.cpu",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cc6.cpu",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 
@@ -1561,7 +1604,7 @@ ROM_START( cclimbrrod )
 ROM_END
 
 
-/* Sets below are Crazy Kong Part II and have an extra screen in attract mode, showing a caged Kong and copyright */
+// Sets below are Crazy Kong Part II and have an extra screen in attract mode, showing a caged Kong and copyright
 
 ROM_START( ckongpt2 )
 	ROM_REGION( 0x6000, "maincpu", 0 )
@@ -1587,7 +1630,7 @@ ROM_START( ckongpt2 )
 	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "14.5s",        0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "13.5p",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1616,7 +1659,7 @@ ROM_START( ckongpt2a )
 	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "14.5s",        0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "13.5p",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1645,7 +1688,7 @@ ROM_START( ckongpt2j )
 	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "14.5s",        0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "13.5p",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1674,11 +1717,39 @@ ROM_START( ckongpt2jeu )
 	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "14.5s",        0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "13.5p",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
+ROM_START( ckongpt2ss )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "ck2_7.5d",     0x0000, 0x1000, CRC(b27df032) SHA1(57f9be139c610405e3c2fddd7093dfb1277e450e) )
+	ROM_LOAD( "ck2_8.5e",     0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
+	ROM_LOAD( "ck2_9.5h",     0x2000, 0x1000, CRC(c9054c94) SHA1(1aa08d2501ee620759fd5c111e12f6d432c25294) )
+	ROM_LOAD( "ck_10.5k",     0x3000, 0x1000, CRC(923420cb) SHA1(51f809c92a1e7483debbf29e77364d0ab3b863e6) ) // unique
+	ROM_LOAD( "ck2_11.5l",    0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) )
+	ROM_LOAD( "ck_12.5n",     0x5000, 0x1000, CRC(25a015d3) SHA1(8b932cb9ae1ba67b4ff86b7b97be0c31cef23514) ) // unique
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "ck2_6.11n",    0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
+	ROM_LOAD( "ck2_5.11l",    0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "ck2_4.11k",    0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
+	ROM_LOAD( "ck2_3.11h",    0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "ck2_2.11c",    0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
+	ROM_LOAD( "ck2_1.11a",    0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "mb7051.v6",    0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
+	ROM_LOAD( "mb7051.u6",    0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "mb7051.t6",    0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
+
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
+	ROM_LOAD( "14.5s",        0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
+	ROM_LOAD( "13.5p",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+ROM_END
 
 ROM_START( ckongpt2b )
 	ROM_REGION( 0x6000, "maincpu", 0 )
@@ -1704,14 +1775,41 @@ ROM_START( ckongpt2b )
 	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "14.5s",        0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "13.5p",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
+ROM_START( ckongpt2b2 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "0.bin",        0x0000, 0x1000, CRC(1c21386f) SHA1(ce1a0c469dd09d81485cede6c8fbaf6299a9decf) ) // unique
+	ROM_LOAD( "1.bin",        0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
+	ROM_LOAD( "2.bin",        0x2000, 0x1000, CRC(c9054c94) SHA1(1aa08d2501ee620759fd5c111e12f6d432c25294) )
+	ROM_LOAD( "3.bin",        0x3000, 0x1000, CRC(84903b9d) SHA1(60c3f3879da9f3cdcdc2313db1196c41132fb27f) ) // unique
+	ROM_LOAD( "4.bin",        0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) )
+	ROM_LOAD( "5.bin",        0x5000, 0x1000, CRC(966bc9ab) SHA1(4434fc620169ffea1b1f227b61674e1daf79b54b) )
 
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "d.bin",        0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
+	ROM_LOAD( "c.bin",        0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "b.bin",        0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
+	ROM_LOAD( "a.bin",        0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-/* Sets below are 'Crazy Kong' without the extra Falcon screen or Pt. 2 subtitle, they also have worse colours */
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
+	ROM_LOAD( "8.bin",        0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "prom.bin",     0x0000, 0x0020, CRC(d3b84067) SHA1(1d025c28c47c4c7508b0dfd534de87e923262630) ) // unique, FIXED BITS (xxxxxxx1), verified on 4 boards, but gives red-ish backgrounds not present on PCB?
+	ROM_LOAD( "prom.t6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "prom.u6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
+
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
+	ROM_LOAD( "7.bin",        0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
+	ROM_LOAD( "6.bin",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+ROM_END
+
+// Sets below are 'Crazy Kong' without the extra Falcon screen or Pt. 2 subtitle, they also have worse colours
 
 ROM_START( ckong )
 	ROM_REGION( 0x6000, "maincpu", 0 )
@@ -1737,7 +1835,7 @@ ROM_START( ckong )
 	ROM_LOAD( "ck6u.bin",     0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
 	ROM_LOAD( "ck6t.bin",     0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "falcon13",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "falcon12",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) ) // differs from ckongalc
 ROM_END
@@ -1772,7 +1870,7 @@ ROM_START( ckongo )
 	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1801,7 +1899,7 @@ ROM_START( ckongalc )
 	ROM_LOAD( "ck6u.bin",     0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
 	ROM_LOAD( "ck6t.bin",     0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "ck12.bin",     0x1000, 0x1000, CRC(2eb23b60) SHA1(c9e7dc584562aceb374193655fbacb7df6c9c731) ) // sldh w/ckongdks
 ROM_END
@@ -1830,7 +1928,7 @@ ROM_START( bigkong )
 	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -1859,7 +1957,7 @@ ROM_START( monkeyd )
 	ROM_LOAD( "ck6u.bin",     0x0020, 0x0020, BAD_DUMP CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423)  )
 	ROM_LOAD( "ck6t.bin",     0x0040, 0x0020, BAD_DUMP CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1)  )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "ck12.bin",     0x1000, 0x1000, CRC(2eb23b60) SHA1(c9e7dc584562aceb374193655fbacb7df6c9c731) )
 ROM_END
@@ -2032,7 +2130,7 @@ ROM_START( dking )
 	ROM_LOAD( "ck6t.bin",     0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) ) // 82s123.1t
 	ROM_LOAD( "82s129.5g",    0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) ) // Decryption Table?
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "falcon13",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) ) // d6.1m
 	ROM_LOAD( "falcon12",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) ) // d5.1k
 ROM_END
@@ -2064,7 +2162,7 @@ ROM_START( ckongdks )
 	ROM_LOAD( "ck6t.bin",     0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) ) // 82s123.1t
 	ROM_LOAD( "82s129.5g",    0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) ) // Decryption Table?
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "ck08.bin",    0x0000, 0x1000, CRC(31c0a7de) SHA1(ace23fde4cb3c336b8377c1a1e940607d545e8c3) ) // 97.241211%
 	ROM_LOAD( "ck07.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -2085,8 +2183,8 @@ ROM_START( rpatrol )
 	ROM_CONTINUE(             0x003000, 0x000800 )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "9.2t",    0x000000, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
-	ROM_LOAD( "8.2s",    0x000800, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "8.2s",    0x000000, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "9.2t",    0x000800, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "mb7051.1b",    0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) ) /* or compatible like 82S123 - Had a RED stipe across chip */
@@ -2109,8 +2207,8 @@ ROM_START( rpatroln )
 	ROM_CONTINUE(          0x003000, 0x000800 )
 
 	ROM_REGION( 0x1000, "gfx2", 0 ) /* located on an original ORCA OVG-50B PCB */
-	ROM_LOAD( "9.2t", 0x000000, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
-	ROM_LOAD( "8.2s", 0x000800, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "8.2s", 0x000000, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "9.2t", 0x000800, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 
 	ROM_REGION( 0x0060, "proms", 0 ) /* located on an original ORCA OVG-50B PCB */
 	ROM_LOAD( "mb7051.1b", 0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) ) /* or compatible like 82S123 - Had a RED stipe across chip */
@@ -2137,7 +2235,7 @@ ROM_START( rpatrolb )
 	ROM_LOAD( "rp9.6h",       0x3000, 0x0800, CRC(ea5aafca) SHA1(d8f8fe270680ae261d63bd4702107961cd904699) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "gfx2", 0 ) // roms swapped around
 	ROM_LOAD( "rp11.6c",      0x0000, 0x0800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 	ROM_LOAD( "rp10.6a",      0x0800, 0x0800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
 
@@ -2209,7 +2307,7 @@ ROM_START( cannonb )
 	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "canballs.5s",  0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "canballs.5p",  0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 
@@ -2248,7 +2346,7 @@ ROM_START( cannonb2 )
 	ROM_LOAD( "u6.bin",      0x0020, 0x0020, CRC(c0539747) SHA1(1bc70057b59b8cb11299fb6b0d84a46da6c0a025) )
 	ROM_LOAD( "t6.bin",      0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cb6.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cb5.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -2279,7 +2377,7 @@ ROM_START( cannonb3 )
 	ROM_LOAD( "b pos u6  n82s123n.bin",      0x0020, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
 	ROM_LOAD( "a pos t6  n82s123n.bin",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "ck14 pos s5  2532.bin",  0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "ck13 pos r5  2532.bin",  0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
@@ -2327,7 +2425,7 @@ ROM_START( bagmanf )
 	ROM_LOAD( "2732 07 pos dboard.bin",   0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
 	ROM_LOAD( "2732 08 pos dboard.bin",   0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
 
-	ROM_REGION( 0x2000, "samples", ROMREGION_ERASE00 )  /* samples */
+	ROM_REGION( 0x2000, "cclimber_audio:samples", ROMREGION_ERASE00 )
 	/* unpopulated */
 ROM_END
 
@@ -2597,7 +2695,7 @@ ROM_START( toprollr )
 	ROM_LOAD( "1.d5",   0x0c000, 0x02000, CRC(9894374d) SHA1(173de4abbc3fb5d522aa6d6d5caf8e4d54f2a598) )
 	ROM_LOAD( "7.d3",   0x0e000, 0x02000, CRC(904fffb6) SHA1(5528bc2a4d2fe8672428fd4725644265f0d57ded) )
 
-	ROM_REGION( 0x2000, "samples", 0 )
+	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "12.p3",  0x0000, 0x2000, CRC(7f989dc9) SHA1(3b4d18cbb992872b3cf8f5eaf5381ed3a9468cc1) )
 
 	ROM_REGION( 0x01a0, "proms", 0 )
@@ -2660,49 +2758,51 @@ void cclimber_state::init_rpatrol()
 }
 
 
-GAME( 1980, cclimber,    0,        cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimbera,   cclimber, cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state, init_cclimberj, ROT0,   "Nichibutsu",             "Crazy Climber (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, ccboot,      cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg",                "Crazy Climber (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, ccboot2,     cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg",                "Crazy Climber (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, ccbootmr,    cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimber,    0,        cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbera,   cclimber, cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 2)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state, init_cclimberj, ROT0,   "Nichibutsu",             "Crazy Climber (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccboot,      cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg",                "Crazy Climber (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccboot2,     cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg",                "Crazy Climber (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccbootmr,    cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1980, cclimbroper, cclimber, cclimber,  cclimber,  cclimber_state, empty_init,     ROT0,   "bootleg (Operamatic)",   "Crazy Climber (Spanish, Operamatic bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimbrrod,  cclimber, cclimber,  cclimber,  cclimber_state, empty_init,     ROT0,   "bootleg (Rodmar)",       "Crazy Climber (Spanish, Rodmar bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbrrod,  cclimber, cclimber,  cclimber,  cclimber_state, empty_init,     ROT0,   "bootleg (Rodmar)",       "Crazy Climber (Spanish, Rodmar bootleg)",     MACHINE_SUPPORTS_SAVE )
 
 /* these sets have ugly colours, no extra attract screen, and no graphics for the extra attract screen in the BG roms
   - there is a Falcon logo in the text roms which is unused
   - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Kyoei / Falcon", "Crazy Kong", MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
-GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King", MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
+GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Kyoei / Falcon", "Crazy Kong",                               MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
+GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King",                              MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
 GAME( 1981, ckongdks,    ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey Kong (Spanish Crazy Kong bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused
  - does the code to display the extra screen still exist in the roms?  */
 GAME( 1981, ckongo,      ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, bigkong,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg", "Big Kong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bigkong,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Big Kong",                  MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and the extra attract screen, they also make use of the Falcon logo, some sets hack out the Falcon
    text on the extra screen */
-GAME( 1981, ckongpt2,    0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",           "Crazy Kong Part II (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2a,   ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",           "Crazy Kong Part II (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2j,   ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",           "Crazy Kong Part II (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2jeu, ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2b,   ckongpt2, ckongb,    ckongb,    cclimber_state, init_ckongb,    ROT270, "bootleg",          "Crazy Kong Part II (alternative levels)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2,    0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",                   "Crazy Kong Part II (set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2a,   ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",                   "Crazy Kong Part II (set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2j,   ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",                   "Crazy Kong Part II (Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2jeu, ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Jeutel)",         "Crazy Kong Part II (Jeutel bootleg)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, ckongpt2ss,  ckongpt2, cclimber,  ckongb2,   cclimber_state, empty_init,     ROT270, "bootleg (SegaSA / Sonic)", "Crazy Kong (SegaSA / Sonic bootleg)",     MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-00 PCB
+GAME( 1981, ckongpt2b,   ckongpt2, ckongb,    ckongb,    cclimber_state, init_ckongb,    ROT270, "bootleg",                  "Crazy Kong Part II (alternative levels)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2b2,  ckongpt2, cclimber,  ckongb2,   cclimber_state, empty_init,     ROT270, "bootleg",                  "Crazy Kong Part II (bootleg)",            MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // one PROM differs and seems bad, but dump has been confirmed on multiple PCBs
 
 // see bagman.cpp for parent
 GAME( 1982, bagmanf,     bagman,   bagmanf,   bagmanf,   cclimber_state, empty_init,     ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        cclimber,  rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE)
-GAME( 1981, rpatroln,    rpatrol,  cclimber,  rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rpatrolb,    rpatrol,  cclimber,  rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, silvland,    rpatrol,  cclimber,  rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",              MACHINE_SUPPORTS_SAVE)
+GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land",                       MACHINE_SUPPORTS_SAVE )
 
 // see pacman.cpp for parent
-GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb,   ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb2,    cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb2,  ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb,   ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" ,        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb2,    cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb2,  ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)",         MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
 GAME( 1985, cannonb3,    cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb2,  ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", MACHINE_SUPPORTS_SAVE ) // the bonus game is patched out, thus avoiding the protection issue
 
 GAME( 1982, swimmer,     0,        swimmer,   swimmer,   cclimber_state, empty_init,     ROT0,   "Tehkan", "Swimmer (set 1)", MACHINE_SUPPORTS_SAVE )
@@ -2712,7 +2812,7 @@ GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  cclimber_state, empty_i
 GAME( 1983, guzzler,     0,        guzzler,   guzzler,   cclimber_state, empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   cclimber_state, empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, yamato,      0,        yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato,      0,        yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, yamato2,     yamato,   yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

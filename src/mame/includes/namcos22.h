@@ -20,6 +20,7 @@
 #include "video/poly.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 enum
 {
@@ -136,7 +137,7 @@ struct namcos22_object_data
 
 class namcos22_state;
 
-class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4, 8000>
+class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4>
 {
 public:
 	namcos22_renderer(namcos22_state &state);
@@ -151,9 +152,10 @@ private:
 
 	struct namcos22_scenenode m_scenenode_root;
 	struct namcos22_scenenode *m_scenenode_cur;
+	std::list<namcos22_scenenode> m_scenenode_alloc;
 
-	float m_clipx;
-	float m_clipy;
+	float m_clipx = 0.0;
+	float m_clipy = 0.0;
 	rectangle m_cliprect;
 
 	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
@@ -212,12 +214,11 @@ public:
 		m_vics_control(*this, "vics_control"),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
-		m_dsw(*this, "DSW"),
 		m_inputs(*this, "INPUTS"),
 		m_custom(*this, "CUSTOM.%u", 0),
 		m_opt(*this, "OPT.%u", 0),
-		m_mcuout(*this, "mcuout%u", 0U),
-		m_cpuled(*this, "cpuled%u", 0U)
+		m_mcu_out(*this, "mcuout%u", 0U),
+		m_cpuled_out(*this, "cpuled%u", 0U)
 	{ }
 
 	void cybrcomm(machine_config &config);
@@ -254,7 +255,7 @@ public:
 	int m_fog_r_per_cztype[4];
 	int m_fog_g_per_cztype[4];
 	int m_fog_b_per_cztype[4];
-	u16 m_czattr[8];
+	u16 m_czattr[8] = { };
 
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<u32> m_czram;
@@ -267,62 +268,60 @@ protected:
 	virtual void video_start() override;
 	virtual void device_post_load() override;
 
-//private:
-	DECLARE_WRITE32_MEMBER(namcos22_textram_w);
-	DECLARE_READ16_MEMBER(namcos22_tilemapattr_r);
-	DECLARE_WRITE16_MEMBER(namcos22_tilemapattr_w);
-	DECLARE_READ32_MEMBER(namcos22_dspram_r);
-	DECLARE_WRITE32_MEMBER(namcos22_dspram_w);
-	DECLARE_WRITE32_MEMBER(namcos22_cgram_w);
-	DECLARE_WRITE32_MEMBER(namcos22_paletteram_w);
-	DECLARE_WRITE16_MEMBER(namcos22_dspram16_bank_w);
-	DECLARE_READ16_MEMBER(namcos22_dspram16_r);
-	DECLARE_WRITE16_MEMBER(namcos22_dspram16_w);
-	DECLARE_READ16_MEMBER(pdp_status_r);
-	DECLARE_READ16_MEMBER(pdp_begin_r);
-	DECLARE_READ16_MEMBER(dsp_hold_signal_r);
-	DECLARE_WRITE16_MEMBER(dsp_hold_ack_w);
-	DECLARE_WRITE16_MEMBER(dsp_xf_output_w);
-	DECLARE_WRITE16_MEMBER(point_address_w);
-	DECLARE_WRITE16_MEMBER(point_loword_iw);
-	DECLARE_WRITE16_MEMBER(point_hiword_w);
-	DECLARE_READ16_MEMBER(point_loword_r);
-	DECLARE_READ16_MEMBER(point_hiword_ir);
-	DECLARE_WRITE16_MEMBER(dsp_unk2_w);
-	DECLARE_READ16_MEMBER(dsp_unk_port3_r);
-	DECLARE_WRITE16_MEMBER(upload_code_to_slave_dsp_w);
-	DECLARE_READ16_MEMBER(dsp_unk8_r);
-	DECLARE_READ16_MEMBER(custom_ic_status_r);
-	DECLARE_READ16_MEMBER(dsp_upload_status_r);
-	DECLARE_WRITE16_MEMBER(slave_serial_io_w);
-	DECLARE_READ16_MEMBER(master_serial_io_r);
-	DECLARE_WRITE16_MEMBER(dsp_unk_porta_w);
-	DECLARE_WRITE16_MEMBER(dsp_led_w);
-	DECLARE_WRITE16_MEMBER(dsp_unk8_w);
-	DECLARE_WRITE16_MEMBER(master_render_device_w);
-	DECLARE_READ16_MEMBER(dsp_slave_bioz_r);
-	DECLARE_READ16_MEMBER(dsp_slave_port3_r);
-	DECLARE_READ16_MEMBER(dsp_slave_port4_r);
-	DECLARE_READ16_MEMBER(dsp_slave_port5_r);
-	DECLARE_READ16_MEMBER(dsp_slave_port6_r);
-	DECLARE_WRITE16_MEMBER(dsp_slave_portc_w);
-	DECLARE_READ16_MEMBER(dsp_slave_port8_r);
-	DECLARE_READ16_MEMBER(dsp_slave_portb_r);
-	DECLARE_WRITE16_MEMBER(dsp_slave_portb_w);
-	DECLARE_READ32_MEMBER(namcos22_sci_r);
-	DECLARE_WRITE32_MEMBER(namcos22_sci_w);
-	DECLARE_READ16_MEMBER(namcos22_shared_r);
-	DECLARE_WRITE16_MEMBER(namcos22_shared_w);
-	DECLARE_READ16_MEMBER(namcos22_keycus_r);
-	DECLARE_WRITE16_MEMBER(namcos22_keycus_w);
-	DECLARE_READ16_MEMBER(namcos22_portbit_r);
-	DECLARE_WRITE16_MEMBER(namcos22_portbit_w);
-	DECLARE_READ16_MEMBER(namcos22_dipswitch_r);
-	DECLARE_WRITE16_MEMBER(namcos22_cpuleds_w);
-	DECLARE_READ8_MEMBER(mcu_port4_s22_r);
-	DECLARE_READ8_MEMBER(iomcu_port4_s22_r);
-	DECLARE_READ16_MEMBER(mcuc74_speedup_r);
-	DECLARE_WRITE16_MEMBER(mcu_speedup_w);
+	void namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 namcos22_tilemapattr_r(offs_t offset);
+	void namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u32 namcos22_dspram_r(offs_t offset);
+	void namcos22_dspram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void namcos22_cgram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void namcos22_paletteram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void namcos22_dspram16_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 namcos22_dspram16_r(offs_t offset);
+	void namcos22_dspram16_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pdp_status_r();
+	u16 pdp_begin_r();
+	u16 dsp_hold_signal_r();
+	void dsp_hold_ack_w(u16 data);
+	void dsp_xf_output_w(u16 data);
+	void point_address_w(u16 data);
+	void point_loword_iw(u16 data);
+	void point_hiword_w(u16 data);
+	u16 point_loword_r();
+	u16 point_hiword_ir();
+	void dsp_unk2_w(u16 data);
+	u16 dsp_unk_port3_r();
+	void upload_code_to_slave_dsp_w(u16 data);
+	u16 dsp_unk8_r();
+	u16 custom_ic_status_r();
+	u16 dsp_upload_status_r();
+	void slave_serial_io_w(u16 data);
+	u16 master_serial_io_r();
+	void dsp_unk_porta_w(u16 data);
+	void dsp_led_w(u16 data);
+	void dsp_unk8_w(u16 data);
+	void master_render_device_w(u16 data);
+	u16 dsp_slave_bioz_r();
+	u16 dsp_slave_port3_r();
+	u16 dsp_slave_port4_r();
+	u16 dsp_slave_port5_r();
+	u16 dsp_slave_port6_r();
+	void dsp_slave_portc_w(u16 data);
+	u16 dsp_slave_port8_r();
+	u16 dsp_slave_portb_r();
+	void dsp_slave_portb_w(u16 data);
+	u16 namcos22_sci_r(offs_t offset);
+	void namcos22_sci_w(offs_t offset, u16 data);
+	u16 namcos22_shared_r(offs_t offset);
+	void namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 namcos22_keycus_r(offs_t offset);
+	void namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 namcos22_portbit_r(offs_t offset);
+	void namcos22_portbit_w(offs_t offset, u16 data);
+	void namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 mcu_port4_s22_r();
+	u8 iomcu_port4_s22_r();
+	u16 mcuc74_speedup_r();
+	void mcu_speedup_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
 	inline u16 nthword(const u32 *src, int n) { return (src[n / 2] << ((n & 1) * 16)) >> 16; }
@@ -349,9 +348,9 @@ protected:
 	void syscon_irqack(offs_t offset, u8 data);
 	void syscon_dspcontrol(offs_t offset, u8 data);
 	void syscon_mcucontrol(offs_t offset, u8 data);
-	DECLARE_READ8_MEMBER(syscon_r);
-	DECLARE_WRITE8_MEMBER(ss22_syscon_w);
-	DECLARE_WRITE8_MEMBER(s22_syscon_w);
+	u8 syscon_r(offs_t offset);
+	void ss22_syscon_w(offs_t offset, u8 data);
+	void s22_syscon_w(offs_t offset, u8 data);
 
 	void posirq_update();
 	emu_timer *m_posirq_timer;
@@ -423,81 +422,80 @@ protected:
 	optional_shared_ptr<u32> m_vics_control;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
-	required_ioport m_dsw;
 	required_ioport m_inputs;
 	optional_ioport_array<2> m_custom;
 	optional_ioport_array<2> m_opt;
-	output_finder<16> m_mcuout;
-	output_finder<8> m_cpuled;
+	output_finder<16> m_mcu_out;
+	output_finder<8> m_cpuled_out;
 
-	u8 m_syscontrol[0x20];
-	bool m_dsp_irq_enabled;
-	emu_timer *m_ar_tb_interrupt[2];
-	u16 m_dsp_master_bioz;
+	u8 m_syscontrol[0x20] = { };
+	bool m_dsp_irq_enabled = false;
+	u16 m_dsp_master_bioz = 0;
 	std::unique_ptr<u32[]> m_pointram;
-	int m_old_coin_state;
-	u32 m_credits1;
-	u32 m_credits2;
-	u32 m_point_address;
-	u32 m_point_data;
-	u16 m_SerialDataSlaveToMasterNext;
-	u16 m_SerialDataSlaveToMasterCurrent;
-	int m_RenderBufSize;
-	u16 m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ];
-	u16 m_portbits[2];
-	int m_irq_state;
-	int m_irq_enabled;
+	int m_old_coin_state = 0;
+	u32 m_credits1 = 0;
+	u32 m_credits2 = 0;
+	u32 m_point_address = 0;
+	u32 m_point_data = 0;
+	u16 m_SerialDataSlaveToMasterNext = 0;
+	u16 m_SerialDataSlaveToMasterCurrent = 0;
+	int m_RenderBufSize = 0;
+	u16 m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ] = { };
+	u16 m_portbits[2] = { };
+	int m_irq_state = 0;
+	int m_irq_enabled = 0;
 	namcos22_dsp_upload_state m_dsp_upload_state;
-	int m_UploadDestIdx;
-	u16 m_su_82;
-	u16 m_keycus_id;
-	u16 m_keycus_rng;
-	int m_gametype;
-	int m_cz_adjust;
-	namcos22_renderer *m_poly;
-	u16 m_dspram_bank;
-	u16 m_dspram16_latch;
-	bool m_slave_simulation_active;
-	int m_absolute_priority;
-	int m_objectshift;
-	float m_viewmatrix[4][4];
-	u8 m_reflection;
-	bool m_cullflip;
-	u8 m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES];
-	int m_SurfaceNormalFormat;
-	unsigned m_LitSurfaceCount;
-	unsigned m_LitSurfaceIndex;
-	int m_pointrom_size;
-	s32 *m_pointrom;
+	int m_UploadDestIdx = 0;
+	u32 m_cpuled_data = 0;
+	u16 m_su_82 = 0;
+	u16 m_keycus_id = 0;
+	u16 m_keycus_rng = 0;
+	int m_gametype = 0;
+	int m_cz_adjust = 0;
+	std::unique_ptr<namcos22_renderer> m_poly;
+	u16 m_dspram_bank = 0;
+	u16 m_dspram16_latch = 0;
+	bool m_slave_simulation_active = false;
+	int m_absolute_priority = 0;
+	int m_objectshift = 0;
+	float m_viewmatrix[4][4] = { };
+	u8 m_reflection = 0;
+	bool m_cullflip = false;
+	u8 m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES] = { };
+	int m_SurfaceNormalFormat = 0;
+	unsigned m_LitSurfaceCount = 0;
+	unsigned m_LitSurfaceIndex = 0;
+	int m_pointrom_size = 0;
+	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
-	u16 m_tilemapattr[8];
+	u16 m_tilemapattr[8] = { };
 
-	int m_spot_factor;
-	int m_text_palbase;
-	int m_bg_palbase;
+	int m_spot_factor = 0;
+	int m_text_palbase = 0;
+	int m_bg_palbase = 0;
 
-	float m_camera_zoom;
-	float m_camera_vx;
-	float m_camera_vy;
-	float m_camera_vu;
-	float m_camera_vd;
-	float m_camera_vl;
-	float m_camera_vr;
-	float m_camera_lx; // unit vector for light direction
-	float m_camera_ly; // "
-	float m_camera_lz; // "
-	int m_camera_ambient; // 0.0..1.0
-	int m_camera_power;   // 0.0..1.0
+	float m_camera_zoom = 0.0f;
+	float m_camera_vx = 0.0f;
+	float m_camera_vy = 0.0f;
+	float m_camera_vu = 0.0f;
+	float m_camera_vd = 0.0f;
+	float m_camera_vl = 0.0f;
+	float m_camera_vr = 0.0f;
+	float m_camera_lx = 0.0f; // unit vector for light direction
+	float m_camera_ly = 0.0f; // "
+	float m_camera_lz = 0.0f; // "
+	int m_camera_ambient = 0; // 0.0..1.0
+	int m_camera_power = 0;   // 0.0..1.0
 
-	bool m_skipped_this_frame;
+	bool m_skipped_this_frame = false;
 	void render_frame_active();
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	bool m_pdp_render_done;
-	bool m_render_refresh;
-	uint64_t m_pdp_frame;
-	u16 m_pdp_base;
+	bool m_pdp_render_done = false;
+	bool m_render_refresh = false;
+	uint64_t m_pdp_frame = 0;
+	u16 m_pdp_base = 0;
 };
 
 class namcos22s_state : public namcos22_state
@@ -506,7 +504,8 @@ public:
 	namcos22s_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos22_state(mconfig, type, tag),
 		m_motor_timer(*this, "motor_timer"),
-		m_pc_pedal_interrupt(*this, "pc_p_int")
+		m_pc_pedal_interrupt(*this, "pc_p_int"),
+		m_ar_tb_interrupt(*this, "ar_tb_int%u", 0)
 	{ }
 
 	void namcos22s(machine_config &config);
@@ -526,13 +525,14 @@ public:
 	void init_timecris();
 	void init_tokyowar();
 	void init_propcycl();
+	void init_propcyclj();
 	void init_alpiner2();
 	void init_dirtdash();
 	void init_airco22();
 	void init_alpiner();
 	void init_alpinesa();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(alpine_motor_read);
+	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
 
 protected:
 	virtual void machine_start() override;
@@ -541,8 +541,6 @@ protected:
 	virtual void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 private:
-	DECLARE_MACHINE_START(adillor);
-
 	void install_130_speedup();
 	void install_141_speedup();
 
@@ -550,36 +548,36 @@ private:
 	void namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival);
 	u32 screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(namcos22s_czattr_w);
-	DECLARE_READ16_MEMBER(namcos22s_czattr_r);
-	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);
-	DECLARE_READ32_MEMBER(namcos22s_czram_r);
-	DECLARE_READ32_MEMBER(namcos22s_vics_control_r);
-	DECLARE_WRITE32_MEMBER(namcos22s_vics_control_w);
-	DECLARE_READ16_MEMBER(spotram_r);
-	DECLARE_WRITE16_MEMBER(spotram_w);
+	void namcos22s_czattr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 namcos22s_czattr_r(offs_t offset);
+	void namcos22s_czram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 namcos22s_czram_r(offs_t offset);
+	u32 namcos22s_vics_control_r(offs_t offset);
+	void namcos22s_vics_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 spotram_r(offs_t offset);
+	void spotram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(alpinesa_prot_r);
-	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
-	DECLARE_READ16_MEMBER(timecris_gun_r);
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
-	DECLARE_WRITE32_MEMBER(namcos22s_chipselect_w);
+	u32 alpinesa_prot_r();
+	void alpinesa_prot_w(u32 data);
+	u16 timecris_gun_r(offs_t offset);
+	void mb87078_gain_changed(offs_t offset, u8 data);
+	void namcos22s_chipselect_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(mcu_port4_w);
-	DECLARE_READ8_MEMBER(mcu_port4_r);
-	DECLARE_WRITE8_MEMBER(mcu_port5_w);
-	DECLARE_READ8_MEMBER(mcu_port5_r);
-	DECLARE_WRITE8_MEMBER(mcu_port6_w);
-	DECLARE_READ8_MEMBER(mcu_port6_r);
+	void mcu_port4_w(u8 data);
+	u8 mcu_port4_r();
+	void mcu_port5_w(u8 data);
+	u8 mcu_port5_r();
+	void mcu_port6_w(u8 data);
+	u8 mcu_port6_r();
 	template <int Channel> u16 mcu_adc_r();
-	DECLARE_WRITE8_MEMBER(alpine_mcu_port4_w);
-	DECLARE_READ16_MEMBER(mcu130_speedup_r);
-	DECLARE_READ16_MEMBER(mcu141_speedup_r);
+	void alpine_mcu_port4_w(u8 data);
+	u16 mcu130_speedup_r();
+	u16 mcu141_speedup_r();
 
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_update);
-	TIMER_CALLBACK_MEMBER(adillor_trackball_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
@@ -591,18 +589,19 @@ private:
 
 	optional_device<timer_device> m_motor_timer;
 	optional_device<timer_device> m_pc_pedal_interrupt;
+	optional_device_array<timer_device, 2> m_ar_tb_interrupt;
 
-	int m_spotram_enable;
-	int m_spotram_address;
+	int m_spotram_enable = 0;
+	int m_spotram_address = 0;
 	std::unique_ptr<u16[]> m_spotram;
 	std::unique_ptr<u16[]> m_banked_czram[4];
 	u32 m_cz_was_written[4];
 
-	u32 m_alpinesa_protection;
-	int m_motor_status;
-	u8 m_mcu_iocontrol;
-	u8 m_mcu_outdata;
-	int m_chipselect;
+	u32 m_alpinesa_protection = 0;
+	int m_motor_status = 0;
+	u8 m_mcu_iocontrol = 0;
+	u8 m_mcu_outdata = 0;
+	int m_chipselect = 0;
 };
 
 #endif // MAME_INCLUDES_NAMCOS22_H

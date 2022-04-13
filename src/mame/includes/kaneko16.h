@@ -22,7 +22,8 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "video/bufsprite.h"
 #include "video/kaneko_spr.h"
 #include "video/kaneko_tmap.h"
 #include "emupal.h"
@@ -42,14 +43,13 @@ public:
 		m_kaneko_calc3(*this, "calc3_prot"),
 		m_toybox(*this, "toybox"),
 		m_screen(*this, "screen"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_bgpalette(*this, "bgpalette"),
 		m_eeprom(*this, "eeprom"),
 		m_soundlatch(*this, "soundlatch"),
 		m_watchdog(*this, "watchdog"),
-		m_mainregion(*this, "maincpu"),
 		m_spriteram(*this, "spriteram"),
+		m_mainregion(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_mcuram(*this, "mcuram"),
 		m_okiregion(*this, "oki%u", 1),
@@ -64,7 +64,6 @@ public:
 	{
 	}
 
-	void init_kaneko16();
 	void init_bakubrkr();
 
 	void bakubrkr(machine_config &config);
@@ -82,15 +81,14 @@ protected:
 	optional_device<kaneko_calc3_device> m_kaneko_calc3;
 	optional_device<kaneko_toybox_device> m_toybox;
 	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_bgpalette;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<watchdog_timer_device> m_watchdog;
+	optional_device<buffered_spriteram16_device> m_spriteram;
 
 	required_region_ptr<u16> m_mainregion;
-	optional_shared_ptr<u16> m_spriteram;
 	optional_shared_ptr<u16> m_mainram;
 	optional_shared_ptr<u16> m_mcuram;
 
@@ -103,18 +101,18 @@ protected:
 	optional_ioport m_eepromout_port;
 	optional_ioport_array<3> m_wheel_port;
 
-	u16 m_disp_enable;
+	u16 m_disp_enable = 0U;
 
-	int m_VIEW2_2_pri;
+	int m_VIEW2_2_pri = 0;
 
 	virtual void common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize);
 	void coin_lockout_w(u8 data);
 	void bloodwar_coin_lockout_w(u8 data);
 
-	void display_enable_w(offs_t offset, u16 data, u16 mem_mask); // (u16 data, u16 mem_mask);
+	void display_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0); // (u16 data, u16 mem_mask = ~0);
 
-	template<unsigned Chip> DECLARE_READ16_MEMBER(ym2149_r);
-	template<unsigned Chip> DECLARE_WRITE16_MEMBER(ym2149_w);
+	template<unsigned Chip> u16 ym2149_r(offs_t offset);
+	template<unsigned Chip> void ym2149_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Mask> void oki_bank0_w(u8 data);
 	template<unsigned Mask> void oki_bank1_w(u8 data);
 
@@ -123,15 +121,13 @@ protected:
 	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template<class _BitmapClass>
-	u32 screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect);
+	template<class BitmapClass>
+	u32 screen_update_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	template<class _BitmapClass>
-	void fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect);
-
-	void unscramble_tiles(const char *region);
+	template<class BitmapClass>
+	void fill_bitmap(BitmapClass &bitmap, const rectangle &cliprect);
 
 	void gtmr_oki1_map(address_map &map);
 	void gtmr_oki2_map(address_map &map);
@@ -212,15 +208,15 @@ private:
 	u8 bg15_bright_r();
 	void bg15_bright_w(u8 data);
 
-	DECLARE_WRITE16_MEMBER(berlwall_oki_w);
+	void berlwall_oki_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u16 berlwall_spriteram_r(offs_t offset);
-	void berlwall_spriteram_w(offs_t offset, u16 data, u16 mem_mask);
-	DECLARE_READ16_MEMBER(berlwall_spriteregs_r);
-	DECLARE_WRITE16_MEMBER(berlwall_spriteregs_w);
+	void berlwall_spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 berlwall_spriteregs_r(offs_t offset);
+	void berlwall_spriteregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	u8 m_bg15_select;
-	u8 m_bg15_bright;
+	u8 m_bg15_select = 0U;
+	u8 m_bg15_bright = 0U;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);

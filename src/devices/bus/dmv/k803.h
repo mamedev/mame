@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K803_H
 #define MAME_BUS_DMV_K803_H
 
@@ -41,7 +42,6 @@ private:
 
 	required_device<mm58167_device> m_rtc;
 	required_ioport m_dsw;
-	dmvcart_slot_device * m_bus;
 	uint8_t   m_latch;
 	int     m_rtc_int;
 };

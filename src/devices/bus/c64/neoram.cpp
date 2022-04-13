@@ -43,7 +43,7 @@ c64_neoram_cartridge_device::c64_neoram_cartridge_device(const machine_config &m
 void c64_neoram_cartridge_device::device_start()
 {
 	// allocate memory
-	m_nvram.allocate(0x200000);
+	m_nvram = std::make_unique<uint8_t[]>(0x200000);
 
 	// state saving
 	save_item(NAME(m_bank));

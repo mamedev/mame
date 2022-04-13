@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -60,7 +60,7 @@ std::string i8089_disassembler::invalid()
 }
 
 // to register or memory from immediate
-std::string i8089_disassembler::from_i(std::string instr8, std::string instr16, std::string target)
+std::string i8089_disassembler::from_i(const std::string &instr8, const std::string &instr16, const std::string &target)
 {
 	if (m_w == 0 && m_wb == 1)
 		return util::string_format("%s %s, %02x", instr8, target, fetch_immediate());
@@ -71,7 +71,7 @@ std::string i8089_disassembler::from_i(std::string instr8, std::string instr16, 
 }
 
 // register, immediate
-std::string i8089_disassembler::inst_ri(std::string instr8, std::string instr16)
+std::string i8089_disassembler::inst_ri(const std::string &instr8, const std::string &instr16)
 {
 	if (m_mm == 0)
 		return from_i(instr8, instr16, m_reg[m_brp]);
@@ -80,7 +80,7 @@ std::string i8089_disassembler::inst_ri(std::string instr8, std::string instr16)
 }
 
 // register
-std::string i8089_disassembler::inst_r(std::string instr)
+std::string i8089_disassembler::inst_r(const std::string &instr)
 {
 	if (m_mm == 0 && m_w == 0 && m_aa == 0 && m_wb == 0)
 		return util::string_format("%s %s", instr, m_reg[m_brp]);
@@ -89,7 +89,7 @@ std::string i8089_disassembler::inst_r(std::string instr)
 }
 
 // jump register
-std::string i8089_disassembler::inst_jr(std::string instr8, std::string instr16)
+std::string i8089_disassembler::inst_jr(const std::string &instr8, const std::string &instr16)
 {
 	uint16_t i = fetch_immediate();
 	if (m_mm == 0 && m_w == 0 && m_wb == 1)
@@ -101,14 +101,14 @@ std::string i8089_disassembler::inst_jr(std::string instr8, std::string instr16)
 }
 
 // memory immediate
-std::string i8089_disassembler::inst_mi(std::string instr8, std::string instr16)
+std::string i8089_disassembler::inst_mi(const std::string &instr8, const std::string &instr16)
 {
 	std::string off = offset();
 	return from_i(instr8, instr16, off);
 }
 
 // register memory
-std::string i8089_disassembler::inst_rm(std::string instr8, std::string instr16)
+std::string i8089_disassembler::inst_rm(const std::string &instr8, const std::string &instr16)
 {
 	std::string off = offset();
 	if (m_w == 0 && m_wb == 0)
@@ -120,7 +120,7 @@ std::string i8089_disassembler::inst_rm(std::string instr8, std::string instr16)
 }
 
 // jump memory
-std::string i8089_disassembler::inst_jm(std::string jump8short, std::string jump8long)
+std::string i8089_disassembler::inst_jm(const std::string &jump8short, const std::string &jump8long)
 {
 	std::string off = offset();
 	uint16_t i = fetch_immediate();
@@ -133,7 +133,7 @@ std::string i8089_disassembler::inst_jm(std::string jump8short, std::string jump
 }
 
 // jump memory bit
-std::string i8089_disassembler::inst_jmb(std::string jump8short, std::string jump8long)
+std::string i8089_disassembler::inst_jmb(const std::string &jump8short, const std::string &jump8long)
 {
 	std::string off = offset();
 	uint16_t i = fetch_immediate();
@@ -146,7 +146,7 @@ std::string i8089_disassembler::inst_jmb(std::string jump8short, std::string jum
 }
 
 // memory register
-std::string i8089_disassembler::inst_mr(std::string instr8, std::string instr16)
+std::string i8089_disassembler::inst_mr(const std::string &instr8, const std::string &instr16)
 {
 	std::string off = offset();
 	if (m_w == 0 && m_wb == 0)
@@ -158,7 +158,7 @@ std::string i8089_disassembler::inst_mr(std::string instr8, std::string instr16)
 }
 
 // pointer memory
-std::string i8089_disassembler::inst_pm(std::string instr16)
+std::string i8089_disassembler::inst_pm(const std::string &instr16)
 {
 	std::string off = offset();
 	if (m_w == 1 && m_wb == 0)
@@ -168,7 +168,7 @@ std::string i8089_disassembler::inst_pm(std::string instr16)
 }
 
 // memory pointer
-std::string i8089_disassembler::inst_mp(std::string instr16)
+std::string i8089_disassembler::inst_mp(const std::string &instr16)
 {
 	std::string off = offset();
 	if (m_w == 1 && m_wb == 0)
@@ -178,7 +178,7 @@ std::string i8089_disassembler::inst_mp(std::string instr16)
 }
 
 // jump memory
-std::string i8089_disassembler::inst_j16(std::string jump8short, std::string jump16short, std::string jump8long, std::string jump16long)
+std::string i8089_disassembler::inst_j16(const std::string &jump8short, const std::string &jump16short, const std::string &jump8long, const std::string &jump16long)
 {
 	std::string off = offset();
 	uint16_t i = fetch_immediate();
@@ -195,7 +195,7 @@ std::string i8089_disassembler::inst_j16(std::string jump8short, std::string jum
 }
 
 // memory
-std::string i8089_disassembler::inst_m(std::string instr8, std::string instr16)
+std::string i8089_disassembler::inst_m(const std::string &instr8, const std::string &instr16)
 {
 	std::string off = offset();
 	if (m_w == 0 && m_wb == 0)
@@ -207,7 +207,7 @@ std::string i8089_disassembler::inst_m(std::string instr8, std::string instr16)
 }
 
 // memory bit
-std::string i8089_disassembler::inst_b(std::string instr)
+std::string i8089_disassembler::inst_b(const std::string &instr)
 {
 	std::string off = offset();
 	if (m_w == 0 && m_wb == 0)
@@ -302,8 +302,8 @@ std::string i8089_disassembler::do_disassemble()
 	case 0x0c: return inst_ri("movbi", "movi");
 	case 0x0e: return inst_r("inc");
 	case 0x0f: return inst_r("dec");
-	case 0x10: return inst_jr("jnz", "ljnz");
-	case 0x11: return inst_jr("jz", "ljz");
+	case 0x10: m_flags |= STEP_COND; return inst_jr("jnz", "ljnz");
+	case 0x11: m_flags |= STEP_COND; return inst_jr("jz", "ljz");
 
 	case 0x12:
 		if (m_mm == 0 && m_w == 0 && m_aa == 0 && m_wb == 0 && m_brp == 1)
@@ -362,17 +362,16 @@ std::string i8089_disassembler::do_disassemble()
 			else if (m_wb == 2)
 				return util::string_format("lcall %s, %05x", off, m_pc + (int16_t) i);
 		}
-		else
-			return invalid();
+		return invalid();
 
 	case 0x28: return inst_rm("addb", "add");
 	case 0x29: return inst_rm("orb", "or");
 	case 0x2a: return inst_rm("andb", "and");
 	case 0x2b: return inst_rm("notb", "not");
-	case 0x2c: return inst_jm("jmce", "ljmce");
-	case 0x2d: return inst_jm("jmcne", "ljmcne");
-	case 0x2e: return inst_jmb("jnbt", "ljnbt");
-	case 0x2f: return inst_jmb("jbt", "ljbt");
+	case 0x2c: m_flags |= STEP_COND; return inst_jm("jmce", "ljmce");
+	case 0x2d: m_flags |= STEP_COND; return inst_jm("jmcne", "ljmcne");
+	case 0x2e: m_flags |= STEP_COND; return inst_jmb("jnbt", "ljnbt");
+	case 0x2f: m_flags |= STEP_COND; return inst_jmb("jbt", "ljbt");
 	case 0x30: return inst_mi("addbi", "addi");
 	case 0x31: return inst_mi("orbi", "ori");
 	case 0x32: return inst_mi("andbi", "andi");
@@ -381,8 +380,8 @@ std::string i8089_disassembler::do_disassemble()
 	case 0x35: return inst_mr("orb", "or");
 	case 0x36: return inst_mr("andb", "and");
 	case 0x37: return inst_mr("notb", "not");
-	case 0x38: return inst_j16("jnzb", "jnz", "ljnzb", "ljnz");
-	case 0x39: return inst_j16("jzb", "jz", "ljzb", "ljz");
+	case 0x38: m_flags |= STEP_COND; return inst_j16("jnzb", "jnz", "ljnzb", "ljnz");
+	case 0x39: m_flags |= STEP_COND; return inst_j16("jzb", "jz", "ljzb", "ljz");
 	case 0x3a: return inst_m("incb", "inc");
 	case 0x3b: return inst_m("decb", "dec");
 	case 0x3d: return inst_b("setb");

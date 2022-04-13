@@ -63,6 +63,12 @@ U0562 LH28F800SU OBJ2-1
 U0563 LH28F800SU OBJ3-1
 U0564 LH28F800SU OBJ4-1
 
+U0218 RTL8019AS Realtek Full-Duplex Ethernet Controller with Plug and Play Function
+X221 20MHz
+U0225 YCL20F001N 10 Base T Low Pass Filter
+
+U089 MAX232 Dual EIA Driver/Receiver
+
 *******************************************************************************************/
 
 #include "emu.h"
@@ -102,13 +108,13 @@ public:
 	void feversoc(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(in_r);
-	DECLARE_WRITE16_MEMBER(output_w);
-	DECLARE_WRITE16_MEMBER(output2_w);
+	uint16_t in_r(offs_t offset);
+	void output_w(uint16_t data);
+	void output2_w(uint16_t data);
 	void feversoc_map(address_map &map);
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(feversoc_irq);
-	DECLARE_WRITE16_MEMBER(feversoc_irq_ack);
+	void feversoc_irq_ack(uint16_t data);
 	virtual void machine_start() override;
 
 	required_shared_ptr<uint32_t> m_mainram1;
@@ -162,12 +168,12 @@ uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_in
 
 
 
-READ16_MEMBER(feversoc_state::in_r)
+uint16_t feversoc_state::in_r(offs_t offset)
 {
 	return m_in[offset]->read() & 0xffff;
 }
 
-WRITE16_MEMBER( feversoc_state::output_w )
+void feversoc_state::output_w(uint16_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x40);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x40);
@@ -187,7 +193,7 @@ WRITE16_MEMBER( feversoc_state::output_w )
 	m_rtc->ce_w((data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER( feversoc_state::output2_w )
+void feversoc_state::output2_w(uint16_t data)
 {
 	for (int n = 0; n < 7; n++)
 		m_lamps[n] = BIT(data, n); // LAMP1-LAMP7
@@ -201,7 +207,7 @@ void feversoc_state::feversoc_map(address_map &map)
 {
 	map(0x00000000, 0x0003ffff).rom();
 	map(0x02000000, 0x0202ffff).ram().share("workram1"); //work ram
-	map(0x02030000, 0x0203ffff).ram().share("nvram");
+	map(0x02030000, 0x02033fff).ram().share("nvram");
 	map(0x02034000, 0x0203dfff).ram().share("workram2"); //work ram
 	map(0x0203e000, 0x0203ffff).ram().share("spriteram");
 	map(0x06000000, 0x06000001).w(FUNC(feversoc_state::output_w));
@@ -209,7 +215,7 @@ void feversoc_state::feversoc_map(address_map &map)
 	map(0x06000006, 0x06000007).w(FUNC(feversoc_state::feversoc_irq_ack));
 	map(0x06000008, 0x0600000b).r(FUNC(feversoc_state::in_r));
 	map(0x0600000d, 0x0600000d).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
+	//map(0x06010000, 0x0601007f).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
 	map(0x06010060, 0x06010063).nopw(); // sprite buffering
 	map(0x06018000, 0x06019fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 }
@@ -276,7 +282,7 @@ WRITE_LINE_MEMBER(feversoc_state::feversoc_irq)
 		m_maincpu->set_input_line(8, ASSERT_LINE);
 }
 
-WRITE16_MEMBER(feversoc_state::feversoc_irq_ack)
+void feversoc_state::feversoc_irq_ack(uint16_t data)
 {
 	m_maincpu->set_input_line(8, CLEAR_LINE);
 }

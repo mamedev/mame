@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Olivier Galibert
 /*********************************************************************
 
-    dvdisasm.c
+    dvdisasm.cpp
 
     Disassembly debugger view.
 
@@ -22,11 +22,15 @@
 //  debug_view_disasm_source - constructor
 //-------------------------------------------------
 
-debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &device)
-	: debug_view_source(name, &device),
+debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t &device)
+	: debug_view_source(std::move(name), &device),
 		m_space(device.memory().space(AS_PROGRAM)),
-		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM))
+		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM)),
+		m_pcbase(nullptr)
 {
+	const device_state_interface *state;
+	if (device.interface(state))
+		m_pcbase = state->state_find_entry(STATE_GENPCBASE);
 }
 
 
@@ -34,9 +38,6 @@ debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &d
 //**************************************************************************
 //  DEBUG VIEW DISASM
 //**************************************************************************
-
-const int debug_view_disasm::DEFAULT_DASM_LINES, debug_view_disasm::DEFAULT_DASM_WIDTH, debug_view_disasm::DASM_MAX_BYTES;
-
 
 //-------------------------------------------------
 //  debug_view_disasm - constructor
@@ -52,16 +53,16 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 {
 	// fail if no available sources
 	enumerate_sources();
-	if(m_source_list.count() == 0)
+	if(m_source_list.empty())
 		throw std::bad_alloc();
 
 	// count the number of comments
-	int total_comments = 0;
-	for(const debug_view_source &source : m_source_list)
-	{
-		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(source);
-		total_comments += dasmsource.device()->debug()->comment_count();
-	}
+	//int total_comments = 0;
+	//for(auto &source : m_source_list)
+	//{
+		//const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
+		//total_comments += dasmsource.device()->debug()->comment_count();
+	//}
 
 	// configure the view
 	m_total.y = DEFAULT_DASM_LINES;
@@ -86,19 +87,23 @@ debug_view_disasm::~debug_view_disasm()
 void debug_view_disasm::enumerate_sources()
 {
 	// start with an empty list
-	m_source_list.reset();
+	m_source_list.clear();
 
 	// iterate over devices with disassembly interfaces
-	std::string name;
-	for(device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
+	for (device_disasm_interface &dasm : disasm_interface_enumerator(machine().root_device()))
 	{
-		name = string_format("%s '%s'", dasm.device().name(), dasm.device().tag());
-		if(dasm.device().memory().space_config(AS_PROGRAM)!=nullptr)
-			m_source_list.append(*global_alloc(debug_view_disasm_source(name.c_str(), dasm.device())));
+		if (dasm.device().memory().space_config(AS_PROGRAM))
+		{
+			m_source_list.emplace_back(
+					std::make_unique<debug_view_disasm_source>(
+						util::string_format("%s '%s'", dasm.device().name(), dasm.device().tag()),
+						dasm.device()));
+		}
 	}
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.first());
+	if (!m_source_list.empty())
+		set_source(*m_source_list[0]);
 }
 
 
@@ -109,11 +114,15 @@ void debug_view_disasm::enumerate_sources()
 
 void debug_view_disasm::view_notify(debug_view_notification type)
 {
-	if(type == VIEW_NOTIFY_CURSOR_CHANGED)
+	if((type == VIEW_NOTIFY_CURSOR_CHANGED) && (m_cursor_visible == true))
 		adjust_visible_y_for_cursor();
 
 	else if(type == VIEW_NOTIFY_SOURCE_CHANGED)
-		m_expression.set_context(&downcast<const debug_view_disasm_source *>(m_source)->device()->debug()->symtable());
+	{
+		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
+		m_expression.set_context(&source.device()->debug()->symtable());
+		m_expression.set_default_base(source.space().is_octal() ? 8 : 16);
+	}
 }
 
 
@@ -159,7 +168,7 @@ void debug_view_disasm::view_char(int chval)
 		case DCH_HOME:              // set the active column to the PC
 		{
 			const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-			offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
+			offs_t pc = source.pcbase();
 
 			// figure out which row the pc is on
 			for(unsigned int curline = 0; curline < m_dasm.size(); curline++)
@@ -225,6 +234,7 @@ void debug_view_disasm::generate_from_address(debug_disasm_buffer &buffer, offs_
 		m_dasm.emplace_back(address, size, dasm);
 		address = next_address;
 	}
+	m_recompute = false;
 }
 
 bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
@@ -242,6 +252,7 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 		backwards_offset = 64 << shift;
 
 	m_dasm.clear();
+	m_recompute = false;
 	offs_t address = (pc - m_backwards_steps*backwards_offset) & source.m_space.logaddrmask();
 	// Handle wrap at 0
 	if(address > pc)
@@ -316,7 +327,7 @@ void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 		return;
 	}
 
-	if(address_position(pc) != -1) {
+	if(!m_recompute && address_position(pc) != -1) {
 		generate_from_address(buffer, m_dasm[0].m_address);
 		int pos = address_position(pc);
 		if(pos != -1) {
@@ -352,13 +363,7 @@ void debug_view_disasm::complete_information(const debug_view_disasm_source &sou
 
 		dasm.m_is_pc = adr == pc;
 
-		dasm.m_is_bp = false;
-		for(device_debug::breakpoint *bp = source.device()->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
-			if(adr ==(bp->address() & source.m_space.logaddrmask())) {
-				dasm.m_is_bp = true;
-				break;
-			}
-
+		dasm.m_is_bp = source.device()->debug()->breakpoint_find(adr) != nullptr;
 		dasm.m_is_visited = source.device()->debug()->track_pc_visited(adr);
 
 		const char *comment = source.device()->debug()->comment_text(adr);
@@ -376,7 +381,7 @@ void debug_view_disasm::view_update()
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 	debug_disasm_buffer buffer(*source.device());
-	offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
+	offs_t pc = source.pcbase();
 
 	generate_dasm(buffer, pc);
 
@@ -511,7 +516,7 @@ void debug_view_disasm::set_right_column(disasm_right_column contents)
 {
 	begin_update();
 	m_right_column = contents;
-	m_recompute = m_update_pending = true;
+	m_update_pending = true;
 	end_update();
 }
 
@@ -568,7 +573,7 @@ void debug_view_disasm::set_selected_address(offs_t address)
 void debug_view_disasm::set_source(const debug_view_source &source)
 {
 	if(&source != m_source) {
+		m_recompute = true;
 		debug_view::set_source(source);
-		m_dasm.clear();
 	}
 }

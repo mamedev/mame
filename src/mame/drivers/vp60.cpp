@@ -28,8 +28,8 @@ public:
 
 private:
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
+	u8 crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, u8 data);
 
 	void io_map(address_map &map);
 	void kbd_map(address_map &map);
@@ -44,14 +44,14 @@ I8275_DRAW_CHARACTER_MEMBER(vp60_state::draw_character)
 {
 }
 
-READ8_MEMBER(vp60_state::crtc_r)
+u8 vp60_state::crtc_r(offs_t offset)
 {
-	return m_crtc->read(space, offset >> 8);
+	return m_crtc->read(offset >> 8);
 }
 
-WRITE8_MEMBER(vp60_state::crtc_w)
+void vp60_state::crtc_w(offs_t offset, u8 data)
 {
-	m_crtc->write(space, offset >> 8, data);
+	m_crtc->write(offset >> 8, data);
 }
 
 void vp60_state::mem_map(address_map &map)
@@ -86,7 +86,7 @@ void vp60_state::vp60(machine_config &config)
 
 	I8275(config, m_crtc, 25.92_MHz_XTAL / 16);
 	m_crtc->set_character_width(16);
-	m_crtc->set_display_callback(FUNC(vp60_state::draw_character), this);
+	m_crtc->set_display_callback(FUNC(vp60_state::draw_character));
 	m_crtc->set_screen("screen");
 
 	i8035_device &kbdcpu(I8035(config, "kbdcpu", 3.579545_MHz_XTAL)); // 48-300-010 XTAL

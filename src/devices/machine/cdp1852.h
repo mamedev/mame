@@ -37,8 +37,8 @@ public:
 	auto di_cb() { return m_read_data.bind(); }
 	auto do_cb() { return m_write_data.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read();
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 

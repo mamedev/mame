@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class pooyan_state : public driver_device
 {
@@ -36,16 +37,16 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram2;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t    m_irq_enable;
+	uint8_t    m_irq_enable = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

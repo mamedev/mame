@@ -21,7 +21,7 @@ class device_astrocade_accessory_interface;
 
 // ======================> astrocade_accessory_port_device
 
-class astrocade_accessory_port_device : public device_t, public device_slot_interface
+class astrocade_accessory_port_device : public device_t, public device_single_card_slot_interface<device_astrocade_accessory_interface>
 {
 public:
 	// construction/destruction
@@ -42,7 +42,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
@@ -59,7 +58,7 @@ private:
 
 // ======================> device_astrocade_accessory_interface
 
-class device_astrocade_accessory_interface : public device_slot_card_interface
+class device_astrocade_accessory_interface : public device_interface
 {
 public:
 	virtual ~device_astrocade_accessory_interface();

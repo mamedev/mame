@@ -11,16 +11,14 @@
 #ifndef IMGTOOL_H
 #define IMGTOOL_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <functional>
-
-#include "corestr.h"
-#include "formats/flopimg.h"
-#include "opresolv.h"
 #include "library.h"
-#include "filter.h"
+#include "stream.h"
+
+#include "osdcomm.h"
+
+#include <cassert>
+#include <cstdlib>
+#include <functional>
 
 /* ----------------------------------------------------------------------- */
 
@@ -94,7 +92,7 @@ namespace imgtool
 	public:
 		typedef std::unique_ptr<image> ptr;
 
-		image(const imgtool_module &module, object_pool *pool, void *extra_bytes);
+		image(const imgtool_module &module);
 		~image();
 
 		static imgtoolerr_t identify_file(const char *filename, imgtool_module **modules, size_t count);
@@ -114,14 +112,12 @@ namespace imgtool
 		imgtoolerr_t write_block(uint64_t block, const void *buffer);
 		imgtoolerr_t clear_block(uint64_t block, uint8_t data);
 		imgtoolerr_t list_partitions(std::vector<imgtool::partition_info> &partitions);
-		void *malloc(size_t size);
 		const imgtool_module &module() { return m_module; }
-		void *extra_bytes() { return m_extra_bytes; }
+		void *extra_bytes() { return m_extra_bytes.get(); }
 
 	private:
 		const imgtool_module &m_module;
-		object_pool *m_pool;
-		void *m_extra_bytes;
+		std::unique_ptr<uint8_t[]> m_extra_bytes;
 
 		// because of an idiosyncrasy of how imgtool::image::internal_open() works, we are only "okay to close"
 		// by invoking the module's close function once internal_open() succeeds.  the long term solution is
@@ -226,8 +222,8 @@ namespace imgtool
 		std::unique_ptr<uint8_t[]> m_extra_bytes;
 
 		// methods
-		imgtoolerr_t cannonicalize_path(uint32_t flags, const char *path, std::string &result);
-		imgtoolerr_t cannonicalize_fork(const char **fork);
+		imgtoolerr_t canonicalize_path(uint32_t flags, const char *path, std::string &result);
+		imgtoolerr_t canonicalize_fork(const char **fork);
 		imgtoolerr_t map_block_to_image_block(uint64_t partition_block, uint64_t &image_block) const;
 	};
 
@@ -264,6 +260,6 @@ void unknown_partition_get_info(const imgtool_class *imgclass, uint32_t state, u
 
 char *strncpyz(char *dest, const char *source, size_t len);
 void rtrim(char *buf);
-std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length);
+std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length, char pad = ' ');
 
 #endif /* IMGTOOL_H */

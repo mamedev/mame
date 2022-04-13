@@ -72,6 +72,40 @@ private:
 DECLARE_DEVICE_TYPE(XBOX_EEPROM, xbox_eeprom_device)
 
 /*
+ * Super-io connected to lpc bus used as a rs232 debug port
+ */
+
+class xbox_superio_device : public device_t, public lpcbus_device_interface
+{
+public:
+	xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
+	virtual void set_host(int index, lpcbus_host_interface *host) override;
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read_rs232(offs_t offset);
+	void write_rs232(offs_t offset, uint8_t data);
+
+protected:
+	virtual void device_start() override;
+
+private:
+	void internal_io_map(address_map &map);
+
+	lpcbus_host_interface *lpchost = nullptr;
+	int lpcindex = 0;
+	address_space *memspace = nullptr;
+	address_space *iospace = nullptr;
+	bool configuration_mode;
+	int index;
+	int selected;
+	uint8_t registers[16][256]{}; // 256 registers for up to 16 devices, registers 0-0x2f common to all
+};
+
+DECLARE_DEVICE_TYPE(XBOX_SUPERIO, xbox_superio_device)
+
+/*
  * Base
  */
 
@@ -85,42 +119,23 @@ public:
 		debug_irq_number(0),
 		m_maincpu(*this, "maincpu"),
 		mcpxlpc(*this, ":pci:01.0"),
-		ide(*this, ":pci:09.0:ide"),
+		ide(*this, ":pci:09.0:ide1"),
 		debugc_bios(nullptr) { }
 
 	void xbox_base(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(superio_read);
-	DECLARE_WRITE8_MEMBER(superio_write);
-	DECLARE_READ8_MEMBER(superiors232_read);
-	DECLARE_WRITE8_MEMBER(superiors232_write);
-
-	int smbus_pic16lc(int command, int rw, int data);
-	int smbus_cx25871(int command, int rw, int data);
-	int smbus_eeprom(int command, int rw, int data);
 	void debug_generate_irq(int irq, bool active);
-	virtual void hack_eeprom() {};
-	virtual void hack_usb() {};
+	virtual void hack_eeprom() {}
+	virtual void hack_usb() {}
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ohci_usb_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(smbus_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(nv2a_interrupt_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	struct superio_state
-	{
-		bool configuration_mode;
-		int index;
-		int selected;
-		uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
-	} superiost;
 	nv2a_renderer *nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;
@@ -134,26 +149,24 @@ protected:
 	} debugp[];
 	const debugger_constants *debugc_bios;
 
-	void xbox_base_map(address_map &map);
-	void xbox_base_map_io(address_map &map);
-
 private:
-	void dump_string_command(int ref, const std::vector<std::string> &params);
-	void dump_process_command(int ref, const std::vector<std::string> &params);
-	void dump_list_command(int ref, const std::vector<std::string> &params);
-	void dump_dpc_command(int ref, const std::vector<std::string> &params);
-	void dump_timer_command(int ref, const std::vector<std::string> &params);
-	void curthread_command(int ref, const std::vector<std::string> &params);
-	void threadlist_command(int ref, const std::vector<std::string> &params);
-	void generate_irq_command(int ref, const std::vector<std::string> &params);
-	void nv2a_combiners_command(int ref, const std::vector<std::string> &params);
-	void nv2a_wclipping_command(int ref, const std::vector<std::string> &params);
-	void waitvblank_command(int ref, const std::vector<std::string> &params);
-	void grab_texture_command(int ref, const std::vector<std::string> &params);
-	void grab_vprog_command(int ref, const std::vector<std::string> &params);
-	void vprogdis_command(int ref, const std::vector<std::string> &params);
-	void help_command(int ref, const std::vector<std::string> &params);
-	void xbox_debug_commands(int ref, const std::vector<std::string> &params);
+	void dump_string_command(const std::vector<std::string> &params);
+	void dump_process_command(const std::vector<std::string> &params);
+	void dump_list_command(const std::vector<std::string> &params);
+	void dump_dpc_command(const std::vector<std::string> &params);
+	void dump_timer_command(const std::vector<std::string> &params);
+	void curthread_command(const std::vector<std::string> &params);
+	void threadlist_command(const std::vector<std::string> &params);
+	void generate_irq_command(const std::vector<std::string> &params);
+	void nv2a_combiners_command(const std::vector<std::string> &params);
+	void nv2a_wclipping_command(const std::vector<std::string> &params);
+	void waitvblank_command(const std::vector<std::string> &params);
+	void grab_texture_command(const std::vector<std::string> &params);
+	void grab_vprog_command(const std::vector<std::string> &params);
+	void vprogdis_command(const std::vector<std::string> &params);
+	void vdeclaration_command(const std::vector<std::string> &params);
+	void help_command(const std::vector<std::string> &params);
+	void xbox_debug_commands(const std::vector<std::string> &params);
 	int find_bios_index();
 	bool find_bios_hash(int bios, uint32_t &crc32);
 	void find_debug_params();

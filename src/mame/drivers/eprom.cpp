@@ -41,25 +41,20 @@
  *
  *************************************/
 
-void eprom_state::update_interrupts()
+void eprom_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 	if (m_extra.found())
-		m_extra->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+		m_extra->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 void eprom_state::machine_start()
 {
-	atarigen_state::machine_start();
-	save_item(NAME(m_sync_data));
 }
 
 void eprom_state::machine_reset()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
-	m_sync_data = 0;
+	m_share1[0xcc00/2] = 0;
 }
 
 
@@ -70,15 +65,7 @@ void eprom_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(eprom_state::special_port1_r)
-{
-	int result = ioport("260010")->read();
-	result ^= 0x0010;
-	return result;
-}
-
-
-READ8_MEMBER(eprom_state::adc_r)
+uint8_t eprom_state::adc_r(offs_t offset)
 {
 	if (!m_adc.found())
 		return 0xff;
@@ -97,9 +84,9 @@ READ8_MEMBER(eprom_state::adc_r)
  *
  *************************************/
 
-WRITE16_MEMBER(eprom_state::eprom_latch_w)
+void eprom_state::eprom_latch_w(uint8_t data)
 {
-	if (ACCESSING_BITS_0_7 && (m_extra != nullptr))
+	if (m_extra.found())
 	{
 		/* bit 0: reset extra CPU */
 		if (data & 1)
@@ -123,18 +110,13 @@ WRITE16_MEMBER(eprom_state::eprom_latch_w)
  *
  *************************************/
 
-READ16_MEMBER(eprom_state::sync_r)
+template<bool maincpu> void eprom_state::sync_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	return m_sync_data;
-}
+	u16 oldword = m_share1[0xcc00/2];
+	COMBINE_DATA(&m_share1[0xcc00/2]);
+	u16 newword = m_share1[0xcc00/2];
 
-
-template<bool maincpu> WRITE16_MEMBER(eprom_state::sync_w)
-{
-	int oldword = m_sync_data;
-	COMBINE_DATA(&m_sync_data);
-
-	if ((oldword & 0xff00) != (m_sync_data & 0xff00))
+	if ((oldword & 0xff00) != (newword & 0xff00))
 		(maincpu ? m_maincpu->yield() : m_extra->yield());
 }
 
@@ -150,24 +132,24 @@ void eprom_state::main_map(address_map &map)
 	map(0x000000, 0x09ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<true>));
+	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
-	map(0x360010, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
+	map(0x360011, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_base_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_base_device::main_command_w));
 	map(0x3e0000, 0x3e0fff).ram().share("paletteram");
-	map(0x3f0000, 0x3f9fff).ram();
-	map(0x3f0000, 0x3f1fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x3f0000, 0x3f1fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f2000, 0x3f3fff).ram().share("mob");
-	map(0x3f4000, 0x3f4f7f).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0x3f4000, 0x3f4f7f).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0x3f4f80, 0x3f4fff).ram().share("mob:slip");
-	map(0x3f8000, 0x3f9fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
+	map(0x3f5000, 0x3f7fff).ram();
+	map(0x3f8000, 0x3f9fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
 }
 
 
@@ -176,15 +158,15 @@ void eprom_state::guts_map(address_map &map)
 	map(0x000000, 0x09ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<true>));
+	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
-//  AM_RANGE(0x360010, 0x360011) AM_WRITE(eprom_latch_w)
+//  map(0x360011, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 	map(0x3e0000, 0x3e0fff).ram().share("paletteram");
@@ -208,13 +190,13 @@ void eprom_state::extra_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x160000, 0x16ffff).ram().share("share1");
-	map(0x16cc00, 0x16cc01).rw(FUNC(eprom_state::sync_r), FUNC(eprom_state::sync_w<false>)).share("sync_data");
+	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<false>));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
 	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
-	map(0x360010, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
+	map(0x360011, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_base_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_base_device::main_command_w));
 }
@@ -383,15 +365,17 @@ GFXDECODE_END
 void eprom_state::eprom(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::main_map);
 
-	M68000(config, m_extra, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_extra, 14.318181_MHz_XTAL/2);
 	m_extra->set_addrmap(AS_PROGRAM, &eprom_state::extra_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	TIMER(config, "scantimer").configure_scanline(FUNC(eprom_state::scanline_update), m_screen, 0, 8);
+
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");
@@ -415,12 +399,11 @@ void eprom_state::eprom(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(eprom_state::screen_update_eprom));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(eprom_state::video_int_write_line));
-
-	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
+	m_screen->screen_vblank().append_inputline(m_extra, M68K_IRQ_4, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -428,7 +411,7 @@ void eprom_state::eprom(machine_config &config)
 	ATARI_JSA_I(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(1);
-	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.4);
 	config.device_remove("jsa:pokey");
 }
 
@@ -436,10 +419,12 @@ void eprom_state::eprom(machine_config &config)
 void eprom_state::klaxp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::main_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(eprom_state::scanline_update), m_screen, 0, 8);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
@@ -459,12 +444,10 @@ void eprom_state::klaxp(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(eprom_state::screen_update_eprom));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(eprom_state::video_int_write_line));
-
-	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -479,12 +462,14 @@ void eprom_state::klaxp(machine_config &config)
 void eprom_state::guts(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::guts_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	TIMER(config, "scantimer").configure_scanline(FUNC(eprom_state::scanline_update), m_screen, 0, 8);
+
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");
@@ -508,12 +493,10 @@ void eprom_state::guts(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(eprom_state::screen_update_guts));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(eprom_state::video_int_write_line));
-
-	MCFG_VIDEO_START_OVERRIDE(eprom_state,guts)
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

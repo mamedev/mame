@@ -114,7 +114,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 	case WM_SYSKEYDOWN:
 		if (wparam != VK_F10)
 			return CallWindowProc(m_original_editproc, m_editwnd, message, wparam, lparam);
-		// (fall through)
+		[[fallthrough]];
 	case WM_KEYDOWN:
 		switch (wparam)
 		{
@@ -185,7 +185,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 				case 13: // carriage return
 					{
 						// fetch the text
-						SendMessage(m_editwnd, WM_GETTEXT, WPARAM(ARRAY_LENGTH(buffer)), LPARAM(buffer));
+						SendMessage(m_editwnd, WM_GETTEXT, WPARAM(std::size(buffer)), LPARAM(buffer));
 
 						// add to the history if it's not a repeat of the last one
 						if (buffer[0] && (m_history.empty() || _tcscmp(buffer, m_history[0].c_str())))
@@ -199,7 +199,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 						// process
 						{
 							auto utf8_buffer = osd::text::from_tstring(buffer);
-							process_string(utf8_buffer.c_str());
+							process_string(utf8_buffer);
 						}
 					}
 					break;
@@ -237,7 +237,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 LRESULT CALLBACK editwin_info::static_edit_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	editwin_info *const info = (editwin_info *)uintptr_t(GetWindowLongPtr(wnd, GWLP_USERDATA));
+	auto *const info = (editwin_info *)uintptr_t(GetWindowLongPtr(wnd, GWLP_USERDATA));
 	assert(info->m_editwnd == wnd);
 	return info->edit_proc(message, wparam, lparam);
 }

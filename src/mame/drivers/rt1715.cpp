@@ -9,7 +9,6 @@
     Notes:
     - keyboard connected to sio channel a
     - sio channel a clock output connected to ctc trigger 0
-    - rt1715w: SCP3 boot crashes in z80dma (Unknown base register XX)
 
     Docs:
     - http://www.robotrontechnik.de/html/computer/pc1715w.htm
@@ -22,18 +21,30 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
-#include "machine/bankdev.h"
+#include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "video/i8275.h"
+
 #include "emupal.h"
 #include "screen.h"
+
+
+#define LOG_BANK    (1U <<  1)
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
 
 
 class rt1715_state : public driver_device
@@ -43,9 +54,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
-		, m_bankdev(*this, "bankdev%u", 0U)
 		, m_sio0(*this, "sio0")
 		, m_ctc0(*this, "ctc0")
+		, m_printer(*this, "printer")
+		, m_rs232(*this, "rs232")
 		, m_fdc(*this, "i8272")
 		, m_floppy(*this, "i8272:%u", 0U)
 		, m_dma(*this, "z80dma")
@@ -54,29 +66,29 @@ public:
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "i8275")
 		, m_p_chargen(*this, "gfx")
-		, m_p_videoram(*this, "videoram")
-	{
-	}
+		, m_videoram(*this, "videoram")
+		, m_p_cas(*this, "prom")
+	{ }
 
 	void rt1715(machine_config &config);
 	void rt1715w(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
-	DECLARE_READ8_MEMBER(k7658_led1_r);
-	DECLARE_READ8_MEMBER(k7658_led2_r);
-	DECLARE_READ8_MEMBER(k7658_data_r);
-	DECLARE_WRITE8_MEMBER(k7658_data_w);
-	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
-	DECLARE_WRITE8_MEMBER(rt1715w_set_bank);
-	DECLARE_WRITE8_MEMBER(rt1715w_floppy_motor);
-	DECLARE_WRITE8_MEMBER(rt1715w_krfd_w);
+	void rt1715_floppy_enable(uint8_t data);
+	uint8_t k7658_led1_r();
+	uint8_t k7658_led2_r();
+	uint8_t k7658_data_r(offs_t offset);
+	void k7658_data_w(uint8_t data);
+	void rt1715_rom_disable(uint8_t data);
+	void rt1715w_set_bank(uint8_t data);
+	void rt1715w_floppy_motor(uint8_t data);
+	void rt1715w_krfd_w(uint8_t data);
 	void rt1715_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
@@ -88,7 +100,6 @@ private:
 	void rt1715w_io(address_map &map);
 	void rt1715_mem(address_map &map);
 	void rt1715w_mem(address_map &map);
-	void rt1715w_banked_mem(address_map &map);
 
 	DECLARE_MACHINE_START(rt1715);
 	DECLARE_MACHINE_RESET(rt1715);
@@ -97,9 +108,10 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	optional_device_array<address_map_bank_device, 2> m_bankdev;
 	required_device<z80sio_device> m_sio0;
 	required_device<z80ctc_device> m_ctc0;
+	required_device<rs232_port_device> m_printer;
+	required_device<rs232_port_device> m_rs232;
 	optional_device<i8272a_device> m_fdc;
 	optional_device_array<floppy_connector, 2> m_floppy;
 	optional_device<z80dma_device> m_dma;
@@ -108,12 +120,14 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
 	required_region_ptr<uint8_t> m_p_chargen;
-	optional_shared_ptr<uint8_t> m_p_videoram;
+	optional_device<ram_device> m_videoram;
+	optional_region_ptr<uint8_t> m_p_cas;
 
-	int m_led1_val;
-	int m_led2_val;
-	u8 m_krfd;
-	uint16_t m_dma_adr;
+	int m_led1_val = 0;
+	int m_led2_val = 0;
+	u8 m_krfd = 0U;
+	uint16_t m_dma_adr = 0U;
+	int m_r = 0, m_w = 0;
 };
 
 
@@ -121,22 +135,22 @@ private:
     FLOPPY
 ***************************************************************************/
 
-WRITE8_MEMBER(rt1715_state::rt1715_floppy_enable)
+void rt1715_state::rt1715_floppy_enable(uint8_t data)
 {
-	logerror("%s: rt1715_floppy_enable %02x\n", machine().describe_context(), data);
+	LOG("%s: rt1715_floppy_enable %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(rt1715_state::rt1715w_floppy_motor)
+void rt1715_state::rt1715w_floppy_motor(uint8_t data)
 {
-	logerror("%s: rt1715w_floppy_motor %02x\n", machine().describe_context(), data);
+	LOG("%s: rt1715w_floppy_motor %02x\n", machine().describe_context(), data);
 
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(data & 0x80 ? 1 : 0);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(data & 0x08 ? 1 : 0);
 }
 
-WRITE8_MEMBER(rt1715_state::rt1715w_krfd_w)
+void rt1715_state::rt1715w_krfd_w(uint8_t data)
 {
-	logerror("%s: rt1715w_krfd_w %02x\n", machine().describe_context(), data);
+	LOG("%s: rt1715w_krfd_w %02x\n", machine().describe_context(), data);
 	m_krfd = data;
 }
 
@@ -150,23 +164,23 @@ WRITE_LINE_MEMBER(rt1715_state::tc_w)
 ***************************************************************************/
 
 /* si/so led */
-READ8_MEMBER(rt1715_state::k7658_led1_r)
+uint8_t rt1715_state::k7658_led1_r()
 {
 	m_led1_val ^= 1;
-	logerror("%s: k7658_led1_r %02x\n", machine().describe_context(), m_led1_val);
+	LOG("%s: k7658_led1_r %02x\n", machine().describe_context(), m_led1_val);
 	return 0xff;
 }
 
 /* caps led */
-READ8_MEMBER(rt1715_state::k7658_led2_r)
+uint8_t rt1715_state::k7658_led2_r()
 {
 	m_led2_val ^= 1;
-	logerror("%s: k7658_led2_r %02x\n", machine().describe_context(), m_led2_val);
+	LOG("%s: k7658_led2_r %02x\n", machine().describe_context(), m_led2_val);
 	return 0xff;
 }
 
 /* read key state */
-READ8_MEMBER(rt1715_state::k7658_data_r)
+uint8_t rt1715_state::k7658_data_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -188,9 +202,12 @@ READ8_MEMBER(rt1715_state::k7658_data_r)
 }
 
 /* serial output on D0 */
-WRITE8_MEMBER(rt1715_state::k7658_data_w)
+void rt1715_state::k7658_data_w(uint8_t data)
 {
-	logerror("%s: k7658_data_w %02x\n", machine().describe_context(), BIT(data, 0));
+	LOG("%s: k7658_data_w %d\n", machine().describe_context(), BIT(data, 0));
+	m_sio0->rxa_w(BIT(data, 0));
+	m_sio0->rxca_w(0);
+	m_sio0->rxca_w(1);
 }
 
 
@@ -210,9 +227,9 @@ MACHINE_RESET_MEMBER(rt1715_state, rt1715)
 	membank("bank1")->set_base(memregion("ipl")->base());
 }
 
-WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
+void rt1715_state::rt1715_rom_disable(uint8_t data)
 {
-	logerror("%s: rt1715_set_bank %02x\n", machine().describe_context(), data);
+	LOGBANK("%s: rt1715_set_bank %02x\n", machine().describe_context(), data);
 
 	/* disable ROM, enable RAM */
 	membank("bank1")->set_base(m_ram->pointer());
@@ -220,21 +237,20 @@ WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
 
 MACHINE_START_MEMBER(rt1715_state, rt1715w)
 {
-	membank("bank2")->set_base(m_ram->pointer() + 0x4000);
-	membank("bank3")->set_base(m_ram->pointer());
 }
 
 MACHINE_RESET_MEMBER(rt1715_state, rt1715w)
 {
-	m_bankdev[0]->set_bank(0);
-	m_bankdev[1]->set_bank(0);
-
 	m_dma->rdy_w(1);
 	m_krfd = 0;
 	m_dma_adr = 0;
+	m_r = 0;
+	m_w = 0;
 }
 
 /*
+   BR (A62, A63)
+
    b2..0 = AB18..16
 
    0 - Hintergrundbank (Bildschirm, Zeichengeneratoren)
@@ -244,36 +260,140 @@ MACHINE_RESET_MEMBER(rt1715_state, rt1715w)
    4 - RAM-Disk
    5 - RAM-Disk
 */
-WRITE8_MEMBER(rt1715_state::rt1715w_set_bank)
+void rt1715_state::rt1715w_set_bank(uint8_t data)
 {
-	int r = data >> 4;
-	int w = data & 15;
+	int w = (data >> 4) & 7;
+	int r = data & 7;
 
-	logerror("%s: rt1715w_set_bank target %x source %x%s\n", machine().describe_context(), r, w, r == w ? "" : " DIFF");
+	LOGBANK("%s: rt1715w_set_bank target %x source %x%s\n", machine().describe_context(), w, r, r == w ? "" : " DIFF");
 
-	m_bankdev[0]->set_bank(r);
-	m_bankdev[1]->set_bank(w);
+	m_r = r;
+	m_w = w;
 }
 
-READ8_MEMBER(rt1715_state::memory_read_byte)
+uint8_t rt1715_state::memory_read_byte(offs_t offset)
 {
-	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
+	uint8_t data = 0;
+
+	switch (m_r)
+	{
+	case 0:
+		switch (offset >> 12)
+		{
+		case 0:
+			data = memregion("ipl")->base()[offset & 0x7ff];
+			break;
+
+		case 1:
+			break;
+
+		case 2:
+			data = m_p_chargen[offset & 0xfff];
+			break;
+
+		case 3:
+			data = m_videoram->pointer()[offset & 0xfff];
+			break;
+
+		default:
+			data = m_ram->pointer()[offset];
+			break;
+		}
+		LOGBANK("mem r %04x bank %d == %02x\n", offset, m_r, data);
+		break;
+
+	default:
+		uint8_t cas_addr = 128 + (m_r << 4) + ((offset >> 12) & 15);
+		uint8_t cas_data = m_p_cas[cas_addr] ^ 15;
+		switch (cas_data)
+		{
+		case 1:
+			data = m_ram->pointer()[offset];
+			break;
+
+		case 2:
+			data = m_ram->pointer()[offset + 0x10000];
+			break;
+
+		case 4:
+			data = m_ram->pointer()[offset + 0x20000];
+			break;
+
+		case 8:
+			data = m_ram->pointer()[offset + 0x30000];
+			break;
+
+		default:
+			break;
+		}
+		LOGBANK("mem r %04x bank %d cas %d(%02x) == %02x\n", offset, m_r, cas_data, cas_addr, data);
+		break;
+	}
+	return data;
 }
 
-WRITE8_MEMBER(rt1715_state::memory_write_byte)
+void rt1715_state::memory_write_byte(offs_t offset, uint8_t data)
 {
-	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
-	prog_space.write_byte(offset, data);
+	switch (m_w)
+	{
+	case 0:
+		switch (offset >> 12)
+		{
+		case 0:
+		case 1:
+			break;
+
+		case 2:
+			m_p_chargen[offset & 0xfff] = data;
+			break;
+
+		case 3:
+			m_videoram->pointer()[offset & 0xfff] = data;
+			break;
+
+		default:
+			m_ram->pointer()[offset] = data;
+			break;
+		}
+		LOGBANK("mem w %04x bank %d <- %02x\n", offset, m_w, data);
+		break;
+
+	default:
+		uint8_t cas_addr = 128 + (m_w << 4) + ((offset >> 12) & 15);
+		uint8_t cas_data = m_p_cas[cas_addr] ^ 15;
+		switch (cas_data)
+		{
+		case 1:
+			m_ram->pointer()[offset] = data;
+			break;
+
+		case 2:
+			m_ram->pointer()[offset + 0x10000] = data;
+			break;
+
+		case 4:
+			m_ram->pointer()[offset + 0x20000] = data;
+			break;
+
+		case 8:
+			m_ram->pointer()[offset + 0x30000] = data;
+			break;
+
+		default:
+			break;
+		}
+		LOGBANK("mem w %04x bank %d cas %d(%02x) <- %02x\n", offset, m_w, cas_data, cas_addr, data);
+		break;
+	}
 }
 
-READ8_MEMBER(rt1715_state::io_read_byte)
+uint8_t rt1715_state::io_read_byte(offs_t offset)
 {
 	address_space &prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(rt1715_state::io_write_byte)
+void rt1715_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
@@ -282,7 +402,7 @@ WRITE8_MEMBER(rt1715_state::io_write_byte)
 WRITE_LINE_MEMBER(rt1715_state::busreq_w)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
@@ -294,25 +414,24 @@ WRITE_LINE_MEMBER(rt1715_state::crtc_drq_w)
 {
 	if (state)
 	{
-		address_space &mem = m_maincpu->space(AS_PROGRAM);
-		m_crtc->dack_w(mem, 0, m_p_videoram[m_dma_adr++]);
+		m_crtc->dack_w(m_videoram->pointer()[m_dma_adr++]);
 		m_dma_adr %= (80 * 24);
 	}
 }
 
 I8275_DRAW_CHARACTER_MEMBER(rt1715_state::crtc_display_pixels)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
 
 	if (!vsp)
-		gfx = m_p_chargen[linecount << 7 | charcode];
+		gfx = m_p_chargen[((gpa & 1) << 11) | (linecount << 7) | charcode];
 
 	if (rvv)
 		gfx ^= 0xff;
 
 	for (u8 i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 /* F4 Character Displayer */
@@ -362,9 +481,10 @@ void rt1715_state::rt1715_base_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x08, 0x0b).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x0c, 0x0f).rw(m_sio0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x0c, 0x0f).rw(m_sio0, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x10, 0x17).noprw();
 //  map(0x10, 0x13).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-//  map(0x14, 0x17).rw(m_sio1, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+//  map(0x14, 0x17).rw(m_sio1, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x18, 0x19).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 //  map(0x2c, 0x2f) // LT107CS -- serial DSR?
 //  map(0x30, 0x33) // LT111CS -- serial SEL? (data rate selector)
@@ -384,16 +504,7 @@ void rt1715_state::rt1715_io(address_map &map)
 
 void rt1715_state::rt1715w_mem(address_map &map)
 {
-	map(0x0000, 0xffff).r(m_bankdev[0], FUNC(address_map_bank_device::read8)).w(m_bankdev[1], FUNC(address_map_bank_device::write8));
-}
-
-void rt1715_state::rt1715w_banked_mem(address_map &map)
-{
-	map(0x00000, 0x007ff).rom().region("ipl", 0);
-	map(0x02000, 0x02fff).ram().region("gfx", 0);
-	map(0x03000, 0x03fff).ram().share("videoram");
-	map(0x04000, 0x0ffff).bankrw("bank2");
-	map(0x10000, 0x4ffff).bankrw("bank3");
+	map(0x0000, 0xffff).rw(FUNC(rt1715_state::memory_read_byte), FUNC(rt1715_state::memory_write_byte));
 }
 
 // rt1715w -- decoders A13, A14, page C
@@ -401,7 +512,7 @@ void rt1715_state::rt1715w_io(address_map &map)
 {
 	rt1715_base_io(map);
 
-	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w)); // A2
+	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write)); // A2
 	map(0x04, 0x07).rw(m_ctc2, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // A4
 //  map(0x1a, 0x1b) // chargen write protection
 	map(0x1c, 0x1d).m(m_fdc, FUNC(i8272a_device::map));
@@ -411,19 +522,19 @@ void rt1715_state::rt1715w_io(address_map &map)
 	map(0x34, 0x37).portr("S8"); // KON -- Konfigurations-schalter FD (config switch -- A114, DIP S8)
 //  map(0x38, 0x3b) // SR (RST1) -- Ru:cksetzen von Flip-Flops im FD
 //  map(0x3c, 0x3f) // RST (RST2) -- Ru:cksetzen von Flip-Flops in V.24 (Pru:ftechnik)
-	// used via DMA only
+	// these two ports are accessed only via DMA
 	map(0x40, 0x40).r(m_fdc, FUNC(i8272a_device::msr_r));
 	map(0x41, 0x41).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
 }
 
 void rt1715_state::k7658_mem(address_map &map)
 {
-	map(0x0000, 0xffff).w(FUNC(rt1715_state::k7658_data_w));
 	map(0x0000, 0x07ff).mirror(0xf800).rom();
 }
 
 void rt1715_state::k7658_io(address_map &map)
 {
+	map(0x0000, 0x1fff).w(FUNC(rt1715_state::k7658_data_w)).nopr();
 	map(0x2000, 0x2000).mirror(0x8000).r(FUNC(rt1715_state::k7658_led1_r));
 	map(0x4000, 0x4000).mirror(0x8000).r(FUNC(rt1715_state::k7658_led2_r));
 	map(0x8000, 0x9fff).r(FUNC(rt1715_state::k7658_data_r));
@@ -434,73 +545,158 @@ void rt1715_state::k7658_io(address_map &map)
     INPUT PORTS
 ***************************************************************************/
 
-static INPUT_PORTS_START( rt1715w )
-	PORT_START("S8")
-	PORT_DIPNAME( 0x01, 0x01, "UNK0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "UNK1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "UNK2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "UNK3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "UNK4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "UNK5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "UNK6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "UNK7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( k7658 )
 	PORT_START("row_00")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D04 A54 E04 B54 B04 C04 D54 C54
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad S *1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad S *3")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad CE") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 
 	PORT_START("row_10")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D03 A53 E03 B53 B03 C03 D53 C53
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
 
 	PORT_START("row_20")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D02 A52 E02 B52 B02 C02 D52 C52
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 00") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
 
 	PORT_START("row_30")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D11 --- E11 A15 A10 C11 --- A16
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('@') PORT_CHAR('`')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad New-Line") PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
 	PORT_START("row_40")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D10 --- E10 --- B10 C10 E52 E51
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("row_50")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D12 --- E12 B16 B01 C12 D16 C16
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('~')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
 
 	PORT_START("row_60")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D07 A17 E07 B17 B07 C07 D17 C17
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("A17 8E")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("rechter Rand") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END))
 
 	PORT_START("row_70")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D01 A51 E01 B51 B00 C01 D51 C51
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 
 	PORT_START("row_08")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D00 B99 E00 --- B11 C00 E15 E16
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SI/SO") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
 
 	PORT_START("row_18")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D08 A56 E08 B56 B08 C08 D56 C56
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad SQ (F14)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad PS (F13)")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F11) PORT_CHAR(UCHAR_MAMEKEY(F11))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12))
 
 	PORT_START("row_28")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D09 E53 E09 E54 B09 C09 E55 E56
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10))
 
 	PORT_START("row_38")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D05 A55 E05 B55 B05 C05 D55 C55
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F9) PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7))
 
 	PORT_START("row_48")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	// D06 A05 E06 B15 B06 C06 D15 C15
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("linker Rand")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rt1715w )
+	PORT_INCLUDE(k7658)
+	PORT_START("S8")
+	PORT_DIPNAME( 0x01, 0x01, "Floppy drive type" )
+	PORT_DIPSETTING(    0x01, "5.25\"-FD" )
+	PORT_DIPSETTING(    0x00, "8\"-FD" )
+	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -520,7 +716,6 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 
 static const z80_daisy_config rt1715w_daisy_chain[] =
 {
-	{ "ctc0" },
 	{ "sio0" },
 	{ nullptr }
 };
@@ -541,12 +736,10 @@ void rt1715_state::rt1715(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(rt1715_state, rt1715)
 	MCFG_MACHINE_RESET_OVERRIDE(rt1715_state, rt1715)
 
-#if 0
 	/* keyboard */
 	z80_device &keyboard(Z80(config, "keyboard", 683000));
 	keyboard.set_addrmap(AS_PROGRAM, &rt1715_state::k7658_mem);
 	keyboard.set_addrmap(AS_IO, &rt1715_state::k7658_io);
-#endif
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -558,15 +751,29 @@ void rt1715_state::rt1715(machine_config &config)
 
 	I8275(config, m_crtc, 13.824_MHz_XTAL / 8);
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(rt1715_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(rt1715_state::crtc_display_pixels));
 	m_crtc->set_screen(m_screen);
 
-	/* keyboard */
 	Z80SIO(config, m_sio0, 9.832_MHz_XTAL / 4);
+	m_sio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio0->out_txda_callback().set(m_printer, FUNC(rs232_port_device::write_txd));
+	m_sio0->out_txdb_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_sio0->out_dtrb_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_sio0->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	Z80CTC(config, m_ctc0, 9.832_MHz_XTAL / 4);
+	Z80CTC(config, m_ctc0, 15.9744_MHz_XTAL / 4);
 	m_ctc0->zc_callback<0>().set(m_sio0, FUNC(z80sio_device::txca_w));
 	m_ctc0->zc_callback<2>().set(m_sio0, FUNC(z80sio_device::rxtxcb_w));
+
+	// X4 connector -- printer
+	RS232_PORT(config, m_printer, default_rs232_devices, "printer");
+	m_printer->cts_handler().set(m_sio0, FUNC(z80sio_device::ctsa_w));
+
+	// X5 connector -- V24 port
+	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
+	m_rs232->rxd_handler().set(m_sio0, FUNC(z80sio_device::rxb_w));
+	m_rs232->cts_handler().set(m_sio0, FUNC(z80sio_device::ctsb_w));
+	m_rs232->dsr_handler().set(m_sio0, FUNC(z80sio_device::syncb_w));
 
 	/* floppy */
 	Z80PIO(config, "a71", 9.832_MHz_XTAL / 4);
@@ -585,9 +792,6 @@ void rt1715_state::rt1715w(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &rt1715_state::rt1715w_io);
 	m_maincpu->set_daisy_config(rt1715w_daisy_chain);
 
-	ADDRESS_MAP_BANK(config, "bankdev0").set_map(&rt1715_state::rt1715w_banked_mem).set_options(ENDIANNESS_BIG, 8, 19, 0x10000);
-	ADDRESS_MAP_BANK(config, "bankdev1").set_map(&rt1715_state::rt1715w_banked_mem).set_options(ENDIANNESS_BIG, 8, 19, 0x10000);
-
 	MCFG_MACHINE_START_OVERRIDE(rt1715_state, rt1715w)
 	MCFG_MACHINE_RESET_OVERRIDE(rt1715_state, rt1715w)
 
@@ -599,8 +803,8 @@ void rt1715_state::rt1715w(machine_config &config)
 	// operates in polled mode
 	I8272A(config, m_fdc, 8'000'000 / 4, false);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w)).invert();
-	FLOPPY_CONNECTOR(config, "i8272:0", rt1715w_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:0", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	Z80DMA(config, m_dma, 15.9744_MHz_XTAL / 4);
 	m_dma->out_busreq_callback().set(FUNC(rt1715_state::busreq_w));
@@ -613,6 +817,7 @@ void rt1715_state::rt1715w(machine_config &config)
 	Z80CTC(config, m_ctc2, 15.9744_MHz_XTAL / 4);
 
 	m_ram->set_default_size("256K");
+	RAM(config, m_videoram).set_default_size("4K").set_default_value(0x00);
 }
 
 
@@ -676,6 +881,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME                             FLAGS
-COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658,   rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658,   rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, rt1715w, rt1715_state, empty_init, "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

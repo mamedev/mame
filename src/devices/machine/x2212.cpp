@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "machine/x2212.h"
+
 #include <algorithm>
 
 
@@ -37,7 +38,7 @@ x2212_device::x2212_device(const machine_config &mconfig, device_type type, cons
 	, m_store(false)
 	, m_array_recall(false)
 	, m_size_data(size_data)
-	, m_default_data(*this, DEVICE_SELF, size_data)
+	, m_default_data(*this, DEVICE_SELF)
 {
 }
 
@@ -79,9 +80,10 @@ void x2212_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void x2212_device::nvram_read(emu_file &file)
+bool x2212_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_e2prom[0], m_size_data);
+	size_t actual;
+	return !file.read(&m_e2prom[0], m_size_data, actual) && actual == m_size_data;
 }
 
 
@@ -90,13 +92,14 @@ void x2212_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void x2212_device::nvram_write(emu_file &file)
+bool x2212_device::nvram_write(util::write_stream &file)
 {
 	// auto-save causes an implicit store prior to exiting (writing)
 	if (m_auto_save)
 		do_store();
 
-	file.write(&m_e2prom[0], m_size_data);
+	size_t actual;
+	return !file.write(&m_e2prom[0], m_size_data, actual) && actual == m_size_data;
 }
 
 
@@ -136,7 +139,7 @@ void x2212_device::do_recall()
 //  write - store to the live RAM
 //-------------------------------------------------
 
-WRITE8_MEMBER( x2212_device::write )
+void x2212_device::write(offs_t offset, uint8_t data)
 {
 	assert(offset < m_size_data);
 	m_sram[offset] = data & 0x0f;
@@ -147,7 +150,7 @@ WRITE8_MEMBER( x2212_device::write )
 //  read - read from the live RAM
 //-------------------------------------------------
 
-READ8_MEMBER( x2212_device::read )
+u8 x2212_device::read(address_space &space, offs_t offset)
 {
 	assert(offset < m_size_data);
 	return (m_sram[offset] & 0x0f) | (space.unmap() & 0xf0);
@@ -159,7 +162,7 @@ READ8_MEMBER( x2212_device::read )
 //  (FIXME: actually active low, not active high)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( x2212_device::store )
+void x2212_device::store(int state)
 {
 	if (state != 0 && !m_store)
 		do_store();
@@ -172,7 +175,7 @@ WRITE_LINE_MEMBER( x2212_device::store )
 //  (FIXME: actually active low, not active high)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( x2212_device::recall )
+void x2212_device::recall(int state)
 {
 	if (state != 0 && !m_array_recall)
 		do_recall();

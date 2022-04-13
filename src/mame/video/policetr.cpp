@@ -25,9 +25,6 @@ void policetr_state::video_start()
 	/* the destination bitmap is not directly accessible to the CPU */
 	m_dstbitmap = std::make_unique<bitmap_ind8>(+DSTBITMAP_WIDTH, +DSTBITMAP_HEIGHT);
 
-	save_item(NAME(m_palette_offset));
-	save_item(NAME(m_palette_index));
-	save_item(NAME(m_palette_data));
 	save_item(NAME(m_src_xoffs));
 	save_item(NAME(m_src_yoffs));
 	save_item(NAME(m_dst_xoffs));
@@ -100,8 +97,8 @@ void policetr_state::render_display_list(offs_t offset)
 			{
 				for (int y = 0; y < dsth; y++)
 				{
-					uint8_t *dst = &m_dstbitmap->pix8(dsty + y,dstx);
-					memset(dst, pixel, dstw);
+					uint8_t *dst = &m_dstbitmap->pix(dsty + y,dstx);
+					std::fill_n(dst, dstw, pixel);
 				}
 			}
 		}
@@ -113,8 +110,8 @@ void policetr_state::render_display_list(offs_t offset)
 			uint32_t cury = srcy;
 			for (int y = 0; y < dsth; y++, cury += srcystep)
 			{
-				const uint8_t *src = &m_srcbitmap[((cury >> 16) & m_srcbitmap_height_mask) * SRCBITMAP_WIDTH];
-				uint8_t *dst = &m_dstbitmap->pix8((dsty + y), dstx);
+				uint8_t const *const src = &m_srcbitmap[((cury >> 16) & m_srcbitmap_height_mask) * SRCBITMAP_WIDTH];
+				uint8_t *const dst = &m_dstbitmap->pix((dsty + y), dstx);
 
 				/* loop over columns */
 				for (int x = 0, curx = srcx; x < dstw; x++, curx += srcxstep)
@@ -139,7 +136,7 @@ void policetr_state::render_display_list(offs_t offset)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::video_w)
+void policetr_state::video_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* 4 offsets */
 	switch (offset)
@@ -184,7 +181,7 @@ WRITE32_MEMBER(policetr_state::video_w)
 				/* latch 0x50 allows a direct write to the destination bitmap */
 				case 0x50:
 					if (ACCESSING_BITS_24_31 && m_dst_xoffs < DSTBITMAP_WIDTH && m_dst_yoffs < DSTBITMAP_HEIGHT)
-						m_dstbitmap->pix8(m_dst_yoffs,m_dst_xoffs) = data >> 24;
+						m_dstbitmap->pix(m_dst_yoffs,m_dst_xoffs) = data >> 24;
 					break;
 
 				/* log anything else */
@@ -252,7 +249,7 @@ WRITE32_MEMBER(policetr_state::video_w)
  *
  *************************************/
 
-READ32_MEMBER(policetr_state::video_r)
+uint32_t policetr_state::video_r()
 {
 	int inputval;
 	int width = m_screen->width();
@@ -300,34 +297,6 @@ READ32_MEMBER(policetr_state::video_r)
 	return 0;
 }
 
-
-
-
-/*************************************
- *
- *  Palette access
- *
- *************************************/
-
-WRITE8_MEMBER(policetr_state::palette_offset_w)
-{
-	m_palette_offset = data;
-	m_palette_index = 0;
-}
-
-
-WRITE8_MEMBER(policetr_state::palette_data_w)
-{
-	m_palette_data[m_palette_index] = data;
-	if (++m_palette_index == 3)
-	{
-		m_palette->set_pen_color(m_palette_offset, rgb_t(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
-		m_palette_index = 0;
-	}
-}
-
-
-
 /*************************************
  *
  *  Main refresh
@@ -337,13 +306,13 @@ WRITE8_MEMBER(policetr_state::palette_data_w)
 uint32_t policetr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const int width = cliprect.width();
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	/* render all the scanlines from the dstbitmap to MAME's bitmap */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const uint8_t *src = &m_dstbitmap->pix8(y,cliprect.min_x);
-		uint32_t *dst = &bitmap.pix32(y,cliprect.min_x);
+		uint8_t const *src = &m_dstbitmap->pix(y,cliprect.min_x);
+		uint32_t *dst = &bitmap.pix(y,cliprect.min_x);
 		//draw_scanline8(bitmap, cliprect.min_x, y, width, src, nullptr);
 		for (int x = 0; x < width; x++, dst++, src++)
 			*dst = palette[*src];

@@ -144,6 +144,7 @@
 				s2 = s2 + mem_readbyte( ( r1 >> 3 ) & 0x07 ); \
 			}  \
 			s2 = mem_readword( s2 ); \
+			break; \
 		case 0x80: \
 		case 0xC0: \
 			break; \
@@ -1282,19 +1283,22 @@ case 0x59:  /* Invalid - 2? cycles - Flags affected: --------? */
 	logerror( "%04X: unk%02x, unhandled\n", m_PC-1,op );
 	mycycles += 2;
 	break;
-case 0x5A:  /* unk5A - 7,8,12,9,8 cycles */
-/* NOTE: This unknown command is used in the calculator, and in a number of carts.
-       It appears to be a compare, and the number of opcode bytes varies depending
-       on the 2nd byte. */
+case 0x5A:  /* indirect CMP - 7,8,12,9,8 cycles */
 	ARG_iR;
 	switch (r2 & 0xc0)
 	{
 		case 0x00:
 		// 5A 02 09 (used in calculator @ 493A and 4941. Used in Defender II @ 6DC9).
 		// Assuming it to be a compare of the literal last number against contents of (contents of r02).
-			logerror( "%04X: unk%02X %02X %02X\n", m_PC-3,op,r2,r1 );
+			//logerror( "%04X: unk%02X %02X %02X\n", m_PC-3,op,r2,r1 );
 			s1 = mem_readbyte(r2 & 7);
 			OP_CMP8( mem_readbyte(s1), r1 );
+			break;
+		case 0x40:
+			s1 = r2 & 7;    // s1 = primary reg
+			res = mem_readbyte(s1);   // res = secondary reg#
+			OP_CMP8( mem_readbyte(res), r1 );
+			mem_writebyte(s1, res+1);       // inc res
 			break;
 		case 0x80:
 		// 5A 86 C6 00 (used in Henry @ 495B, when you guess wrongly in practice mode).
@@ -1302,36 +1306,53 @@ case 0x5A:  /* unk5A - 7,8,12,9,8 cycles */
 		// Assuming it to be a compare of the literal last number against contents of (contents r06 + offset C6).
 			s1 = r1;
 			ARG_R;
-			logerror( "%04X: unk%02X %02X %02X %02X\n", m_PC-4,op,r2,s1,r1 );
+			//logerror( "%04X: unk%02X %02X %02X %02X\n", m_PC-4,op,r2,s1,r1 );
 			s1 += mem_readbyte(r2 & 7);
 			OP_CMP8( mem_readbyte(s1), r1 );
+			mycycles += 4;
 			break;
-		default:
-			logerror( "%04X: unk%02X %02X %02X, unhandled\n", m_PC-3,op,r2,r1 );
+		case 0xC0:
+			s1 = r2 & 7;    // s1 = primary reg
+			res = mem_readbyte(s1) - 1;   // res = secondary reg#
+			mem_writebyte(s1, res);       // dec res
+			OP_CMP8( mem_readbyte(res), r1 );
 			break;
 	}
 	mycycles += 7;
 	break;
-case 0x5B:  /* unk5B - 6,7,11,8,7 cycles */
-/* NOTE: This unknown command appears to have several variants, but all the games that use it only
-       use one specific instruction. We code for that here, and log anything else that may turn up.
-       It appears to move a literal to a register pointed to by another register.
+case 0x5B:  /* indirect MOV - 6,7,11,8,7 cycles */
+/* Only one variant is used in gamecom: 5B 42 00
          Example:
          move r02, E9
-         unk 5b 42 00     (move 00 into register E9, then increment r02)
-*/
+         5b 42 00     (move 00 into register E9, then increment r02) */
 	ARG_iR;
-	if (r2 == 0x42)   // only code used is 5B 42 00. This code allows those games to boot.
-	{ // MOV (Rr)+,i  -- or maybe -- AND (Rr)+,i
-		logerror( "%04X: unk%02X %02X %02X\n", m_PC-3,op,r2,r1 );
-		s1 = r2 & 7;
-		res = mem_readbyte( s1 );
-		mem_writebyte( res, r1 );
-		mem_writebyte( s1, res + 1 );
+	switch (r2 & 0xc0)
+	{
+		case 0x00:
+			s1 = mem_readbyte(r2 & 7);
+			mem_writebyte( mem_readbyte(s1), r1 );
+			break;
+		case 0x40:
+			//logerror( "%04X: unk%02X %02X %02X\n", m_PC-3,op,r2,r1 );
+			s1 = r2 & 7;
+			res = mem_readbyte(s1);
+			mem_writebyte(res, r1);
+			mem_writebyte(s1, res + 1);
+			break;
+		case 0x80:
+			s1 = r1;
+			ARG_R;
+			s1 += mem_readbyte(r2 & 7);
+			mycycles += 4;
+			mem_writebyte(mem_readbyte(s1), r1);
+			break;
+		case 0xC0:
+			s1 = r2 & 7;
+			res = mem_readbyte(s1) - 1;
+			mem_writebyte(s1, res);
+			mem_writebyte(mem_readbyte(res), r1);
+			break;
 	}
-	else
-		logerror( "%04X: unk%02X %02X %02X, unhandled\n", m_PC-3,op,r2,r1 );
-
 	mycycles += 6;
 	break;
 case 0x5C:  /* DIV RRr,RRs - 47 cycles - Flags affected: -Z-V---- */

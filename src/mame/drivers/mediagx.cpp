@@ -79,19 +79,16 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define SPEEDUP_HACKS   1
 
-struct speedup_entry
-{
-	uint32_t          offset;
-	uint32_t          pc;
-};
+namespace {
+
+#define SPEEDUP_HACKS   1
 
 class mediagx_state : public pcat_base_state
 {
 public:
-	mediagx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
+	mediagx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pcat_base_state(mconfig, type, tag),
 		m_ide(*this, "ide"),
 		m_ramdac(*this, "ramdac"),
 		m_dmadac(*this, "dac%u", 0U),
@@ -114,31 +111,27 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ32_MEMBER(disp_ctrl_r);
-	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
-	DECLARE_READ32_MEMBER(memory_ctrl_r);
-	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_READ32_MEMBER(parallel_port_r);
-	DECLARE_WRITE32_MEMBER(parallel_port_w);
-	DECLARE_READ32_MEMBER(ad1847_r);
-	DECLARE_WRITE32_MEMBER(ad1847_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
+	struct speedup_entry
+	{
+		uint32_t          offset;
+		uint32_t          pc;
+	};
+
+	uint32_t disp_ctrl_r(offs_t offset);
+	void disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t memory_ctrl_r(offs_t offset);
+	void memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t biu_ctrl_r(offs_t offset);
+	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t parallel_port_r(offs_t offset, uint32_t mem_mask = ~0);
+	void parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ad1847_r(offs_t offset);
+	void ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t io20_r(offs_t offset);
+	void io20_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER(speedup0_r);
-	DECLARE_READ32_MEMBER(speedup1_r);
-	DECLARE_READ32_MEMBER(speedup2_r);
-	DECLARE_READ32_MEMBER(speedup3_r);
-	DECLARE_READ32_MEMBER(speedup4_r);
-	DECLARE_READ32_MEMBER(speedup5_r);
-	DECLARE_READ32_MEMBER(speedup6_r);
-	DECLARE_READ32_MEMBER(speedup7_r);
-	DECLARE_READ32_MEMBER(speedup8_r);
-	DECLARE_READ32_MEMBER(speedup9_r);
-	DECLARE_READ32_MEMBER(speedup10_r);
-	DECLARE_READ32_MEMBER(speedup11_r);
+	template <offs_t N> uint32_t speedup_r(address_space &space) { return generic_speedup(space, N); }
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -183,44 +176,46 @@ private:
 
 	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
 
-	uint32_t m_disp_ctrl_reg[256/4];
-	int m_frame_width;
-	int m_frame_height;
+	uint32_t m_disp_ctrl_reg[256/4]{};
+	int m_frame_width = 0;
+	int m_frame_height = 0;
 
-	uint32_t m_memory_ctrl_reg[256/4];
-	int m_pal_index;
+	uint32_t m_memory_ctrl_reg[256/4]{};
+	int m_pal_index = 0;
 
-	uint32_t m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4]{};
 
-	uint8_t m_mediagx_config_reg_sel;
-	uint8_t m_mediagx_config_regs[256];
+	uint8_t m_mediagx_config_reg_sel = 0;
+	uint8_t m_mediagx_config_regs[256]{};
 
-	//uint8_t m_controls_data;
-	uint8_t m_parallel_pointer;
-	uint8_t m_parallel_latched;
-	uint32_t m_parport;
-	//int m_control_num;
-	//int m_control_num2;
-	//int m_control_read;
+	//uint8_t m_controls_data = 0;
+	uint8_t m_parallel_pointer = 0;
+	uint8_t m_parallel_latched = 0;
+	uint32_t m_parport = 0;
+	//int m_control_num = 0;
+	//int m_control_num2 = 0;
+	//int m_control_read = 0;
 
-	uint32_t m_cx5510_regs[256/4];
+	uint32_t m_cx5510_regs[256/4]{};
 
 	std::unique_ptr<int16_t[]> m_dacl;
 	std::unique_ptr<int16_t[]> m_dacr;
-	int m_dacl_ptr;
-	int m_dacr_ptr;
+	int m_dacl_ptr = 0;
+	int m_dacr_ptr = 0;
 
-	uint8_t m_ad1847_regs[16];
-	uint32_t m_ad1847_sample_counter;
-	uint32_t m_ad1847_sample_rate;
+	uint8_t m_ad1847_regs[16]{};
+	uint32_t m_ad1847_sample_counter = 0;
+	uint32_t m_ad1847_sample_rate = 0;
 
 #if SPEEDUP_HACKS
-	const speedup_entry *m_speedup_table;
-	uint32_t m_speedup_hits[12];
-	int m_speedup_count;
+	const speedup_entry *m_speedup_table = nullptr;
+	uint32_t m_speedup_hits[12]{};
+	int m_speedup_count = 0;
 #endif
 
-	static const read32_delegate s_speedup_handlers[];
+	using speedup_handler = std::pair<uint32_t (mediagx_state::*)(address_space &), const char *>;
+	static const speedup_handler s_speedup_handlers[];
+	static const speedup_entry a51site4_speedups[];
 };
 
 // Display controller registers
@@ -275,19 +270,17 @@ void mediagx_state::video_start()
 
 void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
-	int i,j;
-	const uint8_t *dp;
 	int index = 0;
-	const pen_t *pens = &m_palette->pen(0);
+	pen_t const *const pens = &m_palette->pen(0);
 
-	dp = gfx->get_data(ch);
+	uint8_t const *const dp = gfx->get_data(ch);
 
-	for (j=y; j < y+8; j++)
+	for (int j=y; j < y+8; j++)
 	{
-		uint32_t *p = &bitmap.pix32(j);
-		for (i=x; i < x+8; i++)
+		uint32_t *const p = &bitmap.pix(j);
+		for (int i=x; i < x+8; i++)
 		{
-			uint8_t pen = dp[index++];
+			uint8_t const pen = dp[index++];
 			if (pen)
 				p[i] = pens[gfx->colorbase() + (att & 0xf)];
 			else
@@ -301,18 +294,16 @@ void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, g
 
 void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-	int width, height;
-	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
+	int const line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
-	width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
+	int width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
 	if (m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
 	{
 		width >>= 1;
 	}
 	width += 4;
 
-	height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
+	int height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
 
 	if ( (width != m_frame_width || height != m_frame_height) &&
 			(width > 1 && height > 1 && width <= 640 && height <= 480) )
@@ -328,19 +319,19 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
 	{
-		uint8_t *framebuf = (uint8_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
-		uint8_t *pal = m_pal;
+		uint8_t const *const framebuf = (uint8_t const *)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint8_t const *const pal = m_pal;
 
-		for (j=0; j < m_frame_height; j++)
+		for (int j=0; j < m_frame_height; j++)
 		{
-			uint32_t *p = &bitmap.pix32(j);
-			uint8_t *si = &framebuf[j * line_delta];
-			for (i=0; i < m_frame_width; i++)
+			uint32_t *const p = &bitmap.pix(j);
+			uint8_t const *si = &framebuf[j * line_delta];
+			for (int i=0; i < m_frame_width; i++)
 			{
-				int c = *si++;
-				int r = pal[(c*3)+0] << 2;
-				int g = pal[(c*3)+1] << 2;
-				int b = pal[(c*3)+2] << 2;
+				int const c = *si++;
+				int const r = pal[(c*3)+0] << 2;
+				int const g = pal[(c*3)+1] << 2;
+				int const b = pal[(c*3)+2] << 2;
 
 				p[i] = r << 16 | g << 8 | b;
 			}
@@ -348,21 +339,21 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 	}
 	else            // 16-bit
 	{
-		uint16_t *framebuf = (uint16_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint16_t const *const framebuf = (uint16_t const *)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
 		// RGB 5-6-5 mode
 		if ((m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
-					uint16_t c = *si++;
-					int r = ((c >> 11) & 0x1f) << 3;
-					int g = ((c >> 5) & 0x3f) << 2;
-					int b = (c & 0x1f) << 3;
+					uint16_t const c = *si++;
+					int const r = ((c >> 11) & 0x1f) << 3;
+					int const g = ((c >> 5) & 0x3f) << 2;
+					int const b = (c & 0x1f) << 3;
 
 					p[i] = r << 16 | g << 8 | b;
 				}
@@ -371,16 +362,16 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 		// RGB 5-5-5 mode
 		else
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
-					uint16_t c = *si++;
-					int r = ((c >> 10) & 0x1f) << 3;
-					int g = ((c >> 5) & 0x1f) << 3;
-					int b = (c & 0x1f) << 3;
+					uint16_t const c = *si++;
+					int const r = ((c >> 10) & 0x1f) << 3;
+					int const g = ((c >> 5) & 0x1f) << 3;
+					int const b = (c & 0x1f) << 3;
 
 					p[i] = r << 16 | g << 8 | b;
 				}
@@ -424,7 +415,7 @@ uint32_t mediagx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ32_MEMBER(mediagx_state::disp_ctrl_r)
+uint32_t mediagx_state::disp_ctrl_r(offs_t offset)
 {
 	uint32_t r = m_disp_ctrl_reg[offset];
 
@@ -446,19 +437,19 @@ READ32_MEMBER(mediagx_state::disp_ctrl_r)
 	return r;
 }
 
-WRITE32_MEMBER(mediagx_state::disp_ctrl_w)
+void mediagx_state::disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
 
 
-READ32_MEMBER(mediagx_state::memory_ctrl_r)
+uint32_t mediagx_state::memory_ctrl_r(offs_t offset)
 {
 	return m_memory_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
+void mediagx_state::memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
@@ -471,7 +462,7 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
 			m_pal_index = data;
-			m_ramdac->index_w( space, 0, data );
+			m_ramdac->index_w(data);
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
@@ -480,7 +471,7 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 			if (m_pal_index >= 768)
 				m_pal_index = 0;
 
-			m_ramdac->pal_w( space, 0, data );
+			m_ramdac->pal_w(data);
 		}
 	}
 	else
@@ -491,7 +482,7 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 
 
 
-READ32_MEMBER(mediagx_state::biu_ctrl_r)
+uint32_t mediagx_state::biu_ctrl_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -500,7 +491,7 @@ READ32_MEMBER(mediagx_state::biu_ctrl_r)
 	return m_biu_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
+void mediagx_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
@@ -511,13 +502,11 @@ WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(mediagx_state::bios_ram_w)
+void mediagx_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
-#endif
 
-READ8_MEMBER(mediagx_state::io20_r)
+uint8_t mediagx_state::io20_r(offs_t offset)
 {
 	uint8_t r = 0;
 
@@ -532,7 +521,7 @@ READ8_MEMBER(mediagx_state::io20_r)
 	return r;
 }
 
-WRITE8_MEMBER(mediagx_state::io20_w)
+void mediagx_state::io20_w(offs_t offset, uint8_t data)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -545,7 +534,7 @@ WRITE8_MEMBER(mediagx_state::io20_w)
 	}
 }
 
-READ32_MEMBER(mediagx_state::parallel_port_r)
+uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -579,7 +568,7 @@ READ32_MEMBER(mediagx_state::parallel_port_r)
 	return r;
 }
 
-WRITE32_MEMBER(mediagx_state::parallel_port_w)
+void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_parport );
 
@@ -713,7 +702,7 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 	}
 }
 
-READ32_MEMBER(mediagx_state::ad1847_r)
+uint32_t mediagx_state::ad1847_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -723,7 +712,7 @@ READ32_MEMBER(mediagx_state::ad1847_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mediagx_state::ad1847_w)
+void mediagx_state::ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -880,8 +869,8 @@ void mediagx_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(mediagx_state::mediagx)
-
+void mediagx_state::mediagx(machine_config &config)
+{
 	/* basic machine hardware */
 	MEDIAGX(config, m_maincpu, 166000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mediagx_state::mediagx_map);
@@ -890,8 +879,8 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, mediagx_state, cx5510_pci_r, cx5510_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device(18, FUNC(mediagx_state::cx5510_pci_r), FUNC(mediagx_state::cx5510_pci_w));
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set(m_pic8259_2, FUNC(pic8259_device::ir6_w));
@@ -919,12 +908,16 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 void mediagx_state::init_mediagx()
 {
 	m_frame_width = m_frame_height = 1;
+	m_parallel_pointer = 0;
+	std::fill(std::begin(m_disp_ctrl_reg), std::end(m_disp_ctrl_reg), 0);
+	std::fill(std::begin(m_biu_ctrl_reg), std::end(m_biu_ctrl_reg), 0);
+	std::fill(std::begin(m_speedup_hits), std::end(m_speedup_hits), 0);
 }
 
 #if SPEEDUP_HACKS
@@ -939,24 +932,11 @@ uint32_t mediagx_state::generic_speedup(address_space &space, int idx)
 	return m_main_ram[m_speedup_table[idx].offset/4];
 }
 
-READ32_MEMBER(mediagx_state::speedup0_r) { return generic_speedup(space, 0); }
-READ32_MEMBER(mediagx_state::speedup1_r) { return generic_speedup(space, 1); }
-READ32_MEMBER(mediagx_state::speedup2_r) { return generic_speedup(space, 2); }
-READ32_MEMBER(mediagx_state::speedup3_r) { return generic_speedup(space, 3); }
-READ32_MEMBER(mediagx_state::speedup4_r) { return generic_speedup(space, 4); }
-READ32_MEMBER(mediagx_state::speedup5_r) { return generic_speedup(space, 5); }
-READ32_MEMBER(mediagx_state::speedup6_r) { return generic_speedup(space, 6); }
-READ32_MEMBER(mediagx_state::speedup7_r) { return generic_speedup(space, 7); }
-READ32_MEMBER(mediagx_state::speedup8_r) { return generic_speedup(space, 8); }
-READ32_MEMBER(mediagx_state::speedup9_r) { return generic_speedup(space, 9); }
-READ32_MEMBER(mediagx_state::speedup10_r) { return generic_speedup(space, 10); }
-READ32_MEMBER(mediagx_state::speedup11_r) { return generic_speedup(space, 11); }
-
-const read32_delegate mediagx_state::s_speedup_handlers[]
+const mediagx_state::speedup_handler mediagx_state::s_speedup_handlers[]
 {
-	{ FUNC(mediagx_state::speedup0_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup1_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup2_r),  (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup3_r),  (mediagx_state*)nullptr },
-	{ FUNC(mediagx_state::speedup4_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup5_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup6_r),  (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup7_r),  (mediagx_state*)nullptr },
-	{ FUNC(mediagx_state::speedup8_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup9_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup10_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup11_r), (mediagx_state*)nullptr }
+	{ FUNC(mediagx_state::speedup_r<0>) }, { FUNC(mediagx_state::speedup_r<1>) }, { FUNC(mediagx_state::speedup_r<2>)  }, { FUNC(mediagx_state::speedup_r<3>)  },
+	{ FUNC(mediagx_state::speedup_r<4>) }, { FUNC(mediagx_state::speedup_r<5>) }, { FUNC(mediagx_state::speedup_r<6>)  }, { FUNC(mediagx_state::speedup_r<7>)  },
+	{ FUNC(mediagx_state::speedup_r<8>) }, { FUNC(mediagx_state::speedup_r<9>) }, { FUNC(mediagx_state::speedup_r<10>) }, { FUNC(mediagx_state::speedup_r<11>) }
 };
 
 #ifdef MAME_DEBUG
@@ -969,23 +949,20 @@ void mediagx_state::report_speedups()
 
 void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 {
-	assert(count < ARRAY_LENGTH(s_speedup_handlers));
+	assert(count < std::size(s_speedup_handlers));
 
 	m_speedup_table = entries;
 	m_speedup_count = count;
 
-	for (int i = 0; i < count; i++) {
-		read32_delegate func = s_speedup_handlers[i];
-		func.late_bind(*this);
-		m_maincpu->space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
-	}
+	for (int i = 0; i < count; i++)
+		m_maincpu->space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, read32mo_delegate(*this, s_speedup_handlers[i].first, s_speedup_handlers[i].second));
 
 #ifdef MAME_DEBUG
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mediagx_state::report_speedups, this));
 #endif
 }
 
-static const speedup_entry a51site4_speedups[] =
+const mediagx_state::speedup_entry mediagx_state::a51site4_speedups[] =
 {
 	{ 0x5504c, 0x0363e },
 	{ 0x5f11c, 0x0363e },
@@ -1006,7 +983,7 @@ void mediagx_state::init_a51site4()
 	init_mediagx();
 
 #if SPEEDUP_HACKS
-	install_speedups(a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
+	install_speedups(a51site4_speedups, std::size(a51site4_speedups));
 #endif
 }
 
@@ -1043,6 +1020,8 @@ ROM_START( a51site4a ) /* When dumped connected straight to IDE the cylinders we
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "a51site4-2_0", 0, SHA1(4de421e4d1708ecbdfb50730000814a1ea36a044) ) /* Stock drive, sticker on drive shows REV 2.0 and Test Mode screen shows the date September 11, 1998 */
 ROM_END
+
+} // Anonymous namespace
 
 
 /*****************************************************************************/

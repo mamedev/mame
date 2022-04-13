@@ -96,7 +96,7 @@ TILEMAP_MAPPER_MEMBER(retofinv_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(retofinv_state::bg_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			m_bg_videoram[tile_index] + 256 * m_bg_bank,
 			m_bg_videoram[0x400 + tile_index] & 0x3f,
 			0);
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(retofinv_state::fg_get_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fg_videoram[tile_index] + 256 * m_fg_bank,
 			color,
 			0);
@@ -124,8 +124,8 @@ TILE_GET_INFO_MEMBER(retofinv_state::fg_get_tile_info)
 
 void retofinv_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(retofinv_state::bg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(retofinv_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(retofinv_state::bg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(retofinv_state::tilemap_scan)), 8, 8, 36, 28);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(retofinv_state::fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(retofinv_state::tilemap_scan)), 8, 8, 36, 28);
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
 
@@ -141,19 +141,19 @@ void retofinv_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(retofinv_state::bg_videoram_w)
+void retofinv_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(retofinv_state::fg_videoram_w)
+void retofinv_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(retofinv_state::gfx_ctrl_w)
+void retofinv_state::gfx_ctrl_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

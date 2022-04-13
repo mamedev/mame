@@ -141,35 +141,6 @@ nes_jf33_device::nes_jf33_device(const machine_config &mconfig, const char *tag,
 
 
 
-void nes_jf11_device::device_start()
-{
-	common_start();
-}
-
-void nes_jf11_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_jf13_device::device_start()
-{
-	common_start();
-}
-
-void nes_jf13_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_jf16_device::device_start()
-{
-	common_start();
-}
-
 void nes_jf16_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -191,18 +162,6 @@ void nes_jf17_device::pcb_reset()
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 	m_latch = 0;
-}
-
-void nes_jf19_device::device_start()
-{
-	common_start();
-}
-
-void nes_jf19_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
 }
 
 void nes_ss88006_device::device_start()
@@ -280,8 +239,8 @@ void nes_jf13_device::write_m(offs_t offset, uint8_t data)
 
 	if (offset < 0x1000)
 	{
-		prg32((data >> 4) & 0x03);
-		chr8(((data >> 4) & 0x04) | (data & 0x03), CHRROM);
+		prg32(BIT(data, 4, 2));
+		chr8(bitswap<3>(data, 6, 1, 0), CHRROM);
 	}
 	else
 	{
@@ -424,7 +383,7 @@ void nes_jf19_adpcm_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -513,9 +472,9 @@ void nes_ss88006_device::ss88006_write(offs_t offset, uint8_t data)
 		case 0x3000: case 0x3001: case 0x3002: case 0x3003:
 		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
 		case 0x5000: case 0x5001: case 0x5002: case 0x5003:
-			bank = ((offset & 0x7000) - 0x2000) / 0x0800 + ((offset & 0x0002) >> 1);
+			bank = 2 * (BIT(offset, 12, 3) - 2) + BIT(offset, 1);
 			if (offset & 0x0001)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f)<< 4);
+				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
 			else
 				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
@@ -575,7 +534,7 @@ void nes_ss88006_adpcm_device::ss88006_adpcm_write(offs_t offset, uint8_t data, 
 			{
 //              printf("sample write: data: %02x\n", data);
 				if ((m_latch & 2) && !(data & 2))
-					dev.start((data >> 2) & 0x1f, (data >> 2) & 0x1f);
+					dev.start(BIT(data, 2, 5), BIT(data, 2, 5));
 			}
 			m_latch = data;
 			break;

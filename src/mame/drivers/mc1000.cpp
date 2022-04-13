@@ -35,9 +35,11 @@
 #include "video/mc6847.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "u13"
@@ -66,7 +68,8 @@ public:
 		m_y(*this, "Y%u", 0),
 		m_joy(*this, "JOY%u", 0),
 		m_modifiers(*this, "MODIFIERS"),
-		m_joykeymap(*this, "JOYKEYMAP%u", 0)
+		m_joykeymap(*this, "JOYKEYMAP%u", 0),
+		m_banks(*this, "bank%u", 1U)
 	{ }
 
 	void mc1000(machine_config &config);
@@ -85,22 +88,23 @@ private:
 	required_ioport_array<2> m_joy;
 	required_ioport m_modifiers;
 	required_ioport_array<2> m_joykeymap;
+	required_memory_bank_array<5> m_banks;
 
 	std::unique_ptr<uint8_t[]> m_banked_ram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_WRITE8_MEMBER( mc6845_ctrl_w );
-	DECLARE_WRITE8_MEMBER( mc6847_attr_w );
+	uint8_t printer_r();
+	void printer_w(uint8_t data);
+	void mc6845_ctrl_w(uint8_t data);
+	void mc6847_attr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( fs_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_READ8_MEMBER( keydata_r );
-	DECLARE_READ8_MEMBER( rom_banking_r );
+	uint8_t videoram_r(offs_t offset);
+	void keylatch_w(uint8_t data);
+	uint8_t keydata_r();
+	uint8_t rom_banking_r(offs_t offset);
 
 	void bankswitch();
 
@@ -109,8 +113,8 @@ private:
 
 	/* memory state */
 	int m_rom0000;
-	int m_mc6845_bank;
-	int m_mc6847_bank;
+	uint8_t m_mc6845_bank;
+	uint8_t m_mc6847_bank;
 
 	/* keyboard state */
 	int m_keylatch;
@@ -137,12 +141,12 @@ void mc1000_state::bankswitch()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* MC6845 video RAM */
-	membank("bank2")->set_entry(m_mc6845_bank);
+	m_banks[1]->set_entry(m_mc6845_bank);
 
 	/* extended RAM */
 	if (m_ram->size() > 16*1024)
 	{
-		program.install_readwrite_bank(0x4000, 0x7fff, "bank3");
+		program.install_readwrite_bank(0x4000, 0x7fff, m_banks[2]);
 	}
 	else
 	{
@@ -154,7 +158,7 @@ void mc1000_state::bankswitch()
 	{
 		if (m_ram->size() > 16*1024)
 		{
-			program.install_readwrite_bank(0x8000, 0x97ff, "bank4");
+			program.install_readwrite_bank(0x8000, 0x97ff, m_banks[3]);
 		}
 		else
 		{
@@ -163,15 +167,15 @@ void mc1000_state::bankswitch()
 	}
 	else
 	{
-		program.install_readwrite_bank(0x8000, 0x97ff, "bank4");
+		program.install_readwrite_bank(0x8000, 0x97ff, m_banks[3]);
 	}
 
-	membank("bank4")->set_entry(m_mc6847_bank);
+	m_banks[3]->set_entry(m_mc6847_bank);
 
 	/* extended RAM */
 	if (m_ram->size() > 16*1024)
 	{
-		program.install_readwrite_bank(0x9800, 0xbfff, "bank5");
+		program.install_readwrite_bank(0x9800, 0xbfff, m_banks[4]);
 	}
 	else
 	{
@@ -186,24 +190,24 @@ WRITE_LINE_MEMBER( mc1000_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( mc1000_state::printer_r )
+uint8_t mc1000_state::printer_r()
 {
 	return m_centronics_busy;
 }
 
-WRITE8_MEMBER( mc1000_state::printer_w )
+void mc1000_state::printer_w(uint8_t data)
 {
 	m_centronics->write_strobe(BIT(data, 0));
 }
 
-WRITE8_MEMBER( mc1000_state::mc6845_ctrl_w )
+void mc1000_state::mc6845_ctrl_w(uint8_t data)
 {
 	m_mc6845_bank = BIT(data, 0);
 
 	bankswitch();
 }
 
-WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
+void mc1000_state::mc6847_attr_w(uint8_t data)
 {
 	/*
 
@@ -260,7 +264,7 @@ void mc1000_state::mc1000_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x04, 0x04).rw(FUNC(mc1000_state::printer_r), FUNC(mc1000_state::printer_w));
-	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::write));
 //  map(0x10, 0x10).w(m_crtc, FUNC(mc6845_device::address_w));
 //  map(0x11, 0x11).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x12, 0x12).w(FUNC(mc1000_state::mc6845_ctrl_w));
@@ -389,7 +393,7 @@ WRITE_LINE_MEMBER( mc1000_state::hs_w )
 	m_hsync = state;
 }
 
-READ8_MEMBER( mc1000_state::videoram_r )
+uint8_t mc1000_state::videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 
@@ -400,14 +404,14 @@ READ8_MEMBER( mc1000_state::videoram_r )
 
 /* AY-3-8910 Interface */
 
-WRITE8_MEMBER( mc1000_state::keylatch_w )
+void mc1000_state::keylatch_w(uint8_t data)
 {
 	m_keylatch = data;
 
 	m_cassette->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( mc1000_state::keydata_r )
+uint8_t mc1000_state::keydata_r()
 {
 	uint8_t data = 0xff;
 
@@ -439,9 +443,9 @@ READ8_MEMBER( mc1000_state::keydata_r )
 }
 
 
-READ8_MEMBER( mc1000_state::rom_banking_r )
+uint8_t mc1000_state::rom_banking_r(offs_t offset)
 {
-	membank("bank1")->set_entry(0);
+	m_banks[0]->set_entry(0);
 	m_rom0000 = 0;
 	return m_rom->base()[offset];
 }
@@ -453,25 +457,27 @@ void mc1000_state::machine_start()
 	/* setup memory banking */
 	m_banked_ram = make_unique_clear<uint8_t[]>(0xc000);
 
-	membank("bank1")->configure_entry(0, m_banked_ram.get());
-	membank("bank1")->configure_entry(1, m_rom->base());
-	membank("bank1")->set_entry(1);
+	m_banks[0]->configure_entry(0, m_banked_ram.get());
+	m_banks[0]->configure_entry(1, m_rom->base());
+	m_banks[0]->set_entry(1);
 
 	m_rom0000 = 1;
+	m_mc6845_bank = 0;
+	m_mc6847_bank = 0;
 
-	membank("bank2")->configure_entry(0, m_banked_ram.get() + 0x2000);
-	membank("bank2")->configure_entry(1, m_mc6845_video_ram);
-	membank("bank2")->set_entry(0);
+	m_banks[1]->configure_entry(0, m_banked_ram.get() + 0x2000);
+	m_banks[1]->configure_entry(1, m_mc6845_video_ram);
+	m_banks[1]->set_entry(0);
 
-	membank("bank3")->configure_entry(0, m_banked_ram.get() + 0x4000);
-	membank("bank3")->set_entry(0);
+	m_banks[2]->configure_entry(0, m_banked_ram.get() + 0x4000);
+	m_banks[2]->set_entry(0);
 
-	membank("bank4")->configure_entry(0, m_mc6847_video_ram);
-	membank("bank4")->configure_entry(1, m_banked_ram.get() + 0x8000);
-	membank("bank4")->set_entry(0);
+	m_banks[3]->configure_entry(0, m_mc6847_video_ram);
+	m_banks[3]->configure_entry(1, m_banked_ram.get() + 0x8000);
+	m_banks[3]->set_entry(0);
 
-	membank("bank5")->configure_entry(0, m_banked_ram.get() + 0x9800);
-	membank("bank5")->set_entry(0);
+	m_banks[4]->configure_entry(0, m_banked_ram.get() + 0x9800);
+	m_banks[4]->set_entry(0);
 
 	bankswitch();
 
@@ -487,7 +493,7 @@ void mc1000_state::machine_start()
 
 void mc1000_state::machine_reset()
 {
-	membank("bank1")->set_entry(1);
+	m_banks[0]->set_entry(1);
 
 	m_rom0000 = 1;
 }
@@ -580,6 +586,7 @@ void mc1000_state::mc1000(machine_config &config)
 	/* devices */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mc1000_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mc1000_cass");
@@ -601,6 +608,8 @@ ROM_START( mc1000 )
 	ROM_LOAD( "mc1000.ic17", 0x0000, 0x2000, CRC(8e78d80d) SHA1(9480270e67a5db2e7de8bc5c8b9e0bb210d4142b) )
 	ROM_LOAD( "mc1000.ic12", 0x2000, 0x2000, CRC(750c95f0) SHA1(fd766f5ea4481ef7fd4df92cf7d8397cc2b5a6c4) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /* System Drivers */

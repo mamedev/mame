@@ -25,6 +25,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "chance32.lh"
 
@@ -49,35 +50,35 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
+	void chance32_fgram_w(offs_t offset, uint8_t data)
 	{
 		m_fgram[offset] = data;
 		m_fg_tilemap->mark_tile_dirty(offset / 2);
 	}
 
-	DECLARE_WRITE8_MEMBER(chance32_bgram_w)
+	void chance32_bgram_w(offs_t offset, uint8_t data)
 	{
 		m_bgram[offset] = data;
 		m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(muxout_w);
-	DECLARE_READ8_MEMBER(mux_r);
+	void mux_w(uint8_t data);
+	void muxout_w(uint8_t data);
+	uint8_t mux_r();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chance32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void chance32_map(address_map &map);
 	void chance32_portmap(address_map &map);
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_shared_ptr<uint8_t> m_fgram;
 	required_shared_ptr<uint8_t> m_bgram;
 
-	uint8_t mux_data;
+	uint8_t mux_data = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<13> m_lamps;
@@ -88,7 +89,7 @@ TILE_GET_INFO_MEMBER(chance32_state::get_fg_tile_info)
 {
 	int code = (m_fgram[tile_index * 2 + 1] << 8) | m_fgram[tile_index * 2];
 	int flip = (~code >> 12)&1;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0x0fff,
 			code >> 13,
 			TILE_FLIPYX(flip<<1)|flip);
@@ -98,7 +99,7 @@ TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
 {
 	int code = (m_bgram[tile_index * 2 +1] << 8) | m_bgram[tile_index * 2];
 	int flip = (~code >> 12)&1;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0x0fff,
 			code >> 13,
 			TILE_FLIPYX(flip<<1|flip));
@@ -107,17 +108,17 @@ TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
 
 void chance32_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chance32_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chance32_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chance32_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chance32_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 
 	m_fg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 	m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 }
 
 
-uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -126,12 +127,12 @@ uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_in
 }
 
 
-WRITE8_MEMBER(chance32_state::mux_w)
+void chance32_state::mux_w(uint8_t data)
 {
 	mux_data = data;
 }
 
-READ8_MEMBER(chance32_state::mux_r)
+uint8_t chance32_state::mux_r()
 {
 	uint8_t res,i;
 	const char *const muxnames[4] = { "IN0", "IN1", "IN2", "IN3" };
@@ -147,7 +148,7 @@ READ8_MEMBER(chance32_state::mux_r)
 }
 
 
-WRITE8_MEMBER(chance32_state::muxout_w)
+void chance32_state::muxout_w(uint8_t data)
 {
 /* Muxed Lamps
 
@@ -394,7 +395,7 @@ static INPUT_PORTS_START( chance32 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_BET )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -423,7 +424,7 @@ static INPUT_PORTS_START( chance32 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Coin A")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Coin B")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_8) PORT_NAME("Flip Screen 1")  /* unknown purpose */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9) PORT_NAME("Flip Screen 2")  /* unknown purpose */
@@ -474,9 +475,8 @@ void chance32_state::chance32(machine_config &config)
 	screen.set_size(40*16, 32*8);
 	screen.set_visarea(0, 35*16-1, 0, 29*8-1);
 	screen.set_screen_update(FUNC(chance32_state::screen_update_chance32));
-	screen.set_palette("palette");
 
-	h46505_device &crtc(H46505(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
+	hd6845s_device &crtc(HD6845S(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16);

@@ -6,7 +6,6 @@
 #pragma once
 
 #include "sound/tiaintf.h"
-#include "emupal.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -39,18 +38,17 @@ struct player_gfx {
 
 // ======================> tia_video_device
 
-class tia_video_device :    public device_t,
-							public device_video_interface
+class tia_video_device : public device_t, public device_video_interface, public device_palette_interface
 {
 public:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	auto read_input_port_callback() { return m_read_input_port_cb.bind(); }
 	auto databus_contents_callback() { return m_databus_contents_cb.bind(); }
 	auto vsync_callback() { return m_vsync_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// construction/destruction
@@ -62,6 +60,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return TIA_PALETTE_LENGTH; }
+
+	void extend_palette();
+	virtual void init_palette() = 0;
 	void draw_sprite_helper(uint8_t* p, uint8_t *col, struct player_gfx *gfx, uint8_t GRP, uint8_t COLUP, uint8_t REFP);
 	void draw_missile_helper(uint8_t* p, uint8_t* col, int horz, int skipdelay, int latch, int start, uint8_t RESMP, uint8_t ENAM, uint8_t NUSIZ, uint8_t COLUM);
 	void draw_playfield_helper(uint8_t* p, uint8_t* col, int horz, uint8_t COLU, uint8_t REFPF);
@@ -77,31 +80,31 @@ protected:
 	int current_y();
 	void setup_pXgfx(void);
 	void update_bitmap(int next_x, int next_y);
-	DECLARE_WRITE8_MEMBER( WSYNC_w );
-	DECLARE_WRITE8_MEMBER( VSYNC_w );
-	DECLARE_WRITE8_MEMBER( VBLANK_w );
-	DECLARE_WRITE8_MEMBER( CTRLPF_w );
-	DECLARE_WRITE8_MEMBER( HMP0_w );
-	DECLARE_WRITE8_MEMBER( HMP1_w );
-	DECLARE_WRITE8_MEMBER( HMM0_w );
-	DECLARE_WRITE8_MEMBER( HMM1_w );
-	DECLARE_WRITE8_MEMBER( HMBL_w );
-	DECLARE_WRITE8_MEMBER( HMOVE_w );
-	DECLARE_WRITE8_MEMBER( RSYNC_w );
-	DECLARE_WRITE8_MEMBER( NUSIZ0_w );
-	DECLARE_WRITE8_MEMBER( NUSIZ1_w );
-	DECLARE_WRITE8_MEMBER( HMCLR_w );
-	DECLARE_WRITE8_MEMBER( CXCLR_w );
-	DECLARE_WRITE8_MEMBER( RESP0_w );
-	DECLARE_WRITE8_MEMBER( RESP1_w );
-	DECLARE_WRITE8_MEMBER( RESM0_w );
-	DECLARE_WRITE8_MEMBER( RESM1_w );
-	DECLARE_WRITE8_MEMBER( RESBL_w );
-	DECLARE_WRITE8_MEMBER( RESMP0_w );
-	DECLARE_WRITE8_MEMBER( RESMP1_w );
-	DECLARE_WRITE8_MEMBER( GRP0_w );
-	DECLARE_WRITE8_MEMBER( GRP1_w );
-	DECLARE_READ8_MEMBER( INPT_r );
+	void WSYNC_w();
+	void VSYNC_w(uint8_t data);
+	void VBLANK_w(uint8_t data);
+	void CTRLPF_w(uint8_t data);
+	void HMP0_w(uint8_t data);
+	void HMP1_w(uint8_t data);
+	void HMM0_w(uint8_t data);
+	void HMM1_w(uint8_t data);
+	void HMBL_w(uint8_t data);
+	void HMOVE_w(uint8_t data);
+	void RSYNC_w();
+	void NUSIZ0_w(uint8_t data);
+	void NUSIZ1_w(uint8_t data);
+	void HMCLR_w(uint8_t data);
+	void CXCLR_w();
+	void RESP0_w();
+	void RESP1_w();
+	void RESM0_w();
+	void RESM1_w();
+	void RESBL_w();
+	void RESMP0_w(uint8_t data);
+	void RESMP1_w(uint8_t data);
+	void GRP0_w(uint8_t data);
+	void GRP1_w(uint8_t data);
+	uint8_t INPT_r(offs_t offset);
 
 
 private:
@@ -196,7 +199,8 @@ private:
 	uint8_t REFLECT;      /* Should playfield be reflected or not */
 	uint8_t NUSIZx_changed;
 
-	std::unique_ptr<bitmap_ind16> helper[3];
+	bitmap_ind16 helper[2];
+	bitmap_rgb32 buffer;
 
 	uint16_t screen_height;
 
@@ -215,10 +219,7 @@ public:
 	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	void tia_pal_palette(palette_device &palette) const;
+	virtual void init_palette() override;
 };
 
 class tia_ntsc_video_device : public tia_video_device
@@ -233,10 +234,7 @@ public:
 	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	void tia_ntsc_palette(palette_device &palette) const;
+	virtual void init_palette() override;
 };
 
 

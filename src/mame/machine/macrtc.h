@@ -38,7 +38,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
@@ -46,40 +46,40 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	/* state of rTCEnb and rTCClk lines */
-	uint8_t m_rtc_rTCEnb;
-	uint8_t m_rtc_rTCClk;
+	uint8_t m_rtc_rTCEnb = 0;
+	uint8_t m_rtc_rTCClk = 0;
 
 	/* serial transmit/receive register : bits are shifted in/out of this byte */
-	uint8_t m_rtc_data_byte;
+	uint8_t m_rtc_data_byte = 0;
 	/* serial transmitted/received bit count */
-	uint8_t m_rtc_bit_count;
+	uint8_t m_rtc_bit_count = 0;
 	/* direction of the current transfer (0 : VIA->RTC, 1 : RTC->VIA) */
-	uint8_t m_rtc_data_dir;
+	uint8_t m_rtc_data_dir = 0;
 	/* when rtc_data_dir == 1, state of rTCData as set by RTC (-> data bit seen by VIA) */
-	uint8_t m_rtc_data_out;
+	uint8_t m_rtc_data_out = 0;
 
 	/* set to 1 when command in progress */
-	uint8_t m_rtc_cmd;
+	uint8_t m_rtc_cmd = 0;
 
 	/* write protect flag */
-	uint8_t m_rtc_write_protect;
+	uint8_t m_rtc_write_protect = 0;
 
 	/* internal seconds register */
-	uint8_t m_rtc_seconds[/*8*/4];
+	uint8_t m_rtc_seconds[/*8*/4]{};
 	/* 20-byte long PRAM, or 256-byte long XPRAM */
-	uint8_t m_pram[256];
+	uint8_t m_pram[256]{};
 	/* current extended address and RTC state */
-	uint8_t m_rtc_xpaddr;
-	uint8_t m_rtc_state;
-	uint8_t m_data_latch;
+	uint8_t m_rtc_xpaddr = 0;
+	uint8_t m_rtc_state = 0;
+	uint8_t m_data_latch = 0;
 
 	// timers
-	emu_timer *m_clock_timer;
+	emu_timer *m_clock_timer = nullptr;
 
 	void rtc_shift_data(int data);
 	void rtc_execute_cmd(int data);

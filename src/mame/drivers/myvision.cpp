@@ -32,7 +32,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -52,11 +52,11 @@ public:
 	void myvision(machine_config &config);
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
-	DECLARE_READ8_MEMBER( ay_port_a_r );
-	DECLARE_READ8_MEMBER( ay_port_b_r );
-	DECLARE_WRITE8_MEMBER( ay_port_a_w );
-	DECLARE_WRITE8_MEMBER( ay_port_b_w );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
+	uint8_t ay_port_a_r();
+	uint8_t ay_port_b_r();
+	void ay_port_a_w(uint8_t data);
+	void ay_port_b_w(uint8_t data);
 
 	void myvision_io(address_map &map);
 	void myvision_mem(address_map &map);
@@ -76,7 +76,7 @@ private:
 void myvision_state::myvision_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0x5fff)      // mapped by the cartslot
+	//map(0x0000, 0x5fff)      // mapped by the cartslot
 	map(0xa000, 0xa7ff).ram();
 	map(0xe000, 0xe000).rw("tms9918", FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
 	map(0xe002, 0xe002).rw("tms9918", FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
@@ -140,7 +140,7 @@ INPUT_PORTS_END
 void myvision_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_column));
 }
@@ -152,13 +152,13 @@ void myvision_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
+DEVICE_IMAGE_LOAD_MEMBER( myvision_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x4000 && size != 0x6000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -169,7 +169,7 @@ DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 }
 
 
-READ8_MEMBER( myvision_state::ay_port_a_r )
+uint8_t myvision_state::ay_port_a_r()
 {
 	uint8_t data = 0xFF;
 
@@ -197,24 +197,25 @@ READ8_MEMBER( myvision_state::ay_port_a_r )
 }
 
 
-READ8_MEMBER( myvision_state::ay_port_b_r )
+uint8_t myvision_state::ay_port_b_r()
 {
 	return 0xff;
 }
 
 
-WRITE8_MEMBER( myvision_state::ay_port_a_w )
+void myvision_state::ay_port_a_w(uint8_t data)
 {
 }
 
 
 // Upper 4 bits select column
-WRITE8_MEMBER( myvision_state::ay_port_b_w )
+void myvision_state::ay_port_b_w(uint8_t data)
 {
 	m_column = data;
 }
 
-MACHINE_CONFIG_START(myvision_state::myvision)
+void myvision_state::myvision(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &myvision_state::myvision_mem);
@@ -237,13 +238,13 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "myvision_cart")
-	MCFG_GENERIC_LOAD(myvision_state, cart)
-	//MCFG_GENERIC_MANDATORY
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "myvision_cart"));
+	cartslot.set_device_load(FUNC(myvision_state::cart_load));
+	//cartslot.set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( myvision )

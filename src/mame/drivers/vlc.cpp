@@ -135,7 +135,10 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
 
 #define MASTER_CLOCK    XTAL(16'000'000)
 #define MASTER_CPU      ((MASTER_CLOCK)/2)    // 8mhz
@@ -173,6 +176,7 @@ public:
 	void init_nevada();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -189,28 +193,26 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 
-	//uint8_t* m_videoram;
-	//uint8_t* m_colorram;
+	//uint8_t* m_videoram = nullptr;
+	//uint8_t* m_colorram = nullptr;
 
-	tilemap_t *m_tilemap;
-	uint16_t  m_datA40000;
+	tilemap_t *m_tilemap = nullptr;
+	uint16_t  m_datA40000 = 0U;
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
-	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nevada(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void nevada_palette(palette_device &palette) const;
 
 	template<int N> uint8_t duart_r(offs_t offset);
 	template<int N> void duart_w(offs_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ16_MEMBER(io_board_r);
-	DECLARE_WRITE16_MEMBER(io_board_w);
-	DECLARE_WRITE16_MEMBER (io_board_x);
-	DECLARE_READ16_MEMBER( nevada_sec_r );
-	DECLARE_WRITE16_MEMBER( nevada_sec_w );
-	DECLARE_WRITE16_MEMBER( vram_w );
-
-	DECLARE_MACHINE_START(nevada);
+	uint8_t rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, uint8_t data);
+	uint16_t io_board_r();
+	void io_board_w(uint16_t data);
+	void io_board_x(uint16_t data);
+	uint16_t nevada_sec_r();
+	void nevada_sec_w(uint16_t data);
+	void vram_w(offs_t offset, uint16_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -267,7 +269,7 @@ static const gfx_layout charlayout =
 
 /***************************************************************************/
 
-WRITE16_MEMBER( nevada_state::vram_w )
+void nevada_state::vram_w(offs_t offset, uint16_t data)
 {
 // Todo, Just for sample
 
@@ -291,7 +293,7 @@ TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
 	//int bank = (attr & 0x02) >> 1;
 	//int color = (attr & 0x3c) >> 2;
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 
 }
 
@@ -299,11 +301,11 @@ TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
 /***************************************************************************/
 void nevada_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nevada_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,31,31);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nevada_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 31,31);
 }
 
 /***************************************************************************/
-uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -360,36 +362,36 @@ void nevada_state::duart_w(offs_t offset, uint8_t data)
 /*********************    RTC SECTION       ********************************/
 /***************************************************************************/
 
-READ8_MEMBER(nevada_state::rtc_r)
+uint8_t nevada_state::rtc_r(offs_t offset)
 {
-	return m_rtc->read(space, offset >> 3);
+	return m_rtc->read(offset >> 3);
 }
 
-WRITE8_MEMBER(nevada_state::rtc_w)
+void nevada_state::rtc_w(offs_t offset, uint8_t data)
 {
-	m_rtc->write(space, offset >> 3, data);
+	m_rtc->write(offset >> 3, data);
 }
 
 
 /***************************************************************************/
-READ16_MEMBER(nevada_state::io_board_r)
+uint16_t nevada_state::io_board_r()
 {
 	// IO board Serial communication 0xA00000
 	return 1;
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::io_board_w)
+void nevada_state::io_board_w(uint16_t data)
 {
 	// IO board Serial communication 0xA00000 on bit0
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::io_board_x)
+void nevada_state::io_board_x(uint16_t data)
 {
 	// IO board Serial communication 0xA80000  on bit15
 }
 
 /***************************************************************************/
-READ16_MEMBER(nevada_state::nevada_sec_r )
+uint16_t nevada_state::nevada_sec_r()
 {
 //  D3..D0 = DOOR OPEN or Track STATE of PAL35
 	uint16_t res;
@@ -402,7 +404,7 @@ READ16_MEMBER(nevada_state::nevada_sec_r )
 	return res;
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::nevada_sec_w )
+void nevada_state::nevada_sec_w(uint16_t data)
 {
 	// 74LS173 $bits Register used LOWER bits D3..D0 for DOOR LOGIC SWITCH
 	m_datA40000 = data | 0x00f0;     // since D7..D4 are not used and are connected to PULLUP
@@ -559,7 +561,7 @@ INPUT_PORTS_END
 *     Machine start      *
 *************************/
 
-MACHINE_START_MEMBER(nevada_state, nevada)
+void nevada_state::machine_start()
 {
 	m_nvram->set_base(m_ram62256, 0x1000);
 }
@@ -578,8 +580,6 @@ void nevada_state::nevada(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(150));   /* 150ms Ds1232 TD to Ground */
 
-	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)
-
 	NVRAM(config, "nvram").set_custom_handler(FUNC(nevada_state::nvram_init));
 
 	// video hardware
@@ -589,7 +589,6 @@ void nevada_state::nevada(machine_config &config)
 	screen.set_size((42+1)*8, (32+1)*8);                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
 	screen.set_visarea(0*8, 31*8-1, 0*8, 31*8-1);    /* From MC6845 init, registers 01 & 06. */
 	screen.set_screen_update(FUNC(nevada_state::screen_update_nevada));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nevada);
 	PALETTE(config, "palette", FUNC(nevada_state::nevada_palette), 256);
@@ -672,6 +671,9 @@ void nevada_state::init_nevada()
 
 }
 /***************************************************************************/
+
+} // Anonymous namespace
+
 
 /*************************
 *      Game Drivers      *

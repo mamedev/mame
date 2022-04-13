@@ -83,9 +83,9 @@ offs_t unsp_disassembler::disassemble_fxxx_001_group(std::ostream& stream, offs_
 		uint8_t d =      (op & 0x0400) >> 10;
 
 		if (d)
-			util::stream_format(stream, "%s ds:[$04x],%d", bitops[bitop], offset);
+			util::stream_format(stream, "%s ds:[%04x],%d", bitops[bitop], ximm, offset);
 		else
-			util::stream_format(stream, "%s [$04x],%d", bitops[bitop], offset);
+			util::stream_format(stream, "%s [%04x],%d", bitops[bitop], ximm, offset);
 
 		return UNSP_DASM_OK;
 	}
@@ -265,6 +265,14 @@ offs_t unsp_disassembler::disassemble_fxxx_101_group(std::ostream& stream, offs_
 		util::stream_format(stream, "int fiq,irq");
 		return UNSP_DASM_OK;
 
+	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
+		util::stream_format(stream, "fir_mov on");
+		return UNSP_DASM_OK;
+
+	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
+		util::stream_format(stream, "fir_mov off");
+		return UNSP_DASM_OK;
+
 	case 0xf160: case 0xf360: case 0xf560: case 0xf760: case 0xf960: case 0xfb60: case 0xfd60: case 0xff60:
 	case 0xf168: case 0xf368: case 0xf568: case 0xf768: case 0xf968: case 0xfb68: case 0xfd68: case 0xff68:
 	case 0xf170: case 0xf370: case 0xf570: case 0xf770: case 0xf970: case 0xfb70: case 0xfd70: case 0xff70:
@@ -300,12 +308,19 @@ offs_t unsp_disassembler::disassemble_fxxx_101_group(std::ostream& stream, offs_
 		util::stream_format(stream, "<UNDEFINED>");
 		return UNSP_DASM_OK;
 	}
-
-	return UNSP_DASM_OK;
 }
 
-offs_t unsp_disassembler::disassemble_fxxx_110_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm)
+offs_t unsp_disassembler::disassemble_fxxx_110_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm, const data_buffer &opcodes)
 {
+	//                         |   | |
+
+	// some sources say this is FFc0, but smartfp clearly uses ff80
+	// EXTOP   1 1 1 1   1 1 1 1   1 0 0 0   0 0 0 0    (+16 bit imm)
+	if ((op == 0xff80) && m_iso >= 20)
+	{
+		return disassemble_extended_group(stream, pc, op, ximm, opcodes);
+	}
+
 	uint32_t len = 1;
 	//                         |   | |
 	// signed * signed  (size 16,1,2,3,4,5,6,7)
@@ -319,12 +334,6 @@ offs_t unsp_disassembler::disassemble_fxxx_110_group(std::ostream& stream, offs_
 offs_t unsp_disassembler::disassemble_fxxx_111_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm,const data_buffer &opcodes)
 {
 	uint32_t len = 1;
-	//                         |   | |
-	// EXTOP   1 1 1 1   1 1 1 1   1 1 0 0   0 0 0 0    (+16 bit imm)
-	if ((op == 0xffc0) && m_iso >= 20)
-	{
-		return disassemble_extended_group(stream, pc, op, ximm, opcodes);
-	}
 
 	// signed * signed  (size 8,9,10,11,12,13,14,15)
 	// MULS    1 1 1 1*  r r r 1*  1 1*s s   s r r r    (1* = sign bit, 1* = sign bit 1* = upper size bit)
@@ -360,7 +369,7 @@ offs_t unsp_disassembler::disassemble_fxxx_group(std::ostream &stream, offs_t pc
 		return disassemble_fxxx_101_group(stream, pc, op, ximm);
 
 	case 0x6:
-		return disassemble_fxxx_110_group(stream, pc, op, ximm);
+		return disassemble_fxxx_110_group(stream, pc, op, ximm, opcodes);
 
 	case 0x7:
 		return disassemble_fxxx_111_group(stream, pc, op, ximm, opcodes);

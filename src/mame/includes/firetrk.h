@@ -15,6 +15,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define FIRETRUCK_MOTOR_DATA    NODE_01
 #define FIRETRUCK_HORN_EN       NODE_02
@@ -72,29 +73,29 @@ public:
 	void montecar(machine_config &config);
 	void superbug(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(steer_dir_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(steer_flag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(skid_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(crash_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gear_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(steer_dir_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(steer_flag_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(skid_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(crash_r);
+	template <int P> DECLARE_READ_LINE_MEMBER(gear_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
 
 private:
-	DECLARE_WRITE8_MEMBER(firetrk_output_w);
-	DECLARE_WRITE8_MEMBER(superbug_output_w);
-	DECLARE_WRITE8_MEMBER(montecar_output_1_w);
-	DECLARE_WRITE8_MEMBER(montecar_output_2_w);
-	DECLARE_READ8_MEMBER(firetrk_dip_r);
-	DECLARE_READ8_MEMBER(montecar_dip_r);
-	DECLARE_READ8_MEMBER(firetrk_input_r);
-	DECLARE_READ8_MEMBER(montecar_input_r);
-	DECLARE_WRITE8_MEMBER(blink_on_w);
-	DECLARE_WRITE8_MEMBER(montecar_car_reset_w);
-	DECLARE_WRITE8_MEMBER(montecar_drone_reset_w);
-	DECLARE_WRITE8_MEMBER(steer_reset_w);
-	DECLARE_WRITE8_MEMBER(crash_reset_w);
+	void firetrk_output_w(uint8_t data);
+	void superbug_output_w(offs_t offset, uint8_t data);
+	void montecar_output_1_w(uint8_t data);
+	void montecar_output_2_w(uint8_t data);
+	uint8_t firetrk_dip_r(offs_t offset);
+	uint8_t montecar_dip_r(offs_t offset);
+	uint8_t firetrk_input_r(offs_t offset);
+	uint8_t montecar_input_r(offs_t offset);
+	void blink_on_w(uint8_t data);
+	void montecar_car_reset_w(uint8_t data);
+	void montecar_drone_reset_w(uint8_t data);
+	void steer_reset_w(uint8_t data);
+	void crash_reset_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(firetrk_get_tile_info1);
 	TILE_GET_INFO_MEMBER(superbug_get_tile_info1);
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info1);
@@ -109,13 +110,13 @@ private:
 	uint32_t screen_update_superbug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_montecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(firetrk_scanline);
-	DECLARE_WRITE8_MEMBER(firetrk_skid_reset_w);
-	DECLARE_WRITE8_MEMBER(montecar_skid_reset_w);
-	DECLARE_WRITE8_MEMBER(firetrk_crash_snd_w);
-	DECLARE_WRITE8_MEMBER(firetrk_skid_snd_w);
-	DECLARE_WRITE8_MEMBER(firetrk_motor_snd_w);
-	DECLARE_WRITE8_MEMBER(superbug_motor_snd_w);
-	DECLARE_WRITE8_MEMBER(firetrk_xtndply_w);
+	void firetrk_skid_reset_w(uint8_t data);
+	void montecar_skid_reset_w(uint8_t data);
+	void firetrk_crash_snd_w(uint8_t data);
+	void firetrk_skid_snd_w(uint8_t data);
+	void firetrk_motor_snd_w(uint8_t data);
+	void superbug_motor_snd_w(uint8_t data);
+	void firetrk_xtndply_w(uint8_t data);
 	void prom_to_palette(int number, uint8_t val);
 	void firetrk_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flash);
 	void superbug_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, int flash);
@@ -154,21 +155,21 @@ private:
 	optional_ioport_array<2> m_steer;
 	output_finder<4> m_leds;
 
-	uint8_t m_in_service_mode;
-	uint32_t m_dial[2];
-	uint8_t m_steer_dir[2];
-	uint8_t m_steer_flag[2];
-	uint8_t m_gear;
+	uint8_t m_in_service_mode = 0;
+	uint32_t m_dial[2]{};
+	uint8_t m_steer_dir[2]{};
+	uint8_t m_steer_flag[2]{};
+	uint8_t m_gear = 0;
 
-	uint8_t m_flash;
-	uint8_t m_crash[2];
-	uint8_t m_skid[2];
+	uint8_t m_flash = 0;
+	uint8_t m_crash[2]{};
+	uint8_t m_skid[2]{};
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
-	uint32_t m_color1_mask;
-	uint32_t m_color2_mask;
-	tilemap_t *m_tilemap1;
-	tilemap_t *m_tilemap2;
+	uint32_t m_color1_mask = 0;
+	uint32_t m_color2_mask = 0;
+	tilemap_t *m_tilemap1 = nullptr;
+	tilemap_t *m_tilemap2 = nullptr;
 };
 
 

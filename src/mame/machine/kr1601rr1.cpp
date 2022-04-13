@@ -17,7 +17,6 @@
 
 #include <algorithm>
 
-#define LOG_GENERAL (1U <<  0)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
@@ -36,7 +35,7 @@ kr1601rr1_device::kr1601rr1_device(const machine_config &mconfig, const char *ta
 {
 }
 
-READ8_MEMBER( kr1601rr1_device::read )
+uint8_t kr1601rr1_device::read(offs_t offset)
 {
 	assert(EAROM_SIZE > offset);
 	if (m_earom_mode == EAROM_READ)
@@ -53,7 +52,7 @@ READ8_MEMBER( kr1601rr1_device::read )
  * b7..b4 = CS _PR _ER RD
  * b3..b0 = data
  */
-WRITE8_MEMBER( kr1601rr1_device::write )
+void kr1601rr1_device::write(offs_t offset, uint8_t data)
 {
 	assert(EAROM_SIZE > offset);
 
@@ -119,9 +118,10 @@ void kr1601rr1_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void kr1601rr1_device::nvram_read(emu_file &file)
+bool kr1601rr1_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_earom, EAROM_SIZE);
+	size_t actual;
+	return !file.read(m_earom, EAROM_SIZE, actual) && actual == EAROM_SIZE;
 }
 
 //-------------------------------------------------
@@ -129,9 +129,10 @@ void kr1601rr1_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void kr1601rr1_device::nvram_write(emu_file &file)
+bool kr1601rr1_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_earom, EAROM_SIZE);
+	size_t actual;
+	return !file.write(m_earom, EAROM_SIZE, actual) && actual == EAROM_SIZE;
 }
 
 //-------------------------------------------------

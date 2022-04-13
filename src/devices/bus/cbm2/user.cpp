@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(CBM2_USER_PORT, cbm2_user_port_device, "cbm2_user_port", "CBM
 //-------------------------------------------------
 
 device_cbm2_user_port_interface::device_cbm2_user_port_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig,device)
+	device_interface(device, "cbm2user")
 {
 	m_slot = dynamic_cast<cbm2_user_port_device *>(device.owner());
 }
@@ -45,11 +45,12 @@ device_cbm2_user_port_interface::device_cbm2_user_port_interface(const machine_c
 
 cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CBM2_USER_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_cbm2_user_port_interface>(mconfig, *this),
 	m_write_irq(*this),
 	m_write_sp(*this),
 	m_write_cnt(*this),
-	m_write_flag(*this), m_card(nullptr)
+	m_write_flag(*this),
+	m_card(nullptr)
 {
 }
 
@@ -60,7 +61,7 @@ cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, cons
 
 void cbm2_user_port_device::device_start()
 {
-	m_card = dynamic_cast<device_cbm2_user_port_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();

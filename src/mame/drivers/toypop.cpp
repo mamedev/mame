@@ -88,25 +88,25 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
 	DECLARE_WRITE_LINE_MEMBER(slave_vblank_irq);
 
-	DECLARE_READ8_MEMBER(irq_enable_r);
-	DECLARE_WRITE8_MEMBER(irq_disable_w);
-	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
+	uint8_t irq_enable_r();
+	void irq_disable_w(uint8_t data);
+	void irq_ctrl_w(offs_t offset, uint8_t data);
 	void toypop_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(dipA_l);
-	DECLARE_READ8_MEMBER(dipA_h);
-	DECLARE_READ8_MEMBER(dipB_l);
-	DECLARE_READ8_MEMBER(dipB_h);
-	//DECLARE_WRITE8_MEMBER(out_coin0);
-	//DECLARE_WRITE8_MEMBER(out_coin1);
-	DECLARE_WRITE8_MEMBER(pal_bank_w);
-	DECLARE_WRITE8_MEMBER(flip);
-	DECLARE_WRITE8_MEMBER(slave_halt_ctrl_w);
-	DECLARE_READ8_MEMBER(slave_shared_r);
-	DECLARE_WRITE8_MEMBER(slave_shared_w);
-	DECLARE_WRITE16_MEMBER(slave_irq_enable_w);
-	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
-	DECLARE_READ8_MEMBER(bg_rmw_r);
-	DECLARE_WRITE8_MEMBER(bg_rmw_w);
+	uint8_t dipA_l();
+	uint8_t dipA_h();
+	uint8_t dipB_l();
+	uint8_t dipB_h();
+	//void out_coin0(uint8_t data);
+	//void out_coin1(uint8_t data);
+	void pal_bank_w(offs_t offset, uint8_t data);
+	void flip(uint8_t data);
+	void slave_halt_ctrl_w(offs_t offset, uint8_t data);
+	uint8_t slave_shared_r(offs_t offset);
+	void slave_shared_w(offs_t offset, uint8_t data);
+	void slave_irq_enable_w(offs_t offset, uint16_t data);
+	void sound_halt_ctrl_w(offs_t offset, uint8_t data);
+	uint8_t bg_rmw_r(offs_t offset);
+	void bg_rmw_w(offs_t offset, uint8_t data);
 
 	void master_liblrabl_map(address_map &map);
 	void master_toypop_map(address_map &map);
@@ -120,9 +120,9 @@ private:
 
 //  virtual void video_start() override;
 
-	bool m_master_irq_enable;
-	bool m_slave_irq_enable;
-	uint8_t m_pal_bank;
+	bool m_master_irq_enable = false;
+	bool m_slave_irq_enable = false;
+	uint8_t m_pal_bank = 0;
 
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
@@ -180,14 +180,14 @@ void namcos16_state::toypop_palette(palette_device &palette) const
 
 void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
 {
-	const uint16_t pal_base = 0x300 + (m_pal_bank << 4);
-	const uint32_t src_base = 0x200/2;
-	const uint16_t src_pitch = 288 / 2;
+	uint16_t const pal_base = 0x300 + (m_pal_bank << 4);
+	uint32_t const src_base = 0x200/2;
+	uint16_t const src_pitch = 288 / 2;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint16_t *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
-		uint16_t *dst = &bitmap.pix16(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
+		uint16_t const *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
+		uint16_t *dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
@@ -279,6 +279,9 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		uint8_t width = ((base_spriteram[count+bank2] & 4) >> 2) + 1;
 		uint8_t height = ((base_spriteram[count+bank2] & 8) >> 3) + 1;
 
+		tile &= ~(width - 1);
+		tile &= ~((height - 1) << 1);
+
 		if (flip)
 		{
 			fx ^= 1;
@@ -308,49 +311,49 @@ uint32_t namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ8_MEMBER(namcos16_state::irq_enable_r)
+uint8_t namcos16_state::irq_enable_r()
 {
 	m_master_irq_enable = true;
 	return 0;
 }
 
-WRITE8_MEMBER(namcos16_state::irq_disable_w)
+void namcos16_state::irq_disable_w(uint8_t data)
 {
 	m_master_irq_enable = false;
 }
 
 
-WRITE8_MEMBER(namcos16_state::irq_ctrl_w)
+void namcos16_state::irq_ctrl_w(offs_t offset, uint8_t data)
 {
 	m_master_irq_enable = (offset & 0x0800) ? false : true;
 }
 
-WRITE8_MEMBER(namcos16_state::slave_halt_ctrl_w)
+void namcos16_state::slave_halt_ctrl_w(offs_t offset, uint8_t data)
 {
 	m_slave_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(namcos16_state::sound_halt_ctrl_w)
+void namcos16_state::sound_halt_ctrl_w(offs_t offset, uint8_t data)
 {
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(namcos16_state::slave_shared_r)
+uint8_t namcos16_state::slave_shared_r(offs_t offset)
 {
 	return m_slave_sharedram[offset];
 }
 
-WRITE8_MEMBER(namcos16_state::slave_shared_w)
+void namcos16_state::slave_shared_w(offs_t offset, uint8_t data)
 {
 	m_slave_sharedram[offset] = data;
 }
 
-WRITE16_MEMBER(namcos16_state::slave_irq_enable_w)
+void namcos16_state::slave_irq_enable_w(offs_t offset, uint16_t data)
 {
 	m_slave_irq_enable = (offset & 0x40000) ? false : true;
 }
 
-READ8_MEMBER(namcos16_state::bg_rmw_r)
+uint8_t namcos16_state::bg_rmw_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -361,23 +364,23 @@ READ8_MEMBER(namcos16_state::bg_rmw_r)
 	return res;
 }
 
-WRITE8_MEMBER(namcos16_state::bg_rmw_w)
+void namcos16_state::bg_rmw_w(offs_t offset, uint8_t data)
 {
 	// note: following offset is written as offset * 2
 	m_bgvram[offset] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-READ8_MEMBER(namcos16_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
-READ8_MEMBER(namcos16_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
-READ8_MEMBER(namcos16_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
-READ8_MEMBER(namcos16_state::dipB_h){ return ioport("DSW2")->read() >> 4; }           // dips B
+uint8_t namcos16_state::dipA_l() { return ioport("DSW1")->read(); }                // dips A
+uint8_t namcos16_state::dipA_h() { return ioport("DSW1")->read() >> 4; }           // dips A
+uint8_t namcos16_state::dipB_l() { return ioport("DSW2")->read(); }                // dips B
+uint8_t namcos16_state::dipB_h() { return ioport("DSW2")->read() >> 4; }           // dips B
 
-WRITE8_MEMBER(namcos16_state::flip)
+void namcos16_state::flip(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE8_MEMBER(namcos16_state::pal_bank_w)
+void namcos16_state::pal_bank_w(offs_t offset, uint8_t data)
 {
 	m_pal_bank = offset & 1;
 }
@@ -753,9 +756,9 @@ ROM_START( liblrabl )
 	ROM_REGION( 0x2000, "sound_rom", 0 )
 	ROM_LOAD( "2c.rom",   0x0000, 0x2000, CRC(7c09e50a) SHA1(5f004d60bbb7355e008a9cda137b28bc2192b8ef) )
 
-	ROM_REGION( 0x8000, "slave_rom", 0 )
-	ROM_LOAD16_BYTE("8c.rom",    0x0001, 0x4000, CRC(a00cd959) SHA1(cc5621103c31cfbc65941615cab391db0f74e6ce) )
-	ROM_LOAD16_BYTE("10c.rom",   0x0000, 0x4000, CRC(09ce209b) SHA1(2ed46d6592f8227bac8ab54963d9a300706ade47) )
+	ROM_REGION16_BE( 0x8000, "slave_rom", 0 )
+	ROM_LOAD16_BYTE("8c.rom",    0x0000, 0x4000, CRC(a00cd959) SHA1(cc5621103c31cfbc65941615cab391db0f74e6ce) )
+	ROM_LOAD16_BYTE("10c.rom",   0x0001, 0x4000, CRC(09ce209b) SHA1(2ed46d6592f8227bac8ab54963d9a300706ade47) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "5p.rom",   0x0000, 0x2000, CRC(3b4937f0) SHA1(06d9de576f1c2262c34aeb91054e68c9298af688) )
@@ -782,9 +785,9 @@ ROM_START( toypop )
 	ROM_REGION( 0x2000, "sound_rom", 0 )
 	ROM_LOAD( "tp1-3.2c", 0x0000, 0x2000, CRC(5f3bf6e2) SHA1(d1b3335661b9b23cb10001416c515b77b5e783e9) )
 
-	ROM_REGION( 0x8000, "slave_rom", 0 )
-	ROM_LOAD16_BYTE("tp1-4.8c",  0x0001, 0x4000, CRC(76997db3) SHA1(5023a2f20a5f2c9baff130f6832583493c71f883) )
-	ROM_LOAD16_BYTE("tp1-5.10c", 0x0000, 0x4000, CRC(37de8786) SHA1(710365e34c05d01815844c414518f93234b6160b) )
+	ROM_REGION16_BE( 0x8000, "slave_rom", 0 )
+	ROM_LOAD16_BYTE("tp1-4.8c",  0x0000, 0x4000, CRC(76997db3) SHA1(5023a2f20a5f2c9baff130f6832583493c71f883) )
+	ROM_LOAD16_BYTE("tp1-5.10c", 0x0001, 0x4000, CRC(37de8786) SHA1(710365e34c05d01815844c414518f93234b6160b) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "tp1-7.5p", 0x0000, 0x2000, CRC(95076f9e) SHA1(1e3d32b21f6d46591ec3921aba51f672d64a9023) )

@@ -1,4 +1,5 @@
-// license:BSD-3-Clause copyright-holders: Joakim Larsson Edstrom
+// license:BSD-3-Clause
+// copyright-holders: Joakim Larsson Edstrom
 /***************************************************************************
 
     MPCC Multi-Protocol Communications Controller emulation
@@ -811,7 +812,7 @@ void mpcc_device::update_interrupts(int source)
 //-------------------------------------------------
 //  Read register
 //-------------------------------------------------
-READ8_MEMBER( mpcc_device::read )
+uint8_t mpcc_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -848,7 +849,7 @@ READ8_MEMBER( mpcc_device::read )
 //-------------------------------------------------
 //  Write register
 //-------------------------------------------------
-WRITE8_MEMBER( mpcc_device::write )
+void mpcc_device::write(offs_t offset, uint8_t data)
 {
 	LOGSETUP(" * %s Reg %02x <- %02x  \n", tag(), offset, data);
 	switch(offset)

@@ -159,7 +159,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -209,7 +209,7 @@ void wwfsstar_state::sound_map(address_map &map)
  as used by the above memory map
 *******************************************************************************/
 
-WRITE16_MEMBER(wwfsstar_state::scroll_w)
+void wwfsstar_state::scroll_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -222,12 +222,12 @@ WRITE16_MEMBER(wwfsstar_state::scroll_w)
 	}
 }
 
-WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
+void wwfsstar_state::flipscreen_w(uint16_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE16_MEMBER(wwfsstar_state::irqack_w)
+void wwfsstar_state::irqack_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(6, CLEAR_LINE);
@@ -280,7 +280,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::scanline)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(wwfsstar_state::vblank_r)
+READ_LINE_MEMBER(wwfsstar_state::vblank_r)
 {
 	return m_vblank;
 }
@@ -315,7 +315,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Button B (1P VS 2P - Buy-in)")
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfsstar_state, vblank_r, nullptr) /* VBlank */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wwfsstar_state, vblank_r) // VBlank
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )

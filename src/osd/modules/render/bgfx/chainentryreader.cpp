@@ -9,6 +9,7 @@
 #include <string>
 
 #include "emu.h"
+#include "fileio.h"
 #include "rendutil.h"
 #include <modules/render/copyutil.h>
 
@@ -34,11 +35,11 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 {
 	if (!validate_parameters(value, prefix))
 	{
-		printf("Failed validation\n");
+		osd_printf_error("Chain entry failed validation.\n");
 		return nullptr;
 	}
 
-	bgfx_effect* effect = chains.effects().effect(value["effect"].GetString());
+	bgfx_effect* effect = chains.effects().get_or_load_effect(chains.options(), value["effect"].GetString());
 	if (effect == nullptr)
 	{
 		return nullptr;
@@ -84,7 +85,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 					texture_name = chains.options().value(option.c_str());
 				}
 
-				if (texture_name != "" && texture_name != "screen")
+				if (texture_name != "" && texture_name != "screen" && texture_name != "palette")
 				{
 					if (selection == "")
 					{
@@ -109,59 +110,48 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 						}
 
 						// get directory of file
-						std::string directory_path = std::string(chains.options().art_path());
-						std::string file_directory = "";
 						const size_t last_slash = texture_name.rfind('/');
-						if (last_slash != std::string::npos)
+						const std::string file_directory = last_slash != std::string::npos ? texture_name.substr(0, last_slash) : std::string();
+						file_enumerator directory_path(chains.options().art_path());
+						while (const osd::directory::entry *entry = directory_path.next(file_directory.empty() ? nullptr : file_directory.c_str()))
 						{
-							file_directory = texture_name.substr(0, last_slash);
-
-							directory_path += "/" + file_directory;
-						}
-
-						osd::directory::ptr directory = osd::directory::open(directory_path);
-						if (directory)
-						{
-							for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
+							if (entry->type == osd::directory::entry::entry_type::FILE)
 							{
-								if (entry->type == osd::directory::entry::entry_type::FILE)
+								std::string file(entry->name);
+								std::string extension(".png");
+
+								// split into file name and extension
+								std::string file_name;
+								std::string file_extension;
+								const size_t last_dot = file.rfind('.');
+								if (last_dot != std::string::npos)
 								{
-									std::string file(entry->name);
-									std::string extension(".png");
+									file_name = file.substr(0, last_dot);
+									file_extension = file.substr(last_dot, file.length() - last_dot);
+								}
 
-									// split into file name and extension
-									std::string file_name;
-									std::string file_extension;
-									const size_t last_dot = file.rfind('.');
-									if (last_dot != std::string::npos)
-									{
-										file_name = file.substr(0, last_dot);
-										file_extension = file.substr(last_dot, file.length() - last_dot);
-									}
+								std::string file_path;
+								if (file_directory == "")
+								{
+									file_path = file;
+								}
+								else
+								{
+									file_path = file_directory + PATH_SEPARATOR + file;
+								}
 
-									std::string file_path;
-									if (file_directory == "")
+								// check for .png extension
+								if (file_extension == extension && std::find(texture_names.begin(), texture_names.end(), file_path) == texture_names.end())
+								{
+									// create textures for all files containd in the path of the specified file name
+									uint32_t flags = bilinear ? 0u : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
+									flags |= clamp ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_W_CLAMP) : 0u;
+									bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), file_path, file_path, flags, screen_index);
+									if (texture == nullptr)
 									{
-										file_path = file;
+										return nullptr;
 									}
-									else
-									{
-										file_path = file_directory + "/" + file;
-									}
-
-									// check for .png extension
-									if (file_extension == extension)
-									{
-										// create textures for all files containd in the path of the specified file name
-										uint32_t flags = bilinear ? 0u : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
-										flags |= clamp ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_W_CLAMP) : 0u;
-										bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), file_path, file_path, flags, screen_index);
-										if (texture == nullptr)
-										{
-											return nullptr;
-										}
-										texture_names.push_back(file_path);
-									}
+									texture_names.push_back(file_path);
 								}
 							}
 						}
@@ -178,11 +168,15 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 			}
 
 			std::string sampler = input["sampler"].GetString();
-			bgfx_input_pair* input_pair = new bgfx_input_pair(i, sampler, texture_name, texture_names, selection, chains, screen_index);
+			auto* input_pair = new bgfx_input_pair(i, sampler, texture_name, texture_names, selection, chains, screen_index);
 			inputs.push_back(input_pair);
 		}
 	}
 
+	// Parse whether or not to apply screen tint in this pass
+	bool applytint = get_bool(value, "applytint", false);
+
+	// Parse uniforms
 	std::vector<bgfx_entry_uniform*> uniforms;
 	if (value.HasMember("uniforms"))
 	{
@@ -228,7 +222,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 	}
 
 	std::string output = value["output"].GetString();
-	return new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, chains.targets(), output);
+	return new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, chains.targets(), output, applytint);
 }
 
 bool chain_entry_reader::validate_parameters(const Value& value, std::string prefix)
@@ -242,5 +236,6 @@ bool chain_entry_reader::validate_parameters(const Value& value, std::string pre
 	if (!READER_CHECK(!value.HasMember("input") || value["input"].IsArray(), (prefix + "Value 'input' must be an array\n").c_str())) return false;
 	if (!READER_CHECK(!value.HasMember("uniforms") || value["uniforms"].IsArray(), (prefix + "Value 'uniforms' must be an array\n").c_str())) return false;
 	if (!READER_CHECK(!value.HasMember("disablewhen") || value["disablewhen"].IsArray(), (prefix + "Value 'disablewhen' must be an array\n").c_str())) return false;
+	if (!READER_CHECK(!value.HasMember("applytint") || value["applytint"].IsBool(), (prefix + "Value 'applytint' must be a bool\n").c_str())) return false;
 	return true;
 }

@@ -62,18 +62,18 @@ private:
 	output_finder<> m_led_comm_err;
 	optional_ioport_array<4> m_lightgun_ports;
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(io_pa_r);
-	DECLARE_READ8_MEMBER(io_pb_r);
-	DECLARE_READ8_MEMBER(io_pc_r);
-	DECLARE_WRITE8_MEMBER(io_pd_w);
-	DECLARE_READ8_MEMBER(io_pe_r);
-	DECLARE_WRITE8_MEMBER(io_pe_w);
-	DECLARE_WRITE8_MEMBER(io_pf_w);
-	DECLARE_WRITE8_MEMBER(io_pg_w);
-	DECLARE_READ8_MEMBER(fpga_r);
-	DECLARE_WRITE8_MEMBER(fpga_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t io_pa_r();
+	uint8_t io_pb_r();
+	uint8_t io_pc_r();
+	void io_pd_w(uint8_t data);
+	uint8_t io_pe_r();
+	void io_pe_w(uint8_t data);
+	void io_pf_w(uint8_t data);
+	void io_pg_w(uint8_t data);
+	uint8_t fpga_r(offs_t offset);
+	void fpga_w(uint8_t data);
 
 	ioport_value analog0_r();
 	ioport_value analog1_r();
@@ -82,10 +82,10 @@ private:
 
 	devcb_read8 m_read_cb;
 	devcb_write8 m_write_cb;
-	devcb_read8 m_in_cb[3];
+	devcb_read8::array<3> m_in_cb;
 	devcb_read8 m_drive_read_cb;
 	devcb_write8 m_drive_write_cb;
-	devcb_read8 m_an_cb[8];
+	devcb_read8::array<8> m_an_cb;
 	devcb_write8 m_output_cb;
 
 	bool m_secondary_controls;

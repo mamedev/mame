@@ -38,13 +38,12 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
+
+#include "formats/ms0515_dsk.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-#include "formats/ms0515_dsk.h"
 
 #include "ms0515.lh"
 
@@ -54,12 +53,14 @@
 #define LOG_SYSREG  (1U <<  2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_BANK | LOG_SYSREG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
 #define LOGSYSREG(format, ...)  LOGMASKED(LOG_SYSREG, "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
 
+
+namespace {
 
 class ms0515_state : public driver_device
 {
@@ -69,19 +70,23 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
 		, m_fdc(*this, "vg93")
-		, m_floppy0(*this, "vg93:0:525qd")
-		, m_floppy1(*this, "vg93:1:525qd")
+		, m_floppies(*this, "vg93:%u", 0U)
 		, m_i8251line(*this, "i8251line")
 		, m_rs232(*this, "rs232")
 		, m_i8251kbd(*this, "i8251kbd")
 		, m_ms7004(*this, "ms7004")
 		, m_pit8253(*this, "pit8253")
 		, m_speaker(*this, "speaker")
+		, m_bank(*this, "bank%u", 0U)
+		, m_led9(*this, "led9")
+		, m_led16(*this, "led16")
+		, m_led17(*this, "led17")
 	{ }
 
 	void ms0515(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -89,20 +94,20 @@ private:
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
-	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
+	void ms0515_bank_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(ms0515_halt_r);
-	DECLARE_WRITE16_MEMBER(ms0515_halt_w);
+	uint16_t ms0515_halt_r();
+	void ms0515_halt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(ms0515_porta_w);
-	DECLARE_READ8_MEMBER(ms0515_portb_r);
-	DECLARE_WRITE8_MEMBER(ms0515_portc_w);
+	void ms0515_porta_w(uint8_t data);
+	uint8_t ms0515_portb_r();
+	void ms0515_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(irq2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq5_w);
@@ -117,21 +122,24 @@ private:
 	required_device<t11_device> m_maincpu; // actual CPU is T11 clone, KR1807VM1
 	required_device<ram_device> m_ram;
 	required_device<kr1818vg93_device> m_fdc;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppies;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
 	required_device<i8251_device> m_i8251kbd;
 	required_device<ms7004_device> m_ms7004;
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
+	required_memory_bank_array<7> m_bank;
+	output_finder<> m_led9;
+	output_finder<> m_led16;
+	output_finder<> m_led17;
 
-	uint8_t *m_video_ram;
-	uint8_t m_sysrega, m_sysregc;
-	uint16_t m_bankreg, m_haltreg;
-	uint16_t m_irqs;
-	int m_blink;
-	floppy_image_device *m_floppy;
+	uint8_t *m_video_ram = nullptr;
+	uint8_t m_sysrega = 0, m_sysregc = 0;
+	uint16_t m_bankreg = 0, m_haltreg = 0;
+	uint16_t m_irqs = 0;
+	int m_blink = 0;
+	floppy_image_device *m_floppy = nullptr;
 };
 
 void ms0515_state::ms0515_mem(address_map &map)
@@ -190,51 +198,51 @@ void ms0515_state::ms0515_mem(address_map &map)
  * 13   parallel port ... signal
  * 14-15 unused
  */
-WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
+void ms0515_state::ms0515_bank_w(uint16_t data)
 {
 	uint8_t *ram = m_ram->pointer();
 
-	LOGBANK("Bank <- %04x & %04x (vblank %d timer %d)\n", data, mem_mask, BIT(data, 8), BIT(data, 9));
+	LOGBANK("Bank <- %04x (vblank %d timer %d)\n", data, BIT(data, 8), BIT(data, 9));
 
 	if (BIT(data ^ m_bankreg, 8)) irq2_w(BIT(data, 8) ? ASSERT_LINE : CLEAR_LINE);
 
 	m_bankreg = data;
 
-	membank("bank0")->set_base(ram + 0000000 + BIT(data, 0) * 0160000);
-	membank("bank1")->set_base(ram + 0020000 + BIT(data, 1) * 0160000);
-	membank("bank2")->set_base(ram + 0040000 + BIT(data, 2) * 0160000);
-	membank("bank3")->set_base(ram + 0060000 + BIT(data, 3) * 0160000);
-	membank("bank4")->set_base(ram + 0100000 + BIT(data, 4) * 0160000);
-	membank("bank5")->set_base(ram + 0120000 + BIT(data, 5) * 0160000);
-	membank("bank6")->set_base(ram + 0140000 + BIT(data, 6) * 0160000);
+	m_bank[0]->set_base(ram + 0000000 + BIT(data, 0) * 0160000);
+	m_bank[1]->set_base(ram + 0020000 + BIT(data, 1) * 0160000);
+	m_bank[2]->set_base(ram + 0040000 + BIT(data, 2) * 0160000);
+	m_bank[3]->set_base(ram + 0060000 + BIT(data, 3) * 0160000);
+	m_bank[4]->set_base(ram + 0100000 + BIT(data, 4) * 0160000);
+	m_bank[5]->set_base(ram + 0120000 + BIT(data, 5) * 0160000);
+	m_bank[6]->set_base(ram + 0140000 + BIT(data, 6) * 0160000);
 
 	if (BIT(data, 7))
 	{
 		switch ((data >> 10) & 3)
 		{
 		case 0: // 000000 - 037777
-			membank("bank0")->set_base(ram + 0000000 + 0340000);
-			membank("bank1")->set_base(ram + 0020000 + 0340000);
+			m_bank[0]->set_base(ram + 0000000 + 0340000);
+			m_bank[1]->set_base(ram + 0020000 + 0340000);
 			break;
 		case 1: // 040000 - 077777
-			membank("bank2")->set_base(ram + 0000000 + 0340000);
-			membank("bank3")->set_base(ram + 0020000 + 0340000);
+			m_bank[2]->set_base(ram + 0000000 + 0340000);
+			m_bank[3]->set_base(ram + 0020000 + 0340000);
 			break;
 		case 2:
 		case 3: // 100000 - 137777
-			membank("bank4")->set_base(ram + 0000000 + 0340000);
-			membank("bank5")->set_base(ram + 0020000 + 0340000);
+			m_bank[4]->set_base(ram + 0000000 + 0340000);
+			m_bank[5]->set_base(ram + 0020000 + 0340000);
 			break;
 		}
 	}
 }
 
-READ16_MEMBER(ms0515_state::ms0515_halt_r)
+uint16_t ms0515_state::ms0515_halt_r()
 {
 	return m_haltreg;
 }
 
-WRITE16_MEMBER(ms0515_state::ms0515_halt_w)
+void ms0515_state::ms0515_halt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_haltreg);
 }
@@ -255,21 +263,21 @@ WRITE16_MEMBER(ms0515_state::ms0515_halt_w)
  *
  * MZ1 = drive 1 side 0-1
  */
-WRITE8_MEMBER(ms0515_state::ms0515_porta_w)
+void ms0515_state::ms0515_porta_w(uint8_t data)
 {
 	LOGSYSREG("Sysreg A <- %02x\n", data);
 
-	output().set_value("led16", BIT(data, 5));
-	output().set_value("led9", BIT(data, 4));
+	m_led16 = BIT(data, 5);
+	m_led9 = BIT(data, 4);
 
 	switch (data & 3)
 	{
 	case 0:
-		m_floppy = m_floppy0;
+		m_floppy = m_floppies[0]->get_device();
 		break;
 
 	case 1:
-		m_floppy = m_floppy1;
+		m_floppy = m_floppies[1]->get_device();
 		break;
 
 	default:
@@ -285,8 +293,9 @@ WRITE8_MEMBER(ms0515_state::ms0515_porta_w)
 	}
 	else
 	{
-		m_floppy0->mon_w(1);
-		m_floppy1->mon_w(1);
+		for (auto &floppy : m_floppies)
+			if (floppy->get_device() != nullptr)
+				floppy->get_device()->mon_w(1);
 	}
 
 	m_sysrega = data;
@@ -300,7 +309,7 @@ WRITE8_MEMBER(ms0515_state::ms0515_porta_w)
  * b1 -- floppy drq (1 -- ready)
  * b0 -- floppy intrq (0 -- ready)
  */
-READ8_MEMBER(ms0515_state::ms0515_portb_r)
+uint8_t ms0515_state::ms0515_portb_r()
 {
 	uint8_t data;
 
@@ -326,12 +335,12 @@ READ8_MEMBER(ms0515_state::ms0515_portb_r)
  * b3 -- video resolution, 0: 320x200, 1: 640x200
  * b2-0 -- overscan color
  */
-WRITE8_MEMBER(ms0515_state::ms0515_portc_w)
+void ms0515_state::ms0515_portc_w(uint8_t data)
 {
 	LOGSYSREG("Sysreg C <- %02x\n", data);
 
 	m_pit8253->write_gate2(BIT(data, 7));
-	output().set_value("led17", BIT(data, 4));
+	m_led17 = BIT(data, 4);
 
 	m_sysregc = data;
 }
@@ -353,10 +362,17 @@ WRITE_LINE_MEMBER(ms0515_state::pit8253_out2_changed)
 	m_speaker->level_w(state);
 }
 
+void ms0515_state::machine_start()
+{
+	m_led9.resolve();
+	m_led16.resolve();
+	m_led17.resolve();
+}
+
 void ms0515_state::machine_reset()
 {
 	uint8_t *ram = m_ram->pointer();
-	ms0515_bank_w(machine().dummy_space(), 0, 0);
+	ms0515_bank_w(0);
 
 	m_video_ram = ram + 0000000 + 0340000;
 	m_blink = 0;
@@ -374,9 +390,11 @@ static INPUT_PORTS_START( ms0515 )
 	PORT_DIPSETTING(0x02, "72 Hz")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( ms0515_state::floppy_formats )
-	FLOPPY_MS0515_FORMAT
-FLOPPY_FORMATS_END
+void ms0515_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MS0515_FORMAT);
+}
 
 static void ms0515_floppies(device_slot_interface &device)
 {
@@ -385,34 +403,33 @@ static void ms0515_floppies(device_slot_interface &device)
 
 uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, x, b;
 	int addr = 0;
 
 	if (BIT(m_sysregc, 3))
 	{
 		uint8_t fg = m_sysregc & 7;
 		uint8_t bg = fg ^ 7;
-		for (y = 0; y < 200; y++)
+		for (int y = 0; y < 200; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
 				uint16_t code = (m_video_ram[addr++] << 8);
-				code += m_video_ram[addr++];
-				for (b = 0; b < 16; b++)
+				code |= m_video_ram[addr++];
+				for (int b = 0; b < 16; b++)
 				{
 					// In lower res mode we will just double pixels
-					bitmap.pix16(y, horpos++) = ((code >> (15 - b)) & 0x01) ? bg : fg;
+					bitmap.pix(y, horpos++) = ((code >> (15 - b)) & 0x01) ? bg : fg;
 				}
 			}
 		}
 	}
 	else
 	{
-		for (y = 0; y < 200; y++)
+		for (int y = 0; y < 200; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
 				uint8_t code = m_video_ram[addr++];
 				uint8_t attr = m_video_ram[addr++];
@@ -425,11 +442,11 @@ uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 
 					bg = tmp;
 					m_blink = -1;
 				}
-				for (b = 0; b < 8; b++)
+				for (int b = 0; b < 8; b++)
 				{
 					// In lower res mode we will just double pixels
-					bitmap.pix16(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
-					bitmap.pix16(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
+					bitmap.pix(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
+					bitmap.pix(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
 				}
 			}
 		}
@@ -479,10 +496,10 @@ void ms0515_state::irq_encoder(int irq, int state)
 	{
 		if (m_irqs & (1 << i)) break;
 	}
-	m_maincpu->set_input_line(3, (i & 8) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, (i & 4) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(1, (i & 2) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(0, (i & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP3_LINE, (i & 8) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP2_LINE, (i & 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP1_LINE, (i & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(t11_device::CP0_LINE, (i & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -532,7 +549,7 @@ void ms0515_state::ms0515(machine_config &config)
 
 	/* video hardware -- 50 Hz refresh rate */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw( XTAL(15'000'000), 958,0,640, 313,0,200 );
+	screen.set_raw(XTAL(15'000'000), 958, 0, 640, 313, 0, 200);
 	screen.set_screen_update(FUNC(ms0515_state::screen_update_ms0515));
 	screen.screen_vblank().set(FUNC(ms0515_state::screen_vblank));
 	screen.set_palette("palette");
@@ -602,6 +619,9 @@ ROM_START( ms0515 )
 	ROMX_LOAD( "0515l.rf4", 0xc000, 0x2000, CRC(85b608a4) SHA1(5b1bb0586d8f7a8a21de69200b08e0b28a318999), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "0515h.rf4", 0xc001, 0x2000, CRC(e3ff6da9) SHA1(3febccf40abc2e3ca7db3f6f3884be117722dd8b), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

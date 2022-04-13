@@ -10,13 +10,46 @@
 
 #pragma once
 
+#include "emupal.h"
+#include "tilemap.h"
+
 typedef device_delegate<void (int, uint16_t*, uint16_t*, uint16_t*, uint16_t*)> segaic16_video_pagelatch_delegate;
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
+
+// ======================> sega_16bit_common_base
+
+class sega_16bit_common_base : public driver_device
+{
+public:
+	// palette helpers
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void hangon_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void philko_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+protected:
+	// construction/destruction
+	sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag);
+
+	// internal helpers
+	void palette_init();
+
+public: // -- stupid system16.cpp
+	// memory pointers
+	required_shared_ptr<u16> m_paletteram;
+protected:
+
+	// internal state
+	u32      m_palette_entries;          // number of palette entries
+	u8       m_palette_normal[32];       // RGB translations for normal pixels
+	u8       m_palette_shadow[32];       // RGB translations for shadowed pixels
+	u8       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	required_device<palette_device> m_palette;
+};
 
 
 class segaic16_video_device :   public device_t,
@@ -96,7 +129,7 @@ public:
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb = segaic16_video_pagelatch_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb.set(std::forward<T>(args)...); }
 
 	uint8_t m_display_enable;
 	optional_shared_ptr<uint16_t> m_tileram;
@@ -125,14 +158,14 @@ public:
 	void tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks);
 	void rotate_init(int which, int type, int colorbase);
 
-	DECLARE_READ16_MEMBER( tileram_r );
-	DECLARE_READ16_MEMBER( textram_r );
-	DECLARE_WRITE16_MEMBER( tileram_w );
-	DECLARE_WRITE16_MEMBER( textram_w );
+	uint16_t tileram_r(offs_t offset);
+	uint16_t textram_r(offs_t offset);
+	void tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void textram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void rotate_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, bitmap_ind16 &srcbitmap);
 
-	DECLARE_READ16_MEMBER( rotate_control_r );
+	uint16_t rotate_control_r();
 
 	TILE_GET_INFO_MEMBER( tilemap_16b_tile_info );
 	TILE_GET_INFO_MEMBER( tilemap_16b_text_info );

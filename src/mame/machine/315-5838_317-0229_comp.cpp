@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838",
 
 sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock),
-	device_rom_interface(mconfig, *this, 23),
+	device_rom_interface(mconfig, *this),
 	m_hackmode(0)
 {
 }
@@ -177,7 +177,7 @@ uint8_t sega_315_5838_comp_device::get_decompressed_byte(void)
 	}
 }
 
-READ16_MEMBER(sega_315_5838_comp_device::data_r)
+uint16_t sega_315_5838_comp_device::data_r()
 {
 	return (get_decompressed_byte() << 8) | (get_decompressed_byte() << 0);
 }
@@ -354,7 +354,7 @@ void sega_315_5838_comp_device::write_prot_data(uint32_t data, uint32_t mem_mask
 	}
 }
 
-WRITE32_MEMBER( sega_315_5838_comp_device::data_w_doa )  { write_prot_data(data, mem_mask, 1); }
-WRITE32_MEMBER( sega_315_5838_comp_device::data_w)  { write_prot_data(data, mem_mask, 0); }
-WRITE32_MEMBER( sega_315_5838_comp_device::srcaddr_w ) { set_prot_addr(data, mem_mask); }
+void sega_315_5838_comp_device::data_w_doa(offs_t offset, uint32_t data, uint32_t mem_mask) { write_prot_data(data, mem_mask, 1); }
+void sega_315_5838_comp_device::data_w(offs_t offset, uint32_t data, uint32_t mem_mask) { write_prot_data(data, mem_mask, 0); }
+void sega_315_5838_comp_device::srcaddr_w(offs_t offset, uint32_t data, uint32_t mem_mask) { set_prot_addr(data, mem_mask); }
 

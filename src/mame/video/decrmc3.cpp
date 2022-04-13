@@ -19,12 +19,12 @@
 DEFINE_DEVICE_TYPE(DECO_RMC3, deco_rmc3_device, "deco_rmc3", "DECO RM-C3 PALETTE")
 
 deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, DECO_RMC3, tag, owner, clock),
-		device_palette_interface(mconfig, *this),
-		m_entries(0),
-		m_indirect_entries(0),
-		m_prom_region(*this, finder_base::DUMMY_TAG),
-		m_init(deco_rmc3_palette_init_delegate())
+	: device_t(mconfig, DECO_RMC3, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, m_entries(0)
+	, m_indirect_entries(0)
+	, m_prom_region(*this, finder_base::DUMMY_TAG)
+	, m_init(*this)
 {
 }
 
@@ -64,35 +64,35 @@ inline void deco_rmc3_device::update_for_write(offs_t byte_offset, int bytes_mod
 //  write - write a byte to the base paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(deco_rmc3_device::write8)
+void deco_rmc3_device::write8(offs_t offset, u8 data)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
-WRITE16_MEMBER(deco_rmc3_device::write16)
+void deco_rmc3_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_paletteram.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
-WRITE32_MEMBER(deco_rmc3_device::write32)
+void deco_rmc3_device::write32(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_paletteram.write32(offset, data, mem_mask);
 	update_for_write(offset * 4, 4);
 }
 
-READ8_MEMBER(deco_rmc3_device::read8)
+u8 deco_rmc3_device::read8(offs_t offset)
 {
 	return m_paletteram.read8(offset);
 }
 
-READ16_MEMBER(deco_rmc3_device::read16)
+u16 deco_rmc3_device::read16(offs_t offset)
 {
 	return m_paletteram.read16(offset);
 }
 
-READ32_MEMBER(deco_rmc3_device::read32)
+u32 deco_rmc3_device::read32(offs_t offset)
 {
 	return m_paletteram.read32(offset);
 }
@@ -103,14 +103,14 @@ READ32_MEMBER(deco_rmc3_device::read32)
 //  paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(deco_rmc3_device::write8_ext)
+void deco_rmc3_device::write8_ext(offs_t offset, u8 data)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
 
-WRITE16_MEMBER(deco_rmc3_device::write16_ext)
+void deco_rmc3_device::write16_ext(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
@@ -122,7 +122,7 @@ WRITE16_MEMBER(deco_rmc3_device::write16_ext)
 //  paletteram, updating indirect colors
 //-------------------------------------------------
 
-WRITE8_MEMBER(deco_rmc3_device::write_indirect)
+void deco_rmc3_device::write_indirect(offs_t offset, u8 data)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1, true);
@@ -134,7 +134,7 @@ WRITE8_MEMBER(deco_rmc3_device::write_indirect)
 //  paletteram, updating indirect colors
 //-------------------------------------------------
 
-WRITE8_MEMBER(deco_rmc3_device::write_indirect_ext)
+void deco_rmc3_device::write_indirect_ext(offs_t offset, u8 data)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1, true);
@@ -153,7 +153,7 @@ WRITE8_MEMBER(deco_rmc3_device::write_indirect_ext)
 void deco_rmc3_device::device_start()
 {
 	// bind the init function
-	m_init.bind_relative_to(*owner());
+	m_init.resolve();
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());

@@ -12,7 +12,7 @@ void msx_yamaha_60pin(device_slot_interface &device);   // 60 pin expansion slot
 
 class msx_slot_cartridge_device;
 
-class msx_cart_interface : public device_slot_card_interface
+class msx_cart_interface : public device_interface
 {
 	friend class msx_slot_cartridge_device;
 

@@ -136,16 +136,17 @@ public:
 
 	    Return value:
 
-	        None
+	        Whether or not the event was actually signalled (false if the event had already been signalled)
 
 	    Notes:
 
 	        All threads waiting for the event will be signalled.
 	-----------------------------------------------------------------------------*/
-	void set()
+	bool set()
 	{
 		m_mutex.lock();
-		if (m_signalled == false)
+		bool needs_signal = !m_signalled;
+		if (needs_signal)
 		{
 			m_signalled = true;
 			if (m_autoreset)
@@ -154,13 +155,14 @@ public:
 				m_cond.notify_all();
 		}
 		m_mutex.unlock();
+		return needs_signal;
 	}
 
 private:
 	std::mutex               m_mutex;
 	std::condition_variable  m_cond;
-	std::atomic<int32_t>       m_autoreset;
-	std::atomic<int32_t>       m_signalled;
+	int32_t                  m_autoreset;
+	int32_t                  m_signalled;
 
 };
 

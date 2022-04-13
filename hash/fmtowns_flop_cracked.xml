@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="fmtowns_flop_cracked" description="Fujitsu FM Towns cracked floppy disk images">
+
+	<software name="asuka120">
+		<description>Asuka 120% Burning Fest. (cracked)</description>
+		<year>1994</year>
+		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<info name="alt_title" value="あすか 120% BURNING Fest." />
+		<info name="release" value="199403xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="asuka 120 burning fest. (disk a).hdm" size="1261568" crc="46a5074d" sha1="8efb863ea0878f9236082f7d7935f494c4522899"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="asuka 120 burning fest. (disk b).hdm" size="1261568" crc="2a448e8f" sha1="3b57fd0a2fecec56a3362884de0770ec4538f5eb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="asuka 120 burning fest. (disk c).hdm" size="1261568" crc="ac9a582e" sha1="726b05d573e0776006cee6aa8c71009b1e66b5cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cracked by cyo.the.vile -->
+	<software name="cameltry">
+		<description>Cameltry (cracked)</description>
+		<year>1994</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="キャメルトライ" />
+		<info name="release" value="199411xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="cameltry_fixed.bin" size="1261568" crc="8d98efc1" sha1="1537ea0addb4398b846a7582b54895533a984dd1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cracked by cyo.the.vile -->
+	<software name="columns">
+		<description>Columns (cracked)</description>
+		<year>1990</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="コラムス" />
+		<info name="release" value="199012xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="columns.hdm" size="1261568" crc="312d2c79" sha1="1c60aaa0028eb6570ecd2303e63e86598362226e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- All the files in these images match the original disks, except for an additional CONTENTS.GBX file. It's unclear if they are actually cracked or not. -->
+	<software name="supdaisn">
+		<description>Super Daisenryaku (cracked?)</description>
+		<year>1990</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="スーパー大戦略" />
+		<info name="release" value="199003xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="superdaisen_1.xdf" size="1261568" crc="49aa5147" sha1="39be212fbef4ef4a93642f6e47dd6d1bae3cb937"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="superdaisen_2.xdf" size="1261568" crc="c7f7f2d3" sha1="394ac85565728e69c30c3cf974d4a3031267f86d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+

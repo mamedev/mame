@@ -15,51 +15,55 @@
 /* private area */
 struct SID6581_t
 {
-	device_t *device;
-	sound_stream *mixer_channel; // mame stream/ mixer channel
+	static constexpr uint8_t max_voices = 3;
 
-	int type;
-	uint32_t clock;
+	device_t *device = nullptr;
+	sound_stream *mixer_channel = nullptr; // mame stream/ mixer channel
 
-	uint16_t PCMfreq; // samplerate of the current systems soundcard/DAC
-	uint32_t PCMsid, PCMsidNoise;
+	int type = 0;
+	uint32_t clock = 0;
+
+	uint16_t PCMfreq = 0; // samplerate of the current systems soundcard/DAC
+	uint32_t PCMsid = 0, PCMsidNoise = 0;
 
 #if 0
 	/* following depends on type */
-	ptr2sidVoidFunc ModeNormalTable[16];
-	ptr2sidVoidFunc ModeRingTable[16];
+	ptr2sidVoidFunc ModeNormalTable[16]{ nullptr };
+	ptr2sidVoidFunc ModeRingTable[16]{ nullptr };
 	// for speed reason it could be better to make them global!
-	uint8_t* waveform30;
-	uint8_t* waveform50;
-	uint8_t* waveform60;
-	uint8_t* waveform70;
+	uint8_t *waveform30 = nullptr;
+	uint8_t *waveform50 = nullptr;
+	uint8_t *waveform60 = nullptr;
+	uint8_t *waveform70 = nullptr;
 #endif
-	int reg[0x20];
+	int reg[0x20]{ 0 };
 
-//  bool sidKeysOn[0x20], sidKeysOff[0x20];
+//  bool sidKeysOn[0x20]{ false }, sidKeysOff[0x20]{ false };
 
-	uint8_t masterVolume;
-	uint16_t masterVolumeAmplIndex;
+	uint8_t masterVolume = 0;
+	uint16_t masterVolumeAmplIndex = 0;
 
 	struct
 	{
-		int Enabled;
-		uint8_t Type, CurType;
-		float Dy, ResDy;
-		uint16_t Value;
+		int Enabled = 0;
+		uint8_t Type = 0, CurType = 0;
+		float Dy = 0.0, ResDy = 0.0;
+		uint16_t Value = 0;
 	} filter;
 
-	sidOperator optr1, optr2, optr3;
-	int optr3_outputmask;
+	sidOperator optr[max_voices];
+	int optr3_outputmask = 0;
 
 	void init();
 
 	bool reset();
 
+	void postload();
+
 	int port_r(running_machine &machine, int offset);
 	void port_w(int offset, int data);
 
-	void fill_buffer(stream_sample_t *buffer, uint32_t bufferLen);
+	void fill_buffer(write_stream_view &buffer);
 
 private:
 	void syncEm();

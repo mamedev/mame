@@ -22,20 +22,20 @@ Todo:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(glass_state::shareram_w)
+void glass_state::shareram_w(offs_t offset, uint8_t data)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
-READ8_MEMBER(glass_state::shareram_r)
+uint8_t glass_state::shareram_r(offs_t offset)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 
 
-WRITE16_MEMBER(glass_state::clr_int_w)
+void glass_state::clr_int_w(uint16_t data)
 {
 	m_cause_interrupt = 1;
 }
@@ -66,12 +66,12 @@ static GFXDECODE_START( gfx_glass )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(glass_state::oki_bankswitch_w)
+void glass_state::oki_bankswitch_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 0x0f);
 }
 
-WRITE16_MEMBER(glass_state::coin_w)
+void glass_state::coin_w(offs_t offset, uint16_t data)
 {
 	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
 }
@@ -259,6 +259,7 @@ void glass_state::glass_ds5002fp(machine_config &config)
 	glass(config);
 	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); /* verified on pcb */
 	ds5002fp.set_addrmap(0, &glass_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 }
 
 ROM_START( glass ) /* Version 1.1 */

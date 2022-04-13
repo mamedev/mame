@@ -7,6 +7,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class tunhunt_state : public driver_device
 {
@@ -27,14 +28,14 @@ public:
 	void tunhunt(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(button_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(dsw2_0r);
-	DECLARE_READ8_MEMBER(dsw2_1r);
-	DECLARE_READ8_MEMBER(dsw2_2r);
-	DECLARE_READ8_MEMBER(dsw2_3r);
-	DECLARE_READ8_MEMBER(dsw2_4r);
+	void control_w(uint8_t data);
+	uint8_t button_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t dsw2_0r();
+	uint8_t dsw2_1r();
+	uint8_t dsw2_2r();
+	uint8_t dsw2_3r();
+	uint8_t dsw2_4r();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -49,6 +50,7 @@ private:
 	void draw_shell(bitmap_ind16 &bitmap, const rectangle &cliprect, int picture_code,
 	int hposition,int vstart,int vstop,int vstretch,int hstretch);
 	void main_map(address_map &map);
+	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -61,9 +63,32 @@ private:
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 	output_finder<> m_led;
 
-	uint8_t m_control;
-	tilemap_t *m_fg_tilemap;
+	uint8_t m_control = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
 	bitmap_ind16 m_tmpbitmap;
+
+	uint8_t m_mobsc0 = 0;
+	uint8_t m_mobsc1 = 0;
+	uint8_t m_lineh[13]{};
+	uint8_t m_shl0st = 0;
+	uint8_t m_shl1st = 0;
+	uint8_t m_vstrlo = 0;
+	uint8_t m_linesh = 0;
+	uint8_t m_shl0pc = 0;
+	uint8_t m_shl1pc = 0;
+	uint8_t m_linec[13]{};
+	uint8_t m_shl0v = 0;
+	uint8_t m_shl1v = 0;
+	uint8_t m_mobjh = 0;
+	uint8_t m_linev[13]{};
+	uint8_t m_shl0vs = 0;
+	uint8_t m_shl1vs = 0;
+	uint8_t m_mobvs = 0;
+	uint8_t m_linevs[13]{};
+	uint8_t m_shel0h = 0;
+	uint8_t m_mobst = 0;
+	uint8_t m_shel1h = 0;
+	uint8_t m_mobjv = 0;
 };
 
 #endif // MAME_INCLUDES_TUNHUNT_H

@@ -77,6 +77,7 @@ bgfx_suppressor* suppressor_reader::read_from_value(const Value& value, std::str
 
 bool suppressor_reader::validate_parameters(const Value& value, std::string prefix)
 {
+	if (!READER_CHECK(value["type"].IsString(), (prefix + "Value 'type' must be a string\n").c_str())) return false;
 	if (!READER_CHECK(value.HasMember("name"), (prefix + "Must have string value 'name'\n").c_str())) return false;
 	if (!READER_CHECK(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str())) return false;
 	if (!READER_CHECK(value.HasMember("value"), (prefix + "Must have numeric or array value 'value'\n").c_str())) return false;

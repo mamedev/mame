@@ -25,10 +25,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE8_MEMBER(hiaddr_w);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(hostram_r);
-	DECLARE_WRITE8_MEMBER(hostram_w);
+	void hiaddr_w(u8 data);
+	void ctrl_w(u8 data);
+	u8 hostram_r(offs_t offset);
+	void hostram_w(offs_t offset, u8 data);
 
 	void ics_io(address_map &map);
 	void ics_mem(address_map &map);

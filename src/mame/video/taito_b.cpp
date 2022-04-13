@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/taito_b.h"
 
-WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
+void hitice_state::pixelram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sy = offset >> 9;
 	int sx = offset & 0x1ff;
@@ -13,40 +13,37 @@ WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 15 of pixel_scroll[0] is probably flip screen */
-		m_pixel_bitmap->pix16(sy, 2 * sx + 0) = m_b_fg_color_base * 16 + (data & 0xff);
-		m_pixel_bitmap->pix16(sy, 2 * sx + 1) = m_b_fg_color_base * 16 + (data & 0xff);
+		m_pixel_bitmap->pix(sy, 2 * sx + 0) = m_b_fg_color_base * 16 + (data & 0xff);
+		m_pixel_bitmap->pix(sy, 2 * sx + 1) = m_b_fg_color_base * 16 + (data & 0xff);
 	}
 }
 
-WRITE16_MEMBER(taitob_state::hitice_pixel_scroll_w)
+void hitice_state::pixel_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pixel_scroll[offset]);
 }
 
-void taitob_state::hitice_clear_pixel_bitmap(  )
+void hitice_state::clear_pixel_bitmap()
 {
-	int i;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	for (i = 0; i < 0x40000; i++)
-		hitice_pixelram_w(space, i, 0, 0xffff);
+	for (int i = 0; i < 0x40000; i++)
+		pixelram_w(i, 0, 0xffff);
 }
 
-WRITE16_MEMBER(taitob_c_state::realpunc_video_ctrl_w)
+void taitob_c_state::realpunc_video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_realpunc_video_ctrl);
 }
 
-VIDEO_START_MEMBER(taitob_state,taitob_core)
+void taitob_state::video_start()
 {
 	m_pixel_bitmap = nullptr;  /* only hitice needs this */
 
 	save_item(NAME(m_pixel_scroll));
 }
 
-VIDEO_START_MEMBER(taitob_state,hitice)
+void hitice_state::video_start()
 {
-	VIDEO_START_CALL_MEMBER(taitob_core);
+	taitob_state::video_start();
 
 	m_b_fg_color_base = 0x80;       /* hitice also uses this for the pixel_bitmap */
 
@@ -55,18 +52,18 @@ VIDEO_START_MEMBER(taitob_state,hitice)
 	save_item(NAME(*m_pixel_bitmap));
 }
 
-VIDEO_RESET_MEMBER(taitob_state,hitice)
+void hitice_state::video_reset()
 {
 	/* kludge: clear the bitmap on startup */
-	hitice_clear_pixel_bitmap();
+	clear_pixel_bitmap();
 }
 
 
-VIDEO_START_MEMBER(taitob_c_state,realpunc)
+void taitob_c_state::video_start()
 {
 	m_realpunc_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
-	VIDEO_START_CALL_MEMBER(taitob_core);
+	taitob_state::video_start();
 }
 
 
@@ -109,9 +106,8 @@ uint32_t taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 
 
 uint32_t taitob_c_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *palette = m_palette->pens();
+	pen_t const *const palette = m_palette->pens();
 	uint8_t const video_control = m_tc0180vcu->get_videoctrl();
-	int x, y;
 
 	/* Video blanked? */
 	if (!(video_control & 0x20))
@@ -131,9 +127,9 @@ uint32_t taitob_c_state::screen_update_realpunc(screen_device &screen, bitmap_rg
 		m_tc0180vcu->draw_framebuffer(*m_realpunc_bitmap, cliprect, 0);
 
 	/* Copy the intermediate bitmap to the output bitmap, applying the palette */
-	for (y = 0; y <= cliprect.max_y; y++)
-		for (x = 0; x <= cliprect.max_x; x++)
-			bitmap.pix32(y, x) = palette[m_realpunc_bitmap->pix16(y, x)];
+	for (int y = 0; y <= cliprect.max_y; y++)
+		for (int x = 0; x <= cliprect.max_x; x++)
+			bitmap.pix(y, x) = palette[m_realpunc_bitmap->pix(y, x)];
 
 	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
 	if (m_realpunc_video_ctrl & 0x0002)
@@ -143,29 +139,28 @@ uint32_t taitob_c_state::screen_update_realpunc(screen_device &screen, bitmap_rg
 
 		m_hd63484->update_screen(screen, *m_realpunc_bitmap, cliprect);
 
-		for (y = 0; y <= cliprect.max_y; y++)
+		for (int y = 0; y <= cliprect.max_y; y++)
 		{
-			for (x = 0; x <= cliprect.max_x; x++)
+			for (int x = 0; x <= cliprect.max_x; x++)
 			{
-				int r, g, b;
-				uint16_t srcpix = m_realpunc_bitmap->pix16(cliprect.min_y + y, cliprect.min_x + x);
+				uint16_t srcpix = m_realpunc_bitmap->pix(cliprect.min_y + y, cliprect.min_x + x);
 
-				r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
-				g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);
-				b = (BIT(srcpix, 3)) | ((srcpix >> 3) & 0x1e);
+				int r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
+				int g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);
+				int b = (BIT(srcpix, 3)) | ((srcpix >> 3) & 0x1e);
 
 				if (srcpix)
-					bitmap.pix32(y, x) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+					bitmap.pix(y, x) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 		}
 	}
 	/* Draw the 15bpp raw output of the camera ADCs (TODO) */
 	else if (m_realpunc_video_ctrl & 0x0004)
 	{
-		for (y = 0; y <= cliprect.max_y; y++)
+		for (int y = 0; y <= cliprect.max_y; y++)
 		{
-			for (x = 0; x <= cliprect.max_x; x++)
-				bitmap.pix32(y, x) = rgb_t(0x00, 0x00, 0x00);
+			for (int x = 0; x <= cliprect.max_x; x++)
+				bitmap.pix(y, x) = rgb_t(0x00, 0x00, 0x00);
 		}
 	}
 
@@ -178,12 +173,12 @@ uint32_t taitob_c_state::screen_update_realpunc(screen_device &screen, bitmap_rg
 	m_tc0180vcu->tilemap_draw(screen, *m_realpunc_bitmap, cliprect, 2, 0);
 
 	/* Merge the indexed layers with the output bitmap */
-	for (y = 0; y <= cliprect.max_y; y++)
+	for (int y = 0; y <= cliprect.max_y; y++)
 	{
-		for (x = 0; x <= cliprect.max_x; x++)
+		for (int x = 0; x <= cliprect.max_x; x++)
 		{
-			if (m_realpunc_bitmap->pix16(y, x))
-				bitmap.pix32(y, x) = palette[m_realpunc_bitmap->pix16(y, x)];
+			if (m_realpunc_bitmap->pix(y, x))
+				bitmap.pix(y, x) = palette[m_realpunc_bitmap->pix(y, x)];
 		}
 	}
 

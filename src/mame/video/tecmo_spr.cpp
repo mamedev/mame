@@ -74,7 +74,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, gfx_element *g
 	int sourceinc = 8;
 
 	int count = NUM_SPRITES;
-	int screenwidth = screen.width();
+	int screenwidth = screen.visible_area().width();
 
 	int attributes_word = 0;
 	int tilenumber_word = 1;

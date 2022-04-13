@@ -49,7 +49,7 @@ private:
 	// internal helpers
 	DECLARE_WRITE_LINE_MEMBER(signal_out_w);
 	DECLARE_WRITE_LINE_MEMBER(scan_disable_w);
-	DECLARE_WRITE8_MEMBER(key_scan_w);
+	void key_scan_w(u8 data);
 
 	devcb_write_line m_signal_out_cb;
 

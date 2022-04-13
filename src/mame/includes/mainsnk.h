@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class mainsnk_state : public driver_device
 {
@@ -39,15 +40,15 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_fgram;
 
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg_tilemap;
-	int m_sound_cpu_busy;
-	uint32_t m_bg_tile_offset;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_sound_cpu_busy = 0;
+	uint32_t m_bg_tile_offset = 0;
 
-	DECLARE_READ8_MEMBER(sound_ack_r);
-	DECLARE_WRITE8_MEMBER(c600_w);
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
+	uint8_t sound_ack_r();
+	void c600_w(uint8_t data);
+	void fgram_w(offs_t offset, uint8_t data);
+	void bgram_w(offs_t offset, uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

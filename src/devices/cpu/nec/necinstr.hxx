@@ -47,7 +47,7 @@ OP( 0x0f, i_pre_nec  ) { uint32_t ModRM, tmp, tmp2;
 		case 0x33 : ModRM = fetch(); ModRM=0; logerror("%06x: Unimplemented bitfield EXT\n",PC()); break;
 		case 0xe0 : BRKXA(true); CLK(12); break;
 		case 0xf0 : BRKXA(false); CLK(12); break;
-		case 0xff : ModRM = fetch(); ModRM=0; logerror("%06x: unimplemented BRKEM (break to 8080 emulation mode)\n",PC()); break;
+		case 0xff : BRKEM; CLK(50); break;
 		default:    logerror("%06x: Unknown V20 instruction\n",PC()); break;
 	}
 }

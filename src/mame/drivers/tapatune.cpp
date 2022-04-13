@@ -56,12 +56,14 @@
 class tapatune_state : public driver_device
 {
 public:
-	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tapatune_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videocpu(*this, "videocpu"),
 		m_bsmt(*this, "bsmt"),
-		m_videoram(*this, "videoram") {}
+		m_videoram(*this, "videoram")
+	{
+	}
 
 	void tapatune(machine_config &config);
 	void tapatune_base(machine_config &config);
@@ -73,42 +75,42 @@ private:
 
 	optional_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t   m_paletteram[0x300];
-	uint16_t  m_palette_write_addr;
+	uint8_t   m_paletteram[0x300]{};
+	uint16_t  m_palette_write_addr = 0;
 	rgb_t   m_pens[0x100];
-	uint8_t   m_controls_mux;
-	uint8_t   m_z80_to_68k_index;
-	uint8_t   m_z80_to_68k_data;
-	uint8_t   m_68k_to_z80_index;
-	uint8_t   m_68k_to_z80_data;
-	uint8_t   m_z80_data_available;
-	uint8_t   m_68k_data_available;
-	uint8_t   m_bsmt_data_l;
-	uint8_t   m_bsmt_data_h;
-	bool    m_bsmt_reset;
+	uint8_t   m_controls_mux = 0;
+	uint8_t   m_z80_to_68k_index = 0;
+	uint8_t   m_z80_to_68k_data = 0;
+	uint8_t   m_68k_to_z80_index = 0;
+	uint8_t   m_68k_to_z80_data = 0;
+	uint8_t   m_z80_data_available = 0;
+	uint8_t   m_68k_data_available = 0;
+	uint8_t   m_bsmt_data_l = 0;
+	uint8_t   m_bsmt_data_h = 0;
+	bool    m_bsmt_reset = false;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_READ16_MEMBER(read_from_z80);
-	DECLARE_WRITE16_MEMBER(write_to_z80);
+	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t read_from_z80();
+	void write_to_z80(uint16_t data);
 
-	DECLARE_READ8_MEMBER(sound_irq_clear);
-	DECLARE_WRITE8_MEMBER(controls_mux);
-	DECLARE_READ8_MEMBER(controls_r);
-	DECLARE_WRITE8_MEMBER(write_index_to_68k);
-	DECLARE_WRITE8_MEMBER(write_data_to_68k);
-	DECLARE_READ8_MEMBER(read_index_from_68k);
-	DECLARE_READ8_MEMBER(read_data_from_68k);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(bsmt_data_lo_w);
-	DECLARE_WRITE8_MEMBER(bsmt_data_hi_w);
-	DECLARE_WRITE8_MEMBER(bsmt_reg_w);
-	DECLARE_READ8_MEMBER(special_r);
+	uint8_t sound_irq_clear();
+	void controls_mux(uint8_t data);
+	uint8_t controls_r();
+	void write_index_to_68k(uint8_t data);
+	void write_data_to_68k(uint8_t data);
+	uint8_t read_index_from_68k();
+	uint8_t read_data_from_68k();
+	void lamps_w(uint8_t data);
+	uint8_t status_r();
+	void bsmt_data_lo_w(uint8_t data);
+	void bsmt_data_hi_w(uint8_t data);
+	void bsmt_reg_w(uint8_t data);
+	uint8_t special_r();
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -178,10 +180,10 @@ MC6845_BEGIN_UPDATE( tapatune_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( tapatune_state::crtc_update_row )
 {
-	uint32_t *dest = &bitmap.pix32(y);
+	uint32_t *const dest = &bitmap.pix(y);
 	offs_t offs = (ma*2 + ra*0x40)*4;
 
-	uint8_t *videoram = reinterpret_cast<uint8_t *>(m_videoram.target());
+	uint8_t const *const videoram = reinterpret_cast<uint8_t *>(m_videoram.target());
 
 	for (uint32_t x = 0; x < x_count*4; x++)
 	{
@@ -192,7 +194,7 @@ MC6845_UPDATE_ROW( tapatune_state::crtc_update_row )
 }
 
 
-WRITE16_MEMBER(tapatune_state::palette_w)
+void tapatune_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("Palette write: offset = %02x, data = %04x, mask = %04x\n", offset, data, mem_mask );
 	switch(offset)
@@ -221,14 +223,14 @@ WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
  *
  *************************************/
 
-READ16_MEMBER(tapatune_state::read_from_z80)
+uint16_t tapatune_state::read_from_z80()
 {
 	m_z80_data_available = 0;
 	return ((uint16_t)m_z80_to_68k_data << 8) | (m_z80_to_68k_index);
 }
 
 
-WRITE16_MEMBER(tapatune_state::write_to_z80)
+void tapatune_state::write_to_z80(uint16_t data)
 {
 	m_68k_to_z80_index = data & 0xff;
 	m_68k_to_z80_data = (data >> 8) & 0xff;
@@ -247,13 +249,13 @@ WRITE16_MEMBER(tapatune_state::write_to_z80)
  *
  *************************************/
 
-WRITE8_MEMBER(tapatune_state::write_index_to_68k)
+void tapatune_state::write_index_to_68k(uint8_t data)
 {
 	m_z80_to_68k_index = data;
 }
 
 
-WRITE8_MEMBER(tapatune_state::write_data_to_68k)
+void tapatune_state::write_data_to_68k(uint8_t data)
 {
 	// todo, use callback as this will hook up elsewhere on non-video games
 	if (m_videocpu)
@@ -265,13 +267,13 @@ WRITE8_MEMBER(tapatune_state::write_data_to_68k)
 }
 
 
-READ8_MEMBER(tapatune_state::read_index_from_68k)
+uint8_t tapatune_state::read_index_from_68k()
 {
 	return m_68k_to_z80_index;
 }
 
 
-READ8_MEMBER(tapatune_state::read_data_from_68k)
+uint8_t tapatune_state::read_data_from_68k()
 {
 	m_68k_data_available = 0;
 
@@ -331,14 +333,14 @@ void tapatune_state::maincpu_io_map(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER(tapatune_state::sound_irq_clear)
+uint8_t tapatune_state::sound_irq_clear()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
 
-WRITE8_MEMBER(tapatune_state::controls_mux)
+void tapatune_state::controls_mux(uint8_t data)
 {
 	/*
 	    Input multiplexer select and outputs:
@@ -358,7 +360,7 @@ WRITE8_MEMBER(tapatune_state::controls_mux)
 }
 
 
-READ8_MEMBER(tapatune_state::controls_r)
+uint8_t tapatune_state::controls_r()
 {
 	switch (m_controls_mux & 0xf)
 	{
@@ -371,7 +373,7 @@ READ8_MEMBER(tapatune_state::controls_r)
 }
 
 
-READ8_MEMBER(tapatune_state::special_r)
+uint8_t tapatune_state::special_r()
 {
 	// Not sure if this is actually correct
 	if (m_z80_data_available)
@@ -381,7 +383,7 @@ READ8_MEMBER(tapatune_state::special_r)
 }
 
 
-WRITE8_MEMBER(tapatune_state::lamps_w)
+void tapatune_state::lamps_w(uint8_t data)
 {
 	/*
 	    Button Lamps:
@@ -405,19 +407,19 @@ WRITE8_MEMBER(tapatune_state::lamps_w)
  *
  *************************************/
 
-READ8_MEMBER(tapatune_state::status_r)
+uint8_t tapatune_state::status_r()
 {
 	return !m_bsmt->read_status() << 7;
 }
 
 
-WRITE8_MEMBER(tapatune_state::bsmt_data_lo_w)
+void tapatune_state::bsmt_data_lo_w(uint8_t data)
 {
 	m_bsmt_data_l = data;
 }
 
 
-WRITE8_MEMBER(tapatune_state::bsmt_data_hi_w)
+void tapatune_state::bsmt_data_hi_w(uint8_t data)
 {
 	m_bsmt_data_h = data;
 
@@ -429,7 +431,7 @@ WRITE8_MEMBER(tapatune_state::bsmt_data_hi_w)
 }
 
 
-WRITE8_MEMBER(tapatune_state::bsmt_reg_w)
+void tapatune_state::bsmt_reg_w(uint8_t data)
 {
 	m_bsmt->write_reg(data);
 	m_bsmt->write_data((m_bsmt_data_h << 8) | m_bsmt_data_l);
@@ -550,20 +552,20 @@ void tapatune_state::tapatune(machine_config &config)
 	M68000(config, m_videocpu, XTAL(24'000'000) / 2);
 	m_videocpu->set_addrmap(AS_PROGRAM, &tapatune_state::video_map);
 
-	config.m_perfect_cpu_quantum = subtag("videocpu");
+	config.set_perfect_quantum(m_videocpu);
 
-	h46505_device &crtc(H46505(config, "crtc", XTAL(24'000'000) / 16));
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(24'000'000) / 16));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(5);
-	crtc.set_begin_update_callback(FUNC(tapatune_state::crtc_begin_update), this);
-	crtc.set_update_row_callback(FUNC(tapatune_state::crtc_update_row), this);
+	crtc.set_begin_update_callback(FUNC(tapatune_state::crtc_begin_update));
+	crtc.set_update_row_callback(FUNC(tapatune_state::crtc_update_row));
 	crtc.out_vsync_callback().set(FUNC(tapatune_state::crtc_vsync));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(24'000'000) / 16 * 5, 500, 0, 320, 250, 0, 240);
-	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 }
 
 /*************************************

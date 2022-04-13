@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="gj4000" description="VTech Genius Junior 4000 cartridges">
+
+	<!-- According to the boxart, this is compatible with: Junior 4000/5000 -->
+	<software name="wfk" supported="no">
+		<description>Wissen für Kinder</description>
+		<year>1997</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-15272" />
+
+		<part name="rom" interface="genius_rom">
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-6035-00.u2" size="0x20000" crc="8dcaa8c0" sha1="bca46f6cd150632fca79b1c2b524cd8ed1dacf84"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

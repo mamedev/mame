@@ -4,6 +4,13 @@
 
     STmicro ST6-series microcontroller emulation
 
+    TODO: Implement ST62T25 handling
+
+    Notable ST62T25 differences:
+    - No GPIO port D
+    - No UART, SPI, or AR Timer
+    - No bankable RAM space
+
 **********************************************************************
                             _____   _____
                    Vdd   1 |*    \_/     | 28  Vss
@@ -78,15 +85,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(portd6_w);
 	DECLARE_WRITE_LINE_MEMBER(portd7_w);
 
+	DECLARE_WRITE_LINE_MEMBER(timer_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -104,12 +113,39 @@ protected:
 	void st6228_data_map(address_map &map);
 
 	void unimplemented_opcode(uint8_t op);
-	void tick_timers(int cycles);
-	void update_port_mode(uint8_t index, uint8_t changed);
-	void set_port_output_bit(uint8_t index, uint8_t bit, uint8_t state);
 
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ8_MEMBER(regs_r);
+	// Banking
+	void data_rom_window_w(offs_t offset, uint8_t data);
+	void rom_bank_select_w(offs_t offset, uint8_t data);
+	void ram_bank_select_w(offs_t offset, uint8_t data);
+
+	// GPIO
+	void gpio_update_mode(uint8_t index, uint8_t changed);
+	void gpio_set_output_bit(uint8_t index, uint8_t bit, uint8_t state);
+	void gpio_data_w(offs_t offset, uint8_t data);
+	void gpio_dir_w(offs_t offset, uint8_t data);
+	void gpio_option_w(offs_t offset, uint8_t data);
+	uint8_t gpio_data_r(offs_t offset);
+	uint8_t gpio_dir_r(offs_t offset);
+	uint8_t gpio_option_r(offs_t offset);
+
+	// Timer
+	void timer_counter_tick();
+	void timer_prescaler_tick();
+	void timer_update_count();
+	void timer_prescale_w(offs_t offset, uint8_t data);
+	void timer_counter_w(offs_t offset, uint8_t data);
+	void timer_control_w(offs_t offset, uint8_t data);
+	uint8_t timer_prescale_r(offs_t offset);
+	uint8_t timer_counter_r(offs_t offset);
+	uint8_t timer_status_r(offs_t offset);
+
+	// Watchdog
+	void watchdog_w(offs_t offset, uint8_t data);
+
+	// Catch-all
+	void unimplemented_reg_w(offs_t offset, uint8_t data);
+	uint8_t unimplemented_reg_r(offs_t offset);
 
 	enum
 	{
@@ -129,7 +165,7 @@ protected:
 		STATE_W
 	};
 
-	enum
+	enum : uint8_t
 	{
 		PROGRAM_ROM_START       = 0x40,
 		REGS_START              = 0x80,
@@ -172,6 +208,25 @@ protected:
 		REG_ARTIMER_COMPARE     = 0xea,
 		REG_ARTIMER_LOAD        = 0xeb,
 		REG_A                   = 0xff
+	};
+
+	enum : uint8_t
+	{
+		PSC_MASK                = 0x7f,
+
+		TSCR_PS_BIT             = 0,
+		TSCR_PS_MASK            = 0x07,
+		TSCR_PSI_BIT            = 3,
+		TSCR_DOUT_BIT           = 4,
+		TSCR_TOUT_BIT           = 5,
+		TSCR_ETI_BIT            = 6,
+		TSCR_TMZ_BIT            = 7,
+
+		TSCR_MODE_MASK          = (1 << TSCR_DOUT_BIT) | (1 << TSCR_TOUT_BIT),
+		TSCR_MODE_EVENT         = 0x00,
+		TSCR_MODE_GATED         = (1 << TSCR_DOUT_BIT),
+		TSCR_MODE_OUTPUT_0      = (1 << TSCR_TOUT_BIT),
+		TSCR_MODE_OUTPUT_1      = (1 << TSCR_DOUT_BIT) | (1 << TSCR_TOUT_BIT)
 	};
 
 	enum
@@ -222,10 +277,10 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 
-	devcb_write_line m_porta_out[6];
-	devcb_write_line m_portb_out[3];
-	devcb_write_line m_portc_out[4];
-	devcb_write_line m_portd_out[7];
+	devcb_write_line::array<6> m_porta_out;
+	devcb_write_line::array<3> m_portb_out;
+	devcb_write_line::array<4> m_portc_out;
+	devcb_write_line::array<7> m_portd_out;
 
 	uint8_t m_port_dir[4];
 	uint8_t m_port_option[4];
@@ -235,13 +290,20 @@ protected:
 	uint8_t m_port_input[4];
 	uint8_t m_port_irq_enable[4];
 
+	int m_timer_divider;
+	int m_timer_pin;
+	bool m_timer_active;
+	devcb_write_line m_timer_out;
+
 	address_space *m_program;
 	address_space *m_data;
 
-	// FIXME: memory banks do not currently work with internal maps.
-	required_memory_bank m_rambank;
-	required_memory_bank m_program_rombank;
-	required_memory_bank m_data_rombank;
+	required_memory_bank m_ram_bank;
+	required_memory_bank m_data_bank;
+
+	required_memory_bank m_program_rom_bank;
+	required_memory_bank m_data_rom_bank;
+
 	required_memory_region m_rom;
 };
 

@@ -8,10 +8,6 @@ Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 updated by Peter Ferrie <peter.ferrie@gmail.com>
 
-There is a priority bug on the title screen (Gaelco logo is hidden by black
-borders)  It seems sprite priority is hacked around on most of the older
-Gaelco drivers.
-
 
 REF.940411
 +-------------------------------------------------+
@@ -78,7 +74,7 @@ void thoop2_state::machine_start()
 	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-WRITE8_MEMBER(thoop2_state::oki_bankswitch_w)
+void thoop2_state::oki_bankswitch_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 0x0f);
 }
@@ -103,15 +99,15 @@ WRITE_LINE_MEMBER(thoop2_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(thoop2_state::shareram_w)
+void thoop2_state::shareram_w(offs_t offset, uint8_t data)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
-READ8_MEMBER(thoop2_state::shareram_r)
+uint8_t thoop2_state::shareram_r(offs_t offset)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 
@@ -135,7 +131,7 @@ void thoop2_state::thoop2_map(address_map &map)
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x700008, 0x700009).portr("SYSTEM");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 3, data); });
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(thoop2_state::oki_bankswitch_w));               /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                  /* OKI6295 data register */
 	map(0xfe0000, 0xfe7fff).ram();                                          /* Work RAM */
@@ -269,6 +265,7 @@ void thoop2_state::thoop2(machine_config &config)
 
 	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); // 12MHz verified
 	ds5002fp.set_addrmap(0, &thoop2_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(thoop2_state::coin1_lockout_w));

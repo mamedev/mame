@@ -280,7 +280,7 @@ void tms9980a_device::acquire_instruction()
 /*
     The minimum number of cycles applies to a command like STWP R0.
 */
-uint32_t tms9980a_device::execute_min_cycles() const
+uint32_t tms9980a_device::execute_min_cycles() const noexcept
 {
 	return 12;
 }
@@ -289,12 +289,12 @@ uint32_t tms9980a_device::execute_min_cycles() const
     The maximum number of cycles applies to a DIV command, depending on the
     data to be divided, and the mode of adressing.
 */
-uint32_t tms9980a_device::execute_max_cycles() const
+uint32_t tms9980a_device::execute_max_cycles() const noexcept
 {
 	return 136;
 }
 
-uint32_t tms9980a_device::execute_input_lines() const
+uint32_t tms9980a_device::execute_input_lines() const noexcept
 {
 	return 8;
 }

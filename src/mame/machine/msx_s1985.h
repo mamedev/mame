@@ -18,8 +18,8 @@ public:
 	msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// msx_switched_interface overrides
-	virtual DECLARE_READ8_MEMBER(switched_read) override;
-	virtual DECLARE_WRITE8_MEMBER(switched_write) override;
+	virtual uint8_t switched_read(offs_t offset) override;
+	virtual void switched_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -27,8 +27,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	bool m_selected;

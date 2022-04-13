@@ -21,14 +21,13 @@ public:
 
 	auto out_port() { return m_out_port_cb.bind(); }
 	auto in_port() { return m_in_port_cb.bind(); }
-	auto cp1() { return m_out_cp1_cb.bind(); }
 	auto cp2() { return m_out_cp2_cb.bind(); }
 	auto cto() { return m_out_cto_cb.bind(); }
 	auto irq() { return m_irq_cb.bind(); }
 
 	/* interface to CPU via address/data bus*/
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	/* asynchronous write from outside world into interrupt-generating pins */
 	void set_input_cp1(int data);
@@ -78,7 +77,6 @@ private:
 
 	/* CPU write to the outside through chip */
 	devcb_write8 m_out_port_cb;  /* 8-bit output */
-	devcb_write_line m_out_cp1_cb;   /* 1-bit output */
 	devcb_write_line m_out_cp2_cb;   /* 1-bit output */
 
 	/* CPU read from the outside through chip */

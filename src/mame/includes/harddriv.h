@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/atarijsa.h"
+#include "machine/slapstic.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -103,110 +104,110 @@ protected:
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
 
-	/*----------- defined in machine/harddriv.c -----------*/
+	/*----------- defined in machine/harddriv.cpp -----------*/
 
 	/* Driver/Multisync board */
-	DECLARE_WRITE16_MEMBER( hd68k_irq_ack_w );
+	void hd68k_irq_ack_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
 
-	DECLARE_READ16_MEMBER( hd68k_gsp_io_r );
-	DECLARE_WRITE16_MEMBER( hd68k_gsp_io_w );
+	uint16_t hd68k_gsp_io_r(offs_t offset);
+	void hd68k_gsp_io_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER( hd68k_msp_io_r );
-	DECLARE_WRITE16_MEMBER( hd68k_msp_io_w );
+	uint16_t hd68k_msp_io_r(offs_t offset);
+	void hd68k_msp_io_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER( hd68k_a80000_r );
-	DECLARE_READ16_MEMBER( hd68k_port0_r );
-	DECLARE_READ16_MEMBER( hd68k_adc12_r );
-	DECLARE_READ16_MEMBER( hdc68k_port1_r );
-	DECLARE_READ16_MEMBER( hda68k_port1_r );
-	DECLARE_READ16_MEMBER( hdc68k_wheel_r );
-	DECLARE_READ16_MEMBER( hd68k_sound_reset_r );
+	uint16_t hd68k_a80000_r();
+	uint16_t hd68k_port0_r();
+	uint16_t hd68k_adc12_r();
+	uint16_t hdc68k_port1_r();
+	uint16_t hda68k_port1_r();
+	uint16_t hdc68k_wheel_r();
+	uint16_t hd68k_sound_reset_r();
 
-	DECLARE_WRITE16_MEMBER( hd68k_adc_control_w );
-	DECLARE_WRITE16_MEMBER( hd68k_wr0_write );
-	DECLARE_WRITE16_MEMBER( hd68k_wr1_write );
-	DECLARE_WRITE16_MEMBER( hd68k_wr2_write );
-	DECLARE_WRITE16_MEMBER( hd68k_nwr_w );
-	DECLARE_WRITE16_MEMBER( hdc68k_wheel_edge_reset_w );
+	void hd68k_adc_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void hd68k_wr0_write(offs_t offset, uint16_t data);
+	void hd68k_wr1_write(offs_t offset, uint16_t data);
+	void hd68k_wr2_write(offs_t offset, uint16_t data);
+	void hd68k_nwr_w(offs_t offset, uint16_t data);
+	void hdc68k_wheel_edge_reset_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER( hd68k_zram_r );
-	DECLARE_WRITE16_MEMBER( hd68k_zram_w );
+	uint16_t hd68k_zram_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void hd68k_zram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void hdgsp_io_w(offs_t offset, u16 data, u16 mem_mask = ~u16(0));
 
-	DECLARE_WRITE16_MEMBER( hdgsp_protection_w );
+	void hdgsp_protection_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( hdgsp_irq_gen );
 	DECLARE_WRITE_LINE_MEMBER( hdmsp_irq_gen );
 
 	/* ADSP board */
-	DECLARE_READ16_MEMBER( hd68k_adsp_program_r );
-	DECLARE_WRITE16_MEMBER( hd68k_adsp_program_w );
+	uint16_t hd68k_adsp_program_r(offs_t offset);
+	void hd68k_adsp_program_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( hd68k_adsp_data_r );
-	DECLARE_WRITE16_MEMBER( hd68k_adsp_data_w );
+	uint16_t hd68k_adsp_data_r(offs_t offset);
+	void hd68k_adsp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( hd68k_adsp_buffer_r );
-	DECLARE_WRITE16_MEMBER( hd68k_adsp_buffer_w );
+	uint16_t hd68k_adsp_buffer_r(offs_t offset);
+	void hd68k_adsp_buffer_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( hd68k_adsp_control_w );
-	DECLARE_WRITE16_MEMBER( hd68k_adsp_irq_clear_w );
-	DECLARE_READ16_MEMBER( hd68k_adsp_irq_state_r );
+	void hd68k_adsp_control_w(offs_t offset, uint16_t data);
+	void hd68k_adsp_irq_clear_w(uint16_t data);
+	uint16_t hd68k_adsp_irq_state_r();
 
-	DECLARE_READ16_MEMBER( hdadsp_special_r );
-	DECLARE_WRITE16_MEMBER( hdadsp_special_w );
+	uint16_t hdadsp_special_r(offs_t offset);
+	void hdadsp_special_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER(steeltal_dummy_r);
-	DECLARE_READ32_MEMBER(rddsp_unmap_r);
+	uint16_t steeltal_dummy_r();
+	uint32_t rddsp_unmap_r();
 
 	/* DS III/IV board */
-	DECLARE_WRITE16_MEMBER( hd68k_ds3_control_w );
-	DECLARE_READ16_MEMBER( hd68k_ds3_girq_state_r );
+	void hd68k_ds3_control_w(offs_t offset, uint16_t data);
+	uint16_t hd68k_ds3_girq_state_r();
 
-	DECLARE_READ16_MEMBER( hd68k_ds3_gdata_r );
-	DECLARE_WRITE16_MEMBER( hd68k_ds3_gdata_w );
+	uint16_t hd68k_ds3_gdata_r();
+	void hd68k_ds3_gdata_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( hdds3_special_r );
-	DECLARE_WRITE16_MEMBER( hdds3_special_w );
-	DECLARE_READ16_MEMBER( hdds3_control_r );
-	DECLARE_WRITE16_MEMBER( hdds3_control_w );
+	uint16_t hdds3_special_r(offs_t offset);
+	void hdds3_special_w(offs_t offset, uint16_t data);
+	uint16_t hdds3_control_r(offs_t offset);
+	void hdds3_control_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER( hd68k_ds3_program_r );
-	DECLARE_WRITE16_MEMBER( hd68k_ds3_program_w );
+	uint16_t hd68k_ds3_program_r(offs_t offset);
+	void hd68k_ds3_program_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( hd68k_ds3_sdata_r );
-	DECLARE_WRITE16_MEMBER( hd68k_ds3_sdata_w );
-	DECLARE_WRITE16_MEMBER( hd68k_ds3_sirq_clear_w );
-	DECLARE_READ16_MEMBER( hd68k_ds3_sirq_state_r );
+	uint16_t hd68k_ds3_sdata_r();
+	void hd68k_ds3_sdata_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void hd68k_ds3_sirq_clear_w(uint16_t data);
+	uint16_t hd68k_ds3_sirq_state_r();
 
-	DECLARE_READ16_MEMBER( hdds3_sdsp_special_r );
-	DECLARE_WRITE16_MEMBER( hdds3_sdsp_special_w );
+	uint16_t hdds3_sdsp_special_r(offs_t offset);
+	void hdds3_sdsp_special_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER( hdds3_sdsp_control_r );
-	DECLARE_WRITE16_MEMBER( hdds3_sdsp_control_w );
-	DECLARE_READ16_MEMBER( hdds3_xdsp_control_r );
-	DECLARE_WRITE16_MEMBER( hdds3_xdsp_control_w );
+	uint16_t hdds3_sdsp_control_r(offs_t offset);
+	void hdds3_sdsp_control_w(offs_t offset, uint16_t data);
+	uint16_t hdds3_xdsp_control_r(offs_t offset);
+	void hdds3_xdsp_control_w(offs_t offset, uint16_t data);
 
 	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
 
-	DECLARE_READ16_MEMBER( hdgsp_control_lo_r );
-	DECLARE_WRITE16_MEMBER( hdgsp_control_lo_w );
-	DECLARE_READ16_MEMBER( hdgsp_control_hi_r );
-	DECLARE_WRITE16_MEMBER( hdgsp_control_hi_w );
+	uint16_t hdgsp_control_lo_r(offs_t offset);
+	void hdgsp_control_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t hdgsp_control_hi_r(offs_t offset);
+	void hdgsp_control_hi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( hdgsp_vram_2bpp_r );
-	DECLARE_WRITE16_MEMBER( hdgsp_vram_1bpp_w );
-	DECLARE_WRITE16_MEMBER( hdgsp_vram_2bpp_w );
+	uint16_t hdgsp_vram_2bpp_r();
+	void hdgsp_vram_1bpp_w(offs_t offset, uint16_t data);
+	void hdgsp_vram_2bpp_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER( hdgsp_paletteram_lo_r );
-	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_lo_w );
-	DECLARE_READ16_MEMBER( hdgsp_paletteram_hi_r );
-	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_hi_w );
+	uint16_t hdgsp_paletteram_lo_r(offs_t offset);
+	void hdgsp_paletteram_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t hdgsp_paletteram_hi_r(offs_t offset);
+	void hdgsp_paletteram_hi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	/* DSK board */
-	DECLARE_WRITE32_MEMBER(hddsk_update_pif);
+	void hddsk_update_pif(uint32_t data);
 
 	/* DS III/IV board */
 	TIMER_DEVICE_CALLBACK_MEMBER( ds3sdsp_internal_timer_callback );
@@ -215,58 +216,55 @@ protected:
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_driver);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_multisync);
 
-	/*----------- defined in video/harddriv.c -----------*/
+	/*----------- defined in video/harddriv.cpp -----------*/
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(hdgsp_write_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(hdgsp_read_from_shiftreg);
 
 	/* DSK board */
-	DECLARE_WRITE16_MEMBER( hd68k_dsk_control_w );
-	DECLARE_READ16_MEMBER( hd68k_dsk_ram_r );
-	DECLARE_WRITE16_MEMBER( hd68k_dsk_ram_w );
-	DECLARE_READ16_MEMBER( hd68k_dsk_small_rom_r );
-	DECLARE_READ16_MEMBER( hd68k_dsk_rom_r );
-	DECLARE_WRITE16_MEMBER( hd68k_dsk_dsp32_w );
-	DECLARE_READ16_MEMBER( hd68k_dsk_dsp32_r );
-	DECLARE_WRITE32_MEMBER( rddsp32_sync0_w );
-	DECLARE_WRITE32_MEMBER( rddsp32_sync1_w );
+	void hd68k_dsk_control_w(offs_t offset, uint16_t data);
+	uint16_t hd68k_dsk_ram_r(offs_t offset);
+	void hd68k_dsk_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t hd68k_dsk_small_rom_r(offs_t offset);
+	uint16_t hd68k_dsk_rom_r(offs_t offset);
+	void hd68k_dsk_dsp32_w(offs_t offset, uint16_t data);
+	uint16_t hd68k_dsk_dsp32_r(offs_t offset);
+	void rddsp32_sync0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void rddsp32_sync1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	/* DSPCOM board */
-	DECLARE_WRITE16_MEMBER( hddspcom_control_w );
-
-	DECLARE_WRITE16_MEMBER( rd68k_slapstic_w );
-	DECLARE_READ16_MEMBER( rd68k_slapstic_r );
+	void hddspcom_control_w(offs_t offset, uint16_t data);
 
 	/* Game-specific protection */
-	DECLARE_WRITE16_MEMBER( st68k_sloop_w );
-	DECLARE_READ16_MEMBER( st68k_sloop_r );
-	DECLARE_READ16_MEMBER( st68k_sloop_alt_r );
-	DECLARE_WRITE16_MEMBER( st68k_protosloop_w );
-	DECLARE_READ16_MEMBER( st68k_protosloop_r );
+	void st68k_sloop_w(offs_t offset, uint16_t data);
+	uint16_t st68k_sloop_r(offs_t offset);
+	uint16_t st68k_sloop_alt_r(offs_t offset);
+	void st68k_protosloop_w(offs_t offset, uint16_t data);
+	uint16_t st68k_protosloop_r(offs_t offset);
 
 	/* GSP optimizations */
-	DECLARE_READ16_MEMBER( hdgsp_speedup_r );
-	DECLARE_WRITE16_MEMBER( hdgsp_speedup1_w );
-	DECLARE_WRITE16_MEMBER( hdgsp_speedup2_w );
-	DECLARE_READ16_MEMBER( rdgsp_speedup1_r );
-	DECLARE_WRITE16_MEMBER( rdgsp_speedup1_w );
+	uint16_t hdgsp_speedup_r(offs_t offset);
+	void hdgsp_speedup1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void hdgsp_speedup2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rdgsp_speedup1_r(offs_t offset);
+	void rdgsp_speedup1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	/* MSP optimizations */
-	DECLARE_READ16_MEMBER( hdmsp_speedup_r );
-	DECLARE_WRITE16_MEMBER( hdmsp_speedup_w );
+	uint16_t hdmsp_speedup_r(offs_t offset);
+	void hdmsp_speedup_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	/* ADSP optimizations */
-	DECLARE_READ16_MEMBER( hdadsp_speedup_r );
-	DECLARE_READ16_MEMBER( hdds3_speedup_r );
+	uint16_t hdadsp_speedup_r();
+	uint16_t hdds3_speedup_r();
 
 
 	DECLARE_WRITE_LINE_MEMBER(hdds3sdsp_timer_enable_callback);
-	DECLARE_WRITE32_MEMBER(hdds3sdsp_serial_tx_callback);
-	DECLARE_READ32_MEMBER(hdds3sdsp_serial_rx_callback);
+	void hdds3sdsp_serial_tx_callback(uint32_t data);
+	uint32_t hdds3sdsp_serial_rx_callback();
 
 	DECLARE_WRITE_LINE_MEMBER(hdds3xdsp_timer_enable_callback);
-	DECLARE_WRITE32_MEMBER(hdds3xdsp_serial_tx_callback);
-	DECLARE_READ32_MEMBER(hdds3xdsp_serial_rx_callback);
+	void hdds3xdsp_serial_tx_callback(uint32_t data);
+	uint32_t hdds3xdsp_serial_rx_callback();
 
 
 	void adsp_data_map(address_map &map);
@@ -305,19 +303,21 @@ protected:
 	optional_device<mc68681_device> m_duartn68681;
 	required_device<adc0808_device> m_adc8;
 	output_finder<2> m_lamps;
+	output_finder<4> m_sel;
+	output_finder<> m_wheel;
 
-	uint8_t                   m_hd34010_host_access;
+	uint8_t                   m_hd34010_host_access = 0;
 
 	optional_shared_ptr<uint16_t> m_msp_ram;
 
-	uint16_t *                m_dsk_ram;
-	uint16_t *                m_dsk_rom;
+	uint16_t *                m_dsk_ram = nullptr;
+	uint16_t *                m_dsk_rom = nullptr;
 	optional_device<eeprom_parallel_28xx_device> m_dsk_10c;
 	optional_device<eeprom_parallel_28xx_device> m_dsk_30c;
-	uint8_t                   m_dsk_pio_access;
+	uint8_t                   m_dsk_pio_access = 0;
 
-	uint16_t *                m_m68k_slapstic_base;
-	uint16_t *                m_m68k_sloop_alt_base;
+	uint16_t *                m_m68k_sloop_base = nullptr;
+	uint16_t *                m_m68k_sloop_alt_base = nullptr;
 
 	required_device<timekeeper_device> m_200e;
 	required_device<eeprom_parallel_28xx_device> m_210e;
@@ -331,30 +331,30 @@ protected:
 
 	optional_shared_ptr<uint32_t> m_dsp32_ram;
 
-	uint16_t *                m_gsp_protection;
+	uint16_t *                m_gsp_protection = nullptr;
 
-	uint16_t *                m_gsp_speedup_addr[2];
-	offs_t                  m_gsp_speedup_pc;
+	uint16_t *                m_gsp_speedup_addr[2]{};
+	offs_t                  m_gsp_speedup_pc = 0;
 
-	uint16_t *                m_msp_speedup_addr;
-	offs_t                  m_msp_speedup_pc;
+	uint16_t *                m_msp_speedup_addr = nullptr;
+	offs_t                  m_msp_speedup_pc = 0;
 
-	uint16_t *                m_ds3_speedup_addr;
-	offs_t                  m_ds3_speedup_pc;
-	offs_t                  m_ds3_transfer_pc;
+	uint16_t *                m_ds3_speedup_addr = nullptr;
+	offs_t                  m_ds3_speedup_pc = 0;
+	offs_t                  m_ds3_transfer_pc = 0;
 
-	uint32_t *                m_rddsp32_sync[2];
+	uint32_t *                m_rddsp32_sync[2]{};
 
-	uint32_t                  m_gsp_speedup_count[4];
-	uint32_t                  m_msp_speedup_count[4];
-	uint32_t                  m_adsp_speedup_count[4];
+	uint32_t                  m_gsp_speedup_count[4]{};
+	uint32_t                  m_msp_speedup_count[4]{};
+	uint32_t                  m_adsp_speedup_count[4]{};
 
-	uint8_t                   m_gsp_multisync;
-	optional_shared_ptr<uint8_t>  m_gsp_vram;
-	optional_shared_ptr<uint16_t> m_gsp_control_lo;
-	optional_shared_ptr<uint16_t> m_gsp_control_hi;
-	optional_shared_ptr<uint16_t> m_gsp_paletteram_lo;
-	optional_shared_ptr<uint16_t> m_gsp_paletteram_hi;
+	uint8_t                   m_gsp_multisync = 0;
+	optional_shared_ptr<uint16_t>  m_gsp_vram;
+	optional_shared_ptr<uint16_t>  m_gsp_control_lo;
+	optional_shared_ptr<uint16_t>  m_gsp_control_hi;
+	memory_share_creator<uint16_t> m_gsp_paletteram_lo;
+	memory_share_creator<uint16_t> m_gsp_paletteram_hi;
 
 	required_ioport m_in0;
 	optional_ioport m_sw1;
@@ -362,97 +362,97 @@ protected:
 	optional_ioport_array<4> m_12badc;
 
 	/* machine state */
-	uint8_t                   m_irq_state;
-	uint8_t                   m_gsp_irq_state;
-	uint8_t                   m_msp_irq_state;
-	uint8_t                   m_adsp_irq_state;
-	uint8_t                   m_ds3sdsp_irq_state;
-	uint8_t                   m_duart_irq_state;
+	uint8_t                   m_irq_state = 0;
+	uint8_t                   m_gsp_irq_state = 0;
+	uint8_t                   m_msp_irq_state = 0;
+	uint8_t                   m_adsp_irq_state = 0;
+	uint8_t                   m_ds3sdsp_irq_state = 0;
+	uint8_t                   m_duart_irq_state = 0;
 
-	uint8_t                   m_last_gsp_shiftreg;
+	uint8_t                   m_last_gsp_shiftreg = 0;
 
-	uint8_t                   m_m68k_zp1;
-	uint8_t                   m_m68k_zp2;
-	uint8_t                   m_m68k_adsp_buffer_bank;
+	uint8_t                   m_m68k_zp1 = 0;
+	uint8_t                   m_m68k_zp2 = 0;
+	uint8_t                   m_m68k_adsp_buffer_bank = 0;
 
-	uint8_t                   m_adsp_halt;
-	uint8_t                   m_adsp_br;
-	uint8_t                   m_adsp_xflag;
-	uint16_t                  m_adsp_sim_address;
-	uint16_t                  m_adsp_som_address;
-	uint32_t                  m_adsp_eprom_base;
+	uint8_t                   m_adsp_halt = 0;
+	uint8_t                   m_adsp_br = 0;
+	uint8_t                   m_adsp_xflag = 0;
+	uint16_t                  m_adsp_sim_address = 0;
+	uint16_t                  m_adsp_som_address = 0;
+	uint32_t                  m_adsp_eprom_base = 0;
 
 	required_region_ptr<uint16_t> m_sim_memory;
-	uint16_t                  m_som_memory[0x8000/2];
-	uint16_t *                m_adsp_pgm_memory_word;
+	uint16_t                  m_som_memory[0x8000/2]{};
+	uint16_t *                m_adsp_pgm_memory_word = 0;
 
-	uint16_t *                m_ds3_sdata_memory;
-	uint32_t                  m_ds3_sdata_memory_size;
+	uint16_t *                m_ds3_sdata_memory = 0;
+	uint32_t                  m_ds3_sdata_memory_size = 0;
 
-	uint8_t                   m_ds3_gcmd;
-	uint8_t                   m_ds3_gflag;
-	uint8_t                   m_ds3_g68irqs;
-	uint8_t                   m_ds3_gfirqs;
-	uint8_t                   m_ds3_g68flag;
-	uint8_t                   m_ds3_send;
-	uint8_t                   m_ds3_reset;
-	uint16_t                  m_ds3_gdata;
-	uint16_t                  m_ds3_g68data;
-	uint32_t                  m_ds3_sim_address;
+	uint8_t                   m_ds3_gcmd = 0;
+	uint8_t                   m_ds3_gflag = 0;
+	uint8_t                   m_ds3_g68irqs = 0;
+	uint8_t                   m_ds3_gfirqs = 0;
+	uint8_t                   m_ds3_g68flag = 0;
+	uint8_t                   m_ds3_send = 0;
+	uint8_t                   m_ds3_reset = 0;
+	uint16_t                  m_ds3_gdata = 0;
+	uint16_t                  m_ds3_g68data = 0;
+	uint32_t                  m_ds3_sim_address = 0;
 
-	uint8_t                   m_ds3_scmd;
-	uint8_t                   m_ds3_sflag;
-	uint8_t                   m_ds3_s68irqs;
-	uint8_t                   m_ds3_sfirqs;
-	uint8_t                   m_ds3_s68flag;
-	uint8_t                   m_ds3_sreset;
-	uint16_t                  m_ds3_sdata;
-	uint16_t                  m_ds3_s68data;
-	uint32_t                  m_ds3_sdata_address;
-	uint16_t                  m_ds3sdsp_regs[32];
-	uint16_t                  m_ds3sdsp_timer_en;
-	uint16_t                  m_ds3sdsp_sdata;
+	uint8_t                   m_ds3_scmd = 0;
+	uint8_t                   m_ds3_sflag = 0;
+	uint8_t                   m_ds3_s68irqs = 0;
+	uint8_t                   m_ds3_sfirqs = 0;
+	uint8_t                   m_ds3_s68flag = 0;
+	uint8_t                   m_ds3_sreset = 0;
+	uint16_t                  m_ds3_sdata = 0;
+	uint16_t                  m_ds3_s68data = 0;
+	uint32_t                  m_ds3_sdata_address = 0;
+	uint16_t                  m_ds3sdsp_regs[32]{};
+	uint16_t                  m_ds3sdsp_timer_en = 0;
+	uint16_t                  m_ds3sdsp_sdata = 0;
 	optional_device<timer_device> m_ds3sdsp_internal_timer;
 
-	uint16_t                  m_ds3xdsp_regs[32];
-	uint16_t                  m_ds3xdsp_timer_en;
-	uint16_t                  m_ds3xdsp_sdata;
+	uint16_t                  m_ds3xdsp_regs[32]{};
+	uint16_t                  m_ds3xdsp_timer_en = 0;
+	uint16_t                  m_ds3xdsp_sdata = 0;
 	optional_device<timer_device> m_ds3xdsp_internal_timer;
 
-	uint16_t                  m_adc_control;
-	uint8_t                   m_adc12_select;
-	uint8_t                   m_adc12_byte;
-	uint16_t                  m_adc12_data;
+	uint16_t                  m_adc_control = 0;
+	uint8_t                   m_adc12_select = 0;
+	uint8_t                   m_adc12_byte = 0;
+	uint16_t                  m_adc12_data = 0;
 
-	uint16_t                  m_hdc68k_last_wheel;
-	uint16_t                  m_hdc68k_last_port1;
-	uint8_t                   m_hdc68k_wheel_edge;
-	uint8_t                   m_hdc68k_shifter_state;
+	uint16_t                  m_hdc68k_last_wheel = 0;
+	uint16_t                  m_hdc68k_last_port1 = 0;
+	uint8_t                   m_hdc68k_wheel_edge = 0;
+	uint8_t                   m_hdc68k_shifter_state = 0;
 
-	uint8_t                   m_st68k_sloop_bank;
-	offs_t                  m_st68k_last_alt_sloop_offset;
+	uint8_t                   m_st68k_sloop_bank = 0;
+	offs_t                  m_st68k_last_alt_sloop_offset = 0;
 
-	uint8_t                   m_sel_select;
-	uint8_t                   m_sel1_data;
-	uint8_t                   m_sel2_data;
-	uint8_t                   m_sel3_data;
-	uint8_t                   m_sel4_data;
+	uint8_t                   m_sel_select = 0;
+	uint8_t                   m_sel1_data = 0;
+	uint8_t                   m_sel2_data = 0;
+	uint8_t                   m_sel3_data = 0;
+	uint8_t                   m_sel4_data = 0;
 
 	#define MAX_MSP_SYNC    16
-	uint32_t *                m_dataptr[MAX_MSP_SYNC];
-	uint32_t                  m_dataval[MAX_MSP_SYNC];
-	int                     m_next_msp_sync;
+	uint32_t *                m_dataptr[MAX_MSP_SYNC]{};
+	uint32_t                  m_dataval[MAX_MSP_SYNC]{};
+	int                     m_next_msp_sync = 0;
 
 	/* video state */
-	offs_t                  m_vram_mask;
+	offs_t                  m_vram_mask = 0;
 
-	uint8_t                   m_shiftreg_enable;
+	uint8_t                   m_shiftreg_enable = 0;
 
-	uint32_t                  m_mask_table[65536 * 4];
-	uint8_t *                 m_gsp_shiftreg_source;
+	uint32_t                  m_mask_table[65536 * 4]{};
+	uint16_t *                m_gsp_shiftreg_source = 0;
 
-	int8_t                    m_gfx_finescroll;
-	uint8_t                   m_gfx_palettebank;
+	int8_t                    m_gfx_finescroll = 0;
+	uint8_t                   m_gfx_palettebank = 0;
 	virtual void update_interrupts();
 	void init_driver();
 	void init_multisync(int compact_inputs);
@@ -485,12 +485,13 @@ protected:
 
 	inline void gsp_palette_change(int offset);
 
-	uint8_t               m_sound_int_state;
-	uint8_t               m_video_int_state;
+	uint8_t               m_sound_int_state = 0;
+	uint8_t               m_video_int_state = 0;
 
 	optional_device<palette_device> m_palette;
 	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
-	optional_device<atari_slapstic_device> m_slapstic_device;
+	optional_device<atari_slapstic_device> m_slapstic;
+	memory_bank_creator m_slapstic_bank;
 
 	optional_device<rs232_port_device> m_rs232;
 
@@ -506,41 +507,40 @@ public:
 	harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~harddriv_sound_board_device() {}
 
-	DECLARE_READ16_MEMBER(hd68k_snd_data_r);
-	DECLARE_READ16_MEMBER(hd68k_snd_status_r);
-	DECLARE_WRITE16_MEMBER(hd68k_snd_data_w);
-	DECLARE_WRITE16_MEMBER(hd68k_snd_reset_w);
+	uint16_t hd68k_snd_data_r();
+	uint16_t hd68k_snd_status_r();
+	void hd68k_snd_data_w(uint16_t data);
+	void hd68k_snd_reset_w(uint16_t data);
 
 private:
-
-	DECLARE_READ16_MEMBER(hdsnd68k_data_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_data_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_switches_r);
-	DECLARE_READ16_MEMBER(hdsnd68k_320port_r);
-	DECLARE_READ16_MEMBER(hdsnd68k_status_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_latches_w);
+	uint16_t hdsnd68k_data_r();
+	void hdsnd68k_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t hdsnd68k_switches_r(offs_t offset);
+	uint16_t hdsnd68k_320port_r(offs_t offset);
+	uint16_t hdsnd68k_status_r();
+	void hdsnd68k_latches_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(speech_write_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_rate_w);
 	DECLARE_WRITE_LINE_MEMBER(cram_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(led_w);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_speech_w);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_irqclr_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_320ram_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_320ram_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_320ports_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_320ports_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_320com_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_320com_w);
+	void hdsnd68k_speech_w(offs_t offset, uint16_t data);
+	void hdsnd68k_irqclr_w(uint16_t data);
+	uint16_t hdsnd68k_320ram_r(offs_t offset);
+	void hdsnd68k_320ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t hdsnd68k_320ports_r(offs_t offset);
+	void hdsnd68k_320ports_w(offs_t offset, uint16_t data);
+	uint16_t hdsnd68k_320com_r(offs_t offset);
+	void hdsnd68k_320com_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_comport_w);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_mute_w);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_gen68kirq_w);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_soundaddr_w);
-	DECLARE_READ16_MEMBER(hdsnddsp_rom_r);
-	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
-	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
+	void hdsnddsp_dac_w(uint16_t data);
+	void hdsnddsp_comport_w(uint16_t data);
+	void hdsnddsp_mute_w(uint16_t data);
+	void hdsnddsp_gen68kirq_w(uint16_t data);
+	void hdsnddsp_soundaddr_w(offs_t offset, uint16_t data);
+	uint16_t hdsnddsp_rom_r();
+	uint16_t hdsnddsp_comram_r();
+	uint16_t hdsnddsp_compare_r(offs_t offset);
 
 	void driversnd_68k_map(address_map &map);
 	void driversnd_dsp_io_map(address_map &map);
@@ -557,18 +557,18 @@ private:
 	required_shared_ptr<uint16_t> m_sounddsp_ram;
 	required_region_ptr<uint8_t>  m_sound_rom;
 
-	uint8_t                   m_soundflag;
-	uint8_t                   m_mainflag;
-	uint16_t                  m_sounddata;
-	uint16_t                  m_maindata;
+	uint8_t                   m_soundflag = 0;
+	uint8_t                   m_mainflag = 0;
+	uint16_t                  m_sounddata = 0;
+	uint16_t                  m_maindata = 0;
 
-	uint8_t                   m_cramen;
-	uint8_t                   m_irq68k;
+	uint8_t                   m_cramen = 0;
+	uint8_t                   m_irq68k = 0;
 
-	offs_t                  m_sound_rom_offs;
+	offs_t                  m_sound_rom_offs = 0;
 
-	uint16_t                  m_comram[0x400/2];
-	uint64_t                  m_last_bio_cycles;
+	uint16_t                  m_comram[0x400/2]{};
+	uint64_t                  m_last_bio_cycles = 0;
 
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );

@@ -41,7 +41,7 @@ static const struct gotya_sample gotya_samples[] =
 	{   -1, 0, 0 }      /* end of array */
 };
 
-WRITE8_MEMBER(gotya_state::gotya_soundlatch_w)
+void gotya_state::gotya_soundlatch_w(uint8_t data)
 {
 	int sample_number;
 

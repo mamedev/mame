@@ -16,9 +16,8 @@
 
 */
 
-#include <assert.h>
 #include "imageutl.h"
-#include "flopimg.h"
+#include "flopimg_legacy.h"
 
 /***************************************************************************
     PARAMETERS

@@ -29,25 +29,23 @@ public:
 			m_gfxram(*this, "gfxram")
 	{ }
 
+	void init_cupidon();
+	void init_funnyfm();
+
+	void cupidon(machine_config &config);
+	void cupidon_map(address_map &map);
+
+protected:
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_gfxram;
 
 	uint32_t screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_cupidon();
-	void init_funnyfm();
-
-	DECLARE_READ32_MEMBER( cupidon_return_ffffffff )
+	uint32_t cupidon_return_ffffffff()
 	{
 		return -1; // or it hits an illegal opcode (sleep on the 68340?)
-	};
-
-		void cupidon(machine_config &config);
-		void cupidon_map(address_map &map);
-protected:
-
-
+	}
 };
 
 uint32_t cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -60,7 +58,7 @@ uint32_t cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind1
 		{
 			for (int y=0;y<16;y++)
 			{
-				uint16_t* destline = &bitmap.pix16(ytile*16 + y);
+				uint16_t *const destline = &bitmap.pix(ytile*16 + y);
 
 				for (int x=0;x<8;x++)
 				{
@@ -88,14 +86,13 @@ void cupidon_state::cupidon_map(address_map &map)
 	map(0x1800000, 0x1800003).r(FUNC(cupidon_state::cupidon_return_ffffffff));
 	map(0x2000074, 0x2000077).ram(); // port
 
-//  AM_RANGE(0x2000040, 0x200004f) AM_RAM
-
+//  map(0x2000040, 0x200004f).ram();
 
 // might just be 4mb of VRAM
 	map(0x3000000, 0x33bffff).ram();
 	map(0x33c0000, 0x33fffff).ram().share("gfxram"); // seems to upload graphics to here, tiles etc. if you skip the loop after the romtest in funnyfm
-//  AM_RANGE(0x3400000, 0x3400fff) AM_RAM
-//  AM_RANGE(0x3F80000, 0x3F80003) AM_RAM
+//  map(0x3400000, 0x3400fff).ram();
+//  map(0x3F80000, 0x3F80003).ram();
 	map(0x3FF0400, 0x3FF0403).ram(); // register? gangrose likes to read this?
 }
 

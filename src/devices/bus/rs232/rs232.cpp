@@ -42,7 +42,7 @@
 #include "emu.h"
 #include "rs232.h"
 
-DEFINE_DEVICE_TYPE(RS232_PORT, rs232_port_device, "rs232", "RS232 Port")
+DEFINE_DEVICE_TYPE(RS232_PORT, rs232_port_device, "rs232", "RS-232 Port")
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	rs232_port_device(mconfig, RS232_PORT, tag, owner, clock)
@@ -51,7 +51,7 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_rs232_port_interface>(mconfig, *this),
 	m_rxd(0),
 	m_dcd(0),
 	m_dsr(0),
@@ -78,7 +78,7 @@ rs232_port_device::~rs232_port_device()
 
 void rs232_port_device::device_config_complete()
 {
-	m_dev = dynamic_cast<device_rs232_port_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
 void rs232_port_device::device_resolve_objects()
@@ -91,6 +91,23 @@ void rs232_port_device::device_resolve_objects()
 	m_cts_handler.resolve_safe();
 	m_rxc_handler.resolve_safe();
 	m_txc_handler.resolve_safe();
+
+	m_rxd = 1;
+	m_dcd = 1;
+	m_dsr = 1;
+	m_ri = 1;
+	m_si = 1;
+	m_cts = 1;
+}
+
+void rs232_port_device::device_reset()
+{
+	m_rxd_handler(m_rxd);
+	m_dcd_handler(m_dcd);
+	m_dsr_handler(m_dsr);
+	m_ri_handler(m_ri);
+	m_si_handler(m_si);
+	m_cts_handler(m_cts);
 }
 
 void rs232_port_device::device_start()
@@ -103,20 +120,6 @@ void rs232_port_device::device_start()
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dce_rxc));
 	save_item(NAME(m_dce_txc));
-
-	m_rxd = 1;
-	m_dcd = 1;
-	m_dsr = 1;
-	m_ri = 1;
-	m_si = 1;
-	m_cts = 1;
-
-	m_rxd_handler(1);
-	m_dcd_handler(1);
-	m_dsr_handler(1);
-	m_ri_handler(1);
-	m_si_handler(1);
-	m_cts_handler(1);
 }
 
 WRITE_LINE_MEMBER( rs232_port_device::write_txd )
@@ -150,7 +153,7 @@ WRITE_LINE_MEMBER( rs232_port_device::write_spds )
 }
 
 device_rs232_port_interface::device_rs232_port_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "rs232")
 {
 	m_port = dynamic_cast<rs232_port_device *>(device.owner());
 }
@@ -159,24 +162,37 @@ device_rs232_port_interface::~device_rs232_port_interface()
 {
 }
 
+
+#include "ie15.h"
 #include "keyboard.h"
 #include "loopback.h"
+#include "mboardd.h"
 #include "null_modem.h"
+#include "patchbox.h"
 #include "printer.h"
 #include "pty.h"
+#include "rs232_sync_io.h"
 #include "sun_kbd.h"
+#include "swtpc8212.h"
 #include "terminal.h"
-#include "ie15.h"
+
+template class device_finder<device_rs232_port_interface, false>;
+template class device_finder<device_rs232_port_interface, true>;
 
 void default_rs232_devices(device_slot_interface &device)
 {
-	device.option_add("keyboard", SERIAL_KEYBOARD);
-	device.option_add("loopback", RS232_LOOPBACK);
-	device.option_add("dec_loopback", DEC_RS232_LOOPBACK);
-	device.option_add("null_modem", NULL_MODEM);
-	device.option_add("printer", SERIAL_PRINTER);
-	device.option_add("terminal", SERIAL_TERMINAL);
-	device.option_add("pty", PSEUDO_TERMINAL);
-	device.option_add("sunkbd", SUN_KBD_ADAPTOR);
-	device.option_add("ie15", SERIAL_TERMINAL_IE15);
+	device.option_add("dec_loopback",  DEC_RS232_LOOPBACK);
+	device.option_add("ie15",          SERIAL_TERMINAL_IE15);
+	device.option_add("keyboard",      SERIAL_KEYBOARD);
+	device.option_add("loopback",      RS232_LOOPBACK);
+	device.option_add("mockingboard",  SERIAL_MOCKINGBOARD_D);
+	device.option_add("null_modem",    NULL_MODEM);
+	device.option_add("patch",         RS232_PATCH_BOX);
+	device.option_add("printer",       SERIAL_PRINTER);
+	device.option_add("pty",           PSEUDO_TERMINAL);
+	device.option_add("rs232_sync_io", RS232_SYNC_IO);
+	device.option_add("rs_printer",    RADIO_SHACK_SERIAL_PRINTER);
+	device.option_add("sunkbd",        SUN_KBD_ADAPTOR);
+	device.option_add("swtpc8212",     SERIAL_TERMINAL_SWTPC8212);
+	device.option_add("terminal",      SERIAL_TERMINAL);
 }

@@ -1,0 +1,9 @@
+{
+  "plugin": {
+	"name": "SLAXML",
+	"description": "Lua SLAX XML parser",
+	"version": "0.8",
+	"author": "Gavin Kistner",
+	"type": "library"
+  }
+}

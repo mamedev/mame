@@ -98,9 +98,12 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "sanremo.lh"
 
+
+namespace {
 
 #define MASTER_CLOCK    XTAL(18'000'000)
 
@@ -120,6 +123,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void roadstar(machine_config &config);
 	void sanremo(machine_config &config);
 
 protected:
@@ -131,17 +135,18 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;
 
-	uint8_t m_attrram[0x800];
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_banksel;
+	uint8_t m_attrram[0x800]{};
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_banksel = 0;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_WRITE8_MEMBER(banksel_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void banksel_w(uint8_t data);
+	void lamps_w(uint8_t data);
 	void sanremo_palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sanremo_map(address_map &map);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void number1_map(address_map &map);
+	void roadstar_map(address_map &map);
 	void sanremo_portmap(address_map &map);
 };
 
@@ -151,7 +156,7 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(sanremo_state::videoram_w)
+void sanremo_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_attrram[offset] = m_banksel;
@@ -163,12 +168,12 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_tile_info)
 	int code = m_videoram[tile_index];
 	int bank = m_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code + bank * 256, 0, 0);
+	tileinfo.set(0, code + bank * 256, 0, 0);
 }
 
 void sanremo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanremo_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanremo_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
 
 	m_lamps.resolve();
 
@@ -176,7 +181,7 @@ void sanremo_state::video_start()
 	save_item(NAME(m_banksel));
 }
 
-uint32_t sanremo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sanremo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -198,7 +203,7 @@ void sanremo_state::sanremo_palette(palette_device &palette) const
 *                   R/W Handlers                  *
 **************************************************/
 
-WRITE8_MEMBER(sanremo_state::lamps_w)
+void sanremo_state::lamps_w(uint8_t data)
 {
 	/*  LAMPS:
 
@@ -216,7 +221,7 @@ WRITE8_MEMBER(sanremo_state::lamps_w)
 		m_lamps[n] = BIT(data, n);
 }
 
-WRITE8_MEMBER(sanremo_state::banksel_w)
+void sanremo_state::banksel_w(uint8_t data)
 {
 	/*  GFX banks selector.
 
@@ -232,11 +237,18 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
 *           Memory map information           *
 *********************************************/
 
-void sanremo_state::sanremo_map(address_map &map)
+void sanremo_state::number1_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().w(FUNC(sanremo_state::videoram_w)).share("videoram");  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
 	map(0xc000, 0xc7ff).ram().share("nvram");                               // battery backed UM6116
+}
+
+void sanremo_state::roadstar_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(FUNC(sanremo_state::videoram_w)).share("videoram");
+	map(0xd000, 0xd7ff).ram().share("nvram");
 }
 
 void sanremo_state::sanremo_portmap(address_map &map)
@@ -359,7 +371,7 @@ void sanremo_state::sanremo(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sanremo_state::sanremo_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sanremo_state::number1_map);
 	m_maincpu->set_addrmap(AS_IO, &sanremo_state::sanremo_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(sanremo_state::irq0_line_hold));
 
@@ -372,7 +384,6 @@ void sanremo_state::sanremo(machine_config &config)
 	screen.set_size(70*8, 41*8);
 	screen.set_visarea(0, 48*8-1, 0, 38*8-1);
 	screen.set_screen_update(FUNC(sanremo_state::screen_update));
-	screen.set_palette("palette");
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	// *** MC6845 init ***
@@ -393,6 +404,13 @@ void sanremo_state::sanremo(machine_config &config)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
+void sanremo_state::roadstar(machine_config &config)
+{
+	sanremo(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &sanremo_state::roadstar_map);
+}
+
 
 /*********************************************
 *                  Rom Load                  *
@@ -411,16 +429,37 @@ ROM_START( number1 )
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "number1_nvram.bin", 0x0000, 0x0800, CRC(4ece7b39) SHA1(49815571d75a39ab67d26691f902dfbd4e05feb4) )
 
-	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce1.bin", 0x0000, 0x0104, NO_DUMP )   /* PALCE is read protected */
-	ROM_LOAD( "palce2.bin", 0x0200, 0x0104, NO_DUMP )   /* PALCE is read protected */
-	ROM_LOAD( "palce3.bin", 0x0400, 0x0104, NO_DUMP )   /* PALCE is read protected */
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "palce1.ic4",  0x0000, 0x0104, NO_DUMP )   /* PALCE is read protected */
+	ROM_LOAD( "palce2.ic24", 0x0200, 0x0104, NO_DUMP )   /* PALCE is read protected */
+	ROM_LOAD( "palce3.ic25", 0x0400, 0x0104, NO_DUMP )   /* PALCE is read protected */
+	ROM_LOAD( "palce2.ic31", 0x0600, 0x0104, NO_DUMP )   /* PALCE is read protected */
 ROM_END
+
+ROM_START( roadstar )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic26", 0x0000, 0x8000, CRC(a5b85c28) SHA1(7f62ab82be18a094834529b9600867befa090782) )
+
+	ROM_REGION( 0x40000, "gfx", 0 )
+	ROM_LOAD( "rp i.ic30", 0x00000, 0x8000, CRC(13a47975) SHA1(d2c210afb44e2615fe216a913172851f723660ab) )    // I
+	ROM_LOAD( "rp b.ic27", 0x10000, 0x8000, CRC(990df77e) SHA1(78755b8fd3a0b5f8453a1427b960844e1428cff7) )    // B
+	ROM_LOAD( "rp g.ic28", 0x20000, 0x8000, CRC(a836434c) SHA1(f8960591589932b1998d9b1c3816bc1409cabbe2) )    // G
+	ROM_LOAD( "rp r.ic29", 0x30000, 0x8000, CRC(6994ad22) SHA1(8288d50aa4db5c7da064a3932a0fd5b6e4070d8f) )    // R
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "palce1.ic4",  0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "palce2.ic24", 0x0200, 0x0104, NO_DUMP )
+	ROM_LOAD( "palce3.ic25", 0x0400, 0x0104, NO_DUMP )
+	ROM_LOAD( "palce2.ic31", 0x0600, 0x0104, NO_DUMP )
+ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS                    LAYOUT
-GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, empty_init, ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,   layout_sanremo )
+//     YEAR  NAME      PARENT  MACHINE   INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS                                        LAYOUT
+GAMEL( 1996, number1,  0,      sanremo,  number1, sanremo_state, empty_init, ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,                       layout_sanremo )
+GAMEL( 199?, roadstar, 0,      roadstar, number1, sanremo_state, empty_init, ROT0, "San Remo Games", "Road Star",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sanremo ) // different I/O map? or does it need special init?

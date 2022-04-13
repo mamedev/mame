@@ -123,6 +123,7 @@
 #include "includes/ccastles.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "speaker.h"
@@ -170,7 +171,7 @@ TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 }
 
 
-CUSTOM_INPUT_MEMBER(ccastles_state::get_vblank)
+READ_LINE_MEMBER(ccastles_state::vblank_r)
 {
 	int scanline = m_screen->vpos();
 	return m_syncprom[scanline & 0xff] & 1;
@@ -237,7 +238,7 @@ void ccastles_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::irq_ack_w)
+void ccastles_state::irq_ack_w(uint8_t data)
 {
 	if (m_irq_state)
 	{
@@ -247,7 +248,7 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 }
 
 
-READ8_MEMBER(ccastles_state::leta_r)
+uint8_t ccastles_state::leta_r(offs_t offset)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
@@ -262,7 +263,7 @@ READ8_MEMBER(ccastles_state::leta_r)
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::nvram_recall_w)
+void ccastles_state::nvram_recall_w(uint8_t data)
 {
 	m_nvram_4b->recall(0);
 	m_nvram_4b->recall(1);
@@ -280,16 +281,16 @@ WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
 }
 
 
-READ8_MEMBER(ccastles_state::nvram_r)
+uint8_t ccastles_state::nvram_r(address_space &space, offs_t offset)
 {
-	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space, offset) << 4);
+	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space,offset) << 4);
 }
 
 
-WRITE8_MEMBER(ccastles_state::nvram_w)
+void ccastles_state::nvram_w(offs_t offset, uint8_t data)
 {
-	m_nvram_4b->write(space, offset, data);
-	m_nvram_4a->write(space, offset, data >> 4);
+	m_nvram_4b->write(offset, data);
+	m_nvram_4a->write(offset, data >> 4);
 }
 
 
@@ -306,8 +307,8 @@ void ccastles_state::main_map(address_map &map)
 	map(0x0000, 0x7fff).ram().w(FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
 	map(0x0000, 0x0001).w(FUNC(ccastles_state::ccastles_bitmode_addr_w));
 	map(0x0002, 0x0002).rw(FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
-	map(0x8000, 0x8fff).ram();
-	map(0x8e00, 0x8fff).share("spriteram");
+	map(0x8000, 0x8dff).ram();
+	map(0x8e00, 0x8fff).ram().share("spriteram");
 	map(0x9000, 0x90ff).mirror(0x0300).rw(FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
 	map(0x9400, 0x9403).mirror(0x01fc).r(FUNC(ccastles_state::leta_r));
 	map(0x9600, 0x97ff).portr("IN0");
@@ -340,7 +341,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ccastles_state, vblank_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Jump/1P Start Upright")    PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* left Jump, non-cocktail start1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Jump")           PORT_CONDITION("IN1",0x20,EQUALS,0x20)  /* 1p Jump, cocktail */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Jump/2P Start Upright")   PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* right Jump, non-cocktail start2 */

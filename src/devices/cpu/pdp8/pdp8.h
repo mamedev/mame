@@ -30,9 +30,9 @@ public:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -46,7 +46,7 @@ public:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// address spaces
-	const address_space_config m_program_config;
+	address_space_config m_program_config;
 
 	enum state
 	{
@@ -105,7 +105,5 @@ enum
 	PDP8_IR,
 	PDP8_HALT
 };
-
-CPU_DISASSEMBLE( pdp8 );
 
 #endif /* __PDP8_H__ */

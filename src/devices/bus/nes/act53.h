@@ -12,12 +12,13 @@ class nes_action53_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+	virtual void pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted) override;
 
 protected:
 	// device-level overrides
@@ -26,8 +27,8 @@ protected:
 private:
 	void update_prg();
 	void update_mirr();
-	uint8_t m_sel;
-	uint8_t m_reg[4];
+	u8 m_sel;
+	u8 m_reg[4];
 };
 
 // device type definition

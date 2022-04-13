@@ -127,6 +127,9 @@ Dip locations verified for:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+namespace {
 
 class m63_state : public driver_device
 {
@@ -156,6 +159,11 @@ public:
 	void init_wilytowr();
 	void init_fghtbskt();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scrollram;
@@ -163,20 +171,20 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t    m_nmi_mask;
+	uint8_t    m_nmi_mask = 0;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_pal_bank;
-	int      m_fg_flag;
-	int      m_sy_offset;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int      m_pal_bank = 0;
+	int      m_fg_flag = 0;
+	int      m_sy_offset = 0;
 
 	/* sound-related */
-	uint8_t    m_sound_irq;
-	int      m_sound_status;
-	int      m_p1;
-	int      m_p2;
+	uint8_t    m_sound_irq = 0;
+	int      m_sound_status = 0;
+	int      m_p1 = 0;
+	int      m_p2 = 0;
 	std::unique_ptr<int16_t[]>    m_samplebuf;
 
 	/* devices */
@@ -189,29 +197,26 @@ private:
 	optional_device<samples_device> m_samples;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(m63_videoram_w);
-	DECLARE_WRITE8_MEMBER(m63_colorram_w);
-	DECLARE_WRITE8_MEMBER(m63_videoram2_w);
+	void m63_videoram_w(offs_t offset, uint8_t data);
+	void m63_colorram_w(offs_t offset, uint8_t data);
+	void m63_videoram2_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pal_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(m63_flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(fghtbskt_flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_w);
-	DECLARE_WRITE8_MEMBER(snd_irq_w);
-	DECLARE_WRITE8_MEMBER(snddata_w);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(snd_status_r);
+	void snd_irq_w(uint8_t data);
+	void snddata_w(offs_t offset, uint8_t data);
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
+	uint8_t snd_status_r();
 	DECLARE_READ_LINE_MEMBER(irq_r);
-	DECLARE_READ8_MEMBER(snddata_r);
-	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
+	uint8_t snddata_r(offs_t offset);
+	void fghtbskt_samples_w(uint8_t data);
 	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_MACHINE_START(m63);
-	DECLARE_MACHINE_RESET(m63);
-	DECLARE_VIDEO_START(m63);
 	void m63_palette(palette_device &palette) const;
 	uint32_t screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(snd_irq);
@@ -279,19 +284,19 @@ void m63_state::m63_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(m63_state::m63_videoram_w)
+void m63_state::m63_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m63_state::m63_colorram_w)
+void m63_state::m63_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m63_state::m63_videoram2_w)
+void m63_state::m63_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -322,20 +327,20 @@ TILE_GET_INFO_MEMBER(m63_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0x0f) + (m_pal_bank << 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, m_fg_flag);
+	tileinfo.set(0, code, 0, m_fg_flag);
 }
 
-VIDEO_START_MEMBER(m63_state,m63)
+void m63_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m63_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m63_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -404,13 +409,13 @@ WRITE_LINE_MEMBER(m63_state::coin2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(m63_state::snd_irq_w)
+void m63_state::snd_irq_w(uint8_t data)
 {
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 	machine().scheduler().synchronize();
 }
 
-WRITE8_MEMBER(m63_state::snddata_w)
+void m63_state::snddata_w(offs_t offset, uint8_t data)
 {
 	if ((m_p2 & 0xf0) == 0xe0)
 		m_ay1->address_w(offset);
@@ -424,12 +429,12 @@ WRITE8_MEMBER(m63_state::snddata_w)
 		m_sound_status = offset;
 }
 
-WRITE8_MEMBER(m63_state::p1_w)
+void m63_state::p1_w(uint8_t data)
 {
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(m63_state::p2_w)
+void m63_state::p2_w(uint8_t data)
 {
 	m_p2 = data;
 	if((m_p2 & 0xf0) == 0x50)
@@ -438,7 +443,7 @@ WRITE8_MEMBER(m63_state::p2_w)
 	}
 }
 
-READ8_MEMBER(m63_state::snd_status_r)
+uint8_t m63_state::snd_status_r()
 {
 	return m_sound_status;
 }
@@ -453,7 +458,7 @@ READ_LINE_MEMBER(m63_state::irq_r)
 	return 0;
 }
 
-READ8_MEMBER(m63_state::snddata_r)
+uint8_t m63_state::snddata_r(offs_t offset)
 {
 	switch (m_p2 & 0xf0)
 	{
@@ -463,7 +468,7 @@ READ8_MEMBER(m63_state::snddata_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(m63_state::fghtbskt_samples_w)
+void m63_state::fghtbskt_samples_w(uint8_t data)
 {
 	if (data & 1)
 		m_samples->start_raw(0, m_samplebuf.get() + ((data & 0xf0) << 8), 0x2000, 8000);
@@ -659,28 +664,6 @@ static INPUT_PORTS_START( fghtbskt )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(1,2), RGN_FRAC(0,2) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -696,15 +679,15 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_m63 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   256, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 256, 1  )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar,   0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_fghtbskt )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,  16, 1  )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar,   0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       0, 32 )
 GFXDECODE_END
 
 
@@ -725,7 +708,7 @@ INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
 	m_sound_irq = 1;
 }
 
-MACHINE_START_MEMBER(m63_state,m63)
+void m63_state::machine_start()
 {
 	save_item(NAME(m_pal_bank));
 	save_item(NAME(m_fg_flag));
@@ -738,7 +721,7 @@ MACHINE_START_MEMBER(m63_state,m63)
 	save_item(NAME(m_p2));
 }
 
-MACHINE_RESET_MEMBER(m63_state,m63)
+void m63_state::machine_reset()
 {
 	m_pal_bank = 0;
 	m_fg_flag = 0;
@@ -777,9 +760,6 @@ void m63_state::m63(machine_config &config)
 	m_soundcpu->t1_in_cb().set(FUNC(m63_state::irq_r));
 	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60));
 
-	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
-	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -791,8 +771,6 @@ void m63_state::m63(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m63);
 	PALETTE(config, m_palette, FUNC(m63_state::m63_palette), 256+4);
-
-	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); /* ????? */
@@ -824,10 +802,10 @@ void m63_state::fghtbskt(machine_config &config)
 	I8039(config, m_soundcpu, XTAL(12'000'000)/4); /* ????? */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m63_state::i8039_map);
 	m_soundcpu->set_addrmap(AS_IO, &m63_state::i8039_port_map);
+	m_soundcpu->p1_out_cb().set(FUNC(m63_state::p1_w));
+	m_soundcpu->p2_out_cb().set(FUNC(m63_state::p2_w));
+	m_soundcpu->t1_in_cb().set(FUNC(m63_state::irq_r));
 	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60/2));
-
-	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
-	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -840,8 +818,6 @@ void m63_state::fghtbskt(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghtbskt);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
-
-	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1039,6 +1015,9 @@ void m63_state::init_fghtbskt()
 {
 	m_sy_offset = 240;
 }
+
+} // Anonymous namespace
+
 
 GAME( 1984, wilytowr, 0,        m63,      wilytowr, m63_state, init_wilytowr, ROT180, "Irem",                    "Wily Tower", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, atomboy,  wilytowr, atomboy,  wilytowr, m63_state, init_wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision B)", MACHINE_SUPPORTS_SAVE )

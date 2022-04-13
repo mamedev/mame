@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="redled" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="yellowled" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.75" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.20" green="0.20" blue="0.0" />
+		</disk>
+	</element>
+	<element name="blueled" defstate="0">
+		<disk state="1">
+			<color red="0" green="0.0" blue="0.75" />
+		</disk>
+		<disk state="0">
+			<color red="0.0" green="0.0" blue="0.20" />
+		</disk>
+	</element>
+	<element name="greenled" defstate="0">
+		<disk state="1">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</disk>
+	</element>
+	<view name="Screen with Controller LEDs">
+		<screen index="0">
+			<bounds x="0" y="0" width="320" height="240" />
+		</screen>
+		<collection name="Controller LEDs" visible="no">
+			<element name="redled1" ref="redled">
+				<bounds x="5" y="245" width="10" height="10" />
+			</element>
+			<element name="yellowled1" ref="yellowled">
+				<bounds x="20" y="245" width="10" height="10" />
+			</element>
+			<element name="blueled1" ref="blueled">
+				<bounds x="35" y="245" width="10" height="10" />
+			</element>
+			<element name="greenled1" ref="greenled">
+				<bounds x="50" y="245" width="10" height="10" />
+			</element>
+			<element name="redled2" ref="redled">
+				<bounds x="260" y="245" width="10" height="10" />
+			</element>
+			<element name="yellowled2" ref="yellowled">
+				<bounds x="275" y="245" width="10" height="10" />
+			</element>
+			<element name="blueled2" ref="blueled">
+				<bounds x="290" y="245" width="10" height="10" />
+			</element>
+			<element name="greenled2" ref="greenled">
+				<bounds x="305" y="245" width="10" height="10" />
+			</element>
+		</collection>
+	</view>
+</mamelayout>

@@ -38,9 +38,9 @@ void namco_c139_device::regs_map(address_map &map)
 {
 	map(0x00, 0x01).r(FUNC(namco_c139_device::status_r)); // WRITE clears flags
 	map(0x02, 0x03).noprw(); // settings?
-//  AM_RANGE(0x0a, 0x0b) // WRITE tx_w
-//  AM_RANGE(0x0c, 0x0d) // READ rx_r
-//  AM_RANGE(0x0e, 0x0f) //
+//  map(0x0a, 0x0b) // WRITE tx_w
+//  map(0x0c, 0x0d) // READ rx_r
+//  map(0x0e, 0x0f) //
 }
 
 //-------------------------------------------------
@@ -92,17 +92,17 @@ device_memory_interface::space_config_vector namco_c139_device::memory_space_con
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER(namco_c139_device::ram_r)
+uint16_t namco_c139_device::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER(namco_c139_device::ram_w)
+void namco_c139_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-READ16_MEMBER(namco_c139_device::status_r)
+uint16_t namco_c139_device::status_r()
 {
 	/*
 	 x-- RX READY or irq pending?

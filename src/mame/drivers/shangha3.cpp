@@ -30,6 +30,14 @@ Notes:
 - a Blocken PCB shot shows a 48 MHz xtal, game is definitely too slow at
   8 MHz (noticeable thru colour cycling effects)
 - Confirmed OSC is 48MHz and OKI resonator is 1.056MHz.
+- Hebereke no Popoon has various debug mode switches, the ones found so far:
+  $30878e: bit 0 enable, active low.
+           If enabled correctly all of the non gameplay screens become
+       text stubs;
+  $aff14: a non-zero value enables CPU usage in 2p mode.
+          As a side-effect this also makes winning condition to never
+      satisfy, it goes on indefinitely with the selected characters and
+      input methods.
 
 ***************************************************************************/
 
@@ -39,7 +47,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/2612intf.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -56,7 +64,7 @@ write    read
 20    -> 8
 40    -> 0
 */
-READ16_MEMBER(shangha3_state::shangha3_prot_r)
+uint16_t shangha3_state::shangha3_prot_r()
 {
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
@@ -65,12 +73,12 @@ READ16_MEMBER(shangha3_state::shangha3_prot_r)
 	return result[m_prot_count++ % 9];
 }
 
-WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
+void shangha3_state::shangha3_prot_w(uint16_t data)
 {
 	logerror("PC %04x: write %02x to 20004e\n",m_maincpu->pc(),data);
 }
 
-WRITE8_MEMBER(shangha3_state::shangha3_coinctrl_w)
+void shangha3_state::shangha3_coinctrl_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
 	machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
@@ -78,7 +86,7 @@ WRITE8_MEMBER(shangha3_state::shangha3_coinctrl_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE8_MEMBER(shangha3_state::heberpop_coinctrl_w)
+void shangha3_state::heberpop_coinctrl_w(uint8_t data)
 {
 	/* the sound ROM bank is selected by the main CPU! */
 	m_oki->set_rom_bank((data >> 3) & 1);
@@ -89,7 +97,7 @@ WRITE8_MEMBER(shangha3_state::heberpop_coinctrl_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE8_MEMBER(shangha3_state::blocken_coinctrl_w)
+void shangha3_state::blocken_coinctrl_w(uint8_t data)
 {
 	/* the sound ROM bank is selected by the main CPU! */
 	m_okibank->set_entry((data >> 4) & 3);
@@ -101,9 +109,14 @@ WRITE8_MEMBER(shangha3_state::blocken_coinctrl_w)
 }
 
 
-WRITE16_MEMBER(shangha3_state::irq_ack_w)
+void shangha3_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
+}
+
+uint8_t shangha3_state::cgrom_r(offs_t offset)
+{
+	return m_cgrom[offset];
 }
 
 void shangha3_state::shangha3_map(address_map &map)
@@ -139,7 +152,7 @@ void shangha3_state::heberpop_map(address_map &map)
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
 	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
 	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
-	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
+	map(0x800000, 0xb7ffff).r(FUNC(shangha3_state::cgrom_r));
 }
 
 void shangha3_state::blocken_map(address_map &map)
@@ -156,7 +169,7 @@ void shangha3_state::blocken_map(address_map &map)
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
 	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
 	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
-	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
+	map(0x800000, 0xb7ffff).r(FUNC(shangha3_state::cgrom_r));
 }
 
 
@@ -428,20 +441,8 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ STEP16(0,4*16) },
-	128*8
-};
-
 static GFXDECODE_START( gfx_shangha3 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_lsb, 0, 128 )
 GFXDECODE_END
 
 

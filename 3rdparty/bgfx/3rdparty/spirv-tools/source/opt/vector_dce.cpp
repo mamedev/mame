@@ -52,6 +52,9 @@ void VectorDCE::FindLiveComponents(Function* function,
   // components are live because of arbitrary nesting of structs.
   function->ForEachInst(
       [&work_list, this, live_components](Instruction* current_inst) {
+        if (current_inst->IsCommonDebugInstr()) {
+          return;
+        }
         if (!HasVectorOrScalarResult(current_inst) ||
             !context()->IsCombinatorInstruction(current_inst)) {
           MarkUsesAsLive(current_inst, all_components_live_, live_components,
@@ -66,7 +69,8 @@ void VectorDCE::FindLiveComponents(Function* function,
 
     switch (current_inst->opcode()) {
       case SpvOpCompositeExtract:
-        MarkExtractUseAsLive(current_inst, live_components, &work_list);
+        MarkExtractUseAsLive(current_inst, current_item.components,
+                             live_components, &work_list);
         break;
       case SpvOpCompositeInsert:
         MarkInsertUsesAsLive(current_item, live_components, &work_list);
@@ -92,6 +96,7 @@ void VectorDCE::FindLiveComponents(Function* function,
 }
 
 void VectorDCE::MarkExtractUseAsLive(const Instruction* current_inst,
+                                     const utils::BitVector& live_elements,
                                      LiveComponentMap* live_components,
                                      std::vector<WorkListItem>* work_list) {
   analysis::DefUseManager* def_use_mgr = context()->get_def_use_mgr();
@@ -102,7 +107,15 @@ void VectorDCE::MarkExtractUseAsLive(const Instruction* current_inst,
   if (HasVectorOrScalarResult(operand_inst)) {
     WorkListItem new_item;
     new_item.instruction = operand_inst;
-    new_item.components.Set(current_inst->GetSingleWordInOperand(1));
+    if (current_inst->NumInOperands() < 2) {
+      new_item.components = live_elements;
+    } else {
+      uint32_t element_index = current_inst->GetSingleWordInOperand(1);
+      uint32_t item_size = GetVectorComponentCount(operand_inst->type_id());
+      if (element_index < item_size) {
+        new_item.components.Set(element_index);
+      }
+    }
     AddItemToWorkListIfNeeded(new_item, live_components, work_list);
   }
 }
@@ -113,30 +126,44 @@ void VectorDCE::MarkInsertUsesAsLive(
     std::vector<VectorDCE::WorkListItem>* work_list) {
   analysis::DefUseManager* def_use_mgr = context()->get_def_use_mgr();
 
-  uint32_t insert_position =
-      current_item.instruction->GetSingleWordInOperand(2);
+  if (current_item.instruction->NumInOperands() > 2) {
+    uint32_t insert_position =
+        current_item.instruction->GetSingleWordInOperand(2);
 
-  // Add the elements of the composite object that are used.
-  uint32_t operand_id =
-      current_item.instruction->GetSingleWordInOperand(kInsertCompositeIdInIdx);
-  Instruction* operand_inst = def_use_mgr->GetDef(operand_id);
+    // Add the elements of the composite object that are used.
+    uint32_t operand_id = current_item.instruction->GetSingleWordInOperand(
+        kInsertCompositeIdInIdx);
+    Instruction* operand_inst = def_use_mgr->GetDef(operand_id);
 
-  WorkListItem new_item;
-  new_item.instruction = operand_inst;
-  new_item.components = current_item.components;
-  new_item.components.Clear(insert_position);
+    WorkListItem new_item;
+    new_item.instruction = operand_inst;
+    new_item.components = current_item.components;
+    new_item.components.Clear(insert_position);
 
-  AddItemToWorkListIfNeeded(new_item, live_components, work_list);
+    AddItemToWorkListIfNeeded(new_item, live_components, work_list);
 
-  // Add the element being inserted if it is used.
-  if (current_item.components.Get(insert_position)) {
-    uint32_t obj_operand_id =
+    // Add the element being inserted if it is used.
+    if (current_item.components.Get(insert_position)) {
+      uint32_t obj_operand_id =
+          current_item.instruction->GetSingleWordInOperand(
+              kInsertObjectIdInIdx);
+      Instruction* obj_operand_inst = def_use_mgr->GetDef(obj_operand_id);
+      WorkListItem new_item_for_obj;
+      new_item_for_obj.instruction = obj_operand_inst;
+      new_item_for_obj.components.Set(0);
+      AddItemToWorkListIfNeeded(new_item_for_obj, live_components, work_list);
+    }
+  } else {
+    // If there are no indices, then this is a copy of the object being
+    // inserted.
+    uint32_t object_id =
         current_item.instruction->GetSingleWordInOperand(kInsertObjectIdInIdx);
-    Instruction* obj_operand_inst = def_use_mgr->GetDef(obj_operand_id);
-    WorkListItem new_item_for_obj;
-    new_item_for_obj.instruction = obj_operand_inst;
-    new_item_for_obj.components.Set(0);
-    AddItemToWorkListIfNeeded(new_item_for_obj, live_components, work_list);
+    Instruction* object_inst = def_use_mgr->GetDef(object_id);
+
+    WorkListItem new_item;
+    new_item.instruction = object_inst;
+    new_item.components = current_item.components;
+    AddItemToWorkListIfNeeded(new_item, live_components, work_list);
   }
 }
 
@@ -153,10 +180,10 @@ void VectorDCE::MarkVectorShuffleUsesAsLive(
   second_operand.instruction =
       def_use_mgr->GetDef(current_item.instruction->GetSingleWordInOperand(1));
 
-  analysis::TypeManager* type_mgr = context()->get_type_mgr();
-  analysis::Vector* first_type =
-      type_mgr->GetType(first_operand.instruction->type_id())->AsVector();
-  uint32_t size_of_first_operand = first_type->element_count();
+  uint32_t size_of_first_operand =
+      GetVectorComponentCount(first_operand.instruction->type_id());
+  uint32_t size_of_second_operand =
+      GetVectorComponentCount(second_operand.instruction->type_id());
 
   for (uint32_t in_op = 2; in_op < current_item.instruction->NumInOperands();
        ++in_op) {
@@ -164,7 +191,7 @@ void VectorDCE::MarkVectorShuffleUsesAsLive(
     if (current_item.components.Get(in_op - 2)) {
       if (index < size_of_first_operand) {
         first_operand.components.Set(index);
-      } else {
+      } else if (index - size_of_first_operand < size_of_second_operand) {
         second_operand.components.Set(index - size_of_first_operand);
       }
     }
@@ -179,7 +206,6 @@ void VectorDCE::MarkCompositeContructUsesAsLive(
     VectorDCE::LiveComponentMap* live_components,
     std::vector<VectorDCE::WorkListItem>* work_list) {
   analysis::DefUseManager* def_use_mgr = context()->get_def_use_mgr();
-  analysis::TypeManager* type_mgr = context()->get_type_mgr();
 
   uint32_t current_component = 0;
   Instruction* current_inst = work_item.instruction;
@@ -200,8 +226,7 @@ void VectorDCE::MarkCompositeContructUsesAsLive(
       assert(HasVectorResult(op_inst));
       WorkListItem new_work_item;
       new_work_item.instruction = op_inst;
-      uint32_t op_vector_size =
-          type_mgr->GetType(op_inst->type_id())->AsVector()->element_count();
+      uint32_t op_vector_size = GetVectorComponentCount(op_inst->type_id());
 
       for (uint32_t op_vector_idx = 0; op_vector_idx < op_vector_size;
            op_vector_idx++, current_component++) {
@@ -274,63 +299,94 @@ bool VectorDCE::HasScalarResult(const Instruction* inst) const {
   }
 }
 
+uint32_t VectorDCE::GetVectorComponentCount(uint32_t type_id) {
+  assert(type_id != 0 &&
+         "Trying to get the vector element count, but the type id is 0");
+  analysis::TypeManager* type_mgr = context()->get_type_mgr();
+  const analysis::Type* type = type_mgr->GetType(type_id);
+  const analysis::Vector* vector_type = type->AsVector();
+  assert(
+      vector_type &&
+      "Trying to get the vector element count, but the type is not a vector");
+  return vector_type->element_count();
+}
+
 bool VectorDCE::RewriteInstructions(
     Function* function, const VectorDCE::LiveComponentMap& live_components) {
   bool modified = false;
-  function->ForEachInst(
-      [&modified, this, live_components](Instruction* current_inst) {
-        if (!context()->IsCombinatorInstruction(current_inst)) {
-          return;
-        }
 
-        auto live_component = live_components.find(current_inst->result_id());
-        if (live_component == live_components.end()) {
-          // If this instruction is not in live_components then it does not
-          // produce a vector, or it is never referenced and ADCE will remove
-          // it.  No point in trying to differentiate.
-          return;
-        }
+  // Kill DebugValue in the middle of the instruction iteration will result
+  // in accessing a dangling pointer. We keep dead DebugValue instructions
+  // in |dead_dbg_value| to kill them once after the iteration.
+  std::vector<Instruction*> dead_dbg_value;
 
-        // If no element in the current instruction is used replace it with an
-        // OpUndef.
-        if (live_component->second.Empty()) {
-          modified = true;
-          uint32_t undef_id = this->Type2Undef(current_inst->type_id());
-          context()->KillNamesAndDecorates(current_inst);
-          context()->ReplaceAllUsesWith(current_inst->result_id(), undef_id);
-          context()->KillInst(current_inst);
-          return;
-        }
+  function->ForEachInst([&modified, this, live_components,
+                         &dead_dbg_value](Instruction* current_inst) {
+    if (!context()->IsCombinatorInstruction(current_inst)) {
+      return;
+    }
 
-        switch (current_inst->opcode()) {
-          case SpvOpCompositeInsert:
-            modified |=
-                RewriteInsertInstruction(current_inst, live_component->second);
-            break;
-          case SpvOpCompositeConstruct:
-            // TODO: The members that are not live can be replaced by an undef
-            // or constant. This will remove uses of those values, and possibly
-            // create opportunities for ADCE.
-            break;
-          default:
-            // Do nothing.
-            break;
-        }
-      });
+    auto live_component = live_components.find(current_inst->result_id());
+    if (live_component == live_components.end()) {
+      // If this instruction is not in live_components then it does not
+      // produce a vector, or it is never referenced and ADCE will remove
+      // it.  No point in trying to differentiate.
+      return;
+    }
+
+    // If no element in the current instruction is used replace it with an
+    // OpUndef.
+    if (live_component->second.Empty()) {
+      modified = true;
+      MarkDebugValueUsesAsDead(current_inst, &dead_dbg_value);
+      uint32_t undef_id = this->Type2Undef(current_inst->type_id());
+      context()->KillNamesAndDecorates(current_inst);
+      context()->ReplaceAllUsesWith(current_inst->result_id(), undef_id);
+      context()->KillInst(current_inst);
+      return;
+    }
+
+    switch (current_inst->opcode()) {
+      case SpvOpCompositeInsert:
+        modified |= RewriteInsertInstruction(
+            current_inst, live_component->second, &dead_dbg_value);
+        break;
+      case SpvOpCompositeConstruct:
+        // TODO: The members that are not live can be replaced by an undef
+        // or constant. This will remove uses of those values, and possibly
+        // create opportunities for ADCE.
+        break;
+      default:
+        // Do nothing.
+        break;
+    }
+  });
+  for (auto* i : dead_dbg_value) context()->KillInst(i);
   return modified;
 }
 
 bool VectorDCE::RewriteInsertInstruction(
-    Instruction* current_inst, const utils::BitVector& live_components) {
+    Instruction* current_inst, const utils::BitVector& live_components,
+    std::vector<Instruction*>* dead_dbg_value) {
   // If the value being inserted is not live, then we can skip the insert.
-  bool modified = false;
+
+  if (current_inst->NumInOperands() == 2) {
+    // If there are no indices, then this is the same as a copy.
+    context()->KillNamesAndDecorates(current_inst->result_id());
+    uint32_t object_id =
+        current_inst->GetSingleWordInOperand(kInsertObjectIdInIdx);
+    context()->ReplaceAllUsesWith(current_inst->result_id(), object_id);
+    return true;
+  }
+
   uint32_t insert_index = current_inst->GetSingleWordInOperand(2);
   if (!live_components.Get(insert_index)) {
-    modified = true;
+    MarkDebugValueUsesAsDead(current_inst, dead_dbg_value);
     context()->KillNamesAndDecorates(current_inst->result_id());
     uint32_t composite_id =
         current_inst->GetSingleWordInOperand(kInsertCompositeIdInIdx);
     context()->ReplaceAllUsesWith(current_inst->result_id(), composite_id);
+    return true;
   }
 
   // If the values already in the composite are not used, then replace it with
@@ -342,9 +398,19 @@ bool VectorDCE::RewriteInsertInstruction(
     uint32_t undef_id = Type2Undef(current_inst->type_id());
     current_inst->SetInOperand(kInsertCompositeIdInIdx, {undef_id});
     context()->AnalyzeUses(current_inst);
+    return true;
   }
 
-  return modified;
+  return false;
+}
+
+void VectorDCE::MarkDebugValueUsesAsDead(
+    Instruction* composite, std::vector<Instruction*>* dead_dbg_value) {
+  context()->get_def_use_mgr()->ForEachUser(
+      composite, [&dead_dbg_value](Instruction* use) {
+        if (use->GetCommonDebugOpcode() == CommonDebugInfoDebugValue)
+          dead_dbg_value->push_back(use);
+      });
 }
 
 void VectorDCE::AddItemToWorkListIfNeeded(

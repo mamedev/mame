@@ -45,7 +45,7 @@ public:
 	// construction/destruction
 	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void fcg_write(offs_t offset, uint8_t data);
 	virtual void write_m(offs_t offset, uint8_t data) override;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -20,23 +20,27 @@
 #define BX_COUNTOF(_x) sizeof(bx::CountOfRequireArrayArgumentT(_x) )
 
 ///
-#define BX_IGNORE_C4127(_x) bx::ignoreC4127(!!(_x) )
+#if BX_COMPILER_MSVC
+#	define BX_IGNORE_C4127(_x) bx::ignoreC4127(!!(_x) )
+#else
+#	define BX_IGNORE_C4127(_x) (!!(_x) )
+#endif // BX_COMPILER_MSVC
 
 ///
-#define BX_ENABLED(_x) bx::isEnabled<!!(_x)>()
+#define BX_ENABLED(_x) BX_IGNORE_C4127(bx::isEnabled<!!(_x)>::value)
 
 namespace bx
 {
 	constexpr int32_t kExitSuccess = 0;
 	constexpr int32_t kExitFailure = 1;
 
-	/// Template for avoiding MSVC: C4127: conditional expression is constant
-	template<bool>
-	constexpr bool isEnabled();
-
 	///
 	template<class Ty>
 	constexpr bool isTriviallyCopyable();
+
+	/// Find the address of an object of a class that has an overloaded unary ampersand (&) operator.
+	template <class Ty>
+	Ty* addressOf(Ty& _a);
 
 	/// Swap two values.
 	template<typename Ty>
@@ -73,26 +77,75 @@ namespace bx
 	template<typename Ty>
 	constexpr bool isPowerOf2(Ty _a);
 
+	/// Copy memory block.
+	///
+	/// @param _dst Destination pointer.
+	/// @param _src Source pointer.
+	/// @param _numBytes Number of bytes to copy.
+	///
+	/// @remark Source and destination memory blocks must not overlap.
 	///
 	void memCopy(void* _dst, const void* _src, size_t _numBytes);
 
+	/// Copy strided memory block.
 	///
-	void memCopy(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch, uint32_t _dstPitch);
-
+	/// @param _dst Destination pointer.
+	/// @param _dstStride Destination stride.
+	/// @param _src Source pointer.
+	/// @param _srcStride Source stride.
+	/// @param _stride Number of bytes per stride to copy.
+	/// @param _num Number of strides.
 	///
-	void gather(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch);
-
+	/// @remark Source and destination memory blocks must not overlap.
 	///
-	void scatter(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _dstPitch);
+	void memCopy(
+		  void* _dst
+		, uint32_t _dstStride
+		, const void* _src
+		, uint32_t _srcStride
+		, uint32_t _stride
+		, uint32_t _num
+		);
 
 	///
 	void memMove(void* _dst, const void* _src, size_t _numBytes);
 
 	///
+	void memMove(
+		  void* _dst
+		, uint32_t _dstStride
+		, const void* _src
+		, uint32_t _srcStride
+		, uint32_t _stride
+		, uint32_t _num
+		);
+
+	///
 	void memSet(void* _dst, uint8_t _ch, size_t _numBytes);
 
 	///
+	void memSet(void* _dst, uint32_t _dstStride, uint8_t _ch, uint32_t _stride, uint32_t _num);
+
+	///
 	int32_t memCmp(const void* _lhs, const void* _rhs, size_t _numBytes);
+
+	///
+	void gather(
+		  void* _dst
+		, const void* _src
+		, uint32_t _srcStride
+		, uint32_t _stride
+		, uint32_t _num
+		);
+
+	///
+	void scatter(
+		  void* _dst
+		, uint32_t _dstStride
+		, const void* _src
+		, uint32_t _stride
+		, uint32_t _num
+		);
 
 } // namespace bx
 

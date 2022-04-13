@@ -15,6 +15,10 @@
 
     TODO: everything!
 
+    NAND types
+
+    Storio Spanish old BIOS TC58NVG0S3ETA00 (2048+64) x 64 x 1024
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -26,7 +30,7 @@
 #include "bus/generic/carts.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class vtech_storio_state : public driver_device
@@ -46,7 +50,9 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	void vtech_storio_base(machine_config &config);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -76,7 +82,7 @@ void vtech_storio_state::machine_reset()
 {
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(vtech_storio_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(vtech_storio_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -90,7 +96,7 @@ static INPUT_PORTS_START( vtech_storio )
 INPUT_PORTS_END
 
 
-void vtech_storio_state::vtech_storio(machine_config &config)
+void vtech_storio_state::vtech_storio_base(machine_config &config)
 {
 	ARM9(config, m_maincpu, 240000000); // ARM926EJ-S CPU core (probably 240MHz, but not sure)
 
@@ -105,8 +111,13 @@ void vtech_storio_state::vtech_storio(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vtech_storio_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&vtech_storio_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(vtech_storio_state::cart_load));
 
+}
+
+void vtech_storio_state::vtech_storio(machine_config &config)
+{
+	vtech_storio_base(config);
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_storio_cart");
 }
 
@@ -148,6 +159,13 @@ ROM_START( storioes )
 	ROM_LOAD( "esspa-pack_20111017.bin", 0x000000, 0x03c62bfc, CRC(fe9b78f9) SHA1(c114a8f82799861a0cca432ee145e436aca5f400) )
 ROM_END
 
+// ROM image dumped from a real Spanish VTech Storio console.
+// Seems to be the "2011.06.17" compilation, although there is a "Copyright (c) 2009 - 2012 Nuvoton" text on the ROM
+ROM_START( storioesa )
+	ROM_REGION( 0x08400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "storiospanisholdbios.bin", 0x000000, 0x08400000, CRC(c462cac4) SHA1(37e5497342a3a27366288b5c5dffd00d0826e183) )
+ROM_END
+
 // ROM image from VTech, not padded to the real ROM size
 ROM_START( storiofr )
 	ROM_REGION( 0x038c2a19, "maincpu", ROMREGION_ERASEFF )
@@ -167,5 +185,6 @@ CONS( 2011, vreadercafr,  vreader, 0,      vtech_storio, vtech_storio, vtech_sto
 CONS( 2011, storio,       vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (GB, English, 2011-10-17)",   MACHINE_IS_SKELETON )
 CONS( 2011, storiode,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (DE, German, 2011-10-17)",    MACHINE_IS_SKELETON )
 CONS( 2011, storioes,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-10-17)",   MACHINE_IS_SKELETON )
+CONS( 2011, storioesa,    vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-06-17?)",  MACHINE_IS_SKELETON )
 CONS( 2011, storiofr,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (FR, French, 2011-10-17)",    MACHINE_IS_SKELETON )
 CONS( 2011, storionl,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (NL, Dutch, 2011-10-17)",     MACHINE_IS_SKELETON )

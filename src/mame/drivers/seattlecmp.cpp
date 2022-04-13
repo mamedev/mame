@@ -44,23 +44,25 @@ public:
 	seattle_comp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pic(*this, "pic%u", 1)
+		, m_pic(*this, "pic%u", 1U)
+		, m_monitor(*this, "monitor")
 	{ }
 
 	void seattle(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(pic_slave_ack);
+	u8 pic_slave_ack(offs_t offset);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pic8259_device, 2> m_pic;
+	required_region_ptr<u8> m_monitor;
 };
 
 
-READ8_MEMBER(seattle_comp_state::pic_slave_ack)
+u8 seattle_comp_state::pic_slave_ack(offs_t offset)
 {
 	if (offset == 1)
 		return m_pic[1]->acknowledge();
@@ -73,19 +75,19 @@ void seattle_comp_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xff7ff).ram();
-	map(0xff800, 0xfffff).rom().region("user1", 0);
+	map(0xff800, 0xfffff).lr8([this](offs_t offset) { return m_monitor[offset]; }, "monitor_r");
 }
 
 void seattle_comp_state::io_map(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
+	//map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xf0, 0xf1).rw("pic1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw("pic2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf4, 0xf5).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
 	map(0xf6, 0xf7).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	//AM_RANGE(0xfc, 0xfd) Parallel data, status, serial DCD
-	//AM_RANGE(0xfe, 0xff) Eprom disable bit, read sense switches (bank of 8 dipswitches)
+	//map(0xfc, 0xfd) Parallel data, status, serial DCD
+	//map(0xfe, 0xff) Eprom disable bit, read sense switches (bank of 8 dipswitches)
 }
 
 /* Input ports */
@@ -97,7 +99,6 @@ INPUT_PORTS_END
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -106,16 +107,16 @@ DEVICE_INPUT_DEFAULTS_END
 void seattle_comp_state::seattle(machine_config &config)
 {
 	/* basic machine hardware */
-	I8086(config, m_maincpu, XTAL(24'000'000) / 3); // 8 MHz or 4 MHz selectable
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3); // 8 MHz or 4 MHz selectable
 	m_maincpu->set_addrmap(AS_PROGRAM, &seattle_comp_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &seattle_comp_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic1", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic[0], 0);
+	PIC8259(config, m_pic[0]);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_INT0);
 	m_pic[0]->read_slave_ack_callback().set(FUNC(seattle_comp_state::pic_slave_ack));
 
-	PIC8259(config, m_pic[1], 0);
+	PIC8259(config, m_pic[1]);
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir1_w));
 
 	am9513_device &stc(AM9513(config, "stc", 4_MHz_XTAL)); // dedicated XTAL
@@ -127,7 +128,7 @@ void seattle_comp_state::seattle(machine_config &config)
 	stc.fout_cb().set("stc", FUNC(am9513_device::source1_w));
 	// FOUT not shown on schematics, which inexplicably have Source 1 tied to Gate 5
 
-	i8251_device &uart(I8251(config, "uart", XTAL(24'000'000) / 12)); // CLOCK on line 49
+	i8251_device &uart(I8251(config, "uart", 24_MHz_XTAL / 12)); // CLOCK on line 49
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -143,11 +144,11 @@ void seattle_comp_state::seattle(machine_config &config)
 
 /* ROM definition */
 ROM_START( scp300f )
-	ROM_REGION( 0x800, "user1", 0 )
+	ROM_REGION( 0x800, "monitor", 0 )
 	ROM_LOAD( "mon86 v1.5tdd", 0x0000, 0x0800, CRC(7db23169) SHA1(c791b02ca33a4e1f8e95eb541624a59738f378c4))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS               INIT        COMPANY            FULLNAME    FLAGS
-COMP( 1986, scp300f, 0,      0,      seattle, seattle, seattle_comp_state, empty_init, "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW )
+COMP( 1986, scp300f, 0,      0,      seattle, seattle, seattle_comp_state, empty_init, "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

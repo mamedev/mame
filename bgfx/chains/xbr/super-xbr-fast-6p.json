@@ -2,9 +2,9 @@
 // copyright-holders:Hyllian
 
 /*
-   
+
   *******  Super XBR Shader  *******
-   
+
   Copyright (c) 2016 Hyllian - sergiogdb@gmail.com
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -55,6 +55,7 @@
 	"passes": [
 		{
 			"effect": "xbr/super-xbr/super-xbr-fast-pass0",
+			"applytint": true,
 			"name": "Pass 0",
 			"input": [
 				{ "sampler": "s0", "texture": "screen" }

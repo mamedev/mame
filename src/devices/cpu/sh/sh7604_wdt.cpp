@@ -29,10 +29,10 @@ DEFINE_DEVICE_TYPE(SH7604_WDT, sh7604_wdt_device, "sh7604wdt", "SH7604 Watchdog 
 
 void sh7604_wdt_device::wdt_regs(address_map &map)
 {
-//  AM_RANGE(0x00, 0x00) timer control/status
-//  AM_RANGE(0x01, 0x01) timer counter
-//  AM_RANGE(0x02, 0x02) write only, reset control register
-//  AM_RANGE(0x03, 0x03) read status register, write reset status register
+//  map(0x00, 0x00) timer control/status
+//  map(0x01, 0x01) timer counter
+//  map(0x02, 0x02) write only, reset control register
+//  map(0x03, 0x03) read status register, write reset status register
 }
 
 //-------------------------------------------------
@@ -67,12 +67,12 @@ void sh7604_wdt_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( sh7604_wdt_device::read )
+uint8_t sh7604_wdt_device::read(address_space &space, offs_t offset)
 {
 	return space.read_byte(offset);
 }
 
-WRITE16_MEMBER( sh7604_wdt_device::write )
+void sh7604_wdt_device::write(address_space &space, offs_t offset, uint16_t data)
 {
 	uint8_t id_param = data >> 8;
 	switch(id_param)

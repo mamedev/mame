@@ -15,20 +15,20 @@ struct priority_t
 
 struct tempsprite_t
 {
-	int code,color;
+	u32 code,color;
 	int x,y;
 	int xoffs,yoffs;
-	int flipx,flipy;
+	bool flipx,flipy;
 	int priority;
 };
 
 
 
-class kaneko16_sprite_device : public device_t, public device_video_interface
+class kaneko16_sprite_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_color_base(u16 base) { m_colbase = base; }
 	void set_fliptype(int fliptype) { m_sprite_fliptype = fliptype; }
 	void set_offsets(int xoffs, int yoffs)
 	{
@@ -46,15 +46,15 @@ public:
 	// (legacy) used in the bitmap clear functions
 	virtual int get_sprite_type(void) =0;
 
-	void render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes);
-	void render_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes);
+	void render_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
 
+	void copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+	void copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
-	template<class _BitmapClass>
-	void render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes);
+	template<class BitmapClass>
+	void copybitmap_common(BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
 	void bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
-
 
 	u16 regs_r(offs_t offset);
 	void regs_w(offs_t offset, u16 data, u16 mem_mask);
@@ -85,6 +85,8 @@ protected:
 	// them in a different order
 	virtual void get_sprite_attributes(struct tempsprite_t *s, u16 attr) =0;
 
+	required_memory_region m_gfx_region;
+	u16 m_colbase;
 
 private:
 	// registers
@@ -95,24 +97,17 @@ private:
 	std::unique_ptr<struct tempsprite_t[]> m_first_sprite;
 	int m_keep_sprites;
 	bitmap_ind16 m_sprites_bitmap;
+	bitmap_ind8 m_sprites_maskmap;
 
 
-	template<class _BitmapClass>
-	void draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes);
+	void draw_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
 
 
-	template<class _BitmapClass>
-	void draw_sprites_custom(_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-			u32 code,u32 color,int flipx,int flipy,int sx,int sy,
-			bitmap_ind8 &priority_bitmap, int priority);
+	void draw_sprites_custom(const rectangle &clip,gfx_element *gfx,
+			u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
+			int priority);
 
 	int parse_sprite_type012(int i, struct tempsprite_t *s, u16* spriteram16, int spriteram16_bytes);
-
-	void copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	required_device<gfxdecode_device> m_gfxdecode;
-
 };
 
 //extern const device_type KANEKO16_SPRITE;
@@ -129,7 +124,10 @@ public:
 
 	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	void get_sprite_attributes(struct tempsprite_t *s, u16 attr) override;
-	int get_sprite_type(void) override{ return 0; };
+	int get_sprite_type(void) override{ return 0; }
+
+protected:
+	virtual void device_start() override;
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device)
@@ -145,7 +143,10 @@ public:
 
 	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	void get_sprite_attributes(struct tempsprite_t *s, u16 attr) override;
-	int get_sprite_type(void) override{ return 1; };
+	int get_sprite_type(void) override{ return 1; }
+
+protected:
+	virtual void device_start() override;
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_KC002_SPRITE, kaneko_kc002_sprite_device)

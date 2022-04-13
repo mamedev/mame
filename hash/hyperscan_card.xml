@@ -1,0 +1,5488 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+    Hyperscan RFID cards contain 120 bytes of memory:
+    - 0-6      RFID ID (read-only)
+    - 7        Reserved
+    - 8-9      Game ID
+    - 10-11    Card ID
+    - 12-103   Available for save game state
+    - 104-111  Reserved
+    - 112-113  Banks lock
+    - 114-119  One time programmable
+
+    Known Game ID (bytes 8 and 9):
+    - 01 00: IWL
+    - 02 00: Ben 10
+    - 03 00: X-Men
+    - 00 04: Marvel Heroes
+    - 05 00: Spider-Man
+
+    NOTE: all cards marked baddump are not real dumps, but manually generated.
+-->
+
+<softwarelist name="hyperscan_card" description="Mattel Hyperscan RFID cards">
+	<software name="ben001">
+		<description>Ben 10: Ben Tennyson (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="001"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben001.bin" size="120" crc="edd53a13" sha1="30850f937033314856c630f148bebb462e0cba9b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben002">
+		<description>Ben 10: Four Arms (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="002"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben002.bin" size="120" crc="ef2c5c8c" sha1="bff8de68dc2abad6dc2b07e02496502967d49955" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben004">
+		<description>Ben 10: Stinkfly (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="003"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben004.bin" size="120" crc="eade91b2" sha1="266df4388369e05a33df2173801e5c545517fdb2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben006">
+		<description>Ben 10: Ripjaws (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="004"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben006.bin" size="120" crc="5f5fd767" sha1="9be864611080f011af4a652cf21ff1707aa84d25" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben008">
+		<description>Ben 10: XLR8 (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="005"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben008.bin" size="120" crc="e13b0bce" sha1="5cfe774bb4eecf8799c26ecc64c046fc110d6a6b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben010">
+		<description>Ben 10: Heatblast (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="006"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben010.bin" size="120" crc="54ba4d1b" sha1="8cee78a93d3d74fc9d02cc0f02f142e87b555531" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben012">
+		<description>Ben 10: Wildmutt (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="007"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben012.bin" size="120" crc="51488025" sha1="41bdb51784d4ef55c3a20958048e88580c33116a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben014">
+		<description>Ben 10: Diamondhead (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="008"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben014.bin" size="120" crc="e4c9c6f0" sha1="1b5886a336489610b4b5a24b524a8cb2d8f8d3d8" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben016">
+		<description>Ben 10: Ghostfreak (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="009"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben016.bin" size="120" crc="f6f03f36" sha1="4a049bd0dfbdd6bb28a443843be1db8c99d1fc3f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben018">
+		<description>Ben 10: Grey Matter (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="010"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben018.bin" size="120" crc="437179e3" sha1="c254acae0f315d15789dc0dd9296951cf56a6c50" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben020">
+		<description>Ben 10: Upgrade (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="011"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben020.bin" size="120" crc="4683b4dd" sha1="385b717585d99090de434bd7d83f305a8a1d5c79" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben022">
+		<description>Ben 10: Shardblaster (Projectile Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="012"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben022.bin" size="120" crc="f302f208" sha1="dbf080a14d7811232e6eaa7b67ed14101a028bf7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben023">
+		<description>Ben 10: Laser Wave (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="013"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben023.bin" size="120" crc="447ad242" sha1="ecfc28c524a217ba0f8e011eac5677a34d1f93da" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben024">
+		<description>Ben 10: Prismforce (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="014"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben024.bin" size="120" crc="4d662ea1" sha1="b9e2ff68f19b54ccfc372924f7fd1f27f3002856" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben025">
+		<description>Ben 10: Crystal Shield (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="015"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben025.bin" size="120" crc="fa1e0eeb" sha1="35c92d7180db8d7139de7c6b9a66c0641a166183" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben026">
+		<description>Ben 10: Flamethrower (Projectile Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="016"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben026.bin" size="120" crc="f8e76874" sha1="a4ec60c471cd0929f4f4d3ea7c0e240d564fd8e2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben027">
+		<description>Ben 10: Thermostat (Speed Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="017"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben027.bin" size="120" crc="4f9f483e" sha1="e5a50b00d30b47b7ca22a0ea057eda6a1145b4e5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben028">
+		<description>Ben 10: Blast Furnace (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="018"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben028.bin" size="120" crc="fd15a54a" sha1="10dc6ef5cf11ff0c3d433e75d16d547e5bfee88f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben029">
+		<description>Ben 10: Firewall (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="019"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben029.bin" size="120" crc="4a6d8500" sha1="df00c77dccbc76ff7e450239582a9c024acb10dd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben030">
+		<description>Ben 10: Razor Quills (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="020"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben030.bin" size="120" crc="4894e39f" sha1="eea06dd9679c456fd6bcd1ef666c611bab77b2ed" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben031">
+		<description>Ben 10: Feral Slashes (Speed Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="021"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben031.bin" size="120" crc="ffecc3d5" sha1="c238798652d6988c393fe39fbbe9a4e58ddf9af5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben033">
+		<description>Ben 10: Berzerker (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="022"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben033.bin" size="120" crc="6e1e768c" sha1="9835b98a07781bcd82d71e4dadba69f1d6b34bfb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben032">
+		<description>Ben 10: Sixth Sense (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="023"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben032.bin" size="120" crc="d96656c6" sha1="44e4168b1febc04b342ade871fd5258c5e233144" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben034">
+		<description>Ben 10: Soul Sink (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="024"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben034.bin" size="120" crc="6ce71013" sha1="86fb377eb96c374eb6853a6d7b0a8796968575f5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben036">
+		<description>Ben 10: Ectoslaught (Speed Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="025"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben036.bin" size="120" crc="6915dd2d" sha1="0fa037daceb5a85d059085ef69196521fa4815c2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben035">
+		<description>Ben 10: Spectral Shriek (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="026"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben035.bin" size="120" crc="db9f3059" sha1="871e7dbebf2b0d58af298ad00c402ebe14e51479" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben037">
+		<description>Ben 10: Fade Out (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="027"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben037.bin" size="120" crc="de6dfd67" sha1="33fca948fdd3e2421042901b371bc6d7e318e49a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben038">
+		<description>Ben 10: High Jump (Power Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="028"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben038.bin" size="120" crc="dc949bf8" sha1="bf82124ede4d9bf7601daf49e7c7138bb301ff39" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben039">
+		<description>Ben 10: Mini-Max (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="029"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben039.bin" size="120" crc="6becbbb2" sha1="81d9cada18323dc4aaa14b115d46ae655fc613b6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben040">
+		<description>Ben 10: Bounce Back (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="030"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben040.bin" size="120" crc="62f04751" sha1="cdcba364c2ce456c5424e9f37fd39db55e8597d9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben041">
+		<description>Ben 10: Shrink Wrap (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="031"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben041.bin" size="120" crc="d588671b" sha1="ac4a53ce06aebf868490420a02c6284620f45a59" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben042">
+		<description>Ben 10: Fliptail (Power Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="032"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben042.bin" size="120" crc="d7710184" sha1="ef005789984e974d271815adcf8744008fa3343c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben043">
+		<description>Ben 10: Dive Bomb (Speed Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="033"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben043.bin" size="120" crc="600921ce" sha1="291ac0227e9d11a7f6f22e343befd7f3f6f9c67e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben044">
+		<description>Ben 10: Bite Radius (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="034"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben044.bin" size="120" crc="d283ccba" sha1="a9645ddcd5e0af5807244d5390653e69bdd1e6eb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben045">
+		<description>Ben 10: Scale Armor (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="035"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben045.bin" size="120" crc="65fbecf0" sha1="ea490a2c7dbf0baec8413132a02c270e2c242b45" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben046">
+		<description>Ben 10: Nano Blast (Projectile Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="036"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben046.bin" size="120" crc="67028a6f" sha1="1f7b7360255f429bdc77a27bb31793d240cde262" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben047">
+		<description>Ben 10: Overclock (Speed Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="037"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben047.bin" size="120" crc="d07aaa25" sha1="47ffaa639236a92b4182f1e12d2b48d0212a067f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben048">
+		<description>Ben 10: Binary Blaster (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="038"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben048.bin" size="120" crc="753b73a9" sha1="e320fd8068c4485aeee983549b9cf09f2d215119" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben049">
+		<description>Ben 10: Diffuse (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="039"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben049.bin" size="120" crc="c24353e3" sha1="938f42ab50bc47b65ac18aefff2e4fe181214770" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben050">
+		<description>Ben 10: Big Smack (Power Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="040"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben050.bin" size="120" crc="c0ba357c" sha1="61f5a5edc25ebe94021214e3822d68277b1bf02a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben051">
+		<description>Ben 10: Thunderclap (Speed Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="041"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben051.bin" size="120" crc="77c21536" sha1="b58193a1f5f70e99023ea837a99a925ae060b42f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben052">
+		<description>Ben 10: Juggernaut (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="042"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben052.bin" size="120" crc="c548f842" sha1="630d6dd4c1628a01391c6242aa72fa45e234ebdd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben053">
+		<description>Ben 10: Behemoth (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="043"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben053.bin" size="120" crc="7230d808" sha1="e4b36e755ada55b178812d46bddd7a8259f0addd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben054">
+		<description>Ben 10: Goo Sting (Projectile Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="044"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben054.bin" size="120" crc="70c9be97" sha1="7e0e2f0363e117b54e3f7d184bb0e9aaef8653f7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben055">
+		<description>Ben 10: Hive Mind (Speed Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="045"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben055.bin" size="120" crc="c7b19edd" sha1="126741847e2ec75ebf8ddf3a81ca60743fb29a1c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben056">
+		<description>Ben 10: Hyper Wing (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="046"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben056.bin" size="120" crc="cead623e" sha1="d242cbedb510802629dc62928239114056ba8716" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben057">
+		<description>Ben 10: Stink Swarm (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="047"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben057.bin" size="120" crc="79d54274" sha1="a993d562351040dc1e14508d5cc0fcfc53071e98" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben058">
+		<description>Ben 10: Static Boom (Projectile Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="048"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben058.bin" size="120" crc="7b2c24eb" sha1="2756365a89afe4cc0c7c3bcb05614631b31c97a7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben059">
+		<description>Ben 10: Turbo Charge (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="049"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben059.bin" size="120" crc="cc5404a1" sha1="588acc1a753bb902fda6e7d5d6e6b8bb2c0d1ee2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben060">
+		<description>Ben 10: Gear Shift (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="050"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben060.bin" size="120" crc="7edee9d5" sha1="431ecb46a81984a42307c266a8dac08ef90d8d74" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben061">
+		<description>Ben 10: Spin Out (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="051"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben061.bin" size="120" crc="c9a6c99f" sha1="55129c0f59f0c788f792a7f6df2befc2cdc07b62" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben062">
+		<description>Ben 10: Rust Belt (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="052"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben062.bin" size="120" crc="cb5faf00" sha1="46c9da3fc1d37eb7e3ffd3269c94a83eb6804aec" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben063">
+		<description>Ben 10: Metal Fatigue (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="053"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben063.bin" size="120" crc="7c278f4a" sha1="e22ec5f288961c9eeb58aa03ab6bf75829fcc763" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben064">
+		<description>Ben 10: Harpoon (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="054"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben064.bin" size="120" crc="864a8526" sha1="c1143c24984d073e0465580104abc8ed94d11345" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben065">
+		<description>Ben 10: Deep Six (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="055"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben065.bin" size="120" crc="3132a56c" sha1="1e600b999a5bdafac0e69974fcb3e51ca21cabf3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben066">
+		<description>Ben 10: All Thumbs (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="056"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben066.bin" size="120" crc="33cbc3f3" sha1="4a691a39c18477fb9d154677a19061e3ef6719af" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben067">
+		<description>Ben 10: Flame Out (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="057"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben067.bin" size="120" crc="84b3e3b9" sha1="a1a2a4e2fad01c8b3501b9296b1a0e3d59cb7203" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben068">
+		<description>Ben 10: Brain Drain (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="058"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben068.bin" size="120" crc="36390ecd" sha1="2579add8c54dcbd44b98af21cc0d7e81319a9870" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben069">
+		<description>Ben 10: Bio-Feedback (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="059"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben069.bin" size="120" crc="81412e87" sha1="2fd221714c0d53dde67cb22b87469ff4057308b9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben070">
+		<description>Ben 10: Hyp-no! (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="060"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben070.bin" size="120" crc="83b84818" sha1="f19638198e7ce8e776b65ff91b948f6764635c37" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben071">
+		<description>Ben 10: Reverse Psychology (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="061"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben071.bin" size="120" crc="34c06852" sha1="2177733719ecc03b24cf1cad1a297286b3f31a94" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben072">
+		<description>Ben 10: Snail Trail (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="062"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben072.bin" size="120" crc="3ddc94b1" sha1="5b0a2ee618aac222e276de577147c9e831c21f70" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben073">
+		<description>Ben 10: Surface Tension (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="063"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben073.bin" size="120" crc="8aa4b4fb" sha1="dd3fb28dc1e7f933d854444f520c280322bae108" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben074">
+		<description>Ben 10: Hexa-Gone (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="064"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben074.bin" size="120" crc="885dd264" sha1="8b19f251d57d83c0095b99b282fcf40a8a81b15e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben075">
+		<description>Ben 10: Smoke and Mirrors (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="065"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben075.bin" size="120" crc="3f25f22e" sha1="eb091cfe96f86a92c375f9aa6c73db130f6338fb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben076">
+		<description>Ben 10: Short Circuit (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="066"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben076.bin" size="120" crc="8daf1f5a" sha1="70ab1eca7508834803676e5d1d8560fea812e30f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben077">
+		<description>Ben 10: Ground Swell (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="067"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben077.bin" size="120" crc="3ad73f10" sha1="5a155e355a809fe5e6062802b0bb1698b4799bb9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben078">
+		<description>Ben 10: Shell Shock (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="068"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben078.bin" size="120" crc="382e598f" sha1="06b0423698844eeb1a614985c1643c91370013f2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben079">
+		<description>Ben 10: Out Claw (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="069"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben079.bin" size="120" crc="8f5679c5" sha1="fb02e65c36fae9cba5b756f1749f78017d4b023d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben080">
+		<description>Ben 10: Gravity Pull (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="070"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben080.bin" size="120" crc="2a17a049" sha1="2189a8823b309531f5aac3d4b6524994821eebed" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben081">
+		<description>Ben 10: Astro-Nought (Villain Defense)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="071"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben081.bin" size="120" crc="9d6f8003" sha1="550cdbae2adc7eaa13f7c6cb6df14af4ff4149a6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben092">
+		<description>Ben 10: Grandpa Max (Help)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="072"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben092.bin" size="120" crc="21f23a35" sha1="1b1095fb32f065b1c311da21bb5da1de1a2004e2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben093">
+		<description>Ben 10: Gwen (Help)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="073"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben093.bin" size="120" crc="968a1a7f" sha1="4b6e1f0defccecc30cb450bd39f72e2a86dd01c0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben003">
+		<description>Ben 10: Four Arms (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="074"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben003.bin" size="120" crc="58547cc6" sha1="511e922c33e1ed826ed4f2b794f9b4a93c9b19a9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben005">
+		<description>Ben 10: Stinkfly (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="075"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben005.bin" size="120" crc="5da6b1f8" sha1="2fb54ee0b643b2518481024ceca6a77cbef6144f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben007">
+		<description>Ben 10: Ripjaws (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="076"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben007.bin" size="120" crc="e827f72d" sha1="c66e742007ed78a6d661e3d0d816751b6a408cb1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben009">
+		<description>Ben 10: XLR8 (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="077"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben009.bin" size="120" crc="56432b84" sha1="e902434fd4fe823bed0322075ef34a302d976011" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben011">
+		<description>Ben 10: Heatblast (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="078"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben011.bin" size="120" crc="e3c26d51" sha1="9da231e8659e38e0e44adea10ceb40b91f9f5f70" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben013">
+		<description>Ben 10: Wildmutt (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="079"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben013.bin" size="120" crc="e630a06f" sha1="9a3f65624d6fa9da05f5edef706b2a10e86130dc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben015">
+		<description>Ben 10: Diamondhead (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="080"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben015.bin" size="120" crc="53b1e6ba" sha1="eac7eb4af6dd1ec6cbdc1a7662deb06aa8fcda6f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben017">
+		<description>Ben 10: Ghostfreak (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="S01"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben017.bin" size="120" crc="41881f7c" sha1="013719f238689da8afe896bc4f209a0e16f08e7d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben019">
+		<description>Ben 10: Grey Matter (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="S02"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben019.bin" size="120" crc="f40959a9" sha1="75a7f0306558d79c55a52548b2358a757f808cad" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben021">
+		<description>Ben 10: Upgrade (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="S03"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben021.bin" size="120" crc="f1fb9497" sha1="c6c9672864a83afc7956c816ed1730fd27e98bc9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben094">
+		<!-- Unreleased -->
+		<description>Ben 10: Omnicharge (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben094.bin" size="120" crc="94737ce0" sha1="ecfa92cf5114045005ad9aa816ca12957ac5812e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben095">
+		<!-- Unreleased -->
+		<description>Ben 10: Backpack (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="ben095.bin" size="120" crc="230b5caa" sha1="16eb3759d2e121167ed29925aa108803b04c48fc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl019">
+		<description>IWL: Galacto The Magnificent (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="001"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl019.bin" size="120" crc="a60109e8" sha1="6b8f471f38ee8a5bb713f833ff947b205130edaa" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl021">
+		<description>IWL: Canned Heat (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="002"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl021.bin" size="120" crc="a3f3c4d6" sha1="4030cdb25b2163410e89a58c058be68fa3eadbea" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl039">
+		<description>IWL: Pan Quantum Duae (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="003"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl039.bin" size="120" crc="39e4ebf3" sha1="02d5634ec6d5c25acb9db0f428310472ccddfb16" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl035">
+		<description>IWL: Hercules Quantum Duae (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="004"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl035.bin" size="120" crc="89976018" sha1="98becef0eb6406881c2e3a6aec9002b6df7441ba" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl073">
+		<description>IWL: Aroma Borealis (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="005"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl073.bin" size="120" crc="d8ace4ba" sha1="ff338b91ac2a8f034f8502770ce6558a18d7e0c4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl078">
+		<description>IWL: Pie in the Eye (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="006"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl078.bin" size="120" crc="6a2609ce" sha1="30d5848cd6669620f2285a971a3bad3a00b75096" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl003">
+		<description>IWL: Growler da Pirate (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="007"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl003.bin" size="120" crc="0a5c2c87" sha1="2a45260473809c59f8df7f792dcf5dee2e1e2964" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl001">
+		<description>IWL: Lobstar (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="008"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl001.bin" size="120" crc="bfdd6a52" sha1="343cae3ae76817aaee41154449122125a51072cd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl013">
+		<description>IWL: Gibbonator (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="009"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl013.bin" size="120" crc="b438f02e" sha1="d78f7e37b0a060007af6c81ad7a8a69d63f98657" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl027">
+		<description>IWL: Billy Ray The Evil Twins (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="010"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl027.bin" size="120" crc="1d97187f" sha1="a03e074ced1e8391a921942c622cb5ecffe82d11" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl029">
+		<description>IWL: Uber Tuber (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="011"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl029.bin" size="120" crc="1865d541" sha1="f4be8f7388a84206d0f7f56c53882bd57de93304" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl017">
+		<description>IWL: The Mad Protoplasm (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="012"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl017.bin" size="120" crc="13804f3d" sha1="2bf67e048d4e05331b40c3e76e0c6e162d20d532" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl018">
+		<description>IWL: Ultimate The Mad Protoplasm (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="013"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl018.bin" size="120" crc="117929a2" sha1="5551421ed969315845d000233f05f34e53982a28" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl014">
+		<description>IWL: Ultimate Gibbonator (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="014"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl014.bin" size="120" crc="b6c196b1" sha1="85a8bb66768c92c7e56c79cf1e0ceaaeb5f0d125" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl020">
+		<description>IWL: Ultimate Galacto The Magnificent (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="015"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl020.bin" size="120" crc="148be49c" sha1="3eec9d51a9206d2ca42b3e5c15439f534920cc69" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl022">
+		<description>IWL: Ultimate Canned Heat (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="016"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl022.bin" size="120" crc="a10aa249" sha1="8d76e777aed1310d3f03de7233b84a3acf011782" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl028">
+		<description>IWL: Ultimate Billy Ray The Evil Twins (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="017"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl028.bin" size="120" crc="af1df50b" sha1="98cf082df9aedcea64c48e3326f9c9dd829abd42" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl106">
+		<description>IWL: The Poser (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="018"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl106.bin" size="120" crc="599eceba" sha1="b05bd04dd16c4db3b4b96adcdc696dc8a1dc3ceb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl107">
+		<description>IWL: The Asimov (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="019"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl107.bin" size="120" crc="eee6eef0" sha1="7b2893544b9eb353afeebe8380ca78ccd77c3ba2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl037">
+		<description>IWL: Mercury Quantum Duae (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="020"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl037.bin" size="120" crc="8c65ad26" sha1="edc039a0561bb156af95e599ec3ae65ab49eda38" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl038">
+		<description>IWL: Atlas Quantum Duae (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="021"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl038.bin" size="120" crc="8e9ccbb9" sha1="60a2c52c22523b7d9656be74ae3383647443f0b0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl036">
+		<description>IWL: Apollo Quantum Duae (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="022"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl036.bin" size="120" crc="3b1d8d6c" sha1="6fea79231bc1c304d4461e7cd803e6b0e43c6c36" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl033">
+		<description>IWL: Unum Atlas Daum (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="023"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl033.bin" size="120" crc="3c1626cd" sha1="3ce828a20d702552d2f6f27377fcff2926977974" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl054">
+		<description>IWL: Mercollo (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="024"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl054.bin" size="120" crc="22c1eed6" sha1="35a9fb121cacca5ddf72ae408965243a29d3d536" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl045">
+		<description>IWL: Max Hercules Meyiotos (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="025"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl045.bin" size="120" crc="37f3bcb1" sha1="1a1bd4d989e7a6f5cf72647675f5c5b7dc944239" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl049">
+		<description>IWL: Max Pan Meyiotos (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="026"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl049.bin" size="120" crc="904b03a2" sha1="7760152c9128e6959a1de7d14f35d62372e7dacc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl060">
+		<description>IWL: El Mas Loco (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="027"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl060.bin" size="120" crc="2cd6b994" sha1="3ee3edcbc4a88c4fac0d6e0457645c5c0f95c43a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl081">
+		<description>IWL: Metal Folding Chair Launcher (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="028"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl081.bin" size="120" crc="cf67d042" sha1="32931b766b22738773643fb5c6e2c2be97a1cc39" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl082">
+		<description>IWL: Blinded by the Light (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="029"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl082.bin" size="120" crc="cd9eb6dd" sha1="29f9e7fd2cec006462f8e7635ecfdbf437188950" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl094">
+		<description>IWL: Venus di Meltdown (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="030"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl094.bin" size="120" crc="c67b2ca1" sha1="6979d0d6f49e533f633da53576592b4687dc3db4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl096">
+		<description>IWL: Vigor Trigger (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="031"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl096.bin" size="120" crc="578999f8" sha1="14f51c682acd317b7fb135a44fe34d156477960a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl072">
+		<description>IWL: Can&#x27;t Touch This (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="032"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl072.bin" size="120" crc="6fd4c4f0" sha1="af1304410ef20c134b0070247f0af0d1fcfc5e2b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl076">
+		<description>IWL: ACME Special Delivery (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="033"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl076.bin" size="120" crc="dfa74f1b" sha1="34b2f3645358f9bcdb274e5cfac2734405568d1b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl079">
+		<description>IWL: Roid Rager (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="034"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl079.bin" size="120" crc="dd5e2984" sha1="ea2e002ef496268578e6239056907b0071022511" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl085">
+		<description>IWL: Rain of Pain (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="035"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl085.bin" size="120" crc="7f145ba9" sha1="4e1e777bc6ebda78d9afece8f62a9ff404cadf0f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl087">
+		<description>IWL: Jacob&#x27;s Ladder (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="036"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl087.bin" size="120" crc="ca951d7c" sha1="6855f8fc8c4089aad81c4d4500f7afc4342b645b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl090">
+		<description>IWL: Bad Dentist (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="037"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl090.bin" size="120" crc="7608a74a" sha1="6128545b1953c077d649965419bce75dc4606e39" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl091">
+		<description>IWL: The Milky Wake (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="038"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl091.bin" size="120" crc="c1708700" sha1="64fdae56db846088bd25a36484b7b6dee523a90c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl080">
+		<description>IWL: Black Hole (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="039"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl080.bin" size="120" crc="781ff008" sha1="27b78b9494043a6a82d094d910962866b11fc6e8" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl061">
+		<description>IWL: Galaxy Shifter (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="040"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl061.bin" size="120" crc="9bae99de" sha1="1e2659661f62133f9c9623ac0578db104381913a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl062">
+		<description>IWL: Interstellar Ka-Boom (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="041"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl062.bin" size="120" crc="9957ff41" sha1="02e40f84823aa7b0682e228e5a13d7d564f5e5a4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl063">
+		<description>IWL: Caraba Chaba (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="042"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl063.bin" size="120" crc="2e2fdf0b" sha1="8b616d39ee1a30f0e3fb0057ee5c5d3befc1cd55" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl097">
+		<description>IWL: Express Delivery (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="043"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl097.bin" size="120" crc="e0f1b9b2" sha1="46aa1d3aead5d37edfbdf6aa6a5921ee772aee1a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl110">
+		<description>IWL: The Moon Shiner (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="044"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl110.bin" size="120" crc="e9ed4551" sha1="5978639d25deb4fd2e6c4851c07dffa6afb8cb9b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl098">
+		<description>IWL: Davey Jones Locker (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="045"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl098.bin" size="120" crc="e208df2d" sha1="d1dbd83f46763999d0cebc19a75a58a1d4e72e60" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl103">
+		<description>IWL: The Banana Split (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="046"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl103.bin" size="120" crc="e503748c" sha1="763fc76c81f5bab5f56f3cf321ddd9b694e7b8fe" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl111">
+		<description>IWL: The Freedom Fryer (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="047"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl111.bin" size="120" crc="5e95651b" sha1="773d64ba5c3fdbe308f132dc49377ea662520140" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl105">
+		<description>IWL: The Ecto-Squeeze (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="048"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl105.bin" size="120" crc="5b67a825" sha1="98a66111f5ca62af997ce3ea02ee3bc904b628e3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl047">
+		<description>IWL: Max Mercury Meyiotos (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="049"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl047.bin" size="120" crc="8272fa64" sha1="8246b4b97ebe55cdac20c39690ab202931557872" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl053">
+		<description>IWL: Panules (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="050"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl053.bin" size="120" crc="20388849" sha1="c35ef538d6aa2bd474faeea818594f1734fa78db" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl030">
+		<description>IWL: Unum Herculaum (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="051"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl030.bin" size="120" crc="1a9cb3de" sha1="08206536d55a1f1e3f4d49fc1f193647a2c4cb16" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl034">
+		<description>IWL: Unum Pan Daum (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="052"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl034.bin" size="120" crc="3eef4052" sha1="3f0efb809512b001265bee0e7d94738b239879f1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl057">
+		<description>IWL: Atlury (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="053"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl057.bin" size="120" crc="2bdd1235" sha1="43edc21d34f1b2364a9a91b209fb1ea479a95ebe" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl044">
+		<description>IWL: Tria Pan 3 (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="054"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl044.bin" size="120" crc="808b9cfb" sha1="cf770fe6826c76d977da748b5d75db426d8d537b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl064">
+		<!-- Unreleased -->
+		<description>IWL: Orion&#x27;s Belt (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="055"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl064.bin" size="120" crc="d442d567" sha1="9fc8286055ec03897d8679aa2ec1ba8fcd8f1472" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl065">
+		<!-- Unreleased -->
+		<description>IWL: Planet Crusher (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="056"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl065.bin" size="120" crc="633af52d" sha1="373f69f6b28d08a5f1ddf731e45acdc7203ddd6b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl066">
+		<!-- Unreleased -->
+		<description>IWL: The Force... To Be Reckoned With (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="057"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl066.bin" size="120" crc="61c393b2" sha1="c65f29aaa28c41df34be5f1ad2f388b33c08cf30" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl031">
+		<!-- Unreleased -->
+		<description>IWL: Unum Apollo Daum (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="058"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl031.bin" size="120" crc="ade49394" sha1="81f7c4508326acc67cf133016ea02560facd0cb8" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl032">
+		<!-- Unreleased -->
+		<description>IWL: Unum Mercury Daum (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="059"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl032.bin" size="120" crc="8b6e0687" sha1="cdf89c0ce18471f81ce1670854715db8add0858c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl040">
+		<!-- Unreleased -->
+		<description>IWL: Tria Hercules 3 (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="060"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl040.bin" size="120" crc="30f81710" sha1="ff37a69856ae392963008b0040d65fd5d73d2cf4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl041">
+		<!-- Unreleased -->
+		<description>IWL: Tria Apollo 3 (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="061"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl041.bin" size="120" crc="8780375a" sha1="f4352e0665dae043fe9a41b77118f08f65905bc7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl042">
+		<!-- Unreleased -->
+		<description>IWL: Tria Mercury 3 (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="062"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl042.bin" size="120" crc="857951c5" sha1="aa12196654e983d7239e29c4d8050c778596ff69" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl043">
+		<!-- Unreleased -->
+		<description>IWL: Tria Atlas 3 (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="063"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl043.bin" size="120" crc="3201718f" sha1="a53365085c559f77059939326811c68b72d00db2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl046">
+		<!-- Unreleased -->
+		<description>IWL: Max Apollo Meyiotos (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="064"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl046.bin" size="120" crc="350ada2e" sha1="a3cef14154446ad27ba44f8d29feac83735de219" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl048">
+		<!-- Unreleased -->
+		<description>IWL: Max Atlas Meyiotos (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="065"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl048.bin" size="120" crc="273323e8" sha1="62280a41d12f5c59a161c8291430ff517e996e6e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl050">
+		<!-- Unreleased -->
+		<description>IWL: Apocules (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="066"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl050.bin" size="120" crc="92b2653d" sha1="d49d1478131ebe07391379b54310ed4e47de5431" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl051">
+		<!-- Unreleased -->
+		<description>IWL: Merculon (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="067"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl051.bin" size="120" crc="25ca4577" sha1="2d7bdc37345474c1ee2ee9217c2d778cbcdbe9f4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl052">
+		<!-- Unreleased -->
+		<description>IWL: Atules (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="068"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl052.bin" size="120" crc="9740a803" sha1="46be14dba0dc8cde1c448a6cf6e0b71b402d629b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl055">
+		<!-- Unreleased -->
+		<description>IWL: Atollus (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="069"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl055.bin" size="120" crc="95b9ce9c" sha1="d82c26caca171b1b23c221a3cc6459fdede511f7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl056">
+		<!-- Unreleased -->
+		<description>IWL: Panollo (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="070"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl056.bin" size="120" crc="9ca5327f" sha1="89f44066663051ac230f541eeff9acc054b4ec97" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl058">
+		<!-- Unreleased -->
+		<description>IWL: Panury (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="071"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl058.bin" size="120" crc="292474aa" sha1="2591a2d50bfaa9a5e762c7c4022a7f7d95b8b1b8" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl059">
+		<!-- Unreleased -->
+		<description>IWL: Panlas (Game Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="072"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl059.bin" size="120" crc="9e5c54e0" sha1="4c131ca70054a7816947335019aa47e30a001a52" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl067">
+		<!-- Unreleased -->
+		<description>IWL: Star Gazer (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="073"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl067.bin" size="120" crc="d6bbb3f8" sha1="32847225a7dd1b0ebad05762b3e40c00a990afb2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl068">
+		<!-- Unreleased -->
+		<description>IWL: Cosmonut Cracker (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="074"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl068.bin" size="120" crc="64315e8c" sha1="8bf575f5832713e4deb76ec9ca6eaa3acab3ec9e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl069">
+		<!-- Unreleased -->
+		<description>IWL: Warp Pile Driver (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="075"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl069.bin" size="120" crc="d3497ec6" sha1="0fdab3a1e9a222be57eddfbc80c470a85cbe359e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl070">
+		<!-- Unreleased -->
+		<description>IWL: Cosmic Crush (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="076"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl070.bin" size="120" crc="d1b01859" sha1="00477404c3752000bd46155fd135e1a0bedba46e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl071">
+		<!-- Unreleased -->
+		<description>IWL: Laser Eyeballs (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="077"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl071.bin" size="120" crc="66c83813" sha1="180533d7404d0381d92aa11cdb3ccf4038a770ff" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl074">
+		<!-- Unreleased -->
+		<description>IWL: Tortoise (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="078"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl074.bin" size="120" crc="da558225" sha1="778a3944382b06942ee3ded47a79cc7d722c8a59" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl075">
+		<!-- Unreleased -->
+		<description>IWL: Wise Guy (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="079"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl075.bin" size="120" crc="6d2da26f" sha1="10d7de0b7666a1a44af4b28156c498e2604c96eb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl083">
+		<!-- Unreleased -->
+		<description>IWL: Doll of Cement (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="080"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl083.bin" size="120" crc="7ae69697" sha1="880e5b1efc10a2d4d2e55b145c8a6a2e06c3216c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl086">
+		<!-- Unreleased -->
+		<description>IWL: Jupiter Juice (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="081"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl086.bin" size="120" crc="7ded3d36" sha1="daba3a454a9e974c74e447bf1cd80ff5fb140484" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl088">
+		<!-- Unreleased -->
+		<description>IWL: The Foot of Ra (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="082"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl088.bin" size="120" crc="c389e19f" sha1="ea0a0a531f7d1aa66f0c3f48c3cc26b9c3c9d77b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl089">
+		<!-- Unreleased -->
+		<description>IWL: Slap of 1000 Hands (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="083"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl089.bin" size="120" crc="74f1c1d5" sha1="50c676efaba5467a0ef422a49cbba1a2a1860c4a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl093">
+		<!-- Unreleased -->
+		<description>IWL: Mercury Heater (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="084"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl093.bin" size="120" crc="c4824a3e" sha1="de7c1af15ec647033b54892ab59a3648d534190b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl095">
+		<!-- Unreleased -->
+		<description>IWL: The Cleaner (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="085"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl095.bin" size="120" crc="71030ceb" sha1="33f069a7b3405dfe33787e57c935d14f283396e0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl005">
+		<!-- Unreleased -->
+		<description>IWL: Arrffin&#x27; Annie The Chupacabra (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="086"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl005.bin" size="120" crc="0faee1b9" sha1="8738476d5974f6079300e16accac2731eb1f84f4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl007">
+		<!-- Unreleased -->
+		<description>IWL: Mandible (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="087"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl007.bin" size="120" crc="ba2fa76c" sha1="38dae05702d9f192fa11c2298a61b14d02bec184" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl009">
+		<!-- Unreleased -->
+		<description>IWL: Matsumo Clodsan (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="088"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl009.bin" size="120" crc="044b7bc5" sha1="c1b4f7dcbfe7f0ccbbb173b7f76bce930ebb234a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl011">
+		<!-- Unreleased -->
+		<description>IWL: Balthazaar The Bash-ful (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="089"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl011.bin" size="120" crc="b1ca3d10" sha1="e32fbfb2336e9e9640e8e8b1fbd0abca528bfaa2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl015">
+		<!-- Unreleased -->
+		<description>IWL: The Fossil (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="090"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl015.bin" size="120" crc="01b9b6fb" sha1="148b5b53a72b9789ae3235feeab23a70b7d243d8" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl023">
+		<!-- Unreleased -->
+		<description>IWL: Brother Beardsly (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="091"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl023.bin" size="120" crc="16728203" sha1="a700b64fc1bc1f7227b8e7b84872393f18397763" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl025">
+		<!-- Unreleased -->
+		<description>IWL: The Big Kahuna (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="092"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl025.bin" size="120" crc="a8165eaa" sha1="c560f7778838f4db76ea6d8502b004ece588f496" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl006">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Arrffin&#x27; Annie The Chupacabra (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="093"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl006.bin" size="120" crc="0d578726" sha1="cff4374338776366896b5d7a889081f867271d22" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl008">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Mandible (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="094"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl008.bin" size="120" crc="b3335b8f" sha1="66a830472d08cbd47f6d308d52b97174bf9f9a86" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl010">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Matsumo Clodsan (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="095"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl010.bin" size="120" crc="06b21d5a" sha1="b80643f2b7dde460e6df34d6a45916e5419b7a65" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl012">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Balthazaar The Bash-ful (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="096"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl012.bin" size="120" crc="0340d064" sha1="8284f4d06a7af0fb61f32686a6e65350bb7b3da6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl016">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Fossil (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="097"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl016.bin" size="120" crc="a4f86f77" sha1="91002481de49d21b8e68a4fc24200a726564585f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl024">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Brother Beardsly (Ultimate)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="098"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl024.bin" size="120" crc="1f6e7ee0" sha1="c305cc2e9cdeaaac6be4a3829dc803684560aa8e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl099">
+		<!-- Unreleased -->
+		<description>IWL: The Mutilator (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="099"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl099.bin" size="120" crc="5570ff67" sha1="73a6b847eb698854dac58c5e843e0a16df1c33c6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl100">
+		<!-- Unreleased -->
+		<description>IWL: A Plight of Fists (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="100"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl100.bin" size="120" crc="e7fa1213" sha1="785cc03b1497cb59834ca9c50fce92dff2f25d87" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl101">
+		<!-- Unreleased -->
+		<description>IWL: Eat My Dust (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="101"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl101.bin" size="120" crc="50823259" sha1="f82036cea78e36f85f7de98478d9b4f9592f82bb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl102">
+		<!-- Unreleased -->
+		<description>IWL: The Deadly Cream Pie (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="102"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl102.bin" size="120" crc="527b54c6" sha1="787b24dcfbae3b607b43722f5cd78cfcb223e5df" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl104">
+		<!-- Unreleased -->
+		<description>IWL: The Saber Tooth Cave Painting (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="103"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl104.bin" size="120" crc="ec1f886f" sha1="1042d5ff3354c858d8e52c63de8167b14efa8745" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl108">
+		<!-- Unreleased -->
+		<description>IWL: The Dragon Bucket (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="104"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl108.bin" size="120" crc="5c6c0384" sha1="70298908b779b9336beb89c635fbb0e9eca4cb44" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl109">
+		<!-- Unreleased -->
+		<description>IWL: Humuhumunukunuku Apua&#x27;a (Finishing)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="105"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl109.bin" size="120" crc="eb1423ce" sha1="07acfb8b9f95091ed38278dbecbcdb7591fab635" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl002">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Lobstar (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl002.bin" size="120" crc="bd240ccd" sha1="d3a7c23b930a7d4977b797bbeb3434ee56aeab7d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl004">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Growler da Pirate (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl004.bin" size="120" crc="b8d6c1f3" sha1="66ebda5dbbe0b686249b6636d0bf86a1c4fd2877" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl026">
+		<!-- Unreleased -->
+		<description>IWL: Ultimate Big Kahuna (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl026.bin" size="120" crc="aaef3835" sha1="af1292cb44521c225b382667d032f4564b6bb89e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl077">
+		<!-- Unreleased -->
+		<description>IWL: Light Speed (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl077.bin" size="120" crc="68df6f51" sha1="ac4fc7449b332f1ebd5557fbf7282fcd1f053452" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl084">
+		<!-- Unreleased -->
+		<description>IWL: Rocket Boots (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl084.bin" size="120" crc="c86c7be3" sha1="2aead4a505315a8b19f095281fe36dd06e98ca51" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwl092">
+		<!-- Unreleased -->
+		<description>IWL: Aroma Borealis 2 (Battle Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="iwl092.bin" size="120" crc="73fa6a74" sha1="63406cc8be56e0a6fe0ac41a26e006e919650bc5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh001">
+		<description>Marvel Heroes: Spider-Man (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="001"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh001.bin" size="120" crc="cb494322" sha1="aa165c1a64c7c6dffe15405d33c9302cd3e7a1b9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh002">
+		<description>Marvel Heroes: Captain America (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="002"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh002.bin" size="120" crc="5fbcd6e1" sha1="8f832eb2fdb5d67781d73fbaba93b21e9078116f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh003">
+		<description>Marvel Heroes: Hulk (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="003"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh003.bin" size="120" crc="9ac0a79f" sha1="c25d0ea5a4866eb31e94ecb49cc61b3ed42c2c29" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh004">
+		<description>Marvel Heroes: Thor (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="004"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh004.bin" size="120" crc="ad26fb26" sha1="bf5df43022a48388cf1bfe48a14a4df1b7ff7015" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh005">
+		<description>Marvel Heroes: Wolverine (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="005"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh005.bin" size="120" crc="685a8a58" sha1="44e2e8563674404c5966eb28c360036b8d9cf609" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh006">
+		<description>Marvel Heroes: Human Torch (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="006"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh006.bin" size="120" crc="fcaf1f9b" sha1="5143ff5fc274898866cda5e0f52c62096e03eebd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh007">
+		<description>Marvel Heroes: Iron Man (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="007"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh007.bin" size="120" crc="39d36ee5" sha1="0d4c3b158ce04df71eb2e92d00b92bb87e265bbf" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh008">
+		<description>Marvel Heroes: Storm (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="008"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh008.bin" size="120" crc="9363a6e9" sha1="fd646587ea1b5dbd2c9c00ef3a83a6501b94b854" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh009">
+		<description>Marvel Heroes: Elektra (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="009"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh009.bin" size="120" crc="561fd797" sha1="b377821f102257ce4b74406910ebace367ed6ccb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh010">
+		<description>Marvel Heroes: Thing (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="010"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh010.bin" size="120" crc="c2ea4254" sha1="dc513dd497a629c6354ac97c6653c6aa190c6c2e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh011">
+		<description>Marvel Heroes: Daredevil (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="011"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh011.bin" size="120" crc="0796332a" sha1="efe3f4f0e22a52582f1e1ffc2a04fba501d61e3a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh012">
+		<description>Marvel Heroes: Municipal Mayhem (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="012"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh012.bin" size="120" crc="30706f93" sha1="2becb1eea8e8175332452272f1daec27104283e4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh013">
+		<description>Marvel Heroes: Jungle Tech (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="013"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh013.bin" size="120" crc="f50c1eed" sha1="36ebe9075f52a326bc7232e3e804c0c1a670340e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh014">
+		<description>Marvel Heroes: Mount Fury (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="014"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh014.bin" size="120" crc="61f98b2e" sha1="da7ba53453287466db145d3a11b326a398c64fe6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh015">
+		<description>Marvel Heroes: Space-Station Omega (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="015"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh015.bin" size="120" crc="a485fa50" sha1="47da677b84e857e26ef61755ebd686496ac79cc9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh016">
+		<description>Marvel Heroes: Rat House Rumble (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="016"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh016.bin" size="120" crc="efe91d77" sha1="37b293e1bd7b9f27f6edcd18b33c8fa4e0089321" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh017">
+		<description>Marvel Heroes: Dread Field (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="017"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh017.bin" size="120" crc="2a956c09" sha1="fdd21770976ce1bfed90572f5e8f8d1a40371802" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh018">
+		<description>Marvel Heroes: Techno Terror (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="018"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh018.bin" size="120" crc="be60f9ca" sha1="e67bdf73d22182a09ec999c9e6d3092b2dcff167" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh019">
+		<description>Marvel Heroes: Chaos Laboratories (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="019"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh019.bin" size="120" crc="7b1c88b4" sha1="b2dd3d516001db51596041e2a4c553f28f49132a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh020">
+		<description>Marvel Heroes: Desolation Flats (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="020"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh020.bin" size="120" crc="4cfad40d" sha1="8719de272879632b09ec5f81ead8944fe1775974" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh021">
+		<description>Marvel Heroes: Target X (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="021"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh021.bin" size="120" crc="8986a573" sha1="a3da31c1fe31eb8a3ab7fb926b347f4676017c1e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh022">
+		<description>Marvel Heroes: Wretched Acres (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="022"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh022.bin" size="120" crc="1d7330b0" sha1="662c96a7b6a805a1201e14d93502118c213757c7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh023">
+		<description>Marvel Heroes: Back-Alley Bust Up (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="023"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh023.bin" size="120" crc="d80f41ce" sha1="333e868e9a5ba97b46b56e2b49e4175488569115" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh024">
+		<description>Marvel Heroes: Drab Town (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="024"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh024.bin" size="120" crc="72bf89c2" sha1="106ce303aa9cd6d85ec0f98d6b58e207ac1d1432" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh025">
+		<description>Marvel Heroes: Scraps (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="025"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh025.bin" size="120" crc="b7c3f8bc" sha1="8bf946bade21129efaf7465f91d4ff5c4af5315e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh026">
+		<description>Marvel Heroes: Fire Island Station (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="026"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh026.bin" size="120" crc="23366d7f" sha1="330020f9a9c44c38771ac3382674ed5f033bb448" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh027">
+		<description>Marvel Heroes: Cavern Clash (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="027"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh027.bin" size="120" crc="e64a1c01" sha1="9d125e9f8f892c5e0a90dfef52674fd3e6e1a0d4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh028">
+		<description>Marvel Heroes: Force Factor (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="028"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh028.bin" size="120" crc="d1ac40b8" sha1="49ab4916757163e1173bf21808e25dd112429876" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh029">
+		<description>Marvel Heroes: Vanguard Forest (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="029"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh029.bin" size="120" crc="14d031c6" sha1="a4764c56959fed8a08f61cb4a271fd8eb89c4cfc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh030">
+		<description>Marvel Heroes: Mountain Meltdown (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="030"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh030.bin" size="120" crc="8025a405" sha1="191c56de6563c1dc034a19710880d2433b0e9f7b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh031">
+		<description>Marvel Heroes: Wastes of Warfare (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="031"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh031.bin" size="120" crc="4559d57b" sha1="ad7a516e90bb87edacecd11b30104e96852c9588" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh032">
+		<description>Marvel Heroes: Last Chance Bog (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="032"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh032.bin" size="120" crc="16fc6a4b" sha1="746bedc2281e28c736c94b4ad3b5e70c1d120f31" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh033">
+		<description>Marvel Heroes: Tunnels of Terror (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="033"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh033.bin" size="120" crc="d3801b35" sha1="c93a6329a7cb1c8530b0a5e6aa14fd88dc32620f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh034">
+		<description>Marvel Heroes: Lightning Ridge (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="034"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh034.bin" size="120" crc="47758ef6" sha1="7a203ec4098a4f303a8517011ac883f8099459a4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh035">
+		<description>Marvel Heroes: Biotronic (Area Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="035"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh035.bin" size="120" crc="8209ff88" sha1="9c6aecb2bd49bfeddc3d2bd94bfeae78497324d6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh036">
+		<description>Marvel Heroes: Mystery (Atmosphere Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="036"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh036.bin" size="120" crc="b5efa331" sha1="be12c62d53d32120a9972c1042d1bfa766a59a5c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh037">
+		<description>Marvel Heroes: Witching Hour (Atmosphere Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="037"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh037.bin" size="120" crc="7093d24f" sha1="a5e7f168c39d1ac6806d118d6584db0dab32f0eb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh038">
+		<description>Marvel Heroes: Thunderhead (Atmosphere Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="038"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh038.bin" size="120" crc="e466478c" sha1="c490357041bd8e909041c3a3076fe05f83be4dc4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh039">
+		<description>Marvel Heroes: Thick Soup (Atmosphere Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="039"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh039.bin" size="120" crc="211a36f2" sha1="559d6a132181b051513d61fb878eea518e308fd9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh040">
+		<description>Marvel Heroes: Snow Squall (Atmosphere Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="040"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh040.bin" size="120" crc="8baafefe" sha1="b346eaa2aa83489e3b0713dc5d7c71fa36df1a23" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh041">
+		<description>Marvel Heroes: Heat Wave (Atmosphere Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="041"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh041.bin" size="120" crc="4ed68f80" sha1="755ed8c40baafeb9080a70f4021cf827b522cafb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh042">
+		<description>Marvel Heroes: Below Zero (Atmosphere Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="042"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh042.bin" size="120" crc="da231a43" sha1="d4df3b5b4418e0e8c390c176d380e0b3270e5c87" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh043">
+		<description>Marvel Heroes: Gale Force (Atmosphere Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="043"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh043.bin" size="120" crc="1f5f6b3d" sha1="50d19bde5cd7a5921c4b3428c09e12081740332d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh044">
+		<description>Marvel Heroes: Doctor Doom (Boss Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="044"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh044.bin" size="120" crc="28b93784" sha1="1c7d6fbd7f4e402c2f7cda21d81104aa29502690" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh045">
+		<description>Marvel Heroes: Magneto (Boss Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="045"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh045.bin" size="120" crc="edc546fa" sha1="d796eeeea4aa76cffdb9c0511f22bfcf88a8618c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh046">
+		<description>Marvel Heroes: Ultron (Boss Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="046"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh046.bin" size="120" crc="7930d339" sha1="ef15451900ab9fcf877735e9f3f3396428acea3f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh047">
+		<description>Marvel Heroes: Thanos (Boss Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="047"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh047.bin" size="120" crc="bc4ca247" sha1="901801a65b69b28d1786b117b337afcab9e16945" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh048">
+		<description>Marvel Heroes: Doctor Octopus (Boss Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="048"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh048.bin" size="120" crc="f7204560" sha1="1039b2c46f86775ceb161bf843a028bbd3500484" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh049">
+		<description>Marvel Heroes: Baron Zemo (Boss Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="049"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh049.bin" size="120" crc="325c341e" sha1="00f39d32da4fbfac86fbca1ee49ae6bf32d0f5f4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh050">
+		<description>Marvel Heroes: Venom (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="050"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh050.bin" size="120" crc="a6a9a1dd" sha1="0635ddec69cde9bd054dffdf58e8bf22ab3b535c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh051">
+		<description>Marvel Heroes: Bullseye (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="051"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh051.bin" size="120" crc="63d5d0a3" sha1="5fa3cd62f022f989a076b5c6fa5a642db984fc59" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh052">
+		<description>Marvel Heroes: Hobgoblin (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="052"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh052.bin" size="120" crc="54338c1a" sha1="cfd13e81ec3df56ccdbfc0269498c68e8440ae65" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh053">
+		<description>Marvel Heroes: Spiral (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="053"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh053.bin" size="120" crc="914ffd64" sha1="cadadc95442d3a0fc4f8958622d6532a78c50542" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh054">
+		<description>Marvel Heroes: Loki (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="054"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh054.bin" size="120" crc="05ba68a7" sha1="e2f27a57596599e676536717f62baaf621eed927" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh055">
+		<description>Marvel Heroes: Lady Deathstrike (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="055"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh055.bin" size="120" crc="c0c619d9" sha1="384d7b4cb0a243e9de59ddfd5af10209f6fad771" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh056">
+		<description>Marvel Heroes: Klaw (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="056"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh056.bin" size="120" crc="6a76d1d5" sha1="d91ba5a609e3e06a6ff93a5a4446bd0d489a473e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh057">
+		<description>Marvel Heroes: Whirlwind (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="057"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh057.bin" size="120" crc="af0aa0ab" sha1="b3aa72c6a1d081c7d0c3475db1dcbae2dbd67b1a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh058">
+		<description>Marvel Heroes: Omega Red (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="058"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh058.bin" size="120" crc="3bff3568" sha1="b2358396ac2bf4c2d37dccddef8dc334c9206eca" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh059">
+		<description>Marvel Heroes: The Owl (Villain Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="059"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh059.bin" size="120" crc="fe834416" sha1="01e5bdc686e28d93971a4f119fe117cbb581ce11" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh060">
+		<description>Marvel Heroes: Spider-Man Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="060"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh060.bin" size="120" crc="c96518af" sha1="dcc585e714e51c4284bcec6e566c24df1528872b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh061">
+		<description>Marvel Heroes: Captain America Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="061"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh061.bin" size="120" crc="0c1969d1" sha1="2e527d806575f6031614520bf46d9926f1f82091" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh062">
+		<description>Marvel Heroes: Hulk Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="062"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh062.bin" size="120" crc="98ecfc12" sha1="d58729584955c6138ae8f7abe351bc7617ae7b79" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh063">
+		<description>Marvel Heroes: Thor Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="063"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh063.bin" size="120" crc="5d908d6c" sha1="09f2d8bfcc4b6cd9ceaab06d907085025df464bd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh064">
+		<description>Marvel Heroes: Wolverine Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="064"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh064.bin" size="120" crc="3fa78272" sha1="1257b70d487fcb5f2fc8e791b127bfb138fb4523" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh065">
+		<description>Marvel Heroes: Human Torch Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="065"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh065.bin" size="120" crc="fadbf30c" sha1="1b00f10f8907990116d23f32564f82cea48a8a1f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh066">
+		<description>Marvel Heroes: Iron Man Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="066"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh066.bin" size="120" crc="6e2e66cf" sha1="5a817f733db46b69ef9b31ba7f7830e257624ceb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh067">
+		<description>Marvel Heroes: Storm Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="067"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh067.bin" size="120" crc="ab5217b1" sha1="1a8c652da119b97856a26cad6f4f1aeee1c3925c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh068">
+		<description>Marvel Heroes: Elektra Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="068"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh068.bin" size="120" crc="9cb44b08" sha1="96850b83eaaaa7b16de091677205f0b63f5eda1d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh069">
+		<description>Marvel Heroes: Thing Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="069"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh069.bin" size="120" crc="59c83a76" sha1="56384e21216ef8483e183bdca5ebadf4b9b65f7d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvh070">
+		<description>Marvel Heroes: Daredevil Challenge (Story Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="070"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="marvh070.bin" size="120" crc="cd3dafb5" sha1="a040afbbe4aeb3244a7cb03e88ba4dcd0abad738" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm001">
+		<description>Spiderman: Spider-Man (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="001"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm001.bin" size="120" crc="783daaae" sha1="dacaaaa0301fc46bac3fb3a2324de445baab5e6e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm002">
+		<description>Spiderman: Black Widow (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="002"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm002.bin" size="120" crc="7ac4cc31" sha1="4025a98b91ffa6f37009ad7ca742c4b4419aa600" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm003">
+		<description>Spiderman: Attitude Adjustment (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="003"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm003.bin" size="120" crc="cdbcec7b" sha1="5e9a8be03265d4463e392c071d09479d3f902782" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm004">
+		<description>Spiderman: Fly Paper (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="004"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm004.bin" size="120" crc="7f36010f" sha1="c9fb757f8df31a9c3331b8fb5339034c8ac2b5e8" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm005">
+		<description>Spiderman: Daddy Long Legs (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="005"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm005.bin" size="120" crc="c84e2145" sha1="49bb60b8da45bece8d34df79802868989c171407" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm006">
+		<description>Spiderman: Web Fluid (Arsenal Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="006"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm006.bin" size="120" crc="cab747da" sha1="4a7a1b16d64db244f8e52b3c4524fd7ba8ba2576" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm007">
+		<description>Spiderman: Spider Bite (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="007"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm007.bin" size="120" crc="7dcf6790" sha1="449599e449507d2bcb40f29c4efa8bc33f617038" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm008">
+		<description>Spiderman: The Tarantula (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="008"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm008.bin" size="120" crc="74d39b73" sha1="83597e22f9386d0dbe7f308990efc27a134c738d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm009">
+		<description>Spiderman: Trap Door Spider (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="009"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm009.bin" size="120" crc="c3abbb39" sha1="02b28404ce5c9442066015a7d9136ea0b0c673fd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm010">
+		<description>Spiderman: Octattack (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="010"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm010.bin" size="120" crc="c152dda6" sha1="574b2deb1c9899288554ebb1f1af4d7e2d3b1e0c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm011">
+		<description>Spiderman: The Bowling Ball (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="011"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm011.bin" size="120" crc="762afdec" sha1="0b66b36376e0f248874bcbe0a915985e26e64141" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm012">
+		<description>Spiderman: Jumping Spider (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="012"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm012.bin" size="120" crc="c4a01098" sha1="c87f8d3607c6b049a4bfc18a75a839b5bb0c9257" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm013">
+		<description>Spiderman: Goo Hammer (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="013"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm013.bin" size="120" crc="73d830d2" sha1="0c59f1a7570fbf9eb93392f478b2b425aa388a4a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm014">
+		<description>Spiderman: Disguised (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="014"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm014.bin" size="120" crc="7121564d" sha1="3460c207611f4573569b1fcea41a56545dca2703" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm015">
+		<description>Spiderman: Bad Habit (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="015"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm015.bin" size="120" crc="c6597607" sha1="cebcf509acaa12433522a8846efc01df44abeb51" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm016">
+		<description>Spiderman: Up And Away (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="016"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm016.bin" size="120" crc="6318af8b" sha1="2b4d47aa5ff8f2c00cc60f0791869fb9664d5c68" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm017">
+		<description>Spiderman: Shaky Ground (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="017"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm017.bin" size="120" crc="d4608fc1" sha1="30dd16da48edb218d64029fb22dc4152a90c1eb7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm018">
+		<description>Spiderman: Snap Back (Black Mod Suit)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="018"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm018.bin" size="120" crc="d699e95e" sha1="ee87580aa5432f6ee5c5cb3c29efe45475ab3378" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm019">
+		<description>Spiderman: Black Flail (Black Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="019"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm019.bin" size="120" crc="61e1c914" sha1="1443e7a6af17b239b3868adfbed8d620f1a71a4d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm020">
+		<description>Spiderman: Spider Shield (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="020"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm020.bin" size="120" crc="d36b2460" sha1="4545da40f36bad29546b9c2c1e7db6575c7576c4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm021">
+		<description>Spiderman: Super Slinger (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="021"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm021.bin" size="120" crc="6413042a" sha1="945497448dbe7120d9d88a026ed69481370fe8a5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm022">
+		<description>Spiderman: Spidey Sense (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="022"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm022.bin" size="120" crc="66ea62b5" sha1="3b84c9fc4f520e77f7d9c5bc8c3caa23d07f380e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm023">
+		<description>Spiderman: Web O Mondo (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="023"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm023.bin" size="120" crc="d19242ff" sha1="a714151232af3e6a467d09f00f744f2eae8e54c9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm024">
+		<description>Spiderman: Slow Motion (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="024"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm024.bin" size="120" crc="d88ebe1c" sha1="025b7ba9b3b3c022baae47c296a62bd262e291c7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm025">
+		<description>Spiderman: Air Evac (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="025"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm025.bin" size="120" crc="6ff69e56" sha1="024596f5fd3a2bdfcc26c34c0d08a10ada8455bf" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm026">
+		<description>Spiderman: Tuffanuff (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="026"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm026.bin" size="120" crc="6d0ff8c9" sha1="01861945f237ead57c84d8a73d0c0f52f88af255" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm027">
+		<description>Spiderman: Arachnophobia (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="027"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm027.bin" size="120" crc="da77d883" sha1="e4347be8794615482b7e53c66e29d0a9d98a5860" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm028">
+		<description>Spiderman: Hang &#x27;em High (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="028"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm028.bin" size="120" crc="68fd35f7" sha1="05332773fd1b2a3c69a699f2e72eb544cdd65beb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm029">
+		<description>Spiderman: Safety Net (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="029"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm029.bin" size="120" crc="df8515bd" sha1="fb6c452850aba55f0d1ba2cc9a678b9cc7398607" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm030">
+		<description>Spiderman: Trip Web (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="030"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm030.bin" size="120" crc="dd7c7322" sha1="a7380a55c85a8fdb286ac255a77366659df03887" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm031">
+		<description>Spiderman: Camouflage (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="031"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm031.bin" size="120" crc="6a045368" sha1="81436ca836f0b56e1006870f7d48faf7bfb9e6f5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm032">
+		<description>Spiderman: Divine Reflex (Red Suit Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="032"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm032.bin" size="120" crc="4c8ec67b" sha1="47395426efa0acf00e08b92edbf168fee93ef09f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm033">
+		<description>Spiderman: Sonic Drubbing (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="033"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm033.bin" size="120" crc="fbf6e631" sha1="2b7c46c53c4834b5e388f44dbb34c151ed30e94e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm034">
+		<description>Spiderman: Tritium Card (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="034"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm034.bin" size="120" crc="f90f80ae" sha1="eba782e955e76aa9cce8616cb54bd3dee86a96de" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm035">
+		<description>Spiderman: Disintegrator (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="035"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm035.bin" size="120" crc="4e77a0e4" sha1="955af28013bc4df7aa1dffffebc5dd45449e5a20" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm036">
+		<description>Spiderman: Spider Agility (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="036"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm036.bin" size="120" crc="fcfd4d90" sha1="9d5b3c9879758d50f88b61107aa56ea8f36fd7ae" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm037">
+		<description>Spiderman: Web of Steel (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="037"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm037.bin" size="120" crc="4b856dda" sha1="f80260eeceed19a51bebe03f293d1d3177172070" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm038">
+		<description>Spiderman: Ego Boost (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="038"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm038.bin" size="120" crc="497c0b45" sha1="3b8d719595dc4f743a15fcdb6507b08aafc47309" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm039">
+		<description>Spiderman: Guilt Trip (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="039"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm039.bin" size="120" crc="fe042b0f" sha1="d737da18733f29b21ff16533f2a4ebb9c8a478fd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm040">
+		<description>Spiderman: EZ Does It (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="040"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm040.bin" size="120" crc="f718d7ec" sha1="88e1072f64f05c395fde410eada8b33b472eb716" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm041">
+		<description>Spiderman: Big Apple 1 (Mission Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="041"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm041.bin" size="120" crc="4060f7a6" sha1="3f12bf345d429964d9529dbe7d4ae30f70e25a1a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm042">
+		<description>Spiderman: Big Apple 2 (Mission Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="042"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm042.bin" size="120" crc="42999139" sha1="2cbe0106216c150cc992617ca93e4b6ddf8d3bc0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm043">
+		<description>Spiderman: Big Apple 3 (Mission Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="043"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm043.bin" size="120" crc="f5e1b173" sha1="202e2d065254d148324b99d161eab43734b0b0ff" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm044">
+		<description>Spiderman: Big Apple 4 (Mission Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="044"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm044.bin" size="120" crc="476b5c07" sha1="06c85ac69ba6cf9a487bceebf9be5c50dc50b0bd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm045">
+		<description>Spiderman: Big Apple 5 (Mission Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="045"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm045.bin" size="120" crc="f0137c4d" sha1="c8a74a66476f17a6ef996c716b49feb7312fc73b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm046">
+		<description>Spiderman: Invincibility (Arsenal Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="046"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm046.bin" size="120" crc="f2ea1ad2" sha1="d2ed361e02d77190e2283380e6d1d562201911a2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm047">
+		<description>Spiderman: Spider Speed (Arsenal Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="047"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm047.bin" size="120" crc="45923a98" sha1="16454ddee6d889642bfff606316ca3cb0a000eb5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm048">
+		<description>Spiderman: Super Strength (Arsenal Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="048"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm048.bin" size="120" crc="e0d3e314" sha1="7dadc2778eecf9dadfce6691ef55bedb03921ef9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm049">
+		<description>Spiderman: Health Drink (Arsenal Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="049"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm049.bin" size="120" crc="57abc35e" sha1="d8355d2b821466ceac9b1e3add2b31d7706ea354" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm050">
+		<description>Spiderman: Stopwatch (Arsenal Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="050"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm050.bin" size="120" crc="5552a5c1" sha1="5cc8b4c78c252808ac31101e4211fbfae8cb1f61" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm051">
+		<description>Spiderman: Web Flurry (Arsenal Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="051"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm051.bin" size="120" crc="e22a858b" sha1="e09346c0bb1c0f55a590d4d6e71c6b5542c2be61" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm052">
+		<description>Spiderman: Light As A Feather (FX Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="052"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm052.bin" size="120" crc="50a068ff" sha1="7289851fe2658f974a1c13c9e9e445a2710288ba" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm053">
+		<description>Spiderman: Super Jumper (FX Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="053"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm053.bin" size="120" crc="e7d848b5" sha1="1003c0aa09999d0a8810c867eea076ba8d776bd7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm054">
+		<description>Spiderman: Parade Route (FX Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="054"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm054.bin" size="120" crc="e5212e2a" sha1="fa636056ef46d0aa53074a0ff22b95c55916d768" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm055">
+		<description>Spiderman: Wacky Noises (FX Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="055"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm055.bin" size="120" crc="52590e60" sha1="186700e12d72d541eb8aa8257e1843ef3a3ecc5d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm056">
+		<description>Spiderman: Time Twist (FX Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="056"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm056.bin" size="120" crc="5b45f283" sha1="f1ad027a74379d979039aefaa28cdce1686b1c6e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm057">
+		<description>Spiderman: Daily Bugle (FX Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="057"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm057.bin" size="120" crc="ec3dd2c9" sha1="235126e8ff626b48d3dd7943894359acc4654722" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm058">
+		<description>Spiderman: Sound Mode (FX Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="058"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm058.bin" size="120" crc="eec4b456" sha1="beeb8ae7e15bf83875b46d527862bbac0458f056" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm059">
+		<description>Spiderman: Quick Learner (Enemy Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="059"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm059.bin" size="120" crc="59bc941c" sha1="e888770762925d58eb9c5dbf62935635499eb9de" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrm060">
+		<!-- Unreleased -->
+		<description>Spiderman: Comic Book Mode (FX Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="060"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="spdrm060.bin" size="120" crc="eb367968" sha1="5bf60030e2514f6e0e23f555be750cc0898a1440" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen001">
+		<description>X-Men: Wolverine (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="001"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen001.bin" size="120" crc="dc2d0a2c" sha1="c115b9e0ddf24005e5a012f88613a0ecd40ceb6b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen031">
+		<description>X-Men: Lady Deathstrike (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="002"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen031.bin" size="120" crc="ce14f3ea" sha1="b65e0d5612ddd24ec66840dfd874854025c10612" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen042">
+		<description>X-Men: Adamantium Claws (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="003"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen042.bin" size="120" crc="e68931bb" sha1="f518fa16675f486e839e55a246ccdb6f1ea5b7db" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen054">
+		<description>X-Men: Big Chill (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="004"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen054.bin" size="120" crc="41318ea8" sha1="443342dfcb07725aa9a289f57a282454670fcf3d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen072">
+		<description>X-Men: Cyborg Assault (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="005"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen072.bin" size="120" crc="0c24a48e" sha1="b39d9667fe98b974a6179479d2a5d77d13b53bf3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen116">
+		<description>X-Men: Strength Room (Danger Room)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="006"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen116.bin" size="120" crc="28575702" sha1="0603b0da4c33e31a8791d9416e5b4d78071da28e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen002">
+		<description>X-Men: Ultimate Wolverine (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="007"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen002.bin" size="120" crc="ded46cb3" sha1="451dcb0d2ec97b074fc6c05bf63351b73086898a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen003">
+		<description>X-Men: Storm (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="008"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen003.bin" size="120" crc="69ac4cf9" sha1="2c71e8e29e015cb1387627dafeadfc7d31b97efa" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen005">
+		<description>X-Men: Cyclops (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="009"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen005.bin" size="120" crc="6c5e81c7" sha1="eda51a3669ccf82a557c766aecc75f87d7cbedbb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen013">
+		<description>X-Men: Iceman (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="010"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen013.bin" size="120" crc="d7c89050" sha1="10660a666c2fe2649bd908b32005fe236ccb9d8b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen017">
+		<description>X-Men: Jean Grey/Phoenix (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="011"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen017.bin" size="120" crc="70702f43" sha1="50a8773d511b02b52cf281001c7dcfd08c03a54d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen021">
+		<description>X-Men: Magneto (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="012"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen021.bin" size="120" crc="c003a4a8" sha1="ecd000f2f164fe59b549ccaa79df9bef57326d3f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen018">
+		<description>X-Men: Ultimate Jean Grey/Phoenix (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="013"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen018.bin" size="120" crc="728949dc" sha1="b85f57775b072e034fb557df13a44b908ee8852b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen027">
+		<description>X-Men: Mystique (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="014"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen027.bin" size="120" crc="7e677801" sha1="9baf5eac3baf96ba70f34dedebddddfbde89cbe0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen035">
+		<description>X-Men: Omega Red (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="015"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen035.bin" size="120" crc="ea670066" sha1="0161e296dc0768b9768f61ec300c24b9a40ca7d0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen037">
+		<description>X-Men: Blob (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="016"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen037.bin" size="120" crc="ef95cd58" sha1="b268ec1816a6c849145005607a590622bdf4c9f5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen082">
+		<description>X-Men: Adamantium Mayhem (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="017"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen082.bin" size="120" crc="ae6ed6a3" sha1="a3e941dfcebbd2a36cadb8f8f6e79227bcc70298" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen083">
+		<description>X-Men: Sun Burst (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="018"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen083.bin" size="120" crc="1916f6e9" sha1="28db07c0670eaeaedc621283e9801e89c3998170" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen084">
+		<description>X-Men: Devastating Optic Blast (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="019"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen084.bin" size="120" crc="ab9c1b9d" sha1="c6497f62d6b12a1fdbc10e3ee029bb6f5ca846c0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen088">
+		<description>X-Men: Super Freeze (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="020"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen088.bin" size="120" crc="a07981e1" sha1="84ca55beeef51970ddee515bed8120dc8536697c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen090">
+		<description>X-Men: Mental Bolt (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="021"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen090.bin" size="120" crc="15f8c734" sha1="bcf37b7b4a0764987ba7e11092da74b402b23365" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen092">
+		<description>X-Men: Shrapnel (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="022"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen092.bin" size="120" crc="100a0a0a" sha1="7aa1697f400a49db1cde72e0b76145de9a2ac1c9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen097">
+		<description>X-Men: Spinning Death (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="023"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen097.bin" size="120" crc="8301d9cc" sha1="08841dbbb93328f3e85668bac584e5f90eba1530" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen095">
+		<description>X-Men: Rapid Fire Destruction (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="024"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen095.bin" size="120" crc="12f36c95" sha1="f5d118c4d6ce59a3625c1b8ca798e56d3f07c707" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen099">
+		<description>X-Men: Lethal Injection (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="025"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen099.bin" size="120" crc="36809f19" sha1="235883a143dbfbb385182d549c995ee2c2310329" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen100">
+		<description>X-Men: Gravity Press (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="026"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen100.bin" size="120" crc="840a726d" sha1="47d1cb48810a0827ded4ddcd137e6d9c06cedebb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen043">
+		<description>X-Men: Accelerated Healing (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="027"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen043.bin" size="120" crc="51f111f1" sha1="70b3b322119aaaf0094a28f08d46ce3801c1ec7c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen044">
+		<description>X-Men: Thunder n&#x27; Lightning (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="028"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen044.bin" size="120" crc="e37bfc85" sha1="3da60f4adb4ddcc8f3e3e63613bb6f968f8c0281" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen045">
+		<description>X-Men: Hover Hold (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="029"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen045.bin" size="120" crc="5403dccf" sha1="68fb1d74699bfa5bf9f517dd30f9c026a2615c45" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen046">
+		<description>X-Men: Vapor-eyes (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="030"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen046.bin" size="120" crc="56faba50" sha1="69d29e976bc6446d3f5ca704f974fb5be173c163" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen047">
+		<description>X-Men: Cool Head (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="031"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen047.bin" size="120" crc="e1829a1a" sha1="a9089d065fb37962520be1d4bb813a9de31f460c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen055">
+		<description>X-Men: Below Zero (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="032"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen055.bin" size="120" crc="f649aee2" sha1="89a0cb463c1dad4f18a6dc13fa3e07fbc554c09b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen058">
+		<description>X-Men: Telepathic Touch (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="033"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen058.bin" size="120" crc="4ad414d4" sha1="114e9dca39a8838c298ae99fe6a28fdadad4e45c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen059">
+		<description>X-Men: Psychic Shield (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="034"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen059.bin" size="120" crc="fdac349e" sha1="f1fbccdcdf13229391dcc9f413f8c3206ddeccef" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen062">
+		<description>X-Men: Metallic Mayhem (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="035"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen062.bin" size="120" crc="faa79f3f" sha1="57b567e717b366e04f1cfe59d55409cb1be261ed" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen063">
+		<description>X-Men: Magnetic Maneuver (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="036"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen063.bin" size="120" crc="4ddfbf75" sha1="62d21619a1b445cde59666ea30bef29f25ed6ecc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen073">
+		<description>X-Men: Adamantium Skeleton (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="037"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen073.bin" size="120" crc="bb5c84c4" sha1="5a6a403f58a0f967a959bf6a6230063f69010a4b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen068">
+		<description>X-Men: Morph Queen (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="038"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen068.bin" size="120" crc="07c13ef2" sha1="a96ade58139cd2c0c6cddbf7c32878ab397f41a0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen069">
+		<description>X-Men: Shapely Shifting (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="039"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen069.bin" size="120" crc="b0b91eb8" sha1="9f0544f8e391835f722724e1021022b55a318261" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen076">
+		<description>X-Men: Toxic Tentacles (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="040"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen076.bin" size="120" crc="bc572f65" sha1="f107cf1840b29d8e53ebd87a59d203274c6b60a6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen077">
+		<description>X-Men: Red Guard (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="041"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen077.bin" size="120" crc="0b2f0f2f" sha1="c7c90e627bf0b388a38ce5c99519a2c1955be264" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen078">
+		<description>X-Men: Unstoppable Force (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="042"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen078.bin" size="120" crc="09d669b0" sha1="25628f63862c5ba09c3600a7b11434518390ec3d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen079">
+		<description>X-Men: Superhuman Resistant (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="043"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen079.bin" size="120" crc="beae49fa" sha1="c2692a563bd7b0849624038774fbd923b6267ddf" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen102">
+		<description>X-Men: Projectile Shield (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="044"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen102.bin" size="120" crc="318b34b8" sha1="b21837d4e36668928c22104fabde9dd5c40c0fae" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen103">
+		<description>X-Men: Auto Duck (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="045"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen103.bin" size="120" crc="86f314f2" sha1="21aa4f6011d159aac559c51a85d14a51a987d365" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen106">
+		<description>X-Men: Resurrect (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="046"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen106.bin" size="120" crc="3a6eaec4" sha1="815db1a61484e3883dc397323c6c8142b93bd16e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen107">
+		<description>X-Men: Melee Shield (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="047"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen107.bin" size="120" crc="8d168e8e" sha1="c6398fd38a8832a7c2df138b9be482c90fc28557" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen108">
+		<description>X-Men: Triple Strike (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="048"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen108.bin" size="120" crc="3f9c63fa" sha1="b8553f11df3080109a86cf9a2352db3ac80c1afb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen110">
+		<description>X-Men: Half as Nice (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="049"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen110.bin" size="120" crc="8a1d252f" sha1="672125c185fa9451460e8aabd29230ac4013e54f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen112">
+		<description>X-Men: Projectile Vengeance (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="050"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen112.bin" size="120" crc="9824dce9" sha1="88bd63f4dd867d855ba70b212b1950cd419ab761" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen113">
+		<description>X-Men: Melee Vengeance (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="051"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen113.bin" size="120" crc="2f5cfca3" sha1="2cdf3dbc5a43b4223918cb6b27011d2f456734b1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen041">
+		<description>X-Men: Professor X (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="052"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen041.bin" size="120" crc="e4705724" sha1="e28a4b7bc2e7561a1e47a2e83f4a3657e5ca1541" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen114">
+		<description>X-Men: Durability Room (Danger Room)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="053"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen114.bin" size="120" crc="2da59a3c" sha1="4cf9251397a7a72ce997a468cbd2df3143aa9de9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen115">
+		<description>X-Men: Speed Room (Danger Room)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="054"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen115.bin" size="120" crc="9addba76" sha1="9accb804719e59231673cc9a40de260e39c0f59c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen117">
+		<description>X-Men: Intelligence Room (Danger Room)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="055"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen117.bin" size="120" crc="9f2f7748" sha1="73ea9428f978837a202094584ecd31ab78fec06c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen118">
+		<description>X-Men: Fighting Skills Room (Danger Room)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="056"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen118.bin" size="120" crc="9dd611d7" sha1="d98b036cf28f8d1730c8713336ec4c3ea80d8da1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen119">
+		<description>X-Men: Energy Projection Room (Danger Room)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="057"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen119.bin" size="120" crc="2aae319d" sha1="1c14ab4660f9d53c2f49ce260d5ea3cf72583dde" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen007">
+		<!-- Unreleased -->
+		<description>X-Men: Gambit (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="058"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen007.bin" size="120" crc="d9dfc712" sha1="afc57957702c8b176429aea0847494a705fb051c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen009">
+		<!-- Unreleased -->
+		<description>X-Men: Colossus (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="059"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen009.bin" size="120" crc="67bb1bbb" sha1="3f129963a4978b37f7d31e4f656b2379ff5b60dc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen011">
+		<!-- Unreleased -->
+		<description>X-Men: Nightcrawler (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="060"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen011.bin" size="120" crc="d23a5d6e" sha1="84a9ee415cc3e95e5633a26146cb5a2b3db6f2de" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen015">
+		<!-- Unreleased -->
+		<description>X-Men: Rogue (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="061"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen015.bin" size="120" crc="6249d685" sha1="d78f00f87cec598494f333f7dcb6f4c06920ed08" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen019">
+		<!-- Unreleased -->
+		<description>X-Men: Beast (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="062"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen019.bin" size="120" crc="c5f16996" sha1="7f6c069f313d095abadcb597c8d4bbe8fb75338b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen023">
+		<!-- Unreleased -->
+		<description>X-Men: Juggernaut (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="063"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen023.bin" size="120" crc="7582e27d" sha1="e6d1a671c50991eda3b10bba62be65cc07c9ccfa" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen025">
+		<!-- Unreleased -->
+		<description>X-Men: Toad (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="064"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen025.bin" size="120" crc="cbe63ed4" sha1="18dea3b6119f970371ddaa7a20c5e02e4f0b4773" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen029">
+		<!-- Unreleased -->
+		<description>X-Men: Sabretooth (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="065"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen029.bin" size="120" crc="7b95b53f" sha1="4c1ccc9f8931d331b6f98dfdf2e3fa7bd79990c2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen030">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Sabretooth (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="066"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen030.bin" size="120" crc="796cd3a0" sha1="09d39efe52313a5bf45c087ada052d0a7e08646c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen033">
+		<!-- Unreleased -->
+		<description>X-Men: Scarlet Witch (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="067"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen033.bin" size="120" crc="5fe646b3" sha1="9118f78c0a411c746bf668d908a134401c7c0d92" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen039">
+		<!-- Unreleased -->
+		<description>X-Men: Sentinel (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="068"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen039.bin" size="120" crc="5a148b8d" sha1="b483a8f1bd2e1a46240b5bae1279d5627f59d869" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen048">
+		<!-- Unreleased -->
+		<description>X-Men: Death Dealer (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="069"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen048.bin" size="120" crc="44c34396" sha1="ee175f5bb86dc3ed45c217fe292246422eea4875" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen049">
+		<!-- Unreleased -->
+		<description>X-Men: Kinetic Cover (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="070"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen049.bin" size="120" crc="f3bb63dc" sha1="ebe500acb78c2e6d20124bf8bbd1c67d007b8257" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen050">
+		<!-- Unreleased -->
+		<description>X-Men: Brutal Force (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="071"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen050.bin" size="120" crc="f1420543" sha1="2452200f52bca36d40bef33f2caafaad00d133b5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen051">
+		<!-- Unreleased -->
+		<description>X-Men: Steel-like Skin (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="072"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen051.bin" size="120" crc="463a2509" sha1="a63516218c0795dfbc39bd4b0beb7000ea6f1a07" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen052">
+		<!-- Unreleased -->
+		<description>X-Men: Teleportation (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="073"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen052.bin" size="120" crc="f4b0c87d" sha1="7d1615abe8b6954811e135a84bdf1005e11507c1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen053">
+		<!-- Unreleased -->
+		<description>X-Men: Escape Artist (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="074"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen053.bin" size="120" crc="43c8e837" sha1="ed662b1beb8c41053e08a8586b7fc5007ad21d7b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen056">
+		<!-- Unreleased -->
+		<description>X-Men: Absorption (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="075"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen056.bin" size="120" crc="ff555201" sha1="2b467d3c6a2043b0b9a538e5c497178fadd45caf" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen057">
+		<!-- Unreleased -->
+		<description>X-Men: Escape Flight (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="076"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen057.bin" size="120" crc="482d724b" sha1="302840a1a3b36bd357060226c7cf6ada9465304f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen060">
+		<!-- Unreleased -->
+		<description>X-Men: Real McCoy (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="077"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen060.bin" size="120" crc="4f26d9ea" sha1="4ce5931aea12bc70b5713fcc0aa49d0965b5b157" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen061">
+		<!-- Unreleased -->
+		<description>X-Men: Passive Aggression (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="078"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen061.bin" size="120" crc="f85ef9a0" sha1="accd20864b0a552c270920425e2d8b8e7fd27775" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen064">
+		<!-- Unreleased -->
+		<description>X-Men: Power of Cyttorak (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="079"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen064.bin" size="120" crc="b7b2b519" sha1="8d0e88fab88f427e4e283565b1dfe5e337c825bd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen065">
+		<!-- Unreleased -->
+		<description>X-Men: Armored Helmet (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="080"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen065.bin" size="120" crc="00ca9553" sha1="eac8cb207ab3cd26bc5fd2c3939412458552e4b2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen066">
+		<!-- Unreleased -->
+		<description>X-Men: Amphibian Assault (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="081"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen066.bin" size="120" crc="0233f3cc" sha1="6c6fcab7c281d3e5e1aed88123cf2de6539dc796" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen067">
+		<!-- Unreleased -->
+		<description>X-Men: Goop Swoop (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="082"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen067.bin" size="120" crc="b54bd386" sha1="07bb03fcac42f1345ca3f168ce71bbab25fdac04" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen070">
+		<!-- Unreleased -->
+		<description>X-Men: Killer Instinct (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="083"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen070.bin" size="120" crc="b2407827" sha1="c9c57771c79c8168d410a08ec046d2754a20f4b3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen071">
+		<!-- Unreleased -->
+		<description>X-Men: Rapid Recovery (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="084"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen071.bin" size="120" crc="0538586d" sha1="e7e87911a639efa04e4bebe2e8696c1e061671fe" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen074">
+		<!-- Unreleased -->
+		<description>X-Men: Chaos Magick (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="085"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen074.bin" size="120" crc="b9a5e25b" sha1="8cfede7105b35cea3c06dc319fc207599f51645c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen075">
+		<!-- Unreleased -->
+		<description>X-Men: Scarlet Leather (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="086"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen075.bin" size="120" crc="0eddc211" sha1="1f7d9cc0e3b7167d62b4963166b65dbe9d019b99" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen080">
+		<!-- Unreleased -->
+		<description>X-Men: Mutant Extermination (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="087"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen080.bin" size="120" crc="1bef9076" sha1="3167aadfc1faecf5cf4d1cf157af069c0ec3a8d4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen081">
+		<!-- Unreleased -->
+		<description>X-Men: Adaptive Mode (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="088"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen081.bin" size="120" crc="ac97b03c" sha1="116d1fe508f5abcf1cad6ac21a6dad3ce086b76e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen085">
+		<!-- Unreleased -->
+		<description>X-Men: 52 Card Slice (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="089"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen085.bin" size="120" crc="1ce43bd7" sha1="6834c79708cfc63b6b024a30ab158b057aa5bc8c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen086">
+		<!-- Unreleased -->
+		<description>X-Men: Power Driver (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="090"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen086.bin" size="120" crc="1e1d5d48" sha1="5e1c1bddab69caef2a1d4557d5ede9a50ccf3b91" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen087">
+		<!-- Unreleased -->
+		<description>X-Men: Tele-Driver Spin (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="091"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen087.bin" size="120" crc="a9657d02" sha1="60cb425cd4f67a00d2a09d7eae0a0c3cad42316c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen089">
+		<!-- Unreleased -->
+		<description>X-Men: Total Drain (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="092"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen089.bin" size="120" crc="1701a1ab" sha1="4d031d2983293819479d663577f6279ac6572cad" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen091">
+		<!-- Unreleased -->
+		<description>X-Men: Irresistible Force (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="093"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen091.bin" size="120" crc="a280e77e" sha1="f4dc3f3a59731e74d370f470250ec8380a3057a9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen093">
+		<!-- Unreleased -->
+		<description>X-Men: Head Crush (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="094"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen093.bin" size="120" crc="a7722a40" sha1="8c4dc7ce6a478e193223116bab8c2eff3f41ba69" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen094">
+		<!-- Unreleased -->
+		<description>X-Men: Toxic Spew (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="095"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen094.bin" size="120" crc="a58b4cdf" sha1="d4df27ea36530e844513cb96fe2af68d952c762c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen096">
+		<!-- Unreleased -->
+		<description>X-Men: Throat-Rip (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="096"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen096.bin" size="120" crc="3479f986" sha1="7df54aa87e046a362a25feb356e9a2b52e908a0b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen098">
+		<!-- Unreleased -->
+		<description>X-Men: Thermonuclear Holocaust (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="097"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen098.bin" size="120" crc="81f8bf53" sha1="87323760298004becee523ac754b20e0ea4ecc91" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen101">
+		<!-- Unreleased -->
+		<description>X-Men: Dead Man&#x27;s Hands (Finishing Move)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="098"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen101.bin" size="120" crc="33725227" sha1="aa179dfa7e77e92f8885794f110aa902d00f3dbf" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen104">
+		<!-- Unreleased -->
+		<description>X-Men: Super Shield (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="099"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen104.bin" size="120" crc="8fefe811" sha1="2c264518418f27ad9c753709e556d7fe55523647" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen105">
+		<!-- Unreleased -->
+		<description>X-Men: Auto Jump (Defense Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="100"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen105.bin" size="120" crc="3897c85b" sha1="697f30337cb231516de8ff111396c36176e0bfa5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen109">
+		<!-- Unreleased -->
+		<description>X-Men: Reflective Mode (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="101"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen109.bin" size="120" crc="88e443b0" sha1="c7df316be0499f6cfee29b6d329669fa81cd65a3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen111">
+		<!-- Unreleased -->
+		<description>X-Men: Super Speed (Attack Mod)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="102"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen111.bin" size="120" crc="3d650565" sha1="8179a3368b470609881bcacce498d2577b9af9d6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen004">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Storm (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen004.bin" size="120" crc="db26a18d" sha1="027e4aa612af85f9cfb47ccb5aa775f144bca9dc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen006">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Cyclops (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen006.bin" size="120" crc="6ea7e758" sha1="0b38acaca6bcc21c9e6e5c6e6f38b1d2edaefc6e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen008">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Gambit (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen008.bin" size="120" crc="d0c33bf1" sha1="86adb940dea8bae2e817ef91eb13272d437b046d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen010">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Colossus (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen010.bin" size="120" crc="65427d24" sha1="b6988ddff62624072adf67d783358ba62b865e37" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen012">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Nightcrawler (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen012.bin" size="120" crc="60b0b01a" sha1="52415ddd7568120d5e170789746b7aead8fcdf6f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen014">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Iceman (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen014.bin" size="120" crc="d531f6cf" sha1="7082b6660e57717edbc6b27f4c10a8967d87ddf7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen016">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Rogue (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen016.bin" size="120" crc="c7080f09" sha1="abcda78f1301571dbb3c50d01de4d2877b8c27db" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen020">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Beast (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen020.bin" size="120" crc="777b84e2" sha1="4e134a081bb5f99c48b9727bb8116142de15dbf2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen022">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Magneto (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen022.bin" size="120" crc="c2fac237" sha1="5a6f36cc9ae797891962bb772c5d0bef290d4a9f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen024">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Juggernaut (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen024.bin" size="120" crc="7c9e1e9e" sha1="4cd3ec20955d5deb290e74ee98d42a6ab6a69d99" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen026">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Toad (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen026.bin" size="120" crc="c91f584b" sha1="5ac179335cc33fb5f8c18cf1c2b5d38a64ad6ca5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen028">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Mystique (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen028.bin" size="120" crc="cced9575" sha1="a1ee3d14ce8c402cce8564ab61081484d39d34bb" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen032">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Lady Deathstrike (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen032.bin" size="120" crc="e89e66f9" sha1="04d5c246287b7cda5d1ca4a0c78150083b490bfd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen034">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Scarlet Witch (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen034.bin" size="120" crc="5d1f202c" sha1="8a58be99fcbe67cb3027232df9edfc513049fd33" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen036">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Omega Red (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen036.bin" size="120" crc="58eded12" sha1="43241c8e43643db0a4ba9a409a9c7be87936eca6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen038">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Blob (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen038.bin" size="120" crc="ed6cabc7" sha1="68232bc980a738b69696c30246dc6a30d8f3b6ec" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen040">
+		<!-- Unreleased -->
+		<description>X-Men: Ultimate Sentinel (Character)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<info name="card_num" value="???"/>
+		<part name="card" interface="hyperscan_card">
+			<dataarea name="rom" size="120">
+				<rom name="xmen040.bin" size="120" crc="5308776e" sha1="126ab3e58ddd0a853327b48d5130e8759d855928" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -12,13 +12,6 @@
 #include "emu.h"
 #include "includes/popeye.h"
 
-#define USE_NEW_COLOR (1)
-
-// Only enable USE_INTERLACE if you can ensure the game is rendered at an
-// integer multiple of it's original resolution
-#define USE_INTERLACE (0)
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -51,6 +44,18 @@
   bit 0 -- 1.2kohm resistor  -- RED (inverted)
 
   The bootleg is the same, but the outputs are not inverted.
+
+  system11 left the following comment on mametesters:
+
+      Worth noting that there are at least 3 different types of picture output
+      for this game - and it will be difficult to make it match 'everything' out there.
+        1) Normal Nintendo board - inverted video output
+        2) Normal Nintendo board with non-inverted video output - has potentiometers to adjust R/G/B
+        3) Bootleg board, non inverted non adjustable output
+
+  Additional note: Output for 1) is also adjusted by potentiometers which adjust
+  RGB. With today's bgfx hlsl filters it is easy to individually adjust
+  levels.
 
 ***************************************************************************/
 
@@ -92,11 +97,7 @@ const res_net_info tnx1_state::tnx1_bak_mb7051_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
-#if USE_NEW_COLOR
 		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  680, 470,   0 } }
-#else
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, { 1300, 470,   0 } }
-#endif
 	}
 };
 
@@ -189,7 +190,7 @@ void tnx1_state::update_palette()
 	m_palette_bank_cache = m_palette_bank;
 }
 
-WRITE8_MEMBER(tnx1_state::background_w)
+void tnx1_state::background_w(offs_t offset, uint8_t data)
 {
 	// TODO: confirm the memory layout
 	bool lsn = (data & 0x80) == 0;
@@ -203,7 +204,7 @@ WRITE8_MEMBER(tnx1_state::background_w)
 	}
 }
 
-WRITE8_MEMBER(tpp2_state::background_w)
+void tpp2_state::background_w(offs_t offset, uint8_t data)
 {
 	// TODO: confirm the memory layout
 	bool lsn = (offset & 0x40) == 0;
@@ -218,13 +219,13 @@ WRITE8_MEMBER(tpp2_state::background_w)
 	}
 }
 
-WRITE8_MEMBER(tnx1_state::popeye_videoram_w)
+void tnx1_state::popeye_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tnx1_state::popeye_colorram_w)
+void tnx1_state::popeye_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -235,7 +236,7 @@ TILE_GET_INFO_MEMBER(tnx1_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void tnx1_state::video_start()
@@ -245,8 +246,11 @@ void tnx1_state::video_start()
 
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tnx1_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tnx1_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_bitmap[0].resize(512, 512);
+	m_bitmap[1].resize(512, 512);
 
 	m_field = 0;
 
@@ -266,13 +270,13 @@ void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		struct attribute_memory
 		{
-			int row;
-			int sx;
-			uint8_t color;
-			uint16_t code;
-			int flipx;
-			int flipy;
-		} attributes[64] = { 0 };
+			int row = 0;
+			int sx = 0;
+			uint8_t color = 0;
+			uint16_t code = 0;
+			int flipx = 0;
+			int flipy = 0;
+		} attributes[64];
 
 		for (int offs = 4; offs < m_dmasource.bytes(); offs += 4)
 		{
@@ -379,14 +383,14 @@ void tnx1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
 			else
 			{
 				// TODO: confirm the memory layout
 				int sx = x + (2 * (m_background_scroll[0] | ((m_background_scroll[2] & 1) << 8))) + 0x70;
 				int shift = (sx & 0x200) / 0x80;
 
-				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
 			}
 		}
 	}
@@ -405,14 +409,14 @@ void tpp1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
+				bitmap.pix(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
 			else
 			{
 				// TODO: confirm the memory layout
 				int sx = x + (2 * m_background_scroll[0]) + 0x70;
 				int shift = (sy & 4);
 
-				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
 			}
 		}
 	}
@@ -431,14 +435,14 @@ void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sy < 0)
-				bitmap.pix16(y, x) = m_background_ram[((sy & 0x100) / 8) * 0x40] & 0xf;
+				bitmap.pix(y, x) = m_background_ram[((sy & 0x100) / 8) * 0x40] & 0xf;
 			else
 			{
 				// TODO: confirm the memory layout
 				int sx = x + (2 * m_background_scroll[0]) + 0x70;
 				int shift = (sy & 4);
 
-				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
 			}
 		}
 	}
@@ -446,12 +450,37 @@ void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t tnx1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const auto ilmode(m_io_mconf->read());
+	bitmap_ind16 &bm((ilmode == 0) ? bitmap : m_bitmap[m_field]);
+
 	update_palette();
-	draw_background(bitmap, cliprect);
-	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-#if USE_INTERLACE
-	draw_field(bitmap, cliprect);
-#endif
+	draw_background(bm, cliprect);
+	draw_sprites(bm, cliprect);
+	m_fg_tilemap->draw(screen, bm, cliprect, 0, 0);
+	if (ilmode == 1)
+	{
+		for (int y=(cliprect.min_y); y<=cliprect.max_y; y ++)
+		{
+			if ((y & 1) == m_field)
+				for (int x=cliprect.min_x; x<=cliprect.max_x; x++)
+					bitmap.pix(y, x) = 0;
+			else
+				for (int x=cliprect.min_x; x<=cliprect.max_x; x++)
+					bitmap.pix(y, x) = bm.pix(y, x);
+		}
+	}
+	else if (ilmode == 2)
+	{
+		for (int y=(cliprect.min_y); y<=cliprect.max_y; y ++)
+		{
+			auto &bm_last(m_bitmap[m_field ^ 1]);
+			if ((y & 1) == m_field)
+				for (int x=cliprect.min_x; x<=cliprect.max_x; x++)
+					bitmap.pix(y, x) = bm_last.pix(y, x);
+			else
+				for (int x=cliprect.min_x; x<=cliprect.max_x; x++)
+					bitmap.pix(y, x) = bm.pix(y, x);
+		}
+	}
 	return 0;
 }

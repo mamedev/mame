@@ -11,8 +11,8 @@
 //============================================================
 
 // standard C headers
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 // MAME headers
 #include "emu.h"
@@ -111,11 +111,7 @@ void renderer_sdl1::setup_texture(const osd_dim &size)
 	// Determine preferred pixelformat and set up yuv if necessary
 	SDL_GetCurrentDisplayMode(win->monitor()->oshandle(), &mode);
 
-	if (m_yuv_bitmap)
-	{
-		global_free_array(m_yuv_bitmap);
-		m_yuv_bitmap = nullptr;
-	}
+	m_yuv_bitmap.reset();
 
 	fmt = (sdl_sm->pixel_format ? sdl_sm->pixel_format : mode.format);
 
@@ -134,7 +130,7 @@ void renderer_sdl1::setup_texture(const osd_dim &size)
 			m_hw_scale_width = (m_hw_scale_width + 1) & ~1;
 		}
 		if (sdl_sm->is_yuv)
-			m_yuv_bitmap = global_alloc_array(uint16_t, m_hw_scale_width * m_hw_scale_height);
+			m_yuv_bitmap = std::make_unique<uint16_t []>(m_hw_scale_width * m_hw_scale_height);
 
 		int w = m_hw_scale_width * sdl_sm->mult_w;
 		int h = m_hw_scale_height * sdl_sm->mult_h;
@@ -257,16 +253,6 @@ renderer_sdl1::~renderer_sdl1()
 {
 	destroy_all_textures();
 
-	if (m_yuv_lookup != nullptr)
-	{
-		global_free_array(m_yuv_lookup);
-		m_yuv_lookup = nullptr;
-	}
-	if (m_yuv_bitmap != nullptr)
-	{
-		global_free_array(m_yuv_bitmap);
-		m_yuv_bitmap = nullptr;
-	}
 	SDL_DestroyRenderer(m_sdl_renderer);
 }
 
@@ -415,6 +401,10 @@ int renderer_sdl1::draw(int update)
 	{
 		switch (rmask)
 		{
+			case 0xff000000:
+				software_renderer<uint32_t, 0,0,0, 24,16,8>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				break;
+
 			case 0x0000ff00:
 				software_renderer<uint32_t, 0,0,0, 8,16,24>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
@@ -444,8 +434,8 @@ int renderer_sdl1::draw(int update)
 	{
 		assert (m_yuv_bitmap != nullptr);
 		assert (surfptr != nullptr);
-		software_renderer<uint16_t, 3,3,3, 10,5,0>::draw_primitives(*win->m_primlist, m_yuv_bitmap, mamewidth, mameheight, mamewidth);
-		sm->yuv_blit((uint16_t *)m_yuv_bitmap, surfptr, pitch, m_yuv_lookup, mamewidth, mameheight);
+		software_renderer<uint16_t, 3,3,3, 10,5,0>::draw_primitives(*win->m_primlist, m_yuv_bitmap.get(), mamewidth, mameheight, mamewidth);
+		sm->yuv_blit(m_yuv_bitmap.get(), surfptr, pitch, m_yuv_lookup.get(), mamewidth, mameheight);
 	}
 
 	win->m_primlist->release_lock();
@@ -521,12 +511,11 @@ void renderer_sdl1::yuv_lookup_set(unsigned int pen, unsigned char red,
 
 void renderer_sdl1::yuv_init()
 {
-	unsigned char r,g,b;
-	if (m_yuv_lookup == nullptr)
-		m_yuv_lookup = global_alloc_array(uint32_t, 65536);
-	for (r = 0; r < 32; r++)
-		for (g = 0; g < 32; g++)
-			for (b = 0; b < 32; b++)
+	if (!m_yuv_lookup)
+		m_yuv_lookup = std::make_unique<uint32_t []>(65536);
+	for (unsigned char r = 0; r < 32; r++)
+		for (unsigned char g = 0; g < 32; g++)
+			for (unsigned char b = 0; b < 32; b++)
 			{
 				int idx = (r << 10) | (g << 5) | b;
 				yuv_lookup_set(idx,

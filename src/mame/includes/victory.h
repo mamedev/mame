@@ -41,10 +41,10 @@ public:
 	void victory(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(lamp_control_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_READ8_MEMBER(video_control_r);
-	DECLARE_WRITE8_MEMBER(video_control_w);
+	void lamp_control_w(uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	uint8_t video_control_r(offs_t offset);
+	void video_control_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -96,18 +96,18 @@ private:
 	std::unique_ptr<uint8_t[]> m_rram;
 	std::unique_ptr<uint8_t[]> m_gram;
 	std::unique_ptr<uint8_t[]> m_bram;
-	uint8_t m_vblank_irq;
-	uint8_t m_fgcoll;
-	uint8_t m_fgcollx;
-	uint8_t m_fgcolly;
-	uint8_t m_bgcoll;
-	uint8_t m_bgcollx;
-	uint8_t m_bgcolly;
-	uint8_t m_scrollx;
-	uint8_t m_scrolly;
-	uint8_t m_video_control;
+	uint8_t m_vblank_irq = 0;
+	uint8_t m_fgcoll = 0;
+	uint8_t m_fgcollx = 0;
+	uint8_t m_fgcolly = 0;
+	uint8_t m_bgcoll = 0;
+	uint8_t m_bgcollx = 0;
+	uint8_t m_bgcolly = 0;
+	uint8_t m_scrollx = 0;
+	uint8_t m_scrolly = 0;
+	uint8_t m_video_control = 0;
 	micro_t m_micro;
-	emu_timer *m_bgcoll_irq_timer;
+	emu_timer *m_bgcoll_irq_timer = nullptr;
 };
 
 #endif // MAME_INCLUDES_VICTORY_H

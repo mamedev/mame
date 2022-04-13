@@ -102,7 +102,7 @@ protected:
 	IRQ_CALLBACK_MEMBER( irq_callback );
 
 	// static helpers
-	DECLARE_WRITE32_MEMBER(cmp_callback);
+	void cmp_callback(offs_t offset, uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(rte_callback);
 
 	// internal state

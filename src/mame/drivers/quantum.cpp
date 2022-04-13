@@ -60,6 +60,8 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 #include "speaker.h"
 
 
+namespace {
+
 class quantum_state : public driver_device
 {
 public:
@@ -73,13 +75,15 @@ public:
 
 	void quantum(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override { m_leds.resolve(); }
-	DECLARE_READ16_MEMBER(trackball_r);
-	DECLARE_WRITE16_MEMBER(led_w);
-	DECLARE_WRITE16_MEMBER(nvram_recall_w);
-	DECLARE_READ8_MEMBER(input_1_r);
-	DECLARE_READ8_MEMBER(input_2_r);
+
+private:
+	uint16_t trackball_r();
+	void led_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nvram_recall_w(uint16_t data);
+	uint8_t input_1_r(offs_t offset);
+	uint8_t input_2_r(offs_t offset);
 	void main_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -99,19 +103,19 @@ static constexpr XTAL CLOCK_3KHZ   = MASTER_CLOCK / 4096;
  *
  *************************************/
 
-READ16_MEMBER(quantum_state::trackball_r)
+uint16_t quantum_state::trackball_r()
 {
 	return (ioport("TRACKY")->read() << 4) | ioport("TRACKX")->read();
 }
 
 
-READ8_MEMBER(quantum_state::input_1_r)
+uint8_t quantum_state::input_1_r(offs_t offset)
 {
 	return (ioport("DSW0")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
 
 
-READ8_MEMBER(quantum_state::input_2_r)
+uint8_t quantum_state::input_2_r(offs_t offset)
 {
 	return (ioport("DSW1")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
@@ -124,7 +128,7 @@ READ8_MEMBER(quantum_state::input_2_r)
  *
  *************************************/
 
-WRITE16_MEMBER(quantum_state::led_w)
+void quantum_state::led_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -141,12 +145,12 @@ WRITE16_MEMBER(quantum_state::led_w)
 		m_leds[1] = BIT(data, 5);
 
 		/* bits 6 and 7 flip screen */
-		m_avg->set_flip_x (data & 0x40);
-		m_avg->set_flip_y (data & 0x80);
+		m_avg->set_flip_x(data & 0x40);
+		m_avg->set_flip_y(data & 0x80);
 	}
 }
 
-WRITE16_MEMBER(quantum_state::nvram_recall_w)
+void quantum_state::nvram_recall_w(uint16_t data)
 {
 	m_nvram->recall(1);
 	m_nvram->recall(0);
@@ -164,13 +168,13 @@ void quantum_state::main_map(address_map &map)
 {
 	map(0x000000, 0x013fff).rom();
 	map(0x018000, 0x01cfff).ram();
-	map(0x800000, 0x801fff).ram().share("vectorram");
+	map(0x800000, 0x801fff).ram(); // vector RAM
 	map(0x840000, 0x84001f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x840020, 0x84003f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x900000, 0x9001ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
-	map(0x940000, 0x940001).r(FUNC(quantum_state::trackball_r)); /* trackball */
+	map(0x940000, 0x940001).r(FUNC(quantum_state::trackball_r)); // trackball
 	map(0x948000, 0x948001).portr("SYSTEM");
-	map(0x950000, 0x95001f).writeonly().share("colorram");
+	map(0x950000, 0x95001f).writeonly().share("avg:colorram");
 	map(0x958000, 0x958001).w(FUNC(quantum_state::led_w));
 	map(0x960000, 0x960001).w(FUNC(quantum_state::nvram_recall_w));
 	map(0x968000, 0x968001).w(m_avg, FUNC(avg_quantum_device::reset_word_w));
@@ -188,7 +192,7 @@ void quantum_state::main_map(address_map &map)
 static INPUT_PORTS_START( quantum )
 	PORT_START("SYSTEM")
 	/* YHALT here MUST BE ALWAYS 0  */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_quantum_device, done_r, nullptr) /* vg YHALT */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_quantum_device, done_r) // vg YHALT
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
@@ -305,7 +309,8 @@ void quantum_state::quantum(machine_config &config)
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	AVG_QUANTUM(config, m_avg, 0);
-	m_avg->set_vector_tag("vector");
+	m_avg->set_vector("vector");
+	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -358,7 +363,7 @@ ROM_START( quantum )
 	ROM_LOAD16_BYTE( "136016.105",   0x010000, 0x002000, CRC(13ec512c) SHA1(22a0395135b83ba47eacb5129f34fc97aa1b70a1) )
 	ROM_LOAD16_BYTE( "136016.110",   0x010001, 0x002000, CRC(acb50363) SHA1(9efa9ca88efdd2d5e212bd537903892b67b4fe53) )
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	ROM_REGION( 0x200, "plds", 0 )
@@ -379,7 +384,7 @@ ROM_START( quantum1 )
 	ROM_LOAD16_BYTE( "136016.105",   0x010000, 0x002000, CRC(13ec512c) SHA1(22a0395135b83ba47eacb5129f34fc97aa1b70a1) )
 	ROM_LOAD16_BYTE( "136016.110",   0x010001, 0x002000, CRC(acb50363) SHA1(9efa9ca88efdd2d5e212bd537903892b67b4fe53) )
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	ROM_REGION( 0x200, "plds", 0 )
@@ -400,12 +405,14 @@ ROM_START( quantump )
 	ROM_LOAD16_BYTE( "quantump.2l",  0x010000, 0x002000, CRC(1285b5e7) SHA1(0e01e361da2d9cf1fac1896f8f44c4c2e75a3061) )
 	ROM_LOAD16_BYTE( "quantump.3l",  0x010001, 0x002000, CRC(e19de844) SHA1(cb4f9d80807b26d6b95405b2d830799984667f54) )
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.6h",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	ROM_REGION( 0x200, "plds", 0 )
 	ROM_LOAD( "cf2038n.1b",   0x0000, 0x00eb, CRC(b372fa4f) SHA1(a60b51849e9f691b412ae4c4afc834ff93d8a30f) ) /* Original chip is a 82S153, schematics refer to this chip as 137290-001 */
 ROM_END
+
+} // anonoymous namespace
 
 
 

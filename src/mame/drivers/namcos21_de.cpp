@@ -44,14 +44,12 @@ Driver's Eyes works,
 #include "machine/namcos21_dsp.h"
 #include "video/namco_c355spr.h"
 #include "video/namcos21_3d.h"
-#include "sound/ym2151.h"
 #include "sound/c140.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 
 
 #define ENABLE_LOGGING      0
-
-#define NAMCOS21_NUM_COLORS 0x8000
 
 DECLARE_DEVICE_TYPE(NAMCO_DE_PCB, namco_de_pcbstack_device)
 
@@ -86,27 +84,28 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
+	required_region_ptr<u16> m_c140_region;
 	required_shared_ptr<uint8_t> m_dpram;
 	required_device<namcos21_3d_device> m_namcos21_3d;
 	required_device<namcos21_dsp_device> m_namcos21_dsp;
 
 	uint16_t m_video_enable;
 
-	DECLARE_READ16_MEMBER(video_enable_r);
-	DECLARE_WRITE16_MEMBER(video_enable_w);
+	uint16_t video_enable_r();
+	void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint16_t dpram_word_r(offs_t offset);
+	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	void eeprom_w(offs_t offset, uint8_t data);
+	uint8_t eeprom_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
+	void sound_bankselect_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(system_reset_w);
+	void sound_reset_w(uint8_t data);
+	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
@@ -122,6 +121,7 @@ private:
 	void driveyes_slave_map(address_map &map);
 
 	void sound_map(address_map &map);
+	void c140_map(address_map &map);
 };
 
 
@@ -142,6 +142,7 @@ namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig
 	m_palette(*this, "palette"),
 	m_screen(*this, "screen"),
 	m_audiobank(*this, "audiobank"),
+	m_c140_region(*this, "c140"),
 	m_dpram(*this, "dpram"),
 	m_namcos21_3d(*this, "namcos21_3d"),
 	m_namcos21_dsp(*this, "namcos21dsp")
@@ -152,54 +153,25 @@ INTERRUPT_GEN_MEMBER( namco_de_pcbstack_device::irq0_line_hold )   { device.exec
 INTERRUPT_GEN_MEMBER( namco_de_pcbstack_device::irq1_line_hold )   { device.execute().set_input_line(1, HOLD_LINE); }
 
 
-static const gfx_layout tile_layout =
-{
-	16,16,
-	RGN_FRAC(1,4),  /* number of tiles */
-	8,      /* bits per pixel */
-	{       /* plane offsets */
-		0,1,2,3,4,5,6,7
-	},
-	{ /* x offsets */
-		0*8,RGN_FRAC(1,4)+0*8,RGN_FRAC(2,4)+0*8,RGN_FRAC(3,4)+0*8,
-		1*8,RGN_FRAC(1,4)+1*8,RGN_FRAC(2,4)+1*8,RGN_FRAC(3,4)+1*8,
-		2*8,RGN_FRAC(1,4)+2*8,RGN_FRAC(2,4)+2*8,RGN_FRAC(3,4)+2*8,
-		3*8,RGN_FRAC(1,4)+3*8,RGN_FRAC(2,4)+3*8,RGN_FRAC(3,4)+3*8
-	},
-	{ /* y offsets */
-		0*32,1*32,2*32,3*32,
-		4*32,5*32,6*32,7*32,
-		8*32,9*32,10*32,11*32,
-		12*32,13*32,14*32,15*32
-	},
-	8*64 /* sprite offset */
-};
-
-static GFXDECODE_START( gfx_namcos21 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
-GFXDECODE_END
-
-
 void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 {
-	M68000(config, m_maincpu, 12288000); /* Master */
+	M68000(config, m_maincpu, 49.152_MHz_XTAL / 4); /* Master */
 	m_maincpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namco_de_pcbstack_device::screen_scanline), "screen", 0, 1);
 
-	M68000(config, m_slave, 12288000); /* Slave */
+	M68000(config, m_slave, 49.152_MHz_XTAL / 4); /* Slave */
 	m_slave->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_slave_map);
 
 	MC6809E(config, m_audiocpu, 3072000); /* Sound */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(namco_de_pcbstack_device::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namco_de_pcbstack_device::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c68_namcos21(config);
 
 	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
 	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -208,12 +180,11 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-	m_screen->set_raw(12288000*2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_raw(49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264*2, 0, 480);
 	m_screen->set_screen_update(FUNC(namco_de_pcbstack_device::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_namcos21);
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
 	NAMCOS21_3D(config, m_namcos21_3d, 0);
 	m_namcos21_3d->set_fixed_palbase(0x3f00);
@@ -223,21 +194,23 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
-	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_palxor(0xf); // reverse mapping
-	m_c355spr->set_gfxregion(0);
+	m_c355spr->set_color_base(0x1000);
+	m_c355spr->set_external_prifill(true);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	C140(config, m_c140, 8000000/374);
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	C140(config, m_c140, 49.152_MHz_XTAL / 2304);
+	m_c140->set_addrmap(0, &namco_de_pcbstack_device::c140_map);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
 
-	YM2151(config, "ymsnd", 3579580).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
 }
 
 
@@ -247,6 +220,8 @@ uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_i
 	int pivot = 3;
 	int pri;
 	bitmap.fill(0xff, cliprect );
+	screen.priority().fill(0, cliprect);
+	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
 	m_c355spr->draw(screen, bitmap, cliprect, 2 );
 	m_c355spr->draw(screen, bitmap, cliprect, 14 );   //driver's eyes
@@ -269,12 +244,12 @@ uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_i
 
 }
 
-READ16_MEMBER(namco_de_pcbstack_device::video_enable_r)
+uint16_t namco_de_pcbstack_device::video_enable_r()
 {
 	return m_video_enable;
 }
 
-WRITE16_MEMBER(namco_de_pcbstack_device::video_enable_w)
+void namco_de_pcbstack_device::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
 	if( m_video_enable!=0 && m_video_enable!=0x40 )
@@ -287,12 +262,12 @@ WRITE16_MEMBER(namco_de_pcbstack_device::video_enable_w)
 
 /* dual port ram memory handlers */
 
-READ16_MEMBER(namco_de_pcbstack_device::dpram_word_r)
+uint16_t namco_de_pcbstack_device::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namco_de_pcbstack_device::dpram_word_w)
+void namco_de_pcbstack_device::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -300,12 +275,12 @@ WRITE16_MEMBER(namco_de_pcbstack_device::dpram_word_w)
 	}
 }
 
-READ8_MEMBER(namco_de_pcbstack_device::dpram_byte_r)
+uint8_t namco_de_pcbstack_device::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::dpram_byte_w)
+void namco_de_pcbstack_device::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dpram[offset] = data;
 }
@@ -319,15 +294,22 @@ void namco_de_pcbstack_device::sound_map(address_map &map)
 	map(0x0000, 0x3fff).bankr("audiobank"); /* banked */
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x7000, 0x77ff).rw(FUNC(namco_de_pcbstack_device::dpram_byte_r), FUNC(namco_de_pcbstack_device::dpram_byte_w)).share("dpram");
-	map(0x7800, 0x7fff).rw(FUNC(namco_de_pcbstack_device::dpram_byte_r), FUNC(namco_de_pcbstack_device::dpram_byte_w)); /* mirror */
+	map(0x5000, 0x51ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
+	map(0x6000, 0x61ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)); // mirrored
+	map(0x7000, 0x77ff).mirror(0x0800).rw(FUNC(namco_de_pcbstack_device::dpram_byte_r), FUNC(namco_de_pcbstack_device::dpram_byte_w)).share("dpram");
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* amplifier enable on 1st write */
 	map(0xc000, 0xffff).nopw(); /* avoid debug log noise; games write frequently to 0xe000 */
 	map(0xc000, 0xc001).w(FUNC(namco_de_pcbstack_device::sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* watchdog */
 	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
+}
+
+void namco_de_pcbstack_device::c140_map(address_map &map)
+{
+	map.global_mask(0x7fffff);
+	// TODO: LSB not used? verify from schematics/real hardware
+	map(0x000000, 0x7fffff).lr16([this](offs_t offset) { return m_c140_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)]; }, "c140_rom_r");
 }
 
 /*************************************************************/
@@ -401,12 +383,12 @@ void namco_de_pcbstack_device::driveyes_slave_map(address_map &map)
 	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
 }
 
-WRITE8_MEMBER( namco_de_pcbstack_device::sound_bankselect_w )
+void namco_de_pcbstack_device::sound_bankselect_w(uint8_t data)
 {
 	m_audiobank->set_entry(data>>4);
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::sound_reset_w)
+void namco_de_pcbstack_device::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -421,7 +403,7 @@ WRITE8_MEMBER(namco_de_pcbstack_device::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::system_reset_w)
+void namco_de_pcbstack_device::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -435,12 +417,12 @@ void namco_de_pcbstack_device::reset_all_subcpus(int state)
 	m_c68->ext_reset(state);
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::eeprom_w)
+void namco_de_pcbstack_device::eeprom_w(offs_t offset, uint8_t data)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER(namco_de_pcbstack_device::eeprom_r)
+uint8_t namco_de_pcbstack_device::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }
@@ -479,6 +461,7 @@ void namco_de_pcbstack_device::device_start()
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
+	save_item(NAME(m_video_enable));
 }
 
 void namco_de_pcbstack_device::device_reset()
@@ -585,7 +568,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("pcb_1:MCUDI0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("gearbox", namcoio_gearbox_device, in_r, nullptr )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("gearbox", namcoio_gearbox_device, in_r)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("pcb_1:MCUDI1")     /* 63B05Z0 - $3001 */
@@ -610,7 +593,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_DIPNAME( 0x10, 0x10, "DSW5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
+	PORT_DIPNAME( 0x20, 0x20, "PCM ROM")
 	PORT_DIPSETTING(    0x20, "2M" )
 	PORT_DIPSETTING(    0x00, "4M" )
 	PORT_DIPNAME( 0x40, 0x40, "DSW7")
@@ -724,24 +707,24 @@ ROM_START( driveyes )
 	ROM_REGION( 0x20000, "pcb_1:audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "de1-snd0.8j",  0x000000, 0x020000, CRC(5474f203) SHA1(e0ae2f6978deb0c934d9311a334a6e36bb402aee) ) /* correct for center view */
 
-	ROM_REGION( 0x200000, "pcb_1:c140", 0 ) /* sound samples - populated for center view only */
-	ROM_LOAD("de1-voi0.12b", 0x040000, 0x40000, CRC(fc44adbd) SHA1(4268bb1f025e47a94212351d1c1cfd0e5029221f) )
-	ROM_LOAD("de1-voi1.12c", 0x0c0000, 0x40000, CRC(a71dc55a) SHA1(5e746184db9144ab4e3a97b20195b92b0f56c8cc) )
-	ROM_LOAD("de1-voi2.12d", 0x140000, 0x40000, CRC(4d32879a) SHA1(eae65f4b98cee9efe4e5dad7298c3717cfb1e6bf) )
-	ROM_LOAD("de1-voi3.12e", 0x1c0000, 0x40000, CRC(e4832d18) SHA1(0460c79d3942aab89a765b0bd8bbddaf19a6d682) )
+	ROM_REGION16_BE( 0x400000, "pcb_1:c140", ROMREGION_ERASE00 ) /* sound samples - populated for center view only */
+	ROM_LOAD16_BYTE("de1-voi0.12b", 0x080000, 0x40000, CRC(fc44adbd) SHA1(4268bb1f025e47a94212351d1c1cfd0e5029221f) )
+	ROM_LOAD16_BYTE("de1-voi1.12c", 0x180000, 0x40000, CRC(a71dc55a) SHA1(5e746184db9144ab4e3a97b20195b92b0f56c8cc) )
+	ROM_LOAD16_BYTE("de1-voi2.12d", 0x280000, 0x40000, CRC(4d32879a) SHA1(eae65f4b98cee9efe4e5dad7298c3717cfb1e6bf) )
+	ROM_LOAD16_BYTE("de1-voi3.12e", 0x380000, 0x40000, CRC(e4832d18) SHA1(0460c79d3942aab89a765b0bd8bbddaf19a6d682) )
 
 	ROM_REGION( 0x8000, "pcb_1:c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x200000, "pcb_1:gfx1", 0 ) /* sprites */
-	ROM_LOAD( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
-	ROM_LOAD( "de1-obj4.4s", 0x040000, 0x40000, CRC(335f0ea4) SHA1(9ec065d99ad0874b262b372334179a7e7612558e) )
-	ROM_LOAD( "de1-obj1.5x", 0x080000, 0x40000, CRC(45f2334e) SHA1(95f277a4e43d6662ae44d6b69a57f65c72978319) )
-	ROM_LOAD( "de1-obj5.4x", 0x0c0000, 0x40000, CRC(9e22999c) SHA1(02624186c359b5e2c96cd3f0e2cb1598ea36dff7) )
-	ROM_LOAD( "de1-obj2.3s", 0x100000, 0x40000, CRC(8f1a542c) SHA1(2cb59713607d8929815a9b28bf2a384b6a6c9db8) )
-	ROM_LOAD( "de1-obj6.2s", 0x140000, 0x40000, CRC(346df4d5) SHA1(edbadb9db93b7f5a3b064c7f6acb77001cdacce2) )
-	ROM_LOAD( "de1-obj3.3x", 0x180000, 0x40000, CRC(fc94544c) SHA1(6297445c64784ee253716f6438d98e5fcd4e7520) )
-	ROM_LOAD( "de1-obj7.2x", 0x1c0000, 0x40000, CRC(9ce325d7) SHA1(de4d788bec14842507ed405244974b4fd4f07515) )
+	ROM_REGION( 0x200000, "pcb_1:c355spr", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
+	ROM_LOAD32_BYTE( "de1-obj1.5x", 0x000001, 0x40000, CRC(45f2334e) SHA1(95f277a4e43d6662ae44d6b69a57f65c72978319) )
+	ROM_LOAD32_BYTE( "de1-obj2.3s", 0x000002, 0x40000, CRC(8f1a542c) SHA1(2cb59713607d8929815a9b28bf2a384b6a6c9db8) )
+	ROM_LOAD32_BYTE( "de1-obj3.3x", 0x000003, 0x40000, CRC(fc94544c) SHA1(6297445c64784ee253716f6438d98e5fcd4e7520) )
+	ROM_LOAD32_BYTE( "de1-obj4.4s", 0x100000, 0x40000, CRC(335f0ea4) SHA1(9ec065d99ad0874b262b372334179a7e7612558e) )
+	ROM_LOAD32_BYTE( "de1-obj5.4x", 0x100001, 0x40000, CRC(9e22999c) SHA1(02624186c359b5e2c96cd3f0e2cb1598ea36dff7) )
+	ROM_LOAD32_BYTE( "de1-obj6.2s", 0x100002, 0x40000, CRC(346df4d5) SHA1(edbadb9db93b7f5a3b064c7f6acb77001cdacce2) )
+	ROM_LOAD32_BYTE( "de1-obj7.2x", 0x100003, 0x40000, CRC(9ce325d7) SHA1(de4d788bec14842507ed405244974b4fd4f07515) )
 
 	ROM_REGION16_BE( 0x100000, "pcb_1:data", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
@@ -770,21 +753,21 @@ ROM_START( driveyes )
 	ROM_REGION( 0x20000, "pcb_0:audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "de1-snd0r.8j", 0x000000, 0x020000, CRC(7bbeda42) SHA1(fe840cc9069758928492bbeec79acded18daafd9) ) // correct for left & right views
 
-	ROM_REGION( 0x200000, "pcb_0:c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_REGION16_BE( 0x400000, "pcb_0:c140", ROMREGION_ERASE00 ) /* sound samples */
 	/* unpopulated for left / right views */
 
 	ROM_REGION( 0x8000, "pcb_0:c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x200000, "pcb_0:gfx1", 0 ) /* sprites */
-	ROM_LOAD( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
-	ROM_LOAD( "de1-obj4.4s", 0x040000, 0x40000, CRC(335f0ea4) SHA1(9ec065d99ad0874b262b372334179a7e7612558e) )
-	ROM_LOAD( "de1-obj1.5x", 0x080000, 0x40000, CRC(45f2334e) SHA1(95f277a4e43d6662ae44d6b69a57f65c72978319) )
-	ROM_LOAD( "de1-obj5.4x", 0x0c0000, 0x40000, CRC(9e22999c) SHA1(02624186c359b5e2c96cd3f0e2cb1598ea36dff7) )
-	ROM_LOAD( "de1-obj2.3s", 0x100000, 0x40000, CRC(8f1a542c) SHA1(2cb59713607d8929815a9b28bf2a384b6a6c9db8) )
-	ROM_LOAD( "de1-obj6.2s", 0x140000, 0x40000, CRC(346df4d5) SHA1(edbadb9db93b7f5a3b064c7f6acb77001cdacce2) )
-	ROM_LOAD( "de1-obj3.3x", 0x180000, 0x40000, CRC(fc94544c) SHA1(6297445c64784ee253716f6438d98e5fcd4e7520) )
-	ROM_LOAD( "de1-obj7.2x", 0x1c0000, 0x40000, CRC(9ce325d7) SHA1(de4d788bec14842507ed405244974b4fd4f07515) )
+	ROM_REGION( 0x200000, "pcb_0:c355spr", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
+	ROM_LOAD32_BYTE( "de1-obj1.5x", 0x000001, 0x40000, CRC(45f2334e) SHA1(95f277a4e43d6662ae44d6b69a57f65c72978319) )
+	ROM_LOAD32_BYTE( "de1-obj2.3s", 0x000002, 0x40000, CRC(8f1a542c) SHA1(2cb59713607d8929815a9b28bf2a384b6a6c9db8) )
+	ROM_LOAD32_BYTE( "de1-obj3.3x", 0x000003, 0x40000, CRC(fc94544c) SHA1(6297445c64784ee253716f6438d98e5fcd4e7520) )
+	ROM_LOAD32_BYTE( "de1-obj4.4s", 0x100000, 0x40000, CRC(335f0ea4) SHA1(9ec065d99ad0874b262b372334179a7e7612558e) )
+	ROM_LOAD32_BYTE( "de1-obj5.4x", 0x100001, 0x40000, CRC(9e22999c) SHA1(02624186c359b5e2c96cd3f0e2cb1598ea36dff7) )
+	ROM_LOAD32_BYTE( "de1-obj6.2s", 0x100002, 0x40000, CRC(346df4d5) SHA1(edbadb9db93b7f5a3b064c7f6acb77001cdacce2) )
+	ROM_LOAD32_BYTE( "de1-obj7.2x", 0x100003, 0x40000, CRC(9ce325d7) SHA1(de4d788bec14842507ed405244974b4fd4f07515) )
 
 	ROM_REGION16_BE( 0x100000, "pcb_0:data", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
@@ -813,21 +796,21 @@ ROM_START( driveyes )
 	ROM_REGION( 0x20000, "pcb_2:audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "de1-snd0r.8j", 0x000000, 0x020000, CRC(7bbeda42) SHA1(fe840cc9069758928492bbeec79acded18daafd9) ) // correct for left & right views
 
-	ROM_REGION( 0x200000, "pcb_2:c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_REGION16_BE( 0x400000, "pcb_2:c140", ROMREGION_ERASE00 ) /* sound samples */
 	/* unpopulated for left / right views */
 
 	ROM_REGION( 0x8000, "pcb_2:c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x200000, "pcb_2:gfx1", 0 ) /* sprites */
-	ROM_LOAD( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
-	ROM_LOAD( "de1-obj4.4s", 0x040000, 0x40000, CRC(335f0ea4) SHA1(9ec065d99ad0874b262b372334179a7e7612558e) )
-	ROM_LOAD( "de1-obj1.5x", 0x080000, 0x40000, CRC(45f2334e) SHA1(95f277a4e43d6662ae44d6b69a57f65c72978319) )
-	ROM_LOAD( "de1-obj5.4x", 0x0c0000, 0x40000, CRC(9e22999c) SHA1(02624186c359b5e2c96cd3f0e2cb1598ea36dff7) )
-	ROM_LOAD( "de1-obj2.3s", 0x100000, 0x40000, CRC(8f1a542c) SHA1(2cb59713607d8929815a9b28bf2a384b6a6c9db8) )
-	ROM_LOAD( "de1-obj6.2s", 0x140000, 0x40000, CRC(346df4d5) SHA1(edbadb9db93b7f5a3b064c7f6acb77001cdacce2) )
-	ROM_LOAD( "de1-obj3.3x", 0x180000, 0x40000, CRC(fc94544c) SHA1(6297445c64784ee253716f6438d98e5fcd4e7520) )
-	ROM_LOAD( "de1-obj7.2x", 0x1c0000, 0x40000, CRC(9ce325d7) SHA1(de4d788bec14842507ed405244974b4fd4f07515) )
+	ROM_REGION( 0x200000, "pcb_2:c355spr", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
+	ROM_LOAD32_BYTE( "de1-obj1.5x", 0x000001, 0x40000, CRC(45f2334e) SHA1(95f277a4e43d6662ae44d6b69a57f65c72978319) )
+	ROM_LOAD32_BYTE( "de1-obj2.3s", 0x000002, 0x40000, CRC(8f1a542c) SHA1(2cb59713607d8929815a9b28bf2a384b6a6c9db8) )
+	ROM_LOAD32_BYTE( "de1-obj3.3x", 0x000003, 0x40000, CRC(fc94544c) SHA1(6297445c64784ee253716f6438d98e5fcd4e7520) )
+	ROM_LOAD32_BYTE( "de1-obj4.4s", 0x100000, 0x40000, CRC(335f0ea4) SHA1(9ec065d99ad0874b262b372334179a7e7612558e) )
+	ROM_LOAD32_BYTE( "de1-obj5.4x", 0x100001, 0x40000, CRC(9e22999c) SHA1(02624186c359b5e2c96cd3f0e2cb1598ea36dff7) )
+	ROM_LOAD32_BYTE( "de1-obj6.2s", 0x100002, 0x40000, CRC(346df4d5) SHA1(edbadb9db93b7f5a3b064c7f6acb77001cdacce2) )
+	ROM_LOAD32_BYTE( "de1-obj7.2x", 0x100003, 0x40000, CRC(9ce325d7) SHA1(de4d788bec14842507ed405244974b4fd4f07515) )
 
 	ROM_REGION16_BE( 0x100000, "pcb_2:data", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )

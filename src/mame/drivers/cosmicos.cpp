@@ -6,6 +6,10 @@
 
     http://retro.hansotten.nl/index.php?page=1802-cosmicos
 
+    Press G to start, and to enable the debugger (if -debug used).
+    The video options include 8-digit LEDs, 2-digit LEDs, and CRT,
+    of which the default is the 8-digit LEDs. Unknown how to enable
+    the others.
 
     HEX-monitor
 
@@ -52,9 +56,9 @@ enum
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( cosmicos_state::read )
+uint8_t cosmicos_state::read(offs_t offset)
 {
-	if (m_boot) offset |= 0xc0c0;
+	if (m_boot) offset |= 0xc000;
 
 	uint8_t data = 0;
 
@@ -74,9 +78,9 @@ READ8_MEMBER( cosmicos_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::write )
+void cosmicos_state::write(offs_t offset, uint8_t data)
 {
-	if (m_boot) offset |= 0xc0c0;
+	if (m_boot) offset |= 0xc000;
 
 	if (offset < 0xc000)
 	{
@@ -88,44 +92,43 @@ WRITE8_MEMBER( cosmicos_state::write )
 	}
 }
 
-READ8_MEMBER( cosmicos_state::video_off_r )
+uint8_t cosmicos_state::video_off_r()
 {
 	uint8_t data = 0;
 
 	if (!m_q)
 	{
-		data = m_cti->dispoff_r(space, 0);
+		data = m_cti->dispoff_r();
 	}
 
 	return data;
 }
 
-READ8_MEMBER( cosmicos_state::video_on_r )
+uint8_t cosmicos_state::video_on_r()
 {
 	uint8_t data = 0;
 
 	if (!m_q)
 	{
-		data = m_cti->dispon_r(space, 0);
+		data = m_cti->dispon_r();
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::audio_latch_w )
+void cosmicos_state::audio_latch_w(uint8_t data)
 {
 	if (m_q)
 	{
-		m_cti->tone_latch_w(space, 0, data);
+		m_cti->tone_latch_w(data);
 	}
 }
 
-READ8_MEMBER( cosmicos_state::hex_keyboard_r )
+uint8_t cosmicos_state::hex_keyboard_r()
 {
 	uint8_t data = 0;
-	int i;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		if (BIT(m_keylatch, i))
 		{
@@ -141,19 +144,19 @@ READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::hex_keylatch_w )
+void cosmicos_state::hex_keylatch_w(uint8_t data)
 {
 	m_keylatch = data & 0x0f;
 }
 
-READ8_MEMBER( cosmicos_state::reset_counter_r )
+uint8_t cosmicos_state::reset_counter_r()
 {
 	m_counter = 0;
 
 	return 0;
 }
 
-WRITE8_MEMBER( cosmicos_state::segment_w )
+void cosmicos_state::segment_w(uint8_t data)
 {
 	m_counter++;
 
@@ -168,12 +171,12 @@ WRITE8_MEMBER( cosmicos_state::segment_w )
 	}
 }
 
-READ8_MEMBER( cosmicos_state::data_r )
+uint8_t cosmicos_state::data_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( cosmicos_state::display_w )
+void cosmicos_state::display_w(uint8_t data)
 {
 	m_segment = data;
 }
@@ -187,11 +190,11 @@ void cosmicos_state::cosmicos_mem(address_map &map)
 
 void cosmicos_state::cosmicos_io(address_map &map)
 {
-//  AM_RANGE(0x00, 0x00)
+//  map(0x00, 0x00)
 	map(0x01, 0x01).r(FUNC(cosmicos_state::video_on_r));
 	map(0x02, 0x02).rw(FUNC(cosmicos_state::video_off_r), FUNC(cosmicos_state::audio_latch_w));
-//  AM_RANGE(0x03, 0x03)
-//  AM_RANGE(0x04, 0x04)
+//  map(0x03, 0x03)
+//  map(0x04, 0x04)
 	map(0x05, 0x05).rw(FUNC(cosmicos_state::hex_keyboard_r), FUNC(cosmicos_state::hex_keylatch_w));
 	map(0x06, 0x06).rw(FUNC(cosmicos_state::reset_counter_r), FUNC(cosmicos_state::segment_w));
 	map(0x07, 0x07).rw(FUNC(cosmicos_state::data_r), FUNC(cosmicos_state::display_w));
@@ -359,11 +362,9 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
 {
-// commented this out because (a) m_digit isn't initialised anywhere,
-// and (b) writing to a negative digit is not a good idea.
-//  m_digit = !m_digit;
+	m_digit ^= 1;
 
-//  m_digits[m_digit] = m_segment;
+	m_digits[m_digit] = m_segment;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
@@ -436,12 +437,12 @@ WRITE_LINE_MEMBER( cosmicos_state::q_w )
 	m_q = state;
 }
 
-READ8_MEMBER( cosmicos_state::dma_r )
+uint8_t cosmicos_state::dma_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( cosmicos_state::sc_w )
+void cosmicos_state::sc_w(uint8_t data)
 {
 	int sc1 = BIT(data, 1);
 
@@ -494,7 +495,7 @@ void cosmicos_state::machine_reset()
 
 /* Quickload */
 
-QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
+QUICKLOAD_LOAD_MEMBER(cosmicos_state::quickload_cb)
 {
 	uint8_t *ptr = m_rom->base();
 	int size = image.length();
@@ -507,7 +508,8 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(cosmicos_state::cosmicos)
+void cosmicos_state::cosmicos(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cosmicos_state::cosmicos_mem);
@@ -532,7 +534,6 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
@@ -547,13 +548,14 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", cosmicos_state, cosmicos, "bin")
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(cosmicos_state::quickload_cb));
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256").set_extra_options("4K,48K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

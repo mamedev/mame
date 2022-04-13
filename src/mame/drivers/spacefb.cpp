@@ -128,15 +128,15 @@
  *************************************/
 
 
-void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(param);
 		break;
 	default:
-			assert_always(false, "Unknown id in spacefb_state::device_timer");
+		throw emu_fatalerror("Unknown id in spacefb_state::device_timer");
 	}
 }
 
@@ -188,11 +188,10 @@ void spacefb_state::machine_start()
 
 void spacefb_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_IO);
 	/* the 3 output ports are cleared on reset */
-	port_0_w(space, 0, 0);
-	port_1_w(space, 0, 0);
-	port_2_w(space, 0, 0);
+	port_0_w(0);
+	port_1_w(0);
+	port_2_w(0);
 
 	start_interrupt_timer();
 }
@@ -344,7 +343,7 @@ void spacefb_state::spacefb(machine_config &config)
 	m_audiocpu->t0_in_cb().set(FUNC(spacefb_state::audio_t0_r));
 	m_audiocpu->t1_in_cb().set(FUNC(spacefb_state::audio_t1_r));
 
-	config.m_minimum_quantum = attotime::from_hz(180);
+	config.set_maximum_quantum(attotime::from_hz(180));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

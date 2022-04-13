@@ -7,15 +7,15 @@
     driver by Aaron Giles
 
     Games supported:
-        * Rampart (1990) [3 sets]
+        * Rampart (1990) [4 sets]
 
     Known bugs:
-        * P3 trackball doesn't work, maybe it needs some kind of fake input port
+        * none at this time
 
     Note:
         P3 buttons 1 and 2 are mapped twice. THIS IS NOT A BUG!
 
-    bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g}
+    bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g} <- what's this for?
 
 ****************************************************************************
 
@@ -30,8 +30,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
-#include "sound/okim6295.h"
-#include "sound/ym2413.h"
 #include "emupal.h"
 #include "speaker.h"
 
@@ -45,31 +43,17 @@
  *
  *************************************/
 
-void rampart_state::update_interrupts()
-{
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-void rampart_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(rampart_state::scanline_interrupt)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0)
-		scanline_int_write_line(1);
+	if ((param & 32) == 0)
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
 
 
-
-/*************************************
- *
- *  Initialization
- *
- *************************************/
-
-void rampart_state::machine_reset()
+void rampart_state::scanline_int_ack_w(u16 data)
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 32);
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -80,7 +64,7 @@ void rampart_state::machine_reset()
  *
  *************************************/
 
-WRITE16_MEMBER(rampart_state::latch_w)
+void rampart_state::latch_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* bit layout in this register:
 
@@ -132,7 +116,7 @@ void rampart_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fffff);
 	map(0x000000, 0x0fffff).rom();
-	map(0x140000, 0x147fff).mirror(0x438000).rom(); /* slapstic goes here */
+	map(0x140000, 0x141fff).mirror(0x43e000).bankr(m_slapstic_bank); /* slapstic goes here */
 	map(0x200000, 0x21ffff).ram().share("bitmap");
 	map(0x220000, 0x3bffff).nopw();    /* the code blasts right through this when initializing */
 	map(0x3c0000, 0x3c07ff).mirror(0x019800).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
@@ -344,7 +328,11 @@ void rampart_state::rampart(machine_config &config)
 	M68000(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rampart_state::main_map);
 
-	SLAPSTIC(config, m_slapstic_device, 118, true);
+	SLAPSTIC(config, m_slapstic, 118);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x140000, 0x147fff, 0x438000);
+	m_slapstic->set_bank(m_slapstic_bank);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(rampart_state::scanline_interrupt), m_screen, 0, 32);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -364,7 +352,7 @@ void rampart_state::rampart(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(rampart_state::screen_update_rampart));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(rampart_state::video_int_write_line));
+	//m_screen->screen_vblank().set(FUNC(rampart_state::video_int_write_line));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -383,7 +371,7 @@ void rampart_state::rampart(machine_config &config)
  *************************************/
 
 ROM_START( rampart )
-	ROM_REGION( 0x148000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "136082-1033.13l", 0x00000, 0x80000, CRC(5c36795f) SHA1(2f3dcdfd6b04d851aa1082848624687ac0cec9e2) )
 	ROM_LOAD16_BYTE( "136082-1032.13j", 0x00001, 0x80000, CRC(ec7bc38c) SHA1(72d4dbb11e92c69cb560bbb39d7bbd5e845b1e4d) )
 	ROM_LOAD16_BYTE( "136082-2031.13l", 0x00000, 0x10000, CRC(07650c7e) SHA1(0a8eec76aefd4fd1515c1a0d5b96f71c674cdce7) )
@@ -410,7 +398,7 @@ ROM_END
 
 
 ROM_START( rampart2p )
-	ROM_REGION( 0x148000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "136082-1033.13l",  0x00000, 0x80000, CRC(5c36795f) SHA1(2f3dcdfd6b04d851aa1082848624687ac0cec9e2) )
 	ROM_LOAD16_BYTE( "136082-1032.13j",  0x00001, 0x80000, CRC(ec7bc38c) SHA1(72d4dbb11e92c69cb560bbb39d7bbd5e845b1e4d) )
 	ROM_LOAD16_BYTE( "136082-2051.13kl", 0x00000, 0x20000, CRC(d4e26d0f) SHA1(5106549e6d003711bfd390aa2e19e6e5f33f2cf9) )
@@ -436,8 +424,39 @@ ROM_START( rampart2p )
 ROM_END
 
 
+ROM_START( rampart2pa ) // original Atari PCB but with mostly hand-written labels, uses smaller ROMs for the main CPU
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "0h.13k-l",  0x00000, 0x20000, CRC(d4e26d0f) SHA1(5106549e6d003711bfd390aa2e19e6e5f33f2cf9) )
+	ROM_LOAD16_BYTE( "0l.13h",    0x00001, 0x20000, CRC(ed2a49bd) SHA1(b97ee41b7f930ba7b8b113c1b19c7729a5880b1f) )
+	ROM_LOAD16_BYTE( "1h.13l",    0x40000, 0x20000, CRC(b232b807) SHA1(1e405371595d97d44dec97387a0dedc6bc1ad1d2) )
+	ROM_LOAD16_BYTE( "1l.13h-j",  0x40001, 0x20000, CRC(a2db78b1) SHA1(586ee0b5901b685ac3c2bfad1d8ce1cd51def292) )
+	ROM_LOAD16_BYTE( "2h.13m",    0x80000, 0x20000, CRC(37b32b7e) SHA1(3f6c969829b5ca866e8e162ccecdf9ec7c17d808) )
+	ROM_LOAD16_BYTE( "2l.13j",    0x80001, 0x20000, CRC(00cd567b) SHA1(1d6ee16dd5af3328365dafb2fc771396f53dbc44) )
+	ROM_LOAD16_BYTE( "3h.13n",    0xc0000, 0x20000, CRC(c23b1c98) SHA1(abd8e2738bb945476dc9f848290880d7ece92081) )
+	ROM_LOAD16_BYTE( "3l.13k",    0xc0001, 0x20000, CRC(0a12ca83) SHA1(2f44420b94b981af1d65cb775e4799bc43898041) )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "atr.2n",   0x000000, 0x20000, CRC(efa38bef) SHA1(d38448138134e7a0be2a75c3cd6ab0729da5b83b) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
+	ROM_LOAD( "arom0_2_player_136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
+	ROM_LOAD( "arom1_2_player_136082-1006.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "rampart-eeprom.bin", 0x0000, 0x800, CRC(0be57615) SHA1(bd1f9eef410c78c091d2c925d6275427c77c7ecd) )
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "gal16v8-136082-1000.1j",  0x0000, 0x0117, CRC(18f82b38) SHA1(2ffd43a143396617704ced51da78fec2cf12cced) ) // not dumped for this set but same part number as rampart2p
+	ROM_LOAD( "gal16v8-136082-1001.4l",  0x0200, 0x0117, CRC(74d75d68) SHA1(dc3ee765ec48a76af6433026243284437958a39a) ) // not dumped for this set but same part number as rampart2p
+	ROM_LOAD( "gal16v8-136082-1002.7k",  0x0400, 0x0117, CRC(f593401f) SHA1(fbc258cd389f397a005a522812d412f4ed9bf407) ) // not dumped for this set but same part number as rampart2p
+	ROM_LOAD( "gal20v8-136082-1003.8j",  0x0600, 0x0157, CRC(67bb9705) SHA1(65bb31421f1303fce546781a463cc76921e58b25) ) // not dumped for this set but same part number as rampart2p
+	ROM_LOAD( "gal20v8-136082-1004.8m",  0x0800, 0x0157, CRC(0001ed7d) SHA1(c16a695361ee17d7508f6fb46854a9189549e3a3) ) // not dumped for this set but same part number as rampart2p
+	ROM_LOAD( "gal16v8-136082-1005.12c", 0x0a00, 0x0117, CRC(42c05114) SHA1(869a7f07da2d096b5a62f694db0dc1ca62d62242) ) // dumped for this set, matches rampartj (same part number)
+ROM_END
+
+
 ROM_START( rampartj )
-	ROM_REGION( 0x148000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "136082-3451.bin",  0x00000, 0x20000, CRC(c6596d32) SHA1(3e3e0cbb3b5fc6dd9685bbc4b18c22e0858d9282) )
 	ROM_LOAD16_BYTE( "136082-3450.bin",  0x00001, 0x20000, CRC(563b33cc) SHA1(8b454bc19644f1d3d76e4a13f08071cf5eab36e2) )
 	ROM_LOAD16_BYTE( "136082-1463.bin",  0x40000, 0x20000, CRC(65fe3491) SHA1(3aa3b98fb7fe808ef89e100b5e1ee1c99c4312b6) )
@@ -474,14 +493,10 @@ ROM_END
  *
  *************************************/
 
-void rampart_state::init_rampart()
+void rampart_state::machine_start()
 {
-	uint8_t *rom = memregion("maincpu")->base();
-
-	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	slapstic_configure(*m_maincpu, 0x140000, 0x438000, memregion("maincpu")->base() + 0x140000);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x40000, 0x2000);
 }
-
 
 
 /*************************************
@@ -490,6 +505,7 @@ void rampart_state::init_rampart()
  *
  *************************************/
 
-GAME( 1990, rampart,  0,       rampart, rampart,  rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampart2p,rampart, rampart, ramprt2p, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampartj, rampart, rampart, rampartj, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart,    0,       rampart, rampart,  rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart2p,  rampart, rampart, ramprt2p, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Joystick, bigger ROMs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart2pa, rampart, rampart, ramprt2p, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Joystick, smaller ROMs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampartj,   rampart, rampart, rampartj, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )

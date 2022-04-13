@@ -74,7 +74,7 @@ void spectrum_protek_device::device_start()
 
 uint8_t spectrum_protek_device::iorq_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = offset & 1 ? m_slot->fb_r() : 0xff;
 
 	switch (offset & 0xff)
 	{

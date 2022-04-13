@@ -11,6 +11,7 @@
 #include "sound/okim6295.h"
 #include "sound/upd7759.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class aerofgt_state : public driver_device
 {
@@ -61,17 +62,17 @@ public:
 	optional_memory_bank m_okibank;
 
 	/* video-related */
-	tilemap_t   *m_tilemap[2];
-	uint8_t     m_gfxbank[8];
-	uint16_t    m_bank[4];
-	uint16_t    m_scrollx[2];
-	uint16_t    m_scrolly[2];
-	bool        m_flip_screen;
-	uint16_t    m_wbbc97_bitmap_enable;
-	int       m_charpalettebank;
-	int       m_spritepalettebank;
-	int       m_sprite_gfx;
-	int       m_spikes91_lookup;
+	tilemap_t   *m_tilemap[2]{};
+	uint8_t     m_gfxbank[8]{};
+	uint16_t    m_bank[4]{};
+	uint16_t    m_scrollx[2]{};
+	uint16_t    m_scrolly[2]{};
+	bool        m_flip_screen = false;
+	uint16_t    m_wbbc97_bitmap_enable = 0;
+	int       m_charpalettebank = 0;
+	int       m_spritepalettebank = 0;
+	int       m_sprite_gfx = 0;
+	int       m_spikes91_lookup = 0;
 	uint32_t aerofgt_tile_callback( uint32_t code );
 
 	uint32_t aerofgt_old_tile_callback( uint32_t code );
@@ -79,30 +80,30 @@ public:
 	uint32_t spinbrk_tile_callback( uint32_t code );
 
 	/* handlers */
-	DECLARE_WRITE8_MEMBER(karatblzbl_soundlatch_w);
-	DECLARE_READ8_MEMBER(pending_command_r);
-	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(spinlbrk_sh_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(aerfboot_okim6295_banking_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(pspikes_gfxbank_w);
-	DECLARE_WRITE16_MEMBER(pspikesb_gfxbank_w);
-	DECLARE_WRITE16_MEMBER(spikes91_lookup_w);
-	DECLARE_WRITE8_MEMBER(karatblz_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(spinlbrk_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(kickball_gfxbank_w);
-	DECLARE_WRITE16_MEMBER(turbofrc_gfxbank_w);
-	DECLARE_WRITE16_MEMBER(aerofgt_gfxbank_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(scrollx_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(pspikes_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(spinlbrk_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(turbofrc_flip_screen_w);
-	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
-	DECLARE_WRITE16_MEMBER(pspikesb_oki_banking_w);
-	DECLARE_WRITE16_MEMBER(aerfboo2_okim6295_banking_w);
-	DECLARE_WRITE8_MEMBER(karatblzbl_d7759_write_port_0_w);
-	DECLARE_WRITE8_MEMBER(karatblzbl_d7759_reset_w);
+	void karatblzbl_soundlatch_w(uint8_t data);
+	uint8_t pending_command_r();
+	void aerofgt_sh_bankswitch_w(uint8_t data);
+	void spinlbrk_sh_bankswitch_w(uint8_t data);
+	void aerfboot_okim6295_banking_w(uint8_t data);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pspikes_gfxbank_w(uint8_t data);
+	void pspikesb_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void spikes91_lookup_w(uint16_t data);
+	void karatblz_gfxbank_w(uint8_t data);
+	void spinlbrk_gfxbank_w(uint8_t data);
+	void kickball_gfxbank_w(uint8_t data);
+	void turbofrc_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void aerofgt_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pspikes_palette_bank_w(uint8_t data);
+	void spinlbrk_flip_screen_w(uint8_t data);
+	void turbofrc_flip_screen_w(uint8_t data);
+	void wbbc97_bitmap_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pspikesb_oki_banking_w(uint16_t data);
+	void aerfboo2_okim6295_banking_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void karatblzbl_d7759_write_port_0_w(uint8_t data);
+	void karatblzbl_d7759_reset_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_pspikes_tile_info);
 	template<int Layer> TILE_GET_INFO_MEMBER(karatblz_tile_info);
 	template<int Layer> TILE_GET_INFO_MEMBER(spinlbrk_tile_info);
@@ -169,6 +170,7 @@ public:
 	void pspikesc_map(address_map &map);
 	void sound_map(address_map &map);
 	void spikes91_map(address_map &map);
+	void spikes91_sound_map(address_map &map);
 	void spinlbrk_map(address_map &map);
 	void spinlbrk_sound_portmap(address_map &map);
 	void turbofrc_map(address_map &map);

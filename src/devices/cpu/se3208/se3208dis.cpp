@@ -232,71 +232,63 @@ INST(STSP)
 INST(PUSH)
 {
 	uint32_t Set=EXTRACT(Opcode,0,10);
-	char str[1024];
-	strcpy(str,"PUSH  ");
+	stream << "PUSH  ";
 	if(Set&(1<<10))
-		strcat(str,"%PC-");
+		stream << "%PC-";
 	if(Set&(1<<9))
-		strcat(str,"%SR-");
+		stream << "%SR-";
 	if(Set&(1<<8))
-		strcat(str,"%ER-");
+		stream << "%ER-";
 	if(Set&(1<<7))
-		strcat(str,"%R7-");
+		stream << "%R7-";
 	if(Set&(1<<6))
-		strcat(str,"%R6-");
+		stream << "%R6-";
 	if(Set&(1<<5))
-		strcat(str,"%R5-");
+		stream << "%R5-";
 	if(Set&(1<<4))
-		strcat(str,"%R4-");
+		stream << "%R4-";
 	if(Set&(1<<3))
-		strcat(str,"%R3-");
+		stream << "%R3-";
 	if(Set&(1<<2))
-		strcat(str,"%R2-");
+		stream << "%R2-";
 	if(Set&(1<<1))
-		strcat(str,"%R1-");
+		stream << "%R1-";
 	if(Set&(1<<0))
-		strcat(str,"%R0-");
-	str[strlen(str)-1]=0;
-	stream << str;
+		stream << "%R0-";
 	return 0;
 }
 
 INST(POP)
 {
 	uint32_t Set=EXTRACT(Opcode,0,10);
-	char str[1024];
 	int Ret=0;
-	strcpy(str,"POP   ");
+	stream << "POP   ";
 	if(Set&(1<<0))
-		strcat(str,"%R0-");
+		stream << "%R0-";
 	if(Set&(1<<1))
-		strcat(str,"%R1-");
+		stream << "%R1-";
 	if(Set&(1<<2))
-		strcat(str,"%R2-");
+		stream << "%R2-";
 	if(Set&(1<<3))
-		strcat(str,"%R3-");
+		stream << "%R3-";
 	if(Set&(1<<4))
-		strcat(str,"%R4-");
+		stream << "%R4-";
 	if(Set&(1<<5))
-		strcat(str,"%R5-");
+		stream << "%R5-";
 	if(Set&(1<<6))
-		strcat(str,"%R6-");
+		stream << "%R6-";
 	if(Set&(1<<7))
-		strcat(str,"%R7-");
+		stream << "%R7-";
 	if(Set&(1<<8))
-		strcat(str,"%ER-");
+		stream << "%ER-";
 	if(Set&(1<<9))
-		strcat(str,"%SR-");
+		stream << "%SR-";
 	if(Set&(1<<10))
 	{
-		strcat(str,"%PC-");
+		stream << "%PC-";
 		CLRFLAG(FLAG_E);    //Clear the flag, this is a ret so disassemble will start a new E block
 		Ret=1;
 	}
-	str[strlen(str)-1]=0;
-	if(Ret)
-		strcat(str,"\n");
-	stream << str;
 	return Ret ? STEP_OUT : 0;
 }
 
@@ -770,7 +762,7 @@ INST(JV)
 	util::stream_format(stream, "JV    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JNV)
@@ -786,7 +778,7 @@ INST(JNV)
 	util::stream_format(stream, "JNV   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JC)
@@ -802,7 +794,7 @@ INST(JC)
 	util::stream_format(stream, "JC    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JNC)
@@ -818,7 +810,7 @@ INST(JNC)
 	util::stream_format(stream, "JNC   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JP)
@@ -834,7 +826,7 @@ INST(JP)
 	util::stream_format(stream, "JP    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JM)
@@ -850,7 +842,7 @@ INST(JM)
 	util::stream_format(stream, "JM    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JNZ)
@@ -866,7 +858,7 @@ INST(JNZ)
 	util::stream_format(stream, "JNZ   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JZ)
@@ -882,7 +874,7 @@ INST(JZ)
 	util::stream_format(stream, "JZ    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JGE)
@@ -898,7 +890,7 @@ INST(JGE)
 	util::stream_format(stream, "JGE   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JLE)
@@ -914,7 +906,7 @@ INST(JLE)
 	util::stream_format(stream, "JLE   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JHI)
@@ -930,7 +922,7 @@ INST(JHI)
 	util::stream_format(stream, "JHI   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JLS)
@@ -946,7 +938,7 @@ INST(JLS)
 	util::stream_format(stream, "JLS   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JGT)
@@ -962,7 +954,7 @@ INST(JGT)
 	util::stream_format(stream, "JGT   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JLT)
@@ -978,7 +970,7 @@ INST(JLT)
 	util::stream_format(stream, "JLT   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 

@@ -23,10 +23,10 @@
 //  DEBUGGERY
 //**************************************************************************
 
-#define LOG_UNHANDLED       (1U << 0)
-#define LOG_HOST            (1U << 1)
-#define LOG_STATE           (1U << 2)
-#define LOG_SCRIPTS         (1U << 3)
+#define LOG_UNHANDLED       (1U << 1)
+#define LOG_HOST            (1U << 2)
+#define LOG_STATE           (1U << 3)
+#define LOG_SCRIPTS         (1U << 4)
 #define VERBOSE             (0)
 
 #include "logmacro.h"
@@ -89,6 +89,7 @@ DEFINE_DEVICE_TYPE(NCR53C7XX, ncr53c7xx_device, "ncr537xx", "NCR 53C7xx SCSI")
 
 ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   nscsi_device(mconfig, NCR53C7XX, tag, owner, clock),
+		nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_irq_handler(*this),
@@ -212,7 +213,7 @@ void ncr53c7xx_device::device_reset()
 //  read - Host read handler
 //-------------------------------------------------
 
-READ32_MEMBER( ncr53c7xx_device::read )
+uint32_t ncr53c7xx_device::read(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_HOST, "%s: REG R: [%x] (%08X)\n", machine().describe_context(), offset, mem_mask);
 
@@ -291,7 +292,8 @@ READ32_MEMBER( ncr53c7xx_device::read )
 			if (ACCESSING_BITS_0_7)
 			{
 				ret = m_dstat;
-				m_dstat = 0;
+				// DFE isn't cleared on read
+				m_dstat &= DSTAT_DFE;
 				update_irqs();
 			}
 			if (ACCESSING_BITS_8_15)
@@ -455,7 +457,7 @@ READ32_MEMBER( ncr53c7xx_device::read )
 //  write - Host write handler
 //-------------------------------------------------
 
-WRITE32_MEMBER( ncr53c7xx_device::write )
+void ncr53c7xx_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_HOST, "%s: REG W: [%x] (%08X) %x\n", offset, mem_mask, data, machine().describe_context());
 
@@ -759,7 +761,7 @@ void ncr53c7xx_device::recv_byte()
 //  state machine
 //-------------------------------------------------
 
-void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	step(true);
 }
@@ -1734,7 +1736,7 @@ void ncr53c7xx_device::tc_int()
 //  disassemble_scripts -
 //-------------------------------------------------
 
-const char* ncr53c7xx_device::disassemble_scripts()
+std::string ncr53c7xx_device::disassemble_scripts()
 {
 	static char const *const phases[] =
 	{
@@ -1748,14 +1750,13 @@ const char* ncr53c7xx_device::disassemble_scripts()
 		"Message In"
 	};
 
-	static char buffer[64];
-	char opstring[64];
+	std::string opstring;
 
 	switch ((m_dcmd >> 6) & 3)
 	{
 		case 0:
 		{
-			sprintf(opstring, "BMOV: %s [%x] %d bytes\n", phases[m_dcmd & 7], m_dnad, m_dbc);
+			opstring = util::string_format("BMOV: %s [%x] %d bytes\n", phases[m_dcmd & 7], m_dnad, m_dbc);
 			break;
 		}
 		case 1:
@@ -1772,7 +1773,7 @@ const char* ncr53c7xx_device::disassemble_scripts()
 				"ILLEGAL",
 			};
 
-			sprintf(opstring, "IO: %s (%x)\n", ops[(m_dcmd >> 3) & 7], m_dnad);
+			opstring = util::string_format("IO: %s (%x)\n", ops[(m_dcmd >> 3) & 7], m_dnad);
 			break;
 		}
 		case 2:
@@ -1789,17 +1790,15 @@ const char* ncr53c7xx_device::disassemble_scripts()
 				"ILLEGAL",
 			};
 
-			sprintf(opstring, "TC: %s %c (%s) (%x)\n", ops[(m_dcmd >> 3) & 7], m_dbc & (1 << 19) ? 'T' : 'F', phases[m_dcmd & 7], m_dnad);
+			opstring = util::string_format("TC: %s %c (%s) (%x)\n", ops[(m_dcmd >> 3) & 7], m_dbc & (1 << 19) ? 'T' : 'F', phases[m_dcmd & 7], m_dnad);
 			break;
 		}
 		case 3:
 		{
-			sprintf(opstring, "ILLEGAL");
+			opstring = "ILLEGAL";
 			break;
 		}
 	}
 
-	sprintf(buffer, "SCRIPTS [%08x]: %s", m_dsp - 8, opstring);
-
-	return buffer;
+	return util::string_format("SCRIPTS [%08x]: %s", m_dsp - 8, opstring);
 }

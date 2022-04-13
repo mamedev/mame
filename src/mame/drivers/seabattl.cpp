@@ -38,6 +38,7 @@ the sound board should be fully discrete.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "seabattl.lh"
 
@@ -71,18 +72,18 @@ protected:
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_colorram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_control_w);
-	DECLARE_READ8_MEMBER(seabattl_collision_r);
-	DECLARE_WRITE8_MEMBER(seabattl_collision_clear_w);
-	DECLARE_READ8_MEMBER(seabattl_collision_clear_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(time_display_w);
-	DECLARE_WRITE8_MEMBER(score_display_w);
-	DECLARE_WRITE8_MEMBER(score2_display_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
+	void seabattl_videoram_w(offs_t offset, uint8_t data);
+	void seabattl_colorram_w(offs_t offset, uint8_t data);
+	void seabattl_control_w(uint8_t data);
+	uint8_t seabattl_collision_r();
+	void seabattl_collision_clear_w(uint8_t data);
+	uint8_t seabattl_collision_clear_r();
+	void sound_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void time_display_w(uint8_t data);
+	void score_display_w(uint8_t data);
+	void score2_display_w(uint8_t data);
+	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
@@ -100,7 +101,7 @@ private:
 	output_finder<6> m_7segs;
 	output_finder<> m_lamp;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	bitmap_ind16 m_collision_bg;
 
 	bool m_waveenable;
@@ -142,16 +143,16 @@ TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, code, (color & 0x7), 0);
+	tileinfo.set(1, code, (color & 0x7), 0);
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_videoram_w)
+void seabattl_state::seabattl_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_colorram_w)
+void seabattl_state::seabattl_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -159,14 +160,12 @@ WRITE8_MEMBER(seabattl_state::seabattl_colorram_w)
 
 uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y, offset;
-
 	// wave
 	if ( m_waveenable )
 	{
-		for ( y = 0; y < 32; y++ )
+		for ( int y = 0; y < 32; y++ )
 		{
-			for ( x = 0; x < 32; x++ )
+			for ( int x = 0; x < 32; x++ )
 			{
 				m_gfxdecode->gfx(2)->opaque(bitmap,cliprect, (y & 0x0f) + (((x & 0x0f) + ((screen.frame_number() & 0xe0) >> 4)) << 4), 0, 0, 0, x*8, y*8 );
 			}
@@ -182,7 +181,7 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 	m_bg_tilemap->draw(screen, m_collision_bg, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	// sprites (m.obj)
-	for ( offset = 0; offset < 256; offset++ )
+	for ( int offset = 0; offset < 256; offset++ )
 	{
 		// bits 0-3: sprite num
 		// bits 4-7: x coordinate
@@ -199,15 +198,15 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 	bitmap_ind16 const &s2636_0_bitmap = m_s2636->update(cliprect);
 
 	// collisions
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			// bit 0: m.obj - pvi-bkg
 			// bit 1: pvi-bkg - scr.sm.obj
 			// bit 2: m.obj - scr.sm.obj
 			bool obj = (bitmap.pix(y,x) > 0) && (bitmap.pix(y,x) < 8);
-			bool pvi = S2636_IS_PIXEL_DRAWN(s2636_0_bitmap.pix16(y, x));
+			bool pvi = S2636_IS_PIXEL_DRAWN(s2636_0_bitmap.pix(y, x));
 			bool scr = (m_collision_bg.pix(y,x) & 1) != 0;
 
 			if (obj && pvi)
@@ -222,14 +221,14 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 	}
 
 	// s2636 layer
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int pixel = s2636_0_bitmap.pix16(y, x);
+			int pixel = s2636_0_bitmap.pix(y, x);
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
-				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
+				bitmap.pix(y, x) = S2636_PIXEL_COLOR(pixel);
 			}
 		}
 	}
@@ -241,7 +240,7 @@ void seabattl_state::video_start()
 {
 	m_7segs.resolve();
 	m_screen->register_screen_bitmap(m_collision_bg);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(seabattl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seabattl_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(-12, 0);
 }
@@ -278,13 +277,13 @@ void seabattl_state::seabattl_data_map(address_map &map)
 	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(seabattl_state::seabattl_collision_clear_r), FUNC(seabattl_state::seabattl_collision_clear_w));
 }
 
-READ8_MEMBER(seabattl_state::seabattl_collision_r)
+uint8_t seabattl_state::seabattl_collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	return m_collision;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_control_w)
+void seabattl_state::seabattl_control_w(uint8_t data)
 {
 	// bit 0: play counter
 	// bit 1: super bonus counter
@@ -297,20 +296,20 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	m_waveenable = BIT(data, 5);
 }
 
-READ8_MEMBER(seabattl_state::seabattl_collision_clear_r)
+uint8_t seabattl_state::seabattl_collision_clear_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 	return 0;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_collision_clear_w )
+void seabattl_state::seabattl_collision_clear_w(uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 }
 
-WRITE8_MEMBER(seabattl_state::sound_w )
+void seabattl_state::sound_w(uint8_t data)
 {
 	// sound effects
 	// bits:
@@ -324,7 +323,7 @@ WRITE8_MEMBER(seabattl_state::sound_w )
 	// 7 - unused
 }
 
-WRITE8_MEMBER(seabattl_state::sound2_w )
+void seabattl_state::sound2_w(uint8_t data)
 {
 	// sound effects
 	// bits:
@@ -338,19 +337,19 @@ WRITE8_MEMBER(seabattl_state::sound2_w )
 	// 7 - unused
 }
 
-WRITE8_MEMBER(seabattl_state::time_display_w )
+void seabattl_state::time_display_w(uint8_t data)
 {
 	m_digits[5]->a_w(data & 0x0f);
 	m_digits[4]->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_MEMBER(seabattl_state::score_display_w )
+void seabattl_state::score_display_w(uint8_t data)
 {
 	m_digits[3]->a_w(data & 0x0f);
 	m_digits[2]->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_MEMBER(seabattl_state::score2_display_w )
+void seabattl_state::score2_display_w(uint8_t data)
 {
 	m_digits[1]->a_w(data & 0x0f);
 	m_digits[0]->a_w((data >> 4) & 0x0f);
@@ -448,7 +447,7 @@ void seabattl_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(seabattl_state::seabattl_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 static const gfx_layout tiles32x16x3_layout =
@@ -463,21 +462,10 @@ static const gfx_layout tiles32x16x3_layout =
 };
 
 
-static const gfx_layout tiles8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_seabattl )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles32x16x3_layout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 8, 8 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 24, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x1,           8, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x1,          24, 1 )
 GFXDECODE_END
 
 void seabattl_state::seabattl(machine_config &config)
@@ -488,7 +476,7 @@ void seabattl_state::seabattl(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
 	m_maincpu->set_vblank_int("screen", FUNC(seabattl_state::seabattl_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 	S2636(config, m_s2636, 0);
 	m_s2636->set_offsets(-13, -29);
 	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);

@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_GUAB_FORMAT;
+extern const guab_format FLOPPY_GUAB_FORMAT;
 
 #endif // MAME_FORMATS_GUAB_DSK_H

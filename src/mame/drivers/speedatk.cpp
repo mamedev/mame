@@ -93,6 +93,8 @@ void speedatk_state::machine_start()
 	save_item(NAME(m_km_status));
 	save_item(NAME(m_coin_settings));
 	save_item(NAME(m_coin_impulse));
+
+	m_coin_impulse = 0;
 }
 
 uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)
@@ -117,7 +119,7 @@ uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)
 	return 0;
 }
 
-READ8_MEMBER(speedatk_state::key_matrix_r)
+uint8_t speedatk_state::key_matrix_r()
 {
 	if(m_coin_impulse > 0)
 	{
@@ -151,13 +153,13 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 	return iox_key_matrix_calc((m_mux_data == 2) ? 0 : 2);
 }
 
-WRITE8_MEMBER(speedatk_state::key_matrix_w)
+void speedatk_state::key_matrix_w(uint8_t data)
 {
 	m_mux_data = data;
 }
 
 /* Key matrix status,used for coin settings and I don't know what else... */
-READ8_MEMBER(speedatk_state::key_matrix_status_r)
+uint8_t speedatk_state::key_matrix_status_r()
 {
 	/* bit 0: busy flag,active low */
 	return (m_km_status & 0xfe) | 1;
@@ -174,7 +176,7 @@ My guess is that the other commands configs the key matrix, it probably needs so
 8x coinage setting command
 a1
 */
-WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
+void speedatk_state::key_matrix_status_w(uint8_t data)
 {
 	m_km_status = data;
 	if((m_km_status & 0xf0) == 0x80) //coinage setting command
@@ -281,24 +283,12 @@ static const gfx_layout charlayout_1bpp =
 	8*8
 };
 
-static const gfx_layout charlayout_3bpp =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 static GFXDECODE_START( gfx_speedatk )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,   0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp,   0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar,  0, 32 )
 GFXDECODE_END
 
-WRITE8_MEMBER(speedatk_state::output_w)
+void speedatk_state::output_w(uint8_t data)
 {
 	m_flip_scr = data & 0x80;
 
@@ -322,9 +312,8 @@ void speedatk_state::speedatk(machine_config &config)
 	screen.set_size(320, 256);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(speedatk_state::screen_update));
-	screen.set_palette(m_palette);
 
-	H46505(config, m_crtc, MASTER_CLOCK/16);   /* hand tuned to get ~60 fps */
+	MC6845(config, m_crtc, MASTER_CLOCK/16);   /* unknown variant; hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

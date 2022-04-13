@@ -59,28 +59,28 @@ protected:
 private:
 	struct svision_t
 	{
-		emu_timer *timer1;
-		int timer_shot;
+		emu_timer *timer1 = nullptr;
+		int timer_shot = 0;
 	};
 
 	struct svision_pet_t
 	{
-		int state;
-		int on, clock, data;
-		uint8_t input;
-		emu_timer *timer;
+		int state = 0;
+		int on = 0, clock = 0, data = 0;
+		uint8_t input = 0;
+		emu_timer *timer = nullptr;
 	};
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
-	DECLARE_READ8_MEMBER(svision_r);
-	DECLARE_WRITE8_MEMBER(svision_w);
-	DECLARE_READ8_MEMBER(tvlink_r);
-	DECLARE_WRITE8_MEMBER(tvlink_w);
+	uint8_t svision_r(offs_t offset);
+	void svision_w(offs_t offset, uint8_t data);
+	uint8_t tvlink_r(offs_t offset);
+	void tvlink_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(frame_int_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void svision_palette(palette_device &palette) const;
 	void svisionp_palette(palette_device &palette) const;
@@ -117,12 +117,12 @@ private:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 
 	svision_t m_svision;
 	svision_pet_t m_pet;
 	tvlink_t m_tvlink;
-	bool m_dma_finished;
+	bool m_dma_finished = false;
 };
 
 #endif // MAME_INCLUDES_SVISION_H

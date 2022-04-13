@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2017 Stanislav Pidhorskyi. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
@@ -37,11 +37,11 @@
  * ==========
  *
  * [1] R. Perez, R. Seals, and J. Michalsky."An All-Weather Model for Sky Luminance Distribution".
- *     Solar Energy, Volume 50, Number 3 (March 1993), pp. 235–245.
+ *     Solar Energy, Volume 50, Number 3 (March 1993), pp. 235-245.
  *
  * [2] A. J. Preetham, Peter Shirley, and Brian Smits. "A Practical Analytic Model for Daylight",
  *     Proceedings of the 26th Annual Conference on Computer Graphics and Interactive Techniques,
- *     1999, pp. 91–100.
+ *     1999, pp. 91-100.
  *     https://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
  *
  * [3] E. Lengyel, Game Engine Gems, Volume One. Jones & Bartlett Learning, 2010. pp. 219 - 234
@@ -63,7 +63,7 @@ namespace
 	typedef bx::Vec3 Color;
 
 	// HDTV rec. 709 matrix.
-	static float M_XYZ2RGB[] =
+	static constexpr float M_XYZ2RGB[] =
 	{
 		 3.240479f, -0.969256f,  0.055648f,
 		-1.53715f,   1.875991f, -0.204043f,
@@ -73,18 +73,18 @@ namespace
 	// Converts color repesentation from CIE XYZ to RGB color-space.
 	Color xyzToRgb(const Color& xyz)
 	{
-		Color rgb;
+		Color rgb(bx::init::None);
 		rgb.x = M_XYZ2RGB[0] * xyz.x + M_XYZ2RGB[3] * xyz.y + M_XYZ2RGB[6] * xyz.z;
 		rgb.y = M_XYZ2RGB[1] * xyz.x + M_XYZ2RGB[4] * xyz.y + M_XYZ2RGB[7] * xyz.z;
 		rgb.z = M_XYZ2RGB[2] * xyz.x + M_XYZ2RGB[5] * xyz.y + M_XYZ2RGB[8] * xyz.z;
 		return rgb;
 	};
 
-
 	// Precomputed luminance of sunlight in XYZ colorspace.
 	// Computed using code from Game Engine Gems, Volume One, chapter 15. Implementation based on Dr. Richard Bird model.
 	// This table is used for piecewise linear interpolation. Transitions from and to 0.0 at sunset and sunrise are highly inaccurate
-	static std::map<float, Color> sunLuminanceXYZTable = {
+	static std::map<float, Color> sunLuminanceXYZTable =
+	{
 		{  5.0f, {  0.000000f,  0.000000f,  0.000000f } },
 		{  7.0f, { 12.703322f, 12.989393f,  9.100411f } },
 		{  8.0f, { 13.202644f, 13.597814f, 11.524929f } },
@@ -107,7 +107,8 @@ namespace
 	// This table is used for piecewise linear interpolation. Day/night transitions are highly inaccurate.
 	// The scale of luminance change in Day/night transitions is not preserved.
 	// Luminance at night was increased to eliminate need the of HDR render.
-	static std::map<float, Color> skyLuminanceXYZTable = {
+	static std::map<float, Color> skyLuminanceXYZTable =
+	{
 		{  0.0f, { 0.308f,    0.308f,    0.411f    } },
 		{  1.0f, { 0.308f,    0.308f,    0.410f    } },
 		{  2.0f, { 0.301f,    0.301f,    0.402f    } },
@@ -134,9 +135,9 @@ namespace
 
 
 	// Turbidity tables. Taken from:
-	// A. J. Preetham, P. Shirley, and B. Smits. A Practical Analytic Model for Daylight. SIGGRAPH ’99
+	// A. J. Preetham, P. Shirley, and B. Smits. A Practical Analytic Model for Daylight. SIGGRAPH '99
 	// Coefficients correspond to xyY colorspace.
-	static Color ABCDE[] =
+	static constexpr Color ABCDE[] =
 	{
 		{ -0.2592f, -0.2608f, -1.4630f },
 		{  0.0008f,  0.0092f,  0.4275f },
@@ -144,7 +145,8 @@ namespace
 		{ -0.8989f, -1.6537f, -2.5771f },
 		{  0.0452f,  0.0529f,  0.3703f },
 	};
-	static Color ABCDE_t[] =
+
+	static constexpr Color ABCDE_t[] =
 	{
 		{ -0.0193f, -0.0167f,  0.1787f },
 		{ -0.0665f, -0.0950f, -0.3554f },
@@ -241,17 +243,14 @@ namespace
 		};
 
 		SunController()
-			: m_latitude(50.0f)
+			: m_northDir(1.0f,  0.0f, 0.0f)
+			, m_sunDir(0.0f, -1.0f, 0.0f)
+			, m_upDir(0.0f,  1.0f, 0.0f)
+			, m_latitude(50.0f)
 			, m_month(June)
 			, m_eclipticObliquity(bx::toRad(23.4f) )
 			, m_delta(0.0f)
 		{
-			m_northDirection[0] = 1.0;
-			m_northDirection[1] = 0.0;
-			m_northDirection[2] = 0.0;
-			m_upvector[0] = 0.0f;
-			m_upvector[1] = 1.0f;
-			m_upvector[2] = 0.0f;
 		}
 
 		void Update(float _time)
@@ -260,9 +259,9 @@ namespace
 			UpdateSunPosition(_time - 12.0f);
 		}
 
-		float m_northDirection[3];
-		float m_sunDirection[4];
-		float m_upvector[3];
+		bx::Vec3 m_northDir;
+		bx::Vec3 m_sunDir;
+		bx::Vec3 m_upDir;
 		float m_latitude;
 		Month m_month;
 
@@ -277,27 +276,23 @@ namespace
 
 		void UpdateSunPosition(float _hour)
 		{
-			float latitude = bx::toRad(m_latitude);
-			float hh = _hour * bx::kPi / 12.0f;
-			float azimuth = bx::atan2(
+			const float latitude = bx::toRad(m_latitude);
+			const float hh = _hour * bx::kPi / 12.0f;
+			const float azimuth = bx::atan2(
 				  bx::sin(hh)
 				, bx::cos(hh) * bx::sin(latitude) - bx::tan(m_delta) * bx::cos(latitude)
 				);
 
-			float altitude = bx::asin(
+			const float altitude = bx::asin(
 				bx::sin(latitude) * bx::sin(m_delta) + bx::cos(latitude) * bx::cos(m_delta) * bx::cos(hh)
 				);
 
-			float rotation[4];
-			bx::quatRotateAxis(rotation, m_upvector, -azimuth);
+			const bx::Quaternion rot0 = bx::rotateAxis(m_upDir, -azimuth);
+			const bx::Vec3 dir = bx::mul(m_northDir, rot0);
+			const bx::Vec3 uxd = bx::cross(m_upDir, dir);
 
-			float direction[3];
-			bx::vec3MulQuat(direction, m_northDirection, rotation);
-
-			float v[3];
-			bx::vec3Cross(v, m_upvector, direction);
-			bx::quatRotateAxis(rotation, v, altitude);
-			bx::vec3MulQuat(m_sunDirection, direction, rotation);
+			const bx::Quaternion rot1 = bx::rotateAxis(uxd, altitude);
+			m_sunDir = bx::mul(dir, rot1);
 		}
 
 		float m_eclipticObliquity;
@@ -311,16 +306,16 @@ namespace
 
 		static void init()
 		{
-			ms_decl
+			ms_layout
 				.begin()
 				.add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
 				.end();
 		}
 
-		static bgfx::VertexDecl ms_decl;
+		static bgfx::VertexLayout ms_layout;
 	};
 
-	bgfx::VertexDecl ScreenPosVertex::ms_decl;
+	bgfx::VertexLayout ScreenPosVertex::ms_layout;
 
 	// Renders a screen-space grid of triangles.
 	// Because of performance reasons, and because sky color is smooth, sky color is computed in vertex shader.
@@ -372,7 +367,7 @@ namespace
 				}
 			}
 
-			m_vbh = bgfx::createVertexBuffer(bgfx::copy(vertices, sizeof(ScreenPosVertex) * verticalCount * horizontalCount), ScreenPosVertex::ms_decl);
+			m_vbh = bgfx::createVertexBuffer(bgfx::copy(vertices, sizeof(ScreenPosVertex) * verticalCount * horizontalCount), ScreenPosVertex::ms_layout);
 			m_ibh = bgfx::createIndexBuffer(bgfx::copy(indices, sizeof(uint16_t) * k));
 
 			BX_FREE(allocator, indices);
@@ -407,8 +402,10 @@ namespace
 	class ExampleProceduralSky : public entry::AppI
 	{
 	public:
-		ExampleProceduralSky(const char* _name, const char* _description): entry::AppI(_name, _description)
-		{}
+		ExampleProceduralSky(const char* _name, const char* _description, const char* _url)
+			: entry::AppI(_name, _description, _url)
+		{
+		}
 
 		void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 		{
@@ -436,7 +433,7 @@ namespace
 				, 0x000000ff
 				, 1.0f
 				, 0
-			);
+				);
 
 			m_sunLuminanceXYZ.SetMap(sunLuminanceXYZTable);
 			m_skyLuminanceXYZ.SetMap(skyLuminanceXYZTable);
@@ -452,7 +449,7 @@ namespace
 			m_time = 0.0f;
 			m_timeScale = 1.0f;
 
-			s_texLightmap     = bgfx::createUniform("s_texLightmap",     bgfx::UniformType::Int1);
+			s_texLightmap     = bgfx::createUniform("s_texLightmap",     bgfx::UniformType::Sampler);
 			u_sunLuminance    = bgfx::createUniform("u_sunLuminance",    bgfx::UniformType::Vec4);
 			u_skyLuminanceXYZ = bgfx::createUniform("u_skyLuminanceXYZ", bgfx::UniformType::Vec4);
 			u_skyLuminance    = bgfx::createUniform("u_skyLuminance",    bgfx::UniformType::Vec4);
@@ -468,8 +465,7 @@ namespace
 
 			cameraCreate();
 
-			const float initialPos[3] = { 5.0f, 3.0, 0.0f };
-			cameraSetPosition(initialPos);
+			cameraSetPosition({ 5.0f, 3.0, 0.0f });
 			cameraSetVerticalAngle(bx::kPi / 8.0f);
 			cameraSetHorizontalAngle(-bx::kPi / 3.0f);
 
@@ -515,7 +511,8 @@ namespace
 			ImGui::SliderFloat("Turbidity", &m_turbidity, 1.9f, 10.0f);
 			ImGui::Checkbox("Prevent color banding", &m_sky.m_preventBanding);
 
-			const char* items[] = {
+			const char* items[] =
+			{
 				"January",
 				"February",
 				"March",
@@ -529,6 +526,7 @@ namespace
 				"November",
 				"December"
 			};
+
 			ImGui::Combo("Month", (int*)&m_sun.m_month, items, 12);
 
 			ImGui::End();
@@ -569,11 +567,8 @@ namespace
 
 				imguiEndFrame();
 
-				if (!ImGui::MouseOverArea())
-				{
-					// Update camera.
-					cameraUpdate(deltaTime, m_mouseState);
-				}
+				// Update camera.
+				cameraUpdate(deltaTime, m_mouseState, ImGui::MouseOverArea() );
 
 				// Set view 0 default viewport.
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
@@ -596,7 +591,7 @@ namespace
 				bgfx::setUniform(u_skyLuminanceXYZ, &skyLuminanceXYZ.x);
 				bgfx::setUniform(u_skyLuminance,    &skyLuminanceRGB.x);
 
-				bgfx::setUniform(u_sunDirection, m_sun.m_sunDirection);
+				bgfx::setUniform(u_sunDirection, &m_sun.m_sunDir.x);
 
 				float exposition[4] = { 0.02f, 3.0f, 0.1f, m_time };
 				bgfx::setUniform(u_parameters, exposition);
@@ -665,4 +660,9 @@ namespace
 
 } // namespace
 
-ENTRY_IMPLEMENT_MAIN(ExampleProceduralSky, "36-sky", "Perez dynamic sky model.");
+ENTRY_IMPLEMENT_MAIN(
+	  ExampleProceduralSky
+	, "36-sky"
+	, "Perez dynamic sky model."
+	, "https://bkaradzic.github.io/bgfx/examples.html#sky"
+	);

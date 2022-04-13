@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(TC0150ROD, tc0150rod_device, "tc0150rod", "Taito TC0150ROD")
 
 tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TC0150ROD, tag, owner, clock)
-	, m_roadgfx(*this, DEVICE_SELF, 0x40000)
+	, m_roadgfx(*this, DEVICE_SELF)
 {
 }
 
@@ -36,12 +36,12 @@ void tc0150rod_device::device_start()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ16_MEMBER( tc0150rod_device::word_r )
+uint16_t tc0150rod_device::word_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0150rod_device::word_w )
+void tc0150rod_device::word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 }

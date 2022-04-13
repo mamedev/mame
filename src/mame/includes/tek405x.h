@@ -65,46 +65,46 @@ private:
 	void update_nmi();
 	void scan_keyboard();
 
-	DECLARE_WRITE8_MEMBER( lbs_w );
+	void lbs_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( x_pia_pa_r );
-	DECLARE_WRITE8_MEMBER( x_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( x_pia_pb_w );
+	uint8_t x_pia_pa_r();
+	void x_pia_pa_w(uint8_t data);
+	void x_pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( adot_w );
 	DECLARE_WRITE_LINE_MEMBER( bufclk_w );
 	DECLARE_WRITE_LINE_MEMBER( x_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( x_pia_irqb_w );
 
-	DECLARE_READ8_MEMBER( sa_r );
-	DECLARE_WRITE8_MEMBER( y_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( sb_w );
+	uint8_t sa_r();
+	void y_pia_pa_w(uint8_t data);
+	void sb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( sot_w );
 	DECLARE_WRITE_LINE_MEMBER( y_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( y_pia_irqb_w );
 
-	DECLARE_READ8_MEMBER( kb_pia_pa_r );
-	DECLARE_READ8_MEMBER( kb_pia_pb_r );
-	DECLARE_WRITE8_MEMBER( kb_pia_pb_w );
+	uint8_t kb_pia_pa_r();
+	uint8_t kb_pia_pb_r();
+	void kb_pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( kb_halt_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_pia_irqb_w );
 
-	DECLARE_READ8_MEMBER( tape_pia_pa_r );
-	DECLARE_WRITE8_MEMBER( tape_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( tape_pia_pb_w );
+	uint8_t tape_pia_pa_r();
+	void tape_pia_pa_w(uint8_t data);
+	void tape_pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tape_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( tape_pia_irqb_w );
 
-	DECLARE_WRITE8_MEMBER( dio_w );
-	DECLARE_READ8_MEMBER( gpib_pia_pb_r );
-	DECLARE_WRITE8_MEMBER( gpib_pia_pb_w );
+	void dio_w(uint8_t data);
+	uint8_t gpib_pia_pb_r();
+	void gpib_pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( talk_w );
 	DECLARE_WRITE_LINE_MEMBER( gpib_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( gpib_pia_irqb_w );
 
-	DECLARE_WRITE8_MEMBER( com_pia_pa_w );
-	DECLARE_READ8_MEMBER( com_pia_pb_r );
-	DECLARE_WRITE8_MEMBER( com_pia_pb_w );
+	void com_pia_pa_w(uint8_t data);
+	uint8_t com_pia_pb_r();
+	void com_pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( com_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( com_pia_irqb_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
@@ -131,25 +131,25 @@ private:
 	output_finder<3> m_lamps;
 
 	// interrupts
-	int m_x_pia_irqa;
-	int m_x_pia_irqb;
-	int m_y_pia_irqa;
-	int m_y_pia_irqb;
-	int m_tape_pia_irqa;
-	int m_tape_pia_irqb;
-	int m_kb_pia_irqa;
-	int m_kb_pia_irqb;
-	int m_gpib_pia_irqa;
-	int m_gpib_pia_irqb;
-	int m_com_pia_irqa;
-	int m_com_pia_irqb;
-	int m_acia_irq;
+	int m_x_pia_irqa = 0;
+	int m_x_pia_irqb = 0;
+	int m_y_pia_irqa = 0;
+	int m_y_pia_irqb = 0;
+	int m_tape_pia_irqa = 0;
+	int m_tape_pia_irqb = 0;
+	int m_kb_pia_irqa = 0;
+	int m_kb_pia_irqb = 0;
+	int m_gpib_pia_irqa = 0;
+	int m_gpib_pia_irqb = 0;
+	int m_com_pia_irqa = 0;
+	int m_com_pia_irqb = 0;
+	int m_acia_irq = 0;
 
 	// keyboard
-	int m_kc;
+	int m_kc = 0;
 
 	// GPIB
-	int m_talk;
+	int m_talk = 0;
 };
 
 class tek4052_state : public driver_device

@@ -59,11 +59,11 @@ void rmnimbus_state::nimbus_io(address_map &map)
 	map(0x00a4, 0x00a4).rw(FUNC(rmnimbus_state::nimbus_mouse_js_r), FUNC(rmnimbus_state::nimbus_mouse_js_w));
 	map(0x00c0, 0x00cf).rw(FUNC(rmnimbus_state::nimbus_pc8031_r), FUNC(rmnimbus_state::nimbus_pc8031_w)).umask16(0x00ff);
 	map(0x00e0, 0x00ef).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x00f0, 0x00f7).rw(m_z80sio, FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
+	map(0x00f0, 0x00f7).rw(m_z80sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0400, 0x0400).w(FUNC(rmnimbus_state::fdc_ctl_w));
 	map(0x0408, 0x040f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write)).umask16(0x00ff);
 	map(0x0410, 0x041f).rw(FUNC(rmnimbus_state::scsi_r), FUNC(rmnimbus_state::scsi_w)).umask16(0x00ff);
-	map(0x0480, 0x049f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x0480, 0x049f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff);
 }
 
 
@@ -112,8 +112,8 @@ void rmnimbus_state::nimbus(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rmnimbus_state::nimbus_mem);
 	m_maincpu->set_addrmap(AS_IO, &rmnimbus_state::nimbus_io);
 	m_maincpu->read_slave_ack_callback().set(FUNC(rmnimbus_state::cascade_callback));
-	m_maincpu->tmrout0_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
-	m_maincpu->tmrout1_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
+	m_maincpu->tmrout0_handler().set(m_z80sio, FUNC(z80sio_device::rxca_w));
+	m_maincpu->tmrout1_handler().set(m_z80sio, FUNC(z80sio_device::rxtxcb_w));
 
 	I8031(config, m_iocpu, 11059200);
 	m_iocpu->set_addrmap(AS_PROGRAM, &rmnimbus_state::nimbus_iocpu_mem);
@@ -133,10 +133,11 @@ void rmnimbus_state::nimbus(machine_config &config)
 	PALETTE(config, m_palette).set_entries(16);
 
 	/* Backing storage */
-	WD2793(config, m_fdc, 1000000);
+	WD2793(config, m_fdc, 2000000);
 	m_fdc->set_force_ready(true);
 	m_fdc->intrq_wr_callback().set(FUNC(rmnimbus_state::nimbus_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(rmnimbus_state::nimbus_fdc_drq_w));
+	m_fdc->enmf_rd_callback().set(FUNC(rmnimbus_state::nimbus_fdc_enmf_r));
 	FLOPPY_CONNECTOR(config, FDC_TAG":0", rmnimbus_floppies, "35dd", isa8_fdc_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, FDC_TAG":1", rmnimbus_floppies, "35dd", isa8_fdc_device::floppy_formats);
 
@@ -168,25 +169,25 @@ void rmnimbus_state::nimbus(machine_config &config)
 	m_ram->set_extra_options("128K,256K,384K,512K,640K,1024K");
 
 	/* Peripheral chips */
-	Z80SIO2(config, m_z80sio, 4000000);
+	Z80SIO(config, m_z80sio, 4000000); // Z0844006PSC (SIO/0)
 	m_z80sio->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_z80sio->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_z80sio->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	m_z80sio->out_int_callback().set(FUNC(rmnimbus_state::sio_interrupt));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", keyboard, "rmnkbd"));
-	rs232a.rxd_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rxa_w));
+	rs232a.rxd_handler().set(m_z80sio, FUNC(z80sio_device::rxa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(Z80SIO_TAG, FUNC(z80dart_device::dcdb_w));
-	rs232b.ri_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rib_w));
-	rs232b.cts_handler().set(Z80SIO_TAG, FUNC(z80dart_device::ctsb_w));
+	rs232b.rxd_handler().set(m_z80sio, FUNC(z80sio_device::rxb_w));
+	rs232b.dcd_handler().set(m_z80sio, FUNC(z80sio_device::dcdb_w));
+	rs232b.ri_handler().set(m_z80sio, FUNC(z80sio_device::syncb_w));
+	rs232b.cts_handler().set(m_z80sio, FUNC(z80sio_device::ctsb_w));
 
 	EEPROM_93C06_16BIT(config, m_eeprom);
 
-	VIA6522(config, m_via, 1000000);
-	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	MOS6522(config, m_via, 1000000);
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->writepb_handler().set(FUNC(rmnimbus_state::nimbus_via_write_portb));
 	m_via->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_via->irq_handler().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
@@ -209,24 +210,45 @@ void rmnimbus_state::nimbus(machine_config &config)
 	msm5205.set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz */
 	msm5205.add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
-	SOFTWARE_LIST(config, "disk_list").set_type("nimbus", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "disk_list").set_original("nimbus");
+
+	m_maincpu->set_dasm_override(FUNC(rmnimbus_state::dasm_override));
 }
 
-
+/*
+Known unavailable BIOS set:
+    Another version of v1.31a labelled: SYS1 16128 31/10/86, SYS2 16129 28/10/86
+    Another version of v1.32c labelled: SYS1 17130 10.03.87, SYS 2. 17131 09.03.87
+    Another version of v1.32c labelled: SYS 1 21323 2/12/88, SYS 2 21324 5/1/89
+    v1.33c labelled "RESEARCH MACHINE P.N. 32857(32858) PC186 SYS1(SYS2) V1.33C", no date labelled
+    Another version of v1.40d labelled: 24693 IC30 02/7/91(AA), 24694 IC27 28/6/91(AA)
+*/
 ROM_START( nimbus )
 	ROM_REGION( 0x100000, MAINCPU_TAG, 0 )
 
-	ROM_SYSTEM_BIOS(0, "v131a", "Nimbus BIOS v1.31a (1986-06-18)")
-	ROMX_LOAD("sys1-1.31a-16128-1986-06-18.rom", 0xf0001, 0x8000, CRC(6416eb05) SHA1(1b640163a7efbc24381c7b24976a8609c066959b), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("sys2-1.31a-16129-1986-06-18.rom", 0xf0000, 0x8000, CRC(b224359d) SHA1(456bbe37afcd4429cca76ba2d6bd534dfda3fc9c), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "v125a", "Nimbus BIOS v1.25a (1985-12-02)")
+	ROMX_LOAD("sys1-1.25a_13484_6-11-85_m5m27256p.rom", 0xf0001, 0x8000, CRC(5870df28) SHA1(12e1a7d22439d512b221c355d641d113f0e6568e), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("sys2-1.25a_13485_2-12-85_m5m27256p.rom", 0xf0000, 0x8000, CRC(15888320) SHA1(32cc2485468c6a9944e505162e319a283eef8a84), ROM_SKIP(1) | ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "v132f", "Nimbus BIOS v1.32f (1989-10-20)")
-	ROMX_LOAD("sys-1-1.32f-22779-1989-10-20.rom", 0xf0001, 0x8000, CRC(786c31e8) SHA1(da7f828f7f96087518bea1a3d89fee59b283b4ba), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("sys-2-1.32f-22779-1989-10-20.rom", 0xf0000, 0x8000, CRC(0be3db64) SHA1(af806405ec6fbc20385705f90d5059a47de17b08), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v131a", "Nimbus BIOS v1.31a (1986-06-18)")
+	ROMX_LOAD("sys1-1.31a-16128-1986-06-18.rom", 0xf0001, 0x8000, CRC(6416eb05) SHA1(1b640163a7efbc24381c7b24976a8609c066959b), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("sys2-1.31a-16129-1986-06-18.rom", 0xf0000, 0x8000, CRC(b224359d) SHA1(456bbe37afcd4429cca76ba2d6bd534dfda3fc9c), ROM_SKIP(1) | ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(2, "v140d", "Nimbus BIOS v1.40d (1990-xx-xx)")
-	ROMX_LOAD("sys-1-1.40d.rom", 0xf0001, 0x8000, CRC(b8d3dc0b) SHA1(82e0dcdc6c7a83339af68d6cb61211fcb14bed88), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("sys-2-1.40d.rom", 0xf0000, 0x8000, CRC(b0826b0b) SHA1(3baa369a0e7ef138ca29aae0ee8a89ab670a02b9), ROM_SKIP(1) | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "v132c", "Nimbus BIOS v1.32c (1987-03-21)")
+	ROMX_LOAD("sys1-1.32c_17130_21-3-87_m5m27256p_63210c.rom", 0xf0001, 0x8000, CRC(91b88b29) SHA1(1db5e3ff8bb237f006b53d5f91b080f99e95a58e), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("sys2-1.32c_17131_21-3-87_m5m27256p_63210c.rom", 0xf0000, 0x8000, CRC(4876cc4f) SHA1(4348b293f5c443453c08663809bfa5c462222137), ROM_SKIP(1) | ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "v132d", "Nimbus BIOS v1.32d (1989-01-20)")
+	ROMX_LOAD("sys1-1.32d_21323_17-1-89_m5m27256p_63210c.rom", 0xf0001, 0x8000, CRC(e0ecbc02) SHA1(b5cb16df23bd30af5556660364e4733790f99164), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("sys2-1.32d_21324_20-1-89_m5m27256p_63210c.rom", 0xf0000, 0x8000, CRC(8ef4a357) SHA1(29309cb8bfe9256d4684f3e6575e3720b0dcacd4), ROM_SKIP(1) | ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(4, "v132f", "Nimbus BIOS v1.32f (1989-11-29)")
+	ROMX_LOAD("sys-1-1.32f-22779-1989-11-29.rom", 0xf0001, 0x8000, CRC(786c31e8) SHA1(da7f828f7f96087518bea1a3d89fee59b283b4ba), ROM_SKIP(1) | ROM_BIOS(4))
+	ROMX_LOAD("sys-2-1.32f-22778-1989-11-29.rom", 0xf0000, 0x8000, CRC(0be3db64) SHA1(af806405ec6fbc20385705f90d5059a47de17b08), ROM_SKIP(1) | ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(5, "v140d", "Nimbus BIOS v1.40d (1990-02-19)")
+	ROMX_LOAD("rt-1.40d-24694-ic27-1990-02-19.rom", 0xf0001, 0x8000, CRC(b8d3dc0b) SHA1(82e0dcdc6c7a83339af68d6cb61211fcb14bed88), ROM_SKIP(1) | ROM_BIOS(5))
+	ROMX_LOAD("left-1.40d-24693-ic30-1990-02-15.rom", 0xf0000, 0x8000, CRC(b0826b0b) SHA1(3baa369a0e7ef138ca29aae0ee8a89ab670a02b9), ROM_SKIP(1) | ROM_BIOS(5))
 
 	ROM_REGION( 0x4000, IOCPU_TAG, 0 )
 	ROM_LOAD("hexec-v1.02u-13488-1985-10-29.rom", 0x0000, 0x1000, CRC(75c6adfd) SHA1(0f11e0b7386c6368d20e1fc7a6196d670f924825))

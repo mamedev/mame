@@ -10,6 +10,7 @@
 #include "machine/taitoio.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class taitojc_state : public driver_device
 {
@@ -19,7 +20,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_dsp(*this,"dsp"),
 		m_tc0640fio(*this, "tc0640fio"),
-		m_gfx2(*this, "gfx2"),
+		m_dspgfx(*this, "dspgfx"),
 		m_vram(*this, "vram"),
 		m_objlist(*this, "objlist"),
 		m_main_ram(*this, "main_ram"),
@@ -33,7 +34,6 @@ public:
 		m_lamps(*this, "lamp%u", 0U),
 		m_counters(*this, "counter%u", 0U)
 	{
-		m_mcu_output = 0;
 		m_speed_meter = 0;
 		m_brake_meter = 0;
 	}
@@ -50,7 +50,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<tc0640fio_device> m_tc0640fio;
-	required_memory_region m_gfx2;
+	required_region_ptr<uint16_t> m_dspgfx;
 
 	required_shared_ptr<uint32_t> m_vram;
 	required_shared_ptr<uint32_t> m_objlist;
@@ -68,75 +68,73 @@ private:
 	output_finder<8> m_lamps;
 	output_finder<5> m_counters;
 
-	uint32_t m_dsp_rom_pos;
+	uint32_t m_dsp_rom_pos = 0;
 
-	int m_first_dsp_reset;
+	int m_first_dsp_reset = 0;
 	int16_t m_viewport_data[3];
 	int16_t m_projection_data[3];
 	int16_t m_intersection_data[3];
 
-	int m_gfx_index;
+	int m_gfx_index = 0;
 
 	std::unique_ptr<uint32_t[]> m_char_ram;
 	std::unique_ptr<uint32_t[]> m_tile_ram;
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
-	uint8_t m_mcu_comm_main;
-	uint8_t m_mcu_comm_hc11;
-	uint8_t m_mcu_data_main;
-	uint8_t m_mcu_data_hc11;
-	uint8_t m_mcu_output;
+	uint8_t m_mcu_comm_main = 0;
+	uint8_t m_mcu_comm_hc11 = 0;
+	uint8_t m_mcu_data_main = 0;
+	uint8_t m_mcu_data_hc11 = 0;
 
-	uint8_t m_has_dsp_hack;
+	uint8_t m_has_dsp_hack = 0;
 
-	int m_speed_meter;
-	int m_brake_meter;
+	int m_speed_meter = 0;
+	int m_brake_meter = 0;
 
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void coin_control_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(mcu_comm_r);
-	DECLARE_WRITE8_MEMBER(mcu_comm_w);
-	DECLARE_READ8_MEMBER(jc_pcbid_r);
-	DECLARE_READ8_MEMBER(jc_lan_r);
-	DECLARE_WRITE8_MEMBER(jc_lan_w);
-	DECLARE_WRITE8_MEMBER(jc_irq_unk_w);
-	DECLARE_WRITE8_MEMBER(dendego_speedmeter_w);
-	DECLARE_WRITE8_MEMBER(dendego_brakemeter_w);
+	uint8_t mcu_comm_r(offs_t offset);
+	void mcu_comm_w(offs_t offset, uint8_t data);
+	uint8_t jc_pcbid_r(offs_t offset);
+	uint8_t jc_lan_r();
+	void jc_lan_w(uint8_t data);
+	void jc_irq_unk_w(uint8_t data);
+	void dendego_speedmeter_w(uint8_t data);
+	void dendego_brakemeter_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(hc11_comm_r);
-	DECLARE_WRITE8_MEMBER(hc11_comm_w);
-	DECLARE_WRITE8_MEMBER(hc11_output_w);
-	DECLARE_READ8_MEMBER(hc11_data_r);
-	DECLARE_READ8_MEMBER(hc11_output_r);
-	DECLARE_WRITE8_MEMBER(hc11_data_w);
-	DECLARE_READ8_MEMBER(hc11_analog_r);
+	uint8_t hc11_comm_r();
+	void hc11_comm_w(uint8_t data);
+	void hc11_output_w(uint8_t data);
+	uint8_t hc11_data_r();
+	void hc11_data_w(uint8_t data);
+	template <int Ch> uint8_t hc11_analog_r();
 
-	DECLARE_READ16_MEMBER(dsp_shared_r);
-	DECLARE_WRITE16_MEMBER(dsp_shared_w);
-	DECLARE_READ16_MEMBER(dsp_to_main_7fe_r);
-	DECLARE_WRITE16_MEMBER(dsp_to_main_7fe_w);
-	DECLARE_WRITE16_MEMBER(main_to_dsp_7ff_w);
+	uint16_t dsp_shared_r(offs_t offset);
+	void dsp_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp_to_main_7fe_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dsp_to_main_7fe_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void main_to_dsp_7ff_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(dsp_rom_r);
-	DECLARE_WRITE16_MEMBER(dsp_rom_w);
+	uint16_t dsp_rom_r();
+	void dsp_rom_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(dsp_math_viewport_w);
-	DECLARE_WRITE16_MEMBER(dsp_math_projection_w);
-	DECLARE_READ16_MEMBER(dsp_math_projection_y_r);
-	DECLARE_READ16_MEMBER(dsp_math_projection_x_r);
-	DECLARE_WRITE16_MEMBER(dsp_math_intersection_w);
-	DECLARE_READ16_MEMBER(dsp_math_intersection_r);
-	DECLARE_READ16_MEMBER(dsp_math_unk_r);
+	void dsp_math_viewport_w(offs_t offset, uint16_t data);
+	void dsp_math_projection_w(offs_t offset, uint16_t data);
+	uint16_t dsp_math_projection_y_r();
+	uint16_t dsp_math_projection_x_r();
+	void dsp_math_intersection_w(offs_t offset, uint16_t data);
+	uint16_t dsp_math_intersection_r();
+	uint16_t dsp_math_unk_r();
 
-	DECLARE_READ16_MEMBER(taitojc_dsp_idle_skip_r);
-	DECLARE_READ16_MEMBER(dendego2_dsp_idle_skip_r);
+	uint16_t taitojc_dsp_idle_skip_r();
+	uint16_t dendego2_dsp_idle_skip_r();
 
-	DECLARE_READ32_MEMBER(taitojc_palette_r);
-	DECLARE_WRITE32_MEMBER(taitojc_palette_w);
-	DECLARE_READ32_MEMBER(taitojc_tile_r);
-	DECLARE_READ32_MEMBER(taitojc_char_r);
-	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
-	DECLARE_WRITE32_MEMBER(taitojc_char_w);
+	uint32_t taitojc_palette_r(offs_t offset);
+	void taitojc_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t taitojc_tile_r(offs_t offset);
+	uint32_t taitojc_char_r(offs_t offset);
+	void taitojc_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void taitojc_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
 	virtual void machine_reset() override;
@@ -149,7 +147,6 @@ private:
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
 
 	void dendego_map(address_map &map);
-	void hc11_io_map(address_map &map);
 	void hc11_pgm_map(address_map &map);
 	void taitojc_map(address_map &map);
 	void tms_data_map(address_map &map);

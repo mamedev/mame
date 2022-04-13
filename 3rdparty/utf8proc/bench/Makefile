@@ -1,7 +1,8 @@
 CURL=curl
 
 CC = cc
-CFLAGS = -O2 -std=c99 -pedantic -Wall
+CFLAGS ?= -O2
+CFLAGS += -std=c99 -pedantic -Wall
 
 all: bench
 

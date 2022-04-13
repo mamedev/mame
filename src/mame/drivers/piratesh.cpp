@@ -92,27 +92,22 @@ private:
 
 	optional_shared_ptr<uint16_t> m_spriteram;
 
-	int m_layer_colorbase[6];
-	int m_sprite_colorbase;
-	int m_lvc_colorbase;
+	int m_layer_colorbase[6]{};
+	int m_sprite_colorbase = 0;
+	int m_lvc_colorbase = 0;
 
-	uint8_t m_int_enable;
-	uint8_t m_int_status;
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_nmi_clk;
-	uint16_t m_control;
+	uint8_t m_int_enable = 0;
+	uint8_t m_int_status = 0;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_nmi_clk = 0;
+	uint16_t m_control = 0;
 
 	void update_interrupts();
 
-	DECLARE_READ16_MEMBER(K056832_rom_r);
-	DECLARE_WRITE16_MEMBER(control1_w);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(control3_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_READ16_MEMBER(k053247_scattered_word_r);
-	DECLARE_WRITE16_MEMBER(k053247_scattered_word_w);
-	DECLARE_READ16_MEMBER(k053247_martchmp_word_r);
-	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
+	uint16_t K056832_rom_r(offs_t offset);
+	void control1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update_piratesh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
@@ -337,7 +332,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(piratesh_state::piratesh_interrupt)
 
 
 
-READ16_MEMBER(piratesh_state::K056832_rom_r)
+uint16_t piratesh_state::K056832_rom_r(offs_t offset)
 {
 	uint16_t offs;
 
@@ -347,7 +342,7 @@ READ16_MEMBER(piratesh_state::K056832_rom_r)
 
 
 
-WRITE16_MEMBER(piratesh_state::control1_w)
+void piratesh_state::control1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// .... ..xx .... ....      - Unknown
 	// .... .x.. .... ....      - Unknown - Active during attract, clear during game
@@ -357,7 +352,7 @@ WRITE16_MEMBER(piratesh_state::control1_w)
 		logerror("CTRL3: %x %x %x\n", offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(piratesh_state::control2_w)
+void piratesh_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// .... .... ...x ....      - Unknown (always 1?)
 	// .... .... ..x. ....      - Unknown
@@ -379,7 +374,7 @@ WRITE16_MEMBER(piratesh_state::control2_w)
 		logerror("CTRL2: %x %x %x\n", offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(piratesh_state::control3_w)
+void piratesh_state::control3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// .... .... .... ...x      - Watchdog? (051550?)
 	// .... .... .... ..x.      - 056832 ROM bank control
@@ -490,7 +485,7 @@ static INPUT_PORTS_START( piratesh )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("k053250", k053250ps_device, dmairq_r)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // FIXME: NCPU from 053246 (DMA)
-	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(DEVICE_SELF, piratesh_state, battery_r, nullptr)
+	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(piratesh_state, battery_r)
 
 	PORT_START("HELM")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1)
@@ -507,7 +502,7 @@ static INPUT_PORTS_START( piratesh )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x1800, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(DEVICE_SELF, piratesh_state, helm_r, nullptr)
+	PORT_BIT( 0x1800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(piratesh_state, helm_r)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -578,6 +573,9 @@ void piratesh_state::machine_start()
 	save_item(NAME(m_mw_irq_control));
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_nmi_clk));
+#else
+	(void)m_sound_ctrl;
+	(void)m_sound_nmi_clk;
 #endif
 }
 
@@ -626,7 +624,7 @@ void piratesh_state::piratesh(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::BGRx_888, 2048).enable_shadows().enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback));
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette("palette");
 
@@ -635,13 +633,13 @@ void piratesh_state::piratesh(machine_config &config)
 	K053250PS(config, m_k053250, 12000000, "palette", "screen", -16, 0);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette("palette");
 
 	// ????
 	//K053246(config, m_k053246, 0);
-	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
 	//m_k053246->set_config("k053246", NORMAL_PLANE_ORDER, -48+1, 23);
 	//m_k053246->set_palette(m_palette);
 

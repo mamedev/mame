@@ -33,13 +33,15 @@ Also seem to be running on the same/similar hardware:
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
-#include "sound/2612intf.h"
+#include "sound/ymopn.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include "segajw.lh"
+
+namespace {
 
 class segajw_state : public driver_device
 {
@@ -57,19 +59,20 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+	DECLARE_READ_LINE_MEMBER(hopper_sensors_r);
 
-private:
-	DECLARE_READ8_MEMBER(coin_counter_r);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
-	DECLARE_WRITE8_MEMBER(hopper_w);
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(coinlockout_w);
-
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
+	uint8_t coin_counter_r();
+	void coin_counter_w(uint8_t data);
+	void hopper_w(uint8_t data);
+	void lamps1_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void coinlockout_w(uint8_t data);
 
 	void ramdac_map(address_map &map);
 	void segajw_audiocpu_io_map(address_map &map);
@@ -84,40 +87,40 @@ private:
 	output_finder<16> m_lamps;
 	output_finder<3> m_towerlamps;
 
-	uint64_t      m_coin_start_cycles;
-	uint64_t      m_hopper_start_cycles;
-	uint8_t       m_coin_counter;
+	uint64_t      m_coin_start_cycles = 0;
+	uint64_t      m_hopper_start_cycles = 0;
+	uint8_t       m_coin_counter = 0;
 };
 
 
-READ8_MEMBER(segajw_state::coin_counter_r)
+uint8_t segajw_state::coin_counter_r()
 {
 	return m_coin_counter ^ 0xff;
 }
 
-WRITE8_MEMBER(segajw_state::coin_counter_w)
+void segajw_state::coin_counter_w(uint8_t data)
 {
 	m_coin_counter = data;
 }
 
-WRITE8_MEMBER(segajw_state::hopper_w)
+void segajw_state::hopper_w(uint8_t data)
 {
 	m_hopper_start_cycles = data & 0x02 ? 0 : m_maincpu->total_cycles();
 }
 
-WRITE8_MEMBER(segajw_state::lamps1_w)
+void segajw_state::lamps1_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(segajw_state::lamps2_w)
+void segajw_state::lamps2_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[8 + i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(segajw_state::coinlockout_w)
+void segajw_state::coinlockout_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 
@@ -131,7 +134,7 @@ INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
 		m_coin_start_cycles = m_maincpu->total_cycles();
 }
 
-CUSTOM_INPUT_MEMBER( segajw_state::hopper_sensors_r )
+READ_LINE_MEMBER( segajw_state::hopper_sensors_r )
 {
 	uint8_t data = 0;
 
@@ -177,8 +180,7 @@ void segajw_state::segajw_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x080000, 0x080001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x080002, 0x080003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x080000, 0x080003).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 
 	map(0x180000, 0x180001).portr("DSW0");
 	map(0x180005, 0x180005).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
@@ -241,17 +243,17 @@ static INPUT_PORTS_START( segajw )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Last Game")   PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("M-Door")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("D-Door")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )       PORT_CUSTOM_MEMBER(DEVICE_SELF, segajw_state, hopper_sensors_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )       PORT_READ_LINE_MEMBER(segajw_state, hopper_sensors_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Full")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Fill")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segajw_state, coin_sensors_r, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(segajw_state, coin_sensors_r)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN1") // start the coin drop sequence (see coin_sensors_r)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, segajw_state, coin_drop_start, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, segajw_state, coin_drop_start, 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0000, "Progressive" )   PORT_DIPLOCATION("SW1:1")
@@ -352,6 +354,9 @@ void segajw_state::machine_start()
 	m_lamps.resolve();
 	m_towerlamps.resolve();
 
+	m_coin_start_cycles = 0;
+	m_hopper_start_cycles = 0;
+
 	save_item(NAME(m_coin_start_cycles));
 	save_item(NAME(m_hopper_start_cycles));
 	save_item(NAME(m_coin_counter));
@@ -360,8 +365,6 @@ void segajw_state::machine_start()
 
 void segajw_state::machine_reset()
 {
-	m_coin_start_cycles = 0;
-	m_hopper_start_cycles = 0;
 	m_coin_counter = 0xff;
 }
 
@@ -381,7 +384,7 @@ void segajw_state::segajw(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_audiocpu_map);
 	m_audiocpu->set_addrmap(AS_IO, &segajw_state::segajw_audiocpu_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(2000);
+	config.set_maximum_quantum(attotime::from_hz(2000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
@@ -445,6 +448,8 @@ ROM_START( segajw )
 	ROM_REGION16_BE( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_WORD_SWAP( "14586.epr",   0x00000, 0x80000, CRC(daeb0616) SHA1(17a8bb7137ad46a7c3ac07d22cbc4430e76e2f71) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAMEL( 1991, segajw, 0, segajw,  segajw, segajw_state, empty_init, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )

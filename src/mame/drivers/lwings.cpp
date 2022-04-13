@@ -59,8 +59,8 @@ Notes:
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -73,17 +73,17 @@ Notes:
  * a code reflecting the direction (8 angles) from one point to the other.
  */
 
-WRITE8_MEMBER(lwings_state::avengers_adpcm_w)
+void lwings_state::avengers_adpcm_w(uint8_t data)
 {
 	m_adpcm = data;
 }
 
-READ8_MEMBER(lwings_state::avengers_adpcm_r)
+uint8_t lwings_state::avengers_adpcm_r()
 {
 	return m_adpcm;
 }
 
-WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
+void lwings_state::lwings_bankswitch_w(uint8_t data)
 {
 //  if (data & 0xe0) printf("bankswitch_w %02x\n", data);
 //  Fireball writes 0x20 on startup, maybe reset soundcpu?
@@ -103,20 +103,20 @@ WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
-INTERRUPT_GEN_MEMBER(lwings_state::lwings_interrupt)
+WRITE_LINE_MEMBER(lwings_state::lwings_interrupt)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 }
 
-INTERRUPT_GEN_MEMBER(lwings_state::avengers_interrupt)
+WRITE_LINE_MEMBER(lwings_state::avengers_interrupt)
 {
-	if(m_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (state && m_nmi_mask)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-WRITE8_MEMBER(lwings_state::avengers_protection_w)
+void lwings_state::avengers_protection_w(uint8_t data)
 {
 	int pc = m_maincpu->pc();
 
@@ -143,7 +143,7 @@ WRITE8_MEMBER(lwings_state::avengers_protection_w)
 	}
 }
 
-WRITE8_MEMBER(lwings_state::avengers_prot_bank_w)
+void lwings_state::avengers_prot_bank_w(uint8_t data)
 {
 	m_palette_pen = data * 64;
 }
@@ -239,7 +239,7 @@ int lwings_state::avengers_fetch_paldata(  )
 	return result;
 }
 
-READ8_MEMBER(lwings_state::avengers_protection_r)
+uint8_t lwings_state::avengers_protection_r()
 {
 	static const int xpos[8] = { 10, 7,  0, -7, -10, -7,   0,  7 };
 	static const int ypos[8] = {  0, 7, 10,  7,   0, -7, -10, -7 };
@@ -275,17 +275,17 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 	return best_dir << 5;
 }
 
-READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
+uint8_t lwings_state::avengers_soundlatch2_r()
 {
 	uint8_t data = *m_soundlatch2 | m_soundstate;
 	m_soundstate = 0;
 	return(data);
 }
 
-WRITE8_MEMBER(lwings_state::msm5205_w)
+void lwings_state::msm5205_w(uint8_t data)
 {
 	m_msm->reset_w(BIT(data, 7));
-	m_msm->write_data(data);
+	m_msm->data_w(data);
 	m_msm->vclk_w(1);
 	m_msm->vclk_w(0);
 }
@@ -402,7 +402,7 @@ void lwings_state::fball_map(address_map &map)
 
 
 
-WRITE8_MEMBER(lwings_state::fball_oki_bank_w)
+void lwings_state::fball_oki_bank_w(uint8_t data)
 {
 	//printf("fball_oki_bank_w %02x\n", data);
 	membank("samplebank")->set_entry((data >> 1) & 0x7);
@@ -936,7 +936,6 @@ void lwings_state::lwings(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);     /* verified on PCB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::lwings_interrupt));
 
 	Z80(config, m_soundcpu, XTAL(12'000'000)/4);    /* verified on PCB */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_sound_map);
@@ -955,6 +954,7 @@ void lwings_state::lwings(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.screen_vblank().append(FUNC(lwings_state::lwings_interrupt));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
@@ -978,12 +978,20 @@ void lwings_state::lwings(machine_config &config)
 	ym2203b.add_route(3, "mono", 0.10);
 }
 
+void lwings_state::sectionz(machine_config &config)
+{
+	lwings(config);
+
+	m_maincpu->set_clock(XTAL(12'000'000)/4);     // XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
+
+	subdevice<screen_device>("screen")->set_refresh_hz(55.37); // verified on an original PCB
+}
+
 void lwings_state::fball(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::avengers_interrupt));
 
 	Z80(config, m_soundcpu, XTAL(12'000'000)/4); // ?
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_sound_map);
@@ -1001,6 +1009,7 @@ void lwings_state::fball(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // the 16-pixel black border on left edge is correct, test mode actually uses that area
 	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.screen_vblank().append(FUNC(lwings_state::avengers_interrupt));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
@@ -1051,7 +1060,10 @@ void lwings_state::avengers(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
+
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.screen_vblank().append(FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
 
 	subdevice<cpu_device>("adpcm")->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
 
@@ -1765,8 +1777,8 @@ ROM_END
 
 void lwings_state::init_avengersb()
 {
-	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8smo_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
+	// set up protection handlers
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8smo_delegate(*m_soundlatch, FUNC(generic_latch_8_device::write)));
 }
 
 
@@ -1776,8 +1788,8 @@ void lwings_state::init_avengersb()
  *
  *************************************/
 
-GAME( 1985, sectionz,  0,        lwings,    sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sectionza, sectionz, lwings,    sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionz,  0,        sectionz,  sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionza, sectionz, sectionz,  sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, lwings,    0,        lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, lwings2,   lwings,   lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )

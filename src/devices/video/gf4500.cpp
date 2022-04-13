@@ -89,12 +89,11 @@ static rgb_t gf4500_get_color_16( uint16_t data )
 
 uint32_t gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *vram = (uint16_t *)(m_data.get() + GF4500_FRAMEBUF_OFFSET / 4);
-	int x, y;
-	for (y = 0; y < 240; y++)
+	uint16_t const *vram = (uint16_t *)(m_data.get() + GF4500_FRAMEBUF_OFFSET / 4);
+	for (int y = 0; y < 240; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
-		for (x = 0; x < 320; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 320; x++)
 		{
 			*scanline++ = gf4500_get_color_16(*vram++);
 		}
@@ -103,7 +102,7 @@ uint32_t gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ32_MEMBER( gf4500_device::read )
+uint32_t gf4500_device::read(offs_t offset)
 {
 	uint32_t data = m_data[offset];
 	switch (offset)
@@ -119,7 +118,7 @@ READ32_MEMBER( gf4500_device::read )
 	return data;
 }
 
-WRITE32_MEMBER( gf4500_device::write )
+void gf4500_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_data[offset]);
 	if ((offset < (GF4500_FRAMEBUF_OFFSET / 4)) || (offset >= ((GF4500_FRAMEBUF_OFFSET + (321 * 240 * 2)) / 4)))

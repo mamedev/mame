@@ -55,7 +55,15 @@ DEFINE_DEVICE_TYPE(SGI_MACE, mace_device, "sgimace", "SGI MACE")
 mace_device::mace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SGI_MACE, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_rtc_read_callback(*this)
+	, m_rtc_write_callback(*this)
 {
+}
+
+void mace_device::device_resolve_objects()
+{
+	m_rtc_read_callback.resolve_safe(0);
+	m_rtc_write_callback.resolve_safe();
 }
 
 void mace_device::device_start()
@@ -82,15 +90,12 @@ void mace_device::device_start()
 	m_timer_msc = timer_alloc(TIMER_MSC);
 	m_timer_ust->adjust(attotime::never);
 	m_timer_msc->adjust(attotime::never);
-
-	save_item(NAME(m_rtc.m_unknown));
 }
 
 void mace_device::device_reset()
 {
 	memset(&m_isa, 0, sizeof(isa_t));
 	memset(&m_ust_msc, 0, sizeof(ust_msc_t));
-	memset(&m_rtc, 0, sizeof(rtc_t));
 
 	m_timer_ust->adjust(attotime::from_nsec(960), 0, attotime::from_nsec(960));
 	m_timer_msc->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
@@ -117,14 +122,14 @@ void mace_device::map(address_map &map)
 	map(0x00330000, 0x0033ffff).rw(FUNC(mace_device::i2c_r), FUNC(mace_device::i2c_w));
 	map(0x00340000, 0x0034ffff).rw(FUNC(mace_device::ust_msc_r), FUNC(mace_device::ust_msc_w));
 	map(0x00380000, 0x0039ffff).rw(FUNC(mace_device::isa_ext_r), FUNC(mace_device::isa_ext_w));
-	map(0x003a0000, 0x003a3fff).rw(FUNC(mace_device::rtc_r), FUNC(mace_device::rtc_w));
+	map(0x003a0000, 0x003a7fff).rw(FUNC(mace_device::rtc_r), FUNC(mace_device::rtc_w));
 }
 
 //**************************************************************************
 //  REGISTER ACCESS
 //**************************************************************************
 
-READ64_MEMBER(mace_device::pci_r)
+uint64_t mace_device::pci_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -137,7 +142,7 @@ READ64_MEMBER(mace_device::pci_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::pci_w)
+void mace_device::pci_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -148,7 +153,7 @@ WRITE64_MEMBER(mace_device::pci_w)
 	}
 }
 
-READ64_MEMBER(mace_device::vin1_r)
+uint64_t mace_device::vin1_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -161,7 +166,7 @@ READ64_MEMBER(mace_device::vin1_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::vin1_w)
+void mace_device::vin1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -172,7 +177,7 @@ WRITE64_MEMBER(mace_device::vin1_w)
 	}
 }
 
-READ64_MEMBER(mace_device::vin2_r)
+uint64_t mace_device::vin2_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -185,7 +190,7 @@ READ64_MEMBER(mace_device::vin2_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::vin2_w)
+void mace_device::vin2_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -196,7 +201,7 @@ WRITE64_MEMBER(mace_device::vin2_w)
 	}
 }
 
-READ64_MEMBER(mace_device::vout_r)
+uint64_t mace_device::vout_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -209,7 +214,7 @@ READ64_MEMBER(mace_device::vout_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::vout_w)
+void mace_device::vout_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -220,7 +225,7 @@ WRITE64_MEMBER(mace_device::vout_w)
 	}
 }
 
-READ64_MEMBER(mace_device::enet_r)
+uint64_t mace_device::enet_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -233,7 +238,7 @@ READ64_MEMBER(mace_device::enet_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::enet_w)
+void mace_device::enet_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -244,7 +249,7 @@ WRITE64_MEMBER(mace_device::enet_w)
 	}
 }
 
-READ64_MEMBER(mace_device::audio_r)
+uint64_t mace_device::audio_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -257,7 +262,7 @@ READ64_MEMBER(mace_device::audio_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::audio_w)
+void mace_device::audio_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -268,7 +273,7 @@ WRITE64_MEMBER(mace_device::audio_w)
 	}
 }
 
-READ64_MEMBER(mace_device::isa_r)
+uint64_t mace_device::isa_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -301,7 +306,7 @@ READ64_MEMBER(mace_device::isa_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::isa_w)
+void mace_device::isa_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -337,7 +342,7 @@ WRITE64_MEMBER(mace_device::isa_w)
 	}
 }
 
-READ64_MEMBER(mace_device::kbdms_r)
+uint64_t mace_device::kbdms_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -350,7 +355,7 @@ READ64_MEMBER(mace_device::kbdms_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::kbdms_w)
+void mace_device::kbdms_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -361,7 +366,7 @@ WRITE64_MEMBER(mace_device::kbdms_w)
 	}
 }
 
-READ64_MEMBER(mace_device::i2c_r)
+uint64_t mace_device::i2c_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -374,7 +379,7 @@ READ64_MEMBER(mace_device::i2c_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::i2c_w)
+void mace_device::i2c_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -385,7 +390,7 @@ WRITE64_MEMBER(mace_device::i2c_w)
 	}
 }
 
-READ64_MEMBER(mace_device::isa_ext_r)
+uint64_t mace_device::isa_ext_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -398,7 +403,7 @@ READ64_MEMBER(mace_device::isa_ext_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::isa_ext_w)
+void mace_device::isa_ext_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -413,45 +418,29 @@ WRITE64_MEMBER(mace_device::isa_ext_w)
 //  RTC
 //**************************************************************************
 
-READ64_MEMBER(mace_device::rtc_r)
+uint64_t mace_device::rtc_r(offs_t offset, uint64_t mem_mask)
 {
-	uint64_t ret = 0ULL;
-	switch (offset)
-	{
-	case 0x3f00/8:
-		ret = m_rtc.m_unknown;
-		LOGMASKED(LOG_READ_RTC, "%s: MACE: RTC: Unknown Read: %08x = %08x%08x & %08x%08x\n", machine().describe_context(), 0x1f3a0000 + offset*8
-			, (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-		break;
-	default:
-		LOGMASKED(LOG_READ_RTC, "%s: MACE: RTC: Unknown Read: %08x = %08x%08x & %08x%08x\n", machine().describe_context()
-			, 0x1f3a0000 + offset*8, (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-		break;
-	}
+	uint64_t ret = m_rtc_read_callback(offset >> 5);
+
+	LOGMASKED(LOG_READ_RTC, "%s: MACE: RTC Read: %08x (register %02x) = %08x%08x & %08x%08x\n", machine().describe_context()
+		, 0x1f3a0000 + offset*8, offset >> 5, (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::rtc_w)
+void mace_device::rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	switch (offset)
-	{
-	case 0x3f00/8:
-		LOGMASKED(LOG_WRITE_RTC, "%s: MACE: RTC: Unknown Write: %08x = %08x%08x & %08x%08x\n", machine().describe_context(), 0x1f3a0000 + offset*8
-			, (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-		m_rtc.m_unknown = data;
-		break;
-	default:
-		LOGMASKED(LOG_WRITE_RTC, "%s: MACE: RTC: Unknown Write: %08x = %08x%08x & %08x%08x\n", machine().describe_context(), 0x1f3a0000 + offset*8
-			, (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-		return;
-	}
+	LOGMASKED(LOG_WRITE_RTC, "%s: MACE: RTC Write: %08x (register %02x) = %08x%08x & %08x%08x\n", machine().describe_context(), 0x1f3a0000 + offset*8
+			, offset >> 5, (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+
+	m_rtc_write_callback(offset >> 5, data & 0xff);
 }
 
 //**************************************************************************
 //  TIMERS
 //**************************************************************************
 
-void mace_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mace_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_UST)
 	{
@@ -478,7 +467,7 @@ void mace_device::check_ust_msc_compare()
 		m_isa.m_int_status |= ISA_INT_COMPARE3;
 }
 
-READ64_MEMBER(mace_device::ust_msc_r)
+uint64_t mace_device::ust_msc_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -541,7 +530,7 @@ READ64_MEMBER(mace_device::ust_msc_r)
 	return ret;
 }
 
-WRITE64_MEMBER(mace_device::ust_msc_w)
+void mace_device::ust_msc_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{

@@ -57,7 +57,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(beep_w);
+	void beep_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(latch_full_w);
 	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
 	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
@@ -86,17 +86,17 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<beep_device> m_beep;
 
-	u8 m_line_base;
-	u8 m_line_count;
-	bool m_latch_full;
-	u8 m_mcu_p2;
-	bool m_hsync;
+	u8 m_line_base = 0;
+	u8 m_line_count = 0;
+	bool m_latch_full = false;
+	u8 m_mcu_p2 = 0;
+	bool m_hsync = false;
 
-	emu_timer *m_hsync_on_timer;
-	emu_timer *m_hsync_off_timer;
+	emu_timer *m_hsync_on_timer = nullptr;
+	emu_timer *m_hsync_off_timer = nullptr;
 };
 
-WRITE8_MEMBER(m79152pc_state::beep_w)
+void m79152pc_state::beep_w(offs_t offset, uint8_t data)
 {
 	m_beep->set_state(BIT(offset, 2));
 }
@@ -134,7 +134,7 @@ void m79152pc_state::lc_reset_w(u8 data)
 void m79152pc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom().region("maincpu", 0);;
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0x8fff).ram().share("videoram");
 	map(0x9000, 0x9fff).ram().share("attributes");
@@ -142,7 +142,7 @@ void m79152pc_state::mem_map(address_map &map)
 
 void m79152pc_state::io_map(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
+	//map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x44, 0x47).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -185,10 +185,10 @@ TIMER_CALLBACK_MEMBER(m79152pc_state::hsync_off)
 
 void m79152pc_state::screen_draw_line(bitmap_ind16 &bitmap, unsigned y)
 {
-	u16 ma = u16(m_line_base) << 4;
-	u8 ra = m_line_count & 0xf;
+	const u16 ma = u16(m_line_base) << 4;
+	const u8 ra = m_line_count & 0xf;
 
-	u16 *p = &bitmap.pix16(y++);
+	u16 *p = &bitmap.pix(y++);
 
 	for (u16 x = ma; x < ma + 80; x++)
 	{

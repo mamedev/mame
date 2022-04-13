@@ -38,11 +38,12 @@
 #include "machine/6532riot.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 
 
+namespace {
 
 class tomcat_state : public driver_device
 {
@@ -60,22 +61,22 @@ public:
 	void tomcat(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(adcon_w);
-	DECLARE_READ16_MEMBER(tomcat_inputs_r);
-	DECLARE_WRITE16_MEMBER(main_latch_w);
+	void adcon_w(uint8_t data);
+	uint16_t tomcat_inputs_r(offs_t offset, uint16_t mem_mask = ~0);
+	void main_latch_w(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(lnkmode_w);
 	DECLARE_WRITE_LINE_MEMBER(err_w);
 	DECLARE_WRITE_LINE_MEMBER(ack_w);
 	DECLARE_WRITE_LINE_MEMBER(txbuff_w);
 	DECLARE_WRITE_LINE_MEMBER(sndres_w);
 	DECLARE_WRITE_LINE_MEMBER(mres_w);
-	DECLARE_WRITE16_MEMBER(tomcat_irqclr_w);
-	DECLARE_READ16_MEMBER(tomcat_inputs2_r);
-	DECLARE_READ16_MEMBER(tomcat_320bio_r);
-	DECLARE_READ8_MEMBER(tomcat_nvram_r);
-	DECLARE_WRITE8_MEMBER(tomcat_nvram_w);
+	void tomcat_irqclr_w(uint16_t data);
+	uint16_t tomcat_inputs2_r();
+	uint16_t tomcat_320bio_r();
+	uint8_t tomcat_nvram_r(offs_t offset);
+	void tomcat_nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(dsp_bio_r);
-	DECLARE_WRITE8_MEMBER(soundlatches_w);
+	void soundlatches_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	void dsp_map(address_map &map);
 	void sound_map(address_map &map);
@@ -83,9 +84,9 @@ private:
 
 	required_device<tms5220_device> m_tms;
 	required_shared_ptr<uint16_t> m_shared_ram;
-	uint8_t m_nvram[0x800];
-	int m_dsp_bio;
-	int m_dsp_idle;
+	uint8_t m_nvram[0x800]{};
+	int m_dsp_bio = 0;
+	int m_dsp_idle = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms32010_device> m_dsp;
@@ -95,13 +96,13 @@ private:
 
 
 
-WRITE8_MEMBER(tomcat_state::adcon_w)
+void tomcat_state::adcon_w(uint8_t data)
 {
 	m_adc->address_w(data & 7);
 	m_adc->start_w(BIT(data, 3));
 }
 
-READ16_MEMBER(tomcat_state::tomcat_inputs_r)
+uint16_t tomcat_state::tomcat_inputs_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0;
 	if (ACCESSING_BITS_8_15)
@@ -110,7 +111,7 @@ READ16_MEMBER(tomcat_state::tomcat_inputs_r)
 	return result;
 }
 
-WRITE16_MEMBER(tomcat_state::main_latch_w)
+void tomcat_state::main_latch_w(offs_t offset, uint16_t data)
 {
 	// A1-A3 = address, A4 = data
 	m_mainlatch->write_bit(offset & 7, BIT(offset, 3));
@@ -155,13 +156,13 @@ WRITE_LINE_MEMBER(tomcat_state::mres_w)
 	m_dsp->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_irqclr_w)
+void tomcat_state::tomcat_irqclr_w(uint16_t data)
 {
 	// Clear IRQ Latch          (Address Strobe)
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-READ16_MEMBER(tomcat_state::tomcat_inputs2_r)
+uint16_t tomcat_state::tomcat_inputs2_r()
 {
 /*
 *       D15 LNKFLAG     (Game Link)
@@ -176,7 +177,7 @@ READ16_MEMBER(tomcat_state::tomcat_inputs2_r)
 	return m_dsp_idle ? 0 : (1 << 9);
 }
 
-READ16_MEMBER(tomcat_state::tomcat_320bio_r)
+uint16_t tomcat_state::tomcat_320bio_r()
 {
 	m_dsp_bio = 1;
 	m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
@@ -215,12 +216,12 @@ READ_LINE_MEMBER(tomcat_state::dsp_bio_r)
 	}
 }
 
-READ8_MEMBER(tomcat_state::tomcat_nvram_r)
+uint8_t tomcat_state::tomcat_nvram_r(offs_t offset)
 {
 	return m_nvram[offset];
 }
 
-WRITE8_MEMBER(tomcat_state::tomcat_nvram_w)
+void tomcat_state::tomcat_nvram_w(offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = data;
 }
@@ -229,12 +230,12 @@ void tomcat_state::tomcat_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x402001, 0x402001).r("adc", FUNC(adc0808_device::data_r)).w(FUNC(tomcat_state::adcon_w));
-	map(0x404000, 0x404001).r(FUNC(tomcat_state::tomcat_inputs_r)).w("avg", FUNC(avg_tomcat_device::go_word_w));
-	map(0x406000, 0x406001).w("avg", FUNC(avg_tomcat_device::reset_word_w));
+	map(0x404000, 0x404001).r(FUNC(tomcat_state::tomcat_inputs_r)).w("avg", FUNC(avg_device::go_word_w));
+	map(0x406000, 0x406001).w("avg", FUNC(avg_device::reset_word_w));
 	map(0x408000, 0x408001).r(FUNC(tomcat_state::tomcat_inputs2_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x40a000, 0x40a001).rw(FUNC(tomcat_state::tomcat_320bio_r), FUNC(tomcat_state::tomcat_irqclr_w));
 	map(0x40e000, 0x40e01f).w(FUNC(tomcat_state::main_latch_w));
-	map(0x800000, 0x803fff).ram().share("vectorram");
+	map(0x800000, 0x803fff).ram();
 	map(0xffa000, 0xffbfff).ram().share("shared_ram");
 	map(0xffc000, 0xffcfff).ram();
 	map(0xffd000, 0xffdfff).rw("m48t02", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);
@@ -247,7 +248,7 @@ void tomcat_state::dsp_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(tomcat_state::soundlatches_w)
+void tomcat_state::soundlatches_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -276,7 +277,7 @@ void tomcat_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")   /* INPUTS */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_tomcat_device, done_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED ) // SPARE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON5 ) // DIAGNOSTIC
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
@@ -343,7 +344,7 @@ void tomcat_state::tomcat(machine_config &config)
 	// OUTB PB0 - PB7   OUTPUT  Speech Data
 	// IRQ CB connected to IRQ line of 6502
 
-	config.m_minimum_quantum = attotime::from_hz(4000);
+	config.set_maximum_quantum(attotime::from_hz(4000));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set_output("led1").invert();
@@ -369,8 +370,9 @@ void tomcat_state::tomcat(machine_config &config)
 	screen.set_visarea(0, 280, 0, 250);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_TOMCAT(config, "avg", 0));
-	avg.set_vector_tag("vector");
+	avg_device &avg(AVG_STARWARS(config, "avg", 0));
+	avg.set_vector("vector");
+	avg.set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -390,8 +392,10 @@ ROM_START( tomcat )
 	ROM_LOAD16_BYTE( "rom1k.bin", 0x00001, 0x8000, CRC(5535a1ff) SHA1(b9807c749a8e6b5ddec3ff494130abda09f0baab) )
 	ROM_LOAD16_BYTE( "rom2k.bin", 0x00000, 0x8000, CRC(021a01d2) SHA1(01d99aab54ad57a664e8aaa91296bb879fc6e422) )
 
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, empty_init, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -13,6 +13,7 @@
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class lasso_state : public driver_device
 {
@@ -61,10 +62,10 @@ private:
 	optional_shared_ptr<uint8_t> m_track_scroll;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_track_tilemap;
-	uint8_t    m_gfxbank;     /* used by lasso, chameleo, wwjgtin and pinbo */
-	uint8_t    m_track_enable;    /* used by wwjgtin */
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_track_tilemap = nullptr;
+	uint8_t    m_gfxbank = 0U;     /* used by lasso, chameleo, wwjgtin and pinbo */
+	uint8_t    m_track_enable = 0U;    /* used by wwjgtin */
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -75,15 +76,15 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(sound_select_w);
-	DECLARE_WRITE8_MEMBER(lasso_videoram_w);
-	DECLARE_WRITE8_MEMBER(lasso_colorram_w);
-	DECLARE_WRITE8_MEMBER(lasso_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(lasso_video_control_w);
-	DECLARE_WRITE8_MEMBER(wwjgtin_video_control_w);
-	DECLARE_WRITE8_MEMBER(pinbo_video_control_w);
+	void sound_command_w(uint8_t data);
+	uint8_t sound_status_r();
+	void sound_select_w(uint8_t data);
+	void lasso_videoram_w(offs_t offset, uint8_t data);
+	void lasso_colorram_w(offs_t offset, uint8_t data);
+	void lasso_flip_screen_w(uint8_t data);
+	void lasso_video_control_w(uint8_t data);
+	void wwjgtin_video_control_w(uint8_t data);
+	void pinbo_video_control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);

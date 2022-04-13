@@ -43,7 +43,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/vs9209.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -200,24 +200,12 @@ void gstriker_state::machine_start()
 /*** SOUND RELATED ***********************************************************/
 
 
-WRITE8_MEMBER(gstriker_state::sh_bankswitch_w)
+void gstriker_state::sh_bankswitch_w(uint8_t data)
 {
 	membank("soundbank")->set_entry(data & 0x07);
 }
 
 /*** GFX DECODE **************************************************************/
-
-static const gfx_layout gs_8x8x4_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-
 
 static const gfx_layout gs_16x16x4_layout =
 {
@@ -236,9 +224,9 @@ static const gfx_layout gs_16x16x4_layout =
 };
 
 static GFXDECODE_START( gfx_gstriker )
-	GFXDECODE_ENTRY( "gfx1", 0, gs_8x8x4_layout,     0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0, gs_16x16x4_layout,   0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0, gs_16x16x4_layout,   0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb, 0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gs_16x16x4_layout,    0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0, gs_16x16x4_layout,    0, 256 )
 GFXDECODE_END
 
 
@@ -297,10 +285,10 @@ static INPUT_PORTS_START( gstriker_generic )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )             // "Test"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) // "Test"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // vbl?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // vbl?
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -326,51 +314,52 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gstriker )
 	PORT_INCLUDE( gstriker_generic )
 
+	// defaults are confirmed from the jp manual
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x00, "2 Players VS CPU Game" )     // "Cooperation Coin"
+	PORT_DIPNAME( 0x10, 0x10, "2 Players VS CPU Game" ) PORT_DIPLOCATION("SW1:5") // "Cooperation Coin"
 	PORT_DIPSETTING(    0x10, "1 Credit" )
 	PORT_DIPSETTING(    0x00, "2 Credits" )
-	PORT_DIPNAME( 0x20, 0x00, "Player VS Player Game" )     // "Competitive Coin"
+	PORT_DIPNAME( 0x20, 0x20, "Player VS Player Game" ) PORT_DIPLOCATION("SW1:6") // "Competitive Coin"
 	PORT_DIPSETTING(    0x20, "1 Credit" )
 	PORT_DIPSETTING(    0x00, "2 Credits" )
-	PORT_DIPNAME( 0x40, 0x40, "New Challenger" )            /* unknown purpose */
+	PORT_DIPNAME( 0x40, 0x40, "New Challenger" ) PORT_DIPLOCATION("SW1:7") // buy-in on linked cab only according to manual
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Maximum Players" )           // "Cabinet Type"
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPNAME( 0x80, 0x80, "Cabinet Type" ) PORT_DIPLOCATION("SW1:8") // "Cabinet Type"
+	PORT_DIPSETTING(    0x00, "1 Player" )
+	PORT_DIPSETTING(    0x80, "2 Players" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x06, 0x06, "Player(s) VS CPU Time" )     // "Tournament  Time"
+	PORT_DIPNAME( 0x06, 0x04, "Player(s) VS CPU Time" ) PORT_DIPLOCATION("SW2:2,3") // "Tournament  Time"
 	PORT_DIPSETTING(    0x06, "1:30" )
 	PORT_DIPSETTING(    0x04, "2:00" )
 	PORT_DIPSETTING(    0x02, "3:00" )
 	PORT_DIPSETTING(    0x00, "4:00" )
-	PORT_DIPNAME( 0x18, 0x18, "Player VS Player Time" )     // "Competitive Time"
+	PORT_DIPNAME( 0x18, 0x10, "Player VS Player Time" ) PORT_DIPLOCATION("SW2:4,5") // "Competitive Time"
 	PORT_DIPSETTING(    0x18, "2:00" )
 	PORT_DIPSETTING(    0x10, "3:00" )
 	PORT_DIPSETTING(    0x08, "4:00" )
 	PORT_DIPSETTING(    0x00, "5:00" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      // "Demo Sound"
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6") // "Demo Sound"
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Communication Mode" )            // "Master/Slave"
+	PORT_DIPNAME( 0x40, 0x40, "Communication Mode" ) PORT_DIPLOCATION("SW2:7") // "Master/Slave"
 	PORT_DIPSETTING(    0x40, "Master" )
 	PORT_DIPSETTING(    0x00, "Slave" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )                   // "Self Test Mode"
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" ) // "Self Test Mode"
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( twcup94 )
@@ -387,7 +376,7 @@ static INPUT_PORTS_START( twcup94 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -396,8 +385,7 @@ static INPUT_PORTS_START( twcup94 )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -407,42 +395,39 @@ static INPUT_PORTS_START( twcup94 )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0xc0, 0xc0, "Play Time" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Play Time" ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "P v CPU 1:00, P v P 1:30" )
 	PORT_DIPSETTING(    0xc0, "P v CPU 1:30, P v P 2:00" )
 	PORT_DIPSETTING(    0x40, "P v CPU 2:00, P v P 2:30" )
 	PORT_DIPSETTING(    0x80, "P v CPU 2:30, P v P 3:00" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Show Configuration" )
+	PORT_DIPNAME( 0x08, 0x08, "Show Dip Configuration" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Countdown" )
+	PORT_DIPNAME( 0x10, 0x10, "Countdown" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "54 sec" )
 	PORT_DIPSETTING(    0x00, "60 sec" )
-	PORT_DIPNAME( 0x20, 0x20, "Start credit" )
+	PORT_DIPNAME( 0x20, 0x20, "Start credit" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7")
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vgoalsoc )
 	PORT_INCLUDE( gstriker_generic )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -451,8 +436,7 @@ static INPUT_PORTS_START( vgoalsoc )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -461,32 +445,31 @@ static INPUT_PORTS_START( vgoalsoc )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
-
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x80, "A" )
 	PORT_DIPSETTING(    0xc0, "B" )
 	PORT_DIPSETTING(    0x40, "C" )
 	PORT_DIPSETTING(    0x00, "D" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Player VS CPU Time" ) PORT_DIPLOCATION("SWB:1,2") // no cooperative
+	PORT_DIPNAME( 0x03, 0x03, "Player VS CPU Time" ) PORT_DIPLOCATION("SW2:1,2") // no cooperative
 	PORT_DIPSETTING(    0x02, "1:00" )
 	PORT_DIPSETTING(    0x03, "1:30" )
 	PORT_DIPSETTING(    0x01, "2:00" )
 	PORT_DIPSETTING(    0x00, "2:30" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Player VS Player Time" ) PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Player VS Player Time" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "1:30" )
 	PORT_DIPSETTING(    0x0c, "2:00" )
 	PORT_DIPSETTING(    0x04, "2:30" )
 	PORT_DIPSETTING(    0x00, "3:00" )
-	PORT_DIPNAME( 0x10, 0x10, "Countdown" ) PORT_DIPLOCATION("SWB:5")
+	PORT_DIPNAME( 0x10, 0x10, "Countdown" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "54 sec" )
 	PORT_DIPSETTING(    0x00, "60 sec" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
-	PORT_DIPNAME( 0x80, 0x80, "Start credit" ) PORT_DIPLOCATION("SWB:8")
+	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPNAME( 0x80, 0x80, "Start credit" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -554,11 +537,11 @@ void gstriker_state::base(machine_config &config)
 
 void gstriker_state::gstriker(machine_config &config)
 {
-	base(config);
-
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstriker_state::gstriker_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gstriker_state::irq1_line_hold));
+
+	base(config);
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_2);
@@ -568,11 +551,11 @@ void gstriker_state::gstriker(machine_config &config)
 
 void gstriker_state::twc94(machine_config &config)
 {
-	base(config);
-
 	M68000(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstriker_state::twcup94_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gstriker_state::irq1_line_hold));
+
+	base(config);
 
 	subdevice<vs9209_device>("io")->porth_output_cb().append(FUNC(gstriker_state::twcup94_prot_reg_w));
 }
@@ -581,7 +564,7 @@ void gstriker_state::twc94(machine_config &config)
 void gstriker_state::vgoal(machine_config &config)
 {
 	twc94(config);
-	m_spr->set_transpen(0xf); // different vs. the other games, find register
+	m_spr->set_transpen(0xf); // different vs. the other games, TODO: find register
 }
 
 
@@ -610,10 +593,10 @@ ROM_START( gstriker )
 	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
 	ROM_LOAD( "human-4_27c240.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) ) // extra european team flags
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
 	ROM_REGION( 0x1000, "plds", 0 )
@@ -645,13 +628,13 @@ ROM_START( gstrikera )
 	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
 	ROM_LOAD( "human-4_27c240.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) ) // extra european team flags
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
-		/* PALs were protected on this version, used the ones from the "gstriker" set */
+	/* PALs were protected on this version, used the ones from the "gstriker" set */
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16l8.s201a.u52",   0x0000, 0x0104, CRC(724faf0f) SHA1(755fad09d188af58efce733a9f1256b1abc7c360) )
 	ROM_LOAD( "pal16l8.s202a.u74",   0x0200, 0x0104, CRC(ad5c4722) SHA1(0aad71b73c6674e15596b7de59160a5156a4118d) )
@@ -681,13 +664,13 @@ ROM_START( gstrikerj )
 	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
 	// u6 is NOT populated on the JPN version
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
-		/* PALs were protected on this version, used the ones from the "gstriker" set */
+	/* PALs were protected on this version, used the ones from the "gstriker" set */
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16l8.s201a.u52",   0x0000, 0x0104, CRC(724faf0f) SHA1(755fad09d188af58efce733a9f1256b1abc7c360) )
 	ROM_LOAD( "pal16l8.s202a.u74",   0x0200, 0x0104, CRC(ad5c4722) SHA1(0aad71b73c6674e15596b7de59160a5156a4118d) )
@@ -695,6 +678,16 @@ ROM_START( gstrikerj )
 	ROM_LOAD( "pal16l8.s204a.u89",   0x0600, 0x0104, CRC(eb997577) SHA1(504a2499c8a96c74607d06aefb0a062612a78b38) )
 	ROM_LOAD( "pal16l8.s205a.u109",  0x0800, 0x0104, CRC(0d644e59) SHA1(bb8f4ab47d7bc9b9b37f636f8fa9c419f17630ad) )
 ROM_END
+
+
+/* these were bruteforced from secured pal16l8 devices found on a twcup94a set, probably the same for all sets? */
+#define TWCUP94_PLD_DEVICES \
+	ROM_LOAD( "s2031a.u39", 0x0000, 0x0117, CRC(66f6020f) SHA1(b44a9ad51c1987bab14fb044b3ee37d73ec96fa7) ) \
+	ROM_LOAD( "s2032a.u64", 0x0200, 0x0117, CRC(e186728e) SHA1(c6ad476566d48585944e7f7889667899f654619b) ) \
+	ROM_LOAD( "s2033a.u66", 0x0400, 0x0117, CRC(672aa79b) SHA1(2e1f0643e537d6040855478f1c5b4a9f117458fe) ) \
+	ROM_LOAD( "s2034a.u67", 0x0600, 0x0117, CRC(92ebeafd) SHA1(3bf5fd1f12934c3b7076dd1f31820bbb4c4b2bd2) ) \
+	ROM_LOAD( "s2035a.u68", 0x0800, 0x0117, CRC(e3fe7bc9) SHA1(339adcfa3128f466fb5a216f53b098e6fd9d7d2b) ) \
+	ROM_LOAD( "s2036a.u79", 0x1000, 0x0117, CRC(20a4c0c5) SHA1(2bef5fca2f17877f23a4c8c5c183f8895f3d18c6) )
 
 ROM_START( vgoalsoc )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -717,11 +710,14 @@ ROM_START( vgoalsoc )
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
+
+	ROM_REGION( 0x1200, "plds", 0 ) // from twcup94a set
+	TWCUP94_PLD_DEVICES
 ROM_END
 
 ROM_START( vgoalsca )
@@ -745,101 +741,113 @@ ROM_START( vgoalsca )
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
+
+	ROM_REGION( 0x1200, "plds", 0 ) // from twcup94a set
+	TWCUP94_PLD_DEVICES
 ROM_END
 
 ROM_START( twcup94 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "13.u37",           0x00000, 0x80000, CRC(42adb463) SHA1(ec7bcb684489b56f81ab851a9d8f42d54679363b) )
+	ROM_LOAD16_WORD_SWAP( "13.u37", 0x00000, 0x80000, CRC(42adb463) SHA1(ec7bcb684489b56f81ab851a9d8f42d54679363b) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
-	ROM_LOAD( "12.u65",           0x000000, 0x040000, CRC(f316e7fc) SHA1(a2215605518e7293774735371c65abcead99bd88) )
+	ROM_LOAD( "12.u65", 0x000000, 0x040000, CRC(f316e7fc) SHA1(a2215605518e7293774735371c65abcead99bd88) )
 
 	ROM_REGION( 0x20000, "mcu", 0 )
 	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
-	ROM_LOAD( "11.u48",           0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
+	ROM_LOAD( "11.u48", 0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tile
-	ROM_LOAD( "u17",          0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
-	ROM_LOAD( "u20",          0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
+	ROM_LOAD( "u17", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
+	ROM_LOAD( "u20", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 
 	ROM_REGION( 0x800000, "gfx3", 0 )
-	ROM_LOAD( "u11",          0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
-	ROM_LOAD( "u12",          0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
-	ROM_LOAD( "u13",          0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
-	ROM_LOAD( "u14",          0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
+	ROM_LOAD( "u11", 0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
+	ROM_LOAD( "u12", 0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
+	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
+	ROM_LOAD( "u14", 0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
-	ROM_LOAD( "u86",          0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
+	ROM_LOAD( "u86", 0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
-	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
+
+	ROM_REGION( 0x1200, "plds", 0 ) // from twcup94a set
+	TWCUP94_PLD_DEVICES
 ROM_END
 
 ROM_START( twcup94a )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "twrdc94a_13.u37",           0x00000, 0x80000, CRC(08f314ee) SHA1(3fca5050f5bcd60533d3bd9dea81ba631a98bfd6) )
+	ROM_LOAD16_WORD_SWAP( "twrdc94a_13.u37", 0x00000, 0x80000, CRC(08f314ee) SHA1(3fca5050f5bcd60533d3bd9dea81ba631a98bfd6) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
-	ROM_LOAD( "twrdc94a_12.u65",           0x000000, 0x040000, CRC(c131f5a4) SHA1(d8cc7c463ad628f6f052489a73b97f998532738d) )
+	ROM_LOAD( "twrdc94a_12.u65", 0x000000, 0x040000, CRC(c131f5a4) SHA1(d8cc7c463ad628f6f052489a73b97f998532738d) )
 
 	ROM_REGION( 0x20000, "mcu", 0 )
 	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
-	ROM_LOAD( "twrdc94a_11.u48",           0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
+	ROM_LOAD( "twrdc94a_11.u48", 0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tile
-	ROM_LOAD( "u17",          0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
-	ROM_LOAD( "u20",          0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
+	ROM_LOAD( "u17", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
+	ROM_LOAD( "u20", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 
 	ROM_REGION( 0x800000, "gfx3", 0 )
-	ROM_LOAD( "u11",          0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
-	ROM_LOAD( "u12",          0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
-	ROM_LOAD( "u13",          0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
-	ROM_LOAD( "u14",          0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
+	ROM_LOAD( "u11", 0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
+	ROM_LOAD( "u12", 0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
+	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
+	ROM_LOAD( "u14", 0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
-	ROM_LOAD( "u86",          0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
+	ROM_LOAD( "u86", 0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
-	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
+
+	ROM_REGION( 0x1200, "plds", 0 )
+	TWCUP94_PLD_DEVICES
 ROM_END
 
 ROM_START( twcup94b )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "twrdc94b_13.u37",           0x00000, 0x80000, CRC(00059e88) SHA1(0da18d7f6ede7c6b50e45e0c8f7b70516b974fc3) )
+	ROM_LOAD16_WORD_SWAP( "twrdc94b_13.u37", 0x00000, 0x80000, CRC(00059e88) SHA1(0da18d7f6ede7c6b50e45e0c8f7b70516b974fc3) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
-	ROM_LOAD( "twrdc94a_12.u65",           0x000000, 0x040000, CRC(c131f5a4) SHA1(d8cc7c463ad628f6f052489a73b97f998532738d) )
+	ROM_LOAD( "twrdc94a_12.u65", 0x000000, 0x040000, CRC(c131f5a4) SHA1(d8cc7c463ad628f6f052489a73b97f998532738d) )
 
 	ROM_REGION( 0x20000, "mcu", 0 )
 	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
-	ROM_LOAD( "11.u48",           0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
+	ROM_LOAD( "11.u48", 0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tile
-	ROM_LOAD( "u17",          0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
-	ROM_LOAD( "u20",          0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
+	ROM_LOAD( "u17", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
+	ROM_LOAD( "u20", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 
 	ROM_REGION( 0x800000, "gfx3", 0 )
-	ROM_LOAD( "u11",          0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
-	ROM_LOAD( "u12",          0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
-	ROM_LOAD( "u13",          0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
-	ROM_LOAD( "u14",          0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
+	ROM_LOAD( "u11", 0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
+	ROM_LOAD( "u12", 0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
+	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
+	ROM_LOAD( "u14", 0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
-	ROM_LOAD( "u86",          0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
+	ROM_LOAD( "u86", 0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
-	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
+
+	ROM_REGION( 0x1200, "plds", 0 ) // from twcup94a set
+	TWCUP94_PLD_DEVICES
 ROM_END
 
 
@@ -858,11 +866,11 @@ the zooming.To use it,you should use Player 2 Start button to show the test scre
 or to advance into the tests.
 ******************************************************************************************/
 #define PC(_num_)\
-m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
-m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
+		m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
+		m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
-WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
+void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 {
 	m_prot_reg[1] = m_prot_reg[0];
 	m_prot_reg[0] = data;
@@ -1051,12 +1059,12 @@ WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
 #define TICKCOUNT_3 m_work_ram[0x290e/2]
 #define COUNTER_1 m_work_ram[0x2928/2]
 #define COUNTER_2 m_work_ram[0x292a/2]
-READ16_MEMBER(gstriker_state::vbl_toggle_r)
+uint16_t gstriker_state::vbl_toggle_r()
 {
 	return 0xff;
 }
 
-WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
+void gstriker_state::vbl_toggle_w(uint16_t data)
 {
 	if( COUNTER1_ENABLE == 1 )
 	{
@@ -1102,26 +1110,26 @@ void gstriker_state::init_twcup94b()
 	mcu_init();
 }
 
-
 void gstriker_state::init_vgoalsoc()
 {
 	m_gametype = VGOAL_SOCCER_MCU;
 	mcu_init();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16_delegate(FUNC(gstriker_state::vbl_toggle_w),this)); // vblank toggle
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16_delegate(FUNC(gstriker_state::vbl_toggle_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16smo_delegate(*this, FUNC(gstriker_state::vbl_toggle_w))); // vblank toggle
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16smo_delegate(*this, FUNC(gstriker_state::vbl_toggle_r)));
 }
+
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init,    ROT0, "Human", "Grand Striker (Europe, Oceania)",            MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init,    ROT0, "Human", "Grand Striker (Americas)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init,    ROT0, "Human", "Grand Striker (Japan)",    MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Europe, Oceania)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Americas)",        MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Japan)",           MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
-GAME( 1994, vgoalsoc, 0,         vgoal,    vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
-GAME( 1994, vgoalsca, vgoalsoc,  vgoal,    vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
-GAME( 1994, twcup94,  0,         twc94,    twcup94,  gstriker_state, init_twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twcup94a, twcup94,   twc94,    twcup94,  gstriker_state, init_twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twcup94b, twcup94,   twc94,    twcup94,  gstriker_state, init_twcup94b, ROT0, "Tecmo", "Tecmo World Cup '94 (set 3)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vgoalsoc, 0,        vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
+GAME( 1994, vgoalsca, vgoalsoc, vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
+GAME( 1994, twcup94,  0,        twc94, twcup94,  gstriker_state, init_twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94a, twcup94,  twc94, twcup94,  gstriker_state, init_twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94b, twcup94,  twc94, twcup94,  gstriker_state, init_twcup94b, ROT0, "Tecmo", "Tecmo World Cup '94 (set 3)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

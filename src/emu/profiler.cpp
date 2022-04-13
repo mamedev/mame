@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    profiler.c
+    profiler.cpp
 
     Functions to manage profiling of MAME execution.
 
@@ -159,6 +159,7 @@ void real_profiler_state::update_text(running_machine &machine)
 		{ PROFILER_INPUT,            "Input Processing" },
 		{ PROFILER_MOVIE_REC,        "Movie Recording" },
 		{ PROFILER_LOGERROR,         "Error Logging" },
+		{ PROFILER_LUA,              "LUA" },
 		{ PROFILER_EXTRA,            "Unaccounted/Overhead" },
 		{ PROFILER_USER1,            "User 1" },
 		{ PROFILER_USER2,            "User 2" },
@@ -192,7 +193,7 @@ void real_profiler_state::update_text(running_machine &machine)
 	}
 
 	// loop over all types and generate the string
-	device_iterator iter(machine.root_device());
+	device_enumerator iter(machine.root_device());
 	std::ostringstream stream;
 	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_TOTAL; ++curtype)
 	{

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="hp9k3xx_hdd" description="HP9000/300 hard disk images">
+
+	<!--
+	Unless otherwise specified, all images are based on default installs of the
+	corresponding hp9k3xx_flop or hp9k3xx_cdrom sets.
+	-->
+
+	<software name="hpux_9_10">
+		<description>HP-UX Release 9.10 for Series 300/400</description>
+		<year>1995</year>
+		<publisher>Hewlett-Packard</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="hpux_9_10" sha1="85898db956bb5539832817c0203354b4299b381e" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

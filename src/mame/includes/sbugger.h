@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class sbugger_state : public driver_device
 {
@@ -27,10 +28,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram_attr;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(videoram_attr_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void videoram_attr_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

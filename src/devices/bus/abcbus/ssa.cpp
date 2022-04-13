@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-	Luxor ABC-80 Owoco Super Smartaid cartridge emulation
+    Luxor ABC-80 Owoco Super Smartaid cartridge emulation
 
     New BASIC commands:
 
@@ -19,9 +19,40 @@
 
 /*
 
-	TODO:
+PCB Layout
+----------
 
-	- banking
+Super Smartaid / Super Smartaid Magnum 4
+
+[---------------------------------------------------|
+|                       PROM    LS155   LS08        |
+|                                                   |
+||-----------CN1----------|     LS74    HC32        |
+|                                                   |
+|       ROM1        RAM                             |
+|                                                   |
+|LS245          LS126   LS393   LS00        BAT     |
+|       ROM2                                        |
+|               LS260   LS74    LS32                |
+|---------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    RAM     - Hitachi HM6116LP-3 / Fujitsu MB8416A-15 2Kx8 SRAM
+    ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM
+    ROM2    - SGS M2716F1 2Kx8 EPROM / NEC D27128D 16Kx8 EPROM
+    PROM    - Signetics N82S131N 512x4 bipolar PROM
+    CN1     - ABC bus connector
+    BAT     - Varta 3/V150H 3.6V 140mAh Ni-MH battery
+
+*/
+
+/*
+
+    TODO:
+
+    - entering a bad command locks up the system
 
 */
 
@@ -34,16 +65,16 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SUPER_SMARTAID, super_smartaid_t, "ssa", "Super Smartaid")
+DEFINE_DEVICE_TYPE(ABC_SUPER_SMARTAID, abc_super_smartaid_device, "abc_ssa", "Super Smartaid")
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void super_smartaid_t::device_add_mconfig(machine_config &config)
+void abc_super_smartaid_device::device_add_mconfig(machine_config &config)
 {
-	ABCBUS_SLOT(config, ABCBUS_TAG, DERIVED_CLOCK(1, 1), abc80_cards, nullptr);
+	ABCBUS_SLOT(config, m_bus, DERIVED_CLOCK(1, 1), abc80_cards, nullptr);
 }
 
 
@@ -67,7 +98,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *super_smartaid_t::device_rom_region() const
+const tiny_rom_entry *abc_super_smartaid_device::device_rom_region() const
 {
 	return ROM_NAME( super_smartaid );
 }
@@ -79,18 +110,18 @@ const tiny_rom_entry *super_smartaid_t::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  super_smartaid_t - constructor
+//  abc_super_smartaid_device - constructor
 //-------------------------------------------------
 
-super_smartaid_t::super_smartaid_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SUPER_SMARTAID, tag, owner, clock),
+abc_super_smartaid_device::abc_super_smartaid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ABC_SUPER_SMARTAID, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
-	m_bus(*this, ABCBUS_TAG),
+	m_bus(*this, "bus"),
 	m_rom_1(*this, "ssa1"),
 	m_rom_2(*this, "ssa2"),
 	m_prom(*this, "ssa3"),
-	m_nvram(*this, "nvram"),
+	m_nvram(*this, "nvram", 0x800, ENDIANNESS_LITTLE),
 	m_rom_bank(0),
 	m_prom_bank(0)
 {
@@ -101,7 +132,7 @@ super_smartaid_t::super_smartaid_t(const machine_config &mconfig, const char *ta
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void super_smartaid_t::device_start()
+void abc_super_smartaid_device::device_start()
 {
 	// descramble ROMs
 	for (offs_t i = 0; i < 0x800; i++)
@@ -113,9 +144,6 @@ void super_smartaid_t::device_start()
 		m_rom_2->base()[i] = bitswap<8>(m_rom_2->base()[i], 2, 6, 1, 4, 3, 5, 7, 0);
 	}
 
-	// allocate memory
-	m_nvram.allocate(0x800);
-
 	// state saving
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_prom_bank));
@@ -126,7 +154,7 @@ void super_smartaid_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void super_smartaid_t::device_reset()
+void abc_super_smartaid_device::device_reset()
 {
 	m_rom_bank = 0;
 	m_prom_bank = 0;
@@ -142,13 +170,16 @@ void super_smartaid_t::device_reset()
 //  abcbus_xmemfl -
 //-------------------------------------------------
 
-uint8_t super_smartaid_t::abcbus_xmemfl(offs_t offset)
+uint8_t abc_super_smartaid_device::abcbus_xmemfl(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	switch (m_prom->base()[offset >> 10])
+	switch (m_prom->base()[(m_prom_bank << 6) | (offset >> 10)])
 	{
-	case 0x08: case 0x0c: case 0x0f:
+	case 0x08:
+		m_prom_bank = 1;
+		[[fallthrough]];
+	case 0x0c: case 0x0f:
 		data = m_rom_2->base()[(m_rom_bank << 12) | (offset & 0xfff)];
 		break;
 	case 0x0d:
@@ -170,14 +201,14 @@ uint8_t super_smartaid_t::abcbus_xmemfl(offs_t offset)
 //  abcbus_xmemw -
 //-------------------------------------------------
 
-void super_smartaid_t::abcbus_xmemw(offs_t offset, uint8_t data)
+void abc_super_smartaid_device::abcbus_xmemw(offs_t offset, uint8_t data)
 {
-	if ((offset & 0x4041) == 0x4040) 
+	if ((offset == 0x4040) || (offset == 0x4041))
 	{
 		m_rom_bank = BIT(offset, 0);
 	}
 
-	switch (m_prom->base()[offset >> 10])
+	switch (m_prom->base()[(m_prom_bank << 6) | (offset >> 10)])
 	{
 	case 0x0e:
 		m_nvram[offset & 0x7ff] = data;

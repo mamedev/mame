@@ -15,6 +15,7 @@
 #include "video/atarivad.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class batman_state : public driver_device
 {
@@ -24,7 +25,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_jsa(*this, "jsa"),
-		m_vad(*this, "vad")
+		m_vad(*this, "vad"),
+		m_mob(*this, "vad:mob")
 	{ }
 
 	void init_batman();
@@ -32,7 +34,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	DECLARE_WRITE16_MEMBER(latch_w);
+	void latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
@@ -45,9 +47,10 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<atari_jsa_iii_device> m_jsa;
 	required_device<atari_vad_device> m_vad;
+	required_device<atari_motion_objects_device> m_mob;
 
-	uint16_t          m_latch_data;
-	uint8_t           m_alpha_tile_bank;
+	uint16_t          m_latch_data = 0U;
+	uint8_t           m_alpha_tile_bank = 0U;
 
 	static const atari_motion_objects_config s_mob_config;
 };

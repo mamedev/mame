@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class rollrace_state : public driver_device
 {
@@ -35,35 +36,35 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t *m_fg_tilemap;
-	int m_bkgpage;
-	int m_bkgflip;
-	int m_chrbank;
-	int m_bkgpen;
-	int m_bkgcol;
-	int m_flipy;
-	int m_flipx;
-	int m_spritebank;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int m_bkgpage = 0;
+	int m_bkgflip = 0;
+	int m_chrbank = 0;
+	int m_bkgpen = 0;
+	int m_bkgcol = 0;
+	int m_flipy = 0;
+	int m_flipx = 0;
+	int m_spritebank = 0;
 
-	uint8_t m_nmi_mask;
-	uint8_t m_sound_nmi_mask;
+	uint8_t m_nmi_mask = 0;
+	uint8_t m_sound_nmi_mask = 0;
 
-	DECLARE_READ8_MEMBER(fake_d800_r);
-	DECLARE_WRITE8_MEMBER(fake_d800_w);
+	uint8_t fake_d800_r();
+	void fake_d800_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
+	void sound_nmi_mask_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(charbank_0_w);
 	DECLARE_WRITE_LINE_MEMBER(charbank_1_w);
-	DECLARE_WRITE8_MEMBER(bkgpen_w);
+	void bkgpen_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
-	DECLARE_WRITE8_MEMBER(backgroundpage_w);
-	DECLARE_WRITE8_MEMBER(backgroundcolor_w);
-	DECLARE_WRITE8_MEMBER(flipy_w);
+	void backgroundpage_w(uint8_t data);
+	void backgroundcolor_w(uint8_t data);
+	void flipy_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipx_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(cram_w);
+	void vram_w(offs_t offset, uint8_t data);
+	void cram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void tilemap_refresh_flip();
 

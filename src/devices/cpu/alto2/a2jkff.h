@@ -44,8 +44,8 @@ typedef enum {
 
 #else   // ALTO2_DEFINE_CONSTANTS
 
-#ifndef _A2JKFF_H_
-#define _A2JKFF_H_
+#ifndef MAME_CPU_ALTO2_A2JKFF_H
+#define MAME_CPU_ALTO2_A2JKFF_H
 
 #if JKFF_DEBUG
 /**
@@ -188,5 +188,5 @@ static inline jkff_t update_jkff(uint8_t s0, uint8_t s1, const char*)
 }
 #endif  // JKFF_DEBUG
 
-#endif  // _A2JKFF_H_
+#endif  // MAME_CPU_ALTO2_A2JKFF_H
 #endif  // ALTO2_DEFINE_CONSTANTS

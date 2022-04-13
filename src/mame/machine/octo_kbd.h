@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "bus/rs232/keyboard.h"
+#include "bus/rs232/rs232.h"
+#include "machine/keyboard.h"
 
 class octopus_keyboard_device : public buffered_rs232_device<16U>, protected device_matrix_keyboard_interface<16U>
 {
@@ -23,9 +24,9 @@ protected:
 private:
 	virtual void received_byte(uint8_t data) override;
 
-	int m_delay;  // keypress delay after initial press
-	int m_repeat; // keypress repeat rate
-	uint8_t m_enabled;  // keyboard enabled?
+	int m_delay = 0;  // keypress delay after initial press
+	int m_repeat = 0; // keypress repeat rate
+	uint8_t m_enabled = 0;  // keyboard enabled?
 };
 
 DECLARE_DEVICE_TYPE(OCTOPUS_KEYBOARD, octopus_keyboard_device)

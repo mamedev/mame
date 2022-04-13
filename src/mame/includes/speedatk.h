@@ -23,35 +23,37 @@ public:
 
 	void speedatk(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<h46505_device> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_crtc_vreg[0x100];
-	uint8_t m_crtc_index;
-	uint8_t m_flip_scr;
-	uint8_t m_mux_data;
-	uint8_t m_km_status;
-	uint8_t m_coin_settings;
-	uint8_t m_coin_impulse;
+	uint8_t m_crtc_vreg[0x100]{};
+	uint8_t m_crtc_index = 0;
+	uint8_t m_flip_scr = 0;
+	uint8_t m_mux_data = 0;
+	uint8_t m_km_status = 0;
+	uint8_t m_coin_settings = 0;
+	uint8_t m_coin_impulse = 0;
 
-	DECLARE_READ8_MEMBER(key_matrix_r);
-	DECLARE_WRITE8_MEMBER(key_matrix_w);
-	DECLARE_READ8_MEMBER(key_matrix_status_r);
-	DECLARE_WRITE8_MEMBER(key_matrix_status_w);
-	DECLARE_WRITE8_MEMBER(m6845_w);
-	DECLARE_WRITE8_MEMBER(output_w);
+	uint8_t key_matrix_r();
+	void key_matrix_w(uint8_t data);
+	uint8_t key_matrix_status_r();
+	void key_matrix_status_w(uint8_t data);
+	void m6845_w(offs_t offset, uint8_t data);
+	void output_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	void speedatk_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
 

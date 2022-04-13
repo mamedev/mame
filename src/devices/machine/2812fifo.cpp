@@ -29,7 +29,7 @@
 #include <cassert>
 
 
-DEFINE_DEVICE_TYPE(FIFO2812, fifo2812_device, "fifo2812", "2812 32*8 FIFO Memory");
+DEFINE_DEVICE_TYPE(FIFO2812, fifo2812_device, "fifo2812", "2812 32x8 FIFO Memory");
 
 
 fifo2812_device::fifo2812_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :

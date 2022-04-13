@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<!-- Many thanks to Luca Antignano for the help with this software list -->
 <!--
+license:CC0
+
+Many thanks to Luca Antignano for the help with this software list
+
 A couple of comments about the 6k/8k images:
 - game code occupies 6k, but there can be different chips inside the actual carts:
   1x8k eprom, 2x4k eproms or 1x2k + 1x4k eproms. In the 1x8k case, the console
@@ -11,9 +13,6 @@ Carts were found where the remaining part is empty, and carts were found where t
 lower 2k are repeated (see the Alt dumps below), but the dumps are basically the
 same and a Creativision would not see the difference between them.
 
--->
-
-<!--
 Notes from Luca:
 1. In real carts, roms sometimes are EPROMs with a sticker, but the same data could
 well be found on EPROMs with no stickers or with a different sticker (due to different
@@ -26,9 +25,46 @@ based on a specific model
 chips. The choice of PCB for each game and the presence of ROMs split into different sizes
 follows no pattern and was probably based only on the chip availability at manufacturing
 time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
--->
 
-<!-- Creativision carts were universal (Japanese NTSC dumps turned out to be the same as worldwide PAL ones). -->
+Dick Smith catalog numbers, taken from advertisements:
+
+Y-1600 : Wizzard console
+Y-2600 : Funvision console
+Y-1605 : Basic (cart)
+Y-1607 : Storage Cassette Unit (a cassette recorder)
+Y-1608 : Moving-key keyboard
+Y-1610 : Tank Attack
+Y-1612, Y-1685 : Astro Pinball (it had 2 catalog numbers)
+Y-1620 : Wimbledon Tennis / Dick Smith Championship Tennis
+Y-1622 : Police Jump
+Y-1630 : Auto Chase
+Y-1635 : Music Maker
+Y-1640 : Crazy Chicky
+Y-1645 : Soccer
+Y-1650 : Planet Defender
+Y-1660 : Air/Sea Attack
+Y-1670 : Skiing
+Y-1680 : Mouse Puzzle
+B-6196 : First Book of Wizzard Programs
+?????? : Helicopter Rescue, Speed Race, Deep Sea Adventure (these were promised, but never heard of again)
+
+Creativision carts were universal (Japanese NTSC dumps turned out to be the same as worldwide PAL ones).
+
+
+USAGE: Carts generally start up in attract mode, so to play:
+       - press F10
+       - Make any adjustments, such as starting level, number of players etc with the action keys
+       - Press R to begin (there may a short tune first)
+       - On older machines (crvision, wizzard etc) action keys are Shift and Ctrl.
+       - On newer machines (laser2001, manager), the action buttons are Ctrl and Alt.
+
+NOTE that the BASIC carts will load on the newer machines, but the keyboard is incompatible. You must
+         use the inbuilt BASIC instead.
+
+NOTE that all our versions of astropin have a corruption of the right flipper that appears when you press R,
+     and the BASIC carts have a corruption of the @ symbol. Both of these are most likely original issues.
+
+-->
 <softwarelist name="crvision" description="V-Tech Creativision cartridges">
 
 	<software name="airsea">
@@ -36,10 +72,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8008" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="airsea.bin" size="4096" crc="81a9257d" sha1="1fbc52f335c0d8bb96578a6ba764f5631c41fd36" offset="000000" />
+				<rom name="airsea.bin" size="4096" crc="81a9257d" sha1="1fbc52f335c0d8bb96578a6ba764f5631c41fd36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -49,10 +86,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8014" />
+		<info name="usage" value="Press F10 then R. R to launch ball." />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="astropin.bin" size="8192" crc="d03c0603" sha1="e7cb096d4d16fd8193f7e39c2f73bdf0930c9654" offset="000000" />
+				<rom name="astropin.bin" size="8192" crc="d03c0603" sha1="e7cb096d4d16fd8193f7e39c2f73bdf0930c9654"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,6 +100,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8014" />
+		<info name="usage" value="Press F10 then R. R to launch ball." />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -79,10 +118,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8014" />
+		<info name="usage" value="Press F10 then R. R to launch ball." />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="astropinb.bin" size="8192" crc="cf7bdfc2" sha1="38bcc856d604567dc6453205a8f858bdf2000330" offset="000000" />
+				<rom name="astropinb.bin" size="8192" crc="cf7bdfc2" sha1="38bcc856d604567dc6453205a8f858bdf2000330"/>
 			</dataarea>
 		</part>
 	</software>
@@ -92,10 +132,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8006" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="autochas.bin" size="8192" crc="bd091ee0" sha1="369dc9aa55dd2c09376be840f8ebeca450db8b9c" offset="000000" />
+				<rom name="autochas.bin" size="8192" crc="bd091ee0" sha1="369dc9aa55dd2c09376be840f8ebeca450db8b9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,6 +146,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8006" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -114,12 +156,13 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		</part>
 	</software>
 
-<!-- Reminder: Basic got found both in PCB with 2 chips (4k+8k) and in PCB with 3 chips (4k+4k+4k)... split accordingly! -->
+	<!-- Reminder: Basic got found both in PCB with 2 chips (4k+8k) and in PCB with 3 chips (4k+4k+4k)... split accordingly! -->
 	<software name="basico2">
 		<description>Creativision Basic (1982, Release 2)</description>
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
+		<info name="usage" value="Not for manager or lasr2001" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -135,6 +178,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
+		<info name="usage" value="Not for manager or lasr2001" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -150,6 +194,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
+		<info name="usage" value="Not for manager or lasr2001" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -164,6 +209,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
+		<info name="usage" value="Not for manager or lasr2001" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -179,6 +225,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8021" />
+		<info name="usage" value="Press F10" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom18k" />
 			<dataarea name="rom" size="18432">
@@ -194,10 +241,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8001" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="crazych.bin" size="4096" crc="b1b5bfe5" sha1="c0eed370267644d142a42de6201f7ac6d275104d" offset="000000" />
+				<rom name="crazych.bin" size="4096" crc="b1b5bfe5" sha1="c0eed370267644d142a42de6201f7ac6d275104d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,10 +255,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8001" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="crazypuc.bin" size="4096" crc="c673be37" sha1="0762ba98e9a08b7e6063e2a54734becd83df6eb3" offset="000000" />
+				<rom name="crazypuc.bin" size="4096" crc="c673be37" sha1="0762ba98e9a08b7e6063e2a54734becd83df6eb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -220,6 +269,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8013" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -234,10 +284,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8013" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="deeps8k.bin" size="8192" crc="2e0ddd86" sha1="d25f82aab473d4c7850ab626ae92d1eac69dbb32" offset="000000" />
+				<rom name="deeps8k.bin" size="8192" crc="2e0ddd86" sha1="d25f82aab473d4c7850ab626ae92d1eac69dbb32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -247,6 +298,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8020" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom10k" />
 			<dataarea name="rom" size="10240">
@@ -261,6 +313,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8020" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -275,10 +328,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8015" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="mousepuz.bin" size="8192" crc="e954c46b" sha1="c3aa8077756a6101009645711687edd59bf90a98" offset="000000" />
+				<rom name="mousepuz.bin" size="8192" crc="e954c46b" sha1="c3aa8077756a6101009645711687edd59bf90a98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -288,6 +342,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8015" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -302,6 +357,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8016" />
+		<info name="usage" value="Press F10" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -316,6 +372,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8005" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -330,10 +387,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8005" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="planet8k.bin" size="8192" crc="4457c7b3" sha1="0be7935db55ecf3e70b96e071ecbc489bd22dc73" offset="000000" />
+				<rom name="planet8k.bin" size="8192" crc="4457c7b3" sha1="0be7935db55ecf3e70b96e071ecbc489bd22dc73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -342,10 +400,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<description>Planet Defender (8k Cart, Bad?)</description>
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="planetd2.bin" size="8192" crc="4b463c18" sha1="1fd80a3921f2487d9eee2b6d8bb3955d22857d0e" offset="000000" />
+				<rom name="planetd2.bin" size="8192" crc="4b463c18" sha1="1fd80a3921f2487d9eee2b6d8bb3955d22857d0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -355,10 +414,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8009" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="policej.bin" size="8192" crc="db3d50b2" sha1="0fe6d15c973c73b53c33945e213bc2671ff5d7df" offset="000000" />
+				<rom name="policej.bin" size="8192" crc="db3d50b2" sha1="0fe6d15c973c73b53c33945e213bc2671ff5d7df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -368,6 +428,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8009" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -382,6 +443,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8009" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -397,6 +459,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8017" />
+		<info name="usage" value="Press F10 then R. If the ball goes out-of-bounds, press Right-Shift." />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -411,10 +474,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8003" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="sonicinv.bin" size="4096" crc="767a1f38" sha1="d77f49bfa951ce0ba505ad4f05f3d0adb697811f" offset="000000" />
+				<rom name="sonicinv.bin" size="4096" crc="767a1f38" sha1="d77f49bfa951ce0ba505ad4f05f3d0adb697811f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -423,10 +487,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<description>Stone Age</description>
 		<year>1984</year>
 		<publisher>Video Technology Ltd.</publisher>
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="stoneage.bin" size="8192" crc="74365e94" sha1="dafe57b0ea5da7431bd5b0393bae7cf256c9a562" offset="000000" />
+				<rom name="stoneage.bin" size="8192" crc="74365e94" sha1="dafe57b0ea5da7431bd5b0393bae7cf256c9a562"/>
 			</dataarea>
 		</part>
 	</software>
@@ -436,6 +501,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8002" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -450,10 +516,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8002" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="tankat8k.bin" size="8192" crc="2621ffca" sha1="f3c69a848f1246faf6f9558c0badddd3db626e5f" offset="000000" />
+				<rom name="tankat8k.bin" size="8192" crc="2621ffca" sha1="f3c69a848f1246faf6f9558c0badddd3db626e5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -463,6 +530,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -472,16 +540,17 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		</part>
 	</software>
 
-<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
+	<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
 	<software name="tennisa" cloneof="tennis">
 		<description>Tennis (Wimbledon, 8k Cart)</description>
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="tens8k.bin" size="8192" crc="8bed8745" sha1="690a4dcb412e517b172ec5b44c86863ef63b1246" offset="000000" />
+				<rom name="tens8k.bin" size="8192" crc="8bed8745" sha1="690a4dcb412e517b172ec5b44c86863ef63b1246"/>
 			</dataarea>
 		</part>
 	</software>
@@ -491,6 +560,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -505,10 +575,11 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="tenscs8k.bin" size="8192" crc="098d1cbb" sha1="7ea0c5aa6072e2c9eab711f278fd939986a92602" offset="000000" />
+				<rom name="tenscs8k.bin" size="8192" crc="098d1cbb" sha1="7ea0c5aa6072e2c9eab711f278fd939986a92602"/>
 			</dataarea>
 		</part>
 	</software>
@@ -518,6 +589,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="Y-1620" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -532,6 +604,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="Y-1620" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -541,16 +614,17 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		</part>
 	</software>
 
-<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
+	<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
 	<software name="tennisd2a" cloneof="tennis">
 		<description>Tennis (Dick Smith, 8k Cart)</description>
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="Y-1620" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="tensds8k.bin" size="8192" crc="c914c092" sha1="7b64efddb590332c192f6c4a6accce85a6d402c3" offset="000000" />
+				<rom name="tensds8k.bin" size="8192" crc="c914c092" sha1="7b64efddb590332c192f6c4a6accce85a6d402c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -558,14 +632,14 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 	<!-- hapmon is a homebrew hex editor created in the 80s and perfectly working
 	    on the real machine. It was dumped and released to the public in ~2002,
 	    when FunnyMu emulator (written by Paul Hayter) was released -->
-	<software name="hapmon">
+	<software name="hapmon"><!-- need instructions -->
 		<description>Hapmon</description>
 		<year>198?</year>
 		<publisher>Richard Hayter</publisher>
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="hapmon.bin" size="4096" crc="15d07b96" sha1="89359dca952bc90644dfd7f546c184a8165faa14" offset="000000" />
+				<rom name="hapmon.bin" size="4096" crc="15d07b96" sha1="89359dca952bc90644dfd7f546c184a8165faa14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -578,7 +652,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
         <part name="cart" interface="crvision_cart">
             <feature name="slot" value="crv_rom18k">
             <dataarea name="rom" size="18432">
-                <rom name="chopper rescue (alt).rom" size="18432" crc="48e7e8b8" sha1="037088f15830fdd43081edddc5d683318d67ee01" offset="000000" />
+                <rom name="chopper rescue (alt).rom" size="18432" crc="48e7e8b8" sha1="037088f15830fdd43081edddc5d683318d67ee01"/>
             </dataarea>
         </part>
     </software>
@@ -590,7 +664,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
         <part name="cart" interface="crvision_cart">
             <feature name="slot" value="crv_rom18k">
             <dataarea name="rom" size="18432">
-                <rom name="chopper rescue.rom" size="18432" crc="14179570" sha1="fde339c8dbd44b3332e888cd24d3d492cf066b94" offset="000000" />
+                <rom name="chopper rescue.rom" size="18432" crc="14179570" sha1="fde339c8dbd44b3332e888cd24d3d492cf066b94"/>
             </dataarea>
         </part>
     </software>

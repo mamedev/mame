@@ -87,11 +87,11 @@ INPUT_PORTS_START( pc1512_keyboard )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Left SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\'') PORT_CHAR('|')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\\') PORT_CHAR('|')
 
 	PORT_START("Y3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('?')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR(0x00a3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
@@ -144,7 +144,7 @@ INPUT_PORTS_START( pc1512_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT" Del") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7 Home") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('#') PORT_CHAR('~')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('#') PORT_CHAR('~')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Right SHIFT") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("* PrtSc") PORT_CODE(KEYCODE_PRTSCR)
@@ -256,7 +256,7 @@ void pc1512_keyboard_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void pc1512_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc1512_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (!m_clock_in)
 	{
@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_device::m2_w )
 //  kb_bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
+uint8_t pc1512_keyboard_device::kb_bus_r()
 {
 	/*
 
@@ -361,7 +361,7 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_keyboard_device::kb_p1_w )
+void pc1512_keyboard_device::kb_p1_w(uint8_t data)
 {
 	/*
 
@@ -386,7 +386,7 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p1_w )
 //  kb_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_device::kb_p2_r )
+uint8_t pc1512_keyboard_device::kb_p2_r()
 {
 	/*
 
@@ -416,7 +416,7 @@ READ8_MEMBER( pc1512_keyboard_device::kb_p2_r )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
+void pc1512_keyboard_device::kb_p2_w(uint8_t data)
 {
 	/*
 

@@ -11,7 +11,7 @@ driver by
 TODO:
 - map missing inputs (temp mapped to z-x-left shift)
 - is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen) (this seems fixed now -AS)
-- colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently.
+- colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently. Reference: https://www.youtube.com/watch?v=inc4tyuh4qk
 
 
 Basic hw is...
@@ -45,6 +45,7 @@ to prevent disabling inputs.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define KOIKOI_CRYSTAL 15468000
 
@@ -67,18 +68,18 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t  *m_tmap;
+	tilemap_t  *m_tmap = nullptr;
 
 	/* misc */
-	int m_inputcnt;
-	int m_inputval;
-	int m_inputlen;
-	int m_ioram[8];
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(unknown_w);
+	int m_inputcnt = 0;
+	int m_inputval = 0;
+	int m_inputlen = 0;
+	int m_ioram[8]{};
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t input_r();
+	void unknown_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -104,7 +105,7 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 	int color = (m_videoram[tile_index + 0x400] & 0x1f);
 	int flip  = (m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flip);
+	tileinfo.set(0, code, color, flip);
 }
 
 void koikoi_state::koikoi_palette(palette_device &palette) const
@@ -150,7 +151,7 @@ void koikoi_state::koikoi_palette(palette_device &palette) const
 
 void koikoi_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(koikoi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koikoi_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -165,13 +166,13 @@ uint32_t koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-WRITE8_MEMBER(koikoi_state::vram_w)
+void koikoi_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
-READ8_MEMBER(koikoi_state::input_r)
+uint8_t koikoi_state::input_r()
 {
 	if (m_inputcnt < 0)
 		return 0;
@@ -207,12 +208,12 @@ READ8_MEMBER(koikoi_state::input_r)
 	return 0xff; //return 0^0xff
 }
 
-WRITE8_MEMBER(koikoi_state::unknown_w)
+void koikoi_state::unknown_w(uint8_t data)
 {
 	//xor'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
 }
 
-READ8_MEMBER(koikoi_state::io_r)
+uint8_t koikoi_state::io_r(offs_t offset)
 {
 	if (!offset)
 		return ioport("IN0")->read() ^ m_ioram[4]; //coin
@@ -220,7 +221,7 @@ READ8_MEMBER(koikoi_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(koikoi_state::io_w)
+void koikoi_state::io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 7 && data == 0)
 		m_inputcnt = 0; //reset read cycle counter

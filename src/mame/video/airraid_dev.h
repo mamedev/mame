@@ -8,6 +8,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 DECLARE_DEVICE_TYPE(AIRRAID_VIDEO, airraid_video_device)
@@ -19,8 +20,8 @@ public:
 	// construction/destruction
 	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(txram_w);
-	DECLARE_WRITE8_MEMBER(vregs_w);
+	void txram_w(offs_t offset, uint8_t data);
+	void vregs_w(offs_t offset, uint8_t data);
 	void layer_enable_w(uint8_t enable);
 
 protected:
@@ -48,9 +49,9 @@ private:
 	required_shared_ptr<uint8_t> m_vregs;
 
 	// tilemaps
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILEMAP_MAPPER_MEMBER(fg_scan);

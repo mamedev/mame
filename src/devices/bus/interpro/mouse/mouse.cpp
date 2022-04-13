@@ -26,19 +26,19 @@ DEFINE_DEVICE_TYPE(INTERPRO_MOUSE, interpro_mouse_device, "interpro_mouse", "Int
 
 static INPUT_PORTS_START(interpro_mouse)
 	PORT_START("mouse_buttons")
-	PORT_BIT(interpro_mouse_device::MOUSE_LBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, nullptr)
-	PORT_BIT(interpro_mouse_device::MOUSE_MBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, nullptr)
-	PORT_BIT(interpro_mouse_device::MOUSE_RBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, nullptr)
+	PORT_BIT(interpro_mouse_device::MOUSE_LBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, 0)
+	PORT_BIT(interpro_mouse_device::MOUSE_MBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, 0)
+	PORT_BIT(interpro_mouse_device::MOUSE_RBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, 0)
 
 	PORT_START("mouse_x")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_x, nullptr)
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_x, 0)
 	PORT_START("mouse_y")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_y, nullptr)
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_y, 0)
 INPUT_PORTS_END
 
 interpro_mouse_port_device::interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_MOUSE_PORT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_interpro_mouse_port_interface>(mconfig, *this)
 	, m_state_func(*this)
 	, m_device(nullptr)
 {
@@ -46,15 +46,7 @@ interpro_mouse_port_device::interpro_mouse_port_device(machine_config const &mco
 
 void interpro_mouse_port_device::device_config_complete()
 {
-	m_device = dynamic_cast<device_interpro_mouse_port_interface *>(get_card_device());
-}
-
-void interpro_mouse_port_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-
-	if (card && !dynamic_cast<device_interpro_mouse_port_interface *>(card))
-		osd_printf_error("Device %s (%s) does not implement device_interpro_mouse_port_interface\n", card->tag(), card->name());
+	m_device = get_card_device();
 }
 
 void interpro_mouse_port_device::device_start()
@@ -63,7 +55,7 @@ void interpro_mouse_port_device::device_start()
 }
 
 device_interpro_mouse_port_interface::device_interpro_mouse_port_interface(machine_config const &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "interpromouse")
 	, m_port(dynamic_cast<interpro_mouse_port_device *>(device.owner()))
 {
 }
@@ -98,7 +90,7 @@ INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_button)
 
 	LOG("mouse_button 0x%08x\n", data);
 
-	state_w(machine().dummy_space(), 0, data & MOUSE_BUTTONS, MOUSE_BUTTONS);
+	state_w(data & MOUSE_BUTTONS, MOUSE_BUTTONS);
 }
 
 INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_x)
@@ -112,7 +104,7 @@ INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_x)
 
 	LOG("mouse_x delta %d\n", delta);
 
-	state_w(machine().dummy_space(), 0, (delta << 8) & MOUSE_XPOS, MOUSE_XPOS);
+	state_w((delta << 8) & MOUSE_XPOS, MOUSE_XPOS);
 }
 
 INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_y)
@@ -126,5 +118,5 @@ INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_y)
 
 	LOG("mouse_y delta %d\n", delta);
 
-	state_w(machine().dummy_space(), 0, (delta << 0) & MOUSE_YPOS, MOUSE_YPOS);
+	state_w((delta << 0) & MOUSE_YPOS, MOUSE_YPOS);
 }

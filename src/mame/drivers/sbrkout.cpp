@@ -39,10 +39,10 @@
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 #include "sbrkout.lh"
 
 class sbrkout_state : public driver_device
@@ -61,37 +61,40 @@ public:
 
 	void sbrkout(machine_config &config);
 
+protected:
+	virtual uint8_t switches_r(offs_t offset);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	virtual DECLARE_READ8_MEMBER(switches_r);
+	void irq_ack_w(uint8_t data);
+
 	DECLARE_WRITE_LINE_MEMBER(pot_mask1_w);
 	DECLARE_WRITE_LINE_MEMBER(pot_mask2_w);
-	DECLARE_WRITE8_MEMBER(output_latch_w);
+	void output_latch_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(start_1_led_w);
 	DECLARE_WRITE_LINE_MEMBER(start_2_led_w);
 	DECLARE_WRITE_LINE_MEMBER(serve_led_w);
 	DECLARE_WRITE_LINE_MEMBER(serve_2_led_w);
 	DECLARE_WRITE_LINE_MEMBER(coincount_w);
-	DECLARE_READ8_MEMBER(sync_r);
-	DECLARE_READ8_MEMBER(sync2_r);
-	DECLARE_WRITE8_MEMBER(sbrkout_videoram_w);
+	uint8_t sync_r();
+	uint8_t sync2_r();
+	void sbrkout_videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sbrkout(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
 	void main_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
-	emu_timer *m_scanline_timer;
-	emu_timer *m_pot_timer;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_sync2_value;
-	uint8_t m_pot_mask[2];
-	uint8_t m_pot_trigger[2];
+	emu_timer *m_scanline_timer = nullptr;
+	emu_timer *m_pot_timer = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_sync2_value = 0;
+	uint8_t m_pot_mask[2]{};
+	uint8_t m_pot_trigger[2]{};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<f9334_device> m_outlatch;
@@ -108,7 +111,7 @@ public:
 	void sbrkoutct(machine_config &config);
 
 protected:
-	virtual DECLARE_READ8_MEMBER(switches_r) override;
+	virtual uint8_t switches_r(offs_t offset) override;
 };
 
 
@@ -122,18 +125,6 @@ static constexpr XTAL MAIN_CLOCK    = 12.096_MHz_XTAL;
 #define TIME_4V                     attotime::from_hz(MAIN_CLOCK/2/256/2/4)
 
 
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-
-
-
-
-
 /*************************************
  *
  *  Machine setup
@@ -142,8 +133,7 @@ static constexpr XTAL MAIN_CLOCK    = 12.096_MHz_XTAL;
 
 void sbrkout_state::machine_start()
 {
-	uint8_t *videoram = m_videoram;
-	membank("bank1")->set_base(&videoram[0x380]);
+	membank("bank1")->set_base(&m_videoram[0x380]);
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sbrkout_state::scanline_callback),this));
 	m_pot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sbrkout_state::pot_trigger_callback),this));
 
@@ -168,7 +158,6 @@ void sbrkout_state::machine_reset()
 
 TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 {
-	uint8_t *videoram = m_videoram;
 	int scanline = param;
 
 	/* force a partial update before anything happens */
@@ -179,7 +168,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	/* update the DAC state */
-	m_dac->write((videoram[0x380 + 0x11] & (scanline >> 2)) != 0);
+	m_dac->write((m_videoram[0x380 + 0x11] & (scanline >> 2)) != 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == m_screen->visible_area().bottom() + 1)
@@ -196,7 +185,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 }
 
 
-WRITE8_MEMBER(sbrkout_state::irq_ack_w)
+void sbrkout_state::irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -209,7 +198,7 @@ WRITE8_MEMBER(sbrkout_state::irq_ack_w)
  *
  *************************************/
 
-READ8_MEMBER(sbrkout_state::switches_r)
+uint8_t sbrkout_state::switches_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -238,7 +227,7 @@ READ8_MEMBER(sbrkout_state::switches_r)
 	return result;
 }
 
-READ8_MEMBER(sbrkoutct_state::switches_r)
+uint8_t sbrkoutct_state::switches_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -301,7 +290,7 @@ WRITE_LINE_MEMBER(sbrkout_state::pot_mask2_w)
     reversed for the Serve LED, which has a NOT on the signal.
 */
 
-WRITE8_MEMBER(sbrkout_state::output_latch_w)
+void sbrkout_state::output_latch_w(offs_t offset, uint8_t data)
 {
 	m_outlatch->write_bit(offset >> 4, offset & 1);
 }
@@ -319,7 +308,7 @@ WRITE_LINE_MEMBER(sbrkout_state::coincount_w)
  *
  *************************************/
 
-READ8_MEMBER(sbrkout_state::sync_r)
+uint8_t sbrkout_state::sync_r()
 {
 	int hpos = m_screen->hpos();
 	m_sync2_value = (hpos >= 128 && hpos <= m_screen->visible_area().right());
@@ -327,7 +316,7 @@ READ8_MEMBER(sbrkout_state::sync_r)
 }
 
 
-READ8_MEMBER(sbrkout_state::sync2_r)
+uint8_t sbrkout_state::sync2_r()
 {
 	return (m_sync2_value << 7) | 0x7f;
 }
@@ -342,22 +331,20 @@ READ8_MEMBER(sbrkout_state::sync2_r)
 
 TILE_GET_INFO_MEMBER(sbrkout_state::get_bg_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	int code = (m_videoram[tile_index] & 0x80) ? m_videoram[tile_index] : 0;
+	tileinfo.set(0, code, 0, 0);
 }
 
 
 void sbrkout_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbrkout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sbrkout_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
-WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
+void sbrkout_state::sbrkout_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -369,18 +356,15 @@ WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
  *
  *************************************/
 
-uint32_t sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
-	int ball;
-
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	for (ball = 2; ball >= 0; ball--)
+	for (int ball = 2; ball >= 0; ball--)
 	{
-		int code = ((videoram[0x380 + 0x18 + ball * 2 + 1] & 0x80) >> 7);
-		int sx = 31 * 8 - videoram[0x380 + 0x10 + ball * 2];
-		int sy = 30 * 8 - videoram[0x380 + 0x18 + ball * 2];
+		int code = ((m_videoram[0x380 + 0x18 + ball * 2 + 1] & 0x80) >> 7);
+		int sx = 31 * 8 - m_videoram[0x380 + 0x10 + ball * 2];
+		int sy = 30 * 8 - m_videoram[0x380 + 0x18 + ball * 2];
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, 0, 0, 0, sx, sy, 0);
 	}
@@ -559,7 +543,7 @@ GFXDECODE_END
 void sbrkout_state::sbrkout(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, MAIN_CLOCK/16); // 375 KHz? Should be 750KHz?
+	M6502(config, m_maincpu, MAIN_CLOCK/16); // 756KHz verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbrkout_state::main_map);
 
 	F9334(config, m_outlatch); // H8
@@ -581,14 +565,12 @@ void sbrkout_state::sbrkout(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(sbrkout_state::screen_update_sbrkout));
-	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
 }
 
 

@@ -117,12 +117,10 @@ class sdl_event_manager : public event_manager_t<sdl_event_subscriber>
 {
 private:
 	bool                                 m_mouse_over_window;
-	bool                                 m_has_focus;
 	std::shared_ptr<sdl_window_info>     m_focus_window;
 
 	sdl_event_manager()
 		: m_mouse_over_window(true),
-		  m_has_focus(true),
 		  m_focus_window(nullptr)
 	{
 	}
@@ -195,7 +193,7 @@ static inline void devmap_init(running_machine &machine, device_map_t *devmap, c
 		{
 			// remove the spaces from the name store it in the index
 			devmap->map[dev].name = remove_spaces(dev_name);
-			osd_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, devmap->map[dev].name.c_str());
+			osd_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, devmap->map[dev].name);
 			devmap->initialized = 1;
 		}
 	}

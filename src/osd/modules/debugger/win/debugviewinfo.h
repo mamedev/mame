@@ -5,9 +5,10 @@
 //  debugviewinfo.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_DEBUGVIEWINFO_H
+#define MAME_DEBUGGER_WIN_DEBUGVIEWINFO_H
 
-#ifndef __DEBUG_WIN_DEBUG_VIEW_INFO_H__
-#define __DEBUG_WIN_DEBUG_VIEW_INFO_H__
+#pragma once
 
 #include "debugwin.h"
 
@@ -51,12 +52,23 @@ public:
 	HWND create_source_combobox(HWND parent, LONG_PTR userdata);
 
 protected:
+	enum
+	{
+		ID_CONTEXT_COPY_VISIBLE = 1,
+		ID_CONTEXT_PASTE
+	};
+
 	template <typename T> T *view() const { return downcast<T *>(m_view); }
+
+	virtual void add_items_to_context_menu(HMENU menu);
+	virtual void update_context_menu(HMENU menu);
+	virtual void handle_context_menu(unsigned command);
 
 private:
 	void draw_contents(HDC windc);
 	void update();
 	uint32_t process_scroll(WORD type, HWND wnd);
+	bool process_context_menu(int x, int y);
 	LRESULT view_proc(UINT message, WPARAM wparam, LPARAM lparam);
 
 	static void static_update(debug_view &view, void *osdprivate);
@@ -69,6 +81,7 @@ private:
 	HWND            m_wnd;
 	HWND            m_hscroll;
 	HWND            m_vscroll;
+	HMENU           m_contextmenu;
 
 	static bool     s_window_class_registered;
 };

@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(PC1512_MOUSE,      pc1512_mouse_device,      "pc1512_mouse", 
 //-------------------------------------------------
 
 device_pc1512_mouse_port_interface::device_pc1512_mouse_port_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "pc1512mouse")
 {
 	m_port = dynamic_cast<pc1512_mouse_port_device *>(device.owner());
 }
@@ -46,7 +46,7 @@ device_pc1512_mouse_port_interface::device_pc1512_mouse_port_interface(const mac
 
 pc1512_mouse_port_device::pc1512_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC1512_MOUSE_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_pc1512_mouse_port_interface>(mconfig, *this),
 	m_write_x(*this),
 	m_write_y(*this),
 	m_write_m1(*this),
@@ -68,7 +68,7 @@ pc1512_mouse_device::pc1512_mouse_device(const machine_config &mconfig, const ch
 
 void pc1512_mouse_port_device::device_start()
 {
-	m_device = dynamic_cast<device_pc1512_mouse_port_interface *>(get_card_device());
+	m_device = get_card_device();
 
 	// resolve callbacks
 	m_write_x.resolve_safe();

@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// license:GPL-2.0+
+// copyright-holders:byuu
 #ifndef MAME_CPU_SUPERFX_SUPERFX_H
 #define MAME_CPU_SUPERFX_SUPERFX_H
 
@@ -92,9 +92,6 @@ enum
 class superfx_device :  public cpu_device, public superfx_disassembler::config
 {
 public:
-	// construction/destruction
-	superfx_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
-
 	// configuration helpers
 	auto irq() { return m_out_irq_func.bind(); }
 
@@ -107,14 +104,15 @@ public:
 	virtual u16 get_alt() const override;
 
 protected:
+	// construction/destruction
+	superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -210,7 +208,26 @@ private:
 	inline void superfx_dreg_sfr_sz_update();
 };
 
+class superfx1_device :  public superfx_device
+{
+public:
+	// construction/destruction
+	superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-DECLARE_DEVICE_TYPE(SUPERFX, superfx_device)
+protected:
+	// device_execute_interface overrides
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
+};
+
+class superfx2_device :  public superfx_device
+{
+public:
+	// construction/destruction
+	superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(SUPERFX1, superfx1_device)
+DECLARE_DEVICE_TYPE(SUPERFX2, superfx2_device)
 
 #endif // MAME_CPU_SUPERFX_SUPERFX_H

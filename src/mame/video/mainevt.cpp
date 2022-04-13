@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/mainevt.h"
+#include "screen.h"
 
 /***************************************************************************
 

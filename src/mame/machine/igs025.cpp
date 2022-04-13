@@ -18,8 +18,8 @@
 
 igs025_device::igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IGS025, tag, owner, clock)
+	, m_execute_external(*this, DEVICE_SELF, FUNC(igs025_device::no_callback_setup))
 {
-	m_execute_external =  igs025_execute_external(FUNC(igs025_device::no_callback_setup), this);
 }
 
 void igs025_device::no_callback_setup()
@@ -39,8 +39,10 @@ void igs025_device::device_start()
 	m_kb_reg = 0;
 	m_kb_ptr = 0;
 	m_kb_swap = 0;
+	m_olds_bs = 0;
+	m_kb_cmd3 = 0;
 
-	m_execute_external.bind_relative_to(*owner());
+	m_execute_external.resolve();
 
 	save_item(NAME(m_kb_prot_hold));
 	save_item(NAME(m_kb_prot_hilo));
@@ -48,19 +50,9 @@ void igs025_device::device_start()
 	save_item(NAME(m_kb_cmd));
 	save_item(NAME(m_kb_reg));
 	save_item(NAME(m_kb_ptr));
-
-
-
-
-	m_olds_bs = 0;
-	m_kb_cmd3 = 0;
-
-
+	save_item(NAME(m_kb_swap));
 	save_item(NAME(m_olds_bs));
 	save_item(NAME(m_kb_cmd3));
-
-
-
 }
 
 void igs025_device::device_reset()
@@ -84,7 +76,7 @@ void igs025_device::device_reset()
 /* WRITE */
 /****************************************/
 
-WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
+void igs025_device::killbld_igs025_prot_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -143,7 +135,7 @@ WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 	}
 }
 
-WRITE16_MEMBER(igs025_device::olds_w )
+void igs025_device::olds_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -196,7 +188,7 @@ WRITE16_MEMBER(igs025_device::olds_w )
 
 
 
-WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
+void igs025_device::drgw2_d80000_protection_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
@@ -239,7 +231,7 @@ WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
 /* READ */
 /****************************************/
 
-READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
+uint16_t igs025_device::killbld_igs025_prot_r(offs_t offset)
 {
 	if (offset)
 	{

@@ -1,16 +1,14 @@
-/*
- * Documentation settings
- */
+//
+// Documentation settings
+//
 
 /*!
  *
  * \mainpage Netlist
 
+## Netlist
 
-
-##Netlist
-
-###A mixed signal circuit simulation.
+### A mixed signal circuit simulation.
 
 - D: Device
 - O: Rail output (output)
@@ -146,7 +144,7 @@ conductance on the diagonal elements, V the net voltage vector and I the
 current vector.
 
 By using solely two terminal devices, we can simplify the whole calculation
-significantly. A BJT now is a four terminal device with two terminals being
+significantly. A BJT now is a three terminal device with two terminals being
 connected internally.
 
 The system is solved using an iterative approach:

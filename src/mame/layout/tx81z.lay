@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="greyback">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="blackback">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="button" defstate="0">
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="buttonled" defstate="0">
+		<rect>
+			<bounds x="0" y="0" width="1.0" height="1.0"/>
+			<color alpha="0" />
+		</rect>
+		<rect state="0">
+			<bounds x="0.3" y="0.1" width="0.4" height="0.1"/>
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.3" y="0.1" width="0.4" height="0.1"/>
+			<color red="1.0" green="0.3" blue="0.3" />
+		</rect>
+	</element>
+	<element name="phonesjack">
+		<disk>
+			<bounds x="0" y="0" width="22" height="22"/>
+			<color red="0.7" green="0.7" blue="0.7" />
+		</disk>
+		<disk>
+			<bounds x="3" y="3" width="16" height="16"/>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="brline">
+		<rect>
+			<bounds x="0" y="0" width="1.0" height="1.0"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="0" width="0.98" height="0.96"/>
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="mounthole">
+		<disk>
+			<bounds x="0" y="0" width="16" height="16"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</disk>
+		<disk>
+			<bounds x="10" y="0" width="16" height="16"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</disk>
+		<rect>
+			<bounds x="8" y="0" width="10" height="16"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+	</element>
+	<element name="lcdmult"><rect><color red="0.7" green="1.0" blue="0.2"/></rect></element>
+	<element name="lcdback"><rect><color red="0.1" green="0.1" blue="0.1"/></rect></element>
+
+	<element name="power"><text string="POWER" /></element>
+	<element name="onoff"><text string="ON/OFF" /></element>
+	<element name="yamaha"><text string="YAMAHA" /></element>
+	<element name="fmtone"><text string="FM TONE GENERATOR" /></element>
+	<element name="tx81z"><text string="TX81Z"><color red="1.0" green="0.2" blue="0.2" /></text></element>
+	<element name="modeselect"><text string="MODE SELECT" /></element>
+	<element name="store"><text string="STORE/" /></element>
+	<element name="egcopy"><text string="EG COPY" /></element>
+	<element name="utility"><text string="UTILITY" /></element>
+	<element name="edit"><text string="EDIT/" /></element>
+	<element name="compare"><text string="COMPARE" /></element>
+	<element name="play"><text string="PLAY/" /></element>
+	<element name="perform"><text string="PERFORM" /></element>
+	<element name="parameter"><text string="PARAMETER" /></element>
+	<element name="dataentry"><text string="DATA ENTRY" /></element>
+	<element name="neg1"><text string="-1" /></element>
+	<element name="nooff"><text string="NO/OFF" /></element>
+	<element name="plus1"><text string="+1" /></element>
+	<element name="yeson"><text string="YES/ON" /></element>
+	<element name="dec"><text string="DEC" /></element>
+	<element name="inc"><text string="INC" /></element>
+	<element name="mastervolume"><text string="MASTER VOLUME" /></element>
+	<element name="cursor"><text string="CURSOR" /></element>
+	<element name="phones"><text string="PHONES" /></element>
+	<element name="arrow">
+		<image>
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="66.43" height="68.45">
+				<polygon fill="none" stroke="#FFFFFF" stroke-width="3" stroke-miterlimit="10" points="57.53,15.86 57.53,3.45 4.02,34.1 57.97,65 57.97,52.59 64.43,52.59 64.43,15.86 "/>
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<!-- logo and screen -->
+	<group name="group-logoscreen">
+		<element ref="blackback"><bounds x="124" y="14" width="260" height="64" /></element>
+		<element ref="yamaha"><bounds x="152" y="27" width="53" height="13" /></element>
+		<element ref="fmtone"><bounds x="144" y="43" width="67" height="7" /></element>
+		<element ref="tx81z"><bounds x="139" y="51" width="77" height="14" /></element>
+		<screen index="0"><bounds x="231" y="29" width="132" height="33" /></screen>
+		<element ref="lcdback" blend="add"><bounds x="231" y="29" width="132" height="33" /></element>
+		<element ref="lcdmult" blend="multiply"><bounds x="231" y="29" width="132" height="33" /></element>
+	</group>
+
+	<!-- mode select buttons -->
+	<group name="group-modeselect">
+		<element ref="modeselect"><bounds x="401" y="19" width="152" height="7" /></element>
+		<element ref="blackback"><bounds x="401" y="28" width="152" height="38" /></element>
+		<element ref="button" inputtag="P5" inputmask="0x02"><bounds x="405" y="31" width="34" height="32" /></element>
+		<element ref="store"><bounds x="406" y="40" width="32" height="7" /></element>
+		<element ref="egcopy"><bounds x="406" y="47" width="32" height="7" /></element>
+		<element ref="button" inputtag="P6" inputmask="0x04"><bounds x="442" y="31" width="34" height="32" /></element>
+		<element ref="buttonled" name="led4"><bounds x="442" y="31" width="34" height="32" /></element>
+		<element ref="utility"><bounds x="443" y="43" width="32" height="7" /></element>
+		<element ref="button" inputtag="P6" inputmask="0x02"><bounds x="479" y="31" width="34" height="32" /></element>
+		<element ref="buttonled" name="led3"><bounds x="479" y="31" width="34" height="32" /></element>
+		<element ref="edit"><bounds x="480" y="40" width="32" height="7" /></element>
+		<element ref="compare"><bounds x="480" y="47" width="32" height="7" /></element>
+		<element ref="button" inputtag="P6" inputmask="0x01"><bounds x="516" y="31" width="34" height="32" /></element>
+		<element ref="buttonled" name="led2"><bounds x="516" y="31" width="34" height="32" /></element>
+		<element ref="play"><bounds x="517" y="40" width="32" height="7" /></element>
+		<element ref="perform"><bounds x="517" y="47" width="32" height="7" /></element>
+	</group>
+
+	<!-- parameter buttons -->
+	<group name="group-parameter">
+		<element ref="parameter"><bounds x="570" y="19" width="77" height="7" /></element>
+		<element ref="blackback"><bounds x="570" y="28" width="77" height="38" /></element>
+		<element ref="button" inputtag="P5" inputmask="0x80"><bounds x="573" y="31" width="34" height="32" /></element>
+		<element ref="arrow"><bounds x="578" y="34" width="24" height="26" /></element>
+		<element ref="button" inputtag="P5" inputmask="0x40"><bounds x="610" y="31" width="34" height="32" /></element>
+		<element ref="arrow"><orientation flipx="yes"/><bounds x="615" y="34" width="24" height="26" /></element>
+	</group>
+
+	<!-- data entry buttons -->
+	<group name="group-dataentry">
+		<element ref="dataentry"><bounds x="663" y="19" width="77" height="7" /></element>
+		<element ref="blackback"><bounds x="663" y="28" width="77" height="38" /></element>
+		<element ref="button" inputtag="P5" inputmask="0x20"><bounds x="666" y="31" width="34" height="32" /></element>
+		<element ref="dec"><bounds x="667" y="43" width="32" height="7" /></element>
+		<element ref="neg1"><bounds x="666" y="67" width="34" height="7" /></element>
+		<element ref="nooff"><bounds x="666" y="74" width="34" height="7" /></element>
+		<element ref="button" inputtag="P5" inputmask="0x10"><bounds x="703" y="31" width="34" height="32" /></element>
+		<element ref="inc"><bounds x="704" y="43" width="32" height="7" /></element>
+		<element ref="plus1"><bounds x="703" y="67" width="34" height="7" /></element>
+		<element ref="yeson"><bounds x="703" y="74" width="34" height="7" /></element>
+	</group>
+
+	<!-- master volume/cursor buttons -->
+	<group name="group-mastervolumecursor">
+		<element ref="brline"><bounds x="812" y="41" width="60" height="30" /></element>
+		<element ref="mastervolume"><bounds x="757" y="19" width="77" height="7" /></element>
+		<element ref="blackback"><bounds x="757" y="28" width="77" height="38" /></element>
+		<element ref="button" inputtag="P2" inputmask="0x80"><bounds x="760" y="31" width="34" height="32" /></element>
+		<element ref="arrow"><bounds x="765" y="34" width="24" height="26" /></element>
+		<element ref="button" inputtag="P2" inputmask="0x40"><bounds x="797" y="31" width="34" height="32" /></element>
+		<element ref="arrow"><orientation flipx="yes"/><bounds x="802" y="34" width="24" height="26" /></element>
+		<element ref="cursor"><bounds x="757" y="67" width="77" height="7" /></element>
+
+		<element ref="blackback"><bounds x="851" y="28" width="40" height="38" /></element>
+		<element ref="button" inputtag="P2" inputmask="0x20"><bounds x="854" y="31" width="34" height="32" /></element>
+		<element ref="buttonled" name="led1"><bounds x="854" y="31" width="34" height="32" /></element>
+		<element ref="cursor"><bounds x="855" y="43" width="32" height="7" /></element>
+	</group>
+
+	<view name="Front Panel">
+		<!-- overall background -->
+		<element ref="greyback"><bounds x="0" y="0" width="1000" height="92" /></element>
+
+		<!-- mounting holes -->
+		<element ref="mounthole"><bounds x="4" y="4" width="26" height="16" /></element>
+		<element ref="mounthole"><bounds x="4" y="72" width="26" height="16" /></element>
+		<element ref="mounthole"><bounds x="970" y="4" width="26" height="16" /></element>
+		<element ref="mounthole"><bounds x="970" y="72" width="26" height="16" /></element>
+
+		<!-- power button -->
+		<element ref="power"><bounds x="65" y="19" width="40" height="7" /></element>
+		<element ref="blackback"><bounds x="65" y="28" width="40" height="38" /></element>
+		<element ref="button"><bounds x="68" y="31" width="34" height="32" /></element>
+		<element ref="onoff"><bounds x="65" y="67" width="40" height="7" /></element>
+
+		<!-- logo and screen -->
+		<group ref="group-logoscreen"><bounds x="124" y="14" width="260" height="64" /></group>
+
+		<!-- mode select buttons -->
+		<group ref="group-modeselect"><bounds x="401" y="18" width="152" height="48" /></group>
+
+		<!-- parameter buttons -->
+		<group ref="group-parameter"><bounds x="570" y="18" width="77" height="48" /></group>
+
+		<!-- data entry buttons -->
+		<group ref="group-dataentry"><bounds x="663" y="18" width="77" height="63" /></group>
+
+		<!-- master volume/cursor buttons -->
+		<group ref="group-mastervolumecursor"><bounds x="757" y="18" width="134" height="56" /></group>
+
+		<!-- headphone jack -->
+		<element ref="phones"><bounds x="911" y="19" width="24" height="7" /></element>
+		<element ref="phonesjack"><bounds x="912" y="35" width="22" height="22" /></element>
+	</view>
+
+	<view name="16:9 Friendly">
+		<!-- overall background -->
+		<element ref="greyback"><bounds x="0" y="0" width="360" height="230" /></element>
+
+		<!-- logo and screen -->
+		<group ref="group-logoscreen"><bounds x="50" y="14" width="260" height="64" /></group>
+
+		<!-- mode select buttons -->
+		<group ref="group-modeselect"><bounds x="104" y="93" width="152" height="48" /></group>
+
+		<!-- parameter buttons -->
+		<group ref="group-parameter"><bounds x="20" y="158" width="77" height="48" /></group>
+
+		<!-- data entry buttons -->
+		<group ref="group-dataentry"><bounds x="103" y="158" width="77" height="63" /></group>
+
+		<!-- master volume/cursor buttons -->
+		<group ref="group-mastervolumecursor"><bounds x="207" y="158" width="134" height="56" /></group>
+	</view>
+</mamelayout>

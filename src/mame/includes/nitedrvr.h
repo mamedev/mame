@@ -14,7 +14,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 
-/* Discrete Sound Input Nodes */
+// Discrete Sound Input Nodes
 #define NITEDRVR_BANG_DATA  NODE_01
 #define NITEDRVR_SKID1_EN   NODE_02
 #define NITEDRVR_SKID2_EN   NODE_03
@@ -28,63 +28,72 @@ class nitedrvr_state : public driver_device
 public:
 	nitedrvr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_hvc(*this, "hvc"),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led")
+		m_videoram(*this, "videoram"),
+		m_hvc(*this, "hvc"),
+		m_steer(*this, "STEER"),
+		m_gears(*this, "GEARS"),
+		m_in0(*this, "IN0"),
+		m_dsw(*this, "DSW%u", 0U),
+		m_led(*this, "led"),
+		m_track_sel(*this, "track%u", 1U),
+		m_gear_sel(*this, "gear%u", 1U)
 	{ }
 
 	void nitedrvr(machine_config &config);
 
-private:
-	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
-	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);
-	DECLARE_READ8_MEMBER(nitedrvr_in0_r);
-	DECLARE_READ8_MEMBER(nitedrvr_in1_r);
-	DECLARE_WRITE8_MEMBER(nitedrvr_out0_w);
-	DECLARE_WRITE8_MEMBER(nitedrvr_out1_w);
-	DECLARE_WRITE8_MEMBER(nitedrvr_videoram_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_crash_toggle_callback);
+
+private:
+	uint8_t steering_reset_r();
+	void steering_reset_w(uint8_t data);
+	uint8_t in0_r(offs_t offset);
+	uint8_t in1_r(offs_t offset);
+	void out0_w(uint8_t data);
+	void out1_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(crash_toggle_callback);
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey);
 	void draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int nitedrvr_steering();
-	void nitedrvr_map(address_map &map);
+	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	int steering();
+	void main_map(address_map &map);
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_hvc;
-
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-
-	/* input */
-	uint8_t m_gear;
-	uint8_t m_track;
-	int32_t m_steering_buf;
-	int32_t m_steering_val;
-	uint8_t m_crash_en;
-	uint8_t m_crash_data;
-	uint8_t m_crash_data_en;  // IC D8
-	uint8_t m_ac_line;
-	int32_t m_last_steering_val;
-
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_hvc;
+
+	// input
+	uint8_t m_gear = 0;
+	uint8_t m_track = 0;
+	int32_t m_steering_buf = 0;
+	int32_t m_steering_val = 0;
+	uint8_t m_crash_en = 0;
+	uint8_t m_crash_data = 0;
+	uint8_t m_crash_data_en = 0;  // IC D8
+	uint8_t m_ac_line = 0;
+	int32_t m_last_steering_val = 0;
+	required_ioport m_steer, m_gears, m_in0;
+	required_ioport_array<3> m_dsw;
+
+	// output
 	output_finder<> m_led;
+	output_finder<3> m_track_sel;
+	output_finder<4> m_gear_sel;
 };
 
-/*----------- defined in audio/nitedrvr.c -----------*/
+//----------- defined in audio/nitedrvr.cpp -----------
 DISCRETE_SOUND_EXTERN( nitedrvr_discrete );
 
 #endif // MAME_INCLUDES_NITEDRVR_H

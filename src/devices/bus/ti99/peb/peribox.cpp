@@ -182,6 +182,8 @@ CRUCLK*  51||52  DBIN
 #include "ti_fdc.h"
 #include "bwg.h"
 #include "hfdc.h"
+#include "cc_fdc.h"
+#include "myarcfdc.h"
 #include "pcode.h"
 #include "myarcmem.h"
 #include "samsmem.h"
@@ -193,6 +195,11 @@ CRUCLK*  51||52  DBIN
 #include "spchsyn.h"
 #include "memex.h"
 #include "horizon.h"
+#include "forti.h"
+#include "pgram.h"
+#include "sidmaster.h"
+#include "scsicard.h"
+#include "tipi.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CONFIG      (1U<<2)   // Configuration
@@ -206,24 +213,24 @@ CRUCLK*  51||52  DBIN
 // Peripheral box that is attached to the TI console (also TI with EVPC)
 // and has the Flex Cable Interface in slot 1
 // This is a device that plugs into the slot "ioport" of the console
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX,      bus::ti99::peb, peribox_device,      "peribox",      "Peripheral expansion box")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX,      bus::ti99::peb::peribox_device,      "peribox",      "Peripheral expansion box")
 
 // Peripheral box which has a EVPC card in slot 2 (for use with the ti99_4ev)
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_EV,   bus::ti99::peb, peribox_ev_device,   "peribox_ev",   "Peripheral expansion box with EVPC")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_EV,   bus::ti99::peb::peribox_ev_device,   "peribox_ev",   "Peripheral expansion box with EVPC")
 
 // Peripheral box which hosts the SGCPU card in slot 1
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_SG,   bus::ti99::peb, peribox_sg_device,   "peribox_sg",   "Peripheral expansion box SGCPU")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_SG,   bus::ti99::peb::peribox_sg_device,   "peribox_sg",   "Peripheral expansion box SGCPU")
 
 // Peripheral box which hosts the Geneve 9640 in slot 1
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device,  "peribox_gen",  "Peripheral expansion box Geneve")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_GEN,  bus::ti99::peb::peribox_gen_device,  "peribox_gen",  "Peripheral expansion box Geneve")
 
 // Peripheral box which hosts the Geneve 9640 in slot 1 with Genmod
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_GENMOD,  bus::ti99::peb, peribox_genmod_device,  "peribox_genmod",  "Peripheral expansion box Genmod")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_GENMOD,  bus::ti99::peb::peribox_genmod_device,  "peribox_genmod",  "Peripheral expansion box Genmod")
 
 // Single slot of the PEB
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device, "peribox_slot", "TI P-Box slot")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_SLOT, bus::ti99::peb::peribox_slot_device, "peribox_slot", "TI P-Box slot")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define PEBSLOT2 "slot2"
 #define PEBSLOT3 "slot3"
@@ -264,11 +271,13 @@ peribox_device::peribox_device(const machine_config &mconfig, device_type type, 
 peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: peribox_device(mconfig, TI99_PERIBOX, tag, owner, clock)
 {
+	// The address prefix represents a set of pull-up resistors for the
+	// additional address lines AMA, AMB, AMC. They are contained in the
+	// Flex Cable Interface.
 	m_address_prefix = 0x70000;
-	m_genmod = false;
 }
 
-READ8Z_MEMBER(peribox_device::readz)
+void peribox_device::readz(offs_t offset, uint8_t *value)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -284,7 +293,7 @@ void peribox_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
+void peribox_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Ignore the address when the TI-99/8 transmits the high-order 8 bits
 	if (!m_memen) return;
@@ -295,7 +304,7 @@ SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
 	}
 }
 
-READ8Z_MEMBER(peribox_device::crureadz)
+void peribox_device::crureadz(offs_t offset, uint8_t *value)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -308,6 +317,17 @@ void peribox_device::cruwrite(offs_t offset, uint8_t data)
 	for (int i=2; i <= 8; i++)
 	{
 		if (m_slot[i]!=nullptr) m_slot[i]->cruwrite(offset, data);
+	}
+}
+
+/*
+    RESET line from the console.
+*/
+WRITE_LINE_MEMBER(peribox_device::reset_in)
+{
+	for (int i=2; i <= 8; i++)
+	{
+		if (m_slot[i]!=nullptr) m_slot[i]->reset_in(state);
 	}
 }
 
@@ -428,8 +448,6 @@ void peribox_device::ready_join(int slot, int state)
 void peribox_device::set_slot_loaded(int slot, peribox_slot_device* slotdev)
 {
 	m_slot[slot] = slotdev;
-	if (slotdev != nullptr)
-		slotdev->set_genmod(m_genmod);
 }
 
 void peribox_device::device_start()
@@ -474,11 +492,19 @@ void ti99_peribox_slot_standard(device_slot_interface &device)
 	device.option_add("tirs232",  TI99_RS232);
 	device.option_add("speech",   TI99_SPEECH);
 	device.option_add("horizon",  TI99_HORIZON);
+	device.option_add("pgram",    TI99_PGRAM);
 	device.option_add("ide",      TI99_IDE);
 	device.option_add("usbsm",    TI99_USBSM);
 	device.option_add("bwg",      TI99_BWG);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
+	device.option_add("ccdcc",    TI99_CCDCC);
+	device.option_add("ccfdc",    TI99_CCFDC);
+	device.option_add("ddcc1",    TI99_DDCC1);
+	device.option_add("forti",    TI99_FORTI);
+	device.option_add("sidmaster", TI99_SIDMASTER);
+	device.option_add("whtscsi",  TI99_WHTSCSI);
+	device.option_add("tipi",     TI99_TIPI);
 }
 
 void peribox_device::device_add_mconfig(machine_config &config)
@@ -500,7 +526,6 @@ peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *
 	: peribox_device(mconfig, TI99_PERIBOX_EV, tag, owner, clock)
 {
 	m_address_prefix = 0x70000;
-	m_genmod = false;
 }
 
 void ti99_peribox_slot_evpc(device_slot_interface &device)
@@ -514,11 +539,19 @@ void ti99_peribox_slot_evpc(device_slot_interface &device)
 	device.option_add("tirs232",  TI99_RS232);
 	device.option_add("speech",   TI99_SPEECH);
 	device.option_add("horizon",  TI99_HORIZON);
+	device.option_add("pgram",    TI99_PGRAM);
 	device.option_add("ide",      TI99_IDE);
 	device.option_add("usbsm",    TI99_USBSM);
 	device.option_add("bwg",      TI99_BWG);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
+	device.option_add("ccdcc",    TI99_CCDCC);
+	device.option_add("ccfdc",    TI99_CCFDC);
+	device.option_add("ddcc1",    TI99_DDCC1);
+	device.option_add("forti",    TI99_FORTI);
+	device.option_add("sidmaster", TI99_SIDMASTER);
+	device.option_add("whtscsi",  TI99_WHTSCSI);
+	device.option_add("tipi",     TI99_TIPI);
 }
 
 void peribox_ev_device::device_add_mconfig(machine_config &config)
@@ -548,17 +581,17 @@ peribox_gen_device::peribox_gen_device(const machine_config &mconfig, device_typ
 peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: peribox_gen_device(mconfig, TI99_PERIBOX_GEN, tag, owner, clock)
 {
-	m_genmod = false;
 }
 
 peribox_genmod_device::peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: peribox_gen_device(mconfig, TI99_PERIBOX_GENMOD, tag, owner, clock)
 {
-	m_genmod = true;
 }
 
 // The BwG controller will not run with the Geneve due to its wait state
-// logic (see bwg.c)
+// logic (see bwg.cpp)
+// The SID master card may have trouble with the Geneve because of its CRU
+// handling (see sidmaster.cpp)
 
 void ti99_peribox_slot_geneve(device_slot_interface &device)
 {
@@ -570,6 +603,13 @@ void ti99_peribox_slot_geneve(device_slot_interface &device)
 	device.option_add("usbsm",    TI99_USBSM);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
+	device.option_add("ccdcc",    TI99_CCDCC);
+	device.option_add("ccfdc",    TI99_CCFDC);
+	device.option_add("ddcc1",    TI99_DDCC1);
+	device.option_add("forti",    TI99_FORTI);
+	device.option_add("sidmaster", TI99_SIDMASTER);
+	device.option_add("whtscsi",  TI99_WHTSCSI);
+	device.option_add("tipi",     TI99_TIPI);
 }
 
 void peribox_gen_device::device_add_mconfig(machine_config &config)
@@ -601,8 +641,9 @@ void peribox_genmod_device::device_add_mconfig(machine_config &config)
 peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, TI99_PERIBOX_SG, tag, owner, clock)
 {
+	// The SGCPU card contains pull-up registers for the AMA/AMB/AMC lines
+	// like the Flex Cable Interface
 	m_address_prefix = 0x70000;
-	m_genmod = false;
 }
 
 void ti99_peribox_slot_sgcpu(device_slot_interface &device)
@@ -620,6 +661,13 @@ void ti99_peribox_slot_sgcpu(device_slot_interface &device)
 	device.option_add("bwg",      TI99_BWG);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
+	device.option_add("ccdcc",    TI99_CCDCC);
+	device.option_add("ccfdc",    TI99_CCFDC);
+	device.option_add("ddcc1",    TI99_DDCC1);
+	device.option_add("forti",    TI99_FORTI);
+	device.option_add("sidmaster", TI99_SIDMASTER);
+	device.option_add("whtscsi",  TI99_WHTSCSI);
+	device.option_add("tipi",     TI99_TIPI);
 }
 
 void peribox_sg_device::device_add_mconfig(machine_config &config)
@@ -639,13 +687,13 @@ void peribox_sg_device::device_add_mconfig(machine_config &config)
 
 peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_PERIBOX_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_ti99_peribox_card_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_slotnumber(0)
 {
 }
 
-READ8Z_MEMBER(peribox_slot_device::readz)
+void peribox_slot_device::readz(offs_t offset, uint8_t *value)
 {
 	m_card->readz(offset, value);
 }
@@ -655,12 +703,12 @@ void peribox_slot_device::write(offs_t offset, uint8_t data)
 	m_card->write(offset, data);
 }
 
-SETADDRESS_DBIN_MEMBER(peribox_slot_device::setaddress_dbin)
+void peribox_slot_device::setaddress_dbin(offs_t offset, int state)
 {
 	m_card->setaddress_dbin(offset, state);
 }
 
-READ8Z_MEMBER(peribox_slot_device::crureadz)
+void peribox_slot_device::crureadz(offs_t offset, uint8_t *value)
 {
 	m_card->crureadz(offset, value);
 }
@@ -685,12 +733,9 @@ WRITE_LINE_MEMBER( peribox_slot_device::clock_in )
 	m_card->clock_in(state);
 }
 
-/*
-    Genmod support
-*/
-void peribox_slot_device::set_genmod(bool set)
+WRITE_LINE_MEMBER( peribox_slot_device::reset_in )
 {
-	m_card->m_genmod = set;
+	m_card->reset_in(state);
 }
 
 void peribox_slot_device::device_start()
@@ -699,7 +744,7 @@ void peribox_slot_device::device_start()
 
 void peribox_slot_device::device_config_complete()
 {
-	m_card = dynamic_cast<device_ti99_peribox_card_interface *>(get_card_device());
+	m_card = get_card_device();
 	peribox_device *peb = dynamic_cast<peribox_device*>(owner());
 	if (peb)
 		peb->set_slot_loaded(m_slotnumber, m_card ? this : nullptr);
@@ -736,15 +781,12 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
 /***************************************************************************/
 
 device_ti99_peribox_card_interface::device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device):
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "ti99peb"),
 	m_selected(false),
-	m_cru_base(0),
-	m_select_mask(0),
-	m_select_value(0)
+	m_cru_base(0)
 {
 	m_senila = CLEAR_LINE;
 	m_senilb = CLEAR_LINE;
-	m_genmod = false;
 }
 
 void device_ti99_peribox_card_interface::interface_config_complete()
@@ -752,4 +794,20 @@ void device_ti99_peribox_card_interface::interface_config_complete()
 	m_slot = dynamic_cast<peribox_slot_device*>(device().owner());
 }
 
-} } } // end namespace bus::ti99::peb
+bool device_ti99_peribox_card_interface::in_dsr_space(offs_t offset, bool amadec)
+{
+	if (amadec)
+		return (offset & 0x7e000)==0x74000;
+	else
+		return (offset & 0x0e000)==0x04000;
+}
+
+bool device_ti99_peribox_card_interface::in_cart_space(offs_t offset, bool amadec)
+{
+	if (amadec)
+		return (offset & 0x7e000)==0x76000;
+	else
+		return (offset & 0x0e000)==0x06000;
+}
+
+} // end namespace bus::ti99::peb

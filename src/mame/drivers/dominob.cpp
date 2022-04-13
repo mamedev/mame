@@ -101,8 +101,8 @@ private:
 	//uint8_t m_paddle_select;
 	//uint8_t m_paddle_value;
 
-	DECLARE_WRITE8_MEMBER(dominob_d008_w);
-	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
+	void dominob_d008_w(uint8_t data);
+	uint8_t dominob_unk_port02_r();
 	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void memmap(address_map &map);
@@ -182,7 +182,7 @@ uint32_t dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind1
 }
 
 
-WRITE8_MEMBER(dominob_state::dominob_d008_w)
+void dominob_state::dominob_d008_w(uint8_t data)
 {
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
@@ -209,7 +209,7 @@ void dominob_state::memmap(address_map &map)
 }
 
 /* I don't know if this has a purpose - also read in 'arkatayt' but not handled */
-READ8_MEMBER(dominob_state::dominob_unk_port02_r)
+uint8_t dominob_state::dominob_unk_port02_r()
 {
 	return 0xff;
 }
@@ -269,17 +269,6 @@ static INPUT_PORTS_START( dominob )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3)},
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout bglayout =
 {
 	32,32,
@@ -297,8 +286,8 @@ static const gfx_layout bglayout =
 };
 
 static GFXDECODE_START( gfx_dominob )
-	GFXDECODE_ENTRY("gfx1", 0, charlayout,   0, 0x20)
-	GFXDECODE_ENTRY("gfx2", 0, bglayout,     0x100, 0x10)
+	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x3_planar,   0, 0x20)
+	GFXDECODE_ENTRY("gfx2", 0, bglayout,       0x100, 0x10)
 GFXDECODE_END
 
 

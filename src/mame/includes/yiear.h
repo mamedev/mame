@@ -12,6 +12,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class yiear_state : public driver_device
 {
@@ -48,26 +49,26 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
-	uint8_t      m_yiear_nmi_enable;
-	uint8_t      m_yiear_irq_enable;
-	DECLARE_WRITE8_MEMBER(yiear_videoram_w);
-	DECLARE_WRITE8_MEMBER(yiear_control_w);
-	DECLARE_READ8_MEMBER(yiear_speech_r);
-	DECLARE_WRITE8_MEMBER(yiear_VLM5030_control_w);
+	uint8_t      m_nmi_enable = 0;
+	uint8_t      m_irq_enable = 0;
+	void videoram_w(offs_t offset, uint8_t data);
+	void control_w(uint8_t data);
+	uint8_t speech_r();
+	void VLM5030_control_w(uint8_t data);
 
-	uint8_t m_SN76496_latch;
-	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
+	uint8_t m_SN76496_latch = 0;
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void yiear_palette(palette_device &palette) const;
-	uint32_t screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);
+	INTERRUPT_GEN_MEMBER(nmi_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	void main_map(address_map &map);

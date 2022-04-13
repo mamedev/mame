@@ -4,7 +4,9 @@
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "video/snk68_spr.h"
+#include "video/alpha68k_palette.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class snk68_state : public driver_device
 {
@@ -17,6 +19,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_sprites(*this, "sprites"),
+		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -28,14 +31,18 @@ public:
 
 	void streetsm(machine_config &config);
 	void pow(machine_config &config);
+	void powb(machine_config &config);
+
+	void init_powb();
 
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<upd7759_device> m_upd7759;
+	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<snk68_spr_device> m_sprites;
+	required_device<alpha68k_palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_fg_videoram;
@@ -49,8 +56,8 @@ protected:
 	tilemap_t *m_fg_tilemap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(D7759_write_port_0_w);
+	void sound_w(uint8_t data);
+	void D7759_write_port_0_w(uint8_t data);
 
 	virtual void video_start() override;
 	void common_video_start();
@@ -66,15 +73,16 @@ private:
 	uint32_t m_fg_tile_offset;
 
 	// pow and streetsm
-	DECLARE_READ16_MEMBER(fg_videoram_r);
-	DECLARE_WRITE16_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	uint16_t fg_videoram_r(offs_t offset);
+	void fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void flipscreen_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	void tile_callback_pow(int &tile, int& fx, int& fy, int& region);
 
 	void pow_map(address_map &map);
+	void powb_sound_io_map(address_map &map);
 };
 
 class searchar_state : public snk68_state
@@ -95,14 +103,14 @@ protected:
 private:
 	optional_ioport_array<2> m_rotary_io;
 
-	uint8_t m_invert_controls;
+	uint8_t m_invert_controls = 0;
 
 	// searchar and ikari3
-	DECLARE_WRITE16_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_READ16_MEMBER(rotary_1_r);
-	DECLARE_READ16_MEMBER(rotary_2_r);
-	DECLARE_READ16_MEMBER(rotary_lsb_r);
+	void fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void flipscreen_w(uint8_t data);
+	uint16_t rotary_1_r();
+	uint16_t rotary_2_r();
+	uint16_t rotary_lsb_r();
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

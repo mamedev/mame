@@ -57,19 +57,21 @@ void msx_matsushita_device::nvram_default()
 }
 
 
-void msx_matsushita_device::nvram_read(emu_file &file)
+bool msx_matsushita_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_sram[0], m_sram.size());
+	size_t actual;
+	return !file.read(&m_sram[0], m_sram.size(), actual) && actual == m_sram.size();
 }
 
 
-void msx_matsushita_device::nvram_write(emu_file &file)
+bool msx_matsushita_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_sram[0], m_sram.size());
+	size_t actual;
+	return !file.write(&m_sram[0], m_sram.size(), actual) && actual == m_sram.size();
 }
 
 
-READ8_MEMBER(msx_matsushita_device::switched_read)
+uint8_t msx_matsushita_device::switched_read(offs_t offset)
 {
 	if (m_selected)
 	{
@@ -137,7 +139,7 @@ READ8_MEMBER(msx_matsushita_device::switched_read)
 */
 
 
-WRITE8_MEMBER(msx_matsushita_device::switched_write)
+void msx_matsushita_device::switched_write(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

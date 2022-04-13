@@ -35,13 +35,13 @@ void compgolf_state::compgolf_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(compgolf_state::compgolf_video_w)
+void compgolf_state::compgolf_video_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(compgolf_state::compgolf_back_w)
+void compgolf_state::compgolf_back_w(offs_t offset, uint8_t data)
 {
 	m_bg_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -50,7 +50,7 @@ WRITE8_MEMBER(compgolf_state::compgolf_back_w)
 TILE_GET_INFO_MEMBER(compgolf_state::get_text_info)
 {
 	tile_index <<= 1;
-	SET_TILE_INFO_MEMBER(2, m_videoram[tile_index + 1] | (m_videoram[tile_index] << 8), m_videoram[tile_index] >> 2, 0);
+	tileinfo.set(2, m_videoram[tile_index + 1] | (m_videoram[tile_index] << 8), m_videoram[tile_index] >> 2, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(compgolf_state::back_scan)
@@ -65,13 +65,13 @@ TILE_GET_INFO_MEMBER(compgolf_state::get_back_info)
 	int code = m_bg_ram[tile_index * 2 + 1] + ((attr & 1) << 8);
 	int color = (attr & 0x3e) >> 1;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void compgolf_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(compgolf_state::get_back_info),this), tilemap_mapper_delegate(FUNC(compgolf_state::back_scan),this), 16, 16, 32, 32);
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(compgolf_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(compgolf_state::get_back_info)), tilemap_mapper_delegate(*this, FUNC(compgolf_state::back_scan)), 16, 16, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(compgolf_state::get_text_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_text_tilemap->set_transparent_pen(0);
 }

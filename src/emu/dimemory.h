@@ -42,30 +42,6 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DEVICE_ADDRESS_MAP(_space, _map) \
-	dynamic_cast<device_memory_interface *>(device)->set_addrmap(_space, address_map_constructor(&std::remove_pointer_t<decltype(this)>::_map, tag(), this));
-
-#define MCFG_DEVICE_REMOVE_ADDRESS_MAP(_space) \
-	dynamic_cast<device_memory_interface *>(device)->set_addrmap(_space, address_map_constructor());
-
-#define MCFG_DEVICE_PROGRAM_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
-
-#define MCFG_DEVICE_DATA_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_DATA, _map)
-
-#define MCFG_DEVICE_IO_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _map)
-
-#define MCFG_DEVICE_OPCODES_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_OPCODES, _map)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -74,11 +50,11 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 class device_memory_interface : public device_interface
 {
 	friend class device_scheduler;
-	template <typename T, typename U> struct is_related_class { static constexpr bool value = std::is_convertible<std::add_pointer_t<T>, std::add_pointer_t<U> >::value; };
-	template <typename T, typename U> struct is_related_device { static constexpr bool value = emu::detail::is_device_implementation<T>::value && is_related_class<T, U>::value; };
-	template <typename T, typename U> struct is_related_interface { static constexpr bool value = emu::detail::is_device_interface<T>::value && is_related_class<T, U>::value; };
-	template <typename T, typename U> struct is_unrelated_device { static constexpr bool value = emu::detail::is_device_implementation<T>::value && !is_related_class<T, U>::value; };
-	template <typename T, typename U> struct is_unrelated_interface { static constexpr bool value = emu::detail::is_device_interface<T>::value && !is_related_class<T, U>::value; };
+	template <typename T, typename U> using is_related_class = std::bool_constant<std::is_convertible_v<std::add_pointer_t<T>, std::add_pointer_t<U> > >;
+	template <typename T, typename U> using is_related_device = std::bool_constant<emu::detail::is_device_implementation<T>::value && is_related_class<T, U>::value >;
+	template <typename T, typename U> using is_related_interface = std::bool_constant<emu::detail::is_device_interface<T>::value && is_related_class<T, U>::value >;
+	template <typename T, typename U> using is_unrelated_device = std::bool_constant<emu::detail::is_device_implementation<T>::value && !is_related_class<T, U>::value >;
+	template <typename T, typename U> using is_unrelated_interface = std::bool_constant<emu::detail::is_device_interface<T>::value && !is_related_class<T, U>::value >;
 
 public:
 	// construction/destruction
@@ -100,9 +76,7 @@ public:
 	template <typename T, typename U, typename Ret, typename... Params>
 	std::enable_if_t<is_unrelated_interface<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &dynamic_cast<U &>(obj))); }
 	template <typename T, typename Ret, typename... Params>
-	std::enable_if_t<is_related_class<device_t, T>::value> set_addrmap(int spacenum, Ret (T::*func)(Params...));
-	template <typename T, typename Ret, typename... Params>
-	std::enable_if_t<!is_related_class<device_t, T>::value> set_addrmap(int spacenum, Ret (T::*func)(Params...));
+	void set_addrmap(int spacenum, Ret (T::*func)(Params...));
 	void set_addrmap(int spacenum, address_map_constructor map);
 
 	// basic information getters
@@ -127,8 +101,6 @@ public:
 	}
 	void prepare_maps() { for (auto const &space : m_addrspace) { if (space) { space->prepare_map(); } } }
 	void populate_from_maps() { for (auto const &space : m_addrspace) { if (space) { space->populate_from_map(); } } }
-	void allocate_memory() { for (auto const &space : m_addrspace) { if (space) { space->allocate_memory(); } } }
-	void locate_memory() { for (auto const &space : m_addrspace) { if (space) { space->locate_memory(); } } }
 	void set_log_unmap(bool log) { for (auto const &space : m_addrspace) { if (space) { space->set_log_unmap(log); } } }
 
 protected:
@@ -154,8 +126,7 @@ private:
 };
 
 // iterator
-typedef device_interface_iterator<device_memory_interface> memory_interface_iterator;
+typedef device_interface_enumerator<device_memory_interface> memory_interface_enumerator;
 
 
-
-#endif  /* MAME_EMU_DIMEMORY_H */
+#endif // MAME_EMU_DIMEMORY_H

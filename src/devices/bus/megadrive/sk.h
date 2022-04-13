@@ -21,16 +21,20 @@ protected:
 	md_rom_sk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual uint16_t read_a13(offs_t offset) override;
+	virtual void write_a13(offs_t offset, uint16_t data) override;
 
 private:
 	required_device<md_cart_slot_device> m_exp;
+	bool m_map_upper;
 };
 
 

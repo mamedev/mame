@@ -28,8 +28,7 @@ void t10sbc::t10_reset()
 	else
 	{
 		// get hard disk sector size from CHD metadata
-		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
-		m_sector_bytes = hdinfo->sectorbytes;
+		m_sector_bytes = m_disk->get_info().sectorbytes;
 	}
 }
 
@@ -278,7 +277,7 @@ void t10sbc::ReadData( uint8_t *data, int dataLength )
 			m_device->logerror("T10SBC: Reading %d bytes from HD\n", dataLength);
 			while (dataLength > 0)
 			{
-				if (!hard_disk_read(m_disk, m_lba,  data))
+				if (!m_disk->read(m_lba,  data))
 				{
 					m_device->logerror("T10SBC: HD read error!\n");
 				}
@@ -320,7 +319,7 @@ void t10sbc::WriteData( uint8_t *data, int dataLength )
 			m_device->logerror("T10SBC: Writing %d bytes to HD\n", dataLength);
 			while (dataLength > 0)
 			{
-				if (!hard_disk_write(m_disk, m_lba, data))
+				if (!m_disk->write(m_lba, data))
 				{
 					m_device->logerror("T10SBC: HD write error!\n");
 				}
@@ -350,46 +349,46 @@ void t10sbc::SetDevice( void *_disk )
 
 void t10sbc::GetFormatPage( format_page_t *page )
 {
-	hard_disk_info *info = hard_disk_get_info(m_disk);
+	const auto &info = m_disk->get_info();
 
 	memset(page, 0, sizeof(format_page_t));
 	page->m_page_code = 0x03;
 	page->m_page_length = 0x16;
-	page->m_sectors_per_track_msb = (uint8_t)(info->sectors >> 8);
-	page->m_sectors_per_track_lsb = (uint8_t)info->sectors;
-	page->m_bytes_per_sector_msb = (uint8_t)(info->sectorbytes >> 8);
-	page->m_bytes_per_sector_lsb = (uint8_t)info->sectorbytes;
+	page->m_sectors_per_track_msb = (uint8_t)(info.sectors >> 8);
+	page->m_sectors_per_track_lsb = (uint8_t)info.sectors;
+	page->m_bytes_per_sector_msb = (uint8_t)(info.sectorbytes >> 8);
+	page->m_bytes_per_sector_lsb = (uint8_t)info.sectorbytes;
 	page->m_format = 0x80; // SSEC, Soft-Sectored
 }
 
 void t10sbc::GetGeometryPage( geometry_page_t *page )
 {
-	hard_disk_info *info = hard_disk_get_info(m_disk);
+	const auto &info = m_disk->get_info();
 
 	memset(page, 0, sizeof(geometry_page_t));
 	page->m_page_code = 0x04;
 	page->m_page_length = 0x16;
-	page->m_num_cylinders_msb = (uint8_t)(info->cylinders >> 16);
-	page->m_num_cylinders_2nd = (uint8_t)(info->cylinders >> 8);
-	page->m_num_cylinders_lsb = (uint8_t)info->cylinders;
-	page->m_num_heads = (uint8_t)info->heads;
+	page->m_num_cylinders_msb = (uint8_t)(info.cylinders >> 16);
+	page->m_num_cylinders_2nd = (uint8_t)(info.cylinders >> 8);
+	page->m_num_cylinders_lsb = (uint8_t)info.cylinders;
+	page->m_num_heads = (uint8_t)info.heads;
 	page->m_rot_rate_msb = (uint8_t)(3600 >> 8);
 	page->m_rot_rate_lsb = (uint8_t)3600;
 }
 
 void t10sbc::ReadCapacity( uint8_t *data )
 {
-	hard_disk_info *info = hard_disk_get_info(m_disk);
+	const auto &info = m_disk->get_info();
 
 	// get # of sectors
-	uint32_t temp = info->cylinders * info->heads * info->sectors - 1;
+	uint32_t temp = info.cylinders * info.heads * info.sectors - 1;
 
 	data[0] = (temp>>24) & 0xff;
 	data[1] = (temp>>16) & 0xff;
 	data[2] = (temp>>8) & 0xff;
 	data[3] = (temp & 0xff);
-	data[4] = (info->sectorbytes>>24)&0xff;
-	data[5] = (info->sectorbytes>>16)&0xff;
-	data[6] = (info->sectorbytes>>8)&0xff;
-	data[7] = (info->sectorbytes & 0xff);
+	data[4] = (info.sectorbytes>>24)&0xff;
+	data[5] = (info.sectorbytes>>16)&0xff;
+	data[6] = (info.sectorbytes>>8)&0xff;
+	data[7] = (info.sectorbytes & 0xff);
 }

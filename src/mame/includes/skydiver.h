@@ -14,6 +14,7 @@
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
 #define SKYDIVER_RANGE_DATA     NODE_01
@@ -55,9 +56,9 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t wram_r(offs_t offset);
+	void wram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(width_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(start_lamp_1_w);
@@ -70,7 +71,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(lamp_v_w);
 	DECLARE_WRITE_LINE_MEMBER(lamp_e_w);
 	DECLARE_WRITE_LINE_MEMBER(lamp_r_w);
-	DECLARE_WRITE8_MEMBER(latch3_watchdog_w);
+	void latch3_watchdog_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -102,9 +103,9 @@ private:
 	output_finder<> m_lamp_v;
 	output_finder<> m_lamp_e;
 	output_finder<> m_lamp_r;
-	int m_nmion;
-	tilemap_t *m_bg_tilemap;
-	int m_width;
+	int m_nmion = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_width = 0;
 };
 
 /*----------- defined in audio/skydiver.c -----------*/

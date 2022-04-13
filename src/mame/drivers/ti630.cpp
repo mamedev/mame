@@ -59,9 +59,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
-	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
-	DECLARE_READ8_MEMBER(i80c31_p1_r);
+	void i80c31_p1_w(uint8_t data);
+	void i80c31_p3_w(uint8_t data);
+	uint8_t i80c31_p1_r();
 	void ti630_palette(palette_device &palette) const;
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
@@ -83,9 +83,9 @@ void ti630_state::init_ti630()
 
 void ti630_state::i80c31_io(address_map &map)
 {
-	map(0x0000, 0x0000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::control_write));
-	map(0x1000, 0x1000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::data_write));
-	map(0x2000, 0x2000) /*.mirror(?)*/ .r("hd44780", FUNC(hd44780_device::control_read));
+	map(0x0000, 0x0000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::control_w));
+	map(0x1000, 0x1000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::data_w));
+	map(0x2000, 0x2000) /*.mirror(?)*/ .r("hd44780", FUNC(hd44780_device::control_r));
 	map(0x8000, 0xffff).ram(); /*TODO: verify the ammont of RAM and the correct address range to which it is mapped. This is just a first reasonable guess that apparently yields good results in the emulation */
 }
 
@@ -97,7 +97,7 @@ void ti630_state::machine_reset()
 {
 }
 
-READ8_MEMBER(ti630_state::i80c31_p1_r)
+uint8_t ti630_state::i80c31_p1_r()
 {
 	uint8_t value = 0;
 	if (LOG_IO_PORTS)
@@ -106,13 +106,13 @@ READ8_MEMBER(ti630_state::i80c31_p1_r)
 	return value;
 }
 
-WRITE8_MEMBER(ti630_state::i80c31_p1_w)
+void ti630_state::i80c31_p1_w(uint8_t data)
 {
 	if (LOG_IO_PORTS)
 		logerror("Write to P1: %02X\n", data);
 }
 
-WRITE8_MEMBER(ti630_state::i80c31_p3_w)
+void ti630_state::i80c31_p3_w(uint8_t data)
 {
 	if (LOG_IO_PORTS)
 		logerror("Write to P3: %02X\n", data);

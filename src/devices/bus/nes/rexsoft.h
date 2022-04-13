@@ -38,9 +38,10 @@ class nes_rex_sl1632_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+	virtual void chr_cb(int start, int bank, int source) override;
 
 	virtual void pcb_reset() override;
 
@@ -49,10 +50,11 @@ protected:
 	virtual void device_start() override;
 
 	virtual void set_prg(int prg_base, int prg_mask) override;
-	virtual void set_chr(uint8_t chr, int chr_base, int chr_mask) override;
 
-	uint8_t m_mode, m_mirror;
-	uint8_t m_extra_bank[12];
+	u8 m_mode;
+	u8 m_mirror[2];
+	u8 m_vrc2_prg_bank[2];
+	u8 m_vrc2_vrom_bank[8];
 };
 
 

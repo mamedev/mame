@@ -124,15 +124,15 @@ protected:
 	O(sty_abx);
 
 	O(stz_aba);
-	O(stz_zpg);
+	O(stz_xav_zpg);
 
-	O(bit_zpx);
+	O(bit_xav_zpx);
 	O(bit_abx);
 	O(bit_imm);
 
-	O(asr_zpg);
+	O(asr_xav_zpg);
 	O(asr_aba);
-	O(asr_zpx);
+	O(asr_xav_zpx);
 	O(asr_acc);
 	O(asr_abx);
 

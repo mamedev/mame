@@ -32,11 +32,14 @@ public:
 	auto tend0() { return tend0_cb.bind(); }
 	auto tend1() { return tend1_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(syscr_r);
-	DECLARE_WRITE8_MEMBER(syscr_w);
+	void set_mode_a20() { mode_a20 = true; }
+	void set_mode_a24() { mode_a20 = false; }
 
-	DECLARE_READ8_MEMBER(rtmcsr_r);
-	DECLARE_WRITE8_MEMBER(rtmcsr_w);
+	uint8_t syscr_r();
+	void syscr_w(uint8_t data);
+
+	uint8_t rtmcsr_r();
+	void rtmcsr_w(uint8_t data);
 
 protected:
 	required_device<h8h_intc_device> intc;

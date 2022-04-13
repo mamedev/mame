@@ -118,12 +118,12 @@ void pitnrun_state::pitnrun_map(address_map &map)
 	map(0xb800, 0xb800).portr("INPUTS").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc800, 0xc801).w(FUNC(pitnrun_state::scroll_w));
 	map(0xc802, 0xc802).w(FUNC(pitnrun_state::scroll_y_w));
-	//AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
+	//map(0xc804, 0xc804).w(FUNC(pitnrun_state::mcu_data_w));
 	map(0xc805, 0xc805).w(FUNC(pitnrun_state::h_heed_w));
 	map(0xc806, 0xc806).w(FUNC(pitnrun_state::v_heed_w));
 	map(0xc807, 0xc807).w(FUNC(pitnrun_state::ha_w));
-	//AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
-	//AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
+	//map(0xd000, 0xd000).r(FUNC(pitnrun_state::mcu_data_r));
+	//map(0xd800, 0xd800).r(FUNC(pitnrun_state::mcu_status_r));
 	map(0xf000, 0xf000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -298,7 +298,7 @@ void pitnrun_state::pitnrun(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

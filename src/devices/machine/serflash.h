@@ -26,17 +26,17 @@ public:
 	// configuration
 	void set_flash_page_size(uint16_t size) { m_flash_page_size = size; }
 
-	DECLARE_READ8_MEMBER( flash_ready_r );
-	DECLARE_READ8_MEMBER( flash_io_r );
-	DECLARE_WRITE8_MEMBER( flash_addr_w );
-	DECLARE_WRITE8_MEMBER( flash_data_w );
-	DECLARE_WRITE8_MEMBER( flash_cmd_w );
-	DECLARE_WRITE8_MEMBER( flash_enab_w );
+	uint8_t flash_ready_r();
+	uint8_t flash_io_r();
+	void flash_addr_w(uint8_t data);
+	void flash_data_w(uint8_t data);
+	void flash_cmd_w(uint8_t data);
+	void flash_enab_w(uint8_t data);
 	void flash_hard_reset();
 
-	DECLARE_READ8_MEMBER(n3d_flash_r);
-	DECLARE_WRITE8_MEMBER(n3d_flash_cmd_w);
-	DECLARE_WRITE8_MEMBER(n3d_flash_addr_w);
+	uint8_t n3d_flash_r(offs_t offset);
+	void n3d_flash_cmd_w(offs_t offset, uint8_t data);
+	void n3d_flash_addr_w(offs_t offset, uint8_t data);
 
 protected:
 	enum class flash_state_t : u8 { IDLE = 0, READ, READ_ID, READ_STATUS, BLOCK_ERASE, PAGE_PROGRAM };
@@ -47,8 +47,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	void flash_change_state(flash_state_t state);
 

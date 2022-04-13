@@ -15,8 +15,10 @@ public:
 	auto dma_in() { return m_dma_in_cb.bind(); }
 	auto dma_out() { return m_dma_out_cb.bind(); }
 
-	DECLARE_READ16_MEMBER(regs_r);
-	DECLARE_WRITE16_MEMBER(regs_w);
+	u16 regs_r(address_space &space, offs_t offset);
+	void regs_w(offs_t offset, u16 data);
+
+	void reset_w(int state) { if (!state) device_reset(); }
 
 protected:
 	am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);

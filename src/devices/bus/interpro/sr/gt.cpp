@@ -107,6 +107,12 @@
 
 #include "gt.h"
 
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/loopback.h"
+
+#include "bus/interpro/keyboard/keyboard.h"
+#include "bus/interpro/mouse/mouse.h"
+
 #define LOG_GENERAL (1U << 0)
 #define LOG_LINE    (1U << 1)
 #define LOG_BLIT    (1U << 2)
@@ -182,18 +188,18 @@ void gt_device_base::map(address_map &map)
 
 	map(0x16c, 0x16f).w(FUNC(gt_device_base::ri_control_w)); // mask 1ff?
 
-	//AM_RANGE(0x174, 0x177) AM_READWRITE(ri_xfer_r, ri_xfer_w)
-	//AM_RANGE(0x178, 0x17b) AM_READWRITE(ri_xfer_r, ri_xfer_w)
+	//map(0x174, 0x177).rw(FUNC(gt_device_base::ri_xfer_r), FUNC(gt_device_base::ri_xfer_w));
+	//map(0x178, 0x17b).rw(FUNC(gt_device_base::ri_xfer_r), FUNC(gt_device_base::ri_xfer_w));
 	map(0x17c, 0x17f).w(FUNC(gt_device_base::ri_xfer_w));
 
 	map(0x1a4, 0x1ab).w(FUNC(gt_device_base::bsga_float_w));
 
 	map(0x1b0, 0x1b3).nopr(); //?
 
-	//AM_RANGE(0x1c0, 0x1c3)
-	//AM_RANGE(0x1c4, 0x1c7)
-	//AM_RANGE(0x1c8, 0x1cb)
-	//AM_RANGE(0x1cc, 0x1cf) // write32 - float conversion control (inhibit/enable overflow detection?)
+	//map(0x1c0, 0x1c3)
+	//map(0x1c4, 0x1c7)
+	//map(0x1c8, 0x1cb)
+	//map(0x1cc, 0x1cf) // write32 - float conversion control (inhibit/enable overflow detection?)
 
 /*
  * Don't know where/how these fifos come into play yet:
@@ -224,7 +230,7 @@ void gtdb_device::map(address_map &map)
 
 	// Note: FDMDISK GTII register ODT gives a different serial mapping, but does
 	// not seem to be correct; the mapping here matches software usage elsewhere.
-	map(0x210, 0x21f).rw(m_scc, FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
+	map(0x210, 0x21f).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask32(0x000000ff);
 
 	map(0x300, 0x303).r(FUNC(gtdb_device::fifo_control_r));
 
@@ -500,6 +506,7 @@ gt_device_base::gt_device_base(const machine_config &mconfig, device_type type, 
 	, m_vram(*this, "vram%u", 0)
 	, m_mram(*this, "mram%u", 0)
 	, m_bpu(*this, "bpu%u", 0)
+	, m_control(0)
 	, m_double_buffered(double_buffered)
 	, m_masked_reads(masked_reads)
 {
@@ -614,7 +621,7 @@ void gt_device_base::device_start()
 	m_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt_device_base::done), this));
 }
 
-WRITE32_MEMBER(gt_device_base::control_w)
+void gt_device_base::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (data & GFX_BSGA_RST)
 	{
@@ -674,13 +681,13 @@ void gt_device_base::bsga_clip_status(s16 x, s16 y)
 	LOG("bsga_clip_status result 0x%04x\n", m_bsga_status);
 }
 
-WRITE32_MEMBER(gt_device_base::ri_xfer_w)
+void gt_device_base::ri_xfer_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOG("ri_xfer_w 0x%08x mem_mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
 
 	// initiate ri line draw
 	u32 address = m_ri_initial_address;
-	u32 error = m_ri_initial_error;
+	s32 error = m_ri_initial_error;
 
 	for (int i = 0; i < m_ri_stop_count; i++)
 	{
@@ -700,7 +707,7 @@ WRITE32_MEMBER(gt_device_base::ri_xfer_w)
 	}
 }
 
-WRITE32_MEMBER(gt_device_base::bsga_xin1yin1_w)
+void gt_device_base::bsga_xin1yin1_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_bsga_xin1 = (m_bsga_xin1 & ~(mem_mask >> 0)) | ((data & mem_mask) >> 0);
 	m_bsga_yin1 = (m_bsga_yin1 & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
@@ -719,7 +726,7 @@ WRITE32_MEMBER(gt_device_base::bsga_xin1yin1_w)
 	m_bsga_tmp = m_bsga_xin1;
 }
 
-WRITE32_MEMBER(gt_device_base::bsga_xin2yin2_w)
+void gt_device_base::bsga_xin2yin2_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_bsga_xin2 = (m_bsga_xin2 & ~(mem_mask >> 0)) | ((data & mem_mask) >> 0);
 	m_bsga_yin2 = (m_bsga_yin2 & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
@@ -736,7 +743,7 @@ WRITE32_MEMBER(gt_device_base::bsga_xin2yin2_w)
 	m_line_timer->adjust(attotime::zero);
 }
 
-WRITE16_MEMBER(gt_device_base::bsga_yin2_w)
+void gt_device_base::bsga_yin2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bsga_yin2);
 
@@ -750,14 +757,14 @@ WRITE16_MEMBER(gt_device_base::bsga_yin2_w)
 	m_line_timer->adjust(attotime::zero);
 }
 
-READ16_MEMBER(gt_device_base::bsga_status_r)
+u16 gt_device_base::bsga_status_r()
 {
 	LOG("bsga_status_r 0x%04x (%s)\n", m_bsga_status, machine().describe_context());
 
 	return m_bsga_status;
 }
 
-WRITE32_MEMBER(gt_device_base::bsga_float_w)
+void gt_device_base::bsga_float_w(offs_t offset, u32 data)
 {
 	// TODO: when we figure out exactly what this is supposed to do, convert it
 	// to use softfloat instead.
@@ -805,7 +812,7 @@ WRITE32_MEMBER(gt_device_base::bsga_float_w)
 	LOG("bsga_float_w result 0x%04x overflow %s\n", m_bsga_xin, m_bsga_status & STATUS_FLOAT_OFLOW ? "set" : "clear");
 }
 
-WRITE16_MEMBER(gt_device_base::blit_width_w)
+void gt_device_base::blit_width_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// writing to blit width starts blit operation
 	LOG("blit_width_w 0x%04x (%s)\n", data, machine().describe_context());
@@ -953,7 +960,7 @@ TIMER_CALLBACK_MEMBER(gt_device_base::done)
 	m_control &= ~u32(param);
 }
 
-WRITE8_MEMBER(gt_device_base::plane_enable_w)
+void gt_device_base::plane_enable_w(u8 data)
 {
 	if (m_control & GFX_GRPHCS_BUSY)
 		return;
@@ -964,7 +971,7 @@ WRITE8_MEMBER(gt_device_base::plane_enable_w)
 	m_plane_enable = (data << 24) | (data << 16) | (data << 8) | (data << 0);
 }
 
-WRITE8_MEMBER(gt_device_base::plane_data_w)
+void gt_device_base::plane_data_w(u8 data)
 {
 	if (m_control & GFX_GRPHCS_BUSY)
 		return;
@@ -1366,7 +1373,7 @@ void gt_device_base::bresenham_line(s16 major, s16 minor, s16 major_step, s16 mi
 	LOG("bresenham_line end %d,%d\n", shallow ? major : minor, shallow ? minor : major);
 }
 
-WRITE8_MEMBER(gt_device_base::contrast_dac_w)
+void gt_device_base::contrast_dac_w(u8 data)
 {
 	m_ramdac[0]->set_contrast(data);
 
@@ -1377,7 +1384,7 @@ WRITE8_MEMBER(gt_device_base::contrast_dac_w)
 /*
  * GTDB support (SRX, SCC and mouse).
  */
-WRITE32_MEMBER(gtdb_device::srx_mapping_w)
+void gtdb_device::srx_mapping_w(u32 data)
 {
 	const offs_t srx_base = data << 24;
 
@@ -1394,7 +1401,7 @@ WRITE_LINE_MEMBER(gtdb_device::serial_irq)
 	irq0(state);
 }
 
-WRITE32_MEMBER(gtdb_device::mouse_status_w)
+void gtdb_device::mouse_status_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (mem_mask & interpro_mouse_device::state_mask::MOUSE_XPOS)
 	{
@@ -1422,7 +1429,7 @@ WRITE32_MEMBER(gtdb_device::mouse_status_w)
 	irq0(CLEAR_LINE);
 }
 
-READ32_MEMBER(gtdb_device::mouse_x_r)
+u32 gtdb_device::mouse_x_r()
 {
 	const u32 result = m_mouse_x;
 
@@ -1431,7 +1438,7 @@ READ32_MEMBER(gtdb_device::mouse_x_r)
 	return result;
 }
 
-READ32_MEMBER(gtdb_device::mouse_y_r)
+u32 gtdb_device::mouse_y_r()
 {
 	const u32 result = m_mouse_y;
 
@@ -1564,7 +1571,7 @@ u32 gtdb_device::vram_r(offs_t offset, const bool linear) const
 		return gt_device_base::vram_r(offset, linear);
 }
 
-void gtdb_device::vram_w(const offs_t offset, const u32 data, const u32 mem_mask, const bool linear) const
+void gtdb_device::vram_w(offs_t offset, const u32 data, u32 mem_mask, const bool linear) const
 {
 	if (m_control & GFX_HILITE_SEL)
 	{

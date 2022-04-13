@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(COM8116_003, com8116_003_device, "com8116_003", "COM8116-003 
 DEFINE_DEVICE_TYPE(COM5016_5, com5016_5_device, "com5016_5", "COM5016-5 Dual BRG")
 DEFINE_DEVICE_TYPE(COM5016_013, com5016_013_device, "com5016_013", "COM5016-013 Dual BRG")
 DEFINE_DEVICE_TYPE(COM8116_020, com8116_020_device, "com8116_020", "COM8116-020 Dual BRG")
+DEFINE_DEVICE_TYPE(K1135AB, k1135ab_device, "k1135ab", "K1135A/B Dual BRG")
 
 // Parts with T after the number do not have an internal oscillator and require an external clock source
 // The SMC/COM 5xxx parts are all dual 5v/12v parts, while the 8xxx parts are 5v only
@@ -44,7 +45,7 @@ const int com8116_device::divisors_16X_5_0688MHz[16] =
 const int com8116_device::divisors_16X_6_01835MHz[16] =
 	{ 7523, 5015, 3420, 2797, 2508, 1881, 1254, 627, 313, 209, 188, 157, 104, 78, 39, 20 };
 
-// SMC/COM5016(T)-5 and WD WD-1943-05; Synertek SY2661-1 and 2 are NOT the same as this despite using same clock speed, see below
+// SMC/COM5016(T)-5 and WD WD-1943-05; Synertek SY2661-1 and 2 are NOT the same as this despite using same clock speed
 // SMC/COM8156(T)-5 is the same chip but clocked twice as fast and 32x clocks per baud instead of 16x
 // Motorola K1135C is similar, with undivided 4.9152 MHz on pin 1
 // baud rates are 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200
@@ -78,16 +79,6 @@ const int com8116_device::divisors_16X_4_6080MHz[16] =
 	{ 5760, 3840, 2618, 2141, 1920, 960, 480, 240, 160, 144, 120, 80, 60, 40, 30, 15 };
 
 // COM8046 combines the -6 and STD tables into one device as a 32-entry table
-
-// Synertek SY2661-1 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/synertek/_dataBooks/Synertek_1981-1982_Data_Catalog.pdf page 3-40 (pdf page 139))
-// baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1050, 1200, 1800, 2000, 2400, 4800, 9600, 19200
-const int com8116_device::divisors_16X_4_9152MHz_SY2661_1[16] =
-	{ 6144, 4096, 2793, 2284, 2048, 1536, 1024, 512, 292, 256, 171, 154, 128, 64, 32, 16 };
-
-// Synertek SY2661-2 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/synertek/_dataBooks/Synertek_1981-1982_Data_Catalog.pdf page 3-40 (pdf page 139))
-// baud rates are 45.5, 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 4800, 9600, 19200, 38400
-const int com8116_device::divisors_16X_4_9152MHz_SY2661_2[16] =
-	{ 6752, 6144, 4096, 2793, 2284, 2048, 1024, 512, 256, 171, 154, 128, 64, 32, 16, 8 };
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -128,6 +119,11 @@ com5016_013_device::com5016_013_device(const machine_config &mconfig, const char
 
 com8116_020_device::com8116_020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	com8116_device(mconfig, COM8116_020, tag, owner, clock, divisors_16X_1_8432MHz)
+{
+}
+
+k1135ab_device::k1135ab_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	com8116_device(mconfig, K1135AB, tag, owner, clock, divisors_16X_5_0688MHz)
 {
 }
 
@@ -178,7 +174,7 @@ void com8116_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "wpc_shift.h"
 
-DEFINE_DEVICE_TYPE(WPC_SHIFT, wpc_shift_device, "wpc_shift", "Windows Pinball Controller Shifter")
+DEFINE_DEVICE_TYPE(WPC_SHIFT, wpc_shift_device, "wpc_shift", "Williams Pinball Controller Shifter")
 
 wpc_shift_device::wpc_shift_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_SHIFT, tag, owner, clock)
@@ -24,42 +24,42 @@ void wpc_shift_device::registers(address_map &map)
 }
 
 
-READ8_MEMBER(wpc_shift_device::adrh_r)
+uint8_t wpc_shift_device::adrh_r()
 {
 	return (adr + (val1 >> 3)) >> 8;
 }
 
-WRITE8_MEMBER(wpc_shift_device::adrh_w)
+void wpc_shift_device::adrh_w(uint8_t data)
 {
 	adr = (adr & 0xff) | (data << 8);
 }
 
-READ8_MEMBER(wpc_shift_device::adrl_r)
+uint8_t wpc_shift_device::adrl_r()
 {
 	return adr + (val1 >> 3);
 }
 
-WRITE8_MEMBER(wpc_shift_device::adrl_w)
+void wpc_shift_device::adrl_w(uint8_t data)
 {
 	adr = (adr & 0xff00) | data;
 }
 
-READ8_MEMBER(wpc_shift_device::val1_r)
+uint8_t wpc_shift_device::val1_r()
 {
 	return 1 << (val1 & 7);
 }
 
-WRITE8_MEMBER(wpc_shift_device::val1_w)
+void wpc_shift_device::val1_w(uint8_t data)
 {
 	val1 = data;
 }
 
-READ8_MEMBER(wpc_shift_device::val2_r)
+uint8_t wpc_shift_device::val2_r()
 {
 	return 1 << (val2 & 7);
 }
 
-WRITE8_MEMBER(wpc_shift_device::val2_w)
+void wpc_shift_device::val2_w(uint8_t data)
 {
 	val2 = data;
 }

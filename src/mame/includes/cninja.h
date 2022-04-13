@@ -38,6 +38,17 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
+	void cninjabl(machine_config &config);
+	void edrandy(machine_config &config);
+	void cninja(machine_config &config);
+	void robocop2(machine_config &config);
+	void stoneage(machine_config &config);
+	void cninjabl2(machine_config &config);
+	void mutantf(machine_config &config);
+	void init_mutantf();
+	void init_cninjabl2();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -55,13 +66,11 @@ public:
 	required_shared_ptr_array<uint16_t, 4> m_pf_rowscroll;
 	optional_memory_bank m_okibank;
 
-	uint16_t m_priority;
+	uint16_t m_priority = 0U;
 
-	template<int Chip> DECLARE_WRITE16_MEMBER(cninja_pf_control_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
-	void init_mutantf();
-	void init_cninjabl2();
+	template<int Chip> void cninja_pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_bankswitch_w(uint8_t data);
+	void cninjabl2_oki_bank_w(uint8_t data);
 	DECLARE_MACHINE_START(robocop2);
 	DECLARE_MACHINE_RESET(robocop2);
 	DECLARE_VIDEO_START(cninja);
@@ -81,28 +90,23 @@ public:
 	DECO16IC_BANK_CB_MEMBER(mutantf_2_bank_callback);
 
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+	u16 robocop2_mix_callback(u16 p, u16 p2);
 
-	DECLARE_READ16_MEMBER( edrandy_protection_region_6_146_r );
-	DECLARE_WRITE16_MEMBER( edrandy_protection_region_6_146_w );
-	DECLARE_READ16_MEMBER( edrandy_protection_region_8_146_r );
-	DECLARE_WRITE16_MEMBER( edrandy_protection_region_8_146_w );
+	uint16_t edrandy_protection_region_6_146_r(offs_t offset);
+	void edrandy_protection_region_6_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t edrandy_protection_region_8_146_r(offs_t offset);
+	void edrandy_protection_region_8_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( mutantf_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( mutantf_protection_region_0_146_w );
-	DECLARE_READ16_MEMBER( cninja_protection_region_0_104_r );
-	DECLARE_WRITE16_MEMBER( cninja_protection_region_0_104_w );
+	uint16_t mutantf_protection_region_0_146_r(offs_t offset);
+	void mutantf_protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cninja_protection_region_0_104_r(offs_t offset);
+	void cninja_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(cninjabl2_sprite_dma_r);
-	DECLARE_WRITE16_MEMBER(robocop2_priority_w);
-	DECLARE_READ16_MEMBER(mutantf_71_r);
-	void cninjabl(machine_config &config);
-	void edrandy(machine_config &config);
-	void cninja(machine_config &config);
-	void robocop2(machine_config &config);
-	void stoneage(machine_config &config);
-	void cninjabl2(machine_config &config);
-	void mutantf(machine_config &config);
+	uint16_t cninjabl2_sprite_dma_r();
+	void robocop2_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mutantf_71_r();
 	void cninja_map(address_map &map);
+	void cninjabl2_map(address_map &map);
 	void cninjabl2_oki_map(address_map &map);
 	void cninjabl2_s_map(address_map &map);
 	void cninjabl_map(address_map &map);

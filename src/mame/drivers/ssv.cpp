@@ -43,9 +43,9 @@ STA-0001B   P1-105A     96? Meosis Magic                            Sammy
 STA-0001B   ?           97  Joryuu Syougi Kyoushitsu (3)            Visco
 STA-0001B   VISCO-JJ1   97  Koi Koi Shimasho 2                      Visco
 STA-0001B   P1-112A     97  Mahjong Hyper Reaction 2                Sammy
-STA-0001B   ?           97  Monster Slider                          Visco / Datt
-STA-0001    ?           97  Super Real Mahjong P7                   Seta
-STA-0001B   ?           98  Gourmet Battle Quiz Ryorioh CooKing     Visco
+STA-0001B   STS-0001    97  Monster Slider                          Visco / Datt
+STA-0001    dedicated   97  Super Real Mahjong P7                   Seta
+STA-0001B   VISCO-JJ1   98  Gourmet Battle Quiz Ryorioh CooKing     Visco
 STA-0001B   P1-112C     98  Pachinko Sexy Reaction                  Sammy
 STA-0001B   B1-001A     99  Pachinko Sexy Reaction 2                Sammy
 STA-0001B   P1-112C     99  Change Air Blade                        Visco
@@ -199,7 +199,7 @@ IRQ_CALLBACK_MEMBER(ssv_state::irq_callback)
 	return 0;
 }
 
-WRITE16_MEMBER(ssv_state::irq_ack_w)
+void ssv_state::irq_ack_w(offs_t offset, uint16_t data)
 {
 	int level = ((offset * 2) & 0x70) >> 4;
 
@@ -226,7 +226,7 @@ WRITE16_MEMBER(ssv_state::irq_ack_w)
     ultrax:     40,00 at the start then 42,4a
     twineag2:   40,00 at the start then 42,4a
 */
-WRITE16_MEMBER(ssv_state::irq_enable_w)
+void ssv_state::irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_irq_enable);
 }
@@ -260,7 +260,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::interrupt)
 	}
 }
 
-WRITE_LINE_MEMBER(ssv_state::gdfs_adc_int_w)
+WRITE_LINE_MEMBER(gdfs_state::adc_int_w)
 {
 	if (state)
 	{
@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER(ssv_state::gdfs_adc_int_w)
     survarts:   83
     sxyreact:   80
 */
-WRITE16_MEMBER(ssv_state::lockout_w)
+void ssv_state::lockout_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
@@ -307,7 +307,7 @@ WRITE16_MEMBER(ssv_state::lockout_w)
 }
 
 /* Same as above but with inverted lockout lines */
-WRITE16_MEMBER(ssv_state::lockout_inv_w)
+void ssv_state::lockout_inv_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
@@ -345,17 +345,17 @@ void ssv_state::dsp_data_map(address_map &map)
 	map(0x0000, 0x07ff).rom().region("dspdata", 0);
 }
 
-READ16_MEMBER(ssv_state::dsp_dr_r)
+uint16_t ssv_state::dsp_dr_r()
 {
 	return m_dsp->snesdsp_read(true);
 }
 
-WRITE16_MEMBER(ssv_state::dsp_dr_w)
+void ssv_state::dsp_dr_w(uint16_t data)
 {
 	m_dsp->snesdsp_write(true, data);
 }
 
-READ16_MEMBER(ssv_state::dsp_r)
+uint16_t ssv_state::dsp_r(offs_t offset)
 {
 	uint16_t temp = m_dsp->dataram_r(offset/2);
 	uint16_t res;
@@ -372,7 +372,7 @@ READ16_MEMBER(ssv_state::dsp_r)
 	return res;
 }
 
-WRITE16_MEMBER(ssv_state::dsp_w)
+void ssv_state::dsp_w(offs_t offset, uint16_t data)
 {
 	uint16_t temp = m_dsp->dataram_r(offset/2);
 
@@ -398,9 +398,7 @@ WRITE16_MEMBER(ssv_state::dsp_w)
 
 ***************************************************************************/
 
-#ifdef UNUSED_FUNCTION
-READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
-#endif
+uint16_t ssv_state::fake_r(offs_t offset) { return m_scroll[offset]; }
 
 void ssv_state::ssv_map(address_map &map, u32 rom)
 {
@@ -408,9 +406,8 @@ void ssv_state::ssv_map(address_map &map, u32 rom)
 	map(0x100000, 0x13ffff).ram().share("spriteram");                                                                /*  Sprites */
 	map(0x140000, 0x15ffff).ram().w("palette", FUNC(palette_device::write16)).share("palette");                      /*  Palette */
 	map(0x160000, 0x17ffff).ram();                                                                                   /*          */
+	map(0x1c0000, 0x1c007f).ram().w(FUNC(ssv_state::scroll_w)).share("scroll");                                      /*  Scroll  */
 	map(0x1c0000, 0x1c0001).r(FUNC(ssv_state::vblank_r));                                                      /*  Vblank? */
-/**/map(0x1c0002, 0x1c007f).readonly();                                                                              /*  Scroll  */
-	map(0x1c0000, 0x1c007f).w(FUNC(ssv_state::scroll_w)).share("scroll");                                      /*  Scroll  */
 	map(0x210002, 0x210003).portr("DSW1");
 	map(0x210004, 0x210005).portr("DSW2");
 	map(0x210008, 0x210009).portr("P1");
@@ -429,7 +426,7 @@ void ssv_state::ssv_map(address_map &map, u32 rom)
                                 Drift Out '94
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::drifto94_unknown_r)
+uint16_t ssv_state::drifto94_unknown_r()
 {
 	return machine().rand() & 0xffff;
 }
@@ -437,8 +434,8 @@ READ16_MEMBER(ssv_state::drifto94_unknown_r)
 void ssv_state::drifto94_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
-	map(0x400000, 0x47ffff).writeonly();                                       // ?
+//  map(0x210002, 0x210003).nopw();                                      // ? 1 at the start
+	map(0x400000, 0x47ffff).nopw();                                       // ?
 	map(0x480000, 0x480001).rw(FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
 	map(0x482000, 0x482fff).rw(FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
 	map(0x483000, 0x485fff).nopw();                                        // ?
@@ -453,12 +450,12 @@ void ssv_state::drifto94_map(address_map &map)
                      Mobil Suit Gundam Final Shooting
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::gdfs_eeprom_r)
+uint16_t gdfs_state::eeprom_r()
 {
 	return m_adc->data_r() | (m_eeprom->do_read() << 8);
 }
 
-WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
+void gdfs_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x7b00)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -483,18 +480,18 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 }
 
 
-void ssv_state::gdfs_map(address_map &map)
+void gdfs_state::gdfs_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
-	map(0x400000, 0x41ffff).ram().w(FUNC(ssv_state::gdfs_tmapram_w)).share("gdfs_tmapram");
+	map(0x400000, 0x41ffff).ram().w(FUNC(gdfs_state::tmapram_w)).share("gdfs_tmapram");
 	map(0x420000, 0x43ffff).ram();
 	map(0x440000, 0x44003f).ram().share("gdfs_tmapscroll");
-	map(0x500000, 0x500001).w(FUNC(ssv_state::gdfs_eeprom_w));
-	map(0x540000, 0x540001).r(FUNC(ssv_state::gdfs_eeprom_r));
+	map(0x500000, 0x500001).w(FUNC(gdfs_state::eeprom_w));
+	map(0x540000, 0x540001).r(FUNC(gdfs_state::eeprom_r));
 	map(0x600000, 0x600fff).ram();
-	map(0x800000, 0x87ffff).rw(m_gdfs_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
-	map(0x8c0000, 0x8c00ff).rw(m_gdfs_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
-	map(0x900000, 0x9fffff).rw(m_gdfs_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
+	map(0x800000, 0x87ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
+	map(0x8c0000, 0x8c00ff).rw(m_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
+	map(0x900000, 0x9fffff).rw(m_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
 }
 
 
@@ -510,7 +507,7 @@ void ssv_state::gdfs_map(address_map &map)
     ROM board, AFAIK)
 */
 
-READ16_MEMBER(ssv_state::hypreact_input_r)
+uint16_t ssv_state::hypreact_input_r()
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -526,9 +523,9 @@ void ssv_state::hypreact_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
+//  map(0x210002, 0x210003).nopw();                      // ? 5 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));            // Inverted lockout lines
-//  AM_RANGE(0x280000, 0x280001) AM_READNOP                       // ? read at the start, value not used
+//  map(0x280000, 0x280001).nopr();                       // ? read at the start, value not used
 	map(0xc00000, 0xc00001).r(FUNC(ssv_state::hypreact_input_r));              // Inputs
 	map(0xc00006, 0xc00007).ram().share("input_sel");           //
 	map(0xc00008, 0xc00009).noprw();                                 //
@@ -543,9 +540,9 @@ void ssv_state::hypreac2_map(address_map &map)
 {
 	ssv_map(map, 0xe00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 5 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                // Inverted lockout lines
-//  AM_RANGE(0x280000, 0x280001) AM_READNOP                           // ? read at the start, value not used
+//  map(0x280000, 0x280001).nopr();                           // ? read at the start, value not used
 	map(0x500000, 0x500001).r(FUNC(ssv_state::hypreact_input_r));                  // Inputs
 	map(0x500002, 0x500003).r(FUNC(ssv_state::hypreact_input_r));                  // (again?)
 	map(0x520000, 0x520001).writeonly().share("input_sel"); // Inputs
@@ -554,7 +551,7 @@ void ssv_state::hypreac2_map(address_map &map)
 
 
 /***************************************************************************
-                                Jan Jan Simasyo
+                                Jan Jan Shimasho
 ***************************************************************************/
 
 
@@ -563,7 +560,7 @@ void ssv_state::janjans1_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
 	map(0x210000, 0x210001).nopw();                            // koikois2 but not janjans1
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 1 at the start
 	map(0x210006, 0x210007).nopr();
 	map(0x800000, 0x800001).writeonly().share("input_sel"); // Inputs
 	map(0x800002, 0x800003).r(FUNC(ssv_state::srmp4_input_r));                     // Inputs
@@ -577,10 +574,10 @@ void ssv_state::janjans1_map(address_map &map)
 void ssv_state::keithlcy_map(address_map &map)
 {
 	ssv_map(map, 0xe00000);
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP  // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();  // ? 1 at the start
 	map(0x210010, 0x210011).nopw();    //
 	map(0x21000e, 0x21000f).nopr(); //
-	map(0x400000, 0x47ffff).writeonly();   // ?
+	map(0x400000, 0x47ffff).nopw();   // ?
 }
 
 
@@ -592,9 +589,9 @@ void ssv_state::meosism_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 5 at the start
-//  AM_RANGE(0x280000, 0x280001) AM_READNOP                                       // ? read once, value not used
-//  AM_RANGE(0x500004, 0x500005) AM_WRITENOP                                      // ? 0,58,18
+//  map(0x210002, 0x210003).nopw();                                      // ? 5 at the start
+//  map(0x280000, 0x280001).nopr();                                       // ? read once, value not used
+//  map(0x500004, 0x500005).nopw();                                      // ? 0,58,18
 	map(0x580000, 0x58ffff).ram().share("nvram");   // NVRAM
 }
 
@@ -604,12 +601,12 @@ void ssv_state::meosism_map(address_map &map)
 
 /* Monster Slider needs the RAM mirrored for the gameplay logic to work correctly */
 
-READ16_MEMBER(ssv_state::mainram_r)
+uint16_t ssv_state::mainram_r(offs_t offset)
 {
 	return m_mainram[offset];
 }
 
-WRITE16_MEMBER(ssv_state::mainram_w)
+void ssv_state::mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 }
@@ -618,9 +615,9 @@ void ssv_state::mslider_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x010000, 0x01ffff).rw(FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
-	map(0x400000, 0x47ffff).writeonly();                           // ?
-//  AM_RANGE(0x500000, 0x500001) AM_WRITENOP                          // ? ff at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 1 at the start
+	map(0x400000, 0x47ffff).nopw();                           // ?
+//  map(0x500000, 0x500001).nopw();                          // ? ff at the start
 }
 
 
@@ -632,7 +629,7 @@ void ssv_state::ryorioh_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
 	map(0x210000, 0x210001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();              // ? 1 at the start
 }
 
 
@@ -640,7 +637,7 @@ void ssv_state::ryorioh_map(address_map &map)
                             Super Real Mahjong PIV
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::srmp4_input_r)
+uint16_t ssv_state::srmp4_input_r()
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -656,7 +653,7 @@ void ssv_state::srmp4_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 1,5 at the start
 	map(0xc0000a, 0xc0000b).r(FUNC(ssv_state::srmp4_input_r));                     // Inputs
 	map(0xc0000e, 0xc0000f).writeonly().share("input_sel"); // Inputs
 	map(0xc00010, 0xc00011).nopw();                            //
@@ -671,23 +668,22 @@ void ssv_state::srmp4_map(address_map &map)
     Interrupts aren't supported by the chip emulator yet
     (lev 5 in this case, I guess)
 */
-READ16_MEMBER(ssv_state::srmp7_irqv_r)
+uint16_t ssv_state::srmp7_irqv_r()
 {
 	return 0x0080;
 }
 
-WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
+void ssv_state::srmp7_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int bank = 0x400000/2 * (data & 1); // uint16_t address
-		for (int voice = 0; voice < 32; voice++)
-			m_ensoniq->voice_bank_w(voice, bank);
+		m_srmp7_esbank[0]->set_entry(data & 1);
+		m_srmp7_esbank[1]->set_entry(data & 1);
 	}
 //  popmessage("%04X",data);
 }
 
-READ16_MEMBER(ssv_state::srmp7_input_r)
+uint16_t ssv_state::srmp7_input_r()
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -704,13 +700,23 @@ void ssv_state::srmp7_map(address_map &map)
 	ssv_map(map, 0xc00000);
 	map(0x010000, 0x050faf).ram();                                     // More RAM
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 0,4 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                // Coin Counters / Lockouts
 	map(0x300076, 0x300077).r(FUNC(ssv_state::srmp7_irqv_r));                      // Sound
 //  0x540000, 0x540003, related to lev 5 irq?
 	map(0x580000, 0x580001).w(FUNC(ssv_state::srmp7_sound_bank_w));               // Sound Bank
 	map(0x600000, 0x600001).r(FUNC(ssv_state::srmp7_input_r));                     // Inputs
 	map(0x680000, 0x680001).writeonly().share("input_sel"); // Inputs
+}
+
+void ssv_state::srmp7_es5506_bank2_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).bankr(m_srmp7_esbank[0]);
+}
+
+void ssv_state::srmp7_es5506_bank3_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).bankr(m_srmp7_esbank[1]);
 }
 
 
@@ -722,9 +728,9 @@ void ssv_state::survarts_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 0,4 at the start
-//  AM_RANGE(0x290000, 0x290001) AM_READNOP               // ?
-//  AM_RANGE(0x2a0000, 0x2a0001) AM_READNOP               // ?
+//  map(0x210002, 0x210003).nopw();              // ? 0,4 at the start
+//  map(0x290000, 0x290001).nopr();               // ?
+//  map(0x2a0000, 0x2a0001).nopr();               // ?
 
 	map(0x400000, 0x43ffff).ram();                         // dyna
 
@@ -737,47 +743,44 @@ void ssv_state::survarts_map(address_map &map)
 ***************************************************************************/
 
 
-READ16_MEMBER(ssv_state::sxyreact_ballswitch_r)
+uint16_t sxyreact_state::ballswitch_r()
 {
-	return m_io_service.read_safe(0);
+	return m_io_service->read();
 }
 
-READ16_MEMBER(ssv_state::sxyreact_dial_r)
+uint8_t sxyreact_state::dial_r()
 {
-	return ((m_sxyreact_serial >> 1) & 0x80);
+	return m_sxyreact_adc->eoc_so_r() ? 0x80 : 0;
 }
 
-
-WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
+void sxyreact_state::dial_w(uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data & 0x20)
-			m_sxyreact_serial = m_io_paddle.read_safe(0) & 0xff;
-
-		if ( (m_sxyreact_dial & 0x40) && !(data & 0x40) )   // $40 -> $00
-			m_sxyreact_serial <<= 1;                        // shift 1 bit
-
-		m_sxyreact_dial = data;
-	}
+	m_sxyreact_adc->cs_w(BIT(data, 5));
+	m_sxyreact_adc->sck_w(BIT(data, 6));
 }
 
-WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
+void sxyreact_state::motor_w(uint16_t data)
 {
 //  popmessage("%04X",data);   // 8 = motor on; 0 = motor off
 }
 
-void ssv_state::sxyreact_map(address_map &map)
+void ssv_state::cairblad_map(address_map &map)
 {
 	ssv_map(map, 0xe00000);
-//  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(mainram_r, mainram_w)             // sxyreac2 reads / writes here, why?
+//  map(0x020000, 0x03ffff).rw(FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w));             // sxyreac2 reads / writes here, why?
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();                                      // ? 1 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
-	map(0x500002, 0x500003).r(FUNC(ssv_state::sxyreact_ballswitch_r));                         // ?
-	map(0x500004, 0x500005).rw(FUNC(ssv_state::sxyreact_dial_r), FUNC(ssv_state::sxyreact_motor_w));        // Dial Value (serial)
-	map(0x520000, 0x520001).w(FUNC(ssv_state::sxyreact_dial_w));                              // Dial Value (advance 1 bit)
 	map(0x580000, 0x58ffff).ram().share("nvram");   // NVRAM
+}
+
+void sxyreact_state::sxyreact_map(address_map &map)
+{
+	cairblad_map(map);
+	map(0x500002, 0x500003).r(FUNC(sxyreact_state::ballswitch_r));                         // ?
+	map(0x500004, 0x500004).r(FUNC(sxyreact_state::dial_r));                               // Dial Value (serial)
+	map(0x500004, 0x500005).w(FUNC(sxyreact_state::motor_w));
+	map(0x520000, 0x520000).w(FUNC(sxyreact_state::dial_w));                              // Dial Value (advance 1 bit)
 }
 
 
@@ -808,23 +811,23 @@ void ssv_state::ultrax_map(address_map &map)
 	ssv_map(map, 0xe00000);
 	map(0x010000, 0x03ffff).ram();                         // More RAM
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog (also value is cmp.b with memory address 8)
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 2,6 at the start
+//  map(0x210002, 0x210003).nopw();              // ? 2,6 at the start
 }
 
 /***************************************************************************
             Joryuu Syougi Kyoushitsu
 ***************************************************************************/
 
-/* from st0016.c */
+/* from simple_st0016.cpp */
 
-READ32_MEMBER(ssv_state::latch32_r)
+uint32_t ssv_state::latch32_r(offs_t offset)
 {
 	if(!offset)
 		m_latches[2]&=~2;
 	return m_latches[offset];
 }
 
-WRITE32_MEMBER(ssv_state::latch32_w)
+void ssv_state::latch32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(!offset)
 		m_latches[2]|=1;
@@ -832,14 +835,14 @@ WRITE32_MEMBER(ssv_state::latch32_w)
 	machine().scheduler().synchronize();
 }
 
-READ16_MEMBER(ssv_state::latch16_r)
+uint16_t ssv_state::latch16_r(offs_t offset)
 {
 	if(!offset)
 		m_latches[2]&=~1;
 	return m_latches[offset];
 }
 
-WRITE16_MEMBER(ssv_state::latch16_w)
+void ssv_state::latch16_w(offs_t offset, uint16_t data)
 {
 	if(!offset)
 		m_latches[2]|=2;
@@ -871,12 +874,12 @@ void ssv_state::jsk_v810_mem(address_map &map)
   Eagle Shot Golf
 ***************************************************************************/
 
-WRITE8_MEMBER(ssv_state::eaglshot_gfxrom_bank_w)
+void eaglshot_state::gfxrom_bank_w(uint8_t data)
 {
 	membank("gfxrom")->set_entry(data < 6 ? data : 6);
 }
 
-WRITE8_MEMBER(ssv_state::eaglshot_trackball_w)
+void eaglshot_state::trackball_w(uint8_t data)
 {
 	// All these get toggled during trackball reads; the precise arrangement is uncertain
 	m_upd4701->cs_w(!BIT(data, 6));
@@ -888,28 +891,28 @@ WRITE8_MEMBER(ssv_state::eaglshot_trackball_w)
 
 
 
-READ16_MEMBER(ssv_state::eaglshot_gfxram_r)
+uint16_t eaglshot_state::gfxram_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_eaglshot_gfxram[offset + (m_scroll[0x76/2] & 0xf) * 0x40000/2];
+	return m_gfxram[offset + (m_scroll[0x76/2] & 0xf) * 0x40000/2];
 }
 
-WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
+void eaglshot_state::gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset += (m_scroll[0x76/2] & 0xf) * 0x40000/2;
-	COMBINE_DATA(&m_eaglshot_gfxram[offset]);
+	COMBINE_DATA(&m_gfxram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset / (16*8/2));
 }
 
 
-void ssv_state::eaglshot_map(address_map &map)
+void eaglshot_state::eaglshot_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
-	map(0x180000, 0x1bffff).rw(FUNC(ssv_state::eaglshot_gfxram_r), FUNC(ssv_state::eaglshot_gfxram_w));
-	map(0x210000, 0x210001).nopr(); /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
-	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
-	map(0x800000, 0x800000).w(FUNC(ssv_state::eaglshot_gfxrom_bank_w));
-	map(0x900000, 0x900000).w(FUNC(ssv_state::eaglshot_trackball_w));
+	map(0x180000, 0x1bffff).rw(FUNC(eaglshot_state::gfxram_r), FUNC(eaglshot_state::gfxram_w));
+	map(0x210000, 0x210001).nopr(); // .r("watchdog", FUNC(watchdog_timer_device::reset16_r));                 // Watchdog
+//  map(0x210002, 0x210003).nopw();                                      // ? 0,4 at the start
+	map(0x21000e, 0x21000f).w(FUNC(eaglshot_state::lockout_inv_w));                            // Inverted lockout lines
+	map(0x800000, 0x800000).w(FUNC(eaglshot_state::gfxrom_bank_w));
+	map(0x900000, 0x900000).w(FUNC(eaglshot_state::trackball_w));
 	map(0xa00000, 0xbfffff).bankr("gfxrom");
 	map(0xc00000, 0xc007ff).ram().share("nvram");   // NVRAM
 	map(0xd00000, 0xd00000).r(m_upd4701, FUNC(upd4701_device::d_r));
@@ -1338,10 +1341,10 @@ static INPUT_PORTS_START( eaglshot )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "DSW2:8" )
 
 	PORT_START("TRACKX")    // IN5 - trackball x ($d00000)
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("TRACKY")    // IN6 - trackball y ($d00000)
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -2540,14 +2543,12 @@ void ssv_state::init_ssv_tilescram()
 // srmp4
 //  ((uint16_t *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 
-void ssv_state::init_sexy()
+void sxyreact_state::init_sexy()
 {
 	init_ssv_tilescram();
-	save_item(NAME(m_sxyreact_serial));
-	save_item(NAME(m_sxyreact_dial));
 }
 
-void ssv_state::init_eaglshot()
+void eaglshot_state::init_eaglshot()
 {
 	init_ssv_tilescram();
 	membank("gfxrom")->configure_entries(0, 6+1, memregion("gfxdata")->base(), 0x200000);
@@ -2569,6 +2570,15 @@ void ssv_state::init_ssv_irq1()
 {
 	init_ssv();
 	m_interrupt_ultrax = 1;
+}
+
+void ssv_state::init_srmp7()
+{
+	init_ssv();
+	m_srmp7_esbank[0]->configure_entries(0, 2, memregion("ensoniq.2")->base(), 0x400000);
+	m_srmp7_esbank[1]->configure_entries(0, 2, memregion("ensoniq.3")->base(), 0x400000);
+	m_srmp7_esbank[0]->set_entry(0);
+	m_srmp7_esbank[1]->set_entry(0);
 }
 
 
@@ -2625,7 +2635,7 @@ void ssv_state::drifto94(machine_config &config)
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2633,12 +2643,12 @@ void ssv_state::drifto94(machine_config &config)
 	m_screen->set_visarea(0, (0xcd-0x25)*2-1, 0, (0x101-0x13)-1);
 }
 
-void ssv_state::gdfs(machine_config &config)
+void gdfs_state::gdfs(machine_config &config)
 {
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::gdfs_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gdfs_state::gdfs_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -2647,18 +2657,16 @@ void ssv_state::gdfs(machine_config &config)
 	m_adc->in_callback<1>().set_ioport("GUNY1");
 	m_adc->in_callback<2>().set_ioport("GUNX2");
 	m_adc->in_callback<3>().set_ioport("GUNY2");
-	m_adc->eoc_callback().set(FUNC(ssv_state::gdfs_adc_int_w));
+	m_adc->eoc_callback().set(FUNC(gdfs_state::adc_int_w));
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1);
-	m_screen->set_screen_update(FUNC(ssv_state::screen_update_gdfs));
+	m_screen->set_screen_update(FUNC(gdfs_state::screen_update));
 
-	ST0020_SPRITES(config, m_gdfs_st0020, 0);
-	m_gdfs_st0020->set_palette(m_palette);
+	ST0020_SPRITES(config, m_st0020, 0);
+	m_st0020->set_palette(m_palette);
 
 	m_gfxdecode->set_info(gfx_gdfs);
-
-	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)
 }
 
 void ssv_state::hypreact(machine_config &config)
@@ -2785,6 +2793,9 @@ void ssv_state::srmp7(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xd4-0x2c)*2-1, 0, (0xfd - 0x0e)-1);
+
+	m_ensoniq->set_addrmap(2, &ssv_state::srmp7_es5506_bank2_map);
+	m_ensoniq->set_addrmap(3, &ssv_state::srmp7_es5506_bank3_map);
 }
 
 void ssv_state::stmblade(machine_config &config)
@@ -2799,7 +2810,7 @@ void ssv_state::stmblade(machine_config &config)
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
 	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
-	//config.m_perfect_cpu_quantum = subtag("maincpu");
+	//config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2828,12 +2839,12 @@ void ssv_state::dynagear(machine_config &config)
 	m_screen->set_visarea(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1);
 }
 
-void ssv_state::eaglshot(machine_config &config)
+void eaglshot_state::eaglshot(machine_config &config)
 {
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::eaglshot_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eaglshot_state::eaglshot_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2845,38 +2856,44 @@ void ssv_state::eaglshot(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1);
-	m_screen->set_screen_update(FUNC(ssv_state::screen_update_eaglshot));
+	m_screen->set_screen_update(FUNC(eaglshot_state::screen_update));
 
 	m_gfxdecode->set_info(gfx_eaglshot);
-
-	MCFG_VIDEO_START_OVERRIDE(ssv_state,eaglshot)
 }
 
-void ssv_state::sxyreact(machine_config &config)
+void sxyreact_state::sxyreact(machine_config &config)
 {
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sxyreact_state::sxyreact_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
+
+	UPD7001(config, m_sxyreact_adc, 1'500'000); // FIXME: runs too fast because CPU doesn't wait long enough
+	m_sxyreact_adc->a0_callback().set_ioport("PADDLE");
+	m_sxyreact_adc->dl_w(1);
+	m_sxyreact_adc->si_w(0);
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1);
 }
 
-void ssv_state::sxyreac2(machine_config &config)
+void sxyreact_state::sxyreac2(machine_config &config)
 {
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sxyreact_state::sxyreact_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
+
+	UPD7001(config, m_sxyreact_adc, 1'500'000); // FIXME: runs too fast because CPU doesn't wait long enough
+	m_sxyreact_adc->a0_callback().set_ioport("PADDLE");
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1);
@@ -2887,7 +2904,7 @@ void ssv_state::cairblad(machine_config &config)
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::cairblad_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2908,7 +2925,7 @@ void ssv_state::twineag2(machine_config &config)
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -3131,10 +3148,10 @@ ROM_START( drifto94 )
 	ROM_LOAD( "vg003-12.d2", 0x1c00000, 0x200000, CRC(ac0fd855) SHA1(992ae0d02bcefaa2fad7462b211a49fbd1338b62) )
 	ROM_LOAD( "vg003-16.d3", 0x1e00000, 0x200000, CRC(1a5fd312) SHA1(1e67ffa51408de107be75c9c63df6fd1bb6ce6b1) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "vg003-17.u22", 0x000000, 0x200000, CRC(6f9294ce) SHA1(b097defd95eb1d8f00e107d7669f9d33148e75c1) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "vg003-18.u15", 0x000000, 0x200000, CRC(511b3e93) SHA1(09eda175c8f1b21c18645519cc6e89c6ca1fc5de) )
 
 	ROM_REGION( 0x11000, "st010", 0)
@@ -3395,10 +3412,10 @@ ROM_START( janjans1 )
 	ROM_LOAD( "jj1-d1.bin", 0x2200000, 0x400000, CRC(f24c0d36) SHA1(212969b456bfd7cc00081f65c03c1e167186891a) )
 	ROM_LOAD( "jj1-d2.bin", 0x2600000, 0x200000, CRC(481b3be8) SHA1(cd1bcaca8c236cebba72d315e759b2e9d243aca8) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "jj1-snd0.bin", 0x000000, 0x200000, CRC(4f7d620a) SHA1(edded130ce7bb0f37e1f59b2771ae6a10a061f9e) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "jj1-snd1.bin", 0x000000, 0x200000, CRC(9b3a7ae5) SHA1(193743fcce779c4a8a73a44c54b5391d08116331) )
 ROM_END
 
@@ -3438,10 +3455,10 @@ ROM_START( janjans2 )
 	ROM_LOAD( "jan2-d0.u34", 0x1800000, 0x400000, CRC(479fdb54) SHA1(667d89518877a3b501a87c9c765b85b9a0b23517) )
 	ROM_LOAD( "jan2-d1.u35", 0x1c00000, 0x400000, CRC(c0148895) SHA1(f89482a6ef475ca44d570332d05201b34887afbb) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )    /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )    /* Samples */
 	ROM_LOAD16_BYTE( "jan2-snd0.u29", 0x000000, 0x200000, CRC(22cc054e) SHA1(4926dd9f8f85880d6c1d14f93d68f330898b473a) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )    /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )    /* Samples */
 	ROM_LOAD16_BYTE( "jan2-snd1.u33", 0x000000, 0x200000, CRC(cbcac4a6) SHA1(f0c57fa6784e910bdb94f046d09e58e26921773b) )
 ROM_END
 
@@ -3632,10 +3649,10 @@ ROM_START( koikois2 )
 	ROM_LOAD( "kk2-d0.bin", 0x1800000, 0x400000, CRC(0e3005a4) SHA1(fa8da58308d58bb6b2e8beb8ee8f7ea08b18f4d9) )
 	ROM_LOAD( "kk2-d1.bin", 0x1c00000, 0x200000, CRC(17a02252) SHA1(c7aa61e27f197b3c497a65a9369e3a6a20c9f82a) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "kk2_snd0.bin", 0x000000, 0x200000, CRC(b27eaa94) SHA1(05baaef683a1fcd9eb8a7cfd5b280c05108e832f) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "kk2_snd1.bin", 0x000000, 0x200000, CRC(e5a963e1) SHA1(464ffd53ac2e6db62225b18d12bfea93160771ec) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
@@ -3762,8 +3779,12 @@ ROM_START( ryorioh )
 	ROM_LOAD( "ryorioh.d0", 0x1800000, 0x400000, CRC(ffa14ef1) SHA1(22a6992f6217d8ef2140e72063290fa34cb45683) )
 	ROM_LOAD( "ryorioh.d1", 0x1c00000, 0x400000, CRC(ae6055e8) SHA1(ee20a7b3c4f899404ca259991509728d3a0f96b9) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "ryorioh.snd", 0x000000, 0x200000, CRC(7bd38b76) SHA1(d8490b4af839ef0802b8b2a47277fcd4091e4d37) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "gal16v8b.u25", 0x000, 0x117, CRC(9f9066be) SHA1(5640418e0235b409262aa5f20407e2d44722073d) )
+	ROM_LOAD( "gal16v8b.u36", 0x200, 0x117, CRC(971d6f4d) SHA1(35d9adf8cb2ea6097b670b189077d9850d33baf0) )
 ROM_END
 
 
@@ -3890,19 +3911,17 @@ ROM_START( srmp7 )
 	ROM_LOAD( "sx015-12.d2", 0x3800000, 0x400000, CRC(80336523) SHA1(ec66e21fe1401fdb438e03657542a7b6b0cbc5ce) )
 	ROM_LOAD( "sx015-11.d3", 0x3c00000, 0x400000, CRC(134c8e28) SHA1(669118b58f27d5e2e08052debe904f95d9ab32a3) )
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sx015-06.s0", 0x000000, 0x200000, CRC(0d5a206c) SHA1(2fdaf2a56b6608f20a788eb79a8426102ff33e14) )
-	ROM_RELOAD(                     0x400000, 0x200000)
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sx015-05.s1", 0x000000, 0x200000, CRC(bb8cebe2) SHA1(3691e5fb4e963f69c1fe01cb5d968433029c4833) )
-	ROM_RELOAD(                     0x400000, 0x200000)
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.2", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x800000, "ensoniq.2", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sx015-04.s2", 0x000000, 0x200000, CRC(f6e933df) SHA1(7cb69515a0ffc62fbac2be3a5fb322538560bd38) )
 	ROM_LOAD16_BYTE( "sx015-02.s4", 0x400000, 0x200000, CRC(6567bc3e) SHA1(e902f22f1499edc6a0e2c8b6cc26460d66a3bdbe) )
 
-	ROM_REGION16_BE( 0x800000, "ensoniq.3", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x800000, "ensoniq.3", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sx015-03.s3", 0x000000, 0x200000, CRC(5b51ab21) SHA1(cf3e86e41f7984208984d6486b04cec117dadc18) )
 	ROM_LOAD16_BYTE( "sx015-01.s5", 0x400000, 0x200000, CRC(481b00ed) SHA1(2c3d158dd5be9af0ee57fd5dd94d2ec75e28b182) )
 ROM_END
@@ -4298,6 +4317,9 @@ ROM_START( sxyreac2 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
 	ROM_COPY( "ensoniq.1", 0x000000,    0x200000, 0x200000 )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "gal16v8d.ac1709g00.u34", 0x000, 0x117, CRC(65c4db12) SHA1(4931775ab5bcb9716db5a8e71e50b202d09c468b) )
 ROM_END
 
 
@@ -4386,7 +4408,7 @@ ROM_START( stmblade )
 	ROM_LOAD( "sb-c2.u4",  0x1000000, 0x080000, CRC(fd1d2a92) SHA1(957a8a52b79e252c7f1a4b6383107ae609dce5ef) )
 	ROM_FILL(              0x1200000, 0x600000, 0x000000)
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
@@ -4417,7 +4439,7 @@ ROM_START( stmbladej )
 	ROM_LOAD( "sb-c2.u4",  0x1000000, 0x080000, CRC(fd1d2a92) SHA1(957a8a52b79e252c7f1a4b6383107ae609dce5ef) )
 	ROM_FILL(              0x1200000, 0x600000, 0x000000)
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
@@ -4485,10 +4507,10 @@ ROM_START( twineag2 )
 
 	ROM_FILL(             0x1200000, 0x600000, 0x000000          )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "sx002-10.u14", 0x000000, 0x200000, CRC(b0669dfa) SHA1(ff805f59864ac4ccee3e249c06804d844d3df59c) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "sx002-11.u7",  0x000000, 0x200000, CRC(b8dd621a) SHA1(f9b43e018f2bb121e4f4e9554419cd32b870556b) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
@@ -4531,10 +4553,10 @@ ROM_START( ultrax )
 	ROM_LOAD( "71047-06.u88", 0x0800000, 0x100000, CRC(b8ac2942) SHA1(3e85e8f5669d469dd3114455248546d32a642315) )
 	ROM_FILL(                 0x0900000, 0x300000, 0x000000 )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-07.u59", 0x000000, 0x200000, CRC(d9828b62) SHA1(f66a388d7a00b3a45d386671c061f5b840453451) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-08.u60", 0x000000, 0x200000, CRC(30ebff6d) SHA1(53824c1fc37e22b545fd68b59722f7968f0ca1e2) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
@@ -4561,10 +4583,10 @@ ROM_START( ultraxg )
 	ROM_LOAD( "71047-06.u88", 0x0800000, 0x100000, CRC(b8ac2942) SHA1(3e85e8f5669d469dd3114455248546d32a642315) )
 	ROM_FILL(                 0x0900000, 0x300000, 0x000000 )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-07.u59", 0x000000, 0x200000, CRC(d9828b62) SHA1(f66a388d7a00b3a45d386671c061f5b840453451) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-08.u60", 0x000000, 0x200000, CRC(30ebff6d) SHA1(53824c1fc37e22b545fd68b59722f7968f0ca1e2) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
@@ -4674,10 +4696,10 @@ ROM_START( vasara )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(d110dacf) SHA1(6f33bf6ce8c06f0b823b5478a56dc95095385181) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(82d0ca55) SHA1(5ac07df713504329fbc8e8b5374c04e53745230e) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(754fca02) SHA1(5b2810a36183e0d4f42f0fb4a09be033ad0db40d) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(5f303698) SHA1(bd6495f912aa9d761d245ef0a1566d9d7bdbb2ad) )
 ROM_END
 
@@ -4695,10 +4717,10 @@ ROM_START( vasara2 )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(54ede017) SHA1(4a7ff7ff8ec5843837016f35a588983b5ace06ff) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(4be8479d) SHA1(cbb5943dfae86f4d571459263199a63399dedc20) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(2b381b33) SHA1(b9dd13651e4b8d0b9e3bc4c592022f31ea634d19) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(11cd7098) SHA1(f75288b5c89df039dfb41d66bd275cda8605e75a) )
 ROM_END
 
@@ -4716,10 +4738,10 @@ ROM_START( vasara2a )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(54ede017) SHA1(4a7ff7ff8ec5843837016f35a588983b5ace06ff) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(4be8479d) SHA1(cbb5943dfae86f4d571459263199a63399dedc20) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(2b381b33) SHA1(b9dd13651e4b8d0b9e3bc4c592022f31ea634d19) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )   /* Samples */
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )   /* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(11cd7098) SHA1(f75288b5c89df039dfb41d66bd275cda8605e75a) )
 ROM_END
 
@@ -4805,18 +4827,17 @@ ROM_START( gdfs )
 	ROM_REGION( 0x80000, "gfx3", 0 )    // Tilemap
 	ROM_LOAD( "ssvv7.u16",    0x0000000, 0x080000, CRC(f1c3ab6f) SHA1(b7f54f7ae60650fee7570aa4dd4266c629149673) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
-	ROM_LOAD16_BYTE( "vg004-12.u4", 0x000000, 0x200000, CRC(eb41a4ef) SHA1(f4d0844a3c00cf90faa59ae982744b7f0bcbe218) )
-	ROM_LOAD16_BYTE( "vg004-13.u5", 0x000001, 0x200000, CRC(a4ed3977) SHA1(5843d56f69789e70ce0201a693ffae322b628459) )
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD16_BYTE( "vg004-12.u4", 0x000000, 0x200000, CRC(eb41a4ef) SHA1(f4d0844a3c00cf90faa59ae982744b7f0bcbe218) ) // music
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD16_BYTE( "vg004-13.u5", 0x000000, 0x200000, CRC(a4ed3977) SHA1(5843d56f69789e70ce0201a693ffae322b628459) ) // credit sound, gunshots etc.
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Samples */
+	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 ) // nothing played from here?
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 ) /* Samples */
+	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 ) // nothing played from here?
 ROM_END
 
 /***************************************************************************
@@ -4844,18 +4865,18 @@ GAME( 1993,  survartsj, survarts, survarts, survarts, ssv_state, init_ssv,      
 
 GAME( 1994,  drifto94,  0,        drifto94, drifto94, ssv_state, init_ssv,           ROT0,   "Visco",              "Drift Out '94 - The Hard Order (Japan)",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, ssv_state, init_eaglshot,      ROT0,   "Sammy",              "Eagle Shot Golf (US)",                                                   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994,  eaglshotj, eaglshot, eaglshot, eaglshot, ssv_state, init_eaglshot,      ROT0,   "Sammy",              "Eagle Shot Golf (Japan, bootleg?)",                                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // from a bootleg ROM board with no proper Seta / Sammy markings, possibly original ROM tho?
+GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, eaglshot_state, init_eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf (US)",                                                   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  eaglshotj, eaglshot, eaglshot, eaglshot, eaglshot_state, init_eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf (Japan, bootleg?)",                                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // from a bootleg ROM board with no proper Seta / Sammy markings, possibly original ROM tho?
 
 GAME( 1995,  hypreact,  0,        hypreact, hypreact, ssv_state, init_ssv,           ROT0,   "Sammy",              "Mahjong Hyper Reaction (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994,  twineag2,  0,        twineag2, twineag2, ssv_state, init_ssv_irq1,      ROT270, "Seta",               "Twin Eagle II - The Rescue Mission",                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, init_ssv,           ROT0,   "Banpresto",          "Mobile Suit Gundam Final Shooting (Japan)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // title screen spells the title "Mobil" but standardized spelling is "Mobile" it also lists the company name as "Banprest" instead of "Banpresto"
+GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     gdfs_state, init_ssv,          ROT0,   "Banpresto",          "Mobile Suit Gundam Final Shooting (Japan)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // title screen spells the title "Mobil" but standardized spelling is "Mobile" it also lists the company name as "Banprest" instead of "Banpresto"
 
 // Ultra X Weapon: "developed by Seta" in ending screen
 GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
-GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
+GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (Gamest review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
 
 GAME( 1996,  janjans1,  0,        janjans1, janjans1, ssv_state, init_ssv,           ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
@@ -4872,13 +4893,13 @@ GAME( 1997,  koikois2,  0,        janjans1, koikois2, ssv_state, init_ssv,      
 
 GAME( 1997,  mslider,   0,        mslider,  mslider,  ssv_state, init_ssv,           ROT0,   "Visco / Datt Japan", "Monster Slider (Japan)",                                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997,  srmp7,     0,        srmp7,    srmp7,    ssv_state, init_ssv,           ROT0,   "Seta",               "Super Real Mahjong P7 (Japan)",                                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  srmp7,     0,        srmp7,    srmp7,    ssv_state, init_srmp7,         ROT0,   "Seta",               "Super Real Mahjong P7 (Japan)",                                          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1998,  ryorioh,   0,        ryorioh,  ryorioh,  ssv_state, init_ssv,           ROT0,   "Visco",              "Gourmet Battle Quiz Ryohrioh CooKing (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998,  sxyreact,  0,        sxyreact, sxyreact, ssv_state, init_sexy,          ROT0,   "Sammy",              "Pachinko Sexy Reaction (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  sxyreact,  0,        sxyreact, sxyreact, sxyreact_state, init_sexy,     ROT0,   "Sammy",              "Pachinko Sexy Reaction (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999,  sxyreac2,  0,        sxyreac2, sxyreact, ssv_state, init_sexy,          ROT0,   "Sammy",              "Pachinko Sexy Reaction 2 (Japan)",                                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1999,  sxyreac2,  0,        sxyreac2, sxyreact, sxyreact_state, init_sexy,     ROT0,   "Sammy",              "Pachinko Sexy Reaction 2 (Japan)",                                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999,  cairblad,  0,        cairblad, cairblad, ssv_state, init_ssv_tilescram, ROT270, "Sammy",              "Change Air Blade (Japan)",                                               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 

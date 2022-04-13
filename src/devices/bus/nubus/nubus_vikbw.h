@@ -33,10 +33,10 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_READ32_MEMBER(viking_ack_r);
-	DECLARE_WRITE32_MEMBER(viking_ack_w);
-	DECLARE_READ32_MEMBER(viking_enable_r);
-	DECLARE_WRITE32_MEMBER(viking_disable_w);
+	uint32_t viking_ack_r();
+	void viking_ack_w(uint32_t data);
+	uint32_t viking_enable_r();
+	void viking_disable_w(uint32_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

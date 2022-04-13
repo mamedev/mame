@@ -23,15 +23,17 @@ Atari Ultra Tank driver
 
 
 
-CUSTOM_INPUT_MEMBER(ultratnk_state::get_collision)
+template <int N>
+READ_LINE_MEMBER(ultratnk_state::collision_flipflop_r)
 {
-	return m_collision[(uintptr_t) param];
+	return m_collision[N];
 }
 
 
-CUSTOM_INPUT_MEMBER(ultratnk_state::get_joystick)
+template <int N>
+READ_LINE_MEMBER(ultratnk_state::joystick_r)
 {
-	uint8_t joy = ioport((const char *)param)->read() & 3;
+	uint8_t joy = m_joy[N]->read() & 3;
 
 	if (joy == 1)
 	{
@@ -46,15 +48,15 @@ CUSTOM_INPUT_MEMBER(ultratnk_state::get_joystick)
 }
 
 
-void ultratnk_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ultratnk_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_NMI:
-		nmi_callback(ptr, param);
+		nmi_callback(param);
 		break;
 	default:
-		assert_always(false, "Unknown id in ultratnk_state::device_timer");
+		throw emu_fatalerror("Unknown id in ultratnk_state::device_timer");
 	}
 }
 
@@ -92,45 +94,45 @@ void ultratnk_state::machine_reset()
 }
 
 
-READ8_MEMBER(ultratnk_state::wram_r)
+uint8_t ultratnk_state::wram_r(offs_t offset)
 {
 	return m_videoram[0x380 + offset];
 }
 
 
-READ8_MEMBER(ultratnk_state::analog_r)
+uint8_t ultratnk_state::analog_r(offs_t offset)
 {
 	return (ioport("ANALOG")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(ultratnk_state::coin_r)
+uint8_t ultratnk_state::coin_r(offs_t offset)
 {
 	return (ioport("COIN")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(ultratnk_state::collision_r)
+uint8_t ultratnk_state::collision_r(offs_t offset)
 {
 	return (ioport("COLLISION")->read() << (~offset & 7)) & 0x80;
 }
 
 
-READ8_MEMBER(ultratnk_state::options_r)
+uint8_t ultratnk_state::options_r(offs_t offset)
 {
 	return (ioport("DIP")->read() >> (2 * (offset & 3))) & 3;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::wram_w)
+void ultratnk_state::wram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[0x380 + offset] = data;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::collision_reset_w)
+void ultratnk_state::collision_reset_w(offs_t offset, uint8_t data)
 {
 	m_collision[(offset >> 1) & 3] = 0;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::da_latch_w)
+void ultratnk_state::da_latch_w(uint8_t data)
 {
 	m_da_latch = data & 15;
 }
@@ -142,11 +144,11 @@ WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
 }
 
 
-WRITE8_MEMBER(ultratnk_state::attract_w)
+void ultratnk_state::attract_w(uint8_t data)
 {
 	m_discrete->write(ULTRATNK_ATTRACT_EN, data & 1);
 }
-WRITE8_MEMBER(ultratnk_state::explosion_w)
+void ultratnk_state::explosion_w(uint8_t data)
 {
 	m_discrete->write(ULTRATNK_EXPLOSION_DATA, data & 15);
 }
@@ -192,13 +194,13 @@ static INPUT_PORTS_START( ultratnk )
 
 	PORT_START("COLLISION")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)0 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ultratnk_state, collision_flipflop_r<0>)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ultratnk_state, collision_flipflop_r<1>)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* VCC */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ultratnk_state, collision_flipflop_r<2>)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )   /* SLAM */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_collision, (void *)3 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ultratnk_state, collision_flipflop_r<3>)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -231,13 +233,13 @@ static INPUT_PORTS_START( ultratnk )
 
 	PORT_START("ANALOG")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-W" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ultratnk_state, joystick_r<0>) // "JOY-W"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-Y" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ultratnk_state, joystick_r<2>) // "JOY-Y"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-X" )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ultratnk_state, joystick_r<1>) // "JOY-X"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultratnk_state, get_joystick, "JOY-Z" )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ultratnk_state, joystick_r<3>) // "JOY-Z"
 
 	PORT_START("JOY-W")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(1)

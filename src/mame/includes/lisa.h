@@ -27,8 +27,8 @@
 /* lisa MMU segment regs */
 struct real_mmu_entry
 {
-	uint16_t sorg;
-	uint16_t slim;
+	uint16_t sorg = 0;
+	uint16_t slim = 0;
 };
 
 /* MMU regs translated into a more efficient format */
@@ -36,9 +36,9 @@ enum mmu_entry_t { RAM_stack_r, RAM_r, RAM_stack_rw, RAM_rw, IO, invalid, specia
 
 struct mmu_entry
 {
-	offs_t sorg;    /* (real_sorg & 0x0fff) << 9 */
+	offs_t sorg = 0;    /* (real_sorg & 0x0fff) << 9 */
 	mmu_entry_t type;   /* <-> (real_slim & 0x0f00) */
-	int slim;   /* (~ ((real_slim & 0x00ff) << 9)) & 0x01ffff */
+	int slim = 0;   /* (~ ((real_slim & 0x00ff) << 9)) & 0x01ffff */
 };
 
 enum floppy_hardware_t
@@ -59,20 +59,20 @@ enum clock_mode_t
 /* clock registers */
 struct clock_regs_t
 {
-	long alarm;     /* alarm (20-bit binary) */
-	int years;      /* years (4-bit binary ) */
-	int days1;      /* days (BCD : 1-366) */
-	int days2;
-	int days3;
-	int hours1;     /* hours (BCD : 0-23) */
-	int hours2;
-	int minutes1;   /* minutes (BCD : 0-59) */
-	int minutes2;
-	int seconds1;   /* seconds (BCD : 0-59) */
-	int seconds2;
-	int tenths;     /* tenths of second (BCD : 0-9) */
+	long alarm = 0;     /* alarm (20-bit binary) */
+	int years = 0;      /* years (4-bit binary ) */
+	int days1 = 0;      /* days (BCD : 1-366) */
+	int days2 = 0;
+	int days3 = 0;
+	int hours1 = 0;     /* hours (BCD : 0-23) */
+	int hours2 = 0;
+	int minutes1 = 0;   /* minutes (BCD : 0-59) */
+	int minutes2 = 0;
+	int seconds1 = 0;   /* seconds (BCD : 0-59) */
+	int seconds2 = 0;
+	int tenths = 0;     /* tenths of second (BCD : 0-9) */
 
-	int clock_write_ptr;    /* clock byte to be written next (-1 if clock write disabled) */
+	int clock_write_ptr = 0;    /* clock byte to be written next (-1 if clock write disabled) */
 
 	enum clock_mode_t clock_mode;
 };
@@ -112,7 +112,6 @@ public:
 		m_nvram(*this, "nvram"),
 		m_latch(*this, "latch"),
 		m_fdc_cpu(*this,"fdccpu"),
-		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),
 		m_io_line1(*this, "LINE1"),
@@ -141,13 +140,12 @@ private:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	optional_device<applefdc_base_device> m_fdc;
-	required_device<scc8530_t> m_scc;
+	required_device<scc8530_legacy_device> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
 	required_device<ls259_device> m_latch;
 	required_device<m6504_device> m_fdc_cpu;
 
-	required_shared_ptr<uint8_t> m_fdc_rom;
 	required_shared_ptr<uint8_t> m_fdc_ram;
 
 	required_ioport m_io_line0;
@@ -164,54 +162,54 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	uint8_t *m_ram_ptr;
-	uint8_t *m_rom_ptr;
-	uint8_t *m_videoROM_ptr;
-	int m_setup;
-	int m_seg;
+	uint8_t *m_ram_ptr = nullptr;
+	uint8_t *m_rom_ptr = nullptr;
+	uint8_t *m_videoROM_ptr = nullptr;
+	int m_setup = 0;
+	int m_seg = 0;
 	real_mmu_entry m_real_mmu_regs[4][128];
 	mmu_entry m_mmu_regs[4][128];
-	int m_diag2;
-	int m_test_parity;
-	uint16_t m_mem_err_addr_latch;
-	int m_parity_error_pending;
-	int m_bad_parity_count;
+	int m_diag2 = 0;
+	int m_test_parity = 0;
+	uint16_t m_mem_err_addr_latch = 0;
+	int m_parity_error_pending = 0;
+	int m_bad_parity_count = 0;
 	std::unique_ptr<uint8_t[]> m_bad_parity_table;
-	int m_VTMSK;
-	int m_VTIR;
-	uint16_t m_video_address_latch;
-	uint16_t *m_videoram_ptr;
-	int m_KBIR;
-	int m_FDIR;
-	int m_DISK_DIAG;
-	int m_MT1;
-	int m_PWM_floppy_motor_speed;
-	int m_model;
+	int m_VTMSK = 0;
+	int m_VTIR = 0;
+	uint16_t m_video_address_latch = 0;
+	uint16_t *m_videoram_ptr = nullptr;
+	int m_KBIR = 0;
+	int m_FDIR = 0;
+	int m_DISK_DIAG = 0;
+	int m_MT1 = 0;
+	int m_PWM_floppy_motor_speed = 0;
+	int m_model = 0;
 	lisa_features_t m_features;
-	int m_COPS_Ready;
-	int m_COPS_command;
-	int m_fifo_data[8];
-	int m_fifo_size;
-	int m_fifo_head;
-	int m_fifo_tail;
-	int m_mouse_data_offset;
-	int m_COPS_force_unplug;
-	emu_timer *m_mouse_timer;
-	emu_timer *m_cops_ready_timer;
-	int m_hold_COPS_data;
-	int m_NMIcode;
+	int m_COPS_Ready = 0;
+	int m_COPS_command = 0;
+	int m_fifo_data[8]{};
+	int m_fifo_size = 0;
+	int m_fifo_head = 0;
+	int m_fifo_tail = 0;
+	int m_mouse_data_offset = 0;
+	int m_COPS_force_unplug = 0;
+	emu_timer *m_mouse_timer = nullptr;
+	emu_timer *m_cops_ready_timer = nullptr;
+	int m_hold_COPS_data = 0;
+	int m_NMIcode = 0;
 	clock_regs_t m_clock_regs;
-	int m_key_matrix[8];
-	int m_last_mx;
-	int m_last_my;
-	int m_frame_count;
-	int m_videoROM_address;
-	DECLARE_READ8_MEMBER(lisa_fdc_io_r);
-	DECLARE_WRITE8_MEMBER(lisa_fdc_io_w);
-	DECLARE_READ16_MEMBER(lisa_r);
-	DECLARE_WRITE16_MEMBER(lisa_w);
-	DECLARE_READ16_MEMBER(lisa_IO_r);
-	DECLARE_WRITE16_MEMBER(lisa_IO_w);
+	int m_key_matrix[8]{};
+	int m_last_mx = 0;
+	int m_last_my = 0;
+	int m_frame_count = 0;
+	int m_videoROM_address = 0;
+	uint8_t lisa_fdc_io_r(offs_t offset);
+	void lisa_fdc_io_w(offs_t offset, uint8_t data);
+	uint16_t lisa_r(offs_t offset, uint16_t mem_mask = ~0);
+	void lisa_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t lisa_IO_r(offs_t offset, uint16_t mem_mask = ~0);
+	void lisa_IO_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(diag1_w);
 	DECLARE_WRITE_LINE_MEMBER(diag2_w);
 	DECLARE_WRITE_LINE_MEMBER(seg1_w);
@@ -230,9 +228,9 @@ private:
 	TIMER_CALLBACK_MEMBER(handle_mouse);
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
 	TIMER_CALLBACK_MEMBER(set_COPS_ready);
-	DECLARE_WRITE8_MEMBER(COPS_via_out_a);
+	void COPS_via_out_a(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);
-	DECLARE_WRITE8_MEMBER(COPS_via_out_b);
+	void COPS_via_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_cb2);
 
 	void field_interrupts();

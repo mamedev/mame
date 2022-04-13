@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 {
 	int code = m_playfield_ram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(2, code, code == 0x3f ? 1 : 0, 0);
+	tileinfo.set(2, code, code == 0x3f ? 1 : 0, 0);
 }
 
 
@@ -22,7 +22,7 @@ void triplhnt_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_helper);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(triplhnt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(triplhnt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 
 	m_hit_timer = timer_alloc(TIMER_HIT);
 
@@ -35,7 +35,7 @@ void triplhnt_state::video_start()
 }
 
 
-void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -43,7 +43,7 @@ void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		set_collision(param);
 		break;
 	default:
-		assert_always(false, "Unknown id in triplhnt_state::device_timer");
+		throw emu_fatalerror("Unknown id in triplhnt_state::device_timer");
 	}
 }
 
@@ -88,27 +88,21 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		rect &= cliprect;
 
 		/* check for collisions and copy sprite */
-
+		for (int x = rect.left(); x <= rect.right(); x++)
 		{
-			int x;
-			int y;
-
-			for (x = rect.left(); x <= rect.right(); x++)
+			for (int y = rect.top(); y <= rect.bottom(); y++)
 			{
-				for (y = rect.top(); y <= rect.bottom(); y++)
+				pen_t const a = m_helper.pix(y, x);
+				pen_t const b = bitmap.pix(y, x);
+
+				if (a == 2 && b == 7)
 				{
-					pen_t a = m_helper.pix16(y, x);
-					pen_t b = bitmap.pix16(y, x);
-
-					if (a == 2 && b == 7)
-					{
-						hit_code = j;
-						hit_line = y;
-					}
-
-					if (a != 1)
-						bitmap.pix16(y, x) = a;
+					hit_code = j;
+					hit_line = y;
 				}
+
+				if (a != 1)
+					bitmap.pix(y, x) = a;
 			}
 		}
 	}

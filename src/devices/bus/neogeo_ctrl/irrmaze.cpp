@@ -86,22 +86,16 @@ void neogeo_irrmaze_device::device_start()
 //  in0_r
 //-------------------------------------------------
 
-READ8_MEMBER(neogeo_irrmaze_device::in0_r)
+uint8_t neogeo_irrmaze_device::in0_r()
 {
-	uint8_t res = 0;
-	if (m_ctrl_sel & 0x01)
-		res = m_ty->read();
-	else
-		res = m_tx->read();
-
-	return res;
+	return BIT(m_ctrl_sel, 0) ? m_ty->read() : m_tx->read();
 }
 
 //-------------------------------------------------
 //  in1_r
 //-------------------------------------------------
 
-READ8_MEMBER(neogeo_irrmaze_device::in1_r)
+uint8_t neogeo_irrmaze_device::in1_r()
 {
 	return m_buttons->read();
 }

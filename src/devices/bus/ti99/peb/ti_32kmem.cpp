@@ -31,9 +31,9 @@
 #include "emu.h"
 #include "ti_32kmem.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_32KMEM, bus::ti99::peb, ti_32k_expcard_device, "ti99_32kmem", "TI-99 32KiB memory expansion card")
+DEFINE_DEVICE_TYPE(TI99_32KMEM, bus::ti99::peb::ti_32k_expcard_device, "ti99_32kmem", "TI-99 32KiB memory expansion card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define RAMREGION "ram32k"
 
@@ -44,7 +44,7 @@ ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, cons
 {
 }
 
-READ8Z_MEMBER(ti_32k_expcard_device::readz)
+void ti_32k_expcard_device::readz(offs_t offset, uint8_t *value)
 {
 	uint8_t val = 0;
 	/*
@@ -107,4 +107,4 @@ void ti_32k_expcard_device::device_add_mconfig(machine_config &config)
 	m_ram->set_default_value(0);
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

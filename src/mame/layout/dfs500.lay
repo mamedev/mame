@@ -1,0 +1,507 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="255">
+		<led7seg>
+			<color red="1" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="led" defstate="1">
+		<disk state="1">
+			<color red="1" green="0.4" blue="0.4" />
+		</disk>
+		<disk state="0">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</disk>
+	</element>
+
+	<element name="squared_led" defstate="1">
+		<rect state="1">
+			<color red="0.4" green="1.0" blue="0.4" />
+		</rect>
+		<rect state="0">
+			<color red="0.05" green="0.3" blue="0.05" />
+		</rect>
+	</element>
+
+	<element name="digit_bg" defstate="0">
+		<rect state="0">
+			<color red="0.1" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+	<element name="background">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+	</element>
+
+	<!-- Snap Shot -->
+
+	<!-- Lighting -->
+	<element name="lighting_spot" defstate="0">
+		<text state="1" string="SPOT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="SPOT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="lighting_line" defstate="0">
+		<text state="1" string="LINE"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="LINE"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="lighting_plane" defstate="0">
+		<text state="1" string="PLANE"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="PLANE"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="lighting_width_wide" defstate="0">
+		<text state="1" string="WIDE"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="WIDE"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="lighting_width_medium" defstate="0">
+		<text state="1" string="MEDIUM"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="MEDIUM"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="lighting_width_narrow" defstate="0">
+		<text state="1" string="NARROW"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="NARROW"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="lighting_intensity_high" defstate="0">
+		<text state="1" string="HIGH"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="HIGH"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="lighting_intensity_medium" defstate="0">
+		<text state="1" string="MEDIUM"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="MEDIUM"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="lighting_intensity_low" defstate="0">
+		<text state="1" string="LOW"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="LOW"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<!-- Trail/Shadow -->
+	<element name="trail_drop_type_hard" defstate="0">
+		<text state="1" string="HARD"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="HARD"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_drop_type_soft" defstate="0">
+		<text state="1" string="SOFT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="SOFT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_drop_type_hard_star" defstate="0">
+		<text state="1" string="HARD STAR"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="HARD STAR"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_drop_type_soft_star" defstate="0">
+		<text state="1" string="SOFT STAR"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="SOFT STAR"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_drop_fill_self" defstate="0">
+		<text state="1" string="SELF"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="SELF"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_drop_fill_bord_mat" defstate="0">
+		<text state="1" string="BORD MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="BORD MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_drop_fill_shad_mat" defstate="0">
+		<text state="1" string="SHAD MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="SHAD MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_drop_fill_rndm_mat" defstate="0">
+		<text state="1" string="RNDM MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="RNDM MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_frames_duration" defstate="0">
+		<text state="1" string="DURATION"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DURATION"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_frames_wid_pos" defstate="0">
+		<text state="1" string="WID/POS"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="WID/POS"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trail_frames_density" defstate="0">
+		<text state="1" string="DENSITY"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DENSITY"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<!-- Edge -->
+
+	<!-- User Program -->
+
+	<!-- Location -->
+
+	<!-- Title -->
+	<element name="title_frgd_bus" defstate="0">
+		<text state="1" string="FRGD BUS"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="FRGD BUS"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="title_bord_mat" defstate="0">
+		<text state="1" string="BORD MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="BORD MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="title_shad_mat" defstate="0">
+		<text state="1" string="SHAD MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="SHAD MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<!-- Mattes/Bkgd -->
+	<element name="mattes_col_bkgd" defstate="0">
+		<text state="1" string="COL BKGD"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="COL BKGD"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="mattes_bord_mat" defstate="0">
+		<text state="1" string="BORD MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="BORD MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="mattes_shad_mat" defstate="0">
+		<text state="1" string="SHAD MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="SHAD MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="mattes_dsk_mat" defstate="0">
+		<text state="1" string="DSK MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DSK MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="mattes_dsk_bord" defstate="0">
+		<text state="1" string="DSK BORD"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DSK BORD"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<!-- Downstream Keyer -->
+	<element name="wide_bord" defstate="0">
+		<text state="1" string="WIDE BORD"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="WIDE BORD"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="narw_bord" defstate="0">
+		<text state="1" string="NARW BORD"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="NARW BORD"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="drop_bord" defstate="0">
+		<text state="1" string="DROP BORD"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DROP BORD"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="double" defstate="0">
+		<text state="1" string="DOUBLE"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DOUBLE"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="top_left" defstate="0">
+		<text state="1" string="TOP LEFT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="TOP LEFT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="top_right" defstate="0">
+		<text state="1" string="TOP RIGHT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="TOP RIGHT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="btm_right" defstate="0">
+		<text state="1" string="BTM RIGHT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="BTM RIGHT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="btm_left" defstate="0">
+		<text state="1" string="BTM LEFT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="BTM LEFT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="dsk_fill_video" defstate="0">
+		<text state="1" string="DSK VIDEO"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DSK VIDEO"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="dsk_fill_mat" defstate="0">
+		<text state="1" string="DSK MAT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DSK MAT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="dsk_fill_none" defstate="0">
+		<text state="1" string="NONE"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="NONE"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+
+	<!-- Effect Control -->
+	<element name="effect_ctrl_modify" defstate="0">
+		<text state="1" string="MODIFY"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="MODIFY"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="effect_ctrl_linear" defstate="0">
+		<text state="1" string="LINEAR"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="LINEAR"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="effect_ctrl_nonlin" defstate="0">
+		<text state="1" string="NON-LIN"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="NON-LIN"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="effect_ctrl_mask" defstate="0">
+		<text state="1" string="MASK"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="MASK"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<!-- Background -->
+	<element name="no_color_button">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+
+	<element name="single_color_button" defstate="0">
+		<rect state="0"><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<rect state="1"><color red="1.0" green="0.8" blue="0.3" /></rect>
+	</element>
+
+	<element name="multi_color_button" defstate="0">
+		<rect state="0"><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<rect state="1"><color red="1.0" green="0.3" blue="0.3" /></rect>
+		<rect state="2"><color red="1.0" green="0.8" blue="0.3" /></rect>
+		<rect state="3"><color red="1.0" green="1.0" blue="0.5" /></rect>
+	</element>
+
+	<!-- Foreground -->
+
+	<!-- Int Video -->
+	<element name="int_video_col_bkgd" defstate="0">
+		<text state="1" string="COL BKGD"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="COL BKGD"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="int_video_col_bar" defstate="0">
+		<text state="1" string="COL BAR"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="COL BAR"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="int_video_grid" defstate="0">
+		<text state="1" string="GRID"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="GRID"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<!-- Effect Transition -->
+	<element name="trans_rate_effect" defstate="0">
+		<text state="1" string="EFFECT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="EFFECT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trans_rate_dsk" defstate="0">
+		<text state="1" string="DSK"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="DSK"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="trans_rate_norm_rev" defstate="0">
+		<text state="1" string="NORM/REV"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="NORM/REV"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<!-- Pattern Number -->
+
+	<!-- Mode -->
+	<element name="mode_pattern" defstate="0">
+		<text state="1" string="PATTERN"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="PATTERN"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="mode_trans" defstate="0">
+		<text state="1" string="TRANS"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="TRANS"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="mode_user_pgm" defstate="0">
+		<text state="1" string="USER PGM"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="USER PGM"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+	<element name="mode_snap_shot" defstate="0">
+		<text state="1" string="SNAP SHOT"><color red="0.7" green="0.9" blue="0.2" /></text>
+		<text state="0" string="SNAP SHOT"><color red="0.4" green="0.4" blue="0.4" /></text>
+	</element>
+
+	<!-- Pattern / Key Pad -->
+
+
+	<view name="Control Panel">
+		<bounds x="0" y="0" width="1888" height="927" />
+		<screen index="0"><bounds x="1120" y="207" width="768" height="512" /></screen>
+
+		<element name="LD1" ref="led"><!-- EDITOR ENABLE --><bounds x="117" y="182"  width="9" height="9" /></element>
+
+		<!-- Snap Shot -->
+		<element name="snapshot_background" ref="digit_bg"><bounds x="154" y="84"  width="52" height="38" /></element>
+		<element name="snapshot_1" ref="digit"><bounds x="154" y="84"  width="26" height="38" /></element>
+		<element name="snapshot_0" ref="digit"><bounds x="180" y="84"  width="26" height="38" /></element>
+		<element name="LD4" ref="led"><!-- LEARN --><bounds x="179" y="139"  width="9" height="9" /></element>
+		<element name="LD3" ref="led"><!-- RECALL --><bounds x="185" y="182"  width="9" height="9" /></element>
+		<element name="LD2" ref="led"><!-- HOLD INPUT --><bounds x="190" y="221"  width="9" height="9" /></element>
+
+		<!-- Lighting -->
+		<element name="LD8"  ref="lighting_spot"><bounds x="243" y="86" width="32" height="12" /></element>
+		<element name="LD7"  ref="lighting_line"><bounds x="248" y="114" width="27" height="12" /></element>
+		<element name="LD6"  ref="lighting_plane"><bounds x="246" y="141" width="36" height="12" /></element>
+		<element name="LD11" ref="lighting_width_wide"><bounds x="313" y="86" width="32" height="12" /></element>
+		<element name="LD10" ref="lighting_width_medium"><bounds x="309" y="113" width="44" height="12" /></element>
+		<element name="LD9"  ref="lighting_width_narrow"><bounds x="309" y="140" width="49" height="12" /></element>
+		<element name="LD14" ref="lighting_intensity_high"><bounds x="384" y="86" width="30" height="12" /></element>
+		<element name="LD13" ref="lighting_intensity_medium"><bounds x="378" y="113" width="44" height="12" /></element>
+		<element name="LD12" ref="lighting_intensity_low"><bounds x="386" y="140" width="30" height="12" /></element>
+		<element name="LD5"  ref="led"><!-- LIGHTING --><bounds x="333" y="220"  width="9" height="9" /></element>
+
+		<!-- Trail/Shadow -->
+		<element name="trail_shadow_background" ref="digit_bg"><bounds x="594" y="84"  width="52" height="38" /></element>
+		<element name="trail_shadow_frames_1"   ref="digit"><bounds x="594" y="84"  width="26" height="38" /></element>
+		<element name="trail_shadow_frames_0"   ref="digit"><bounds x="620" y="84"  width="26" height="38" /></element>
+		<element name="LD15" ref="led"><!-- TRAIL --><bounds x="478" y="220"  width="9" height="9" /></element>
+		<element name="LD20" ref="led"><!-- DROP BORDER --><bounds x="544" y="220"  width="9" height="9" /></element>
+		<element name="LD25" ref="led"><!-- SHADOW --><bounds x="614" y="220"  width="9" height="9" /></element>
+		<element name="LD19" ref="trail_drop_type_hard"><bounds x="462" y="85" width="36" height="12" /></element>
+		<element name="LD18" ref="trail_drop_type_soft"><bounds x="462" y="104" width="36" height="12" /></element>
+		<element name="LD17" ref="trail_drop_type_hard_star"><bounds x="452" y="122" width="59" height="12" /></element>
+		<element name="LD16" ref="trail_drop_type_soft_star"><bounds x="453" y="140" width="59" height="12" /></element>
+		<element name="LD24" ref="trail_drop_fill_self"><bounds x="535" y="85" width="31" height="12" /></element>
+		<element name="LD23" ref="trail_drop_fill_bord_mat"><bounds x="519" y="104" width="59" height="12" /></element>
+		<element name="LD22" ref="trail_drop_fill_shad_mat"><bounds x="519" y="122" width="59" height="12" /></element>
+		<element name="LD21" ref="trail_drop_fill_rndm_mat"><bounds x="519" y="140" width="59" height="12" /></element>
+		<element name="LD28" ref="trail_frames_duration"><bounds x="657" y="100" width="54" height="12" /></element>
+		<element name="LD27" ref="trail_frames_wid_pos"><bounds x="657" y="119" width="51" height="12" /></element>
+		<element name="LD26" ref="trail_frames_density"><bounds x="658" y="139" width="47" height="12" /></element>
+
+		<!-- Edge -->
+		<element name="LD29" ref="led"><!-- EDGE BORDER --><bounds x="763" y="103"  width="9" height="9" /></element>
+		<element name="LD30" ref="led"><!-- EDGE SOFT --><bounds x="758" y="144"  width="9" height="9" /></element>
+
+		<!-- User Program -->
+		<element name="status_background" ref="digit_bg"><bounds x="841" y="84"  width="26" height="38" /></element>
+		<element name="status" ref="digit"><bounds x="841" y="84"  width="26" height="38" /></element>
+		<element name="edit_background" ref="digit_bg"><bounds x="833" y="148"  width="26" height="38" /></element>
+		<element name="edit" ref="digit"><bounds x="833" y="148" width="26" height="38" /></element>
+		<element name="LD31" ref="led"><!-- EDIT --><bounds x="837" y="220"  width="9" height="9" /></element>
+
+		<!-- Location -->
+		<element name="LD32" ref="led"><!-- LOCATION --><bounds x="914" y="221"  width="9" height="9" /></element>
+
+		<!-- Title -->
+		<element name="LD34" ref="led"><!-- MASK NORMAL --><bounds x="100" y="384"  width="9" height="9" /></element>
+		<element name="LD36" ref="led"><!-- MASK INVERT --><bounds x="143" y="384"  width="9" height="9" /></element>
+		<element name="LD33" ref="led"><!-- KEY INV --><bounds x="98"  y="440"  width="9" height="9" /></element>
+		<element name="LD35" ref="led"><!-- EXT KEY --><bounds x="140" y="440"  width="9" height="9" /></element>
+		<element name="LD37" ref="led"><!-- TITLE --><bounds x="117" y="495"  width="9" height="9" /></element>
+		<element name="LD40" ref="title_frgd_bus"><bounds x="181" y="342" width="52" height="12" /></element>
+		<element name="LD39" ref="title_bord_mat"><bounds x="180" y="361" width="52" height="12" /></element>
+		<element name="LD38" ref="title_shad_mat"><bounds x="180" y="381" width="52" height="12" /></element>
+
+		<!-- Mattes/Bkgd -->
+		<element name="LD63" ref="led"><!-- MATTE COPY --><bounds x="275" y="495"  width="9" height="9" /></element>
+		<element name="LD62" ref="mattes_col_bkgd"><bounds x="258" y="342" width="53" height="12" /></element>
+		<element name="LD61" ref="mattes_bord_mat"><bounds x="258" y="358" width="53" height="12" /></element>
+		<element name="LD60" ref="mattes_shad_mat"><bounds x="257" y="375" width="53" height="12" /></element>
+		<element name="LD59" ref="mattes_dsk_mat"><bounds x="260" y="390" width="46" height="12" /></element>
+		<element name="LD58" ref="mattes_dsk_bord"><bounds x="257" y="407" width="52" height="12" /></element>
+
+		<!-- Downstream Keyer -->
+		<element name="LD53" ref="wide_bord"><bounds x="393" y="344" width="50" height="12" /></element>
+		<element name="LD52" ref="narw_bord"><bounds x="392" y="363" width="53" height="12" /></element>
+		<element name="LD51" ref="drop_bord"><bounds x="392" y="383" width="52" height="12" /></element>
+		<element name="LD50" ref="double"><bounds x="396" y="403" width="43" height="12" /></element>
+		<element name="LD57" ref="top_left"><bounds x="452" y="344" width="50" height="12" /></element>
+		<element name="LD56" ref="top_right"><bounds x="450" y="364" width="54" height="12" /></element>
+		<element name="LD55" ref="btm_left" ><bounds x="448" y="383" width="56" height="12" /></element>
+		<element name="LD54" ref="btm_right"><bounds x="450" y="403" width="52" height="12" /></element>
+		<element name="LD49" ref="led"><!-- BORDER --><bounds x="442" y="495"  width="9" height="9" /></element>
+		<element name="LD42" ref="led"><!-- DSK MASK NORMAL --><bounds x="534" y="385"  width="9" height="9" /></element>
+		<element name="LD44" ref="led"><!-- DSK MASK INVERT --><bounds x="576" y="385"  width="9" height="9" /></element>
+		<element name="LD41" ref="led"><!-- DSK KEY INV --><bounds x="534" y="442"  width="9" height="9" /></element>
+		<element name="LD43" ref="led"><!-- DSK EXT KEY --><bounds x="576" y="442"  width="9" height="9" /></element>
+		<element name="LD48" ref="dsk_fill_video"><bounds x="608" y="345" width="52" height="12" /></element>
+		<element name="LD47" ref="dsk_fill_mat"  ><bounds x="611" y="364" width="46" height="12" /></element>
+		<element name="LD46" ref="dsk_fill_none" ><bounds x="619" y="383" width="32" height="12" /></element>
+		<element name="LD45" ref="multi_color_button"><bounds x="537" y="478"  width="43" height="43" /></element>
+
+		<!-- Effect Control -->
+		<element name="LD65"  ref="led"><!-- EFFECT CTRL: TITLE --><bounds x="693" y="442"  width="9" height="9" /></element>
+		<element name="LD66"  ref="led"><!-- EFFECT CTRL: DSK --><bounds x="736" y="442"  width="9" height="9" /></element>
+		<element name="LD234" ref="led"><!-- EFFECT CTRL: SHIFT --><bounds x="820" y="497"  width="9" height="9" /></element>
+		<element name="LD64"  ref="led"><!-- PATTERN NUMBER: SET --><bounds x="1016" y="497"  width="9" height="9" /></element>
+		<element name="LD69"  ref="effect_ctrl_modify"><bounds x="695" y="346" width="42" height="12" /></element>
+		<element name="LD68"  ref="effect_ctrl_linear"><bounds x="696" y="366" width="40" height="12" /></element>
+		<element name="LD67"  ref="effect_ctrl_nonlin"><bounds x="693" y="385" width="46" height="12" /></element>
+		<element name="LD235" ref="effect_ctrl_mask"><bounds x="700" y="405" width="32" height="12" /></element>
+
+		<!-- Background -->
+		<element name="LD75" ref="multi_color_button"><!-- VTR A --><bounds x="79" y="560"  width="43" height="43" /></element>
+		<element name="LD76" ref="multi_color_button"><!-- VTR B --><bounds x="124" y="560"  width="43" height="43" /></element>
+		<element name="LD77" ref="multi_color_button"><!-- 3 --><bounds x="169" y="560"  width="43" height="43" /></element>
+		<element name="LD78" ref="multi_color_button"><!-- 4 --><bounds x="214" y="560"  width="43" height="43" /></element>
+		<element name="LD79" ref="multi_color_button"><!-- INT VIDEO --><bounds x="259" y="560"  width="43" height="43" /></element>
+<!-- TODO:  <text string="VTR A"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="VTR B"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="3"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="4"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="INT VIDEO"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+
+		<!-- Foreground -->
+		<element name="LD70" ref="multi_color_button"><!-- VTR A --><bounds x="75" y="663"  width="43" height="43" /></element>
+		<element name="LD71" ref="multi_color_button"><!-- VTR B --><bounds x="120" y="663"  width="43" height="43" /></element>
+		<element name="LD72" ref="multi_color_button"><!-- 3 --><bounds x="165" y="663"  width="43" height="43" /></element>
+		<element name="LD73" ref="multi_color_button"><!-- 4 --><bounds x="210" y="663"  width="43" height="43" /></element>
+		<element name="LD74" ref="multi_color_button"><!-- INT VIDEO --><bounds x="255" y="663"  width="43" height="43" /></element>
+<!-- TODO:  <text string="VTR A"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="VTR B"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="3"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="4"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+<!-- TODO:  <text string="INT VIDEO"><color red="0.1" green="0.1" blue="0.1" /><bounds x="..." y="..."  width="..." height="..." /></text> -->
+
+		<!-- Int Video -->
+		<element name="LD82" ref="int_video_col_bkgd"><bounds x="321" y="578" width="52" height="12" /></element>
+		<element name="LD81" ref="int_video_col_bar"><bounds x="322" y="610" width="47" height="12" /></element>
+		<element name="LD80" ref="int_video_grid"><bounds x="331" y="643" width="28" height="12" /></element>
+
+		<!-- Effect Transition -->
+		<element name="trans_rate_background" ref="digit_bg"><bounds x="428" y="571"  width="78" height="38" /></element>
+		<element name="trans_rate_2" ref="digit"><bounds x="428" y="571"  width="26" height="38" /></element>
+		<element name="trans_rate_1" ref="digit"><bounds x="454" y="571"  width="26" height="38" /></element>
+		<element name="trans_rate_0" ref="digit"><bounds x="480" y="571"  width="26" height="38" /></element>
+		<element name="LD88" ref="trans_rate_effect"><!-- TRANS RATE EFFECT --><bounds x="419" y="626" width="40" height="12" /></element>
+		<element name="LD86" ref="trans_rate_dsk"><!-- TRANS RATE DSK --><bounds x="482" y="625" width="23" height="12" /></element>
+		<element name="LD90" ref="trans_rate_norm_rev"><!-- TRANS RATE NORM/REV --><bounds x="531" y="609" width="56" height="12" /></element>
+		<element name="LD85" ref="led"><!-- TRANSITION EFFECT --><bounds x="433" y="668"  width="9" height="9" /></element>
+		<element name="LD87" ref="led"><!-- TRANSITION DSK --><bounds x="490" y="668"  width="9" height="9" /></element>
+		<element name="LD91" ref="led"><!-- TRANSITION REVERSE --><bounds x="555" y="668"  width="9" height="9" /></element>
+		<element name="LD83" ref="led"><!-- FREEZE FIELD --><bounds x="433" y="740"  width="9" height="9" /></element>
+		<element name="LD84" ref="led"><!-- FREEZE FRAME --><bounds x="490" y="740"  width="9" height="9" /></element>
+		<element name="LD89" ref="single_color_button"><!-- TRANSITION AUTO TRANS --><bounds x="537" y="716"  width="43" height="43" /></element>
+		<element name="transition_0"   ref="squared_led"><bounds x="623" y="598.197"  width="14" height="4.5" /></element>
+		<element name="transition_1"   ref="squared_led"><bounds x="623" y="604.966"  width="14" height="4.5" /></element>
+		<element name="transition_2"   ref="squared_led"><bounds x="623" y="611.735"  width="14" height="4.5" /></element>
+		<element name="transition_3"   ref="squared_led"><bounds x="623" y="618.503"  width="14" height="4.5" /></element>
+		<element name="transition_4"   ref="squared_led"><bounds x="623" y="625.272"  width="14" height="4.5" /></element>
+		<element name="transition_5"   ref="squared_led"><bounds x="623" y="632.041"  width="14" height="4.5" /></element>
+		<element name="transition_6"   ref="squared_led"><bounds x="623" y="638.809"  width="14" height="4.5" /></element>
+		<element name="transition_7"   ref="squared_led"><bounds x="623" y="645.578"  width="14" height="4.5" /></element>
+		<element name="transition_8"   ref="squared_led"><bounds x="623" y="652.347"  width="14" height="4.5" /></element>
+		<element name="transition_9"   ref="squared_led"><bounds x="623" y="659.116"  width="14" height="4.5" /></element>
+		<element name="transition_10"  ref="squared_led"><bounds x="623" y="665.884"  width="14" height="4.5" /></element>
+		<element name="transition_11"  ref="squared_led"><bounds x="623" y="672.653"  width="14" height="4.5" /></element>
+		<element name="transition_12"  ref="squared_led"><bounds x="623" y="679.422"  width="14" height="4.5" /></element>
+		<element name="transition_13"  ref="squared_led"><bounds x="623" y="686.19"  width="14" height="4.5" /></element>
+		<element name="transition_14"  ref="squared_led"><bounds x="623" y="692.959"  width="14" height="4.5" /></element>
+		<element name="transition_15"  ref="squared_led"><bounds x="623" y="699.728"  width="14" height="4.5" /></element>
+		<element name="transition_16"  ref="squared_led"><bounds x="623" y="706.497"  width="14" height="4.5" /></element>
+		<element name="transition_17"  ref="squared_led"><bounds x="623" y="713.265"  width="14" height="4.5" /></element>
+		<element name="transition_18"  ref="squared_led"><bounds x="623" y="720.034"  width="14" height="4.5" /></element>
+		<element name="transition_19"  ref="squared_led"><bounds x="623" y="726.803"  width="14" height="4.5" /></element>
+
+		<!-- Pattern Number -->
+		<element name="pattern_number_background" ref="digit_bg"><bounds x="871" y="483"  width="108" height="41" /></element>
+		<element name="pattern_number_3" ref="digit"><bounds x="873" y="485"  width="26" height="37" /></element>
+		<element name="pattern_number_2" ref="digit"><bounds x="899" y="485"  width="26" height="37" /></element>
+		<element name="pattern_number_1" ref="digit"><bounds x="925" y="485"  width="26" height="37" /></element>
+		<element name="pattern_number_0" ref="digit"><bounds x="951" y="485"  width="26" height="37" /></element>
+
+		<!-- Mode -->
+		<element name="LD96" ref="led"><!-- DIRECT PATTERN --><bounds x="822" y="574"  width="9" height="9" /></element>
+		<element name="LD95" ref="mode_pattern"  ><bounds x="801" y="621" width="47" height="12" /></element>
+		<element name="LD94" ref="mode_trans"    ><bounds x="806" y="654" width="38" height="12" /></element>
+		<element name="LD93" ref="mode_user_pgm" ><bounds x="799" y="687" width="54" height="12" /></element>
+		<element name="LD92" ref="mode_snap_shot"><bounds x="805" y="720" width="44" height="12" /></element>
+
+		<!-- Pattern / Key Pad -->
+		<element name="LD106" ref="single_color_button"><!-- KEYPAD 7 --><bounds x="866" y="558"  width="43" height="43" /></element>
+		<element name="LD107" ref="single_color_button"><!-- KEYPAD 8 --><bounds x="911" y="558"  width="43" height="43" /></element>
+		<element name="LD108" ref="single_color_button"><!-- KEYPAD 9 --><bounds x="956" y="558"  width="43" height="43" /></element>
+		<element name="LD109" ref="single_color_button"><!-- KEYPAD INS --><bounds x="1001" y="558"  width="43" height="43" /></element>
+		<element name="LD102" ref="single_color_button"><!-- KEYPAD 4 --><bounds x="866" y="603"  width="43" height="43" /></element>
+		<element name="LD103" ref="single_color_button"><!-- KEYPAD 5 --><bounds x="911" y="603"  width="43" height="43" /></element>
+		<element name="LD104" ref="single_color_button"><!-- KEYPAD 6 --><bounds x="956" y="603"  width="43" height="43" /></element>
+		<element name="LD105" ref="single_color_button"><!-- KEYPAD DEL --><bounds x="1001" y="603"  width="43" height="43" /></element>
+		<element name="LD98"  ref="single_color_button"><!-- KEYPAD 1 --><bounds x="866" y="648"  width="43" height="43" /></element>
+		<element name="LD99"  ref="single_color_button"><!-- KEYPAD 2 --><bounds x="911" y="648"  width="43" height="43" /></element>
+		<element name="LD100" ref="single_color_button"><!-- KEYPAD 3 --><bounds x="956" y="648"  width="43" height="43" /></element>
+		<element name="LD101" ref="single_color_button"><!-- KEYPAD RST --><bounds x="1001" y="648"  width="43" height="43" /></element>
+		<element name="LD97"  ref="single_color_button"><!-- KEYPAD 0 --><bounds x="866" y="693"  width="43" height="43" /></element>
+		<element name="keypad_down"  ref="no_color_button"><!-- KEYPAD DOWN --><bounds x="911" y="693"  width="43" height="43" /></element>
+		<element name="keypad_up"    ref="no_color_button"><!-- KEYPAD UP --><bounds x="956" y="693"  width="43" height="43" /></element>
+		<element name="keypad_enter" ref="no_color_button"><!-- KEYPAD ENTER --><bounds x="1001" y="693"  width="43" height="43" /></element>
+	</view>
+</mamelayout>

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 
 
@@ -19,9 +20,9 @@ public:
 	stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	DECLARE_WRITE8_MEMBER(stfight_text_char_w);
-	DECLARE_WRITE8_MEMBER(stfight_sprite_bank_w);
-	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
+	void stfight_text_char_w(offs_t offset, uint8_t data);
+	void stfight_sprite_bank_w(uint8_t data);
+	void stfight_vh_latch_w(offs_t offset, uint8_t data);
 
 protected:
 	uint32_t screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -50,9 +51,9 @@ private:
 	required_shared_ptr<uint8_t> m_txram;
 
 	// tilemaps
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	TILEMAP_MAPPER_MEMBER(fg_scan);
 	TILEMAP_MAPPER_MEMBER(bg_scan);
@@ -62,7 +63,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
 	// internal variables
-	int m_sprite_base;
+	int m_sprite_base = 0;
 
 	// rendering / mixing
 	bitmap_ind16 m_temp_bitmap;

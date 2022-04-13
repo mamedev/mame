@@ -85,7 +85,7 @@ with the following code:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/vsystem_gga.h"
 #include "speaker.h"
 
@@ -96,7 +96,7 @@ with the following code:
  *
  *************************************/
 
-READ8_MEMBER(fromance_state::fromance_busycheck_main_r)
+uint8_t fromance_state::fromance_busycheck_main_r()
 {
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
@@ -108,7 +108,7 @@ READ8_MEMBER(fromance_state::fromance_busycheck_main_r)
 }
 
 
-READ8_MEMBER(fromance_state::fromance_busycheck_sub_r)
+uint8_t fromance_state::fromance_busycheck_sub_r()
 {
 	if (m_sublatch->pending_r())
 		return 0xff;        // standby
@@ -124,9 +124,9 @@ READ8_MEMBER(fromance_state::fromance_busycheck_sub_r)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_rombank_w)
+void fromance_state::fromance_rombank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data);
+	m_rombank->set_entry(data);
 }
 
 
@@ -137,7 +137,7 @@ WRITE8_MEMBER(fromance_state::fromance_rombank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_adpcm_reset_w)
+void fromance_state::fromance_adpcm_reset_w(uint8_t data)
 {
 	m_adpcm_reset = (data & 0x01);
 	m_vclk_left = 0;
@@ -146,7 +146,7 @@ WRITE8_MEMBER(fromance_state::fromance_adpcm_reset_w)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_adpcm_w)
+void fromance_state::fromance_adpcm_w(uint8_t data)
 {
 	m_adpcm_data = data;
 	m_vclk_left = 2;
@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		m_msm->write_data(m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}
@@ -180,13 +180,13 @@ WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_portselect_w)
+void fromance_state::fromance_portselect_w(uint8_t data)
 {
 	m_portselect = data;
 }
 
 
-READ8_MEMBER(fromance_state::fromance_keymatrix_r)
+uint8_t fromance_state::fromance_keymatrix_r()
 {
 	int ret = 0xff;
 
@@ -212,7 +212,7 @@ READ8_MEMBER(fromance_state::fromance_keymatrix_r)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_coinctr_w)
+void fromance_state::fromance_coinctr_w(uint8_t data)
 {
 	//
 }
@@ -261,7 +261,7 @@ void fromance_state::fromance_main_map(address_map &map)
 void fromance_state::nekkyoku_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_rombank);
 	map(0xc000, 0xefff).rw(FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xffff).rw(FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
@@ -270,7 +270,7 @@ void fromance_state::nekkyoku_sub_map(address_map &map)
 void fromance_state::fromance_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_rombank);
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).rw(FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
 	map(0xd000, 0xffff).rw(FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
@@ -864,11 +864,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(fromance_state,fromance)
+void fromance_state::machine_start()
 {
 	uint8_t *ROM = memregion("sub")->base();
 
-	membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
+	m_rombank->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 
 	save_item(NAME(m_portselect));
 
@@ -879,7 +879,7 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 	/* video-related elements are saved in video_start */
 }
 
-MACHINE_RESET_MEMBER(fromance_state,fromance)
+void fromance_state::machine_reset()
 {
 	m_portselect = 0;
 
@@ -914,9 +914,6 @@ void fromance_state::nekkyoku(machine_config &config)
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
 
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -947,19 +944,16 @@ void fromance_state::nekkyoku(machine_config &config)
 void fromance_state::idolmj(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000) / 2);   /* 6.00 Mhz ? */
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);   /* 6.00 Mhz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &fromance_state::fromance_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fromance_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, XTAL(12'000'000) / 2);    /* 6.00 Mhz ? */
+	Z80(config, m_subcpu, 12_MHz_XTAL / 2);    /* 6.00 Mhz ? */
 	m_subcpu->set_addrmap(AS_PROGRAM, &fromance_state::fromance_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &fromance_state::idolmj_sub_io_map);
 
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
-
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -980,7 +974,7 @@ void fromance_state::idolmj(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2149(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15);
+	YM2149(config, "aysnd", 12_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MSM5205(config, m_msm, 384000);
 	m_msm->vck_legacy_callback().set(FUNC(fromance_state::fromance_adpcm_int)); /* IRQ handler */
@@ -1002,9 +996,6 @@ void fromance_state::fromance(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
-
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

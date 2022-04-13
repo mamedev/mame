@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -27,17 +27,17 @@
  *
  *************************************/
 
-WRITE8_MEMBER(compgolf_state::compgolf_scrollx_lo_w)
+void compgolf_state::compgolf_scrollx_lo_w(uint8_t data)
 {
 	m_scrollx_lo = data;
 }
 
-WRITE8_MEMBER(compgolf_state::compgolf_scrolly_lo_w)
+void compgolf_state::compgolf_scrolly_lo_w(uint8_t data)
 {
 	m_scrolly_lo = data;
 }
 
-WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
+void compgolf_state::compgolf_ctrl_w(uint8_t data)
 {
 	/* bit 4 and 6 are always set */
 

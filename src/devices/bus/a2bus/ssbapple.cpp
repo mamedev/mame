@@ -11,20 +11,47 @@
 
 #include "emu.h"
 #include "ssbapple.h"
+
 #include "sound/tms5220.h"
+
 #include "speaker.h"
+
+
+namespace {
 
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_SSBAPPLE, a2bus_ssb_device, "a2ssbapl", "Multitech Industrial SSB Apple speech card")
-
 #define TMS_TAG         "tms5220"
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_ssb_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_ssb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
+	required_device<tms5220_device> m_tms;
+
+protected:
+	a2bus_ssb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
+	virtual bool take_c800() override;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -85,3 +112,12 @@ void a2bus_ssb_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 	m_tms->data_w(data);
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_SSBAPPLE, device_a2bus_card_interface, a2bus_ssb_device, "a2ssbapl", "Multitech Industrial SSB Apple speech card")

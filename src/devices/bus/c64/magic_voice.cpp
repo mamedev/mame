@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_irq_w )
 	m_slot->nmi_w(state);
 }
 
-READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
+uint8_t c64_magic_voice_cartridge_device::tpi_pa_r()
 {
 	/*
 
@@ -97,14 +97,14 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 
 	uint8_t data = 0;
 
-	data |= m_exp->game_r(get_offset(m_ca), 1, 1, 1, 0) << 5;
+	data |= m_exp->game_r(get_offset(m_ca), 1, 1, 1, 0, 0) << 5;
 	data |= m_vslsi->eos_r() << 6;
 	data |= m_fifo->dir_r() << 7;
 
 	return data;
 }
 
-WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_w )
+void c64_magic_voice_cartridge_device::tpi_pa_w(uint8_t data)
 {
 	/*
 
@@ -125,7 +125,7 @@ WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_w )
 	m_fifo->si_w(BIT(data, 4));
 }
 
-READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
+uint8_t c64_magic_voice_cartridge_device::tpi_pb_r()
 {
 	/*
 
@@ -144,12 +144,12 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
 
 	uint8_t data = 0;
 
-	data |= m_exp->exrom_r(get_offset(m_ca), 1, 1, 1, 0) << 7;
+	data |= m_exp->exrom_r(get_offset(m_ca), 1, 1, 1, 0, 0) << 7;
 
 	return data;
 }
 
-WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_w )
+void c64_magic_voice_cartridge_device::tpi_pb_w(uint8_t data)
 {
 	/*
 

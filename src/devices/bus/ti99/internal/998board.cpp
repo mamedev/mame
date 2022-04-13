@@ -128,13 +128,13 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
-DEFINE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
-DEFINE_DEVICE_TYPE_NS(TI99_MOFETTA, bus::ti99::internal, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
-DEFINE_DEVICE_TYPE_NS(TI99_OSO, bus::ti99::internal, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
-DEFINE_DEVICE_TYPE_NS(TI99_AMIGO, bus::ti99::internal, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
+DEFINE_DEVICE_TYPE(TI99_MAINBOARD8, bus::ti99::internal::mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
+DEFINE_DEVICE_TYPE(TI99_VAQUERRO, bus::ti99::internal::vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
+DEFINE_DEVICE_TYPE(TI99_MOFETTA, bus::ti99::internal::mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
+DEFINE_DEVICE_TYPE(TI99_OSO, bus::ti99::internal::oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
+DEFINE_DEVICE_TYPE(TI99_AMIGO, bus::ti99::internal::amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 enum
 {
@@ -160,8 +160,8 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_amigo(*this, TI998_AMIGO_TAG),
 	m_oso(*this, TI998_OSO_TAG),
 	m_maincpu(*owner, "maincpu"),
-	m_video(*owner, TI_VDP_TAG),               // subdevice of main class
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI998_VDP_TAG),
+	m_sound(*owner, TI998_SOUNDCHIP_TAG),
 	m_speech(*owner, TI998_SPEECHSYN_TAG),
 	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
@@ -351,7 +351,7 @@ void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
 
 // =============== CRU bus access ==================
 
-READ8Z_MEMBER(mainboard8_device::crureadz)
+void mainboard8_device::crureadz(offs_t offset, uint8_t *value)
 {
 	m_ioport->crureadz(offset, value);
 }
@@ -1153,7 +1153,7 @@ vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
+void vaquerro_device::set_address(offs_t offset, int state)
 {
 	// Do the decoding
 	// state = dbin, offset = address
@@ -1602,7 +1602,7 @@ mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-SETADDRESS_DBIN_MEMBER( mofetta_device::set_address )
+void mofetta_device::set_address(offs_t offset, int state)
 {
 	if (!m_gotfirstword)
 	{
@@ -2189,6 +2189,8 @@ void amigo_device::device_start()
 {
 	m_mainboard = downcast<mainboard8_device*>(owner());
 
+	std::fill(std::begin(m_base_register), std::end(m_base_register), 0);
+
 	save_item(NAME(m_memen));
 	save_pointer(NAME(m_base_register),16);
 	save_item(NAME(m_logical_space));
@@ -2264,7 +2266,7 @@ void amigo_device::device_reset()
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_int(*this),
-	m_hexbusout(*this, ":" TI_HEXBUS_TAG),
+	m_hexbusout(*this, ":" TI998_HEXBUS_TAG),
 	m_data(0),
 	m_status(0xff),
 	m_control(0),
@@ -2667,12 +2669,10 @@ void oso_device::update_hexbus()
 
 	// Check how the bus has changed. This depends on the states of all
 	// connected peripherals
-	uint8_t value1 = hexbus_read();
-	// if (value1 != value) LOGMASKED(LOG_OSO, "actually: %02x (BAV*=%d, HSK*=%d, data=%01x)\n", value1, (value1 & 0x04)? 1:0, (value1 & 0x10)? 1:0, ((value1>>4)&0x0c) | (value1&0x03));
 
 	// Update the state of BAV and HSK
-	m_bav = ((value1 & bus::hexbus::HEXBUS_LINE_BAV)==0);
-	m_hsk = ((value1 & bus::hexbus::HEXBUS_LINE_HSK)==0);
+	m_bav = (bus_bav_level()==ASSERT_LINE);
+	m_hsk = (bus_hsk_level()==ASSERT_LINE);
 
 	// Sometimes, Oso does not have a chance to advance its state after the
 	// last byte was read. In that case, a change of rdsetin would not be
@@ -2680,7 +2680,7 @@ void oso_device::update_hexbus()
 	// has happened.
 	if (m_hsk==false) m_rdsetold = false;
 
-	m_oldvalue = value1;
+	m_oldvalue = m_current_bus_value;
 }
 
 /*
@@ -2689,8 +2689,8 @@ void oso_device::update_hexbus()
 void oso_device::hexbus_value_changed(uint8_t data)
 {
 //  LOGMASKED(LOG_OSO, "Hexbus value changed to %02x\n", data);
-	bool bav = (data & bus::hexbus::HEXBUS_LINE_BAV)==0;
-	bool hsk = (data & bus::hexbus::HEXBUS_LINE_HSK)==0;
+	bool bav = (bus_bav_level()==ASSERT_LINE);
+	bool hsk = (bus_hsk_level()==ASSERT_LINE);
 
 	if ((bav != m_bav) || (hsk != m_hsk))
 	{
@@ -2698,7 +2698,7 @@ void oso_device::hexbus_value_changed(uint8_t data)
 		m_hsk = hsk;
 
 		LOGMASKED(LOG_HEXBUS, "BAV*=%d, HSK*=%d\n", m_bav? 0:1, m_hsk? 0:1);
-		int nibble = ((data & bus::hexbus::HEXBUS_LINE_BIT32)>>4) | (data & bus::hexbus::HEXBUS_LINE_BIT10);
+		int nibble = data_lines(data);
 
 		// The real devices are driven at a similar clock rate like the 99/8.
 		// The designers assumed that there is a clock tick of Oso between
@@ -2748,5 +2748,4 @@ void oso_device::device_start()
 	save_item(NAME(m_xmit));
 }
 
-} } } // end namespace bus::ti99::internal
-
+} // end namespace bus::ti99::internal

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="jb3000_flop" description="Panasonic JB-3000 diskettes">
+
+	<!-- OS 8" -->
+	<software name="dos125"> <!-- From https://archive.org/details/JB-3000-MS-DOS -->
+		<description>MS-DOS v1.25</description>
+		<year>1982</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="200914">
+				<rom name="JB-3000 MS-DOS (8-inch).imd" size="200914" crc="8aba9f35" sha1="7dba4f64296039d88c35098c71f30ab32e9e081e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Apps -->
+
+</softwarelist>

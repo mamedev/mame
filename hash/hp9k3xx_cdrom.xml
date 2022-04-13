@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="hp9k3xx_cdrom" description="HP9000/300 CD-ROM images">
+	<software name="hpux_8_0">
+		<description>HP-UX Release 8.0 for Series 300/400</description>
+		<year>1992</year>
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="HP-UX Install Disc"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="hp_ux_8_0_install_s300_400" sha1="f01e92159014f5526e3551d6b687597cd0572c7a" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="B2378-13610"/>
+			<feature name="part_id" value="HP-UX Core Operating System Software"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="hp_ux_8_0_core_os_s300_400" sha1="2ffca5ca0572be5f6f25098de33c3ccf3f37a0eb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux8_app_may_92">
+		<description>HP-UX 8.0 Application Software May 1992</description>
+		<year>1992</year> <!-- 05/92 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="B2378-13612"/>
+			<feature name="part_id" value="HP-UX Application Software"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="hp_ux_8_0_apps_s300_400" sha1="c0bc24567a301c0e639697abbfc0b7d4be508252" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux8_app_sep_92">
+		<description>HP-UX 8.0 Application Software September 1992</description>
+		<year>1992</year> <!-- 09/92 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="24998-10278"/>
+			<feature name="part_id" value="HP-UX Application Software"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="24998_10278_hp_ux_appl_sw_8_0_sep1992" sha1="bca5f68cbaa071b44c024232f786b1cb6511d00b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux_9_10">
+		<description>HP-UX Release 9.10 for Series 300/400</description>
+		<year>1995</year>
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom1" interface="cdrom"> <!-- 10/92 -->
+			<feature name="part_number" value="B2378-13621"/>
+			<feature name="part_id" value="HP-UX Install Disc"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="hpux_9_0_install_disc" sha1="d1918f321f0520a3607c2c87983709c2417203d4" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom"> <!-- 04/95 -->
+			<feature name="part_number" value="B2378-87054"/>
+			<feature name="part_id" value="HP-UX Core Operating System Software"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="hpux_9_10_core_os" sha1="e4bc82c602cc72c8e08ff57dec34de0ee017ec2b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux_9_1_y2k">
+		<description>HP-UX 9.1 Y2K Patches</description>
+		<year>1998</year>
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="hpux_9_1_y2k_patches" sha1="bf2dc75d5527ad49dbc052e21f638d5944e7b572" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux9_app_oct_92">
+		<description>HP-UX 9.0 Application Software October 1992</description>
+		<year>1992</year> <!-- 10/92 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="24998-10261"/>
+			<feature name="part_id" value="HP-UX Application Software"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="24998_10261_hp_ux_appl_sw_9_0_oct1992" sha1="b8c40237d535b086ececfc2fff223d3c09e19cc5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux9_app_jun_93">
+		<description>HP-UX 9.0 Application Software June 1993</description>
+		<year>1993</year> <!-- 06/93 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="24998-10608"/>
+			<feature name="part_id" value="HP-UX Application Software"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="24998_10608_hp_ux_appl_sw_9_0_jun1993" sha1="5964e14216ea918caeddd8d93893cb9da38e82e4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux9_app_apr_95">
+		<description>HP-UX 9.0 Application Software April 1995</description>
+		<year>1995</year> <!-- 04/95 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="B2378-10142"/>
+			<feature name="part_id" value="HP-UX Application Software Disc 1 of 2"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="app_1_of_2" sha1="924d2577b2993cd382444e52079d478e23bb9bac" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="B2378-10143"/>
+			<feature name="part_id" value="HP-UX Application Software Disc 2 of 2"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="app_2_of_2" sha1="500ad788abb71f7f7fcffed5b7eaa3db6046dcbb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux9_app_sep_98">
+		<description>HP-UX 9.0 Application Software September 1998</description>
+		<year>1998</year> <!-- 09/98 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="B6736-87001"/>
+			<feature name="part_id" value="HP-UX Application Software"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="HP-UX 9.10 Programming Language Tools" sha1="b3b0bd68c8368ba267fd76518592053b99cd23de" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux9_lrm_apr_94">
+		<description>HP LaserROM HP-UX Release 9.0 April 1994</description>
+		<year>1994</year> <!-- 04/94 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="B3141-10008"/>
+			<feature name="part_id" value="HP-UX Application Software"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="b3141_10008_laserrom_9_0_apr1994" sha1="050d96e9e27195ccac841cff05378b5e453566c0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hpux9_lrm_feb_95">
+		<description>HP LaserROM HP-UX Release 9.0 February 1995</description>
+		<year>1995</year> <!-- 02/95 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="50726-10230"/>
+			<feature name="part_id" value="HP-UX Documentation Disc"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="50726-10230_LaserROM_9.0_Feb1995" sha1="3c20b94f2090a09665045232c2b1f0d34e3dea23" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hp_pe_me_dec_92">
+		<description>HP Precision Enginnering Systems December 1992</description>
+		<year>1992</year> <!-- 12/92 -->
+		<publisher>Hewlett-Packard</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="B1329-10004"/>
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<disk name="b1329_10004_pe_me_family_dec1992" sha1="70b83f1f29f31b050d9ce2c8385c6550a9ea1fa1" />
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

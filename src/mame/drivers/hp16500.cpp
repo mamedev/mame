@@ -49,7 +49,8 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/mc2661.h"
+#include "machine/ds1386.h"
+#include "machine/scn_pci.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
 #include "video/mc6845.h"
@@ -79,25 +80,25 @@ private:
 	optional_device<hp_hil_mlc_device> m_mlc;
 	std::vector<uint8_t> m_vram;
 
-	uint8_t m_mask, m_val;
+	uint8_t m_mask = 0, m_val = 0;
 
-	DECLARE_WRITE32_MEMBER(palette_w);
+	void palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER  (vram_r);
-	DECLARE_WRITE8_MEMBER (mask_w);
-	DECLARE_WRITE8_MEMBER (val_w);
-	DECLARE_READ32_MEMBER(vbl_state_r);
-	DECLARE_WRITE32_MEMBER(vbl_ack_w);
-	DECLARE_READ16_MEMBER(vbl_ack16_r);
-	DECLARE_WRITE16_MEMBER(vbl_ack16_w);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t vram_r(offs_t offset);
+	void mask_w(uint8_t data);
+	void val_w(uint8_t data);
+	uint32_t vbl_state_r();
+	void vbl_ack_w(uint32_t data);
+	uint16_t vbl_ack16_r();
+	void vbl_ack16_w(uint16_t data);
 
-	DECLARE_WRITE8_MEMBER(pal_ctrl_w);
-	DECLARE_WRITE8_MEMBER(pal_r_w);
-	DECLARE_WRITE8_MEMBER(pal_g_w);
-	DECLARE_WRITE8_MEMBER(pal_b_w);
+	void pal_ctrl_w(uint8_t data);
+	void pal_r_w(uint8_t data);
+	void pal_g_w(uint8_t data);
+	void pal_b_w(uint8_t data);
 
-	DECLARE_WRITE16_MEMBER(maskval_w);
+	void maskval_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_2);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -108,26 +109,26 @@ private:
 	void hp1650_map(address_map &map);
 	void hp1651_map(address_map &map);
 
-	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
+	uint32_t m_palette[256]{}, m_colors[3]{}, m_count = 0, m_clutoffs = 0;
 };
 
-READ32_MEMBER(hp16500_state::vbl_state_r)
+uint32_t hp16500_state::vbl_state_r()
 {
 	return 0x03000000;  // bit 0 set means the interrupt handler advances the pSOS tick counter.
 }
 
-WRITE32_MEMBER(hp16500_state::vbl_ack_w)
+void hp16500_state::vbl_ack_w(uint32_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-READ16_MEMBER(hp16500_state::vbl_ack16_r)
+uint16_t hp16500_state::vbl_ack16_r()
 {
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	return 0;
 }
 
-WRITE16_MEMBER(hp16500_state::vbl_ack16_w)
+void hp16500_state::vbl_ack16_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
@@ -142,12 +143,11 @@ WRITE_LINE_MEMBER( hp16500_state::vsync_changed )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 {
-	uint32_t *p = &bitmap.pix32(y);
-	int i, pos;
+	uint32_t *p = &bitmap.pix(y);
 
-	pos =  y * 144;
+	int pos =  y * 144;
 
-	for (i = 0; i < x_count; i++)
+	for (int i = 0; i < x_count; i++)
 	{
 		*p++  = m_palette[m_vram[pos+0x00000]];
 		*p++  = m_palette[m_vram[pos+0x10000]];
@@ -164,12 +164,11 @@ MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row_1650 )
 {
-	uint32_t *p = &bitmap.pix32(y);
-	int i, pos;
+	uint32_t *p = &bitmap.pix(y);
 
-	pos =  y * 148;
+	int pos =  y * 148;
 
-	for (i = 0; i < x_count; i++)
+	for (int i = 0; i < x_count; i++)
 	{
 		*p++  = m_palette[m_vram[pos+0x00000]];
 		*p++  = m_palette[m_vram[pos+0x10000]];
@@ -184,31 +183,31 @@ MC6845_UPDATE_ROW( hp16500_state::crtc_update_row_1650 )
 	}
 }
 
-WRITE8_MEMBER(hp16500_state::pal_ctrl_w)
+void hp16500_state::pal_ctrl_w(uint8_t data)
 {
 	m_clutoffs = data & 0xf;
 }
 
 
-WRITE8_MEMBER(hp16500_state::pal_r_w)
+void hp16500_state::pal_r_w(uint8_t data)
 {
 	m_colors[0] = (data<<4);
 	m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 }
 
-WRITE8_MEMBER(hp16500_state::pal_g_w)
+void hp16500_state::pal_g_w(uint8_t data)
 {
 	m_colors[1] = (data<<4);
 	m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 }
 
-WRITE8_MEMBER(hp16500_state::pal_b_w)
+void hp16500_state::pal_b_w(uint8_t data)
 {
 	m_colors[2] = (data<<4);
 	m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 }
 
-WRITE16_MEMBER(hp16500_state::maskval_w)
+void hp16500_state::maskval_w(uint16_t data)
 {
 	// by analogy with the string printer code from the 16500b, which
 	// appears to be a direct port...
@@ -234,7 +233,7 @@ void hp16500_state::hp1650_map(address_map &map)
 	map(0x206001, 0x206001).w(FUNC(hp16500_state::pal_g_w));
 	map(0x207001, 0x207001).w(FUNC(hp16500_state::pal_b_w));
 
-	map(0x20a000, 0x20a007).rw("epci", FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0x00ff);
+	map(0x20a000, 0x20a007).rw("epci", FUNC(scn_pci_device::read), FUNC(scn_pci_device::write)).umask16(0x00ff);
 
 	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -263,7 +262,7 @@ void hp16500_state::hp1651_map(address_map &map)
 	map(0x206001, 0x206001).w(FUNC(hp16500_state::pal_g_w));
 	map(0x207001, 0x207001).w(FUNC(hp16500_state::pal_b_w));
 
-	map(0x20a000, 0x20a007).rw("epci", FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0x00ff);
+	map(0x20a000, 0x20a007).rw("epci", FUNC(scn_pci_device::read), FUNC(scn_pci_device::write)).umask16(0x00ff);
 
 	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -314,7 +313,8 @@ void hp16500_state::hp16500_map(address_map &map)
 	map(0x00203000, 0x00203003).w(FUNC(hp16500_state::vbl_ack_w));
 	map(0x00209800, 0x00209803).r(FUNC(hp16500_state::vbl_state_r));
 
-	map(0x0020b800, 0x0020b8ff).ram(); // system ram test is really strange.
+	map(0x0020b800, 0x0020b83f).rw("rtc", FUNC(ds1286_device::data_r), FUNC(ds1286_device::data_w));
+	map(0x0020b840, 0x0020b843).noprw(); // system ram test is really strange.
 
 	map(0x0020f800, 0x0020f80f).rw(m_mlc, FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write));
 	map(0x00600000, 0x0061ffff).w(FUNC(hp16500_state::vram_w));
@@ -340,7 +340,7 @@ void hp16500_state::video_start()
 // that is why the handler needs to be 16 bits, or it won't be called
 // in the first place.
 
-WRITE16_MEMBER(hp16500_state::vram_w)
+void hp16500_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!ACCESSING_BITS_0_7)
 		data = data | (data >> 8);
@@ -353,22 +353,22 @@ WRITE16_MEMBER(hp16500_state::vram_w)
 	}
 }
 
-READ8_MEMBER (hp16500_state::vram_r)
+uint8_t hp16500_state::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(hp16500_state::mask_w)
+void hp16500_state::mask_w(uint8_t data)
 {
 	m_mask = data;
 }
 
-WRITE8_MEMBER(hp16500_state::val_w)
+void hp16500_state::val_w(uint8_t data)
 {
 	m_val = data;
 }
 
-WRITE32_MEMBER(hp16500_state::palette_w)
+void hp16500_state::palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xff000000)
 	{
@@ -398,7 +398,7 @@ uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb3
 	int pos = 0;
 	for (int y = 0; y < 384; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 
 		for (int x = 0; x < 576; x+=4)
 		{
@@ -427,10 +427,10 @@ void hp16500_state::hp1650(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650), this);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
-	MC2661(config, "epci", 5000000);
+	SCN2661A(config, "epci", 5000000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -450,10 +450,10 @@ void hp16500_state::hp1651(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650), this);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
-	MC2661(config, "epci", 5000000);
+	SCN2661A(config, "epci", 5000000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -473,7 +473,7 @@ void hp16500_state::hp16500a(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -483,7 +483,7 @@ void hp16500_state::hp16500a(machine_config &config)
 void hp16500_state::hp16500b(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC030(config, m_maincpu, 25'000'000);
+	M68EC030(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -502,6 +502,7 @@ void hp16500_state::hp16500b(machine_config &config)
 	// later with a 16500b specific keyboard implementation
 	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
 
+	DS1286(config, "rtc", 32768);
 	//WD37C65C(config, "fdc", 16_MHz_XTAL);
 
 	SPEAKER(config, "lspeaker").front_left();

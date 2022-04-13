@@ -33,7 +33,10 @@ public:
 		TIMER_LIGHTPEN_TRIGGER,
 		TIMER_VECTREX_REFRESH,
 		TIMER_VECTREX_ZERO_INTEGRATORS,
-		TIMER_UPDATE_SIGNAL
+		TIMER_UPDATE_ANALOG,
+		TIMER_UPDATE_BLANK,
+		TIMER_UPDATE_MUX_ENABLE,
+		TIMER_UPDATE_RAMP
 	};
 
 	void vectrex_cart(device_slot_interface &device);
@@ -57,9 +60,9 @@ protected:
 		m_screen(*this, "screen")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(vectrex_psg_port_w);
-	DECLARE_READ8_MEMBER(vectrex_via_r);
-	DECLARE_WRITE8_MEMBER(vectrex_via_w);
+	void vectrex_psg_port_w(uint8_t data);
+	uint8_t vectrex_via_r(offs_t offset);
+	void vectrex_via_w(offs_t offset, uint8_t data);
 	virtual void driver_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -69,19 +72,19 @@ protected:
 	TIMER_CALLBACK_MEMBER(lightpen_trigger);
 	TIMER_CALLBACK_MEMBER(vectrex_refresh);
 	TIMER_CALLBACK_MEMBER(vectrex_zero_integrators);
-	TIMER_CALLBACK_MEMBER(update_signal);
-	DECLARE_READ8_MEMBER(vectrex_via_pb_r);
-	DECLARE_READ8_MEMBER(vectrex_via_pa_r);
-	DECLARE_WRITE8_MEMBER(v_via_pb_w);
-	DECLARE_WRITE8_MEMBER(v_via_pa_w);
+	void update_vector();
+	uint8_t vectrex_via_pb_r();
+	uint8_t vectrex_via_pa_r();
+	void v_via_pb_w(uint8_t data);
+	void v_via_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(v_via_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(v_via_cb2_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vectrex_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
 
 	void vectrex_base(machine_config &config);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void configure_imager(bool reset_refresh, const double *imager_angles);
 	void vectrex_configuration();
@@ -94,9 +97,9 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<vectrex_cart_slot_device> m_cart;
 
-	double m_imager_freq;
-	emu_timer *m_imager_timer;
-	emu_timer *m_lp_t;
+	double m_imager_freq = 0;
+	emu_timer *m_imager_timer = nullptr;
+	emu_timer *m_lp_t = nullptr;
 
 	required_device<via6522_device> m_via6522_0;
 
@@ -104,42 +107,42 @@ private:
 
 	struct vectrex_point
 	{
-		int x; int y;
+		int x = 0; int y = 0;
 		rgb_t col;
-		int intensity;
+		int intensity = 0;
 	};
 
 	required_shared_ptr<uint8_t> m_gce_vectorram;
-	int m_imager_status;
-	uint32_t m_beam_color;
-	int m_lightpen_port;
-	int m_reset_refresh;
-	const double *m_imager_angles;
+	int m_imager_status = 0;
+	uint32_t m_beam_color = 0;
+	int m_lightpen_port = 0;
+	int m_reset_refresh = 0;
+	const double *m_imager_angles = nullptr;
 	rgb_t m_imager_colors[6];
-	unsigned char m_imager_pinlevel;
-	int m_old_mcontrol;
-	double m_sl;
-	double m_pwl;
-	int m_x_center;
-	int m_y_center;
-	int m_x_max;
-	int m_y_max;
-	int m_x_int;
-	int m_y_int;
-	int m_lightpen_down;
-	int m_pen_x;
-	int m_pen_y;
-	emu_timer *m_refresh;
-	uint8_t m_blank;
-	uint8_t m_ramp;
-	int8_t m_analog[5];
-	int m_point_index;
-	int m_display_start;
-	int m_display_end;
+	unsigned char m_imager_pinlevel = 0;
+	int m_old_mcontrol = 0;
+	double m_sl = 0;
+	double m_pwl = 0;
+	int m_x_center = 0;
+	int m_y_center = 0;
+	int m_x_max = 0;
+	int m_y_max = 0;
+	int m_x_int = 0;
+	int m_y_int = 0;
+	int m_lightpen_down = 0;
+	int m_pen_x = 0;
+	int m_pen_y = 0;
+	emu_timer *m_refresh = nullptr;
+	uint8_t m_blank = 0;
+	uint8_t m_ramp = 0;
+	int8_t m_analog[5]{};
+	int m_point_index = 0;
+	int m_display_start = 0;
+	int m_display_end = 0;
 	vectrex_point m_points[NVECT];
-	uint16_t m_via_timer2;
+	uint16_t m_via_timer2 = 0;
 	attotime m_vector_start_time;
-	uint8_t m_cb2;
+	uint8_t m_cb2 = 0;
 	void (vectrex_base_state::*vector_add_point_function)(int, int, rgb_t, int);
 
 	required_device<mc1408_device> m_dac;
@@ -168,6 +171,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
+private:
 	void vectrex_map(address_map &map);
 };
 
@@ -182,13 +186,12 @@ public:
 
 	void raaspec(machine_config &config);
 
-protected:
-	DECLARE_WRITE8_MEMBER(raaspec_led_w);
-	DECLARE_READ8_MEMBER(vectrex_s1_via_pb_r);
+private:
+	void raaspec_led_w(uint8_t data);
+	uint8_t vectrex_s1_via_pb_r();
 
 	void raaspec_map(address_map &map);
 
-private:
 	required_ioport m_io_coin;
 };
 

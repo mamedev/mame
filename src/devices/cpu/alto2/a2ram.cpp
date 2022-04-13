@@ -246,7 +246,7 @@ void alto2_cpu_device::f1_late_swmode()
 			branch_ROM("RAM0", 0);
 			break;
 		default:
-			fatal(1, "Impossible current mpc %u\n", page);
+			throw emu_fatalerror(1, "Impossible current mpc %u\n", page);
 		}
 		break;
 
@@ -262,7 +262,7 @@ void alto2_cpu_device::f1_late_swmode()
 				branch_ROM("ROM0", 1);
 				break;
 			default:
-				fatal(1, "Impossible next %u\n", next);
+				throw emu_fatalerror(1, "Impossible next %u\n", next);
 			}
 			break;
 		case 1: /* ROM1 to ROM0 or RAM0 */
@@ -274,7 +274,7 @@ void alto2_cpu_device::f1_late_swmode()
 				branch_RAM("ROM1", 0);
 				break;
 			default:
-				fatal(1, "Impossible next %u\n", next);
+				throw emu_fatalerror(1, "Impossible next %u\n", next);
 			}
 			break;
 		case 2: /* RAM0 to ROM0 or ROM1 */
@@ -286,11 +286,11 @@ void alto2_cpu_device::f1_late_swmode()
 				branch_ROM("RAM0", 1);
 				break;
 			default:
-				fatal(1, "Impossible next %u\n", next);
+				throw emu_fatalerror(1, "Impossible next %u\n", next);
 			}
 			break;
 		default:
-			fatal(1, "Impossible current mpc %u\n", page);
+			throw emu_fatalerror(1, "Impossible current mpc %u\n", page);
 		}
 		break;
 
@@ -313,7 +313,7 @@ void alto2_cpu_device::f1_late_swmode()
 				branch_RAM("ROM0", 0);
 				break;
 			default:
-				fatal(1, "Impossible next %u\n", next);
+				throw emu_fatalerror(1, "Impossible next %u\n", next);
 			}
 			break;
 		case 1: /* RAM0 to ROM0, RAM2, RAM1, RAM1 */
@@ -331,7 +331,7 @@ void alto2_cpu_device::f1_late_swmode()
 				branch_RAM("RAM0", 1);
 				break;
 			default:
-				fatal(1, "Impossible next %u\n", next);
+				throw emu_fatalerror(1, "Impossible next %u\n", next);
 			}
 			break;
 		case 2: /* RAM1 to ROM0, RAM2, RAM0, RAM0 */
@@ -349,7 +349,7 @@ void alto2_cpu_device::f1_late_swmode()
 				branch_RAM("RAM1", 0);
 				break;
 			default:
-				fatal(1, "Impossible next %u\n", next);
+				throw emu_fatalerror(1, "Impossible next %u\n", next);
 			}
 			break;
 		case 3: /* RAM2 to ROM0, RAM1, RAM0, RAM0 */
@@ -367,15 +367,15 @@ void alto2_cpu_device::f1_late_swmode()
 				branch_RAM("RAM2", 0);
 				break;
 			default:
-				fatal(1, "Impossible next %u\n", next);
+				throw emu_fatalerror(1, "Impossible next %u\n", next);
 			}
 			break;
 		default:
-			fatal(1, "Impossible current mpc %u\n", page);
+			throw emu_fatalerror(1, "Impossible current mpc %u\n", page);
 		}
 		break;
 	default:
-		fatal(1, "Impossible control ROM/RAM config %u (%u CROM pages, %u CRAM pages)\n",
+		throw emu_fatalerror(1, "Impossible control ROM/RAM config %u (%u CROM pages, %u CRAM pages)\n",
 			m_cram_config, m_ucode_rom_pages, m_ucode_ram_pages);
 	}
 }

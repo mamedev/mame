@@ -1,19 +1,20 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
-/*
- * nld_ms_direct1.h
- *
- */
 
 #ifndef NLD_MS_DIRECT1_H_
 #define NLD_MS_DIRECT1_H_
 
+///
+/// \file nld_ms_direct1.h
+///
+
+#include "nld_matrix_solver_ext.h"
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 	template <typename FT>
 	class matrix_solver_direct1_t: public matrix_solver_direct_t<FT, 1>
@@ -23,32 +24,27 @@ namespace devices
 		using float_type = FT;
 		using base_type = matrix_solver_direct_t<FT, 1>;
 
-		matrix_solver_direct1_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params)
-			: matrix_solver_direct_t<FT, 1>(anetlist, name, params, 1)
+		matrix_solver_direct1_t(devices::nld_solver &main_solver, const pstring &name,
+			const matrix_solver_t::net_list_t &nets,
+			const solver::solver_parameters_t *params)
+			: matrix_solver_direct_t<FT, 1>(main_solver, name, nets, params, 1)
 			{}
 
 		// ----------------------------------------------------------------------------------------
 		// matrix_solver - Direct1
 		// ----------------------------------------------------------------------------------------
-		unsigned vsolve_non_dynamic(const bool newton_raphson) override
+		void vsolve_non_dynamic() override
 		{
-			this->build_LE_A(*this);
-			this->build_LE_RHS(*this);
-			//NL_VERBOSE_OUT(("{1} {2}\n", new_val, m_RHS[0] / m_A[0][0]);
+			this->clear_square_mat(this->m_A);
+			this->fill_matrix_and_rhs();
 
-			std::array<FT, 1> new_V = { this->RHS(0) / this->A(0,0) };
-
-			const FT err = (newton_raphson ? this->delta(new_V) : 0.0);
-			this->store(new_V);
-			return (err > this->m_params.m_accuracy) ? 2 : 1;
+			this->m_new_V[0] = this->m_RHS[0] / this->m_A[0][0];
 		}
-
 	};
 
 
-
-} //namespace devices
+} // namespace solver
 } // namespace netlist
 
 
-#endif /* NLD_MS_DIRECT1_H_ */
+#endif // NLD_MS_DIRECT1_H_

@@ -22,7 +22,6 @@
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 #define ABC80_HTOTAL    384
@@ -72,7 +71,7 @@ public:
 		m_pio(*this, Z80PIO_TAG),
 		m_csg(*this, SN76477_TAG),
 		m_cassette(*this, "cassette"),
-		m_bus(*this, ABCBUS_TAG),
+		m_bus(*this, "bus"),
 		m_kb(*this, ABC80_KEYBOARD_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rs232(*this, RS232_TAG),
@@ -85,7 +84,7 @@ public:
 		m_vsync_prom(*this, "vsync"),
 		m_line_prom(*this, "line"),
 		m_attr_prom(*this, "attr"),
-		m_video_ram(*this, "video_ram"),
+		m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_LITTLE),
 		m_motor(false),
 		m_tape_in(1),
 		m_tape_in_latch(1)
@@ -110,7 +109,7 @@ public:
 	required_memory_region m_vsync_prom;
 	required_memory_region m_line_prom;
 	required_memory_region m_attr_prom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 
 	enum
 	{
@@ -129,29 +128,29 @@ public:
 		HEAD = 0xfe20
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void draw_scanline(bitmap_rgb32 &bitmap, int y);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( vco_voltage_w );
 
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	u8 pio_pa_r();
+	u8 pio_pb_r();
+	void pio_pb_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 	void kbd_w(u8 data);
-	DECLARE_WRITE8_MEMBER( csg_w );
+	void csg_w(u8 data);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	enum
 	{
@@ -162,17 +161,17 @@ public:
 	};
 
 	// keyboard state
-	int m_key_data;
-	int m_key_strobe;
-	int m_pio_astb;
+	int m_key_data = 0;
+	int m_key_strobe = 0;
+	int m_pio_astb = 0;
 
 	// video state
 	bitmap_rgb32 m_bitmap;
-	uint8_t m_latch;
-	int m_blink;
-	int m_c;
-	int m_r;
-	int m_mode;
+	u8 m_latch = 0;
+	int m_blink = 0;
+	int m_c = 0;
+	int m_r = 0;
+	int m_mode = 0;
 
 	// cassette state
 	bool m_motor;
@@ -180,11 +179,11 @@ public:
 	int m_tape_in_latch;
 
 	// timers
-	emu_timer *m_scanline_timer;
-	emu_timer *m_cassette_timer;
-	emu_timer *m_blink_timer;
-	emu_timer *m_vsync_on_timer;
-	emu_timer *m_vsync_off_timer;
+	emu_timer *m_scanline_timer = nullptr;
+	emu_timer *m_cassette_timer = nullptr;
+	emu_timer *m_blink_timer = nullptr;
+	emu_timer *m_vsync_on_timer = nullptr;
+	emu_timer *m_vsync_off_timer = nullptr;
 	void abc80(machine_config &config);
 	void abc80_video(machine_config &config);
 	void abc80_io(address_map &map);

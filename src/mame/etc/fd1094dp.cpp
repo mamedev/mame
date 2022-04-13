@@ -11,9 +11,9 @@ fd1094.c to decrypt the ROM data.
 *****************************************************************************/
 
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 
 
 int state2;

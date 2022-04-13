@@ -14,7 +14,7 @@ public:
 	void set_voices(int voices) { m_voices = voices; }
 	void set_stereo(bool stereo) { m_stereo = stereo; }
 
-	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
+	void sound_enable_w(int state);
 
 protected:
 	static constexpr unsigned MAX_VOICES = 8;
@@ -44,7 +44,7 @@ protected:
 
 	void build_decoded_waveform( uint8_t *rgnbase );
 	void update_namco_waveform(int offset, uint8_t data);
-	uint32_t namco_update_one(stream_sample_t *buffer, int length, const int16_t *wave, uint32_t counter, uint32_t freq);
+	uint32_t namco_update_one(write_stream_view &buffer, const int16_t *wave, uint32_t counter, uint32_t freq);
 
 	/* waveform region */
 	optional_region_ptr<uint8_t> m_wave_ptr;
@@ -52,7 +52,6 @@ protected:
 	/* data about the sound system */
 	sound_channel m_channel_list[MAX_VOICES];
 	sound_channel *m_last_channel;
-	uint8_t *m_soundregs;
 	uint8_t *m_wavedata;
 
 	/* global sound parameters */
@@ -66,10 +65,12 @@ protected:
 	int m_voices;     /* number of voices */
 	bool m_stereo;    /* set to indicate stereo (e.g., System 1) */
 
-	/* decoded waveform table */
-	int16_t *m_waveform[MAX_VOLUME];
+	std::unique_ptr<uint8_t[]> m_waveram_alloc;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	/* decoded waveform table */
+	std::unique_ptr<int16_t[]> m_waveform[MAX_VOLUME];
+
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 class namco_device : public namco_audio_device
@@ -77,15 +78,19 @@ class namco_device : public namco_audio_device
 public:
 	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(pacman_sound_w);
+	void pacman_sound_w(offs_t offset, uint8_t data);
 
-	void polepos_sound_enable(int enable);
-
-	DECLARE_READ8_MEMBER(polepos_sound_r);
-	DECLARE_WRITE8_MEMBER(polepos_sound_w);
+	uint8_t polepos_sound_r(offs_t offset);
+	void polepos_sound_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	std::unique_ptr<uint8_t[]> m_soundregs;
 };
 
 
@@ -94,14 +99,18 @@ class namco_15xx_device : public namco_audio_device
 public:
 	namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( namco_15xx_w );
-	DECLARE_READ8_MEMBER( sharedram_r );
-	DECLARE_WRITE8_MEMBER( sharedram_w );
-
-	DECLARE_WRITE_LINE_MEMBER(mappy_sound_enable);
+	void namco_15xx_w(offs_t offset, uint8_t data);
+	uint8_t sharedram_r(offs_t offset);
+	void sharedram_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	std::unique_ptr<uint8_t[]> m_soundregs;
 };
 
 
@@ -110,14 +119,14 @@ class namco_cus30_device : public namco_audio_device
 public:
 	namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( namcos1_cus30_w );   /* wavedata + sound registers + RAM */
-	DECLARE_READ8_MEMBER( namcos1_cus30_r );
-	DECLARE_WRITE8_MEMBER( namcos1_sound_w );
+	void namcos1_cus30_w(offs_t offset, uint8_t data);   /* wavedata + sound registers + RAM */
+	uint8_t namcos1_cus30_r(offs_t offset);
+	void namcos1_sound_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( pacman_sound_w );
+	void pacman_sound_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 

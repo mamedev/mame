@@ -37,7 +37,8 @@ DEFINE_DEVICE_TYPE(NICHISND, nichisnd_device, "nichisnd", "Nichibutsu Sound Devi
 nichisnd_device::nichisnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NICHISND, tag, owner, clock),
 	m_soundlatch(*this, "soundlatch"),
-	m_sound_rom(*this, "audiorom")
+	m_sound_rom(*this, "audiorom"),
+	m_soundbank(*this, "soundbank")
 {
 }
 
@@ -45,7 +46,7 @@ void nichisnd_device::nichisnd_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom().region("audiorom", 0);
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("soundbank");
+	map(0x8000, 0xffff).bankr(m_soundbank);
 }
 
 void nichisnd_device::nichisnd_io_map(address_map &map)
@@ -54,12 +55,12 @@ void nichisnd_device::nichisnd_io_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(nichisnd_device::soundbank_w)
+void nichisnd_device::soundbank_w(uint8_t data)
 {
-	membank("soundbank")->set_entry(data & 0x03);
+	m_soundbank->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(nichisnd_device::soundlatch_clear_w)
+void nichisnd_device::soundlatch_clear_w(uint8_t data)
 {
 	if (!(data & 0x01)) m_soundlatch->clear_w();
 }
@@ -100,9 +101,6 @@ void nichisnd_device::device_add_mconfig(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -118,8 +116,8 @@ void nichisnd_device::device_start()
 	SNDROM[0x0213] = 0x00;          // DI -> NOP
 
 	// initialize sound rom bank
-	membank("soundbank")->configure_entries(0, 3, m_sound_rom + 0x8000, 0x8000);
-	membank("soundbank")->set_entry(0);
+	m_soundbank->configure_entries(0, 3, m_sound_rom + 0x8000, 0x8000);
+	m_soundbank->set_entry(0);
 }
 
 
@@ -137,7 +135,7 @@ void nichisnd_device::device_reset()
 //**************************************************************************
 
 // use this to connect to the sound board
-WRITE8_MEMBER(nichisnd_device::sound_host_command_w)
+void nichisnd_device::sound_host_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 }

@@ -24,9 +24,9 @@ public:
 	void tr175(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(ffec01_w);
-	DECLARE_WRITE8_MEMBER(fff000_w);
-	DECLARE_READ8_MEMBER(fff400_r);
+	void ffec01_w(uint8_t data);
+	void fff000_w(uint8_t data);
+	uint8_t fff400_r();
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void mem_map(address_map &map);
@@ -36,17 +36,17 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER(tr175_state::ffec01_w)
+void tr175_state::ffec01_w(uint8_t data)
 {
 	logerror("%s: Writing %02X to FFEC01\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(tr175_state::fff000_w)
+void tr175_state::fff000_w(uint8_t data)
 {
 	logerror("%s: Writing %02X to FFF000\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(tr175_state::fff400_r)
+uint8_t tr175_state::fff400_r()
 {
 	return 0;
 }
@@ -60,7 +60,7 @@ void tr175_state::mem_map(address_map &map)
 	map(0xff0000, 0xff7fff).ram(); // video RAM?
 	map(0xffe000, 0xffe01f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
 	map(0xffe400, 0xffe40f).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0xff00);
-	map(0xffe800, 0xffe805).unmaprw(); //AM_DEVREADWRITE8("pai", um82c11_device, read, write, 0xff00)
+	map(0xffe800, 0xffe805).unmaprw(); //.rw("pai", FUNC(um82c11_device::read), FUNC(um82c11_device::write)).umask16(0xff00);
 	map(0xffec01, 0xffec01).w(FUNC(tr175_state::ffec01_w));
 	map(0xfff000, 0xfff000).w(FUNC(tr175_state::fff000_w));
 	map(0xfff400, 0xfff400).r(FUNC(tr175_state::fff400_r));

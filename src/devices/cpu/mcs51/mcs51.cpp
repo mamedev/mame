@@ -10,6 +10,8 @@
  *   8052 Product Line (8032,8052,8752)
  *   8054 Product Line (8054)
  *   8058 Product Line (8058)
+ *   80552 Product Line (80552, 83552, 87552)
+ *   80562 Product Line (80562, 83562, 87562)
  *
  *   Copyright Steve Ellenoff, all rights reserved.
  *
@@ -87,7 +89,7 @@
  *
  *****************************************************************************/
 
-/* TODO: Varios
+/* TODO: Various
  *  - EA pin - defined by architecture, must implement:
  *    1 means external access, bypassing internal ROM
  *  - T0 output clock ?
@@ -100,6 +102,7 @@
  *      actually use 80CXX, i.e. CMOS versions.
  *      "Normal" 805X will return a 0 if reading from a output port which has
  *      a 0 written to it's latch. At least cardline expects a 1 here.
+ * - ADC support for 80552/80562 (controls analog inputs for Arctic Thunder)
  *
  * Done: (Couriersud)
  * - Merged DS5002FP
@@ -128,7 +131,6 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "mcs51.h"
 #include "mcs51dasm.h"
 
@@ -222,22 +224,28 @@ enum
 };
 
 
-DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel I8031")
-DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel I8032")
-DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel I8051")
-DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel I8751")
+DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel 8031")
+DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel 8032")
+DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel 8051")
+DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel 8751")
 DEFINE_DEVICE_TYPE(AM8753, am8753_device, "am8753", "AMD Am8753")
-DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel I8052")
-DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel I8752")
-DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel I80C31")
-DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "Intel I80C51")
-DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel I87C51")
-DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel I80C32")
-DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel I80C52")
-DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel I87C52")
+DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel 8052")
+DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel 8752")
+DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel 80C31")
+DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "Intel 80C51")
+DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel 87C51")
+DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel 80C32")
+DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel 80C52")
+DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel 87C52")
+DEFINE_DEVICE_TYPE(I87C51FA, i87c51fa_device, "i87c51fa", "Intel 87C51FA")
+DEFINE_DEVICE_TYPE(I80C51GB, i80c51gb_device, "i80c51gb", "Intel 80C51GB")
 DEFINE_DEVICE_TYPE(AT89C52, at89c52_device, "at89c52", "Atmel AT89C52")
 DEFINE_DEVICE_TYPE(AT89S52, at89s52_device, "at89s52", "Atmel AT89S52")
 DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
+DEFINE_DEVICE_TYPE(DS80C320, ds80c320_device, "ds80c320", "Dallas DS80C320 HSM")
+DEFINE_DEVICE_TYPE(SAB80C535, sab80c535_device, "sab80c535", "Siemens SAB80C535")
+DEFINE_DEVICE_TYPE(I8344, i8344_device, "i8344", "Intel 8344AH RUPI-44")
+DEFINE_DEVICE_TYPE(I8744, i8744_device, "i8744", "Intel 8744H RUPI-44")
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
 
@@ -271,8 +279,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
 	, m_serial_tx_cb(*this)
 	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
@@ -282,7 +290,6 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	m_ds5002fp.crc = 0;
 
 	/* default to standard cmos interfacing */
-
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
 }
@@ -371,6 +378,21 @@ i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+i87c51fa_device::i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+	: i80c52_device(mconfig, type, tag, owner, clock, program_width, data_width, features)
+{
+}
+
+i87c51fa_device::i87c51fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i87c51fa_device(mconfig, I87C51FA, tag, owner, clock, 13, 8)
+{
+}
+
+i80c51gb_device::i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i87c51fa_device(mconfig, I80C51GB, tag, owner, clock, 0, 8)
+{
+}
+
 at89c52_device::at89c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c52_device(mconfig, AT89C52, tag, owner, clock, 13, 8)
 {
@@ -383,6 +405,26 @@ at89s52_device::at89s52_device(const machine_config &mconfig, const char *tag, d
 
 at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c51_device(mconfig, AT89C4051, tag, owner, clock, 12, 7)
+{
+}
+
+ds80c320_device::ds80c320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, DS80C320, tag, owner, clock, 0, 8)
+{
+}
+
+sab80c535_device::sab80c535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c51_device(mconfig, SAB80C535, tag, owner, clock, 0, 8)
+{
+}
+
+i8344_device::i8344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mcs51_cpu_device(mconfig, I8344, tag, owner, clock, 0, 8)
+{
+}
+
+i8744_device::i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mcs51_cpu_device(mconfig, I8744, tag, owner, clock, 12, 8)
 {
 }
 
@@ -409,15 +451,15 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 ***************************************************************************/
 
 /* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)         m_cache->read_byte(pc)
-#define ROP_ARG(pc)     m_cache->read_byte(pc)
+#define ROP(pc)         m_program.read_byte(pc)
+#define ROP_ARG(pc)     m_program.read_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
-#define CODEMEM_R(a)    (uint8_t)m_program->read_byte(a)
+#define CODEMEM_R(a)    (uint8_t)m_program.read_byte(a)
 
 /* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
-#define DATAMEM_R(a)    (uint8_t)m_io->read_byte(a)
-#define DATAMEM_W(a,v)  m_io->write_byte(a, v)
+#define DATAMEM_R(a)    (uint8_t)m_io.read_byte(a)
+#define DATAMEM_W(a,v)  m_io.write_byte(a, v)
 
 /* Read/Write a byte from/to the Internal RAM */
 
@@ -426,8 +468,8 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-uint8_t mcs51_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_data->read_byte(a) : 0xff; }
-void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m_data->write_byte(a, d); }
+uint8_t mcs51_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_data.read_byte(a) : 0xff; }
+void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m_data.write_byte(a, d); }
 
 #define IRAM_IR(a)      iram_iread(a)
 #define IRAM_IW(a, d)   iram_iwrite(a, d)
@@ -770,7 +812,7 @@ uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
   assume that most hardware will use port 2 for 8bit access as well.
 
   On configurations where 8 bit access in conjunction with other ports is used,
-  it is up to the driver to use AM_MIRROR to mask out the high level address and
+  it is up to the driver to use mirror() to mask out the high level address and
   provide it's own mapping.
 */
 
@@ -820,13 +862,13 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 
 uint8_t mcs51_cpu_device::iram_read(size_t offset)
 {
-	return (((offset) < 0x80) ? m_data->read_byte(offset) : sfr_read(offset));
+	return (((offset) < 0x80) ? m_data.read_byte(offset) : sfr_read(offset));
 }
 
 void mcs51_cpu_device::iram_write(size_t offset, uint8_t data)
 {
 	if ((offset) < 0x80)
-		m_data->write_byte(offset, data);
+		m_data.write_byte(offset, data);
 	else
 		sfr_write(offset, data);
 }
@@ -991,7 +1033,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 			m_uart.bits_to_send--;
 			if(m_uart.bits_to_send == 0) {
 				//Call the callback function
-				m_serial_tx_cb(*m_io, 0, m_uart.data_out, 0xff);
+				m_serial_tx_cb(0, m_uart.data_out, 0xff);
 				//Set Interrupt Flag
 				SET_TI(1);
 			}
@@ -1009,7 +1051,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 			{
 				int data = 0;
 				//Call our callball function to retrieve the data
-				data = m_serial_rx_cb(*m_io, 0, 0xff);
+				data = m_serial_rx_cb(0, 0xff);
 				LOG(("RX Deliver %d\n", data));
 				SET_SBUF(data);
 				//Flag the IRQ
@@ -1337,8 +1379,7 @@ void mcs51_cpu_device::update_serial(int cycles)
 /* Check and update status of serial port */
 void mcs51_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
 {
-	int i;
-	for (i=0; i<8; i++)
+	for (int i=0; i<8; i++)
 		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
 }
 
@@ -1723,9 +1764,8 @@ void mcs51_cpu_device::check_irqs()
 	uint8_t int_vec = 0;
 	uint8_t int_mask;
 	int priority_request = -1;
-	int i;
 
-	//If All Inerrupts Disabled or no pending abort..
+	//If All Interrupts Disabled or no pending abort..
 	int_mask = (GET_EA ? IE : 0x00);
 
 	if (m_features & FEATURE_I8052)
@@ -1746,7 +1786,7 @@ void mcs51_cpu_device::check_irqs()
 
 	if (!ints)  return;
 
-	/* CLear IDL - got enabled interrupt */
+	/* Clear IDL - got enabled interrupt */
 	if (m_features & FEATURE_CMOS)
 	{
 		/* any interrupt terminates idle mode */
@@ -1758,7 +1798,7 @@ void mcs51_cpu_device::check_irqs()
 				SET_PD(0);
 	}
 
-	for (i=0; i<m_num_interrupts; i++)
+	for (int i=0; i<m_num_interrupts; i++)
 	{
 		if (ints & (1<<i))
 		{
@@ -1773,7 +1813,6 @@ void mcs51_cpu_device::check_irqs()
 	/* Skip the interrupt request if currently processing interrupt
 	 * and the new request does not have a higher priority
 	 */
-
 	LOG(("Request: %d\n", priority_request));
 	if (m_irq_active && (priority_request <= m_cur_irq_prio))
 	{
@@ -1837,7 +1876,6 @@ void mcs51_cpu_device::check_irqs()
 		 *  no flags are cleared, PFW is reset by software
 		 *  This has the same vector as V_TF2.
 		 */
-
 	}
 }
 
@@ -2003,7 +2041,7 @@ void mcs51_cpu_device::execute_run()
 		/* Read next opcode */
 		PPC = PC;
 		debugger_instruction_hook(PC);
-		op = m_cache->read_byte(PC++);
+		op = m_program.read_byte(PC++);
 
 		/* process opcode and count cycles */
 		m_inst_cycles = mcs51_cycles[op];
@@ -2020,7 +2058,12 @@ void mcs51_cpu_device::execute_run()
 
 		/* decrement the timed access window */
 		if (m_features & FEATURE_DS5002FP)
+		{
 			m_ds5002fp.ta_window = (m_ds5002fp.ta_window ? (m_ds5002fp.ta_window - 1) : 0x00);
+
+			if (m_ds5002fp.rnr_delay > 0)
+				m_ds5002fp.rnr_delay-=m_inst_cycles;
+		}
 
 		/* If the chip entered in idle mode, end the loop */
 		if ((m_features & FEATURE_CMOS) && GET_IDL)
@@ -2070,7 +2113,7 @@ void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 			/* no write in this case according to manual */
 			return;
 	}
-	m_data->write_byte((size_t)offset | 0x100, data);
+	m_data.write_byte((size_t)offset | 0x100, data);
 }
 
 uint8_t mcs51_cpu_device::sfr_read(size_t offset)
@@ -2105,7 +2148,7 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 		case ADDR_SBUF:
 		case ADDR_IE:
 		case ADDR_IP:
-			return m_data->read_byte((size_t) offset | 0x100);
+			return m_data.read_byte((size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
 			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (uint32_t)offset,PC));
@@ -2117,21 +2160,16 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 
 void mcs51_cpu_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
 
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
-
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
 	m_serial_rx_cb.resolve_safe(0);
 	m_serial_tx_cb.resolve_safe();
 
 	/* Save states */
-
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_last_op));
@@ -2148,6 +2186,7 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_irq_active) );
 	save_item(NAME(m_ds5002fp.previous_ta) );
 	save_item(NAME(m_ds5002fp.ta_window) );
+	save_item(NAME(m_ds5002fp.rnr_delay) );
 	save_item(NAME(m_ds5002fp.range) );
 	save_item(NAME(m_uart.data_out));
 	save_item(NAME(m_uart.bits_to_send));
@@ -2220,6 +2259,7 @@ void mcs51_cpu_device::device_reset()
 	m_t1_cnt = 0;
 	m_t2_cnt = 0;
 	m_t2ex_cnt = 0;
+
 	/* Flag as NO IRQ in Progress */
 	m_irq_active = 0;
 	m_cur_irq_prio = -1;
@@ -2227,6 +2267,8 @@ void mcs51_cpu_device::device_reset()
 	m_last_bit = 0;
 
 	/* these are all defined reset states */
+	RWM = 0;
+	PPC = PC;
 	PC = 0;
 	SP = 0x7;
 	SET_PSW(0);
@@ -2245,6 +2287,7 @@ void mcs51_cpu_device::device_reset()
 	TH0 = 0;
 	TL1 = 0;
 	TL0 = 0;
+
 	/* set the port configurations to all 1's */
 	SET_P3(0xff);
 	SET_P2(0xff);
@@ -2288,6 +2331,7 @@ void mcs51_cpu_device::device_reset()
 		m_ds5002fp.previous_ta = 0;
 		m_ds5002fp.ta_window = 0;
 		m_ds5002fp.range = (GET_RG1 << 1) | GET_RG0;
+		m_ds5002fp.rnr_delay = 160;
 	}
 
 	m_uart.data_out = 0;
@@ -2315,7 +2359,7 @@ void i8052_device::sfr_write(size_t offset, uint8_t data)
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			m_data->write_byte((size_t) offset | 0x100, data);
+			m_data.write_byte((size_t) offset | 0x100, data);
 			break;
 
 		default:
@@ -2333,7 +2377,7 @@ uint8_t i8052_device::sfr_read(size_t offset)
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			return m_data->read_byte((size_t) offset | 0x100);
+			return m_data.read_byte((size_t) offset | 0x100);
 		default:
 			return mcs51_cpu_device::sfr_read(offset);
 	}
@@ -2363,7 +2407,7 @@ void i80c52_device::sfr_write(size_t offset, uint8_t data)
 			i8052_device::sfr_write(offset, data);
 			return;
 	}
-	m_data->write_byte((size_t) offset | 0x100, data);
+	m_data.write_byte((size_t) offset | 0x100, data);
 }
 
 uint8_t i80c52_device::sfr_read(size_t offset)
@@ -2374,7 +2418,7 @@ uint8_t i80c52_device::sfr_read(size_t offset)
 		case ADDR_IPH:
 		case ADDR_SADDR:
 		case ADDR_SADEN:
-			return m_data->read_byte((size_t) offset | 0x100);
+			return m_data.read_byte((size_t) offset | 0x100);
 		default:
 			return i8052_device::sfr_read(offset);
 	}
@@ -2428,7 +2472,27 @@ void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
 			mcs51_cpu_device::sfr_write(offset, data);
 			return;
 	}
-	m_data->write_byte((size_t) offset | 0x100, data);
+	m_data.write_byte((size_t) offset | 0x100, data);
+}
+
+
+uint8_t ds5002fp_device::handle_rnr()
+{
+	if (m_ds5002fp.rnr_delay <= 0)
+	{
+		m_ds5002fp.rnr_delay = 160; // delay before another random number can be read
+		return machine().rand();
+	}
+	else
+		return 0x00;
+}
+
+bool ds5002fp_device::is_rnr_ready()
+{
+	if (m_ds5002fp.rnr_delay <= 0)
+		return true;
+	else
+		return false;
 }
 
 uint8_t ds5002fp_device::sfr_read(size_t offset)
@@ -2440,8 +2504,10 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 		case ADDR_CRCH:     DS5_LOGR(CRCH, data);       break;
 		case ADDR_MCON:     DS5_LOGR(MCON, data);       break;
 		case ADDR_TA:       DS5_LOGR(TA, data);         break;
-		case ADDR_RNR:      DS5_LOGR(RNR, data);        break;
-		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data); return 0x80; break; /* touchgo stalls unless bit 7 is set, why? documentation is unclear */
+		case ADDR_RNR:      DS5_LOGR(RNR, data);
+			return handle_rnr();
+		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data);  /* touchgo stalls unless bit 7 is set, RNR status (Random Number status) */
+			return (is_rnr_ready() ? 0x80 : 0x00);  /* falling through to sfr_read for the remaining bits stops high score data loading? */
 		case ADDR_RPS:      DS5_LOGR(RPS, data);        break;
 		case ADDR_PCON:
 			SET_PFW(0);     /* reset PFW flag */
@@ -2449,7 +2515,7 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 		default:
 			return mcs51_cpu_device::sfr_read(offset);
 	}
-	return m_data->read_byte((size_t) offset | 0x100);
+	return m_data.read_byte((size_t) offset | 0x100);
 }
 
 /*
@@ -2484,16 +2550,24 @@ void ds5002fp_device::nvram_default()
 	}
 }
 
-void ds5002fp_device::nvram_read( emu_file &file )
+bool ds5002fp_device::nvram_read( util::read_stream &file )
 {
-	file.read( m_scratchpad, 0x80 );
-	file.read( m_sfr_ram, 0x80 );
+	size_t actual;
+	if (file.read( m_scratchpad, 0x80, actual ) || actual != 0x80)
+		return false;
+	if (file.read( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+		return false;
+	return true;
 }
 
-void ds5002fp_device::nvram_write( emu_file &file )
+bool ds5002fp_device::nvram_write( util::write_stream &file )
 {
-	file.write( m_scratchpad, 0x80 );
-	file.write( m_sfr_ram, 0x80 );
+	size_t actual;
+	if (file.write( m_scratchpad, 0x80, actual ) || actual != 0x80)
+		return false;
+	if (file.write( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+		return false;
+	return true;
 }
 
 std::unique_ptr<util::disasm_interface> mcs51_cpu_device::create_disassembler()
@@ -2519,6 +2593,36 @@ std::unique_ptr<util::disasm_interface> i80c51_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> i80c52_device::create_disassembler()
 {
 	return std::make_unique<i80c52_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i87c51fa_device::create_disassembler()
+{
+	return std::make_unique<i8xc51fx_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i80c51gb_device::create_disassembler()
+{
+	return std::make_unique<i8xc51gb_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> ds80c320_device::create_disassembler()
+{
+	return std::make_unique<ds80c320_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> sab80c535_device::create_disassembler()
+{
+	return std::make_unique<sab80c515_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i8344_device::create_disassembler()
+{
+	return std::make_unique<rupi44_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i8744_device::create_disassembler()
+{
+	return std::make_unique<rupi44_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()

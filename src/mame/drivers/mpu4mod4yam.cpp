@@ -282,20 +282,37 @@ GAME_CUSTOM( 199?, m4graff__b,  m4graff,    "graxc.p1", 0x0000, 0x010000, CRC(76
 	ROM_END \
 	GAME(year, setname, parent, mod4yam, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4monte,     0,          "nm8b.p1",  0x0000, 0x010000, CRC(1632080e) SHA1(9ca2cd8f00e49c29f4a216d3c9eacba221ada6ce), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4monte__a,  m4monte,    "nm8ad.p1", 0x0000, 0x010000, CRC(92a07e05) SHA1(94015b219fffb8ad9a40a804a4e0b0fad61cdf21), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4monte__b,  m4monte,    "nm8bd.p1", 0x0000, 0x010000, CRC(a4bc134f) SHA1(72af6b66a5ea7566289bd9bdf8975c29dbb547cf), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4monte__c,  m4monte,    "nm8c.p1",  0x0000, 0x010000, CRC(7e558a64) SHA1(9f325aa9a5b036c317686b901b4c65c1e23fd845), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4monte__d,  m4monte,    "nm8d.p1",  0x0000, 0x010000, CRC(66716e7d) SHA1(719d32a3486accfa1c2e8e2ca53c05f916927e7a), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4monte__e,  m4monte,    "nm8dk.p1", 0x0000, 0x010000, CRC(ae4866e8) SHA1(5ec210b6b69f72b85abe5844b800b251fef20fc5), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4monte__f,  m4monte,    "nm8dy.p1", 0x0000, 0x010000, CRC(9d6f71a5) SHA1(577d39eef82761fff30f851282cd85b84ac22953), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4monte__g,  m4monte,    "nm8k.p1",  0x0000, 0x010000, CRC(47c00612) SHA1(647216e7489043f90e0cd807ddc3d631842b3f7f), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4monte__h,  m4monte,    "nm8s.p1",  0x0000, 0x010000, CRC(cf8fd333) SHA1(4b2b98d0c3d043a6425a6d82f7a98cf662582832), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4monte__i,  m4monte,    "nm8y.p1",  0x0000, 0x010000, CRC(cbb96053) SHA1(9fb6c449d8e26ecacfa9ba40979134c705ecb1be), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4monte__j,  m4monte,    "nmnc.p1",  0x0000, 0x010000, CRC(c2fdcc91) SHA1(aa3ec11425adee94c24b3a1472541e7e04e4000a), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4monte__k,  m4monte,    "nmnd.p1",  0x0000, 0x010000, CRC(94985809) SHA1(636b9106ea330a238f3d4168636fbf21021a7216), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4monte__l,  m4monte,    "nmnk.p1",  0x0000, 0x010000, CRC(8d022ae6) SHA1(01e12acbed34a2d4fb81dc9da12441ddc31f605b), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4monte__m,  m4monte,    "nmns.p1",  0x0000, 0x010000, CRC(48e2ab70) SHA1(bc452a36374a6e62516aad1a4887876ee9da37f7), "Barcrest","Monte Carlo (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4monte,     0,          "nm8b.p1",  0x0000, 0x010000, CRC(1632080e) SHA1(9ca2cd8f00e49c29f4a216d3c9eacba221ada6ce), "Barcrest","Monte Carlo (NM8 0.1 B) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__a,  m4monte,    "nm8ad.p1", 0x0000, 0x010000, CRC(92a07e05) SHA1(94015b219fffb8ad9a40a804a4e0b0fad61cdf21), "Barcrest","Monte Carlo (NM8 0.1 AD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__b,  m4monte,    "nm8bd.p1", 0x0000, 0x010000, CRC(a4bc134f) SHA1(72af6b66a5ea7566289bd9bdf8975c29dbb547cf), "Barcrest","Monte Carlo (NM8 0.1 BD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__c,  m4monte,    "nm8c.p1",  0x0000, 0x010000, CRC(7e558a64) SHA1(9f325aa9a5b036c317686b901b4c65c1e23fd845), "Barcrest","Monte Carlo (NM8 0.1 C) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__d,  m4monte,    "nm8d.p1",  0x0000, 0x010000, CRC(66716e7d) SHA1(719d32a3486accfa1c2e8e2ca53c05f916927e7a), "Barcrest","Monte Carlo (NM8 0.1 D) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__e,  m4monte,    "nm8dk.p1", 0x0000, 0x010000, CRC(ae4866e8) SHA1(5ec210b6b69f72b85abe5844b800b251fef20fc5), "Barcrest","Monte Carlo (NM8 0.1 KD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__f,  m4monte,    "nm8dy.p1", 0x0000, 0x010000, CRC(9d6f71a5) SHA1(577d39eef82761fff30f851282cd85b84ac22953), "Barcrest","Monte Carlo (NM8 0.1 YD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__g,  m4monte,    "nm8k.p1",  0x0000, 0x010000, CRC(47c00612) SHA1(647216e7489043f90e0cd807ddc3d631842b3f7f), "Barcrest","Monte Carlo (NM8 0.1 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__h,  m4monte,    "nm8s.p1",  0x0000, 0x010000, CRC(cf8fd333) SHA1(4b2b98d0c3d043a6425a6d82f7a98cf662582832), "Barcrest","Monte Carlo (NM8 0.1) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__i,  m4monte,    "nm8y.p1",  0x0000, 0x010000, CRC(cbb96053) SHA1(9fb6c449d8e26ecacfa9ba40979134c705ecb1be), "Barcrest","Monte Carlo (NM8 0.1 Y) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__j,  m4monte,    "nmnc.p1",  0x0000, 0x010000, CRC(c2fdcc91) SHA1(aa3ec11425adee94c24b3a1472541e7e04e4000a), "Barcrest","Monte Carlo (NMN 0.1 C) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__k,  m4monte,    "nmnd.p1",  0x0000, 0x010000, CRC(94985809) SHA1(636b9106ea330a238f3d4168636fbf21021a7216), "Barcrest","Monte Carlo (NMN 0.1 D) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__l,  m4monte,    "nmnk.p1",  0x0000, 0x010000, CRC(8d022ae6) SHA1(01e12acbed34a2d4fb81dc9da12441ddc31f605b), "Barcrest","Monte Carlo (NMN 0.1 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4monte__m,  m4monte,    "nmns.p1",  0x0000, 0x010000, CRC(48e2ab70) SHA1(bc452a36374a6e62516aad1a4887876ee9da37f7), "Barcrest","Monte Carlo (NMN 0.1) (Barcrest) (MPU4)" )
+// this might be a different game
+GAME_CUSTOM( 1991, m4montez,    m4monte,    "montvnd",  0x0000, 0x010000, CRC(9858bb1d) SHA1(a2d3de2cec7420cc6f7da2239bdc79d7c4b7394e), "Barcrest","Monte Carlo (MSS 1.6 C) (Barcrest) (MPU4)" )
+// this might be a different game
+GAME_CUSTOM( 1995, m4monteza,   m4monte,    "mx_05a__.2_1", 0x0000, 0x010000, CRC(a1a03e03) SHA1(bf49b516e6824a47cd9bf1408bf676f9f1e43d62), "BwB","Monte Carlo (MX052.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1995, m4montezi,   m4monte,    "mxi05___.2_1", 0x0000, 0x010000, CRC(de425b55) SHA1(2aa63bbd32c766e7e2d888345115c3185dc03bff), "BwB","Monte Carlo (MX052.0 C) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1995, m4montezb,   m4monte,    "mx_10a__.2_1", 0x0000, 0x010000, CRC(bbf21e9f) SHA1(901b14b96cdb0945f491c39707ab9d2b9a2d25dd), "BwB","Monte Carlo (MX102.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1995, m4montezj,   m4monte,    "mxi10___.2_1", 0x0000, 0x010000, CRC(19077425) SHA1(e31da38a903345c65b083cac192555f1f4ba2e5a), "BwB","Monte Carlo (MX102.0 C) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezc,   m4monte,    "mx_20__c.1_1", 0x0000, 0x010000, CRC(a753798d) SHA1(ae1f5f14a37dead66f6b2d075a5bfc019d59f806), "BwB","Monte Carlo (MC  2.0 C) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezd,   m4monte,    "mx_20a_c.1_1", 0x0000, 0x010000, CRC(9ec6f5fb) SHA1(ee181a64557053349cc8bff86bba937b191cab01), "BwB","Monte Carlo (MC  2.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1996, m4monteze,   m4monte,    "mx_20dkc.1_1", 0x0000, 0x010000, CRC(d580f742) SHA1(3c1d6aba4068d60ab53eceecf65bc920f8b5604e), "BwB","Monte Carlo (MC  2.0 YD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezf,   m4monte,    "mx_25__c.3_1", 0x0000, 0x010000, CRC(11ae121d) SHA1(11e61db1c645410ac18ef429cde167a7774be5f5), "BwB","Monte Carlo (MC_ 3.0 C) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezh,   m4monte,    "mx_25a_c.3_1", 0x0000, 0x010000, CRC(283b9e6b) SHA1(937da8bda49a7a0fa1f728770f96d10a65bfe7bc), "BwB","Monte Carlo (MC_ 3.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezg,   m4monte,    "mx_25_bc.3_1", 0x0000, 0x010000, CRC(4228139c) SHA1(a448ddc034923cba58ee298fd2a4c2cdd4f84f04), "BwB","Monte Carlo (MC_ 3.0 YD) (Barcrest) (MPU4)" )
+
+
+
+
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \

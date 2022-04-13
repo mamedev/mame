@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>pugixml</id>
+    <version>1.10.0-appveyor</version>
+    <title>pugixml</title>
+    <authors>Arseny Kapoulkine</authors>
+    <owners>Arseny Kapoulkine</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://pugixml.org/license.html</licenseUrl>
+    <projectUrl>https://pugixml.org/</projectUrl>
+    <iconUrl>https://github.com/zeux/pugixml/logo.svg</iconUrl>
+    <description>pugixml is a C++ XML processing library, which consists of a DOM-like interface with rich traversal/modification capabilities, an extremely fast XML parser which constructs the DOM tree from an XML file/buffer, and an XPath 1.0 implementation for complex data-driven tree queries. Full Unicode support is also available, with Unicode interface variants and conversions between different Unicode encodings (which happen automatically during parsing/saving).
+pugixml is used by a lot of projects, both open-source and proprietary, for performance and easy-to-use interface.
+This package contains builds for VS2013, VS2015 and VS2017, VS2019, for both statically linked and DLL CRT; you can switch the CRT linkage in Project -> Properties -> Referenced Packages -> pugixml.</description>
+    <summary>Light-weight, simple and fast XML parser for C++ with XPath support</summary>
+    <releaseNotes>https://pugixml.org/docs/manual.html#changes</releaseNotes>
+    <copyright>Copyright (c) 2006-2019 Arseny Kapoulkine</copyright>
+    <tags>native nativepackage</tags>
+  </metadata>
+</package>
