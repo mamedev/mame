@@ -2,9 +2,9 @@
 // copyright-holders:Robbbert
 /**********************************************************************************************
 
-        Vegas 6809
+Vegas 6809
 
-        Skeleton driver
+Skeleton driver
 
 Devices:
 
@@ -31,16 +31,16 @@ M modify memory (. to exit)
 
 ToDo:
 
-   - Colours (Looks like characters 0xc0-0xff produce coloured lores gfx).
+- Colours (Looks like characters 0xc0-0xff produce coloured lores gfx).
 
-   - Connect the RTC interrupt pin (not supported currently)
+- Connect the RTC interrupt pin (not supported currently)
 
-   - Find the missing character generator rom.
+- Find the missing character generator rom.
 
-   - Schematic is almost useless, riddled with omissions and errors. All documents are in
-     French. The parts list only has half of the parts.
+- Schematic is almost useless, riddled with omissions and errors. All documents are in
+    French. The parts list only has half of the parts.
 
-   - Need software (there are floppy images, but they are not yet in a supported format)
+- Need software (there are floppy images, but they are not yet in a supported format)
 
 
 *******************************************************************************************/

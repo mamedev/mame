@@ -2,23 +2,23 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Pyldin-601
+Pyldin-601
 
-        12/05/2009 Skeleton driver.
-        22/04/2012 Added sound, fixed keyboard, marked as working [Robbbert]
+2009-05-12 Skeleton driver.
+2012-04-22 Added sound, fixed keyboard, marked as working [Robbbert]
 
-        ToDo?
-        - PYL601 - command 'MODE80' does nothing
+ToDo?
+- PYL601 - command 'MODE80' does nothing
 
-        - PYL601a - most software looks odd (unplayable) because of the
-          different design of the screen.
-        - PYL601A - command 'MODE40' doesn't go to 40-columns, instead
-          there is a space between each letter.
+- PYL601a - most software looks odd (unplayable) because of the
+            different design of the screen.
+- PYL601A - command 'MODE40' doesn't go to 40-columns, instead
+            there is a space between each letter.
 
 
-        The BASIC
-        - to get back to dos, enter SYSTEM
-        - It has its own internal monitor: MON to enter, Q to exit.
+The BASIC
+- to get back to dos, enter SYSTEM
+- It has its own internal monitor: MON to enter, Q to exit.
 
 
 

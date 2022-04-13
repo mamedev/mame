@@ -2,9 +2,9 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        P112 Single Board Computer
+P112 Single Board Computer
 
-        30/08/2010 Skeleton driver
+2010-08-30 Skeleton driver
 
 The P112 is a stand-alone 8-bit CPU board. Typically running CP/M (tm) or a
 similar operating system, it provides a Z80182 (Z-80 upgrade) CPU with up to
