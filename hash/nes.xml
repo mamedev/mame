@@ -85731,22 +85731,6 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s8kr" supported="no">
-		<description>Super 8 in 1 Super Mario Kart Rider</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="super 8 in 1 super mario kart rider.chr" size="131072" crc="6f594503" sha1="72af0c8b30da5ff7270bfa39b84aec3a55cee991" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="super 8 in 1 super mario kart rider.prg" size="131072" crc="d54bf8bd" sha1="c6dd8220efe0c11babaf351f71c9f8ee594dc4e7" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mc_s8rk">
 		<description>Super 8 in 1 (Including Rockin' Kats)</description>
 		<year>199?</year>
