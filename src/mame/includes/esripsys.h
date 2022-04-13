@@ -69,7 +69,7 @@ private:
 	int m_io_firq_status = 0;
 	uint8_t m_cmos_ram_a2_0 = 0U;
 	uint8_t m_cmos_ram_a10_3 = 0U;
-	std::unique_ptr<uint8_t[]> m_cmos_ram{};
+	std::unique_ptr<uint8_t[]> m_cmos_ram;
 	uint8_t m_u56a = 0U;
 	uint8_t m_u56b = 0U;
 	uint8_t m_g_to_s_latch1 = 0U;
@@ -78,8 +78,8 @@ private:
 	uint8_t m_s_to_g_latch2 = 0U;
 	uint8_t m_dac_msb = 0U;
 	uint8_t m_tms_data = 0U;
-	std::unique_ptr<uint8_t[]> m_fdt_a{};
-	std::unique_ptr<uint8_t[]> m_fdt_b{};
+	std::unique_ptr<uint8_t[]> m_fdt_a;
+	std::unique_ptr<uint8_t[]> m_fdt_b;
 
 	struct line_buffer_t
 	{
@@ -98,8 +98,8 @@ private:
 	int m_video_firq_en = 0;
 	emu_timer *m_hblank_end_timer = nullptr;
 	emu_timer *m_hblank_start_timer = nullptr;
-	std::unique_ptr<uint8_t[]> m_fig_scale_table{};
-	std::unique_ptr<uint8_t[]> m_scale_table{};
+	std::unique_ptr<uint8_t[]> m_fig_scale_table;
+	std::unique_ptr<uint8_t[]> m_scale_table;
 	int m_video_firq = 0;
 	uint8_t m_bg_intensity = 0;
 	void uart_w(offs_t offset, uint8_t data);

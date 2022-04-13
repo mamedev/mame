@@ -389,43 +389,43 @@ public:
 	}
 
 	/* sprite states */
-	uint8_t m_sprite_comparitor_enable_mask;
-	uint8_t m_sprite_dma_reload_mask;
-	uint8_t m_sprite_dma_live_mask;
-	uint8_t m_sprite_ctl_written;
-	uint32_t m_sprite_shiftreg[8];
-	uint8_t m_sprite_remain[8];
+	uint8_t m_sprite_comparitor_enable_mask = 0;
+	uint8_t m_sprite_dma_reload_mask = 0;
+	uint8_t m_sprite_dma_live_mask = 0;
+	uint8_t m_sprite_ctl_written = 0;
+	uint32_t m_sprite_shiftreg[8]{};
+	uint8_t m_sprite_remain[8]{};
 
 	/* copper states */
-	uint32_t m_copper_pc;
-	uint8_t m_copper_waiting;
-	uint8_t m_copper_waitblit;
-	uint16_t m_copper_waitval;
-	uint16_t m_copper_waitmask;
-	uint16_t m_copper_pending_offset;
-	uint16_t m_copper_pending_data;
-	int m_wait_offset;
+	uint32_t m_copper_pc = 0;
+	uint8_t m_copper_waiting = 0;
+	uint8_t m_copper_waitblit = 0;
+	uint16_t m_copper_waitval = 0;
+	uint16_t m_copper_waitmask = 0;
+	uint16_t m_copper_pending_offset = 0;
+	uint16_t m_copper_pending_data = 0;
+	int m_wait_offset = 0;
 
 	/* playfield states */
-	int m_last_scanline;
+	int m_last_scanline = 0;
 	rgb_t m_ham_color;
 
 	/* misc states */
-	uint16_t m_genlock_color;
+	uint16_t m_genlock_color = 0;
 
 	/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
 	// FIXME: we instantiate 256 entries so that it pleases AGA
 	uint8_t m_separate_bitplanes[2][256];
 
 	/* aga */
-	int m_aga_diwhigh_written;
-	rgb_t m_aga_palette[256];
-	rgb_t m_aga_ehb_palette[32 + 32];
-	uint64_t m_aga_bpldat[8];
-	uint16_t m_aga_sprdata[8][4];
-	uint16_t m_aga_sprdatb[8][4];
-	int m_aga_sprite_fetched_words;
-	int m_aga_sprite_dma_used_words[8];
+	int m_aga_diwhigh_written = 0;
+	rgb_t m_aga_palette[256]{};
+	rgb_t m_aga_ehb_palette[32 + 32]{};
+	uint64_t m_aga_bpldat[8]{};
+	uint16_t m_aga_sprdata[8][4]{};
+	uint16_t m_aga_sprdatb[8][4]{};
+	int m_aga_sprite_fetched_words = 0;
+	int m_aga_sprite_dma_used_words[8]{};
 
 	DECLARE_VIDEO_START( amiga );
 	DECLARE_VIDEO_START( amiga_aga );
@@ -499,10 +499,10 @@ public:
 		HBLANK = 186
 	};
 
-	emu_timer *m_blitter_timer;
+	emu_timer *m_blitter_timer = nullptr;
 
-	uint16_t m_agnus_id;
-	uint16_t m_denise_id;
+	uint16_t m_agnus_id = 0;
+	uint16_t m_denise_id = 0;
 
 	void blitter_setup();
 
@@ -610,10 +610,10 @@ protected:
 	memory_array m_chip_ram;
 	uint32_t m_chip_ram_mask;
 
-	int m_cia_0_irq;
-	int m_cia_1_irq;
+	int m_cia_0_irq = 0;
+	int m_cia_1_irq = 0;
 
-	uint16_t m_custom_regs[256];
+	uint16_t m_custom_regs[256]{};
 	static const char *const s_custom_reg_names[0x100];
 
 	void ocs_map(address_map &map);
@@ -705,9 +705,9 @@ private:
 	int m_centronics_perror;
 	int m_centronics_select;
 
-	emu_timer *m_irq_timer;
-	emu_timer *m_serial_timer;
-	emu_timer *m_scanline_timer;
+	emu_timer *m_irq_timer = nullptr;
+	emu_timer *m_serial_timer = nullptr;
+	emu_timer *m_scanline_timer = nullptr;
 
 	bool m_gayle_reset;
 
@@ -725,10 +725,10 @@ private:
 	int m_tx_state;
 	int m_rx_previous;
 
-	int m_rs232_dcd;
-	int m_rs232_dsr;
-	int m_rs232_ri;
-	int m_rs232_cts;
+	int m_rs232_dcd = 0;
+	int m_rs232_dsr = 0;
+	int m_rs232_ri = 0;
+	int m_rs232_cts = 0;
 
 	void serial_adjust();
 	void serial_shift();

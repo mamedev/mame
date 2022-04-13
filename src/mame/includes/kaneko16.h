@@ -201,7 +201,7 @@ private:
 	optional_shared_ptr<u16> m_bg15_scroll;
 	required_device<palette_device> m_bgpalette;
 
-	bitmap_ind16 m_bg15_bitmap[32]{};
+	bitmap_ind16 m_bg15_bitmap[32];
 
 	u8 bg15_select_r();
 	void bg15_select_w(u8 data);
