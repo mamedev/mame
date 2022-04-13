@@ -12,6 +12,7 @@
     CF card has a Linux partition, partially bootable with m55hipl driver.
 	- starts with a "LILO boot", fails with a recoverable "undefined video mode" 
 	  (press RETURN or SPACE);
+	- Shows being a "Red Hat Linux 3.2.2-5" distro;
 	- Has pretty verbose terminal log, checks PnP, USB, Pentium f0 0f bug, 
 	  assumes "33 MHz system bus" for IDE PIO mode, returns PIIX only during PCI scan 
 	  (that's what m55hipl has as default);
