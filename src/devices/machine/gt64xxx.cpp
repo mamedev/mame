@@ -28,7 +28,7 @@
 
 #define TIMER_PERIOD        attotime::from_hz(clock())
 #define PCI_BUS_CLOCK       33000000
-// Number of dma dwords to transfer at a time, real hardware configurable between 8-32
+// Number of dma words (32 bits) to transfer at a time, real hardware configurable between 8-32
 #define DMA_BURST_SIZE      32
 // DMA will transfer up to DMA_BURST_SIZE*4 bytes every DMA_TIMER_PERIOD seconds
 #define DMA_TIMER_PERIOD    attotime::from_hz(PCI_BUS_CLOCK / 64)
