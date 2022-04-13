@@ -482,7 +482,7 @@ static const nes_mmc mmc_list[] =
 	// 444 NC7000M multicart
 	// 445 DG574B MMC3-compatible multicart
 	// 446 Mindkids SMD172B_FPGA board
-	// 447 VRC4-based KL-06 multicart
+	{ 447, BMC_KL06 },
 	// 448 VRC4-based 830768C multicart
 	// 449 Super Games King multicart
 	// 450 VRC2-based YY841157C multicart
@@ -506,7 +506,7 @@ static const nes_mmc mmc_list[] =
 	{ 525, KAISER_KS7021A },       // GetsuFumaDen pirate (and maybe a Contra?)
 	// 526 sangochu clone not yet in nes.xml?
 	{ 527, UNL_AX40G },            // Fudou Myouou Den pirate
-	// 528 1995 New Series Super 2-in-1 multicart not in nes.xml
+	{ 528, BMC_831128C },          // 1995 New Series Super 2-in-1
 	{ 529, UNL_T230 },             // Datach Dragon Ball Z IV bootleg
 	{ 530, UNL_AX5705 },           // Super Mario Bros Pocker Mali
 	// 531 Used by Asder PC-95 Famicom clone built into a keyboard

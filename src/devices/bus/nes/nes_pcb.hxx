@@ -150,7 +150,6 @@ static const nes_pcb pcb_list[] =
 	{ "waixing_h1",       WAIXING_TYPE_H1 },
 	{ "waixing_i",        WAIXING_TYPE_I },
 	{ "waixing_j",        WAIXING_TYPE_J },
-	{ "waixing_sgz",      WAIXING_SGZ },
 	{ "waixing_sgzlz",    WAIXING_SGZLZ },
 	{ "waixing_sec",      WAIXING_SECURITY },
 	{ "waixing_ffv",      WAIXING_FFV },
@@ -164,7 +163,6 @@ static const nes_pcb pcb_list[] =
 	{ "yoko",             YOKO_BOARD },
 	{ "hengg_srich",      HENGG_SRICH },
 	{ "hengg_xhzs",       HENGG_XHZS },
-	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
 	{ "hes",              HES_BOARD },
 	{ "ks106c",           KAISER_KS106C },  // mapper 352
 	{ "ks202",            KAISER_KS202 },   // mapper 56
@@ -201,12 +199,24 @@ static const nes_pcb pcb_list[] =
 	{ "cc21",             UNL_CC21 },
 	{ "xiaozy",           UNL_XIAOZY },
 	{ "edu2k",            UNL_EDU2K },
-	{ "t230",             UNL_T230 },
 	{ "jy830623c",        UNL_JY830623C },
 	{ "zemina",           ZEMINA_BOARD },
-	// misc bootleg boards
+	// misc VRC clone boards
+	{ "btl_2yudb",        BTL_2YUDB },
+	{ "btl_900218",       BTL_900218 },  // pirate The Lord of King
 	{ "ax40g",            UNL_AX40G },
 	{ "ax5705",           UNL_AX5705 },
+	{ "bmc_830506c",      BMC_830506C },
+	{ "bmc_831128c",      BMC_831128C },
+	{ "bmc_kl06",         BMC_KL06 },
+	{ "unl_cfight",       UNL_CITYFIGHT },
+	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
+	{ "sgpipe",           BTL_SHUIGUAN },
+	{ "t230",             UNL_T230 },
+	{ "tf1201",           UNL_TF1201 },
+	{ "th21311",          UNL_TH21311 },
+	{ "waixing_sgz",      WAIXING_SGZ },
+	// misc bootleg boards
 	{ "sc127",            UNL_SC127 },
 	{ "mariobaby",        BTL_MARIOBABY },
 	{ "asnicol",          BTL_AISENSHINICOL },
@@ -218,8 +228,6 @@ static const nes_pcb pcb_list[] =
 	{ "smb2jb",           BTL_SMB2JB },
 	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
-	{ "btl_2yudb",        BTL_2YUDB },
-	{ "btl_900218",       BTL_900218 },  // pirate The Lord of King
 	{ "09034a",           BTL_09034A },
 	{ "l001",             BTL_L001 },
 	{ "batmanfs",         BTL_BATMANFS },
@@ -266,7 +274,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_810544c",      BMC_810544C },
 	{ "bmc_82ab",         BMC_82AB },
 	{ "bmc_830425c",      BMC_830425C },
-	{ "bmc_830506c",      BMC_830506C },
 	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
 	{ "bmc_891227",       BMC_891227 },
@@ -386,12 +393,8 @@ static const nes_pcb pcb_list[] =
 	{ "unl_lh53",         UNL_LH53 },
 	{ "unl_ac08",         UNL_AC08 },
 	{ "unl_malisb",       UNL_MALISB },
-	{ "sgpipe",           BTL_SHUIGUAN },
 	{ "rt01",             UNL_RT01 },   // Russian Test Cart
 	{ "unl_43272",        UNL_43272 },
-	{ "tf1201",           UNL_TF1201 },
-	{ "th21311",          UNL_TH21311 },
-	{ "unl_cfight",       UNL_CITYFIGHT },
 	{ "ninjaryu",         UNL_NINJARYU },
 	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II
 	{ "nocash_nochr",     NOCASH_NOCHR },
