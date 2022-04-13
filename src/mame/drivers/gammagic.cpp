@@ -13,10 +13,11 @@ TODO:
   Should be a m55hipl with CD-ROM as bootable option, m55-04ns and m55-04s doesn't cope with
   this requirement, dump mentions using El Torito specs at offset 0x8801.
 - CD-ROM dumps are unreadable by DOS ("not High Sierra or ISO9660"),
-  both dumps have FAT filesystem (cfr. gammagic at 0x1d90e00) and MS Joilet directories (0x4b000),
-  and doesn't seem to have valid boot/volume descriptors on top, likely missing the first 150
-  sectors from the dumps.
-  .cue also sports a single data track with 2 seconds pregap, which backs up this theory ...
+  .cue sports a single data track with 2 seconds pregap, extracting the CD and editing
+  the .cue to remove the pregap makes it mountable, is it a chd issue or dump mistake?
+- Missing 68k dump portion.
+  Very unlikely it transfers code from serial, and CD-ROM dump doesn't have any clear file that
+  would indicate a code transfer or an handshake between main and sub CPUs;
 
 ===================================================================================================
 
@@ -30,11 +31,13 @@ V8000 platform includes:
 
 1 Motherboard MICRONICS M55Hi-Plus PCI/ISA, Chipset INTEL i430HX (TRITON II), 64 MB Ram (4 SIMM M x 16 MB SIMM)
 On board Sound Blaster Vibra 16C chipset.
+    [has optional ESS references in dump -AS]
 1 TOSHIBA CD-ROM or DVD-ROM Drive w/Bootable CD-ROM with Game.
 1 OAK SVGA PCI Video Board.
 1 Voodoo Graphics PCI Video Board, connected to the monitor.
-  [Voodoo 1 or 2 according to strings in dump -AS]
+    [Voodoo 1 or 2 according to strings in dump -AS]
 1 21" SVGA Color Monitor, 16x9 Aspect, Vertical mount, with touchscreen.
+    [running at 50Hz with option for 60Hz declared in config file -AS]
 1 Bally's IO-Board, Based on 68000 procesor as interface to all gaming devices
 (Buttons, Lamps, Switches, Coin acceptor, Bill Validator, Hopper, Touchscreen, etc...)
 
@@ -126,6 +129,10 @@ ROM_START( gammagic )
 	// TODO: specs mentions a m55hipl compatible BIOS, this is 5HX29
 	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, BAD_DUMP CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
 
+	ROM_REGION(0x20000, "v8000", 0)
+	// 68k code, unknown size/number of roms
+	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
+
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gammagic", 0, BAD_DUMP SHA1(caa8fc885d84dbc07fb0604c76cd23c873a65ce6) )
 ROM_END
@@ -141,6 +148,10 @@ ROM_START( 99bottles )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 	// TODO: specs mentions a m55hipl compatible BIOS, this is 5HX29
 	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, BAD_DUMP CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
+
+	ROM_REGION(0x20000, "v8000", 0)
+	// 68k code, unknown size/number of roms
+	ROM_LOAD("v8000.bin", 0x0000, 0x20000, NO_DUMP)
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "99bottles", 0, BAD_DUMP SHA1(0b874178c8dd3cfc451deb53dc7936dc4ad5a04f))
