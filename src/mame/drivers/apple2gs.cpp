@@ -2619,9 +2619,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 					(m_rombank ? 0x02 : 0x00) |
 					(m_intcxrom ? 0x01 : 0x00);
 
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			// todo: does reading these on the IIgs also trigger the joysticks?
+		case 0x70:	// PTRIG - triggers paddles on read or write
 			if (!machine().side_effects_disabled())
 			{
 				// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
@@ -2653,7 +2651,11 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			}
 
 			return m_rom[offset + 0x3c000];
-			break;
+
+		// The ROM IRQ vectors point here
+		case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
+		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
+			return m_rom[offset + 0x3c000];
 
 		default:
 			do_io(offset);
