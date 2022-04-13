@@ -114,7 +114,7 @@ static const nes_mmc mmc_list[] =
 	{ 79, AVE_NINA06 },
 	{ 80, TAITO_X1_005 },
 	{ 81, NTDEC_N715021 }, // 81 Super Gun
-	{ 82, TAITO_X1_017 },
+	// 82 Taito X1-017 mapper for old mis-ordered PRG dumps
 	{ 83, CONY_BOARD },
 	// 84 Pasofami hacked images?
 	{ 85, KONAMI_VRC7 },
@@ -529,7 +529,7 @@ static const nes_mmc mmc_list[] =
 	{ 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
 	{ 550, BMC_JY820845C },
 	{ 551, JNCOTA_KT1001 },
-	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
+	{ 552, TAITO_X1_017 },
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
 	{ 555, STD_EVENT2 },
