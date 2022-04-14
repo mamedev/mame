@@ -197,6 +197,7 @@
 #include "machine/pci.h"
 #include "machine/gt64xxx.h"
 #include "machine/pci-ide.h"
+#include "bus/ata/idehd.h"
 #include "video/voodoo_pci.h"
 #include "screen.h"
 
@@ -443,6 +444,8 @@ private:
 	void widget_cs3_map(address_map &map);
 	void carnevil_cs3_map(address_map &map);
 	void flagstaff_cs3_map(address_map &map);
+
+	static void hdd_config(device_t* device);
 };
 
 /*************************************
@@ -454,7 +457,7 @@ private:
 void seattle_state::machine_start()
 {
 	// set the fastest DRC options, but strict verification
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY);
 
 	// configure fast RAM regions
 //  m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
@@ -905,7 +908,7 @@ uint32_t seattle_state::carnevil_gun_r(offs_t offset)
 
 void seattle_state::carnevil_gun_w(offs_t offset, uint32_t data)
 {
-	logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
+	//logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
 }
 
 /*************************************
@@ -1013,7 +1016,7 @@ void seattle_state::output_w(uint32_t data)
 	}
 	else if (!BIT(data, 9) || !BIT(data, 8))
 	{
-		logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
+		//logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -2024,6 +2027,7 @@ void seattle_state::seattle_common(machine_config &config)
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
 	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
 	ide.set_legacy_top(0x0a0);
+	ide.subdevice<bus_master_ide_controller_device>("ide")->slot(0).set_option_machine_config("hdd", hdd_config);
 
 	// video hardware
 	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
@@ -2045,6 +2049,11 @@ void seattle_state::seattle_common(machine_config &config)
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
 }
 
+void seattle_state::hdd_config(device_t* device)
+{
+	// Set the disk dma transfer speed
+	static_cast<ide_hdd_device*>(device)->set_dma_transfer_time(attotime::from_usec(15));
+}
 
 void seattle_state::phoenix(machine_config &config)
 {
