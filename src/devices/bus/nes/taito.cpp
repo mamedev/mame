@@ -66,8 +66,8 @@ nes_x1_005_device::nes_x1_005_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_x1_017_device::nes_x1_017_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_X1_017, tag, owner, clock), m_latch(0)
+nes_x1_017_device::nes_x1_017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_X1_017, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
@@ -125,6 +125,13 @@ void nes_x1_005_device::pcb_reset()
 void nes_x1_017_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_count_latch));
+
 	save_item(NAME(m_latch));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_mmc_vrom_bank));
@@ -137,14 +144,17 @@ void nes_x1_017_device::device_start()
 
 void nes_x1_017_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 
+	m_irq_enable = 0;
+	m_irq_count = 0;
+	m_irq_count_latch = 0;
+
 	m_latch = 0;
-	memset(m_reg, 0, sizeof(m_reg));
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
+	m_reg[0] = m_reg[1] = m_reg[2] = 0;
+	std::fill(std::begin(m_mmc_vrom_bank), std::end(m_mmc_vrom_bank), 0x00);
 }
 
 
@@ -279,9 +289,6 @@ void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, uint8_t data)
  Actually, Fudou Myouou Den uses a variant of the board with
  CIRAM, making necessary two distinct mappers & pcb_id.
 
- Also, we miss to emulate the security check at 0x7ef8 / 0x7ef9
- and the 0x80 ram!
-
  iNES: mappers 80 & 207
 
  -------------------------------------------------*/
@@ -364,37 +371,42 @@ uint8_t nes_x1_005_device::read_m(offs_t offset)
 
  Taito X1-017 board emulation
 
- We miss to emulate the security check at 0x6000-0x73ff
- and the ram!
-
  Games: Kyuukyoku Harikiri Koushien, Kyuukyoku Harikiri
- Stadium, SD Keiji - Blader
+ Stadium 3, Kyuukyoku Harikiri - Heisei Gannenban,
+ SD Keiji - Blader
 
- iNES: mapper 82
+ NES 2.0: mapper 552 (old mapper 82 are mis-ordered bad dumps)
 
- In MESS: Supported.
+ In MAME: Supported.
+
+ TODO: KH Koushien seems to be working except it needs to
+ be reset once with a new NVRAM file. KH Heisei won't
+ load "Single Game" menu option but other game modes work.
 
  -------------------------------------------------*/
 
+void nes_x1_017_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+{
+	if (id == TIMER_IRQ)
+	{
+		if ((m_irq_enable & 0x05) == 1 && m_irq_count) // counting enabled?
+			m_irq_count--;
+		if (!m_irq_count && BIT(m_irq_enable, 1))
+			set_irq_line(ASSERT_LINE);
+	}
+}
+
 void nes_x1_017_device::set_chr()
 {
-	if (m_latch)
-	{
-		chr2_4(m_mmc_vrom_bank[0] >> 1, CHRROM);
-		chr2_6(m_mmc_vrom_bank[1] >> 1, CHRROM);
-	}
-	else
-	{
-		chr2_0(m_mmc_vrom_bank[0] >> 1, CHRROM);
-		chr2_2(m_mmc_vrom_bank[1] >> 1, CHRROM);
-	}
+	chr2_x(0 ^ m_latch, m_mmc_vrom_bank[0] >> 1, CHRROM);
+	chr2_x(2 ^ m_latch, m_mmc_vrom_bank[1] >> 1, CHRROM);
 	chr1_x(4 ^ m_latch, m_mmc_vrom_bank[2], CHRROM);
 	chr1_x(5 ^ m_latch, m_mmc_vrom_bank[3], CHRROM);
 	chr1_x(6 ^ m_latch, m_mmc_vrom_bank[4], CHRROM);
 	chr1_x(7 ^ m_latch, m_mmc_vrom_bank[5], CHRROM);
 }
 
-void nes_x1_017_device::write_m(offs_t offset, uint8_t data)
+void nes_x1_017_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("x1017 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -406,19 +418,13 @@ void nes_x1_017_device::write_m(offs_t offset, uint8_t data)
 		case 0x1ef3:
 		case 0x1ef4:
 		case 0x1ef5:
-			if (m_mmc_vrom_bank[offset & 0x07] != data)
-			{
-				m_mmc_vrom_bank[offset & 0x07] = data;
-				set_chr();
-			}
+			m_mmc_vrom_bank[offset & 0x07] = data;
+			set_chr();
 			break;
 		case 0x1ef6:
 			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-			if (m_latch != ((data & 0x02) << 1))
-			{
-				m_latch = ((data & 0x02) << 1);
-				set_chr();
-			}
+			m_latch = (data & 0x02) << 1;
+			set_chr();
 			break;
 		case 0x1ef7:
 		case 0x1ef8:
@@ -426,39 +432,54 @@ void nes_x1_017_device::write_m(offs_t offset, uint8_t data)
 			m_reg[(offset & 0x0f) - 7] = data;
 			break;
 		case 0x1efa:
-			prg8_89(data >> 2);
-			break;
 		case 0x1efb:
-			prg8_ab(data >> 2);
-			break;
 		case 0x1efc:
-			prg8_cd(data >> 2);
+			prg8_x((offset & 0x0f) - 0xa, bitswap<6>(data, 0, 1, 2, 3, 4, 5));
 			break;
-		default:
-			logerror("x1017_m_w uncaught write, addr: %04x, value: %02x\n", offset + 0x6000, data);
+		case 0x1efd:
+			m_irq_count_latch = data;
+			break;
+		case 0x1efe:
+			m_irq_enable = data;
+			if (!BIT(m_irq_enable, 0))
+				m_irq_count = m_irq_count_latch ? (m_irq_count_latch + 2) * 16 : 17;
+			if (!BIT(m_irq_enable, 1))
+				set_irq_line(CLEAR_LINE);
+			break;
+		case 0x1eff:
+			set_irq_line(CLEAR_LINE);
+			m_irq_count = m_irq_count_latch ? (m_irq_count_latch + 1) * 16 : 1;
 			break;
 	}
 
 	// 2+2+1 KB of Internal RAM can be independently enabled/disabled!
-	if (offset < 0x0800 && m_reg[0] == 0xca)
-		m_x1_017_ram[0x0000 + (offset & 0x7ff)] = data;
-	if (offset < 0x1000 && m_reg[1] == 0x69)
-		m_x1_017_ram[0x0800 + (offset & 0x7ff)] = data;
-	if (offset < 0x1400 && m_reg[2] == 0x84)
-		m_x1_017_ram[0x1000 + (offset & 0x3ff)] = data;
+	if ((offset < 0x0800 && m_reg[0] == 0xca) ||
+	    (offset < 0x1000 && m_reg[1] == 0x69) ||
+	    (offset < 0x1400 && m_reg[2] == 0x84))
+	{
+		m_x1_017_ram[offset] = data;
+
+		// 1st byte in each 1K page latches most recent read/write from that page
+		m_x1_017_ram[offset & 0x1c00] = data;
+	}
 }
 
-uint8_t nes_x1_017_device::read_m(offs_t offset)
+u8 nes_x1_017_device::read_m(offs_t offset)
 {
 	LOG_MMC(("x1017 read_m, offset: %04x\n", offset));
 
 	// 2+2+1 KB of Internal RAM can be independently enabled/disabled!
-	if (offset < 0x0800 && m_reg[0] == 0xca)
-		return m_x1_017_ram[0x0000 + (offset & 0x7ff)];
-	if (offset < 0x1000 && m_reg[1] == 0x69)
-		return m_x1_017_ram[0x0800 + (offset & 0x7ff)];
-	if (offset < 0x1400 && m_reg[2] == 0x84)
-		return m_x1_017_ram[0x1000 + (offset & 0x3ff)];
+	if ((offset < 0x0800 && m_reg[0] == 0xca) ||
+	    (offset < 0x1000 && m_reg[1] == 0x69) ||
+	    (offset < 0x1400 && m_reg[2] == 0x84))
+	{
+		u8 ret = m_x1_017_ram[offset];
 
-	return get_open_bus();
+		// 1st byte in each 1K page latches most recent read/write from that page
+		m_x1_017_ram[offset & 0x1c00] = ret;
+
+		return ret;
+	}
+
+	return 0; // no open bus behavior due to pull-down resistors
 }

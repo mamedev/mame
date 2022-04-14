@@ -121,7 +121,7 @@ private:
 	u8 m_pri_mask = 0U;
 	u8 m_key_mux = 0U;
 	u8 m_background = 0U;
-	bool m_irq_en = 1;
+	bool m_irq_en = true;
 	u8 m_irq_slow = 0U;
 	u8 m_irq_count = 0U;
 	std::unique_ptr<u8[]> m_vram;

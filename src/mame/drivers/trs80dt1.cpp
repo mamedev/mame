@@ -77,8 +77,8 @@ private:
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 
-	bool m_bow = 0;
-	bool m_cent_busy = 0;
+	bool m_bow = false;
+	bool m_cent_busy = false;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;

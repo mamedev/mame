@@ -34,29 +34,18 @@ const char *meta_data::entry_name(meta_name name)
 	return "";
 }
 
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
+
 meta_type meta_value::type() const
 {
 	std::optional<meta_type> result;
-
-	std::visit([&result](auto &&arg)
+	std::visit(overloaded
 	{
-		using T = std::decay_t<decltype(arg)>;
-		if constexpr (std::is_same_v<T, std::string>)
-		{
-			result = meta_type::string;
-		}
-		else if constexpr (std::is_same_v<T, uint64_t>)
-		{
-			result = meta_type::number;
-		}
-		else if constexpr (std::is_same_v<T, bool>)
-		{
-			result = meta_type::flag;
-		}
-		else if constexpr (std::is_same_v<T, util::arbitrary_datetime>)
-		{
-			result = meta_type::date;
-		}
+		[&result](const std::string &)				{ result = meta_type::string; },
+		[&result](std::uint64_t)					{ result = meta_type::number; },
+		[&result](bool)								{ result = meta_type::flag; },
+		[&result](const util::arbitrary_datetime &)	{ result = meta_type::date; }
 	}, value);
 	return *result;
 }

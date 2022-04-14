@@ -21301,7 +21301,7 @@ license:CC0
 	</software>
 
 	<software name="khkoshn" supported="no">
-		<description>Kyuukyoku Harikiri Koushien (Jpn)</description>
+		<description>Kyuukyoku Harikiri Koushien (Japan)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-KHK-6900 (42)"/>
@@ -21312,7 +21312,7 @@ license:CC0
 			<feature name="pcb" value="TAITO-X1-017" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="131072">
-				<rom name="d23-01" size="131072" crc="265167e1" sha1="9e587587b2685ca1b320bd0a137eedbb6b274797" offset="00000" />
+				<rom name="d23-01" size="131072" crc="f45c0971" sha1="46e76efbd5e2eca206abe80329fbd5df0ef5bc79" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="d23-02" size="262144" crc="63ca0132" sha1="1fd70de7748ec7f42619f182bc8c86573b96abf6" offset="00000" />
@@ -21374,7 +21374,7 @@ license:CC0
 	</software>
 
 	<software name="khstad3">
-		<description>Kyuukyoku Harikiri Stadium III (Jpn)</description>
+		<description>Kyuukyoku Harikiri Stadium III (Japan)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-KHIII-6900 (34)"/>
@@ -21385,7 +21385,7 @@ license:CC0
 			<feature name="pcb" value="TAITO-X1-017" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="131072">
-				<rom name="c75-01" size="131072" crc="49aa5257" sha1="974e0af88ca48d491d34a15661dc45bdba7dbe03" offset="00000" />
+				<rom name="c75-01" size="131072" crc="b15e8be2" sha1="d5047b27e37ec33ed2c4a198aecea3966e032e29" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="c75-02" size="262144" crc="0d6a9893" sha1="079c20f0ba98aa846440e988f2d989b003ee9909" offset="00000" />
@@ -21397,7 +21397,7 @@ license:CC0
 	</software>
 
 	<software name="khstadh" supported="no">
-		<description>Kyuukyoku Harikiri Stadium - Heisei Gannen Ban (Jpn)</description>
+		<description>Kyuukyoku Harikiri Stadium - Heisei Gannen Ban (Japan)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-KHH-6800 (25)"/>
@@ -21408,7 +21408,7 @@ license:CC0
 			<feature name="pcb" value="TAITO-X1-017" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="131072">
-				<rom name="prg-x3-025b" size="131072" crc="4819a595" sha1="4479fe8316d8dec8927d58650d6707a048e2a274" offset="00000" />
+				<rom name="prg-x3-025b" size="131072" crc="c2339468" sha1="1c5c9a192a27b848f3f84f2dffb59b1a30749046" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="chr-x3-026" size="262144" crc="1c36a136" sha1="37d36fcc65b56858a5b5aa628c8c8765b064028a" offset="00000" />
@@ -32467,7 +32467,7 @@ license:CC0
 	</software>
 
 	<software name="sdkeiji">
-		<description>SD Keiji - Blader (Jpn)</description>
+		<description>SD Keiji - Blader (Japan)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-SKB-6400 (39)"/>
@@ -32478,7 +32478,7 @@ license:CC0
 			<feature name="pcb" value="TAITO-X1-017" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="131072">
-				<rom name="c94-01" size="131072" crc="ee711afb" sha1="4a6f0c928e068dd0cdb8b38ff45ade6512191fb2" offset="00000" />
+				<rom name="c94-01" size="131072" crc="40bc248e" sha1="f01de343bd9b6fb4458731b44d385e36d999fc08" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="c94-02" size="131072" crc="1e234045" sha1="98ed114cf467a6f25f7e07d9b045df476e5df790" offset="00000" />
@@ -63396,6 +63396,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="2rugby">
+		<description>1995 New Series Super 2 in 1 (Asia)</description>
+		<year>1995</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="Rugby 2 in 1"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_831128c" />
+			<feature name="pcb_model" value="831128C" />
+			<dataarea name="prg" size="393216">
+				<rom name="1995 new series super 2-in-1.prg" size="393216" crc="327f2ba1" sha1="a3c3f2f9699be3a61b77dc0101957f7fd8ef46b1" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1995 new series super 2-in-1.chr" size="524288" crc="74dd59d8" sha1="f61ca4d902d83fdd3af4da57d615c17764dd47b9" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2s5ej3" supported="no">
 		<description>2 in 1 - Sonic 5 + Earthworm Jim 3 (Asia)</description>
 		<year>19??</year>
@@ -67669,26 +67690,8 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="linzexua" cloneof="linzexu" supported="partial">
-		<description>Lin Ze Xu Jin Yan (Chi, Pal)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<info name="serial" value="ES-1013"/>
-		<info name="alt_title" value="林则徐禁烟"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="lin ze xu jin yan (ch) (pal).chr" size="262144" crc="6a78dd7d" sha1="fad02d23fd55c7351dba5e4ab1dd31db741c6c2e" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="lin ze xu jin yan (ch) (pal).prg" size="262144" crc="f70606cd" sha1="ed6ae1d959bebf5d17f2c663cca97d6d446eee7b" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- to be removed? -->
-	<software name="linzexub" cloneof="linzexu" supported="partial">
+	<software name="linzexua" cloneof="linzexu" supported="partial">
 		<description>Lin Ze Xu Jin Yan (Chi, NTSC fix)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -84356,6 +84359,25 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_860">
+		<description>1993 New 860 in 1 Over-Valued Golden Version Games</description>
+		<year>1993</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_kl06" />
+			<feature name="pcb_model" value="KL-06" />
+			<dataarea name="prg" size="524288">
+				<rom name="1993 new 860-in-1 over-valued golden version games.prg" size="524288" crc="8a929147" sha1="ad5354d3e52f1f3547a05f2fdb20c8058d66860c" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1993 new 860-in-1 over-valued golden version games.chr" size="524288" crc="79d28c56" sha1="fb08a82db2fd7dacb61d8cc2a18323f860c079a9" />
+			</dataarea>
+			<!-- 2k WRAM on cartridge -->
+			<dataarea name="wram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- All games work except Journey to the West which has the same issues as the set jwest -->
 	<software name="mc_9jw" supported="partial">
 		<description>9 in 1 (Journey to the West)</description>
@@ -85687,22 +85709,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mc_s8kr" supported="no">
-		<description>Super 8 in 1 Super Mario Kart Rider</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="super 8 in 1 super mario kart rider.chr" size="131072" crc="6f594503" sha1="72af0c8b30da5ff7270bfa39b84aec3a55cee991" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="super 8 in 1 super mario kart rider.prg" size="131072" crc="d54bf8bd" sha1="c6dd8220efe0c11babaf351f71c9f8ee594dc4e7" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

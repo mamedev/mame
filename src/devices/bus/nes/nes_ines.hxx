@@ -114,7 +114,7 @@ static const nes_mmc mmc_list[] =
 	{ 79, AVE_NINA06 },
 	{ 80, TAITO_X1_005 },
 	{ 81, NTDEC_N715021 }, // 81 Super Gun
-	{ 82, TAITO_X1_017 },
+	// 82 Taito X1-017 mapper for old mis-ordered PRG dumps
 	{ 83, CONY_BOARD },
 	// 84 Pasofami hacked images?
 	{ 85, KONAMI_VRC7 },
@@ -482,7 +482,7 @@ static const nes_mmc mmc_list[] =
 	// 444 NC7000M multicart
 	// 445 DG574B MMC3-compatible multicart
 	// 446 Mindkids SMD172B_FPGA board
-	// 447 VRC4-based KL-06 multicart
+	{ 447, BMC_KL06 },
 	// 448 VRC4-based 830768C multicart
 	// 449 Super Games King multicart
 	// 450 VRC2-based YY841157C multicart
@@ -506,7 +506,7 @@ static const nes_mmc mmc_list[] =
 	{ 525, KAISER_KS7021A },       // GetsuFumaDen pirate (and maybe a Contra?)
 	// 526 sangochu clone not yet in nes.xml?
 	{ 527, UNL_AX40G },            // Fudou Myouou Den pirate
-	// 528 1995 New Series Super 2-in-1 multicart not in nes.xml
+	{ 528, BMC_831128C },          // 1995 New Series Super 2-in-1
 	{ 529, UNL_T230 },             // Datach Dragon Ball Z IV bootleg
 	{ 530, UNL_AX5705 },           // Super Mario Bros Pocker Mali
 	// 531 Used by Asder PC-95 Famicom clone built into a keyboard
@@ -529,7 +529,7 @@ static const nes_mmc mmc_list[] =
 	{ 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
 	{ 550, BMC_JY820845C },
 	{ 551, JNCOTA_KT1001 },
-	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
+	{ 552, TAITO_X1_017 },
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
 	{ 555, STD_EVENT2 },

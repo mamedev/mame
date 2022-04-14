@@ -2,9 +2,9 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        SacState 8008
+SacState 8008
 
-        23/02/2009 Skeleton driver.
+2009-02-23 Skeleton driver.
 
 http://www.digibarn.com/stories/bill-pentz-story/index.html
 

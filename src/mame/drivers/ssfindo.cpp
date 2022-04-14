@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
-/************************************************************************
+/**************************************************************************************************
 
  'RISC PC' hardware
 
@@ -17,10 +17,10 @@ TODO:
  - timing
  - unknown reads/writes
  - improve sound hook up
- - ppcar uses the VIDC internal DAC for SFX and the QS1000 for music. It's configured to use the undumped internal ROM.
+ - ppcar: uses the VIDC internal DAC for SFX and the QS1000 for music.
+   It's configured to use the undumped internal ROM.
 
-
-*************************************************************************************************************
+===================================================================================================
 
 See See Find Out
 Icarus, 1999
@@ -69,7 +69,7 @@ Notes:
                     mounting pads for 4 more of these ROMs but they're not populated.
 
 
-**************************************************************************************************************
+===================================================================================================
 
 Pong Pong Car
 Icarus, 1999
@@ -124,7 +124,7 @@ Notes:
          DU5, DU6   These ROMs are mounted on a small plug-in daughterboard. There are additional
                     mounting pads for 4 more of these ROMs but they're not populated.
 
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
@@ -235,7 +235,7 @@ private:
 	uint32_t tetfight_unk_r();
 };
 
-//TODO: eeprom  24c01 & 24c02
+// TODO: eeprom  24c01 & 24c02
 // TODO: untangle, kill hacks
 uint8_t ssfindo_state::iolines_r()
 {
@@ -616,8 +616,8 @@ void ssfindo_state::ssfindo(machine_config &config)
 	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
 	qs1000.set_external_rom(true);
 	// qs1000.p1_out().set(FUNC()); // TODO: writes something here
-	qs1000.add_route(0, "lspeaker", 1.0);
-	qs1000.add_route(1, "rspeaker", 1.0);
+	qs1000.add_route(0, "lspeaker", 0.25);
+	qs1000.add_route(1, "rspeaker", 0.25);
 }
 
 void ssfindo_state::ppcar(machine_config &config)
@@ -740,4 +740,4 @@ void tetfight_state::init_tetfight()
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo_state,  init_ssfindo,  ROT0, "Icarus", "See See Find Out", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ssfindo_state,  init_ppcar,    ROT0, "Icarus", "Pang Pang Car",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, tetfight,0,        tetfight, tetfight, tetfight_state, init_tetfight, ROT0, "Sego",   "Tetris Fighters",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, tetfight,0,        tetfight, tetfight, tetfight_state, init_tetfight, ROT0, "Sego",   "Tetris Fighters",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // severe frame hiccups

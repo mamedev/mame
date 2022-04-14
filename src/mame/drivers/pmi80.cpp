@@ -67,8 +67,8 @@ private:
 	void mem_map(address_map &map);
 
 	uint8_t m_keyrow = 0U;
-	bool m_ledready = 0;
-	bool m_cassbit = 0,m_cassold = 0;
+	bool m_ledready = false;
+	bool m_cassbit = false, m_cassold = false;
 	u16 m_cass_cnt = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

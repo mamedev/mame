@@ -242,7 +242,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("waixing_h1",       NES_WAIXING_H1);   // FIXME: Made up boards the different WRAM protect banks (see Shen Mi Jin San Jiao)
 	device.option_add_internal("waixing_i",        NES_WAIXING_I);
 	device.option_add_internal("waixing_j",        NES_WAIXING_J);
-	device.option_add_internal("waixing_sgz",      NES_WAIXING_SGZ);
 	device.option_add_internal("waixing_sgzlz",    NES_WAIXING_SGZLZ);
 	device.option_add_internal("waixing_sec",      NES_WAIXING_SEC);
 	device.option_add_internal("waixing_ffv",      NES_WAIXING_FFV);
@@ -256,7 +255,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("yoko",             NES_YOKO);
 	device.option_add_internal("hengg_srich",      NES_HENGG_SRICH);
 	device.option_add_internal("hengg_xhzs",       NES_HENGG_XHZS);
-	device.option_add_internal("hengg_shjy3",      NES_HENGG_SHJY3); // mapper 253
 	device.option_add_internal("hes",              NES_HES);
 	device.option_add_internal("ks106c",           NES_KS106C);     // mapper 352
 	device.option_add_internal("ks202",            NES_KS202);      // mapper 56
@@ -293,18 +291,12 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("cc21",             NES_CC21);
 	device.option_add_internal("xiaozy",           NES_XIAOZY);
 	device.option_add_internal("edu2k",            NES_EDU2K);
-	device.option_add_internal("t230",             NES_T230);
 	device.option_add_internal("jy830623c",        NES_JY830623C);
 	device.option_add_internal("unl_43272",        NES_43272);     // used in Gaau Hok Gwong Cheung
-	device.option_add_internal("tf1201",           NES_TF1201);
-	device.option_add_internal("th21311",          NES_TH21311);
-	device.option_add_internal("unl_cfight",       NES_CITYFIGHT); // used by City Fighter IV
 	device.option_add_internal("ninjaryu",         NES_NINJARYU);  // used by Ninja Ryukenden Chinese
 	device.option_add_internal("unl_eh8813a",      NES_EH8813A);   // used by Dr. Mario II
 	device.option_add_internal("zemina",           NES_ZEMINA);    // mapper 190 - Magic Kid GooGoo
 // misc bootleg boards
-	device.option_add_internal("ax40g",            NES_AX40G);
-	device.option_add_internal("ax5705",           NES_AX5705);
 	device.option_add_internal("sc127",            NES_SC127);
 	device.option_add_internal("mariobaby",        NES_MARIOBABY);
 	device.option_add_internal("asnicol",          NES_ASN);
@@ -316,8 +308,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
 	device.option_add_internal("yung08",           NES_YUNG08);
 	device.option_add_internal("btl_0353",         NES_0353);       // used by Lucky (Roger) Rabbit FDS conversion
-	device.option_add_internal("btl_2yudb",        NES_2YUDB);
-	device.option_add_internal("btl_900218",       NES_900218);
 	device.option_add_internal("09034a",           NES_09034A);
 	device.option_add_internal("l001",             NES_L001);
 	device.option_add_internal("batmanfs",         NES_BATMANFS);
@@ -336,7 +326,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("unl_lh51",         NES_LH51);       // used in Ai Senshi Nicol alt FDS conversion
 	device.option_add_internal("unl_lh53",         NES_LH53);       // used in Nazo no Murasamejou (FDS Conversion)
 	device.option_add_internal("unl_ac08",         NES_AC08);       // used by Green Beret FDS conversion
-	device.option_add_internal("sgpipe",           NES_SHUIGUAN);   // mapper 183
 	device.option_add_internal("rt01",             NES_RT01);
 // misc MMC3 clone boards
 	device.option_add_internal("dbz5",             NES_REX_DBZ5);
@@ -367,6 +356,21 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("sachen_shero",     NES_SACHEN_SHERO);
 	device.option_add_internal("sachen_zgdh",      NES_SACHEN_ZGDH);
 	device.option_add_internal("a9746",            NES_A9746); // mapper 219
+// misc VRC clone boards
+	device.option_add_internal("btl_2yudb",        NES_2YUDB);
+	device.option_add_internal("btl_900218",       NES_900218);
+	device.option_add_internal("ax40g",            NES_AX40G);
+	device.option_add_internal("ax5705",           NES_AX5705);
+	device.option_add_internal("bmc_830506c",      NES_BMC_830506C);
+	device.option_add_internal("bmc_831128c",      NES_BMC_831128C);
+	device.option_add_internal("bmc_kl06",         NES_BMC_KL06);
+	device.option_add_internal("unl_cfight",       NES_CITYFIGHT); // used by City Fighter IV
+	device.option_add_internal("hengg_shjy3",      NES_HENGG_SHJY3); // mapper 253
+	device.option_add_internal("sgpipe",           NES_SHUIGUAN);   // mapper 183
+	device.option_add_internal("t230",             NES_T230);
+	device.option_add_internal("tf1201",           NES_TF1201);
+	device.option_add_internal("th21311",          NES_TH21311);
+	device.option_add_internal("waixing_sgz",      NES_WAIXING_SGZ);
 // misc multigame cart boards
 	device.option_add_internal("benshieng",        NES_BENSHIENG);
 	device.option_add_internal("action52",         NES_ACTION52);
@@ -387,7 +391,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_810544c",      NES_BMC_810544C);
 	device.option_add_internal("bmc_82ab",         NES_BMC_82AB);
 	device.option_add_internal("bmc_830425c",      NES_BMC_830425C);
-	device.option_add_internal("bmc_830506c",      NES_BMC_830506C);
 	device.option_add_internal("bmc_830928c",      NES_BMC_830928C);
 	device.option_add_internal("bmc_850437c",      NES_BMC_850437C);
 	device.option_add_internal("bmc_891227",       NES_BMC_891227);

@@ -159,10 +159,10 @@ private:
 	required_region_ptr<uint8_t> m_char_rom;
 	required_ioport m_battery;
 
-	uint8_t m_ip;
-	uint8_t m_ie;
-	uint16_t m_counter;
-	int m_rom_b;
+	uint8_t m_ip = 0;
+	uint8_t m_ie = 0;
+	uint16_t m_counter = 0;
+	int m_rom_b = 0;
 };
 
 
