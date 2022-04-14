@@ -485,7 +485,10 @@ private:
 void vegas_state::machine_start()
 {
 	/* set the fastest DRC options, but strict verification */
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	/* need to check the current options since some drivers add options in their init */
+	uint32_t new_options = m_maincpu->mips3drc_get_options();
+	new_options |= MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY;
+	m_maincpu->mips3drc_set_options(new_options);
 
 	m_system_led.resolve();
 	m_wheel_driver.resolve();
@@ -2034,14 +2037,14 @@ void vegas_state::denver(machine_config &config)
 	m_uart2->out_rts_callback().set("ttys02", FUNC(rs232_port_device::write_rts));
 	m_uart2->out_int_callback().set("duart_irq", FUNC(input_merger_device::in_w<1>));
 
-	rs232_port_device &ttys01(RS232_PORT(config, "ttys01", 0));
+	rs232_port_device &ttys01(RS232_PORT(config, "ttys01", default_rs232_devices, nullptr));
 	ttys01.rxd_handler().set(m_uart1, FUNC(ins8250_uart_device::rx_w));
 	ttys01.dcd_handler().set(m_uart1, FUNC(ins8250_uart_device::dcd_w));
 	ttys01.dsr_handler().set(m_uart1, FUNC(ins8250_uart_device::dsr_w));
 	ttys01.ri_handler().set(m_uart1, FUNC(ins8250_uart_device::ri_w));
 	ttys01.cts_handler().set(m_uart1, FUNC(ins8250_uart_device::cts_w));
 
-	rs232_port_device &ttys02(RS232_PORT(config, "ttys02", 0));
+	rs232_port_device &ttys02(RS232_PORT(config, "ttys02", default_rs232_devices, nullptr));
 	ttys02.rxd_handler().set(m_uart2, FUNC(ins8250_uart_device::rx_w));
 	ttys02.dcd_handler().set(m_uart2, FUNC(ins8250_uart_device::dcd_w));
 	ttys02.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
@@ -2621,11 +2624,13 @@ void vegas_state::init_roadburn()
 
 void vegas_state::init_nbashowt()
 {
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 }
 
 
 void vegas_state::init_nbanfl()
 {
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 	// The first three bytes of the blitz00_nov30_1999.u27 ROM are FF's which breaks the reset vector.
 	// These bytes are from blitz00_sep22_1999.u27 which allows the other ROM to start.
 	// The last byte which is part of the checksum is also FF. By changing it to 0x01 the 4 byte checksum matches with the other 3 changes.
@@ -2639,6 +2644,7 @@ void vegas_state::init_nbanfl()
 
 void vegas_state::init_nbagold()
 {
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 }
 
 
